@@ -112,14 +112,14 @@ const AITutor = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <Card className="bg-gray-800 border-gray-700">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between text-white">
+          <CardTitle className="flex items-center justify-between">
             <span className="flex items-center space-x-2">
               <span className="text-2xl">🎓</span>
               <span>AI Lærer - Personlig Tutor</span>
             </span>
-            <Badge variant="outline" className="bg-green-900/50 text-green-400 border-green-600">
+            <Badge variant="outline" className="bg-green-100 text-green-800">
               GPT-4o + ElevenLabs Dansk
             </Badge>
           </CardTitle>
@@ -132,8 +132,8 @@ const AITutor = () => {
                 variant={currentSubject === subject.id ? "default" : "outline"}
                 className={`flex flex-col space-y-1 h-auto py-3 ${
                   currentSubject === subject.id 
-                    ? "bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white" 
-                    : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+                    ? "bg-red-600 hover:bg-red-700 text-white" 
+                    : "hover:bg-red-50 hover:text-red-700"
                 }`}
                 onClick={() => setCurrentSubject(subject.id)}
               >
@@ -145,9 +145,9 @@ const AITutor = () => {
         </CardContent>
       </Card>
 
-      <Card className="h-96 bg-gray-800 border-gray-700">
+      <Card className="h-96">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-white">Chat med din AI lærer</CardTitle>
+          <CardTitle className="text-lg">Chat med din AI lærer</CardTitle>
         </CardHeader>
         <CardContent className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto space-y-4 mb-4">
@@ -159,8 +159,8 @@ const AITutor = () => {
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white'
-                      : 'bg-gray-700 text-gray-100'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   <p className="text-sm">{message.content}</p>
@@ -179,13 +179,13 @@ const AITutor = () => {
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Skriv dit spørgsmål her..."
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-400"
+              className="flex-1"
             />
             <Button
               variant="outline"
               size="icon"
               onClick={toggleListening}
-              className={`border-gray-600 ${isListening ? "bg-green-900/50 text-green-400 border-green-600" : "bg-gray-700 text-gray-300 hover:bg-gray-600"}`}
+              className={isListening ? "bg-red-100 text-red-600" : ""}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
@@ -193,19 +193,19 @@ const AITutor = () => {
               variant="outline"
               size="icon"
               onClick={isSpeaking ? stopSpeaking : () => {}}
-              className={`border-gray-600 ${isSpeaking ? "bg-blue-900/50 text-blue-400 border-blue-600" : "bg-gray-700 text-gray-300"}`}
+              className={isSpeaking ? "bg-blue-100 text-blue-600" : ""}
               disabled={!isSpeaking}
             >
               {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </Button>
-            <Button onClick={handleSendMessage} size="icon" className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600">
+            <Button onClick={handleSendMessage} size="icon" className="bg-red-600 hover:bg-red-700">
               <Send className="w-4 h-4" />
             </Button>
           </div>
 
           {isListening && (
             <div className="mt-2 text-center">
-              <Badge variant="outline" className="bg-green-900/50 text-green-400 border-green-600 animate-pulse">
+              <Badge variant="outline" className="bg-red-50 text-red-600 animate-pulse">
                 🎤 Lytter... Tal nu!
               </Badge>
             </div>
