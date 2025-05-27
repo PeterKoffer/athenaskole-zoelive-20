@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +10,6 @@ import AITutor from "@/components/AITutor";
 import GameHub from "@/components/GameHub";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
-
 const Index = () => {
   const [user, setUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -22,14 +20,11 @@ const Index = () => {
     engelsk: 72,
     naturteknik: 58
   });
-
-  const handleLogin = (userData) => {
+  const handleLogin = userData => {
     setUser(userData);
     setShowAuth(false);
   };
-
-  return (
-    <div className="min-h-screen bg-gray-900">
+  return <div className="min-h-screen bg-gray-900">
       {/* Dark NFT-style Header */}
       <header className="bg-gray-900 border-b border-gray-800 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
@@ -45,8 +40,7 @@ const Index = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              {user ? (
-                <>
+              {user ? <>
                   <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
                     <Coins className="w-4 h-4 text-lime-400" />
                     <span className="font-semibold text-white">{learekroner} Lære-Kroner</span>
@@ -57,24 +51,16 @@ const Index = () => {
                     </div>
                     <span className="text-white">Hej, {user.name}!</span>
                   </div>
-                </>
-              ) : (
-                <Button 
-                  variant="secondary" 
-                  onClick={() => setShowAuth(true)}
-                  className="bg-lime-400 text-gray-900 hover:bg-lime-500 border-lime-400"
-                >
+                </> : <Button variant="secondary" onClick={() => setShowAuth(true)} className="bg-lime-400 text-gray-900 hover:bg-lime-500 border-lime-400">
                   Log ind
-                </Button>
-              )}
+                </Button>}
             </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {!user ? (
-          <div className="text-center py-16 relative overflow-hidden">
+        {!user ? <div className="text-center py-16 relative overflow-hidden">
             {/* Background decoration dots */}
             <div className="absolute top-20 left-20 w-2 h-2 bg-lime-400 rounded-full"></div>
             <div className="absolute top-40 right-32 w-3 h-3 bg-purple-400 rounded-full"></div>
@@ -128,25 +114,15 @@ const Index = () => {
               </div>
 
               <div className="space-y-4">
-                <Button 
-                  size="lg" 
-                  onClick={() => setShowAuth(true)}
-                  className="bg-lime-400 hover:bg-lime-500 text-gray-900 px-8 py-3 text-lg font-semibold rounded-full"
-                >
+                <Button size="lg" onClick={() => setShowAuth(true)} className="bg-lime-400 hover:bg-lime-500 text-gray-900 px-8 py-3 text-lg font-semibold rounded-full">
                   Start din lærerejse gratis
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800 px-8 py-3 text-lg ml-4 rounded-full"
-                >
+                <Button size="lg" variant="outline" className="border-gray-600 px-8 py-3 text-lg ml-4 rounded-full bg-slate-50 text-slate-950">
                   Udforsk mere
                 </Button>
               </div>
             </div>
-          </div>
-        ) : (
-          <Tabs defaultValue="dashboard" className="space-y-6">
+          </div> : <Tabs defaultValue="dashboard" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5 bg-gray-800 border border-gray-700">
               <TabsTrigger value="dashboard" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
                 Dashboard
@@ -264,30 +240,17 @@ const Index = () => {
             <TabsContent value="subscription">
               <SubscriptionPlans />
             </TabsContent>
-          </Tabs>
-        )}
+          </Tabs>}
       </main>
 
-      {showAuth && (
-        <AuthModal 
-          onClose={() => setShowAuth(false)} 
-          onLogin={handleLogin} 
-        />
-      )}
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onLogin={handleLogin} />}
 
       {/* Pyt-tid Button - Danish stress relief */}
-      {user && (
-        <div className="fixed bottom-6 right-6">
-          <Button 
-            className="bg-lime-400 hover:bg-lime-500 text-gray-900 rounded-full w-16 h-16 shadow-lg border-2 border-gray-800"
-            onClick={() => alert("Pyt-tid! Tag en dyb indånding og byg nogle LEGO klodser 🧱")}
-          >
+      {user && <div className="fixed bottom-6 right-6">
+          <Button className="bg-lime-400 hover:bg-lime-500 text-gray-900 rounded-full w-16 h-16 shadow-lg border-2 border-gray-800" onClick={() => alert("Pyt-tid! Tag en dyb indånding og byg nogle LEGO klodser 🧱")}>
             <span className="text-2xl">😌</span>
           </Button>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
-
 export default Index;
