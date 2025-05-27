@@ -26,18 +26,18 @@ const AuthModal = ({ onClose, onLogin }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-2 border-red-200">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-md bg-gray-900 border-2 border-gray-700">
         <CardHeader className="relative">
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute right-2 top-2"
+            className="absolute right-2 top-2 text-gray-400 hover:text-white hover:bg-gray-800"
             onClick={onClose}
           >
             <X className="w-4 h-4" />
           </Button>
-          <CardTitle className="text-center text-red-800">
+          <CardTitle className="text-center text-white">
             {isLogin ? "Log ind på Læreleg" : "Opret konto"}
           </CardTitle>
         </CardHeader>
@@ -46,16 +46,17 @@ const AuthModal = ({ onClose, onLogin }) => {
             {!isLogin && (
               <>
                 <div>
-                  <Label htmlFor="name">Fulde navn</Label>
+                  <Label htmlFor="name" className="text-gray-300">Fulde navn</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="f.eks. Emil Nielsen"
+                    className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-400"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="age">Alder</Label>
+                  <Label htmlFor="age" className="text-gray-300">Alder</Label>
                   <Input
                     id="age"
                     type="number"
@@ -64,13 +65,14 @@ const AuthModal = ({ onClose, onLogin }) => {
                     placeholder="8-16 år"
                     min="6"
                     max="18"
+                    className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-400"
                   />
                 </div>
               </>
             )}
             
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-300">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -78,11 +80,12 @@ const AuthModal = ({ onClose, onLogin }) => {
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 placeholder="din@email.dk"
                 required
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-400"
               />
             </div>
             
             <div>
-              <Label htmlFor="password">Adgangskode</Label>
+              <Label htmlFor="password" className="text-gray-300">Adgangskode</Label>
               <Input
                 id="password"
                 type="password"
@@ -90,10 +93,11 @@ const AuthModal = ({ onClose, onLogin }) => {
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 placeholder="Mindst 6 tegn"
                 required
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-400"
               />
             </div>
 
-            <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
+            <Button type="submit" className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white">
               {isLogin ? "Log ind" : "Opret konto"}
             </Button>
           </form>
@@ -102,14 +106,14 @@ const AuthModal = ({ onClose, onLogin }) => {
             <Button 
               variant="link" 
               onClick={() => setIsLogin(!isLogin)}
-              className="text-red-600 hover:text-red-700"
+              className="text-green-400 hover:text-green-300"
             >
               {isLogin ? "Har du ikke en konto? Opret en" : "Har du allerede en konto? Log ind"}
             </Button>
           </div>
 
           {!isLogin && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+            <div className="mt-4 p-3 bg-blue-900/50 border border-blue-700 rounded-lg text-sm text-blue-300">
               <p className="font-semibold">GDPR & Privatliv:</p>
               <p>Vi respekterer dansk lovgivning og gemmer kun nødvendige data i EU.</p>
             </div>
