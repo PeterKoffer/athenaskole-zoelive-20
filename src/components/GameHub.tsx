@@ -81,23 +81,23 @@ const GameHub = () => {
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case "Let": return "bg-green-100 text-green-800";
-      case "Mellem": return "bg-yellow-100 text-yellow-800";
-      case "Svær": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "Let": return "bg-green-900 text-green-400 border-green-400";
+      case "Mellem": return "bg-yellow-900 text-yellow-400 border-yellow-400";
+      case "Svær": return "bg-red-900 text-red-400 border-red-400";
+      default: return "bg-gray-900 text-gray-400 border-gray-400";
     }
   };
 
   const getSubjectColor = (subject) => {
     const colors = {
-      "Matematik": "bg-blue-100 text-blue-800",
-      "Dansk": "bg-red-100 text-red-800",
-      "Programmering": "bg-purple-100 text-purple-800",
-      "Historie": "bg-orange-100 text-orange-800",
-      "Natur & Teknik": "bg-green-100 text-green-800",
-      "Musik": "bg-pink-100 text-pink-800"
+      "Matematik": "bg-blue-900 text-blue-400 border-blue-400",
+      "Dansk": "bg-red-900 text-red-400 border-red-400",
+      "Programmering": "bg-purple-900 text-purple-400 border-purple-400",
+      "Historie": "bg-orange-900 text-orange-400 border-orange-400",
+      "Natur & Teknik": "bg-green-900 text-green-400 border-green-400",
+      "Musik": "bg-pink-900 text-pink-400 border-pink-400"
     };
-    return colors[subject] || "bg-gray-100 text-gray-800";
+    return colors[subject] || "bg-gray-900 text-gray-400 border-gray-400";
   };
 
   if (selectedGame === "viking-castle") {
@@ -106,12 +106,12 @@ const GameHub = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <Card>
+      <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Trophy className="w-6 h-6 text-yellow-500" />
+          <CardTitle className="flex items-center space-x-2 text-white">
+            <Trophy className="w-6 h-6 text-lime-400" />
             <span>Skjult Læring Spil</span>
-            <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+            <Badge variant="outline" className="bg-lime-400 text-gray-900 border-lime-400">
               Lær mens du leger!
             </Badge>
           </CardTitle>
@@ -119,10 +119,10 @@ const GameHub = () => {
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {games.map((game) => (
-              <Card key={game.id} className="relative overflow-hidden hover:shadow-lg transition-shadow">
+              <Card key={game.id} className="relative overflow-hidden hover:shadow-lg transition-shadow bg-gray-800 border-gray-700 hover:border-lime-400">
                 {game.status === "coming-soon" && (
                   <div className="absolute top-2 right-2 z-10">
-                    <Badge variant="secondary" className="bg-gray-200 text-gray-600">
+                    <Badge variant="secondary" className="bg-gray-700 text-gray-300 border-gray-600">
                       Kommer snart
                     </Badge>
                   </div>
@@ -140,19 +140,19 @@ const GameHub = () => {
                       </Badge>
                     </div>
                   </div>
-                  <CardTitle className="text-lg">{game.title}</CardTitle>
+                  <CardTitle className="text-lg text-white">{game.title}</CardTitle>
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-gray-600">{game.description}</p>
+                  <p className="text-sm text-gray-300">{game.description}</p>
                   
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <div className="flex items-center space-x-2 text-sm text-gray-400">
                       <Clock className="w-4 h-4" />
                       <span>{game.timeEstimate}</span>
                     </div>
                     
-                    <div className="flex items-center space-x-2 text-sm text-green-600">
+                    <div className="flex items-center space-x-2 text-sm text-lime-400">
                       <Star className="w-4 h-4" />
                       <span>{game.rewards}</span>
                     </div>
@@ -173,10 +173,10 @@ const GameHub = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Users className="w-6 h-6 text-blue-500" />
+          <CardTitle className="flex items-center space-x-2 text-white">
+            <Users className="w-6 h-6 text-lime-400" />
             <span>Klassens Rangliste</span>
           </CardTitle>
         </CardHeader>
@@ -189,24 +189,24 @@ const GameHub = () => {
               { name: "Anna K.", points: 1950, badge: "⭐" },
               { name: "Tobias R.", points: 1820, badge: "⭐" }
             ].map((player, index) => (
-              <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${
-                player.name.includes("Dig") ? "bg-red-50 border-2 border-red-200" : "bg-gray-50"
+              <div key={index} className={`flex items-center justify-between p-3 rounded-lg border ${
+                player.name.includes("Dig") ? "bg-lime-900/20 border-lime-400" : "bg-gray-800 border-gray-700"
               }`}>
                 <div className="flex items-center space-x-3">
                   <span className="text-xl">{player.badge}</span>
-                  <span className="font-medium">{player.name}</span>
+                  <span className="font-medium text-white">{player.name}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-blue-600">{player.points}</span>
-                  <span className="text-sm text-gray-500">point</span>
+                  <span className="font-bold text-lime-400">{player.points}</span>
+                  <span className="text-sm text-gray-400">point</span>
                 </div>
               </div>
             ))}
           </div>
           
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Godt gået!</strong> Du er #2 i klassen. Fortsæt med at spille for at komme på førstepladsen! 🇩🇰
+          <div className="mt-4 p-3 bg-gray-800 border border-lime-400 rounded-lg">
+            <p className="text-sm text-lime-400">
+              <strong>Godt gået!</strong> <span className="text-gray-300">Du er #2 i klassen. Fortsæt med at spille for at komme på førstepladsen! 🇩🇰</span>
             </p>
           </div>
         </CardContent>

@@ -29,17 +29,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-red-50 to-white">
-      {/* Danish Flag Header */}
-      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+    <div className="min-h-screen bg-gray-900">
+      {/* Dark NFT-style Header */}
+      <header className="bg-gray-900 border-b border-gray-800 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span className="text-red-600 font-bold text-lg">L</span>
+              <div className="w-10 h-10 bg-lime-400 rounded-lg flex items-center justify-center">
+                <span className="text-gray-900 font-bold text-lg">L</span>
               </div>
               <h1 className="text-2xl font-bold">Læreleg</h1>
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+              <Badge variant="secondary" className="bg-lime-400 text-gray-900 border-lime-400">
                 Learning Play
               </Badge>
             </div>
@@ -47,22 +47,22 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
-                  <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
-                    <Coins className="w-4 h-4 text-yellow-300" />
-                    <span className="font-semibold">{learekroner} Lære-Kroner</span>
+                  <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
+                    <Coins className="w-4 h-4 text-lime-400" />
+                    <span className="font-semibold text-white">{learekroner} Lære-Kroner</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <span className="font-bold">{user.name[0]}</span>
+                    <div className="w-8 h-8 bg-lime-400 rounded-full flex items-center justify-center">
+                      <span className="font-bold text-gray-900">{user.name[0]}</span>
                     </div>
-                    <span>Hej, {user.name}!</span>
+                    <span className="text-white">Hej, {user.name}!</span>
                   </div>
                 </>
               ) : (
                 <Button 
                   variant="secondary" 
                   onClick={() => setShowAuth(true)}
-                  className="bg-white text-red-600 hover:bg-gray-100"
+                  className="bg-lime-400 text-gray-900 hover:bg-lime-500 border-lime-400"
                 >
                   Log ind
                 </Button>
@@ -74,157 +74,172 @@ const Index = () => {
 
       <main className="container mx-auto px-4 py-8">
         {!user ? (
-          <div className="text-center py-16">
-            <div className="mb-8">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          <div className="text-center py-16 relative overflow-hidden">
+            {/* Background decoration dots */}
+            <div className="absolute top-20 left-20 w-2 h-2 bg-lime-400 rounded-full"></div>
+            <div className="absolute top-40 right-32 w-3 h-3 bg-purple-400 rounded-full"></div>
+            <div className="absolute bottom-40 left-40 w-2 h-2 bg-blue-400 rounded-full"></div>
+            <div className="absolute bottom-20 right-20 w-4 h-4 bg-pink-400 rounded-full"></div>
+            
+            <div className="mb-8 relative z-10">
+              <h2 className="text-5xl font-bold text-white mb-4">
                 Velkommen til Læreleg! 🇩🇰
               </h2>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                 AI-drevet læring med danske værdier - Gør læring til leg!
               </p>
               
-              <div className="grid md:grid-cols-3 gap-6 mb-12">
-                <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
+              <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
+                <Card className="bg-gray-800 border-gray-700 hover:border-lime-400 transition-colors group">
                   <CardHeader className="text-center">
-                    <Book className="w-12 h-12 text-blue-600 mx-auto mb-2" />
-                    <CardTitle className="text-blue-800">AI Lærer</CardTitle>
+                    <Book className="w-12 h-12 text-lime-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <CardTitle className="text-white">AI Lærer</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">
+                    <p className="text-gray-300">
                       Personlig AI-tutor med dansk stemme og tilpasset til Folkeskole curriculum
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
+                <Card className="bg-gray-800 border-gray-700 hover:border-lime-400 transition-colors group">
                   <CardHeader className="text-center">
-                    <Trophy className="w-12 h-12 text-green-600 mx-auto mb-2" />
-                    <CardTitle className="text-green-800">Spil & Belønninger</CardTitle>
+                    <Trophy className="w-12 h-12 text-lime-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <CardTitle className="text-white">Spil & Belønninger</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">
+                    <p className="text-gray-300">
                       Tjen Lære-Kroner, lås op for badges og konkurrér venligt med klassekammerater
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-purple-200 hover:border-purple-400 transition-colors">
+                <Card className="bg-gray-800 border-gray-700 hover:border-lime-400 transition-colors group">
                   <CardHeader className="text-center">
-                    <Users className="w-12 h-12 text-purple-600 mx-auto mb-2" />
-                    <CardTitle className="text-purple-800">Forældreindblanding</CardTitle>
+                    <Users className="w-12 h-12 text-lime-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <CardTitle className="text-white">Forældreindblanding</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">
+                    <p className="text-gray-300">
                       Ugentlige rapporter og fremskridtsanalyse til forældre og lærere
                     </p>
                   </CardContent>
                 </Card>
               </div>
 
-              <Button 
-                size="lg" 
-                onClick={() => setShowAuth(true)}
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg"
-              >
-                Start din lærerejse gratis
-              </Button>
+              <div className="space-y-4">
+                <Button 
+                  size="lg" 
+                  onClick={() => setShowAuth(true)}
+                  className="bg-lime-400 hover:bg-lime-500 text-gray-900 px-8 py-3 text-lg font-semibold rounded-full"
+                >
+                  Start din lærerejse gratis
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800 px-8 py-3 text-lg ml-4 rounded-full"
+                >
+                  Udforsk mere
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 bg-white border-2 border-gray-200">
-              <TabsTrigger value="dashboard" className="data-[state=active]:bg-red-100 data-[state=active]:text-red-800">
+            <TabsList className="grid w-full grid-cols-5 bg-gray-800 border border-gray-700">
+              <TabsTrigger value="dashboard" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
                 Dashboard
               </TabsTrigger>
-              <TabsTrigger value="tutor" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800">
+              <TabsTrigger value="tutor" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
                 AI Lærer
               </TabsTrigger>
-              <TabsTrigger value="games" className="data-[state=active]:bg-green-100 data-[state=active]:text-green-800">
+              <TabsTrigger value="games" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
                 Spil
               </TabsTrigger>
-              <TabsTrigger value="progress" className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800">
+              <TabsTrigger value="progress" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
                 Fremskridt
               </TabsTrigger>
-              <TabsTrigger value="subscription" className="data-[state=active]:bg-yellow-100 data-[state=active]:text-yellow-800">
+              <TabsTrigger value="subscription" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
                 Abonnement
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="dashboard">
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="col-span-full lg:col-span-2">
+                <Card className="col-span-full lg:col-span-2 bg-gray-800 border-gray-700">
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Star className="w-5 h-5 text-yellow-500" />
+                    <CardTitle className="flex items-center space-x-2 text-white">
+                      <Star className="w-5 h-5 text-lime-400" />
                       <span>Dagens Udfordringer</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm text-white">
                         <span>Matematik: Brøker</span>
                         <span>15/20 opgaver</span>
                       </div>
-                      <Progress value={75} className="h-2" />
+                      <Progress value={75} className="h-2 bg-gray-700" />
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm text-white">
                         <span>Dansk: Stavning</span>
                         <span>8/15 ord</span>
                       </div>
-                      <Progress value={53} className="h-2" />
+                      <Progress value={53} className="h-2 bg-gray-700" />
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm text-white">
                         <span>Engelsk: Ordforråd</span>
                         <span>12/12 ord ✓</span>
                       </div>
-                      <Progress value={100} className="h-2" />
+                      <Progress value={100} className="h-2 bg-gray-700" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                   <CardHeader>
-                    <CardTitle className="text-center">Dine Badges</CardTitle>
+                    <CardTitle className="text-center text-white">Dine Badges</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center space-y-3">
                     <div className="grid grid-cols-2 gap-2">
-                      <Badge variant="outline" className="p-2 border-yellow-300 text-yellow-700">
+                      <Badge variant="outline" className="p-2 border-lime-400 text-lime-400 bg-gray-900">
                         🏆 Matematik Viking
                       </Badge>
-                      <Badge variant="outline" className="p-2 border-blue-300 text-blue-700">
+                      <Badge variant="outline" className="p-2 border-blue-400 text-blue-400 bg-gray-900">
                         📚 Ordets Mester
                       </Badge>
-                      <Badge variant="outline" className="p-2 border-green-300 text-green-700">
+                      <Badge variant="outline" className="p-2 border-green-400 text-green-400 bg-gray-900">
                         🎯 Stavning Pro
                       </Badge>
-                      <Badge variant="outline" className="p-2 border-purple-300 text-purple-700">
+                      <Badge variant="outline" className="p-2 border-purple-400 text-purple-400 bg-gray-900">
                         🧪 Natur Forsker
                       </Badge>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="col-span-full">
+                <Card className="col-span-full bg-gray-800 border-gray-700">
                   <CardHeader>
-                    <CardTitle>Hurtig Adgang</CardTitle>
+                    <CardTitle className="text-white">Hurtig Adgang</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <Button variant="outline" className="h-20 flex flex-col space-y-2">
+                      <Button variant="outline" className="h-20 flex flex-col space-y-2 bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-lime-400 text-white">
                         <span className="text-2xl">🏰</span>
                         <span className="text-sm">Byg En Vikingborg</span>
                       </Button>
-                      <Button variant="outline" className="h-20 flex flex-col space-y-2">
+                      <Button variant="outline" className="h-20 flex flex-col space-y-2 bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-lime-400 text-white">
                         <span className="text-2xl">🔍</span>
                         <span className="text-sm">Ordjagt AR</span>
                       </Button>
-                      <Button variant="outline" className="h-20 flex flex-col space-y-2">
+                      <Button variant="outline" className="h-20 flex flex-col space-y-2 bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-lime-400 text-white">
                         <span className="text-2xl">🥪</span>
                         <span className="text-sm">Kod Smørrebrød</span>
                       </Button>
-                      <Button variant="outline" className="h-20 flex flex-col space-y-2">
+                      <Button variant="outline" className="h-20 flex flex-col space-y-2 bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-lime-400 text-white">
                         <span className="text-2xl">🎓</span>
                         <span className="text-sm">AI Lærer Chat</span>
                       </Button>
@@ -264,7 +279,7 @@ const Index = () => {
       {user && (
         <div className="fixed bottom-6 right-6">
           <Button 
-            className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-16 h-16 shadow-lg"
+            className="bg-lime-400 hover:bg-lime-500 text-gray-900 rounded-full w-16 h-16 shadow-lg border-2 border-gray-800"
             onClick={() => alert("Pyt-tid! Tag en dyb indånding og byg nogle LEGO klodser 🧱")}
           >
             <span className="text-2xl">😌</span>
