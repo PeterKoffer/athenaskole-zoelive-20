@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,7 @@ const FloatingAITutor = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
-      content: "Hej! Jeg er din flydende AI-lærer. Hvad kan jeg hjælpe dig med?",
+      content: "Hej! Jeg er Nelie, din flydende AI-lærer. Sig 'hi Nelie' for at starte, eller skriv dit spørgsmål!",
       timestamp: new Date()
     }
   ]);
@@ -64,13 +65,36 @@ const FloatingAITutor = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    
+    // Check for "hi Nelie" greeting
+    const isNelieGreeting = inputMessage.toLowerCase().includes('hi nelie') || 
+                           inputMessage.toLowerCase().includes('hej nelie');
+    
     setInputMessage("");
 
     // Simulate AI response
     setTimeout(() => {
+      let responseContent = "";
+      
+      if (isNelieGreeting) {
+        responseContent = "Hej! Jeg er Nelie, og jeg er så glad for at møde dig! 🌟 Jeg er her for at hjælpe dig med at lære. Hvad vil du gerne arbejde med i dag? Matematik, dansk, engelsk eller måske noget helt andet?";
+        
+        // Speak the response
+        if ('speechSynthesis' in window) {
+          setIsSpeaking(true);
+          const utterance = new SpeechSynthesisUtterance(responseContent);
+          utterance.lang = 'da-DK';
+          utterance.rate = 0.8;
+          utterance.onend = () => setIsSpeaking(false);
+          speechSynthesis.speak(utterance);
+        }
+      } else {
+        responseContent = "Det er et godt spørgsmål! Som Nelie kan jeg hjælpe dig med mange ting. Prøv at sige 'hi Nelie' for en mere personlig hilsen!";
+      }
+
       const aiResponse: Message = {
         role: "assistant" as const,
-        content: "Det er et godt spørgsmål! Lad mig hjælpe dig med det...",
+        content: responseContent,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
@@ -82,7 +106,7 @@ const FloatingAITutor = () => {
     if (!isListening) {
       setTimeout(() => {
         setIsListening(false);
-        setInputMessage("Kan du hjælpe mig med matematik?");
+        setInputMessage("Hi Nelie");
       }, 2000);
     }
   };
@@ -128,7 +152,7 @@ const FloatingAITutor = () => {
             <div className="flex items-center space-x-2 text-white">
               <Move className="w-4 h-4 text-gray-400" />
               <span className="text-lg">🎓</span>
-              <span>Flydende AI Lærer</span>
+              <span>Nelie - Din AI Lærer</span>
             </div>
             <div className="flex items-center space-x-2">
               <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 text-xs">
@@ -170,7 +194,7 @@ const FloatingAITutor = () => {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Skriv dit spørgsmål..."
+                placeholder="Skriv 'hi Nelie' eller dit spørgsmål..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400 text-xs h-8"
               />
@@ -203,7 +227,7 @@ const FloatingAITutor = () => {
             {isListening && (
               <div className="text-center">
                 <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 animate-pulse text-xs">
-                  🎤 Lytter...
+                  🎤 Lytter... Sig 'Hi Nelie'!
                 </Badge>
               </div>
             )}

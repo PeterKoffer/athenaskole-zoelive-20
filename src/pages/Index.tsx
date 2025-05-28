@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import GameHub from "@/components/GameHub";
@@ -15,6 +16,7 @@ import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const [showGames, setShowGames] = useState(false);
@@ -34,7 +36,13 @@ const Index = () => {
   }, [user]);
 
   const handleGetStarted = () => {
-    setShowAuthModal(true);
+    if (user) {
+      // If user is logged in, go directly to daily program
+      navigate('/daily-program');
+    } else {
+      // If not logged in, show auth modal
+      setShowAuthModal(true);
+    }
   };
 
   const handleModalClose = () => {
@@ -43,7 +51,8 @@ const Index = () => {
 
   const handleLogin = () => {
     setShowAuthModal(false);
-    // User state will be updated automatically by useAuth hook
+    // After login, navigate to daily program
+    navigate('/daily-program');
   };
 
   return (

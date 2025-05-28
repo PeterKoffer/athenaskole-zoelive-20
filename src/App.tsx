@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import UserProfile from "./pages/UserProfile";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
+import DailyProgram from "./pages/DailyProgram";
 import NotFound from "./pages/NotFound";
 import FloatingAITutor from "./components/FloatingAITutor";
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/school-dashboard" element={<SchoolDashboard />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
+          <Route path="/daily-program" element={<DailyProgram />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
