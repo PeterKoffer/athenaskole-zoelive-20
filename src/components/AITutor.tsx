@@ -1,16 +1,16 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Send, Volume2, VolumeX, BookOpen, Calculator, Globe, Atom } from "lucide-react";
+import LanguageLearning from "./LanguageLearning";
 
 const AITutor = ({ user }) => {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: user ? `Hej ${user.name}! Dette er hvad vi vil arbejde på i dag. Hvor vil du gerne begynde? 🇩🇰` : "Hej! Jeg er din AI-lærer. Hvad vil du gerne lære i dag? 🇩🇰",
+      content: user ? `Hej ${user.user_metadata?.name || 'Elev'}! Dette er hvad vi vil arbejde på i dag. Hvor vil du gerne begynde? 🇩🇰` : "Hej! Jeg er din AI-lærer. Hvad vil du gerne lære i dag? 🇩🇰",
       timestamp: new Date(),
       showOptions: user ? true : false
     }
@@ -19,6 +19,7 @@ const AITutor = ({ user }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentSubject, setCurrentSubject] = useState("matematik");
+  const [showLanguageLearning, setShowLanguageLearning] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -33,16 +34,17 @@ const AITutor = ({ user }) => {
     { id: "matematik", name: "Matematik", emoji: "🔢", icon: Calculator },
     { id: "dansk", name: "Dansk", emoji: "📝", icon: BookOpen },
     { id: "engelsk", name: "Engelsk", emoji: "🇬🇧", icon: Globe },
+    { id: "sprog", name: "Sprog", emoji: "🌍", icon: Globe },
     { id: "naturteknik", name: "Natur & Teknik", emoji: "🧪", icon: Atom },
-    { id: "historie", name: "Historie", emoji: "🏰", icon: BookOpen },
-    { id: "samfundsfag", name: "Samfundsfag", emoji: "🏛️", icon: BookOpen }
+    { id: "historie", name: "Historie", emoji: "🏰", icon: BookOpen }
   ];
 
   const learningOptions = [
     { id: "review", title: "Gennemgå gårsdagens emner", description: "Lad os repetere hvad du lærte sidst", icon: "🔄" },
     { id: "new", title: "Lær noget nyt", description: "Udforsk nye emner og koncepter", icon: "✨" },
     { id: "practice", title: "Øv tidligere emner", description: "Styrk dine færdigheder med øvelser", icon: "💪" },
-    { id: "test", title: "Tag en lille test", description: "Test din viden med sjove opgaver", icon: "🎯" }
+    { id: "test", title: "Tag en lille test", description: "Test din viden med sjove opgaver", icon: "🎯" },
+    { id: "language", title: "Sprogtræning", description: "Lær nye sprog som Duolingo", icon: "🌍" }
   ];
 
   const predefinedResponses = {
@@ -60,6 +62,11 @@ const AITutor = ({ user }) => {
       "Great! Let's practice English. Can you tell me about your favorite Danish food in English?",
       "Wonderful! What's your favorite color in English?",
       "Let's learn new words! Do you know what 'hygge' means in English?"
+    ],
+    sprog: [
+      "Fantastisk! Vil du prøve vores interaktive sprogtræning? Det ligner Duolingo og gør det sjovt at lære nye sprog!",
+      "Perfekt valg! Hvilke sprog vil du gerne lære? Vi har engelsk, tysk, fransk og mange flere!",
+      "Lad os begynde sprogtræning! Du kan vælge mellem forskellige sprog og øvelser."
     ]
   };
 
@@ -76,7 +83,6 @@ const AITutor = ({ user }) => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage("");
 
-    // Simulate AI response
     setTimeout(() => {
       const responses = predefinedResponses[currentSubject] || predefinedResponses.matematik;
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -90,7 +96,6 @@ const AITutor = ({ user }) => {
       
       setMessages(prev => [...prev, aiResponse]);
       
-      // Simulate text-to-speech
       if ('speechSynthesis' in window) {
         setIsSpeaking(true);
         const utterance = new SpeechSynthesisUtterance(randomResponse);
@@ -103,6 +108,11 @@ const AITutor = ({ user }) => {
   };
 
   const handleLearningOption = (option) => {
+    if (option.id === "language") {
+      setShowLanguageLearning(true);
+      return;
+    }
+
     const optionMessage = {
       role: "user",
       content: `Jeg vil gerne ${option.title.toLowerCase()}`,
@@ -159,6 +169,21 @@ const AITutor = ({ user }) => {
     }
   };
 
+  if (showLanguageLearning) {
+    return (
+      <div className="space-y-6">
+        <Button
+          variant="outline"
+          onClick={() => setShowLanguageLearning(false)}
+          className="text-white border-gray-600 hover:bg-gray-700"
+        >
+          ← Tilbage til AI Lærer
+        </Button>
+        <LanguageLearning />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Card className="bg-gray-900 border-gray-800">
@@ -186,7 +211,12 @@ const AITutor = ({ user }) => {
                       ? "bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none" 
                       : "bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-purple-400 text-white"
                   }`}
-                  onClick={() => setCurrentSubject(subject.id)}
+                  onClick={() => {
+                    setCurrentSubject(subject.id);
+                    if (subject.id === "sprog") {
+                      setShowLanguageLearning(true);
+                    }
+                  }}
                 >
                   <IconComponent className="w-4 h-4" />
                   <span className="text-xs">{subject.name}</span>
