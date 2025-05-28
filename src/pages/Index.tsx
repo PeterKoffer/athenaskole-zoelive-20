@@ -1,257 +1,317 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, BookOpen, Users, GraduationCap, Building, Target, Calendar, Brain, Gamepad2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import AITutor from "@/components/AITutor";
-import GameHub from "@/components/GameHub";
+import { useNavigate } from "react-router-dom";
+import {
+  Monitor,
+  LayoutDashboard,
+  BookOpenCheck,
+  Gamepad2,
+  BrainCircuit,
+  Settings,
+  LogOut
+} from "lucide-react";
+import AuthModal from "@/components/AuthModal";
 import ProgressDashboard from "@/components/ProgressDashboard";
-const Index = () => {
-  const navigate = useNavigate();
-  const {
-    user,
-    signOut
-  } = useAuth();
-  const [showRoleSelection, setShowRoleSelection] = useState(false);
-  const [selectedStudentOption, setSelectedStudentOption] = useState("");
+import GameHub from "@/components/GameHub";
+import EnhancedAITutor from "@/components/EnhancedAITutor";
 
-  // Sample user progress data
+const Index = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
+  const [showGames, setShowGames] = useState(false);
+  const [showAITutor, setShowAITutor] = useState(false);
+
   const userProgress = {
     matematik: 75,
-    dansk: 68,
-    engelsk: 82,
-    naturteknik: 71
+    dansk: 60,
+    engelsk: 80,
+    naturteknik: 90
   };
-  const userRoles = [{
-    id: "student",
-    title: "Elev",
-    description: "Log ind som elev for at få adgang til lektioner og spil",
-    icon: GraduationCap,
-    color: "bg-blue-500 hover:bg-blue-600",
-    route: "/auth?role=student"
-  }, {
-    id: "parent",
-    title: "Forælder",
-    description: "Følg dit barns fremskridt og kommuniker med skolen",
-    icon: Users,
-    color: "bg-green-500 hover:bg-green-600",
-    route: "/auth?role=parent"
-  }, {
-    id: "teacher",
-    title: "Lærer",
-    description: "Administrer klasser og følg elevernes udvikling",
-    icon: BookOpen,
-    color: "bg-purple-500 hover:bg-purple-600",
-    route: "/auth?role=teacher"
-  }, {
-    id: "school",
-    title: "Skole",
-    description: "Få overblik over hele skolen og statistikker",
-    icon: Building,
-    color: "bg-orange-500 hover:bg-orange-600",
-    route: "/auth?role=school"
-  }];
-  const studentOptions = [{
-    id: "learning-journey",
-    title: "Din læringsrejse",
-    description: "Se dit fremskridt og fortsæt hvor du slap",
-    icon: Target,
-    color: "bg-blue-500 hover:bg-blue-600"
-  }, {
-    id: "weekly-goals",
-    title: "Ugentlige mål",
-    description: "Sæt og følg dine ugentlige læringsmål",
-    icon: Calendar,
-    color: "bg-green-500 hover:bg-green-600"
-  }, {
-    id: "ai-teacher",
-    title: "AI lærer",
-    description: "Chat med din personlige AI-lærer",
-    icon: Brain,
-    color: "bg-purple-500 hover:bg-purple-600"
-  }, {
-    id: "games",
-    title: "Spil",
-    description: "Lær gennem sjove og interaktive spil",
-    icon: Gamepad2,
-    color: "bg-orange-500 hover:bg-orange-600"
-  }];
-  const handleStudentOptionSelect = (optionId: string) => {
-    setSelectedStudentOption(optionId);
-  };
-  const renderStudentContent = () => {
-    switch (selectedStudentOption) {
-      case "learning-journey":
-        return <ProgressDashboard userProgress={userProgress} />;
-      case "ai-teacher":
-        return <AITutor user={user} />;
-      case "games":
-        return <GameHub />;
-      case "weekly-goals":
-        return <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Ugentlige mål</CardTitle>
-            </CardHeader>
-            <CardContent className="text-gray-300">
-              <p>Her kan du sætte og følge dine ugentlige læringsmål. Denne funktion kommer snart!</p>
-            </CardContent>
-          </Card>;
-      default:
-        return null;
-    }
-  };
-  if (user) {
-    // Get the actual name from user metadata or profile
-    const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'Elev';
-    return <div className="min-h-screen bg-gray-900 text-white">
-        <nav className="bg-gray-800 border-b border-gray-700 p-4">
-          <div className="max-w-6xl mx-auto flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 via-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg">
-                <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center">
-                  <span className="text-gray-900 font-bold text-sm">Α</span>
-                </div>
-              </div>
-              <h1 className="text-2xl font-bold">Athena</h1>
-              <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
-                Dansk AI Læring
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => navigate('/profile')} className="border-gray-600 hover:bg-gray-700 text-slate-950">
-                Profil
-              </Button>
-              <Button variant="outline" onClick={signOut} className="border-gray-600 hover:bg-gray-700 text-slate-950">
-                Log ud
-              </Button>
-            </div>
-          </div>
-        </nav>
 
-        <div className="max-w-6xl mx-auto p-6 space-y-8">
-          {!selectedStudentOption ? <>
-              <div className="text-center">
-                <h2 className="text-4xl font-bold mb-4">
-                  Velkommen tilbage, {userName}! 🎓
+  useEffect(() => {
+    if (user) {
+      console.log("User is logged in:", user);
+    }
+  }, [user]);
+
+  const handleGetStarted = () => {
+    setShowAuthModal(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <nav className="bg-gray-800 border-b border-gray-700 p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <a href="/" className="flex items-center space-x-2">
+            <BrainCircuit className="w-6 h-6 text-blue-500" />
+            <span className="font-bold text-lg">Athena</span>
+          </a>
+          <div className="space-x-4">
+            {user ? (
+              <>
+                <Button variant="ghost" onClick={() => setShowProgress(true)}>
+                  <Monitor className="w-4 h-4 mr-2" />
+                  Fremskridt
+                </Button>
+                <Button variant="ghost" onClick={() => setShowGames(true)}>
+                  <Gamepad2 className="w-4 h-4 mr-2" />
+                  Spil
+                </Button>
+                <Button variant="ghost" onClick={() => setShowAITutor(true)}>
+                  <BookOpenCheck className="w-4 h-4 mr-2" />
+                  AI Lærer
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/profile')}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Profil
+                </Button>
+                <Button variant="outline" onClick={signOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Log ud
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={handleGetStarted}>
+                  Log ind
+                </Button>
+                <Button variant="outline" onClick={handleGetStarted}>
+                  Start Gratis
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {showProgress && user ? (
+          <div className="py-8">
+            <ProgressDashboard userProgress={userProgress} />
+          </div>
+        ) : showGames ? (
+          <div className="py-8">
+            <GameHub />
+          </div>
+        ) : showAITutor ? (
+          <div className="py-8">
+            <EnhancedAITutor user={user} />
+          </div>
+        ) : (
+          <>
+            <div className="text-center py-20">
+              <h1 className="text-5xl font-bold text-white mb-4">
+                Velkommen til Athena
+              </h1>
+              <p className="text-xl text-gray-300 mb-8">
+                Din personlige platform for sprog og læring.
+              </p>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+                onClick={handleGetStarted}
+              >
+                Kom i gang
+              </Button>
+            </div>
+
+            <section className="py-12">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-semibold text-white">
+                  Hvad kan du lære?
                 </h2>
-                <p className="text-xl text-gray-300">
-                  Hvad vil du gerne arbejde med i dag?
+                <p className="text-gray-400">
+                  Udforsk et bredt udvalg af fag og sprog.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <h3 className="text-xl font-bold text-white mb-2">Dansk</h3>
+                    <p className="text-gray-300">
+                      Forbedre dit ordforråd og grammatik.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <h3 className="text-xl font-bold text-white mb-2">Engelsk</h3>
+                    <p className="text-gray-300">
+                      Bliv flydende i engelsk gennem interaktive øvelser.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <h3 className="text-xl font-bold text-white mb-2">Matematik</h3>
+                    <p className="text-gray-300">
+                      Lær matematik på en sjov og engagerende måde.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+
+            <section className="py-12">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-semibold text-white">
+                  Funktioner
+                </h2>
+                <p className="text-gray-400">
+                  Oplev de mange måder, Athena kan hjælpe dig med at lære.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <LayoutDashboard className="w-6 h-6 text-blue-500 mb-2" />
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      Personligt Dashboard
+                    </h3>
+                    <p className="text-gray-300">
+                      Få et overblik over dine fremskridt.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <BookOpenCheck className="w-6 h-6 text-green-500 mb-2" />
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      Interaktive Lektioner
+                    </h3>
+                    <p className="text-gray-300">
+                      Engagerende indhold, der gør læring sjov.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <Gamepad2 className="w-6 h-6 text-purple-500 mb-2" />
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      Gamificeret Læring
+                    </h3>
+                    <p className="text-gray-300">
+                      Tjen point og badges, mens du lærer.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <BrainCircuit className="w-6 h-6 text-orange-500 mb-2" />
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      AI-drevet Tutor
+                    </h3>
+                    <p className="text-gray-300">
+                      Få personlig hjælp fra vores AI-tutor.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+            
+            {/* Add Phase 1 Features Showcase */}
+            <section className="py-20">
+              <div className="text-center mb-16">
+                <Badge className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-4 py-2 mb-4">
+                  🚀 Nye Features - Phase 1
+                </Badge>
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  Forbedret Læring med AI
+                </h2>
+                <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                  Oplev de nyeste forbedringer til Athena med avanceret udtale-feedback, 
+                  daglige udfordringer og bedre forældre-kommunikation.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                {studentOptions.map(option => {
-              const IconComponent = option.icon;
-              return <Card key={option.id} className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-all cursor-pointer" onClick={() => handleStudentOptionSelect(option.id)}>
-                      <CardHeader className="text-center">
-                        <div className={`w-16 h-16 ${option.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                          <IconComponent className="w-8 h-8 text-white" />
-                        </div>
-                        <CardTitle className="text-white text-xl">{option.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <p className="text-gray-300 text-sm mb-4">{option.description}</p>
-                        <Button className={`w-full ${option.color} text-white border-none`}>
-                          Start {option.title.toLowerCase()}
-                        </Button>
-                      </CardContent>
-                    </Card>;
-            })}
+              <div className="grid lg:grid-cols-3 gap-8">
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-6">
+                    <div className="text-4xl mb-4">🎤</div>
+                    <h3 className="text-xl font-bold text-white mb-3">Udtale Feedback</h3>
+                    <p className="text-gray-300 mb-4">
+                      Få øjeblikkelig feedback på din udtale med avanceret stemme-genkendelse.
+                    </p>
+                    <Badge variant="outline" className="bg-green-600 text-white border-green-600">
+                      Nye AI-funktioner
+                    </Badge>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-6">
+                    <div className="text-4xl mb-4">🎯</div>
+                    <h3 className="text-xl font-bold text-white mb-3">Daglige Udfordringer</h3>
+                    <p className="text-gray-300 mb-4">
+                      Nye udfordringer hver dag med belønninger og streak-system for motivation.
+                    </p>
+                    <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">
+                      Gamification
+                    </Badge>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-6">
+                    <div className="text-4xl mb-4">📧</div>
+                    <h3 className="text-xl font-bold text-white mb-3">Forældre Rapporter</h3>
+                    <p className="text-gray-300 mb-4">
+                      Automatiske ugentlige rapporter til forældre med detaljeret fremskridts-tracking.
+                    </p>
+                    <Badge variant="outline" className="bg-purple-600 text-white border-purple-600">
+                      Smart Kommunikation
+                    </Badge>
+                  </CardContent>
+                </Card>
               </div>
-            </> : <div className="space-y-6">
-              <Button variant="outline" onClick={() => setSelectedStudentOption("")} className="border-gray-600 text-slate-950 bg-slate-400 hover:bg-slate-300">
-                ← Tilbage til hovedmenu
-              </Button>
-              {renderStudentContent()}
-            </div>}
-        </div>
-      </div>;
-  }
-  return <div className="min-h-screen bg-gray-900 text-white">
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 via-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-gray-900 font-bold text-2xl">Α</span>
+
+              <div className="text-center mt-12">
+                <Button
+                  onClick={() => setShowAITutor(true)}
+                  className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white px-8 py-4 text-lg"
+                >
+                  Prøv Forbedret AI Lærer
+                </Button>
               </div>
-            </div>
-          </div>
-          <h1 className="text-5xl font-bold mb-4">Athena</h1>
-          <p className="text-xl text-gray-300 mb-8">
-            Danmarks mest avancerede AI-platform til læring
-          </p>
-          <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 text-lg px-4 py-2">
-            🇩🇰 Tilpasset dansk folkeskole
-          </Badge>
-        </div>
+            </section>
 
-        {!showRoleSelection ? <div className="text-center space-y-8">
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white text-center">🤖 AI Lærer</CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-300 text-center">
-                  Personlig AI-tutor der tilpasser sig din læringsstil og hjælper dig med alle fag.
-                </CardContent>
-              </Card>
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white text-center">🎮 Læringsspil</CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-300 text-center">
-                  Lær gennem sjove spil og interaktive aktiviteter der gør læring til leg.
-                </CardContent>
-              </Card>
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white text-center">📊 Fremskridt</CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-300 text-center">
-                  Følg din udvikling og se hvor du kan forbedre dig mest.
-                </CardContent>
-              </Card>
-            </div>
+            <section className="py-12">
+              <div className="text-center">
+                <h2 className="text-3xl font-semibold text-white mb-4">
+                  Klar til at starte?
+                </h2>
+                <p className="text-gray-400 mb-8">
+                  Opret en gratis konto og begynd din læringsrejse i dag!
+                </p>
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white"
+                  onClick={handleGetStarted}
+                >
+                  Tilmeld dig gratis
+                </Button>
+              </div>
+            </section>
+          </>
+        )}
+      </main>
 
-            <Button onClick={() => setShowRoleSelection(true)} size="lg" className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none text-lg px-8 py-4">
-              Kom i gang <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div> : <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold mb-4">Vælg din rolle</h2>
-              <p className="text-gray-300 mb-8">Hvordan vil du bruge Athena?</p>
-            </div>
+      <footer className="bg-gray-800 p-4 text-center">
+        <p className="text-gray-500">
+          &copy; {new Date().getFullYear()} Athena. Alle rettigheder forbeholdes.
+        </p>
+      </footer>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {userRoles.map(role => {
-            const IconComponent = role.icon;
-            return <Card key={role.id} className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-all cursor-pointer" onClick={() => navigate(role.route)}>
-                    <CardHeader className="text-center">
-                      <div className={`w-16 h-16 ${role.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                        <IconComponent className="w-8 h-8 text-white" />
-                      </div>
-                      <CardTitle className="text-white text-xl">{role.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <p className="text-gray-300 text-sm mb-4">{role.description}</p>
-                      <Button className={`w-full ${role.color} text-white border-none`}>
-                        Log ind som {role.title.toLowerCase()}
-                      </Button>
-                    </CardContent>
-                  </Card>;
-          })}
-            </div>
-
-            <div className="text-center">
-              <Button variant="outline" onClick={() => setShowRoleSelection(false)} className="border-gray-600 text-slate-950 bg-slate-500 hover:bg-slate-400">
-                Tilbage
-              </Button>
-            </div>
-          </div>}
-      </div>
-    </div>;
+      <AuthModal show={showAuthModal} onClose={() => setShowAuthModal(false)} />
+    </div>
+  );
 };
+
+import EnhancedAITutor from "@/components/EnhancedAITutor";
+
 export default Index;

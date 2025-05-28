@@ -8,11 +8,42 @@ interface LearningOptionsProps {
 
 const LearningOptions = ({ onOptionSelect }: LearningOptionsProps) => {
   const learningOptions: LearningOption[] = [
-    { id: "review", title: "Gennemgå gårsdagens emner", description: "Lad os repetere hvad du lærte sidst", icon: "🔄" },
-    { id: "new", title: "Lær noget nyt", description: "Udforsk nye emner og koncepter", icon: "✨" },
-    { id: "practice", title: "Øv tidligere emner", description: "Styrk dine færdigheder med øvelser", icon: "💪" },
-    { id: "test", title: "Tag en lille test", description: "Test din viden med sjove opgaver", icon: "🎯" },
-    { id: "language", title: "Sprogtræning", description: "Lær nye sprog som Duolingo", icon: "🌍" }
+    {
+      id: "review",
+      title: "Gennemgå",
+      description: "Gentag hvad du lærte i går",
+      icon: "🔄"
+    },
+    {
+      id: "new",
+      title: "Nyt emne",
+      description: "Lær noget helt nyt",
+      icon: "✨"
+    },
+    {
+      id: "practice",
+      title: "Øv dig",
+      description: "Træn dine færdigheder",
+      icon: "💪"
+    },
+    {
+      id: "test",
+      title: "Test dig selv",
+      description: "Se hvor god du er",
+      icon: "🎯"
+    },
+    {
+      id: "pronunciation",
+      title: "Udtale",
+      description: "Træn din udtale med AI",
+      icon: "🎤"
+    },
+    {
+      id: "language",
+      title: "Sprogtræning",
+      description: "Lær nye sprog interaktivt",
+      icon: "🌍"
+    }
   ];
 
   return (
