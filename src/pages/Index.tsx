@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import GameHub from "@/components/GameHub";
@@ -16,6 +16,7 @@ import CTASection from "@/components/home/CTASection";
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const [showGames, setShowGames] = useState(false);
@@ -28,11 +29,22 @@ const Index = () => {
     naturteknik: 90
   };
 
+  // Scroll to top when page loads or navigation state changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname, showProgress, showGames, showAITutor]);
+
   useEffect(() => {
     if (user) {
       console.log("User is logged in:", user);
     }
   }, [user]);
+
+  const resetNavigationState = () => {
+    setShowProgress(false);
+    setShowGames(false);
+    setShowAITutor(false);
+  };
 
   const handleGetStarted = () => {
     if (user) {
@@ -53,13 +65,35 @@ const Index = () => {
     // After login, stay on homepage instead of navigating to daily program
   };
 
+  const handleShowProgress = () => {
+    setShowProgress(true);
+    setShowGames(false);
+    setShowAITutor(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleShowGames = () => {
+    setShowGames(true);
+    setShowProgress(false);
+    setShowAITutor(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleShowAITutor = () => {
+    setShowAITutor(true);
+    setShowProgress(false);
+    setShowGames(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <Navbar 
         onGetStarted={handleGetStarted}
-        onShowProgress={() => setShowProgress(true)}
-        onShowGames={() => setShowGames(true)}
-        onShowAITutor={() => setShowAITutor(true)}
+        onShowProgress={handleShowProgress}
+        onShowGames={handleShowGames}
+        onShowAITutor={handleShowAITutor}
+        onResetNavigation={resetNavigationState}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

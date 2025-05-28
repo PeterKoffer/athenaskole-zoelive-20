@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,11 @@ const DailyProgram = () => {
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   
   const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Elev';
+  
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
   
   const todaysDate = new Date().toLocaleDateString('da-DK', {
     weekday: 'long',
@@ -97,7 +102,8 @@ const DailyProgram = () => {
           </h2>
           
           <div className="grid md:grid-cols-2 gap-6">
-            {dailyActivities.map(activity => <Card key={activity.id} className="bg-gray-800 border-gray-700 hover:border-purple-400 transition-all duration-300 cursor-pointer transform hover:scale-105">
+            {dailyActivities.map(activity => (
+              <Card key={activity.id} className="bg-gray-800 border-gray-700 hover:border-purple-400 transition-all duration-300 cursor-pointer transform hover:scale-105">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -127,7 +133,8 @@ const DailyProgram = () => {
                     Start {activity.title}
                   </Button>
                 </CardContent>
-              </Card>)}
+              </Card>
+            ))}
           </div>
         </div>
 
