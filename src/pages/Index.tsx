@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,15 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Crown, Trophy, Coins, Book, Users, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import AuthModal from "@/components/AuthModal";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import AITutor from "@/components/AITutor";
 import GameHub from "@/components/GameHub";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 
 const Index = () => {
-  const [user, setUser] = useState(null);
-  const [showAuth, setShowAuth] = useState(false);
+  const { user, signOut } = useAuth();
   const [learekroner, setLearekroner] = useState(125);
   const [userProgress, setUserProgress] = useState({
     matematik: 80,
@@ -22,15 +23,39 @@ const Index = () => {
     engelsk: 72,
     naturteknik: 58
   });
+  const [profile, setProfile] = useState<any>(null);
   const navigate = useNavigate();
 
-  const handleLogin = userData => {
-    setUser(userData);
-    setShowAuth(false);
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
   };
 
   const handleProfileClick = () => {
     navigate('/profile');
+  };
+
+  const handleAuthClick = () => {
+    navigate('/auth');
   };
 
   return <div className="min-h-screen bg-gray-900">
@@ -61,11 +86,20 @@ const Index = () => {
                       onClick={handleProfileClick}
                       className="w-10 h-10 bg-gradient-to-br from-purple-400 via-blue-500 to-cyan-400 rounded-full flex items-center justify-center hover:scale-105 transition-transform cursor-pointer"
                     >
-                      <span className="font-bold text-white text-lg">{user.name[0]}</span>
+                      <span className="font-bold text-white text-lg">
+                        {profile?.name?.[0] || user.email?.[0] || 'U'}
+                      </span>
                     </button>
-                    <span className="text-white">Hej, {user.name}!</span>
+                    <span className="text-white">Hej, {profile?.name || user.email?.split('@')[0]}!</span>
+                    <Button 
+                      variant="ghost" 
+                      onClick={signOut}
+                      className="text-gray-400 hover:text-white hover:bg-gray-800"
+                    >
+                      Log ud
+                    </Button>
                   </div>
-                </> : <Button variant="secondary" onClick={() => setShowAuth(true)} className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white hover:from-purple-500 hover:to-cyan-500 border-none">
+                </> : <Button variant="secondary" onClick={handleAuthClick} className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white hover:from-purple-500 hover:to-cyan-500 border-none">
                   Log ind
                 </Button>}
             </div>
@@ -128,7 +162,7 @@ const Index = () => {
               </div>
 
               <div className="space-y-4">
-                <Button size="lg" onClick={() => setShowAuth(true)} className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 text-lg font-semibold rounded-full border-none">
+                <Button size="lg" onClick={handleAuthClick} className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 text-lg font-semibold rounded-full border-none">
                   Start din lærerejse gratis
                 </Button>
                 <Button size="lg" variant="outline" className="border-gray-600 px-8 py-3 text-lg ml-4 rounded-full bg-slate-50 text-slate-950">
@@ -260,8 +294,6 @@ const Index = () => {
             </TabsContent>
           </Tabs>}
       </main>
-
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onLogin={handleLogin} />}
 
       {/* Pyt-tid Button - Danish stress relief */}
       {user && <div className="fixed bottom-6 right-6">

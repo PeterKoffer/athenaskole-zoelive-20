@@ -1,23 +1,37 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, User, Mail, MapPin, Calendar, Trophy, TrendingUp, Settings } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft, User, Trophy, TrendingUp, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+
+interface UserProfile {
+  id: string;
+  user_id: string;
+  name: string | null;
+  email: string | null;
+  address: string | null;
+  birth_date: string | null;
+  grade: string | null;
+  school: string | null;
+  avatar_url: string | null;
+}
 
 const UserProfile = () => {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const [editMode, setEditMode] = useState(false);
-  const [userInfo, setUserInfo] = useState({
-    name: "Emil Nielsen",
-    email: "emil@example.com",
-    address: "Københavnsgade 123, 2100 København Ø",
-    birthDate: "2012-05-15",
-    grade: "5. klasse",
-    school: "Østerbro Skole"
-  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const previousYearsProgress = [
     { year: "2023", matematik: 85, dansk: 78, engelsk: 82, naturteknik: 75 },
@@ -32,10 +46,160 @@ const UserProfile = () => {
     { name: "Natur Forsker", date: "2023-12-20", difficulty: "Sølv" }
   ];
 
-  const handleSave = () => {
-    setEditMode(false);
-    // Here you would typically save to database
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+      return;
+    }
+
+    if (user) {
+      fetchProfile();
+    }
+  }, [user, authLoading, navigate]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        throw error;
+      }
+
+      if (data) {
+        setProfile(data);
+      } else {
+        // Create a new profile if one doesn't exist
+        const newProfile = {
+          user_id: user.id,
+          name: user.user_metadata?.name || null,
+          email: user.email || null,
+          address: null,
+          birth_date: null,
+          grade: null,
+          school: null,
+          avatar_url: null
+        };
+
+        const { data: createdProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert(newProfile)
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        setProfile(createdProfile);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Fejl",
+        description: "Kunne ikke hente profil: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSave = async () => {
+    if (!profile || !user) return;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: profile.name,
+          email: profile.email,
+          address: profile.address,
+          birth_date: profile.birth_date,
+          grade: profile.grade,
+          school: profile.school,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profil gemt!",
+        description: "Dine ændringer er blevet gemt.",
+      });
+      setEditMode(false);
+    } catch (error: any) {
+      toast({
+        title: "Fejl",
+        description: "Kunne ikke gemme profil: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user || !profile) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile, avatar_url: data.publicUrl });
+
+      toast({
+        title: "Profilbillede opdateret!",
+        description: "Dit nye profilbillede er blevet gemt.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fejl",
+        description: "Kunne ikke uploade billede: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Indlæser...</div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Profil ikke fundet</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -76,47 +240,72 @@ const UserProfile = () => {
               </CardTitle>
               <Button
                 onClick={() => editMode ? handleSave() : setEditMode(true)}
+                disabled={saving}
                 className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none"
               >
-                {editMode ? 'Gem' : 'Rediger'}
+                {saving ? 'Gemmer...' : (editMode ? 'Gem' : 'Rediger')}
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Profile Picture */}
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="relative">
+                  <Avatar className="w-24 h-24">
+                    <AvatarImage src={profile.avatar_url || undefined} alt="Profilbillede" />
+                    <AvatarFallback className="bg-gray-700 text-white text-xl">
+                      {profile.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-purple-500 rounded-full p-2 cursor-pointer hover:bg-purple-600 transition-colors">
+                    <Camera className="w-4 h-4 text-white" />
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+                {uploading && <span className="text-gray-300">Uploader...</span>}
+              </div>
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-gray-300 mb-2 block">Navn</label>
                   {editMode ? (
                     <Input
-                      value={userInfo.name}
-                      onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
+                      value={profile.name || ''}
+                      onChange={(e) => setProfile({...profile, name: e.target.value})}
                       className="bg-gray-700 border-gray-600 text-white"
                     />
                   ) : (
-                    <p className="text-white font-medium">{userInfo.name}</p>
+                    <p className="text-white font-medium">{profile.name || 'Ikke angivet'}</p>
                   )}
                 </div>
                 <div>
                   <label className="text-sm text-gray-300 mb-2 block">Email</label>
                   {editMode ? (
                     <Input
-                      value={userInfo.email}
-                      onChange={(e) => setUserInfo({...userInfo, email: e.target.value})}
+                      value={profile.email || ''}
+                      onChange={(e) => setProfile({...profile, email: e.target.value})}
                       className="bg-gray-700 border-gray-600 text-white"
                     />
                   ) : (
-                    <p className="text-white font-medium">{userInfo.email}</p>
+                    <p className="text-white font-medium">{profile.email || 'Ikke angivet'}</p>
                   )}
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-sm text-gray-300 mb-2 block">Adresse</label>
                   {editMode ? (
                     <Input
-                      value={userInfo.address}
-                      onChange={(e) => setUserInfo({...userInfo, address: e.target.value})}
+                      value={profile.address || ''}
+                      onChange={(e) => setProfile({...profile, address: e.target.value})}
                       className="bg-gray-700 border-gray-600 text-white"
                     />
                   ) : (
-                    <p className="text-white font-medium">{userInfo.address}</p>
+                    <p className="text-white font-medium">{profile.address || 'Ikke angivet'}</p>
                   )}
                 </div>
                 <div>
@@ -124,17 +313,37 @@ const UserProfile = () => {
                   {editMode ? (
                     <Input
                       type="date"
-                      value={userInfo.birthDate}
-                      onChange={(e) => setUserInfo({...userInfo, birthDate: e.target.value})}
+                      value={profile.birth_date || ''}
+                      onChange={(e) => setProfile({...profile, birth_date: e.target.value})}
                       className="bg-gray-700 border-gray-600 text-white"
                     />
                   ) : (
-                    <p className="text-white font-medium">{userInfo.birthDate}</p>
+                    <p className="text-white font-medium">{profile.birth_date || 'Ikke angivet'}</p>
                   )}
                 </div>
                 <div>
                   <label className="text-sm text-gray-300 mb-2 block">Klasse</label>
-                  <p className="text-white font-medium">{userInfo.grade}</p>
+                  {editMode ? (
+                    <Input
+                      value={profile.grade || ''}
+                      onChange={(e) => setProfile({...profile, grade: e.target.value})}
+                      className="bg-gray-700 border-gray-600 text-white"
+                    />
+                  ) : (
+                    <p className="text-white font-medium">{profile.grade || 'Ikke angivet'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Skole</label>
+                  {editMode ? (
+                    <Input
+                      value={profile.school || ''}
+                      onChange={(e) => setProfile({...profile, school: e.target.value})}
+                      className="bg-gray-700 border-gray-600 text-white"
+                    />
+                  ) : (
+                    <p className="text-white font-medium">{profile.school || 'Ikke angivet'}</p>
+                  )}
                 </div>
               </div>
             </CardContent>
