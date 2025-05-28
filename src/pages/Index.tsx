@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,14 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [showRoleSelection, setShowRoleSelection] = useState(false);
+
+  // Sample user progress data
+  const userProgress = {
+    matematik: 75,
+    dansk: 68,
+    engelsk: 82,
+    naturteknik: 71
+  };
 
   const userRoles = [
     {
@@ -95,7 +102,7 @@ const Index = () => {
             </p>
           </div>
 
-          <ProgressDashboard />
+          <ProgressDashboard userProgress={userProgress} />
           <AITutor user={user} />
           <GameHub />
         </div>
