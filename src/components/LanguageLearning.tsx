@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +21,7 @@ const LanguageLearning = () => {
     { code: "tysk", name: "Tysk", flag: "🇩🇪", color: "bg-red-500" },
     { code: "fransk", name: "Fransk", flag: "🇫🇷", color: "bg-blue-600" },
     { code: "spansk", name: "Spansk", flag: "🇪🇸", color: "bg-yellow-500" },
+    { code: "kinesisk", name: "Kinesisk", flag: "🇨🇳", color: "bg-red-600" },
     { code: "svensk", name: "Svensk", flag: "🇸🇪", color: "bg-blue-400" },
     { code: "norsk", name: "Norsk", flag: "🇳🇴", color: "bg-red-600" }
   ];
@@ -65,6 +65,86 @@ const LanguageLearning = () => {
             type: "multiple",
             question: "Hvilket tal er 'fifteen'?",
             options: ["14", "15", "16", "50"],
+            correct: 1
+          }
+        ]
+      }
+    ],
+    tysk: [
+      {
+        title: "Grundlæggende hilsner",
+        questions: [
+          {
+            type: "translate",
+            question: "Oversæt til tysk: 'Hej, hvordan har du det?'",
+            options: ["Hallo, wie geht es dir?", "Guten Tag", "Auf Wiedersehen", "Danke schön"],
+            correct: 0,
+            audio: "Hallo, wie geht es dir?"
+          },
+          {
+            type: "multiple",
+            question: "Hvad betyder 'Guten Morgen'?",
+            options: ["God aften", "God morgen", "God nat", "God dag"],
+            correct: 1
+          }
+        ]
+      }
+    ],
+    fransk: [
+      {
+        title: "Grundlæggende hilsner",
+        questions: [
+          {
+            type: "translate",
+            question: "Oversæt til fransk: 'Hej, hvordan har du det?'",
+            options: ["Bonjour, comment allez-vous?", "Au revoir", "Merci beaucoup", "Bonne nuit"],
+            correct: 0,
+            audio: "Bonjour, comment allez-vous?"
+          },
+          {
+            type: "multiple",
+            question: "Hvad betyder 'Bonjour'?",
+            options: ["God aften", "God morgen", "God nat", "Farvel"],
+            correct: 1
+          }
+        ]
+      }
+    ],
+    spansk: [
+      {
+        title: "Grundlæggende hilsner",
+        questions: [
+          {
+            type: "translate",
+            question: "Oversæt til spansk: 'Hej, hvordan har du det?'",
+            options: ["Hola, ¿cómo estás?", "Adiós", "Gracias", "Buenas noches"],
+            correct: 0,
+            audio: "Hola, ¿cómo estás?"
+          },
+          {
+            type: "multiple",
+            question: "Hvad betyder 'Buenos días'?",
+            options: ["God aften", "God morgen", "God nat", "Farvel"],
+            correct: 1
+          }
+        ]
+      }
+    ],
+    kinesisk: [
+      {
+        title: "Grundlæggende hilsner",
+        questions: [
+          {
+            type: "translate",
+            question: "Oversæt til kinesisk: 'Hej, hvordan har du det?'",
+            options: ["你好，你好吗？", "再见", "谢谢", "晚安"],
+            correct: 0,
+            audio: "你好，你好吗？"
+          },
+          {
+            type: "multiple",
+            question: "Hvad betyder '你好'?",
+            options: ["Farvel", "Hej/Hallo", "Tak", "Undskyld"],
             correct: 1
           }
         ]
@@ -159,7 +239,7 @@ const LanguageLearning = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {languages.map((lang) => (
                   <Button
                     key={lang.code}
