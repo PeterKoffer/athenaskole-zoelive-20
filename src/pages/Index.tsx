@@ -5,11 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Crown, Trophy, Coins, Book, Users, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import AITutor from "@/components/AITutor";
 import GameHub from "@/components/GameHub";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
+
 const Index = () => {
   const [user, setUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -20,23 +22,32 @@ const Index = () => {
     engelsk: 72,
     naturteknik: 58
   });
+  const navigate = useNavigate();
+
   const handleLogin = userData => {
     setUser(userData);
     setShowAuth(false);
   };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
   return <div className="min-h-screen bg-gray-900">
       {/* Dark NFT-style Header */}
       <header className="bg-gray-900 border-b border-gray-800 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-lime-400 rounded-lg flex items-center justify-center">
-                <span className="text-gray-900 font-bold text-lg">L</span>
+              {/* New Athena Logo */}
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-400 via-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                  <span className="text-gray-900 font-bold text-lg">Α</span>
+                </div>
               </div>
-              <h1 className="text-2xl font-bold">Læreleg</h1>
-              <Badge variant="secondary" className="bg-lime-400 text-gray-900 border-lime-400">
-                Learning Play
-              </Badge>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                Athena
+              </h1>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -46,12 +57,15 @@ const Index = () => {
                     <span className="font-semibold text-white">{learekroner} Lære-Kroner</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-lime-400 rounded-full flex items-center justify-center">
-                      <span className="font-bold text-gray-900">{user.name[0]}</span>
-                    </div>
+                    <button
+                      onClick={handleProfileClick}
+                      className="w-10 h-10 bg-gradient-to-br from-purple-400 via-blue-500 to-cyan-400 rounded-full flex items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+                    >
+                      <span className="font-bold text-white text-lg">{user.name[0]}</span>
+                    </button>
                     <span className="text-white">Hej, {user.name}!</span>
                   </div>
-                </> : <Button variant="secondary" onClick={() => setShowAuth(true)} className="bg-lime-400 text-gray-900 hover:bg-lime-500 border-lime-400">
+                </> : <Button variant="secondary" onClick={() => setShowAuth(true)} className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white hover:from-purple-500 hover:to-cyan-500 border-none">
                   Log ind
                 </Button>}
             </div>
@@ -62,23 +76,23 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         {!user ? <div className="text-center py-16 relative overflow-hidden">
             {/* Background decoration dots */}
-            <div className="absolute top-20 left-20 w-2 h-2 bg-lime-400 rounded-full"></div>
-            <div className="absolute top-40 right-32 w-3 h-3 bg-purple-400 rounded-full"></div>
+            <div className="absolute top-20 left-20 w-2 h-2 bg-purple-400 rounded-full"></div>
+            <div className="absolute top-40 right-32 w-3 h-3 bg-cyan-400 rounded-full"></div>
             <div className="absolute bottom-40 left-40 w-2 h-2 bg-blue-400 rounded-full"></div>
-            <div className="absolute bottom-20 right-20 w-4 h-4 bg-pink-400 rounded-full"></div>
+            <div className="absolute bottom-20 right-20 w-4 h-4 bg-purple-500 rounded-full"></div>
             
             <div className="mb-8 relative z-10">
               <h2 className="text-5xl font-bold text-white mb-4">
-                Velkommen til Læreleg! 🇩🇰
+                Velkommen til Athena! 🇩🇰
               </h2>
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                AI-drevet læring med danske værdier - Gør læring til leg!
+                AI-drevet læring med danske værdier - Din personlige læringsguddess!
               </p>
               
               <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
-                <Card className="bg-gray-800 border-gray-700 hover:border-lime-400 transition-colors group">
+                <Card className="bg-gray-800 border-gray-700 hover:border-purple-400 transition-colors group">
                   <CardHeader className="text-center">
-                    <Book className="w-12 h-12 text-lime-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <Book className="w-12 h-12 text-purple-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
                     <CardTitle className="text-white">AI Lærer</CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -88,33 +102,33 @@ const Index = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800 border-gray-700 hover:border-lime-400 transition-colors group">
+                <Card className="bg-gray-800 border-gray-700 hover:border-cyan-400 transition-colors group">
                   <CardHeader className="text-center">
-                    <Trophy className="w-12 h-12 text-lime-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                    <CardTitle className="text-white">Spil & Belønninger</CardTitle>
+                    <Trophy className="w-12 h-12 text-cyan-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <CardTitle className="text-white">3D Badges & Belønninger</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-300">
-                      Tjen Lære-Kroner, lås op for badges og konkurrér venligt med klassekammerater
+                      Tjen Lære-Kroner, lås op for 3D Pixar-style badges og konkurrér venligt
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800 border-gray-700 hover:border-lime-400 transition-colors group">
+                <Card className="bg-gray-800 border-gray-700 hover:border-blue-400 transition-colors group">
                   <CardHeader className="text-center">
-                    <Users className="w-12 h-12 text-lime-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                    <CardTitle className="text-white">Forældreindblanding</CardTitle>
+                    <Users className="w-12 h-12 text-blue-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <CardTitle className="text-white">Personlig Profil</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-300">
-                      Ugentlige rapporter og fremskridtsanalyse til forældre og lærere
+                      Dine fremskridt, badges og personlige læringsrejse på ét sted
                     </p>
                   </CardContent>
                 </Card>
               </div>
 
               <div className="space-y-4">
-                <Button size="lg" onClick={() => setShowAuth(true)} className="bg-lime-400 hover:bg-lime-500 text-gray-900 px-8 py-3 text-lg font-semibold rounded-full">
+                <Button size="lg" onClick={() => setShowAuth(true)} className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 text-lg font-semibold rounded-full border-none">
                   Start din lærerejse gratis
                 </Button>
                 <Button size="lg" variant="outline" className="border-gray-600 px-8 py-3 text-lg ml-4 rounded-full bg-slate-50 text-slate-950">
@@ -124,19 +138,19 @@ const Index = () => {
             </div>
           </div> : <Tabs defaultValue="dashboard" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5 bg-gray-800 border border-gray-700">
-              <TabsTrigger value="dashboard" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
+              <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-cyan-400 data-[state=active]:text-white text-gray-300">
                 Dashboard
               </TabsTrigger>
-              <TabsTrigger value="tutor" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
+              <TabsTrigger value="tutor" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-cyan-400 data-[state=active]:text-white text-gray-300">
                 AI Lærer
               </TabsTrigger>
-              <TabsTrigger value="games" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
+              <TabsTrigger value="games" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-cyan-400 data-[state=active]:text-white text-gray-300">
                 Spil
               </TabsTrigger>
-              <TabsTrigger value="progress" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
+              <TabsTrigger value="progress" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-cyan-400 data-[state=active]:text-white text-gray-300">
                 Fremskridt
               </TabsTrigger>
-              <TabsTrigger value="subscription" className="data-[state=active]:bg-lime-400 data-[state=active]:text-gray-900 text-gray-300">
+              <TabsTrigger value="subscription" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-cyan-400 data-[state=active]:text-white text-gray-300">
                 Abonnement
               </TabsTrigger>
             </TabsList>
@@ -146,7 +160,7 @@ const Index = () => {
                 <Card className="col-span-full lg:col-span-2 bg-gray-800 border-gray-700">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2 text-white">
-                      <Star className="w-5 h-5 text-lime-400" />
+                      <Star className="w-5 h-5 text-purple-400" />
                       <span>Dagens Udfordringer</span>
                     </CardTitle>
                   </CardHeader>
@@ -177,22 +191,26 @@ const Index = () => {
 
                 <Card className="bg-gray-800 border-gray-700">
                   <CardHeader>
-                    <CardTitle className="text-center text-white">Dine Badges</CardTitle>
+                    <CardTitle className="text-center text-white">Dine 3D Badges</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center space-y-3">
                     <div className="grid grid-cols-2 gap-2">
-                      <Badge variant="outline" className="p-2 border-lime-400 text-lime-400 bg-gray-900">
-                        🏆 Matematik Viking
-                      </Badge>
-                      <Badge variant="outline" className="p-2 border-blue-400 text-blue-400 bg-gray-900">
-                        📚 Ordets Mester
-                      </Badge>
-                      <Badge variant="outline" className="p-2 border-green-400 text-green-400 bg-gray-900">
-                        🎯 Stavning Pro
-                      </Badge>
-                      <Badge variant="outline" className="p-2 border-purple-400 text-purple-400 bg-gray-900">
-                        🧪 Natur Forsker
-                      </Badge>
+                      <div className="p-3 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 transform hover:scale-105 transition-transform shadow-lg">
+                        <div className="text-2xl mb-1">🏆</div>
+                        <div className="text-xs font-semibold text-white">Matematik Viking</div>
+                      </div>
+                      <div className="p-3 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 transform hover:scale-105 transition-transform shadow-lg">
+                        <div className="text-2xl mb-1">📚</div>
+                        <div className="text-xs font-semibold text-white">Ordets Mester</div>
+                      </div>
+                      <div className="p-3 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 transform hover:scale-105 transition-transform shadow-lg">
+                        <div className="text-2xl mb-1">🎯</div>
+                        <div className="text-xs font-semibold text-white">Stavning Pro</div>
+                      </div>
+                      <div className="p-3 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 transform hover:scale-105 transition-transform shadow-lg">
+                        <div className="text-2xl mb-1">🧪</div>
+                        <div className="text-xs font-semibold text-white">Natur Forsker</div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -226,7 +244,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="tutor">
-              <AITutor />
+              <AITutor user={user} />
             </TabsContent>
 
             <TabsContent value="games">
@@ -247,10 +265,11 @@ const Index = () => {
 
       {/* Pyt-tid Button - Danish stress relief */}
       {user && <div className="fixed bottom-6 right-6">
-          <Button className="bg-lime-400 hover:bg-lime-500 text-gray-900 rounded-full w-16 h-16 shadow-lg border-2 border-gray-800" onClick={() => alert("Pyt-tid! Tag en dyb indånding og byg nogle LEGO klodser 🧱")}>
+          <Button className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white rounded-full w-16 h-16 shadow-lg border-none" onClick={() => alert("Pyt-tid! Tag en dyb indånding og byg nogle LEGO klodser 🧱")}>
             <span className="text-2xl">😌</span>
           </Button>
         </div>}
     </div>;
 };
+
 export default Index;
