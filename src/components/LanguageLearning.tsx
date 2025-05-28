@@ -5,8 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Heart, Star, Trophy, Volume2, RotateCcw } from "lucide-react";
 
-const LanguageLearning = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState("engelsk");
+interface LanguageLearningProps {
+  initialLanguage?: string;
+}
+
+const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage || "engelsk");
   const [currentLesson, setCurrentLesson] = useState(0);
   const [hearts, setHearts] = useState(5);
   const [streak, setStreak] = useState(3);
@@ -15,6 +19,13 @@ const LanguageLearning = () => {
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+
+  // Update selectedLanguage when initialLanguage changes
+  useEffect(() => {
+    if (initialLanguage) {
+      setSelectedLanguage(initialLanguage);
+    }
+  }, [initialLanguage]);
 
   const languages = [
     { code: "engelsk", name: "Engelsk", flag: "🇬🇧", color: "bg-blue-500" },

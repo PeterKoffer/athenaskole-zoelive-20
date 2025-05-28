@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, Send, Volume2, VolumeX, BookOpen, Calculator, Globe, Atom } from "lucide-react";
+import { Mic, MicOff, Send, Volume2, VolumeX, BookOpen, Calculator, Globe, Atom, ArrowRight } from "lucide-react";
 import LanguageLearning from "./LanguageLearning";
 
 const AITutor = ({ user }) => {
@@ -20,6 +20,8 @@ const AITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentSubject, setCurrentSubject] = useState("matematik");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
+  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -37,6 +39,16 @@ const AITutor = ({ user }) => {
     { id: "sprog", name: "Sprog", emoji: "🌍", icon: Globe },
     { id: "naturteknik", name: "Natur & Teknik", emoji: "🧪", icon: Atom },
     { id: "historie", name: "Historie", emoji: "🏰", icon: BookOpen }
+  ];
+
+  const languages = [
+    { code: "engelsk", name: "Engelsk", flag: "🇬🇧", color: "bg-blue-500" },
+    { code: "tysk", name: "Tysk", flag: "🇩🇪", color: "bg-red-500" },
+    { code: "fransk", name: "Fransk", flag: "🇫🇷", color: "bg-blue-600" },
+    { code: "spansk", name: "Spansk", flag: "🇪🇸", color: "bg-yellow-500" },
+    { code: "kinesisk", name: "Kinesisk", flag: "🇨🇳", color: "bg-red-600" },
+    { code: "svensk", name: "Svensk", flag: "🇸🇪", color: "bg-blue-400" },
+    { code: "norsk", name: "Norsk", flag: "🇳🇴", color: "bg-red-600" }
   ];
 
   const learningOptions = [
@@ -109,7 +121,7 @@ const AITutor = ({ user }) => {
 
   const handleLearningOption = (option) => {
     if (option.id === "language") {
-      setShowLanguageLearning(true);
+      setShowLanguageSelection(true);
       return;
     }
 
@@ -152,6 +164,12 @@ const AITutor = ({ user }) => {
     }, 1000);
   };
 
+  const handleLanguageSelect = (languageCode) => {
+    setSelectedLanguage(languageCode);
+    setShowLanguageSelection(false);
+    setShowLanguageLearning(true);
+  };
+
   const toggleListening = () => {
     setIsListening(!isListening);
     if (!isListening) {
@@ -169,17 +187,64 @@ const AITutor = ({ user }) => {
     }
   };
 
+  if (showLanguageSelection) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Button
+          variant="outline"
+          onClick={() => setShowLanguageSelection(false)}
+          className="text-white border-gray-600 hover:bg-gray-700"
+        >
+          ← Tilbage til AI Lærer
+        </Button>
+        
+        <Card className="bg-gray-900 border-gray-800">
+          <CardHeader>
+            <CardTitle className="text-white text-center">
+              <span className="flex items-center justify-center space-x-2">
+                <span className="text-2xl">🌍</span>
+                <span>Vælg dit sprog</span>
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-center mb-6">
+              Hvilket sprog vil du gerne lære i dag?
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {languages.map((lang) => (
+                <Button
+                  key={lang.code}
+                  variant="outline"
+                  className="h-24 bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-purple-400 text-white flex flex-col space-y-2 group"
+                  onClick={() => handleLanguageSelect(lang.code)}
+                >
+                  <span className="text-3xl">{lang.flag}</span>
+                  <span className="text-sm font-medium">{lang.name}</span>
+                  <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (showLanguageLearning) {
     return (
       <div className="space-y-6">
         <Button
           variant="outline"
-          onClick={() => setShowLanguageLearning(false)}
+          onClick={() => {
+            setShowLanguageLearning(false);
+            setSelectedLanguage("");
+          }}
           className="text-white border-gray-600 hover:bg-gray-700"
         >
           ← Tilbage til AI Lærer
         </Button>
-        <LanguageLearning />
+        <LanguageLearning initialLanguage={selectedLanguage} />
       </div>
     );
   }
@@ -214,7 +279,7 @@ const AITutor = ({ user }) => {
                   onClick={() => {
                     setCurrentSubject(subject.id);
                     if (subject.id === "sprog") {
-                      setShowLanguageLearning(true);
+                      setShowLanguageSelection(true);
                     }
                   }}
                 >
