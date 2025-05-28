@@ -69,7 +69,8 @@ const AITutor = ({ user }) => {
     const userMessage = {
       role: "user",
       content: inputMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
+      showOptions: false
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -83,7 +84,8 @@ const AITutor = ({ user }) => {
       const aiResponse = {
         role: "assistant",
         content: randomResponse,
-        timestamp: new Date()
+        timestamp: new Date(),
+        showOptions: false
       };
       
       setMessages(prev => [...prev, aiResponse]);
@@ -104,7 +106,8 @@ const AITutor = ({ user }) => {
     const optionMessage = {
       role: "user",
       content: `Jeg vil gerne ${option.title.toLowerCase()}`,
-      timestamp: new Date()
+      timestamp: new Date(),
+      showOptions: false
     };
 
     setMessages(prev => [...prev, optionMessage]);
@@ -131,7 +134,8 @@ const AITutor = ({ user }) => {
       const aiResponse = {
         role: "assistant",
         content: response,
-        timestamp: new Date()
+        timestamp: new Date(),
+        showOptions: false
       };
       
       setMessages(prev => [...prev, aiResponse]);
