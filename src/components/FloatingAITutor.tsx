@@ -6,9 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Send, Volume2, VolumeX, MessageCircle, X, Move } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
 const FloatingAITutor = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
       content: "Hej! Jeg er din flydende AI-lærer. Hvad kan jeg hjælpe dig med?",
@@ -57,7 +63,7 @@ const FloatingAITutor = () => {
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       role: "user" as const,
       content: inputMessage,
       timestamp: new Date()
@@ -68,7 +74,7 @@ const FloatingAITutor = () => {
 
     // Simulate AI response
     setTimeout(() => {
-      const aiResponse = {
+      const aiResponse: Message = {
         role: "assistant" as const,
         content: "Det er et godt spørgsmål! Lad mig hjælpe dig med det...",
         timestamp: new Date()

@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,10 +9,17 @@ import ChatMessage from "./ai-tutor/ChatMessage";
 import LearningOptions from "./ai-tutor/LearningOptions";
 import ChatInput from "./ai-tutor/ChatInput";
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  showOptions?: boolean;
+}
+
 const AITutor = ({ user }) => {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
-      role: "assistant",
+      role: "assistant" as const,
       content: user ? `Hej ${user.user_metadata?.name || 'Elev'}! Dette er hvad vi vil arbejde på i dag. Hvor vil du gerne begynde? 🇩🇰` : "Hej! Jeg er din AI-lærer. Hvad vil du gerne lære i dag? 🇩🇰",
       timestamp: new Date(),
       showOptions: user ? true : false
@@ -68,8 +74,8 @@ const AITutor = ({ user }) => {
   }, [messages]);
 
   const handleSendMessage = (message: string) => {
-    const userMessage = {
-      role: "user",
+    const userMessage: Message = {
+      role: "user" as const,
       content: message,
       timestamp: new Date(),
       showOptions: false
@@ -81,8 +87,8 @@ const AITutor = ({ user }) => {
       const responses = predefinedResponses[currentSubject] || predefinedResponses.matematik;
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
       
-      const aiResponse = {
-        role: "assistant",
+      const aiResponse: Message = {
+        role: "assistant" as const,
         content: randomResponse,
         timestamp: new Date(),
         showOptions: false
@@ -107,8 +113,8 @@ const AITutor = ({ user }) => {
       return;
     }
 
-    const optionMessage = {
-      role: "user",
+    const optionMessage: Message = {
+      role: "user" as const,
       content: `Jeg vil gerne ${option.title.toLowerCase()}`,
       timestamp: new Date(),
       showOptions: false
@@ -135,8 +141,8 @@ const AITutor = ({ user }) => {
           response = "Lad os komme i gang med at lære!";
       }
 
-      const aiResponse = {
-        role: "assistant",
+      const aiResponse: Message = {
+        role: "assistant" as const,
         content: response,
         timestamp: new Date(),
         showOptions: false
