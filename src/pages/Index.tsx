@@ -11,7 +11,6 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import SubjectsSection from "@/components/home/SubjectsSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
-import Phase1FeaturesSection from "@/components/home/Phase1FeaturesSection";
 import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
@@ -51,8 +50,7 @@ const Index = () => {
 
   const handleLogin = () => {
     setShowAuthModal(false);
-    // After login, navigate to daily program
-    navigate('/daily-program');
+    // After login, stay on homepage instead of navigating to daily program
   };
 
   return (
@@ -82,7 +80,6 @@ const Index = () => {
             <HeroSection onGetStarted={handleGetStarted} />
             <SubjectsSection />
             <FeaturesSection />
-            <Phase1FeaturesSection onShowAITutor={() => setShowAITutor(true)} />
             <CTASection onGetStarted={handleGetStarted} />
           </>
         )}
