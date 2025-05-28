@@ -171,7 +171,7 @@ const Index = () => {
             </div>
 
             <div className="text-center">
-              <Button variant="outline" onClick={() => setShowRoleSelection(false)} className="border-gray-600 hover:bg-gray-700 text-slate-950">
+              <Button variant="outline" onClick={() => setShowRoleSelection(false)} className="border-gray-600 text-slate-950 bg-slate-500 hover:bg-slate-400">
                 Tilbage
               </Button>
             </div>
