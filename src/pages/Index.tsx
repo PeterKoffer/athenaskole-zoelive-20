@@ -307,11 +307,12 @@ const Index = () => {
         </p>
       </footer>
 
-      <AuthModal show={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <AuthModal 
+        onClose={() => setShowAuthModal(false)} 
+        onLogin={() => setShowAuthModal(false)} 
+      />
     </div>
   );
 };
-
-import EnhancedAITutor from "@/components/EnhancedAITutor";
 
 export default Index;
