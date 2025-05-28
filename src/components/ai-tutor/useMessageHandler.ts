@@ -10,10 +10,12 @@ interface UseMessageHandlerProps {
 }
 
 export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMessageHandlerProps) => {
+  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Elev';
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
-      content: user ? `Hej ${user.user_metadata?.name || 'Elev'}! Dette er hvad vi vil arbejde på i dag. Hvor vil du gerne begynde? 🇩🇰` : "Hej! Jeg er din AI-lærer. Hvad vil du gerne lære i dag? 🇩🇰",
+      content: user ? `Hej ${firstName}! Dette er hvad vi vil arbejde på i dag. Hvor vil du gerne begynde? 🇩🇰` : "Hej! Jeg er din AI-lærer. Hvad vil du gerne lære i dag? 🇩🇰",
       timestamp: new Date(),
       showOptions: user ? true : false
     }
@@ -31,7 +33,13 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
 
     setTimeout(() => {
       const responses = predefinedResponses[currentSubject] || predefinedResponses.matematik;
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      let randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      // Replace any full name references with first name
+      if (user?.user_metadata?.name) {
+        const fullName = user.user_metadata.name;
+        randomResponse = randomResponse.replace(new RegExp(fullName, 'g'), firstName);
+      }
       
       const aiResponse: Message = {
         role: "assistant" as const,
@@ -64,7 +72,13 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
     setMessages(prev => [...prev, optionMessage]);
 
     setTimeout(() => {
-      const response = learningOptionResponses[option.id] || learningOptionResponses.default;
+      let response = learningOptionResponses[option.id] || learningOptionResponses.default;
+      
+      // Replace any name references with first name
+      if (user?.user_metadata?.name) {
+        const fullName = user.user_metadata.name;
+        response = response.replace(new RegExp(fullName, 'g'), firstName);
+      }
 
       const aiResponse: Message = {
         role: "assistant" as const,

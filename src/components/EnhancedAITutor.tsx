@@ -15,6 +15,7 @@ import DailyChallenges from "./gamification/DailyChallenges";
 import RewardsSystem from "./gamification/RewardsSystem";
 import ParentNotifications from "./parent/ParentNotifications";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
+import { Target, Clock, Star } from "lucide-react";
 
 const EnhancedAITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -35,7 +36,7 @@ const EnhancedAITutor = ({ user }) => {
 
   // Mock child progress data for parent notifications
   const childProgress = {
-    childName: user?.user_metadata?.name || "Emma",
+    childName: user?.user_metadata?.name?.split(' ')[0] || "Emma",
     weeklyMinutes: 95,
     completedLessons: 8,
     pronunciationScore: 87,
@@ -43,6 +44,13 @@ const EnhancedAITutor = ({ user }) => {
     streak: 5,
     newAchievements: ["Udtale Mester", "7 Dages Streak"]
   };
+
+  const todaysDate = new Date().toLocaleDateString('da-DK', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -121,17 +129,39 @@ const EnhancedAITutor = ({ user }) => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* Welcome Message with Today's Agenda */}
+      <Card className="bg-gradient-to-r from-purple-600 to-cyan-600 border-none">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-3 text-white">
+            <div className="text-4xl">🎓</div>
+            <div>
+              <h1 className="text-3xl font-bold">Hej {user?.user_metadata?.name?.split(' ')[0] || 'Elev'}! Jeg er Athena</h1>
+              <p className="text-purple-100 text-lg">{todaysDate}</p>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
+            <p className="text-xl mb-4">
+              Velkommen til din personlige AI-lærer! Jeg har forberedt et spændende program til dig i dag. 
+              Du kan vælge hvor du vil starte, og jeg vil guide dig gennem hver aktivitet.
+            </p>
+            <div className="flex items-center space-x-2">
+              <Star className="w-6 h-6 text-yellow-300" />
+              <span className="text-lg">Lad os lære noget fantastisk sammen!</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center space-x-2 text-white">
               <span className="text-2xl">🎓</span>
-              <span>Athena AI Lærer - Forbedret Version</span>
+              <span>Athena AI Lærer</span>
             </span>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
-                Phase 1 Features
-              </Badge>
               <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">
                 {currentCoins} ⭐
               </Badge>
@@ -234,7 +264,7 @@ const EnhancedAITutor = ({ user }) => {
         <TabsContent value="parents" className="space-y-6">
           <ParentNotifications
             childProgress={childProgress}
-            parentEmail="foraeldere@example.com"
+            parentEmail="foraeldre@example.com"
           />
         </TabsContent>
       </Tabs>

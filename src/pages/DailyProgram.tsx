@@ -5,12 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { BookOpen, Calculator, Globe, Palette, Target, Clock, Star } from "lucide-react";
+
 const DailyProgram = () => {
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  
+  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Elev';
+  
   const todaysDate = new Date().toLocaleDateString('da-DK', {
     weekday: 'long',
     year: 'numeric',
@@ -59,7 +61,8 @@ const DailyProgram = () => {
       }
     });
   };
-  return <div className="min-h-screen bg-gray-900 text-white p-4">
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-4">
       <div className="max-w-4xl mx-auto">
         {/* Nelie's Welcome */}
         <Card className="bg-gradient-to-r from-purple-600 to-cyan-600 border-none mb-8">
@@ -67,7 +70,7 @@ const DailyProgram = () => {
             <CardTitle className="flex items-center space-x-3 text-white">
               <div className="text-4xl">🎓</div>
               <div>
-                <h1 className="text-2xl font-bold">Hej {user?.user_metadata?.name || 'Elev'}! Jeg er Nelie</h1>
+                <h1 className="text-2xl font-bold">Hej {firstName}! Jeg er Nelie</h1>
                 <p className="text-purple-100">{todaysDate}</p>
               </div>
             </CardTitle>
@@ -153,6 +156,8 @@ const DailyProgram = () => {
           </Button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default DailyProgram;
