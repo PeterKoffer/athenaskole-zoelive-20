@@ -1,11 +1,8 @@
 
+import { Message } from "./types";
+
 interface ChatMessageProps {
-  message: {
-    role: "user" | "assistant";
-    content: string;
-    timestamp: Date;
-    showOptions?: boolean;
-  };
+  message: Message;
   children?: React.ReactNode;
 }
 

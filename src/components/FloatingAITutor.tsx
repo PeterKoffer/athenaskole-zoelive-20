@@ -1,16 +1,10 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Send, Volume2, VolumeX, MessageCircle, X, Move } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
+import { Message } from "./ai-tutor/types";
 
 const FloatingAITutor = () => {
   const [isExpanded, setIsExpanded] = useState(false);

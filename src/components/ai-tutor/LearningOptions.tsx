@@ -1,12 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-
-interface LearningOption {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-}
+import { LearningOption } from "./types";
 
 interface LearningOptionsProps {
   onOptionSelect: (option: LearningOption) => void;
