@@ -43,6 +43,15 @@ const Index = () => {
     setShowAuthModal(true);
   };
 
+  const handleModalClose = () => {
+    setShowAuthModal(false);
+  };
+
+  const handleLogin = () => {
+    setShowAuthModal(false);
+    // User state will be updated automatically by useAuth hook
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <nav className="bg-gray-800 border-b border-gray-700 p-4">
@@ -214,7 +223,6 @@ const Index = () => {
               </div>
             </section>
             
-            {/* Add Phase 1 Features Showcase */}
             <section className="py-20">
               <div className="text-center mb-16">
                 <Badge className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-4 py-2 mb-4">
@@ -307,10 +315,12 @@ const Index = () => {
         </p>
       </footer>
 
-      <AuthModal 
-        onClose={() => setShowAuthModal(false)} 
-        onLogin={() => setShowAuthModal(false)} 
-      />
+      {showAuthModal && (
+        <AuthModal 
+          onClose={handleModalClose} 
+          onLogin={handleLogin} 
+        />
+      )}
     </div>
   );
 };

@@ -5,9 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const AuthModal = ({ onClose, onLogin }) => {
+interface AuthModalProps {
+  onClose: () => void;
+  onLogin: () => void;
+}
+
+const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
+  const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,14 +24,57 @@ const AuthModal = ({ onClose, onLogin }) => {
     age: ""
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login
-    onLogin({
-      name: formData.name || "Emil",
-      email: formData.email,
-      subscription: "free"
-    });
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Velkommen tilbage!",
+          description: "Du er nu logget ind.",
+        });
+        
+        onLogin();
+        onClose();
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              name: formData.name,
+              age: formData.age
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Konto oprettet!",
+          description: "Tjek din email for at bekræfte din konto.",
+        });
+        
+        setIsLogin(true);
+      }
+    } catch (error: any) {
+      console.error("Auth error:", error);
+      toast({
+        title: "Fejl",
+        description: error.message || "Der opstod en fejl ved login/registrering",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,7 +90,7 @@ const AuthModal = ({ onClose, onLogin }) => {
             <X className="w-4 h-4" />
           </Button>
           <CardTitle className="text-center text-white">
-            {isLogin ? "Log ind på Læreleg" : "Opret konto"}
+            {isLogin ? "Log ind på Athena" : "Opret konto"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -52,6 +104,7 @@ const AuthModal = ({ onClose, onLogin }) => {
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="f.eks. Emil Nielsen"
+                    required={!isLogin}
                     className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-lime-400"
                   />
                 </div>
@@ -97,8 +150,12 @@ const AuthModal = ({ onClose, onLogin }) => {
               />
             </div>
 
-            <Button type="submit" className="w-full bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold">
-              {isLogin ? "Log ind" : "Opret konto"}
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold"
+            >
+              {loading ? "Vent..." : (isLogin ? "Log ind" : "Opret konto")}
             </Button>
           </form>
 
