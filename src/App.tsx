@@ -10,6 +10,7 @@ import UserProfile from "./pages/UserProfile";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import NotFound from "./pages/NotFound";
+import FloatingAITutor from "./components/FloatingAITutor";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <FloatingAITutor />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

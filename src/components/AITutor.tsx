@@ -1,10 +1,14 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, Send, Volume2, VolumeX, BookOpen, Calculator, Globe, Atom, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import LanguageLearning from "./LanguageLearning";
+import SubjectSelector from "./ai-tutor/SubjectSelector";
+import ChatMessage from "./ai-tutor/ChatMessage";
+import LearningOptions from "./ai-tutor/LearningOptions";
+import ChatInput from "./ai-tutor/ChatInput";
 
 const AITutor = ({ user }) => {
   const [messages, setMessages] = useState([
@@ -15,31 +19,12 @@ const AITutor = ({ user }) => {
       showOptions: user ? true : false
     }
   ]);
-  const [inputMessage, setInputMessage] = useState("");
-  const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentSubject, setCurrentSubject] = useState("matematik");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
   const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const subjects = [
-    { id: "matematik", name: "Matematik", emoji: "🔢", icon: Calculator },
-    { id: "dansk", name: "Dansk", emoji: "📝", icon: BookOpen },
-    { id: "engelsk", name: "Engelsk", emoji: "🇬🇧", icon: Globe },
-    { id: "sprog", name: "Sprog", emoji: "🌍", icon: Globe },
-    { id: "naturteknik", name: "Natur & Teknik", emoji: "🧪", icon: Atom },
-    { id: "historie", name: "Historie", emoji: "🏰", icon: BookOpen }
-  ];
 
   const languages = [
     { code: "engelsk", name: "Engelsk", flag: "🇬🇧", color: "bg-blue-500" },
@@ -49,14 +34,6 @@ const AITutor = ({ user }) => {
     { code: "kinesisk", name: "Kinesisk", flag: "🇨🇳", color: "bg-red-600" },
     { code: "svensk", name: "Svensk", flag: "🇸🇪", color: "bg-blue-400" },
     { code: "norsk", name: "Norsk", flag: "🇳🇴", color: "bg-red-600" }
-  ];
-
-  const learningOptions = [
-    { id: "review", title: "Gennemgå gårsdagens emner", description: "Lad os repetere hvad du lærte sidst", icon: "🔄" },
-    { id: "new", title: "Lær noget nyt", description: "Udforsk nye emner og koncepter", icon: "✨" },
-    { id: "practice", title: "Øv tidligere emner", description: "Styrk dine færdigheder med øvelser", icon: "💪" },
-    { id: "test", title: "Tag en lille test", description: "Test din viden med sjove opgaver", icon: "🎯" },
-    { id: "language", title: "Sprogtræning", description: "Lær nye sprog som Duolingo", icon: "🌍" }
   ];
 
   const predefinedResponses = {
@@ -82,18 +59,23 @@ const AITutor = ({ user }) => {
     ]
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = (message: string) => {
     const userMessage = {
       role: "user",
-      content: inputMessage,
+      content: message,
       timestamp: new Date(),
       showOptions: false
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputMessage("");
 
     setTimeout(() => {
       const responses = predefinedResponses[currentSubject] || predefinedResponses.matematik;
@@ -168,16 +150,6 @@ const AITutor = ({ user }) => {
     setSelectedLanguage(languageCode);
     setShowLanguageSelection(false);
     setShowLanguageLearning(true);
-  };
-
-  const toggleListening = () => {
-    setIsListening(!isListening);
-    if (!isListening) {
-      setTimeout(() => {
-        setIsListening(false);
-        setInputMessage("Jeg vil gerne lære om brøker");
-      }, 2000);
-    }
   };
 
   const stopSpeaking = () => {
@@ -264,31 +236,11 @@ const AITutor = ({ user }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
-            {subjects.map((subject) => {
-              const IconComponent = subject.icon;
-              return (
-                <Button
-                  key={subject.id}
-                  variant={currentSubject === subject.id ? "default" : "outline"}
-                  className={`flex flex-col space-y-1 h-auto py-3 ${
-                    currentSubject === subject.id 
-                      ? "bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none" 
-                      : "bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-purple-400 text-white"
-                  }`}
-                  onClick={() => {
-                    setCurrentSubject(subject.id);
-                    if (subject.id === "sprog") {
-                      setShowLanguageSelection(true);
-                    }
-                  }}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  <span className="text-xs">{subject.name}</span>
-                </Button>
-              );
-            })}
-          </div>
+          <SubjectSelector
+            currentSubject={currentSubject}
+            onSubjectChange={setCurrentSubject}
+            onLanguageSelect={() => setShowLanguageSelection(true)}
+          />
         </CardContent>
       </Card>
 
@@ -299,86 +251,20 @@ const AITutor = ({ user }) => {
         <CardContent className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto space-y-4 mb-4">
             {messages.map((message, index) => (
-              <div key={index}>
-                <div
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white'
-                        : 'bg-gray-800 text-gray-100 border border-gray-700'
-                    }`}
-                  >
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {message.timestamp.toLocaleTimeString('da-DK')}
-                    </p>
-                  </div>
-                </div>
-                
+              <ChatMessage key={index} message={message}>
                 {message.showOptions && (
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {learningOptions.map((option) => (
-                      <Button
-                        key={option.id}
-                        variant="outline"
-                        className="h-auto p-4 bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-purple-400 text-left"
-                        onClick={() => handleLearningOption(option)}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <span className="text-2xl">{option.icon}</span>
-                          <div>
-                            <div className="font-medium text-white">{option.title}</div>
-                            <div className="text-sm text-gray-300">{option.description}</div>
-                          </div>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
+                  <LearningOptions onOptionSelect={handleLearningOption} />
                 )}
-              </div>
+              </ChatMessage>
             ))}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="flex space-x-2">
-            <Input
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Skriv dit spørgsmål her..."
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleListening}
-              className={`border-gray-600 ${isListening ? "bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-none" : "bg-gray-800 text-gray-300 hover:bg-gray-700"}`}
-            >
-              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={isSpeaking ? stopSpeaking : () => {}}
-              className={`border-gray-600 ${isSpeaking ? "bg-blue-400 text-gray-900 border-blue-400" : "bg-gray-800 text-gray-300"}`}
-              disabled={!isSpeaking}
-            >
-              {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </Button>
-            <Button onClick={handleSendMessage} size="icon" className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none">
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {isListening && (
-            <div className="mt-2 text-center">
-              <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 animate-pulse">
-                🎤 Lytter... Tal nu!
-              </Badge>
-            </div>
-          )}
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            isSpeaking={isSpeaking}
+            onStopSpeaking={stopSpeaking}
+          />
         </CardContent>
       </Card>
     </div>
