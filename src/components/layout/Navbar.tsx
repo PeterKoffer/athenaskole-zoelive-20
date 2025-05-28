@@ -39,11 +39,11 @@ const Navbar = ({
                 <BookOpenCheck className="w-4 h-4 mr-2" />
                 AI Lærer
               </Button>
-              <Button variant="outline" onClick={() => navigate('/profile')}>
+              <Button variant="outline" onClick={() => navigate('/profile')} className="text-slate-950">
                 <Settings className="w-4 h-4 mr-2" />
                 Profil
               </Button>
-              <Button variant="outline" onClick={signOut}>
+              <Button variant="outline" onClick={signOut} className="text-slate-950">
                 <LogOut className="w-4 h-4 mr-2" />
                 Log ud
               </Button>
