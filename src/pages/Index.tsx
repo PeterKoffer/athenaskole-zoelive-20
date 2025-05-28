@@ -8,10 +8,12 @@ import { useAuth } from "@/hooks/useAuth";
 import AITutor from "@/components/AITutor";
 import GameHub from "@/components/GameHub";
 import ProgressDashboard from "@/components/ProgressDashboard";
-
 const Index = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const {
+    user,
+    signOut
+  } = useAuth();
   const [showRoleSelection, setShowRoleSelection] = useState(false);
 
   // Sample user progress data
@@ -21,45 +23,37 @@ const Index = () => {
     engelsk: 82,
     naturteknik: 71
   };
-
-  const userRoles = [
-    {
-      id: "student",
-      title: "Elev",
-      description: "Log ind som elev for at få adgang til lektioner og spil",
-      icon: GraduationCap,
-      color: "bg-blue-500 hover:bg-blue-600",
-      route: "/auth?role=student"
-    },
-    {
-      id: "parent",
-      title: "Forælder",
-      description: "Følg dit barns fremskridt og kommuniker med skolen",
-      icon: Users,
-      color: "bg-green-500 hover:bg-green-600",
-      route: "/auth?role=parent"
-    },
-    {
-      id: "teacher",
-      title: "Lærer",
-      description: "Administrer klasser og følg elevernes udvikling",
-      icon: BookOpen,
-      color: "bg-purple-500 hover:bg-purple-600",
-      route: "/auth?role=teacher"
-    },
-    {
-      id: "school",
-      title: "Skole",
-      description: "Få overblik over hele skolen og statistikker",
-      icon: Building,
-      color: "bg-orange-500 hover:bg-orange-600",
-      route: "/auth?role=school"
-    }
-  ];
-
+  const userRoles = [{
+    id: "student",
+    title: "Elev",
+    description: "Log ind som elev for at få adgang til lektioner og spil",
+    icon: GraduationCap,
+    color: "bg-blue-500 hover:bg-blue-600",
+    route: "/auth?role=student"
+  }, {
+    id: "parent",
+    title: "Forælder",
+    description: "Følg dit barns fremskridt og kommuniker med skolen",
+    icon: Users,
+    color: "bg-green-500 hover:bg-green-600",
+    route: "/auth?role=parent"
+  }, {
+    id: "teacher",
+    title: "Lærer",
+    description: "Administrer klasser og følg elevernes udvikling",
+    icon: BookOpen,
+    color: "bg-purple-500 hover:bg-purple-600",
+    route: "/auth?role=teacher"
+  }, {
+    id: "school",
+    title: "Skole",
+    description: "Få overblik over hele skolen og statistikker",
+    icon: Building,
+    color: "bg-orange-500 hover:bg-orange-600",
+    route: "/auth?role=school"
+  }];
   if (user) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white">
+    return <div className="min-h-screen bg-gray-900 text-white">
         <nav className="bg-gray-800 border-b border-gray-700 p-4">
           <div className="max-w-6xl mx-auto flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -74,18 +68,10 @@ const Index = () => {
               </Badge>
             </div>
             <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/profile')}
-                className="text-white border-gray-600 hover:bg-gray-700"
-              >
+              <Button variant="outline" onClick={() => navigate('/profile')} className="border-gray-600 hover:bg-gray-700 text-slate-950">
                 Profil
               </Button>
-              <Button
-                variant="outline"
-                onClick={signOut}
-                className="text-white border-gray-600 hover:bg-gray-700"
-              >
+              <Button variant="outline" onClick={signOut} className="border-gray-600 hover:bg-gray-700 text-slate-950">
                 Log ud
               </Button>
             </div>
@@ -106,12 +92,9 @@ const Index = () => {
           <AITutor user={user} />
           <GameHub />
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
+  return <div className="min-h-screen bg-gray-900 text-white">
       <div className="max-w-6xl mx-auto p-6">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -130,8 +113,7 @@ const Index = () => {
           </Badge>
         </div>
 
-        {!showRoleSelection ? (
-          <div className="text-center space-y-8">
+        {!showRoleSelection ? <div className="text-center space-y-8">
             <div className="grid md:grid-cols-3 gap-8 mb-12">
               <Card className="bg-gray-800 border-gray-700">
                 <CardHeader>
@@ -159,30 +141,19 @@ const Index = () => {
               </Card>
             </div>
 
-            <Button
-              onClick={() => setShowRoleSelection(true)}
-              size="lg"
-              className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none text-lg px-8 py-4"
-            >
+            <Button onClick={() => setShowRoleSelection(true)} size="lg" className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none text-lg px-8 py-4">
               Kom i gang <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-          </div>
-        ) : (
-          <div className="space-y-8">
+          </div> : <div className="space-y-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-4">Vælg din rolle</h2>
               <p className="text-gray-300 mb-8">Hvordan vil du bruge Athena?</p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {userRoles.map((role) => {
-                const IconComponent = role.icon;
-                return (
-                  <Card
-                    key={role.id}
-                    className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-all cursor-pointer"
-                    onClick={() => navigate(role.route)}
-                  >
+              {userRoles.map(role => {
+            const IconComponent = role.icon;
+            return <Card key={role.id} className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-all cursor-pointer" onClick={() => navigate(role.route)}>
                     <CardHeader className="text-center">
                       <div className={`w-16 h-16 ${role.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
                         <IconComponent className="w-8 h-8 text-white" />
@@ -195,25 +166,17 @@ const Index = () => {
                         Log ind som {role.title.toLowerCase()}
                       </Button>
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+          })}
             </div>
 
             <div className="text-center">
-              <Button
-                variant="outline"
-                onClick={() => setShowRoleSelection(false)}
-                className="text-white border-gray-600 hover:bg-gray-700"
-              >
+              <Button variant="outline" onClick={() => setShowRoleSelection(false)} className="text-white border-gray-600 hover:bg-gray-700">
                 Tilbage
               </Button>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
