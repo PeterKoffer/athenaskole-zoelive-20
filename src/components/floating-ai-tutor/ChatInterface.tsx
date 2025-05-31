@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, X, Move } from "lucide-react";
+import { Send, X, Move, Home } from "lucide-react";
 import { Message } from "./types";
 import VoiceControls from "./VoiceControls";
 
@@ -13,6 +13,7 @@ interface ChatInterfaceProps {
   onSendMessage: (message: string) => void;
   onClose: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  onResetToHome: () => void;
   isSpeaking: boolean;
   onStopSpeaking: () => void;
   isDragging?: boolean;
@@ -23,6 +24,7 @@ const ChatInterface = ({
   onSendMessage, 
   onClose, 
   onMouseDown, 
+  onResetToHome,
   isSpeaking, 
   onStopSpeaking,
   isDragging 
@@ -61,6 +63,15 @@ const ChatInterface = ({
             <Badge variant="outline" className="bg-gradient-to-r from-pink-400 to-purple-500 text-white border-pink-400 text-xs">
               Live
             </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onResetToHome}
+              className="text-gray-400 hover:text-white p-1"
+              title="Gå hjem"
+            >
+              <Home className="w-4 h-4" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"

@@ -1,14 +1,15 @@
 
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Move } from "lucide-react";
+import { MessageCircle, Move, Home } from "lucide-react";
 
 interface CollapsedButtonProps {
   onExpand: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  onResetToHome: () => void;
   isDragging?: boolean;
 }
 
-const CollapsedButton = ({ onExpand, onMouseDown, isDragging }: CollapsedButtonProps) => {
+const CollapsedButton = ({ onExpand, onMouseDown, onResetToHome, isDragging }: CollapsedButtonProps) => {
   return (
     <div className="relative">
       <Button
@@ -32,6 +33,19 @@ const CollapsedButton = ({ onExpand, onMouseDown, isDragging }: CollapsedButtonP
           )}
         </div>
       </Button>
+      
+      {/* Home button for collapsed state */}
+      <Button
+        onClick={(e) => {
+          e.stopPropagation();
+          onResetToHome();
+        }}
+        className="absolute -top-2 -right-2 w-6 h-6 bg-gray-700 hover:bg-gray-600 text-white border-none rounded-full p-1"
+        title="Gå hjem"
+      >
+        <Home className="w-3 h-3" />
+      </Button>
+      
       {isDragging && (
         <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-white bg-black bg-opacity-75 px-2 py-1 rounded whitespace-nowrap">
           Træk mig rundt

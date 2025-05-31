@@ -1,7 +1,8 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Position, DragOffset } from "./types";
 
-export const useDragHandler = (initialPosition: Position) => {
+export const useDragHandler = (homePosition: Position) => {
   const [position, setPosition] = useState<Position>(() => {
     // Try to restore position from localStorage
     if (typeof window !== 'undefined') {
@@ -15,7 +16,7 @@ export const useDragHandler = (initialPosition: Position) => {
         }
       }
     }
-    return initialPosition;
+    return homePosition;
   });
   
   const [isDragging, setIsDragging] = useState(false);
@@ -32,6 +33,11 @@ export const useDragHandler = (initialPosition: Position) => {
       x: Math.max(0, Math.min(newPosition.x, viewportWidth - elementWidth)),
       y: Math.max(0, Math.min(newPosition.y, viewportHeight - elementHeight))
     };
+  };
+
+  const resetToHome = () => {
+    const constrainedHomePosition = constrainPosition(homePosition);
+    setPosition(constrainedHomePosition);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -92,6 +98,7 @@ export const useDragHandler = (initialPosition: Position) => {
   return {
     position,
     isDragging,
-    handleMouseDown
+    handleMouseDown,
+    resetToHome
   };
 };

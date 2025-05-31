@@ -114,7 +114,9 @@ const Index = () => {
             <HeroSection onGetStarted={handleGetStarted} />
             <SubjectsSection />
             <FeaturesSection />
-            <CTASection onGetStarted={handleGetStarted} />
+            <div className="pb-20">
+              <CTASection onGetStarted={handleGetStarted} />
+            </div>
           </>
         )}
       </main>

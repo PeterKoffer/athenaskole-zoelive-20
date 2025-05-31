@@ -10,7 +10,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   return (
     <div className="text-center py-20">
       <h1 className="text-5xl font-bold text-white mb-4">
-        Velkommen til Athena
+        Velkommen til NELIE
       </h1>
       <p className="text-xl text-gray-300 mb-4">
         Din personlige platform for sprog og læring.
