@@ -1,10 +1,12 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import LanguageSelectionView from "./language-learning/LanguageSelectionView";
 import LessonView from "./language-learning/LessonView";
 import { Language, LanguageLessons, LanguageLearningProps } from "./language-learning/types";
 
 const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
+  const navigate = useNavigate();
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage || "spanish");
   const [currentLesson, setCurrentLesson] = useState(-1);
   const [hearts, setHearts] = useState(5);
@@ -151,6 +153,10 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
     setCurrentLesson(-1);
   };
 
+  const handleBackToProgram = () => {
+    navigate('/daily-program');
+  };
+
   const handleLessonComplete = () => {
     setCurrentLesson(-1);
     setStreak(prev => prev + 1);
@@ -166,7 +172,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-900">
       {!currentLessonData ? (
         <LanguageSelectionView
           languages={languages}
@@ -177,18 +183,21 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
           xp={xp}
           onLanguageSelect={handleLanguageSelect}
           onLessonSelect={handleLessonSelect}
+          onBack={handleBackToProgram}
         />
       ) : (
-        <LessonView
-          currentLesson={currentLessonData}
-          selectedLanguage={selectedLanguage}
-          hearts={hearts}
-          xp={xp}
-          onBack={handleBackToSelection}
-          onLessonComplete={handleLessonComplete}
-          onHeartLost={handleHeartLost}
-          onXpGained={handleXpGained}
-        />
+        <div className="bg-gray-900 min-h-screen">
+          <LessonView
+            currentLesson={currentLessonData}
+            selectedLanguage={selectedLanguage}
+            hearts={hearts}
+            xp={xp}
+            onBack={handleBackToSelection}
+            onLessonComplete={handleLessonComplete}
+            onHeartLost={handleHeartLost}
+            onXpGained={handleXpGained}
+          />
+        </div>
       )}
     </div>
   );
