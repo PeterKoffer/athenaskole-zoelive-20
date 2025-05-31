@@ -5,10 +5,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, GraduationCap } from "lucide-react";
+import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, GraduationCap, Menu } from "lucide-react";
 import TeacherNavbar from "@/components/teacher/TeacherNavbar";
 import TeacherStatsCards from "@/components/teacher/TeacherStatsCards";
 import TeacherOverviewTab from "@/components/teacher/TeacherOverviewTab";
@@ -30,60 +34,81 @@ const TeacherDashboard = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <TeacherStatsCards stats={stats} />
 
-        {/* Teaching Tools and Analytics Dropdown Menus */}
+        {/* Unified Teacher Tools and Analytics Dropdown Menu */}
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Student Analytics
+                <Menu className="w-4 h-4 mr-2" />
+                Teacher Tools & Analytics
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Grade Reports
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Progress Tracking
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <Users className="w-4 h-4 mr-2" />
-                Attendance Reports
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <ClipboardList className="w-4 h-4 mr-2" />
-                Assignment Statistics
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64">
+              {/* Student Analytics Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="hover:bg-gray-700">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Student Analytics
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <GraduationCap className="w-4 h-4 mr-2" />
+                    Grade Reports
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Progress Tracking
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <Users className="w-4 h-4 mr-2" />
+                    Attendance Reports
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <ClipboardList className="w-4 h-4 mr-2" />
+                    Assignment Statistics
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Teaching Tools
-                <ChevronDown className="w-4 h-4 ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Lesson Planning
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <ClipboardList className="w-4 h-4 mr-2" />
-                Assignment Creation
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <Settings className="w-4 h-4 mr-2" />
-                Class Settings
-              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-gray-700" />
+
+              {/* Teaching Tools Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="hover:bg-gray-700">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Teaching Tools
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Lesson Planning
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <ClipboardList className="w-4 h-4 mr-2" />
+                    Assignment Creation
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Class Settings
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuSeparator className="bg-gray-700" />
+
+              {/* Communication Tools */}
               <DropdownMenuItem className="hover:bg-gray-700">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Communication Center
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="bg-gray-700" />
+
+              {/* Class Management */}
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Users className="w-4 h-4 mr-2" />
+                Manage Classes
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
