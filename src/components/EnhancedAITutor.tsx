@@ -1,21 +1,18 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LanguageLearning from "./LanguageLearning";
-import SubjectSelector from "./ai-tutor/SubjectSelector";
-import ChatMessage from "./ai-tutor/ChatMessage";
-import LearningOptions from "./ai-tutor/LearningOptions";
-import ChatInput from "./ai-tutor/ChatInput";
 import LanguageSelector from "./ai-tutor/LanguageSelector";
-import SpeechRecognition from "./ai-tutor/SpeechRecognition";
 import DailyChallenges from "./gamification/DailyChallenges";
 import RewardsSystem from "./gamification/RewardsSystem";
 import ParentNotifications from "./parent/ParentNotifications";
+import WelcomeCard from "./ai-tutor/WelcomeCard";
+import TutorHeader from "./ai-tutor/TutorHeader";
+import ChatTab from "./ai-tutor/ChatTab";
+import SpeechTab from "./ai-tutor/SpeechTab";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
-import { Target, Clock, Star } from "lucide-react";
 
 const EnhancedAITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -24,9 +21,7 @@ const EnhancedAITutor = ({ user }) => {
   const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [currentCoins, setCurrentCoins] = useState(150);
-  const [showSpeechPractice, setShowSpeechPractice] = useState(false);
   const [currentPracticeText, setCurrentPracticeText] = useState("Hello, my name is Emma");
-  const messagesEndRef = useRef(null);
 
   const { messages, handleSendMessage, handleLearningOption } = useMessageHandler({
     user,
@@ -45,28 +40,12 @@ const EnhancedAITutor = ({ user }) => {
     newAchievements: ["Pronunciation Master", "7 Day Streak"]
   };
 
-  const todaysDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const handleLearningOptionWithLanguageCheck = (option) => {
     if (option.id === "language") {
       setShowLanguageSelection(true);
       return;
     }
     if (option.id === "pronunciation") {
-      setShowSpeechPractice(true);
       return;
     }
     handleLearningOption(option);
@@ -80,16 +59,13 @@ const EnhancedAITutor = ({ user }) => {
 
   const handleChallengeComplete = (challengeId: string, reward: number) => {
     setCurrentCoins(prev => prev + reward);
-    // Could add notifications here
   };
 
   const handleRewardPurchase = (rewardId: string, cost: number) => {
     setCurrentCoins(prev => prev - cost);
-    // Could add purchased item to user profile
   };
 
   const handlePronunciationScore = (score: number) => {
-    // Update challenge progress if pronunciation-related
     console.log(`Pronunciation score: ${score}%`);
   };
 
@@ -99,6 +75,8 @@ const EnhancedAITutor = ({ user }) => {
       setIsSpeaking(false);
     }
   };
+
+  const userName = user?.user_metadata?.name?.split(' ')[0] || 'Student';
 
   if (showLanguageSelection) {
     return (
@@ -129,53 +107,14 @@ const EnhancedAITutor = ({ user }) => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Welcome Message with Today's Agenda */}
-      <Card className="bg-gradient-to-r from-purple-600 to-cyan-600 border-none">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-3 text-white">
-            <div className="text-4xl">🎓</div>
-            <div>
-              <h1 className="text-3xl font-bold">Hi {user?.user_metadata?.name?.split(' ')[0] || 'Student'}! I'm Nelie</h1>
-              <p className="text-purple-100 text-lg">{todaysDate}</p>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
-            <p className="text-xl mb-4">
-              Welcome to your personal AI tutor! I've prepared an exciting program for you today. 
-              You can choose where to start, and I'll guide you through each activity.
-            </p>
-            <div className="flex items-center space-x-2">
-              <Star className="w-6 h-6 text-yellow-300" />
-              <span className="text-lg">Let's learn something amazing together!</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-gray-900 border-gray-800">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center space-x-2 text-white">
-              <span className="text-2xl">🎓</span>
-              <span>Nelie AI Tutor</span>
-            </span>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">
-                {currentCoins} ⭐
-              </Badge>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SubjectSelector
-            currentSubject={currentSubject}
-            onSubjectChange={setCurrentSubject}
-            onLanguageSelect={() => setShowLanguageSelection(true)}
-          />
-        </CardContent>
-      </Card>
+      <WelcomeCard userName={userName} />
+      
+      <TutorHeader
+        currentCoins={currentCoins}
+        currentSubject={currentSubject}
+        onSubjectChange={setCurrentSubject}
+        onLanguageSelect={() => setShowLanguageSelection(true)}
+      />
 
       <Tabs defaultValue="chat" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5 bg-gray-800">
@@ -187,67 +126,21 @@ const EnhancedAITutor = ({ user }) => {
         </TabsList>
 
         <TabsContent value="chat" className="space-y-6">
-          <Card className="h-96 bg-gray-900 border-gray-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-white">Chat with your AI tutor</CardTitle>
-            </CardHeader>
-            <CardContent className="h-full flex flex-col">
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                {messages.map((message, index) => (
-                  <ChatMessage key={index} message={message}>
-                    {message.showOptions && (
-                      <LearningOptions onOptionSelect={handleLearningOptionWithLanguageCheck} />
-                    )}
-                  </ChatMessage>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <ChatInput
-                onSendMessage={handleSendMessage}
-                isSpeaking={isSpeaking}
-                onStopSpeaking={stopSpeaking}
-              />
-            </CardContent>
-          </Card>
+          <ChatTab
+            messages={messages}
+            isSpeaking={isSpeaking}
+            onSendMessage={handleSendMessage}
+            onStopSpeaking={stopSpeaking}
+            onLearningOptionSelect={handleLearningOptionWithLanguageCheck}
+          />
         </TabsContent>
 
         <TabsContent value="speech" className="space-y-6">
-          <SpeechRecognition
-            targetText={currentPracticeText}
-            language="english"
+          <SpeechTab
+            currentPracticeText={currentPracticeText}
+            onPracticeTextChange={setCurrentPracticeText}
             onScoreUpdate={handlePronunciationScore}
           />
-          
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Practice Texts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-3">
-                {[
-                  "Hello, my name is Emma",
-                  "I love reading books",
-                  "The United States is a beautiful country",
-                  "I eat cereal for breakfast",
-                  "Learning is very important for students"
-                ].map((text, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    onClick={() => setCurrentPracticeText(text)}
-                    className={`text-left justify-start ${
-                      currentPracticeText === text
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'text-gray-300 border-gray-600 hover:bg-gray-600'
-                    }`}
-                  >
-                    {text}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="challenges" className="space-y-6">
