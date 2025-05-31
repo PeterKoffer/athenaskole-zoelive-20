@@ -48,11 +48,11 @@ const StudentRegistration = () => {
   });
 
   const steps: RegistrationStep[] = [
-    { id: 0, title: "Personlige Oplysninger", icon: User },
-    { id: 1, title: "Kontakt Information", icon: Phone },
-    { id: 2, title: "Akademiske Oplysninger", icon: GraduationCap },
-    { id: 3, title: "Forældre Information", icon: Home },
-    { id: 4, title: "Bekræft & Gem", icon: CheckCircle }
+    { id: 0, title: "Personal Information", icon: User },
+    { id: 1, title: "Contact Information", icon: Phone },
+    { id: 2, title: "Academic Information", icon: GraduationCap },
+    { id: 3, title: "Parent Information", icon: Home },
+    { id: 4, title: "Confirm & Save", icon: CheckCircle }
   ];
 
   const handleInputChange = (section: keyof StudentProfile, field: string, value: string) => {
@@ -90,8 +90,8 @@ const StudentRegistration = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Registrering data:", profileData);
-    alert("Elev registrering er fuldført!");
+    console.log("Registration data:", profileData);
+    alert("Student registration completed successfully!");
   };
 
   const renderStepContent = () => {
@@ -139,7 +139,7 @@ const StudentRegistration = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <Save className="w-5 h-5 mr-2" />
-            Ny Elev Registrering
+            New Student Registration
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -164,7 +164,7 @@ const StudentRegistration = () => {
           </div>
           <div className="text-center">
             <h3 className="text-white text-lg font-semibold">{steps[currentStep].title}</h3>
-            <p className="text-gray-400">Trin {currentStep + 1} af {steps.length}</p>
+            <p className="text-gray-400">Step {currentStep + 1} of {steps.length}</p>
           </div>
         </CardContent>
       </Card>
@@ -182,7 +182,7 @@ const StudentRegistration = () => {
               disabled={currentStep === 0}
               className="text-gray-300 border-gray-600 hover:bg-gray-600"
             >
-              Forrige
+              Previous
             </Button>
             
             {currentStep < steps.length - 1 ? (
@@ -190,7 +190,7 @@ const StudentRegistration = () => {
                 onClick={handleNext}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                Næste
+                Next
               </Button>
             ) : (
               <Button
@@ -198,7 +198,7 @@ const StudentRegistration = () => {
                 className="bg-green-600 hover:bg-green-700"
               >
                 <Save className="w-4 h-4 mr-2" />
-                Registrer Elev
+                Register Student
               </Button>
             )}
           </div>

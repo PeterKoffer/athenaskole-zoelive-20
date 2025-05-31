@@ -33,9 +33,9 @@ const AnalyticsDashboard = () => {
               <Users className="w-10 h-10 text-blue-500" />
               <div>
                 <p className="text-2xl font-bold text-white">456</p>
-                <p className="text-gray-400">Aktive Elever</p>
+                <p className="text-gray-400">Active Students</p>
                 <Badge variant="outline" className="text-green-400 border-green-400 mt-1">
-                  +2.3% denne måned
+                  +2.3% this month
                 </Badge>
               </div>
             </div>
@@ -48,9 +48,9 @@ const AnalyticsDashboard = () => {
               <TrendingUp className="w-10 h-10 text-green-500" />
               <div>
                 <p className="text-2xl font-bold text-white">87%</p>
-                <p className="text-gray-400">Gennemsnit Score</p>
+                <p className="text-gray-400">Average Score</p>
                 <Badge variant="outline" className="text-green-400 border-green-400 mt-1">
-                  +5.2% forbedring
+                  +5.2% improvement
                 </Badge>
               </div>
             </div>
@@ -63,9 +63,9 @@ const AnalyticsDashboard = () => {
               <Calendar className="w-10 h-10 text-orange-500" />
               <div>
                 <p className="text-2xl font-bold text-white">94%</p>
-                <p className="text-gray-400">Fremmøde Rate</p>
+                <p className="text-gray-400">Attendance Rate</p>
                 <Badge variant="outline" className="text-blue-400 border-blue-400 mt-1">
-                  Stabil
+                  Stable
                 </Badge>
               </div>
             </div>
@@ -78,9 +78,9 @@ const AnalyticsDashboard = () => {
               <Clock className="w-10 h-10 text-purple-500" />
               <div>
                 <p className="text-2xl font-bold text-white">45min</p>
-                <p className="text-gray-400">Daglig Læring</p>
+                <p className="text-gray-400">Daily Learning</p>
                 <Badge variant="outline" className="text-green-400 border-green-400 mt-1">
-                  Over mål
+                  Above target
                 </Badge>
               </div>
             </div>
@@ -90,10 +90,10 @@ const AnalyticsDashboard = () => {
 
       <Tabs defaultValue="performance" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 bg-gray-800">
-          <TabsTrigger value="performance" className="data-[state=active]:bg-gray-700">Præstation</TabsTrigger>
+          <TabsTrigger value="performance" className="data-[state=active]:bg-gray-700">Performance</TabsTrigger>
           <TabsTrigger value="engagement" className="data-[state=active]:bg-gray-700">Engagement</TabsTrigger>
-          <TabsTrigger value="subjects" className="data-[state=active]:bg-gray-700">Fag Analyse</TabsTrigger>
-          <TabsTrigger value="trends" className="data-[state=active]:bg-gray-700">Tendenser</TabsTrigger>
+          <TabsTrigger value="subjects" className="data-[state=active]:bg-gray-700">Subject Analysis</TabsTrigger>
+          <TabsTrigger value="trends" className="data-[state=active]:bg-gray-700">Trends</TabsTrigger>
         </TabsList>
 
         <TabsContent value="performance" className="space-y-6">
@@ -102,7 +102,7 @@ const AnalyticsDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <BarChart3 className="w-5 h-5 mr-2" />
-                  Månedlig Præstation Udvikling
+                  Monthly Performance Development
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -130,7 +130,7 @@ const AnalyticsDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Target className="w-5 h-5 mr-2" />
-                  Klasse Fordeling
+                  Class Distribution
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -169,7 +169,7 @@ const AnalyticsDashboard = () => {
             <CardHeader>
               <CardTitle className="text-white flex items-center">
                 <Clock className="w-5 h-5 mr-2" />
-                Ugentlig Aktivitet
+                Weekly Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -199,7 +199,7 @@ const AnalyticsDashboard = () => {
             <CardHeader>
               <CardTitle className="text-white flex items-center">
                 <BookOpen className="w-5 h-5 mr-2" />
-                Fag Præstation
+                Subject Performance
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -210,7 +210,7 @@ const AnalyticsDashboard = () => {
                       <BookOpen className="w-6 h-6 text-blue-400" />
                       <div>
                         <p className="text-white font-medium">{subject.subject}</p>
-                        <p className="text-gray-400 text-sm">{subject.students} elever</p>
+                        <p className="text-gray-400 text-sm">{subject.students} students</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -237,7 +237,7 @@ const AnalyticsDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Award className="w-5 h-5 mr-2" />
-                  Top Præstationer
+                  Top Performances
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -258,7 +258,7 @@ const AnalyticsDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <TrendingUp className="w-5 h-5 mr-2" />
-                  Forbedringer Denne Måned
+                  Improvements This Month
                 </CardTitle>
               </CardHeader>
               <CardContent>

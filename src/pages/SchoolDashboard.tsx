@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -9,6 +10,7 @@ import SchoolOverviewTab from "@/components/school/SchoolOverviewTab";
 import ClassManagement from "@/components/school/ClassManagement";
 import AnalyticsDashboard from "@/components/school/AnalyticsDashboard";
 import StudentRegistration from "@/components/school/StudentRegistration";
+
 const SchoolDashboard = () => {
   const stats = {
     totalStudents: 485,
@@ -16,7 +18,9 @@ const SchoolDashboard = () => {
     averageProgress: 87.5,
     attendanceRate: 94.2
   };
-  return <div className="min-h-screen bg-gray-900 text-white">
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
       <SchoolNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -166,6 +170,8 @@ const SchoolDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default SchoolDashboard;
