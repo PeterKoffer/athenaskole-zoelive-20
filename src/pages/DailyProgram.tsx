@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,13 @@ const DailyProgram = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
   
   const todaysDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -60,10 +68,25 @@ const DailyProgram = () => {
   }];
 
   const handleStartActivity = (activityId: string) => {
+    console.log("Starting activity:", activityId, "User:", user);
+    
+    if (!user) {
+      console.log("No user found, redirecting to auth");
+      navigate('/auth');
+      return;
+    }
+
     setSelectedActivity(activityId);
+    console.log("Navigating to:", `/learn/${activityId}`);
+    
     // Navigate to the specific educational component
     navigate(`/learn/${activityId}`);
   };
+
+  // Don't render the component if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
@@ -128,7 +151,10 @@ const DailyProgram = () => {
                       </Badge>
                     </div>
                   </div>
-                  <Button onClick={() => handleStartActivity(activity.id)} className={`w-full bg-gradient-to-r ${activity.color} hover:opacity-90 text-white border-none`}>
+                  <Button 
+                    onClick={() => handleStartActivity(activity.id)} 
+                    className={`w-full bg-gradient-to-r ${activity.color} hover:opacity-90 text-white border-none`}
+                  >
                     Start {activity.title}
                   </Button>
                 </CardContent>
