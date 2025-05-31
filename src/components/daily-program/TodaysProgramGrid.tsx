@@ -1,12 +1,13 @@
 
 import { Target } from "lucide-react";
 import ActivityCard from "./ActivityCard";
+import { LucideIcon } from "lucide-react";
 
 interface Activity {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   duration: string;
   level: string;
   color: string;

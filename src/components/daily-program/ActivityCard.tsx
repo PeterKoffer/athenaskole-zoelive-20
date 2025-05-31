@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface Activity {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   duration: string;
   level: string;
   color: string;
@@ -20,13 +21,15 @@ interface ActivityCardProps {
 }
 
 const ActivityCard = ({ activity, onStartActivity }: ActivityCardProps) => {
+  const IconComponent = activity.icon;
+
   return (
     <Card className="bg-gray-800 border-gray-700 hover:border-purple-400 transition-all duration-300 cursor-pointer transform hover:scale-105">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-lg bg-gradient-to-r ${activity.color}`}>
-              {activity.icon}
+              <IconComponent className="w-6 h-6" />
             </div>
             <div>
               <h3 className="text-white font-bold">{activity.title}</h3>
