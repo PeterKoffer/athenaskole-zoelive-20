@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Calculator, ArrowLeft, CheckCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SessionTimer from "@/components/adaptive-learning/SessionTimer";
-import AdaptiveDifficultyManager from "@/components/adaptive-learning/AdaptiveDifficultyManager";
 import LearningPathOptimizer from "@/components/adaptive-learning/LearningPathOptimizer";
+import MathHeader from "./math/MathHeader";
+import MathQuestion from "./math/MathQuestion";
 import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 
 const MathematicsLearning = () => {
@@ -20,7 +19,6 @@ const MathematicsLearning = () => {
   const {
     difficulty,
     performanceMetrics,
-    userProgress,
     recommendedSessionTime,
     recordAnswer,
     adjustDifficulty,
@@ -73,10 +71,8 @@ const MathematicsLearning = () => {
     }
   ];
 
-  // Filter questions based on current difficulty
   const filteredQuestions = questions.filter(q => q.difficulty <= difficulty);
   const currentQuestionData = filteredQuestions[currentQuestion] || questions[0];
-  const progress = ((currentQuestion + 1) / filteredQuestions.length) * 100;
 
   const userProfile = {
     strengths: [],
@@ -99,9 +95,7 @@ const MathematicsLearning = () => {
       setScore(score + 1);
     }
     
-    // Record the answer for adaptive learning
     await recordAnswer(isCorrect, responseTime);
-    
     setShowResult(true);
   };
 
@@ -112,14 +106,12 @@ const MathematicsLearning = () => {
       setShowResult(false);
       setQuestionStartTime(new Date());
     } else {
-      // Lesson complete
       endSession();
       navigate('/daily-program');
     }
   };
 
   const handleGoalSelect = (goal: any) => {
-    // In a real implementation, this would navigate to the specific goal content
     console.log('Selected goal:', goal);
   };
 
@@ -135,8 +127,7 @@ const MathematicsLearning = () => {
     return (
       <div className="min-h-screen bg-gray-900 text-white p-4 flex items-center justify-center">
         <div className="text-center">
-          <Calculator className="w-8 h-8 text-blue-400 animate-pulse mx-auto mb-4" />
-          <p>Loading your personalized math session...</p>
+          <div className="text-lg">Loading your personalized math session...</div>
         </div>
       </div>
     );
@@ -154,106 +145,33 @@ const MathematicsLearning = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Program
           </Button>
-          <div className="text-lg font-semibold">
-            Score: {score}/{filteredQuestions.length}
-          </div>
         </div>
 
-        {/* Session Timer */}
         <SessionTimer
           recommendedDuration={recommendedSessionTime}
           onTimeUp={handleTimeUp}
           onBreakSuggested={handleBreakSuggested}
         />
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-white">
-              <div className="flex items-center space-x-2">
-                <Calculator className="w-5 h-5 text-blue-400" />
-                <span>Mathematics - Adaptive Learning</span>
-              </div>
-              <AdaptiveDifficultyManager
-                currentDifficulty={difficulty}
-                onDifficultyChange={adjustDifficulty}
-                performanceMetrics={performanceMetrics}
-              />
-            </CardTitle>
-            <Progress value={progress} className="w-full" />
-            <p className="text-sm text-gray-400">
-              Question {currentQuestion + 1} of {filteredQuestions.length}
-            </p>
-          </CardHeader>
-        </Card>
+        <MathHeader
+          currentQuestion={currentQuestion}
+          totalQuestions={filteredQuestions.length}
+          score={score}
+          difficulty={difficulty}
+          performanceMetrics={performanceMetrics}
+          onDifficultyChange={adjustDifficulty}
+        />
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-6 text-white">
-              {currentQuestionData.question}
-            </h3>
+        <MathQuestion
+          question={currentQuestionData}
+          selectedAnswer={selectedAnswer}
+          showResult={showResult}
+          onAnswerSelect={handleAnswerSelect}
+          onSubmit={handleSubmit}
+          onNext={handleNext}
+          isLastQuestion={currentQuestion >= filteredQuestions.length - 1}
+        />
 
-            <div className="space-y-3 mb-6">
-              {currentQuestionData.options.map((option, index) => (
-                <Button
-                  key={index}
-                  variant={selectedAnswer === index ? "default" : "outline"}
-                  className={`w-full text-left justify-start p-4 h-auto ${
-                    selectedAnswer === index
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                  }`}
-                  onClick={() => !showResult && handleAnswerSelect(index)}
-                  disabled={showResult}
-                >
-                  <span className="mr-3 font-semibold">
-                    {String.fromCharCode(65 + index)}.
-                  </span>
-                  {option}
-                </Button>
-              ))}
-            </div>
-
-            {showResult && (
-              <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-4">
-                <div className="flex items-center mb-2">
-                  <CheckCircle className={`w-5 h-5 mr-2 ${
-                    selectedAnswer === currentQuestionData.correct 
-                      ? 'text-green-400' 
-                      : 'text-red-400'
-                  }`} />
-                  <span className={selectedAnswer === currentQuestionData.correct 
-                    ? 'text-green-400 font-semibold' 
-                    : 'text-red-400 font-semibold'
-                  }>
-                    {selectedAnswer === currentQuestionData.correct ? 'Correct!' : 'Incorrect'}
-                  </span>
-                </div>
-                <p className="text-gray-300">{currentQuestionData.explanation}</p>
-              </div>
-            )}
-
-            <div className="flex justify-end">
-              {!showResult ? (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={selectedAnswer === null}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  Submit Answer
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleNext}
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                >
-                  {currentQuestion < filteredQuestions.length - 1 ? 'Next Question' : 'Complete Lesson'}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Learning Path Optimizer */}
         <LearningPathOptimizer
           subject="mathematics"
           userProfile={userProfile}

@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Brain, ArrowRight, CheckCircle, Target } from 'lucide-react';
+import { Brain, CheckCircle } from 'lucide-react';
+import GoalCard from './learning-path/GoalCard';
 
 interface LearningGoal {
   id: string;
@@ -188,19 +186,6 @@ const LearningPathOptimizer = ({
     setCurrentFocus(sortedGoals[0] || null);
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getDifficultyStars = (difficulty: number) => {
-    return '★'.repeat(difficulty) + '☆'.repeat(5 - difficulty);
-  };
-
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
@@ -211,51 +196,26 @@ const LearningPathOptimizer = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {currentFocus && (
-          <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-4">
+          <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-semibold text-purple-200">Recommended Focus</h4>
-              <Badge className={`${getPriorityColor(currentFocus.priority)} text-white`}>
-                {currentFocus.priority} priority
-              </Badge>
             </div>
-            <h5 className="text-white font-medium mb-1">{currentFocus.title}</h5>
-            <p className="text-gray-300 text-sm mb-3">{currentFocus.description}</p>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4 text-sm text-gray-400">
-                <span>{getDifficultyStars(currentFocus.difficulty)}</span>
-                <span>{currentFocus.estimatedTime} min</span>
-              </div>
-              <Button
-                onClick={() => onGoalSelect(currentFocus)}
-                size="sm"
-                className="bg-purple-500 hover:bg-purple-600 text-white"
-              >
-                Start Learning
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
+            <GoalCard 
+              goal={currentFocus} 
+              isRecommended={true} 
+              onSelect={onGoalSelect} 
+            />
           </div>
         )}
 
         <div className="space-y-2">
           <h4 className="text-white font-medium">Up Next</h4>
-          {optimizedPath.slice(1).map((goal, index) => (
-            <div key={goal.id} className="bg-gray-700 rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h5 className="text-white text-sm font-medium">{goal.title}</h5>
-                  <p className="text-gray-400 text-xs">{goal.description}</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="text-xs">
-                    {goal.estimatedTime}m
-                  </Badge>
-                  <span className="text-xs text-gray-400">
-                    {getDifficultyStars(goal.difficulty)}
-                  </span>
-                </div>
-              </div>
-            </div>
+          {optimizedPath.slice(1).map((goal) => (
+            <GoalCard 
+              key={goal.id} 
+              goal={goal} 
+              onSelect={onGoalSelect} 
+            />
           ))}
         </div>
 
