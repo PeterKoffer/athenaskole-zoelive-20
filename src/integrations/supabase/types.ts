@@ -54,6 +54,87 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_interactions: {
+        Row: {
+          ai_service: string
+          cost_estimate: number | null
+          created_at: string
+          error_message: string | null
+          id: string
+          interaction_type: string
+          processing_time_ms: number | null
+          prompt_text: string | null
+          response_data: Json | null
+          success: boolean
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          ai_service: string
+          cost_estimate?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          interaction_type: string
+          processing_time_ms?: number | null
+          prompt_text?: string | null
+          response_data?: Json | null
+          success?: boolean
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          ai_service?: string
+          cost_estimate?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          interaction_type?: string
+          processing_time_ms?: number | null
+          prompt_text?: string | null
+          response_data?: Json | null
+          success?: boolean
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_analytics: {
+        Row: {
+          achievements_earned: Json | null
+          ai_interactions_count: number
+          created_at: string
+          date: string
+          engagement_score: number | null
+          id: string
+          subjects_studied: Json | null
+          total_session_time: number
+          user_id: string
+        }
+        Insert: {
+          achievements_earned?: Json | null
+          ai_interactions_count?: number
+          created_at?: string
+          date: string
+          engagement_score?: number | null
+          id?: string
+          subjects_studied?: Json | null
+          total_session_time?: number
+          user_id: string
+        }
+        Update: {
+          achievements_earned?: Json | null
+          ai_interactions_count?: number
+          created_at?: string
+          date?: string
+          engagement_score?: number | null
+          id?: string
+          subjects_studied?: Json | null
+          total_session_time?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       learning_paths: {
         Row: {
           completion_percentage: number | null
@@ -158,6 +239,54 @@ export type Database = {
           },
         ]
       }
+      music_projects: {
+        Row: {
+          collaboration_users: Json | null
+          created_at: string
+          generated_audio_url: string | null
+          id: string
+          metadata: Json | null
+          music_style: string | null
+          project_name: string
+          project_type: string
+          prompt_used: string | null
+          soundtrap_project_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          collaboration_users?: Json | null
+          created_at?: string
+          generated_audio_url?: string | null
+          id?: string
+          metadata?: Json | null
+          music_style?: string | null
+          project_name: string
+          project_type: string
+          prompt_used?: string | null
+          soundtrap_project_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          collaboration_users?: Json | null
+          created_at?: string
+          generated_audio_url?: string | null
+          id?: string
+          metadata?: Json | null
+          music_style?: string | null
+          project_name?: string
+          project_type?: string
+          prompt_used?: string | null
+          soundtrap_project_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       Nelie: {
         Row: {
           created_at: string
@@ -215,6 +344,87 @@ export type Database = {
         }
         Relationships: []
       }
+      real_time_progress: {
+        Row: {
+          achievements: Json | null
+          id: string
+          last_activity: string
+          progress_percentage: number
+          skill_area: string
+          streak_count: number
+          subject: string
+          total_time_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achievements?: Json | null
+          id?: string
+          last_activity?: string
+          progress_percentage?: number
+          skill_area: string
+          streak_count?: number
+          subject: string
+          total_time_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achievements?: Json | null
+          id?: string
+          last_activity?: string
+          progress_percentage?: number
+          skill_area?: string
+          streak_count?: number
+          subject?: string
+          total_time_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_activity_sessions: {
+        Row: {
+          completion_status: string
+          created_at: string
+          duration_minutes: number | null
+          end_time: string | null
+          engagement_score: number | null
+          id: string
+          metadata: Json | null
+          session_type: string
+          start_time: string
+          subject: string | null
+          user_id: string
+        }
+        Insert: {
+          completion_status?: string
+          created_at?: string
+          duration_minutes?: number | null
+          end_time?: string | null
+          engagement_score?: number | null
+          id?: string
+          metadata?: Json | null
+          session_type: string
+          start_time?: string
+          subject?: string | null
+          user_id: string
+        }
+        Update: {
+          completion_status?: string
+          created_at?: string
+          duration_minutes?: number | null
+          end_time?: string | null
+          engagement_score?: number | null
+          id?: string
+          metadata?: Json | null
+          session_type?: string
+          start_time?: string
+          subject?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_performance: {
         Row: {
           accuracy_rate: number
@@ -268,6 +478,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      update_real_time_progress: {
+        Args: {
+          p_user_id: string
+          p_subject: string
+          p_skill_area: string
+          p_time_spent: number
+          p_progress_delta: number
+        }
+        Returns: undefined
+      }
       update_user_performance: {
         Args: {
           p_user_id: string
