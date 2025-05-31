@@ -63,34 +63,67 @@ const Navbar = ({
         <div className="hidden md:flex space-x-4">
           {user ? (
             <>
-              <Button variant="ghost" onClick={() => handleNavigation(onShowProgress)}>
+              <Button 
+                variant="outline" 
+                onClick={() => handleNavigation(onShowProgress)}
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 <Monitor className="w-4 h-4 mr-2" />
                 Progress
               </Button>
-              <Button variant="ghost" onClick={() => handleNavigation(onShowGames)}>
+              <Button 
+                variant="outline" 
+                onClick={() => handleNavigation(onShowGames)}
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 <Gamepad2 className="w-4 h-4 mr-2" />
                 Games
               </Button>
-              <Button variant="ghost" onClick={() => handleNavigation(onShowAITutor)}>
+              <Button 
+                variant="outline" 
+                onClick={() => handleNavigation(onShowAITutor)}
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 <BookOpenCheck className="w-4 h-4 mr-2" />
                 AI Tutor
               </Button>
-              <GlobalCommunicationButton />
-              <Button variant="outline" onClick={() => navigate('/profile')} className="text-slate-950">
+              <Button 
+                variant="outline" 
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
+                Messages
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/profile')} 
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 <Settings className="w-4 h-4 mr-2" />
                 Profile
               </Button>
-              <Button variant="outline" onClick={signOut} className="text-slate-950">
+              <Button 
+                variant="outline" 
+                onClick={signOut} 
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
                 Log Out
               </Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" onClick={onGetStarted}>
+              <Button 
+                variant="outline" 
+                onClick={onGetStarted}
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 Sign In
               </Button>
-              <Button variant="outline" onClick={onGetStarted} className="text-slate-950">
+              <Button 
+                variant="outline" 
+                onClick={onGetStarted} 
+                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+              >
                 Start Free
               </Button>
             </>

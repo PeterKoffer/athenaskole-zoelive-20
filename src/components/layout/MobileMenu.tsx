@@ -32,10 +32,10 @@ const MobileMenu = ({
   return (
     <div className="md:hidden">
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="text-white z-50 relative"
+        className="bg-white text-black border-gray-300 hover:bg-gray-100 z-50 relative"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </Button>
@@ -46,24 +46,24 @@ const MobileMenu = ({
             {user ? (
               <>
                 <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-white" 
+                  variant="outline" 
+                  className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
                   onClick={() => handleNavigation(onShowProgress)}
                 >
                   <Monitor className="w-4 h-4 mr-3" />
                   Progress
                 </Button>
                 <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-white" 
+                  variant="outline" 
+                  className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
                   onClick={() => handleNavigation(onShowGames)}
                 >
                   <Gamepad2 className="w-4 h-4 mr-3" />
                   Games
                 </Button>
                 <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-white" 
+                  variant="outline" 
+                  className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
                   onClick={() => handleNavigation(onShowAITutor)}
                 >
                   <BookOpenCheck className="w-4 h-4 mr-3" />
@@ -72,7 +72,7 @@ const MobileMenu = ({
                 <div className="border-t border-gray-700 pt-3 mt-3">
                   <Button 
                     variant="outline" 
-                    className="w-full justify-start mb-2" 
+                    className="w-full justify-start mb-2 bg-white text-black border-gray-300 hover:bg-gray-100" 
                     onClick={() => {
                       navigate('/profile');
                       closeMenu();
@@ -83,7 +83,7 @@ const MobileMenu = ({
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="w-full justify-start" 
+                    className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
                     onClick={() => {
                       signOut();
                       closeMenu();
@@ -97,15 +97,15 @@ const MobileMenu = ({
             ) : (
               <div className="space-y-2">
                 <Button 
-                  variant="ghost" 
-                  className="w-full text-white" 
+                  variant="outline" 
+                  className="w-full bg-white text-black border-gray-300 hover:bg-gray-100" 
                   onClick={() => handleNavigation(onGetStarted)}
                 >
                   Sign In
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full" 
+                  className="w-full bg-white text-black border-gray-300 hover:bg-gray-100" 
                   onClick={() => handleNavigation(onGetStarted)}
                 >
                   Start Free
