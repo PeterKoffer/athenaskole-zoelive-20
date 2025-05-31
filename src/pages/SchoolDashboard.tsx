@@ -1,15 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, UserPlus, School, Menu, GraduationCap, Calendar } from "lucide-react";
 import SchoolNavbar from "@/components/school/SchoolNavbar";
@@ -18,7 +9,6 @@ import SchoolOverviewTab from "@/components/school/SchoolOverviewTab";
 import ClassManagement from "@/components/school/ClassManagement";
 import AnalyticsDashboard from "@/components/school/AnalyticsDashboard";
 import StudentRegistration from "@/components/school/StudentRegistration";
-
 const SchoolDashboard = () => {
   const stats = {
     totalStudents: 485,
@@ -26,9 +16,7 @@ const SchoolDashboard = () => {
     averageProgress: 87.5,
     attendanceRate: 94.2
   };
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
+  return <div className="min-h-screen bg-gray-900 text-white">
       <SchoolNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -38,7 +26,7 @@ const SchoolDashboard = () => {
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
+              <Button variant="outline" className="border-gray-600 text-slate-950 bg-slate-50">
                 <Menu className="w-4 h-4 mr-2" />
                 School Management & Analytics
                 <ChevronDown className="w-4 h-4 ml-2" />
@@ -178,8 +166,6 @@ const SchoolDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SchoolDashboard;
