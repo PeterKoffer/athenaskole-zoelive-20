@@ -1,6 +1,13 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut, Users } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowLeft, LogOut, Users, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ProfileHeaderProps {
@@ -31,24 +38,37 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
           </div>
           <span className="text-white font-semibold">My Profile</span>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline" 
-            onClick={handleRoleSelector}
-            className="border-gray-600 bg-white text-black hover:bg-gray-100"
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="border-gray-600 bg-white text-black hover:bg-gray-100"
+            >
+              Profile Actions
+              <ChevronDown className="w-4 h-4 ml-2" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            className="w-48 bg-gray-700 border-gray-600 z-50" 
+            align="end"
           >
-            <Users className="w-4 h-4 mr-2" />
-            Switch Role
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={onSignOut} 
-            className="border-gray-600 bg-white text-black hover:bg-gray-100"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
+            <DropdownMenuItem 
+              onClick={handleRoleSelector}
+              className="text-white hover:bg-gray-600 focus:bg-gray-600 cursor-pointer"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Switch Role
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-gray-600" />
+            <DropdownMenuItem 
+              onClick={onSignOut}
+              className="text-white hover:bg-gray-600 focus:bg-gray-600 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </nav>
   );
