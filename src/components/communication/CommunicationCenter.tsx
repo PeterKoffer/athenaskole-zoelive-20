@@ -38,7 +38,7 @@ const CommunicationCenter = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <MessageSquare className="w-5 h-5 mr-2" />
-            Kommunikation
+            Communication
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -46,11 +46,11 @@ const CommunicationCenter = () => {
             <TabsList className="grid w-full grid-cols-3 bg-gray-700">
               <TabsTrigger value="groups" className="data-[state=active]:bg-gray-600">
                 <Users className="w-4 h-4 mr-2" />
-                Grupper
+                Groups
               </TabsTrigger>
               <TabsTrigger value="conversations" className="data-[state=active]:bg-gray-600">
                 <Mail className="w-4 h-4 mr-2" />
-                Samtaler
+                Conversations
               </TabsTrigger>
               <TabsTrigger value="chat" className="data-[state=active]:bg-gray-600">
                 <Send className="w-4 h-4 mr-2" />
@@ -82,7 +82,7 @@ const CommunicationCenter = () => {
                 />
               ) : (
                 <div className="text-center text-gray-400 py-8">
-                  Vælg en gruppe eller samtale for at begynde at chatte
+                  Select a group or conversation to start chatting
                 </div>
               )}
             </TabsContent>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Message, Conversation, Participant, MessageGroup } from '@/types/communication';
 import { UserRole } from '@/types/auth';
@@ -12,12 +11,12 @@ export const useCommunication = () => {
 
   // Mock data for demonstration
   useEffect(() => {
-    // Initialize with sample message groups
+    // Initialize with sample message groups in English
     const sampleGroups: MessageGroup[] = [
       {
         id: 'class_1a',
-        name: '1.A - Elever',
-        description: 'Alle elever i klasse 1.A',
+        name: '1.A - Students',
+        description: 'All students in class 1.A',
         type: 'class',
         classId: '1a',
         icon: 'Users',
@@ -28,40 +27,40 @@ export const useCommunication = () => {
       },
       {
         id: 'class_1a_teachers',
-        name: '1.A - Lærere',
-        description: 'Lærere for klasse 1.A',
+        name: '1.A - Teachers',
+        description: 'Teachers for class 1.A',
         type: 'class_teachers',
         classId: '1a',
         icon: 'BookOpen',
         participants: [
-          { id: 'teacher1', name: 'Lærer Hansen', role: 'teacher', email: 'hansen@school.dk' }
+          { id: 'teacher1', name: 'Teacher Hansen', role: 'teacher', email: 'hansen@school.dk' }
         ]
       },
       {
         id: 'class_1a_all',
-        name: '1.A - Alle',
-        description: 'Elever, lærere og forældre for klasse 1.A',
+        name: '1.A - Everyone',
+        description: 'Students, teachers and parents for class 1.A',
         type: 'class_all',
         classId: '1a',
         icon: 'School',
         participants: [
           { id: '1', name: 'Emma Nielsen', role: 'student', email: 'emma@example.com' },
           { id: '2', name: 'Lucas Hansen', role: 'student', email: 'lucas@example.com' },
-          { id: 'teacher1', name: 'Lærer Hansen', role: 'teacher', email: 'hansen@school.dk' },
+          { id: 'teacher1', name: 'Teacher Hansen', role: 'teacher', email: 'hansen@school.dk' },
           { id: 'parent1', name: 'Anna Nielsen', role: 'parent', email: 'anna@example.com' },
           { id: 'parent2', name: 'Peter Hansen', role: 'parent', email: 'peter@example.com' }
         ]
       },
       {
         id: 'school_all',
-        name: 'Hele Skolen',
-        description: 'Alle brugere på skolen',
+        name: 'Entire School',
+        description: 'All users in the school',
         type: 'school_all',
         icon: 'School',
         participants: [
           { id: '1', name: 'Emma Nielsen', role: 'student', email: 'emma@example.com' },
-          { id: 'teacher1', name: 'Lærer Hansen', role: 'teacher', email: 'hansen@school.dk' },
-          { id: 'admin1', name: 'Skoleleder Nielsen', role: 'school_leader', email: 'leder@school.dk' }
+          { id: 'teacher1', name: 'Teacher Hansen', role: 'teacher', email: 'hansen@school.dk' },
+          { id: 'admin1', name: 'Principal Nielsen', role: 'school_leader', email: 'principal@school.dk' }
         ]
       }
     ];
