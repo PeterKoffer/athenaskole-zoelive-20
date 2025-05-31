@@ -34,6 +34,16 @@ const Index = () => {
     scrollToTop();
   }, [location.pathname, state.showProgress, state.showGames, state.showAITutor, scrollToTop]);
 
+  // Additional scroll to top specifically for AI tutor
+  useEffect(() => {
+    if (state.showAITutor) {
+      // Use setTimeout to ensure the component has rendered
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
+  }, [state.showAITutor]);
+
   useEffect(() => {
     if (user) {
       console.log("User is logged in:", user);

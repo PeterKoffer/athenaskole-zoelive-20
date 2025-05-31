@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
-import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, Menu, X, ArrowLeft } from "lucide-react";
+import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, Menu, X, ArrowLeft, MessageSquare } from "lucide-react";
 import NavbarButton from "./NavbarButton";
+import GlobalCommunicationButton from "../communication/GlobalCommunicationButton";
 
 interface MobileMenuProps {
   onShowProgress: () => void;
@@ -35,7 +36,7 @@ const MobileMenu = ({
   };
 
   const handleProfileClick = () => {
-    navigateToHome();
+    window.location.href = '/profile';
     closeMenu();
   };
 
@@ -83,6 +84,9 @@ const MobileMenu = ({
                     {label}
                   </Button>
                 ))}
+                <div className="w-full">
+                  <GlobalCommunicationButton />
+                </div>
                 <div className="border-t border-gray-700 pt-3 mt-3">
                   <Button 
                     variant="outline" 

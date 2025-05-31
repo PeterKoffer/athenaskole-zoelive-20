@@ -42,7 +42,7 @@ const FloatingAITutor = () => {
 
   if (!isExpanded) {
     return (
-      <div className="fixed z-50" style={containerStyle}>
+      <div className="fixed z-40" style={containerStyle}>
         <CollapsedButton 
           onExpand={() => setIsExpanded(true)}
           {...commonProps}
@@ -52,7 +52,7 @@ const FloatingAITutor = () => {
   }
 
   return (
-    <div className="fixed z-50" style={containerStyle}>
+    <div className="fixed z-40" style={containerStyle}>
       <ChatInterface
         messages={messages}
         onSendMessage={onSendMessage}

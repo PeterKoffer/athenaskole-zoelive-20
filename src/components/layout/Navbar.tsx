@@ -5,6 +5,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, ArrowLeft } from "lucide-react";
 import MobileMenu from "./MobileMenu";
 import NavbarButton from "./NavbarButton";
+import GlobalCommunicationButton from "../communication/GlobalCommunicationButton";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -38,10 +39,8 @@ const Navbar = ({
   };
 
   const handleProfileClick = () => {
-    navigateToHome();
-    if (onResetNavigation) {
-      onResetNavigation();
-    }
+    // Navigate to profile page
+    window.location.href = '/profile';
   };
 
   const navItems = [
@@ -87,12 +86,7 @@ const Navbar = ({
                   onClick={() => handleNavigation(action)}
                 />
               ))}
-              <Button 
-                variant="outline" 
-                className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
-              >
-                Messages
-              </Button>
+              <GlobalCommunicationButton />
               <NavbarButton
                 icon={Settings}
                 label="Profile"
