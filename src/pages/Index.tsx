@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useNavbarState } from "@/hooks/useNavbarState";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import GameHub from "@/components/GameHub";
@@ -17,6 +16,7 @@ import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { navigateToHome, scrollToTop } = useNavigation();
   const location = useLocation();
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -53,9 +53,8 @@ const Index = () => {
   const handleGetStarted = () => {
     console.log("Get Started button clicked, user:", user);
     if (user) {
-      console.log("User is logged in, starting AI tutor experience");
-      setActiveView('showAITutor');
-      scrollToTop();
+      console.log("User is logged in, navigating to daily program");
+      navigate('/daily-program');
     } else {
       console.log("User not logged in, showing auth modal");
       setShowAuthModal(true);
@@ -68,8 +67,9 @@ const Index = () => {
   };
 
   const handleLogin = () => {
-    console.log("Login successful, closing modal");
+    console.log("Login successful, closing modal and navigating to daily program");
     setShowAuthModal(false);
+    navigate('/daily-program');
   };
 
   const handleShowProgress = () => {
