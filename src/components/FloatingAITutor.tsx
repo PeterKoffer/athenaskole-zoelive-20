@@ -11,7 +11,7 @@ const FloatingAITutor = () => {
   
   // Define the home position that avoids the logo
   const homePosition = { x: window.innerWidth - 100, y: 80 };
-  const { position, isDragging, handleMouseDown, resetToHome } = useDragHandler(homePosition);
+  const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
   const { messages, handleSendMessage } = useMessageHandler();
 
   const onSendMessage = (message: string) => {
@@ -34,6 +34,7 @@ const FloatingAITutor = () => {
         <CollapsedButton 
           onExpand={() => setIsExpanded(true)}
           onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
           onResetToHome={resetToHome}
           isDragging={isDragging}
         />
@@ -51,6 +52,7 @@ const FloatingAITutor = () => {
         onSendMessage={onSendMessage}
         onClose={() => setIsExpanded(false)}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         onResetToHome={resetToHome}
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}

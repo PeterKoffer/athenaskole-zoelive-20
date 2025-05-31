@@ -13,6 +13,7 @@ interface ChatInterfaceProps {
   onSendMessage: (message: string) => void;
   onClose: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  onTouchStart: (e: React.TouchEvent) => void;
   onResetToHome: () => void;
   isSpeaking: boolean;
   onStopSpeaking: () => void;
@@ -24,6 +25,7 @@ const ChatInterface = ({
   onSendMessage, 
   onClose, 
   onMouseDown, 
+  onTouchStart,
   onResetToHome,
   isSpeaking, 
   onStopSpeaking,
@@ -50,6 +52,7 @@ const ChatInterface = ({
           isDragging ? 'cursor-grabbing bg-gray-800' : 'cursor-grab hover:bg-gray-800'
         } transition-colors duration-200`} 
         onMouseDown={onMouseDown}
+        onTouchStart={onTouchStart}
       >
         <CardTitle className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-2 text-white">

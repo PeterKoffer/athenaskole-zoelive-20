@@ -5,11 +5,12 @@ import { MessageCircle, Move, Home } from "lucide-react";
 interface CollapsedButtonProps {
   onExpand: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  onTouchStart: (e: React.TouchEvent) => void;
   onResetToHome: () => void;
   isDragging?: boolean;
 }
 
-const CollapsedButton = ({ onExpand, onMouseDown, onResetToHome, isDragging }: CollapsedButtonProps) => {
+const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, isDragging }: CollapsedButtonProps) => {
   return (
     <div className="relative">
       <Button
@@ -20,6 +21,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onResetToHome, isDragging }: C
           }
         }}
         onMouseDown={onMouseDown}
+        onTouchStart={onTouchStart}
         className={`bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white border-none rounded-full w-16 h-16 shadow-lg transition-all duration-200 ${
           isDragging ? 'scale-105 shadow-xl cursor-grabbing' : 'cursor-grab hover:scale-105'
         }`}

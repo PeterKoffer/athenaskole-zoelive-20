@@ -40,6 +40,7 @@ export const useDragHandler = (homePosition: Position) => {
     setPosition(constrainedHomePosition);
   };
 
+  // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
@@ -48,6 +49,18 @@ export const useDragHandler = (homePosition: Position) => {
       y: e.clientY - rect.top
     };
     e.preventDefault(); // Prevent text selection
+  };
+
+  // Touch events for mobile devices
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    dragOffset.current = {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+    e.preventDefault(); // Prevent scrolling
   };
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -60,7 +73,23 @@ export const useDragHandler = (homePosition: Position) => {
     }
   };
 
+  const handleTouchMove = (e: TouchEvent) => {
+    if (isDragging) {
+      const touch = e.touches[0];
+      const newPosition = constrainPosition({
+        x: touch.clientX - dragOffset.current.x,
+        y: touch.clientY - dragOffset.current.y
+      });
+      setPosition(newPosition);
+      e.preventDefault(); // Prevent scrolling
+    }
+  };
+
   const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchEnd = () => {
     setIsDragging(false);
   };
 
@@ -83,13 +112,21 @@ export const useDragHandler = (homePosition: Position) => {
 
   useEffect(() => {
     if (isDragging) {
+      // Mouse events
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      
+      // Touch events
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+      
       document.body.style.userSelect = 'none'; // Prevent text selection while dragging
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
         document.body.style.userSelect = '';
       };
     }
@@ -99,6 +136,7 @@ export const useDragHandler = (homePosition: Position) => {
     position,
     isDragging,
     handleMouseDown,
+    handleTouchStart,
     resetToHome
   };
 };
