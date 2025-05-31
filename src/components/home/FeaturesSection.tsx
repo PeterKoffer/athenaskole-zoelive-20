@@ -12,10 +12,10 @@ const FeaturesSection = () => {
     <section className="py-12">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-semibold text-white">
-          Funktioner
+          Features
         </h2>
         <p className="text-gray-400">
-          Oplev de mange måder, Athena kan hjælpe dig med at lære.
+          Experience the many ways Nelie can help you learn.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -23,10 +23,10 @@ const FeaturesSection = () => {
           <CardContent className="p-4">
             <LayoutDashboard className="w-6 h-6 text-blue-500 mb-2" />
             <h3 className="text-xl font-bold text-white mb-2">
-              Personligt Dashboard
+              Personal Dashboard
             </h3>
             <p className="text-gray-300">
-              Få et overblik over dine fremskridt.
+              Get an overview of your progress.
             </p>
           </CardContent>
         </Card>
@@ -34,10 +34,10 @@ const FeaturesSection = () => {
           <CardContent className="p-4">
             <BookOpenCheck className="w-6 h-6 text-green-500 mb-2" />
             <h3 className="text-xl font-bold text-white mb-2">
-              Interaktive Lektioner
+              Interactive Lessons
             </h3>
             <p className="text-gray-300">
-              Engagerende indhold, der gør læring sjov.
+              Engaging content that makes learning fun.
             </p>
           </CardContent>
         </Card>
@@ -45,10 +45,10 @@ const FeaturesSection = () => {
           <CardContent className="p-4">
             <Gamepad2 className="w-6 h-6 text-purple-500 mb-2" />
             <h3 className="text-xl font-bold text-white mb-2">
-              Gamificeret Læring
+              Gamified Learning
             </h3>
             <p className="text-gray-300">
-              Tjen point og badges, mens du lærer.
+              Earn points and badges while you learn.
             </p>
           </CardContent>
         </Card>
@@ -56,10 +56,10 @@ const FeaturesSection = () => {
           <CardContent className="p-4">
             <BrainCircuit className="w-6 h-6 text-orange-500 mb-2" />
             <h3 className="text-xl font-bold text-white mb-2">
-              AI-drevet Tutor
+              AI-Powered Tutor
             </h3>
             <p className="text-gray-300">
-              Få personlig hjælp fra vores AI-tutor.
+              Get personalized help from our AI tutor.
             </p>
           </CardContent>
         </Card>

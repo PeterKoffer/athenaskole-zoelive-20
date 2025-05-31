@@ -64,32 +64,32 @@ const Navbar = ({
             <>
               <Button variant="ghost" onClick={() => handleNavigation(onShowProgress)}>
                 <Monitor className="w-4 h-4 mr-2" />
-                Fremskridt
+                Progress
               </Button>
               <Button variant="ghost" onClick={() => handleNavigation(onShowGames)}>
                 <Gamepad2 className="w-4 h-4 mr-2" />
-                Spil
+                Games
               </Button>
               <Button variant="ghost" onClick={() => handleNavigation(onShowAITutor)}>
                 <BookOpenCheck className="w-4 h-4 mr-2" />
-                AI Lærer
+                AI Tutor
               </Button>
               <Button variant="outline" onClick={() => navigate('/profile')} className="text-slate-950">
                 <Settings className="w-4 h-4 mr-2" />
-                Profil
+                Profile
               </Button>
               <Button variant="outline" onClick={signOut} className="text-slate-950">
                 <LogOut className="w-4 h-4 mr-2" />
-                Log ud
+                Log Out
               </Button>
             </>
           ) : (
             <>
               <Button variant="ghost" onClick={onGetStarted}>
-                Log ind
+                Sign In
               </Button>
               <Button variant="outline" onClick={onGetStarted} className="text-slate-950">
-                Start Gratis
+                Start Free
               </Button>
             </>
           )}

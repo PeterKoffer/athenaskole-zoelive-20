@@ -57,7 +57,7 @@ const ChatInterface = ({
               isDragging ? 'text-blue-400' : 'text-gray-400'
             }`} />
             <span className="text-xl">👩‍🏫</span>
-            <span>Athena - Your AI Tutor</span>
+            <span>Nelie - Your AI Tutor</span>
           </div>
           <div className="flex items-center space-x-2">
             <Badge variant="outline" className="bg-gradient-to-r from-pink-400 to-purple-500 text-white border-pink-400 text-xs">
@@ -113,7 +113,7 @@ const ChatInterface = ({
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type 'hi Athena' or your question..."
+              placeholder="Type 'hi Nelie' or your question..."
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-pink-400 text-xs h-8"
             />

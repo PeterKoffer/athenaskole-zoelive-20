@@ -26,7 +26,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onResetToHome, isDragging }: C
       >
         <div className="flex flex-col items-center">
           <div className="text-2xl">👩‍🏫</div>
-          <div className="text-xs font-bold mt-1">Athena</div>
+          <div className="text-xs font-bold mt-1">Nelie</div>
           <MessageCircle className="w-4 h-4 absolute -bottom-1 -right-1 bg-green-500 rounded-full p-0.5" />
           {isDragging && (
             <Move className="w-3 h-3 absolute -top-1 -left-1 bg-blue-500 rounded-full p-0.5 text-white" />

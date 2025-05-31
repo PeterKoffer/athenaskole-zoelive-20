@@ -51,7 +51,7 @@ const MobileMenu = ({
                   onClick={() => handleNavigation(onShowProgress)}
                 >
                   <Monitor className="w-4 h-4 mr-3" />
-                  Fremskridt
+                  Progress
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -59,7 +59,7 @@ const MobileMenu = ({
                   onClick={() => handleNavigation(onShowGames)}
                 >
                   <Gamepad2 className="w-4 h-4 mr-3" />
-                  Spil
+                  Games
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -67,7 +67,7 @@ const MobileMenu = ({
                   onClick={() => handleNavigation(onShowAITutor)}
                 >
                   <BookOpenCheck className="w-4 h-4 mr-3" />
-                  AI Lærer
+                  AI Tutor
                 </Button>
                 <div className="border-t border-gray-700 pt-3 mt-3">
                   <Button 
@@ -79,7 +79,7 @@ const MobileMenu = ({
                     }}
                   >
                     <Settings className="w-4 h-4 mr-3" />
-                    Profil
+                    Profile
                   </Button>
                   <Button 
                     variant="outline" 
@@ -90,7 +90,7 @@ const MobileMenu = ({
                     }}
                   >
                     <LogOut className="w-4 h-4 mr-3" />
-                    Log ud
+                    Log Out
                   </Button>
                 </div>
               </>
@@ -101,14 +101,14 @@ const MobileMenu = ({
                   className="w-full text-white" 
                   onClick={() => handleNavigation(onGetStarted)}
                 >
-                  Log ind
+                  Sign In
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full" 
                   onClick={() => handleNavigation(onGetStarted)}
                 >
-                  Start Gratis
+                  Start Free
                 </Button>
               </div>
             )}

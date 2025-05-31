@@ -6,7 +6,7 @@ export const useMessageHandler = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
-      content: "Hi! I'm Athena, your AI tutor. Say 'hi Athena' to start, or write your question!",
+      content: "Hi! I'm Nelie, your AI tutor. Say 'hi Nelie' to start, or write your question!",
       timestamp: new Date()
     }
   ]);
@@ -22,16 +22,16 @@ export const useMessageHandler = () => {
 
     setMessages(prev => [...prev, userMessage]);
     
-    const isAthenaGreeting = inputMessage.toLowerCase().includes('hi athena') || 
-                           inputMessage.toLowerCase().includes('hello athena');
+    const isNelieGreeting = inputMessage.toLowerCase().includes('hi nelie') || 
+                           inputMessage.toLowerCase().includes('hello nelie');
     
     setInputMessage("");
 
     setTimeout(() => {
       let responseContent = "";
       
-      if (isAthenaGreeting) {
-        responseContent = "Hi! I'm Athena, and I'm so excited to meet you! 🌟 I'm here to help you learn. What would you like to work on today? Math, English, Science, or maybe something else?";
+      if (isNelieGreeting) {
+        responseContent = "Hi! I'm Nelie, and I'm so excited to meet you! 🌟 I'm here to help you learn. What would you like to work on today? Math, English, Science, or maybe something else?";
         
         if ('speechSynthesis' in window) {
           setIsSpeaking(true);
@@ -42,7 +42,7 @@ export const useMessageHandler = () => {
           speechSynthesis.speak(utterance);
         }
       } else {
-        responseContent = "That's a good question! As Athena, I can help you with many things. Try saying 'hi Athena' for a more personal greeting!";
+        responseContent = "That's a good question! As Nelie, I can help you with many things. Try saying 'hi Nelie' for a more personal greeting!";
       }
 
       const aiResponse: Message = {

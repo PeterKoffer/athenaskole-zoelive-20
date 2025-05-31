@@ -10,17 +10,17 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
     <section className="py-16">
       <div className="text-center">
         <h2 className="text-3xl font-semibold text-white mb-4">
-          Klar til at møde Nelie?
+          Ready to meet Nelie?
         </h2>
         <p className="text-gray-400 mb-8">
-          Opret en gratis konto og start din personlige læringsrejse med Nelie i dag!
+          Create a free account and start your personal learning journey with Nelie today!
         </p>
         <Button
           size="lg"
           className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
           onClick={onGetStarted}
         >
-          Kom i gang med Nelie
+          Get Started with Nelie
         </Button>
       </div>
     </section>

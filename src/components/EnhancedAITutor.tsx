@@ -135,7 +135,7 @@ const EnhancedAITutor = ({ user }) => {
           <CardTitle className="flex items-center space-x-3 text-white">
             <div className="text-4xl">🎓</div>
             <div>
-              <h1 className="text-3xl font-bold">Hi {user?.user_metadata?.name?.split(' ')[0] || 'Student'}! I'm Athena</h1>
+              <h1 className="text-3xl font-bold">Hi {user?.user_metadata?.name?.split(' ')[0] || 'Student'}! I'm Nelie</h1>
               <p className="text-purple-100 text-lg">{todaysDate}</p>
             </div>
           </CardTitle>
@@ -159,7 +159,7 @@ const EnhancedAITutor = ({ user }) => {
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center space-x-2 text-white">
               <span className="text-2xl">🎓</span>
-              <span>Athena AI Tutor</span>
+              <span>Nelie AI Tutor</span>
             </span>
             <div className="flex items-center space-x-2">
               <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">
