@@ -26,7 +26,7 @@ const ChatInput = ({ onSendMessage, isSpeaking, onStopSpeaking }: ChatInputProps
     if (!isListening) {
       setTimeout(() => {
         setIsListening(false);
-        setInputMessage("Jeg vil gerne lære om brøker");
+        setInputMessage("I would like to learn about fractions");
       }, 2000);
     }
   };
@@ -37,7 +37,7 @@ const ChatInput = ({ onSendMessage, isSpeaking, onStopSpeaking }: ChatInputProps
         <Input
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Skriv dit spørgsmål her..."
+          placeholder="Type your question here..."
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
           className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
         />
@@ -66,7 +66,7 @@ const ChatInput = ({ onSendMessage, isSpeaking, onStopSpeaking }: ChatInputProps
       {isListening && (
         <div className="text-center">
           <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 animate-pulse">
-            🎤 Lytter... Tal nu!
+            🎤 Listening... Speak now!
           </Badge>
         </div>
       )}

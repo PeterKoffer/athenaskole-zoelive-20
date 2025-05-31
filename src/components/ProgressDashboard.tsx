@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -20,27 +21,27 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
   const navigate = useNavigate();
 
   const weeklyData = [
-    { day: "Mandag", matematik: 45, dansk: 30, engelsk: 20 },
-    { day: "Tirsdag", matematik: 60, dansk: 40, engelsk: 35 },
-    { day: "Onsdag", matematik: 30, dansk: 55, engelsk: 25 },
-    { day: "Torsdag", matematik: 75, dansk: 20, engelsk: 40 },
-    { day: "Fredag", matematik: 40, dansk: 35, engelsk: 30 },
-    { day: "Lørdag", matematik: 20, dansk: 15, engelsk: 45 },
-    { day: "Søndag", matematik: 35, dansk: 25, engelsk: 20 }
+    { day: "Monday", matematik: 45, dansk: 30, engelsk: 20 },
+    { day: "Tuesday", matematik: 60, dansk: 40, engelsk: 35 },
+    { day: "Wednesday", matematik: 30, dansk: 55, engelsk: 25 },
+    { day: "Thursday", matematik: 75, dansk: 20, engelsk: 40 },
+    { day: "Friday", matematik: 40, dansk: 35, engelsk: 30 },
+    { day: "Saturday", matematik: 20, dansk: 15, engelsk: 45 },
+    { day: "Sunday", matematik: 35, dansk: 25, engelsk: 20 }
   ];
 
   const achievements = [
-    { name: "7 dage i træk", description: "Brugt appen hver dag i en uge", date: "2024-01-15", emoji: "🔥" },
-    { name: "Matematik Mester", description: "Nået 80% i matematik", date: "2024-01-10", emoji: "🧮" },
-    { name: "Stavning Champion", description: "Stavet 100 ord korrekt", date: "2024-01-08", emoji: "✏️" },
-    { name: "Nysgerrig Lærer", description: "Prøvet alle fag", date: "2024-01-05", emoji: "🎓" }
+    { name: "7 days in a row", description: "Used the app every day for a week", date: "2024-01-15", emoji: "🔥" },
+    { name: "Math Master", description: "Reached 80% in mathematics", date: "2024-01-10", emoji: "🧮" },
+    { name: "Spelling Champion", description: "Spelled 100 words correctly", date: "2024-01-08", emoji: "✏️" },
+    { name: "Curious Learner", description: "Tried all subjects", date: "2024-01-05", emoji: "🎓" }
   ];
 
   const getPerformanceMessage = (score: number) => {
-    if (score >= 80) return { message: "Fantastisk! Du mestrer dette fag! 🌟", color: "text-green-400" };
-    if (score >= 65) return { message: "Godt arbejde! Du er på rette vej! 👍", color: "text-blue-400" };
-    if (score >= 50) return { message: "Fortsæt det gode arbejde! 💪", color: "text-yellow-400" };
-    return { message: "Du kan gøre det! Bliv ved! 🚀", color: "text-orange-400" };
+    if (score >= 80) return { message: "Fantastic! You're mastering this subject! 🌟", color: "text-green-400" };
+    if (score >= 65) return { message: "Good work! You're on the right track! 👍", color: "text-blue-400" };
+    if (score >= 50) return { message: "Keep up the good work! 💪", color: "text-yellow-400" };
+    return { message: "You can do it! Keep going! 🚀", color: "text-orange-400" };
   };
 
   return (
@@ -52,9 +53,9 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
             <div className="flex items-center space-x-4">
               <Brain className="w-12 h-12 text-lime-400" />
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Prøv Adaptiv AI Læring!</h3>
+                <h3 className="text-xl font-bold text-white mb-1">Try Adaptive AI Learning!</h3>
                 <p className="text-lime-200">
-                  Nelie tilpasser automatisk sværhedsgraden baseret på din præstation
+                  Nelie automatically adjusts difficulty based on your performance
                 </p>
               </div>
             </div>
@@ -62,7 +63,7 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
               onClick={() => navigate('/adaptive-learning')}
               className="bg-lime-400 hover:bg-lime-500 text-black font-semibold"
             >
-              Start AI Læring
+              Start AI Learning
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -73,9 +74,9 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-white">
             <TrendingUp className="w-6 h-6 text-lime-400" />
-            <span>Din Læringsrejse</span>
+            <span>Your Learning Journey</span>
             <Badge variant="outline" className="bg-lime-400 text-black border-lime-400">
-              Uge 3, 2024
+              Week 3, 2024
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -83,11 +84,17 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {Object.entries(userProgress).map(([subject, score]) => {
               const performance = getPerformanceMessage(score);
+              const subjectNames = {
+                matematik: "Mathematics",
+                dansk: "Danish",
+                engelsk: "English", 
+                naturteknik: "Science & Tech"
+              };
               return (
                 <Card key={subject} className="bg-gray-800 border-gray-700">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold capitalize text-white">{subject}</h3>
+                      <h3 className="font-semibold capitalize text-white">{subjectNames[subject] || subject}</h3>
                       <span className="text-2xl font-bold text-lime-400">{score}%</span>
                     </div>
                     <Progress value={score} className="h-3 mb-3 bg-gray-700" />
@@ -107,7 +114,7 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-white">
               <Calendar className="w-5 h-5 text-lime-400" />
-              <span>Ugentlig Aktivitet</span>
+              <span>Weekly Activity</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -116,7 +123,7 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between text-sm font-medium text-white">
                     <span>{day.day}</span>
-                    <span>{day.matematik + day.dansk + day.engelsk} minutter</span>
+                    <span>{day.matematik + day.dansk + day.engelsk} minutes</span>
                   </div>
                   <div className="flex space-x-1 h-3 bg-gray-700 rounded-full overflow-hidden">
                     <div 
@@ -137,15 +144,15 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
               <div className="flex justify-center space-x-6 mt-4 text-sm text-gray-300">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                  <span>Matematik</span>
+                  <span>Mathematics</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded"></div>
-                  <span>Dansk</span>
+                  <span>Danish</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-500 rounded"></div>
-                  <span>Engelsk</span>
+                  <span>English</span>
                 </div>
               </div>
             </div>
@@ -156,7 +163,7 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-white">
               <Award className="w-5 h-5 text-lime-400" />
-              <span>Seneste Præstationer</span>
+              <span>Recent Achievements</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -168,7 +175,7 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
                     <h4 className="font-semibold text-white">{achievement.name}</h4>
                     <p className="text-sm text-gray-400">{achievement.description}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Opnået {new Date(achievement.date).toLocaleDateString('da-DK')}
+                      Achieved {new Date(achievement.date).toLocaleDateString('en-US')}
                     </p>
                   </div>
                 </div>
@@ -182,34 +189,34 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-white">
             <Target className="w-5 h-5 text-lime-400" />
-            <span>Ugentlige Mål</span>
+            <span>Weekly Goals</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-white">
-                <span>Læring (180 min/uge)</span>
+                <span>Learning (180 min/week)</span>
                 <span>145/180 min</span>
               </div>
               <Progress value={80} className="h-2 bg-gray-700" />
-              <p className="text-xs text-gray-400">35 minutter tilbage</p>
+              <p className="text-xs text-gray-400">35 minutes remaining</p>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-white">
-                <span>Spil gennemført (5/uge)</span>
-                <span>3/5 spil</span>
+                <span>Games completed (5/week)</span>
+                <span>3/5 games</span>
               </div>
               <Progress value={60} className="h-2 bg-gray-700" />
-              <p className="text-xs text-gray-400">2 spil tilbage</p>
+              <p className="text-xs text-gray-400">2 games remaining</p>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-white">
-                <span>Perfekte scores (3/uge)</span>
+                <span>Perfect scores (3/week)</span>
                 <span>1/3 scores</span>
               </div>
               <Progress value={33} className="h-2 bg-gray-700" />
-              <p className="text-xs text-gray-400">2 perfekte scores tilbage</p>
+              <p className="text-xs text-gray-400">2 perfect scores remaining</p>
             </div>
           </div>
         </CardContent>
@@ -217,22 +224,22 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
 
       <Card className="bg-gradient-to-r from-gray-900 to-gray-800 border-2 border-lime-400">
         <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-bold text-white mb-2">Forældremail næste uge 📧</h3>
+          <h3 className="text-xl font-bold text-white mb-2">Parent email next week 📧</h3>
           <p className="text-gray-300 mb-4">
-            Dine forældre vil modtage en rapport om dine fremskridt:
+            Your parents will receive a report about your progress:
           </p>
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div className="bg-gray-800 p-3 rounded-lg border border-gray-700">
-              <div className="font-semibold text-green-400">Forbedring</div>
-              <div className="text-white">Matematik: +15%</div>
+              <div className="font-semibold text-green-400">Improvement</div>
+              <div className="text-white">Mathematics: +15%</div>
             </div>
             <div className="bg-gray-800 p-3 rounded-lg border border-gray-700">
-              <div className="font-semibold text-blue-400">Mest Aktiv</div>
-              <div className="text-white">Tirsdag: 2 timer</div>
+              <div className="font-semibold text-blue-400">Most Active</div>
+              <div className="text-white">Tuesday: 2 hours</div>
             </div>
             <div className="bg-gray-800 p-3 rounded-lg border border-gray-700">
-              <div className="font-semibold text-purple-400">Nye Badges</div>
-              <div className="text-white">2 denne uge</div>
+              <div className="font-semibold text-purple-400">New Badges</div>
+              <div className="text-white">2 this week</div>
             </div>
           </div>
         </CardContent>

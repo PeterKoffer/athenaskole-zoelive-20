@@ -10,38 +10,38 @@ const LearningOptions = ({ onOptionSelect }: LearningOptionsProps) => {
   const learningOptions: LearningOption[] = [
     {
       id: "review",
-      title: "Gennemgå",
-      description: "Gentag hvad du lærte i går",
+      title: "Review",
+      description: "Review what you learned yesterday",
       icon: "🔄"
     },
     {
       id: "new",
-      title: "Nyt emne",
-      description: "Lær noget helt nyt",
+      title: "New Topic",
+      description: "Learn something completely new",
       icon: "✨"
     },
     {
       id: "practice",
-      title: "Øv dig",
-      description: "Træn dine færdigheder",
+      title: "Practice",
+      description: "Train your skills",
       icon: "💪"
     },
     {
       id: "test",
-      title: "Test dig selv",
-      description: "Se hvor god du er",
+      title: "Test Yourself",
+      description: "See how good you are",
       icon: "🎯"
     },
     {
       id: "pronunciation",
-      title: "Udtale",
-      description: "Træn din udtale med AI",
+      title: "Pronunciation",
+      description: "Practice your pronunciation with AI",
       icon: "🎤"
     },
     {
       id: "language",
-      title: "Sprogtræning",
-      description: "Lær nye sprog interaktivt",
+      title: "Language Training",
+      description: "Learn new languages interactively",
       icon: "🌍"
     }
   ];

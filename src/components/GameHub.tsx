@@ -13,89 +13,89 @@ const GameHub = () => {
   const games = [
     {
       id: "viking-castle",
-      title: "Byg En Vikingborg",
-      description: "Lær geometri og matematik ved at bygge en vikingborg og forsvare den mod angreb!",
-      subject: "Matematik",
-      difficulty: "Mellem",
+      title: "Build A Viking Castle",
+      description: "Learn geometry and mathematics by building a viking castle and defending it from attacks!",
+      subject: "Mathematics",
+      difficulty: "Medium",
       timeEstimate: "15-20 min",
       emoji: "🏰",
-      rewards: "50 Lære-Kroner + Matematik Viking badge",
+      rewards: "50 Learning Coins + Math Viking badge",
       status: "available"
     },
     {
       id: "word-hunt",
-      title: "Ordjagt AR",
-      description: "Brug din telefon til at finde genstande i den virkelige verden og stav dem korrekt!",
-      subject: "Dansk",
-      difficulty: "Let",
+      title: "Word Hunt AR",
+      description: "Use your phone to find objects in the real world and spell them correctly!",
+      subject: "English",
+      difficulty: "Easy",
       timeEstimate: "10-15 min",
       emoji: "🔍",
-      rewards: "30 Lære-Kroner + Ordjæger badge",
+      rewards: "30 Learning Coins + Word Hunter badge",
       status: "coming-soon"
     },
     {
       id: "sandwich-coding",
-      title: "Kod en Smørrebrød",
-      description: "Lær logik og algoritmer ved at stable ingredienser i den rigtige rækkefølge!",
-      subject: "Programmering",
-      difficulty: "Mellem",
+      title: "Code a Sandwich",
+      description: "Learn logic and algorithms by stacking ingredients in the correct order!",
+      subject: "Programming",
+      difficulty: "Medium",
       timeEstimate: "20-25 min",
       emoji: "🥪",
-      rewards: "60 Lære-Kroner + Kode Mester badge",
+      rewards: "60 Learning Coins + Code Master badge",
       status: "coming-soon"
     },
     {
       id: "time-travel",
-      title: "Vikingetids Eventyr",
-      description: "Rejse tilbage til vikingetiden og hjælp Harald Blåtand med at løse problemer!",
-      subject: "Historie",
-      difficulty: "Let",
+      title: "Viking Age Adventure",
+      description: "Travel back to the Viking Age and help Harald Bluetooth solve problems!",
+      subject: "History",
+      difficulty: "Easy",
       timeEstimate: "25-30 min",
       emoji: "⚔️",
-      rewards: "40 Lære-Kroner + Tidsrejsende badge",
+      rewards: "40 Learning Coins + Time Traveler badge",
       status: "coming-soon"
     },
     {
       id: "windmill-builder",
-      title: "Byg Et Vindmølle",
-      description: "Lær om vedvarende energi ved at designe og bygge din egen vindmølle!",
-      subject: "Natur & Teknik",
-      difficulty: "Svær",
+      title: "Build A Windmill",
+      description: "Learn about renewable energy by designing and building your own windmill!",
+      subject: "Science & Technology",
+      difficulty: "Hard",
       timeEstimate: "30-35 min",
       emoji: "🌪️",
-      rewards: "80 Lære-Kroner + Grøn Ingeniør badge",
+      rewards: "80 Learning Coins + Green Engineer badge",
       status: "coming-soon"
     },
     {
       id: "music-composer",
-      title: "Komponer med Carl Nielsen",
-      description: "Skab smukke melodier sammen med den berømte danske komponist Carl Nielsen!",
-      subject: "Musik",
-      difficulty: "Mellem",
+      title: "Compose with Carl Nielsen",
+      description: "Create beautiful melodies together with the famous Danish composer Carl Nielsen!",
+      subject: "Music",
+      difficulty: "Medium",
       timeEstimate: "20-25 min",
       emoji: "🎵",
-      rewards: "50 Lære-Kroner + Komponist badge",
+      rewards: "50 Learning Coins + Composer badge",
       status: "coming-soon"
     }
   ];
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case "Let": return "bg-green-900 text-green-400 border-green-400";
-      case "Mellem": return "bg-yellow-900 text-yellow-400 border-yellow-400";
-      case "Svær": return "bg-red-900 text-red-400 border-red-400";
+      case "Easy": return "bg-green-900 text-green-400 border-green-400";
+      case "Medium": return "bg-yellow-900 text-yellow-400 border-yellow-400";
+      case "Hard": return "bg-red-900 text-red-400 border-red-400";
       default: return "bg-gray-900 text-gray-400 border-gray-400";
     }
   };
 
   const getSubjectColor = (subject) => {
     const colors = {
-      "Matematik": "bg-blue-900 text-blue-400 border-blue-400",
-      "Dansk": "bg-red-900 text-red-400 border-red-400",
-      "Programmering": "bg-purple-900 text-purple-400 border-purple-400",
-      "Historie": "bg-orange-900 text-orange-400 border-orange-400",
-      "Natur & Teknik": "bg-green-900 text-green-400 border-green-400",
-      "Musik": "bg-pink-900 text-pink-400 border-pink-400"
+      "Mathematics": "bg-blue-900 text-blue-400 border-blue-400",
+      "English": "bg-red-900 text-red-400 border-red-400",
+      "Programming": "bg-purple-900 text-purple-400 border-purple-400",
+      "History": "bg-orange-900 text-orange-400 border-orange-400",
+      "Science & Technology": "bg-green-900 text-green-400 border-green-400",
+      "Music": "bg-pink-900 text-pink-400 border-pink-400"
     };
     return colors[subject] || "bg-gray-900 text-gray-400 border-gray-400";
   };
@@ -110,9 +110,9 @@ const GameHub = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-white">
             <Trophy className="w-6 h-6 text-lime-400" />
-            <span>Skjult Læring Spil</span>
+            <span>Hidden Learning Games</span>
             <Badge variant="outline" className="bg-lime-400 text-gray-900 border-lime-400">
-              Lær mens du leger!
+              Learn while you play!
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -123,7 +123,7 @@ const GameHub = () => {
                 {game.status === "coming-soon" && (
                   <div className="absolute top-2 right-2 z-10">
                     <Badge variant="secondary" className="bg-gray-700 text-gray-300 border-gray-600">
-                      Kommer snart
+                      Coming Soon
                     </Badge>
                   </div>
                 )}
@@ -164,7 +164,7 @@ const GameHub = () => {
                     disabled={game.status === "coming-soon"}
                     onClick={() => game.status === "available" && setSelectedGame(game.id)}
                   >
-                    {game.status === "available" ? "Spil Nu" : "Kommer Snart"}
+                    {game.status === "available" ? "Play Now" : "Coming Soon"}
                   </Button>
                 </CardContent>
               </Card>
@@ -177,20 +177,20 @@ const GameHub = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-white">
             <Users className="w-6 h-6 text-lime-400" />
-            <span>Klassens Rangliste</span>
+            <span>Class Leaderboard</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {[
-              { name: "Sofie M.", points: 2450, badge: "🏆" },
-              { name: "Dig (Emil)", points: 2210, badge: "🥈" },
+              { name: "Sophie M.", points: 2450, badge: "🏆" },
+              { name: "You (Emil)", points: 2210, badge: "🥈" },
               { name: "Marcus L.", points: 2180, badge: "🥉" },
               { name: "Anna K.", points: 1950, badge: "⭐" },
               { name: "Tobias R.", points: 1820, badge: "⭐" }
             ].map((player, index) => (
               <div key={index} className={`flex items-center justify-between p-3 rounded-lg border ${
-                player.name.includes("Dig") ? "bg-lime-900/20 border-lime-400" : "bg-gray-800 border-gray-700"
+                player.name.includes("You") ? "bg-lime-900/20 border-lime-400" : "bg-gray-800 border-gray-700"
               }`}>
                 <div className="flex items-center space-x-3">
                   <span className="text-xl">{player.badge}</span>
@@ -198,7 +198,7 @@ const GameHub = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="font-bold text-lime-400">{player.points}</span>
-                  <span className="text-sm text-gray-400">point</span>
+                  <span className="text-sm text-gray-400">points</span>
                 </div>
               </div>
             ))}
@@ -206,7 +206,7 @@ const GameHub = () => {
           
           <div className="mt-4 p-3 bg-gray-800 border border-lime-400 rounded-lg">
             <p className="text-sm text-lime-400">
-              <strong>Godt gået!</strong> <span className="text-gray-300">Du er #2 i klassen. Fortsæt med at spille for at komme på førstepladsen! 🇩🇰</span>
+              <strong>Well done!</strong> <span className="text-gray-300">You are #2 in the class. Keep playing to reach first place! 🎯</span>
             </p>
           </div>
         </CardContent>
