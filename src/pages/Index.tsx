@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -129,7 +130,7 @@ const Index = () => {
     );
   };
 
-  console.log("Index component rendering, showAuthModal:", showAuthModal);
+  console.log("Index component rendering, showAuthModal:", showAuthModal, "user:", user);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
