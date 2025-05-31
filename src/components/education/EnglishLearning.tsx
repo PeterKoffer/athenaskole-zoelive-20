@@ -10,7 +10,7 @@ import PerformanceAnalytics from "../adaptive-learning/PerformanceAnalytics";
 import LearningHeader from "./LearningHeader";
 
 const EnglishLearning = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -26,12 +26,13 @@ const EnglishLearning = () => {
     endSession
   } = useAdaptiveLearning('english', 'comprehension');
 
+  // Redirect to auth if not logged in - but only after loading is complete
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
+      console.log("User not authenticated in EnglishLearning, redirecting to auth");
       navigate('/auth');
-      return;
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   // Sample questions for English learning
   const questions = [
@@ -75,6 +76,19 @@ const EnglishLearning = () => {
     adjustDifficulty(newLevel, reason);
   };
 
+  // Show loading state while authentication is being checked
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">📚</div>
+          <p className="text-lg">Loading your English lesson...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the component if user is not authenticated
   if (!user) return null;
 
   if (showResults) {

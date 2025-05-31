@@ -9,7 +9,7 @@ import SessionTimer from "../adaptive-learning/SessionTimer";
 import LearningHeader from "./LearningHeader";
 
 const MathematicsLearning = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -27,12 +27,13 @@ const MathematicsLearning = () => {
     endSession
   } = useAdaptiveLearning('mathematics', 'arithmetic');
 
+  // Redirect to auth if not logged in - but only after loading is complete
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
+      console.log("User not authenticated in MathematicsLearning, redirecting to auth");
       navigate('/auth');
-      return;
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   // Sample math questions
   const questions = [
@@ -90,6 +91,19 @@ const MathematicsLearning = () => {
     adjustDifficulty(newLevel, reason);
   };
 
+  // Show loading state while authentication is being checked
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🔢</div>
+          <p className="text-lg">Loading your math lesson...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the component if user is not authenticated
   if (!user) return null;
 
   if (showResults) {
