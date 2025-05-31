@@ -3,17 +3,23 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-interface ProfileHeaderProps {
-  onSignOut: () => void;
+interface LearningHeaderProps {
+  title?: string;
+  backTo?: string;
+  backLabel?: string;
 }
 
-const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
+const LearningHeader = ({ 
+  title, 
+  backTo = "/", 
+  backLabel = "Back to Program" 
+}: LearningHeaderProps) => {
   const navigate = useNavigate();
 
   return (
     <nav className="bg-gray-800 border-b border-gray-700 p-4">
-      <div className="max-w-4xl mx-auto flex justify-between items-center">
-        {/* Left side - NELIE logo with AI tutor */}
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Left side - AI Tutor logo */}
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
             <span className="text-lg">👩‍🏫</span>
@@ -23,14 +29,14 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
           </span>
         </div>
 
-        {/* Center - Back to Home button */}
+        {/* Center - Back button */}
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/')} 
+          onClick={() => navigate(backTo)}
           className="text-gray-400 hover:text-white hover:bg-gray-700"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
+          {backLabel}
         </Button>
 
         {/* Right side - Empty for balance */}
@@ -40,4 +46,4 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
   );
 };
 
-export default ProfileHeader;
+export default LearningHeader;

@@ -1,154 +1,121 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLearningSession } from "@/hooks/useLearningSession";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Palette, ArrowLeft, Save, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Palette, Music, Camera, Pen } from "lucide-react";
+import SessionTimer from "../adaptive-learning/SessionTimer";
+import LearningHeader from "./LearningHeader";
 
 const CreativeLearning = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [currentActivity, setCurrentActivity] = useState(0);
-  const [storyText, setStoryText] = useState("");
-  const [drawing, setDrawing] = useState("");
-  const [completed, setCompleted] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+
+  const { startSession } = useLearningSession();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    startSession('creative');
+  }, [user, navigate, startSession]);
 
   const activities = [
     {
-      title: "Write a Short Story",
-      description: "Write a creative story about a magical forest. Use your imagination!",
-      prompt: "Once upon a time, in a magical forest...",
-      type: "story"
+      id: 'drawing',
+      title: 'Digital Drawing',
+      description: 'Create beautiful digital artwork',
+      icon: Palette,
+      color: 'from-pink-400 to-purple-600'
     },
     {
-      title: "Describe Your Drawing",
-      description: "Imagine you're drawing your dream house. Describe what it looks like!",
-      prompt: "My dream house has...",
-      type: "description"
+      id: 'music',
+      title: 'Music Creation',
+      description: 'Compose and play music',
+      icon: Music,
+      color: 'from-blue-400 to-cyan-600'
+    },
+    {
+      id: 'photography',
+      title: 'Photo Stories',
+      description: 'Tell stories through images',
+      icon: Camera,
+      color: 'from-green-400 to-blue-600'
+    },
+    {
+      id: 'writing',
+      title: 'Creative Writing',
+      description: 'Write stories and poems',
+      icon: Pen,
+      color: 'from-orange-400 to-pink-600'
     }
   ];
 
-  const currentActivityData = activities[currentActivity];
-
-  const handleSubmit = () => {
-    setCompleted(true);
-  };
-
-  const handleNext = () => {
-    if (currentActivity < activities.length - 1) {
-      setCurrentActivity(currentActivity + 1);
-      setStoryText("");
-      setCompleted(false);
-    } else {
-      navigate('/daily-program');
-    }
-  };
-
-  const generateIdeas = () => {
-    const ideas = [
-      "Add a talking animal character",
-      "Include a mysterious door",
-      "Describe colorful flowers",
-      "Add a friendly dragon",
-      "Include a hidden treasure",
-      "Describe magical sounds"
-    ];
-    const randomIdea = ideas[Math.floor(Math.random() * ideas.length)];
-    setStoryText(prev => prev + " " + randomIdea + "...");
-  };
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/daily-program')}
-            className="border-gray-600 text-white bg-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Program
-          </Button>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <LearningHeader />
+      <div className="max-w-6xl mx-auto p-6">
+        <SessionTimer />
+        
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-4">Creative Learning</h1>
+          <p className="text-gray-400 text-lg">Express yourself through art, music, and storytelling</p>
         </div>
 
-        <Card className="bg-gray-800 border-gray-700 mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Palette className="w-5 h-5 text-pink-400" />
-              <span>Creative Time - Stories & Art</span>
-            </CardTitle>
-            <p className="text-sm text-gray-400">
-              Activity {currentActivity + 1} of {activities.length}
-            </p>
-          </CardHeader>
-        </Card>
+        <div className="grid md:grid-cols-2 gap-6">
+          {activities.map((activity) => {
+            const IconComponent = activity.icon;
+            return (
+              <Card key={activity.id} className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-3">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${activity.color} rounded-lg flex items-center justify-center`}>
+                      <IconComponent className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white text-xl">{activity.title}</h3>
+                      <p className="text-gray-400 text-sm">{activity.description}</p>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className={`w-full bg-gradient-to-r ${activity.color} hover:opacity-90 text-white border-none`}
+                    onClick={() => setSelectedActivity(activity.id)}
+                  >
+                    Start Creating
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-4 text-white">
-              {currentActivityData.title}
-            </h3>
-            
-            <div className="bg-pink-900/20 border border-pink-700 rounded-lg p-4 mb-6">
-              <p className="text-pink-200">{currentActivityData.description}</p>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Start your {currentActivityData.type} here:
-              </label>
-              <Textarea
-                value={storyText}
-                onChange={(e) => setStoryText(e.target.value)}
-                placeholder={currentActivityData.prompt}
-                className="min-h-[200px] bg-gray-700 border-gray-600 text-white placeholder-gray-400 resize-none"
-                disabled={completed}
-              />
-            </div>
-
-            <div className="flex gap-2 mb-6">
-              <Button
-                onClick={generateIdeas}
-                variant="outline"
-                size="sm"
-                disabled={completed}
-                className="border-pink-600 text-pink-400 bg-gray-800 hover:bg-pink-900/20"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Get Ideas
-              </Button>
-            </div>
-
-            {completed && (
-              <div className="bg-green-900/20 border border-green-700 rounded-lg p-4 mb-4">
-                <p className="text-green-200 font-semibold">Wonderful creativity! 🎨</p>
-                <p className="text-green-300 mt-1">
-                  Your imagination is amazing. Keep being creative!
+        {selectedActivity && (
+          <Card className="mt-8 bg-gray-800 border-gray-700">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-4">Coming Soon!</h3>
+                <p className="text-gray-400 mb-6">
+                  This creative activity is being developed. Check back soon for an amazing creative experience!
                 </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedActivity(null)}
+                  className="border-gray-600 text-white hover:bg-gray-700"
+                >
+                  Back to Activities
+                </Button>
               </div>
-            )}
-
-            <div className="flex justify-end gap-2">
-              {!completed ? (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={storyText.trim().length < 10}
-                  className="bg-pink-500 hover:bg-pink-600 text-white"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Work
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleNext}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  {currentActivity < activities.length - 1 ? 'Next Activity' : 'Complete Session'}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

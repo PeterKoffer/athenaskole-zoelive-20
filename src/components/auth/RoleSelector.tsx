@@ -56,7 +56,7 @@ const RoleSelector = ({
           <p className="text-gray-300">Choose how you want to access the system</p>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availableRoles.map(([role, config]) => {
               const IconComponent = roleIcons[role as UserRole];
               const colorClass = roleColors[role as UserRole];
@@ -65,14 +65,16 @@ const RoleSelector = ({
                 <Button
                   key={role}
                   variant="outline"
-                  className="h-auto p-6 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white flex flex-col space-y-3"
+                  className="h-auto p-6 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white flex flex-col items-center justify-center space-y-4 min-h-[180px]"
                   onClick={() => onRoleSelect(role as UserRole)}
                 >
-                  <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center`}>
-                    <IconComponent className="w-6 h-6 text-white" />
+                  <div className={`w-16 h-16 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center`}>
+                    <IconComponent className="w-8 h-8 text-white" />
                   </div>
-                  <span className="font-semibold text-center">{config.title}</span>
-                  <span className="text-xs text-gray-300 text-center">{config.description}</span>
+                  <div className="text-center space-y-2">
+                    <span className="font-semibold text-lg">{config.title}</span>
+                    <span className="text-sm text-gray-300 block">{config.description}</span>
+                  </div>
                 </Button>
               );
             })}
