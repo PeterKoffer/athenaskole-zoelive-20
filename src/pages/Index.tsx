@@ -53,8 +53,9 @@ const Index = () => {
   const handleGetStarted = () => {
     console.log("Get Started button clicked, user:", user);
     if (user) {
-      console.log("User is logged in, navigating to home");
-      navigateToHome();
+      console.log("User is logged in, starting AI tutor experience");
+      setActiveView('showAITutor');
+      scrollToTop();
     } else {
       console.log("User not logged in, showing auth modal");
       setShowAuthModal(true);

@@ -22,6 +22,7 @@ export const useActivityTracking = (
         session_type: sessionType,
         subject,
         completion_status: 'in_progress',
+        start_time: new Date().toISOString(),
         metadata
       });
 
