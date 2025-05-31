@@ -9,8 +9,8 @@ const FloatingAITutor = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   
-  // Define the home position that avoids the logo
-  const homePosition = { x: window.innerWidth - 100, y: 80 };
+  // Define the home position in the top-left corner
+  const homePosition = { x: 20, y: 20 };
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
   const { messages, handleSendMessage } = useMessageHandler();
 
