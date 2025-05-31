@@ -90,7 +90,7 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
             <X className="w-4 h-4" />
           </Button>
           <CardTitle className="text-center text-white">
-            {isLogin ? "Log in to Athena" : "Create account"}
+            {isLogin ? "Log in to Nelie" : "Create account"}
           </CardTitle>
         </CardHeader>
         <CardContent>
