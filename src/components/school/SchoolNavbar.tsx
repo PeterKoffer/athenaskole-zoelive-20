@@ -18,13 +18,13 @@ const SchoolNavbar = () => {
             className="text-gray-400 hover:text-white hover:bg-gray-700"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Tilbage
+            Back
           </Button>
           <div className="flex items-center space-x-3">
             <School className="w-8 h-8 text-orange-500" />
             <div>
-              <h1 className="text-xl font-bold">Skole Dashboard</h1>
-              <p className="text-sm text-gray-400">Aarhus Vest Skole</p>
+              <h1 className="text-xl font-bold">School Dashboard</h1>
+              <p className="text-sm text-gray-400">Aarhus West School</p>
             </div>
           </div>
         </div>
@@ -33,7 +33,7 @@ const SchoolNavbar = () => {
           onClick={signOut}
           className="text-white border-gray-600 hover:bg-gray-700"
         >
-          Log ud
+          Log out
         </Button>
       </div>
     </nav>

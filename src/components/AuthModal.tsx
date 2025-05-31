@@ -38,8 +38,8 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
         if (error) throw error;
 
         toast({
-          title: "Velkommen tilbage!",
-          description: "Du er nu logget ind.",
+          title: "Welcome back!",
+          description: "You are now logged in.",
         });
         
         onLogin();
@@ -59,8 +59,8 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
         if (error) throw error;
 
         toast({
-          title: "Konto oprettet!",
-          description: "Tjek din email for at bekræfte din konto.",
+          title: "Account created!",
+          description: "Check your email to confirm your account.",
         });
         
         setIsLogin(true);
@@ -68,8 +68,8 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
     } catch (error: any) {
       console.error("Auth error:", error);
       toast({
-        title: "Fejl",
-        description: error.message || "Der opstod en fejl ved login/registrering",
+        title: "Error",
+        description: error.message || "An error occurred during login/registration",
         variant: "destructive",
       });
     } finally {
@@ -90,7 +90,7 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
             <X className="w-4 h-4" />
           </Button>
           <CardTitle className="text-center text-white">
-            {isLogin ? "Log ind på Athena" : "Opret konto"}
+            {isLogin ? "Log in to Athena" : "Create account"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -98,24 +98,24 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
             {!isLogin && (
               <>
                 <div>
-                  <Label htmlFor="name" className="text-gray-300">Fulde navn</Label>
+                  <Label htmlFor="name" className="text-gray-300">Full name</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="f.eks. Emil Nielsen"
+                    placeholder="e.g. Emily Johnson"
                     required={!isLogin}
                     className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-lime-400"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="age" className="text-gray-300">Alder</Label>
+                  <Label htmlFor="age" className="text-gray-300">Age</Label>
                   <Input
                     id="age"
                     type="number"
                     value={formData.age}
                     onChange={(e) => setFormData({...formData, age: e.target.value})}
-                    placeholder="8-16 år"
+                    placeholder="8-16 years"
                     min="6"
                     max="18"
                     className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-lime-400"
@@ -131,20 +131,20 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                placeholder="din@email.dk"
+                placeholder="your@email.com"
                 required
                 className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-lime-400"
               />
             </div>
             
             <div>
-              <Label htmlFor="password" className="text-gray-300">Adgangskode</Label>
+              <Label htmlFor="password" className="text-gray-300">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
-                placeholder="Mindst 6 tegn"
+                placeholder="At least 6 characters"
                 required
                 className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-lime-400"
               />
@@ -155,7 +155,7 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
               disabled={loading}
               className="w-full bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold"
             >
-              {loading ? "Vent..." : (isLogin ? "Log ind" : "Opret konto")}
+              {loading ? "Please wait..." : (isLogin ? "Log in" : "Create account")}
             </Button>
           </form>
 
@@ -165,14 +165,14 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
               onClick={() => setIsLogin(!isLogin)}
               className="text-lime-400 hover:text-lime-300"
             >
-              {isLogin ? "Har du ikke en konto? Opret en" : "Har du allerede en konto? Log ind"}
+              {isLogin ? "Don't have an account? Create one" : "Already have an account? Log in"}
             </Button>
           </div>
 
           {!isLogin && (
             <div className="mt-4 p-3 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300">
-              <p className="font-semibold text-lime-400">GDPR & Privatliv:</p>
-              <p>Vi respekterer dansk lovgivning og gemmer kun nødvendige data i EU.</p>
+              <p className="font-semibold text-lime-400">GDPR & Privacy:</p>
+              <p>We respect privacy laws and only store necessary data in the EU.</p>
             </div>
           )}
         </CardContent>
