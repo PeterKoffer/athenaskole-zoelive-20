@@ -1,16 +1,27 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { BookOpen, ArrowLeft, Volume2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
+import { shouldAdjustDifficulty } from "@/utils/adaptiveLearningUtils";
+import EnglishHeader from "./english/EnglishHeader";
+import EnglishQuestion from "./english/EnglishQuestion";
 
 const EnglishLearning = () => {
   const navigate = useNavigate();
   const [currentActivity, setCurrentActivity] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
-  const [showResult, setShowResult] = useState(false);
+  const [score, setScore] = useState(0);
+  const [questionsCompleted, setQuestionsCompleted] = useState(0);
+
+  const {
+    difficulty,
+    performanceMetrics,
+    recordAnswer,
+    adjustDifficulty,
+    endSession,
+    isLoading
+  } = useAdaptiveLearning("english", "reading_spelling");
 
   const activities = [
     {
@@ -39,35 +50,59 @@ const EnglishLearning = () => {
     }
   ];
 
-  const currentActivityData = activities[currentActivity];
-  const progress = ((currentActivity + 1) / activities.length) * 100;
+  const totalQuestions = activities.length;
 
-  const playAudio = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.8;
-      speechSynthesis.speak(utterance);
+  const handleAnswer = async (isCorrect: boolean, responseTime: number) => {
+    await recordAnswer(isCorrect, responseTime);
+    
+    if (isCorrect) {
+      setScore(score + 1);
     }
-  };
+    
+    setQuestionsCompleted(questionsCompleted + 1);
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    setSelectedAnswer(answerIndex.toString());
-  };
+    // Check if difficulty should be adjusted
+    const adjustmentResult = shouldAdjustDifficulty(
+      performanceMetrics.accuracy,
+      performanceMetrics.consecutiveCorrect,
+      performanceMetrics.consecutiveIncorrect,
+      performanceMetrics.totalAttempts
+    );
 
-  const handleSubmit = () => {
-    setShowResult(true);
-  };
-
-  const handleNext = () => {
-    if (currentActivity < activities.length - 1) {
-      setCurrentActivity(currentActivity + 1);
-      setSelectedAnswer("");
-      setShowResult(false);
-    } else {
-      navigate('/daily-program');
+    if (adjustmentResult.shouldAdjust && adjustmentResult.newLevel && adjustmentResult.reason) {
+      const newDifficulty = Math.max(1, Math.min(5, difficulty + adjustmentResult.newLevel));
+      adjustDifficulty(newDifficulty, adjustmentResult.reason);
     }
+
+    // Auto-advance after a short delay
+    setTimeout(() => {
+      if (currentActivity < activities.length - 1) {
+        setCurrentActivity(currentActivity + 1);
+      } else {
+        handleComplete();
+      }
+    }, 2000);
   };
+
+  const handleComplete = async () => {
+    await endSession();
+    navigate('/daily-program');
+  };
+
+  const handleDifficultyChange = (newLevel: number, reason: string) => {
+    adjustDifficulty(newLevel, reason);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
+          <p>Loading adaptive learning session...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
@@ -83,101 +118,22 @@ const EnglishLearning = () => {
           </Button>
         </div>
 
-        <Card className="bg-gray-800 border-gray-700 mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <BookOpen className="w-5 h-5 text-green-400" />
-              <span>English - Reading & Spelling</span>
-            </CardTitle>
-            <Progress value={progress} className="w-full" />
-            <p className="text-sm text-gray-400">
-              Activity {currentActivity + 1} of {activities.length}
-            </p>
-          </CardHeader>
-        </Card>
+        <div className="space-y-6">
+          <EnglishHeader
+            currentQuestion={currentActivity}
+            totalQuestions={totalQuestions}
+            score={score}
+            difficulty={difficulty}
+            performanceMetrics={performanceMetrics}
+            onDifficultyChange={handleDifficultyChange}
+          />
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">
-                {currentActivityData.title}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => playAudio(currentActivityData.content)}
-                className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
-              >
-                <Volume2 className="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-6">
-              <p className="text-gray-200 text-lg leading-relaxed">
-                {currentActivityData.content}
-              </p>
-            </div>
-
-            <h4 className="text-lg font-medium mb-4 text-white">
-              {currentActivityData.question}
-            </h4>
-
-            <div className="space-y-3 mb-6">
-              {currentActivityData.options.map((option, index) => (
-                <Button
-                  key={index}
-                  variant={selectedAnswer === index.toString() ? "default" : "outline"}
-                  className={`w-full text-left justify-start p-4 h-auto ${
-                    selectedAnswer === index.toString()
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                  }`}
-                  onClick={() => !showResult && handleAnswerSelect(index)}
-                  disabled={showResult}
-                >
-                  <span className="mr-3 font-semibold">
-                    {String.fromCharCode(65 + index)}.
-                  </span>
-                  {option}
-                </Button>
-              ))}
-            </div>
-
-            {showResult && (
-              <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-4">
-                <p className={`font-semibold ${
-                  parseInt(selectedAnswer) === currentActivityData.correct 
-                    ? 'text-green-400' 
-                    : 'text-red-400'
-                }`}>
-                  {parseInt(selectedAnswer) === currentActivityData.correct ? 'Excellent!' : 'Try again next time!'}
-                </p>
-                <p className="text-gray-300 mt-2">
-                  The correct answer is: {currentActivityData.options[currentActivityData.correct]}
-                </p>
-              </div>
-            )}
-
-            <div className="flex justify-end">
-              {!showResult ? (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={selectedAnswer === ""}
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                >
-                  Submit Answer
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleNext}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  {currentActivity < activities.length - 1 ? 'Next Activity' : 'Complete Lesson'}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          <EnglishQuestion
+            activity={activities[currentActivity]}
+            onAnswer={handleAnswer}
+            disabled={questionsCompleted >= totalQuestions}
+          />
+        </div>
       </div>
     </div>
   );

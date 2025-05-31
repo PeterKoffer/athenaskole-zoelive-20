@@ -1,6 +1,22 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { LearningSession } from './progressPersistence';
+
+// Import the interface from progressPersistence to avoid circular dependency
+interface LearningSession {
+  id: string;
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  difficulty_level: number;
+  start_time: string;
+  end_time?: string;
+  time_spent: number;
+  score: number;
+  completed: boolean;
+  content_id?: string;
+  user_feedback?: any;
+  ai_adjustments?: any;
+}
 
 export class SessionService {
   async saveSession(sessionData: Partial<LearningSession>): Promise<string | null> {
