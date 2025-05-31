@@ -10,6 +10,7 @@ import UserProfile from "./pages/UserProfile";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import DailyProgram from "./pages/DailyProgram";
+import AdaptiveLearning from "./pages/AdaptiveLearning";
 import NotFound from "./pages/NotFound";
 import FloatingAITutor from "./components/FloatingAITutor";
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/school-dashboard" element={<SchoolDashboard />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/daily-program" element={<DailyProgram />} />
+          <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

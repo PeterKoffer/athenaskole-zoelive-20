@@ -9,6 +9,155 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      adaptive_content: {
+        Row: {
+          content: Json
+          content_type: string
+          created_at: string
+          difficulty_level: number
+          estimated_time: number | null
+          id: string
+          learning_objectives: string[] | null
+          prerequisites: string[] | null
+          skill_area: string
+          subject: string
+          success_criteria: Json | null
+          title: string
+        }
+        Insert: {
+          content: Json
+          content_type: string
+          created_at?: string
+          difficulty_level: number
+          estimated_time?: number | null
+          id?: string
+          learning_objectives?: string[] | null
+          prerequisites?: string[] | null
+          skill_area: string
+          subject: string
+          success_criteria?: Json | null
+          title: string
+        }
+        Update: {
+          content?: Json
+          content_type?: string
+          created_at?: string
+          difficulty_level?: number
+          estimated_time?: number | null
+          id?: string
+          learning_objectives?: string[] | null
+          prerequisites?: string[] | null
+          skill_area?: string
+          subject?: string
+          success_criteria?: Json | null
+          title?: string
+        }
+        Relationships: []
+      }
+      learning_paths: {
+        Row: {
+          completion_percentage: number | null
+          created_at: string
+          current_step: number
+          difficulty_progression: Json
+          id: string
+          is_active: boolean | null
+          path_name: string
+          recommended_content: string[]
+          subject: string
+          total_steps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completion_percentage?: number | null
+          created_at?: string
+          current_step?: number
+          difficulty_progression: Json
+          id?: string
+          is_active?: boolean | null
+          path_name: string
+          recommended_content: string[]
+          subject: string
+          total_steps: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completion_percentage?: number | null
+          created_at?: string
+          current_step?: number
+          difficulty_progression?: Json
+          id?: string
+          is_active?: boolean | null
+          path_name?: string
+          recommended_content?: string[]
+          subject?: string
+          total_steps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      learning_sessions: {
+        Row: {
+          ai_adjustments: Json | null
+          completed: boolean | null
+          content_id: string | null
+          created_at: string
+          difficulty_level: number
+          end_time: string | null
+          id: string
+          score: number | null
+          skill_area: string
+          start_time: string
+          subject: string
+          time_spent: number | null
+          user_feedback: Json | null
+          user_id: string
+        }
+        Insert: {
+          ai_adjustments?: Json | null
+          completed?: boolean | null
+          content_id?: string | null
+          created_at?: string
+          difficulty_level: number
+          end_time?: string | null
+          id?: string
+          score?: number | null
+          skill_area: string
+          start_time?: string
+          subject: string
+          time_spent?: number | null
+          user_feedback?: Json | null
+          user_id: string
+        }
+        Update: {
+          ai_adjustments?: Json | null
+          completed?: boolean | null
+          content_id?: string | null
+          created_at?: string
+          difficulty_level?: number
+          end_time?: string | null
+          id?: string
+          score?: number | null
+          skill_area?: string
+          start_time?: string
+          subject?: string
+          time_spent?: number | null
+          user_feedback?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_sessions_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "adaptive_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Nelie: {
         Row: {
           created_at: string
@@ -66,12 +215,69 @@ export type Database = {
         }
         Relationships: []
       }
+      user_performance: {
+        Row: {
+          accuracy_rate: number
+          attempts_count: number
+          completion_time_avg: number | null
+          correct_answers: number
+          created_at: string
+          current_level: number
+          id: string
+          last_assessment: string | null
+          skill_area: string
+          subject: string
+          total_questions: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy_rate?: number
+          attempts_count?: number
+          completion_time_avg?: number | null
+          correct_answers?: number
+          created_at?: string
+          current_level?: number
+          id?: string
+          last_assessment?: string | null
+          skill_area: string
+          subject: string
+          total_questions?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accuracy_rate?: number
+          attempts_count?: number
+          completion_time_avg?: number | null
+          correct_answers?: number
+          created_at?: string
+          current_level?: number
+          id?: string
+          last_assessment?: string | null
+          skill_area?: string
+          subject?: string
+          total_questions?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_user_performance: {
+        Args: {
+          p_user_id: string
+          p_subject: string
+          p_skill_area: string
+          p_is_correct: boolean
+          p_completion_time: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

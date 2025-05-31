@@ -1,8 +1,9 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Calendar, Target, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, Calendar, Target, Award, Brain, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface UserProgress {
   matematik: number;
@@ -16,6 +17,8 @@ interface ProgressDashboardProps {
 }
 
 const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
+  const navigate = useNavigate();
+
   const weeklyData = [
     { day: "Mandag", matematik: 45, dansk: 30, engelsk: 20 },
     { day: "Tirsdag", matematik: 60, dansk: 40, engelsk: 35 },
@@ -42,6 +45,30 @@ const ProgressDashboard = ({ userProgress }: ProgressDashboardProps) => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* AI-Powered Adaptive Learning CTA */}
+      <Card className="bg-gradient-to-r from-lime-900 via-lime-800 to-green-900 border-lime-400">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Brain className="w-12 h-12 text-lime-400" />
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Prøv Adaptiv AI Læring!</h3>
+                <p className="text-lime-200">
+                  Nelie tilpasser automatisk sværhedsgraden baseret på din præstation
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={() => navigate('/adaptive-learning')}
+              className="bg-lime-400 hover:bg-lime-500 text-black font-semibold"
+            >
+              Start AI Læring
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-white">
