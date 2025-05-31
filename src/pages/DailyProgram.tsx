@@ -32,7 +32,7 @@ const DailyProgram = () => {
     description: "Work with fractions and geometry",
     icon: <Calculator className="w-6 h-6" />,
     duration: "30 min",
-    level: "Medium",
+    level: "Foundation",
     color: "from-blue-400 to-blue-600"
   }, {
     id: "dansk",
@@ -40,7 +40,7 @@ const DailyProgram = () => {
     description: "Read stories and practice spelling",
     icon: <BookOpen className="w-6 h-6" />,
     duration: "25 min",
-    level: "Easy",
+    level: "Foundation",
     color: "from-green-400 to-green-600"
   }, {
     id: "engelsk",
@@ -48,7 +48,7 @@ const DailyProgram = () => {
     description: "Learn new words and pronunciation",
     icon: <Globe className="w-6 h-6" />,
     duration: "20 min",
-    level: "Hard",
+    level: "Foundation",
     color: "from-purple-400 to-purple-600"
   }, {
     id: "kreativ",
@@ -56,7 +56,7 @@ const DailyProgram = () => {
     description: "Draw and write stories",
     icon: <Palette className="w-6 h-6" />,
     duration: "15 min",
-    level: "Free",
+    level: "Foundation",
     color: "from-pink-400 to-pink-600"
   }];
 
@@ -128,7 +128,7 @@ const DailyProgram = () => {
                         <Clock className="w-3 h-3 mr-1" />
                         {activity.duration}
                       </Badge>
-                      <Badge variant="outline" className={`border-gray-600 ${activity.level === 'Easy' ? 'bg-green-600 text-white' : activity.level === 'Medium' ? 'bg-yellow-600 text-white' : activity.level === 'Hard' ? 'bg-red-600 text-white' : 'bg-purple-600 text-white'}`}>
+                      <Badge variant="outline" className="bg-blue-600 text-white border-blue-600">
                         {activity.level}
                       </Badge>
                     </div>
