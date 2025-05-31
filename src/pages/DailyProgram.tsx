@@ -9,7 +9,7 @@ import { BookOpen, Calculator, Globe, Palette, Target, Clock, Star } from "lucid
 
 const DailyProgram = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   
   const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Student';
@@ -19,12 +19,13 @@ const DailyProgram = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Redirect to auth if not logged in
+  // Redirect to auth if not logged in - but only after loading is complete
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
+      console.log("User not authenticated, redirecting to auth");
       navigate('/auth');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
   
   const todaysDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -82,6 +83,18 @@ const DailyProgram = () => {
     // Navigate to the specific educational component
     navigate(`/learn/${activityId}`);
   };
+
+  // Show loading state while authentication is being checked
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🎓</div>
+          <p className="text-lg">Loading your daily program...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Don't render the component if user is not authenticated
   if (!user) {
