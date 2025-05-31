@@ -1,6 +1,6 @@
 
 import { Target } from "lucide-react";
-import ActivityCard from "./ActivityCard";
+import AIEnhancedActivityCard from "./AIEnhancedActivityCard";
 import { LucideIcon } from "lucide-react";
 
 interface Activity {
@@ -11,6 +11,7 @@ interface Activity {
   duration: string;
   level: string;
   color: string;
+  aiEnhanced?: boolean;
 }
 
 interface TodaysProgramGridProps {
@@ -28,7 +29,7 @@ const TodaysProgramGrid = ({ activities, onStartActivity }: TodaysProgramGridPro
       
       <div className="grid md:grid-cols-2 gap-6">
         {activities.map(activity => (
-          <ActivityCard 
+          <AIEnhancedActivityCard 
             key={activity.id}
             activity={activity}
             onStartActivity={onStartActivity}
