@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -24,8 +23,8 @@ const SchoolDashboard = () => {
   const stats = {
     totalStudents: 485,
     totalTeachers: 28,
-    totalClasses: 24,
-    averagePerformance: 87.5
+    averageProgress: 87.5,
+    attendanceRate: 94.2
   };
 
   return (

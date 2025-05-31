@@ -21,10 +21,10 @@ import { AdminStats } from "@/types/admin";
 
 const AdminDashboard = () => {
   const stats: AdminStats = {
+    totalSchools: 12,
     totalUsers: 1250,
-    activeSchools: 12,
-    systemUptime: 99.8,
-    totalSessions: 5432
+    totalStudents: 5432,
+    systemUptime: 99.8
   };
 
   return (
