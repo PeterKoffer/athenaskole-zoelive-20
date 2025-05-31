@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useDragHandler } from "./floating-ai-tutor/useDragHandler";
 import { useMessageHandler } from "./floating-ai-tutor/useMessageHandler";
 import ChatInterface from "./floating-ai-tutor/ChatInterface";
@@ -9,8 +9,11 @@ const FloatingAITutor = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   
-  // Define the home position in the bottom-right corner
-  const homePosition = { x: window.innerWidth - 100, y: window.innerHeight - 100 };
+  const homePosition = useMemo(() => ({
+    x: typeof window !== 'undefined' ? window.innerWidth - 100 : 100,
+    y: typeof window !== 'undefined' ? window.innerHeight - 100 : 100
+  }), []);
+
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
   const { messages, handleSendMessage } = useMessageHandler();
 
@@ -25,38 +28,38 @@ const FloatingAITutor = () => {
     }
   };
 
+  const commonProps = {
+    onMouseDown: handleMouseDown,
+    onTouchStart: handleTouchStart,
+    onResetToHome: resetToHome,
+    isDragging
+  };
+
+  const containerStyle = {
+    left: position.x,
+    top: position.y
+  };
+
   if (!isExpanded) {
     return (
-      <div
-        className="fixed z-50"
-        style={{ left: position.x, top: position.y }}
-      >
+      <div className="fixed z-50" style={containerStyle}>
         <CollapsedButton 
           onExpand={() => setIsExpanded(true)}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onResetToHome={resetToHome}
-          isDragging={isDragging}
+          {...commonProps}
         />
       </div>
     );
   }
 
   return (
-    <div
-      className="fixed z-50"
-      style={{ left: position.x, top: position.y }}
-    >
+    <div className="fixed z-50" style={containerStyle}>
       <ChatInterface
         messages={messages}
         onSendMessage={onSendMessage}
         onClose={() => setIsExpanded(false)}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onResetToHome={resetToHome}
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}
-        isDragging={isDragging}
+        {...commonProps}
       />
     </div>
   );

@@ -1,7 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigation } from "@/hooks/useNavigation";
+import { useNavbarState } from "@/hooks/useNavbarState";
+import { useLocation } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import GameHub from "@/components/GameHub";
@@ -15,12 +17,10 @@ import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const { navigateToHome, scrollToTop } = useNavigation();
   const location = useLocation();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showProgress, setShowProgress] = useState(false);
-  const [showGames, setShowGames] = useState(false);
-  const [showAITutor, setShowAITutor] = useState(false);
+  const { state, resetState, setActiveView } = useNavbarState();
 
   const userProgress = {
     matematik: 75,
@@ -31,8 +31,8 @@ const Index = () => {
 
   // Scroll to top when page loads or navigation state changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [location.pathname, showProgress, showGames, showAITutor]);
+    scrollToTop();
+  }, [location.pathname, state.showProgress, state.showGames, state.showAITutor, scrollToTop]);
 
   useEffect(() => {
     if (user) {
@@ -40,18 +40,10 @@ const Index = () => {
     }
   }, [user]);
 
-  const resetNavigationState = () => {
-    setShowProgress(false);
-    setShowGames(false);
-    setShowAITutor(false);
-  };
-
   const handleGetStarted = () => {
     if (user) {
-      // If user is logged in, go directly to daily program
-      navigate('/daily-program');
+      navigateToHome();
     } else {
-      // If not logged in, show auth modal
       setShowAuthModal(true);
     }
   };
@@ -62,28 +54,58 @@ const Index = () => {
 
   const handleLogin = () => {
     setShowAuthModal(false);
-    // After login, stay on homepage instead of navigating to daily program
   };
 
   const handleShowProgress = () => {
-    setShowProgress(true);
-    setShowGames(false);
-    setShowAITutor(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActiveView('showProgress');
+    scrollToTop();
   };
 
   const handleShowGames = () => {
-    setShowGames(true);
-    setShowProgress(false);
-    setShowAITutor(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActiveView('showGames');
+    scrollToTop();
   };
 
   const handleShowAITutor = () => {
-    setShowAITutor(true);
-    setShowProgress(false);
-    setShowGames(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActiveView('showAITutor');
+    scrollToTop();
+  };
+
+  const renderMainContent = () => {
+    if (state.showProgress && user) {
+      return (
+        <div className="py-8">
+          <ProgressDashboard userProgress={userProgress} />
+        </div>
+      );
+    }
+
+    if (state.showGames) {
+      return (
+        <div className="py-8">
+          <GameHub />
+        </div>
+      );
+    }
+
+    if (state.showAITutor) {
+      return (
+        <div className="py-8">
+          <EnhancedAITutor user={user} />
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <HeroSection onGetStarted={handleGetStarted} />
+        <SubjectsSection />
+        <FeaturesSection />
+        <div className="pb-20">
+          <CTASection onGetStarted={handleGetStarted} />
+        </div>
+      </>
+    );
   };
 
   return (
@@ -93,32 +115,11 @@ const Index = () => {
         onShowProgress={handleShowProgress}
         onShowGames={handleShowGames}
         onShowAITutor={handleShowAITutor}
-        onResetNavigation={resetNavigationState}
+        onResetNavigation={resetState}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {showProgress && user ? (
-          <div className="py-8">
-            <ProgressDashboard userProgress={userProgress} />
-          </div>
-        ) : showGames ? (
-          <div className="py-8">
-            <GameHub />
-          </div>
-        ) : showAITutor ? (
-          <div className="py-8">
-            <EnhancedAITutor user={user} />
-          </div>
-        ) : (
-          <>
-            <HeroSection onGetStarted={handleGetStarted} />
-            <SubjectsSection />
-            <FeaturesSection />
-            <div className="pb-20">
-              <CTASection onGetStarted={handleGetStarted} />
-            </div>
-          </>
-        )}
+        {renderMainContent()}
       </main>
 
       <Footer />

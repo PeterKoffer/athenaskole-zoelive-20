@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigation } from "@/hooks/useNavigation";
 import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, Menu, X } from "lucide-react";
+import NavbarButton from "./NavbarButton";
 
 interface MobileMenuProps {
   onShowProgress: () => void;
@@ -19,7 +20,7 @@ const MobileMenu = ({
   onGetStarted
 }: MobileMenuProps) => {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { navigateToHome } = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
 
   const closeMenu = () => setIsOpen(false);
@@ -28,6 +29,12 @@ const MobileMenu = ({
     action();
     closeMenu();
   };
+
+  const menuItems = [
+    { icon: Monitor, label: "Progress", action: onShowProgress },
+    { icon: Gamepad2, label: "Games", action: onShowGames },
+    { icon: BookOpenCheck, label: "AI Tutor", action: onShowAITutor }
+  ];
 
   return (
     <div className="md:hidden">
@@ -45,36 +52,23 @@ const MobileMenu = ({
           <div className="p-4 space-y-3">
             {user ? (
               <>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
-                  onClick={() => handleNavigation(onShowProgress)}
-                >
-                  <Monitor className="w-4 h-4 mr-3" />
-                  Progress
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
-                  onClick={() => handleNavigation(onShowGames)}
-                >
-                  <Gamepad2 className="w-4 h-4 mr-3" />
-                  Games
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
-                  onClick={() => handleNavigation(onShowAITutor)}
-                >
-                  <BookOpenCheck className="w-4 h-4 mr-3" />
-                  AI Tutor
-                </Button>
+                {menuItems.map(({ icon, label, action }) => (
+                  <Button
+                    key={label}
+                    variant="outline" 
+                    className="w-full justify-start bg-white text-black border-gray-300 hover:bg-gray-100" 
+                    onClick={() => handleNavigation(action)}
+                  >
+                    {React.createElement(icon, { className: "w-4 h-4 mr-3" })}
+                    {label}
+                  </Button>
+                ))}
                 <div className="border-t border-gray-700 pt-3 mt-3">
                   <Button 
                     variant="outline" 
                     className="w-full justify-start mb-2 bg-white text-black border-gray-300 hover:bg-gray-100" 
                     onClick={() => {
-                      navigate('/profile');
+                      navigateToHome();
                       closeMenu();
                     }}
                   >
