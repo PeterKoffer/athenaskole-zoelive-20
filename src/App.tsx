@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import UserProfile from "./pages/UserProfile";
+import AdminDashboard from "./pages/AdminDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import DailyProgram from "./pages/DailyProgram";
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/school-dashboard" element={<SchoolDashboard />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/daily-program" element={<DailyProgram />} />
