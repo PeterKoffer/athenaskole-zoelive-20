@@ -1,16 +1,6 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, GraduationCap, Menu } from "lucide-react";
 import TeacherNavbar from "@/components/teacher/TeacherNavbar";
@@ -18,7 +8,6 @@ import TeacherStatsCards from "@/components/teacher/TeacherStatsCards";
 import TeacherOverviewTab from "@/components/teacher/TeacherOverviewTab";
 import ClassroomManagement from "@/components/teacher/ClassroomManagement";
 import { TeacherStats } from "@/types/teacher";
-
 const TeacherDashboard = () => {
   const stats: TeacherStats = {
     totalStudents: 28,
@@ -26,9 +15,7 @@ const TeacherDashboard = () => {
     completedLessons: 45,
     averageGrade: 8.2
   };
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
+  return <div className="min-h-screen bg-gray-900 text-white">
       <TeacherNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -38,7 +25,7 @@ const TeacherDashboard = () => {
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
+              <Button variant="outline" className="border-gray-600 text-slate-950 bg-slate-50">
                 <Menu className="w-4 h-4 mr-2" />
                 Teacher Tools & Analytics
                 <ChevronDown className="w-4 h-4 ml-2" />
@@ -174,8 +161,6 @@ const TeacherDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TeacherDashboard;
