@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -111,9 +110,37 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
       }
 
       if (data && data.length > 0) {
-        setContent(data[0]);
-        setSessionStartTime(new Date());
-        await createLearningSession(data[0].id, targetLevel);
+        const rawContent = data[0];
+        
+        // Type-safe conversion from Supabase Json to our expected structure
+        try {
+          const parsedContent = typeof rawContent.content === 'string' 
+            ? JSON.parse(rawContent.content) 
+            : rawContent.content;
+          
+          const adaptiveContent: AdaptiveContent = {
+            id: rawContent.id,
+            subject: rawContent.subject,
+            skill_area: rawContent.skill_area,
+            difficulty_level: rawContent.difficulty_level,
+            content_type: rawContent.content_type,
+            title: rawContent.title,
+            content: parsedContent,
+            learning_objectives: rawContent.learning_objectives || [],
+            estimated_time: rawContent.estimated_time || 0
+          };
+          
+          setContent(adaptiveContent);
+          setSessionStartTime(new Date());
+          await createLearningSession(adaptiveContent.id, targetLevel);
+        } catch (parseError) {
+          console.error('Error parsing content:', parseError);
+          toast({
+            title: "Fejl",
+            description: "Kunne ikke parse læringsindhold",
+            variant: "destructive"
+          });
+        }
       } else {
         toast({
           title: "Intet indhold",
