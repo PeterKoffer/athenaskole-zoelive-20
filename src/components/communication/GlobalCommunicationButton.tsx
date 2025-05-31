@@ -1,27 +1,13 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import CommunicationCenter from './CommunicationCenter';
-
 const GlobalCommunicationButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-        >
+        <Button variant="outline" size="sm" className="border-gray-600 text-slate-950 bg-slate-50 rounded font-normal">
           <MessageSquare className="w-4 h-4 mr-2" />
           Beskeder
         </Button>
@@ -34,8 +20,6 @@ const GlobalCommunicationButton = () => {
           <CommunicationCenter />
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default GlobalCommunicationButton;
