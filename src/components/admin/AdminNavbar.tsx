@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
@@ -28,13 +29,16 @@ const AdminNavbar = () => {
             </div>
           </div>
         </div>
-        <Button
-          variant="outline"
-          onClick={signOut}
-          className="text-white border-gray-600 hover:bg-gray-700"
-        >
-          Log out
-        </Button>
+        <div className="flex items-center space-x-3">
+          <UserRoleDisplay role="admin" />
+          <Button
+            variant="outline"
+            onClick={signOut}
+            className="text-white border-gray-600 hover:bg-gray-700"
+          >
+            Log out
+          </Button>
+        </div>
       </div>
     </nav>
   );
