@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,12 +42,8 @@ const RoleSelector = ({
   // Roles that require special clearance
   const restrictedRoles = ['admin', 'teacher', 'school_leader'];
 
-  // Mock clearance codes (in real app, this would be validated on the backend)
-  const clearanceCodes = {
-    admin: 'ADMIN2025',
-    teacher: 'TEACH2025',
-    school_leader: 'SCHOOL2025'
-  };
+  // Updated clearance code to "1111" for all restricted roles
+  const clearanceCode1111 = '1111';
 
   // Filter roles based on current user role restrictions
   const availableRoles = Object.entries(ROLE_CONFIGS).filter(([role, config]) => {
@@ -73,12 +68,10 @@ const RoleSelector = ({
   const handleClearanceSubmit = () => {
     if (!selectedRole) return;
 
-    const expectedCode = clearanceCodes[selectedRole as keyof typeof clearanceCodes];
-    
-    if (clearanceCode === expectedCode) {
+    if (clearanceCode === clearanceCode1111) {
       onRoleSelect(selectedRole);
     } else {
-      setClearanceError("Invalid clearance code. Please contact your administrator for access.");
+      setClearanceError("Invalid clearance code. Please enter '1111' for access.");
     }
   };
 
@@ -116,7 +109,7 @@ const RoleSelector = ({
                 type="password"
                 value={clearanceCode}
                 onChange={(e) => setClearanceCode(e.target.value)}
-                placeholder="Enter clearance code"
+                placeholder="Enter clearance code (1111)"
                 className="bg-gray-700 border-gray-600 text-white"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -154,7 +147,7 @@ const RoleSelector = ({
 
             <div className="text-center">
               <p className="text-sm text-gray-400">
-                Need access? Contact your system administrator.
+                Access code: 1111
               </p>
             </div>
           </CardContent>
@@ -206,7 +199,7 @@ const RoleSelector = ({
                     <span className="text-sm text-gray-300 block">{config.description}</span>
                     {requiresClearance && (
                       <span className="text-xs text-yellow-400 block">
-                        Requires clearance
+                        Requires clearance (1111)
                       </span>
                     )}
                   </div>
