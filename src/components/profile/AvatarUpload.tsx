@@ -41,8 +41,10 @@ const AvatarUpload = ({ avatarUrl, name, uploading, onUpload }: AvatarUploadProp
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
-            className="w-48 bg-gray-800 border-gray-700 text-white" 
+            className="w-48 bg-gray-800 border-gray-700 text-white z-[9999]" 
             align="center"
+            side="bottom"
+            sideOffset={5}
           >
             <DropdownMenuItem 
               onClick={handleRoleSelector}
