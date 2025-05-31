@@ -15,6 +15,7 @@ interface ChatInterfaceProps {
   onMouseDown: (e: React.MouseEvent) => void;
   isSpeaking: boolean;
   onStopSpeaking: () => void;
+  isDragging?: boolean;
 }
 
 const ChatInterface = ({ 
@@ -23,7 +24,8 @@ const ChatInterface = ({
   onClose, 
   onMouseDown, 
   isSpeaking, 
-  onStopSpeaking 
+  onStopSpeaking,
+  isDragging 
 }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState("");
 
@@ -38,11 +40,20 @@ const ChatInterface = ({
   };
 
   return (
-    <Card className="w-80 bg-gray-900 border-gray-800 shadow-2xl">
-      <CardHeader className="pb-3 cursor-move" onMouseDown={onMouseDown}>
+    <Card className={`w-80 bg-gray-900 border-gray-800 shadow-2xl transition-all duration-200 ${
+      isDragging ? 'shadow-3xl scale-105' : ''
+    }`}>
+      <CardHeader 
+        className={`pb-3 select-none ${
+          isDragging ? 'cursor-grabbing bg-gray-800' : 'cursor-grab hover:bg-gray-800'
+        } transition-colors duration-200`} 
+        onMouseDown={onMouseDown}
+      >
         <CardTitle className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-2 text-white">
-            <Move className="w-4 h-4 text-gray-400" />
+            <Move className={`w-4 h-4 transition-colors duration-200 ${
+              isDragging ? 'text-blue-400' : 'text-gray-400'
+            }`} />
             <span className="text-lg">🎓</span>
             <span>Nelie - Din AI Lærer</span>
           </div>
@@ -60,6 +71,11 @@ const ChatInterface = ({
             </Button>
           </div>
         </CardTitle>
+        {isDragging && (
+          <div className="text-xs text-blue-400 mt-1">
+            Træk mig rundt på siden - jeg følger med overalt! 🚀
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="h-48 overflow-y-auto space-y-2">

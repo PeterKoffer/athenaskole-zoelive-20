@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Monitor, Gamepad2, BookOpenCheck, BrainCircuit, Settings, LogOut } from "lucide-react";
+import MobileMenu from "./MobileMenu";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -46,13 +47,15 @@ const Navbar = ({
   };
 
   return (
-    <nav className="bg-gray-800 border-b border-gray-700 p-4">
+    <nav className="bg-gray-800 border-b border-gray-700 p-4 relative">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <button onClick={handleLogoClick} className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+        <button onClick={handleLogoClick} className="flex items-center space-x-2 hover:opacity-80 transition-opacity z-10">
           <BrainCircuit className="w-6 h-6 text-blue-500" />
           <span className="font-bold text-lg">Athena</span>
         </button>
-        <div className="space-x-4">
+        
+        {/* Desktop Menu */}
+        <div className="hidden md:flex space-x-4">
           {user ? (
             <>
               <Button variant="ghost" onClick={() => handleNavigation(onShowProgress)}>
@@ -87,6 +90,14 @@ const Navbar = ({
             </>
           )}
         </div>
+
+        {/* Mobile Menu */}
+        <MobileMenu
+          onGetStarted={onGetStarted}
+          onShowProgress={() => handleNavigation(onShowProgress)}
+          onShowGames={() => handleNavigation(onShowGames)}
+          onShowAITutor={() => handleNavigation(onShowAITutor)}
+        />
       </div>
     </nav>
   );
