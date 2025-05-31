@@ -9,8 +9,8 @@ const FloatingAITutor = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   
-  // Define the home position in the top-left corner
-  const homePosition = { x: 20, y: 20 };
+  // Define the home position in the bottom-right corner
+  const homePosition = { x: window.innerWidth - 100, y: window.innerHeight - 100 };
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
   const { messages, handleSendMessage } = useMessageHandler();
 
@@ -28,7 +28,7 @@ const FloatingAITutor = () => {
   if (!isExpanded) {
     return (
       <div
-        className="fixed z-30"
+        className="fixed z-50"
         style={{ left: position.x, top: position.y }}
       >
         <CollapsedButton 
@@ -44,7 +44,7 @@ const FloatingAITutor = () => {
 
   return (
     <div
-      className="fixed z-30"
+      className="fixed z-50"
       style={{ left: position.x, top: position.y }}
     >
       <ChatInterface

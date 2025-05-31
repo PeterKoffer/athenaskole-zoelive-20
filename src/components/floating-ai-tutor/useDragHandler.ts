@@ -15,6 +15,11 @@ export const useDragHandler = (homePosition: Position) => {
           console.log('Failed to parse saved position');
         }
       }
+      // Default to bottom-right corner if no saved position
+      return { 
+        x: Math.max(20, window.innerWidth - 100), 
+        y: Math.max(20, window.innerHeight - 100) 
+      };
     }
     return homePosition;
   });
@@ -36,7 +41,11 @@ export const useDragHandler = (homePosition: Position) => {
   };
 
   const resetToHome = () => {
-    const constrainedHomePosition = constrainPosition(homePosition);
+    const safeHomePosition = { 
+      x: Math.max(20, window.innerWidth - 100), 
+      y: Math.max(20, window.innerHeight - 100) 
+    };
+    const constrainedHomePosition = constrainPosition(safeHomePosition);
     setPosition(constrainedHomePosition);
   };
 
@@ -103,7 +112,10 @@ export const useDragHandler = (homePosition: Position) => {
   // Handle window resize to keep tutor in bounds
   useEffect(() => {
     const handleResize = () => {
-      setPosition(current => constrainPosition(current));
+      setPosition(current => {
+        const newSafePosition = constrainPosition(current);
+        return newSafePosition;
+      });
     };
 
     window.addEventListener('resize', handleResize);
