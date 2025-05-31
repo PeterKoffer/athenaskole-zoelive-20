@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { ArrowLeft, LogOut, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ProfileHeaderProps {
@@ -9,6 +9,10 @@ interface ProfileHeaderProps {
 
 const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
   const navigate = useNavigate();
+
+  const handleRoleSelector = () => {
+    navigate('/auth');
+  };
 
   return (
     <nav className="bg-gray-800 border-b border-gray-700 p-4">
@@ -27,14 +31,24 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
           </div>
           <span className="text-white font-semibold">My Profile</span>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={onSignOut} 
-          className="border-gray-600 bg-white text-black hover:bg-gray-100"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={handleRoleSelector}
+            className="border-gray-600 bg-white text-black hover:bg-gray-100"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Switch Role
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={onSignOut} 
+            className="border-gray-600 bg-white text-black hover:bg-gray-100"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
       </div>
     </nav>
   );

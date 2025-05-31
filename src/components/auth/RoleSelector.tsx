@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, Users, BookOpen, Building, Shield } from "lucide-react";
+import { GraduationCap, Users, BookOpen, Building, Shield, Home } from "lucide-react";
 import { UserRole, ROLE_CONFIGS } from "@/types/auth";
 
 interface RoleSelectorProps {
@@ -43,7 +43,15 @@ const RoleSelector = ({
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl bg-gray-800 border-gray-700">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center relative">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-4 top-4 text-gray-400 hover:text-white hover:bg-gray-700"
+            onClick={onBack}
+          >
+            <Home className="w-4 h-4" />
+          </Button>
           <CardTitle className="text-white text-2xl mb-4">Select User Role</CardTitle>
           <p className="text-gray-300">Choose how you want to access the system</p>
         </CardHeader>

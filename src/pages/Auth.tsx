@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -96,14 +96,24 @@ const Auth = () => {
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gray-800 border-gray-700">
         <CardHeader className="relative">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="absolute left-2 top-2 text-gray-400 hover:text-white hover:bg-gray-700"
-            onClick={() => setSelectedRole(null)}
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-gray-400 hover:text-white hover:bg-gray-700"
+              onClick={() => setSelectedRole(null)}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-gray-400 hover:text-white hover:bg-gray-700"
+              onClick={() => navigate('/')}
+            >
+              <Home className="w-4 h-4" />
+            </Button>
+          </div>
           <div className="text-center">
             <CardTitle className="text-white">
               {isLogin ? `Log in as ${currentRole?.title}` : `Create ${currentRole?.title} account`}
