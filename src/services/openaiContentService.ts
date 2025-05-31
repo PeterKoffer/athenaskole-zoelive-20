@@ -20,24 +20,28 @@ export interface GeneratedContent {
 export class OpenAIContentService {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
     try {
-      console.log('Generating adaptive content with OpenAI:', request);
+      console.log('🤖 Generating adaptive content with OpenAI:', request);
 
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: request
       });
 
+      console.log('🔄 Supabase function response:', { data, error });
+
       if (error) {
-        console.error('Error calling generate-adaptive-content function:', error);
+        console.error('❌ Error calling generate-adaptive-content function:', error);
         throw new Error(`Failed to generate content: ${error.message}`);
       }
 
       if (!data.success) {
+        console.error('❌ Content generation failed:', data.error);
         throw new Error(data.error || 'Content generation failed');
       }
 
+      console.log('✅ Generated content received:', data.generatedContent);
       return data.generatedContent;
     } catch (error) {
-      console.error('Error in generateAdaptiveContent:', error);
+      console.error('❌ Error in generateAdaptiveContent:', error);
       throw error;
     }
   }
@@ -49,6 +53,8 @@ export class OpenAIContentService {
     userId: string
   ): Promise<any> {
     try {
+      console.log(`🔍 Looking for existing content: ${subject}/${skillArea} level ${difficultyLevel}`);
+      
       // First, try to get existing content
       const { data: existingContent, error: fetchError } = await supabase
         .from('adaptive_content')
@@ -59,17 +65,19 @@ export class OpenAIContentService {
         .limit(1);
 
       if (fetchError) {
-        console.error('Error fetching existing content:', fetchError);
+        console.error('❌ Error fetching existing content:', fetchError);
       }
+
+      console.log('📋 Existing content found:', existingContent);
 
       // If we have existing content, use it
       if (existingContent && existingContent.length > 0) {
-        console.log('Using existing adaptive content');
+        console.log('♻️ Using existing adaptive content');
         return existingContent[0];
       }
 
       // If no existing content, generate new content
-      console.log('No existing content found, generating new content with AI');
+      console.log('🆕 No existing content found, generating new content with AI');
       
       const generatedContent = await this.generateAdaptiveContent({
         subject,
@@ -77,6 +85,8 @@ export class OpenAIContentService {
         difficultyLevel,
         userId
       });
+
+      console.log('🔄 Fetching newly saved content from database...');
 
       // Fetch the newly saved content from the database
       const { data: newContent, error: newContentError } = await supabase
@@ -90,12 +100,14 @@ export class OpenAIContentService {
         .single();
 
       if (newContentError) {
+        console.error('❌ Failed to fetch newly generated content:', newContentError);
         throw new Error('Failed to fetch newly generated content');
       }
 
+      console.log('✅ Successfully retrieved newly generated content:', newContent);
       return newContent;
     } catch (error) {
-      console.error('Error in getOrGenerateContent:', error);
+      console.error('❌ Error in getOrGenerateContent:', error);
       throw error;
     }
   }

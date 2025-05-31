@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,19 +43,24 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    console.log('🎯 AILearningModule mounted with:', { subject, skillArea, user: user?.id });
     if (user) {
       initializeSession();
     }
   }, [user, subject, skillArea]);
 
   const initializeSession = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('❌ No user found, cannot initialize session');
+      return;
+    }
 
     try {
+      console.log('🚀 Initializing session for user:', user.id);
       setProgress(10);
       
       // Get user's current level for this subject/skill area
-      const { data: performanceData } = await supabase
+      const { data: performanceData, error: perfError } = await supabase
         .from('user_performance')
         .select('current_level')
         .eq('user_id', user.id)
@@ -64,7 +68,10 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
         .eq('skill_area', skillArea)
         .single();
 
+      console.log('📊 Performance data:', { performanceData, perfError });
+
       const userLevel = performanceData?.current_level || 1;
+      console.log('📈 User level determined:', userLevel);
       setCurrentLevel(userLevel);
       setProgress(25);
 
@@ -81,8 +88,10 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
         .select()
         .single();
 
+      console.log('📝 Learning session created:', { sessionData, sessionError });
+
       if (sessionError) {
-        console.error('Error creating session:', sessionError);
+        console.error('❌ Error creating session:', sessionError);
         toast({
           title: "Fejl",
           description: "Kunne ikke starte læringsmodul",
@@ -95,7 +104,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
       setProgress(50);
       await loadOrGenerateQuestion(userLevel);
     } catch (error) {
-      console.error('Error initializing session:', error);
+      console.error('❌ Error initializing session:', error);
       toast({
         title: "Fejl",
         description: "Kunne ikke starte AI-læringsmodul",
@@ -107,13 +116,16 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   };
 
   const loadOrGenerateQuestion = async (level: number) => {
-    if (!user) return;
+    if (!user) {
+      console.log('❌ No user found, cannot load question');
+      return;
+    }
 
     try {
       setGenerating(true);
       setProgress(60);
 
-      console.log(`Loading or generating question for ${subject}/${skillArea} at level ${level}`);
+      console.log(`🔄 Loading or generating question for ${subject}/${skillArea} at level ${level}`);
 
       const contentData = await openaiContentService.getOrGenerateContent(
         subject,
@@ -122,10 +134,14 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
         user.id
       );
 
+      console.log('📋 Content data received:', contentData);
+
       if (contentData) {
         const parsedContent = typeof contentData.content === 'string' 
           ? JSON.parse(contentData.content) 
           : contentData.content;
+
+        console.log('📝 Parsed content:', parsedContent);
 
         const adaptiveQuestion: AdaptiveQuestion = {
           id: contentData.id,
@@ -137,6 +153,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
           estimated_time: contentData.estimated_time || 5
         };
 
+        console.log('✅ Adaptive question created:', adaptiveQuestion);
         setQuestion(adaptiveQuestion);
         setProgress(100);
 
@@ -146,13 +163,14 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
           duration: 3000
         });
       } else {
+        console.error('❌ No content data received');
         throw new Error('Failed to load or generate content');
       }
     } catch (error) {
-      console.error('Error loading/generating question:', error);
+      console.error('❌ Error loading/generating question:', error);
       toast({
         title: "Fejl",
-        description: "Kunne ikke generere AI-indhold. Prøv igen.",
+        description: `Kunne ikke generere AI-indhold: ${error.message}`,
         variant: "destructive"
       });
     } finally {
