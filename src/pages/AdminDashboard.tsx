@@ -1,7 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Users, Building, Settings, BarChart3 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Shield, Users, Building, Settings, BarChart3, ChevronDown, Activity, Database } from "lucide-react";
 import AdminNavbar from "@/components/admin/AdminNavbar";
 import AdminStatsCards from "@/components/admin/AdminStatsCards";
 import AdminOverviewTab from "@/components/admin/AdminOverviewTab";
@@ -22,6 +29,65 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <AdminStatsCards stats={stats} />
+
+        {/* System Analytics and Management Dropdown Menus */}
+        <div className="flex gap-4 mb-6">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                System Analytics
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Activity className="w-4 h-4 mr-2" />
+                System Performance
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Users className="w-4 h-4 mr-2" />
+                User Activity Reports
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Building className="w-4 h-4 mr-2" />
+                School Performance
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Database className="w-4 h-4 mr-2" />
+                Data Usage Statistics
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
+                <Settings className="w-4 h-4 mr-2" />
+                Admin Tools
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Building className="w-4 h-4 mr-2" />
+                School Management
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Users className="w-4 h-4 mr-2" />
+                User Management
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Settings className="w-4 h-4 mr-2" />
+                System Configuration
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Shield className="w-4 h-4 mr-2" />
+                Security Settings
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-gray-800">

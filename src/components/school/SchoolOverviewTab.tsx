@@ -12,9 +12,9 @@ import {
 
 const SchoolOverviewTab = () => {
   const recentActivity = [
-    { student: "Emma Nielsen", activity: "Afsluttede matematik lektion", time: "10 min siden", class: "3.A" },
-    { student: "Lucas Hansen", activity: "Scorede 95% i dansk quiz", time: "25 min siden", class: "2.B" },
-    { student: "Sofia Andersen", activity: "Startede ny engelsk lektion", time: "1 time siden", class: "4.A" }
+    { student: "Emma Nielsen", activity: "Completed mathematics lesson", time: "10 min ago", class: "3.A" },
+    { student: "Lucas Hansen", activity: "Scored 95% in Danish quiz", time: "25 min ago", class: "2.B" },
+    { student: "Sofia Andersen", activity: "Started new English lesson", time: "1 hour ago", class: "4.A" }
   ];
 
   return (
@@ -23,7 +23,7 @@ const SchoolOverviewTab = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <TrendingUp className="w-5 h-5 mr-2" />
-            Seneste aktivitet
+            Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -46,25 +46,25 @@ const SchoolOverviewTab = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <BarChart3 className="w-5 h-5 mr-2" />
-            Hurtig Actions
+            Quick Actions
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button className="w-full bg-blue-600 hover:bg-blue-700 justify-start">
             <Users className="w-4 h-4 mr-2" />
-            Administrer Klasser
+            Manage Classes
           </Button>
           <Button className="w-full bg-green-600 hover:bg-green-700 justify-start">
             <UserPlus className="w-4 h-4 mr-2" />
-            Registrer Ny Elev
+            Register New Student
           </Button>
           <Button className="w-full bg-purple-600 hover:bg-purple-700 justify-start">
             <BarChart3 className="w-4 h-4 mr-2" />
-            Se Detaljeret Statistik
+            View Detailed Statistics
           </Button>
           <Button className="w-full bg-orange-600 hover:bg-orange-700 justify-start">
             <MessageSquare className="w-4 h-4 mr-2" />
-            Send Besked til Forældre
+            Send Message to Parents
           </Button>
         </CardContent>
       </Card>

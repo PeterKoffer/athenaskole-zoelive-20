@@ -1,7 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Users, ClipboardList, MessageSquare } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, GraduationCap } from "lucide-react";
 import TeacherNavbar from "@/components/teacher/TeacherNavbar";
 import TeacherStatsCards from "@/components/teacher/TeacherStatsCards";
 import TeacherOverviewTab from "@/components/teacher/TeacherOverviewTab";
@@ -22,6 +29,65 @@ const TeacherDashboard = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <TeacherStatsCards stats={stats} />
+
+        {/* Teaching Tools and Analytics Dropdown Menus */}
+        <div className="flex gap-4 mb-6">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Student Analytics
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <GraduationCap className="w-4 h-4 mr-2" />
+                Grade Reports
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Progress Tracking
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Users className="w-4 h-4 mr-2" />
+                Attendance Reports
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <ClipboardList className="w-4 h-4 mr-2" />
+                Assignment Statistics
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Teaching Tools
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Lesson Planning
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <ClipboardList className="w-4 h-4 mr-2" />
+                Assignment Creation
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <Settings className="w-4 h-4 mr-2" />
+                Class Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-700">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Communication Center
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-gray-800">
