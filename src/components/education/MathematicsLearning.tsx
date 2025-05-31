@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,8 +79,8 @@ const MathematicsLearning = () => {
   const progress = ((currentQuestion + 1) / filteredQuestions.length) * 100;
 
   const userProfile = {
-    strengths: userProgress?.strengths || [],
-    weaknesses: userProgress?.weaknesses || ['fractions'],
+    strengths: [],
+    weaknesses: ['fractions'],
     learningStyle: 'mixed' as const,
     preferredPace: 'medium' as const
   };

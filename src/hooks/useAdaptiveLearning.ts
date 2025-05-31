@@ -56,14 +56,13 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
       const sessionData = {
         user_id: user.id,
         subject,
-        activity_type: activityType,
+        skill_area: activityType,
         start_time: new Date().toISOString(),
-        duration_minutes: 0,
-        questions_answered: 0,
-        correct_answers: 0,
+        time_spent: 0,
+        score: 0,
         difficulty_level: userProgress?.current_level || 1,
         completed: false,
-        performance_metrics: {
+        user_feedback: {
           accuracy: 0,
           averageResponseTime: 0,
           difficultyProgression: [],
@@ -123,9 +122,8 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
 
     // Update session in database
     await progressPersistence.updateSession(state.currentSession, {
-      questions_answered: newMetrics.totalAttempts,
-      correct_answers: Math.round(newMetrics.accuracy * newMetrics.totalAttempts / 100),
-      performance_metrics: {
+      score: Math.round(newMetrics.accuracy * newMetrics.totalAttempts / 100),
+      user_feedback: {
         accuracy: newMetrics.accuracy,
         averageResponseTime: newMetrics.averageTime,
         difficultyProgression: [state.difficulty],
@@ -158,7 +156,7 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
     // Update session as completed
     await progressPersistence.updateSession(state.currentSession, {
       end_time: new Date().toISOString(),
-      duration_minutes: duration,
+      time_spent: duration,
       completed: true
     });
 
@@ -167,11 +165,8 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
       user_id: user.id,
       subject,
       current_level: state.difficulty,
-      total_time_spent: (state.userProgress?.total_time_spent || 0) + duration,
-      sessions_completed: (state.userProgress?.sessions_completed || 0) + 1,
-      average_accuracy: state.performanceMetrics.accuracy,
-      last_session_date: new Date().toISOString(),
-      preferred_difficulty: state.difficulty
+      accuracy_rate: state.performanceMetrics.accuracy,
+      last_assessment: new Date().toISOString()
     };
 
     await progressPersistence.updateUserProgress(progressUpdate);
@@ -188,27 +183,21 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
   const calculateRecommendedSessionTime = (userProgress: UserProgress | null): number => {
     if (!userProgress) return 20; // Default 20 minutes for new users
 
-    const { average_accuracy, sessions_completed, total_time_spent } = userProgress;
+    const { accuracy_rate, attempts_count } = userProgress;
     
     // Base time on past performance
     let recommendedTime = 20;
 
     // Adjust based on accuracy
-    if (average_accuracy > 80) {
+    if (accuracy_rate > 80) {
       recommendedTime += 5; // Longer sessions for high performers
-    } else if (average_accuracy < 60) {
+    } else if (accuracy_rate < 60) {
       recommendedTime -= 5; // Shorter sessions for struggling learners
     }
 
     // Adjust based on experience
-    if (sessions_completed > 10) {
+    if (attempts_count > 10) {
       recommendedTime += 5; // Experienced learners can handle longer sessions
-    }
-
-    // Consider average session length
-    if (sessions_completed > 0) {
-      const avgSessionLength = total_time_spent / sessions_completed;
-      recommendedTime = Math.round((recommendedTime + avgSessionLength) / 2);
     }
 
     return Math.max(10, Math.min(40, recommendedTime)); // Between 10-40 minutes
