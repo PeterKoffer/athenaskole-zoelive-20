@@ -17,10 +17,10 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
         </p>
         <Button
           size="lg"
-          className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white"
+          className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
           onClick={onGetStarted}
         >
-          Kom i gang
+          Kom i gang med Nelie
         </Button>
       </div>
     </section>

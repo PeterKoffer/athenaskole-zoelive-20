@@ -54,11 +54,11 @@ const ChatInterface = ({
             <Move className={`w-4 h-4 transition-colors duration-200 ${
               isDragging ? 'text-blue-400' : 'text-gray-400'
             }`} />
-            <span className="text-lg">🎓</span>
+            <span className="text-xl">👩‍🏫</span>
             <span>Nelie - Din AI Lærer</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 text-xs">
+            <Badge variant="outline" className="bg-gradient-to-r from-pink-400 to-purple-500 text-white border-pink-400 text-xs">
               Live
             </Badge>
             <Button
@@ -84,7 +84,7 @@ const ChatInterface = ({
               <div
                 className={`max-w-xs px-3 py-2 rounded-lg text-xs ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white'
+                    ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white'
                     : 'bg-gray-800 text-gray-100 border border-gray-700'
                 }`}
               >
@@ -104,7 +104,7 @@ const ChatInterface = ({
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Skriv 'hi Nelie' eller dit spørgsmål..."
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400 text-xs h-8"
+              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-pink-400 text-xs h-8"
             />
             <VoiceControls 
               isSpeaking={isSpeaking}
@@ -114,7 +114,7 @@ const ChatInterface = ({
             <Button 
               onClick={handleSendMessage} 
               size="sm" 
-              className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none p-1"
+              className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white border-none p-1"
             >
               <Send className="w-3 h-3" />
             </Button>

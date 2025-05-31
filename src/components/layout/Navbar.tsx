@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Monitor, Gamepad2, BookOpenCheck, BrainCircuit, Settings, LogOut } from "lucide-react";
+import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut } from "lucide-react";
 import MobileMenu from "./MobileMenu";
 
 interface NavbarProps {
@@ -47,11 +47,15 @@ const Navbar = ({
   };
 
   return (
-    <nav className="bg-gray-800 border-b border-gray-700 p-4 relative">
+    <nav className="bg-gray-800 border-b border-gray-700 p-4 relative z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <button onClick={handleLogoClick} className="flex items-center space-x-2 hover:opacity-80 transition-opacity z-10">
-          <BrainCircuit className="w-6 h-6 text-blue-500" />
-          <span className="font-bold text-lg">Athena</span>
+          <div className="w-8 h-8 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+            <span className="text-lg">👩‍🏫</span>
+          </div>
+          <span className="font-bold text-xl bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+            NELIE
+          </span>
         </button>
         
         {/* Desktop Menu */}

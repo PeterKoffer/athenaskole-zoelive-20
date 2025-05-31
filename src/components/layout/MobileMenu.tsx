@@ -35,13 +35,13 @@ const MobileMenu = ({
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="text-white"
+        className="text-white z-50 relative"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </Button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 bg-gray-800 border-t border-gray-700 shadow-lg z-50">
+        <div className="absolute top-full left-0 right-0 bg-gray-800 border-t border-gray-700 shadow-lg z-[60]">
           <div className="p-4 space-y-3">
             {user ? (
               <>

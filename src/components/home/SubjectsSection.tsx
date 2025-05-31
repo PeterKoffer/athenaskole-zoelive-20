@@ -17,7 +17,7 @@ const SubjectsSection = () => {
           <CardContent className="p-4">
             <h3 className="text-xl font-bold text-white mb-2">Dansk</h3>
             <p className="text-gray-300">
-              Forbedre dit ordforråd og grammatik.
+              Styrk dit sprog med personlig vejledning fra Nelie.
             </p>
           </CardContent>
         </Card>
