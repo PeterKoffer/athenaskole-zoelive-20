@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,6 +20,69 @@ const MessageGroupsList = ({ groups, onGroupSelect }: MessageGroupsListProps) =>
   
   // Generate class letter options (a-e)
   const classOptions = ['a', 'b', 'c', 'd', 'e'];
+
+  // Generate dynamic groups based on selected grade and class
+  const dynamicGroups = useMemo(() => {
+    if (!selectedGrade || !selectedClass) {
+      return groups; // Return original groups if no selection
+    }
+
+    const classId = `${selectedGrade}${selectedClass}`;
+    const className = `${selectedGrade}.${selectedClass.toUpperCase()}`;
+
+    return [
+      {
+        id: `class_${classId}`,
+        name: `${className} - Students`,
+        description: `All students in class ${className}`,
+        type: 'class' as const,
+        classId: classId,
+        icon: 'GraduationCap',
+        participants: [
+          { id: '1', name: 'Sample Student 1', role: 'student' as const, email: 'student1@example.com' },
+          { id: '2', name: 'Sample Student 2', role: 'student' as const, email: 'student2@example.com' }
+        ]
+      },
+      {
+        id: `class_${classId}_teachers`,
+        name: `${className} - Teachers`,
+        description: `Teachers for class ${className}`,
+        type: 'class_teachers' as const,
+        classId: classId,
+        icon: 'BookOpen',
+        participants: [
+          { id: 'teacher1', name: `Teacher for ${className}`, role: 'teacher' as const, email: `teacher${classId}@school.dk` }
+        ]
+      },
+      {
+        id: `class_${classId}_all`,
+        name: `${className} - Everyone`,
+        description: `Students, teachers and parents for class ${className}`,
+        type: 'class_all' as const,
+        classId: classId,
+        icon: 'School',
+        participants: [
+          { id: '1', name: 'Sample Student 1', role: 'student' as const, email: 'student1@example.com' },
+          { id: '2', name: 'Sample Student 2', role: 'student' as const, email: 'student2@example.com' },
+          { id: 'teacher1', name: `Teacher for ${className}`, role: 'teacher' as const, email: `teacher${classId}@school.dk` },
+          { id: 'parent1', name: 'Parent 1', role: 'parent' as const, email: 'parent1@example.com' },
+          { id: 'parent2', name: 'Parent 2', role: 'parent' as const, email: 'parent2@example.com' }
+        ]
+      },
+      {
+        id: 'school_all',
+        name: 'Entire School',
+        description: 'All users in the school',
+        type: 'school_all' as const,
+        icon: 'School',
+        participants: [
+          { id: '1', name: 'Sample Student', role: 'student' as const, email: 'student@example.com' },
+          { id: 'teacher1', name: 'Sample Teacher', role: 'teacher' as const, email: 'teacher@school.dk' },
+          { id: 'admin1', name: 'Principal', role: 'school_leader' as const, email: 'principal@school.dk' }
+        ]
+      }
+    ];
+  }, [selectedGrade, selectedClass, groups]);
 
   const getGroupIcon = (type: string) => {
     switch (type) {
@@ -53,19 +116,7 @@ const MessageGroupsList = ({ groups, onGroupSelect }: MessageGroupsListProps) =>
   const handleCreateClassGroup = () => {
     if (selectedGrade && selectedClass) {
       const classId = `${selectedGrade}${selectedClass}`;
-      const classGroup: MessageGroup = {
-        id: `class_${classId}`,
-        name: `Class ${selectedGrade}.${selectedClass.toUpperCase()} - Students`,
-        description: `All students in class ${selectedGrade}.${selectedClass.toUpperCase()}`,
-        type: 'class',
-        classId: classId,
-        icon: 'GraduationCap',
-        participants: [
-          { id: '1', name: 'Sample Student 1', role: 'student', email: 'student1@example.com' },
-          { id: '2', name: 'Sample Student 2', role: 'student', email: 'student2@example.com' }
-        ]
-      };
-      onGroupSelect(classGroup.id);
+      onGroupSelect(`class_${classId}`);
     }
   };
 
@@ -126,7 +177,7 @@ const MessageGroupsList = ({ groups, onGroupSelect }: MessageGroupsListProps) =>
       <div>
         <h4 className="text-white font-medium mb-3">Predefined Groups</h4>
         <div className="grid gap-3">
-          {groups.map((group) => {
+          {dynamicGroups.map((group) => {
             const Icon = getGroupIcon(group.type);
             return (
               <Button
