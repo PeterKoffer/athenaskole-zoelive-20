@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Calculator, ArrowLeft, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SessionTimer from "@/components/adaptive-learning/SessionTimer";
+import AdaptiveDifficultyManager from "@/components/adaptive-learning/AdaptiveDifficultyManager";
+import LearningPathOptimizer from "@/components/adaptive-learning/LearningPathOptimizer";
+import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 
 const MathematicsLearning = () => {
   const navigate = useNavigate();
@@ -12,58 +16,137 @@ const MathematicsLearning = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [questionStartTime, setQuestionStartTime] = useState<Date>(new Date());
+  
+  const {
+    difficulty,
+    performanceMetrics,
+    userProgress,
+    recommendedSessionTime,
+    recordAnswer,
+    adjustDifficulty,
+    endSession,
+    isLoading
+  } = useAdaptiveLearning('mathematics', 'problem-solving');
 
   const questions = [
     {
       question: "What is 1/2 + 1/4?",
       options: ["1/6", "2/6", "3/4", "1/3"],
       correct: 2,
-      explanation: "1/2 + 1/4 = 2/4 + 1/4 = 3/4"
+      explanation: "1/2 + 1/4 = 2/4 + 1/4 = 3/4",
+      difficulty: 1
     },
     {
       question: "What is the area of a rectangle with length 5 and width 3?",
       options: ["8", "15", "10", "12"],
       correct: 1,
-      explanation: "Area = length × width = 5 × 3 = 15"
+      explanation: "Area = length × width = 5 × 3 = 15",
+      difficulty: 1
     },
     {
       question: "Solve: 2x + 4 = 10",
       options: ["x = 2", "x = 3", "x = 4", "x = 6"],
       correct: 1,
-      explanation: "2x + 4 = 10, so 2x = 6, therefore x = 3"
+      explanation: "2x + 4 = 10, so 2x = 6, therefore x = 3",
+      difficulty: 2
+    },
+    {
+      question: "What is 3/4 × 2/3?",
+      options: ["1/2", "5/7", "6/12", "2/4"],
+      correct: 0,
+      explanation: "3/4 × 2/3 = (3×2)/(4×3) = 6/12 = 1/2",
+      difficulty: 2
+    },
+    {
+      question: "Find the perimeter of a triangle with sides 3, 4, and 5",
+      options: ["12", "10", "15", "8"],
+      correct: 0,
+      explanation: "Perimeter = 3 + 4 + 5 = 12",
+      difficulty: 2
+    },
+    {
+      question: "Solve: 3x - 7 = 2x + 5",
+      options: ["x = 12", "x = 6", "x = 8", "x = 10"],
+      correct: 0,
+      explanation: "3x - 7 = 2x + 5, so 3x - 2x = 5 + 7, therefore x = 12",
+      difficulty: 3
     }
   ];
 
-  const currentQuestionData = questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
+  // Filter questions based on current difficulty
+  const filteredQuestions = questions.filter(q => q.difficulty <= difficulty);
+  const currentQuestionData = filteredQuestions[currentQuestion] || questions[0];
+  const progress = ((currentQuestion + 1) / filteredQuestions.length) * 100;
+
+  const userProfile = {
+    strengths: userProgress?.strengths || [],
+    weaknesses: userProgress?.weaknesses || ['fractions'],
+    learningStyle: 'mixed' as const,
+    preferredPace: 'medium' as const
+  };
 
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (selectedAnswer === null) return;
+    
     const isCorrect = selectedAnswer === currentQuestionData.correct;
+    const responseTime = (new Date().getTime() - questionStartTime.getTime()) / 1000;
+    
     if (isCorrect) {
       setScore(score + 1);
     }
+    
+    // Record the answer for adaptive learning
+    await recordAnswer(isCorrect, responseTime);
+    
     setShowResult(true);
   };
 
   const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < filteredQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      setQuestionStartTime(new Date());
     } else {
       // Lesson complete
+      endSession();
       navigate('/daily-program');
     }
   };
 
+  const handleGoalSelect = (goal: any) => {
+    // In a real implementation, this would navigate to the specific goal content
+    console.log('Selected goal:', goal);
+  };
+
+  const handleTimeUp = () => {
+    endSession();
+  };
+
+  const handleBreakSuggested = () => {
+    // Could pause the session or show a break reminder
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-4 flex items-center justify-center">
+        <div className="text-center">
+          <Calculator className="w-8 h-8 text-blue-400 animate-pulse mx-auto mb-4" />
+          <p>Loading your personalized math session...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
           <Button
             variant="outline"
             onClick={() => navigate('/daily-program')}
@@ -73,19 +156,33 @@ const MathematicsLearning = () => {
             Back to Program
           </Button>
           <div className="text-lg font-semibold">
-            Score: {score}/{questions.length}
+            Score: {score}/{filteredQuestions.length}
           </div>
         </div>
 
-        <Card className="bg-gray-800 border-gray-700 mb-6">
+        {/* Session Timer */}
+        <SessionTimer
+          recommendedDuration={recommendedSessionTime}
+          onTimeUp={handleTimeUp}
+          onBreakSuggested={handleBreakSuggested}
+        />
+
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Calculator className="w-5 h-5 text-blue-400" />
-              <span>Mathematics - Fractions & Geometry</span>
+            <CardTitle className="flex items-center justify-between text-white">
+              <div className="flex items-center space-x-2">
+                <Calculator className="w-5 h-5 text-blue-400" />
+                <span>Mathematics - Adaptive Learning</span>
+              </div>
+              <AdaptiveDifficultyManager
+                currentDifficulty={difficulty}
+                onDifficultyChange={adjustDifficulty}
+                performanceMetrics={performanceMetrics}
+              />
             </CardTitle>
             <Progress value={progress} className="w-full" />
             <p className="text-sm text-gray-400">
-              Question {currentQuestion + 1} of {questions.length}
+              Question {currentQuestion + 1} of {filteredQuestions.length}
             </p>
           </CardHeader>
         </Card>
@@ -150,12 +247,20 @@ const MathematicsLearning = () => {
                   onClick={handleNext}
                   className="bg-green-500 hover:bg-green-600 text-white"
                 >
-                  {currentQuestion < questions.length - 1 ? 'Next Question' : 'Complete Lesson'}
+                  {currentQuestion < filteredQuestions.length - 1 ? 'Next Question' : 'Complete Lesson'}
                 </Button>
               )}
             </div>
           </CardContent>
         </Card>
+
+        {/* Learning Path Optimizer */}
+        <LearningPathOptimizer
+          subject="mathematics"
+          userProfile={userProfile}
+          completedGoals={[]}
+          onGoalSelect={handleGoalSelect}
+        />
       </div>
     </div>
   );
