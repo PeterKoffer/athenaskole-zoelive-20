@@ -71,6 +71,11 @@ const Index = () => {
     scrollToTop();
   };
 
+  const handleBackToHome = () => {
+    resetState();
+    scrollToTop();
+  };
+
   const renderMainContent = () => {
     if (state.showProgress && user) {
       return (
@@ -91,7 +96,7 @@ const Index = () => {
     if (state.showAITutor) {
       return (
         <div className="py-8">
-          <EnhancedAITutor user={user} />
+          <EnhancedAITutor user={user} onBack={handleBackToHome} />
         </div>
       );
     }
@@ -116,6 +121,8 @@ const Index = () => {
         onShowGames={handleShowGames}
         onShowAITutor={handleShowAITutor}
         onResetNavigation={resetState}
+        showBackButton={state.showProgress || state.showGames || state.showAITutor}
+        onBack={handleBackToHome}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft } from "lucide-react";
 import LanguageLearning from "./LanguageLearning";
 import LanguageSelector from "./ai-tutor/LanguageSelector";
 import DailyChallenges from "./gamification/DailyChallenges";
@@ -14,7 +15,12 @@ import ChatTab from "./ai-tutor/ChatTab";
 import SpeechTab from "./ai-tutor/SpeechTab";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
 
-const EnhancedAITutor = ({ user }) => {
+interface EnhancedAITutorProps {
+  user: any;
+  onBack?: () => void;
+}
+
+const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentSubject, setCurrentSubject] = useState("math");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
@@ -80,26 +86,59 @@ const EnhancedAITutor = ({ user }) => {
 
   if (showLanguageSelection) {
     return (
-      <LanguageSelector
-        onLanguageSelect={handleLanguageSelect}
-        onBack={() => setShowLanguageSelection(false)}
-      />
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          {onBack && (
+            <Button
+              variant="outline"
+              onClick={onBack}
+              className="text-white border-gray-600 hover:bg-gray-700 flex items-center space-x-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Home</span>
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => setShowLanguageSelection(false)}
+            className="text-white border-gray-600 hover:bg-gray-700"
+          >
+            ← Back to AI Tutor
+          </Button>
+        </div>
+        <LanguageSelector
+          onLanguageSelect={handleLanguageSelect}
+          onBack={() => setShowLanguageSelection(false)}
+        />
+      </div>
     );
   }
 
   if (showLanguageLearning) {
     return (
       <div className="space-y-6">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setShowLanguageLearning(false);
-            setSelectedLanguage("");
-          }}
-          className="text-white border-gray-600 hover:bg-gray-700"
-        >
-          ← Back to AI Tutor
-        </Button>
+        <div className="flex items-center space-x-4">
+          {onBack && (
+            <Button
+              variant="outline"
+              onClick={onBack}
+              className="text-white border-gray-600 hover:bg-gray-700 flex items-center space-x-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Home</span>
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowLanguageLearning(false);
+              setSelectedLanguage("");
+            }}
+            className="text-white border-gray-600 hover:bg-gray-700"
+          >
+            ← Back to AI Tutor
+          </Button>
+        </div>
         <LanguageLearning initialLanguage={selectedLanguage} />
       </div>
     );
@@ -118,11 +157,11 @@ const EnhancedAITutor = ({ user }) => {
 
       <Tabs defaultValue="chat" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5 bg-gray-800">
-          <TabsTrigger value="chat" className="data-[state=active]:bg-gray-700">AI Chat</TabsTrigger>
-          <TabsTrigger value="speech" className="data-[state=active]:bg-gray-700">Speech</TabsTrigger>
-          <TabsTrigger value="challenges" className="data-[state=active]:bg-gray-700">Challenges</TabsTrigger>
-          <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700">Rewards</TabsTrigger>
-          <TabsTrigger value="parents" className="data-[state=active]:bg-gray-700">Parents</TabsTrigger>
+          <TabsTrigger value="chat" className="data-[state=active]:bg-gray-700 text-white">AI Chat</TabsTrigger>
+          <TabsTrigger value="speech" className="data-[state=active]:bg-gray-700 text-white">Speech</TabsTrigger>
+          <TabsTrigger value="challenges" className="data-[state=active]:bg-gray-700 text-white">Challenges</TabsTrigger>
+          <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700 text-white">Rewards</TabsTrigger>
+          <TabsTrigger value="parents" className="data-[state=active]:bg-gray-700 text-white">Parents</TabsTrigger>
         </TabsList>
 
         <TabsContent value="chat" className="space-y-6">

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
-import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, Menu, X } from "lucide-react";
+import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, Menu, X, ArrowLeft } from "lucide-react";
 import NavbarButton from "./NavbarButton";
 
 interface MobileMenuProps {
@@ -11,13 +11,17 @@ interface MobileMenuProps {
   onShowGames: () => void;
   onShowAITutor: () => void;
   onGetStarted: () => void;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
 const MobileMenu = ({
   onShowProgress,
   onShowGames,
   onShowAITutor,
-  onGetStarted
+  onGetStarted,
+  showBackButton = false,
+  onBack
 }: MobileMenuProps) => {
   const { user, signOut } = useAuth();
   const { navigateToHome } = useNavigation();
@@ -30,6 +34,11 @@ const MobileMenu = ({
     closeMenu();
   };
 
+  const handleProfileClick = () => {
+    navigateToHome();
+    closeMenu();
+  };
+
   const menuItems = [
     { icon: Monitor, label: "Progress", action: onShowProgress },
     { icon: Gamepad2, label: "Games", action: onShowGames },
@@ -37,7 +46,18 @@ const MobileMenu = ({
   ];
 
   return (
-    <div className="md:hidden">
+    <div className="md:hidden flex items-center space-x-2">
+      {showBackButton && onBack && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onBack}
+          className="bg-white text-black border-gray-300 hover:bg-gray-100 p-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+      )}
+      
       <Button
         variant="outline"
         size="sm"
@@ -67,10 +87,7 @@ const MobileMenu = ({
                   <Button 
                     variant="outline" 
                     className="w-full justify-start mb-2 bg-white text-black border-gray-300 hover:bg-gray-100" 
-                    onClick={() => {
-                      navigateToHome();
-                      closeMenu();
-                    }}
+                    onClick={handleProfileClick}
                   >
                     <Settings className="w-4 h-4 mr-3" />
                     Profile
