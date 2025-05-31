@@ -27,12 +27,12 @@ const SchoolDashboard = () => {
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 bg-gray-800">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overblik</TabsTrigger>
-            <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Klasser</TabsTrigger>
-            <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Elever</TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-gray-700">Statistik</TabsTrigger>
-            <TabsTrigger value="registration" className="data-[state=active]:bg-gray-700">Registrering</TabsTrigger>
-            <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Kommunikation</TabsTrigger>
+            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
+            <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Classes</TabsTrigger>
+            <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Students</TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-gray-700">Analytics</TabsTrigger>
+            <TabsTrigger value="registration" className="data-[state=active]:bg-gray-700">Registration</TabsTrigger>
+            <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Communication</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -46,10 +46,10 @@ const SchoolDashboard = () => {
           <TabsContent value="students" className="space-y-6">
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Elev overblik</CardTitle>
+                <CardTitle className="text-white">Student Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-400">Detaljeret elev statistik og fremskridt kommer snart...</p>
+                <p className="text-gray-400">Detailed student statistics and progress coming soon...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -67,11 +67,11 @@ const SchoolDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <MessageSquare className="w-5 h-5 mr-2" />
-                  Kommunikation
+                  Communication
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-400">Kommunikationsplatform med lærere og elever kommer snart...</p>
+                <p className="text-gray-400">Communication platform with teachers and students coming soon...</p>
               </CardContent>
             </Card>
           </TabsContent>
