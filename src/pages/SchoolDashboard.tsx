@@ -4,22 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, TrendingUp, Calendar, MessageSquare, School, BarChart3 } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, Calendar, MessageSquare, School, BarChart3, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import ClassManagement from "@/components/school/ClassManagement";
+import AnalyticsDashboard from "@/components/school/AnalyticsDashboard";
+import StudentRegistration from "@/components/school/StudentRegistration";
 
 const SchoolDashboard = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const [selectedClass, setSelectedClass] = useState("all");
-
-  const classes = [
-    { id: "all", name: "Alle klasser", students: 456 },
-    { id: "1a", name: "1.A", students: 24 },
-    { id: "1b", name: "1.B", students: 22 },
-    { id: "2a", name: "2.A", students: 26 },
-    { id: "2b", name: "2.B", students: 25 }
-  ];
 
   const stats = {
     totalStudents: 456,
@@ -115,11 +109,12 @@ const SchoolDashboard = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-800">
             <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overblik</TabsTrigger>
             <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Klasser</TabsTrigger>
             <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Elever</TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-gray-700">Statistik</TabsTrigger>
+            <TabsTrigger value="registration" className="data-[state=active]:bg-gray-700">Registrering</TabsTrigger>
             <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Kommunikation</TabsTrigger>
           </TabsList>
 
@@ -152,54 +147,33 @@ const SchoolDashboard = () => {
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
                     <BarChart3 className="w-5 h-5 mr-2" />
-                    Klasse overblik
+                    Hurtig Actions
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {classes.slice(1).map((classItem) => (
-                      <div key={classItem.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                        <div>
-                          <p className="text-white font-medium">{classItem.name}</p>
-                          <p className="text-gray-400 text-sm">{classItem.students} elever</p>
-                        </div>
-                        <Button size="sm" variant="outline" className="text-gray-300 border-gray-600">
-                          Se detaljer
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+                <CardContent className="space-y-3">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 justify-start">
+                    <Users className="w-4 h-4 mr-2" />
+                    Administrer Klasser
+                  </Button>
+                  <Button className="w-full bg-green-600 hover:bg-green-700 justify-start">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Registrer Ny Elev
+                  </Button>
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700 justify-start">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Se Detaljeret Statistik
+                  </Button>
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700 justify-start">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Send Besked til Forældre
+                  </Button>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="classes" className="space-y-6">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Klasse administration</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {classes.filter(c => c.id !== "all").map((classItem) => (
-                    <Card key={classItem.id} className="bg-gray-700 border-gray-600">
-                      <CardContent className="p-4">
-                        <h3 className="text-white font-semibold text-lg">{classItem.name}</h3>
-                        <p className="text-gray-400">{classItem.students} elever</p>
-                        <div className="mt-4 space-y-2">
-                          <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
-                            Se elever
-                          </Button>
-                          <Button size="sm" variant="outline" className="w-full text-gray-300 border-gray-600">
-                            Statistik
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <ClassManagement />
           </TabsContent>
 
           <TabsContent value="students" className="space-y-6">
@@ -214,14 +188,11 @@ const SchoolDashboard = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Avanceret statistik</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">Avancerede analyser og rapporter kommer snart...</p>
-              </CardContent>
-            </Card>
+            <AnalyticsDashboard />
+          </TabsContent>
+
+          <TabsContent value="registration" className="space-y-6">
+            <StudentRegistration />
           </TabsContent>
 
           <TabsContent value="communication" className="space-y-6">
