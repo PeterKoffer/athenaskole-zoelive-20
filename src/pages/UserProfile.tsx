@@ -16,6 +16,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
+  const [profileExists, setProfileExists] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
     email: "",
@@ -47,6 +48,7 @@ const UserProfile = () => {
       .single();
 
     if (data) {
+      setProfileExists(true);
       setProfileData({
         name: data.name || user.user_metadata?.name || "",
         email: data.email || user.email || "",
@@ -55,6 +57,18 @@ const UserProfile = () => {
         school: data.school || "",
         address: data.address || "",
         avatar_url: data.avatar_url || ""
+      });
+    } else {
+      // Profile doesn't exist yet
+      setProfileExists(false);
+      setProfileData({
+        name: user.user_metadata?.name || "",
+        email: user.email || "",
+        birth_date: "",
+        grade: "",
+        school: "",
+        address: "",
+        avatar_url: ""
       });
     }
   };
@@ -107,28 +121,46 @@ const UserProfile = () => {
 
     setLoading(true);
     
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        user_id: user.id,
-        ...profileData,
-        updated_at: new Date().toISOString()
-      });
+    try {
+      if (profileExists) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            ...profileData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
 
-    if (error) {
+        if (error) throw error;
+      } else {
+        // Insert new profile
+        const { error } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            ...profileData,
+            updated_at: new Date().toISOString()
+          });
+
+        if (error) throw error;
+        setProfileExists(true);
+      }
+
+      toast({
+        title: "Profile updated!",
+        description: "Your information has been saved.",
+      });
+    } catch (error: any) {
+      console.error("Profile update error:", error);
       toast({
         title: "Error",
         description: "Could not update profile: " + error.message,
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Profile updated!",
-        description: "Your information has been saved.",
-      });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   if (!user) {
