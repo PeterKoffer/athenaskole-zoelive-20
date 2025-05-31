@@ -10,7 +10,7 @@ interface LanguageLearningProps {
 }
 
 const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
-  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage || "engelsk");
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage || "spanish");
   const [currentLesson, setCurrentLesson] = useState(0);
   const [hearts, setHearts] = useState(5);
   const [streak, setStreak] = useState(3);
@@ -28,134 +28,117 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
   }, [initialLanguage]);
 
   const languages = [
-    { code: "engelsk", name: "Engelsk", flag: "🇬🇧", color: "bg-blue-500" },
-    { code: "tysk", name: "Tysk", flag: "🇩🇪", color: "bg-red-500" },
-    { code: "fransk", name: "Fransk", flag: "🇫🇷", color: "bg-blue-600" },
-    { code: "spansk", name: "Spansk", flag: "🇪🇸", color: "bg-yellow-500" },
-    { code: "kinesisk", name: "Kinesisk", flag: "🇨🇳", color: "bg-red-600" },
-    { code: "svensk", name: "Svensk", flag: "🇸🇪", color: "bg-blue-400" },
-    { code: "norsk", name: "Norsk", flag: "🇳🇴", color: "bg-red-600" }
+    { code: "spanish", name: "Spanish", flag: "🇪🇸", color: "bg-red-500" },
+    { code: "french", name: "French", flag: "🇫🇷", color: "bg-blue-600" },
+    { code: "german", name: "German", flag: "🇩🇪", color: "bg-yellow-500" },
+    { code: "italian", name: "Italian", flag: "🇮🇹", color: "bg-green-500" },
+    { code: "portuguese", name: "Portuguese", flag: "🇵🇹", color: "bg-green-600" },
+    { code: "mandarin", name: "Mandarin", flag: "🇨🇳", color: "bg-red-600" },
+    { code: "japanese", name: "Japanese", flag: "🇯🇵", color: "bg-red-400" }
   ];
 
   const lessons = {
-    engelsk: [
+    spanish: [
       {
-        title: "Grundlæggende hilsner",
+        title: "Basic Greetings",
         questions: [
           {
             type: "translate",
-            question: "Oversæt til engelsk: 'Hej, hvordan har du det?'",
-            options: ["Hello, how are you?", "Hi, what's up?", "Good morning, sir", "Nice to meet you"],
+            question: "Translate to Spanish: 'Hello, how are you?'",
+            options: ["Hola, ¿cómo estás?", "Buenos días", "Adiós", "Gracias"],
             correct: 0,
-            audio: "Hello, how are you?"
+            audio: "Hola, ¿cómo estás?"
           },
           {
             type: "multiple",
-            question: "Hvad betyder 'Good morning'?",
-            options: ["God aften", "God morgen", "God nat", "God dag"],
+            question: "What does 'Buenos días' mean?",
+            options: ["Good evening", "Good morning", "Good night", "Goodbye"],
             correct: 1
           },
           {
             type: "fill",
-            question: "Udfyld: 'Nice to ___ you!'",
-            options: ["see", "meet", "find", "know"],
-            correct: 1
-          }
-        ]
-      },
-      {
-        title: "Farver og tal",
-        questions: [
-          {
-            type: "translate",
-            question: "Oversæt til engelsk: 'Det røde hus'",
-            options: ["The red house", "A red home", "The blue house", "Red building"],
+            question: "Fill in: 'Mucho ___' (Nice to meet you)",
+            options: ["gusto", "gracias", "bueno", "hola"],
             correct: 0
-          },
-          {
-            type: "multiple",
-            question: "Hvilket tal er 'fifteen'?",
-            options: ["14", "15", "16", "50"],
-            correct: 1
           }
         ]
       }
     ],
-    tysk: [
+    french: [
       {
-        title: "Grundlæggende hilsner",
+        title: "Basic Greetings",
         questions: [
           {
             type: "translate",
-            question: "Oversæt til tysk: 'Hej, hvordan har du det?'",
-            options: ["Hallo, wie geht es dir?", "Guten Tag", "Auf Wiedersehen", "Danke schön"],
-            correct: 0,
-            audio: "Hallo, wie geht es dir?"
-          },
-          {
-            type: "multiple",
-            question: "Hvad betyder 'Guten Morgen'?",
-            options: ["God aften", "God morgen", "God nat", "God dag"],
-            correct: 1
-          }
-        ]
-      }
-    ],
-    fransk: [
-      {
-        title: "Grundlæggende hilsner",
-        questions: [
-          {
-            type: "translate",
-            question: "Oversæt til fransk: 'Hej, hvordan har du det?'",
+            question: "Translate to French: 'Hello, how are you?'",
             options: ["Bonjour, comment allez-vous?", "Au revoir", "Merci beaucoup", "Bonne nuit"],
             correct: 0,
             audio: "Bonjour, comment allez-vous?"
           },
           {
             type: "multiple",
-            question: "Hvad betyder 'Bonjour'?",
-            options: ["God aften", "God morgen", "God nat", "Farvel"],
+            question: "What does 'Bonjour' mean?",
+            options: ["Good evening", "Good morning/Hello", "Good night", "Goodbye"],
             correct: 1
           }
         ]
       }
     ],
-    spansk: [
+    german: [
       {
-        title: "Grundlæggende hilsner",
+        title: "Basic Greetings",
         questions: [
           {
             type: "translate",
-            question: "Oversæt til spansk: 'Hej, hvordan har du det?'",
-            options: ["Hola, ¿cómo estás?", "Adiós", "Gracias", "Buenas noches"],
+            question: "Translate to German: 'Hello, how are you?'",
+            options: ["Hallo, wie geht es dir?", "Guten Tag", "Auf Wiedersehen", "Danke schön"],
             correct: 0,
-            audio: "Hola, ¿cómo estás?"
+            audio: "Hallo, wie geht es dir?"
           },
           {
             type: "multiple",
-            question: "Hvad betyder 'Buenos días'?",
-            options: ["God aften", "God morgen", "God nat", "Farvel"],
+            question: "What does 'Guten Morgen' mean?",
+            options: ["Good evening", "Good morning", "Good night", "Good day"],
             correct: 1
           }
         ]
       }
     ],
-    kinesisk: [
+    italian: [
       {
-        title: "Grundlæggende hilsner",
+        title: "Basic Greetings",
         questions: [
           {
             type: "translate",
-            question: "Oversæt til kinesisk: 'Hej, hvordan har du det?'",
+            question: "Translate to Italian: 'Hello, how are you?'",
+            options: ["Ciao, come stai?", "Arrivederci", "Grazie", "Buonanotte"],
+            correct: 0,
+            audio: "Ciao, come stai?"
+          },
+          {
+            type: "multiple",
+            question: "What does 'Buongiorno' mean?",
+            options: ["Good evening", "Good morning", "Good night", "Goodbye"],
+            correct: 1
+          }
+        ]
+      }
+    ],
+    mandarin: [
+      {
+        title: "Basic Greetings",
+        questions: [
+          {
+            type: "translate",
+            question: "Translate to Mandarin: 'Hello, how are you?'",
             options: ["你好，你好吗？", "再见", "谢谢", "晚安"],
             correct: 0,
             audio: "你好，你好吗？"
           },
           {
             type: "multiple",
-            question: "Hvad betyder '你好'?",
-            options: ["Farvel", "Hej/Hallo", "Tak", "Undskyld"],
+            question: "What does '你好' mean?",
+            options: ["Goodbye", "Hello", "Thank you", "Excuse me"],
             correct: 1
           }
         ]
@@ -170,7 +153,10 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
   const playAudio = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = selectedLanguage === 'engelsk' ? 'en-US' : 'da-DK';
+      utterance.lang = selectedLanguage === 'spanish' ? 'es-ES' : 
+                      selectedLanguage === 'french' ? 'fr-FR' :
+                      selectedLanguage === 'german' ? 'de-DE' :
+                      selectedLanguage === 'italian' ? 'it-IT' : 'en-US';
       utterance.rate = 0.8;
       speechSynthesis.speak(utterance);
     }
@@ -232,7 +218,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
               <CardTitle className="flex items-center justify-between text-white">
                 <span className="flex items-center space-x-2">
                   <span className="text-2xl">🌍</span>
-                  <span>Sprogtræning - Duolingo stil</span>
+                  <span>Language Learning - Duolingo Style</span>
                 </span>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-1">
@@ -241,7 +227,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
                   </div>
                   <div className="flex items-center space-x-1">
                     <Trophy className="w-5 h-5 text-yellow-500" />
-                    <span className="text-white">{streak} dages streak</span>
+                    <span className="text-white">{streak} day streak</span>
                   </div>
                   <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
                     {xp} XP
@@ -272,7 +258,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
                 <CardTitle className="text-white">
-                  Lektioner i {languages.find(l => l.code === selectedLanguage)?.name}
+                  Lessons in {languages.find(l => l.code === selectedLanguage)?.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -309,7 +295,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
                   onClick={() => setCurrentLesson(-1)}
                   className="text-gray-400 hover:text-white"
                 >
-                  ← Tilbage
+                  ← Back
                 </Button>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-1">
@@ -347,7 +333,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
                         className="text-gray-300 border-gray-600 hover:bg-gray-700"
                       >
                         <Volume2 className="w-4 h-4 mr-2" />
-                        Lyt
+                        Listen
                       </Button>
                     )}
                   </div>
@@ -386,7 +372,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
                       disabled={!selectedAnswer}
                       className="w-full bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none"
                     >
-                      Tjek svar
+                      Check Answer
                     </Button>
                   ) : (
                     <div className="space-y-4">
@@ -397,7 +383,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
                           {isCorrect ? '🎉' : '😔'}
                         </div>
                         <p className={`font-semibold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                          {isCorrect ? 'Rigtigt! Godt klaret!' : 'Forkert. Prøv igen næste gang!'}
+                          {isCorrect ? 'Correct! Well done!' : 'Incorrect. Try again next time!'}
                         </p>
                         {isCorrect && <p className="text-white text-sm mt-2">+10 XP</p>}
                       </div>
@@ -405,7 +391,7 @@ const LanguageLearning = ({ initialLanguage }: LanguageLearningProps) => {
                         onClick={nextQuestion}
                         className="w-full bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none"
                       >
-                        {currentQuestion < currentLessonData.questions.length - 1 ? 'Næste' : 'Afslut lektion'}
+                        {currentQuestion < currentLessonData.questions.length - 1 ? 'Next' : 'Complete Lesson'}
                       </Button>
                     </div>
                   )}

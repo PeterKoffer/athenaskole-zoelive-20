@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Calculator, BookOpen, Globe, Atom } from "lucide-react";
+import { Calculator, BookOpen, Globe, Atom, Microscope, History } from "lucide-react";
 
 interface Subject {
   id: string;
@@ -17,12 +17,12 @@ interface SubjectSelectorProps {
 
 const SubjectSelector = ({ currentSubject, onSubjectChange, onLanguageSelect }: SubjectSelectorProps) => {
   const subjects: Subject[] = [
-    { id: "matematik", name: "Matematik", emoji: "🔢", icon: Calculator },
-    { id: "dansk", name: "Dansk", emoji: "📝", icon: BookOpen },
-    { id: "engelsk", name: "Engelsk", emoji: "🇬🇧", icon: Globe },
-    { id: "sprog", name: "Sprog", emoji: "🌍", icon: Globe },
-    { id: "naturteknik", name: "Natur & Teknik", emoji: "🧪", icon: Atom },
-    { id: "historie", name: "Historie", emoji: "🏰", icon: BookOpen }
+    { id: "math", name: "Math", emoji: "🔢", icon: Calculator },
+    { id: "english", name: "English", emoji: "📝", icon: BookOpen },
+    { id: "science", name: "Science", emoji: "🧪", icon: Atom },
+    { id: "foreign-languages", name: "Languages", emoji: "🌍", icon: Globe },
+    { id: "social-studies", name: "Social Studies", emoji: "🏛️", icon: History },
+    { id: "biology", name: "Biology", emoji: "🔬", icon: Microscope }
   ];
 
   return (
@@ -40,7 +40,7 @@ const SubjectSelector = ({ currentSubject, onSubjectChange, onLanguageSelect }: 
             }`}
             onClick={() => {
               onSubjectChange(subject.id);
-              if (subject.id === "sprog") {
+              if (subject.id === "foreign-languages") {
                 onLanguageSelect();
               }
             }}

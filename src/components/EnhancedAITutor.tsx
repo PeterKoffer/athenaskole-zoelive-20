@@ -19,13 +19,13 @@ import { Target, Clock, Star } from "lucide-react";
 
 const EnhancedAITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [currentSubject, setCurrentSubject] = useState("matematik");
+  const [currentSubject, setCurrentSubject] = useState("math");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
   const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [currentCoins, setCurrentCoins] = useState(150);
   const [showSpeechPractice, setShowSpeechPractice] = useState(false);
-  const [currentPracticeText, setCurrentPracticeText] = useState("Hej, jeg hedder Emma");
+  const [currentPracticeText, setCurrentPracticeText] = useState("Hello, my name is Emma");
   const messagesEndRef = useRef(null);
 
   const { messages, handleSendMessage, handleLearningOption } = useMessageHandler({
@@ -42,10 +42,10 @@ const EnhancedAITutor = ({ user }) => {
     pronunciationScore: 87,
     challengesCompleted: 12,
     streak: 5,
-    newAchievements: ["Udtale Mester", "7 Dages Streak"]
+    newAchievements: ["Pronunciation Master", "7 Day Streak"]
   };
 
-  const todaysDate = new Date().toLocaleDateString('da-DK', {
+  const todaysDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -120,7 +120,7 @@ const EnhancedAITutor = ({ user }) => {
           }}
           className="text-white border-gray-600 hover:bg-gray-700"
         >
-          ← Tilbage til AI Lærer
+          ← Back to AI Tutor
         </Button>
         <LanguageLearning initialLanguage={selectedLanguage} />
       </div>
@@ -135,7 +135,7 @@ const EnhancedAITutor = ({ user }) => {
           <CardTitle className="flex items-center space-x-3 text-white">
             <div className="text-4xl">🎓</div>
             <div>
-              <h1 className="text-3xl font-bold">Hej {user?.user_metadata?.name?.split(' ')[0] || 'Elev'}! Jeg er Athena</h1>
+              <h1 className="text-3xl font-bold">Hi {user?.user_metadata?.name?.split(' ')[0] || 'Student'}! I'm Athena</h1>
               <p className="text-purple-100 text-lg">{todaysDate}</p>
             </div>
           </CardTitle>
@@ -143,12 +143,12 @@ const EnhancedAITutor = ({ user }) => {
         <CardContent>
           <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
             <p className="text-xl mb-4">
-              Velkommen til din personlige AI-lærer! Jeg har forberedt et spændende program til dig i dag. 
-              Du kan vælge hvor du vil starte, og jeg vil guide dig gennem hver aktivitet.
+              Welcome to your personal AI tutor! I've prepared an exciting program for you today. 
+              You can choose where to start, and I'll guide you through each activity.
             </p>
             <div className="flex items-center space-x-2">
               <Star className="w-6 h-6 text-yellow-300" />
-              <span className="text-lg">Lad os lære noget fantastisk sammen!</span>
+              <span className="text-lg">Let's learn something amazing together!</span>
             </div>
           </div>
         </CardContent>
@@ -159,7 +159,7 @@ const EnhancedAITutor = ({ user }) => {
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center space-x-2 text-white">
               <span className="text-2xl">🎓</span>
-              <span>Athena AI Lærer</span>
+              <span>Athena AI Tutor</span>
             </span>
             <div className="flex items-center space-x-2">
               <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">
@@ -180,16 +180,16 @@ const EnhancedAITutor = ({ user }) => {
       <Tabs defaultValue="chat" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5 bg-gray-800">
           <TabsTrigger value="chat" className="data-[state=active]:bg-gray-700">AI Chat</TabsTrigger>
-          <TabsTrigger value="speech" className="data-[state=active]:bg-gray-700">Udtale</TabsTrigger>
-          <TabsTrigger value="challenges" className="data-[state=active]:bg-gray-700">Udfordringer</TabsTrigger>
-          <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700">Belønninger</TabsTrigger>
-          <TabsTrigger value="parents" className="data-[state=active]:bg-gray-700">Forældre</TabsTrigger>
+          <TabsTrigger value="speech" className="data-[state=active]:bg-gray-700">Speech</TabsTrigger>
+          <TabsTrigger value="challenges" className="data-[state=active]:bg-gray-700">Challenges</TabsTrigger>
+          <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700">Rewards</TabsTrigger>
+          <TabsTrigger value="parents" className="data-[state=active]:bg-gray-700">Parents</TabsTrigger>
         </TabsList>
 
         <TabsContent value="chat" className="space-y-6">
           <Card className="h-96 bg-gray-900 border-gray-800">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-white">Chat med din AI lærer</CardTitle>
+              <CardTitle className="text-lg text-white">Chat with your AI tutor</CardTitle>
             </CardHeader>
             <CardContent className="h-full flex flex-col">
               <div className="flex-1 overflow-y-auto space-y-4 mb-4">
@@ -215,22 +215,22 @@ const EnhancedAITutor = ({ user }) => {
         <TabsContent value="speech" className="space-y-6">
           <SpeechRecognition
             targetText={currentPracticeText}
-            language="dansk"
+            language="english"
             onScoreUpdate={handlePronunciationScore}
           />
           
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white">Øvelsestekster</CardTitle>
+              <CardTitle className="text-white">Practice Texts</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-3">
                 {[
-                  "Hej, jeg hedder Emma",
-                  "Jeg kan godt lide at læse bøger",
-                  "Danmark er et smukt land",
-                  "Jeg spiser rugbrød til morgenmad",
-                  "Hygge er meget vigtigt for danskere"
+                  "Hello, my name is Emma",
+                  "I love reading books",
+                  "The United States is a beautiful country",
+                  "I eat cereal for breakfast",
+                  "Learning is very important for students"
                 ].map((text, index) => (
                   <Button
                     key={index}
@@ -264,7 +264,7 @@ const EnhancedAITutor = ({ user }) => {
         <TabsContent value="parents" className="space-y-6">
           <ParentNotifications
             childProgress={childProgress}
-            parentEmail="foraeldre@example.com"
+            parentEmail="parents@example.com"
           />
         </TabsContent>
       </Tabs>

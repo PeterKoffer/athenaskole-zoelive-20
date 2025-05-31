@@ -6,7 +6,7 @@ export const useMessageHandler = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
-      content: "Hej! Jeg er Nelie, din flydende AI-lærer. Sig 'hi Nelie' for at starte, eller skriv dit spørgsmål!",
+      content: "Hi! I'm Athena, your AI tutor. Say 'hi Athena' to start, or write your question!",
       timestamp: new Date()
     }
   ]);
@@ -22,27 +22,27 @@ export const useMessageHandler = () => {
 
     setMessages(prev => [...prev, userMessage]);
     
-    const isNelieGreeting = inputMessage.toLowerCase().includes('hi nelie') || 
-                           inputMessage.toLowerCase().includes('hej nelie');
+    const isAthenaGreeting = inputMessage.toLowerCase().includes('hi athena') || 
+                           inputMessage.toLowerCase().includes('hello athena');
     
     setInputMessage("");
 
     setTimeout(() => {
       let responseContent = "";
       
-      if (isNelieGreeting) {
-        responseContent = "Hej! Jeg er Nelie, og jeg er så glad for at møde dig! 🌟 Jeg er her for at hjælpe dig med at lære. Hvad vil du gerne arbejde med i dag? Matematik, dansk, engelsk eller måske noget helt andet?";
+      if (isAthenaGreeting) {
+        responseContent = "Hi! I'm Athena, and I'm so excited to meet you! 🌟 I'm here to help you learn. What would you like to work on today? Math, English, Science, or maybe something else?";
         
         if ('speechSynthesis' in window) {
           setIsSpeaking(true);
           const utterance = new SpeechSynthesisUtterance(responseContent);
-          utterance.lang = 'da-DK';
+          utterance.lang = 'en-US';
           utterance.rate = 0.8;
           utterance.onend = () => setIsSpeaking(false);
           speechSynthesis.speak(utterance);
         }
       } else {
-        responseContent = "Det er et godt spørgsmål! Som Nelie kan jeg hjælpe dig med mange ting. Prøv at sige 'hi Nelie' for en mere personlig hilsen!";
+        responseContent = "That's a good question! As Athena, I can help you with many things. Try saying 'hi Athena' for a more personal greeting!";
       }
 
       const aiResponse: Message = {

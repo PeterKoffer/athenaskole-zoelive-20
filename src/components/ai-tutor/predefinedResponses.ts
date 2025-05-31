@@ -1,31 +1,31 @@
 
 export const predefinedResponses = {
-  matematik: [
-    "Fantastisk! Lad os arbejde med brøker. Kan du fortælle mig hvad 1/2 + 1/4 er?",
-    "Wow, du er god til geometri! Vil du prøve en udfordring med trekanter?",
-    "Lad os øve multiplikation. Hvad er 7 × 8? Tag din tid!"
+  math: [
+    "Great! Let's work with fractions. Can you tell me what 1/2 + 1/4 equals?",
+    "Awesome, you're good at geometry! Want to try a challenge with triangles?",
+    "Let's practice multiplication. What is 7 × 8? Take your time!"
   ],
-  dansk: [
-    "Perfekt! Lad os øve stavning. Kan du stave ordet 'smørrebrød'?",
-    "Godt valg! Vil du skrive en kort historie om en viking?",
-    "Lad os læse sammen. Kender du H.C. Andersen eventyr?"
+  english: [
+    "Perfect! Let's practice spelling. Can you spell the word 'incredible'?",
+    "Good choice! Would you like to write a short story about an adventure?",
+    "Let's read together. Do you know any famous American authors?"
   ],
-  engelsk: [
-    "Great! Let's practice English. Can you tell me about your favorite Danish food in English?",
-    "Wonderful! What's your favorite color in English?",
-    "Let's learn new words! Do you know what 'hygge' means in English?"
+  science: [
+    "Excellent! Let's learn about the solar system. Can you name the planets?",
+    "Great choice! What do you know about photosynthesis?",
+    "Let's explore chemistry! Do you know what happens when you mix baking soda and vinegar?"
   ],
-  sprog: [
-    "Fantastisk! Vil du prøve vores interaktive sprogtræning? Det ligner Duolingo og gør det sjovt at lære nye sprog!",
-    "Perfekt valg! Hvilke sprog vil du gerne lære? Vi har engelsk, tysk, fransk og mange flere!",
-    "Lad os begynde sprogtræning! Du kan vælge mellem forskellige sprog og øvelser."
+  "foreign-languages": [
+    "Fantastic! Would you like to try our interactive language training? It's like Duolingo and makes learning new languages fun!",
+    "Perfect choice! Which languages would you like to learn? We have Spanish, French, German and many more!",
+    "Let's start language training! You can choose between different languages and exercises."
   ]
 };
 
 export const learningOptionResponses = {
-  review: "Perfekt! Lad os gennemgå hvad du lærte om brøker i går. Husker du hvordan man lægger brøker sammen?",
-  new: "Spændende! I dag vil jeg gerne lære dig om decimaler. Ved du hvad en decimal er?",
-  practice: "Smart valg! Lad os øve multiplikation. Jeg giver dig nogle opgaver at løse.",
-  test: "Fedt! Jeg har lavet en lille quiz til dig. Første spørgsmål: Hvad er 8 × 7?",
-  default: "Lad os komme i gang med at lære!"
+  review: "Perfect! Let's review what you learned about fractions yesterday. Do you remember how to add fractions together?",
+  new: "Exciting! Today I'd like to teach you about decimals. Do you know what a decimal is?",
+  practice: "Smart choice! Let's practice multiplication. I'll give you some problems to solve.",
+  test: "Cool! I've made a little quiz for you. First question: What is 8 × 7?",
+  default: "Let's get started with learning!"
 };

@@ -24,7 +24,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = language === 'dansk' ? 'da-DK' : 'en-US';
+      recognitionRef.current.lang = 'en-US';
       
       recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
@@ -46,13 +46,13 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
     onScoreUpdate(score);
 
     if (score >= 90) {
-      setFeedback("Perfekt udtale! 🌟");
+      setFeedback("Perfect pronunciation! 🌟");
     } else if (score >= 75) {
-      setFeedback("Rigtig godt! Prøv igen for at forbedre 👍");
+      setFeedback("Really good! Try again to improve 👍");
     } else if (score >= 60) {
-      setFeedback("Godt forsøg! Fokuser på udtalen 🎯");
+      setFeedback("Good try! Focus on pronunciation 🎯");
     } else {
-      setFeedback("Prøv igen - lyt til eksemplet først 🔄");
+      setFeedback("Try again - listen to the example first 🔄");
     }
   };
 
@@ -89,7 +89,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
   const playTargetAudio = () => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(targetText);
-      utterance.lang = language === 'dansk' ? 'da-DK' : 'en-US';
+      utterance.lang = 'en-US';
       utterance.rate = 0.8;
       speechSynthesis.speak(utterance);
     }
@@ -105,9 +105,9 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-6 space-y-4">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-white mb-2">Udtale Træning</h3>
+          <h3 className="text-lg font-semibold text-white mb-2">Pronunciation Practice</h3>
           <div className="bg-gray-700 p-3 rounded-lg mb-4">
-            <p className="text-white font-medium">Sig: "{targetText}"</p>
+            <p className="text-white font-medium">Say: "{targetText}"</p>
             <Button
               variant="outline"
               size="sm"
@@ -115,7 +115,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
               className="mt-2 text-gray-300 border-gray-600 hover:bg-gray-600"
             >
               <Volume2 className="w-4 h-4 mr-1" />
-              Hør eksempel
+              Listen to example
             </Button>
           </div>
         </div>
@@ -138,7 +138,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
             ) : (
               <>
                 <Mic className="w-5 h-5 mr-2" />
-                Start optagelse
+                Start recording
               </>
             )}
           </Button>
@@ -149,7 +149,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
             className="text-gray-300 border-gray-600 hover:bg-gray-600"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
-            Nulstil
+            Reset
           </Button>
         </div>
 
@@ -157,7 +157,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
           <div className="text-center">
             <div className="animate-pulse">
               <div className="w-4 h-4 bg-red-500 rounded-full mx-auto mb-2"></div>
-              <p className="text-gray-300">Lytter...</p>
+              <p className="text-gray-300">Listening...</p>
             </div>
           </div>
         )}
@@ -165,7 +165,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
         {transcription && (
           <div className="space-y-3">
             <div className="bg-gray-700 p-3 rounded-lg">
-              <p className="text-gray-300 text-sm">Du sagde:</p>
+              <p className="text-gray-300 text-sm">You said:</p>
               <p className="text-white font-medium">"{transcription}"</p>
             </div>
 
@@ -180,7 +180,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
                     'bg-orange-600 text-white border-orange-600'
                   }`}
                 >
-                  {pronunciationScore}% nøjagtighed
+                  {pronunciationScore}% accuracy
                 </Badge>
                 <p className="text-gray-300">{feedback}</p>
               </div>

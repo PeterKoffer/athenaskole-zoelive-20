@@ -13,7 +13,7 @@ import { useMessageHandler } from "./ai-tutor/useMessageHandler";
 
 const AITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [currentSubject, setCurrentSubject] = useState("matematik");
+  const [currentSubject, setCurrentSubject] = useState("math");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
   const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
@@ -74,7 +74,7 @@ const AITutor = ({ user }) => {
           }}
           className="text-white border-gray-600 hover:bg-gray-700"
         >
-          ← Tilbage til AI Lærer
+          ← Back to AI Tutor
         </Button>
         <LanguageLearning initialLanguage={selectedLanguage} />
       </div>
@@ -88,10 +88,10 @@ const AITutor = ({ user }) => {
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center space-x-2 text-white">
               <span className="text-2xl">🎓</span>
-              <span>AI Lærer - Din Personlige Athena</span>
+              <span>AI Tutor - Your Personal Athena</span>
             </span>
             <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
-              GPT-4o + ElevenLabs Dansk
+              GPT-4o + ElevenLabs English
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -106,7 +106,7 @@ const AITutor = ({ user }) => {
 
       <Card className="h-96 bg-gray-900 border-gray-800">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-white">Chat med din AI lærer</CardTitle>
+          <CardTitle className="text-lg text-white">Chat with your AI tutor</CardTitle>
         </CardHeader>
         <CardContent className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto space-y-4 mb-4">

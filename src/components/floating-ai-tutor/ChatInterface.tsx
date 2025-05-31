@@ -57,7 +57,7 @@ const ChatInterface = ({
               isDragging ? 'text-blue-400' : 'text-gray-400'
             }`} />
             <span className="text-xl">👩‍🏫</span>
-            <span>Nelie - Din AI Lærer</span>
+            <span>Athena - Your AI Tutor</span>
           </div>
           <div className="flex items-center space-x-2">
             <Badge variant="outline" className="bg-gradient-to-r from-pink-400 to-purple-500 text-white border-pink-400 text-xs">
@@ -68,7 +68,7 @@ const ChatInterface = ({
               size="sm"
               onClick={onResetToHome}
               className="text-gray-400 hover:text-white p-1"
-              title="Gå hjem"
+              title="Go home"
             >
               <Home className="w-4 h-4" />
             </Button>
@@ -84,7 +84,7 @@ const ChatInterface = ({
         </CardTitle>
         {isDragging && (
           <div className="text-xs text-blue-400 mt-1">
-            Træk mig rundt på siden - jeg følger med overalt! 🚀
+            Drag me around the page - I'll follow you everywhere! 🚀
           </div>
         )}
       </CardHeader>
@@ -101,7 +101,7 @@ const ChatInterface = ({
               >
                 <p>{message.content}</p>
                 <p className="text-xs opacity-70 mt-1">
-                  {message.timestamp.toLocaleTimeString('da-DK')}
+                  {message.timestamp.toLocaleTimeString('en-US')}
                 </p>
               </div>
             </div>
@@ -113,7 +113,7 @@ const ChatInterface = ({
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Skriv 'hi Nelie' eller dit spørgsmål..."
+              placeholder="Type 'hi Athena' or your question..."
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-pink-400 text-xs h-8"
             />

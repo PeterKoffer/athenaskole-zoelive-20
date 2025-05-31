@@ -11,13 +11,13 @@ interface LanguageSelectorProps {
 
 const LanguageSelector = ({ onLanguageSelect, onBack }: LanguageSelectorProps) => {
   const languages: Language[] = [
-    { code: "engelsk", name: "Engelsk", flag: "🇬🇧", color: "bg-blue-500" },
-    { code: "tysk", name: "Tysk", flag: "🇩🇪", color: "bg-red-500" },
-    { code: "fransk", name: "Fransk", flag: "🇫🇷", color: "bg-blue-600" },
-    { code: "spansk", name: "Spansk", flag: "🇪🇸", color: "bg-yellow-500" },
-    { code: "kinesisk", name: "Kinesisk", flag: "🇨🇳", color: "bg-red-600" },
-    { code: "svensk", name: "Svensk", flag: "🇸🇪", color: "bg-blue-400" },
-    { code: "norsk", name: "Norsk", flag: "🇳🇴", color: "bg-red-600" }
+    { code: "spanish", name: "Spanish", flag: "🇪🇸", color: "bg-red-500" },
+    { code: "french", name: "French", flag: "🇫🇷", color: "bg-blue-600" },
+    { code: "german", name: "German", flag: "🇩🇪", color: "bg-yellow-500" },
+    { code: "italian", name: "Italian", flag: "🇮🇹", color: "bg-green-500" },
+    { code: "portuguese", name: "Portuguese", flag: "🇵🇹", color: "bg-green-600" },
+    { code: "mandarin", name: "Mandarin", flag: "🇨🇳", color: "bg-red-600" },
+    { code: "japanese", name: "Japanese", flag: "🇯🇵", color: "bg-red-400" }
   ];
 
   return (
@@ -27,7 +27,7 @@ const LanguageSelector = ({ onLanguageSelect, onBack }: LanguageSelectorProps) =
         onClick={onBack}
         className="text-white border-gray-600 hover:bg-gray-700"
       >
-        ← Tilbage til AI Lærer
+        ← Back to AI Tutor
       </Button>
       
       <Card className="bg-gray-900 border-gray-800">
@@ -35,13 +35,13 @@ const LanguageSelector = ({ onLanguageSelect, onBack }: LanguageSelectorProps) =
           <CardTitle className="text-white text-center">
             <span className="flex items-center justify-center space-x-2">
               <span className="text-2xl">🌍</span>
-              <span>Vælg dit sprog</span>
+              <span>Choose Your Language</span>
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-300 text-center mb-6">
-            Hvilket sprog vil du gerne lære i dag?
+            Which language would you like to learn today?
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {languages.map((lang) => (

@@ -10,12 +10,12 @@ interface UseMessageHandlerProps {
 }
 
 export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMessageHandlerProps) => {
-  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Elev';
+  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Student';
   
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
-      content: user ? `Hej ${firstName}! Dette er hvad vi vil arbejde på i dag. Hvor vil du gerne begynde? 🇩🇰` : "Hej! Jeg er din AI-lærer. Hvad vil du gerne lære i dag? 🇩🇰",
+      content: user ? `Hi ${firstName}! This is what we'll work on today. Where would you like to start? 🎓` : "Hi! I'm your AI tutor. What would you like to learn today? 🎓",
       timestamp: new Date(),
       showOptions: user ? true : false
     }
@@ -32,7 +32,7 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
     setMessages(prev => [...prev, userMessage]);
 
     setTimeout(() => {
-      const responses = predefinedResponses[currentSubject] || predefinedResponses.matematik;
+      const responses = predefinedResponses[currentSubject] || predefinedResponses.math;
       let randomResponse = responses[Math.floor(Math.random() * responses.length)];
       
       // Replace any full name references with first name
@@ -53,7 +53,7 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
       if ('speechSynthesis' in window) {
         setIsSpeaking(true);
         const utterance = new SpeechSynthesisUtterance(randomResponse);
-        utterance.lang = 'da-DK';
+        utterance.lang = 'en-US';
         utterance.rate = 0.8;
         utterance.onend = () => setIsSpeaking(false);
         speechSynthesis.speak(utterance);
@@ -64,7 +64,7 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
   const handleLearningOption = (option: LearningOption) => {
     const optionMessage: Message = {
       role: "user" as const,
-      content: `Jeg vil gerne ${option.title.toLowerCase()}`,
+      content: `I would like to ${option.title.toLowerCase()}`,
       timestamp: new Date(),
       showOptions: false
     };
