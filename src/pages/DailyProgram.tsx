@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,12 +61,8 @@ const DailyProgram = () => {
 
   const handleStartActivity = (activityId: string) => {
     setSelectedActivity(activityId);
-    // Navigate to the specific activity
-    navigate('/', {
-      state: {
-        startActivity: activityId
-      }
-    });
+    // Navigate to the specific educational component
+    navigate(`/learn/${activityId}`);
   };
 
   return (

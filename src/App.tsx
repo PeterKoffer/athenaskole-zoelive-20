@@ -12,6 +12,10 @@ import ParentDashboard from "./pages/ParentDashboard";
 import DailyProgram from "./pages/DailyProgram";
 import AdaptiveLearning from "./pages/AdaptiveLearning";
 import NotFound from "./pages/NotFound";
+import MathematicsLearning from "./components/education/MathematicsLearning";
+import EnglishLearning from "./components/education/EnglishLearning";
+import CreativeLearning from "./components/education/CreativeLearning";
+import LanguageLearning from "./components/LanguageLearning";
 import FloatingAITutor from "./components/FloatingAITutor";
 
 const queryClient = new QueryClient();
@@ -30,6 +34,10 @@ const App = () => (
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/daily-program" element={<DailyProgram />} />
           <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
+          <Route path="/learn/matematik" element={<MathematicsLearning />} />
+          <Route path="/learn/dansk" element={<EnglishLearning />} />
+          <Route path="/learn/engelsk" element={<LanguageLearning />} />
+          <Route path="/learn/kreativ" element={<CreativeLearning />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
