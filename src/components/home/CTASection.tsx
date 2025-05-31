@@ -6,6 +6,11 @@ interface CTASectionProps {
 }
 
 const CTASection = ({ onGetStarted }: CTASectionProps) => {
+  const handleGetStartedClick = () => {
+    console.log("CTASection Get Started button clicked");
+    onGetStarted();
+  };
+
   return (
     <section className="py-16 relative z-10">
       <div className="text-center">
@@ -18,7 +23,7 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
         <Button
           size="lg"
           className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white relative z-10"
-          onClick={onGetStarted}
+          onClick={handleGetStartedClick}
         >
           Get Started with Nelie
         </Button>

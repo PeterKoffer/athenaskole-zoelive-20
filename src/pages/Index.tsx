@@ -51,18 +51,23 @@ const Index = () => {
   }, [user]);
 
   const handleGetStarted = () => {
+    console.log("Get Started button clicked, user:", user);
     if (user) {
+      console.log("User is logged in, navigating to home");
       navigateToHome();
     } else {
+      console.log("User not logged in, showing auth modal");
       setShowAuthModal(true);
     }
   };
 
   const handleModalClose = () => {
+    console.log("Auth modal closing");
     setShowAuthModal(false);
   };
 
   const handleLogin = () => {
+    console.log("Login successful, closing modal");
     setShowAuthModal(false);
   };
 
@@ -122,6 +127,8 @@ const Index = () => {
       </>
     );
   };
+
+  console.log("Index component rendering, showAuthModal:", showAuthModal);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

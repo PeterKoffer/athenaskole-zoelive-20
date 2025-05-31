@@ -1,12 +1,16 @@
 
 import { Button } from "@/components/ui/button";
-import { BrainCircuit } from "lucide-react";
 
 interface HeroSectionProps {
   onGetStarted: () => void;
 }
 
 const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
+  const handleGetStartedClick = () => {
+    console.log("HeroSection Get Started button clicked");
+    onGetStarted();
+  };
+
   return (
     <div className="text-center py-20">
       <h1 className="text-5xl font-bold text-white mb-4">
@@ -21,7 +25,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
       <Button
         size="lg"
         className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
-        onClick={onGetStarted}
+        onClick={handleGetStartedClick}
       >
         Get Started with Nelie
       </Button>
