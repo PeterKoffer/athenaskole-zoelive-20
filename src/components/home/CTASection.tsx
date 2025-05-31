@@ -7,7 +7,7 @@ interface CTASectionProps {
 
 const CTASection = ({ onGetStarted }: CTASectionProps) => {
   return (
-    <section className="py-16">
+    <section className="py-16 relative z-10">
       <div className="text-center">
         <h2 className="text-3xl font-semibold text-white mb-4">
           Ready to meet Nelie?
@@ -17,7 +17,7 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
         </p>
         <Button
           size="lg"
-          className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+          className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white relative z-10"
           onClick={onGetStarted}
         >
           Get Started with Nelie

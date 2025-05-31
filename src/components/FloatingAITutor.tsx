@@ -28,7 +28,7 @@ const FloatingAITutor = () => {
   if (!isExpanded) {
     return (
       <div
-        className="fixed z-40"
+        className="fixed z-30"
         style={{ left: position.x, top: position.y }}
       >
         <CollapsedButton 
@@ -44,7 +44,7 @@ const FloatingAITutor = () => {
 
   return (
     <div
-      className="fixed z-40"
+      className="fixed z-30"
       style={{ left: position.x, top: position.y }}
     >
       <ChatInterface
