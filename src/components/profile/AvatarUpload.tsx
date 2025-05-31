@@ -41,12 +41,12 @@ const AvatarUpload = ({ avatarUrl, name, uploading, onUpload }: AvatarUploadProp
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
-            className="w-48 bg-gray-700 border-gray-600 z-50" 
+            className="w-48 bg-gray-800 border-gray-700 text-white" 
             align="center"
           >
             <DropdownMenuItem 
               onClick={handleRoleSelector}
-              className="text-white hover:bg-gray-600 focus:bg-gray-600 cursor-pointer"
+              className="text-white hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
             >
               <Users className="w-4 h-4 mr-2" />
               Switch Role
@@ -54,7 +54,7 @@ const AvatarUpload = ({ avatarUrl, name, uploading, onUpload }: AvatarUploadProp
             <DropdownMenuSeparator className="bg-gray-600" />
             <DropdownMenuItem 
               onClick={signOut}
-              className="text-white hover:bg-gray-600 focus:bg-gray-600 cursor-pointer"
+              className="text-white hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
