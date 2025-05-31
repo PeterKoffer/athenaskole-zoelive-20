@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { useLearningSession } from "@/hooks/useLearningSession";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Palette, Music, Camera, Pen } from "lucide-react";
@@ -14,15 +14,14 @@ const CreativeLearning = () => {
   const navigate = useNavigate();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
 
-  const { startSession } = useLearningSession();
+  const { recommendedSessionTime } = useAdaptiveLearning('creative', 'general');
 
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    startSession('creative');
-  }, [user, navigate, startSession]);
+  }, [user, navigate]);
 
   const activities = [
     {
@@ -61,7 +60,9 @@ const CreativeLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-6xl mx-auto p-6">
-        <SessionTimer />
+        <SessionTimer 
+          recommendedDuration={recommendedSessionTime}
+        />
         
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">Creative Learning</h1>

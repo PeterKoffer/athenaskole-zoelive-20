@@ -1,13 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { useLearningSession } from "@/hooks/useLearningSession";
-import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 import MathHeader from "./math/MathHeader";
 import MathQuestion from "./math/MathQuestion";
 import SessionTimer from "../adaptive-learning/SessionTimer";
-import PerformanceAnalytics from "../adaptive-learning/PerformanceAnalytics";
 import LearningHeader from "./LearningHeader";
 
 const MathematicsLearning = () => {
@@ -17,34 +15,56 @@ const MathematicsLearning = () => {
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [showResults, setShowResults] = useState(false);
-
-  const {
-    sessionData,
-    startSession,
-    endSession,
-    updateProgress
-  } = useLearningSession();
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
 
   const {
     difficulty,
-    updateDifficulty,
-    getAdaptiveQuestion
-  } = useAdaptiveLearning();
+    performanceMetrics,
+    recommendedSessionTime,
+    recordAnswer,
+    adjustDifficulty,
+    endSession
+  } = useAdaptiveLearning('mathematics', 'arithmetic');
 
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    startSession('mathematics');
-  }, [user, navigate, startSession]);
+  }, [user, navigate]);
 
+  // Sample math questions
   const questions = [
-    getAdaptiveQuestion('mathematics', difficulty),
-    getAdaptiveQuestion('mathematics', difficulty)
+    {
+      question: 'What is 15 + 27?',
+      options: ['40', '42', '45', '48'],
+      correct: 1,
+      explanation: '15 + 27 = 42',
+      difficulty: 1
+    },
+    {
+      question: 'What is 8 × 7?',
+      options: ['54', '56', '58', '64'],
+      correct: 1,
+      explanation: '8 × 7 = 56',
+      difficulty: 2
+    }
   ];
 
-  const handleAnswer = (isCorrect: boolean) => {
+  const handleAnswerSelect = (index: number) => {
+    setSelectedAnswer(index);
+  };
+
+  const handleSubmit = () => {
+    if (selectedAnswer === null) return;
+    
+    const startTime = Date.now() - 5000; // Simulate 5 seconds thinking time
+    const responseTime = Date.now() - startTime;
+    const isCorrect = selectedAnswer === questions[currentQuestion].correct;
+    
+    setShowResult(true);
+    
     const newAnswers = [...answers, isCorrect];
     setAnswers(newAnswers);
     
@@ -52,19 +72,22 @@ const MathematicsLearning = () => {
       setScore(score + 1);
     }
 
-    updateDifficulty(isCorrect);
-    updateProgress({
-      correct: isCorrect,
-      timeSpent: 30,
-      difficulty: difficulty
-    });
+    recordAnswer(isCorrect, responseTime);
+  };
 
+  const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+      setShowResult(false);
     } else {
       setShowResults(true);
       endSession();
     }
+  };
+
+  const handleDifficultyChange = (newLevel: number, reason: string) => {
+    adjustDifficulty(newLevel, reason);
   };
 
   if (!user) return null;
@@ -78,10 +101,10 @@ const MathematicsLearning = () => {
             <h1 className="text-4xl font-bold mb-4">Great work!</h1>
             <p className="text-xl">You scored {score} out of {questions.length}</p>
           </div>
-          <PerformanceAnalytics 
-            answers={answers}
-            subject="mathematics"
-          />
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-4">Session Complete!</h3>
+            <p className="text-gray-300">Keep practicing to improve your math skills!</p>
+          </div>
         </div>
       </div>
     );
@@ -91,16 +114,25 @@ const MathematicsLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <SessionTimer />
+        <SessionTimer 
+          recommendedDuration={recommendedSessionTime}
+        />
         <MathHeader 
           score={score} 
           totalQuestions={questions.length}
           currentQuestion={currentQuestion}
           difficulty={difficulty}
+          performanceMetrics={performanceMetrics}
+          onDifficultyChange={handleDifficultyChange}
         />
         <MathQuestion
           question={questions[currentQuestion]}
-          onAnswer={handleAnswer}
+          selectedAnswer={selectedAnswer}
+          showResult={showResult}
+          onAnswerSelect={handleAnswerSelect}
+          onSubmit={handleSubmit}
+          onNext={handleNext}
+          isLastQuestion={currentQuestion === questions.length - 1}
         />
       </div>
     </div>

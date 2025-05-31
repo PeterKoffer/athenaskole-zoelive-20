@@ -1,9 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { useLearningSession } from "@/hooks/useLearningSession";
-import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
 import EnglishHeader from "./english/EnglishHeader";
 import EnglishQuestion from "./english/EnglishQuestion";
 import SessionTimer from "../adaptive-learning/SessionTimer";
@@ -19,32 +18,42 @@ const EnglishLearning = () => {
   const [showResults, setShowResults] = useState(false);
 
   const {
-    sessionData,
-    startSession,
-    endSession,
-    updateProgress
-  } = useLearningSession();
-
-  const {
     difficulty,
-    updateDifficulty,
-    getAdaptiveQuestion
-  } = useAdaptiveLearning();
+    performanceMetrics,
+    recommendedSessionTime,
+    recordAnswer,
+    adjustDifficulty,
+    endSession
+  } = useAdaptiveLearning('english', 'comprehension');
 
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    startSession('english');
-  }, [user, navigate, startSession]);
+  }, [user, navigate]);
 
+  // Sample questions for English learning
   const questions = [
-    getAdaptiveQuestion('english', difficulty),
-    getAdaptiveQuestion('english', difficulty)
+    {
+      type: 'comprehension',
+      title: 'Reading Comprehension',
+      content: 'The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet.',
+      question: 'What animal jumps in this sentence?',
+      options: ['Dog', 'Fox', 'Cat', 'Bird'],
+      correct: 1
+    },
+    {
+      type: 'vocabulary',
+      title: 'Vocabulary',
+      content: 'The word "magnificent" means very impressive or beautiful.',
+      question: 'What does "magnificent" mean?',
+      options: ['Very small', 'Very ugly', 'Very impressive', 'Very fast'],
+      correct: 2
+    }
   ];
 
-  const handleAnswer = (isCorrect: boolean) => {
+  const handleAnswer = (isCorrect: boolean, responseTime: number) => {
     const newAnswers = [...answers, isCorrect];
     setAnswers(newAnswers);
     
@@ -52,12 +61,7 @@ const EnglishLearning = () => {
       setScore(score + 1);
     }
 
-    updateDifficulty(isCorrect);
-    updateProgress({
-      correct: isCorrect,
-      timeSpent: 30,
-      difficulty: difficulty
-    });
+    recordAnswer(isCorrect, responseTime);
 
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
@@ -65,6 +69,10 @@ const EnglishLearning = () => {
       setShowResults(true);
       endSession();
     }
+  };
+
+  const handleDifficultyChange = (newLevel: number, reason: string) => {
+    adjustDifficulty(newLevel, reason);
   };
 
   if (!user) return null;
@@ -78,10 +86,10 @@ const EnglishLearning = () => {
             <h1 className="text-4xl font-bold mb-4">Excellent!</h1>
             <p className="text-xl">You scored {score} out of {questions.length}</p>
           </div>
-          <PerformanceAnalytics 
-            answers={answers}
-            subject="english"
-          />
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-4">Session Complete!</h3>
+            <p className="text-gray-300">Great job practicing your English skills!</p>
+          </div>
         </div>
       </div>
     );
@@ -91,15 +99,19 @@ const EnglishLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <SessionTimer />
+        <SessionTimer 
+          recommendedDuration={recommendedSessionTime}
+        />
         <EnglishHeader 
           score={score} 
           totalQuestions={questions.length}
           currentQuestion={currentQuestion}
           difficulty={difficulty}
+          performanceMetrics={performanceMetrics}
+          onDifficultyChange={handleDifficultyChange}
         />
         <EnglishQuestion
-          question={questions[currentQuestion]}
+          activity={questions[currentQuestion]}
           onAnswer={handleAnswer}
         />
       </div>
