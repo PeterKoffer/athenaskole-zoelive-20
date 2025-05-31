@@ -1,23 +1,16 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 interface ProfileHeaderProps {
   onSignOut: () => void;
 }
-
-const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
+const ProfileHeader = ({
+  onSignOut
+}: ProfileHeaderProps) => {
   const navigate = useNavigate();
-
-  return (
-    <nav className="bg-gray-800 border-b border-gray-700 p-4">
+  return <nav className="bg-gray-800 border-b border-gray-700 p-4">
       <div className="max-w-4xl mx-auto flex justify-between items-center">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="text-gray-400 hover:text-white hover:bg-gray-700"
-        >
+        <Button variant="ghost" onClick={() => navigate('/')} className="text-gray-400 hover:text-white hover:bg-gray-700">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Tilbage til forsiden
         </Button>
@@ -27,16 +20,10 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
           </div>
           <span className="text-white font-semibold">Min Profil</span>
         </div>
-        <Button
-          variant="outline"
-          onClick={onSignOut}
-          className="text-white border-gray-600 hover:bg-gray-700"
-        >
+        <Button variant="outline" onClick={onSignOut} className="border-gray-600 bg-slate-50 text-slate-950">
           Log ud
         </Button>
       </div>
-    </nav>
-  );
+    </nav>;
 };
-
 export default ProfileHeader;
