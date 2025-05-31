@@ -50,7 +50,11 @@ export class AIInteractionService {
         return [];
       }
 
-      return data || [];
+      return (data || []).map(item => ({
+        ...item,
+        ai_service: item.ai_service as 'openai' | 'elevenlabs' | 'suno',
+        interaction_type: item.interaction_type as 'chat' | 'tts' | 'music_generation'
+      }));
     } catch (error) {
       console.error('Error fetching AI interactions:', error);
       return [];

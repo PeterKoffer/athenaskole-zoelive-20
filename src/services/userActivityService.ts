@@ -9,31 +9,31 @@ export interface UserActivitySession {
   start_time: string;
   end_time?: string;
   duration_minutes?: number;
-  engagement_score?: number;
   completion_status: 'in_progress' | 'completed' | 'abandoned';
-  metadata: any;
+  engagement_score?: number;
+  metadata?: any;
 }
 
 export class UserActivityService {
-  async startSession(sessionData: Omit<UserActivitySession, 'id' | 'start_time'>): Promise<string | null> {
+  async startSession(session: Omit<UserActivitySession, 'id'>): Promise<string | null> {
     try {
       const { data, error } = await supabase
         .from('user_activity_sessions')
         .insert([{
-          ...sessionData,
+          ...session,
           start_time: new Date().toISOString()
         }])
         .select()
         .single();
 
       if (error) {
-        console.error('Error starting activity session:', error);
+        console.error('Error starting session:', error);
         return null;
       }
 
       return data.id;
     } catch (error) {
-      console.error('Error starting activity session:', error);
+      console.error('Error starting session:', error);
       return null;
     }
   }
@@ -42,7 +42,7 @@ export class UserActivityService {
     try {
       const endTime = new Date().toISOString();
       
-      // First get the session to calculate duration
+      // Get session start time to calculate duration
       const { data: session, error: fetchError } = await supabase
         .from('user_activity_sessions')
         .select('start_time')
@@ -50,30 +50,31 @@ export class UserActivityService {
         .single();
 
       if (fetchError) {
-        console.error('Error fetching session for duration calculation:', fetchError);
+        console.error('Error fetching session:', fetchError);
         return false;
       }
 
-      const duration = Math.round((new Date(endTime).getTime() - new Date(session.start_time).getTime()) / 1000 / 60);
+      const startTime = new Date(session.start_time);
+      const duration = Math.round((new Date(endTime).getTime() - startTime.getTime()) / 1000 / 60);
 
       const { error } = await supabase
         .from('user_activity_sessions')
         .update({
           end_time: endTime,
           duration_minutes: duration,
-          engagement_score: engagementScore,
-          completion_status: 'completed'
+          completion_status: 'completed',
+          engagement_score: engagementScore
         })
         .eq('id', sessionId);
 
       if (error) {
-        console.error('Error ending activity session:', error);
+        console.error('Error ending session:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error ending activity session:', error);
+      console.error('Error ending session:', error);
       return false;
     }
   }
@@ -89,18 +90,18 @@ export class UserActivityService {
         .eq('id', sessionId);
 
       if (error) {
-        console.error('Error abandoning activity session:', error);
+        console.error('Error abandoning session:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error abandoning activity session:', error);
+      console.error('Error abandoning session:', error);
       return false;
     }
   }
 
-  async getUserSessions(userId: string, limit: number = 20): Promise<UserActivitySession[]> {
+  async getUserSessions(userId: string, limit: number = 50): Promise<UserActivitySession[]> {
     try {
       const { data, error } = await supabase
         .from('user_activity_sessions')
@@ -114,7 +115,11 @@ export class UserActivityService {
         return [];
       }
 
-      return data || [];
+      return (data || []).map(item => ({
+        ...item,
+        session_type: item.session_type as 'chat' | 'game' | 'lesson' | 'music_creation' | 'ai_tutor',
+        completion_status: item.completion_status as 'in_progress' | 'completed' | 'abandoned'
+      }));
     } catch (error) {
       console.error('Error fetching user sessions:', error);
       return [];
@@ -125,7 +130,7 @@ export class UserActivityService {
     try {
       const { data, error } = await supabase
         .from('user_activity_sessions')
-        .select('*')
+        .select('session_type, duration_minutes, engagement_score, completion_status')
         .eq('user_id', userId)
         .gte('start_time', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString());
 
@@ -134,15 +139,18 @@ export class UserActivityService {
         return null;
       }
 
+      const completedSessions = data?.filter(s => s.completion_status === 'completed') || [];
+      
       const analytics = {
         totalSessions: data?.length || 0,
-        totalTimeSpent: data?.reduce((sum, session) => sum + (session.duration_minutes || 0), 0) || 0,
-        averageEngagement: data?.length ? 
-          data.reduce((sum, session) => sum + (session.engagement_score || 0), 0) / data.length : 0,
-        completionRate: data?.length ? 
-          (data.filter(session => session.completion_status === 'completed').length / data.length) * 100 : 0,
-        sessionTypeBreakdown: data?.reduce((acc, session) => {
-          acc[session.session_type] = (acc[session.session_type] || 0) + 1;
+        completedSessions: completedSessions.length,
+        totalTimeSpent: completedSessions.reduce((sum, s) => sum + (s.duration_minutes || 0), 0),
+        averageEngagement: completedSessions.length > 0 
+          ? completedSessions.reduce((sum, s) => sum + (s.engagement_score || 0), 0) / completedSessions.length 
+          : 0,
+        completionRate: data?.length ? (completedSessions.length / data.length) * 100 : 0,
+        sessionTypeBreakdown: data?.reduce((acc, s) => {
+          acc[s.session_type] = (acc[s.session_type] || 0) + 1;
           return acc;
         }, {} as Record<string, number>) || {}
       };

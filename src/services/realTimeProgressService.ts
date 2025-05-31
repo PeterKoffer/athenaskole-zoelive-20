@@ -56,7 +56,10 @@ export class RealTimeProgressService {
         return [];
       }
 
-      return data || [];
+      return (data || []).map(item => ({
+        ...item,
+        achievements: Array.isArray(item.achievements) ? item.achievements : []
+      }));
     } catch (error) {
       console.error('Error fetching user progress:', error);
       return [];
@@ -77,7 +80,10 @@ export class RealTimeProgressService {
         return [];
       }
 
-      return data || [];
+      return (data || []).map(item => ({
+        ...item,
+        achievements: Array.isArray(item.achievements) ? item.achievements : []
+      }));
     } catch (error) {
       console.error('Error fetching subject progress:', error);
       return [];
@@ -100,7 +106,7 @@ export class RealTimeProgressService {
         return false;
       }
 
-      const currentAchievements = current?.achievements || [];
+      const currentAchievements = Array.isArray(current?.achievements) ? current.achievements : [];
       const updatedAchievements = [...currentAchievements, achievement];
 
       const { error } = await supabase

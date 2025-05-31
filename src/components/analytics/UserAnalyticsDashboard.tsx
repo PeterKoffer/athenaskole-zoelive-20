@@ -175,7 +175,7 @@ const UserAnalyticsDashboard = () => {
                   {Object.entries(activityStats.sessionTypeBreakdown).map(([type, count]) => (
                     <div key={type} className="flex justify-between items-center">
                       <span className="capitalize">{type.replace('_', ' ')}</span>
-                      <Badge variant="outline">{count} sessions</Badge>
+                      <Badge variant="outline">{String(count)} sessions</Badge>
                     </div>
                   ))}
                 </div>
@@ -200,7 +200,7 @@ const UserAnalyticsDashboard = () => {
                   {Object.entries(aiStats.serviceBreakdown).map(([service, count]) => (
                     <div key={service} className="flex justify-between items-center">
                       <span className="capitalize">{service}</span>
-                      <Badge variant="outline">{count} interactions</Badge>
+                      <Badge variant="outline">{String(count)} interactions</Badge>
                     </div>
                   ))}
                   <div className="pt-4 border-t space-y-2">
