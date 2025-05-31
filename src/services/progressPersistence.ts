@@ -1,47 +1,57 @@
 
-import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface LearningSession {
   id: string;
   user_id: string;
   subject: string;
-  activity_type: string;
+  skill_area: string;
+  difficulty_level: number;
   start_time: string;
   end_time?: string;
-  duration_minutes: number;
-  questions_answered: number;
-  correct_answers: number;
-  difficulty_level: number;
+  time_spent: number;
+  score: number;
   completed: boolean;
-  performance_metrics: {
-    accuracy: number;
-    averageResponseTime: number;
-    difficultyProgression: number[];
-    struggledConcepts: string[];
-  };
+  content_id?: string;
+  user_feedback?: any;
+  ai_adjustments?: any;
 }
 
 export interface UserProgress {
+  id: string;
   user_id: string;
   subject: string;
+  skill_area: string;
   current_level: number;
-  total_time_spent: number;
-  sessions_completed: number;
-  average_accuracy: number;
-  learning_streak: number;
-  last_session_date: string;
-  strengths: string[];
-  weaknesses: string[];
-  preferred_difficulty: number;
+  total_questions: number;
+  correct_answers: number;
+  accuracy_rate: number;
+  attempts_count: number;
+  completion_time_avg: number;
+  last_assessment?: string;
 }
 
 class ProgressPersistenceService {
   async saveSession(sessionData: Partial<LearningSession>): Promise<string | null> {
     try {
+      // Map our session data to match the learning_sessions table schema
+      const dbSessionData = {
+        user_id: sessionData.user_id!,
+        subject: sessionData.subject!,
+        skill_area: sessionData.skill_area || 'general',
+        difficulty_level: sessionData.difficulty_level || 1,
+        start_time: sessionData.start_time || new Date().toISOString(),
+        time_spent: sessionData.time_spent || 0,
+        score: sessionData.score || 0,
+        completed: sessionData.completed || false,
+        content_id: sessionData.content_id,
+        user_feedback: sessionData.user_feedback,
+        ai_adjustments: sessionData.ai_adjustments
+      };
+
       const { data, error } = await supabase
         .from('learning_sessions')
-        .insert([sessionData])
+        .insert([dbSessionData])
         .select()
         .single();
 
@@ -59,9 +69,19 @@ class ProgressPersistenceService {
 
   async updateSession(sessionId: string, updates: Partial<LearningSession>): Promise<boolean> {
     try {
+      // Map updates to match database schema
+      const dbUpdates: any = {};
+      
+      if (updates.end_time) dbUpdates.end_time = updates.end_time;
+      if (updates.time_spent !== undefined) dbUpdates.time_spent = updates.time_spent;
+      if (updates.score !== undefined) dbUpdates.score = updates.score;
+      if (updates.completed !== undefined) dbUpdates.completed = updates.completed;
+      if (updates.user_feedback) dbUpdates.user_feedback = updates.user_feedback;
+      if (updates.ai_adjustments) dbUpdates.ai_adjustments = updates.ai_adjustments;
+
       const { error } = await supabase
         .from('learning_sessions')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', sessionId);
 
       if (error) {
@@ -79,7 +99,7 @@ class ProgressPersistenceService {
   async getUserProgress(userId: string, subject: string): Promise<UserProgress | null> {
     try {
       const { data, error } = await supabase
-        .from('user_progress')
+        .from('user_performance')
         .select('*')
         .eq('user_id', userId)
         .eq('subject', subject)
@@ -90,7 +110,7 @@ class ProgressPersistenceService {
         return null;
       }
 
-      return data;
+      return data as UserProgress;
     } catch (error) {
       console.error('Error fetching user progress:', error);
       return null;
@@ -99,10 +119,24 @@ class ProgressPersistenceService {
 
   async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
     try {
+      // Map progress data to match user_performance table schema
+      const dbProgressData = {
+        user_id: progressData.user_id!,
+        subject: progressData.subject!,
+        skill_area: progressData.skill_area || 'general',
+        current_level: progressData.current_level || 1,
+        total_questions: progressData.total_questions || 0,
+        correct_answers: progressData.correct_answers || 0,
+        accuracy_rate: progressData.accuracy_rate || 0,
+        attempts_count: progressData.attempts_count || 0,
+        completion_time_avg: progressData.completion_time_avg || 0,
+        last_assessment: progressData.last_assessment
+      };
+
       const { error } = await supabase
-        .from('user_progress')
-        .upsert([progressData], { 
-          onConflict: 'user_id,subject',
+        .from('user_performance')
+        .upsert([dbProgressData], { 
+          onConflict: 'user_id,subject,skill_area',
           ignoreDuplicates: false 
         });
 
@@ -132,7 +166,7 @@ class ProgressPersistenceService {
         return [];
       }
 
-      return data || [];
+      return (data || []) as LearningSession[];
     } catch (error) {
       console.error('Error fetching recent sessions:', error);
       return [];
@@ -158,17 +192,18 @@ class ProgressPersistenceService {
       }
 
       // Process data for analytics
+      const sessions = data as LearningSession[];
       const analytics = {
-        totalSessions: data.length,
-        totalTimeSpent: data.reduce((sum, session) => sum + session.duration_minutes, 0),
-        averageAccuracy: data.length > 0 
-          ? data.reduce((sum, session) => sum + (session.correct_answers / session.questions_answered * 100), 0) / data.length 
+        totalSessions: sessions.length,
+        totalTimeSpent: sessions.reduce((sum, session) => sum + (session.time_spent || 0), 0),
+        averageScore: sessions.length > 0 
+          ? sessions.reduce((sum, session) => sum + (session.score || 0), 0) / sessions.length 
           : 0,
-        difficultyProgression: data.map(session => ({
+        difficultyProgression: sessions.map(session => ({
           date: session.start_time,
           level: session.difficulty_level
         })),
-        dailyProgress: this.groupSessionsByDay(data)
+        dailyProgress: this.groupSessionsByDay(sessions)
       };
 
       return analytics;
@@ -186,20 +221,20 @@ class ProgressPersistenceService {
           date,
           sessions: 0,
           totalTime: 0,
-          totalAccuracy: 0,
-          questionsAnswered: 0
+          totalScore: 0,
+          sessionCount: 0
         };
       }
       acc[date].sessions++;
-      acc[date].totalTime += session.duration_minutes;
-      acc[date].totalAccuracy += (session.correct_answers / session.questions_answered * 100);
-      acc[date].questionsAnswered += session.questions_answered;
+      acc[date].totalTime += session.time_spent || 0;
+      acc[date].totalScore += session.score || 0;
+      acc[date].sessionCount++;
       return acc;
     }, {} as any);
 
     return Object.values(grouped).map((day: any) => ({
       ...day,
-      averageAccuracy: day.totalAccuracy / day.sessions
+      averageScore: day.sessionCount > 0 ? day.totalScore / day.sessionCount : 0
     }));
   }
 
