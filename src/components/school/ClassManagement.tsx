@@ -24,28 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-  enrollmentDate: string;
-  progress: number;
-  attendance: number;
-  grades: { subject: string; grade: number }[];
-}
-
-interface Class {
-  id: string;
-  name: string;
-  grade: string;
-  teacher: string;
-  subject: string;
-  students: Student[];
-  schedule: string;
-  room: string;
-  capacity: number;
-}
+import { Student, Class } from "@/types/school";
 
 const ClassManagement = () => {
   const [selectedClass, setSelectedClass] = useState<string>("1a");

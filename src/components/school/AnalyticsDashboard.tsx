@@ -13,39 +13,16 @@ import {
   Clock
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
+import { 
+  monthlyData, 
+  subjectPerformance, 
+  classDistribution, 
+  weeklyActivity,
+  topPerformances,
+  monthlyImprovements
+} from "@/data/schoolAnalytics";
 
 const AnalyticsDashboard = () => {
-  const monthlyData = [
-    { month: 'Jan', students: 420, attendance: 94, performance: 78 },
-    { month: 'Feb', students: 435, attendance: 96, performance: 82 },
-    { month: 'Mar', students: 445, attendance: 93, performance: 85 },
-    { month: 'Apr', students: 456, attendance: 95, performance: 88 },
-    { month: 'Maj', students: 456, attendance: 94, performance: 87 }
-  ];
-
-  const subjectPerformance = [
-    { subject: 'Matematik', score: 85, students: 456 },
-    { subject: 'Dansk', score: 92, students: 456 },
-    { subject: 'Engelsk', score: 78, students: 456 },
-    { subject: 'Naturteknik', score: 81, students: 456 },
-    { subject: 'Historie', score: 88, students: 456 }
-  ];
-
-  const classDistribution = [
-    { name: '1. klasse', value: 120, color: '#8884d8' },
-    { name: '2. klasse', value: 118, color: '#82ca9d' },
-    { name: '3. klasse', value: 108, color: '#ffc658' },
-    { name: '4. klasse', value: 110, color: '#ff7300' }
-  ];
-
-  const weeklyActivity = [
-    { day: 'Man', sessions: 89, avgTime: 45 },
-    { day: 'Tir', sessions: 92, avgTime: 48 },
-    { day: 'Ons', sessions: 88, avgTime: 42 },
-    { day: 'Tor', sessions: 95, avgTime: 50 },
-    { day: 'Fre', sessions: 78, avgTime: 38 }
-  ];
-
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -265,18 +242,14 @@ const AnalyticsDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <span className="text-white">Bedste klasse</span>
-                    <Badge variant="outline" className="text-yellow-400 border-yellow-400">3.A - 95%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <span className="text-white">Bedste fag</span>
-                    <Badge variant="outline" className="text-green-400 border-green-400">Dansk - 92%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <span className="text-white">Højeste fremmøde</span>
-                    <Badge variant="outline" className="text-blue-400 border-blue-400">1.B - 98%</Badge>
-                  </div>
+                  {topPerformances.map((performance, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                      <span className="text-white">{performance.category}</span>
+                      <Badge variant="outline" className={`text-${performance.color}-400 border-${performance.color}-400`}>
+                        {performance.value}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -290,18 +263,14 @@ const AnalyticsDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <span className="text-white">Matematik scores</span>
-                    <Badge variant="outline" className="text-green-400 border-green-400">+12%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <span className="text-white">Elev engagement</span>
-                    <Badge variant="outline" className="text-green-400 border-green-400">+8%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <span className="text-white">Opgave aflevering</span>
-                    <Badge variant="outline" className="text-green-400 border-green-400">+15%</Badge>
-                  </div>
+                  {monthlyImprovements.map((improvement, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                      <span className="text-white">{improvement.category}</span>
+                      <Badge variant="outline" className={`text-${improvement.color}-400 border-${improvement.color}-400`}>
+                        {improvement.improvement}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

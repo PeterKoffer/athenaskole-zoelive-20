@@ -1,14 +1,10 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, TrendingUp, Calendar } from "lucide-react";
+import { SchoolStats } from "@/types/school";
 
 interface SchoolStatsCardsProps {
-  stats: {
-    totalStudents: number;
-    totalTeachers: number;
-    averageProgress: number;
-    attendanceRate: number;
-  };
+  stats: SchoolStats;
 }
 
 const SchoolStatsCards = ({ stats }: SchoolStatsCardsProps) => {

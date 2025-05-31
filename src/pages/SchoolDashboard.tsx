@@ -8,9 +8,10 @@ import StudentRegistration from "@/components/school/StudentRegistration";
 import SchoolNavbar from "@/components/school/SchoolNavbar";
 import SchoolStatsCards from "@/components/school/SchoolStatsCards";
 import SchoolOverviewTab from "@/components/school/SchoolOverviewTab";
+import { SchoolStats } from "@/types/school";
 
 const SchoolDashboard = () => {
-  const stats = {
+  const stats: SchoolStats = {
     totalStudents: 456,
     totalTeachers: 32,
     averageProgress: 78,
