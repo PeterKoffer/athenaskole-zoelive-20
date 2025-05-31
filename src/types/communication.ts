@@ -15,7 +15,7 @@ export interface Message {
 export interface Conversation {
   id: string;
   name: string;
-  type: 'direct' | 'group' | 'class' | 'class_teachers' | 'class_parents' | 'class_all';
+  type: 'direct' | 'group' | 'class' | 'class_teachers' | 'class_parents' | 'class_all' | 'school_all';
   participants: Participant[];
   lastMessage?: Message;
   unreadCount: number;

@@ -4,6 +4,7 @@ import { ArrowLeft, School } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
+import GlobalCommunicationButton from "@/components/communication/GlobalCommunicationButton";
 
 const SchoolNavbar = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const SchoolNavbar = () => {
           </div>
         </div>
         <div className="flex items-center space-x-3">
+          <GlobalCommunicationButton />
           <UserRoleDisplay role="school_leader" />
           <Button 
             variant="outline" 

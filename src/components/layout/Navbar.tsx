@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut } from "lucide-react";
 import MobileMenu from "./MobileMenu";
+import GlobalCommunicationButton from "@/components/communication/GlobalCommunicationButton";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -74,6 +75,7 @@ const Navbar = ({
                 <BookOpenCheck className="w-4 h-4 mr-2" />
                 AI Tutor
               </Button>
+              <GlobalCommunicationButton />
               <Button variant="outline" onClick={() => navigate('/profile')} className="text-slate-950">
                 <Settings className="w-4 h-4 mr-2" />
                 Profile

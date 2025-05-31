@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
+import GlobalCommunicationButton from "@/components/communication/GlobalCommunicationButton";
 
 const TeacherNavbar = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const TeacherNavbar = () => {
           </div>
         </div>
         <div className="flex items-center space-x-3">
+          <GlobalCommunicationButton />
           <UserRoleDisplay role="teacher" />
           <Button 
             variant="outline" 
