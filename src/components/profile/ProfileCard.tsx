@@ -36,7 +36,7 @@ const ProfileCard = ({
       <CardHeader>
         <CardTitle className="text-white flex items-center">
           <User className="w-5 h-5 mr-2" />
-          Profil Information
+          Profile Information
         </CardTitle>
       </CardHeader>
       <CardContent>

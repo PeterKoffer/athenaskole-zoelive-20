@@ -32,13 +32,13 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
         <div className="space-y-3">
           <Label htmlFor="name" className="text-gray-300 flex items-center">
             <User className="w-4 h-4 mr-2" />
-            Fulde navn
+            Full Name
           </Label>
           <Input
             id="name"
             value={profileData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="Indtast dit navn"
+            placeholder="Enter your name"
             className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
           />
         </div>
@@ -53,7 +53,7 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
             type="email"
             value={profileData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
-            placeholder="din@email.dk"
+            placeholder="your@email.com"
             className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
           />
         </div>
@@ -61,7 +61,7 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
         <div className="space-y-3">
           <Label htmlFor="birth_date" className="text-gray-300 flex items-center">
             <Calendar className="w-4 h-4 mr-2" />
-            Fødselsdato
+            Birth Date
           </Label>
           <Input
             id="birth_date"
@@ -73,12 +73,12 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
         </div>
 
         <div className="space-y-3">
-          <Label htmlFor="grade" className="text-gray-300">Klasse</Label>
+          <Label htmlFor="grade" className="text-gray-300">Grade</Label>
           <Input
             id="grade"
             value={profileData.grade}
             onChange={(e) => handleInputChange('grade', e.target.value)}
-            placeholder="f.eks. 5. klasse"
+            placeholder="e.g. 5th grade"
             className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
           />
         </div>
@@ -86,13 +86,13 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
         <div className="space-y-3">
           <Label htmlFor="school" className="text-gray-300 flex items-center">
             <School className="w-4 h-4 mr-2" />
-            Skole
+            School
           </Label>
           <Input
             id="school"
             value={profileData.school}
             onChange={(e) => handleInputChange('school', e.target.value)}
-            placeholder="Navn på din skole"
+            placeholder="Your school name"
             className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
           />
         </div>
@@ -100,13 +100,13 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
         <div className="space-y-3">
           <Label htmlFor="address" className="text-gray-300 flex items-center">
             <MapPin className="w-4 h-4 mr-2" />
-            Adresse
+            Address
           </Label>
           <Input
             id="address"
             value={profileData.address}
             onChange={(e) => handleInputChange('address', e.target.value)}
-            placeholder="Din adresse"
+            placeholder="Your address"
             className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
           />
         </div>
@@ -117,7 +117,7 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
         disabled={loading}
         className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white border-none"
       >
-        {loading ? "Gemmer..." : "Gem ændringer"}
+        {loading ? "Saving..." : "Save Changes"}
       </Button>
     </form>
   );

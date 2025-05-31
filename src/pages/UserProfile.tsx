@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,7 +64,7 @@ const UserProfile = () => {
       setUploading(true);
       
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('Du skal vælge et billede at uploade.');
+        throw new Error('You must select an image to upload.');
       }
 
       const file = event.target.files[0];
@@ -86,12 +87,12 @@ const UserProfile = () => {
       setProfileData(prev => ({ ...prev, avatar_url: data.publicUrl }));
 
       toast({
-        title: "Profilbillede uploadet!",
-        description: "Dit profilbillede er blevet opdateret.",
+        title: "Profile picture uploaded!",
+        description: "Your profile picture has been updated.",
       });
     } catch (error: any) {
       toast({
-        title: "Fejl",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -116,14 +117,14 @@ const UserProfile = () => {
 
     if (error) {
       toast({
-        title: "Fejl",
-        description: "Kunne ikke opdatere profil: " + error.message,
+        title: "Error",
+        description: "Could not update profile: " + error.message,
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Profil opdateret!",
-        description: "Dine oplysninger er blevet gemt.",
+        title: "Profile updated!",
+        description: "Your information has been saved.",
       });
     }
 
@@ -141,8 +142,8 @@ const UserProfile = () => {
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Min Profil</h1>
-          <p className="text-gray-400">Administrer dine oplysninger og abonnement</p>
+          <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+          <p className="text-gray-400">Manage your information and subscription</p>
         </div>
 
         <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />

@@ -30,8 +30,9 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
         <Button 
           variant="outline" 
           onClick={onSignOut} 
-          className="border-gray-600 bg-slate-50 text-slate-950"
+          className="border-gray-600 bg-white text-black hover:bg-gray-100"
         >
+          <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </Button>
       </div>
