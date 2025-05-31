@@ -10,6 +10,7 @@ import SchoolOverviewTab from "@/components/school/SchoolOverviewTab";
 import ClassManagement from "@/components/school/ClassManagement";
 import AnalyticsDashboard from "@/components/school/AnalyticsDashboard";
 import StudentRegistration from "@/components/school/StudentRegistration";
+import CommunicationCenter from "@/components/communication/CommunicationCenter";
 
 const SchoolDashboard = () => {
   const stats = {
@@ -131,12 +132,13 @@ const SchoolDashboard = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-800">
             <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
             <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Students</TabsTrigger>
             <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Classes</TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-gray-700">Analytics</TabsTrigger>
             <TabsTrigger value="registration" className="data-[state=active]:bg-gray-700">Registration</TabsTrigger>
+            <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Communication</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -167,6 +169,10 @@ const SchoolDashboard = () => {
 
           <TabsContent value="registration" className="space-y-6">
             <StudentRegistration />
+          </TabsContent>
+
+          <TabsContent value="communication" className="space-y-6">
+            <CommunicationCenter />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -7,7 +8,9 @@ import TeacherNavbar from "@/components/teacher/TeacherNavbar";
 import TeacherStatsCards from "@/components/teacher/TeacherStatsCards";
 import TeacherOverviewTab from "@/components/teacher/TeacherOverviewTab";
 import ClassroomManagement from "@/components/teacher/ClassroomManagement";
+import CommunicationCenter from "@/components/communication/CommunicationCenter";
 import { TeacherStats } from "@/types/teacher";
+
 const TeacherDashboard = () => {
   const stats: TeacherStats = {
     totalStudents: 28,
@@ -15,7 +18,9 @@ const TeacherDashboard = () => {
     completedLessons: 45,
     averageGrade: 8.2
   };
-  return <div className="min-h-screen bg-gray-900 text-white">
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
       <TeacherNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -102,12 +107,13 @@ const TeacherDashboard = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-800">
             <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
             <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Classes</TabsTrigger>
             <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Students</TabsTrigger>
             <TabsTrigger value="lessons" className="data-[state=active]:bg-gray-700">Lessons</TabsTrigger>
             <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Communication</TabsTrigger>
+            <TabsTrigger value="legacy-communication" className="data-[state=active]:bg-gray-700">Legacy</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -147,6 +153,10 @@ const TeacherDashboard = () => {
           </TabsContent>
 
           <TabsContent value="communication" className="space-y-6">
+            <CommunicationCenter />
+          </TabsContent>
+
+          <TabsContent value="legacy-communication" className="space-y-6">
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
@@ -161,6 +171,8 @@ const TeacherDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default TeacherDashboard;
