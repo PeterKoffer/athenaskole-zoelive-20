@@ -36,7 +36,7 @@ export interface MessageGroup {
   id: string;
   name: string;
   description: string;
-  type: 'class' | 'class_teachers' | 'class_parents' | 'class_all' | 'school_all' | 'custom';
+  type: 'class' | 'class_teachers' | 'class_parents' | 'class_all' | 'school_all' | 'custom' | 'direct';
   participants: Participant[];
   classId?: string;
   icon: string;
