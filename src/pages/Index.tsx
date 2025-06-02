@@ -8,6 +8,7 @@ import AuthModal from "@/components/AuthModal";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import GameHub from "@/components/GameHub";
 import EnhancedAITutor from "@/components/EnhancedAITutor";
+import FloatingAITutor from "@/components/FloatingAITutor";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
@@ -155,6 +156,9 @@ const Index = () => {
       </main>
 
       <Footer />
+
+      {/* Floating AI Tutor - always visible */}
+      <FloatingAITutor />
 
       {showAuthModal && (
         <AuthModal 
