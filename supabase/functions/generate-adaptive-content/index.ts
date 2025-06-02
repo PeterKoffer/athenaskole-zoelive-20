@@ -66,9 +66,9 @@ serve(async (req) => {
 
     console.log('🤖 Calling OpenAI API...');
 
-    // Create prompt
-    const prompt = createPrompt(body.previousQuestions || []);
-    console.log('📝 Using prompt:', prompt.substring(0, 200) + '...');
+    // Create prompt based on subject
+    const prompt = createPrompt(body.subject, body.skillArea, body.difficultyLevel, body.previousQuestions || []);
+    console.log('📝 Using prompt for subject:', body.subject);
 
     // Call OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -82,7 +82,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a math teacher creating fraction problems. Return only valid JSON with no formatting. Ensure each question is unique and different from previous ones.'
+            content: 'You are an AI education assistant that creates questions for specific subjects. Always generate questions that match the requested subject and skill area. Return only valid JSON with no formatting.'
           },
           {
             role: 'user',
@@ -179,8 +179,33 @@ serve(async (req) => {
   }
 });
 
-function createPrompt(previousQuestions: string[]): string {
-  let prompt = `Generate a math question about fractions suitable for elementary students.
+function createPrompt(subject: string, skillArea: string, difficultyLevel: number, previousQuestions: string[]): string {
+  console.log('🎯 Creating prompt for subject:', subject, 'skillArea:', skillArea);
+  
+  let prompt = '';
+  
+  // Generate subject-specific prompts - this is the critical fix
+  if (subject === 'english') {
+    prompt = `Generate an English reading comprehension question suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "Read this sentence: 'The cat sat on the mat.' What did the cat do?",
+  "options": ["ran", "jumped", "sat", "flew"],
+  "correct": 2,
+  "explanation": "The sentence clearly states 'The cat sat on the mat', so the correct answer is 'sat'.",
+  "learningObjectives": ["Reading comprehension", "Verb identification"],
+  "estimatedTime": 30
+}
+
+Make sure:
+- The question focuses on reading comprehension, vocabulary, or grammar
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation clearly shows the reasoning
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+  } else if (subject === 'mathematics') {
+    prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -193,17 +218,71 @@ Return ONLY a valid JSON object with this exact structure:
 }
 
 Make sure:
-- The question is about fractions (adding, subtracting, multiplying, or dividing)
+- The question is about mathematics (arithmetic, fractions, geometry, etc.)
 - There are exactly 4 options
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation clearly shows how to solve the problem
 - Return ONLY the JSON, no markdown formatting or code blocks`;
+  } else if (subject === 'creative_writing') {
+    prompt = `Generate a creative writing exercise suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "Complete this story starter: 'Once upon a time, in a magical forest, there lived a small dragon who...'",
+  "options": ["could not fly", "loved to sing", "was afraid of fire", "collected shiny rocks"],
+  "correct": 1,
+  "explanation": "Any of these options could work creatively, but 'loved to sing' creates an interesting contrast and story opportunity.",
+  "learningObjectives": ["Creative thinking", "Story development", "Character creation"],
+  "estimatedTime": 30
+}
+
+Make sure:
+- The question encourages creativity and imagination
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the most interesting creative choice
+- The explanation shows why this choice works well for storytelling
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+  } else if (subject === 'science') {
+    prompt = `Generate a science discovery question suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What happens when you mix baking soda and vinegar?",
+  "options": ["Nothing happens", "It gets hot", "It fizzes and bubbles", "It changes color"],
+  "correct": 2,
+  "explanation": "When baking soda (a base) mixes with vinegar (an acid), they react to create carbon dioxide gas, which causes fizzing and bubbling.",
+  "learningObjectives": ["Chemical reactions", "Acids and bases", "Observation skills"],
+  "estimatedTime": 30
+}
+
+Make sure:
+- The question focuses on scientific concepts, experiments, or natural phenomena
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation includes the scientific reasoning
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+  } else {
+    // Fallback to math if subject is not recognized
+    console.log('⚠️ Unknown subject, falling back to math:', subject);
+    prompt = `Generate a basic math question suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What is 5 + 3?",
+  "options": ["6", "7", "8", "9"],
+  "correct": 2,
+  "explanation": "5 + 3 = 8",
+  "learningObjectives": ["Basic addition"],
+  "estimatedTime": 30
+}`;
+  }
 
   if (previousQuestions.length > 0) {
     prompt += `\n\nIMPORTANT: Do NOT generate any of these previous questions:\n${previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
 
-Create a completely different fraction problem that hasn't been asked before.`;
+Create a completely different ${subject} question that hasn't been asked before.`;
   }
 
+  console.log('📝 Final prompt created for:', subject);
   return prompt;
 }

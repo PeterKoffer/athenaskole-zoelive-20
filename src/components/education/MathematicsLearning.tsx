@@ -64,7 +64,7 @@ const MathematicsLearning = () => {
           subject="mathematics" 
           skillArea="arithmetic" 
           difficultyLevel={1}
-          onBack={() => navigate('/')}
+          onBack={() => navigate('/daily-program')}
         />
       </div>
     </div>

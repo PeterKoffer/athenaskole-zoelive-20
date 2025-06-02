@@ -64,7 +64,7 @@ const ScienceLearning = () => {
           subject="science" 
           skillArea="general_science" 
           difficultyLevel={1}
-          onBack={() => navigate('/')}
+          onBack={() => navigate('/daily-program')}
         />
       </div>
     </div>

@@ -64,7 +64,7 @@ const CreativeLearning = () => {
           subject="creative_writing" 
           skillArea="storytelling" 
           difficultyLevel={1}
-          onBack={() => navigate('/')}
+          onBack={() => navigate('/daily-program')}
         />
       </div>
     </div>
