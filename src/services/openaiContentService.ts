@@ -95,7 +95,7 @@ export class OpenAIContentService {
             skill_area: skillArea,
             difficulty_level: difficultyLevel,
             title: generatedContent.question,
-            content: generatedContent,
+            content: generatedContent as any, // Cast to any to handle Json type
             learning_objectives: generatedContent.learningObjectives,
             estimated_time: generatedContent.estimatedTime
           })
@@ -181,18 +181,20 @@ export class OpenAIContentService {
     const question = subjectQuestions?.[skillArea as keyof typeof subjectQuestions] || 
                     `Sample question for ${subject} - ${skillArea}`;
 
+    const contentData = {
+      question,
+      options: defaultOptions,
+      correct: 0,
+      explanation: `This is a sample question for ${subject} in the ${skillArea} area.`,
+      learningObjectives: [`Understanding ${skillArea} concepts in ${subject}`]
+    };
+
     return {
       subject,
       skill_area: skillArea,
       difficulty_level: difficultyLevel,
       title: question,
-      content: {
-        question,
-        options: defaultOptions,
-        correct: 0,
-        explanation: `This is a sample question for ${subject} in the ${skillArea} area.`,
-        learningObjectives: [`Understanding ${skillArea} concepts in ${subject}`]
-      },
+      content: contentData as any, // Cast to any to handle Json type
       learning_objectives: [`Understanding ${skillArea} concepts in ${subject}`],
       estimated_time: 30
     };
