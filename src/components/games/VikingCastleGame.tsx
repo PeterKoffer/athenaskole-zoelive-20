@@ -1,321 +1,208 @@
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Sword, Shield, Hammer, Calculator } from "lucide-react";
+import { ArrowLeft, Trophy, Coins } from "lucide-react";
 
-const VikingCastleGame = ({ onBack }) => {
-  const [gameStage, setGameStage] = useState("planning"); // planning, building, defending, completed
+interface VikingCastleGameProps {
+  onBack: () => void;
+}
+
+const VikingCastleGame = ({ onBack }: VikingCastleGameProps) => {
+  const [gameState, setGameState] = useState<'planning' | 'building' | 'defending' | 'complete'>('planning');
   const [resources, setResources] = useState({
     wood: 100,
     stone: 50,
     gold: 25
   });
-  const [castleHealth, setCastleHealth] = useState(100);
-  const [currentProblem, setCurrentProblem] = useState(null);
-  const [playerAnswer, setPlayerAnswer] = useState("");
   const [score, setScore] = useState(0);
-  const [problemsCompleted, setProblemsCompleted] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
 
-  const mathProblems = [
+  const questions = [
     {
-      question: "Hvor mange træstykker skal du bruge til at bygge en væg der er 8 meter lang, hvis hvert træstykke er 2 meter?",
-      answer: 4,
-      hint: "Del 8 med 2",
-      type: "division"
+      question: "What should we build first?",
+      options: [
+        "High walls for defense",
+        "A strong tower for lookout", 
+        "Storage for weapons",
+        "Storehouses for food and weapons"
+      ],
+      correct: 0,
+      explanation: "High walls are the first priority for defense in a Viking castle!"
     },
     {
-      question: "Hvis hver sten vejer 5 kg, og du har 12 sten, hvor meget vejer alle stenene tilsammen?",
-      answer: 60,
-      hint: "Gang 5 med 12",
-      type: "multiplication"
+      question: "How many wooden planks do we need for the main gate?",
+      options: ["15 planks", "25 planks", "35 planks", "45 planks"],
+      correct: 1,
+      explanation: "25 wooden planks will create a strong and sturdy main gate."
     },
     {
-      question: "Du har 45° vinkel på dit tårn. Hvor stor er den anden vinkel hvis trekanten skal have 90° i toppen?",
-      answer: 45,
-      hint: "90° - 45° = ?",
-      type: "subtraction"
-    },
-    {
-      question: "Hvis din vikingborg har 6 sider og hver side koster 15 guld, hvor meget koster det i alt?",
-      answer: 90,
-      hint: "Gang 6 med 15",
-      type: "multiplication"
+      question: "What angle should the castle walls be for maximum strength?",
+      options: ["45 degrees", "60 degrees", "90 degrees", "120 degrees"],
+      correct: 2,
+      explanation: "90-degree walls (vertical) provide the best structural strength for castle walls."
     }
   ];
 
-  useEffect(() => {
-    if (gameStage === "building" && !currentProblem) {
-      generateNewProblem();
-    }
-  }, [gameStage]);
-
-  const generateNewProblem = () => {
-    const problem = mathProblems[Math.floor(Math.random() * mathProblems.length)];
-    setCurrentProblem(problem);
-    setPlayerAnswer("");
-  };
-
-  const checkAnswer = () => {
-    if (parseInt(playerAnswer) === currentProblem.answer) {
-      setScore(score + 25);
-      setProblemsCompleted(problemsCompleted + 1);
+  const handleAnswer = (answerIndex: number) => {
+    const isCorrect = answerIndex === questions[currentQuestion].correct;
+    if (isCorrect) {
+      setScore(score + 100);
       setResources(prev => ({
         wood: prev.wood + 10,
         stone: prev.stone + 5,
-        gold: prev.gold + 3
+        gold: prev.gold + 2
       }));
-      
-      if (problemsCompleted + 1 >= 3) {
-        setGameStage("defending");
-      } else {
-        generateNewProblem();
-      }
+    }
+
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
     } else {
-      alert(`Ikke helt rigtigt! Prøv igen. Hint: ${currentProblem.hint}`);
+      setGameState('complete');
     }
   };
 
-  const defendCastle = () => {
-    const damage = Math.floor(Math.random() * 20) + 10;
-    setCastleHealth(prev => Math.max(0, prev - damage));
-    
-    if (castleHealth - damage <= 0) {
-      setGameStage("completed");
-    } else {
-      setTimeout(() => {
-        setCastleHealth(prev => Math.min(100, prev + 15));
-      }, 1000);
-    }
-  };
+  const renderPlanning = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-white mb-4">Plan Your Viking Castle</h2>
+        <p className="text-gray-300 mb-6">
+          Welcome, young Viking builder! You must build a strong castle to protect your people. 
+          First, let's plan how big and strong the castle should be.
+        </p>
+      </div>
 
-  const getStageEmoji = (stage) => {
-    switch (stage) {
-      case "planning": return "📐";
-      case "building": return "🔨";
-      case "defending": return "⚔️";
-      case "completed": return "🏆";
-      default: return "🏰";
-    }
-  };
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <Card className="bg-orange-100 border-orange-300">
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl mb-2">🪵</div>
+            <div className="font-bold text-red-600">{resources.wood}</div>
+            <div className="text-sm">Wood</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gray-100 border-gray-300">
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl mb-2">🪨</div>
+            <div className="font-bold">{resources.stone}</div>
+            <div className="text-sm">Stone</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-yellow-100 border-yellow-300">
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl mb-2">🪙</div>
+            <div className="font-bold text-orange-600">{resources.gold}</div>
+            <div className="text-sm">Gold</div>
+          </CardContent>
+        </Card>
+      </div>
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <Card>
+      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <Button variant="outline" onClick={onBack} size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Tilbage til spil
-            </Button>
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">{getStageEmoji(gameStage)}</span>
-              <CardTitle>Byg En Vikingborg</CardTitle>
-            </div>
-            <Badge variant="outline" className="bg-blue-100 text-blue-800">
-              Score: {score}
-            </Badge>
-          </div>
+          <CardTitle className="text-white">
+            Question {currentQuestion + 1} of {questions.length}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4 mb-6">
-            <Card className="border-2 border-orange-200">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🪵</div>
-                <div className="font-bold text-orange-700">{resources.wood}</div>
-                <div className="text-sm text-gray-600">Træ</div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-gray-300">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🪨</div>
-                <div className="font-bold text-gray-700">{resources.stone}</div>
-                <div className="text-sm text-gray-600">Sten</div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-yellow-300">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🪙</div>
-                <div className="font-bold text-yellow-700">{resources.gold}</div>
-                <div className="text-sm text-gray-600">Guld</div>
-              </CardContent>
-            </Card>
+        <CardContent className="space-y-4">
+          <h3 className="text-lg font-semibold text-white">
+            {questions[currentQuestion].question}
+          </h3>
+          <div className="space-y-2">
+            {questions[currentQuestion].options.map((option, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="w-full text-left justify-start bg-gray-700 text-white border-gray-600 hover:bg-gray-600"
+                onClick={() => handleAnswer(index)}
+              >
+                {option}
+              </Button>
+            ))}
           </div>
         </CardContent>
       </Card>
 
-      {gameStage === "planning" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <span>📐</span>
-              <span>Planlæg din vikingborg</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-gray-700">
-              Velkommen, unge vikingebygger! Du skal bygge en stærk borg for at beskytte dit folk. 
-              Først skal vi planlægge hvor stor og stærk borgen skal være.
-            </p>
-            
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-bold text-blue-800 mb-2">Hvad skal vi bygge?</h4>
-              <ul className="text-sm space-y-1 text-blue-700">
-                <li>• Høje mure til forsvar</li>
-                <li>• Et stærkt tårn til udkig</li>
-                <li>• En stor port til at komme ind og ud</li>
-                <li>• Magasiner til at opbevare mad og våben</li>
-              </ul>
-            </div>
+      <Button 
+        onClick={() => setGameState('building')}
+        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3"
+      >
+        Start Building! ⚒️
+      </Button>
+    </div>
+  );
 
-            <Button 
-              className="w-full bg-red-600 hover:bg-red-700"
-              onClick={() => setGameStage("building")}
-            >
-              Start byggeri! 🔨
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+  const renderComplete = () => (
+    <div className="text-center space-y-6">
+      <div className="text-6xl mb-4">🏰</div>
+      <h2 className="text-3xl font-bold text-white">Castle Complete!</h2>
+      <p className="text-gray-300 text-lg">
+        Congratulations! You have successfully built a strong Viking castle!
+      </p>
+      
+      <Card className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <Trophy className="w-6 h-6" />
+            <span className="font-bold text-lg">Final Score: {score} points</span>
+          </div>
+          <div className="flex items-center justify-center space-x-2">
+            <Coins className="w-5 h-5" />
+            <span>You earned 50 Learning Coins + Math Viking badge!</span>
+          </div>
+        </CardContent>
+      </Card>
 
-      {gameStage === "building" && currentProblem && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Hammer className="w-5 h-5" />
-              <span>Byg din borg - Løs matematikopgaver</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-yellow-50 border-2 border-yellow-200 p-4 rounded-lg">
-              <h4 className="font-bold text-yellow-800 mb-2">Bygge-udfordring #{problemsCompleted + 1}</h4>
-              <p className="text-yellow-700">{currentProblem.question}</p>
-            </div>
+      <div className="grid grid-cols-2 gap-4">
+        <Button 
+          onClick={() => {
+            setGameState('planning');
+            setCurrentQuestion(0);
+            setScore(0);
+            setResources({ wood: 100, stone: 50, gold: 25 });
+          }}
+          variant="outline" 
+          className="bg-gray-700 text-white border-gray-600 hover:bg-gray-600"
+        >
+          Play Again
+        </Button>
+        <Button onClick={onBack} className="bg-blue-600 hover:bg-blue-700 text-white">
+          Back to Games
+        </Button>
+      </div>
+    </div>
+  );
 
-            <div className="flex space-x-2">
-              <input
-                type="number"
-                value={playerAnswer}
-                onChange={(e) => setPlayerAnswer(e.target.value)}
-                placeholder="Dit svar..."
-                className="flex-1 px-3 py-2 border rounded-md"
-                onKeyPress={(e) => e.key === 'Enter' && checkAnswer()}
-              />
-              <Button onClick={checkAnswer} className="bg-green-600 hover:bg-green-700">
-                <Calculator className="w-4 h-4 mr-2" />
-                Tjek svar
-              </Button>
-            </div>
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center space-x-4">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="text-white border-gray-600 hover:bg-gray-700 flex items-center space-x-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Games</span>
+        </Button>
+        <Badge variant="outline" className="bg-blue-600 text-white border-blue-600">
+          Score: {score}
+        </Badge>
+      </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Byggeprogress</span>
-                <span>{problemsCompleted}/3 opgaver løst</span>
-              </div>
-              <Progress value={(problemsCompleted / 3) * 100} className="h-2" />
-            </div>
-
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="text-sm text-blue-700">
-                💡 <strong>Tip:</strong> Brug din lommeregner hvis du har brug for det! Det vigtige er at forstå hvordan du løser opgaven.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {gameStage === "defending" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Sword className="w-5 h-5" />
-              <span>Forsvar din borg!</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <div className="text-6xl mb-4">🏰</div>
-              <p className="text-lg text-gray-700 mb-4">
-                Din borg er færdig! Nu kommer fjenderne - forsvar din borg!
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4" />
-                  <span>Borgens styrke</span>
-                </span>
-                <span>{castleHealth}/100 HP</span>
-              </div>
-              <Progress value={castleHealth} className="h-3" />
-            </div>
-
-            <Button 
-              className="w-full bg-red-600 hover:bg-red-700"
-              onClick={defendCastle}
-            >
-              ⚔️ Angrib fjenderne!
-            </Button>
-
-            <div className="bg-red-50 p-3 rounded-lg">
-              <p className="text-sm text-red-700">
-                Klik på "Angrib fjenderne" for at forsvare din borg! Din matematik-færdigheder har gjort borgen stærk!
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {gameStage === "completed" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center text-2xl text-green-800">
-              🏆 Tillykke! Du vandt! 🏆
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <div className="text-6xl mb-4">🎉</div>
-            
-            <div className="bg-green-50 border-2 border-green-200 p-6 rounded-lg">
-              <h3 className="text-xl font-bold text-green-800 mb-4">Du har optjent:</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-lg">🪙</span>
-                  <span className="font-bold">50 Lære-Kroner</span>
-                </div>
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-lg">🏆</span>
-                  <span className="font-bold">Matematik Viking Badge</span>
-                </div>
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-lg">⭐</span>
-                  <span className="font-bold">{score} Point</span>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-gray-700">
-              Fantastisk arbejde! Du har lært om division, multiplikation og geometri mens du byggede din vikingborg. 
-              Du er nu en ægte Matematik Viking! 🇩🇰
-            </p>
-
-            <div className="flex space-x-4 justify-center">
-              <Button onClick={onBack} variant="outline">
-                Spil andre spil
-              </Button>
-              <Button 
-                className="bg-red-600 hover:bg-red-700"
-                onClick={() => window.location.reload()}
-              >
-                Spil igen
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card className="bg-gray-900 border-gray-800">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2 text-white">
+            <span className="text-2xl">🏰</span>
+            <span>Build A Viking Castle</span>
+            <Badge variant="outline" className="bg-orange-600 text-white border-orange-600">
+              Mathematics
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {gameState === 'planning' && renderPlanning()}
+          {gameState === 'complete' && renderComplete()}
+        </CardContent>
+      </Card>
     </div>
   );
 };

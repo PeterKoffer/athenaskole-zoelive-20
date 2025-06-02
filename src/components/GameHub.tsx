@@ -31,7 +31,7 @@ const GameHub = () => {
       timeEstimate: "10-15 min",
       emoji: "🔍",
       rewards: "30 Learning Coins + Word Hunter badge",
-      status: "coming-soon"
+      status: "available"
     },
     {
       id: "sandwich-coding",
@@ -42,7 +42,7 @@ const GameHub = () => {
       timeEstimate: "20-25 min",
       emoji: "🥪",
       rewards: "60 Learning Coins + Code Master badge",
-      status: "coming-soon"
+      status: "available"
     },
     {
       id: "time-travel",
@@ -53,7 +53,7 @@ const GameHub = () => {
       timeEstimate: "25-30 min",
       emoji: "⚔️",
       rewards: "40 Learning Coins + Time Traveler badge",
-      status: "coming-soon"
+      status: "available"
     },
     {
       id: "windmill-builder",
@@ -64,7 +64,7 @@ const GameHub = () => {
       timeEstimate: "30-35 min",
       emoji: "🌪️",
       rewards: "80 Learning Coins + Green Engineer badge",
-      status: "coming-soon"
+      status: "available"
     },
     {
       id: "music-composer",
@@ -75,7 +75,7 @@ const GameHub = () => {
       timeEstimate: "20-25 min",
       emoji: "🎵",
       rewards: "50 Learning Coins + Composer badge",
-      status: "coming-soon"
+      status: "available"
     }
   ];
 
