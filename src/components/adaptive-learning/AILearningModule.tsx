@@ -39,10 +39,10 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
 
-  // Force AI generation on mount
+  // Force AI generation on mount - only once
   useEffect(() => {
     if (!hasInitialized.current) {
-      console.log('🚀 AILearningModule: Force generating AI question for:', { subject, skillArea });
+      console.log('🚀 AILearningModule: FORCING AI question generation for:', { subject, skillArea });
       hasInitialized.current = true;
       generateQuestion();
     }

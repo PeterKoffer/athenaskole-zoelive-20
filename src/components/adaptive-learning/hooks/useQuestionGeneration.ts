@@ -42,7 +42,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
     console.log('📋 Generation params:', { subject, skillArea, userId: user.id });
     
     try {
-      console.log('🚀 Calling AI content generator directly...');
+      console.log('🚀 Calling AI content generator with real AI...');
       
       const generatedContent = await aiContentGenerator.generateAdaptiveContent({
         subject,
@@ -51,7 +51,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         userId: user.id
       });
 
-      console.log('✅ AI Content Generator returned:', generatedContent);
+      console.log('✅ AI Content Generator returned real content:', generatedContent);
 
       if (!generatedContent || !generatedContent.question || !generatedContent.options) {
         throw new Error('Invalid AI content structure received');
@@ -66,12 +66,12 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         estimatedTime: generatedContent.estimatedTime || 30
       };
 
-      console.log('🎯 Setting AI generated question:', questionData);
+      console.log('🎯 Setting REAL AI generated question:', questionData);
       setQuestion(questionData);
 
       toast({
-        title: "AI Question Generated! 🤖",
-        description: `Real AI question created for ${subject} - ${skillArea}`,
+        title: "Real AI Question Generated! 🤖✨",
+        description: `Authentic AI question created for ${subject} - ${skillArea}`,
         duration: 3000
       });
 

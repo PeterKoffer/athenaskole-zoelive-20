@@ -19,25 +19,22 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('🚀 Edge function started');
+  console.log('🚀 AI Content Generation started');
 
   try {
     const requestBody = await req.json();
-    console.log('📥 Request received:', requestBody);
+    console.log('📥 Received request:', requestBody);
 
-    const { subject, skillArea, difficultyLevel, userId }: GenerateContentRequest = requestBody;
+    const { subject, skillArea, difficultyLevel }: GenerateContentRequest = requestBody;
 
-    // Check for OpenAI API key
     const openAIApiKey = Deno.env.get('OpenaiAPI');
-    console.log('🔑 OpenAI API key status:', openAIApiKey ? 'Found' : 'Missing');
     
     if (!openAIApiKey) {
-      console.error('❌ No OpenAI API key found in environment');
+      console.error('❌ OpenAI API key missing');
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'OpenAI API key not configured',
-          debug: 'Missing OpenaiAPI secret in Supabase'
+          error: 'OpenAI API key not configured'
         }),
         { 
           status: 500,
@@ -46,24 +43,33 @@ serve(async (req) => {
       );
     }
 
-    const prompt = `Generate an educational multiple-choice question for:
-Subject: ${subject}
-Skill Area: ${skillArea}
-Difficulty Level: ${difficultyLevel} (1-10 scale)
+    console.log('🔑 OpenAI API key found');
 
-Create a JSON response with this exact structure:
+    // Create a specific prompt based on subject and skill area
+    let specificPrompt = '';
+    if (subject === 'matematik' && skillArea === 'fractions') {
+      specificPrompt = `Generate a math question about fractions at difficulty level ${difficultyLevel}. 
+      Include operations like adding, subtracting, multiplying, or dividing fractions.
+      Make it challenging but appropriate for the level.`;
+    } else {
+      specificPrompt = `Generate an educational question for ${subject} focusing on ${skillArea} at difficulty level ${difficultyLevel}.`;
+    }
+
+    const prompt = `${specificPrompt}
+
+Return a JSON object with this EXACT structure (no markdown, no code blocks, just pure JSON):
 {
-  "question": "The main question text",
+  "question": "The main question text here",
   "options": ["Option A", "Option B", "Option C", "Option D"],
   "correct": 0,
-  "explanation": "Explanation of why the correct answer is right",
+  "explanation": "Clear explanation of why the answer is correct",
   "learningObjectives": ["Learning objective 1", "Learning objective 2"]
 }
 
-Make the question appropriate for the difficulty level and subject matter. Ensure it's educational and engaging.`;
+The correct field should be the INDEX (0, 1, 2, or 3) of the correct answer in the options array.
+Make sure the question is educational and appropriate for the difficulty level.`;
 
-    console.log('🤖 Sending request to OpenAI...');
-    console.log('📝 Prompt:', prompt);
+    console.log('🤖 Sending to OpenAI:', { prompt: prompt.substring(0, 100) + '...' });
 
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -76,7 +82,7 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
         messages: [
           {
             role: 'system',
-            content: 'You are an educational content generator. Always respond with valid JSON only, no additional text or markdown formatting.'
+            content: 'You are an educational content generator. Return ONLY valid JSON, no markdown formatting or code blocks.'
           },
           {
             role: 'user',
@@ -84,21 +90,20 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
           }
         ],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 800,
       }),
     });
 
     console.log('📡 OpenAI response status:', openAIResponse.status);
-    console.log('📡 OpenAI response headers:', Object.fromEntries(openAIResponse.headers.entries()));
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
-      console.error('❌ OpenAI API error:', openAIResponse.status, errorText);
+      console.error('❌ OpenAI API error:', errorText);
       return new Response(
         JSON.stringify({ 
           success: false,
           error: `OpenAI API error: ${openAIResponse.status}`,
-          debug: errorText
+          details: errorText
         }),
         { 
           status: 500,
@@ -108,15 +113,14 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
     }
 
     const openAIData = await openAIResponse.json();
-    console.log('✅ OpenAI raw response:', JSON.stringify(openAIData, null, 2));
+    console.log('✅ OpenAI response received');
 
-    if (!openAIData.choices || !openAIData.choices[0] || !openAIData.choices[0].message) {
-      console.error('❌ Invalid OpenAI response structure:', openAIData);
+    if (!openAIData.choices?.[0]?.message?.content) {
+      console.error('❌ Invalid OpenAI response structure');
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Invalid response structure from OpenAI',
-          debug: openAIData
+          error: 'Invalid response from OpenAI'
         }),
         { 
           status: 500,
@@ -125,21 +129,24 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
       );
     }
 
-    const contentText = openAIData.choices[0].message.content;
-    console.log('📄 Content to parse:', contentText);
+    const contentText = openAIData.choices[0].message.content.trim();
+    console.log('📄 Raw content:', contentText);
 
     let generatedContent;
     try {
-      generatedContent = JSON.parse(contentText);
-      console.log('✅ Successfully parsed content:', generatedContent);
+      // Clean the content in case there are markdown artifacts
+      const cleanContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      generatedContent = JSON.parse(cleanContent);
+      console.log('✅ Successfully parsed AI content');
     } catch (parseError) {
-      console.error('❌ JSON parse error:', parseError);
-      console.error('❌ Raw content that failed to parse:', contentText);
+      console.error('❌ JSON parse failed:', parseError.message);
+      console.error('❌ Content that failed:', contentText);
+      
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Failed to parse AI response as JSON',
-          debug: { parseError: parseError.message, rawContent: contentText }
+          error: 'Failed to parse AI response',
+          rawContent: contentText
         }),
         { 
           status: 500,
@@ -148,14 +155,14 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
       );
     }
 
-    // Validate required fields
-    if (!generatedContent.question || !generatedContent.options || !Array.isArray(generatedContent.options)) {
+    // Validate the structure
+    if (!generatedContent.question || !Array.isArray(generatedContent.options) || 
+        typeof generatedContent.correct !== 'number' || !generatedContent.explanation) {
       console.error('❌ Invalid content structure:', generatedContent);
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Invalid content structure from AI',
-          debug: generatedContent
+          error: 'Invalid content structure from AI'
         }),
         { 
           status: 500,
@@ -164,24 +171,17 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
       );
     }
 
-    // Ensure correct field is a number
-    if (typeof generatedContent.correct !== 'number') {
-      console.log('⚠️ Fixing correct field type');
-      generatedContent.correct = parseInt(generatedContent.correct) || 0;
-    }
-
-    // Ensure we have learning objectives
-    if (!generatedContent.learningObjectives || !Array.isArray(generatedContent.learningObjectives)) {
-      console.log('⚠️ Adding default learning objectives');
-      generatedContent.learningObjectives = [`Understanding ${skillArea} concepts in ${subject}`];
-    }
-
+    // Ensure all required fields
     const finalContent = {
-      ...generatedContent,
+      question: generatedContent.question,
+      options: generatedContent.options,
+      correct: Number(generatedContent.correct),
+      explanation: generatedContent.explanation,
+      learningObjectives: generatedContent.learningObjectives || [`Understanding ${skillArea} in ${subject}`],
       estimatedTime: 30
     };
 
-    console.log('🎯 Final generated content:', finalContent);
+    console.log('🎯 Final content generated successfully');
 
     return new Response(
       JSON.stringify({ 
@@ -194,14 +194,13 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
     );
 
   } catch (error) {
-    console.error('💥 Unexpected error in edge function:', error);
-    console.error('💥 Error stack:', error.stack);
+    console.error('💥 Unexpected error:', error);
     
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message || 'Unknown error occurred',
-        debug: error.stack
+        error: 'Unexpected server error',
+        details: error.message
       }),
       { 
         status: 500,
