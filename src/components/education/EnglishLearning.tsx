@@ -16,7 +16,9 @@ const EnglishLearning = () => {
     user: !!user,
     userId: user?.id,
     loading,
-    aiSessionKey
+    aiSessionKey,
+    subject: 'english',
+    skillArea: 'reading_comprehension'
   });
 
   // Redirect to auth if not logged in

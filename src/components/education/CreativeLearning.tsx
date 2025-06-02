@@ -16,7 +16,9 @@ const CreativeLearning = () => {
     user: !!user,
     userId: user?.id,
     loading,
-    aiSessionKey
+    aiSessionKey,
+    subject: 'creative_writing',
+    skillArea: 'storytelling'
   });
 
   // Redirect to auth if not logged in
@@ -44,7 +46,6 @@ const CreativeLearning = () => {
     return null;
   }
 
-  // Always show AI Questions Mode
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />

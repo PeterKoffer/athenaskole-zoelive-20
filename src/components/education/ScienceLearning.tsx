@@ -16,7 +16,9 @@ const ScienceLearning = () => {
     user: !!user,
     userId: user?.id,
     loading,
-    aiSessionKey
+    aiSessionKey,
+    subject: 'science',
+    skillArea: 'general_science'
   });
 
   // Redirect to auth if not logged in

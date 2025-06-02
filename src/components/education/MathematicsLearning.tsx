@@ -16,7 +16,9 @@ const MathematicsLearning = () => {
     user: !!user,
     userId: user?.id,
     loading,
-    aiSessionKey
+    aiSessionKey,
+    subject: 'mathematics',
+    skillArea: 'arithmetic'
   });
 
   // Redirect to auth if not logged in

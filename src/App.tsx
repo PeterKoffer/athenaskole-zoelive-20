@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import DailyProgram from "./pages/DailyProgram";
@@ -28,32 +27,30 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/daily-program" element={<DailyProgram />} />
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
-            <Route path="/ai-learning" element={<AILearning />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/parent" element={<ParentDashboard />} />
-            <Route path="/school" element={<SchoolDashboard />} />
-            <Route path="/teacher" element={<TeacherDashboard />} />
-            
-            {/* Subject-specific learning routes */}
-            <Route path="/learn/english" element={<EnglishLearning />} />
-            <Route path="/learn/mathematics" element={<MathematicsLearning />} />
-            <Route path="/learn/creative_writing" element={<CreativeLearning />} />
-            <Route path="/learn/science" element={<ScienceLearning />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/daily-program" element={<DailyProgram />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
+          <Route path="/ai-learning" element={<AILearning />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/parent" element={<ParentDashboard />} />
+          <Route path="/school" element={<SchoolDashboard />} />
+          <Route path="/teacher" element={<TeacherDashboard />} />
+          
+          {/* Subject-specific learning routes */}
+          <Route path="/learn/english" element={<EnglishLearning />} />
+          <Route path="/learn/mathematics" element={<MathematicsLearning />} />
+          <Route path="/learn/creative_writing" element={<CreativeLearning />} />
+          <Route path="/learn/science" element={<ScienceLearning />} />
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
