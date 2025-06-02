@@ -1,80 +1,56 @@
 
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { handleCors } from './cors.ts';
-import { RequestBody, GeneratedContent } from './types.ts';
-import { validateApiKey, validateContent, isValidContent } from './validation.ts';
-import { createPrompt } from './prompt.ts';
-import { callOpenAI } from './openai.ts';
+import { validateRequest, parseRequestBody } from './requestHandler.ts';
+import { generateContentWithOpenAI } from './openai.ts';
+import { validateGeneratedContent } from './validation.ts';
 import { createErrorResponse, createSuccessResponse } from './response.ts';
 
 serve(async (req) => {
+  console.log('🚀 Edge function called');
+  
+  // Handle CORS
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
-  console.log('🚀 AI Content Generation Function Called');
-
   try {
-    const requestBody: RequestBody = await req.json();
-    console.log('📥 Request received:', JSON.stringify(requestBody, null, 2));
-
-    const { subject, skillArea, difficultyLevel, previousQuestions = [] } = requestBody;
-
-    // Validate API key
-    const openAIApiKey = Deno.env.get('OpenaiAPI');
-    const keyValidation = validateApiKey(openAIApiKey);
-    
-    if (!keyValidation.isValid) {
-      return createErrorResponse(keyValidation.error!, {
-        secretName: 'OpenaiAPI',
-        availableVars: Object.keys(Deno.env.toObject())
-      });
+    // Validate request method
+    const methodValidation = validateRequest(req);
+    if (methodValidation) {
+      return createErrorResponse(methodValidation.error, null, 405);
     }
 
-    console.log('  - Previous questions count:', previousQuestions.length);
-
-    // Create prompt
-    const prompt = createPrompt(previousQuestions);
-
-    // Call OpenAI
-    const openAIResult = await callOpenAI(openAIApiKey!, prompt);
-    
-    if (!openAIResult.success) {
-      return createErrorResponse(openAIResult.error!, openAIResult.debug);
+    // Parse and validate request body
+    const requestData = await parseRequestBody(req);
+    if ('success' in requestData && !requestData.success) {
+      return createErrorResponse(requestData.error, requestData.debug, 400);
     }
 
-    const generatedContent = openAIResult.data!;
+    console.log('📋 Request data validated:', {
+      subject: requestData.subject,
+      skillArea: requestData.skillArea,
+      difficultyLevel: requestData.difficultyLevel,
+      previousQuestions: requestData.previousQuestions?.length || 0
+    });
+
+    // Generate content using OpenAI
+    const generatedContent = await generateContentWithOpenAI(requestData);
+    if (!generatedContent) {
+      return createErrorResponse('Failed to generate content from OpenAI');
+    }
 
     // Validate the generated content
-    const validation = validateContent(generatedContent);
-
-    if (!isValidContent(validation)) {
-      console.error('❌ Content validation failed:', generatedContent);
-      return createErrorResponse('Generated content failed validation', {
-        content: generatedContent,
-        validation: validation
-      });
+    const validation = validateGeneratedContent(generatedContent);
+    if (!validation.hasQuestion || !validation.hasOptions || !validation.hasCorrect || !validation.hasExplanation) {
+      console.error('❌ Content validation failed:', validation);
+      return createErrorResponse('Generated content failed validation', validation);
     }
 
-    // Ensure all required fields with defaults
-    const finalContent: GeneratedContent = {
-      question: generatedContent.question,
-      options: generatedContent.options,
-      correct: Number(generatedContent.correct),
-      explanation: generatedContent.explanation,
-      learningObjectives: generatedContent.learningObjectives || ['Fraction arithmetic'],
-      estimatedTime: 30
-    };
-
-    return createSuccessResponse(finalContent);
+    console.log('✅ Content generated and validated successfully');
+    return createSuccessResponse(generatedContent);
 
   } catch (error) {
-    console.error('💥 Unexpected error in function:', error);
-    
-    return createErrorResponse(`Server error: ${error.message}`, {
-      errorName: error.name,
-      errorMessage: error.message,
-      errorStack: error.stack
-    });
+    console.error('💥 Unexpected error:', error);
+    return createErrorResponse('Internal server error', error.message);
   }
 });

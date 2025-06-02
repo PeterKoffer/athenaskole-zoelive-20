@@ -1,211 +1,263 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { useQuestionGeneration } from './hooks/useQuestionGeneration';
-import { useQuestionTimer } from './hooks/useQuestionTimer';
-import LoadingState from './components/LoadingState';
-import ErrorState from './components/ErrorState';
-import QuestionHeader from './components/QuestionHeader';
-import QuestionDisplay from './components/QuestionDisplay';
-import QuestionResult from './components/QuestionResult';
-import LessonComplete from './components/LessonComplete';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import QuestionDisplay from "./components/QuestionDisplay";
+import LessonComplete from "./components/LessonComplete";
+import LoadingState from "./components/LoadingState";
+import ErrorState from "./components/ErrorState";
+import LessonHeader from "./components/LessonHeader";
+import LessonControls from "./components/LessonControls";
+import SessionTimer from "./SessionTimer";
+import { useQuestionGeneration } from "./hooks/useQuestionGeneration";
+import { progressPersistence } from "@/services/progressPersistence";
+
+interface GeneratedContent {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  learningObjectives: string[];
+  estimatedTime?: number;
+}
 
 interface AILearningModuleProps {
   subject: string;
   skillArea: string;
-  onComplete: (score: number) => void;
+  difficultyLevel: number;
+  onBack: () => void;
 }
 
-const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModuleProps) => {
-  console.log('🎯 AILearningModule MOUNTED with:', { subject, skillArea });
+const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILearningModuleProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   
-  const { question, isLoading, error, generateQuestion } = useQuestionGeneration(subject, skillArea);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(1);
-  const [totalQuestions] = useState(5);
-  const [lessonScore, setLessonScore] = useState(0);
-  const [isLessonComplete, setIsLessonComplete] = useState(false);
-  const [usedQuestions, setUsedQuestions] = useState<Set<string>>(new Set());
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [sessionQuestions, setSessionQuestions] = useState<GeneratedContent[]>([]);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [isSessionActive, setIsSessionActive] = useState(true);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [timeSpent, setTimeSpent] = useState(0);
 
-  console.log('🔄 AILearningModule render state:', { 
-    subject, 
-    skillArea, 
-    hasQuestion: !!question, 
-    isLoading, 
-    hasError: !!error,
-    currentQuestionNumber,
-    totalQuestions,
-    lessonScore,
-    isLessonComplete,
-    usedQuestionsCount: usedQuestions.size
+  const totalQuestions = 5; // Fixed number of questions per session
+  const isSessionComplete = currentQuestionIndex >= totalQuestions;
+  
+  const { 
+    generateQuestion, 
+    isGenerating, 
+    error: generationError 
+  } = useQuestionGeneration({
+    subject,
+    skillArea,
+    difficultyLevel,
+    userId: user?.id || ''
   });
 
-  const handleTimeUp = () => {
-    if (!showResult && selectedAnswer === null) {
-      handleAnswerSubmit();
+  // Initialize session
+  useEffect(() => {
+    if (user?.id && !sessionId) {
+      initializeSession();
+    }
+  }, [user?.id]);
+
+  // Generate first question when session starts
+  useEffect(() => {
+    if (sessionId && sessionQuestions.length === 0) {
+      generateNextQuestion();
+    }
+  }, [sessionId]);
+
+  const initializeSession = async () => {
+    if (!user?.id) return;
+
+    const newSessionId = await progressPersistence.saveSession({
+      user_id: user.id,
+      subject,
+      skill_area: skillArea,
+      difficulty_level: difficultyLevel,
+      start_time: new Date().toISOString(),
+      time_spent: 0,
+      score: 0,
+      completed: false
+    });
+
+    if (newSessionId) {
+      setSessionId(newSessionId);
+      console.log('Session initialized:', newSessionId);
     }
   };
 
-  const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
-
-  // Generate first question on mount
-  useEffect(() => {
-    console.log('🚀 AILearningModule: Starting lesson - generating first question');
-    generateQuestion();
-  }, [generateQuestion]);
-
-  // Check for duplicate questions and regenerate if needed
-  useEffect(() => {
-    if (question && !showResult) {
-      const questionKey = `${question.question}-${question.options.join(',')}`;
-      
-      if (usedQuestions.has(questionKey)) {
-        console.log('🔄 Duplicate question detected, regenerating...');
-        generateQuestion();
-        return;
-      }
-      
-      // Add question to used set and start timer
-      setUsedQuestions(prev => new Set([...prev, questionKey]));
-      
-      if (!startTime) {
-        console.log('⏰ Starting timer for question', currentQuestionNumber);
-        setStartTime(new Date());
-        startTimer(question.estimatedTime);
-      }
-    }
-  }, [question, showResult, startTime, startTimer, currentQuestionNumber, usedQuestions, generateQuestion]);
-
-  const handleAnswerSelect = (index: number) => {
-    if (!showResult && !selectedAnswer) {
-      console.log('📝 Answer selected:', index, 'for question', currentQuestionNumber);
-      setSelectedAnswer(index);
-      // Auto-submit immediately when answer is selected
-      setTimeout(() => handleAnswerSubmit(index), 500);
-    }
-  };
-
-  const handleAnswerSubmit = (answerIndex?: number) => {
-    const finalAnswer = answerIndex !== undefined ? answerIndex : selectedAnswer;
-    
-    if (!question || !startTime) {
-      console.log('❌ Cannot submit: missing question or start time');
+  const generateNextQuestion = async () => {
+    if (sessionQuestions.length >= totalQuestions) {
       return;
     }
 
-    const responseTime = (new Date().getTime() - startTime.getTime()) / 1000;
-    const isCorrect = finalAnswer === question.correct;
+    const usedQuestions = sessionQuestions.map(q => q.question);
+    const newQuestion = await generateQuestion(usedQuestions);
     
-    console.log('✅ Submitting answer for question', currentQuestionNumber, ':', { 
-      selectedAnswer: finalAnswer, 
-      correct: question.correct, 
-      isCorrect, 
-      responseTime 
+    if (newQuestion) {
+      setSessionQuestions(prev => [...prev, newQuestion]);
+    } else {
+      toast({
+        title: "Fejl",
+        description: "Kunne ikke generere spørgsmål. Prøv igen.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAnswerSelect = async (selectedAnswer: number) => {
+    const newAnswers = [...answers, selectedAnswer];
+    setAnswers(newAnswers);
+    
+    const currentQuestion = sessionQuestions[currentQuestionIndex];
+    const isCorrect = selectedAnswer === currentQuestion?.correct;
+    
+    // Auto-advance to next question after a short delay
+    setTimeout(() => {
+      const nextIndex = currentQuestionIndex + 1;
+      setCurrentQuestionIndex(nextIndex);
+      
+      // Generate next question if needed
+      if (nextIndex < totalQuestions && sessionQuestions.length <= nextIndex) {
+        generateNextQuestion();
+      }
+      
+      // Complete session if this was the last question
+      if (nextIndex >= totalQuestions) {
+        completeSession(newAnswers);
+      }
+    }, 1500);
+
+    // Show feedback toast
+    toast({
+      title: isCorrect ? "Korrekt!" : "Forkert",
+      description: isCorrect ? "Godt klaret!" : "Prøv igen næste gang",
+      variant: isCorrect ? "default" : "destructive"
+    });
+  };
+
+  const completeSession = async (finalAnswers: number[]) => {
+    if (!sessionId || !user?.id) return;
+
+    const correctAnswers = finalAnswers.reduce((count, answer, index) => {
+      return count + (answer === sessionQuestions[index]?.correct ? 1 : 0);
+    }, 0);
+
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+    // Update session in database
+    await progressPersistence.updateSession(sessionId, {
+      end_time: new Date().toISOString(),
+      time_spent: timeSpent,
+      score,
+      completed: true
     });
 
-    // Update lesson score
-    if (isCorrect) {
-      setLessonScore(prev => prev + 1);
-    }
-
-    setShowResult(true);
-    stopTimer();
-
-    // Show result for longer (5 seconds) to allow reading
-    setTimeout(() => {
-      if (currentQuestionNumber < totalQuestions) {
-        moveToNextQuestion();
-      } else {
-        completeLessonFlow();
-      }
-    }, 5000); // Increased from 2 to 5 seconds
-  };
-
-  const moveToNextQuestion = () => {
-    console.log('➡️ Moving to next question:', currentQuestionNumber + 1);
-    setCurrentQuestionNumber(prev => prev + 1);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setStartTime(null);
-    generateQuestion();
-  };
-
-  const completeLessonFlow = () => {
-    console.log('🎯 Lesson completed! Final score:', lessonScore, '/', totalQuestions);
-    setIsLessonComplete(true);
-    
-    // Calculate percentage score
-    const percentageScore = Math.round((lessonScore / totalQuestions) * 100);
-    
-    setTimeout(() => {
-      onComplete(percentageScore);
-    }, 3000);
+    console.log('Session completed:', {
+      score,
+      correctAnswers,
+      totalQuestions,
+      timeSpent
+    });
   };
 
   const handleRetry = () => {
-    console.log('🔄 AILearningModule: Retrying question generation...');
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setStartTime(null);
-    generateQuestion();
+    setCurrentQuestionIndex(0);
+    setSessionQuestions([]);
+    setAnswers([]);
+    setTimeSpent(0);
+    setSessionId(null);
+    initializeSession();
   };
 
-  if (isLessonComplete) {
-    return <LessonComplete 
-      score={lessonScore} 
-      totalQuestions={totalQuestions} 
-      onContinue={() => onComplete(Math.round((lessonScore / totalQuestions) * 100))}
-    />;
+  const handleToggleSession = () => {
+    setIsSessionActive(!isSessionActive);
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < totalQuestions - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      
+      // Generate next question if needed
+      if (sessionQuestions.length <= currentQuestionIndex + 1) {
+        generateNextQuestion();
+      }
+    }
+  };
+
+  const currentQuestion = sessionQuestions[currentQuestionIndex];
+  const hasAnswered = answers.length > currentQuestionIndex;
+
+  if (isSessionComplete) {
+    const correctAnswers = answers.reduce((count, answer, index) => {
+      return count + (answer === sessionQuestions[index]?.correct ? 1 : 0);
+    }, 0);
+
+    return (
+      <LessonComplete
+        correctAnswers={correctAnswers}
+        totalQuestions={totalQuestions}
+        timeSpent={timeSpent}
+        subject={subject}
+        skillArea={skillArea}
+        onRetry={handleRetry}
+        onBack={onBack}
+      />
+    );
   }
 
-  if (isLoading) {
-    console.log('⏳ AILearningModule: Showing loading state for question', currentQuestionNumber);
-    return <LoadingState />;
+  if (generationError) {
+    return (
+      <ErrorState
+        error={generationError}
+        onRetry={generateNextQuestion}
+        onBack={onBack}
+      />
+    );
   }
-
-  if (error) {
-    console.error('❌ AILearningModule: Error state:', error);
-    return <ErrorState onRetry={handleRetry} />;
-  }
-
-  if (!question) {
-    console.log('❌ AILearningModule: No question available');
-    return <ErrorState onRetry={handleRetry} />;
-  }
-
-  const isCorrect = selectedAnswer === question.correct;
-
-  console.log('✅ AILearningModule: Rendering question', currentQuestionNumber, 'interface');
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-gray-900 border-gray-800">
-        <QuestionHeader 
-          timeLeft={timeLeft} 
-          estimatedTime={question.estimatedTime}
-          currentQuestion={currentQuestionNumber}
+    <div className="max-w-4xl mx-auto">
+      <SessionTimer
+        isActive={isSessionActive}
+        onTimeUpdate={setTimeSpent}
+      />
+      
+      <Card className="bg-gray-900 border-gray-800 overflow-hidden">
+        <LessonHeader
+          subject={subject}
+          skillArea={skillArea}
+          currentQuestion={currentQuestionIndex + 1}
           totalQuestions={totalQuestions}
-          score={lessonScore}
+          difficultyLevel={difficultyLevel}
+          timeSpent={timeSpent}
+          onBack={onBack}
         />
-        <CardContent>
-          <QuestionDisplay
-            question={question}
-            selectedAnswer={selectedAnswer}
-            showResult={showResult}
-            onAnswerSelect={handleAnswerSelect}
-            autoSubmit={true}
-          />
-          
-          {showResult && (
-            <QuestionResult
-              question={question}
-              selectedAnswer={selectedAnswer}
-              isCorrect={isCorrect}
+
+        <div className="p-6">
+          {isGenerating || !currentQuestion ? (
+            <LoadingState />
+          ) : (
+            <QuestionDisplay
+              question={currentQuestion}
+              questionNumber={currentQuestionIndex + 1}
+              totalQuestions={totalQuestions}
+              onAnswerSelect={handleAnswerSelect}
+              hasAnswered={hasAnswered}
+              selectedAnswer={hasAnswered ? answers[currentQuestionIndex] : undefined}
+              autoSubmit={true}
             />
           )}
-        </CardContent>
+        </div>
+
+        <LessonControls
+          isSessionActive={isSessionActive}
+          onToggleSession={handleToggleSession}
+          onNextQuestion={handleNextQuestion}
+          canSkip={!hasAnswered && currentQuestion}
+        />
       </Card>
     </div>
   );
