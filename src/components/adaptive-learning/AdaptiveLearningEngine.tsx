@@ -25,6 +25,7 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
   const [sessionScore, setSessionScore] = useState(0);
   const [questionsCompleted, setQuestionsCompleted] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [currentQuestionKey, setCurrentQuestionKey] = useState(0);
 
   const {
     difficulty,
@@ -90,6 +91,9 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
     // Check if session should end (after 5 questions or time limit)
     if (questionsCompleted >= 4 || (sessionStartTime && Date.now() - sessionStartTime.getTime() > recommendedSessionTime * 60 * 1000)) {
       await handleSessionComplete();
+    } else {
+      // Generate next question by updating the key
+      setCurrentQuestionKey(prev => prev + 1);
     }
 
     toast({
@@ -129,6 +133,21 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
     });
   };
 
+  const handleRetry = () => {
+    setCurrentSession('loading');
+    setSessionScore(0);
+    setQuestionsCompleted(0);
+    setShowResults(false);
+    setCurrentQuestionKey(prev => prev + 1);
+    
+    // Re-initialize the session
+    setTimeout(() => {
+      if (!isLoading && user) {
+        setCurrentSession('active');
+      }
+    }, 1000);
+  };
+
   if (!user) {
     return (
       <Card className="bg-red-900 border-red-700">
@@ -141,7 +160,7 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
     );
   }
 
-  if (isLoading) {
+  if (isLoading || currentSession === 'loading') {
     return (
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-6">
@@ -185,13 +204,22 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
             </div>
           </div>
           
-          <Button 
-            onClick={() => window.location.reload()}
-            className="w-full bg-lime-400 hover:bg-lime-500 text-black"
-          >
-            <Brain className="w-4 h-4 mr-2" />
-            Start ny session
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              onClick={handleRetry}
+              className="w-full bg-lime-400 hover:bg-lime-500 text-black"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              Start ny session
+            </Button>
+            <Button 
+              onClick={() => window.history.back()}
+              variant="outline"
+              className="w-full border-gray-600 text-white hover:bg-gray-700"
+            >
+              Tilbage til oversigt
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -226,6 +254,7 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
 
       {/* AI Learning Module */}
       <AILearningModule
+        key={currentQuestionKey} // Force re-render for new questions
         subject={subject}
         skillArea={skillArea}
         onComplete={handleQuestionComplete}

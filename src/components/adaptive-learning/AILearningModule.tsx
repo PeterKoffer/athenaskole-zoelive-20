@@ -1,305 +1,159 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Sparkles, Target, CheckCircle, Zap, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Brain, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { openaiContentService } from '@/services/openaiContentService';
+import { useToast } from '@/hooks/use-toast';
 
 interface AILearningModuleProps {
   subject: string;
   skillArea: string;
-  onComplete?: (score: number) => void;
+  onComplete: (score: number) => void;
 }
 
-interface AdaptiveQuestion {
-  id: string;
-  subject: string;
-  skill_area: string;
-  difficulty_level: number;
-  content: {
-    question: string;
-    options: string[];
-    correct: number;
-    explanation: string;
-  };
-  learning_objectives: string[];
-  estimated_time: number;
+interface Question {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  learningObjectives: string[];
+  estimatedTime: number;
 }
 
 const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModuleProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [question, setQuestion] = useState<AdaptiveQuestion | null>(null);
+  const [question, setQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [currentLevel, setCurrentLevel] = useState(1);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showResult, setShowResult] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [startTime, setStartTime] = useState<Date | null>(null);
 
   useEffect(() => {
-    console.log('🎯 AILearningModule mounted with:', { subject, skillArea, user: user?.id });
     if (user) {
-      initializeSession();
+      generateQuestion();
     }
   }, [user, subject, skillArea]);
 
-  const initializeSession = async () => {
-    if (!user) {
-      console.log('❌ No user found, cannot initialize session');
-      setError('Du skal være logget ind for at bruge AI-læring');
-      setLoading(false);
-      return;
+  useEffect(() => {
+    if (question && !showResult && timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && !showResult) {
+      handleSubmit();
     }
+  }, [timeLeft, showResult, question]);
 
+  const generateQuestion = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
     try {
-      console.log('🚀 Initializing session for user:', user.id);
-      setError(null);
-      setProgress(10);
+      console.log('🎯 Generating AI question for:', { subject, skillArea });
       
-      // Get user's current level for this subject/skill area
-      const { data: performanceData, error: perfError } = await supabase
-        .from('user_performance')
-        .select('current_level')
-        .eq('user_id', user.id)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea)
-        .maybeSingle();
-
-      console.log('📊 Performance data:', { performanceData, perfError });
-
-      const userLevel = performanceData?.current_level || 1;
-      console.log('📈 User level determined:', userLevel);
-      setCurrentLevel(userLevel);
-      setProgress(25);
-
-      // Create a new learning session
-      const { data: sessionData, error: sessionError } = await supabase
-        .from('learning_sessions')
-        .insert({
-          user_id: user.id,
-          subject,
-          skill_area: skillArea,
-          difficulty_level: userLevel,
-          start_time: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      console.log('📝 Learning session created:', { sessionData, sessionError });
-
-      if (sessionError) {
-        console.error('❌ Error creating session:', sessionError);
-        setError('Kunne ikke starte læringsmodul');
-        setLoading(false);
-        return;
-      }
-
-      setSessionId(sessionData.id);
-      setProgress(50);
-      await loadOrGenerateQuestion(userLevel);
-    } catch (error) {
-      console.error('❌ Error initializing session:', error);
-      setError('Kunne ikke starte AI-læringsmodul');
-      setLoading(false);
-    }
-  };
-
-  const loadOrGenerateQuestion = async (level: number) => {
-    if (!user) {
-      console.log('❌ No user found, cannot load question');
-      setError('Du skal være logget ind');
-      return;
-    }
-
-    try {
-      setGenerating(true);
-      setError(null);
-      setProgress(60);
-
-      console.log(`🔄 Loading or generating question for ${subject}/${skillArea} at level ${level}`);
-
-      const contentData = await openaiContentService.getOrGenerateContent(
+      const content = await openaiContentService.getOrGenerateContent(
         subject,
         skillArea,
-        level,
+        1, // Start with difficulty level 1
         user.id
       );
 
-      console.log('📋 Content data received:', contentData);
+      console.log('📝 Generated content:', content);
 
-      if (contentData) {
-        const parsedContent = typeof contentData.content === 'string' 
-          ? JSON.parse(contentData.content) 
-          : contentData.content;
+      if (content && content.content) {
+        const parsedContent = typeof content.content === 'string' 
+          ? JSON.parse(content.content) 
+          : content.content;
 
-        console.log('📝 Parsed content:', parsedContent);
-
-        const adaptiveQuestion: AdaptiveQuestion = {
-          id: contentData.id,
-          subject: contentData.subject,
-          skill_area: contentData.skill_area,
-          difficulty_level: contentData.difficulty_level,
-          content: parsedContent,
-          learning_objectives: contentData.learning_objectives || [],
-          estimated_time: contentData.estimated_time || 5
+        const questionData: Question = {
+          question: parsedContent.question || content.title || 'Sample question',
+          options: parsedContent.options || ['Option A', 'Option B', 'Option C', 'Option D'],
+          correct: parsedContent.correct || 0,
+          explanation: parsedContent.explanation || 'This is the correct answer.',
+          learningObjectives: content.learning_objectives || [],
+          estimatedTime: content.estimated_time || 30
         };
 
-        console.log('✅ Adaptive question created:', adaptiveQuestion);
-        setQuestion(adaptiveQuestion);
-        setProgress(100);
-
-        toast({
-          title: "AI-indhold genereret! 🤖",
-          description: "Dit personlige spørgsmål er klar",
-          duration: 3000
-        });
+        setQuestion(questionData);
+        setTimeLeft(questionData.estimatedTime);
+        setStartTime(new Date());
       } else {
-        console.error('❌ No content data received');
-        throw new Error('Failed to load or generate content');
+        // Fallback question if AI generation fails
+        const fallbackQuestion: Question = {
+          question: `What is a key concept in ${skillArea} for ${subject}?`,
+          options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
+          correct: 0,
+          explanation: 'This is a sample explanation.',
+          learningObjectives: [`Understanding ${skillArea} in ${subject}`],
+          estimatedTime: 30
+        };
+        setQuestion(fallbackQuestion);
+        setTimeLeft(30);
+        setStartTime(new Date());
       }
     } catch (error) {
-      console.error('❌ Error loading/generating question:', error);
-      setError(`Kunne ikke generere AI-indhold: ${error.message}`);
+      console.error('❌ Error generating question:', error);
       toast({
-        title: "Fejl",
-        description: `Kunne ikke generere AI-indhold: ${error.message}`,
+        title: "Error",
+        description: "Failed to generate question. Using sample content.",
         variant: "destructive"
       });
+
+      // Use fallback question
+      const fallbackQuestion: Question = {
+        question: `Sample question for ${subject} - ${skillArea}`,
+        options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+        correct: 0,
+        explanation: 'This is a sample question for demonstration.',
+        learningObjectives: [`Learning ${skillArea}`],
+        estimatedTime: 30
+      };
+      setQuestion(fallbackQuestion);
+      setTimeLeft(30);
+      setStartTime(new Date());
     } finally {
-      setGenerating(false);
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleAnswerSubmit = async () => {
-    if (!question || selectedAnswer === null || !user || !sessionId) return;
-
-    const isCorrect = selectedAnswer === question.content.correct;
-    setShowExplanation(true);
-    setProgress(75);
-
-    try {
-      // Log AI interaction
-      await supabase.from('ai_interactions').insert({
-        user_id: user.id,
-        ai_service: 'openai',
-        interaction_type: 'content_generation',
-        prompt_text: `Adaptive learning question for ${subject} - ${skillArea}`,
-        response_data: { question: question.content.question, user_answer: selectedAnswer, correct: isCorrect },
-        success: true,
-        subject,
-        skill_area: skillArea,
-        difficulty_level: question.difficulty_level
-      });
-
-      // Update session
-      await supabase
-        .from('learning_sessions')
-        .update({
-          score: isCorrect ? 100 : 0,
-          completed: true,
-          end_time: new Date().toISOString(),
-          time_spent: 5
-        })
-        .eq('id', sessionId);
-
-      // Update user performance
-      await supabase.rpc('update_user_performance', {
-        p_user_id: user.id,
-        p_subject: subject,
-        p_skill_area: skillArea,
-        p_is_correct: isCorrect,
-        p_completion_time: 300
-      });
-
-      toast({
-        title: isCorrect ? "Rigtigt! 🎉" : "Forkert svar",
-        description: question.content.explanation,
-        variant: isCorrect ? "default" : "destructive"
-      });
-
-      setProgress(100);
-
-      if (onComplete) {
-        onComplete(isCorrect ? 100 : 0);
-      }
-
-    } catch (error) {
-      console.error('Error submitting answer:', error);
-      toast({
-        title: "Fejl",
-        description: "Kunne ikke gemme dit svar",
-        variant: "destructive"
-      });
+  const handleAnswerSelect = (index: number) => {
+    if (!showResult) {
+      setSelectedAnswer(index);
     }
   };
 
-  const handleNextQuestion = () => {
-    setSelectedAnswer(null);
-    setShowExplanation(false);
-    setProgress(0);
-    
-    const newLevel = selectedAnswer === question?.content.correct 
-      ? Math.min(currentLevel + 1, 10) 
-      : Math.max(currentLevel - 1, 1);
-    
-    setCurrentLevel(newLevel);
-    loadOrGenerateQuestion(newLevel);
+  const handleSubmit = () => {
+    if (!question || !startTime) return;
+
+    const responseTime = (new Date().getTime() - startTime.getTime()) / 1000;
+    const isCorrect = selectedAnswer === question.correct;
+    const score = isCorrect ? 100 : 0;
+
+    setShowResult(true);
+
+    // Calculate final score based on accuracy and time
+    let finalScore = score;
+    if (isCorrect && responseTime < question.estimatedTime * 0.5) {
+      finalScore = Math.min(100, score + 10); // Bonus for quick correct answers
+    }
+
+    setTimeout(() => {
+      onComplete(finalScore);
+    }, 3000); // Show result for 3 seconds before completing
   };
 
-  if (error) {
-    return (
-      <Card className="bg-red-900 border-red-700">
-        <CardContent className="p-6">
-          <div className="text-center text-white">
-            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Fejl i AI-læringsmodul</h3>
-            <p className="text-red-300 mb-4">{error}</p>
-            <Button 
-              onClick={() => {
-                setError(null);
-                initializeSession();
-              }}
-              className="bg-red-400 hover:bg-red-500 text-black"
-            >
-              <Brain className="w-4 h-4 mr-2" />
-              Prøv Igen
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <Brain className="w-6 h-6 text-lime-400 animate-pulse mr-2" />
-            <span className="text-white">AI lærer dig at kende...</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (generating) {
-    return (
-      <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
-        <CardContent className="p-6">
-          <div className="text-center text-white">
-            <Zap className="w-12 h-12 text-lime-400 mx-auto mb-4 animate-pulse" />
-            <h3 className="text-lg font-semibold mb-2">AI Genererer Dit Personlige Indhold</h3>
-            <p className="text-gray-300 mb-4">OpenAI skaber et spørgsmål tilpasset dit niveau...</p>
-            <Progress value={progress} className="h-3" />
+          <div className="flex items-center justify-center space-x-2">
+            <Brain className="w-6 h-6 text-lime-400 animate-pulse" />
+            <span className="text-white">AI is generating your question...</span>
           </div>
         </CardContent>
       </Card>
@@ -308,130 +162,112 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   if (!question) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6">
-          <div className="text-center text-white">
-            <Sparkles className="w-12 h-12 text-lime-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">AI-læringsmodul ikke tilgængeligt</h3>
-            <p className="text-gray-400">Kunne ikke generere indhold for {subject} - {skillArea}.</p>
-            <Button 
-              onClick={() => loadOrGenerateQuestion(currentLevel)}
-              className="mt-4 bg-lime-400 hover:bg-lime-500 text-black"
-            >
-              <Brain className="w-4 h-4 mr-2" />
-              Prøv Igen
-            </Button>
-          </div>
+      <Card className="bg-red-900 border-red-700">
+        <CardContent className="p-6 text-center text-white">
+          <h3 className="text-lg font-semibold mb-2">Error Loading Question</h3>
+          <p className="text-red-300">Failed to generate AI content.</p>
+          <Button 
+            onClick={generateQuestion}
+            className="mt-4 bg-red-600 hover:bg-red-700"
+          >
+            Try Again
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* AI Learning Header */}
-      <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Brain className="w-6 h-6 text-lime-400" />
-              <div>
-                <h3 className="text-white font-semibold flex items-center">
-                  AI-Tilpasset Læring
-                  <Sparkles className="w-4 h-4 ml-2 text-yellow-400" />
-                </h3>
-                <p className="text-gray-300 text-sm">Personligt niveau {currentLevel} • AI-Genereret</p>
-              </div>
-            </div>
-            <Badge variant="outline" className="bg-lime-400 text-black border-lime-400">
-              <Zap className="w-3 h-3 mr-1" />
-              OpenAI
-            </Badge>
-          </div>
-          <Progress value={progress} className="mt-3 h-2" />
-        </CardContent>
-      </Card>
-
-      {/* Learning Content */}
+    <div className="space-y-6">
+      {/* Question Header */}
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <Target className="w-5 h-5 text-lime-400" />
-            <span className="capitalize">{subject} - {skillArea}</span>
+          <CardTitle className="flex items-center justify-between text-white">
+            <span className="flex items-center space-x-2">
+              <Brain className="w-5 h-5 text-lime-400" />
+              <span>AI Generated Question</span>
+            </span>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-gray-300">{timeLeft}s</span>
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-white">
-            <h3 className="text-lg font-medium mb-4">{question.content.question}</h3>
-            
-            <div className="space-y-2">
-              {question.content.options.map((option, index) => (
-                <Button
-                  key={index}
-                  variant={selectedAnswer === index ? "default" : "outline"}
-                  className={`w-full text-left justify-start p-4 h-auto ${
-                    selectedAnswer === index 
-                      ? "bg-lime-400 text-black hover:bg-lime-500" 
-                      : "bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
-                  }`}
-                  onClick={() => !showExplanation && setSelectedAnswer(index)}
-                  disabled={showExplanation}
-                >
-                  <span className="mr-3 font-semibold">
-                    {String.fromCharCode(65 + index)}.
-                  </span>
-                  {option}
-                </Button>
-              ))}
-            </div>
+        <CardContent>
+          <Progress value={((question.estimatedTime - timeLeft) / question.estimatedTime) * 100} className="mb-4" />
+          <h3 className="text-lg font-semibold text-white mb-4">{question.question}</h3>
+          
+          <div className="space-y-3">
+            {question.options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleAnswerSelect(index)}
+                disabled={showResult}
+                className={`w-full p-4 text-left rounded-lg border transition-all ${
+                  selectedAnswer === index
+                    ? showResult
+                      ? index === question.correct
+                        ? 'bg-green-600 border-green-500 text-white'
+                        : 'bg-red-600 border-red-500 text-white'
+                      : 'bg-lime-600 border-lime-500 text-white'
+                    : showResult && index === question.correct
+                    ? 'bg-green-600 border-green-500 text-white'
+                    : 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700'
+                } ${showResult ? 'cursor-default' : 'cursor-pointer'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{option}</span>
+                  {showResult && (
+                    <>
+                      {index === question.correct && <CheckCircle className="w-5 h-5 text-green-300" />}
+                      {selectedAnswer === index && index !== question.correct && (
+                        <XCircle className="w-5 h-5 text-red-300" />
+                      )}
+                    </>
+                  )}
+                </div>
+              </button>
+            ))}
           </div>
 
-          {showExplanation && (
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <CheckCircle className="w-5 h-5 text-lime-400 mr-2" />
-                <h4 className="font-semibold text-white">AI Forklaring:</h4>
-              </div>
-              <p className="text-gray-300 mb-3">{question.content.explanation}</p>
-              
-              {question.learning_objectives && question.learning_objectives.length > 0 && (
-                <div className="mt-3">
-                  <h5 className="text-sm font-medium text-lime-400 mb-1">Læringsmål:</h5>
-                  <ul className="text-sm text-gray-400 list-disc list-inside">
-                    {question.learning_objectives.map((objective, index) => (
-                      <li key={index}>{objective}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+          {!showResult && selectedAnswer !== null && (
+            <Button 
+              onClick={handleSubmit}
+              className="w-full mt-4 bg-lime-400 hover:bg-lime-500 text-black"
+            >
+              Submit Answer
+            </Button>
           )}
 
-          <div className="flex justify-between items-center">
-            {!showExplanation ? (
-              <Button
-                onClick={handleAnswerSubmit}
-                disabled={selectedAnswer === null}
-                className="bg-lime-400 hover:bg-lime-500 text-black"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Indsend Svar
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNextQuestion}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white"
-              >
-                <Brain className="w-4 h-4 mr-2" />
-                Næste AI Spørgsmål
-              </Button>
-            )}
-            
-            <div className="text-sm text-gray-400 flex items-center space-x-2">
-              <Brain className="w-4 h-4" />
-              <span>~{question.estimated_time} min</span>
-            </div>
-          </div>
+          {showResult && (
+            <Card className="mt-4 bg-gray-800 border-gray-700">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  {selectedAnswer === question.correct ? (
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-red-400" />
+                  )}
+                  <span className="font-semibold text-white">
+                    {selectedAnswer === question.correct ? 'Correct!' : 'Incorrect'}
+                  </span>
+                </div>
+                <p className="text-gray-300 text-sm">{question.explanation}</p>
+                {question.learningObjectives.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-400 mb-1">Learning Objectives:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {question.learningObjectives.map((objective, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {objective}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </CardContent>
       </Card>
     </div>
