@@ -34,7 +34,7 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <AdminStatsCards stats={stats} />
 
-        {/* Unified Admin Tools Dropdown Menu */}
+        {/* Unified Admin Tools Dropdown Menu - Hidden Content */}
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -44,104 +44,8 @@ const AdminDashboard = () => {
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64">
-              {/* User Management Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <Users className="w-4 h-4 mr-2" />
-                  User Management
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Users className="w-4 h-4 mr-2" />
-                    View All Users
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Add New User
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Lock className="w-4 h-4 mr-2" />
-                    User Permissions
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Activity className="w-4 h-4 mr-2" />
-                    User Activity Logs
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* System Management Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <Settings className="w-4 h-4 mr-2" />
-                  System Management
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Settings className="w-4 h-4 mr-2" />
-                    System Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Database className="w-4 h-4 mr-2" />
-                    Database Management
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Security Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Activity className="w-4 h-4 mr-2" />
-                    System Monitoring
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Analytics & Reports Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Analytics & Reports
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    System Analytics
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Users className="w-4 h-4 mr-2" />
-                    User Statistics
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <School className="w-4 h-4 mr-2" />
-                    School Performance
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Activity className="w-4 h-4 mr-2" />
-                    Platform Usage
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* School Management */}
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <School className="w-4 h-4 mr-2" />
-                Manage Schools
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Communication Tools */}
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Platform Communications
-              </DropdownMenuItem>
+            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64 hidden">
+              {/* All menu content is now hidden */}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
