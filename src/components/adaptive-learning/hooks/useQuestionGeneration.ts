@@ -49,18 +49,31 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       console.log('📨 Edge function response:', { data, error: functionError });
 
       if (functionError) {
+        console.error('❌ Supabase function error:', functionError);
         throw new Error(`Function error: ${functionError.message}`);
       }
 
       if (!data) {
+        console.error('❌ No data returned from function');
         throw new Error('No data returned from function');
       }
 
+      console.log('🔍 Function response data:', JSON.stringify(data, null, 2));
+
       if (!data.success) {
-        throw new Error(data.error || 'Unknown error from AI generation');
+        console.error('❌ Function returned error:', data.error);
+        console.error('❌ Debug info:', data.debug);
+        
+        let errorMessage = data.error || 'Unknown error from AI generation';
+        if (data.debug) {
+          errorMessage += `\n\nDebug info: ${JSON.stringify(data.debug, null, 2)}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       if (!data.generatedContent) {
+        console.error('❌ No generated content in response');
         throw new Error('No generated content in response');
       }
 
@@ -69,6 +82,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
       // Validate content structure
       if (!content.question || !Array.isArray(content.options) || typeof content.correct !== 'number') {
+        console.error('❌ Invalid content structure:', content);
         throw new Error('Invalid content structure received');
       }
 
@@ -98,8 +112,8 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       
       toast({
         title: "AI Generation Failed ❌",
-        description: errorMessage,
-        duration: 5000,
+        description: errorMessage.length > 100 ? 'Check console for details' : errorMessage,
+        duration: 8000,
         variant: "destructive"
       });
 
