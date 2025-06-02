@@ -1,72 +1,81 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Star, Brain } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Trophy, RotateCcw, ArrowLeft, Target } from 'lucide-react';
 
-interface LessonCompleteProps {
+export interface LessonCompleteProps {
   score: number;
   totalQuestions: number;
-  onContinue: () => void;
+  onRetry: () => void;
+  onBack: () => void;
 }
 
-const LessonComplete = ({ score, totalQuestions, onContinue }: LessonCompleteProps) => {
-  const percentage = Math.round((score / totalQuestions) * 100);
-  
-  const getPerformanceMessage = () => {
-    if (percentage >= 80) return { message: "Excellent work! 🌟", color: "text-green-400" };
-    if (percentage >= 60) return { message: "Good job! 👍", color: "text-blue-400" };
-    if (percentage >= 40) return { message: "Keep practicing! 💪", color: "text-yellow-400" };
-    return { message: "Don't give up! 🎯", color: "text-orange-400" };
+const LessonComplete = ({ score, totalQuestions, onRetry, onBack }: LessonCompleteProps) => {
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-400';
+    if (score >= 60) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
-  const performance = getPerformanceMessage();
+  const getScoreBadge = (score: number) => {
+    if (score >= 90) return { text: 'Excellent!', color: 'bg-green-600' };
+    if (score >= 80) return { text: 'Great!', color: 'bg-green-500' };
+    if (score >= 70) return { text: 'Good!', color: 'bg-yellow-500' };
+    if (score >= 60) return { text: 'Pass', color: 'bg-yellow-600' };
+    return { text: 'Try Again', color: 'bg-red-600' };
+  };
+
+  const scoreBadge = getScoreBadge(score);
 
   return (
-    <Card className="bg-gradient-to-br from-purple-900 to-blue-900 border-purple-500">
+    <Card className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-purple-400">
       <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center space-x-2 text-white">
-          <Brain className="w-6 h-6 text-lime-400" />
-          <span>AI Lesson Complete!</span>
-        </CardTitle>
+        <div className="flex justify-center mb-4">
+          <Trophy className="w-16 h-16 text-yellow-400" />
+        </div>
+        <CardTitle className="text-2xl text-white">Session Complete!</CardTitle>
       </CardHeader>
-      <CardContent className="text-center space-y-6">
-        <div className="relative">
-          <div className="text-6xl mb-4">
-            <Trophy className="w-16 h-16 text-yellow-400 mx-auto" />
+      <CardContent className="space-y-6">
+        <div className="text-center">
+          <div className={`text-6xl font-bold ${getScoreColor(score)} mb-2`}>
+            {score}%
           </div>
-          <div className="absolute -top-2 -right-2">
-            <Star className="w-8 h-8 text-yellow-300 animate-pulse" />
-          </div>
+          <Badge className={`${scoreBadge.color} text-white text-lg px-4 py-2`}>
+            {scoreBadge.text}
+          </Badge>
         </div>
-        
-        <div>
-          <div className="text-4xl font-bold text-white mb-2">
-            {score}/{totalQuestions}
+
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div>
+            <div className="text-2xl font-bold text-lime-400">{totalQuestions}</div>
+            <div className="text-gray-300 text-sm">Questions</div>
           </div>
-          <div className="text-xl text-gray-300 mb-1">
-            {percentage}% Correct
-          </div>
-          <div className={`text-lg font-semibold ${performance.color}`}>
-            {performance.message}
+          <div>
+            <div className="text-2xl font-bold text-lime-400">
+              {Math.round((score / 100) * totalQuestions)}
+            </div>
+            <div className="text-gray-300 text-sm">Correct</div>
           </div>
         </div>
 
-        <div className="bg-gray-800/50 rounded-lg p-4">
-          <h4 className="text-white font-semibold mb-2">Lesson Summary</h4>
-          <div className="text-sm text-gray-300 space-y-1">
-            <p>• Completed {totalQuestions} AI-generated questions</p>
-            <p>• Achieved {percentage}% accuracy</p>
-            <p>• Adaptive difficulty maintained engagement</p>
-          </div>
+        <div className="space-y-3">
+          <Button 
+            onClick={onRetry}
+            className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Try Again
+          </Button>
+          <Button 
+            onClick={onBack}
+            variant="outline"
+            className="w-full border-gray-600 text-white hover:bg-gray-700"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Menu
+          </Button>
         </div>
-
-        <Button 
-          onClick={onContinue}
-          className="w-full bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-600 text-black font-semibold"
-        >
-          <Trophy className="w-4 h-4 mr-2" />
-          Continue Learning
-        </Button>
       </CardContent>
     </Card>
   );

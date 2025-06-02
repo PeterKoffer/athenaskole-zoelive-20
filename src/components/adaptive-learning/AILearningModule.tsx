@@ -218,6 +218,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
     <div className="max-w-4xl mx-auto">
       <SessionTimer
         onTimeUp={handleTimeUp}
+        recommendedDuration={20}
       />
       
       <Card className="bg-gray-900 border-gray-800 overflow-hidden">
@@ -237,7 +238,6 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
           ) : (
             <QuestionDisplay
               question={currentQuestion}
-              totalQuestions={totalQuestions}
               onAnswerSelect={handleAnswerSelect}
               hasAnswered={hasAnswered}
               selectedAnswer={hasAnswered ? answers[currentQuestionIndex] : undefined}
