@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Sparkles, Target, CheckCircle, Zap } from 'lucide-react';
+import { Brain, Sparkles, Target, CheckCircle, Zap, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { openaiContentService } from '@/services/openaiContentService';
 
@@ -41,6 +41,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('🎯 AILearningModule mounted with:', { subject, skillArea, user: user?.id });
@@ -52,11 +53,14 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const initializeSession = async () => {
     if (!user) {
       console.log('❌ No user found, cannot initialize session');
+      setError('Du skal være logget ind for at bruge AI-læring');
+      setLoading(false);
       return;
     }
 
     try {
       console.log('🚀 Initializing session for user:', user.id);
+      setError(null);
       setProgress(10);
       
       // Get user's current level for this subject/skill area
@@ -66,7 +70,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
         .eq('user_id', user.id)
         .eq('subject', subject)
         .eq('skill_area', skillArea)
-        .single();
+        .maybeSingle();
 
       console.log('📊 Performance data:', { performanceData, perfError });
 
@@ -92,11 +96,8 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
       if (sessionError) {
         console.error('❌ Error creating session:', sessionError);
-        toast({
-          title: "Fejl",
-          description: "Kunne ikke starte læringsmodul",
-          variant: "destructive"
-        });
+        setError('Kunne ikke starte læringsmodul');
+        setLoading(false);
         return;
       }
 
@@ -105,12 +106,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
       await loadOrGenerateQuestion(userLevel);
     } catch (error) {
       console.error('❌ Error initializing session:', error);
-      toast({
-        title: "Fejl",
-        description: "Kunne ikke starte AI-læringsmodul",
-        variant: "destructive"
-      });
-    } finally {
+      setError('Kunne ikke starte AI-læringsmodul');
       setLoading(false);
     }
   };
@@ -118,11 +114,13 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const loadOrGenerateQuestion = async (level: number) => {
     if (!user) {
       console.log('❌ No user found, cannot load question');
+      setError('Du skal være logget ind');
       return;
     }
 
     try {
       setGenerating(true);
+      setError(null);
       setProgress(60);
 
       console.log(`🔄 Loading or generating question for ${subject}/${skillArea} at level ${level}`);
@@ -168,6 +166,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
       }
     } catch (error) {
       console.error('❌ Error loading/generating question:', error);
+      setError(`Kunne ikke generere AI-indhold: ${error.message}`);
       toast({
         title: "Fejl",
         description: `Kunne ikke generere AI-indhold: ${error.message}`,
@@ -175,6 +174,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
       });
     } finally {
       setGenerating(false);
+      setLoading(false);
     }
   };
 
@@ -253,6 +253,30 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     setCurrentLevel(newLevel);
     loadOrGenerateQuestion(newLevel);
   };
+
+  if (error) {
+    return (
+      <Card className="bg-red-900 border-red-700">
+        <CardContent className="p-6">
+          <div className="text-center text-white">
+            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Fejl i AI-læringsmodul</h3>
+            <p className="text-red-300 mb-4">{error}</p>
+            <Button 
+              onClick={() => {
+                setError(null);
+                initializeSession();
+              }}
+              className="bg-red-400 hover:bg-red-500 text-black"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              Prøv Igen
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (loading) {
     return (

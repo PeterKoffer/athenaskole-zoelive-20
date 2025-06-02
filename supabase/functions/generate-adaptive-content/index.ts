@@ -17,6 +17,8 @@ serve(async (req) => {
   try {
     const { subject, skillArea, difficultyLevel, userId } = await req.json();
 
+    console.log('🔄 Received request:', { subject, skillArea, difficultyLevel, userId });
+
     if (!subject || !skillArea || !difficultyLevel || !userId) {
       throw new Error('Missing required parameters');
     }
@@ -26,10 +28,10 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log(`Generating content for ${subject}/${skillArea} at level ${difficultyLevel}`);
+    console.log(`🤖 Generating content for ${subject}/${skillArea} at level ${difficultyLevel}`);
 
     // Create detailed prompt based on subject, skill area, and difficulty
-    const prompt = `Generate an educational question for a learning system with the following specifications:
+    const prompt = `Generate an educational question for a Danish learning system with the following specifications:
 
 Subject: ${subject}
 Skill Area: ${skillArea}
@@ -37,24 +39,25 @@ Difficulty Level: ${difficultyLevel} (scale 1-10, where 1 is beginner and 10 is 
 
 Generate a JSON response with this exact structure:
 {
-  "question": "A clear, age-appropriate question",
+  "question": "A clear, age-appropriate question in Danish",
   "options": ["Option A", "Option B", "Option C", "Option D"],
   "correct": 1,
-  "explanation": "A detailed explanation of why the correct answer is right and why others are wrong",
+  "explanation": "A detailed explanation in Danish of why the correct answer is right and why others are wrong",
   "learningObjectives": ["Objective 1", "Objective 2"],
   "estimatedTime": 5
 }
 
 Requirements:
 - Make the question appropriate for difficulty level ${difficultyLevel}
-- Include 4 multiple choice options
+- Include 4 multiple choice options in Danish
 - The "correct" field should be the index (0-3) of the correct answer
-- Explanation should be educational and encouraging
-- Learning objectives should be specific and measurable
+- Explanation should be educational and encouraging in Danish
+- Learning objectives should be specific and measurable in Danish
 - Estimated time should be realistic in minutes
 - For mathematics: include calculation problems, word problems, or concept questions
-- For english: include reading comprehension, grammar, vocabulary, or spelling
-- Ensure content is engaging and educational
+- For danish: include reading comprehension, grammar, vocabulary, or spelling
+- For english: include basic english vocabulary, simple phrases, or pronunciation
+- Ensure content is engaging and educational for Danish students
 
 Return only valid JSON, no additional text.`;
 
@@ -69,7 +72,7 @@ Return only valid JSON, no additional text.`;
         messages: [
           { 
             role: 'system', 
-            content: 'You are an expert educational content creator. Generate high-quality, pedagogically sound learning materials. Always respond with valid JSON only.' 
+            content: 'You are an expert Danish educational content creator. Generate high-quality, pedagogically sound learning materials in Danish. Always respond with valid JSON only.' 
           },
           { role: 'user', content: prompt }
         ],
@@ -80,20 +83,25 @@ Return only valid JSON, no additional text.`;
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('❌ OpenAI API error:', errorData);
       throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
 
+    console.log('🤖 Raw OpenAI response:', generatedContent);
+
     // Parse the generated JSON content
     let parsedContent;
     try {
       parsedContent = JSON.parse(generatedContent);
     } catch (parseError) {
-      console.error('Failed to parse OpenAI response:', generatedContent);
+      console.error('❌ Failed to parse OpenAI response:', generatedContent);
       throw new Error('Invalid JSON response from OpenAI');
     }
+
+    console.log('✅ Parsed content:', parsedContent);
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -117,12 +125,14 @@ Return only valid JSON, no additional text.`;
       .single();
 
     if (saveError) {
-      console.error('Error saving content:', saveError);
-      throw new Error('Failed to save generated content');
+      console.error('❌ Error saving content:', saveError);
+      throw new Error(`Failed to save generated content: ${saveError.message}`);
     }
 
+    console.log('✅ Content saved successfully:', savedContent);
+
     // Log the AI interaction
-    await supabase.from('ai_interactions').insert({
+    const { error: logError } = await supabase.from('ai_interactions').insert({
       user_id: userId,
       ai_service: 'openai',
       interaction_type: 'content_generation',
@@ -134,7 +144,11 @@ Return only valid JSON, no additional text.`;
       difficulty_level: difficultyLevel
     });
 
-    console.log('Successfully generated and saved adaptive content');
+    if (logError) {
+      console.error('⚠️ Warning: Failed to log AI interaction:', logError);
+    }
+
+    console.log('🎉 Successfully generated and saved adaptive content');
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -145,7 +159,7 @@ Return only valid JSON, no additional text.`;
     });
 
   } catch (error) {
-    console.error('Error in generate-adaptive-content function:', error);
+    console.error('❌ Error in generate-adaptive-content function:', error);
     
     return new Response(JSON.stringify({ 
       error: error.message,

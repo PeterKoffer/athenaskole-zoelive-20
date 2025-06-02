@@ -13,6 +13,7 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import DailyProgram from "./pages/DailyProgram";
 import AdaptiveLearning from "./pages/AdaptiveLearning";
+import AILearning from "./pages/AILearning";
 import NotFound from "./pages/NotFound";
 import MathematicsLearning from "./components/education/MathematicsLearning";
 import EnglishLearning from "./components/education/EnglishLearning";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/daily-program" element={<DailyProgram />} />
           <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
+          <Route path="/ai-learning" element={<AILearning />} />
           <Route path="/learn/matematik" element={<MathematicsLearning />} />
           <Route path="/learn/dansk" element={<EnglishLearning />} />
           <Route path="/learn/engelsk" element={<LanguageLearning />} />

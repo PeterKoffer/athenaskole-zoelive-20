@@ -33,9 +33,9 @@ export class OpenAIContentService {
         throw new Error(`Failed to generate content: ${error.message}`);
       }
 
-      if (!data.success) {
-        console.error('❌ Content generation failed:', data.error);
-        throw new Error(data.error || 'Content generation failed');
+      if (!data || !data.success) {
+        console.error('❌ Content generation failed:', data?.error || 'Unknown error');
+        throw new Error(data?.error || 'Content generation failed');
       }
 
       console.log('✅ Generated content received:', data.generatedContent);
@@ -88,6 +88,9 @@ export class OpenAIContentService {
 
       console.log('🔄 Fetching newly saved content from database...');
 
+      // Add a small delay to ensure the content is saved
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Fetch the newly saved content from the database
       const { data: newContent, error: newContentError } = await supabase
         .from('adaptive_content')
@@ -97,11 +100,16 @@ export class OpenAIContentService {
         .eq('difficulty_level', difficultyLevel)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (newContentError) {
         console.error('❌ Failed to fetch newly generated content:', newContentError);
         throw new Error('Failed to fetch newly generated content');
+      }
+
+      if (!newContent) {
+        console.error('❌ No content found after generation');
+        throw new Error('Content was generated but not found in database');
       }
 
       console.log('✅ Successfully retrieved newly generated content:', newContent);
