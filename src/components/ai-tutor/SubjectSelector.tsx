@@ -7,9 +7,12 @@ import { Brain, Calculator, BookOpen, Globe } from 'lucide-react';
 export interface SubjectSelectorProps {
   onSubjectSelect: (subject: string, skillArea: string) => void;
   selectedMode?: any;
+  currentSubject?: string;
+  onSubjectChange?: (subject: string) => void;
+  onLanguageSelect?: () => void;
 }
 
-const SubjectSelector = ({ onSubjectSelect, selectedMode }: SubjectSelectorProps) => {
+const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubjectChange, onLanguageSelect }: SubjectSelectorProps) => {
   const subjects = [
     {
       id: 'mathematics',

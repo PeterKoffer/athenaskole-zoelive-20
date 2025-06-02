@@ -12,6 +12,7 @@ import LessonControls from "./components/LessonControls";
 import SessionTimer from "./SessionTimer";
 import { useQuestionGeneration, Question } from "./hooks/useQuestionGeneration";
 import { progressPersistence } from "@/services/progressPersistence";
+import { createFallbackQuestion } from "./utils/fallbackQuestions";
 
 export interface AILearningModuleProps {
   subject: string;
@@ -30,8 +31,9 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
   const [isSessionActive, setIsSessionActive] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [timeSpent, setTimeSpent] = useState(0);
+  const [hasTriedFallback, setHasTriedFallback] = useState(false);
 
-  const totalQuestions = 5; // Fixed number of questions per session
+  const totalQuestions = 5;
   const isSessionComplete = currentQuestionIndex >= totalQuestions;
   
   const { 
@@ -84,17 +86,40 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
       return;
     }
 
+    console.log('🎯 Generating next question...');
     const usedQuestions = sessionQuestions.map(q => q.question);
-    const newQuestion = await generateQuestion(usedQuestions);
     
-    if (newQuestion) {
-      setSessionQuestions(prev => [...prev, newQuestion]);
-    } else {
-      toast({
-        title: "Error",
-        description: "Could not generate question. Please try again.",
-        variant: "destructive"
-      });
+    try {
+      const newQuestion = await generateQuestion(usedQuestions);
+      
+      if (newQuestion) {
+        console.log('✅ AI question generated successfully');
+        setSessionQuestions(prev => [...prev, newQuestion]);
+        setHasTriedFallback(false);
+      } else {
+        throw new Error('AI generation returned null');
+      }
+    } catch (error) {
+      console.error('❌ AI generation failed:', error);
+      
+      if (!hasTriedFallback) {
+        console.log('🔄 Using fallback question...');
+        const fallbackQuestion = createFallbackQuestion();
+        setSessionQuestions(prev => [...prev, fallbackQuestion]);
+        setHasTriedFallback(true);
+        
+        toast({
+          title: "Using Backup Question",
+          description: "AI generation failed, using a backup question",
+          duration: 3000
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not generate question. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -160,6 +185,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
     setAnswers([]);
     setTimeSpent(0);
     setSessionId(null);
+    setHasTriedFallback(false);
     initializeSession();
   };
 
@@ -179,7 +205,6 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
   };
 
   const handleTimeUp = () => {
-    // Handle time up scenario
     toast({
       title: "Time's up!",
       description: "Moving to next question",
@@ -206,10 +231,13 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
     );
   }
 
-  if (generationError) {
+  if (generationError && !hasTriedFallback) {
     return (
       <ErrorState
-        onRetry={generateNextQuestion}
+        onRetry={() => {
+          setHasTriedFallback(false);
+          generateNextQuestion();
+        }}
       />
     );
   }

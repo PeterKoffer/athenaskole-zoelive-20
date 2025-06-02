@@ -1,6 +1,5 @@
 
 import { useState, useCallback } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,34 +26,24 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
   const [error, setError] = useState<string | null>(null);
 
   const generateQuestion = useCallback(async (previousQuestions: string[] = []) => {
-    console.log('🚀 useQuestionGeneration.generateQuestion() CALLED');
-    console.log('👤 User check:', { hasUser: !!userId, userId });
-    console.log('📋 Generation params:', { subject, skillArea, difficultyLevel, historyCount: previousQuestions.length });
+    console.log('🚀 generateQuestion called');
+    console.log('👤 User ID:', userId);
+    console.log('📋 Params:', { subject, skillArea, difficultyLevel, historyCount: previousQuestions.length });
 
     if (!userId) {
-      console.log('❌ No user found - cannot generate question');
+      console.log('❌ No user found');
       setError('User not authenticated');
       return null;
     }
 
-    console.log('🔥 STARTING REAL AI QUESTION GENERATION PROCESS');
+    console.log('🔥 Starting AI question generation');
     
     setIsGenerating(true);
     setError(null);
     setQuestion(null);
     
     try {
-      console.log('📞 About to call Supabase edge function...');
-      console.log('📋 Function call params:', {
-        functionName: 'generate-adaptive-content',
-        body: {
-          subject,
-          skillArea,
-          difficultyLevel,
-          userId,
-          previousQuestions
-        }
-      });
+      console.log('📞 Calling Supabase edge function...');
       
       const { data, error: functionError } = await supabase.functions.invoke('generate-adaptive-content', {
         body: {
@@ -66,40 +55,26 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
         }
       });
 
-      console.log('📨 Supabase function response received:');
-      console.log('  - data:', data);
-      console.log('  - error:', functionError);
+      console.log('📨 Function response:', { data, error: functionError });
 
       if (functionError) {
-        console.error('❌ Supabase function error:', functionError);
+        console.error('❌ Function error:', functionError);
         throw new Error(`Function error: ${functionError.message}`);
       }
 
       if (!data) {
-        console.error('❌ No data returned from function');
+        console.error('❌ No data returned');
         throw new Error('No data returned from function');
       }
-
-      console.log('🔍 Function response analysis:');
-      console.log('  - data keys:', Object.keys(data));
-      console.log('  - success:', data.success);
-      console.log('  - error:', data.error);
-      console.log('  - generatedContent:', !!data.generatedContent);
 
       if (!data.success) {
         console.error('❌ Function returned error:', data.error);
         console.error('❌ Debug info:', data.debug);
-        
-        let errorMessage = data.error || 'Unknown error from AI generation';
-        if (data.debug) {
-          console.log('🔍 Full debug info:', JSON.stringify(data.debug, null, 2));
-        }
-        
-        throw new Error(errorMessage);
+        throw new Error(data.error || 'Unknown error from AI generation');
       }
 
       if (!data.generatedContent) {
-        console.error('❌ No generated content in successful response');
+        console.error('❌ No generated content');
         throw new Error('No generated content in response');
       }
 
@@ -121,7 +96,7 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
         estimatedTime: content.estimatedTime || 30
       };
 
-      console.log('🎯 Final question data prepared:', questionData);
+      console.log('🎯 Final question data:', questionData);
       setQuestion(questionData);
 
       toast({
@@ -134,12 +109,7 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
       return questionData;
 
     } catch (error: any) {
-      console.error('💥 Question generation failed with error:', error);
-      console.error('💥 Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
+      console.error('💥 Question generation failed:', error);
       
       const errorMessage = error.message || 'Unknown error occurred';
       setError(errorMessage);
@@ -155,7 +125,7 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
 
     } finally {
       setIsGenerating(false);
-      console.log('🏁 Question generation process completed (finally block)');
+      console.log('🏁 Generation process completed');
     }
   }, [userId, subject, skillArea, difficultyLevel, toast]);
 

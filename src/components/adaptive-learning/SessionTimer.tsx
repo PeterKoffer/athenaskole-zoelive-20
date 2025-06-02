@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Clock, Play, Pause } from 'lucide-react';
 
 export interface SessionTimerProps {
-  onTimeUp: () => void;
+  onTimeUp?: () => void;
   recommendedDuration?: number; // in minutes
 }
 
@@ -19,7 +19,9 @@ const SessionTimer = ({ onTimeUp, recommendedDuration = 20 }: SessionTimerProps)
       interval = setInterval(() => {
         setTimeLeft(time => {
           if (time <= 1) {
-            onTimeUp();
+            if (onTimeUp) {
+              onTimeUp();
+            }
             return 0;
           }
           return time - 1;
