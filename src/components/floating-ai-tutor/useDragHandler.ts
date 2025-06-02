@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Position, DragOffset } from "./types";
 
@@ -8,17 +7,24 @@ export const useDragHandler = (homePosition: Position) => {
       const saved = localStorage.getItem('floating-tutor-position');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsedPosition = JSON.parse(saved);
+          // Ensure the saved position is still valid on current screen
+          if (parsedPosition.x >= 0 && parsedPosition.y >= 0 && 
+              parsedPosition.x < window.innerWidth - 100 && 
+              parsedPosition.y < window.innerHeight - 100) {
+            return parsedPosition;
+          }
         } catch (e) {
           console.log('Failed to parse saved position');
         }
       }
+      // Default to a safe visible position
       return { 
-        x: Math.max(20, window.innerWidth - 100), 
-        y: Math.max(20, window.innerHeight - 100) 
+        x: window.innerWidth - 120, 
+        y: 20 
       };
     }
-    return homePosition;
+    return { x: 20, y: 20 };
   });
   
   const [isDragging, setIsDragging] = useState(false);
@@ -38,11 +44,12 @@ export const useDragHandler = (homePosition: Position) => {
 
   const resetToHome = useCallback(() => {
     const safeHomePosition = { 
-      x: Math.max(20, window.innerWidth - 100), 
-      y: Math.max(20, window.innerHeight - 100) 
+      x: window.innerWidth - 120, 
+      y: 20 
     };
     const constrainedHomePosition = constrainPosition(safeHomePosition);
     setPosition(constrainedHomePosition);
+    console.log('Reset tutor to home position:', constrainedHomePosition);
   }, [constrainPosition]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {

@@ -10,16 +10,24 @@ const FloatingAITutor = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   
   const homePosition = useMemo(() => ({
-    x: typeof window !== 'undefined' ? window.innerWidth - 100 : 100,
-    y: typeof window !== 'undefined' ? 50 : 50 // Moved to top of the page
+    x: typeof window !== 'undefined' ? window.innerWidth - 120 : 120,
+    y: 20
   }), []);
 
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
   const { messages, handleSendMessage } = useMessageHandler();
 
-  // Auto-scroll to top position when component mounts
+  // Debug logging to ensure component is mounting
   useEffect(() => {
-    resetToHome();
+    console.log('FloatingAITutor mounted at position:', position);
+  }, []);
+
+  // Auto-scroll to a safe position when component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      resetToHome();
+    }, 100);
+    return () => clearTimeout(timer);
   }, [resetToHome]);
 
   const onSendMessage = (message: string) => {
@@ -42,14 +50,21 @@ const FloatingAITutor = () => {
 
   const containerStyle = {
     left: position.x,
-    top: position.y
+    top: position.y,
+    zIndex: 9999, // Ensure it's always on top
+    position: 'fixed' as const
   };
+
+  console.log('FloatingAITutor rendering at position:', position, 'expanded:', isExpanded);
 
   if (!isExpanded) {
     return (
-      <div className="fixed z-40" style={containerStyle}>
+      <div style={containerStyle}>
         <CollapsedButton 
-          onExpand={() => setIsExpanded(true)}
+          onExpand={() => {
+            console.log('Expanding tutor');
+            setIsExpanded(true);
+          }}
           {...commonProps}
         />
       </div>
@@ -57,11 +72,14 @@ const FloatingAITutor = () => {
   }
 
   return (
-    <div className="fixed z-40" style={containerStyle}>
+    <div style={containerStyle}>
       <ChatInterface
         messages={messages}
         onSendMessage={onSendMessage}
-        onClose={() => setIsExpanded(false)}
+        onClose={() => {
+          console.log('Closing tutor');
+          setIsExpanded(false);
+        }}
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}
         {...commonProps}
