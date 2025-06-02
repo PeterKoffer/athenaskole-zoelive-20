@@ -140,12 +140,13 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
 }
 
 function createPrompt(subject: string, skillArea: string, difficultyLevel: number, previousQuestions: string[]): string {
+  console.log('🎯 Creating prompt for subject:', subject, 'skillArea:', skillArea);
+  
   let prompt = '';
   
-  // Generate subject-specific prompts
-  switch (subject) {
-    case 'english':
-      prompt = `Generate an English reading comprehension question suitable for elementary students.
+  // Generate subject-specific prompts - this is the critical fix
+  if (subject === 'english') {
+    prompt = `Generate an English reading comprehension question suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -162,10 +163,8 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation clearly shows the reasoning
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-      break;
-
-    case 'mathematics':
-      prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
+  } else if (subject === 'mathematics') {
+    prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -182,10 +181,8 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation clearly shows how to solve the problem
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-      break;
-
-    case 'creative_writing':
-      prompt = `Generate a creative writing exercise suitable for elementary students.
+  } else if (subject === 'creative_writing') {
+    prompt = `Generate a creative writing exercise suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -202,10 +199,8 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the most interesting creative choice
 - The explanation shows why this choice works well for storytelling
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-      break;
-
-    case 'science':
-      prompt = `Generate a science discovery question suitable for elementary students.
+  } else if (subject === 'science') {
+    prompt = `Generate a science discovery question suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -222,11 +217,10 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation includes the scientific reasoning
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-      break;
-
-    default:
-      // Fallback to math if subject is not recognized
-      prompt = `Generate a basic math question suitable for elementary students.
+  } else {
+    // Fallback to math if subject is not recognized
+    console.log('⚠️ Unknown subject, falling back to math:', subject);
+    prompt = `Generate a basic math question suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -244,5 +238,6 @@ Return ONLY a valid JSON object with this exact structure:
 Create a completely different ${subject} question that hasn't been asked before.`;
   }
 
+  console.log('📝 Final prompt created for:', subject);
   return prompt;
 }
