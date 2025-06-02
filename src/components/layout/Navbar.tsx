@@ -2,9 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
-import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, ArrowLeft } from "lucide-react";
+import { Monitor, Gamepad2, BookOpenCheck, Settings, LogOut, Menu, ChevronDown, MessageSquare } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import MobileMenu from "./MobileMenu";
-import NavbarButton from "./NavbarButton";
 import GlobalCommunicationButton from "../communication/GlobalCommunicationButton";
 
 interface NavbarProps {
@@ -39,31 +45,13 @@ const Navbar = ({
   };
 
   const handleProfileClick = () => {
-    // Navigate to profile page
     window.location.href = '/profile';
   };
-
-  const navItems = [
-    { icon: Monitor, label: "Progress", action: onShowProgress },
-    { icon: Gamepad2, label: "Games", action: onShowGames },
-    { icon: BookOpenCheck, label: "AI Tutor", action: onShowAITutor }
-  ];
 
   return (
     <nav className="bg-gray-800 border-b border-gray-700 p-4 relative z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          {showBackButton && onBack && (
-            <Button
-              variant="ghost"
-              onClick={onBack}
-              className="text-gray-400 hover:text-white hover:bg-gray-700 flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back</span>
-            </Button>
-          )}
-          
           <button onClick={handleLogoClick} className="flex items-center space-x-2 hover:opacity-80 transition-opacity z-10">
             <div className="w-8 h-8 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
               <span className="text-lg">👩‍🏫</span>
@@ -75,28 +63,63 @@ const Navbar = ({
         </div>
         
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex items-center space-x-4">
           {user ? (
             <>
-              {navItems.map(({ icon, label, action }) => (
-                <NavbarButton
-                  key={label}
-                  icon={icon}
-                  label={label}
-                  onClick={() => handleNavigation(action)}
-                />
-              ))}
-              <GlobalCommunicationButton />
-              <NavbarButton
-                icon={Settings}
-                label="Profile"
-                onClick={handleProfileClick}
-              />
-              <NavbarButton
-                icon={LogOut}
-                label="Log Out"
-                onClick={signOut}
-              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="bg-blue-200 text-blue-800 border-blue-300 hover:bg-blue-300 h-10 px-4">
+                    <Menu className="w-4 h-4 mr-2" />
+                    Menu
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+                  <DropdownMenuItem 
+                    onClick={() => handleNavigation(onShowProgress)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <Monitor className="w-4 h-4 mr-2" />
+                    Progress
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => handleNavigation(onShowGames)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <Gamepad2 className="w-4 h-4 mr-2" />
+                    Games
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => handleNavigation(onShowAITutor)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <BookOpenCheck className="w-4 h-4 mr-2" />
+                    AI Tutor
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => window.location.href = '/communication'}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Messages
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleProfileClick}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={signOut}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <>

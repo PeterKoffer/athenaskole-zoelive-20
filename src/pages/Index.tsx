@@ -30,6 +30,12 @@ const Index = () => {
     naturteknik: 90
   };
 
+  // Always start at homepage - reset state when component mounts
+  useEffect(() => {
+    resetState();
+    scrollToTop();
+  }, [resetState, scrollToTop]);
+
   // Scroll to top when page loads or navigation state changes
   useEffect(() => {
     scrollToTop();
