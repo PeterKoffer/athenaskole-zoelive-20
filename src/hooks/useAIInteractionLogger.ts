@@ -15,7 +15,10 @@ export const useAIInteractionLogger = () => {
     costEstimate?: number,
     processingTimeMs?: number,
     success: boolean = true,
-    errorMessage?: string
+    errorMessage?: string,
+    subject?: string,
+    skillArea?: string,
+    difficultyLevel?: number
   ) => {
     if (!user) return null;
 
@@ -29,7 +32,10 @@ export const useAIInteractionLogger = () => {
       cost_estimate: costEstimate,
       processing_time_ms: processingTimeMs,
       success,
-      error_message: errorMessage
+      error_message: errorMessage,
+      subject,
+      skill_area: skillArea,
+      difficulty_level: difficultyLevel
     };
 
     try {
@@ -48,7 +54,9 @@ export const useAIInteractionLogger = () => {
     tokensUsed?: number,
     processingTime?: number,
     success: boolean = true,
-    errorMessage?: string
+    errorMessage?: string,
+    subject?: string,
+    skillArea?: string
   ) => {
     return logInteraction(
       'openai',
@@ -59,7 +67,9 @@ export const useAIInteractionLogger = () => {
       undefined, // We'll calculate cost based on tokens
       processingTime,
       success,
-      errorMessage
+      errorMessage,
+      subject,
+      skillArea
     );
   }, [logInteraction]);
 

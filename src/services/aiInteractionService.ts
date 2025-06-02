@@ -14,6 +14,9 @@ export interface AIInteraction {
   subject?: string;
   skill_area?: string;
   difficulty_level?: number;
+  tokens_used?: number;
+  cost_estimate?: number;
+  processing_time_ms?: number;
 }
 
 export const aiInteractionService = {
@@ -31,7 +34,10 @@ export const aiInteractionService = {
           error_message: interaction.error_message,
           subject: interaction.subject,
           skill_area: interaction.skill_area,
-          difficulty_level: interaction.difficulty_level
+          difficulty_level: interaction.difficulty_level,
+          tokens_used: interaction.tokens_used,
+          cost_estimate: interaction.cost_estimate,
+          processing_time_ms: interaction.processing_time_ms
         })
         .select('id')
         .single();
@@ -62,7 +68,24 @@ export const aiInteractionService = {
         return [];
       }
 
-      return data || [];
+      // Transform the data to match AIInteraction interface
+      return (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        ai_service: item.ai_service as 'openai' | 'elevenlabs' | 'suno',
+        interaction_type: item.interaction_type as 'chat' | 'tts' | 'music_generation',
+        prompt_text: item.prompt_text,
+        response_data: item.response_data,
+        success: item.success,
+        error_message: item.error_message,
+        created_at: item.created_at,
+        subject: item.subject,
+        skill_area: item.skill_area,
+        difficulty_level: item.difficulty_level,
+        tokens_used: item.tokens_used,
+        cost_estimate: item.cost_estimate,
+        processing_time_ms: item.processing_time_ms
+      }));
     } catch (error) {
       console.error('Error in getUserInteractions:', error);
       return [];

@@ -44,16 +44,16 @@ export const useActivityTracking = (
       const success = await userActivityService.endSession(currentSessionId, engagementScore);
       
       if (success && subject) {
-        // Calculate progress delta based on session duration and engagement
+        // Calculate completion time in minutes for progress tracking
         const sessionDuration = Math.round((new Date().getTime() - sessionStartTime.getTime()) / 1000 / 60);
-        const progressDelta = Math.min(sessionDuration * 0.5, 10); // Cap at 10% progress per session
+        const isCorrect = engagementScore ? engagementScore > 70 : true; // Assume success if engagement is high
         
         await realTimeProgressService.updateProgress(
           user.id,
           subject,
           sessionType,
-          sessionDuration,
-          progressDelta
+          isCorrect,
+          sessionDuration * 60 // Convert back to seconds for the progress service
         );
       }
 

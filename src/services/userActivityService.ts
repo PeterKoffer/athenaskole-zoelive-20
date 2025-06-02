@@ -20,8 +20,12 @@ export class UserActivityService {
       const { data, error } = await supabase
         .from('user_activity_sessions')
         .insert([{
-          ...session,
-          start_time: new Date().toISOString()
+          user_id: session.user_id,
+          session_type: session.session_type,
+          subject: session.subject,
+          start_time: new Date().toISOString(),
+          completion_status: session.completion_status,
+          metadata: session.metadata || {}
         }])
         .select()
         .single();
