@@ -73,10 +73,10 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         duration: 3000
       });
 
-    } catch (error) {
-      console.error('❌ Error generating question:', error);
-      setError(error instanceof Error ? error.message : 'Failed to generate question');
+    } catch (aiError) {
+      console.error('❌ AI generation error:', aiError);
       
+      // Only show error and use fallback if AI truly failed
       // Create a working fallback question
       const fallbackQuestion: Question = {
         question: `What is an important concept in ${skillArea} for ${subject}?`,
@@ -93,11 +93,14 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       };
       
       setQuestion(fallbackQuestion);
-      console.log('🔄 Using fallback question:', fallbackQuestion);
+      console.log('🔄 Using fallback question due to AI error:', fallbackQuestion);
+
+      // Only set error if we're using fallback
+      setError('AI generation failed, using fallback question');
 
       toast({
         title: "Question Ready! 📚",
-        description: "Practice question loaded (using fallback)",
+        description: "Practice question loaded (using backup content)",
         duration: 3000
       });
     } finally {

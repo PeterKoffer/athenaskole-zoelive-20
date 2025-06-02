@@ -42,6 +42,7 @@ export class AIContentGenerator {
         throw new Error('Invalid content structure received');
       }
 
+      // Return the validated content - this is successful generation
       return {
         question: content.question,
         options: content.options,
@@ -53,9 +54,8 @@ export class AIContentGenerator {
 
     } catch (error) {
       console.error('❌ Error in AIContentGenerator:', error);
-      
-      // Return fallback content instead of throwing
-      return this.createFallbackContent(request);
+      // Re-throw the error so the hook can handle it appropriately
+      throw error;
     }
   }
 

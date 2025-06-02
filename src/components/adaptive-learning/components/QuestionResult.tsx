@@ -24,13 +24,17 @@ const QuestionResult = ({ question, selectedAnswer, isCorrect }: QuestionResultP
             {isCorrect ? 'Correct!' : 'Incorrect'}
           </span>
         </div>
-        <p className="text-gray-300 text-sm">{question.explanation}</p>
+        <p className="text-gray-300 text-sm mb-3">{question.explanation}</p>
         {question.learningObjectives.length > 0 && (
           <div className="mt-3">
-            <p className="text-xs text-gray-400 mb-1">Learning Objectives:</p>
-            <div className="flex flex-wrap gap-1">
+            <p className="text-sm font-medium text-gray-200 mb-2">Learning Objectives:</p>
+            <div className="flex flex-wrap gap-2">
               {question.learningObjectives.map((objective, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
+                <Badge 
+                  key={index} 
+                  variant="secondary" 
+                  className="text-xs bg-lime-100 text-gray-900 border-lime-300 px-2 py-1"
+                >
                   {objective}
                 </Badge>
               ))}
