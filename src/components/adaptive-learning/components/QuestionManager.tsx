@@ -31,6 +31,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [hasTriedFallback, setHasTriedFallback] = useState(false);
+  const [questionAttempts, setQuestionAttempts] = useState<Set<string>>(new Set());
 
   const { 
     generateQuestion, 
@@ -49,16 +50,36 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       return;
     }
 
-    console.log('🎯 Generating next question...');
-    const usedQuestions = sessionQuestions.map(q => q.question);
+    console.log('🎯 Generating next question for subject:', subject);
+    
+    // Create a comprehensive list of used questions to ensure uniqueness
+    const usedQuestions = Array.from(new Set([
+      ...sessionQuestions.map(q => q.question),
+      ...Array.from(questionAttempts)
+    ]));
+    
+    console.log('📋 Used questions count:', usedQuestions.length);
     
     try {
       console.log('⏰ Starting AI generation with 30s timeout...');
       const newQuestion = await generateQuestion(usedQuestions);
       
       if (newQuestion) {
-        console.log('✅ AI question generated successfully');
+        console.log('✅ AI question generated successfully:', newQuestion.question);
+        
+        // Check if this question has been used before
+        if (usedQuestions.includes(newQuestion.question)) {
+          console.log('⚠️ Duplicate question detected, retrying...');
+          // Add to attempts and try again
+          setQuestionAttempts(prev => new Set([...prev, newQuestion.question]));
+          
+          if (usedQuestions.length < 10) { // Prevent infinite loops
+            return generateNextQuestion();
+          }
+        }
+        
         setSessionQuestions(prev => [...prev, newQuestion]);
+        setQuestionAttempts(prev => new Set([...prev, newQuestion.question]));
         setHasTriedFallback(false);
       } else {
         console.log('⚠️ AI generation returned null, trying fallback...');
@@ -70,24 +91,37 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       if (!hasTriedFallback) {
         console.log('🔄 Using fallback question due to AI failure...');
         const fallbackQuestion = createFallbackQuestion();
-        setSessionQuestions(prev => [...prev, fallbackQuestion]);
-        setHasTriedFallback(true);
         
-        toast({
-          title: "Using Backup Question",
-          description: "AI generation failed, using a practice question",
-          duration: 3000
-        });
+        // Ensure fallback is unique too
+        if (!usedQuestions.includes(fallbackQuestion.question)) {
+          setSessionQuestions(prev => [...prev, fallbackQuestion]);
+          setQuestionAttempts(prev => new Set([...prev, fallbackQuestion.question]));
+          setHasTriedFallback(true);
+          
+          toast({
+            title: "Using Backup Question",
+            description: "AI generation failed, using a practice question",
+            duration: 3000
+          });
+        } else {
+          console.log('⚠️ Even fallback question is duplicate, creating unique one...');
+          const uniqueFallback = {
+            ...fallbackQuestion,
+            question: `${fallbackQuestion.question} (Question ${sessionQuestions.length + 1})`
+          };
+          setSessionQuestions(prev => [...prev, uniqueFallback]);
+          setHasTriedFallback(true);
+        }
       } else {
         console.error('💥 Both AI and fallback failed');
         toast({
           title: "Error",
-          description: "Could not generate question. Please try again.",
+          description: "Could not generate unique question. Please try again.",
           variant: "destructive"
         });
       }
     }
-  }, [generateQuestion, sessionQuestions, totalQuestions, hasTriedFallback, toast]);
+  }, [generateQuestion, sessionQuestions, totalQuestions, hasTriedFallback, toast, subject, questionAttempts]);
 
   const handleAnswerSelect = useCallback((selectedAnswer: number, onComplete?: () => void) => {
     const newAnswers = [...answers, selectedAnswer];
@@ -125,6 +159,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
     setSessionQuestions([]);
     setAnswers([]);
     setHasTriedFallback(false);
+    setQuestionAttempts(new Set());
   }, []);
 
   return {

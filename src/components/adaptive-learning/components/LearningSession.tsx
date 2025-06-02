@@ -156,7 +156,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
 
         <div className="p-6">
           {isGenerating || !currentQuestion ? (
-            <LoadingState />
+            <LoadingState subject={subject} skillArea={skillArea} />
           ) : (
             <QuestionDisplay
               question={currentQuestion}
