@@ -1,5 +1,4 @@
-
-import { sessionService } from './sessionService';
+import { sessionService, LearningSession as SessionLearningSession } from './sessionService';
 import { userProgressService, UserProgress as ServiceUserProgress } from './userProgressService';
 
 // Use the UserProgress from userProgressService and add the missing id field
@@ -7,20 +6,9 @@ export interface UserProgress extends ServiceUserProgress {
   id: string;
 }
 
-export interface LearningSession {
-  id: string;
-  user_id: string;
-  subject: string;
-  skill_area: string;
-  difficulty_level: number;
-  start_time: string;
-  end_time?: string;
-  time_spent: number;
-  score: number;
-  completed: boolean;
-  content_id?: string;
-  user_feedback?: any;
-  ai_adjustments?: any;
+// Use the LearningSession from sessionService to ensure consistency
+export interface LearningSession extends SessionLearningSession {
+  id: string; // Ensure id is required, not optional
 }
 
 class ProgressPersistenceService {
@@ -50,7 +38,12 @@ class ProgressPersistenceService {
   }
 
   async getRecentSessions(userId: string, limit: number = 10): Promise<LearningSession[]> {
-    return sessionService.getRecentSessions(userId, limit);
+    const sessions = await sessionService.getRecentSessions(userId, limit);
+    // Transform sessions to ensure they have required id field
+    return sessions.map(session => ({
+      ...session,
+      id: session.id || `temp-${Date.now()}-${Math.random()}` // Ensure id is always present
+    })) as LearningSession[];
   }
 
   async getPerformanceAnalytics(userId: string, subject: string, days: number = 30): Promise<any> {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { aiInteractionService } from '@/services/aiInteractionService';
 import { userActivityService } from '@/services/userActivityService';
-import { realTimeProgressService } from '@/services/realTimeProgressService';
+import { userProgressService } from '@/services/userProgressService';
 import { Brain, Clock, Target, TrendingUp } from 'lucide-react';
 
 const UserAnalyticsDashboard = () => {
@@ -28,15 +27,22 @@ const UserAnalyticsDashboard = () => {
 
     setIsLoading(true);
     try {
-      const [aiData, activityData, progressData] = await Promise.all([
+      const [aiData, activityData] = await Promise.all([
         aiInteractionService.getInteractionStats(user.id),
-        userActivityService.getSessionAnalytics(user.id),
-        realTimeProgressService.getUserProgress(user.id)
+        userActivityService.getSessionAnalytics(user.id)
       ]);
+
+      // Get progress data for common subjects
+      const subjects = ['matematik', 'dansk', 'engelsk', 'naturteknik'];
+      const progressPromises = subjects.map(subject => 
+        userProgressService.getUserProgress(user.id, subject)
+      );
+      const progressResults = await Promise.all(progressPromises);
+      const validProgress = progressResults.filter(Boolean);
 
       setAiStats(aiData);
       setActivityStats(activityData);
-      setProgressData(progressData);
+      setProgressData(validProgress);
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -144,13 +150,13 @@ const UserAnalyticsDashboard = () => {
                       <p className="text-sm text-muted-foreground">{progress.skill_area}</p>
                     </div>
                     <Badge variant="secondary">
-                      {progress.progress_percentage?.toFixed(1) || 0}%
+                      {progress.accuracy_rate?.toFixed(1) || 0}%
                     </Badge>
                   </div>
-                  <Progress value={progress.progress_percentage || 0} />
+                  <Progress value={progress.accuracy_rate || 0} />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{progress.total_time_spent} minutes spent</span>
-                    <span>{progress.streak_count} day streak</span>
+                    <span>{progress.completion_time_avg} avg seconds</span>
+                    <span>Level {progress.current_level}</span>
                   </div>
                 </div>
               ))}
