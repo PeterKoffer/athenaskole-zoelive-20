@@ -22,8 +22,11 @@ serve(async (req) => {
 
     // Check for OpenAI API key - using the correct secret name "OpenaiAPI"
     const openAIApiKey = Deno.env.get('OpenaiAPI');
-    console.log('🔑 Checking API key... Key exists:', !!openAIApiKey);
-    console.log('🔑 Key length:', openAIApiKey ? openAIApiKey.length : 0);
+    console.log('🔑 API Key Check:');
+    console.log('  - Key exists:', !!openAIApiKey);
+    console.log('  - Key starts with sk-:', openAIApiKey ? openAIApiKey.startsWith('sk-') : false);
+    console.log('  - Key length:', openAIApiKey ? openAIApiKey.length : 0);
+    console.log('  - First 10 chars:', openAIApiKey ? openAIApiKey.substring(0, 10) : 'N/A');
     
     if (!openAIApiKey) {
       console.error('❌ OpenaiAPI secret not found in environment');
@@ -31,8 +34,9 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'OpenAI API key not configured. Please add OpenaiAPI to Supabase Edge Function secrets.',
+          error: 'OpenAI API key not configured. Please check the OpenaiAPI secret in Supabase.',
           debug: {
+            secretName: 'OpenaiAPI',
             availableVars: Object.keys(Deno.env.toObject())
           }
         }),
@@ -43,7 +47,24 @@ serve(async (req) => {
       );
     }
 
-    console.log('🔑 OpenAI API key found, proceeding with generation');
+    if (!openAIApiKey.startsWith('sk-')) {
+      console.error('❌ Invalid OpenAI API key format');
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Invalid OpenAI API key format. Key should start with "sk-"',
+          debug: {
+            keyStartsWith: openAIApiKey.substring(0, 5)
+          }
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('🔑 OpenAI API key validated successfully');
 
     // Create the prompt
     const prompt = `Generate a math question about fractions suitable for elementary students.
@@ -64,7 +85,9 @@ Make sure:
 - The explanation clearly shows how to solve the problem
 - Return ONLY the JSON, no markdown formatting or code blocks`;
 
-    console.log('🤖 Sending request to OpenAI with model gpt-4o-mini');
+    console.log('🤖 Making request to OpenAI API...');
+    console.log('🌐 Using endpoint: https://api.openai.com/v1/chat/completions');
+    console.log('🎯 Using model: gpt-4o-mini');
 
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -89,20 +112,35 @@ Make sure:
       }),
     });
 
-    console.log('📡 OpenAI response status:', openAIResponse.status);
-    console.log('📡 OpenAI response headers:', Object.fromEntries(openAIResponse.headers.entries()));
+    console.log('📡 OpenAI Response Details:');
+    console.log('  - Status:', openAIResponse.status);
+    console.log('  - Status Text:', openAIResponse.statusText);
+    console.log('  - Headers:', Object.fromEntries(openAIResponse.headers.entries()));
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
-      console.error('❌ OpenAI API error:', errorText);
+      console.error('❌ OpenAI API error response:', errorText);
+      
+      let errorMessage = `OpenAI API error: ${openAIResponse.status} - ${openAIResponse.statusText}`;
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.error?.message) {
+          errorMessage = `OpenAI API error: ${errorJson.error.message}`;
+        }
+      } catch (e) {
+        console.log('Could not parse error as JSON');
+      }
+      
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: `OpenAI API error: ${openAIResponse.status} - ${errorText}`,
+          error: errorMessage,
           debug: {
             status: openAIResponse.status,
             statusText: openAIResponse.statusText,
-            errorText: errorText
+            errorResponse: errorText,
+            headers: Object.fromEntries(openAIResponse.headers.entries())
           }
         }),
         { 
@@ -113,16 +151,21 @@ Make sure:
     }
 
     const openAIData = await openAIResponse.json();
-    console.log('✅ OpenAI response received:', JSON.stringify(openAIData, null, 2));
+    console.log('✅ OpenAI response received successfully');
+    console.log('📄 Response structure:', Object.keys(openAIData));
+    console.log('📄 Choices array length:', openAIData.choices?.length || 0);
 
     if (!openAIData.choices?.[0]?.message?.content) {
-      console.error('❌ Invalid OpenAI response structure');
+      console.error('❌ Invalid OpenAI response structure:', openAIData);
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Invalid response from OpenAI',
+          error: 'Invalid response structure from OpenAI',
           debug: {
-            response: openAIData
+            response: openAIData,
+            hasChoices: !!openAIData.choices,
+            choicesLength: openAIData.choices?.length || 0,
+            firstChoice: openAIData.choices?.[0] || null
           }
         }),
         { 
@@ -132,28 +175,30 @@ Make sure:
       );
     }
 
+    const contentText = openAIData.choices[0].message.content.trim();
+    console.log('📄 Raw OpenAI content (first 200 chars):', contentText.substring(0, 200));
+    console.log('📄 Content length:', contentText.length);
+
+    // Clean any potential markdown formatting
+    const cleanContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    console.log('🧹 Cleaned content (first 200 chars):', cleanContent.substring(0, 200));
+
     let generatedContent;
     try {
-      const contentText = openAIData.choices[0].message.content.trim();
-      console.log('📄 Raw OpenAI content:', contentText);
-      
-      // Clean any potential markdown formatting
-      const cleanContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      console.log('🧹 Cleaned content:', cleanContent);
-      
       generatedContent = JSON.parse(cleanContent);
-      
-      console.log('✅ Successfully parsed generated content:', JSON.stringify(generatedContent, null, 2));
+      console.log('✅ Successfully parsed JSON content');
+      console.log('🔍 Parsed content keys:', Object.keys(generatedContent));
     } catch (parseError) {
       console.error('❌ JSON parse failed:', parseError.message);
-      console.error('❌ Content that failed to parse:', openAIData.choices[0].message.content);
+      console.error('❌ Content that failed to parse:', cleanContent);
       return new Response(
         JSON.stringify({ 
           success: false,
           error: 'Failed to parse AI response as JSON',
           debug: {
             parseError: parseError.message,
-            rawContent: openAIData.choices[0].message.content
+            rawContent: contentText,
+            cleanedContent: cleanContent
           }
         }),
         { 
@@ -164,25 +209,26 @@ Make sure:
     }
 
     // Validate the generated content
-    if (!generatedContent.question || 
-        !Array.isArray(generatedContent.options) || 
-        generatedContent.options.length !== 4 ||
-        typeof generatedContent.correct !== 'number' || 
-        !generatedContent.explanation) {
-      console.error('❌ Invalid content structure:', generatedContent);
+    const validation = {
+      hasQuestion: !!generatedContent.question,
+      hasOptions: Array.isArray(generatedContent.options),
+      optionsLength: generatedContent.options?.length,
+      hasCorrect: typeof generatedContent.correct === 'number',
+      correctInRange: typeof generatedContent.correct === 'number' && generatedContent.correct >= 0 && generatedContent.correct <= 3,
+      hasExplanation: !!generatedContent.explanation
+    };
+
+    console.log('🔍 Content validation:', validation);
+
+    if (!validation.hasQuestion || !validation.hasOptions || validation.optionsLength !== 4 || !validation.hasCorrect || !validation.correctInRange || !validation.hasExplanation) {
+      console.error('❌ Content validation failed:', generatedContent);
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Generated content has invalid structure',
+          error: 'Generated content failed validation',
           debug: {
             content: generatedContent,
-            validation: {
-              hasQuestion: !!generatedContent.question,
-              hasOptions: Array.isArray(generatedContent.options),
-              optionsLength: generatedContent.options?.length,
-              hasCorrect: typeof generatedContent.correct === 'number',
-              hasExplanation: !!generatedContent.explanation
-            }
+            validation: validation
           }
         }),
         { 
@@ -202,7 +248,8 @@ Make sure:
       estimatedTime: 30
     };
 
-    console.log('🎯 Returning successful response:', JSON.stringify(finalContent, null, 2));
+    console.log('🎯 Final content prepared successfully');
+    console.log('📤 Returning success response');
 
     return new Response(
       JSON.stringify({ 
@@ -215,7 +262,9 @@ Make sure:
     );
 
   } catch (error) {
-    console.error('💥 Unexpected error:', error);
+    console.error('💥 Unexpected error in function:', error);
+    console.error('💥 Error name:', error.name);
+    console.error('💥 Error message:', error.message);
     console.error('💥 Error stack:', error.stack);
     
     return new Response(
@@ -224,6 +273,7 @@ Make sure:
         error: `Server error: ${error.message}`,
         debug: {
           errorName: error.name,
+          errorMessage: error.message,
           errorStack: error.stack
         }
       }),
