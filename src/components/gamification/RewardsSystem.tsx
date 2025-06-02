@@ -34,8 +34,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       // Avatar rewards
       {
         id: 'viking_avatar',
-        name: 'Viking Kriger',
-        description: 'Bliv til en sej viking kriger',
+        name: 'Viking Warrior',
+        description: 'Become a mighty viking warrior',
         cost: 50,
         type: 'avatar',
         emoji: '⚔️',
@@ -44,8 +44,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       },
       {
         id: 'princess_avatar',
-        name: 'Prinsesse',
-        description: 'En smuk prinsesse avatar',
+        name: 'Princess',
+        description: 'A beautiful princess avatar',
         cost: 50,
         type: 'avatar',
         emoji: '👸',
@@ -54,8 +54,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       },
       {
         id: 'wizard_avatar',
-        name: 'Troldmand',
-        description: 'Magisk troldmand med kræfter',
+        name: 'Wizard',
+        description: 'Magical wizard with powers',
         cost: 75,
         type: 'avatar',
         emoji: '🧙‍♂️',
@@ -66,8 +66,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       // Theme rewards
       {
         id: 'space_theme',
-        name: 'Rumtema',
-        description: 'Udforsk rummet mens du lærer',
+        name: 'Space Theme',
+        description: 'Explore space while learning',
         cost: 100,
         type: 'theme',
         emoji: '🚀',
@@ -76,8 +76,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       },
       {
         id: 'underwater_theme',
-        name: 'Undervandstema',
-        description: 'Dyk ned i havets dybder',
+        name: 'Underwater Theme',
+        description: 'Dive into the ocean depths',
         cost: 100,
         type: 'theme',
         emoji: '🌊',
@@ -88,8 +88,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       // Badge rewards
       {
         id: 'pronunciation_master',
-        name: 'Udtale Mester',
-        description: 'For fantastisk udtale',
+        name: 'Pronunciation Master',
+        description: 'For fantastic pronunciation',
         cost: 25,
         type: 'badge',
         emoji: '🎯',
@@ -98,8 +98,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       },
       {
         id: 'vocabulary_king',
-        name: 'Ord Konge',
-        description: 'For at mestre ordforråd',
+        name: 'Vocabulary King',
+        description: 'For mastering vocabulary',
         cost: 30,
         type: 'badge',
         emoji: '📚',
@@ -108,8 +108,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       },
       {
         id: 'grammar_genius',
-        name: 'Grammatik Geni',
-        description: 'For perfekt grammatik',
+        name: 'Grammar Genius',
+        description: 'For perfect grammar',
         cost: 40,
         type: 'badge',
         emoji: '✏️',
@@ -120,8 +120,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       // Content rewards
       {
         id: 'bonus_lessons',
-        name: 'Bonus Lektioner',
-        description: '5 ekstra lektioner om danske traditioner',
+        name: 'Bonus Lessons',
+        description: '5 extra lessons about Danish traditions',
         cost: 80,
         type: 'content',
         emoji: '📖',
@@ -130,8 +130,8 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
       },
       {
         id: 'premium_games',
-        name: 'Premium Spil',
-        description: 'Adgang til eksklusive læringsspil',
+        name: 'Premium Games',
+        description: 'Access to exclusive learning games',
         cost: 120,
         type: 'content',
         emoji: '🎮',
@@ -157,11 +157,11 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
   );
 
   const categories = [
-    { id: 'all', name: 'Alle', icon: Star },
-    { id: 'avatar', name: 'Avatarer', icon: Crown },
-    { id: 'theme', name: 'Temaer', icon: Sparkles },
+    { id: 'all', name: 'All', icon: Star },
+    { id: 'avatar', name: 'Avatars', icon: Crown },
+    { id: 'theme', name: 'Themes', icon: Sparkles },
     { id: 'badge', name: 'Badges', icon: Award },
-    { id: 'content', name: 'Indhold', icon: Gift }
+    { id: 'content', name: 'Content', icon: Gift }
   ];
 
   const ownedRewards = rewards.filter(r => r.owned);
@@ -174,9 +174,9 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
           <div className="flex items-center justify-center space-x-3 mb-2">
             <Star className="w-8 h-8 text-yellow-400" />
             <span className="text-3xl font-bold text-white">{currentCoins}</span>
-            <span className="text-xl text-gray-300">stjerner</span>
+            <span className="text-xl text-gray-300">stars</span>
           </div>
-          <p className="text-gray-300">Køb fede belønninger med dine stjerner!</p>
+          <p className="text-gray-300">Buy cool rewards with your stars!</p>
         </CardContent>
       </Card>
 
@@ -212,7 +212,7 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Gift className="w-5 h-5 mr-2 text-green-400" />
-              Mine Belønninger ({ownedRewards.length})
+              My Rewards ({ownedRewards.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -257,7 +257,7 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
                 
                 {reward.owned ? (
                   <Badge variant="outline" className="bg-green-600 text-white border-green-600">
-                    Ejet ✓
+                    Owned ✓
                   </Badge>
                 ) : reward.unlocked ? (
                   <Button
@@ -269,11 +269,11 @@ const RewardsSystem = ({ currentCoins, onPurchase }: RewardsSystemProps) => {
                         : 'bg-gray-600 cursor-not-allowed'
                     }`}
                   >
-                    {currentCoins >= reward.cost ? 'Køb nu' : 'Ikke råd'}
+                    {currentCoins >= reward.cost ? 'Buy now' : 'Not enough'}
                   </Button>
                 ) : (
                   <Badge variant="outline" className="bg-gray-600 text-gray-400 border-gray-600">
-                    Låst 🔒
+                    Locked 🔒
                   </Badge>
                 )}
               </div>

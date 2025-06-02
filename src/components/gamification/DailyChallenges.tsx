@@ -43,8 +43,8 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
     const newChallenges: Challenge[] = [
       {
         id: 'pronunciation_practice',
-        title: 'Udtale Mester',
-        description: 'Få 85%+ nøjagtighed i udtale 3 gange',
+        title: 'Pronunciation Master',
+        description: 'Get 85%+ accuracy in pronunciation 3 times',
         type: 'pronunciation',
         target: 3,
         current: 0,
@@ -54,8 +54,8 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
       },
       {
         id: 'vocabulary_builder',
-        title: 'Ord Samler',
-        description: 'Lær 10 nye ord i dag',
+        title: 'Word Collector',
+        description: 'Learn 10 new words today',
         type: 'vocabulary',
         target: 10,
         current: 2,
@@ -65,8 +65,8 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
       },
       {
         id: 'listening_champion',
-        title: 'Lytte Mester',
-        description: 'Afslut 2 lytteøvelser',
+        title: 'Listening Master',
+        description: 'Complete 2 listening exercises',
         type: 'listening',
         target: 2,
         current: 0,
@@ -76,8 +76,8 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
       },
       {
         id: 'grammar_guru',
-        title: 'Grammatik Guru',
-        description: 'Besvar 15 grammatik spørgsmål korrekt',
+        title: 'Grammar Guru',
+        description: 'Answer 15 grammar questions correctly',
         type: 'grammar',
         target: 15,
         current: 7,
@@ -137,14 +137,14 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
                   <Calendar className="w-6 h-6 text-orange-400" />
                   <span className="text-2xl font-bold text-white">{streakDays}</span>
                 </div>
-                <p className="text-gray-300 text-sm">Dage i træk</p>
+                <p className="text-gray-300 text-sm">Day streak</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center space-x-2">
                   <Star className="w-6 h-6 text-yellow-400" />
                   <span className="text-2xl font-bold text-white">{totalCoins}</span>
                 </div>
-                <p className="text-gray-300 text-sm">Stjerner</p>
+                <p className="text-gray-300 text-sm">Stars</p>
               </div>
             </div>
             
@@ -152,7 +152,7 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
               <div className="text-center">
                 <Trophy className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
                 <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">
-                  Alle udfordringer klaret! 🎉
+                  All challenges completed! 🎉
                 </Badge>
               </div>
             )}
@@ -165,7 +165,7 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
         <CardHeader>
           <CardTitle className="flex items-center text-white">
             <Target className="w-6 h-6 mr-2 text-lime-400" />
-            Dagens Udfordringer
+            Daily Challenges
             <Badge variant="outline" className="ml-auto text-lime-400 border-lime-400">
               {completedChallenges}/{challenges.length}
             </Badge>
@@ -194,7 +194,7 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
                     </div>
                     {challenge.completed && (
                       <Badge variant="outline" className="mt-1 bg-green-600 text-white border-green-600">
-                        Fuldført! ✓
+                        Completed! ✓
                       </Badge>
                     )}
                   </div>
@@ -202,7 +202,7 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-300">Fremskridt</span>
+                    <span className="text-gray-300">Progress</span>
                     <span className="text-white font-medium">
                       {challenge.current}/{challenge.target}
                     </span>
@@ -220,7 +220,7 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
                     onClick={() => updateChallengeProgress(challenge.id)}
                     className="mt-3 bg-blue-600 hover:bg-blue-700"
                   >
-                    Simuler fremskridt (+1)
+                    Simulate progress (+1)
                   </Button>
                 )}
               </CardContent>
@@ -234,14 +234,14 @@ const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
         <CardContent className="p-6">
           <div className="text-center">
             <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
-            <h3 className="text-xl font-bold text-white mb-2">Ugentlig Bonus</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Weekly Bonus</h3>
             <p className="text-gray-300 mb-4">
-              Fuldfør alle daglige udfordringer i 7 dage for at få 100 bonus stjerner!
+              Complete all daily challenges for 7 days to get 100 bonus stars!
             </p>
             <div className="flex items-center justify-center space-x-2">
-              <span className="text-white font-semibold">Fremskridt:</span>
+              <span className="text-white font-semibold">Progress:</span>
               <Badge variant="outline" className="bg-orange-600 text-white border-orange-600">
-                {streakDays}/7 dage
+                {streakDays}/7 days
               </Badge>
             </div>
             <Progress value={(streakDays / 7) * 100} className="h-3 mt-3" />
