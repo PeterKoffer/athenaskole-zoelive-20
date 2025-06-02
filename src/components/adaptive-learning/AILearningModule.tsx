@@ -10,19 +10,10 @@ import ErrorState from "./components/ErrorState";
 import LessonHeader from "./components/LessonHeader";
 import LessonControls from "./components/LessonControls";
 import SessionTimer from "./SessionTimer";
-import { useQuestionGeneration } from "./hooks/useQuestionGeneration";
+import { useQuestionGeneration, Question } from "./hooks/useQuestionGeneration";
 import { progressPersistence } from "@/services/progressPersistence";
 
-interface GeneratedContent {
-  question: string;
-  options: string[];
-  correct: number;
-  explanation: string;
-  learningObjectives: string[];
-  estimatedTime?: number;
-}
-
-interface AILearningModuleProps {
+export interface AILearningModuleProps {
   subject: string;
   skillArea: string;
   difficultyLevel: number;
@@ -34,7 +25,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
   const { toast } = useToast();
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [sessionQuestions, setSessionQuestions] = useState<GeneratedContent[]>([]);
+  const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<number[]>([]);
   const [isSessionActive, setIsSessionActive] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -100,8 +91,8 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
       setSessionQuestions(prev => [...prev, newQuestion]);
     } else {
       toast({
-        title: "Fejl",
-        description: "Kunne ikke generere spørgsmål. Prøv igen.",
+        title: "Error",
+        description: "Could not generate question. Please try again.",
         variant: "destructive"
       });
     }
@@ -132,8 +123,8 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
 
     // Show feedback toast
     toast({
-      title: isCorrect ? "Korrekt!" : "Forkert",
-      description: isCorrect ? "Godt klaret!" : "Prøv igen næste gang",
+      title: isCorrect ? "Correct!" : "Incorrect",
+      description: isCorrect ? "Well done!" : "Try again next time",
       variant: isCorrect ? "default" : "destructive"
     });
   };
@@ -197,11 +188,9 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
 
     return (
       <LessonComplete
-        correctAnswers={correctAnswers}
+        score={Math.round((correctAnswers / totalQuestions) * 100)}
         totalQuestions={totalQuestions}
         timeSpent={timeSpent}
-        subject={subject}
-        skillArea={skillArea}
         onRetry={handleRetry}
         onBack={onBack}
       />
@@ -211,9 +200,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
   if (generationError) {
     return (
       <ErrorState
-        error={generationError}
         onRetry={generateNextQuestion}
-        onBack={onBack}
       />
     );
   }
@@ -221,7 +208,6 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
   return (
     <div className="max-w-4xl mx-auto">
       <SessionTimer
-        isActive={isSessionActive}
         onTimeUpdate={setTimeSpent}
       />
       
@@ -256,7 +242,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
           isSessionActive={isSessionActive}
           onToggleSession={handleToggleSession}
           onNextQuestion={handleNextQuestion}
-          canSkip={!hasAnswered && currentQuestion}
+          canSkip={!hasAnswered && !!currentQuestion}
         />
       </Card>
     </div>

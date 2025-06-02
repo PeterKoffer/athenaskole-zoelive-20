@@ -13,28 +13,33 @@ export interface Question {
   estimatedTime: number;
 }
 
-export const useQuestionGeneration = (subject: string, skillArea: string) => {
-  const { user } = useAuth();
+interface UseQuestionGenerationProps {
+  subject: string;
+  skillArea: string;
+  difficultyLevel: number;
+  userId: string;
+}
+
+export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, userId }: UseQuestionGenerationProps) => {
   const { toast } = useToast();
   const [question, setQuestion] = useState<Question | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [questionHistory, setQuestionHistory] = useState<string[]>([]);
 
-  const generateQuestion = useCallback(async () => {
+  const generateQuestion = useCallback(async (previousQuestions: string[] = []) => {
     console.log('🚀 useQuestionGeneration.generateQuestion() CALLED');
-    console.log('👤 User check:', { hasUser: !!user, userId: user?.id });
-    console.log('📋 Generation params:', { subject, skillArea, historyCount: questionHistory.length });
+    console.log('👤 User check:', { hasUser: !!userId, userId });
+    console.log('📋 Generation params:', { subject, skillArea, difficultyLevel, historyCount: previousQuestions.length });
 
-    if (!user) {
+    if (!userId) {
       console.log('❌ No user found - cannot generate question');
       setError('User not authenticated');
-      return;
+      return null;
     }
 
     console.log('🔥 STARTING REAL AI QUESTION GENERATION PROCESS');
     
-    setIsLoading(true);
+    setIsGenerating(true);
     setError(null);
     setQuestion(null);
     
@@ -45,9 +50,9 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         body: {
           subject,
           skillArea,
-          difficultyLevel: 1,
-          userId: user.id,
-          previousQuestions: questionHistory
+          difficultyLevel,
+          userId,
+          previousQuestions
         }
       });
       
@@ -55,9 +60,9 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         body: {
           subject,
           skillArea,
-          difficultyLevel: 1,
-          userId: user.id,
-          previousQuestions: questionHistory
+          difficultyLevel,
+          userId,
+          previousQuestions
         }
       });
 
@@ -119,9 +124,6 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       console.log('🎯 Final question data prepared:', questionData);
       setQuestion(questionData);
 
-      // Add to question history to avoid repeats
-      setQuestionHistory(prev => [...prev, content.question]);
-
       toast({
         title: "AI Question Generated! 🤖",
         description: `Real AI question created for ${subject} - ${skillArea}`,
@@ -129,6 +131,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       });
 
       console.log('✅ Question generation completed successfully');
+      return questionData;
 
     } catch (error: any) {
       console.error('💥 Question generation failed with error:', error);
@@ -148,15 +151,17 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         variant: "destructive"
       });
 
+      return null;
+
     } finally {
-      setIsLoading(false);
+      setIsGenerating(false);
       console.log('🏁 Question generation process completed (finally block)');
     }
-  }, [user, subject, skillArea, toast, questionHistory]);
+  }, [userId, subject, skillArea, difficultyLevel, toast]);
 
   return {
     question,
-    isLoading,
+    isGenerating,
     error,
     generateQuestion
   };

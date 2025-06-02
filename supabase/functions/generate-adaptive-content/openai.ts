@@ -1,6 +1,29 @@
 
 import { OpenAIResponse, GeneratedContent } from './types.ts';
 
+export async function generateContentWithOpenAI(requestData: any): Promise<GeneratedContent | null> {
+  console.log('🤖 generateContentWithOpenAI called with:', requestData);
+  
+  const openaiApiKey = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('OpenaiAPI');
+  
+  if (!openaiApiKey) {
+    console.error('❌ No OpenAI API key found');
+    throw new Error('OpenAI API key not configured');
+  }
+
+  const prompt = createPrompt(requestData.previousQuestions || []);
+  console.log('📝 Using prompt:', prompt);
+
+  const result = await callOpenAI(openaiApiKey, prompt);
+  
+  if (!result.success) {
+    console.error('❌ OpenAI call failed:', result.error);
+    throw new Error(result.error || 'OpenAI call failed');
+  }
+
+  return result.data || null;
+}
+
 export async function callOpenAI(apiKey: string, prompt: string): Promise<{ success: boolean; data?: GeneratedContent; error?: string; debug?: any }> {
   console.log('🤖 Making request to OpenAI API...');
   console.log('🌐 Using endpoint: https://api.openai.com/v1/chat/completions');
@@ -114,4 +137,32 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
       }
     };
   }
+}
+
+function createPrompt(previousQuestions: string[]): string {
+  let prompt = `Generate a math question about fractions suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What is 1/2 + 1/4?",
+  "options": ["1/6", "2/6", "3/4", "3/6"],
+  "correct": 2,
+  "explanation": "To add fractions, find a common denominator. 1/2 = 2/4, so 2/4 + 1/4 = 3/4",
+  "learningObjectives": ["Adding fractions with different denominators", "Finding common denominators"]
+}
+
+Make sure:
+- The question is about fractions (adding, subtracting, multiplying, or dividing)
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation clearly shows how to solve the problem
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+
+  if (previousQuestions.length > 0) {
+    prompt += `\n\nIMPORTANT: Do NOT generate any of these previous questions:\n${previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+Create a completely different fraction problem that hasn't been asked before.`;
+  }
+
+  return prompt;
 }

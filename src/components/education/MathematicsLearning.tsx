@@ -58,11 +58,6 @@ const MathematicsLearning = () => {
     });
   };
 
-  const handleAIComplete = (score: number) => {
-    console.log('✅ AI Learning completed with score:', score);
-    setUseAIQuestions(false);
-  };
-
   // Show loading state while authentication is being checked
   if (loading) {
     console.log('⏳ Showing loading state - auth check in progress');
@@ -100,7 +95,13 @@ const MathematicsLearning = () => {
             </CardContent>
           </Card>
           
-          <AILearningModule key={aiSessionKey} subject="matematik" skillArea="fractions" onComplete={handleAIComplete} />
+          <AILearningModule 
+            key={aiSessionKey} 
+            subject="matematik" 
+            skillArea="fractions" 
+            difficultyLevel={1}
+            onBack={() => setUseAIQuestions(false)}
+          />
         </div>
       </div>;
   }
