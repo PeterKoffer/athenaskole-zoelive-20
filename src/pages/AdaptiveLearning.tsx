@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import AdaptiveLearningEngine from '@/components/adaptive-learning/AdaptiveLearningEngine';
+import AILearningModule from '@/components/adaptive-learning/AILearningModule';
 import PerformanceAnalytics from '@/components/adaptive-learning/PerformanceAnalytics';
 import { Brain, BarChart3, BookOpen, Target, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const subjects = [
-  { id: 'matematik', name: 'Matematik', skills: ['addition', 'subtraction', 'multiplication', 'division'], color: 'bg-blue-500' },
+  { id: 'matematik', name: 'Matematik', skills: ['addition', 'subtraction', 'multiplication', 'division', 'fractions'], color: 'bg-blue-500' },
   { id: 'dansk', name: 'Dansk', skills: ['spelling', 'grammar', 'reading', 'writing'], color: 'bg-red-500' },
   { id: 'engelsk', name: 'Engelsk', skills: ['vocabulary', 'grammar', 'reading', 'speaking'], color: 'bg-green-500' },
   { id: 'naturteknik', name: 'Natur/Teknik', skills: ['science', 'technology', 'experiments', 'nature'], color: 'bg-purple-500' }
@@ -21,6 +21,7 @@ const AdaptiveLearning = () => {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [showEngine, setShowEngine] = useState(false);
+  const [sessionKey, setSessionKey] = useState(0); // Force re-render of AI module
 
   const handleSubjectSelect = (subjectId: string) => {
     console.log('📚 Subject selected:', subjectId);
@@ -33,10 +34,22 @@ const AdaptiveLearning = () => {
     console.log('🎯 Skill selected:', skill);
     setSelectedSkill(skill);
     setShowEngine(true);
+    setSessionKey(prev => prev + 1); // Force new session
   };
 
   const handleComplete = (score: number) => {
     console.log('✅ AI Learning session completed with score:', score);
+    // Reset for next session
+    setShowEngine(false);
+    setSelectedSkill(null);
+  };
+
+  const handleQuickTest = () => {
+    console.log('🚀 Starting quick test');
+    setSelectedSubject('matematik');
+    setSelectedSkill('fractions');
+    setShowEngine(true);
+    setSessionKey(prev => prev + 1); // Force new session
   };
 
   if (!user) {
@@ -88,6 +101,24 @@ const AdaptiveLearning = () => {
           <TabsContent value="learning" className="space-y-6">
             {!showEngine ? (
               <>
+                {/* Quick Test Card */}
+                <Card className="bg-gradient-to-r from-lime-900 to-green-900 border-lime-400">
+                  <CardContent className="p-6 text-center">
+                    <Brain className="w-12 h-12 text-lime-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-white mb-2">Test AI Learning Now!</h3>
+                    <p className="text-lime-200 mb-4">
+                      Skip setup and try a quick AI-generated math question
+                    </p>
+                    <Button
+                      onClick={handleQuickTest}
+                      className="bg-lime-400 hover:bg-lime-500 text-black font-semibold"
+                    >
+                      <Brain className="w-4 h-4 mr-2" />
+                      Quick Test - Math Fractions
+                    </Button>
+                  </CardContent>
+                </Card>
+
                 {/* Subject Selection */}
                 <Card className="bg-gray-900 border-gray-800">
                   <CardHeader>
@@ -145,30 +176,6 @@ const AdaptiveLearning = () => {
                     </CardContent>
                   </Card>
                 )}
-
-                {/* Quick Test Button */}
-                {!selectedSubject && (
-                  <Card className="bg-gradient-to-r from-lime-900 to-green-900 border-lime-400">
-                    <CardContent className="p-6 text-center">
-                      <Brain className="w-12 h-12 text-lime-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-white mb-2">Test AI Learning Now!</h3>
-                      <p className="text-lime-200 mb-4">
-                        Skip setup and try a quick AI-generated question
-                      </p>
-                      <Button
-                        onClick={() => {
-                          setSelectedSubject('matematik');
-                          setSelectedSkill('addition');
-                          setShowEngine(true);
-                        }}
-                        className="bg-lime-400 hover:bg-lime-500 text-black font-semibold"
-                      >
-                        <Brain className="w-4 h-4 mr-2" />
-                        Quick Test - Math
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
               </>
             ) : (
               <>
@@ -196,7 +203,7 @@ const AdaptiveLearning = () => {
                   </CardContent>
                 </Card>
 
-                {/* Adaptive Learning Engine */}
+                {/* AI Learning Module - Only render when we have both subject and skill */}
                 {selectedSubject && selectedSkill && (
                   <div className="space-y-4">
                     <Card className="bg-gradient-to-r from-green-900 to-blue-900 border-green-400">
@@ -208,7 +215,8 @@ const AdaptiveLearning = () => {
                       </CardContent>
                     </Card>
                     
-                    <AdaptiveLearningEngine
+                    <AILearningModule
+                      key={sessionKey} // Force re-render with new session
                       subject={selectedSubject}
                       skillArea={selectedSkill}
                       onComplete={handleComplete}

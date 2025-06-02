@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useQuestionGeneration } from './hooks/useQuestionGeneration';
 import { useQuestionTimer } from './hooks/useQuestionTimer';
@@ -20,6 +20,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const hasInitialized = useRef(false);
 
   const handleTimeUp = () => {
     if (!showResult) {
@@ -29,18 +30,22 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
 
+  // Initialize only once
   useEffect(() => {
-    console.log('🔄 AILearningModule mounted, generating question...');
-    generateQuestion();
-  }, [generateQuestion]);
+    if (!hasInitialized.current) {
+      console.log('🔄 AILearningModule initializing once for:', { subject, skillArea });
+      hasInitialized.current = true;
+      generateQuestion();
+    }
+  }, [subject, skillArea, generateQuestion]);
 
   useEffect(() => {
-    if (question && !showResult) {
-      console.log('⏰ Starting timer for question:', question.estimatedTime);
+    if (question && !showResult && !startTime) {
+      console.log('⏰ Starting timer for new question:', question.estimatedTime);
       setStartTime(new Date());
       startTimer(question.estimatedTime);
     }
-  }, [question, showResult, startTimer]);
+  }, [question, showResult, startTime, startTimer]);
 
   const handleAnswerSelect = (index: number) => {
     if (!showResult) {

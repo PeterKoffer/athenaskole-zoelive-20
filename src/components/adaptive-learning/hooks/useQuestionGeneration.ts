@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { aiContentGenerator } from '@/services/content/aiContentGenerator';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +19,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
   const [question, setQuestion] = useState<Question | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isGenerating = useRef(false);
 
   const generateQuestion = useCallback(async () => {
     if (!user) {
@@ -27,6 +28,12 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       return;
     }
 
+    if (isGenerating.current) {
+      console.log('⏳ Already generating, skipping...');
+      return;
+    }
+
+    isGenerating.current = true;
     setIsLoading(true);
     setError(null);
     setQuestion(null);
@@ -95,6 +102,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       });
     } finally {
       setIsLoading(false);
+      isGenerating.current = false;
     }
   }, [user, subject, skillArea, toast]);
 
