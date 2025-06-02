@@ -29,13 +29,14 @@ const CreativeLearning = () => {
 
   // Show loading state while authentication is being checked
   if (loading) {
-    return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">🎨</div>
           <p className="text-lg">Loading your creative lesson...</p>
         </div>
-      </div>;
-    </div>;
+      </div>
+    );
   }
 
   // Don't render the component if user is not authenticated
@@ -44,7 +45,8 @@ const CreativeLearning = () => {
   }
 
   // Always show AI Questions Mode
-  return <div className="min-h-screen bg-gray-900 text-white">
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
         <Card className="bg-gradient-to-r from-pink-900 to-purple-900 border-pink-400 mb-6">
@@ -64,7 +66,8 @@ const CreativeLearning = () => {
           onBack={() => navigate('/')}
         />
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default CreativeLearning;

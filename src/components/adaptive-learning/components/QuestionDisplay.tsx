@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Question } from '../hooks/useQuestionGeneration';
+import QuestionTimer from './QuestionTimer';
 
 export interface QuestionDisplayProps {
   question: Question;
@@ -36,6 +37,14 @@ const QuestionDisplay = ({
   const handleSubmit = () => {
     if (tempSelected !== null) {
       onAnswerSelect(tempSelected);
+    }
+  };
+
+  const handleTimeUp = () => {
+    if (!hasAnswered) {
+      // Auto-select a random answer if time runs out
+      const randomAnswer = Math.floor(Math.random() * question.options.length);
+      onAnswerSelect(randomAnswer);
     }
   };
 
@@ -75,6 +84,14 @@ const QuestionDisplay = ({
 
   return (
     <div className="space-y-6">
+      {!hasAnswered && (
+        <QuestionTimer
+          initialTime={question.estimatedTime}
+          onTimeUp={handleTimeUp}
+          isActive={!hasAnswered}
+        />
+      )}
+
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <div className="flex items-center justify-between">
