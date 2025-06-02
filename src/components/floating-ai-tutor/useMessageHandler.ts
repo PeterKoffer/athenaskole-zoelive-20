@@ -1,17 +1,20 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Message } from "./types";
+import { RealtimeChat } from "@/utils/RealtimeAudio";
 
 export const useMessageHandler = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant" as const,
-      content: "Hi! I'm Nelie, your AI tutor. Say 'hi Nelie' to start, or write your question!",
+      content: "Hi! I'm Nelie, your AI tutor. Click the microphone to start voice chat, or type your question!",
       timestamp: new Date()
     }
   ]);
 
-  const handleSendMessage = (inputMessage: string, setInputMessage: (message: string) => void, setIsSpeaking: (speaking: boolean) => void) => {
+  const realtimeChatRef = useRef<RealtimeChat | null>(null);
+
+  const handleSendMessage = async (inputMessage: string, setInputMessage: (message: string) => void, setIsSpeaking: (speaking: boolean) => void) => {
     if (!inputMessage.trim()) return;
 
     const userMessage: Message = {
@@ -21,12 +24,22 @@ export const useMessageHandler = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    
+    setInputMessage("");
+
+    // If realtime chat is available, use it
+    if (realtimeChatRef.current) {
+      try {
+        await realtimeChatRef.current.sendMessage(inputMessage);
+        return;
+      } catch (error) {
+        console.error('Failed to send via realtime chat:', error);
+      }
+    }
+
+    // Fallback to simulated response
     const isNelieGreeting = inputMessage.toLowerCase().includes('hi nelie') || 
                            inputMessage.toLowerCase().includes('hello nelie');
     
-    setInputMessage("");
-
     setTimeout(() => {
       let responseContent = "";
       
@@ -42,7 +55,7 @@ export const useMessageHandler = () => {
           speechSynthesis.speak(utterance);
         }
       } else {
-        responseContent = "That's a good question! As Nelie, I can help you with many things. Try saying 'hi Nelie' for a more personal greeting!";
+        responseContent = "That's a good question! I'd love to help you with that. For the best experience, try clicking the microphone button to start voice chat with me!";
       }
 
       const aiResponse: Message = {
@@ -56,6 +69,7 @@ export const useMessageHandler = () => {
 
   return {
     messages,
-    handleSendMessage
+    handleSendMessage,
+    realtimeChatRef
   };
 };

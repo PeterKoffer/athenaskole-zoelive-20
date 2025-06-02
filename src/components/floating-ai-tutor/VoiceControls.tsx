@@ -1,8 +1,9 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { RealtimeChat } from "@/utils/RealtimeAudio";
 
 interface VoiceControlsProps {
   isSpeaking: boolean;
@@ -11,90 +12,86 @@ interface VoiceControlsProps {
 }
 
 const VoiceControls = ({ isSpeaking, onStopSpeaking, onVoiceInput }: VoiceControlsProps) => {
+  const [isConnected, setIsConnected] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef<any>(null);
+  const realtimeChatRef = useRef<RealtimeChat | null>(null);
 
-  const startListening = () => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
-      
-      recognitionRef.current.onstart = () => {
-        setIsListening(true);
+  const handleMessage = (event: any) => {
+    console.log('Voice control received message:', event.type);
+    
+    if (event.type === 'response.audio_transcript.delta') {
+      setTranscript(prev => prev + event.delta);
+    } else if (event.type === 'response.audio_transcript.done') {
+      if (transcript) {
+        onVoiceInput(transcript);
         setTranscript("");
-      };
-      
-      recognitionRef.current.onresult = (event: any) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-        
-        setTranscript(finalTranscript || interimTranscript);
-        
-        if (finalTranscript) {
-          onVoiceInput(finalTranscript);
-          setIsListening(false);
-        }
-      };
-      
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-      
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-      
-      recognitionRef.current.start();
-    } else {
-      // Fallback for browsers without speech recognition
-      console.log('Speech recognition not supported, using fallback');
+      }
+    } else if (event.type === 'input_audio_buffer.speech_started') {
       setIsListening(true);
-      setTimeout(() => {
-        setIsListening(false);
-        onVoiceInput("Hello Nelie, can you help me with my studies?");
-      }, 2000);
+    } else if (event.type === 'input_audio_buffer.speech_stopped') {
+      setIsListening(false);
     }
   };
 
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+  const startVoiceChat = async () => {
+    try {
+      console.log('Starting voice chat...');
+      realtimeChatRef.current = new RealtimeChat(handleMessage, () => {});
+      await realtimeChatRef.current.init();
+      setIsConnected(true);
+      console.log('Voice chat started successfully');
+    } catch (error) {
+      console.error('Failed to start voice chat:', error);
+      // Fallback to simple voice input
+      fallbackVoiceInput();
     }
+  };
+
+  const stopVoiceChat = () => {
+    console.log('Stopping voice chat...');
+    realtimeChatRef.current?.disconnect();
+    setIsConnected(false);
     setIsListening(false);
+    setTranscript("");
   };
 
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening();
+  const fallbackVoiceInput = () => {
+    console.log('Using fallback voice input');
+    setIsListening(true);
+    setTimeout(() => {
+      setIsListening(false);
+      onVoiceInput("Hi Nelie, can you help me with my studies?");
+    }, 2000);
+  };
+
+  const toggleVoiceChat = () => {
+    if (isConnected) {
+      stopVoiceChat();
     } else {
-      startListening();
+      startVoiceChat();
     }
   };
+
+  useEffect(() => {
+    return () => {
+      realtimeChatRef.current?.disconnect();
+    };
+  }, []);
 
   return (
     <>
       <Button
         variant="outline"
         size="sm"
-        onClick={toggleListening}
-        className={`border-gray-600 p-1 ${isListening ? "bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-none" : "bg-gray-800 text-gray-300 hover:bg-gray-700"}`}
+        onClick={toggleVoiceChat}
+        className={`border-gray-600 p-1 ${
+          isConnected
+            ? "bg-gradient-to-r from-green-400 to-blue-400 text-white border-none" 
+            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+        }`}
       >
-        {isListening ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+        {isConnected ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
       </Button>
       <Button
         variant="outline"
@@ -105,10 +102,17 @@ const VoiceControls = ({ isSpeaking, onStopSpeaking, onVoiceInput }: VoiceContro
       >
         {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
       </Button>
-      {isListening && (
+      {(isListening || isConnected) && (
         <div className="text-center mt-2">
-          <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400 animate-pulse text-xs">
-            🎤 Listening... {transcript && `"${transcript}"`}
+          <Badge 
+            variant="outline" 
+            className={`${
+              isListening 
+                ? "bg-gradient-to-r from-red-400 to-pink-400 text-white border-red-400 animate-pulse" 
+                : "bg-gradient-to-r from-green-400 to-blue-400 text-white border-green-400"
+            } text-xs`}
+          >
+            {isListening ? `🎤 Listening... ${transcript}` : '🔊 Voice chat active'}
           </Badge>
         </div>
       )}
