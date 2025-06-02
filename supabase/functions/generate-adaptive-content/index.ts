@@ -184,8 +184,12 @@ function createPrompt(subject: string, skillArea: string, difficultyLevel: numbe
   
   let prompt = '';
   
-  // Generate subject-specific prompts - this is the critical fix
-  if (subject === 'english') {
+  // Map subject names to ensure proper handling
+  const normalizedSubject = normalizeSubjectName(subject);
+  console.log('🔄 Normalized subject from', subject, 'to', normalizedSubject);
+  
+  // Generate subject-specific prompts
+  if (normalizedSubject === 'english') {
     prompt = `Generate an English reading comprehension question suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
@@ -204,7 +208,7 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation clearly shows the reasoning
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-  } else if (subject === 'mathematics') {
+  } else if (normalizedSubject === 'mathematics') {
     prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
 
 Return ONLY a valid JSON object with this exact structure:
@@ -223,7 +227,7 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation clearly shows how to solve the problem
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-  } else if (subject === 'creative_writing') {
+  } else if (normalizedSubject === 'creative_writing') {
     prompt = `Generate a creative writing exercise suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
@@ -242,7 +246,7 @@ Make sure:
 - The "correct" field is the index (0, 1, 2, or 3) of the most interesting creative choice
 - The explanation shows why this choice works well for storytelling
 - Return ONLY the JSON, no markdown formatting or code blocks`;
-  } else if (subject === 'science') {
+  } else if (normalizedSubject === 'science') {
     prompt = `Generate a science discovery question suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
@@ -262,27 +266,40 @@ Make sure:
 - The explanation includes the scientific reasoning
 - Return ONLY the JSON, no markdown formatting or code blocks`;
   } else {
-    // Fallback to math if subject is not recognized
-    console.log('⚠️ Unknown subject, falling back to math:', subject);
-    prompt = `Generate a basic math question suitable for elementary students.
-
-Return ONLY a valid JSON object with this exact structure:
-{
-  "question": "What is 5 + 3?",
-  "options": ["6", "7", "8", "9"],
-  "correct": 2,
-  "explanation": "5 + 3 = 8",
-  "learningObjectives": ["Basic addition"],
-  "estimatedTime": 30
-}`;
+    // This should never happen now with proper subject normalization
+    console.error('⚠️ Unknown subject after normalization:', normalizedSubject, 'original:', subject);
+    // Return an error instead of defaulting to math
+    throw new Error(`Unsupported subject: ${subject}. Supported subjects are: english, mathematics, creative_writing, science`);
   }
 
   if (previousQuestions.length > 0) {
     prompt += `\n\nIMPORTANT: Do NOT generate any of these previous questions:\n${previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
 
-Create a completely different ${subject} question that hasn't been asked before.`;
+Create a completely different ${normalizedSubject} question that hasn't been asked before.`;
   }
 
-  console.log('📝 Final prompt created for:', subject);
+  console.log('📝 Final prompt created for:', normalizedSubject);
   return prompt;
+}
+
+function normalizeSubjectName(subject: string): string {
+  // Handle different variations of subject names
+  const subjectMap: { [key: string]: string } = {
+    'english': 'english',
+    'english_reading': 'english',
+    'reading': 'english',
+    'mathematics': 'mathematics',
+    'math': 'mathematics',
+    'maths': 'mathematics',
+    'creative_writing': 'creative_writing',
+    'creative': 'creative_writing',
+    'writing': 'creative_writing',
+    'science': 'science',
+    'science_discovery': 'science',
+    'discovery': 'science'
+  };
+
+  const normalized = subjectMap[subject.toLowerCase()] || subject.toLowerCase();
+  console.log('🔍 Subject mapping:', subject, '->', normalized);
+  return normalized;
 }

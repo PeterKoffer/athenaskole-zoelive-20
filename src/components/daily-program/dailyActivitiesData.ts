@@ -1,5 +1,5 @@
 
-import { BookOpen, Calculator, Palette, Globe } from "lucide-react";
+import { BookOpen, Calculator, PenTool, Beaker } from "lucide-react";
 
 export const dailyActivities = [
   {
@@ -15,11 +15,11 @@ export const dailyActivities = [
     skillArea: "reading_comprehension"
   },
   {
-    id: "mathematics",
+    id: "mathematics", 
     title: "Mathematics",
     description: "Practice math problems tailored to your level with step-by-step guidance",
     icon: Calculator,
-    duration: "25 min", 
+    duration: "25 min",
     level: "Intermediate",
     color: "from-green-500 to-blue-600",
     aiEnhanced: true,
@@ -28,12 +28,12 @@ export const dailyActivities = [
   },
   {
     id: "creative_writing",
-    title: "Creative Writing",
+    title: "Creative Writing", 
     description: "Express yourself through AI-guided storytelling and creative exercises",
-    icon: Palette,
+    icon: PenTool,
     duration: "30 min",
     level: "Beginner",
-    color: "from-pink-500 to-red-600", 
+    color: "from-pink-500 to-red-600",
     aiEnhanced: true,
     subject: "creative_writing",
     skillArea: "storytelling"
@@ -41,10 +41,10 @@ export const dailyActivities = [
   {
     id: "science",
     title: "Science Discovery",
-    description: "Explore the wonders of science with interactive AI-powered lessons",
-    icon: Globe,
+    description: "Explore the wonders of science with interactive AI-powered lessons", 
+    icon: Beaker,
     duration: "25 min",
-    level: "Intermediate", 
+    level: "Intermediate",
     color: "from-purple-500 to-indigo-600",
     aiEnhanced: true,
     subject: "science",
