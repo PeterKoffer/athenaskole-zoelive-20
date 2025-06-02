@@ -13,8 +13,8 @@ const ChatMessage = ({ message, children }: ChatMessageProps) => {
         <div
           className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
             message.role === 'user'
-              ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white'
-              : 'bg-gray-800 text-gray-100 border border-gray-700'
+              ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white text-right'
+              : 'bg-gray-800 text-gray-100 border border-gray-700 text-left'
           }`}
         >
           <p className="text-sm">{message.content}</p>

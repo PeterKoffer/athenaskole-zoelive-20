@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Calculator, BookOpen, Globe } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export interface SubjectSelectorProps {
   onSubjectSelect?: (subject: string, skillArea: string) => void;
@@ -13,16 +14,18 @@ export interface SubjectSelectorProps {
 }
 
 const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubjectChange, onLanguageSelect }: SubjectSelectorProps) => {
+  const navigate = useNavigate();
+
   const subjects = [
     {
       id: 'mathematics',
       name: 'Mathematics',
       icon: Calculator,
       skillAreas: [
-        { id: 'fractions', name: 'Fractions', description: 'Adding, subtracting, and working with fractions' },
-        { id: 'arithmetic', name: 'Arithmetic', description: 'Basic math operations and number sense' },
-        { id: 'geometry', name: 'Geometry', description: 'Shapes, angles, and spatial reasoning' },
-        { id: 'algebra', name: 'Algebra', description: 'Variables, equations, and problem solving' }
+        { id: 'fractions', name: 'Fractions', description: 'Adding, subtracting, and working with fractions', route: '/mathematics' },
+        { id: 'arithmetic', name: 'Arithmetic', description: 'Basic math operations and number sense', route: '/mathematics' },
+        { id: 'geometry', name: 'Geometry', description: 'Shapes, angles, and spatial reasoning', route: '/mathematics' },
+        { id: 'algebra', name: 'Algebra', description: 'Variables, equations, and problem solving', route: '/mathematics' }
       ]
     },
     {
@@ -30,10 +33,10 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'English',
       icon: BookOpen,
       skillAreas: [
-        { id: 'spelling', name: 'Spelling', description: 'Word recognition and spelling patterns' },
-        { id: 'grammar', name: 'Grammar', description: 'Sentence structure and language rules' },
-        { id: 'reading', name: 'Reading', description: 'Comprehension and vocabulary building' },
-        { id: 'writing', name: 'Writing', description: 'Expression and communication skills' }
+        { id: 'spelling', name: 'Spelling', description: 'Word recognition and spelling patterns', route: '/english' },
+        { id: 'grammar', name: 'Grammar', description: 'Sentence structure and language rules', route: '/english' },
+        { id: 'reading', name: 'Reading', description: 'Comprehension and vocabulary building', route: '/english' },
+        { id: 'writing', name: 'Writing', description: 'Expression and communication skills', route: '/english' }
       ]
     },
     {
@@ -41,18 +44,23 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'Science',
       icon: Globe,
       skillAreas: [
-        { id: 'biology', name: 'Biology', description: 'Living organisms and life processes' },
-        { id: 'chemistry', name: 'Chemistry', description: 'Matter, atoms, and chemical reactions' },
-        { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws' },
-        { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment' }
+        { id: 'biology', name: 'Biology', description: 'Living organisms and life processes', route: '/science' },
+        { id: 'chemistry', name: 'Chemistry', description: 'Matter, atoms, and chemical reactions', route: '/science' },
+        { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws', route: '/science' },
+        { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment', route: '/science' }
       ]
     }
   ];
 
-  const handleSubjectSelect = (subject: string, skillArea: string) => {
+  const handleSubjectSelect = (subject: string, skillArea: string, route: string) => {
+    console.log('🚀 Starting AI learning session:', { subject, skillArea, route });
+    
     if (onSubjectSelect) {
       onSubjectSelect(subject, skillArea);
     }
+    
+    // Navigate to the appropriate AI learning route
+    navigate(route);
   };
 
   return (
@@ -90,7 +98,7 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
                         </div>
                         <p className="text-gray-400 text-sm mb-3">{skillArea.description}</p>
                         <Button 
-                          onClick={() => handleSubjectSelect(subject.id, skillArea.id)}
+                          onClick={() => handleSubjectSelect(subject.id, skillArea.id, skillArea.route)}
                           className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white"
                           size="sm"
                         >

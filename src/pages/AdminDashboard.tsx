@@ -34,7 +34,7 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <AdminStatsCards stats={stats} />
 
-        {/* Unified Admin Tools Dropdown Menu - Hidden Content */}
+        {/* Unified Admin Tools Dropdown Menu - Completely Hidden */}
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -44,8 +44,8 @@ const AdminDashboard = () => {
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64 hidden">
-              {/* All menu content is now hidden */}
+            <DropdownMenuContent className="hidden">
+              {/* All menu content is completely hidden */}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
