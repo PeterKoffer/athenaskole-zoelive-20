@@ -21,21 +21,33 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
   const [error, setError] = useState<string | null>(null);
 
   const generateQuestion = useCallback(async () => {
+    console.log('🚀 useQuestionGeneration.generateQuestion() CALLED');
+    console.log('👤 User check:', { hasUser: !!user, userId: user?.id });
+    console.log('📋 Generation params:', { subject, skillArea });
+
     if (!user) {
-      console.log('❌ No user found');
+      console.log('❌ No user found - cannot generate question');
       setError('User not authenticated');
       return;
     }
 
-    console.log('🚀 STARTING REAL AI QUESTION GENERATION');
-    console.log('📋 Params:', { subject, skillArea, userId: user.id });
+    console.log('🔥 STARTING REAL AI QUESTION GENERATION PROCESS');
     
     setIsLoading(true);
     setError(null);
     setQuestion(null);
     
     try {
-      console.log('📞 Calling Supabase edge function...');
+      console.log('📞 About to call Supabase edge function...');
+      console.log('📋 Function call params:', {
+        functionName: 'generate-adaptive-content',
+        body: {
+          subject,
+          skillArea,
+          difficultyLevel: 1,
+          userId: user.id
+        }
+      });
       
       const { data, error: functionError } = await supabase.functions.invoke('generate-adaptive-content', {
         body: {
@@ -46,7 +58,9 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         }
       });
 
-      console.log('📨 Edge function response:', { data, error: functionError });
+      console.log('📨 Supabase function response received:');
+      console.log('  - data:', data);
+      console.log('  - error:', functionError);
 
       if (functionError) {
         console.error('❌ Supabase function error:', functionError);
@@ -58,7 +72,11 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         throw new Error('No data returned from function');
       }
 
-      console.log('🔍 Function response data:', JSON.stringify(data, null, 2));
+      console.log('🔍 Function response analysis:');
+      console.log('  - data keys:', Object.keys(data));
+      console.log('  - success:', data.success);
+      console.log('  - error:', data.error);
+      console.log('  - generatedContent:', !!data.generatedContent);
 
       if (!data.success) {
         console.error('❌ Function returned error:', data.error);
@@ -66,19 +84,25 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         
         let errorMessage = data.error || 'Unknown error from AI generation';
         if (data.debug) {
-          errorMessage += `\n\nDebug info: ${JSON.stringify(data.debug, null, 2)}`;
+          console.log('🔍 Full debug info:', JSON.stringify(data.debug, null, 2));
         }
         
         throw new Error(errorMessage);
       }
 
       if (!data.generatedContent) {
-        console.error('❌ No generated content in response');
+        console.error('❌ No generated content in successful response');
         throw new Error('No generated content in response');
       }
 
       const content = data.generatedContent;
       console.log('✅ Generated content received:', content);
+      console.log('🔍 Content validation:');
+      console.log('  - has question:', !!content.question);
+      console.log('  - has options:', Array.isArray(content.options));
+      console.log('  - options length:', content.options?.length);
+      console.log('  - has correct:', typeof content.correct === 'number');
+      console.log('  - correct value:', content.correct);
 
       // Validate content structure
       if (!content.question || !Array.isArray(content.options) || typeof content.correct !== 'number') {
@@ -95,7 +119,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         estimatedTime: content.estimatedTime || 30
       };
 
-      console.log('🎯 Setting question data:', questionData);
+      console.log('🎯 Final question data prepared:', questionData);
       setQuestion(questionData);
 
       toast({
@@ -104,8 +128,15 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         duration: 3000
       });
 
+      console.log('✅ Question generation completed successfully');
+
     } catch (error: any) {
-      console.error('💥 Question generation failed:', error);
+      console.error('💥 Question generation failed with error:', error);
+      console.error('💥 Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
       
       const errorMessage = error.message || 'Unknown error occurred';
       setError(errorMessage);
@@ -119,7 +150,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
     } finally {
       setIsLoading(false);
-      console.log('🏁 Question generation process completed');
+      console.log('🏁 Question generation process completed (finally block)');
     }
   }, [user, subject, skillArea, toast]);
 

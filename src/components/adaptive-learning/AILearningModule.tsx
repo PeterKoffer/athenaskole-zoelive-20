@@ -16,17 +16,20 @@ interface AILearningModuleProps {
 }
 
 const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModuleProps) => {
+  console.log('🎯 AILearningModule MOUNTED with:', { subject, skillArea });
+  
   const { question, isLoading, error, generateQuestion } = useQuestionGeneration(subject, skillArea);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
 
-  console.log('🔄 AILearningModule render:', { 
+  console.log('🔄 AILearningModule render state:', { 
     subject, 
     skillArea, 
     hasQuestion: !!question, 
     isLoading, 
-    error 
+    hasError: !!error,
+    errorMessage: error 
   });
 
   const handleTimeUp = () => {
@@ -39,7 +42,8 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   // Generate question immediately on mount
   useEffect(() => {
-    console.log('🚀 Effect: Generating AI question on mount');
+    console.log('🚀 AILearningModule useEffect: Generating AI question on mount');
+    console.log('📋 Parameters:', { subject, skillArea });
     generateQuestion();
   }, [generateQuestion]);
 
@@ -88,7 +92,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   };
 
   const handleRetry = () => {
-    console.log('🔄 Retrying question generation...');
+    console.log('🔄 AILearningModule: Retrying question generation...');
     setSelectedAnswer(null);
     setShowResult(false);
     setStartTime(null);
@@ -96,20 +100,23 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   };
 
   if (isLoading) {
+    console.log('⏳ AILearningModule: Showing loading state');
     return <LoadingState />;
   }
 
   if (error) {
-    console.error('❌ Error state:', error);
+    console.error('❌ AILearningModule: Error state:', error);
     return <ErrorState onRetry={handleRetry} />;
   }
 
   if (!question) {
-    console.log('❌ No question available');
+    console.log('❌ AILearningModule: No question available');
     return <ErrorState onRetry={handleRetry} />;
   }
 
   const isCorrect = selectedAnswer === question.correct;
+
+  console.log('✅ AILearningModule: Rendering question interface');
 
   return (
     <div className="space-y-6">

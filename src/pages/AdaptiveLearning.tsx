@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,11 +43,20 @@ const AdaptiveLearning = () => {
   };
 
   const handleQuickTest = () => {
-    console.log('🚀 Starting QUICK AI TEST - Math Fractions');
+    console.log('🚀 QUICK TEST BUTTON CLICKED - Starting QUICK AI TEST');
+    console.log('👤 Current user:', user?.id);
+    console.log('📋 Setting subject to matematik, skill to fractions');
+    
     setSelectedSubject('matematik');
     setSelectedSkill('fractions');
     setShowEngine(true);
-    setSessionKey(prev => prev + 1);
+    setSessionKey(prev => {
+      const newKey = prev + 1;
+      console.log('🔑 New session key:', newKey);
+      return newKey;
+    });
+    
+    console.log('✅ Quick test setup complete - AI should start generating now');
   };
 
   if (!user) {
