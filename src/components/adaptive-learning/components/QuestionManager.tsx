@@ -96,7 +96,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
     const currentQuestion = sessionQuestions[currentQuestionIndex];
     const isCorrect = selectedAnswer === currentQuestion?.correct;
     
-    // Auto-advance to next question after a short delay
+    // Give users more time to read the answer and explanation - increased from 1.5s to 5s
     setTimeout(() => {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
@@ -110,7 +110,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       if (nextIndex >= totalQuestions && onComplete) {
         onComplete();
       }
-    }, 1500);
+    }, 5000);
 
     // Show feedback toast
     toast({

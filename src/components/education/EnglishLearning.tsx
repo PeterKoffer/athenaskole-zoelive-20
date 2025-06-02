@@ -2,135 +2,68 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
-import EnglishHeader from "./english/EnglishHeader";
-import EnglishQuestion from "./english/EnglishQuestion";
-import SessionTimer from "../adaptive-learning/SessionTimer";
-import PerformanceAnalytics from "../adaptive-learning/PerformanceAnalytics";
 import LearningHeader from "./LearningHeader";
+import AILearningModule from "@/components/adaptive-learning/AILearningModule";
+import { Card, CardContent } from "@/components/ui/card";
+import { Brain } from "lucide-react";
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [answers, setAnswers] = useState<boolean[]>([]);
-  const [showResults, setShowResults] = useState(false);
+  const [aiSessionKey, setAiSessionKey] = useState(0);
 
-  const {
-    difficulty,
-    performanceMetrics,
-    recommendedSessionTime,
-    recordAnswer,
-    adjustDifficulty,
-    endSession
-  } = useAdaptiveLearning('english', 'comprehension');
+  console.log('📚 EnglishLearning component state:', {
+    user: !!user,
+    userId: user?.id,
+    loading,
+    aiSessionKey
+  });
 
-  // Redirect to auth if not logged in - but only after loading is complete
+  // Redirect to auth if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      console.log("User not authenticated in EnglishLearning, redirecting to auth");
+      console.log("🚪 User not authenticated in EnglishLearning, redirecting to auth");
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  // Sample questions for English learning
-  const questions = [
-    {
-      type: 'comprehension',
-      title: 'Reading Comprehension',
-      content: 'The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet.',
-      question: 'What animal jumps in this sentence?',
-      options: ['Dog', 'Fox', 'Cat', 'Bird'],
-      correct: 1
-    },
-    {
-      type: 'vocabulary',
-      title: 'Vocabulary',
-      content: 'The word "magnificent" means very impressive or beautiful.',
-      question: 'What does "magnificent" mean?',
-      options: ['Very small', 'Very ugly', 'Very impressive', 'Very fast'],
-      correct: 2
-    }
-  ];
-
-  const handleAnswer = (isCorrect: boolean, responseTime: number) => {
-    const newAnswers = [...answers, isCorrect];
-    setAnswers(newAnswers);
-    
-    if (isCorrect) {
-      setScore(score + 1);
-    }
-
-    recordAnswer(isCorrect, responseTime);
-
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setShowResults(true);
-      endSession();
-    }
-  };
-
-  const handleDifficultyChange = (newLevel: number, reason: string) => {
-    adjustDifficulty(newLevel, reason);
-  };
-
   // Show loading state while authentication is being checked
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+    return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">📚</div>
           <p className="text-lg">Loading your English lesson...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // Don't render the component if user is not authenticated
-  if (!user) return null;
-
-  if (showResults) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white">
-        <LearningHeader />
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">Excellent!</h1>
-            <p className="text-xl">You scored {score} out of {questions.length}</p>
-          </div>
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">Session Complete!</h3>
-            <p className="text-gray-300">Great job practicing your English skills!</p>
-          </div>
-        </div>
-      </div>
-    );
+  if (!user) {
+    return null;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
+  // Always show AI Questions Mode
+  return <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <SessionTimer 
-          recommendedDuration={recommendedSessionTime}
-        />
-        <EnglishHeader 
-          score={score} 
-          totalQuestions={questions.length}
-          currentQuestion={currentQuestion}
-          difficulty={difficulty}
-          performanceMetrics={performanceMetrics}
-          onDifficultyChange={handleDifficultyChange}
-        />
-        <EnglishQuestion
-          activity={questions[currentQuestion]}
-          onAnswer={handleAnswer}
+        <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400 mb-6">
+          <CardContent className="p-4 text-center">
+            <Brain className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+            <p className="text-white">
+              🤖 AI is generating personalized English questions for reading comprehension
+            </p>
+          </CardContent>
+        </Card>
+        
+        <AILearningModule 
+          key={aiSessionKey} 
+          subject="english" 
+          skillArea="reading_comprehension" 
+          difficultyLevel={1}
+          onBack={() => navigate('/')}
         />
       </div>
-    </div>
-  );
+    </div>;
 };
 
 export default EnglishLearning;

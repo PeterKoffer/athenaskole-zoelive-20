@@ -2,124 +2,69 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Palette, Music, Camera, Pen } from "lucide-react";
-import SessionTimer from "../adaptive-learning/SessionTimer";
 import LearningHeader from "./LearningHeader";
+import AILearningModule from "@/components/adaptive-learning/AILearningModule";
+import { Card, CardContent } from "@/components/ui/card";
+import { Brain } from "lucide-react";
 
 const CreativeLearning = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [aiSessionKey, setAiSessionKey] = useState(0);
 
-  const { recommendedSessionTime } = useAdaptiveLearning('creative', 'general');
+  console.log('🎨 CreativeLearning component state:', {
+    user: !!user,
+    userId: user?.id,
+    loading,
+    aiSessionKey
+  });
 
+  // Redirect to auth if not logged in
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
+      console.log("🚪 User not authenticated in CreativeLearning, redirecting to auth");
       navigate('/auth');
-      return;
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
-  const activities = [
-    {
-      id: 'drawing',
-      title: 'Digital Drawing',
-      description: 'Create beautiful digital artwork',
-      icon: Palette,
-      color: 'from-pink-400 to-purple-600'
-    },
-    {
-      id: 'music',
-      title: 'Music Creation',
-      description: 'Compose and play music',
-      icon: Music,
-      color: 'from-blue-400 to-cyan-600'
-    },
-    {
-      id: 'photography',
-      title: 'Photo Stories',
-      description: 'Tell stories through images',
-      icon: Camera,
-      color: 'from-green-400 to-blue-600'
-    },
-    {
-      id: 'writing',
-      title: 'Creative Writing',
-      description: 'Write stories and poems',
-      icon: Pen,
-      color: 'from-orange-400 to-pink-600'
-    }
-  ];
+  // Show loading state while authentication is being checked
+  if (loading) {
+    return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🎨</div>
+          <p className="text-lg">Loading your creative lesson...</p>
+        </div>
+      </div>;
+    </div>;
+  }
 
-  if (!user) return null;
+  // Don't render the component if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
+  // Always show AI Questions Mode
+  return <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
-      <div className="max-w-6xl mx-auto p-6">
-        <SessionTimer 
-          recommendedDuration={recommendedSessionTime}
-        />
+      <div className="max-w-4xl mx-auto p-6">
+        <Card className="bg-gradient-to-r from-pink-900 to-purple-900 border-pink-400 mb-6">
+          <CardContent className="p-4 text-center">
+            <Brain className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+            <p className="text-white">
+              🤖 AI is generating personalized creative writing exercises
+            </p>
+          </CardContent>
+        </Card>
         
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Creative Learning</h1>
-          <p className="text-gray-400 text-lg">Express yourself through art, music, and storytelling</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {activities.map((activity) => {
-            const IconComponent = activity.icon;
-            return (
-              <Card key={activity.id} className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-3">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${activity.color} rounded-lg flex items-center justify-center`}>
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white text-xl">{activity.title}</h3>
-                      <p className="text-gray-400 text-sm">{activity.description}</p>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button 
-                    className={`w-full bg-gradient-to-r ${activity.color} hover:opacity-90 text-white border-none`}
-                    onClick={() => setSelectedActivity(activity.id)}
-                  >
-                    Start Creating
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {selectedActivity && (
-          <Card className="mt-8 bg-gray-800 border-gray-700">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4">Coming Soon!</h3>
-                <p className="text-gray-400 mb-6">
-                  This creative activity is being developed. Check back soon for an amazing creative experience!
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setSelectedActivity(null)}
-                  className="border-gray-600 text-white hover:bg-gray-700"
-                >
-                  Back to Activities
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <AILearningModule 
+          key={aiSessionKey} 
+          subject="creative_writing" 
+          skillArea="storytelling" 
+          difficultyLevel={1}
+          onBack={() => navigate('/')}
+        />
       </div>
-    </div>
-  );
+    </div>;
 };
 
 export default CreativeLearning;
