@@ -18,19 +18,17 @@ serve(async (req) => {
     const requestBody = await req.json();
     console.log('📥 Request received:', JSON.stringify(requestBody, null, 2));
 
-    const { subject, skillArea, difficultyLevel } = requestBody;
+    const { subject, skillArea, difficultyLevel, previousQuestions = [] } = requestBody;
 
-    // Check for OpenAI API key - using the correct secret name "OpenaiAPI"
+    // Check for OpenAI API key
     const openAIApiKey = Deno.env.get('OpenaiAPI');
     console.log('🔑 API Key Check:');
     console.log('  - Key exists:', !!openAIApiKey);
     console.log('  - Key starts with sk-:', openAIApiKey ? openAIApiKey.startsWith('sk-') : false);
-    console.log('  - Key length:', openAIApiKey ? openAIApiKey.length : 0);
-    console.log('  - First 10 chars:', openAIApiKey ? openAIApiKey.substring(0, 10) : 'N/A');
+    console.log('  - Previous questions count:', previousQuestions.length);
     
     if (!openAIApiKey) {
       console.error('❌ OpenaiAPI secret not found in environment');
-      console.log('🔍 Available env vars:', Object.keys(Deno.env.toObject()));
       return new Response(
         JSON.stringify({ 
           success: false,
@@ -66,8 +64,8 @@ serve(async (req) => {
 
     console.log('🔑 OpenAI API key validated successfully');
 
-    // Create the prompt
-    const prompt = `Generate a math question about fractions suitable for elementary students.
+    // Create the prompt with previous questions to avoid duplicates
+    let prompt = `Generate a math question about fractions suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -85,6 +83,13 @@ Make sure:
 - The explanation clearly shows how to solve the problem
 - Return ONLY the JSON, no markdown formatting or code blocks`;
 
+    // Add previous questions to avoid duplicates
+    if (previousQuestions.length > 0) {
+      prompt += `\n\nIMPORTANT: Do NOT generate any of these previous questions:\n${previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+Create a completely different fraction problem that hasn't been asked before.`;
+    }
+
     console.log('🤖 Making request to OpenAI API...');
     console.log('🌐 Using endpoint: https://api.openai.com/v1/chat/completions');
     console.log('🎯 Using model: gpt-4o-mini');
@@ -100,14 +105,14 @@ Make sure:
         messages: [
           {
             role: 'system',
-            content: 'You are a math teacher creating fraction problems. Return only valid JSON with no formatting.'
+            content: 'You are a math teacher creating fraction problems. Return only valid JSON with no formatting. Ensure each question is unique and different from previous ones.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.7,
+        temperature: 0.8, // Increased for more variety
         max_tokens: 500,
       }),
     });
@@ -115,7 +120,6 @@ Make sure:
     console.log('📡 OpenAI Response Details:');
     console.log('  - Status:', openAIResponse.status);
     console.log('  - Status Text:', openAIResponse.statusText);
-    console.log('  - Headers:', Object.fromEntries(openAIResponse.headers.entries()));
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
@@ -139,8 +143,7 @@ Make sure:
           debug: {
             status: openAIResponse.status,
             statusText: openAIResponse.statusText,
-            errorResponse: errorText,
-            headers: Object.fromEntries(openAIResponse.headers.entries())
+            errorResponse: errorText
           }
         }),
         { 
@@ -152,8 +155,6 @@ Make sure:
 
     const openAIData = await openAIResponse.json();
     console.log('✅ OpenAI response received successfully');
-    console.log('📄 Response structure:', Object.keys(openAIData));
-    console.log('📄 Choices array length:', openAIData.choices?.length || 0);
 
     if (!openAIData.choices?.[0]?.message?.content) {
       console.error('❌ Invalid OpenAI response structure:', openAIData);
@@ -177,20 +178,16 @@ Make sure:
 
     const contentText = openAIData.choices[0].message.content.trim();
     console.log('📄 Raw OpenAI content (first 200 chars):', contentText.substring(0, 200));
-    console.log('📄 Content length:', contentText.length);
 
     // Clean any potential markdown formatting
     const cleanContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    console.log('🧹 Cleaned content (first 200 chars):', cleanContent.substring(0, 200));
 
     let generatedContent;
     try {
       generatedContent = JSON.parse(cleanContent);
       console.log('✅ Successfully parsed JSON content');
-      console.log('🔍 Parsed content keys:', Object.keys(generatedContent));
     } catch (parseError) {
       console.error('❌ JSON parse failed:', parseError.message);
-      console.error('❌ Content that failed to parse:', cleanContent);
       return new Response(
         JSON.stringify({ 
           success: false,
@@ -263,9 +260,6 @@ Make sure:
 
   } catch (error) {
     console.error('💥 Unexpected error in function:', error);
-    console.error('💥 Error name:', error.name);
-    console.error('💥 Error message:', error.message);
-    console.error('💥 Error stack:', error.stack);
     
     return new Response(
       JSON.stringify({ 

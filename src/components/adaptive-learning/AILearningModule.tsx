@@ -24,9 +24,10 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(1);
-  const [totalQuestions] = useState(5); // Set lesson to 5 questions
+  const [totalQuestions] = useState(5);
   const [lessonScore, setLessonScore] = useState(0);
   const [isLessonComplete, setIsLessonComplete] = useState(false);
+  const [usedQuestions, setUsedQuestions] = useState<Set<string>>(new Set());
 
   console.log('🔄 AILearningModule render state:', { 
     subject, 
@@ -37,7 +38,8 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     currentQuestionNumber,
     totalQuestions,
     lessonScore,
-    isLessonComplete
+    isLessonComplete,
+    usedQuestionsCount: usedQuestions.size
   });
 
   const handleTimeUp = () => {
@@ -54,21 +56,34 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     generateQuestion();
   }, [generateQuestion]);
 
-  // Start timer when question is received
+  // Check for duplicate questions and regenerate if needed
   useEffect(() => {
-    if (question && !showResult && !startTime) {
-      console.log('⏰ Starting timer for question', currentQuestionNumber);
-      setStartTime(new Date());
-      startTimer(question.estimatedTime);
+    if (question && !showResult) {
+      const questionKey = `${question.question}-${question.options.join(',')}`;
+      
+      if (usedQuestions.has(questionKey)) {
+        console.log('🔄 Duplicate question detected, regenerating...');
+        generateQuestion();
+        return;
+      }
+      
+      // Add question to used set and start timer
+      setUsedQuestions(prev => new Set([...prev, questionKey]));
+      
+      if (!startTime) {
+        console.log('⏰ Starting timer for question', currentQuestionNumber);
+        setStartTime(new Date());
+        startTimer(question.estimatedTime);
+      }
     }
-  }, [question, showResult, startTime, startTimer, currentQuestionNumber]);
+  }, [question, showResult, startTime, startTimer, currentQuestionNumber, usedQuestions, generateQuestion]);
 
   const handleAnswerSelect = (index: number) => {
     if (!showResult && !selectedAnswer) {
       console.log('📝 Answer selected:', index, 'for question', currentQuestionNumber);
       setSelectedAnswer(index);
       // Auto-submit immediately when answer is selected
-      setTimeout(() => handleAnswerSubmit(index), 500); // Small delay for visual feedback
+      setTimeout(() => handleAnswerSubmit(index), 500);
     }
   };
 
@@ -98,14 +113,14 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     setShowResult(true);
     stopTimer();
 
-    // Move to next question or complete lesson after showing result
+    // Show result for longer (5 seconds) to allow reading
     setTimeout(() => {
       if (currentQuestionNumber < totalQuestions) {
         moveToNextQuestion();
       } else {
         completeLessonFlow();
       }
-    }, 2000); // Show result for 2 seconds
+    }, 5000); // Increased from 2 to 5 seconds
   };
 
   const moveToNextQuestion = () => {

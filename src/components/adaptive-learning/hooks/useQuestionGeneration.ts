@@ -19,11 +19,12 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
   const [question, setQuestion] = useState<Question | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [questionHistory, setQuestionHistory] = useState<string[]>([]);
 
   const generateQuestion = useCallback(async () => {
     console.log('🚀 useQuestionGeneration.generateQuestion() CALLED');
     console.log('👤 User check:', { hasUser: !!user, userId: user?.id });
-    console.log('📋 Generation params:', { subject, skillArea });
+    console.log('📋 Generation params:', { subject, skillArea, historyCount: questionHistory.length });
 
     if (!user) {
       console.log('❌ No user found - cannot generate question');
@@ -45,7 +46,8 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
           subject,
           skillArea,
           difficultyLevel: 1,
-          userId: user.id
+          userId: user.id,
+          previousQuestions: questionHistory
         }
       });
       
@@ -54,7 +56,8 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
           subject,
           skillArea,
           difficultyLevel: 1,
-          userId: user.id
+          userId: user.id,
+          previousQuestions: questionHistory
         }
       });
 
@@ -97,12 +100,6 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
       const content = data.generatedContent;
       console.log('✅ Generated content received:', content);
-      console.log('🔍 Content validation:');
-      console.log('  - has question:', !!content.question);
-      console.log('  - has options:', Array.isArray(content.options));
-      console.log('  - options length:', content.options?.length);
-      console.log('  - has correct:', typeof content.correct === 'number');
-      console.log('  - correct value:', content.correct);
 
       // Validate content structure
       if (!content.question || !Array.isArray(content.options) || typeof content.correct !== 'number') {
@@ -121,6 +118,9 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
       console.log('🎯 Final question data prepared:', questionData);
       setQuestion(questionData);
+
+      // Add to question history to avoid repeats
+      setQuestionHistory(prev => [...prev, content.question]);
 
       toast({
         title: "AI Question Generated! 🤖",
@@ -152,7 +152,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       setIsLoading(false);
       console.log('🏁 Question generation process completed (finally block)');
     }
-  }, [user, subject, skillArea, toast]);
+  }, [user, subject, skillArea, toast, questionHistory]);
 
   return {
     question,
