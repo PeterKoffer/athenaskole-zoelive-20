@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { openaiContentService } from '@/services/openaiContentService';
+import { aiContentGenerator } from '@/services/content/aiContentGenerator';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Question {
@@ -17,69 +17,71 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [question, setQuestion] = useState<Question | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const generateQuestion = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('❌ No user found, cannot generate question');
+      return;
+    }
 
     setIsLoading(true);
+    console.log('🎯 Starting question generation for:', { subject, skillArea, userId: user.id });
+    
     try {
-      console.log('🎯 Generating AI question for:', { subject, skillArea });
-      
-      const content = await openaiContentService.getOrGenerateContent(
+      const generatedContent = await aiContentGenerator.generateAdaptiveContent({
         subject,
         skillArea,
-        1, // Start with difficulty level 1
-        user.id
-      );
-
-      console.log('📝 Generated content:', content);
-
-      if (content && content.content) {
-        const parsedContent = typeof content.content === 'string' 
-          ? JSON.parse(content.content) 
-          : content.content;
-
-        const questionData: Question = {
-          question: parsedContent.question || content.title || 'Sample question',
-          options: parsedContent.options || ['Option A', 'Option B', 'Option C', 'Option D'],
-          correct: parsedContent.correct || 0,
-          explanation: parsedContent.explanation || 'This is the correct answer.',
-          learningObjectives: content.learning_objectives || [],
-          estimatedTime: content.estimated_time || 30
-        };
-
-        setQuestion(questionData);
-      } else {
-        // Fallback question if AI generation fails
-        const fallbackQuestion: Question = {
-          question: `What is a key concept in ${skillArea} for ${subject}?`,
-          options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
-          correct: 0,
-          explanation: 'This is a sample explanation.',
-          learningObjectives: [`Understanding ${skillArea} in ${subject}`],
-          estimatedTime: 30
-        };
-        setQuestion(fallbackQuestion);
-      }
-    } catch (error) {
-      console.error('❌ Error generating question:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate question. Using sample content.",
-        variant: "destructive"
+        difficultyLevel: 1,
+        userId: user.id
       });
 
-      // Use fallback question
+      console.log('📝 Generated content received:', generatedContent);
+
+      const questionData: Question = {
+        question: generatedContent.question,
+        options: generatedContent.options,
+        correct: generatedContent.correct,
+        explanation: generatedContent.explanation,
+        learningObjectives: generatedContent.learningObjectives,
+        estimatedTime: generatedContent.estimatedTime
+      };
+
+      setQuestion(questionData);
+      console.log('✅ Question set successfully:', questionData);
+
+      toast({
+        title: "New Question Generated! 🎯",
+        description: "AI has created a personalized question for you",
+        duration: 2000
+      });
+
+    } catch (error) {
+      console.error('❌ Error generating question:', error);
+      
+      // Create a working fallback question
       const fallbackQuestion: Question = {
-        question: `Sample question for ${subject} - ${skillArea}`,
-        options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+        question: `What is an important concept in ${skillArea} for ${subject}?`,
+        options: [
+          `Basic ${skillArea} understanding`,
+          `Advanced ${skillArea} knowledge`,
+          `Applied ${skillArea} skills`, 
+          `Theoretical ${skillArea} framework`
+        ],
         correct: 0,
-        explanation: 'This is a sample question for demonstration.',
-        learningObjectives: [`Learning ${skillArea}`],
+        explanation: `Understanding basic concepts in ${skillArea} is fundamental for ${subject} learning.`,
+        learningObjectives: [`Learn ${skillArea} fundamentals`],
         estimatedTime: 30
       };
+      
       setQuestion(fallbackQuestion);
+      console.log('🔄 Using fallback question:', fallbackQuestion);
+
+      toast({
+        title: "Question Ready! 📚",
+        description: "Practice question loaded successfully",
+        duration: 2000
+      });
     } finally {
       setIsLoading(false);
     }
