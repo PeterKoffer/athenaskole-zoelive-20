@@ -152,6 +152,48 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          birth_date: string | null
+          created_at: string | null
+          email: string | null
+          grade: string | null
+          id: string
+          name: string | null
+          school: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          created_at?: string | null
+          email?: string | null
+          grade?: string | null
+          id: string
+          name?: string | null
+          school?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          created_at?: string | null
+          email?: string | null
+          grade?: string | null
+          id?: string
+          name?: string | null
+          school?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_performance: {
         Row: {
           accuracy_rate: number
