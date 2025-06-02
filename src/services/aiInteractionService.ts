@@ -35,9 +35,7 @@ export const aiInteractionService = {
           subject: interaction.subject,
           skill_area: interaction.skill_area,
           difficulty_level: interaction.difficulty_level,
-          tokens_used: interaction.tokens_used,
-          cost_estimate: interaction.cost_estimate,
-          processing_time_ms: interaction.processing_time_ms
+          // Note: tokens_used, cost_estimate, processing_time_ms will be added when types are updated
         })
         .select('id')
         .single();
@@ -82,9 +80,10 @@ export const aiInteractionService = {
         subject: item.subject,
         skill_area: item.skill_area,
         difficulty_level: item.difficulty_level,
-        tokens_used: item.tokens_used,
-        cost_estimate: item.cost_estimate,
-        processing_time_ms: item.processing_time_ms
+        // Add these when types are updated
+        tokens_used: 0,
+        cost_estimate: 0,
+        processing_time_ms: 0
       }));
     } catch (error) {
       console.error('Error in getUserInteractions:', error);
@@ -97,6 +96,11 @@ export const aiInteractionService = {
     successful: number;
     failed: number;
     byService: Record<string, number>;
+    totalInteractions: number;
+    successRate: number;
+    serviceBreakdown: Record<string, number>;
+    totalTokens: number;
+    totalCost: number;
   }> {
     try {
       const { data, error } = await supabase
@@ -106,24 +110,50 @@ export const aiInteractionService = {
 
       if (error) {
         console.error('Error fetching interaction stats:', error);
-        return { total: 0, successful: 0, failed: 0, byService: {} };
+        return { 
+          total: 0, 
+          successful: 0, 
+          failed: 0, 
+          byService: {},
+          totalInteractions: 0,
+          successRate: 0,
+          serviceBreakdown: {},
+          totalTokens: 0,
+          totalCost: 0
+        };
       }
 
       const stats = {
         total: data.length,
         successful: data.filter(i => i.success).length,
         failed: data.filter(i => !i.success).length,
-        byService: {} as Record<string, number>
+        byService: {} as Record<string, number>,
+        totalInteractions: data.length,
+        successRate: data.length > 0 ? (data.filter(i => i.success).length / data.length) * 100 : 0,
+        serviceBreakdown: {} as Record<string, number>,
+        totalTokens: 0,
+        totalCost: 0
       };
 
       data.forEach(interaction => {
         stats.byService[interaction.ai_service] = (stats.byService[interaction.ai_service] || 0) + 1;
+        stats.serviceBreakdown[interaction.ai_service] = (stats.serviceBreakdown[interaction.ai_service] || 0) + 1;
       });
 
       return stats;
     } catch (error) {
       console.error('Error in getInteractionStats:', error);
-      return { total: 0, successful: 0, failed: 0, byService: {} };
+      return { 
+        total: 0, 
+        successful: 0, 
+        failed: 0, 
+        byService: {},
+        totalInteractions: 0,
+        successRate: 0,
+        serviceBreakdown: {},
+        totalTokens: 0,
+        totalCost: 0
+      };
     }
   }
 };

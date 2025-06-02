@@ -17,25 +17,30 @@ export interface UserActivitySession {
 export class UserActivityService {
   async startSession(session: Omit<UserActivitySession, 'id'>): Promise<string | null> {
     try {
+      // Use raw query since the table might not be in types yet
       const { data, error } = await supabase
-        .from('user_activity_sessions')
-        .insert([{
-          user_id: session.user_id,
-          session_type: session.session_type,
-          subject: session.subject,
-          start_time: new Date().toISOString(),
-          completion_status: session.completion_status,
-          metadata: session.metadata || {}
-        }])
-        .select()
-        .single();
+        .rpc('exec_sql', {
+          sql: `
+            INSERT INTO user_activity_sessions (user_id, session_type, subject, start_time, completion_status, metadata)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id
+          `,
+          params: [
+            session.user_id,
+            session.session_type,
+            session.subject,
+            new Date().toISOString(),
+            session.completion_status,
+            JSON.stringify(session.metadata || {})
+          ]
+        });
 
       if (error) {
         console.error('Error starting session:', error);
         return null;
       }
 
-      return data.id;
+      return data?.[0]?.id || null;
     } catch (error) {
       console.error('Error starting session:', error);
       return null;
@@ -46,30 +51,19 @@ export class UserActivityService {
     try {
       const endTime = new Date().toISOString();
       
-      // Get session start time to calculate duration
-      const { data: session, error: fetchError } = await supabase
-        .from('user_activity_sessions')
-        .select('start_time')
-        .eq('id', sessionId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching session:', fetchError);
-        return false;
-      }
-
-      const startTime = new Date(session.start_time);
-      const duration = Math.round((new Date(endTime).getTime() - startTime.getTime()) / 1000 / 60);
-
+      // Use raw query to update session
       const { error } = await supabase
-        .from('user_activity_sessions')
-        .update({
-          end_time: endTime,
-          duration_minutes: duration,
-          completion_status: 'completed',
-          engagement_score: engagementScore
-        })
-        .eq('id', sessionId);
+        .rpc('exec_sql', {
+          sql: `
+            UPDATE user_activity_sessions 
+            SET end_time = $1, 
+                duration_minutes = EXTRACT(EPOCH FROM ($1::timestamp - start_time)) / 60,
+                completion_status = 'completed',
+                engagement_score = $2
+            WHERE id = $3
+          `,
+          params: [endTime, engagementScore, sessionId]
+        });
 
       if (error) {
         console.error('Error ending session:', error);
@@ -86,12 +80,14 @@ export class UserActivityService {
   async abandonSession(sessionId: string): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('user_activity_sessions')
-        .update({
-          completion_status: 'abandoned',
-          end_time: new Date().toISOString()
-        })
-        .eq('id', sessionId);
+        .rpc('exec_sql', {
+          sql: `
+            UPDATE user_activity_sessions 
+            SET completion_status = 'abandoned', end_time = $1
+            WHERE id = $2
+          `,
+          params: [new Date().toISOString(), sessionId]
+        });
 
       if (error) {
         console.error('Error abandoning session:', error);
@@ -108,22 +104,22 @@ export class UserActivityService {
   async getUserSessions(userId: string, limit: number = 50): Promise<UserActivitySession[]> {
     try {
       const { data, error } = await supabase
-        .from('user_activity_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('start_time', { ascending: false })
-        .limit(limit);
+        .rpc('exec_sql', {
+          sql: `
+            SELECT * FROM user_activity_sessions 
+            WHERE user_id = $1 
+            ORDER BY start_time DESC 
+            LIMIT $2
+          `,
+          params: [userId, limit]
+        });
 
       if (error) {
         console.error('Error fetching user sessions:', error);
         return [];
       }
 
-      return (data || []).map(item => ({
-        ...item,
-        session_type: item.session_type as 'chat' | 'game' | 'lesson' | 'music_creation' | 'ai_tutor',
-        completion_status: item.completion_status as 'in_progress' | 'completed' | 'abandoned'
-      }));
+      return data || [];
     } catch (error) {
       console.error('Error fetching user sessions:', error);
       return [];
@@ -133,10 +129,15 @@ export class UserActivityService {
   async getSessionAnalytics(userId: string, days: number = 30): Promise<any> {
     try {
       const { data, error } = await supabase
-        .from('user_activity_sessions')
-        .select('session_type, duration_minutes, engagement_score, completion_status')
-        .eq('user_id', userId)
-        .gte('start_time', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString());
+        .rpc('exec_sql', {
+          sql: `
+            SELECT session_type, duration_minutes, engagement_score, completion_status
+            FROM user_activity_sessions 
+            WHERE user_id = $1 
+            AND start_time >= $2
+          `,
+          params: [userId, new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()]
+        });
 
       if (error) {
         console.error('Error fetching session analytics:', error);
