@@ -41,6 +41,8 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
     console.log('🎯 Starting AI question generation for:', { subject, skillArea, userId: user.id });
     
     try {
+      console.log('🚀 Calling AI content generator...');
+      
       const generatedContent = await aiContentGenerator.generateAdaptiveContent({
         subject,
         skillArea,
@@ -75,32 +77,22 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
     } catch (aiError) {
       console.error('❌ AI generation failed completely:', aiError);
+      console.error('❌ Full error details:', {
+        message: aiError.message,
+        stack: aiError.stack,
+        name: aiError.name
+      });
       
-      // Only use fallback after AI completely fails
-      const fallbackQuestion: Question = {
-        question: `What is an important concept in ${skillArea} for ${subject}?`,
-        options: [
-          `Basic ${skillArea} understanding`,
-          `Advanced ${skillArea} knowledge`,
-          `Applied ${skillArea} skills`, 
-          `Theoretical ${skillArea} framework`
-        ],
-        correct: 0,
-        explanation: `Understanding basic concepts in ${skillArea} is fundamental for ${subject} learning.`,
-        learningObjectives: [`Learn ${skillArea} fundamentals`],
-        estimatedTime: 30
-      };
+      // Set the actual error message instead of using fallback
+      setError(`AI generation failed: ${aiError.message}`);
       
-      setQuestion(fallbackQuestion);
-      setError('AI generation failed, using backup content');
-      console.log('🔄 Using fallback question due to AI failure:', fallbackQuestion);
-
       toast({
-        title: "Backup Question Ready 📚",
-        description: "Using backup content (AI temporarily unavailable)",
-        duration: 3000,
+        title: "AI Generation Failed ❌",
+        description: `Error: ${aiError.message}`,
+        duration: 5000,
         variant: "destructive"
       });
+
     } finally {
       setIsLoading(false);
       isGenerating.current = false;

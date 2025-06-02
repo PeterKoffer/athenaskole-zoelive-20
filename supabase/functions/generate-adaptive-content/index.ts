@@ -1,7 +1,6 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,26 +19,39 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log('🚀 Edge function started');
+
   try {
-    const { subject, skillArea, difficultyLevel, userId }: GenerateContentRequest = await req.json();
+    const requestBody = await req.json();
+    console.log('📥 Request received:', requestBody);
 
-    console.log('🔄 Processing content generation request:', { subject, skillArea, difficultyLevel, userId });
+    const { subject, skillArea, difficultyLevel, userId }: GenerateContentRequest = requestBody;
 
-    // Use the correct secret name from Supabase
+    // Check for OpenAI API key
     const openAIApiKey = Deno.env.get('OpenaiAPI');
+    console.log('🔑 OpenAI API key status:', openAIApiKey ? 'Found' : 'Missing');
+    
     if (!openAIApiKey) {
-      console.error('❌ OpenAI API key not found in secrets');
-      throw new Error('OpenAI API key not configured');
+      console.error('❌ No OpenAI API key found in environment');
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'OpenAI API key not configured',
+          debug: 'Missing OpenaiAPI secret in Supabase'
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
-
-    console.log('✅ OpenAI API key found, generating content with AI...');
 
     const prompt = `Generate an educational multiple-choice question for:
 Subject: ${subject}
 Skill Area: ${skillArea}
 Difficulty Level: ${difficultyLevel} (1-10 scale)
 
-Create a JSON response with the following structure:
+Create a JSON response with this exact structure:
 {
   "question": "The main question text",
   "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -51,8 +63,9 @@ Create a JSON response with the following structure:
 Make the question appropriate for the difficulty level and subject matter. Ensure it's educational and engaging.`;
 
     console.log('🤖 Sending request to OpenAI...');
+    console.log('📝 Prompt:', prompt);
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
@@ -63,7 +76,7 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
         messages: [
           {
             role: 'system',
-            content: 'You are an educational content generator. Always respond with valid JSON only, no additional text.'
+            content: 'You are an educational content generator. Always respond with valid JSON only, no additional text or markdown formatting.'
           },
           {
             role: 'user',
@@ -75,82 +88,105 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
+    console.log('📡 OpenAI response status:', openAIResponse.status);
+    console.log('📡 OpenAI response headers:', Object.fromEntries(openAIResponse.headers.entries()));
+
+    if (!openAIResponse.ok) {
+      const errorText = await openAIResponse.text();
+      console.error('❌ OpenAI API error:', openAIResponse.status, errorText);
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: `OpenAI API error: ${openAIResponse.status}`,
+          debug: errorText
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
 
-    const data = await response.json();
-    console.log('✅ OpenAI response received:', data);
+    const openAIData = await openAIResponse.json();
+    console.log('✅ OpenAI raw response:', JSON.stringify(openAIData, null, 2));
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('Invalid response structure from OpenAI');
+    if (!openAIData.choices || !openAIData.choices[0] || !openAIData.choices[0].message) {
+      console.error('❌ Invalid OpenAI response structure:', openAIData);
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Invalid response structure from OpenAI',
+          debug: openAIData
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
+
+    const contentText = openAIData.choices[0].message.content;
+    console.log('📄 Content to parse:', contentText);
 
     let generatedContent;
     try {
-      generatedContent = JSON.parse(data.choices[0].message.content);
-      console.log('🎯 Successfully parsed AI-generated content:', generatedContent);
+      generatedContent = JSON.parse(contentText);
+      console.log('✅ Successfully parsed content:', generatedContent);
     } catch (parseError) {
-      console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
-      throw new Error('Failed to parse AI response');
+      console.error('❌ JSON parse error:', parseError);
+      console.error('❌ Raw content that failed to parse:', contentText);
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Failed to parse AI response as JSON',
+          debug: { parseError: parseError.message, rawContent: contentText }
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
 
     // Validate required fields
     if (!generatedContent.question || !generatedContent.options || !Array.isArray(generatedContent.options)) {
       console.error('❌ Invalid content structure:', generatedContent);
-      throw new Error('Invalid content structure from AI');
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Invalid content structure from AI',
+          debug: generatedContent
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
 
     // Ensure correct field is a number
     if (typeof generatedContent.correct !== 'number') {
-      generatedContent.correct = 0;
+      console.log('⚠️ Fixing correct field type');
+      generatedContent.correct = parseInt(generatedContent.correct) || 0;
     }
 
     // Ensure we have learning objectives
     if (!generatedContent.learningObjectives || !Array.isArray(generatedContent.learningObjectives)) {
+      console.log('⚠️ Adding default learning objectives');
       generatedContent.learningObjectives = [`Understanding ${skillArea} concepts in ${subject}`];
     }
 
-    console.log('📝 Final generated content:', generatedContent);
+    const finalContent = {
+      ...generatedContent,
+      estimatedTime: 30
+    };
 
-    // Try to save to database (optional, don't fail if this doesn't work)
-    try {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: savedContent, error: saveError } = await supabase
-        .from('adaptive_content')
-        .insert({
-          subject,
-          skill_area: skillArea,
-          difficulty_level: difficultyLevel,
-          title: generatedContent.question,
-          content: generatedContent,
-          learning_objectives: generatedContent.learningObjectives || [],
-          estimated_time: 30
-        })
-        .select()
-        .single();
-
-      if (saveError) {
-        console.error('❌ Error saving to database (continuing anyway):', saveError);
-      } else {
-        console.log('✅ Content saved to database:', savedContent);
-      }
-    } catch (dbError) {
-      console.error('❌ Database error (continuing anyway):', dbError);
-    }
+    console.log('🎯 Final generated content:', finalContent);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        generatedContent: {
-          ...generatedContent,
-          estimatedTime: 30
-        }
+        generatedContent: finalContent
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -158,12 +194,14 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
     );
 
   } catch (error) {
-    console.error('❌ Error in generate-adaptive-content function:', error);
+    console.error('💥 Unexpected error in edge function:', error);
+    console.error('💥 Error stack:', error.stack);
     
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message || 'Unknown error occurred'
+        error: error.message || 'Unknown error occurred',
+        debug: error.stack
       }),
       { 
         status: 500,

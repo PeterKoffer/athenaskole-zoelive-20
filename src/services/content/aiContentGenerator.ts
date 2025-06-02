@@ -7,20 +7,30 @@ export class AIContentGenerator {
     console.log('🤖 AIContentGenerator: Starting generation with request:', request);
 
     try {
+      console.log('📞 Calling Supabase function generate-adaptive-content...');
+      
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: request
       });
 
-      console.log('🔄 Supabase function response received:', { data, error });
+      console.log('📨 Supabase function raw response:', { data, error });
 
       if (error) {
         console.error('❌ Supabase function error:', error);
-        throw new Error(`Function error: ${error.message || 'Unknown error'}`);
+        throw new Error(`Supabase function error: ${error.message || JSON.stringify(error)}`);
       }
 
       if (!data) {
         console.error('❌ No data returned from function');
-        throw new Error('No data returned from function');
+        throw new Error('No data returned from Supabase function');
+      }
+
+      console.log('📋 Function response data:', data);
+
+      // Check if the function returned an error response
+      if (data.success === false) {
+        console.error('❌ Function returned error:', data);
+        throw new Error(`AI generation failed: ${data.error || 'Unknown error'} | Debug: ${JSON.stringify(data.debug)}`);
       }
 
       if (!data.success) {
@@ -54,8 +64,14 @@ export class AIContentGenerator {
 
     } catch (error) {
       console.error('❌ Error in AIContentGenerator:', error);
-      // Re-throw the error so the hook can handle it appropriately
-      throw error;
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        request: request
+      });
+      
+      // Re-throw the error with more context
+      throw new Error(`AI Content Generation Failed: ${error.message}`);
     }
   }
 }
