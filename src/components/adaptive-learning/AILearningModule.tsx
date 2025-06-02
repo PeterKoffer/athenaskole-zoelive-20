@@ -8,6 +8,7 @@ import ErrorState from './components/ErrorState';
 import QuestionHeader from './components/QuestionHeader';
 import QuestionDisplay from './components/QuestionDisplay';
 import QuestionResult from './components/QuestionResult';
+import LessonComplete from './components/LessonComplete';
 
 interface AILearningModuleProps {
   subject: string;
@@ -22,6 +23,10 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(1);
+  const [totalQuestions] = useState(5); // Set lesson to 5 questions
+  const [lessonScore, setLessonScore] = useState(0);
+  const [isLessonComplete, setIsLessonComplete] = useState(false);
 
   console.log('🔄 AILearningModule render state:', { 
     subject, 
@@ -29,65 +34,98 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     hasQuestion: !!question, 
     isLoading, 
     hasError: !!error,
-    errorMessage: error 
+    currentQuestionNumber,
+    totalQuestions,
+    lessonScore,
+    isLessonComplete
   });
 
   const handleTimeUp = () => {
-    if (!showResult) {
-      handleSubmit();
+    if (!showResult && selectedAnswer === null) {
+      handleAnswerSubmit();
     }
   };
 
   const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
 
-  // Generate question immediately on mount
+  // Generate first question on mount
   useEffect(() => {
-    console.log('🚀 AILearningModule useEffect: Generating AI question on mount');
-    console.log('📋 Parameters:', { subject, skillArea });
+    console.log('🚀 AILearningModule: Starting lesson - generating first question');
     generateQuestion();
   }, [generateQuestion]);
 
   // Start timer when question is received
   useEffect(() => {
     if (question && !showResult && !startTime) {
-      console.log('⏰ Starting timer for question');
+      console.log('⏰ Starting timer for question', currentQuestionNumber);
       setStartTime(new Date());
       startTimer(question.estimatedTime);
     }
-  }, [question, showResult, startTime, startTimer]);
+  }, [question, showResult, startTime, startTimer, currentQuestionNumber]);
 
   const handleAnswerSelect = (index: number) => {
-    if (!showResult) {
+    if (!showResult && !selectedAnswer) {
+      console.log('📝 Answer selected:', index, 'for question', currentQuestionNumber);
       setSelectedAnswer(index);
-      console.log('📝 Answer selected:', index);
+      // Auto-submit immediately when answer is selected
+      setTimeout(() => handleAnswerSubmit(index), 500); // Small delay for visual feedback
     }
   };
 
-  const handleSubmit = () => {
+  const handleAnswerSubmit = (answerIndex?: number) => {
+    const finalAnswer = answerIndex !== undefined ? answerIndex : selectedAnswer;
+    
     if (!question || !startTime) {
       console.log('❌ Cannot submit: missing question or start time');
       return;
     }
 
     const responseTime = (new Date().getTime() - startTime.getTime()) / 1000;
-    const isCorrect = selectedAnswer === question.correct;
-    const score = isCorrect ? 100 : 0;
-
-    console.log('✅ Submitting answer:', { 
-      selectedAnswer, 
+    const isCorrect = finalAnswer === question.correct;
+    
+    console.log('✅ Submitting answer for question', currentQuestionNumber, ':', { 
+      selectedAnswer: finalAnswer, 
       correct: question.correct, 
       isCorrect, 
-      score, 
       responseTime 
     });
+
+    // Update lesson score
+    if (isCorrect) {
+      setLessonScore(prev => prev + 1);
+    }
 
     setShowResult(true);
     stopTimer();
 
-    // Complete after showing result
+    // Move to next question or complete lesson after showing result
     setTimeout(() => {
-      console.log('🎯 Completing with score:', score);
-      onComplete(score);
+      if (currentQuestionNumber < totalQuestions) {
+        moveToNextQuestion();
+      } else {
+        completeLessonFlow();
+      }
+    }, 2000); // Show result for 2 seconds
+  };
+
+  const moveToNextQuestion = () => {
+    console.log('➡️ Moving to next question:', currentQuestionNumber + 1);
+    setCurrentQuestionNumber(prev => prev + 1);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setStartTime(null);
+    generateQuestion();
+  };
+
+  const completeLessonFlow = () => {
+    console.log('🎯 Lesson completed! Final score:', lessonScore, '/', totalQuestions);
+    setIsLessonComplete(true);
+    
+    // Calculate percentage score
+    const percentageScore = Math.round((lessonScore / totalQuestions) * 100);
+    
+    setTimeout(() => {
+      onComplete(percentageScore);
     }, 3000);
   };
 
@@ -99,8 +137,16 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     generateQuestion();
   };
 
+  if (isLessonComplete) {
+    return <LessonComplete 
+      score={lessonScore} 
+      totalQuestions={totalQuestions} 
+      onContinue={() => onComplete(Math.round((lessonScore / totalQuestions) * 100))}
+    />;
+  }
+
   if (isLoading) {
-    console.log('⏳ AILearningModule: Showing loading state');
+    console.log('⏳ AILearningModule: Showing loading state for question', currentQuestionNumber);
     return <LoadingState />;
   }
 
@@ -116,19 +162,25 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   const isCorrect = selectedAnswer === question.correct;
 
-  console.log('✅ AILearningModule: Rendering question interface');
+  console.log('✅ AILearningModule: Rendering question', currentQuestionNumber, 'interface');
 
   return (
     <div className="space-y-6">
       <Card className="bg-gray-900 border-gray-800">
-        <QuestionHeader timeLeft={timeLeft} estimatedTime={question.estimatedTime} />
+        <QuestionHeader 
+          timeLeft={timeLeft} 
+          estimatedTime={question.estimatedTime}
+          currentQuestion={currentQuestionNumber}
+          totalQuestions={totalQuestions}
+          score={lessonScore}
+        />
         <CardContent>
           <QuestionDisplay
             question={question}
             selectedAnswer={selectedAnswer}
             showResult={showResult}
             onAnswerSelect={handleAnswerSelect}
-            onSubmit={handleSubmit}
+            autoSubmit={true}
           />
           
           {showResult && (
