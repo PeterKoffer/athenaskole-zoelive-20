@@ -178,6 +178,16 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
     }
   };
 
+  const handleTimeUp = () => {
+    // Handle time up scenario
+    toast({
+      title: "Time's up!",
+      description: "Moving to next question",
+      duration: 2000
+    });
+    handleNextQuestion();
+  };
+
   const currentQuestion = sessionQuestions[currentQuestionIndex];
   const hasAnswered = answers.length > currentQuestionIndex;
 
@@ -190,7 +200,6 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
       <LessonComplete
         score={Math.round((correctAnswers / totalQuestions) * 100)}
         totalQuestions={totalQuestions}
-        timeSpent={timeSpent}
         onRetry={handleRetry}
         onBack={onBack}
       />
@@ -208,7 +217,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
   return (
     <div className="max-w-4xl mx-auto">
       <SessionTimer
-        onTimeUpdate={setTimeSpent}
+        onTimeUp={handleTimeUp}
       />
       
       <Card className="bg-gray-900 border-gray-800 overflow-hidden">
@@ -228,7 +237,6 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
           ) : (
             <QuestionDisplay
               question={currentQuestion}
-              questionNumber={currentQuestionIndex + 1}
               totalQuestions={totalQuestions}
               onAnswerSelect={handleAnswerSelect}
               hasAnswered={hasAnswered}

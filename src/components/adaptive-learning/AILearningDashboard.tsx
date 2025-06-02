@@ -76,11 +76,9 @@ const AILearningDashboard = () => {
     }
   };
 
-  const handleModuleComplete = (score: number) => {
+  const handleModuleBack = () => {
     loadAIStats(); // Refresh stats after completion
-    setTimeout(() => {
-      setActiveModule(null); // Return to dashboard after short delay
-    }, 3000);
+    setActiveModule(null); // Return to dashboard
   };
 
   if (activeModule) {
@@ -96,7 +94,8 @@ const AILearningDashboard = () => {
         <AILearningModule 
           subject={activeModule.subject}
           skillArea={activeModule.skillArea}
-          onComplete={handleModuleComplete}
+          difficultyLevel={1}
+          onBack={handleModuleBack}
         />
       </div>
     );

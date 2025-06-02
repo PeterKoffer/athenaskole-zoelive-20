@@ -57,52 +57,6 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
     }
   }, [isLoading, user, difficulty, subject, skillArea, logChatInteraction]);
 
-  const handleQuestionComplete = async (score: number) => {
-    const isCorrect = score >= 70;
-    const responseTime = 30; // Approximate response time in seconds
-    
-    // Record the answer in our adaptive learning system
-    await recordAnswer(isCorrect, responseTime);
-    
-    setSessionScore(prev => prev + score);
-    setQuestionsCompleted(prev => prev + 1);
-
-    // Log the AI interaction
-    await logChatInteraction(
-      `Question completed in ${subject} - ${skillArea}`,
-      `Score: ${score}, Correct: ${isCorrect}`,
-      undefined,
-      responseTime * 1000,
-      true,
-      undefined,
-      subject,
-      skillArea
-    );
-
-    // Check if we should adjust difficulty
-    if (questionsCompleted >= 2) {
-      if (performanceMetrics.accuracy > 85 && difficulty < 10) {
-        adjustDifficulty(difficulty + 1, "Great performance! Moving to a harder level.");
-      } else if (performanceMetrics.accuracy < 50 && difficulty > 1) {
-        adjustDifficulty(difficulty - 1, "Let's try an easier level to build confidence.");
-      }
-    }
-
-    // Check if session should end (after 5 questions or time limit)
-    if (questionsCompleted >= 4 || (sessionStartTime && Date.now() - sessionStartTime.getTime() > recommendedSessionTime * 60 * 1000)) {
-      await handleSessionComplete();
-    } else {
-      // Generate next question by updating the key
-      setCurrentQuestionKey(prev => prev + 1);
-    }
-
-    toast({
-      title: isCorrect ? "Godt klaret! 🎉" : "Fortsæt med at øve dig! 💪",
-      description: `Score: ${score}% - Total gennemført: ${questionsCompleted + 1}`,
-      duration: 2000
-    });
-  };
-
   const handleSessionComplete = async () => {
     const finalScore = questionsCompleted > 0 ? Math.round(sessionScore / questionsCompleted) : 0;
     
@@ -146,6 +100,11 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
         setCurrentSession('active');
       }
     }, 1000);
+  };
+
+  const handleModuleBack = () => {
+    // Handle back navigation from AI module
+    window.history.back();
   };
 
   if (!user) {
@@ -257,7 +216,8 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
         key={currentQuestionKey} // Force re-render for new questions
         subject={subject}
         skillArea={skillArea}
-        onComplete={handleQuestionComplete}
+        difficultyLevel={difficulty}
+        onBack={handleModuleBack}
       />
 
       {/* Performance Indicators */}
