@@ -11,6 +11,8 @@ export type Database = {
     Tables: {
       adaptive_content: {
         Row: {
+          bloom_taxonomy_level: number | null
+          cognitive_level: string | null
           content: Json
           content_type: string
           created_at: string
@@ -18,12 +20,17 @@ export type Database = {
           estimated_time: number
           id: string
           learning_objectives: string[] | null
+          prerequisite_concepts: Json | null
+          question_type_id: string | null
           skill_area: string
           subject: string
+          tags: Json | null
           title: string
           updated_at: string
         }
         Insert: {
+          bloom_taxonomy_level?: number | null
+          cognitive_level?: string | null
           content: Json
           content_type?: string
           created_at?: string
@@ -31,12 +38,17 @@ export type Database = {
           estimated_time?: number
           id?: string
           learning_objectives?: string[] | null
+          prerequisite_concepts?: Json | null
+          question_type_id?: string | null
           skill_area: string
           subject: string
+          tags?: Json | null
           title: string
           updated_at?: string
         }
         Update: {
+          bloom_taxonomy_level?: number | null
+          cognitive_level?: string | null
           content?: Json
           content_type?: string
           created_at?: string
@@ -44,12 +56,67 @@ export type Database = {
           estimated_time?: number
           id?: string
           learning_objectives?: string[] | null
+          prerequisite_concepts?: Json | null
+          question_type_id?: string | null
           skill_area?: string
           subject?: string
+          tags?: Json | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "adaptive_content_question_type_id_fkey"
+            columns: ["question_type_id"]
+            isOneToOne: false
+            referencedRelation: "question_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_conversation_history: {
+        Row: {
+          ai_confidence_score: number | null
+          created_at: string
+          id: string
+          message_content: string
+          message_order: number
+          message_type: string | null
+          response_time_ms: number | null
+          sender: string
+          session_id: string | null
+        }
+        Insert: {
+          ai_confidence_score?: number | null
+          created_at?: string
+          id?: string
+          message_content: string
+          message_order: number
+          message_type?: string | null
+          response_time_ms?: number | null
+          sender: string
+          session_id?: string | null
+        }
+        Update: {
+          ai_confidence_score?: number | null
+          created_at?: string
+          id?: string
+          message_content?: string
+          message_order?: number
+          message_type?: string | null
+          response_time_ms?: number | null
+          sender?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversation_history_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ai_tutoring_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_interactions: {
         Row: {
@@ -92,6 +159,279 @@ export type Database = {
           skill_area?: string | null
           subject?: string | null
           success?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_tutoring_sessions: {
+        Row: {
+          ai_model_used: string | null
+          created_at: string
+          end_time: string | null
+          id: string
+          session_data: Json | null
+          session_type: string
+          skill_area: string | null
+          start_time: string
+          subject: string
+          total_interactions: number | null
+          user_id: string
+          user_satisfaction_score: number | null
+        }
+        Insert: {
+          ai_model_used?: string | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          session_data?: Json | null
+          session_type?: string
+          skill_area?: string | null
+          start_time?: string
+          subject: string
+          total_interactions?: number | null
+          user_id: string
+          user_satisfaction_score?: number | null
+        }
+        Update: {
+          ai_model_used?: string | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          session_data?: Json | null
+          session_type?: string
+          skill_area?: string | null
+          start_time?: string
+          subject?: string
+          total_interactions?: number | null
+          user_id?: string
+          user_satisfaction_score?: number | null
+        }
+        Relationships: []
+      }
+      concept_mastery: {
+        Row: {
+          concept_name: string
+          correct_attempts: number | null
+          created_at: string
+          decay_factor: number | null
+          first_exposure: string | null
+          id: string
+          last_practice: string | null
+          mastery_level: number | null
+          practice_count: number | null
+          subject: string
+          total_attempts: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          concept_name: string
+          correct_attempts?: number | null
+          created_at?: string
+          decay_factor?: number | null
+          first_exposure?: string | null
+          id?: string
+          last_practice?: string | null
+          mastery_level?: number | null
+          practice_count?: number | null
+          subject: string
+          total_attempts?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          concept_name?: string
+          correct_attempts?: number | null
+          created_at?: string
+          decay_factor?: number | null
+          first_exposure?: string | null
+          id?: string
+          last_practice?: string | null
+          mastery_level?: number | null
+          practice_count?: number | null
+          subject?: string
+          total_attempts?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      curriculum_standards: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          grade_level: number
+          id: string
+          name: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          grade_level: number
+          id?: string
+          name: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          grade_level?: number
+          id?: string
+          name?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      learning_objectives: {
+        Row: {
+          created_at: string
+          curriculum_standard_id: string | null
+          description: string | null
+          difficulty_level: number
+          estimated_time_minutes: number | null
+          id: string
+          prerequisites: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          curriculum_standard_id?: string | null
+          description?: string | null
+          difficulty_level?: number
+          estimated_time_minutes?: number | null
+          id?: string
+          prerequisites?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          curriculum_standard_id?: string | null
+          description?: string | null
+          difficulty_level?: number
+          estimated_time_minutes?: number | null
+          id?: string
+          prerequisites?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_objectives_curriculum_standard_id_fkey"
+            columns: ["curriculum_standard_id"]
+            isOneToOne: false
+            referencedRelation: "curriculum_standards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_pathway_steps: {
+        Row: {
+          completion_time: string | null
+          content_id: string | null
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          learning_objective_id: string | null
+          pathway_id: string | null
+          score: number | null
+          step_number: number
+        }
+        Insert: {
+          completion_time?: string | null
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          learning_objective_id?: string | null
+          pathway_id?: string | null
+          score?: number | null
+          step_number: number
+        }
+        Update: {
+          completion_time?: string | null
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          learning_objective_id?: string | null
+          pathway_id?: string | null
+          score?: number | null
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_pathway_steps_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "adaptive_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_pathway_steps_learning_objective_id_fkey"
+            columns: ["learning_objective_id"]
+            isOneToOne: false
+            referencedRelation: "learning_objectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_pathway_steps_pathway_id_fkey"
+            columns: ["pathway_id"]
+            isOneToOne: false
+            referencedRelation: "learning_pathways"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_pathways: {
+        Row: {
+          created_at: string
+          current_step: number | null
+          description: string | null
+          difficulty_progression: Json | null
+          estimated_completion_time: number | null
+          id: string
+          is_active: boolean | null
+          subject: string
+          title: string
+          total_steps: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_step?: number | null
+          description?: string | null
+          difficulty_progression?: Json | null
+          estimated_completion_time?: number | null
+          id?: string
+          is_active?: boolean | null
+          subject: string
+          title: string
+          total_steps?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_step?: number | null
+          description?: string | null
+          difficulty_progression?: Json | null
+          estimated_completion_time?: number | null
+          id?: string
+          is_active?: boolean | null
+          subject?: string
+          title?: string
+          total_steps?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -194,6 +534,33 @@ export type Database = {
         }
         Relationships: []
       }
+      question_types: {
+        Row: {
+          cognitive_level: string
+          created_at: string
+          description: string | null
+          id: string
+          interaction_type: string
+          name: string
+        }
+        Insert: {
+          cognitive_level?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          interaction_type?: string
+          name: string
+        }
+        Update: {
+          cognitive_level?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          interaction_type?: string
+          name?: string
+        }
+        Relationships: []
+      }
       user_performance: {
         Row: {
           accuracy_rate: number
@@ -201,12 +568,18 @@ export type Database = {
           completion_time_avg: number
           created_at: string
           current_level: number
+          engagement_score: number | null
           id: string
           last_assessment: string
+          learning_style: string | null
+          preferred_pace: string | null
+          retention_rate: number | null
           skill_area: string
+          strengths: Json | null
           subject: string
           updated_at: string
           user_id: string
+          weaknesses: Json | null
         }
         Insert: {
           accuracy_rate?: number
@@ -214,12 +587,18 @@ export type Database = {
           completion_time_avg?: number
           created_at?: string
           current_level?: number
+          engagement_score?: number | null
           id?: string
           last_assessment?: string
+          learning_style?: string | null
+          preferred_pace?: string | null
+          retention_rate?: number | null
           skill_area: string
+          strengths?: Json | null
           subject: string
           updated_at?: string
           user_id: string
+          weaknesses?: Json | null
         }
         Update: {
           accuracy_rate?: number
@@ -227,12 +606,18 @@ export type Database = {
           completion_time_avg?: number
           created_at?: string
           current_level?: number
+          engagement_score?: number | null
           id?: string
           last_assessment?: string
+          learning_style?: string | null
+          preferred_pace?: string | null
+          retention_rate?: number | null
           skill_area?: string
+          strengths?: Json | null
           subject?: string
           updated_at?: string
           user_id?: string
+          weaknesses?: Json | null
         }
         Relationships: []
       }
@@ -241,6 +626,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_learning_path: {
+        Args: {
+          p_user_id: string
+          p_subject: string
+          p_target_concepts?: string[]
+        }
+        Returns: string
+      }
+      update_concept_mastery: {
+        Args: {
+          p_user_id: string
+          p_concept_name: string
+          p_subject: string
+          p_is_correct: boolean
+          p_response_time?: number
+        }
+        Returns: undefined
+      }
       update_user_performance: {
         Args: {
           p_user_id: string
