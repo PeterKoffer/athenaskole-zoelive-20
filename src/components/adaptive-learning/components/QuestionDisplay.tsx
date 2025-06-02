@@ -84,13 +84,12 @@ const QuestionDisplay = ({
 
   return (
     <div className="space-y-6">
-      {!hasAnswered && (
-        <QuestionTimer
-          initialTime={question.estimatedTime}
-          onTimeUp={handleTimeUp}
-          isActive={!hasAnswered}
-        />
-      )}
+      {/* Always show countdown timer for active questions */}
+      <QuestionTimer
+        initialTime={question.estimatedTime}
+        onTimeUp={handleTimeUp}
+        isActive={!hasAnswered}
+      />
 
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
