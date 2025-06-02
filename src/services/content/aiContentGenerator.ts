@@ -4,16 +4,17 @@ import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes'
 
 export class AIContentGenerator {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
-    console.log('🤖 AIContentGenerator: Starting generation with request:', request);
+    console.log('🤖 AIContentGenerator: Starting REAL AI generation');
+    console.log('📋 Request details:', request);
 
     try {
-      console.log('📞 Calling Supabase function generate-adaptive-content...');
+      console.log('📞 Calling Supabase edge function: generate-adaptive-content');
       
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: request
       });
 
-      console.log('📨 Supabase function raw response:', { data, error });
+      console.log('📨 Raw Supabase response:', { data, error });
 
       if (error) {
         console.error('❌ Supabase function error:', error);
@@ -21,39 +22,33 @@ export class AIContentGenerator {
       }
 
       if (!data) {
-        console.error('❌ No data returned from function');
+        console.error('❌ No data returned from Supabase function');
         throw new Error('No data returned from Supabase function');
       }
 
-      console.log('📋 Function response data:', data);
+      console.log('📋 Supabase function response data:', data);
 
-      // Check if the function returned an error response
       if (data.success === false) {
-        console.error('❌ Function returned error:', data);
-        throw new Error(`AI generation failed: ${data.error || 'Unknown error'} | Debug: ${JSON.stringify(data.debug)}`);
+        console.error('❌ Function returned error response:', data);
+        throw new Error(`AI generation failed: ${data.error || 'Unknown error'}`);
       }
 
-      if (!data.success) {
-        console.error('❌ Function returned unsuccessful result:', data);
-        throw new Error(`Function failed: ${data.error || 'Unknown error'}`);
+      if (!data.success || !data.generatedContent) {
+        console.error('❌ Invalid response structure:', data);
+        throw new Error('Invalid response from AI generation function');
       }
 
-      if (!data.generatedContent) {
-        console.error('❌ No generated content in response:', data);
-        throw new Error('No generated content in response');
-      }
-
-      console.log('✅ Generated content validated and received:', data.generatedContent);
-      
-      // Ensure the content has all required fields
       const content = data.generatedContent;
+      console.log('🎯 Received AI content:', content);
+
       if (!content.question || !content.options || typeof content.correct !== 'number') {
-        console.error('❌ Invalid content structure:', content);
-        throw new Error('Invalid content structure received');
+        console.error('❌ Invalid AI content structure:', content);
+        throw new Error('Invalid AI content structure received');
       }
 
-      // Return the validated content - this is successful generation
-      return {
+      console.log('✅ AI CONTENT VALIDATION PASSED');
+      
+      const validatedContent: GeneratedContent = {
         question: content.question,
         options: content.options,
         correct: content.correct,
@@ -62,15 +57,17 @@ export class AIContentGenerator {
         estimatedTime: content.estimatedTime || 30
       };
 
+      console.log('🎉 RETURNING VALIDATED AI CONTENT:', validatedContent);
+      return validatedContent;
+
     } catch (error) {
-      console.error('❌ Error in AIContentGenerator:', error);
-      console.error('❌ Error details:', {
+      console.error('💥 CRITICAL AI GENERATION ERROR:', error);
+      console.error('💥 Error details:', {
         message: error.message,
         stack: error.stack,
         request: request
       });
       
-      // Re-throw the error with more context
       throw new Error(`AI Content Generation Failed: ${error.message}`);
     }
   }

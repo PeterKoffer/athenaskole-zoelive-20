@@ -23,13 +23,13 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
   const generateQuestion = useCallback(async () => {
     if (!user) {
-      console.log('❌ No user found, cannot generate question');
+      console.log('❌ No user found, cannot generate AI question');
       setError('User not authenticated');
       return;
     }
 
     if (isGenerating.current) {
-      console.log('⏳ Already generating, skipping...');
+      console.log('⏳ AI generation already in progress, skipping...');
       return;
     }
 
@@ -38,10 +38,11 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
     setError(null);
     setQuestion(null);
     
-    console.log('🎯 Starting AI question generation for:', { subject, skillArea, userId: user.id });
+    console.log('🤖 STARTING AI QUESTION GENERATION');
+    console.log('📋 Generation params:', { subject, skillArea, userId: user.id });
     
     try {
-      console.log('🚀 Calling AI content generator...');
+      console.log('🚀 Calling AI content generator directly...');
       
       const generatedContent = await aiContentGenerator.generateAdaptiveContent({
         subject,
@@ -50,11 +51,10 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         userId: user.id
       });
 
-      console.log('📝 AI Generated content received:', generatedContent);
+      console.log('✅ AI Content Generator returned:', generatedContent);
 
-      // Validate the generated content
       if (!generatedContent || !generatedContent.question || !generatedContent.options) {
-        throw new Error('Invalid content structure received from AI');
+        throw new Error('Invalid AI content structure received');
       }
 
       const questionData: Question = {
@@ -66,24 +66,19 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         estimatedTime: generatedContent.estimatedTime || 30
       };
 
+      console.log('🎯 Setting AI generated question:', questionData);
       setQuestion(questionData);
-      console.log('✅ AI Question set successfully:', questionData);
 
       toast({
-        title: "New AI Question Generated! 🤖",
-        description: "AI has created a personalized question for you",
+        title: "AI Question Generated! 🤖",
+        description: `Real AI question created for ${subject} - ${skillArea}`,
         duration: 3000
       });
 
     } catch (aiError) {
-      console.error('❌ AI generation failed completely:', aiError);
-      console.error('❌ Full error details:', {
-        message: aiError.message,
-        stack: aiError.stack,
-        name: aiError.name
-      });
+      console.error('💥 AI GENERATION FAILED:', aiError);
+      console.error('💥 Error stack:', aiError.stack);
       
-      // Set the actual error message instead of using fallback
       setError(`AI generation failed: ${aiError.message}`);
       
       toast({
@@ -96,6 +91,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
     } finally {
       setIsLoading(false);
       isGenerating.current = false;
+      console.log('🏁 AI generation process completed');
     }
   }, [user, subject, skillArea, toast]);
 

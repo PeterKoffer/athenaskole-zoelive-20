@@ -22,6 +22,15 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [startTime, setStartTime] = useState<Date | null>(null);
   const hasInitialized = useRef(false);
 
+  console.log('🔄 AILearningModule state:', { 
+    subject, 
+    skillArea, 
+    hasQuestion: !!question, 
+    isLoading, 
+    error,
+    hasInitialized: hasInitialized.current 
+  });
+
   const handleTimeUp = () => {
     if (!showResult) {
       handleSubmit();
@@ -30,18 +39,18 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
 
-  // Initialize only once
+  // Force AI generation on mount
   useEffect(() => {
     if (!hasInitialized.current) {
-      console.log('🔄 AILearningModule initializing once for:', { subject, skillArea });
+      console.log('🚀 AILearningModule: Force generating AI question for:', { subject, skillArea });
       hasInitialized.current = true;
       generateQuestion();
     }
-  }, [subject, skillArea, generateQuestion]);
+  }, [generateQuestion, subject, skillArea]);
 
   useEffect(() => {
     if (question && !showResult && !startTime) {
-      console.log('⏰ Starting timer for new question:', question.estimatedTime);
+      console.log('⏰ Starting timer for AI question:', question.estimatedTime);
       setStartTime(new Date());
       startTimer(question.estimatedTime);
     }
@@ -50,7 +59,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const handleAnswerSelect = (index: number) => {
     if (!showResult) {
       setSelectedAnswer(index);
-      console.log('📝 Answer selected:', index);
+      console.log('📝 Answer selected for AI question:', index);
     }
   };
 
@@ -64,7 +73,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     const isCorrect = selectedAnswer === question.correct;
     const score = isCorrect ? 100 : 0;
 
-    console.log('✅ Submitting answer:', { selectedAnswer, correct: question.correct, isCorrect, score, responseTime });
+    console.log('✅ Submitting AI answer:', { selectedAnswer, correct: question.correct, isCorrect, score, responseTime });
 
     setShowResult(true);
     stopTimer();
@@ -72,20 +81,21 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     // Calculate final score based on accuracy and time
     let finalScore = score;
     if (isCorrect && responseTime < question.estimatedTime * 0.5) {
-      finalScore = Math.min(100, score + 10); // Bonus for quick correct answers
+      finalScore = Math.min(100, score + 10);
     }
 
     setTimeout(() => {
-      console.log('🎯 Completing with final score:', finalScore);
+      console.log('🎯 AI module completing with final score:', finalScore);
       onComplete(finalScore);
-    }, 3000); // Show result for 3 seconds before completing
+    }, 3000);
   };
 
   const handleRetry = () => {
-    console.log('🔄 Retrying question generation...');
+    console.log('🔄 Retrying AI question generation...');
     setSelectedAnswer(null);
     setShowResult(false);
     setStartTime(null);
+    hasInitialized.current = false; // Reset to allow re-initialization
     generateQuestion();
   };
 
@@ -93,11 +103,13 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     return <LoadingState />;
   }
 
-  if (error && !question) {
+  if (error) {
+    console.error('❌ AILearningModule error state:', error);
     return <ErrorState onRetry={handleRetry} />;
   }
 
   if (!question) {
+    console.log('❌ No question available, showing error state');
     return <ErrorState onRetry={handleRetry} />;
   }
 
