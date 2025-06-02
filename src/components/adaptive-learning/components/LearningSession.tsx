@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,6 +54,14 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
     userId: user?.id || '',
     totalQuestions
   });
+
+  // Auto-generate first question when session is ready
+  useEffect(() => {
+    if (sessionId && sessionQuestions.length === 0 && !isGenerating) {
+      console.log('🎬 Auto-generating first question...');
+      generateNextQuestion();
+    }
+  }, [sessionId, sessionQuestions.length, isGenerating, generateNextQuestion]);
 
   const isSessionComplete = currentQuestionIndex >= totalQuestions;
   const currentQuestion = sessionQuestions[currentQuestionIndex];
