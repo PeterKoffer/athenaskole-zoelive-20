@@ -14,6 +14,8 @@ interface Activity {
   level: string;
   color: string;
   aiEnhanced?: boolean;
+  subject?: string;
+  skillArea?: string;
 }
 
 interface AIEnhancedActivityCardProps {
@@ -23,6 +25,13 @@ interface AIEnhancedActivityCardProps {
 
 const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivityCardProps) => {
   const IconComponent = activity.icon;
+
+  console.log('🎯 Activity card rendering:', {
+    id: activity.id,
+    title: activity.title,
+    subject: activity.subject,
+    skillArea: activity.skillArea
+  });
 
   return (
     <Card className={`bg-gray-800 border-gray-700 hover:border-purple-400 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
@@ -69,7 +78,7 @@ const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivit
           <div className="mb-4 p-3 bg-purple-900/30 border border-purple-600/30 rounded-lg">
             <div className="flex items-center space-x-2 text-purple-300 text-sm">
               <Sparkles className="w-4 h-4" />
-              <span>AI-tilpasset til dit niveau</span>
+              <span>AI-personalized for your level</span>
             </div>
           </div>
         )}

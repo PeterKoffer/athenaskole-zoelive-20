@@ -12,6 +12,8 @@ interface Activity {
   level: string;
   color: string;
   aiEnhanced?: boolean;
+  subject?: string;
+  skillArea?: string;
 }
 
 interface TodaysProgramGridProps {

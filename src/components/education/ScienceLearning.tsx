@@ -7,12 +7,12 @@ import AILearningModule from "@/components/adaptive-learning/AILearningModule";
 import { Card, CardContent } from "@/components/ui/card";
 import { Brain } from "lucide-react";
 
-const EnglishLearning = () => {
+const ScienceLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [aiSessionKey, setAiSessionKey] = useState(0);
 
-  console.log('📚 EnglishLearning component state:', {
+  console.log('🔬 ScienceLearning component state:', {
     user: !!user,
     userId: user?.id,
     loading,
@@ -22,7 +22,7 @@ const EnglishLearning = () => {
   // Redirect to auth if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      console.log("🚪 User not authenticated in EnglishLearning, redirecting to auth");
+      console.log("🚪 User not authenticated in ScienceLearning, redirecting to auth");
       navigate('/auth');
     }
   }, [user, loading, navigate]);
@@ -32,8 +32,8 @@ const EnglishLearning = () => {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">📚</div>
-          <p className="text-lg">Loading your English lesson...</p>
+          <div className="text-4xl mb-4">🔬</div>
+          <p className="text-lg">Loading your Science lesson...</p>
         </div>
       </div>
     );
@@ -48,19 +48,19 @@ const EnglishLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-400 mb-6">
+        <Card className="bg-gradient-to-r from-purple-900 to-indigo-900 border-purple-400 mb-6">
           <CardContent className="p-4 text-center">
-            <Brain className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+            <Brain className="w-8 h-8 text-purple-400 mx-auto mb-2" />
             <p className="text-white">
-              🤖 AI is generating personalized English questions for reading comprehension
+              🤖 AI is generating personalized Science questions for discovery learning
             </p>
           </CardContent>
         </Card>
         
         <AILearningModule 
           key={aiSessionKey} 
-          subject="english" 
-          skillArea="reading_comprehension" 
+          subject="science" 
+          skillArea="general_science" 
           difficultyLevel={1}
           onBack={() => navigate('/')}
         />
@@ -69,4 +69,4 @@ const EnglishLearning = () => {
   );
 };
 
-export default EnglishLearning;
+export default ScienceLearning;
