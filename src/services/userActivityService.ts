@@ -17,16 +17,17 @@ export interface UserActivitySession {
 export class UserActivityService {
   async startSession(session: Omit<UserActivitySession, 'id'>): Promise<string | null> {
     try {
-      // Insert into user_activity_sessions table
+      // Map to learning_sessions table since user_activity_sessions doesn't exist
       const { data, error } = await supabase
-        .from('user_activity_sessions')
+        .from('learning_sessions')
         .insert({
           user_id: session.user_id,
-          session_type: session.session_type,
-          subject: session.subject,
+          subject: session.subject || 'general',
+          skill_area: session.session_type,
+          difficulty_level: 1,
           start_time: session.start_time,
-          completion_status: session.completion_status,
-          metadata: session.metadata || {}
+          completed: session.completion_status === 'completed',
+          user_feedback: session.metadata || {}
         })
         .select('id')
         .single();
@@ -49,7 +50,7 @@ export class UserActivityService {
       
       // First get the start time to calculate duration
       const { data: sessionData, error: fetchError } = await supabase
-        .from('user_activity_sessions')
+        .from('learning_sessions')
         .select('start_time')
         .eq('id', sessionId)
         .single();
@@ -65,12 +66,12 @@ export class UserActivityService {
 
       // Update the session
       const { error } = await supabase
-        .from('user_activity_sessions')
+        .from('learning_sessions')
         .update({
           end_time: endTime,
-          duration_minutes: durationMinutes,
-          completion_status: 'completed',
-          engagement_score: engagementScore
+          time_spent: durationMinutes,
+          completed: true,
+          score: engagementScore || 0
         })
         .eq('id', sessionId);
 
@@ -89,9 +90,9 @@ export class UserActivityService {
   async abandonSession(sessionId: string): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('user_activity_sessions')
+        .from('learning_sessions')
         .update({
-          completion_status: 'abandoned',
+          completed: false,
           end_time: new Date().toISOString()
         })
         .eq('id', sessionId);
@@ -111,7 +112,7 @@ export class UserActivityService {
   async getUserSessions(userId: string, limit: number = 50): Promise<UserActivitySession[]> {
     try {
       const { data, error } = await supabase
-        .from('user_activity_sessions')
+        .from('learning_sessions')
         .select('*')
         .eq('user_id', userId)
         .order('start_time', { ascending: false })
@@ -122,7 +123,19 @@ export class UserActivityService {
         return [];
       }
 
-      return data || [];
+      // Transform learning_sessions data to UserActivitySession format
+      return (data || []).map(session => ({
+        id: session.id,
+        user_id: session.user_id,
+        session_type: session.skill_area as 'chat' | 'game' | 'lesson' | 'music_creation' | 'ai_tutor',
+        subject: session.subject,
+        start_time: session.start_time,
+        end_time: session.end_time || undefined,
+        duration_minutes: session.time_spent,
+        completion_status: session.completed ? 'completed' : 'abandoned',
+        engagement_score: session.score || undefined,
+        metadata: session.user_feedback
+      }));
     } catch (error) {
       console.error('Error fetching user sessions:', error);
       return [];
@@ -134,8 +147,8 @@ export class UserActivityService {
       const fromDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
       
       const { data, error } = await supabase
-        .from('user_activity_sessions')
-        .select('session_type, duration_minutes, engagement_score, completion_status')
+        .from('learning_sessions')
+        .select('skill_area, time_spent, score, completed')
         .eq('user_id', userId)
         .gte('start_time', fromDate);
 
@@ -155,18 +168,18 @@ export class UserActivityService {
         };
       }
 
-      const completedSessions = data.filter(s => s.completion_status === 'completed');
+      const completedSessions = data.filter(s => s.completed);
       
       const analytics = {
         totalSessions: data.length,
         completedSessions: completedSessions.length,
-        totalTimeSpent: completedSessions.reduce((sum, s) => sum + (s.duration_minutes || 0), 0),
+        totalTimeSpent: completedSessions.reduce((sum, s) => sum + (s.time_spent || 0), 0),
         averageEngagement: completedSessions.length > 0 
-          ? completedSessions.reduce((sum, s) => sum + (s.engagement_score || 0), 0) / completedSessions.length 
+          ? completedSessions.reduce((sum, s) => sum + (s.score || 0), 0) / completedSessions.length 
           : 0,
         completionRate: data.length ? (completedSessions.length / data.length) * 100 : 0,
         sessionTypeBreakdown: data.reduce((acc, s) => {
-          acc[s.session_type] = (acc[s.session_type] || 0) + 1;
+          acc[s.skill_area] = (acc[s.skill_area] || 0) + 1;
           return acc;
         }, {} as Record<string, number>)
       };

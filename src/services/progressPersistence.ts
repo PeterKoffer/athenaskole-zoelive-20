@@ -1,19 +1,10 @@
 
 import { sessionService } from './sessionService';
-import { userProgressService } from './userProgressService';
+import { userProgressService, UserProgress as ServiceUserProgress } from './userProgressService';
 
-export interface UserProgress {
+// Use the UserProgress from userProgressService and add the missing id field
+export interface UserProgress extends ServiceUserProgress {
   id: string;
-  user_id: string;
-  subject: string;
-  skill_area: string;
-  current_level: number;
-  total_questions: number;
-  correct_answers: number;
-  accuracy_rate: number;
-  attempts_count: number;
-  completion_time_avg: number;
-  last_assessment?: string;
 }
 
 export interface LearningSession {
@@ -42,11 +33,20 @@ class ProgressPersistenceService {
   }
 
   async getUserProgress(userId: string, subject: string): Promise<UserProgress | null> {
-    return userProgressService.getUserProgress(userId, subject);
+    const progress = await userProgressService.getUserProgress(userId, subject);
+    if (!progress) return null;
+    
+    // Add the missing id field
+    return {
+      ...progress,
+      id: `${userId}-${subject}-${progress.skill_area}`
+    };
   }
 
   async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
-    return userProgressService.updateUserProgress(progressData);
+    // Remove the id field before passing to userProgressService
+    const { id, ...serviceProgressData } = progressData;
+    return userProgressService.updateUserProgress(serviceProgressData);
   }
 
   async getRecentSessions(userId: string, limit: number = 10): Promise<LearningSession[]> {
