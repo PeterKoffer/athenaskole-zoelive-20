@@ -29,34 +29,7 @@ serve(async (req) => {
     const openAIApiKey = Deno.env.get('OpenaiAPI');
     if (!openAIApiKey) {
       console.error('❌ OpenAI API key not found in secrets');
-      
-      // Return a fallback question instead of failing
-      const fallbackContent = {
-        question: `What is a fundamental concept in ${skillArea} for ${subject}?`,
-        options: [
-          `Basic ${skillArea} principle`,
-          `Advanced ${skillArea} theory`,
-          `Applied ${skillArea} method`,
-          `Theoretical ${skillArea} framework`
-        ],
-        correct: 0,
-        explanation: `This is a sample question about ${skillArea} in ${subject}. The first option represents the most fundamental concept.`,
-        learningObjectives: [`Understanding basic ${skillArea} concepts`],
-        estimatedTime: 30
-      };
-
-      console.log('🔄 Using fallback content due to missing API key');
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          generatedContent: fallbackContent,
-          usingFallback: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      throw new Error('OpenAI API key not configured');
     }
 
     console.log('✅ OpenAI API key found, generating content with AI...');
@@ -104,7 +77,7 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ OpenAI API error:', errorText);
+      console.error('❌ OpenAI API error:', response.status, errorText);
       throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
     }
 
@@ -112,7 +85,7 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
     console.log('✅ OpenAI response received:', data);
 
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('Invalid response from OpenAI');
+      throw new Error('Invalid response structure from OpenAI');
     }
 
     let generatedContent;
@@ -121,30 +94,28 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
       console.log('🎯 Successfully parsed AI-generated content:', generatedContent);
     } catch (parseError) {
       console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
-      // Create fallback content
-      generatedContent = {
-        question: `What is an important concept in ${skillArea} for ${subject}?`,
-        options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
-        correct: 0,
-        explanation: `This is a generated question about ${skillArea} in ${subject}.`,
-        learningObjectives: [`Understanding ${skillArea} concepts`]
-      };
+      throw new Error('Failed to parse AI response');
     }
 
-    // Ensure required fields exist
+    // Validate required fields
     if (!generatedContent.question || !generatedContent.options || !Array.isArray(generatedContent.options)) {
-      generatedContent = {
-        question: `Sample question for ${subject} - ${skillArea}`,
-        options: ['Answer A', 'Answer B', 'Answer C', 'Answer D'],
-        correct: 0,
-        explanation: `This is a sample question for ${subject} in the ${skillArea} area.`,
-        learningObjectives: [`Understanding ${skillArea} concepts`]
-      };
+      console.error('❌ Invalid content structure:', generatedContent);
+      throw new Error('Invalid content structure from AI');
+    }
+
+    // Ensure correct field is a number
+    if (typeof generatedContent.correct !== 'number') {
+      generatedContent.correct = 0;
+    }
+
+    // Ensure we have learning objectives
+    if (!generatedContent.learningObjectives || !Array.isArray(generatedContent.learningObjectives)) {
+      generatedContent.learningObjectives = [`Understanding ${skillArea} concepts in ${subject}`];
     }
 
     console.log('📝 Final generated content:', generatedContent);
 
-    // Save to database (optional, don't fail if this doesn't work)
+    // Try to save to database (optional, don't fail if this doesn't work)
     try {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -179,8 +150,7 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
         generatedContent: {
           ...generatedContent,
           estimatedTime: 30
-        },
-        usingFallback: false
+        }
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -190,24 +160,13 @@ Make the question appropriate for the difficulty level and subject matter. Ensur
   } catch (error) {
     console.error('❌ Error in generate-adaptive-content function:', error);
     
-    // Return fallback content even on error to keep the app working
-    const fallbackContent = {
-      question: "What is 2 + 2?",
-      options: ["3", "4", "5", "6"],
-      correct: 1,
-      explanation: "2 + 2 equals 4. This is basic arithmetic.",
-      learningObjectives: ["Basic arithmetic"],
-      estimatedTime: 30
-    };
-    
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        generatedContent: fallbackContent,
-        usingFallback: true,
-        error: error.message
+        success: false,
+        error: error.message || 'Unknown error occurred'
       }),
       { 
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );

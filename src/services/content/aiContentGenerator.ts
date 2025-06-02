@@ -58,26 +58,6 @@ export class AIContentGenerator {
       throw error;
     }
   }
-
-  private createFallbackContent(request: GenerateContentRequest): GeneratedContent {
-    const { subject, skillArea, difficultyLevel } = request;
-    
-    console.log('🔄 Creating fallback content for:', { subject, skillArea, difficultyLevel });
-    
-    return {
-      question: `What is a key concept in ${skillArea} for ${subject}? (Level ${difficultyLevel})`,
-      options: [
-        `Fundamental ${skillArea} principle`,
-        `Advanced ${skillArea} theory`,
-        `Practical ${skillArea} application`,
-        `Complex ${skillArea} framework`
-      ],
-      correct: 0,
-      explanation: `This is a sample question about ${skillArea} in ${subject}. Understanding fundamental principles is essential for building knowledge.`,
-      learningObjectives: [`Understanding ${skillArea} concepts in ${subject}`],
-      estimatedTime: 30
-    };
-  }
 }
 
 export const aiContentGenerator = new AIContentGenerator();

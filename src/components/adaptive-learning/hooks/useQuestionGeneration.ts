@@ -38,7 +38,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
     setError(null);
     setQuestion(null);
     
-    console.log('🎯 Starting question generation for:', { subject, skillArea, userId: user.id });
+    console.log('🎯 Starting AI question generation for:', { subject, skillArea, userId: user.id });
     
     try {
       const generatedContent = await aiContentGenerator.generateAdaptiveContent({
@@ -48,11 +48,11 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
         userId: user.id
       });
 
-      console.log('📝 Generated content received:', generatedContent);
+      console.log('📝 AI Generated content received:', generatedContent);
 
       // Validate the generated content
       if (!generatedContent || !generatedContent.question || !generatedContent.options) {
-        throw new Error('Invalid content structure received');
+        throw new Error('Invalid content structure received from AI');
       }
 
       const questionData: Question = {
@@ -65,19 +65,18 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       };
 
       setQuestion(questionData);
-      console.log('✅ Question set successfully:', questionData);
+      console.log('✅ AI Question set successfully:', questionData);
 
       toast({
-        title: "New Question Generated! 🎯",
+        title: "New AI Question Generated! 🤖",
         description: "AI has created a personalized question for you",
         duration: 3000
       });
 
     } catch (aiError) {
-      console.error('❌ AI generation error:', aiError);
+      console.error('❌ AI generation failed completely:', aiError);
       
-      // Only show error and use fallback if AI truly failed
-      // Create a working fallback question
+      // Only use fallback after AI completely fails
       const fallbackQuestion: Question = {
         question: `What is an important concept in ${skillArea} for ${subject}?`,
         options: [
@@ -93,15 +92,14 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       };
       
       setQuestion(fallbackQuestion);
-      console.log('🔄 Using fallback question due to AI error:', fallbackQuestion);
-
-      // Only set error if we're using fallback
-      setError('AI generation failed, using fallback question');
+      setError('AI generation failed, using backup content');
+      console.log('🔄 Using fallback question due to AI failure:', fallbackQuestion);
 
       toast({
-        title: "Question Ready! 📚",
-        description: "Practice question loaded (using backup content)",
-        duration: 3000
+        title: "Backup Question Ready 📚",
+        description: "Using backup content (AI temporarily unavailable)",
+        duration: 3000,
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
