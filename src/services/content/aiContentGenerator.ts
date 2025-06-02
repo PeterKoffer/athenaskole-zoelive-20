@@ -4,50 +4,47 @@ import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes'
 
 export class AIContentGenerator {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
-    console.log('🤖 AIContentGenerator: Starting REAL AI generation');
-    console.log('📋 Request details:', request);
+    console.log('🤖 AIContentGenerator: Starting generation');
+    console.log('📋 Request:', request);
 
     try {
-      console.log('📞 Calling Supabase edge function: generate-adaptive-content');
+      console.log('📞 Calling edge function: generate-adaptive-content');
       
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: request
       });
 
-      console.log('📨 Raw Supabase response:', { data, error });
+      console.log('📨 Function response:', { data, error });
 
       if (error) {
-        console.error('❌ Supabase function error:', error);
-        throw new Error(`Supabase function error: ${error.message || JSON.stringify(error)}`);
+        console.error('❌ Function error:', error);
+        throw new Error(`Function error: ${error.message}`);
       }
 
       if (!data) {
-        console.error('❌ No data returned from Supabase function');
-        throw new Error('No data returned from Supabase function');
+        console.error('❌ No data returned');
+        throw new Error('No data returned from function');
       }
 
-      console.log('📋 Supabase function response data:', data);
-
-      if (data.success === false) {
-        console.error('❌ Function returned error response:', data);
-        throw new Error(`AI generation failed: ${data.error || 'Unknown error'}`);
+      if (!data.success) {
+        console.error('❌ Function returned error:', data.error);
+        throw new Error(data.error || 'Unknown error');
       }
 
-      if (!data.success || !data.generatedContent) {
-        console.error('❌ Invalid response structure:', data);
-        throw new Error('Invalid response from AI generation function');
+      if (!data.generatedContent) {
+        console.error('❌ No generated content in response');
+        throw new Error('No generated content in response');
       }
 
       const content = data.generatedContent;
-      console.log('🎯 Received AI content:', content);
+      console.log('🎯 Generated content:', content);
 
-      if (!content.question || !content.options || typeof content.correct !== 'number') {
-        console.error('❌ Invalid AI content structure:', content);
-        throw new Error('Invalid AI content structure received');
+      // Validate structure
+      if (!content.question || !Array.isArray(content.options) || typeof content.correct !== 'number') {
+        console.error('❌ Invalid content structure:', content);
+        throw new Error('Invalid content structure');
       }
 
-      console.log('✅ AI CONTENT VALIDATION PASSED');
-      
       const validatedContent: GeneratedContent = {
         question: content.question,
         options: content.options,
@@ -57,18 +54,12 @@ export class AIContentGenerator {
         estimatedTime: content.estimatedTime || 30
       };
 
-      console.log('🎉 RETURNING VALIDATED AI CONTENT:', validatedContent);
+      console.log('✅ Returning validated content:', validatedContent);
       return validatedContent;
 
-    } catch (error) {
-      console.error('💥 CRITICAL AI GENERATION ERROR:', error);
-      console.error('💥 Error details:', {
-        message: error.message,
-        stack: error.stack,
-        request: request
-      });
-      
-      throw new Error(`AI Content Generation Failed: ${error.message}`);
+    } catch (error: any) {
+      console.error('💥 AI generation error:', error);
+      throw new Error(`AI generation failed: ${error.message}`);
     }
   }
 }

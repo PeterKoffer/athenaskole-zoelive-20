@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useQuestionGeneration } from './hooks/useQuestionGeneration';
 import { useQuestionTimer } from './hooks/useQuestionTimer';
@@ -20,15 +20,13 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
-  const hasInitialized = useRef(false);
 
-  console.log('🔄 AILearningModule state:', { 
+  console.log('🔄 AILearningModule render:', { 
     subject, 
     skillArea, 
     hasQuestion: !!question, 
     isLoading, 
-    error,
-    hasInitialized: hasInitialized.current 
+    error 
   });
 
   const handleTimeUp = () => {
@@ -39,18 +37,16 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
 
   const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
 
-  // Force AI generation on mount - only once
+  // Generate question immediately on mount
   useEffect(() => {
-    if (!hasInitialized.current) {
-      console.log('🚀 AILearningModule: FORCING AI question generation for:', { subject, skillArea });
-      hasInitialized.current = true;
-      generateQuestion();
-    }
-  }, [generateQuestion, subject, skillArea]);
+    console.log('🚀 Effect: Generating AI question on mount');
+    generateQuestion();
+  }, [generateQuestion]);
 
+  // Start timer when question is received
   useEffect(() => {
     if (question && !showResult && !startTime) {
-      console.log('⏰ Starting timer for AI question:', question.estimatedTime);
+      console.log('⏰ Starting timer for question');
       setStartTime(new Date());
       startTimer(question.estimatedTime);
     }
@@ -59,7 +55,7 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const handleAnswerSelect = (index: number) => {
     if (!showResult) {
       setSelectedAnswer(index);
-      console.log('📝 Answer selected for AI question:', index);
+      console.log('📝 Answer selected:', index);
     }
   };
 
@@ -73,29 +69,29 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     const isCorrect = selectedAnswer === question.correct;
     const score = isCorrect ? 100 : 0;
 
-    console.log('✅ Submitting AI answer:', { selectedAnswer, correct: question.correct, isCorrect, score, responseTime });
+    console.log('✅ Submitting answer:', { 
+      selectedAnswer, 
+      correct: question.correct, 
+      isCorrect, 
+      score, 
+      responseTime 
+    });
 
     setShowResult(true);
     stopTimer();
 
-    // Calculate final score based on accuracy and time
-    let finalScore = score;
-    if (isCorrect && responseTime < question.estimatedTime * 0.5) {
-      finalScore = Math.min(100, score + 10);
-    }
-
+    // Complete after showing result
     setTimeout(() => {
-      console.log('🎯 AI module completing with final score:', finalScore);
-      onComplete(finalScore);
+      console.log('🎯 Completing with score:', score);
+      onComplete(score);
     }, 3000);
   };
 
   const handleRetry = () => {
-    console.log('🔄 Retrying AI question generation...');
+    console.log('🔄 Retrying question generation...');
     setSelectedAnswer(null);
     setShowResult(false);
     setStartTime(null);
-    hasInitialized.current = false; // Reset to allow re-initialization
     generateQuestion();
   };
 
@@ -104,12 +100,12 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   }
 
   if (error) {
-    console.error('❌ AILearningModule error state:', error);
+    console.error('❌ Error state:', error);
     return <ErrorState onRetry={handleRetry} />;
   }
 
   if (!question) {
-    console.log('❌ No question available, showing error state');
+    console.log('❌ No question available');
     return <ErrorState onRetry={handleRetry} />;
   }
 

@@ -7,34 +7,28 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface GenerateContentRequest {
-  subject: string;
-  skillArea: string;
-  difficultyLevel: number;
-  userId: string;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('🚀 AI Content Generation started');
+  console.log('🚀 AI Content Generation Function Called');
 
   try {
     const requestBody = await req.json();
-    console.log('📥 Received request:', requestBody);
+    console.log('📥 Request received:', requestBody);
 
-    const { subject, skillArea, difficultyLevel }: GenerateContentRequest = requestBody;
+    const { subject, skillArea, difficultyLevel } = requestBody;
 
-    const openAIApiKey = Deno.env.get('OpenaiAPI');
+    // Check for OpenAI API key
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     
     if (!openAIApiKey) {
-      console.error('❌ OpenAI API key missing');
+      console.error('❌ OPENAI_API_KEY not found in environment');
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'OpenAI API key not configured'
+          error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to Supabase Edge Function secrets.'
         }),
         { 
           status: 500,
@@ -43,33 +37,28 @@ serve(async (req) => {
       );
     }
 
-    console.log('🔑 OpenAI API key found');
+    console.log('🔑 OpenAI API key found, proceeding with generation');
 
-    // Create a specific prompt based on subject and skill area
-    let specificPrompt = '';
-    if (subject === 'matematik' && skillArea === 'fractions') {
-      specificPrompt = `Generate a math question about fractions at difficulty level ${difficultyLevel}. 
-      Include operations like adding, subtracting, multiplying, or dividing fractions.
-      Make it challenging but appropriate for the level.`;
-    } else {
-      specificPrompt = `Generate an educational question for ${subject} focusing on ${skillArea} at difficulty level ${difficultyLevel}.`;
-    }
+    // Create the prompt
+    const prompt = `Generate a math question about fractions suitable for elementary students.
 
-    const prompt = `${specificPrompt}
-
-Return a JSON object with this EXACT structure (no markdown, no code blocks, just pure JSON):
+Return ONLY a valid JSON object with this exact structure:
 {
-  "question": "The main question text here",
-  "options": ["Option A", "Option B", "Option C", "Option D"],
-  "correct": 0,
-  "explanation": "Clear explanation of why the answer is correct",
-  "learningObjectives": ["Learning objective 1", "Learning objective 2"]
+  "question": "What is 1/2 + 1/4?",
+  "options": ["1/6", "2/6", "3/4", "3/6"],
+  "correct": 2,
+  "explanation": "To add fractions, find a common denominator. 1/2 = 2/4, so 2/4 + 1/4 = 3/4",
+  "learningObjectives": ["Adding fractions with different denominators", "Finding common denominators"]
 }
 
-The correct field should be the INDEX (0, 1, 2, or 3) of the correct answer in the options array.
-Make sure the question is educational and appropriate for the difficulty level.`;
+Make sure:
+- The question is about fractions (adding, subtracting, multiplying, or dividing)
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation clearly shows how to solve the problem
+- Return ONLY the JSON, no markdown formatting or code blocks`;
 
-    console.log('🤖 Sending to OpenAI:', { prompt: prompt.substring(0, 100) + '...' });
+    console.log('🤖 Sending request to OpenAI');
 
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -82,7 +71,7 @@ Make sure the question is educational and appropriate for the difficulty level.`
         messages: [
           {
             role: 'system',
-            content: 'You are an educational content generator. Return ONLY valid JSON, no markdown formatting or code blocks.'
+            content: 'You are a math teacher creating fraction problems. Return only valid JSON with no formatting.'
           },
           {
             role: 'user',
@@ -90,7 +79,7 @@ Make sure the question is educational and appropriate for the difficulty level.`
           }
         ],
         temperature: 0.7,
-        max_tokens: 800,
+        max_tokens: 500,
       }),
     });
 
@@ -102,8 +91,7 @@ Make sure the question is educational and appropriate for the difficulty level.`
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: `OpenAI API error: ${openAIResponse.status}`,
-          details: errorText
+          error: `OpenAI API error: ${openAIResponse.status} - ${errorText}`
         }),
         { 
           status: 500,
@@ -129,24 +117,22 @@ Make sure the question is educational and appropriate for the difficulty level.`
       );
     }
 
-    const contentText = openAIData.choices[0].message.content.trim();
-    console.log('📄 Raw content:', contentText);
-
     let generatedContent;
     try {
-      // Clean the content in case there are markdown artifacts
+      const contentText = openAIData.choices[0].message.content.trim();
+      console.log('📄 Raw OpenAI content:', contentText);
+      
+      // Clean any potential markdown formatting
       const cleanContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       generatedContent = JSON.parse(cleanContent);
-      console.log('✅ Successfully parsed AI content');
+      
+      console.log('✅ Successfully parsed generated content:', generatedContent);
     } catch (parseError) {
       console.error('❌ JSON parse failed:', parseError.message);
-      console.error('❌ Content that failed:', contentText);
-      
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Failed to parse AI response',
-          rawContent: contentText
+          error: 'Failed to parse AI response as JSON'
         }),
         { 
           status: 500,
@@ -155,14 +141,17 @@ Make sure the question is educational and appropriate for the difficulty level.`
       );
     }
 
-    // Validate the structure
-    if (!generatedContent.question || !Array.isArray(generatedContent.options) || 
-        typeof generatedContent.correct !== 'number' || !generatedContent.explanation) {
+    // Validate the generated content
+    if (!generatedContent.question || 
+        !Array.isArray(generatedContent.options) || 
+        generatedContent.options.length !== 4 ||
+        typeof generatedContent.correct !== 'number' || 
+        !generatedContent.explanation) {
       console.error('❌ Invalid content structure:', generatedContent);
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Invalid content structure from AI'
+          error: 'Generated content has invalid structure'
         }),
         { 
           status: 500,
@@ -171,17 +160,17 @@ Make sure the question is educational and appropriate for the difficulty level.`
       );
     }
 
-    // Ensure all required fields
+    // Ensure all required fields with defaults
     const finalContent = {
       question: generatedContent.question,
       options: generatedContent.options,
       correct: Number(generatedContent.correct),
       explanation: generatedContent.explanation,
-      learningObjectives: generatedContent.learningObjectives || [`Understanding ${skillArea} in ${subject}`],
+      learningObjectives: generatedContent.learningObjectives || ['Fraction arithmetic'],
       estimatedTime: 30
     };
 
-    console.log('🎯 Final content generated successfully');
+    console.log('🎯 Returning successful response:', finalContent);
 
     return new Response(
       JSON.stringify({ 
@@ -199,8 +188,7 @@ Make sure the question is educational and appropriate for the difficulty level.`
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: 'Unexpected server error',
-        details: error.message
+        error: `Server error: ${error.message}`
       }),
       { 
         status: 500,
