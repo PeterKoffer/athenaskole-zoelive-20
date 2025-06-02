@@ -1,15 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useAdaptiveLearning } from "@/hooks/useAdaptiveLearning";
-import MathHeader from "./math/MathHeader";
-import MathQuestion from "./math/MathQuestion";
-import SessionTimer from "../adaptive-learning/SessionTimer";
 import LearningHeader from "./LearningHeader";
 import AILearningModule from "@/components/adaptive-learning/AILearningModule";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain } from "lucide-react";
+
 const MathematicsLearning = () => {
   const {
     user,
@@ -19,13 +18,6 @@ const MathematicsLearning = () => {
   const [useAIQuestions, setUseAIQuestions] = useState(false);
   const [aiSessionKey, setAiSessionKey] = useState(0);
 
-  // Existing state for regular questions
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [answers, setAnswers] = useState<boolean[]>([]);
-  const [showResults, setShowResults] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
   console.log('🔢 MathematicsLearning component state:', {
     user: !!user,
     userId: user?.id,
@@ -33,6 +25,7 @@ const MathematicsLearning = () => {
     useAIQuestions,
     aiSessionKey
   });
+
   const {
     difficulty,
     performanceMetrics,
@@ -54,20 +47,6 @@ const MathematicsLearning = () => {
     }
   }, [user, loading, navigate]);
 
-  // Sample math questions
-  const questions = [{
-    question: 'What is 15 + 27?',
-    options: ['40', '42', '45', '48'],
-    correct: 1,
-    explanation: '15 + 27 = 42',
-    difficulty: 1
-  }, {
-    question: 'What is 8 × 7?',
-    options: ['54', '56', '58', '64'],
-    correct: 1,
-    explanation: '8 × 7 = 56',
-    difficulty: 2
-  }];
   const handleStartAIQuestions = () => {
     console.log('🚀 STARTING AI QUESTIONS MODE');
     console.log('👤 Current user:', user?.id);
@@ -78,39 +57,10 @@ const MathematicsLearning = () => {
       return newKey;
     });
   };
+
   const handleAIComplete = (score: number) => {
     console.log('✅ AI Learning completed with score:', score);
     setUseAIQuestions(false);
-    setShowResults(true);
-  };
-  const handleAnswerSelect = (index: number) => {
-    setSelectedAnswer(index);
-  };
-  const handleSubmit = () => {
-    if (selectedAnswer === null) return;
-    const startTime = Date.now() - 5000; // Simulate 5 seconds thinking time
-    const responseTime = Date.now() - startTime;
-    const isCorrect = selectedAnswer === questions[currentQuestion].correct;
-    setShowResult(true);
-    const newAnswers = [...answers, isCorrect];
-    setAnswers(newAnswers);
-    if (isCorrect) {
-      setScore(score + 1);
-    }
-    recordAnswer(isCorrect, responseTime);
-  };
-  const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-    } else {
-      setShowResults(true);
-      endSession();
-    }
-  };
-  const handleDifficultyChange = (newLevel: number, reason: string) => {
-    adjustDifficulty(newLevel, reason);
   };
 
   // Show loading state while authentication is being checked
@@ -129,25 +79,8 @@ const MathematicsLearning = () => {
     console.log('❌ No user - component not rendering');
     return null;
   }
+
   console.log('🎯 Rendering main component with useAIQuestions:', useAIQuestions);
-  if (showResults) {
-    return <div className="min-h-screen bg-gray-900 text-white">
-        <LearningHeader />
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">Great work!</h1>
-            <p className="text-xl">You scored {score} out of {questions.length}</p>
-          </div>
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">Session Complete!</h3>
-            <p className="text-gray-300">Keep practicing to improve your math skills!</p>
-            <Button onClick={() => setShowResults(false)} className="mt-4 bg-blue-600 hover:bg-blue-700">
-              Try Again
-            </Button>
-          </div>
-        </div>
-      </div>;
-  }
 
   // Show AI Questions Mode
   if (useAIQuestions) {
@@ -162,7 +95,7 @@ const MathematicsLearning = () => {
                 🤖 AI is generating a REAL personalized math question for fractions
               </p>
               <Button onClick={() => setUseAIQuestions(false)} variant="outline" className="mt-2 border-gray-600 text-slate-950 bg-slate-50">
-                Back to Regular Questions
+                Back to Start
               </Button>
             </CardContent>
           </Card>
@@ -172,19 +105,19 @@ const MathematicsLearning = () => {
       </div>;
   }
 
-  // Show selection between AI and Regular questions
+  // Show initial start screen (no mode selection)
   return <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
         <Card className="bg-gray-800 border-gray-700 mb-6">
           <CardHeader>
-            <CardTitle className="text-white text-center">Choose Your Learning Mode</CardTitle>
+            <CardTitle className="text-white text-center">AI Math Learning</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="text-center">
             <Card className="bg-gradient-to-r from-lime-900 to-green-900 border-lime-400">
               <CardContent className="p-6 text-center">
                 <Brain className="w-12 h-12 text-lime-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">AI-Generated Questions</h3>
+                <h3 className="text-xl font-bold text-white mb-2">AI-Generated Math Questions</h3>
                 <p className="text-lime-200 mb-4">
                   Get personalized math questions generated by AI based on your skill level
                 </p>
@@ -194,32 +127,10 @@ const MathematicsLearning = () => {
                 </Button>
               </CardContent>
             </Card>
-
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-4">🔢</div>
-                <h3 className="text-xl font-bold text-white mb-2">Regular Questions</h3>
-                <p className="text-gray-300 mb-4">
-                  Practice with our predefined math questions
-                </p>
-                <Button onClick={() => {
-                console.log('📚 Starting regular questions mode');
-                // This will render the regular math questions below
-              }} className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Start Regular Math
-                </Button>
-              </CardContent>
-            </Card>
           </CardContent>
         </Card>
-
-        {/* Regular Math Questions - show only if not using AI */}
-        {!useAIQuestions && <>
-            <SessionTimer recommendedDuration={recommendedSessionTime} />
-            <MathHeader score={score} totalQuestions={questions.length} currentQuestion={currentQuestion} difficulty={difficulty} performanceMetrics={performanceMetrics} onDifficultyChange={handleDifficultyChange} />
-            <MathQuestion question={questions[currentQuestion]} selectedAnswer={selectedAnswer} showResult={showResult} onAnswerSelect={handleAnswerSelect} onSubmit={handleSubmit} onNext={handleNext} isLastQuestion={currentQuestion === questions.length - 1} />
-          </>}
       </div>
     </div>;
 };
+
 export default MathematicsLearning;
