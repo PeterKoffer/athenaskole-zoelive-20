@@ -36,8 +36,8 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
       newNotifications.push({
         id: `streak_${childProgress.streak}`,
         type: 'milestone',
-        title: `${childProgress.childName} har ${childProgress.streak} dage i træk! 🔥`,
-        message: `Fantastisk dedikation! ${childProgress.childName} har brugt appen ${childProgress.streak} dage i træk.`,
+        title: `${childProgress.childName} has a ${childProgress.streak} day streak! 🔥`,
+        message: `Amazing dedication! ${childProgress.childName} has used the app for ${childProgress.streak} days in a row.`,
         timestamp: new Date(),
         priority: 'high'
       });
@@ -48,8 +48,8 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
       newNotifications.push({
         id: 'weekly_goal_achieved',
         type: 'achievement',
-        title: 'Ugentligt mål nået! 🎯',
-        message: `${childProgress.childName} har nået det ugentlige mål med ${childProgress.weeklyMinutes} minutter læring.`,
+        title: 'Weekly goal achieved! 🎯',
+        message: `${childProgress.childName} has reached the weekly goal with ${childProgress.weeklyMinutes} minutes of learning.`,
         timestamp: new Date(),
         priority: 'medium'
       });
@@ -60,8 +60,8 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
       newNotifications.push({
         id: `achievement_${index}`,
         type: 'achievement',
-        title: `Ny præstation låst op! 🏆`,
-        message: `${childProgress.childName} har optjent: ${achievement}`,
+        title: `New achievement unlocked! 🏆`,
+        message: `${childProgress.childName} has earned: ${achievement}`,
         timestamp: new Date(),
         priority: 'medium'
       });
@@ -72,8 +72,8 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
       newNotifications.push({
         id: 'pronunciation_excellent',
         type: 'progress',
-        title: 'Fremragende udtale! 🎤',
-        message: `${childProgress.childName} har opnået ${childProgress.pronunciationScore}% nøjagtighed i udtale.`,
+        title: 'Excellent pronunciation! 🎤',
+        message: `${childProgress.childName} has achieved ${childProgress.pronunciationScore}% accuracy in pronunciation.`,
         timestamp: new Date(),
         priority: 'low'
       });
@@ -96,9 +96,9 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
         achievements: childProgress.newAchievements
       },
       recommendations: [
-        childProgress.pronunciationScore < 75 ? "Fokuser på udtaleøvelser" : "Fortsæt det gode arbejde med udtale",
-        childProgress.weeklyMinutes < 120 ? "Prøv at øge den daglige læretid" : "Perfekt ugentlig læring!",
-        childProgress.challengesCompleted < 3 ? "Udforsk de daglige udfordringer" : "Fantastisk engagement i udfordringer"
+        childProgress.pronunciationScore < 75 ? "Focus on pronunciation exercises" : "Continue the great work with pronunciation",
+        childProgress.weeklyMinutes < 120 ? "Try to increase daily learning time" : "Perfect weekly learning!",
+        childProgress.challengesCompleted < 3 ? "Explore the daily challenges" : "Fantastic engagement with challenges"
       ]
     };
 
@@ -112,8 +112,8 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
         setNotifications(prev => [{
           id: 'weekly_report_sent',
           type: 'system',
-          title: 'Ugentlig rapport sendt 📧',
-          message: `Ugentlig rapport for ${childProgress.childName} er sendt til ${parentEmail}`,
+          title: 'Weekly report sent 📧',
+          message: `Weekly report for ${childProgress.childName} has been sent to ${parentEmail}`,
           timestamp: new Date(),
           priority: 'low'
         }, ...prev]);
@@ -150,24 +150,24 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
         <CardHeader>
           <CardTitle className="flex items-center text-white">
             <Send className="w-6 h-6 mr-2" />
-            Ugentlig Rapport til Forældre
+            Weekly Report to Parents
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="text-white font-semibold">Denne Uges Highlights:</h4>
+              <h4 className="text-white font-semibold">This Week's Highlights:</h4>
               <div className="space-y-1 text-gray-300">
-                <p>• {childProgress.weeklyMinutes} minutter læring</p>
-                <p>• {childProgress.completedLessons} lektioner afsluttet</p>
-                <p>• {childProgress.pronunciationScore}% udtale nøjagtighed</p>
-                <p>• {childProgress.challengesCompleted} udfordringer klaret</p>
-                <p>• {childProgress.streak} dages streak</p>
+                <p>• {childProgress.weeklyMinutes} minutes of learning</p>
+                <p>• {childProgress.completedLessons} lessons completed</p>
+                <p>• {childProgress.pronunciationScore}% pronunciation accuracy</p>
+                <p>• {childProgress.challengesCompleted} challenges completed</p>
+                <p>• {childProgress.streak} day streak</p>
               </div>
             </div>
             
             <div className="space-y-2">
-              <h4 className="text-white font-semibold">Nye Præstationer:</h4>
+              <h4 className="text-white font-semibold">New Achievements:</h4>
               <div className="space-y-1">
                 {childProgress.newAchievements.length > 0 ? (
                   childProgress.newAchievements.map((achievement, index) => (
@@ -176,7 +176,7 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
                     </Badge>
                   ))
                 ) : (
-                  <p className="text-gray-400 text-sm">Ingen nye præstationer denne uge</p>
+                  <p className="text-gray-400 text-sm">No new achievements this week</p>
                 )}
               </div>
             </div>
@@ -185,15 +185,15 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
           {parentEmail && (
             <div className="flex items-center justify-between pt-4 border-t border-gray-600">
               <div>
-                <p className="text-white font-medium">Send til: {parentEmail}</p>
-                <p className="text-gray-400 text-sm">Automatisk hver søndag kl. 18:00</p>
+                <p className="text-white font-medium">Send to: {parentEmail}</p>
+                <p className="text-gray-400 text-sm">Automatic every Sunday at 6:00 PM</p>
               </div>
               <Button
                 onClick={sendWeeklyReport}
                 disabled={weeklyReportSent}
                 className="bg-green-600 hover:bg-green-700"
               >
-                {weeklyReportSent ? 'Sendt ✓' : 'Send Nu'}
+                {weeklyReportSent ? 'Sent ✓' : 'Send Now'}
               </Button>
             </div>
           )}
@@ -205,7 +205,7 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
         <CardHeader>
           <CardTitle className="flex items-center text-white">
             <Bell className="w-6 h-6 mr-2 text-lime-400" />
-            Live Notifikationer
+            Live Notifications
             {notifications.length > 0 && (
               <Badge variant="outline" className="ml-auto bg-red-600 text-white border-red-600">
                 {notifications.length}
@@ -229,7 +229,7 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
                         <div className="flex items-center space-x-2">
                           <Clock className="w-3 h-3 text-gray-300" />
                           <span className="text-gray-300 text-xs">
-                            {notification.timestamp.toLocaleString('da-DK')}
+                            {notification.timestamp.toLocaleString('en-US')}
                           </span>
                         </div>
                       </div>
@@ -241,8 +241,8 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
           ) : (
             <div className="text-center py-8 text-gray-400">
               <Bell className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Ingen nye notifikationer</p>
-              <p className="text-sm">Notifikationer vises når der sker fremskridt</p>
+              <p>No new notifications</p>
+              <p className="text-sm">Notifications appear when progress is made</p>
             </div>
           )}
         </CardContent>
@@ -251,25 +251,25 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
       {/* Notification Settings */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-white text-lg">Notifikations Indstillinger</CardTitle>
+          <CardTitle className="text-white text-lg">Notification Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">Ugentlige rapporter</span>
-              <Badge variant="outline" className="bg-green-600 text-white border-green-600">Aktiveret</Badge>
+              <span className="text-gray-300">Weekly reports</span>
+              <Badge variant="outline" className="bg-green-600 text-white border-green-600">Enabled</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">Præstations notifikationer</span>
-              <Badge variant="outline" className="bg-green-600 text-white border-green-600">Aktiveret</Badge>
+              <span className="text-gray-300">Achievement notifications</span>
+              <Badge variant="outline" className="bg-green-600 text-white border-green-600">Enabled</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">Milestone notifikationer</span>
-              <Badge variant="outline" className="bg-green-600 text-white border-green-600">Aktiveret</Badge>
+              <span className="text-gray-300">Milestone notifications</span>
+              <Badge variant="outline" className="bg-green-600 text-white border-green-600">Enabled</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">Daglige påmindelser</span>
-              <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">Hver dag kl. 16:00</Badge>
+              <span className="text-gray-300">Daily reminders</span>
+              <Badge variant="outline" className="bg-yellow-600 text-white border-yellow-600">Every day at 4:00 PM</Badge>
             </div>
           </div>
         </CardContent>
