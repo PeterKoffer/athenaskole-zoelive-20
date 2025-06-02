@@ -12,6 +12,12 @@ interface LessonHeaderProps {
   difficultyLevel: number;
   timeSpent: number;
   onBack: () => void;
+  learningObjective?: {
+    id: string;
+    title: string;
+    description: string;
+    difficulty_level: number;
+  };
 }
 
 const LessonHeader = ({
@@ -21,7 +27,8 @@ const LessonHeader = ({
   totalQuestions,
   difficultyLevel,
   timeSpent,
-  onBack
+  onBack,
+  learningObjective
 }: LessonHeaderProps) => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -58,7 +65,14 @@ const LessonHeader = ({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-white capitalize">{subject}</h2>
-            <p className="text-gray-400 capitalize">{skillArea}</p>
+            <p className="text-gray-400 capitalize">
+              {learningObjective ? learningObjective.title : skillArea}
+            </p>
+            {learningObjective && (
+              <p className="text-sm text-gray-500 mt-1">
+                {learningObjective.description}
+              </p>
+            )}
           </div>
           <div className="text-right">
             <div className="text-white font-semibold">

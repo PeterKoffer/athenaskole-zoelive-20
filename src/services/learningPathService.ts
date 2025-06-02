@@ -73,7 +73,9 @@ export const learningPathService = {
         description: item.description || '',
         currentStep: item.current_step || 0,
         totalSteps: item.total_steps || 0,
-        difficultyProgression: item.difficulty_progression || [],
+        difficultyProgression: Array.isArray(item.difficulty_progression) 
+          ? item.difficulty_progression as number[]
+          : [],
         estimatedCompletionTime: item.estimated_completion_time || 0,
         isActive: item.is_active || false,
         createdAt: item.created_at
@@ -215,7 +217,7 @@ export const learningPathService = {
         return [];
       }
 
-      return (data || []).map(item => ({
+      return (steps || []).map(item => ({
         id: item.id,
         pathwayId: item.pathway_id,
         stepNumber: item.step_number,
