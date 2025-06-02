@@ -183,6 +183,7 @@ export class RealtimeChat {
       
       // Connect to our edge function WebSocket
       const wsUrl = `wss://nqrxydgfawfqdlmdxjyy.supabase.co/functions/v1/realtime-chat`;
+      console.log('Connecting to WebSocket:', wsUrl);
       this.ws = new WebSocket(wsUrl);
 
       this.ws.addEventListener('open', () => {
