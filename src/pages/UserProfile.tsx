@@ -55,14 +55,13 @@ const UserProfile = () => {
     try {
       console.log('🔍 Fetching profile for user:', user.id);
       
-      // Use a direct query to the profiles table
       const { data, error } = await supabase
-        .from('profiles' as any) // Type assertion to bypass TypeScript errors
+        .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
+      if (error && error.code !== 'PGRST116') {
         console.error('❌ Error fetching profile:', error);
         throw error;
       }
@@ -81,7 +80,6 @@ const UserProfile = () => {
         });
       } else {
         console.log('ℹ️ No profile found, using user metadata');
-        // Profile doesn't exist yet
         setProfileExists(false);
         setProfileData({
           name: user.user_metadata?.name || "",
@@ -95,7 +93,6 @@ const UserProfile = () => {
       }
     } catch (error) {
       console.error('❌ Error in fetchProfile:', error);
-      // Fallback to user metadata if profile fetch fails
       setProfileExists(false);
       setProfileData({
         name: user.user_metadata?.name || "",
@@ -161,9 +158,8 @@ const UserProfile = () => {
       console.log('💾 Updating profile for user:', user.id);
       
       if (profileExists) {
-        // Update existing profile
         const { error } = await supabase
-          .from('profiles' as any) // Type assertion to bypass TypeScript errors
+          .from('profiles')
           .update({
             name: profileData.name,
             email: profileData.email,
@@ -179,9 +175,8 @@ const UserProfile = () => {
         if (error) throw error;
         console.log('✅ Profile updated successfully');
       } else {
-        // Insert new profile
         const { error } = await supabase
-          .from('profiles' as any) // Type assertion to bypass TypeScript errors
+          .from('profiles')
           .insert({
             id: user.id,
             user_id: user.id,
@@ -224,7 +219,6 @@ const UserProfile = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <ProfileHeader onSignOut={signOut} />
 
-      {/* Add padding-bottom to ensure AI tutor doesn't cover content */}
       <div className="max-w-4xl mx-auto p-6 pb-24">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">My Profile</h1>

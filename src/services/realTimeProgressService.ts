@@ -2,131 +2,124 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export interface RealTimeProgress {
-  id?: string;
+  id: string;
   user_id: string;
   subject: string;
   skill_area: string;
+  current_level: number;
+  accuracy_rate: number;
+  attempts_count: number;
+  completion_time_avg: number;
   progress_percentage: number;
   last_activity: string;
   streak_count: number;
   total_time_spent: number;
-  achievements: any[];
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export class RealTimeProgressService {
+export const realTimeProgressService = {
   async updateProgress(
     userId: string,
     subject: string,
     skillArea: string,
-    timeSpent: number,
-    progressDelta: number
-  ): Promise<boolean> {
+    isCorrect: boolean,
+    completionTime: number
+  ): Promise<void> {
     try {
-      const { error } = await supabase.rpc('update_real_time_progress', {
+      const { error } = await supabase.rpc('update_user_performance', {
         p_user_id: userId,
         p_subject: subject,
         p_skill_area: skillArea,
-        p_time_spent: timeSpent,
-        p_progress_delta: progressDelta
+        p_is_correct: isCorrect,
+        p_completion_time: completionTime
       });
 
       if (error) {
-        console.error('Error updating real-time progress:', error);
-        return false;
+        console.error('Error updating progress:', error);
+        throw error;
       }
 
-      return true;
+      console.log('✅ Progress updated successfully');
     } catch (error) {
-      console.error('Error updating real-time progress:', error);
-      return false;
+      console.error('Error in updateProgress:', error);
+      throw error;
     }
-  }
+  },
 
   async getUserProgress(userId: string): Promise<RealTimeProgress[]> {
     try {
       const { data, error } = await supabase
-        .from('real_time_progress')
+        .from('user_performance')
         .select('*')
         .eq('user_id', userId)
-        .order('last_activity', { ascending: false });
+        .order('updated_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching user progress:', error);
         return [];
       }
 
-      return (data || []).map(item => ({
-        ...item,
-        achievements: Array.isArray(item.achievements) ? item.achievements : []
+      // Transform the data to match RealTimeProgress interface
+      const transformedData: RealTimeProgress[] = (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        subject: item.subject,
+        skill_area: item.skill_area,
+        current_level: item.current_level,
+        accuracy_rate: item.accuracy_rate,
+        attempts_count: item.attempts_count,
+        completion_time_avg: item.completion_time_avg,
+        progress_percentage: Math.min((item.accuracy_rate / 100) * item.current_level * 10, 100),
+        last_activity: item.last_assessment,
+        streak_count: item.current_level,
+        total_time_spent: item.completion_time_avg * item.attempts_count,
+        created_at: item.created_at,
+        updated_at: item.updated_at
       }));
+
+      return transformedData;
     } catch (error) {
-      console.error('Error fetching user progress:', error);
+      console.error('Error in getUserProgress:', error);
       return [];
     }
-  }
+  },
 
   async getSubjectProgress(userId: string, subject: string): Promise<RealTimeProgress[]> {
     try {
       const { data, error } = await supabase
-        .from('real_time_progress')
+        .from('user_performance')
         .select('*')
         .eq('user_id', userId)
         .eq('subject', subject)
-        .order('skill_area');
+        .order('updated_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching subject progress:', error);
         return [];
       }
 
-      return (data || []).map(item => ({
-        ...item,
-        achievements: Array.isArray(item.achievements) ? item.achievements : []
+      const transformedData: RealTimeProgress[] = (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        subject: item.subject,
+        skill_area: item.skill_area,
+        current_level: item.current_level,
+        accuracy_rate: item.accuracy_rate,
+        attempts_count: item.attempts_count,
+        completion_time_avg: item.completion_time_avg,
+        progress_percentage: Math.min((item.accuracy_rate / 100) * item.current_level * 10, 100),
+        last_activity: item.last_assessment,
+        streak_count: item.current_level,
+        total_time_spent: item.completion_time_avg * item.attempts_count,
+        created_at: item.created_at,
+        updated_at: item.updated_at
       }));
+
+      return transformedData;
     } catch (error) {
-      console.error('Error fetching subject progress:', error);
+      console.error('Error in getSubjectProgress:', error);
       return [];
     }
   }
-
-  async addAchievement(userId: string, subject: string, skillArea: string, achievement: any): Promise<boolean> {
-    try {
-      // First get current achievements
-      const { data: current, error: fetchError } = await supabase
-        .from('real_time_progress')
-        .select('achievements')
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea)
-        .single();
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Error fetching current achievements:', fetchError);
-        return false;
-      }
-
-      const currentAchievements = Array.isArray(current?.achievements) ? current.achievements : [];
-      const updatedAchievements = [...currentAchievements, achievement];
-
-      const { error } = await supabase
-        .from('real_time_progress')
-        .update({ achievements: updatedAchievements })
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea);
-
-      if (error) {
-        console.error('Error adding achievement:', error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error adding achievement:', error);
-      return false;
-    }
-  }
-}
-
-export const realTimeProgressService = new RealTimeProgressService();
+};
