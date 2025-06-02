@@ -14,7 +14,7 @@ const NavbarButton = ({ icon: Icon, label, onClick, variant = "outline" }: Navba
     <Button 
       variant={variant}
       onClick={onClick}
-      className="bg-white text-black border-gray-300 hover:bg-gray-100 h-10 px-4"
+      className="bg-blue-200 text-blue-800 border-blue-300 hover:bg-blue-300 h-10 px-4"
     >
       <Icon className="w-4 h-4 mr-2" />
       {label}
