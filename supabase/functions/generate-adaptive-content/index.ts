@@ -20,15 +20,15 @@ serve(async (req) => {
 
     const { subject, skillArea, difficultyLevel } = requestBody;
 
-    // Check for OpenAI API key
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    // Check for OpenAI API key - using the correct secret name "OpenaiAPI"
+    const openAIApiKey = Deno.env.get('OpenaiAPI');
     
     if (!openAIApiKey) {
-      console.error('❌ OPENAI_API_KEY not found in environment');
+      console.error('❌ OpenaiAPI secret not found in environment');
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to Supabase Edge Function secrets.'
+          error: 'OpenAI API key not configured. Please add OpenaiAPI to Supabase Edge Function secrets.'
         }),
         { 
           status: 500,
