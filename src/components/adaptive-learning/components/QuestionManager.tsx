@@ -45,6 +45,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
 
   const generateNextQuestion = useCallback(async () => {
     if (sessionQuestions.length >= totalQuestions) {
+      console.log('🛑 Already have enough questions');
       return;
     }
 
@@ -52,6 +53,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
     const usedQuestions = sessionQuestions.map(q => q.question);
     
     try {
+      console.log('⏰ Starting AI generation with 30s timeout...');
       const newQuestion = await generateQuestion(usedQuestions);
       
       if (newQuestion) {
@@ -59,23 +61,25 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
         setSessionQuestions(prev => [...prev, newQuestion]);
         setHasTriedFallback(false);
       } else {
+        console.log('⚠️ AI generation returned null, trying fallback...');
         throw new Error('AI generation returned null');
       }
     } catch (error) {
       console.error('❌ AI generation failed:', error);
       
       if (!hasTriedFallback) {
-        console.log('🔄 Using fallback question...');
+        console.log('🔄 Using fallback question due to AI failure...');
         const fallbackQuestion = createFallbackQuestion();
         setSessionQuestions(prev => [...prev, fallbackQuestion]);
         setHasTriedFallback(true);
         
         toast({
           title: "Using Backup Question",
-          description: "AI generation failed, using a backup question",
+          description: "AI generation failed, using a practice question",
           duration: 3000
         });
       } else {
+        console.error('💥 Both AI and fallback failed');
         toast({
           title: "Error",
           description: "Could not generate question. Please try again.",

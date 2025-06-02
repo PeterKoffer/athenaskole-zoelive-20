@@ -26,9 +26,10 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
   const [error, setError] = useState<string | null>(null);
 
   const generateQuestion = useCallback(async (previousQuestions: string[] = []) => {
-    console.log('🚀 generateQuestion called');
+    const startTime = Date.now();
+    console.log('🚀 Starting question generation at:', new Date().toISOString());
     console.log('👤 User ID:', userId);
-    console.log('📋 Params:', { subject, skillArea, difficultyLevel, historyCount: previousQuestions.length });
+    console.log('📋 Parameters:', { subject, skillArea, difficultyLevel, historyCount: previousQuestions.length });
 
     if (!userId) {
       console.log('❌ No user found');
@@ -36,16 +37,19 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
       return null;
     }
 
-    console.log('🔥 Starting AI question generation');
-    
     setIsGenerating(true);
     setError(null);
     setQuestion(null);
     
     try {
-      console.log('📞 Calling Supabase edge function...');
+      console.log('📞 Calling Supabase edge function at:', new Date().toISOString());
       
-      const { data, error: functionError } = await supabase.functions.invoke('generate-adaptive-content', {
+      // Add a timeout to the function call
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000);
+      });
+
+      const functionPromise = supabase.functions.invoke('generate-adaptive-content', {
         body: {
           subject,
           skillArea,
@@ -55,6 +59,13 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
         }
       });
 
+      const { data, error: functionError } = await Promise.race([
+        functionPromise,
+        timeoutPromise
+      ]) as any;
+
+      const responseTime = Date.now() - startTime;
+      console.log(`⏱️ Function response received in ${responseTime}ms`);
       console.log('📨 Function response:', { data, error: functionError });
 
       if (functionError) {
@@ -97,35 +108,47 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
       };
 
       console.log('🎯 Final question data:', questionData);
+      console.log(`✅ Total generation time: ${Date.now() - startTime}ms`);
       setQuestion(questionData);
 
       toast({
         title: "AI Question Generated! 🤖",
-        description: `Real AI question created for ${subject} - ${skillArea}`,
+        description: `Question created in ${Math.round(responseTime / 1000)}s`,
         duration: 3000
       });
 
-      console.log('✅ Question generation completed successfully');
       return questionData;
 
     } catch (error: any) {
-      console.error('💥 Question generation failed:', error);
+      const totalTime = Date.now() - startTime;
+      console.error(`💥 Question generation failed after ${totalTime}ms:`, error);
       
       const errorMessage = error.message || 'Unknown error occurred';
       setError(errorMessage);
       
-      toast({
-        title: "AI Generation Failed ❌",
-        description: errorMessage.length > 100 ? 'Check console for details' : errorMessage,
-        duration: 8000,
-        variant: "destructive"
-      });
+      // Show different error messages based on the type of error
+      if (error.message?.includes('timeout')) {
+        toast({
+          title: "Generation Timeout ⏱️",
+          description: "AI is taking too long. Will use fallback question.",
+          duration: 5000,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "AI Generation Failed ❌",
+          description: errorMessage.length > 100 ? 'Check console for details' : errorMessage,
+          duration: 8000,
+          variant: "destructive"
+        });
+      }
 
       return null;
 
     } finally {
       setIsGenerating(false);
-      console.log('🏁 Generation process completed');
+      const finalTime = Date.now() - startTime;
+      console.log(`🏁 Generation process completed in ${finalTime}ms`);
     }
   }, [userId, subject, skillArea, difficultyLevel, toast]);
 
