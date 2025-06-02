@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Brain, Calculator, BookOpen, Globe } from 'lucide-react';
 
 export interface SubjectSelectorProps {
-  onSubjectSelect: (subject: string, skillArea: string) => void;
+  onSubjectSelect?: (subject: string, skillArea: string) => void;
   selectedMode?: any;
   currentSubject?: string;
   onSubjectChange?: (subject: string) => void;
@@ -49,6 +49,12 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
     }
   ];
 
+  const handleSubjectSelect = (subject: string, skillArea: string) => {
+    if (onSubjectSelect) {
+      onSubjectSelect(subject, skillArea);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -84,7 +90,7 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
                         </div>
                         <p className="text-gray-400 text-sm mb-3">{skillArea.description}</p>
                         <Button 
-                          onClick={() => onSubjectSelect(subject.id, skillArea.id)}
+                          onClick={() => handleSubjectSelect(subject.id, skillArea.id)}
                           className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white"
                           size="sm"
                         >
