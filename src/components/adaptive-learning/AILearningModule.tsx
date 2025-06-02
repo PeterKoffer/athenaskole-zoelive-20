@@ -16,9 +16,10 @@ interface AILearningModuleProps {
 }
 
 const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModuleProps) => {
-  const { question, isLoading, generateQuestion } = useQuestionGeneration(subject, skillArea);
+  const { question, isLoading, error, generateQuestion } = useQuestionGeneration(subject, skillArea);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [startTime, setStartTime] = useState<Date | null>(null);
 
   const handleTimeUp = () => {
     if (!showResult) {
@@ -26,14 +27,17 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     }
   };
 
-  const { timeLeft, startTime, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
+  const { timeLeft, startTimer, stopTimer } = useQuestionTimer(30, handleTimeUp);
 
   useEffect(() => {
+    console.log('🔄 AILearningModule mounted, generating question...');
     generateQuestion();
   }, [generateQuestion]);
 
   useEffect(() => {
     if (question && !showResult) {
+      console.log('⏰ Starting timer for question:', question.estimatedTime);
+      setStartTime(new Date());
       startTimer(question.estimatedTime);
     }
   }, [question, showResult, startTimer]);
@@ -41,15 +45,21 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
   const handleAnswerSelect = (index: number) => {
     if (!showResult) {
       setSelectedAnswer(index);
+      console.log('📝 Answer selected:', index);
     }
   };
 
   const handleSubmit = () => {
-    if (!question || !startTime) return;
+    if (!question || !startTime) {
+      console.log('❌ Cannot submit: missing question or start time');
+      return;
+    }
 
     const responseTime = (new Date().getTime() - startTime.getTime()) / 1000;
     const isCorrect = selectedAnswer === question.correct;
     const score = isCorrect ? 100 : 0;
+
+    console.log('✅ Submitting answer:', { selectedAnswer, correct: question.correct, isCorrect, score, responseTime });
 
     setShowResult(true);
     stopTimer();
@@ -61,16 +71,29 @@ const AILearningModule = ({ subject, skillArea, onComplete }: AILearningModulePr
     }
 
     setTimeout(() => {
+      console.log('🎯 Completing with final score:', finalScore);
       onComplete(finalScore);
     }, 3000); // Show result for 3 seconds before completing
+  };
+
+  const handleRetry = () => {
+    console.log('🔄 Retrying question generation...');
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setStartTime(null);
+    generateQuestion();
   };
 
   if (isLoading) {
     return <LoadingState />;
   }
 
+  if (error && !question) {
+    return <ErrorState onRetry={handleRetry} />;
+  }
+
   if (!question) {
-    return <ErrorState onRetry={generateQuestion} />;
+    return <ErrorState onRetry={handleRetry} />;
   }
 
   const isCorrect = selectedAnswer === question.correct;

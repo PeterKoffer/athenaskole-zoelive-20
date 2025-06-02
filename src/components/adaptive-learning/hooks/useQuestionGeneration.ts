@@ -18,14 +18,19 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
   const { toast } = useToast();
   const [question, setQuestion] = useState<Question | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const generateQuestion = useCallback(async () => {
     if (!user) {
       console.log('❌ No user found, cannot generate question');
+      setError('User not authenticated');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
+    setQuestion(null);
+    
     console.log('🎯 Starting question generation for:', { subject, skillArea, userId: user.id });
     
     try {
@@ -38,13 +43,18 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
       console.log('📝 Generated content received:', generatedContent);
 
+      // Validate the generated content
+      if (!generatedContent || !generatedContent.question || !generatedContent.options) {
+        throw new Error('Invalid content structure received');
+      }
+
       const questionData: Question = {
         question: generatedContent.question,
         options: generatedContent.options,
         correct: generatedContent.correct,
         explanation: generatedContent.explanation,
-        learningObjectives: generatedContent.learningObjectives,
-        estimatedTime: generatedContent.estimatedTime
+        learningObjectives: generatedContent.learningObjectives || [],
+        estimatedTime: generatedContent.estimatedTime || 30
       };
 
       setQuestion(questionData);
@@ -53,11 +63,12 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
       toast({
         title: "New Question Generated! 🎯",
         description: "AI has created a personalized question for you",
-        duration: 2000
+        duration: 3000
       });
 
     } catch (error) {
       console.error('❌ Error generating question:', error);
+      setError(error instanceof Error ? error.message : 'Failed to generate question');
       
       // Create a working fallback question
       const fallbackQuestion: Question = {
@@ -79,8 +90,8 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
 
       toast({
         title: "Question Ready! 📚",
-        description: "Practice question loaded successfully",
-        duration: 2000
+        description: "Practice question loaded (using fallback)",
+        duration: 3000
       });
     } finally {
       setIsLoading(false);
@@ -90,6 +101,7 @@ export const useQuestionGeneration = (subject: string, skillArea: string) => {
   return {
     question,
     isLoading,
+    error,
     generateQuestion
   };
 };

@@ -4,36 +4,65 @@ import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes'
 
 export class AIContentGenerator {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
-    console.log('🤖 Generating adaptive content:', request);
+    console.log('🤖 AIContentGenerator: Starting generation with request:', request);
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: request
       });
 
-      console.log('🔄 Supabase function response:', { data, error });
+      console.log('🔄 Supabase function response received:', { data, error });
 
       if (error) {
         console.error('❌ Supabase function error:', error);
-        // Return fallback content instead of throwing
-        return this.createFallbackContent(request);
+        throw new Error(`Function error: ${error.message || 'Unknown error'}`);
       }
 
-      if (!data || !data.success) {
+      if (!data) {
+        console.error('❌ No data returned from function');
+        throw new Error('No data returned from function');
+      }
+
+      if (!data.success) {
         console.error('❌ Function returned unsuccessful result:', data);
-        return this.createFallbackContent(request);
+        throw new Error(`Function failed: ${data.error || 'Unknown error'}`);
       }
 
-      console.log('✅ Generated content received:', data.generatedContent);
-      return data.generatedContent;
+      if (!data.generatedContent) {
+        console.error('❌ No generated content in response:', data);
+        throw new Error('No generated content in response');
+      }
+
+      console.log('✅ Generated content validated and received:', data.generatedContent);
+      
+      // Ensure the content has all required fields
+      const content = data.generatedContent;
+      if (!content.question || !content.options || typeof content.correct !== 'number') {
+        console.error('❌ Invalid content structure:', content);
+        throw new Error('Invalid content structure received');
+      }
+
+      return {
+        question: content.question,
+        options: content.options,
+        correct: content.correct,
+        explanation: content.explanation || 'No explanation provided',
+        learningObjectives: content.learningObjectives || [],
+        estimatedTime: content.estimatedTime || 30
+      };
+
     } catch (error) {
-      console.error('❌ Error calling generate-adaptive-content:', error);
+      console.error('❌ Error in AIContentGenerator:', error);
+      
+      // Return fallback content instead of throwing
       return this.createFallbackContent(request);
     }
   }
 
   private createFallbackContent(request: GenerateContentRequest): GeneratedContent {
     const { subject, skillArea, difficultyLevel } = request;
+    
+    console.log('🔄 Creating fallback content for:', { subject, skillArea, difficultyLevel });
     
     return {
       question: `What is a key concept in ${skillArea} for ${subject}? (Level ${difficultyLevel})`,
