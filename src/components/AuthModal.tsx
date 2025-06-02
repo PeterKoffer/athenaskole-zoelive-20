@@ -29,13 +29,20 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
     setLoading(true);
 
     try {
+      console.log('🔑 Attempting authentication:', { isLogin, email: formData.email });
+      
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
 
-        if (error) throw error;
+        console.log('🔑 Sign in result:', { data: data?.user?.id, error });
+
+        if (error) {
+          console.error('❌ Sign in error:', error);
+          throw error;
+        }
 
         toast({
           title: "Welcome back!",
@@ -45,31 +52,43 @@ const AuthModal = ({ onClose, onLogin }: AuthModalProps) => {
         onLogin();
         onClose();
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
             data: {
               name: formData.name,
               age: formData.age
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/`
           }
         });
 
-        if (error) throw error;
+        console.log('📝 Sign up result:', { data: data?.user?.id, error });
+
+        if (error) {
+          console.error('❌ Sign up error:', error);
+          throw error;
+        }
 
         toast({
           title: "Account created!",
-          description: "Check your email to confirm your account.",
+          description: "Check your email to confirm your account, or try logging in if email confirmation is disabled.",
         });
         
         setIsLogin(true);
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
+      console.error("❌ Auth error:", error);
+      let errorMessage = "An error occurred during login/registration";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || "An error occurred during login/registration",
+        title: "Authentication Error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
