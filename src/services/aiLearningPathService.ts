@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { learningPathService } from './learningPathService';
+import { pathGenerationService } from './learningPath';
 
 export interface AIPathGenerationOptions {
   userId: string;
@@ -36,8 +36,8 @@ export const aiLearningPathService = {
       // Generate targeted concepts based on weak areas
       const targetConcepts = [...weakConcepts, ...(options.weakAreas || [])];
 
-      // Call the existing path generation with enhanced targeting
-      const pathId = await learningPathService.generateLearningPath(
+      // Call the path generation service
+      const pathId = await pathGenerationService.generateLearningPath(
         options.userId,
         options.subject,
         targetConcepts

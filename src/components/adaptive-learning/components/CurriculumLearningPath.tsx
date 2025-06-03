@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/useAuth';
-import { learningPathService, LearningPathway, LearningPathStep } from '@/services/learningPathService';
+import { 
+  learningPathService, 
+  LearningPathway, 
+  LearningPathStep 
+} from '@/services/learningPath';
 import { Play, CheckCircle, Clock, Target } from 'lucide-react';
 
 interface CurriculumLearningPathProps {
