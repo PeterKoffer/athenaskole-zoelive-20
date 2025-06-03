@@ -56,6 +56,9 @@ const ScienceLearning = () => {
             <p className="text-white">
               🤖 AI is generating personalized Science questions for discovery learning
             </p>
+            <p className="text-sm text-purple-200 mt-1">
+              🎧 Nelie will read explanations aloud and they'll stay visible longer for better understanding
+            </p>
           </CardContent>
         </Card>
         
