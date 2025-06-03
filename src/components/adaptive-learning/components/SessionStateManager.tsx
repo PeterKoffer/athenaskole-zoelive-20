@@ -1,8 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdaptiveLearning } from '@/hooks/useAdaptiveLearning';
 import { useAIInteractionLogger } from '@/hooks/useAIInteractionLogger';
+import { useSessionLifecycle } from '@/hooks/useSessionLifecycle';
+import { useSessionMetrics } from '@/hooks/useSessionMetrics';
+import { useSessionActions } from '@/hooks/useSessionActions';
 
 interface SessionStateManagerProps {
   subject: string;
@@ -13,12 +16,11 @@ interface SessionStateManagerProps {
 export const useSessionStateManager = ({ subject, skillArea, onSessionReady }: SessionStateManagerProps) => {
   const { user } = useAuth();
   const { logChatInteraction } = useAIInteractionLogger();
-  const [currentSession, setCurrentSession] = useState<'loading' | 'active' | 'completed'>('loading');
-  const [sessionScore, setSessionScore] = useState(0);
-  const [questionsCompleted, setQuestionsCompleted] = useState(0);
-  const [showResults, setShowResults] = useState(false);
-  const [currentQuestionKey, setCurrentQuestionKey] = useState(0);
-
+  
+  // Use the smaller, focused hooks
+  const sessionLifecycle = useSessionLifecycle();
+  const sessionMetrics = useSessionMetrics();
+  
   const {
     difficulty,
     performanceMetrics,
@@ -31,9 +33,20 @@ export const useSessionStateManager = ({ subject, skillArea, onSessionReady }: S
     endSession
   } = useAdaptiveLearning(subject, skillArea);
 
+  const sessionActions = useSessionActions({
+    subject,
+    skillArea,
+    questionsCompleted: sessionMetrics.questionsCompleted,
+    calculateFinalScore: sessionMetrics.calculateFinalScore,
+    endSession,
+    completeSession: sessionLifecycle.completeSession,
+    resetSession: sessionLifecycle.resetSession,
+    resetMetrics: sessionMetrics.resetMetrics
+  });
+
   useEffect(() => {
     if (!isLoading && user) {
-      setCurrentSession('active');
+      sessionLifecycle.initializeSession();
       
       // Log the start of AI learning session
       logChatInteraction(
@@ -58,57 +71,27 @@ export const useSessionStateManager = ({ subject, skillArea, onSessionReady }: S
         recordAnswer,
         adjustDifficulty,
         endSession,
-        currentSession,
-        sessionScore,
-        questionsCompleted,
-        showResults
+        currentSession: sessionLifecycle.currentSession,
+        sessionScore: sessionMetrics.sessionScore,
+        questionsCompleted: sessionMetrics.questionsCompleted,
+        showResults: sessionLifecycle.showResults
       });
     }
   }, [isLoading, user, difficulty, subject, skillArea, logChatInteraction, onSessionReady]);
 
-  const handleSessionComplete = async () => {
-    const finalScore = questionsCompleted > 0 ? Math.round(sessionScore / questionsCompleted) : 0;
-    
-    await endSession();
-    setCurrentSession('completed');
-    setShowResults(true);
-
-    // Log session completion
-    await logChatInteraction(
-      `AI learning session completed for ${subject} - ${skillArea}`,
-      `Final score: ${finalScore}%, Questions completed: ${questionsCompleted}`,
-      undefined,
-      undefined,
-      true,
-      undefined,
-      subject,
-      skillArea
-    );
-
-    return finalScore;
-  };
-
-  const handleRetry = () => {
-    setCurrentSession('loading');
-    setSessionScore(0);
-    setQuestionsCompleted(0);
-    setShowResults(false);
-    setCurrentQuestionKey(prev => prev + 1);
-    
-    // Re-initialize the session
-    setTimeout(() => {
-      if (!isLoading && user) {
-        setCurrentSession('active');
-      }
-    }, 1000);
-  };
-
   return {
-    currentSession,
-    sessionScore,
-    questionsCompleted,
-    showResults,
-    currentQuestionKey,
+    // Session lifecycle
+    currentSession: sessionLifecycle.currentSession,
+    showResults: sessionLifecycle.showResults,
+    currentQuestionKey: sessionLifecycle.currentQuestionKey,
+    
+    // Session metrics
+    sessionScore: sessionMetrics.sessionScore,
+    questionsCompleted: sessionMetrics.questionsCompleted,
+    setSessionScore: sessionMetrics.setSessionScore,
+    setQuestionsCompleted: sessionMetrics.setQuestionsCompleted,
+    
+    // Adaptive learning state
     difficulty,
     performanceMetrics,
     userProgress,
@@ -118,9 +101,9 @@ export const useSessionStateManager = ({ subject, skillArea, onSessionReady }: S
     recordAnswer,
     adjustDifficulty,
     endSession,
-    handleSessionComplete,
-    handleRetry,
-    setSessionScore,
-    setQuestionsCompleted
+    
+    // Session actions
+    handleSessionComplete: sessionActions.handleSessionComplete,
+    handleRetry: sessionActions.handleRetry
   };
 };
