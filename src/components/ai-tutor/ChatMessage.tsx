@@ -11,14 +11,14 @@ const ChatMessage = ({ message, children }: ChatMessageProps) => {
     <div>
       <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
         <div
-          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+          className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
             message.role === 'user'
-              ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white text-left'
-              : 'bg-gray-800 text-gray-100 border border-gray-700 text-left'
+              ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white'
+              : 'bg-gray-800 text-gray-100 border border-gray-700'
           }`}
         >
-          <p className="text-sm leading-relaxed">{message.content}</p>
-          <p className="text-xs opacity-70 mt-1 text-left">
+          <p className="text-sm leading-relaxed text-left whitespace-pre-wrap">{message.content}</p>
+          <p className="text-xs opacity-70 mt-2 text-left">
             {message.timestamp.toLocaleTimeString('da-DK')}
           </p>
         </div>

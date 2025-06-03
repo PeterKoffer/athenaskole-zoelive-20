@@ -25,12 +25,10 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
-  // Hide on certain pages to prevent blocking navigation
-  const shouldHide = location.pathname === '/' || 
-                    location.pathname.includes('/auth') || 
-                    location.pathname.includes('/adaptive-learning');
+  // Only hide on auth pages - show on all other pages including home
+  const shouldHide = location.pathname.includes('/auth');
 
-  // Reset state when navigating to different pages
+  // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
       setIsOpen(false);

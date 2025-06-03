@@ -109,11 +109,11 @@ const ChatInterface = ({
               <div
                 className={`max-w-xs px-3 py-2 rounded-lg text-xs ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white text-left'
-                    : 'bg-gray-800 text-gray-100 border border-gray-700 text-left'
+                    ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white'
+                    : 'bg-gray-800 text-gray-100 border border-gray-700'
                 }`}
               >
-                <p className="leading-relaxed">{message.content}</p>
+                <p className="leading-relaxed text-left whitespace-pre-wrap">{message.content}</p>
                 <p className="text-xs opacity-70 mt-1 text-left">
                   {message.timestamp.toLocaleTimeString('en-US')}
                 </p>
