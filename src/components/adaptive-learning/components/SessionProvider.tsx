@@ -24,17 +24,21 @@ export interface SessionData {
   timeSpent: number;
   setTimeSpent: (time: number | ((prev: number) => number)) => void;
   sessionQuestions: any[];
+  questions: any[]; // Add this for compatibility
   currentQuestionIndex: number;
+  currentQuestion: any;
   answers: number[];
+  selectedAnswer?: number;
   isGenerating: boolean;
+  isLoading: boolean; // Add this for compatibility
   generationError: string | null;
+  error: string | null; // Add this for compatibility
   hasTriedFallback: boolean;
   generateNextQuestion: () => Promise<void>;
   handleAnswerSelect: (selectedAnswer: number) => void;
   setCurrentQuestionIndex: (index: number | ((prev: number) => number)) => void;
   resetQuestions: () => void;
   isSessionComplete: boolean;
-  currentQuestion: any;
   hasAnswered: boolean;
   completeSession: () => Promise<void>;
 }
@@ -89,6 +93,7 @@ const SessionProvider = ({
   const isSessionComplete = currentQuestionIndex >= totalQuestions;
   const currentQuestion = sessionQuestions[currentQuestionIndex];
   const hasAnswered = answers.length > currentQuestionIndex;
+  const selectedAnswer = hasAnswered ? answers[currentQuestionIndex] : undefined;
 
   const completeSession = async () => {
     if (!sessionId || !user?.id) return;
@@ -123,17 +128,21 @@ const SessionProvider = ({
     timeSpent,
     setTimeSpent,
     sessionQuestions,
+    questions: sessionQuestions, // Add compatibility alias
     currentQuestionIndex,
+    currentQuestion,
     answers,
+    selectedAnswer,
     isGenerating,
+    isLoading: isGenerating, // Add compatibility alias
     generationError,
+    error: generationError, // Add compatibility alias
     hasTriedFallback,
     generateNextQuestion,
     handleAnswerSelect,
     setCurrentQuestionIndex,
     resetQuestions,
     isSessionComplete,
-    currentQuestion,
     hasAnswered,
     completeSession
   };

@@ -37,7 +37,9 @@ const SessionContent = ({
     selectedAnswer,
     isLoading,
     error,
-    handleAnswerSelect
+    handleAnswerSelect,
+    currentQuestionIndex,
+    timeSpent
   } = sessionData;
 
   if (error) {
@@ -94,7 +96,7 @@ const SessionContent = ({
     );
   }
 
-  const question = questions[currentQuestion];
+  const question = questions[currentQuestionIndex];
   
   if (!question) {
     return (
@@ -137,9 +139,11 @@ const SessionContent = ({
       <LessonHeader
         subject={subject}
         skillArea={skillArea}
-        currentQuestion={currentQuestion}
+        currentQuestion={currentQuestionIndex}
         totalQuestions={totalQuestions}
         difficultyLevel={difficultyLevel}
+        timeSpent={timeSpent}
+        onBack={onBack}
         learningObjective={learningObjective}
       />
 
