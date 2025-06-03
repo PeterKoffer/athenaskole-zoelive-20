@@ -60,8 +60,8 @@ serve(async (req) => {
             type: 'session.update',
             session: {
               modalities: ['text', 'audio'],
-              instructions: 'You are Nelie, a friendly AI tutor. You help students learn by explaining concepts clearly and encouraging them. Always be enthusiastic and supportive!',
-              voice: 'alloy',
+              instructions: 'You are Nelie, a friendly female AI tutor. You help students learn by explaining concepts clearly and encouraging them. Always be enthusiastic and supportive! Use a warm, encouraging tone that reflects your caring personality.',
+              voice: 'shimmer',
               input_audio_format: 'pcm16',
               output_audio_format: 'pcm16',
               input_audio_transcription: {
