@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Question } from '../hooks/useQuestionGeneration';
@@ -61,6 +60,10 @@ const QuestionDisplay = ({
     }
   };
 
+  // Calculate if the answer was correct
+  const isCorrect = hasAnswered && selectedAnswer === question.correct;
+  const correctAnswerText = question.options[question.correct];
+
   return (
     <div className="space-y-6">
       {/* Always show countdown timer for active questions */}
@@ -93,6 +96,8 @@ const QuestionDisplay = ({
           subject={subject}
           isVisible={showExplanation}
           onSpeechEnd={handleSpeechEnd}
+          isCorrect={isCorrect}
+          correctAnswer={correctAnswerText}
         />
       )}
     </div>

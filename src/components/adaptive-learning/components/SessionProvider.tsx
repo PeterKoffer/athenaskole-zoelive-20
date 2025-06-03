@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSessionManager, updateSessionProgress } from "./SessionManager";
 import { useQuestionManager } from "./QuestionManager";
 import { conceptMasteryService } from "../../../services/conceptMasteryService";
+import { useLocation } from "react-router-dom";
 
 export interface SessionProviderProps {
   subject: string;
@@ -52,6 +52,7 @@ const SessionProvider = ({
   children 
 }: SessionProviderProps) => {
   const { user } = useAuth();
+  const location = useLocation();
   const [isSessionActive, setIsSessionActive] = useState(true);
 
   const { sessionId, timeSpent, setTimeSpent } = useSessionManager({
@@ -81,6 +82,18 @@ const SessionProvider = ({
     userId: user?.id || '',
     totalQuestions
   });
+
+  // Reset session when navigating away
+  useEffect(() => {
+    return () => {
+      // Cleanup when component unmounts or route changes
+      if (sessionId) {
+        console.log('🧹 Cleaning up session on navigation');
+        resetQuestions();
+        setTimeSpent(0);
+      }
+    };
+  }, [location.pathname]);
 
   // Auto-generate first question when session is ready
   useEffect(() => {

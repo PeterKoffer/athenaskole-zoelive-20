@@ -124,13 +124,35 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
   }, [generateQuestion, sessionQuestions, totalQuestions, hasTriedFallback, toast, subject, questionAttempts]);
 
   const handleAnswerSelect = useCallback((selectedAnswer: number, onComplete?: () => void) => {
+    const currentQuestion = sessionQuestions[currentQuestionIndex];
+    
+    if (!currentQuestion) {
+      console.error('❌ No current question available for answer validation');
+      return;
+    }
+
     const newAnswers = [...answers, selectedAnswer];
     setAnswers(newAnswers);
     
-    const currentQuestion = sessionQuestions[currentQuestionIndex];
-    const isCorrect = selectedAnswer === currentQuestion?.correct;
+    // Fix the answer validation logic
+    const isCorrect = selectedAnswer === currentQuestion.correct;
     
-    // Give users more time to read the answer and explanation - increased from 1.5s to 5s
+    console.log('🎯 Answer validation:', {
+      selectedAnswer,
+      correctAnswer: currentQuestion.correct,
+      isCorrect,
+      question: currentQuestion.question
+    });
+    
+    // Show immediate feedback
+    toast({
+      title: isCorrect ? "Correct!" : "Incorrect",
+      description: isCorrect ? "Well done!" : `The correct answer was: ${currentQuestion.options[currentQuestion.correct]}`,
+      variant: isCorrect ? "default" : "destructive",
+      duration: 3000
+    });
+    
+    // Only proceed to next question after explanation time - increased to 6s to allow full explanation
     setTimeout(() => {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
@@ -144,14 +166,8 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       if (nextIndex >= totalQuestions && onComplete) {
         onComplete();
       }
-    }, 5000);
+    }, 6000);
 
-    // Show feedback toast
-    toast({
-      title: isCorrect ? "Correct!" : "Incorrect",
-      description: isCorrect ? "Well done!" : "Try again next time",
-      variant: isCorrect ? "default" : "destructive"
-    });
   }, [answers, sessionQuestions, currentQuestionIndex, totalQuestions, generateNextQuestion, toast]);
 
   const resetQuestions = useCallback(() => {
