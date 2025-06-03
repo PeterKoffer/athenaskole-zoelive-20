@@ -19,7 +19,7 @@ const WelcomeCard = ({ userName }: WelcomeCardProps) => {
       <CardHeader>
         <CardTitle className="flex items-center space-x-3 text-white">
           <div className="text-4xl">🎓</div>
-          <div>
+          <div className="text-left">
             <h1 className="text-3xl font-bold">Hi {userName}! I'm Nelie</h1>
             <p className="text-purple-100 text-lg">{todaysDate}</p>
           </div>
@@ -27,7 +27,7 @@ const WelcomeCard = ({ userName }: WelcomeCardProps) => {
       </CardHeader>
       <CardContent>
         <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
-          <p className="text-xl mb-4">
+          <p className="text-xl mb-4 text-left leading-relaxed">
             Welcome to your personal AI tutor! I've prepared an exciting program for you today. 
             You can choose where to start, and I'll guide you through each activity.
           </p>

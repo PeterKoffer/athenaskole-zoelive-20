@@ -13,12 +13,12 @@ const ChatMessage = ({ message, children }: ChatMessageProps) => {
         <div
           className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
             message.role === 'user'
-              ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white text-right'
+              ? 'bg-gradient-to-r from-purple-400 to-cyan-400 text-white text-left'
               : 'bg-gray-800 text-gray-100 border border-gray-700 text-left'
           }`}
         >
-          <p className="text-sm">{message.content}</p>
-          <p className="text-xs opacity-70 mt-1">
+          <p className="text-sm leading-relaxed">{message.content}</p>
+          <p className="text-xs opacity-70 mt-1 text-left">
             {message.timestamp.toLocaleTimeString('da-DK')}
           </p>
         </div>

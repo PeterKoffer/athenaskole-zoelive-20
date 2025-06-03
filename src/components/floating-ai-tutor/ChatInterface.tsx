@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ const ChatInterface = ({
   isDragging 
 }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState("");
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
@@ -42,6 +43,13 @@ const ChatInterface = ({
   const handleVoiceInput = (message: string) => {
     setInputMessage(message);
   };
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = 0;
+    }
+  }, []);
 
   return (
     <Card className={`w-80 bg-gray-900 border-gray-800 shadow-2xl transition-all duration-200 ${
@@ -92,18 +100,21 @@ const ChatInterface = ({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="h-48 overflow-y-auto space-y-2">
+        <div 
+          ref={messagesContainerRef}
+          className="h-48 overflow-y-auto space-y-2"
+        >
           {messages.map((message, index) => (
             <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
                 className={`max-w-xs px-3 py-2 rounded-lg text-xs ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white'
-                    : 'bg-gray-800 text-gray-100 border border-gray-700'
+                    ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white text-left'
+                    : 'bg-gray-800 text-gray-100 border border-gray-700 text-left'
                 }`}
               >
-                <p>{message.content}</p>
-                <p className="text-xs opacity-70 mt-1">
+                <p className="leading-relaxed">{message.content}</p>
+                <p className="text-xs opacity-70 mt-1 text-left">
                   {message.timestamp.toLocaleTimeString('en-US')}
                 </p>
               </div>

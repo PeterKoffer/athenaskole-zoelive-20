@@ -22,22 +22,39 @@ const ChatTab = ({
   onLearningOptionSelect 
 }: ChatTabProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToTop = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = 0;
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  // Scroll to top when component mounts or when there are no messages
+  useEffect(() => {
+    if (messages.length <= 1) {
+      scrollToTop();
+    }
+  }, [messages.length]);
+
   return (
     <Card className="h-96 bg-gray-900 border-gray-800">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg text-white">Chat with your AI tutor</CardTitle>
+        <CardTitle className="text-lg text-white text-center">Chat with Nelie</CardTitle>
       </CardHeader>
       <CardContent className="h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto space-y-4 mb-4"
+        >
           {messages.map((message, index) => (
             <ChatMessage key={index} message={message}>
               {message.showOptions && (
