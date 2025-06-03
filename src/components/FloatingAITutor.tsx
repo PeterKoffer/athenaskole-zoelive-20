@@ -1,23 +1,28 @@
+
 import { useState, useEffect } from "react";
 import { MessageCircle, X, Minimize2, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ChatInterface from "./floating-ai-tutor/ChatInterface";
 import CollapsedButton from "./floating-ai-tutor/CollapsedButton";
 import { useDragHandler } from "./floating-ai-tutor/useDragHandler";
+import { Message } from "./floating-ai-tutor/types";
 
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean; timestamp: Date }>>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const location = useLocation();
+  const navigate = useNavigate();
   
-  const { position, isDragging, handleMouseDown } = useDragHandler({
-    initialX: window.innerWidth - 100,
-    initialY: window.innerHeight - 100
-  });
+  const homePosition = {
+    x: window.innerWidth - 120,
+    y: 20
+  };
+  
+  const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
   // Hide on certain pages to prevent blocking navigation
   const shouldHide = location.pathname === '/' || 
@@ -32,6 +37,8 @@ const FloatingAITutor = () => {
     }
   }, [location.pathname, shouldHide]);
 
+  console.log('FloatingAITutor rendering at position:', position, 'expanded:', isOpen);
+
   if (shouldHide) {
     return null;
   }
@@ -45,8 +52,17 @@ const FloatingAITutor = () => {
   };
 
   const handleSendMessage = (text: string) => {
-    const newMessage = { text: text, isUser: true, timestamp: new Date() };
+    const newMessage: Message = { 
+      role: "user", 
+      content: text, 
+      timestamp: new Date() 
+    };
     setMessages([...messages, newMessage]);
+  };
+
+  const handleResetToHome = () => {
+    resetToHome();
+    navigate('/');
   };
 
   return (
@@ -59,10 +75,15 @@ const FloatingAITutor = () => {
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab',
       }}
-      onMouseDown={handleMouseDown}
     >
       {!isOpen && !isMinimized && (
-        <CollapsedButton onClick={toggleOpen} />
+        <CollapsedButton 
+          onExpand={toggleOpen}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onResetToHome={handleResetToHome}
+          isDragging={isDragging}
+        />
       )}
 
       {isOpen && !isMinimized && (
