@@ -1,15 +1,14 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Brain, Sparkles, Target, BarChart3 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import AILearningModule from './AILearningModule';
-import { useAdaptiveLearning } from '@/hooks/useAdaptiveLearning';
-import { useAIInteractionLogger } from '@/hooks/useAIInteractionLogger';
+import { useSessionStateManager } from './components/SessionStateManager';
+import SessionResultsCard from './components/SessionResultsCard';
+import SessionProgressCard from './components/SessionProgressCard';
+import PerformanceIndicatorsCard from './components/PerformanceIndicatorsCard';
 
 interface AdaptiveLearningEngineProps {
   subject: string;
@@ -20,62 +19,32 @@ interface AdaptiveLearningEngineProps {
 const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLearningEngineProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { logChatInteraction } = useAIInteractionLogger();
-  const [currentSession, setCurrentSession] = useState<'loading' | 'active' | 'completed'>('loading');
-  const [sessionScore, setSessionScore] = useState(0);
-  const [questionsCompleted, setQuestionsCompleted] = useState(0);
-  const [showResults, setShowResults] = useState(false);
-  const [currentQuestionKey, setCurrentQuestionKey] = useState(0);
+  const [sessionData, setSessionData] = useState<any>(null);
 
   const {
+    currentSession,
+    sessionScore,
+    questionsCompleted,
+    showResults,
+    currentQuestionKey,
     difficulty,
     performanceMetrics,
-    userProgress,
     isLoading,
-    recommendedSessionTime,
-    sessionStartTime,
-    recordAnswer,
-    adjustDifficulty,
-    endSession
-  } = useAdaptiveLearning(subject, skillArea);
+    handleSessionComplete,
+    handleRetry
+  } = useSessionStateManager({
+    subject,
+    skillArea,
+    onSessionReady: (data) => setSessionData(data)
+  });
 
-  useEffect(() => {
-    if (!isLoading && user) {
-      setCurrentSession('active');
-      
-      // Log the start of AI learning session
-      logChatInteraction(
-        `Starting AI adaptive learning session for ${subject} - ${skillArea}`,
-        `Session initialized at difficulty level ${difficulty}`,
-        undefined,
-        undefined,
-        true,
-        undefined,
-        subject,
-        skillArea
-      );
-    }
-  }, [isLoading, user, difficulty, subject, skillArea, logChatInteraction]);
+  const handleModuleBack = () => {
+    window.history.back();
+  };
 
-  const handleSessionComplete = async () => {
-    const finalScore = questionsCompleted > 0 ? Math.round(sessionScore / questionsCompleted) : 0;
+  const handleCompleteWithToast = async () => {
+    const finalScore = await handleSessionComplete();
     
-    await endSession();
-    setCurrentSession('completed');
-    setShowResults(true);
-
-    // Log session completion
-    await logChatInteraction(
-      `AI learning session completed for ${subject} - ${skillArea}`,
-      `Final score: ${finalScore}%, Questions completed: ${questionsCompleted}`,
-      undefined,
-      undefined,
-      true,
-      undefined,
-      subject,
-      skillArea
-    );
-
     if (onComplete) {
       onComplete(finalScore);
     }
@@ -87,24 +56,13 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
     });
   };
 
-  const handleRetry = () => {
-    setCurrentSession('loading');
-    setSessionScore(0);
-    setQuestionsCompleted(0);
-    setShowResults(false);
-    setCurrentQuestionKey(prev => prev + 1);
-    
-    // Re-initialize the session
-    setTimeout(() => {
-      if (!isLoading && user) {
-        setCurrentSession('active');
-      }
-    }, 1000);
-  };
-
-  const handleModuleBack = () => {
-    // Handle back navigation from AI module
-    window.history.back();
+  const handleRetrySession = () => {
+    handleRetry();
+    toast({
+      title: "Starting New Session",
+      description: "Preparing your next AI learning session...",
+      duration: 3000
+    });
   };
 
   if (!user) {
@@ -133,124 +91,35 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
   }
 
   if (showResults) {
-    const finalScore = questionsCompleted > 0 ? Math.round(sessionScore / questionsCompleted) : 0;
-    
     return (
-      <Card className="bg-gradient-to-r from-green-900 to-blue-900 border-green-400">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <BarChart3 className="w-5 h-5 text-lime-400" />
-            <span>Session Results</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-white">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-lime-400">{questionsCompleted}</div>
-              <div className="text-sm text-gray-300">Spørgsmål gennemført</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-lime-400">{finalScore}%</div>
-              <div className="text-sm text-gray-300">Gennemsnitsscore</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-lime-400">{difficulty}</div>
-              <div className="text-sm text-gray-300">Sværhedsgrad</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-lime-400">{Math.round(performanceMetrics.accuracy)}%</div>
-              <div className="text-sm text-gray-300">Nøjagtighed</div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Button 
-              onClick={handleRetry}
-              className="w-full bg-lime-400 hover:bg-lime-500 text-black"
-            >
-              <Brain className="w-4 h-4 mr-2" />
-              Start ny session
-            </Button>
-            <Button 
-              onClick={() => window.history.back()}
-              variant="outline"
-              className="w-full border-gray-600 text-white hover:bg-gray-700"
-            >
-              Tilbage til oversigt
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <SessionResultsCard
+        questionsCompleted={questionsCompleted}
+        sessionScore={sessionScore}
+        difficulty={difficulty}
+        performanceAccuracy={performanceMetrics.accuracy}
+        onRetry={handleRetrySession}
+        onBack={() => window.history.back()}
+      />
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Session Progress */}
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-2">
-              <Brain className="w-5 h-5 text-lime-400" />
-              <span className="text-white font-medium">AI Learning Session</span>
-            </div>
-            <Badge className="bg-lime-400 text-black">
-              Level {difficulty}
-            </Badge>
-          </div>
-          
-          <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
-            <span>Spørgsmål: {questionsCompleted}/5</span>
-            <span>Nøjagtighed: {Math.round(performanceMetrics.accuracy)}%</span>
-          </div>
-          
-          <Progress 
-            value={(questionsCompleted / 5) * 100} 
-            className="h-2" 
-          />
-        </CardContent>
-      </Card>
+      <SessionProgressCard
+        difficulty={difficulty}
+        questionsCompleted={questionsCompleted}
+        performanceAccuracy={performanceMetrics.accuracy}
+      />
 
-      {/* AI Learning Module */}
       <AILearningModule
-        key={currentQuestionKey} // Force re-render for new questions
+        key={currentQuestionKey}
         subject={subject}
         skillArea={skillArea}
         difficultyLevel={difficulty}
         onBack={handleModuleBack}
       />
 
-      {/* Performance Indicators */}
-      {performanceMetrics.totalAttempts > 0 && (
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Target className="w-5 h-5 text-lime-400" />
-              <span>Performance</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-lg font-bold text-lime-400">
-                {Math.round(performanceMetrics.accuracy)}%
-              </div>
-              <div className="text-xs text-gray-400">Nøjagtighed</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-lime-400">
-                {Math.round(performanceMetrics.averageTime)}s
-              </div>
-              <div className="text-xs text-gray-400">Gns. tid</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-lime-400">
-                {performanceMetrics.totalAttempts}
-              </div>
-              <div className="text-xs text-gray-400">Forsøg</div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <PerformanceIndicatorsCard performanceMetrics={performanceMetrics} />
     </div>
   );
 };
