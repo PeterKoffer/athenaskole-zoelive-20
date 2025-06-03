@@ -1,10 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Question } from '../hooks/useQuestionGeneration';
 import QuestionTimer from './QuestionTimer';
 import QuestionCard from './QuestionCard';
 import ExplanationCard from './ExplanationCard';
-import { useSpeechSynthesis } from './hooks/useSpeechSynthesis';
 
 export interface QuestionDisplayProps {
   question: Question;
@@ -25,25 +25,17 @@ const QuestionDisplay = ({
 }: QuestionDisplayProps) => {
   const [tempSelected, setTempSelected] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const { speak } = useSpeechSynthesis();
 
   // Show explanation when answer is submitted
   useEffect(() => {
     if (hasAnswered && question.explanation) {
       setShowExplanation(true);
-      
-      // Read the explanation aloud with Nelie's voice
-      speak(question.explanation);
-
-      // For science subjects, keep explanation visible longer
-      const hideDelay = subject === 'science' ? 15000 : 8000;
-      const timer = setTimeout(() => {
-        setShowExplanation(false);
-      }, hideDelay);
-      
-      return () => clearTimeout(timer);
     }
-  }, [hasAnswered, question.explanation, subject, speak]);
+  }, [hasAnswered, question.explanation]);
+
+  const handleSpeechEnd = () => {
+    setShowExplanation(false);
+  };
 
   const handleOptionClick = (optionIndex: number) => {
     if (hasAnswered) return;
@@ -100,6 +92,7 @@ const QuestionDisplay = ({
           explanation={question.explanation}
           subject={subject}
           isVisible={showExplanation}
+          onSpeechEnd={handleSpeechEnd}
         />
       )}
     </div>
