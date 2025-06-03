@@ -14,6 +14,7 @@ const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -65,6 +66,11 @@ const FloatingAITutor = () => {
     navigate('/');
   };
 
+  const handleStopSpeaking = () => {
+    setIsSpeaking(false);
+    speechSynthesis.cancel();
+  };
+
   return (
     <div
       style={{
@@ -87,28 +93,17 @@ const FloatingAITutor = () => {
       )}
 
       {isOpen && !isMinimized && (
-        <Card className="w-80 bg-gray-900 border-gray-700 text-white">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Badge variant="secondary" className="mr-2">
-                <MessageCircle className="h-3 w-3 mr-1" />
-                AI Tutor
-              </Badge>
-              Nelie
-            </CardTitle>
-            <div className="flex space-x-2">
-              <Button variant="ghost" size="icon" onClick={toggleMinimize}>
-                <Minimize2 className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={toggleOpen}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="pl-2 pr-2 pb-2">
-            <ChatInterface messages={messages} onSendMessage={handleSendMessage} />
-          </CardContent>
-        </Card>
+        <ChatInterface
+          messages={messages}
+          onSendMessage={handleSendMessage}
+          onClose={toggleOpen}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onResetToHome={handleResetToHome}
+          isSpeaking={isSpeaking}
+          onStopSpeaking={handleStopSpeaking}
+          isDragging={isDragging}
+        />
       )}
 
       {isMinimized && (
