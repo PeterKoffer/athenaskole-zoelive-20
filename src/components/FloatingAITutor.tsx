@@ -19,8 +19,8 @@ const FloatingAITutor = () => {
   const navigate = useNavigate();
   
   const homePosition = {
-    x: window.innerWidth - 120,
-    y: 20
+    x: 0,
+    y: 0
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
@@ -36,9 +36,10 @@ const FloatingAITutor = () => {
     }
   }, [location.pathname, shouldHide]);
 
-  console.log('FloatingAITutor rendering at position:', position, 'expanded:', isOpen);
+  console.log('FloatingAITutor rendering, shouldHide:', shouldHide, 'current path:', location.pathname);
 
   if (shouldHide) {
+    console.log('FloatingAITutor hidden due to auth page');
     return null;
   }
 
