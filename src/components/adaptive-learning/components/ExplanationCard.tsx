@@ -97,7 +97,7 @@ const ExplanationCard = ({
     <Card ref={cardRef} className={`${isCorrect ? 'bg-blue-900 border-blue-600' : 'bg-red-900 border-red-600'} mt-4`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className={`text-lg font-semibold ${isCorrect ? 'text-blue-100' : 'text-red-100'}`}>
+          <h3 className={`text-lg font-semibold text-center flex-1 ${isCorrect ? 'text-blue-100' : 'text-red-100'}`}>
             {isCorrect ? 'Explanation' : 'Correction'}
           </h3>
           <div className="flex items-center space-x-2">
@@ -119,11 +119,11 @@ const ExplanationCard = ({
           </div>
         </div>
         {!isCorrect && correctAnswer && (
-          <p className="text-red-300 font-medium mb-2">
+          <p className="text-red-300 font-medium mb-2 text-center">
             Correct answer: {correctAnswer}
           </p>
         )}
-        <p className={`${isCorrect ? 'text-blue-200' : 'text-red-200'}`}>{explanation}</p>
+        <p className={`text-center ${isCorrect ? 'text-blue-200' : 'text-red-200'}`}>{explanation}</p>
       </CardContent>
     </Card>
   );

@@ -94,7 +94,7 @@ const ChatInterface = ({
           </div>
         </CardTitle>
         {isDragging && (
-          <div className="text-xs text-blue-400 mt-1">
+          <div className="text-xs text-blue-400 mt-1 text-center">
             Drag me around the page - I'll follow you everywhere! 🚀
           </div>
         )}
@@ -113,8 +113,8 @@ const ChatInterface = ({
                     : 'bg-gray-800 text-gray-100 border border-gray-700'
                 }`}
               >
-                <p className="leading-relaxed text-left whitespace-pre-wrap">{message.content}</p>
-                <p className="text-xs opacity-70 mt-1 text-left">
+                <p className="leading-relaxed text-center whitespace-pre-wrap">{message.content}</p>
+                <p className="text-xs opacity-70 mt-1 text-center">
                   {message.timestamp.toLocaleTimeString('en-US')}
                 </p>
               </div>
@@ -129,7 +129,7 @@ const ChatInterface = ({
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type 'hi Nelie' or your question..."
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-pink-400 text-xs h-8"
+              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-pink-400 text-xs h-8 text-center"
             />
             <VoiceControls 
               isSpeaking={isSpeaking}

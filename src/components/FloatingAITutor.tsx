@@ -36,7 +36,8 @@ const FloatingAITutor = () => {
     shouldHide, 
     currentPath: location.pathname,
     isOpen,
-    isMinimized 
+    isMinimized,
+    position 
   });
 
   if (shouldHide) {
@@ -73,7 +74,7 @@ const FloatingAITutor = () => {
         position: 'fixed',
         bottom: '20px',
         right: '20px',
-        zIndex: 999999,
+        zIndex: 9999999,
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab',
         pointerEvents: 'auto',

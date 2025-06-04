@@ -17,8 +17,8 @@ const ChatMessage = ({ message, children }: ChatMessageProps) => {
               : 'bg-gray-800 text-gray-100 border border-gray-700'
           }`}
         >
-          <p className="text-sm leading-relaxed text-left whitespace-pre-wrap">{message.content}</p>
-          <p className="text-xs opacity-70 mt-2 text-left">
+          <p className="text-sm leading-relaxed text-center whitespace-pre-wrap">{message.content}</p>
+          <p className="text-xs opacity-70 mt-2 text-center">
             {message.timestamp.toLocaleTimeString('da-DK')}
           </p>
         </div>
