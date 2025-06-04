@@ -34,8 +34,7 @@ export const generateFallbackQuestion = (
       'All of the above'
     ],
     correct: 3,
-    explanation: `All of these are important when learning ${subject}.`,
-    standard: null
+    explanation: `All of these are important when learning ${subject}.`
   };
 };
 
@@ -89,12 +88,7 @@ const generateMusicQuestion = (skillArea: string, difficultyLevel: number, grade
     question: selectedQuestion.question,
     options: selectedQuestion.options,
     correct: selectedQuestion.correct,
-    explanation: selectedQuestion.explanation,
-    standard: {
-      code: `GRADE${gradeLevel}.MUSIC`,
-      title: `Grade ${gradeLevel} Music`,
-      description: `${skillArea} practice for Grade ${gradeLevel}`
-    }
+    explanation: selectedQuestion.explanation
   };
 };
 
@@ -103,8 +97,7 @@ const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeL
     question: "What is 15 + 8?",
     options: ["21", "22", "23", "24"],
     correct: 2,
-    explanation: "15 + 8 = 23",
-    standard: null
+    explanation: "15 + 8 = 23"
   };
 };
 
@@ -113,8 +106,7 @@ const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gra
     question: "What is the chemical symbol for water?",
     options: ["H2O", "CO2", "NaCl", "O2"],
     correct: 0,
-    explanation: "Water's chemical formula is H2O - two hydrogen atoms and one oxygen atom.",
-    standard: null
+    explanation: "Water's chemical formula is H2O - two hydrogen atoms and one oxygen atom."
   };
 };
 
@@ -123,8 +115,7 @@ const generateEnglishQuestion = (skillArea: string, difficultyLevel: number, gra
     question: "Which word is a noun?",
     options: ["run", "quickly", "beautiful", "house"],
     correct: 3,
-    explanation: "A noun is a person, place, or thing. 'House' is a thing, so it's a noun.",
-    standard: null
+    explanation: "A noun is a person, place, or thing. 'House' is a thing, so it's a noun."
   };
 };
 
