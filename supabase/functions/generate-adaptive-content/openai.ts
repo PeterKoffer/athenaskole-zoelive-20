@@ -1,8 +1,7 @@
-
 import { OpenAIResponse, GeneratedContent } from './types.ts';
 
 export async function generateContentWithOpenAI(requestData: any): Promise<GeneratedContent | null> {
-  console.log('🤖 generateContentWithOpenAI called with:', requestData);
+  console.log('🤖 generateContentWithOpenAI called with enhanced diversity:', requestData);
   
   const openaiApiKey = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('OpenaiAPI');
   
@@ -11,8 +10,15 @@ export async function generateContentWithOpenAI(requestData: any): Promise<Gener
     throw new Error('OpenAI API key not configured');
   }
 
-  const prompt = createPrompt(requestData.subject, requestData.skillArea, requestData.difficultyLevel, requestData.previousQuestions || []);
-  console.log('📝 Using prompt for subject:', requestData.subject, 'skillArea:', requestData.skillArea);
+  const prompt = createEnhancedPrompt(
+    requestData.subject, 
+    requestData.skillArea, 
+    requestData.difficultyLevel, 
+    requestData.previousQuestions || [],
+    requestData.diversityPrompt,
+    requestData.sessionId
+  );
+  console.log('📝 Using enhanced diversity prompt for subject:', requestData.subject);
 
   const result = await callOpenAI(openaiApiKey, prompt);
   
@@ -146,117 +152,122 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
   }
 }
 
-function createPrompt(subject: string, skillArea: string, difficultyLevel: number, previousQuestions: string[]): string {
-  console.log('🎯 Creating prompt for subject:', subject, 'skillArea:', skillArea);
+function createEnhancedPrompt(
+  subject: string, 
+  skillArea: string, 
+  difficultyLevel: number, 
+  previousQuestions: string[],
+  diversityPrompt?: string,
+  sessionId?: number
+): string {
+  console.log('🎯 Creating enhanced diversity prompt for subject:', subject, 'skillArea:', skillArea);
   
-  let prompt = '';
+  let basePrompt = '';
   
-  // Generate subject-specific prompts with emphasis on correct answers
+  // Generate subject-specific prompts with maximum creativity
   if (subject === 'mathematics') {
-    prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
+    basePrompt = `Generate a COMPLETELY UNIQUE mathematics question about ${skillArea} for elementary students (difficulty ${difficultyLevel}).
 
-CRITICAL: Make sure the math is correct and the "correct" field points to the right answer!
+CRITICAL REQUIREMENTS:
+- Create a question that has NEVER been asked before
+- Use different numbers, scenarios, and contexts than any previous questions
+- ${diversityPrompt || 'Be extremely creative and unique'}
+- Make the math calculation absolutely correct
+- Use fresh examples and contexts
 
-Example for addition:
-Question: "What is 3 + 4 + 2?"
-Calculation: 3 + 4 + 2 = 9
-Options: ["8", "9", "10", "11"]
-Correct answer is "9" which is at index 1, so "correct": 1
+Session ID: ${sessionId} - This must be a completely unique question for this session.
 
-Return ONLY a valid JSON object with this exact structure:
+Example structure (but create something completely different):
 {
-  "question": "What is 5 + 7?",
-  "options": ["11", "12", "13", "14"],
-  "correct": 1,
-  "explanation": "5 + 7 = 12. When adding, we combine the numbers: 5 + 7 = 12",
-  "learningObjectives": ["Basic addition", "Mental math"]
+  "question": "A farmer has 23 apple trees and 17 pear trees. How many fruit trees does the farmer have in total?",
+  "options": ["40", "39", "41", "38"],
+  "correct": 0,
+  "explanation": "To find the total, we add: 23 + 17 = 40 fruit trees",
+  "learningObjectives": ["Addition", "Word problems"]
 }
 
-Make sure:
-- The question is about mathematics (arithmetic, fractions, geometry, etc.)
-- Do the math calculation carefully
-- Put the correct answer in the options array
-- Set "correct" to the INDEX (0, 1, 2, or 3) of where the correct answer appears in the options
-- Verify your math before setting the correct index
-- The explanation clearly shows how to solve the problem
-- Return ONLY the JSON, no markdown formatting or code blocks`;
-  } else if (subject === 'english') {
-    prompt = `Generate an English reading comprehension question suitable for elementary students.
+IMPORTANT: 
+- Use completely different numbers than any example
+- Create a unique scenario or context
+- Verify your math is correct
+- Make sure the correct answer is properly indexed
+- Return ONLY valid JSON, no markdown`;
 
-Return ONLY a valid JSON object with this exact structure:
+  } else if (subject === 'english') {
+    basePrompt = `Generate a COMPLETELY UNIQUE English reading comprehension question for elementary students.
+
+CRITICAL REQUIREMENTS:
+- Create content that is absolutely different from any previous questions
+- Use unique sentences, scenarios, and vocabulary
+- ${diversityPrompt || 'Be extremely creative with contexts and examples'}
+- Focus on reading comprehension skills
+
+Session ID: ${sessionId} - This must be completely original content.
+
+Example structure (but create something totally different):
 {
-  "question": "Read this sentence: 'The cat sat on the mat.' What did the cat do?",
-  "options": ["ran", "jumped", "sat", "flew"],
-  "correct": 2,
-  "explanation": "The sentence clearly states 'The cat sat on the mat', so the correct answer is 'sat'.",
+  "question": "Read this sentence: 'The curious kitten climbed the tall oak tree to watch the sunset.' What did the kitten do?",
+  "options": ["slept", "climbed", "jumped", "ran"],
+  "correct": 1,
+  "explanation": "The sentence states that the kitten 'climbed the tall oak tree'",
   "learningObjectives": ["Reading comprehension", "Verb identification"]
 }
 
-Make sure:
-- The question focuses on reading comprehension, vocabulary, or grammar
-- There are exactly 4 options
-- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
-- The explanation clearly shows the reasoning
-- Return ONLY the JSON, no markdown formatting or code blocks`;
-  } else if (subject === 'creative_writing') {
-    prompt = `Generate a creative writing exercise suitable for elementary students.
+IMPORTANT:
+- Create a completely unique sentence with different subjects, actions, and objects
+- Use fresh vocabulary and scenarios
+- Ensure clear reading comprehension focus
+- Return ONLY valid JSON, no markdown`;
 
-Return ONLY a valid JSON object with this exact structure:
-{
-  "question": "Complete this story starter: 'Once upon a time, in a magical forest, there lived a small dragon who...'",
-  "options": ["could not fly", "loved to sing", "was afraid of fire", "collected shiny rocks"],
-  "correct": 1,
-  "explanation": "Any of these options could work creatively, but 'loved to sing' creates an interesting contrast and story opportunity.",
-  "learningObjectives": ["Creative thinking", "Story development", "Character creation"]
-}
-
-Make sure:
-- The question encourages creativity and imagination
-- There are exactly 4 options
-- The "correct" field is the index (0, 1, 2, or 3) of the most interesting creative choice
-- The explanation shows why this choice works well for storytelling
-- Return ONLY the JSON, no markdown formatting or code blocks`;
   } else if (subject === 'science') {
-    prompt = `Generate a science discovery question suitable for elementary students.
+    basePrompt = `Generate a COMPLETELY UNIQUE science question for elementary discovery learning.
 
-Return ONLY a valid JSON object with this exact structure:
+CRITICAL REQUIREMENTS:
+- Create a question about a different scientific concept or phenomenon
+- Use unique examples and scenarios not used before
+- ${diversityPrompt || 'Explore diverse scientific topics and creative examples'}
+- Focus on discovery and understanding
+
+Session ID: ${sessionId} - This must be original scientific content.
+
+Example structure (but create something entirely different):
 {
-  "question": "What happens when you mix baking soda and vinegar?",
-  "options": ["Nothing happens", "It gets hot", "It fizzes and bubbles", "It changes color"],
-  "correct": 2,
-  "explanation": "When baking soda (a base) mixes with vinegar (an acid), they react to create carbon dioxide gas, which causes fizzing and bubbling.",
-  "learningObjectives": ["Chemical reactions", "Acids and bases", "Observation skills"]
+  "question": "Why do leaves change color in autumn?",
+  "options": ["They get cold", "Chlorophyll breaks down", "They get tired", "The sun is weaker"],
+  "correct": 1,
+  "explanation": "Leaves change color because chlorophyll breaks down in autumn, revealing other pigments",
+  "learningObjectives": ["Plant biology", "Seasonal changes"]
 }
 
-Make sure:
-- The question focuses on scientific concepts, experiments, or natural phenomena
-- There are exactly 4 options
-- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
-- The explanation includes the scientific reasoning
-- Return ONLY the JSON, no markdown formatting or code blocks`;
+IMPORTANT:
+- Choose a completely different scientific topic
+- Use unique examples and scenarios
+- Provide educational scientific explanations
+- Return ONLY valid JSON, no markdown`;
+
   } else {
-    // Fallback to math if subject is not recognized
-    console.log('⚠️ Unknown subject, falling back to math:', subject);
-    prompt = `Generate a basic math question suitable for elementary students.
+    basePrompt = `Generate a COMPLETELY UNIQUE educational question for ${subject} - ${skillArea}.
 
-CRITICAL: Make sure the math is correct and the "correct" field points to the right answer!
+Session ID: ${sessionId} - Create absolutely original content.
+${diversityPrompt || 'Be maximally creative and unique'}
 
-Return ONLY a valid JSON object with this exact structure:
-{
-  "question": "What is 5 + 3?",
-  "options": ["6", "7", "8", "9"],
-  "correct": 2,
-  "explanation": "5 + 3 = 8",
-  "learningObjectives": ["Basic addition"]
-}`;
+Return ONLY valid JSON with question, options (4 choices), correct (index), explanation, and learningObjectives.`;
   }
 
+  // Add anti-repetition instructions
   if (previousQuestions.length > 0) {
-    prompt += `\n\nIMPORTANT: Do NOT generate any of these previous questions:\n${previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+    basePrompt += `\n\nCRITICAL: You MUST NOT create any question similar to these previous ones:
+${previousQuestions.slice(0, 20).map((q, i) => `${i + 1}. ${q}`).join('\n')}
 
-Create a completely different ${subject} question that hasn't been asked before.`;
+Your new question must be:
+- About a completely different scenario/context
+- Using different numbers, words, or examples
+- Focusing on a different aspect of the topic
+- Absolutely unique and never asked before
+
+Session ${sessionId}: Generate something completely fresh and original!`;
   }
 
-  console.log('📝 Final prompt created for:', subject);
-  return prompt;
+  console.log('📝 Enhanced diversity prompt created for:', subject);
+  return basePrompt;
 }

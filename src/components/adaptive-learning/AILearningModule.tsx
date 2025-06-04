@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { Brain } from 'lucide-react';
-import SimplifiedLearningSession from './components/SimplifiedLearningSession';
+import ImprovedLearningSession from './components/ImprovedLearningSession';
 
 interface AILearningModuleProps {
   subject: string;
@@ -15,7 +15,7 @@ interface AILearningModuleProps {
 const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILearningModuleProps) => {
   const { user } = useAuth();
 
-  console.log('🎯 AILearningModule rendering with:', {
+  console.log('🎯 AILearningModule rendering with improved session:', {
     subject,
     skillArea,
     difficultyLevel,
@@ -36,7 +36,7 @@ const AILearningModule = ({ subject, skillArea, difficultyLevel, onBack }: AILea
 
   return (
     <div className="space-y-6">
-      <SimplifiedLearningSession
+      <ImprovedLearningSession
         subject={subject}
         skillArea={skillArea}
         difficultyLevel={difficultyLevel}
