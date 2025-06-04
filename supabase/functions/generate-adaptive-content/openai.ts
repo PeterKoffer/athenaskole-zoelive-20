@@ -41,14 +41,14 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
         messages: [
           {
             role: 'system',
-            content: 'You are an AI education assistant that creates questions for specific subjects. Always generate questions that match the requested subject and skill area. Return only valid JSON with no formatting.'
+            content: 'You are an AI education assistant that creates questions for specific subjects. Always generate questions that match the requested subject and skill area. Return only valid JSON with no formatting. CRITICAL: Make sure the "correct" field points to the INDEX of the actual correct answer in the options array.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.8,
+        temperature: 0.3,
         max_tokens: 500,
       }),
     });
@@ -110,6 +110,13 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
     try {
       generatedContent = JSON.parse(cleanContent);
       console.log('✅ Successfully parsed JSON content');
+      
+      // Validate that the correct answer index is valid
+      if (generatedContent.correct >= generatedContent.options.length || generatedContent.correct < 0) {
+        console.error('❌ Invalid correct answer index:', generatedContent.correct, 'for options:', generatedContent.options);
+        throw new Error('Invalid correct answer index generated');
+      }
+      
     } catch (parseError) {
       console.error('❌ JSON parse failed:', parseError.message);
       return {
@@ -144,8 +151,36 @@ function createPrompt(subject: string, skillArea: string, difficultyLevel: numbe
   
   let prompt = '';
   
-  // Generate subject-specific prompts - this is the critical fix
-  if (subject === 'english') {
+  // Generate subject-specific prompts with emphasis on correct answers
+  if (subject === 'mathematics') {
+    prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
+
+CRITICAL: Make sure the math is correct and the "correct" field points to the right answer!
+
+Example for addition:
+Question: "What is 3 + 4 + 2?"
+Calculation: 3 + 4 + 2 = 9
+Options: ["8", "9", "10", "11"]
+Correct answer is "9" which is at index 1, so "correct": 1
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What is 5 + 7?",
+  "options": ["11", "12", "13", "14"],
+  "correct": 1,
+  "explanation": "5 + 7 = 12. When adding, we combine the numbers: 5 + 7 = 12",
+  "learningObjectives": ["Basic addition", "Mental math"]
+}
+
+Make sure:
+- The question is about mathematics (arithmetic, fractions, geometry, etc.)
+- Do the math calculation carefully
+- Put the correct answer in the options array
+- Set "correct" to the INDEX (0, 1, 2, or 3) of where the correct answer appears in the options
+- Verify your math before setting the correct index
+- The explanation clearly shows how to solve the problem
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+  } else if (subject === 'english') {
     prompt = `Generate an English reading comprehension question suitable for elementary students.
 
 Return ONLY a valid JSON object with this exact structure:
@@ -162,24 +197,6 @@ Make sure:
 - There are exactly 4 options
 - The "correct" field is the index (0, 1, 2, or 3) of the correct answer
 - The explanation clearly shows the reasoning
-- Return ONLY the JSON, no markdown formatting or code blocks`;
-  } else if (subject === 'mathematics') {
-    prompt = `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
-
-Return ONLY a valid JSON object with this exact structure:
-{
-  "question": "What is 1/2 + 1/4?",
-  "options": ["1/6", "2/6", "3/4", "3/6"],
-  "correct": 2,
-  "explanation": "To add fractions, find a common denominator. 1/2 = 2/4, so 2/4 + 1/4 = 3/4",
-  "learningObjectives": ["Adding fractions with different denominators", "Finding common denominators"]
-}
-
-Make sure:
-- The question is about mathematics (arithmetic, fractions, geometry, etc.)
-- There are exactly 4 options
-- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
-- The explanation clearly shows how to solve the problem
 - Return ONLY the JSON, no markdown formatting or code blocks`;
   } else if (subject === 'creative_writing') {
     prompt = `Generate a creative writing exercise suitable for elementary students.
@@ -221,6 +238,8 @@ Make sure:
     // Fallback to math if subject is not recognized
     console.log('⚠️ Unknown subject, falling back to math:', subject);
     prompt = `Generate a basic math question suitable for elementary students.
+
+CRITICAL: Make sure the math is correct and the "correct" field points to the right answer!
 
 Return ONLY a valid JSON object with this exact structure:
 {

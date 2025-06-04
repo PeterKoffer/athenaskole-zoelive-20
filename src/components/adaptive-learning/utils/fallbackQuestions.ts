@@ -12,7 +12,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 0,
       explanation: "15 + 27 = 42. When adding, we combine the numbers: 15 + 27 = 42",
       learningObjectives: ["Basic addition", "Two-digit addition"],
-      estimatedTime: 20
+      estimatedTime: 20,
+      conceptsCovered: ["Basic addition"]
     },
     {
       question: `Math Problem: What is 8 × 9? (ID: ${randomNum})`,
@@ -20,7 +21,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 0,
       explanation: "8 × 9 = 72. This is part of the multiplication table.",
       learningObjectives: ["Multiplication tables", "Mental math"],
-      estimatedTime: 25
+      estimatedTime: 25,
+      conceptsCovered: ["Multiplication tables"]
     },
     {
       question: `Calculate: What is 100 - 37? (Practice ${randomNum})`,
@@ -28,7 +30,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 0,
       explanation: "100 - 37 = 63. When subtracting from 100, think of what adds to 37 to make 100.",
       learningObjectives: ["Subtraction", "Mental calculation"],
-      estimatedTime: 30
+      estimatedTime: 30,
+      conceptsCovered: ["Subtraction"]
     }
   ];
 
@@ -39,7 +42,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 1,
       explanation: "The correct form is 'She doesn't like apples' because we use 'doesn't' with third person singular subjects.",
       learningObjectives: ["Subject-verb agreement", "Negative sentences"],
-      estimatedTime: 25
+      estimatedTime: 25,
+      conceptsCovered: ["Grammar"]
     },
     {
       question: `Reading: What does 'enormous' mean? (Question ${randomNum})`,
@@ -47,7 +51,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 1,
       explanation: "'Enormous' means very large or huge in size.",
       learningObjectives: ["Vocabulary", "Word meanings"],
-      estimatedTime: 20
+      estimatedTime: 20,
+      conceptsCovered: ["Vocabulary"]
     },
     {
       question: `Spelling: Which word is spelled correctly? (ID: ${randomNum})`,
@@ -55,7 +60,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 1,
       explanation: "The correct spelling is 'receive'. Remember: i before e except after c.",
       learningObjectives: ["Spelling rules", "Common words"],
-      estimatedTime: 30
+      estimatedTime: 30,
+      conceptsCovered: ["Spelling"]
     }
   ];
 
@@ -66,7 +72,8 @@ export const createFallbackQuestion = (): Question => {
       correct: 0,
       explanation: "Plants need sunlight, water, and carbon dioxide to make food through photosynthesis.",
       learningObjectives: ["Photosynthesis", "Plant biology"],
-      estimatedTime: 35
+      estimatedTime: 35,
+      conceptsCovered: ["Biology"]
     }
   ];
 
