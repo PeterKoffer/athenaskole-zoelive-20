@@ -8,21 +8,22 @@ interface CollapsedButtonProps {
   onTouchStart: (e: React.TouchEvent) => void;
   onResetToHome: () => void;
   isDragging?: boolean;
+  hasMoved?: boolean;
 }
 
-const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, isDragging }: CollapsedButtonProps) => {
-  console.log('🔘 CollapsedButton rendering, isDragging:', isDragging);
+const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, isDragging, hasMoved }: CollapsedButtonProps) => {
+  console.log('🔘 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
   
   const handleButtonClick = (e: React.MouseEvent) => {
-    console.log('🖱️ Nelie button clicked - checking interaction');
+    console.log('🖱️ Nelie button clicked - checking interaction, hasMoved:', hasMoved, 'isDragging:', isDragging);
     e.stopPropagation();
     
-    // Only expand if we're not dragging
-    if (!isDragging) {
-      console.log('✅ Expanding Nelie - not dragging');
+    // Only expand if we haven't moved and we're not currently dragging
+    if (!hasMoved && !isDragging) {
+      console.log('✅ Expanding Nelie - valid click');
       onExpand();
     } else {
-      console.log('❌ Not expanding Nelie - currently dragging');
+      console.log('❌ Not expanding Nelie - was dragging or moved');
     }
   };
 

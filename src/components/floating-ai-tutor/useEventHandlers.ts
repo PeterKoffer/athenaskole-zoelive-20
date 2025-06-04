@@ -9,9 +9,9 @@ interface UseEventHandlersProps {
 
 export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventHandlersProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
   const dragOffset = useRef<DragOffset>({ x: 0, y: 0 });
   const dragStartTime = useRef<number>(0);
-  const hasMoved = useRef<boolean>(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie at position:', { x: e.clientX, y: e.clientY });
@@ -21,7 +21,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     e.stopPropagation();
     
     setIsDragging(true);
-    hasMoved.current = false;
+    setHasMoved(false);
     dragStartTime.current = Date.now();
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -40,7 +40,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     e.stopPropagation();
     
     setIsDragging(true);
-    hasMoved.current = false;
+    setHasMoved(false);
     dragStartTime.current = Date.now();
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -54,7 +54,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
-      hasMoved.current = true;
+      setHasMoved(true);
       
       // Calculate new position relative to viewport
       const newX = e.clientX - dragOffset.current.x;
@@ -66,7 +66,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (isDragging) {
-      hasMoved.current = true;
+      setHasMoved(true);
       
       const touch = e.touches[0];
       const newX = touch.clientX - dragOffset.current.x;
@@ -78,24 +78,34 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
   }, [isDragging, updatePosition]);
 
   const handleMouseUp = useCallback(() => {
-    console.log('🖱️ Mouse up - stopping drag, hasMoved:', hasMoved.current);
+    console.log('🖱️ Mouse up - stopping drag, hasMoved:', hasMoved);
     setIsDragging(false);
     
     // Cancel any pending animation frame
     if (animationFrameId.current) {
       cancelAnimationFrame(animationFrameId.current);
     }
-  }, [animationFrameId]);
+    
+    // Reset hasMoved after a short delay to allow click handler to check it
+    setTimeout(() => {
+      setHasMoved(false);
+    }, 50);
+  }, [hasMoved, animationFrameId]);
 
   const handleTouchEnd = useCallback(() => {
-    console.log('👆 Touch end - stopping drag, hasMoved:', hasMoved.current);
+    console.log('👆 Touch end - stopping drag, hasMoved:', hasMoved);
     setIsDragging(false);
     
     // Cancel any pending animation frame
     if (animationFrameId.current) {
       cancelAnimationFrame(animationFrameId.current);
     }
-  }, [animationFrameId]);
+    
+    // Reset hasMoved after a short delay to allow click handler to check it
+    setTimeout(() => {
+      setHasMoved(false);
+    }, 50);
+  }, [hasMoved, animationFrameId]);
 
   useEffect(() => {
     if (isDragging) {
@@ -129,6 +139,6 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     isDragging,
     handleMouseDown,
     handleTouchStart,
-    hasMoved: hasMoved.current
+    hasMoved
   };
 };

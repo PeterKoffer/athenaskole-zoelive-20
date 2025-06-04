@@ -18,7 +18,7 @@ const FloatingAITutor = () => {
     y: 20
   };
   
-  const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
+  const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
 
   // Only hide on auth pages - show everywhere else including daily-program
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
@@ -30,6 +30,8 @@ const FloatingAITutor = () => {
     position,
     messagesLength: messages.length,
     isVisible: !shouldHide,
+    isDragging,
+    hasMoved,
     viewportWidth: typeof window !== 'undefined' ? window.innerWidth : 'unknown'
   });
 
@@ -55,8 +57,13 @@ const FloatingAITutor = () => {
   }, [shouldHide, messages.length]);
 
   const toggleOpen = () => {
-    console.log('🔄 Toggling Nelie open state:', !isOpen);
-    setIsOpen(!isOpen);
+    console.log('🔄 Toggling Nelie open state from', isOpen, 'to', !isOpen, 'hasMoved:', hasMoved);
+    // Only toggle if we haven't moved (i.e., it was a genuine click, not a drag)
+    if (!hasMoved) {
+      setIsOpen(!isOpen);
+    } else {
+      console.log('❌ Not toggling - user was dragging');
+    }
   };
 
   const handleSendMessage = (text: string) => {
@@ -109,7 +116,7 @@ const FloatingAITutor = () => {
 
   return (
     <>
-      {/* Collapsed button state - Always visible when not open */}
+      {/* Collapsed button state - Only visible when not open */}
       {!isOpen && (
         <div
           style={{
@@ -126,11 +133,12 @@ const FloatingAITutor = () => {
             onTouchStart={handleTouchStart}
             onResetToHome={handleResetToHome}
             isDragging={isDragging}
+            hasMoved={hasMoved}
           />
         </div>
       )}
 
-      {/* Chat interface state */}
+      {/* Chat interface state - Only visible when open */}
       {isOpen && (
         <div
           style={{
