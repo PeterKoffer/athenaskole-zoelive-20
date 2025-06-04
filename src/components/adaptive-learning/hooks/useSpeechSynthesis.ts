@@ -70,11 +70,13 @@ export const useSpeechSynthesis = () => {
       return;
     }
 
-    if (!text || text.trim() === '' || !autoReadEnabled) {
-      console.log('🚫 Cannot speak - conditions not met:', {
-        hasText: !!text,
-        autoReadEnabled
-      });
+    if (!text || text.trim() === '') {
+      console.log('🚫 Cannot speak - no text provided');
+      return;
+    }
+
+    if (!autoReadEnabled) {
+      console.log('🚫 Cannot speak - auto read disabled');
       return;
     }
 
