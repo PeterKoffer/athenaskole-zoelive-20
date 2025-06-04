@@ -67,11 +67,15 @@ const ChatInterface = ({
             <Move className={`w-4 h-4 transition-colors duration-200 ${
               isDragging ? 'text-blue-400' : 'text-gray-400'
             }`} />
-            <span className="text-xl">👩‍🏫</span>
+            <img 
+              src="/lovable-uploads/5a20a2a3-0727-4695-82d1-75cfde4c94e8.png" 
+              alt="Nelie AI Tutor Robot"
+              className="w-6 h-6 object-contain"
+            />
             <span>Nelie - Your AI Tutor</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="bg-gradient-to-r from-pink-400 to-purple-500 text-white border-pink-400 text-xs">
+            <Badge variant="outline" className="bg-gradient-to-r from-cyan-400 to-purple-500 text-white border-cyan-400 text-xs">
               Live
             </Badge>
             <Button
@@ -109,7 +113,7 @@ const ChatInterface = ({
               <div
                 className={`max-w-xs px-3 py-2 rounded-lg text-xs ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white'
+                    ? 'bg-gradient-to-r from-cyan-400 to-purple-500 text-white'
                     : 'bg-gray-800 text-gray-100 border border-gray-700'
                 }`}
               >
@@ -129,7 +133,7 @@ const ChatInterface = ({
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type 'hi Nelie' or your question..."
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-pink-400 text-xs h-8 text-center"
+              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-cyan-400 text-xs h-8 text-center"
             />
             <VoiceControls 
               isSpeaking={isSpeaking}
@@ -139,7 +143,7 @@ const ChatInterface = ({
             <Button 
               onClick={handleSendMessage} 
               size="sm" 
-              className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white border-none p-1"
+              className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-500 hover:to-purple-600 text-white border-none p-1"
             >
               <Send className="w-3 h-3" />
             </Button>

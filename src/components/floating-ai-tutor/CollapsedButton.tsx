@@ -51,8 +51,8 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         className={`
-          bg-gradient-to-r from-pink-500 to-purple-600 
-          hover:from-pink-600 hover:to-purple-700
+          bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 
+          hover:from-cyan-500 hover:via-blue-500 hover:to-purple-600
           text-white border-none rounded-full 
           w-20 h-20 shadow-2xl 
           transition-all duration-200 
@@ -62,14 +62,19 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         style={{
           minWidth: '80px',
           minHeight: '80px',
-          padding: '12px',
+          padding: '8px',
           boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
           zIndex: 999999,
           pointerEvents: 'auto'
         }}
       >
-        <div className="text-3xl mb-1">👩‍🏫</div>
-        <div className="text-xs font-bold text-center leading-tight">Nelie<br/>AI Tutor</div>
+        <img 
+          src="/lovable-uploads/5a20a2a3-0727-4695-82d1-75cfde4c94e8.png" 
+          alt="Nelie AI Tutor Robot"
+          className="w-12 h-12 object-contain mb-1"
+          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}
+        />
+        <div className="text-xs font-bold text-center leading-tight text-white drop-shadow-sm">Nelie<br/>AI Tutor</div>
         
         {/* Online indicator - larger and more visible */}
         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
