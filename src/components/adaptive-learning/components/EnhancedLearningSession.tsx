@@ -53,6 +53,7 @@ const EnhancedLearningSession = ({
         console.log('📊 SessionData:', {
           isSessionComplete: sessionData.isSessionComplete,
           questionsLength: sessionData.questions.length,
+          answersLength: sessionData.answers.length,
           currentIndex: sessionData.currentQuestionIndex,
           isLoading: sessionData.isLoading,
           error: sessionData.error

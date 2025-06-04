@@ -79,7 +79,7 @@ const EnglishLearning = () => {
   // Show loading state while authentication is being checked
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
         <div className="text-center">
           <div className="text-4xl mb-4">📚</div>
           <p className="text-lg">Loading your English lesson...</p>
@@ -103,16 +103,16 @@ const EnglishLearning = () => {
         currentMode={currentMode}
       />
       
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-6">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="mb-4 sm:mb-6">
           <Card className="bg-gradient-to-r from-blue-900 to-indigo-900 border-blue-400">
-            <CardContent className="p-6 text-center">
-              <BookOpen className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-              <h2 className="text-xl font-bold text-white mb-2">English Reading Comprehension</h2>
-              <p className="text-blue-200">
+            <CardContent className="p-4 sm:p-6 text-center">
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 mx-auto mb-2 sm:mb-3" />
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-2">English Reading Comprehension</h2>
+              <p className="text-sm sm:text-base text-blue-200 mb-2">
                 Let's practice your English reading comprehension skills!
               </p>
-              <p className="text-xs text-blue-300 mt-2">
+              <p className="text-xs text-blue-300">
                 Mode: {currentMode === 'adaptive' ? 'Adaptiv læring' : 
                        currentMode === 'focused' ? 'Fokuseret træning' :
                        currentMode === 'challenge' ? 'Udfordrings mode' :
