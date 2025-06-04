@@ -2,82 +2,27 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trophy } from "lucide-react";
+import { Trophy, BookOpen } from "lucide-react";
 import VikingCastleGame from "@/components/games/VikingCastleGame";
-import GameCard from "@/components/games/GameCard";
+import CurriculumGameSelector from "@/components/games/CurriculumGameSelector";
 import LeaderboardCard from "@/components/games/LeaderboardCard";
 
 const GameHub = () => {
-  const [selectedGame, setSelectedGame] = useState(null);
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
-  const games = [
-    {
-      id: "viking-castle",
-      title: "Build A Viking Castle",
-      description: "Learn geometry and mathematics by building a viking castle and defending it from attacks!",
-      subject: "Mathematics",
-      difficulty: "Medium",
-      timeEstimate: "15-20 min",
-      emoji: "🏰",
-      rewards: "50 Learning Coins + Math Viking badge",
-      status: "available"
-    },
-    {
-      id: "word-hunt",
-      title: "Word Hunt AR",
-      description: "Use your phone to find objects in the real world and spell them correctly!",
-      subject: "English",
-      difficulty: "Easy",
-      timeEstimate: "10-15 min",
-      emoji: "🔍",
-      rewards: "30 Learning Coins + Word Hunter badge",
-      status: "available"
-    },
-    {
-      id: "sandwich-coding",
-      title: "Code a Sandwich",
-      description: "Learn logic and algorithms by stacking ingredients in the correct order!",
-      subject: "Programming",
-      difficulty: "Medium",
-      timeEstimate: "20-25 min",
-      emoji: "🥪",
-      rewards: "60 Learning Coins + Code Master badge",
-      status: "available"
-    },
-    {
-      id: "time-travel",
-      title: "Viking Age Adventure",
-      description: "Travel back to the Viking Age and help Harald Bluetooth solve problems!",
-      subject: "History",
-      difficulty: "Easy",
-      timeEstimate: "25-30 min",
-      emoji: "⚔️",
-      rewards: "40 Learning Coins + Time Traveler badge",
-      status: "available"
-    },
-    {
-      id: "windmill-builder",
-      title: "Build A Windmill",
-      description: "Learn about renewable energy by designing and building your own windmill!",
-      subject: "Science & Technology",
-      difficulty: "Hard",
-      timeEstimate: "30-35 min",
-      emoji: "🌪️",
-      rewards: "80 Learning Coins + Green Engineer badge",
-      status: "available"
-    },
-    {
-      id: "music-composer",
-      title: "Compose with Carl Nielsen",
-      description: "Create beautiful melodies together with the famous Danish composer Carl Nielsen!",
-      subject: "Music",
-      difficulty: "Medium",
-      timeEstimate: "20-25 min",
-      emoji: "🎵",
-      rewards: "50 Learning Coins + Composer badge",
-      status: "available"
+  // Handle game selection - you can expand this to route to different game components
+  const handleGameSelect = (gameId: string) => {
+    console.log("Selected game:", gameId);
+    
+    // For now, only the Viking Castle game is fully implemented
+    if (gameId === "viking-castle-geometry" || gameId === "viking-castle") {
+      setSelectedGame("viking-castle");
+    } else {
+      // For other games, show a coming soon message or redirect to development
+      console.log(`Game ${gameId} selected - ready for implementation!`);
+      // You can implement routing to other game components here
     }
-  ];
+  };
 
   if (selectedGame === "viking-castle") {
     return <VikingCastleGame onBack={() => setSelectedGame(null)} />;
@@ -89,22 +34,28 @@ const GameHub = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-white">
             <Trophy className="w-6 h-6 text-lime-400" />
-            <span>Hidden Learning Games</span>
+            <span>Educational Gaming Center</span>
             <Badge variant="outline" className="bg-lime-400 text-gray-900 border-lime-400">
-              Learn while you play!
+              Curriculum Aligned!
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {games.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                onGameSelect={setSelectedGame}
-              />
-            ))}
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-800/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <BookOpen className="w-5 h-5 text-blue-400" />
+              <h3 className="text-lg font-semibold text-white">Learn Through Play</h3>
+            </div>
+            <p className="text-gray-300 text-sm">
+              Our educational games are carefully designed to align with curriculum standards. 
+              Each game targets specific learning objectives while keeping students engaged through interactive gameplay.
+            </p>
           </div>
+
+          <CurriculumGameSelector 
+            onGameSelect={handleGameSelect}
+            userGradeLevel={6}
+          />
         </CardContent>
       </Card>
 

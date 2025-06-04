@@ -34,7 +34,10 @@ export const generateFallbackQuestion = (
       'All of the above'
     ],
     correct: 3,
-    explanation: `All of these are important when learning ${subject}.`
+    explanation: `All of these are important when learning ${subject}.`,
+    learningObjectives: [`Understanding ${subject} fundamentals`],
+    estimatedTime: 30,
+    conceptsCovered: [skillArea]
   };
 };
 
@@ -88,7 +91,10 @@ const generateMusicQuestion = (skillArea: string, difficultyLevel: number, grade
     question: selectedQuestion.question,
     options: selectedQuestion.options,
     correct: selectedQuestion.correct,
-    explanation: selectedQuestion.explanation
+    explanation: selectedQuestion.explanation,
+    learningObjectives: [`Grade ${gradeLevel} Music Theory`],
+    estimatedTime: 45,
+    conceptsCovered: [skillArea]
   };
 };
 
@@ -97,7 +103,10 @@ const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeL
     question: "What is 15 + 8?",
     options: ["21", "22", "23", "24"],
     correct: 2,
-    explanation: "15 + 8 = 23"
+    explanation: "15 + 8 = 23",
+    learningObjectives: [`Grade ${gradeLevel} Mathematics`],
+    estimatedTime: 30,
+    conceptsCovered: [skillArea]
   };
 };
 
@@ -106,7 +115,10 @@ const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gra
     question: "What is the chemical symbol for water?",
     options: ["H2O", "CO2", "NaCl", "O2"],
     correct: 0,
-    explanation: "Water's chemical formula is H2O - two hydrogen atoms and one oxygen atom."
+    explanation: "Water's chemical formula is H2O - two hydrogen atoms and one oxygen atom.",
+    learningObjectives: [`Grade ${gradeLevel} Science`],
+    estimatedTime: 30,
+    conceptsCovered: [skillArea]
   };
 };
 
@@ -115,7 +127,10 @@ const generateEnglishQuestion = (skillArea: string, difficultyLevel: number, gra
     question: "Which word is a noun?",
     options: ["run", "quickly", "beautiful", "house"],
     correct: 3,
-    explanation: "A noun is a person, place, or thing. 'House' is a thing, so it's a noun."
+    explanation: "A noun is a person, place, or thing. 'House' is a thing, so it's a noun.",
+    learningObjectives: [`Grade ${gradeLevel} English`],
+    estimatedTime: 30,
+    conceptsCovered: [skillArea]
   };
 };
 
