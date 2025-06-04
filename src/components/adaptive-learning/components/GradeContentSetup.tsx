@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, GraduationCap } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import GradeAwareContentGenerator from './GradeAwareContentGenerator';
 
 interface GradeContentSetupProps {
@@ -21,23 +20,10 @@ const GradeContentSetup = ({
     <div className="space-y-6">
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              onClick={onBack}
-              className="text-gray-400 hover:text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            
-            <CardTitle className="text-white flex items-center space-x-2">
-              <GraduationCap className="w-5 h-5 text-lime-400" />
-              <span>Preparing Grade-Level Content</span>
-            </CardTitle>
-            
-            <div></div>
-          </div>
+          <CardTitle className="text-white flex items-center justify-center space-x-2">
+            <GraduationCap className="w-5 h-5 text-lime-400" />
+            <span>Preparing Grade-Level Content</span>
+          </CardTitle>
         </CardHeader>
       </Card>
       
