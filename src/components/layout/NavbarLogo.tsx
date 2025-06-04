@@ -2,14 +2,14 @@
 import { useNavigate } from "react-router-dom";
 
 interface NavbarLogoProps {
-  onLogoClick: () => void;
+  onResetNavigation?: () => void;
 }
 
-const NavbarLogo = ({ onLogoClick }: NavbarLogoProps) => {
+const NavbarLogo = ({ onResetNavigation }: NavbarLogoProps) => {
   return (
     <div 
       className="flex items-center space-x-2 cursor-pointer" 
-      onClick={onLogoClick}
+      onClick={onResetNavigation}
     >
       <img 
         src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"

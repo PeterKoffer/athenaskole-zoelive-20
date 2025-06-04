@@ -11,15 +11,35 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, BookOpen, GraduationCap } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface NavbarUserMenuProps {
   user: SupabaseUser | null;
   onGetStarted: () => void;
-  onSignOut: () => void;
 }
 
-const NavbarUserMenu = ({ user, onGetStarted, onSignOut }: NavbarUserMenuProps) => {
+const NavbarUserMenu = ({ user, onGetStarted }: NavbarUserMenuProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleCurriculumSystem = () => {
     navigate('/curriculum-system');
@@ -84,7 +104,7 @@ const NavbarUserMenu = ({ user, onGetStarted, onSignOut }: NavbarUserMenuProps) 
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-gray-700" />
         <DropdownMenuItem 
-          onClick={onSignOut}
+          onClick={handleSignOut}
           className="text-white hover:bg-gray-700 focus:bg-gray-700"
         >
           <LogOut className="mr-2 h-4 w-4" />

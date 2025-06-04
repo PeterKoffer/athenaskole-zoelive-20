@@ -1,11 +1,10 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   User, 
   BarChart3, 
-  GameController2, 
+  Gamepad2, 
   MessageCircle, 
   LogOut,
   Brain
@@ -90,7 +89,7 @@ const MobileMenu = ({
                 className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
                 onClick={() => handleMenuItemClick(onShowGames)}
               >
-                <GameController2 className="w-4 h-4 mr-3" />
+                <Gamepad2 className="w-4 h-4 mr-3" />
                 Games
               </Button>
             )}
