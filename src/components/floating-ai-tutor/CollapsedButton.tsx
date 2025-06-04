@@ -45,6 +45,8 @@ const CollapsedButton = ({
     e.preventDefault();
     onResetToHome();
   };
+
+  console.log('🎯 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
   
   return (
     <div className="relative select-none">
@@ -52,29 +54,39 @@ const CollapsedButton = ({
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className="w-24 h-24 rounded-full cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105"
+        className="w-20 h-20 cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105 shadow-2xl"
         style={{
           cursor: isDragging ? 'grabbing' : 'grab',
           transform: isDragging ? 'scale(1.1)' : 'scale(1)',
           userSelect: 'none',
-          touchAction: 'none'
+          touchAction: 'none',
         }}
       >
         <img 
           src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
           alt="Nelie AI Tutor Robot"
-          className="w-24 h-24 object-contain pointer-events-none"
+          className="w-20 h-20 object-contain pointer-events-none"
           draggable={false}
           style={{ 
             userSelect: 'none',
             touchAction: 'none'
+          }}
+          onError={(e) => {
+            console.error('❌ Robot image failed to load');
+            // Fallback to emoji if image fails
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const parent = target.parentElement;
+            if (parent) {
+              parent.innerHTML = '<span style="font-size: 4rem;">🤖</span>';
+            }
           }}
         />
       </div>
       
       <Button
         onClick={handleHomeClick}
-        className="absolute -top-2 -right-2 w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-sm p-0 min-w-0"
+        className="absolute -top-2 -right-2 w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-lg p-0 min-w-0 z-10"
         title="Go home"
       >
         <Home className="w-4 h-4" />
