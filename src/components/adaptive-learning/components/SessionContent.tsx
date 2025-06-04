@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { ArrowLeft, Brain } from 'lucide-react';
 import QuestionDisplay from './QuestionDisplay';
 import LessonHeader from './LessonHeader';
 import { SessionData } from './SessionProvider';
+
 interface SessionContentProps {
   subject: string;
   skillArea: string;
@@ -19,6 +21,7 @@ interface SessionContentProps {
   };
   sessionData: SessionData;
 }
+
 const SessionContent = ({
   subject,
   skillArea,
@@ -39,9 +42,12 @@ const SessionContent = ({
     currentQuestionIndex,
     timeSpent,
     generateNextQuestion,
-    sessionId
+    sessionId,
+    showResult
   } = sessionData;
+  
   const hasInitialized = useRef(false);
+
   console.log('📚 SessionContent state:', {
     sessionId: !!sessionId,
     questionsLength: questions.length,
@@ -76,8 +82,10 @@ const SessionContent = ({
       }, 1000);
     }
   }, [sessionId, questions.length, isLoading, generateNextQuestion]);
+
   if (error) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -95,10 +103,13 @@ const SessionContent = ({
             </Button>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
+
   if (isLoading || !questions.length) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -118,12 +129,8 @@ const SessionContent = ({
               </p>
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{
-                animationDelay: '0.1s'
-              }}></div>
-                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{
-                animationDelay: '0.2s'
-              }}></div>
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
               <Button onClick={() => generateNextQuestion()} className="mt-4 bg-lime-400 text-black hover:bg-lime-500">
                 Generate First Question
@@ -131,11 +138,14 @@ const SessionContent = ({
             </div>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
+
   const question = questions[currentQuestionIndex];
   if (!question) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -153,9 +163,12 @@ const SessionContent = ({
             </Button>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
-  return <div className="space-y-6">
+
+  return (
+    <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -163,9 +176,33 @@ const SessionContent = ({
         </Button>
       </div>
 
-      <LessonHeader subject={subject} skillArea={skillArea} currentQuestion={currentQuestionIndex + 1} totalQuestions={totalQuestions} difficultyLevel={difficultyLevel} timeSpent={timeSpent} onBack={onBack} learningObjective={learningObjective} />
+      <LessonHeader 
+        subject={subject}
+        skillArea={skillArea}
+        currentQuestion={currentQuestionIndex + 1}
+        totalQuestions={totalQuestions}
+        difficultyLevel={difficultyLevel}
+        timeSpent={timeSpent}
+        onBack={onBack}
+        learningObjective={learningObjective}
+      />
 
-      <QuestionDisplay question={question} onAnswerSelect={handleAnswerSelect} hasAnswered={hasAnswered} selectedAnswer={selectedAnswer} autoSubmit={true} subject={subject} />
-    </div>;
+      <QuestionDisplay
+        question={question.question}
+        options={question.options}
+        selectedAnswer={selectedAnswer}
+        correctAnswer={question.correct}
+        showResult={showResult || false}
+        explanation={question.explanation}
+        questionNumber={currentQuestionIndex + 1}
+        totalQuestions={totalQuestions}
+        onAnswerSelect={handleAnswerSelect}
+        hasAnswered={hasAnswered}
+        autoSubmit={true}
+        subject={subject}
+      />
+    </div>
+  );
 };
+
 export default SessionContent;

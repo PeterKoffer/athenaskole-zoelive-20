@@ -1,265 +1,207 @@
 
-import { useState, useEffect, useRef } from "react";
-import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { useLearningProfile } from "@/hooks/useLearningProfile";
-import QuestionDisplay from "./QuestionDisplay";
-import LessonComplete from "./LessonComplete";
-import LoadingState from "./LoadingState";
-import ErrorState from "./ErrorState";
-import LessonHeader from "./LessonHeader";
-import LessonControls from "./LessonControls";
-import SessionTimer from "../SessionTimer";
-import { useSessionManager, updateSessionProgress } from "./SessionManager";
-import { useQuestionManager } from "./QuestionManager";
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useSessionMetrics } from '@/hooks/useSessionMetrics';
+import { useDiverseQuestionGeneration, Question } from '../hooks/useDiverseQuestionGeneration';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Brain } from 'lucide-react';
+import QuestionDisplay from './QuestionDisplay';
+import LessonHeader from './LessonHeader';
 
-export interface LearningSessionProps {
+interface LearningSessionProps {
   subject: string;
   skillArea: string;
   difficultyLevel: number;
+  totalQuestions: number;
   onBack: () => void;
+  learningObjective?: {
+    id: string;
+    title: string;
+    description: string;
+    difficulty_level: number;
+  };
 }
 
-const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: LearningSessionProps) => {
+const LearningSession = ({
+  subject,
+  skillArea,
+  difficultyLevel,
+  totalQuestions,
+  onBack,
+  learningObjective
+}: LearningSessionProps) => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const [isSessionActive, setIsSessionActive] = useState(true);
-  const [questionStartTime, setQuestionStartTime] = useState<Date>(new Date());
-  const questionCardRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const totalQuestions = 5;
-
-  // Load user learning profile and preferences
-  const {
-    profile,
-    preferences,
-    getRecommendedDifficulty,
-    getPersonalizedSettings,
-    updateProfile
-  } = useLearningProfile(subject, skillArea);
-
-  // Use recommended difficulty if available
-  const adaptiveDifficulty = profile ? getRecommendedDifficulty() : difficultyLevel;
-  const personalizedSettings = getPersonalizedSettings();
-
-  console.log('🎓 LearningSession with memory system:', {
-    subject,
-    skillArea,
-    originalDifficulty: difficultyLevel,
-    adaptiveDifficulty,
-    hasProfile: !!profile,
-    personalizedSettings
-  });
-
-  const { sessionId, timeSpent, setTimeSpent } = useSessionManager({
-    subject,
-    skillArea,
-    difficultyLevel: adaptiveDifficulty,
-    onSessionReady: (id) => {
-      console.log('Session ready:', id);
-    }
-  });
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [hasAnswered, setHasAnswered] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasInitialized = useRef(false);
 
   const {
-    sessionQuestions,
-    currentQuestionIndex,
-    answers,
-    isGenerating,
-    generationError,
-    hasTriedFallback,
-    generateNextQuestion,
-    handleAnswerSelect,
-    setCurrentQuestionIndex,
-    resetQuestions
-  } = useQuestionManager({
+    questionsCompleted,
+    correctAnswers,
+    totalResponseTime,
+    resetMetrics,
+    updateMetrics
+  } = useSessionMetrics();
+
+  const { generateDiverseQuestion, saveQuestionHistory, isGenerating } = useDiverseQuestionGeneration({
     subject,
     skillArea,
-    difficultyLevel: adaptiveDifficulty,
+    difficultyLevel,
     userId: user?.id || '',
-    totalQuestions
+    gradeLevel: 6,
+    standardsAlignment: null
   });
 
-  // Auto-generate first question when session is ready
+  const generateNextQuestion = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setIsLoading(true);
+      const newQuestion = await generateDiverseQuestion();
+      setCurrentQuestion(newQuestion);
+      setQuestions(prev => [...prev, newQuestion]);
+      setSelectedAnswer(null);
+      setHasAnswered(false);
+      setShowResult(false);
+    } catch (error) {
+      console.error('Failed to generate question:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (sessionId && sessionQuestions.length === 0 && !isGenerating) {
-      console.log('🎬 Auto-generating first question...');
+    if (user?.id && !hasInitialized.current) {
+      hasInitialized.current = true;
       generateNextQuestion();
     }
-  }, [sessionId, sessionQuestions.length, isGenerating, generateNextQuestion]);
+  }, [user?.id]);
 
-  // Track question start time
-  useEffect(() => {
-    if (sessionQuestions[currentQuestionIndex] && !answers[currentQuestionIndex]) {
-      setQuestionStartTime(new Date());
+  const handleAnswerSelect = async (selectedIndex: number) => {
+    if (hasAnswered || !currentQuestion) return;
+
+    setSelectedAnswer(selectedIndex);
+    setHasAnswered(true);
+    setShowResult(true);
+
+    const isCorrect = selectedIndex === currentQuestion.correct;
+    updateMetrics(isCorrect, 30);
+
+    // Save to history
+    if (user?.id) {
+      await saveQuestionHistory(
+        currentQuestion,
+        selectedIndex,
+        isCorrect,
+        30000
+      );
     }
-  }, [currentQuestionIndex, sessionQuestions, answers]);
 
-  // Auto-scroll to question card when a new question loads
-  useEffect(() => {
-    if (sessionQuestions[currentQuestionIndex] && questionCardRef.current) {
-      setTimeout(() => {
-        questionCardRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start',
-          inline: 'nearest'
-        });
-      }, 300);
-    }
-  }, [sessionQuestions, currentQuestionIndex]);
-
-  // Auto-scroll to top when starting new session
-  useEffect(() => {
-    if (containerRef.current && sessionQuestions.length > 0) {
-      setTimeout(() => {
-        containerRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start',
-          inline: 'nearest'
-        });
-      }, 100);
-    }
-  }, [sessionQuestions.length]);
-
-  const isSessionComplete = currentQuestionIndex >= totalQuestions;
-  const currentQuestion = sessionQuestions[currentQuestionIndex];
-  const hasAnswered = answers.length > currentQuestionIndex;
-
-  const completeSession = async () => {
-    if (!sessionId || !user?.id) return;
-
-    const correctAnswers = answers.reduce((count, answer, index) => {
-      return count + (answer === sessionQuestions[index]?.correct ? 1 : 0);
-    }, 0);
-
-    const score = Math.round((correctAnswers / totalQuestions) * 100);
-    await updateSessionProgress(sessionId, timeSpent, score);
-
-    // Update learning profile with session results
-    if (profile) {
-      const newTotalSessions = (profile.total_sessions || 0) + 1;
-      const newTotalTime = (profile.total_time_spent || 0) + timeSpent;
-      
-      await updateProfile({
-        total_sessions: newTotalSessions,
-        total_time_spent: newTotalTime,
-        last_session_date: new Date().toISOString(),
-        last_topic_covered: `${subject} - ${skillArea}`,
-        current_difficulty_level: adaptiveDifficulty
-      });
-
-      console.log('📈 Learning profile updated with session results');
-    }
-  };
-
-  const handleAnswerSelectWithTracking = (selectedAnswer: number) => {
-    const responseTime = Math.round((new Date().getTime() - questionStartTime.getTime()) / 1000);
-    
-    console.log('📝 Answer selected with response time:', responseTime, 'seconds');
-    
-    handleAnswerSelect(selectedAnswer, completeSession);
-  };
-
-  const handleRetry = () => {
-    resetQuestions();
-    setTimeSpent(0);
-  };
-
-  const handleToggleSession = () => {
-    setIsSessionActive(!isSessionActive);
-  };
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      
-      // Generate next question if needed
-      if (sessionQuestions.length <= currentQuestionIndex + 1) {
+    // Auto-advance after 3 seconds
+    setTimeout(() => {
+      if (currentQuestionIndex < totalQuestions - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
         generateNextQuestion();
       }
-    }
+    }, 3000);
   };
 
-  const handleTimeUp = () => {
-    toast({
-      title: "Time's up!",
-      description: "Moving to next question",
-      duration: 2000
-    });
-    handleNextQuestion();
-  };
-
-  if (isSessionComplete) {
-    const correctAnswers = answers.reduce((count, answer, index) => {
-      return count + (answer === sessionQuestions[index]?.correct ? 1 : 0);
-    }, 0);
-
+  if (isLoading && !currentQuestion) {
     return (
-      <LessonComplete
-        score={Math.round((correctAnswers / totalQuestions) * 100)}
-        totalQuestions={totalQuestions}
-        onRetry={handleRetry}
-        onBack={onBack}
-      />
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </div>
+        
+        <Card className="bg-gray-900 border-gray-800">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center justify-center text-center">
+              <Brain className="w-12 h-12 text-lime-400 animate-pulse mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Preparing Your Questions
+              </h3>
+              <p className="text-gray-300 mb-4">
+                Creating personalized {subject} questions just for you...
+              </p>
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  if (generationError && !hasTriedFallback) {
+  if (!currentQuestion) {
     return (
-      <ErrorState
-        onRetry={() => {
-          generateNextQuestion();
-        }}
-      />
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </div>
+        
+        <Card className="bg-yellow-900 border-yellow-700">
+          <CardContent className="p-6 text-center text-white">
+            <Brain className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Question Not Available</h3>
+            <p className="text-yellow-300 mb-4">Let's generate your first question!</p>
+            <Button onClick={generateNextQuestion} className="bg-yellow-500 text-black hover:bg-yellow-400">
+              Generate Question Now
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="max-w-4xl mx-auto">
-      <SessionTimer
-        onTimeUp={handleTimeUp}
-        recommendedDuration={personalizedSettings.attentionSpan}
+    <div className="space-y-6">
+      <div className="flex items-center space-x-4">
+        <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
+      </div>
+
+      <LessonHeader 
+        subject={subject}
+        skillArea={skillArea}
+        currentQuestion={currentQuestionIndex + 1}
+        totalQuestions={totalQuestions}
+        difficultyLevel={difficultyLevel}
+        timeSpent={totalResponseTime}
+        onBack={onBack}
+        learningObjective={learningObjective}
       />
-      
-      <Card ref={questionCardRef} className="bg-gray-900 border-gray-800 overflow-hidden">
-        <LessonHeader
-          subject={subject}
-          skillArea={skillArea}
-          currentQuestion={currentQuestionIndex + 1}
-          totalQuestions={totalQuestions}
-          difficultyLevel={adaptiveDifficulty}
-          timeSpent={timeSpent}
-          onBack={onBack}
-        />
 
-        <div className="p-6">
-          {isGenerating || !currentQuestion ? (
-            <LoadingState subject={subject} skillArea={skillArea} />
-          ) : (
-            <QuestionDisplay
-              question={currentQuestion}
-              onAnswerSelect={handleAnswerSelectWithTracking}
-              hasAnswered={hasAnswered}
-              selectedAnswer={hasAnswered ? answers[currentQuestionIndex] : undefined}
-              autoSubmit={true}
-              subject={subject}
-              skillArea={skillArea}
-              sessionId={sessionId}
-              questionNumber={currentQuestionIndex + 1}
-              totalQuestions={totalQuestions}
-              responseStartTime={questionStartTime}
-            />
-          )}
-        </div>
-
-        <LessonControls
-          isSessionActive={isSessionActive}
-          onToggleSession={handleToggleSession}
-          onNextQuestion={handleNextQuestion}
-          canSkip={!hasAnswered && !!currentQuestion}
-        />
-      </Card>
+      <QuestionDisplay
+        question={currentQuestion.question}
+        options={currentQuestion.options}
+        selectedAnswer={selectedAnswer}
+        correctAnswer={currentQuestion.correct}
+        showResult={showResult}
+        explanation={currentQuestion.explanation}
+        questionNumber={currentQuestionIndex + 1}
+        totalQuestions={totalQuestions}
+        onAnswerSelect={handleAnswerSelect}
+        hasAnswered={hasAnswered}
+        autoSubmit={true}
+        subject={subject}
+      />
     </div>
   );
 };
