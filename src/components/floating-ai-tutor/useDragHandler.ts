@@ -20,48 +20,35 @@ export const useDragHandler = (homePosition: Position) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
   
-  const dragState = useRef({
+  const dragRef = useRef({
     isDragging: false,
-    startX: 0,
-    startY: 0,
-    offsetX: 0,
-    offsetY: 0,
+    startPos: { x: 0, y: 0 },
+    offset: { x: 0, y: 0 },
     hasMovedThreshold: false
   });
 
   const MOVE_THRESHOLD = 5;
 
-  // Save position to localStorage with debouncing
+  // Save position to localStorage
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('floating-tutor-position', JSON.stringify(position));
-      }
-    }, 100);
-    return () => clearTimeout(timeoutId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('floating-tutor-position', JSON.stringify(position));
+    }
   }, [position]);
 
-  const updatePosition = useCallback((newPosition: Position) => {
-    setPosition(newPosition);
-  }, []);
-
   const resetToHome = useCallback(() => {
-    updatePosition(homePosition);
-  }, [homePosition, updatePosition]);
+    setPosition(homePosition);
+  }, [homePosition]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (dragState.current.isDragging) return;
-    
     const rect = e.currentTarget.getBoundingClientRect();
-    dragState.current = {
+    dragRef.current = {
       isDragging: true,
-      startX: e.clientX,
-      startY: e.clientY,
-      offsetX: e.clientX - rect.left,
-      offsetY: e.clientY - rect.top,
+      startPos: { x: e.clientX, y: e.clientY },
+      offset: { x: e.clientX - rect.left, y: e.clientY - rect.top },
       hasMovedThreshold: false
     };
     
@@ -73,17 +60,13 @@ export const useDragHandler = (homePosition: Position) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (dragState.current.isDragging) return;
-    
     const touch = e.touches[0];
     const rect = e.currentTarget.getBoundingClientRect();
     
-    dragState.current = {
+    dragRef.current = {
       isDragging: true,
-      startX: touch.clientX,
-      startY: touch.clientY,
-      offsetX: touch.clientX - rect.left,
-      offsetY: touch.clientY - rect.top,
+      startPos: { x: touch.clientX, y: touch.clientY },
+      offset: { x: touch.clientX - rect.left, y: touch.clientY - rect.top },
       hasMovedThreshold: false
     };
     
@@ -92,74 +75,77 @@ export const useDragHandler = (homePosition: Position) => {
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!dragState.current.isDragging) return;
+    if (!dragRef.current.isDragging) return;
     
-    const deltaX = Math.abs(e.clientX - dragState.current.startX);
-    const deltaY = Math.abs(e.clientY - dragState.current.startY);
+    const deltaX = Math.abs(e.clientX - dragRef.current.startPos.x);
+    const deltaY = Math.abs(e.clientY - dragRef.current.startPos.y);
     const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    if (totalMovement > MOVE_THRESHOLD && !dragState.current.hasMovedThreshold) {
-      dragState.current.hasMovedThreshold = true;
+    if (totalMovement > MOVE_THRESHOLD && !dragRef.current.hasMovedThreshold) {
+      dragRef.current.hasMovedThreshold = true;
       setHasMoved(true);
     }
     
-    if (dragState.current.hasMovedThreshold) {
-      const newX = e.clientX - dragState.current.offsetX;
-      const newY = e.clientY - dragState.current.offsetY;
-      updatePosition({ x: newX, y: newY });
+    if (dragRef.current.hasMovedThreshold) {
+      const newX = e.clientX - dragRef.current.offset.x;
+      const newY = e.clientY - dragRef.current.offset.y;
+      setPosition({ x: newX, y: newY });
     }
-  }, [updatePosition, MOVE_THRESHOLD]);
+  }, []);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!dragState.current.isDragging) return;
+    if (!dragRef.current.isDragging || !e.touches[0]) return;
     
     const touch = e.touches[0];
-    const deltaX = Math.abs(touch.clientX - dragState.current.startX);
-    const deltaY = Math.abs(touch.clientY - dragState.current.startY);
+    const deltaX = Math.abs(touch.clientX - dragRef.current.startPos.x);
+    const deltaY = Math.abs(touch.clientY - dragRef.current.startPos.y);
     const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    if (totalMovement > MOVE_THRESHOLD && !dragState.current.hasMovedThreshold) {
-      dragState.current.hasMovedThreshold = true;
+    if (totalMovement > MOVE_THRESHOLD && !dragRef.current.hasMovedThreshold) {
+      dragRef.current.hasMovedThreshold = true;
       setHasMoved(true);
     }
     
-    if (dragState.current.hasMovedThreshold) {
-      const newX = touch.clientX - dragState.current.offsetX;
-      const newY = touch.clientY - dragState.current.offsetY;
-      updatePosition({ x: newX, y: newY });
+    if (dragRef.current.hasMovedThreshold) {
+      const newX = touch.clientX - dragRef.current.offset.x;
+      const newY = touch.clientY - dragRef.current.offset.y;
+      setPosition({ x: newX, y: newY });
       e.preventDefault();
     }
-  }, [updatePosition, MOVE_THRESHOLD]);
+  }, []);
 
   const handleEnd = useCallback(() => {
-    dragState.current.isDragging = false;
+    if (!dragRef.current.isDragging) return;
+    
+    dragRef.current.isDragging = false;
     setIsDragging(false);
     
-    // Reset hasMoved after a short delay to allow click handler to check it
-    setTimeout(() => {
-      setHasMoved(false);
-    }, 100);
+    // Reset hasMoved after a delay
+    setTimeout(() => setHasMoved(false), 100);
   }, []);
 
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove, { passive: false });
-      document.addEventListener('mouseup', handleEnd, { passive: false });
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleEnd, { passive: false });
-      
-      document.body.style.userSelect = 'none';
-      document.body.style.touchAction = 'none';
-      
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleEnd);
-        document.removeEventListener('touchmove', handleTouchMove);
-        document.removeEventListener('touchend', handleEnd);
-        document.body.style.userSelect = '';
-        document.body.style.touchAction = '';
-      };
-    }
+    if (!isDragging) return;
+
+    const handleMouseMoveGlobal = (e: MouseEvent) => handleMouseMove(e);
+    const handleMouseUpGlobal = () => handleEnd();
+    const handleTouchMoveGlobal = (e: TouchEvent) => handleTouchMove(e);
+    const handleTouchEndGlobal = () => handleEnd();
+
+    document.addEventListener('mousemove', handleMouseMoveGlobal);
+    document.addEventListener('mouseup', handleMouseUpGlobal);
+    document.addEventListener('touchmove', handleTouchMoveGlobal, { passive: false });
+    document.addEventListener('touchend', handleTouchEndGlobal);
+    
+    document.body.style.userSelect = 'none';
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMoveGlobal);
+      document.removeEventListener('mouseup', handleMouseUpGlobal);
+      document.removeEventListener('touchmove', handleTouchMoveGlobal);
+      document.removeEventListener('touchend', handleTouchEndGlobal);
+      document.body.style.userSelect = '';
+    };
   }, [isDragging, handleMouseMove, handleTouchMove, handleEnd]);
 
   return {

@@ -47,7 +47,18 @@ const ChatInterface = ({
     onResetToHome();
   };
 
-  // Scroll to top when component mounts
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onMouseDown(e);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onTouchStart(e);
+  };
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = 0;
@@ -55,39 +66,37 @@ const ChatInterface = ({
   }, []);
 
   return (
-    <Card className={`w-80 bg-gray-900 border-gray-800 shadow-2xl transition-all duration-200 ${
+    <Card className={`w-80 bg-gray-900 border-gray-800 shadow-2xl transition-all duration-200 select-none ${
       isDragging ? 'shadow-3xl scale-105' : ''
     }`}>
       <CardHeader 
-        className={`pb-3 select-none ${
+        className={`pb-3 ${
           isDragging ? 'cursor-grabbing bg-gray-800' : 'cursor-grab hover:bg-gray-800'
         } transition-colors duration-200`} 
-        onMouseDown={onMouseDown}
-        onTouchStart={onTouchStart}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         style={{ userSelect: 'none', touchAction: 'none' }}
       >
         <CardTitle className="flex items-center justify-between text-sm">
           <button 
             onClick={handleLogoClick}
-            className="flex items-center space-x-2 text-white hover:opacity-80 transition-opacity"
+            className="flex items-center space-x-2 text-white hover:opacity-80 transition-opacity pointer-events-auto"
           >
             <img 
               src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
               alt="Nelie AI Tutor Robot"
-              className="w-12 h-12 object-contain"
+              className="w-8 h-8 object-contain pointer-events-none"
               draggable={false}
-              style={{ 
-                userSelect: 'none'
-              }}
+              style={{ userSelect: 'none' }}
             />
             <span>NELIE - Your AI Tutor</span>
           </button>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={onResetToHome}
-              className="text-gray-400 hover:text-white p-1"
+              className="text-gray-400 hover:text-white p-1 pointer-events-auto"
               title="Go home"
             >
               <Home className="w-4 h-4" />
@@ -96,14 +105,14 @@ const ChatInterface = ({
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-gray-400 hover:text-white p-1"
+              className="text-gray-400 hover:text-white p-1 pointer-events-auto"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pointer-events-auto">
         <div 
           ref={messagesContainerRef}
           className="h-48 overflow-y-auto space-y-2"

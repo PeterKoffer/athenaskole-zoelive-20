@@ -13,25 +13,21 @@ const FloatingAITutor = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Position the floating tutor directly on top of the navbar logo
   const homePosition = {
-    x: 16, // Left padding to align with navbar logo
-    y: 20  // Top position to align with navbar
+    x: 16,
+    y: 20
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
 
-  // Only hide on auth pages - show everywhere else including daily-program
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
-  // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
       setIsOpen(false);
     }
   }, [location.pathname, shouldHide]);
 
-  // Add initial welcome message
   useEffect(() => {
     if (!shouldHide && messages.length === 0) {
       const welcomeMessage: Message = {
@@ -44,7 +40,6 @@ const FloatingAITutor = () => {
   }, [shouldHide, messages.length]);
 
   const toggleOpen = () => {
-    // Only toggle if we haven't moved and we're not dragging
     if (!hasMoved && !isDragging) {
       setIsOpen(!isOpen);
     }
@@ -56,9 +51,8 @@ const FloatingAITutor = () => {
       content: text, 
       timestamp: new Date() 
     };
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
 
-    // Auto-respond with encouraging message
     setTimeout(() => {
       const responses = [
         "That's a great question! Keep exploring and learning! 🌟",
@@ -87,7 +81,6 @@ const FloatingAITutor = () => {
     speechSynthesis.cancel();
   };
 
-  // Don't render on auth pages
   if (shouldHide) {
     return null;
   }
