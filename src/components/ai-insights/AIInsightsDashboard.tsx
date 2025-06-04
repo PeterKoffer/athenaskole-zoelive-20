@@ -1,37 +1,23 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, 
-  TrendingUp, 
-  Lightbulb, 
-  Target, 
-  Users, 
-  Zap,
-  RefreshCw,
-  Star,
-  ArrowRight,
-  Sparkles
-} from 'lucide-react';
+import { Brain, TrendingUp, Lightbulb, Target, Users, Zap, RefreshCw, Star, ArrowRight, Sparkles } from 'lucide-react';
 import { AIInsightsScanner } from '@/services/aiInsightsScanner';
-
 interface AIInsightsDashboardProps {
   onClose: () => void;
 }
-
-const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
+const AIInsightsDashboard = ({
+  onClose
+}: AIInsightsDashboardProps) => {
   const [insights, setInsights] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
   useEffect(() => {
     loadInsights();
   }, []);
-
   const loadInsights = async () => {
     try {
       setLoading(true);
@@ -43,7 +29,6 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
       setLoading(false);
     }
   };
-
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
@@ -55,40 +40,41 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
       setRefreshing(false);
     }
   };
-
   const getImpactColor = (impact: string) => {
     switch (impact) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
+      case 'high':
+        return 'bg-red-500';
+      case 'medium':
+        return 'bg-yellow-500';
+      case 'low':
+        return 'bg-green-500';
+      default:
+        return 'bg-gray-500';
     }
   };
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'hard': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case 'easy':
+        return 'bg-green-500';
+      case 'medium':
+        return 'bg-yellow-500';
+      case 'hard':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
+    return <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
         <div className="text-center">
           <Brain className="w-16 h-16 mx-auto mb-4 animate-pulse text-purple-400" />
           <h2 className="text-2xl font-bold mb-2">AI Scanning the Internet...</h2>
           <p className="text-gray-400">Finding the latest educational innovations for your platform</p>
           <Progress value={75} className="w-64 mx-auto mt-4" />
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+  return <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -102,16 +88,11 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
             </div>
           </div>
           <div className="flex space-x-4">
-            <Button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              variant="outline"
-              className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white"
-            >
+            <Button onClick={handleRefresh} disabled={refreshing} variant="outline" className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white">
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Scanning...' : 'Refresh Scan'}
             </Button>
-            <Button onClick={onClose} variant="outline">
+            <Button onClick={onClose} variant="outline" className="text-slate-950">
               Close Dashboard
             </Button>
           </div>
@@ -162,8 +143,7 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
 
           <TabsContent value="trends" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {insights?.trends?.map((trend: any) => (
-                <Card key={trend.id} className="bg-gray-800 border-gray-700">
+              {insights?.trends?.map((trend: any) => <Card key={trend.id} className="bg-gray-800 border-gray-700">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg">{trend.title}</CardTitle>
@@ -194,14 +174,12 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-4">
-            {insights?.recommendations?.map((rec: string, index: number) => (
-              <Card key={index} className="bg-gray-800 border-gray-700">
+            {insights?.recommendations?.map((rec: string, index: number) => <Card key={index} className="bg-gray-800 border-gray-700">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-4">
                     <div className="bg-purple-600 p-2 rounded-full">
@@ -211,13 +189,11 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
                     <ArrowRight className="w-5 h-5 text-purple-400" />
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </TabsContent>
 
           <TabsContent value="technologies" className="space-y-4">
-            {insights?.emergingTechnologies?.map((tech: string, index: number) => (
-              <Card key={index} className="bg-gray-800 border-gray-700">
+            {insights?.emergingTechnologies?.map((tech: string, index: number) => <Card key={index} className="bg-gray-800 border-gray-700">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-4">
                     <div className="bg-cyan-600 p-2 rounded-full">
@@ -226,13 +202,11 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
                     <p className="flex-1 font-medium">{tech}</p>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </TabsContent>
 
           <TabsContent value="improvements" className="space-y-4">
-            {insights?.userExperienceImprovements?.map((improvement: string, index: number) => (
-              <Card key={index} className="bg-gray-800 border-gray-700">
+            {insights?.userExperienceImprovements?.map((improvement: string, index: number) => <Card key={index} className="bg-gray-800 border-gray-700">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-4">
                     <div className="bg-orange-600 p-2 rounded-full">
@@ -241,13 +215,10 @@ const AIInsightsDashboard = ({ onClose }: AIInsightsDashboardProps) => {
                     <p className="flex-1">{improvement}</p>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AIInsightsDashboard;
