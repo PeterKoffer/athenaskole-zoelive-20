@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 export const useSpeechSynthesis = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [autoReadEnabled, setAutoReadEnabled] = useState(true);
-  const hasAutoRead = useRef(false);
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
   const speechQueue = useRef<string[]>([]);
   const isProcessingQueue = useRef(false);
@@ -90,7 +89,7 @@ export const useSpeechSynthesis = () => {
     
     // Configure voice settings
     utterance.lang = 'en-US';
-    utterance.rate = 0.85;
+    utterance.rate = 0.9; // Slightly slower for better clarity
     utterance.pitch = 1.1;
     utterance.volume = 1.0;
 
@@ -113,7 +112,7 @@ export const useSpeechSynthesis = () => {
       // Process next item in queue after a short delay
       setTimeout(() => {
         processQueue();
-      }, 500);
+      }, 300);
     };
 
     utterance.onerror = (event) => {
@@ -125,7 +124,7 @@ export const useSpeechSynthesis = () => {
       // Continue with queue processing after error
       setTimeout(() => {
         processQueue();
-      }, 1000);
+      }, 500);
     };
 
     // Start speaking
@@ -151,16 +150,21 @@ export const useSpeechSynthesis = () => {
 
     console.log('🔊 NELIE QUEUING SPEECH:', text.substring(0, 50) + '...');
 
-    // Add to queue instead of interrupting
-    speechQueue.current.push(text);
+    // Clear existing queue and add new text
+    speechQueue.current = [text];
     
-    // Start processing if not already processing
-    if (!isProcessingQueue.current) {
-      // Small delay to allow UI to update
-      setTimeout(() => {
-        processQueue();
-      }, 100);
+    // Stop current speech and start new one
+    if (currentUtterance.current) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      currentUtterance.current = null;
+      isProcessingQueue.current = false;
     }
+    
+    // Start processing immediately
+    setTimeout(() => {
+      processQueue();
+    }, 100);
   }, [autoReadEnabled, processQueue, isSpeechSynthesisSupported]);
 
   const handleMuteToggle = useCallback(() => {
@@ -187,8 +191,6 @@ export const useSpeechSynthesis = () => {
   return {
     isSpeaking,
     autoReadEnabled,
-    hasAutoRead,
-    voicesLoaded: true,
     speakText,
     stopSpeaking,
     handleMuteToggle,
