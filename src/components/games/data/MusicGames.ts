@@ -1,0 +1,27 @@
+
+import { CurriculumGame } from '../types/GameTypes';
+
+export const musicGames: CurriculumGame[] = [
+  {
+    id: "music-rhythm-maker",
+    title: "Rhythm Maker Studio",
+    description: "Create your own musical compositions while learning about rhythm, melody, and musical notation!",
+    emoji: "🎵",
+    subject: "Music",
+    gradeLevel: [2, 3, 4, 5],
+    difficulty: "beginner",
+    interactionType: "drawing",
+    timeEstimate: "20-25 min",
+    skillAreas: ["rhythm_recognition", "musical_notation", "creativity"],
+    learningObjectives: [
+      "Understand basic rhythm patterns",
+      "Learn musical notation basics",
+      "Express creativity through music"
+    ],
+    status: "coming-soon",
+    rewards: {
+      coins: 180,
+      badges: ["Music Maker", "Rhythm Master"]
+    }
+  }
+];

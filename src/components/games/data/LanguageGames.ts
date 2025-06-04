@@ -1,0 +1,49 @@
+
+import { CurriculumGame } from '../types/GameTypes';
+
+export const languageGames: CurriculumGame[] = [
+  {
+    id: "spanish-fiesta",
+    title: "Spanish Fiesta",
+    description: "Learn Spanish vocabulary and basic conversation through cultural celebrations!",
+    emoji: "🎉",
+    subject: "Spanish",
+    gradeLevel: [4, 5, 6, 7, 8, 9],
+    difficulty: "beginner",
+    interactionType: "multiple-choice",
+    timeEstimate: "25-30 min",
+    skillAreas: ["spanish_vocabulary", "basic_conversation", "culture", "pronunciation"],
+    learningObjectives: [
+      "Learn basic Spanish vocabulary",
+      "Practice pronunciation",
+      "Understand Hispanic culture"
+    ],
+    status: "available",
+    rewards: {
+      coins: 240,
+      badges: ["Spanish Speaker", "Culture Explorer"]
+    }
+  },
+  {
+    id: "french-cafe-conversations",
+    title: "French Café Conversations",
+    description: "Practice French in a charming café setting while learning everyday phrases!",
+    emoji: "☕",
+    subject: "French",
+    gradeLevel: [6, 7, 8, 9, 10],
+    difficulty: "beginner",
+    interactionType: "multiple-choice",
+    timeEstimate: "30-35 min",
+    skillAreas: ["french_vocabulary", "conversation", "grammar", "culture"],
+    learningObjectives: [
+      "Master basic French phrases",
+      "Understand French grammar",
+      "Learn about French culture"
+    ],
+    status: "available",
+    rewards: {
+      coins: 260,
+      badges: ["French Speaker", "Café Linguist"]
+    }
+  }
+];
