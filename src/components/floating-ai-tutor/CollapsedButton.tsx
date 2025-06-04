@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
+import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
 
 interface CollapsedButtonProps {
   onExpand: () => void;
@@ -9,6 +10,7 @@ interface CollapsedButtonProps {
   onResetToHome: () => void;
   isDragging?: boolean;
   hasMoved?: boolean;
+  isSpeaking?: boolean;
 }
 
 const CollapsedButton = ({ 
@@ -17,7 +19,8 @@ const CollapsedButton = ({
   onTouchStart, 
   onResetToHome, 
   isDragging, 
-  hasMoved 
+  hasMoved,
+  isSpeaking = false
 }: CollapsedButtonProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,7 +57,7 @@ const CollapsedButton = ({
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className="w-20 h-20 cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105 shadow-2xl"
+        className="cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105 shadow-2xl"
         style={{
           cursor: isDragging ? 'grabbing' : 'grab',
           transform: isDragging ? 'scale(1.1)' : 'scale(1)',
@@ -62,25 +65,11 @@ const CollapsedButton = ({
           touchAction: 'none',
         }}
       >
-        <img 
-          src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
-          alt="Nelie AI Tutor Robot"
-          className="w-20 h-20 object-contain pointer-events-none"
-          draggable={false}
-          style={{ 
-            userSelect: 'none',
-            touchAction: 'none'
-          }}
-          onError={(e) => {
-            console.error('❌ Robot image failed to load');
-            // Fallback to emoji if image fails
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              parent.innerHTML = '<span style="font-size: 4rem;">🤖</span>';
-            }
-          }}
+        <RobotAvatar 
+          size="4xl" 
+          isActive={true} 
+          isSpeaking={isSpeaking}
+          className="pointer-events-none"
         />
       </div>
       

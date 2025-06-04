@@ -1,11 +1,13 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, X, Home } from "lucide-react";
-import { Message } from "./types";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@/components/ui/card";
+import { Send, X, Home, Volume2, VolumeX } from "lucide-react";
+import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
 import VoiceControls from "./VoiceControls";
+import { Message } from "./types";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -17,145 +19,169 @@ interface ChatInterfaceProps {
   isSpeaking: boolean;
   onStopSpeaking: () => void;
   isDragging?: boolean;
+  autoReadEnabled?: boolean;
+  onMuteToggle?: () => void;
 }
 
-const ChatInterface = ({ 
-  messages, 
-  onSendMessage, 
-  onClose, 
-  onMouseDown, 
+const ChatInterface = ({
+  messages,
+  onSendMessage,
+  onClose,
+  onMouseDown,
   onTouchStart,
   onResetToHome,
-  isSpeaking, 
+  isSpeaking,
   onStopSpeaking,
-  isDragging 
+  isDragging,
+  autoReadEnabled = true,
+  onMuteToggle
 }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState("");
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
-    onSendMessage(inputMessage);
-    setInputMessage("");
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputMessage.trim()) {
+      onSendMessage(inputMessage);
+      setInputMessage("");
+    }
   };
 
   const handleVoiceInput = (message: string) => {
-    setInputMessage(message);
+    if (message.trim()) {
+      onSendMessage(message);
+    }
   };
 
-  const handleLogoClick = () => {
-    onResetToHome();
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleHeaderMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onMouseDown(e);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleHeaderTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onTouchStart(e);
   };
 
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = 0;
-    }
-  }, []);
-
   return (
-    <Card className={`w-80 bg-gray-900 border-gray-800 shadow-2xl transition-all duration-200 select-none ${
-      isDragging ? 'shadow-3xl scale-105' : ''
-    }`}>
-      <CardHeader 
-        className={`pb-3 ${
-          isDragging ? 'cursor-grabbing bg-gray-800' : 'cursor-grab hover:bg-gray-800'
-        } transition-colors duration-200`} 
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        style={{ userSelect: 'none', touchAction: 'none' }}
+    <Card className="w-96 h-[500px] bg-gray-900 border-gray-700 shadow-2xl flex flex-col overflow-hidden">
+      {/* Header with Nelie */}
+      <div 
+        className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 cursor-grab active:cursor-grabbing select-none"
+        style={{
+          cursor: isDragging ? 'grabbing' : 'grab',
+          userSelect: 'none',
+          touchAction: 'none',
+        }}
+        onMouseDown={handleHeaderMouseDown}
+        onTouchStart={handleHeaderTouchStart}
       >
-        <CardTitle className="flex items-center justify-between text-sm">
-          <button 
-            onClick={handleLogoClick}
-            className="flex items-center space-x-2 text-white hover:opacity-80 transition-opacity pointer-events-auto"
-          >
-            <img 
-              src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
-              alt="Nelie AI Tutor Robot"
-              className="w-8 h-8 object-contain pointer-events-none"
-              draggable={false}
-              style={{ userSelect: 'none' }}
-            />
-            <span>NELIE - Your AI Tutor</span>
-          </button>
-          <div className="flex items-center space-x-1">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
             <Button
-              variant="ghost"
+              onClick={onMuteToggle}
+              variant="outline"
               size="sm"
+              className="border-white/20 text-white bg-white/10 hover:bg-white/20"
+            >
+              {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            </Button>
+            <h3 className="text-white font-semibold">Nelie AI Tutor</h3>
+            {isSpeaking && (
+              <div className="flex items-center text-green-300">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-1"></div>
+                <span className="text-xs">Speaking...</span>
+              </div>
+            )}
+          </div>
+          <div className="flex space-x-1">
+            <Button
               onClick={onResetToHome}
-              className="text-gray-400 hover:text-white p-1 pointer-events-auto"
-              title="Go home"
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-white bg-white/10 hover:bg-white/20 p-1"
             >
               <Home className="w-4 h-4" />
             </Button>
             <Button
-              variant="ghost"
-              size="sm"
               onClick={onClose}
-              className="text-gray-400 hover:text-white p-1 pointer-events-auto"
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-white bg-white/10 hover:bg-white/20 p-1"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 pointer-events-auto">
-        <div 
-          ref={messagesContainerRef}
-          className="h-48 overflow-y-auto space-y-2"
-        >
-          {messages.map((message, index) => (
-            <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-xs px-3 py-2 rounded-lg text-xs ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-r from-cyan-400 to-purple-500 text-white'
-                    : 'bg-gray-800 text-gray-100 border border-gray-700'
-                }`}
-              >
-                <p className="leading-relaxed text-center whitespace-pre-wrap">{message.content}</p>
-                <p className="text-xs opacity-70 mt-1 text-center">
-                  {message.timestamp.toLocaleTimeString('en-US')}
-                </p>
-              </div>
-            </div>
-          ))}
         </div>
+        
+        {/* Large Nelie Avatar */}
+        <div className="flex justify-center">
+          <RobotAvatar 
+            size="2xl" 
+            isActive={true} 
+            isSpeaking={isSpeaking}
+          />
+        </div>
+      </div>
 
-        <div className="space-y-2">
-          <div className="flex space-x-1">
+      {/* Chat Messages */}
+      <CardContent className="flex-1 p-0 flex flex-col">
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    message.role === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-100'
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {message.timestamp.toLocaleTimeString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div ref={messagesEndRef} />
+        </ScrollArea>
+
+        {/* Input Area */}
+        <div className="border-t border-gray-700 p-4">
+          <form onSubmit={handleSubmit} className="flex space-x-2">
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type 'hi Nelie' or your question..."
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-cyan-400 text-xs h-8 text-center"
+              placeholder="Ask Nelie anything..."
+              className="flex-1 bg-gray-800 border-gray-600 text-white"
             />
-            <VoiceControls 
+            <Button type="submit" size="sm" disabled={!inputMessage.trim()}>
+              <Send className="w-4 h-4" />
+            </Button>
+          </form>
+          
+          {/* Voice Controls */}
+          <div className="flex justify-center space-x-2 mt-2">
+            <VoiceControls
               isSpeaking={isSpeaking}
               onStopSpeaking={onStopSpeaking}
               onVoiceInput={handleVoiceInput}
             />
-            <Button 
-              onClick={handleSendMessage} 
-              size="sm" 
-              className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-500 hover:to-purple-600 text-white border-none p-1"
-            >
-              <Send className="w-3 h-3" />
-            </Button>
           </div>
         </div>
       </CardContent>

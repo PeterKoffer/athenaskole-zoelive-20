@@ -4,23 +4,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ChatInterface from "./floating-ai-tutor/ChatInterface";
 import CollapsedButton from "./floating-ai-tutor/CollapsedButton";
 import { useDragHandler } from "./floating-ai-tutor/useDragHandler";
+import { useSpeechSynthesis } from "./adaptive-learning/hooks/useSpeechSynthesis";
 import { Message } from "./floating-ai-tutor/types";
 
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle } = useSpeechSynthesis();
   const location = useLocation();
   const navigate = useNavigate();
   
   const homePosition = {
     x: 20,
-    y: window.innerHeight - 140 // Position from bottom instead of top
+    y: window.innerHeight - 140
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
 
-  // Only hide on auth pages, but always show the collapsed button otherwise
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
   useEffect(() => {
@@ -37,8 +37,15 @@ const FloatingAITutor = () => {
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
+      
+      // Auto-speak welcome message if enabled
+      if (autoReadEnabled) {
+        setTimeout(() => {
+          speakText("Hi! I'm Nelie, your AI tutor! I'm here to help you learn. Ask me anything!");
+        }, 1000);
+      }
     }
-  }, [shouldHide, messages.length]);
+  }, [shouldHide, messages.length, autoReadEnabled, speakText]);
 
   const toggleOpen = () => {
     if (!hasMoved && !isDragging) {
@@ -69,6 +76,11 @@ const FloatingAITutor = () => {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Speak the response if auto-read is enabled
+      if (autoReadEnabled) {
+        speakText(randomResponse);
+      }
     }, 1000);
   };
 
@@ -77,12 +89,6 @@ const FloatingAITutor = () => {
     navigate('/');
   };
 
-  const handleStopSpeaking = () => {
-    setIsSpeaking(false);
-    speechSynthesis.cancel();
-  };
-
-  // Return null only on auth pages - otherwise always show the tutor
   if (shouldHide) {
     return null;
   }
@@ -95,9 +101,9 @@ const FloatingAITutor = () => {
         position: 'fixed',
         top: `${position.y}px`,
         left: `${position.x}px`,
-        zIndex: 9999999, // Increased z-index significantly
+        zIndex: 9999999,
         pointerEvents: 'auto',
-        transform: 'translateZ(0)', // Force hardware acceleration
+        transform: 'translateZ(0)',
       }}
       className="floating-tutor-container"
     >
@@ -109,6 +115,7 @@ const FloatingAITutor = () => {
           onResetToHome={handleResetToHome}
           isDragging={isDragging}
           hasMoved={hasMoved}
+          isSpeaking={isSpeaking}
         />
       ) : (
         <ChatInterface
@@ -119,8 +126,10 @@ const FloatingAITutor = () => {
           onTouchStart={handleTouchStart}
           onResetToHome={handleResetToHome}
           isSpeaking={isSpeaking}
-          onStopSpeaking={handleStopSpeaking}
+          onStopSpeaking={stopSpeaking}
           isDragging={isDragging}
+          autoReadEnabled={autoReadEnabled}
+          onMuteToggle={handleMuteToggle}
         />
       )}
     </div>
