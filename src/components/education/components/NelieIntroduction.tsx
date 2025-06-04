@@ -89,22 +89,32 @@ const NelieIntroduction = ({
     }))
   ];
 
+  // Single useEffect to handle step progression and speech
   useEffect(() => {
     const currentStepData = introductionSteps[currentStep];
-    if (currentStepData && autoReadEnabled) {
-      // Add delay before speaking
-      setTimeout(() => {
+    
+    if (!currentStepData) return;
+
+    // Auto-speak if enabled
+    if (autoReadEnabled) {
+      const speakTimeout = setTimeout(() => {
         speakText(currentStepData.text);
       }, 800);
       
-      const timer = setTimeout(() => {
-        if (currentStep < introductionSteps.length - 1) {
-          setCurrentStep(prev => prev + 1);
-        }
-      }, currentStepData.duration);
-      return () => clearTimeout(timer);
+      // Clean up speak timeout
+      return () => clearTimeout(speakTimeout);
     }
-  }, [currentStep, autoReadEnabled, speakText]);
+
+    // Auto-advance to next step
+    const advanceTimeout = setTimeout(() => {
+      if (currentStep < introductionSteps.length - 1) {
+        setCurrentStep(prev => prev + 1);
+      }
+    }, currentStepData.duration);
+
+    // Clean up advance timeout
+    return () => clearTimeout(advanceTimeout);
+  }, [currentStep, autoReadEnabled, speakText, introductionSteps]);
 
   const handleStartLesson = () => {
     stopSpeaking();
