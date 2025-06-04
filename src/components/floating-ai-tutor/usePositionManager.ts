@@ -21,8 +21,17 @@ export const usePositionManager = (homePosition: Position) => {
   });
 
   const animationFrameId = useRef<number | undefined>();
+  const lastUpdateTime = useRef<number>(0);
+  const updateThrottle = 16; // ~60fps
 
   const updatePosition = useCallback((newPosition: Position) => {
+    const now = Date.now();
+    
+    // Throttle updates to prevent excessive re-renders
+    if (now - lastUpdateTime.current < updateThrottle) {
+      return;
+    }
+    
     // Cancel any pending animation frame to prevent duplicate updates
     if (animationFrameId.current) {
       cancelAnimationFrame(animationFrameId.current);
@@ -32,9 +41,10 @@ export const usePositionManager = (homePosition: Position) => {
     animationFrameId.current = requestAnimationFrame(() => {
       console.log('📍 Updating position to:', newPosition);
       setPosition(newPosition);
+      lastUpdateTime.current = now;
       animationFrameId.current = undefined;
     });
-  }, []);
+  }, [updateThrottle]);
 
   const resetToHome = useCallback(() => {
     console.log('🏠 Resetting to home position:', homePosition);
