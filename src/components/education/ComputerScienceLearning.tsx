@@ -27,10 +27,7 @@ const ComputerScienceLearning = () => {
           />
           
           {selectedMode === 'adaptive' ? (
-            <CSAdaptiveView 
-              onModeChange={handleModeChange}
-              selectedMode={selectedMode}
-            />
+            <CSAdaptiveView />
           ) : (
             <CSMainView
               performanceMetrics={performanceMetrics}
