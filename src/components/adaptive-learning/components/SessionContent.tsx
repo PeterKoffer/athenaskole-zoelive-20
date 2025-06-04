@@ -47,12 +47,39 @@ const SessionContent = ({
 
   const hasInitialized = useRef(false);
 
-  // Auto-generate first question when session is ready
+  console.log('📚 SessionContent state:', {
+    sessionId: !!sessionId,
+    questionsLength: questions.length,
+    currentQuestionIndex,
+    isLoading,
+    error: !!error,
+    hasAnswered,
+    hasInitialized: hasInitialized.current
+  });
+
+  // Immediately start generating the first question when session is ready
   useEffect(() => {
+    console.log('🔍 SessionContent effect check:', {
+      sessionId: !!sessionId,
+      questionsLength: questions.length,
+      isLoading,
+      hasInitialized: hasInitialized.current
+    });
+
     if (sessionId && !questions.length && !isLoading && !hasInitialized.current) {
-      console.log('🎬 Auto-generating first question in SessionContent...');
+      console.log('🚀 Starting first question generation in SessionContent');
       hasInitialized.current = true;
       generateNextQuestion();
+    }
+  }, [sessionId, questions.length, isLoading, generateNextQuestion]);
+
+  // Force generation if we have sessionId but no questions and not loading
+  useEffect(() => {
+    if (sessionId && !questions.length && !isLoading && hasInitialized.current) {
+      console.log('🔧 Force generating question - session ready but no questions');
+      setTimeout(() => {
+        generateNextQuestion();
+      }, 1000);
     }
   }, [sessionId, questions.length, isLoading, generateNextQuestion]);
 
@@ -95,16 +122,22 @@ const SessionContent = ({
             <div className="flex flex-col items-center justify-center text-center">
               <Brain className="w-12 h-12 text-lime-400 animate-pulse mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">
-                Preparing Your Learning Experience
+                Nelie is Preparing Your Questions
               </h3>
               <p className="text-gray-300 mb-4">
-                Nelie is generating personalized questions for you...
+                Creating personalized {subject} questions just for you...
               </p>
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                 <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
+              <Button 
+                onClick={() => generateNextQuestion()} 
+                className="mt-4 bg-lime-400 text-black hover:bg-lime-500"
+              >
+                Generate First Question
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -126,10 +159,10 @@ const SessionContent = ({
         <Card className="bg-yellow-900 border-yellow-700">
           <CardContent className="p-6 text-center text-white">
             <Brain className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Questions Available</h3>
-            <p className="text-yellow-300 mb-4">Unable to load questions for this session.</p>
-            <Button onClick={() => generateNextQuestion()}>
-              Generate Question
+            <h3 className="text-lg font-semibold mb-2">Question Not Available</h3>
+            <p className="text-yellow-300 mb-4">Let's generate your first question!</p>
+            <Button onClick={() => generateNextQuestion()} className="bg-yellow-500 text-black hover:bg-yellow-400">
+              Generate Question Now
             </Button>
           </CardContent>
         </Card>

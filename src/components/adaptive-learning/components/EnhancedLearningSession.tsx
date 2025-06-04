@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import SessionProvider from "./SessionProvider";
 import SessionComplete from "./SessionComplete";
 import SessionContent from "./SessionContent";
@@ -23,15 +24,25 @@ const EnhancedLearningSession = ({
   onBack,
   learningObjective 
 }: EnhancedLearningSessionProps) => {
+  const [sessionKey, setSessionKey] = useState(0);
   const totalQuestions = 5;
 
+  console.log('🎯 EnhancedLearningSession rendering with:', {
+    subject,
+    skillArea,
+    difficultyLevel,
+    sessionKey,
+    totalQuestions
+  });
+
   const handleRetry = () => {
-    // Force component remount by updating key
-    window.location.reload();
+    console.log('🔄 Retrying session, incrementing key');
+    setSessionKey(prev => prev + 1);
   };
 
   return (
     <SessionProvider
+      key={sessionKey}
       subject={subject}
       skillArea={skillArea}
       difficultyLevel={difficultyLevel}
@@ -39,13 +50,21 @@ const EnhancedLearningSession = ({
       learningObjective={learningObjective}
     >
       {(sessionData) => {
+        console.log('📊 SessionData:', {
+          isSessionComplete: sessionData.isSessionComplete,
+          questionsLength: sessionData.questions.length,
+          currentIndex: sessionData.currentQuestionIndex,
+          isLoading: sessionData.isLoading,
+          error: sessionData.error
+        });
+
         if (sessionData.isSessionComplete) {
           return (
             <SessionComplete
               subject={subject}
               skillArea={skillArea}
               answers={sessionData.answers}
-              sessionQuestions={sessionData.sessionQuestions}
+              sessionQuestions={sessionData.questions}
               totalQuestions={totalQuestions}
               onRetry={handleRetry}
               onBack={onBack}

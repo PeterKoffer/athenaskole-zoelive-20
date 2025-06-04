@@ -48,8 +48,13 @@ const EnglishLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">English Learning with Nelie</h1>
+          <p className="text-gray-300">Let's practice your English reading comprehension skills!</p>
+        </div>
+        
         <EnhancedLearningSession
-          key={sessionKey} 
+          key={`english-${sessionKey}`}
           subject="english" 
           skillArea="reading_comprehension" 
           difficultyLevel={1}
