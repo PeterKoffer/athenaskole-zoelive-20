@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +67,7 @@ const ChatInterface = ({
               isDragging ? 'text-blue-400' : 'text-gray-400'
             }`} />
             <img 
-              src="/lovable-uploads/5a20a2a3-0727-4695-82d1-75cfde4c94e8.png" 
+              src="/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png" 
               alt="Nelie AI Tutor Robot"
               className="w-6 h-6 object-contain"
             />

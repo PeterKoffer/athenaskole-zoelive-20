@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Move, Home } from "lucide-react";
+import { Home } from "lucide-react";
 
 interface CollapsedButtonProps {
   onExpand: () => void;
@@ -51,60 +51,37 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         className={`
-          bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 
-          hover:from-cyan-500 hover:via-blue-500 hover:to-purple-600
-          text-white border-none rounded-full 
-          w-20 h-20 shadow-2xl 
+          bg-transparent border-none rounded-full 
+          w-20 h-20 
           transition-all duration-200 
-          flex flex-col items-center justify-center
-          ${isDragging ? 'scale-110 shadow-3xl cursor-grabbing' : 'cursor-grab hover:scale-105'}
+          flex items-center justify-center
+          ${isDragging ? 'scale-110 cursor-grabbing' : 'cursor-grab hover:scale-105'}
         `}
         style={{
           minWidth: '80px',
           minHeight: '80px',
-          padding: '8px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          padding: '0',
           zIndex: 999999,
           pointerEvents: 'auto'
         }}
       >
         <img 
-          src="/lovable-uploads/5a20a2a3-0727-4695-82d1-75cfde4c94e8.png" 
+          src="/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png" 
           alt="Nelie AI Tutor Robot"
-          className="w-12 h-12 object-contain mb-1"
-          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}
+          className="w-20 h-20 object-contain"
+          style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }}
         />
-        <div className="text-xs font-bold text-center leading-tight text-white drop-shadow-sm">Nelie<br/>AI Tutor</div>
-        
-        {/* Online indicator - larger and more visible */}
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
-          <MessageCircle className="w-3 h-3 text-white" />
-        </div>
-        
-        {/* Drag indicator */}
-        {isDragging && (
-          <div className="absolute -top-2 -left-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
-            <Move className="w-3 h-3 text-white" />
-          </div>
-        )}
       </Button>
       
-      {/* Home button - larger and more visible */}
+      {/* Home button - positioned at top-right */}
       <Button
         onClick={handleHomeClick}
-        className="absolute -top-3 -right-3 w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white border-2 border-white rounded-full flex items-center justify-center shadow-lg"
+        className="absolute -top-2 -right-2 w-6 h-6 bg-gray-700 hover:bg-gray-600 text-white border border-white rounded-full flex items-center justify-center shadow-lg"
         title="Go home"
         style={{ pointerEvents: 'auto', zIndex: 999999 }}
       >
-        <Home className="w-4 h-4" />
+        <Home className="w-3 h-3" />
       </Button>
-      
-      {/* Drag tooltip */}
-      {isDragging && (
-        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black bg-opacity-75 px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
-          🚀 Drag me around!
-        </div>
-      )}
     </div>
   );
 };
