@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import LearningHeader from "./LearningHeader";
 import AILearningModule from "@/components/adaptive-learning/AILearningModule";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import NelieIntroduction from "./components/NelieIntroduction";
 
 interface LearningMode {
   id: string;
@@ -24,6 +26,7 @@ const EnglishLearning = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentMode, setCurrentMode] = useState("adaptive");
   const [difficultyLevel, setDifficultyLevel] = useState(2);
+  const [showIntroduction, setShowIntroduction] = useState(true);
 
   console.log('📚 EnglishLearning component state:', {
     user: !!user,
@@ -34,7 +37,8 @@ const EnglishLearning = () => {
     currentMode,
     difficultyLevel,
     subject: 'english',
-    skillArea: 'reading_comprehension'
+    skillArea: 'reading_comprehension',
+    showIntroduction
   });
 
   // Redirect to auth if not logged in
@@ -76,13 +80,22 @@ const EnglishLearning = () => {
     setSessionKey(prev => prev + 1);
   };
 
+  const handleIntroductionComplete = () => {
+    console.log("✅ English introduction completed, starting main lesson");
+    setShowIntroduction(false);
+  };
+
+  const handleBackToProgram = () => {
+    navigate('/daily-program');
+  };
+
   // Show loading state while authentication is being checked
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
         <div className="text-center">
           <div className="text-4xl mb-4">📚</div>
-          <p className="text-lg">Loading your English lesson...</p>
+          <p className="text-lg">Loading your English lesson with Nelie...</p>
         </div>
       </div>
     );
@@ -95,40 +108,61 @@ const EnglishLearning = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <LearningHeader 
-        title="English Learning with Nelie"
-        backTo="/daily-program"
-        backLabel="Back to Program"
-        onModeChange={handleModeChange}
-        currentMode={currentMode}
-      />
-      
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <div className="mb-4 sm:mb-6">
-          <Card className="bg-gradient-to-r from-blue-900 to-indigo-900 border-blue-400">
-            <CardContent className="p-4 sm:p-6 text-center">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 mx-auto mb-2 sm:mb-3" />
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-2">English Reading Comprehension</h2>
-              <p className="text-sm sm:text-base text-blue-200 mb-2">
-                Let's practice your English reading comprehension skills!
-              </p>
-              <p className="text-xs text-blue-300">
-                Mode: {currentMode === 'adaptive' ? 'Adaptiv læring' : 
-                       currentMode === 'focused' ? 'Fokuseret træning' :
-                       currentMode === 'challenge' ? 'Udfordrings mode' :
-                       currentMode === 'mastery' ? 'Mestring mode' : 'Gruppe læring'}
-              </p>
-            </CardContent>
-          </Card>
+      <div className="max-w-4xl mx-auto p-6">
+        {/* Header with navigation */}
+        <div className="flex items-center justify-between mb-6">
+          <Button 
+            variant="outline" 
+            onClick={handleBackToProgram}
+            className="border-gray-600 text-white bg-gray-800 hover:bg-gray-700"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Program
+          </Button>
+          
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-white">English Learning with Nelie</h1>
+            <p className="text-gray-400">Reading comprehension and language skills</p>
+          </div>
+          
+          <div className="w-32"></div> {/* Spacer for balance */}
         </div>
-        
-        <AILearningModule
-          key={sessionKey}
-          subject="english" 
-          skillArea="reading_comprehension" 
-          difficultyLevel={difficultyLevel}
-          onBack={() => navigate('/daily-program')}
-        />
+
+        {showIntroduction ? (
+          <NelieIntroduction 
+            subject="english"
+            skillArea="reading_comprehension"
+            onIntroductionComplete={handleIntroductionComplete}
+          />
+        ) : (
+          <div className="space-y-6">
+            <div className="mb-6">
+              <Card className="bg-gradient-to-r from-blue-900 to-indigo-900 border-blue-400">
+                <CardContent className="p-6 text-center">
+                  <BookOpen className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+                  <h2 className="text-xl font-bold text-white mb-2">English Reading Comprehension</h2>
+                  <p className="text-blue-200 mb-2">
+                    Let's practice your English reading comprehension skills with Nelie!
+                  </p>
+                  <p className="text-xs text-blue-300">
+                    Mode: {currentMode === 'adaptive' ? 'Adaptive Learning' : 
+                           currentMode === 'focused' ? 'Focused Training' :
+                           currentMode === 'challenge' ? 'Challenge Mode' :
+                           currentMode === 'mastery' ? 'Mastery Mode' : 'Group Learning'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <AILearningModule
+              key={sessionKey}
+              subject="english" 
+              skillArea="reading_comprehension" 
+              difficultyLevel={difficultyLevel}
+              onBack={handleBackToProgram}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

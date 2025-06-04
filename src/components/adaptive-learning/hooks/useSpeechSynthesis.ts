@@ -80,50 +80,53 @@ export const useSpeechSynthesis = () => {
     // Ensure any previous speech is completely stopped
     speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    currentUtterance.current = utterance;
-    
-    utterance.lang = 'en-US';
-    utterance.rate = 0.85;
-    utterance.pitch = 1.1;
-    utterance.volume = 1.0;
-
-    const voice = getFemaleVoice();
-    if (voice) {
-      utterance.voice = voice;
-    }
-
-    utterance.onstart = () => {
-      console.log('✅ Nelie speech STARTED');
-      setIsSpeaking(true);
-    };
-
-    utterance.onend = () => {
-      console.log('🏁 Nelie speech ENDED');
-      setIsSpeaking(false);
-      currentUtterance.current = null;
-      isProcessingQueue.current = false;
+    // Wait for cancel to complete
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      currentUtterance.current = utterance;
       
-      // Process next item in queue after a short delay
-      setTimeout(() => {
-        processQueue();
-      }, 500);
-    };
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.2;
+      utterance.volume = 1.0;
 
-    utterance.onerror = (event) => {
-      console.error('🚫 Speech error:', event.error);
-      setIsSpeaking(false);
-      currentUtterance.current = null;
-      isProcessingQueue.current = false;
-      
-      // Continue with queue even after error
-      setTimeout(() => {
-        processQueue();
-      }, 1000);
-    };
+      const voice = getFemaleVoice();
+      if (voice) {
+        utterance.voice = voice;
+      }
 
-    console.log('🚀 Starting speech synthesis...');
-    speechSynthesis.speak(utterance);
+      utterance.onstart = () => {
+        console.log('✅ Nelie speech STARTED');
+        setIsSpeaking(true);
+      };
+
+      utterance.onend = () => {
+        console.log('🏁 Nelie speech ENDED');
+        setIsSpeaking(false);
+        currentUtterance.current = null;
+        isProcessingQueue.current = false;
+        
+        // Process next item in queue after a short delay
+        setTimeout(() => {
+          processQueue();
+        }, 800);
+      };
+
+      utterance.onerror = (event) => {
+        console.error('🚫 Speech error:', event.error);
+        setIsSpeaking(false);
+        currentUtterance.current = null;
+        isProcessingQueue.current = false;
+        
+        // Continue with queue even after error
+        setTimeout(() => {
+          processQueue();
+        }, 1000);
+      };
+
+      console.log('🚀 Starting speech synthesis...');
+      speechSynthesis.speak(utterance);
+    }, 300);
   }, [autoReadEnabled, getFemaleVoice]);
 
   const speakText = useCallback((text: string) => {
@@ -144,14 +147,14 @@ export const useSpeechSynthesis = () => {
 
     console.log('🔊 NELIE QUEUING SPEECH:', text.substring(0, 50) + '...');
     
-    // Clear existing queue and add new text
-    speechQueue.current = [text];
+    // Add to queue
+    speechQueue.current.push(text);
     
     // Start processing if not already processing
     if (!isProcessingQueue.current) {
       setTimeout(() => {
         processQueue();
-      }, 100);
+      }, 200);
     }
   }, [autoReadEnabled, processQueue, isSpeechSynthesisSupported]);
 
@@ -165,6 +168,23 @@ export const useSpeechSynthesis = () => {
       stopSpeaking();
     }
   }, [autoReadEnabled, stopSpeaking]);
+
+  // Initialize voices on component mount
+  useEffect(() => {
+    if (isSpeechSynthesisSupported) {
+      const loadVoices = () => {
+        speechSynthesis.getVoices();
+        console.log('🎵 Speech synthesis voices loaded');
+      };
+      
+      loadVoices();
+      speechSynthesis.addEventListener('voiceschanged', loadVoices);
+      
+      return () => {
+        speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      };
+    }
+  }, [isSpeechSynthesisSupported]);
 
   // Cleanup on unmount
   useEffect(() => {

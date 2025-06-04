@@ -1,6 +1,6 @@
 
 import NelieIntroduction from './NelieIntroduction';
-import ExtendedLessonManager from './ExtendedLessonManager';
+import EnhancedLessonManager from './EnhancedLessonManager';
 import LessonPausedView from './LessonPausedView';
 import LessonCompletedView from './LessonCompletedView';
 import { LessonState } from './LessonStateManager';
@@ -32,7 +32,7 @@ const LessonPhaseRenderer = ({
     
     case 'lesson':
       return (
-        <ExtendedLessonManager 
+        <EnhancedLessonManager 
           subject="mathematics"
           skillArea="arithmetic"
           onLessonComplete={onLessonComplete}
