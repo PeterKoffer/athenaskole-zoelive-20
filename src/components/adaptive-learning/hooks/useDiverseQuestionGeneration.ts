@@ -30,8 +30,13 @@ export const useDiverseQuestionGeneration = ({
 
       console.log(`🎯 Generating diverse ${subject} question for Grade ${gradeLevel}, avoiding ${usedQuestions.length} used questions`);
 
-      // Try to generate question using API
-      const question = await QuestionGenerationService.generateWithAPI(
+      // Set a shorter timeout for question generation
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Question generation timeout')), 8000); // 8 second timeout
+      });
+
+      // Try to generate question using API with timeout
+      const questionPromise = QuestionGenerationService.generateWithAPI(
         subject,
         skillArea,
         difficultyLevel,
@@ -42,6 +47,30 @@ export const useDiverseQuestionGeneration = ({
         usedQuestions
       );
 
+      let question;
+      try {
+        question = await Promise.race([questionPromise, timeoutPromise]);
+      } catch (apiError) {
+        console.log('⚠️ API generation failed or timed out, using fallback:', apiError.message);
+        
+        // Use fallback immediately if API fails
+        const uniqueQuestion = FallbackQuestionGenerator.createUniqueQuestion(
+          subject, 
+          skillArea, 
+          Date.now(), 
+          usedQuestions.length + Math.random() * 1000
+        );
+        setSessionQuestions(prev => [...prev, uniqueQuestion.question]);
+        
+        toast({
+          title: "Question Ready! 📚",
+          description: `Created Grade ${gradeLevel} practice question`,
+          duration: 2000
+        });
+
+        return uniqueQuestion;
+      }
+
       // Check for duplicates
       if (QuestionGenerationService.isDuplicateQuestion(question.question, usedQuestions)) {
         console.log('⚠️ Generated question is too similar, creating completely new one...');
@@ -49,7 +78,7 @@ export const useDiverseQuestionGeneration = ({
           subject, 
           skillArea, 
           Date.now(), 
-          usedQuestions.length
+          usedQuestions.length + Math.random() * 1000
         );
         setSessionQuestions(prev => [...prev, uniqueQuestion.question]);
         return uniqueQuestion;
@@ -99,17 +128,22 @@ export const useDiverseQuestionGeneration = ({
     responseTime: number,
     additionalContext?: any
   ) => {
-    await QuestionHistoryService.saveQuestionHistory(
-      userId,
-      subject,
-      skillArea,
-      difficultyLevel,
-      question,
-      userAnswer,
-      isCorrect,
-      responseTime,
-      additionalContext
-    );
+    try {
+      await QuestionHistoryService.saveQuestionHistory(
+        userId,
+        subject,
+        skillArea,
+        difficultyLevel,
+        question,
+        userAnswer,
+        isCorrect,
+        responseTime,
+        additionalContext
+      );
+    } catch (error) {
+      console.error('Failed to save question history:', error);
+      // Continue without breaking the flow
+    }
   }, [userId, subject, skillArea, difficultyLevel]);
 
   return {

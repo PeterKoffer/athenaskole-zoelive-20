@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
 import { commonStandardsAPI } from '@/services/commonStandardsAPI';
-import { GraduationCap, Target, BookOpen, Play } from 'lucide-react';
+import { GraduationCap, Target, BookOpen, Play, AlertCircle } from 'lucide-react';
 
 interface GradeAwareContentGeneratorProps {
   subject: string;
@@ -21,49 +21,86 @@ const GradeAwareContentGenerator = ({
   const { gradeConfig, loading, getStandardForSkillArea } = useGradeLevelContent(subject);
   const [selectedStandard, setSelectedStandard] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (gradeConfig && skillArea && !isGenerating) {
+    if (gradeConfig && skillArea && !isGenerating && !error && retryCount === 0) {
       // Auto-generate content after a short delay
       const timer = setTimeout(() => {
         generateGradeAppropriateContent();
-      }, 1500);
+      }, 1000);
       
       return () => clearTimeout(timer);
     }
-  }, [gradeConfig, skillArea]);
+  }, [gradeConfig, skillArea, retryCount]);
 
-  const generateGradeAppropriateContent = () => {
-    if (!gradeConfig) return;
+  const generateGradeAppropriateContent = async () => {
+    if (!gradeConfig) {
+      setError('Grade configuration not available');
+      return;
+    }
 
     setIsGenerating(true);
+    setError(null);
     console.log('🎯 Starting grade-appropriate content generation...');
 
-    // Find the most appropriate standard for the skill area
-    const standard = getStandardForSkillArea(skillArea);
-    
-    if (standard) {
-      setSelectedStandard(standard);
-      
-      // Generate content configuration based on the standard
-      const contentConfig = {
-        gradeLevel: gradeConfig.userGrade,
-        standard: standard,
-        difficultyRange: gradeConfig.difficultyRange,
-        subject: subject,
-        skillArea: skillArea,
-        prerequisites: gradeConfig.prerequisites.filter(p => 
-          p.domain === standard.domain
-        ),
-        contentPrompt: createGradeSpecificPrompt(standard, gradeConfig.userGrade)
-      };
+    try {
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Content generation timeout')), 5000);
+      });
 
-      console.log('🎯 Generated grade-appropriate content config:', contentConfig);
+      const contentGenerationPromise = new Promise((resolve) => {
+        // Find the most appropriate standard for the skill area
+        const standard = getStandardForSkillArea(skillArea);
+        
+        if (standard) {
+          setSelectedStandard(standard);
+        }
+        
+        // Generate content configuration based on the standard or fallback
+        const contentConfig = {
+          gradeLevel: gradeConfig.userGrade,
+          standard: standard || {
+            code: `GRADE${gradeConfig.userGrade}.${subject.toUpperCase()}`,
+            title: `Grade ${gradeConfig.userGrade} ${subject.charAt(0).toUpperCase() + subject.slice(1)}`,
+            description: `${skillArea} practice for Grade ${gradeConfig.userGrade}`,
+            domain: skillArea
+          },
+          difficultyRange: gradeConfig.difficultyRange,
+          subject: subject,
+          skillArea: skillArea,
+          prerequisites: gradeConfig.prerequisites.filter(p => 
+            standard ? p.domain === standard.domain : true
+          ),
+          contentPrompt: createGradeSpecificPrompt(
+            standard || { 
+              code: `GRADE${gradeConfig.userGrade}`, 
+              title: `Grade ${gradeConfig.userGrade} Content`,
+              description: skillArea 
+            }, 
+            gradeConfig.userGrade
+          )
+        };
+
+        console.log('🎯 Generated grade-appropriate content config:', contentConfig);
+        resolve(contentConfig);
+      });
+
+      const contentConfig = await Promise.race([contentGenerationPromise, timeoutPromise]);
       
-      // Simulate processing time, then proceed
+      // Simulate minimal processing time, then proceed immediately
       setTimeout(() => {
         onContentGenerated(contentConfig);
-      }, 2000);
+        setIsGenerating(false);
+      }, 500);
+
+    } catch (error) {
+      console.error('❌ Content generation failed:', error);
+      setError('Failed to generate content. Please try again.');
+      setIsGenerating(false);
+      setRetryCount(prev => prev + 1);
     }
   };
 
@@ -90,6 +127,12 @@ Use age-appropriate language, examples, and difficulty level.
 Ensure content builds on previous grade knowledge and prepares for next grade concepts.`;
   };
 
+  const handleRetry = () => {
+    setError(null);
+    setRetryCount(0);
+    generateGradeAppropriateContent();
+  };
+
   if (loading) {
     return (
       <Card className="bg-gray-900 border-gray-800">
@@ -105,12 +148,30 @@ Ensure content builds on previous grade knowledge and prepares for next grade co
     return (
       <Card className="bg-red-900 border-red-700">
         <CardContent className="p-6 text-center">
+          <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-4" />
           <p className="text-white">Unable to determine appropriate grade level</p>
           <Button 
             onClick={generateGradeAppropriateContent}
             className="mt-4 bg-red-600 hover:bg-red-700"
           >
             Retry Setup
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-red-900 border-red-700">
+        <CardContent className="p-6 text-center">
+          <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-4" />
+          <p className="text-white mb-4">{error}</p>
+          <Button 
+            onClick={handleRetry}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Try Again
           </Button>
         </CardContent>
       </Card>
@@ -178,10 +239,20 @@ Ensure content builds on previous grade knowledge and prepares for next grade co
                 <span className="text-blue-200 text-sm font-medium">Generating Grade {gradeConfig.userGrade} Content...</span>
               </div>
               <p className="text-blue-300 text-xs">Creating personalized questions for your skill level</p>
+              <div className="mt-3">
+                <Button 
+                  onClick={handleRetry}
+                  variant="outline"
+                  size="sm"
+                  className="text-blue-300 border-blue-600 hover:bg-blue-800"
+                >
+                  Skip Wait & Continue
+                </Button>
+              </div>
             </div>
           )}
 
-          {!isGenerating && !selectedStandard && (
+          {!isGenerating && !selectedStandard && !error && (
             <Button 
               onClick={generateGradeAppropriateContent}
               className="w-full bg-lime-600 hover:bg-lime-700 text-white"
