@@ -6,6 +6,7 @@ export const useSpeechSynthesis = () => {
   const [autoReadEnabled, setAutoReadEnabled] = useState(true);
   const hasAutoRead = useRef(false);
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const isProcessing = useRef(false);
 
   // Check if speech synthesis is available
   const isSpeechSynthesisSupported = typeof speechSynthesis !== 'undefined';
@@ -15,10 +16,18 @@ export const useSpeechSynthesis = () => {
     
     if (!isSpeechSynthesisSupported) return;
     
+    // Set processing flag to prevent new speech
+    isProcessing.current = true;
+    
     // Stop any current speech
     speechSynthesis.cancel();
     setIsSpeaking(false);
     currentUtterance.current = null;
+    
+    // Clear processing flag after a delay
+    setTimeout(() => {
+      isProcessing.current = false;
+    }, 500);
   }, [isSpeechSynthesisSupported]);
 
   const getFemaleVoice = useCallback(() => {
@@ -70,19 +79,26 @@ export const useSpeechSynthesis = () => {
       return;
     }
 
-    if (!text || text.trim() === '' || !autoReadEnabled) {
-      console.log('🚫 Cannot speak - no text or auto-read disabled');
+    if (!text || text.trim() === '' || !autoReadEnabled || isProcessing.current) {
+      console.log('🚫 Cannot speak - conditions not met:', {
+        hasText: !!text,
+        autoReadEnabled,
+        isProcessing: isProcessing.current
+      });
       return;
     }
 
     console.log('🔊 NELIE SPEAKING:', text.substring(0, 50) + '...');
 
     try {
-      // Stop any existing speech
-      stopSpeaking();
+      // Set processing flag
+      isProcessing.current = true;
 
-      // Wait a moment for cleanup
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Stop any existing speech without triggering the cancellation loop
+      if (currentUtterance.current) {
+        speechSynthesis.cancel();
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
 
       const utterance = new SpeechSynthesisUtterance(text);
       currentUtterance.current = utterance;
@@ -116,38 +132,34 @@ export const useSpeechSynthesis = () => {
       utterance.onstart = () => {
         console.log('✅ Nelie speech STARTED');
         setIsSpeaking(true);
+        isProcessing.current = false;
       };
 
       utterance.onend = () => {
         console.log('🏁 Nelie speech ENDED');
         setIsSpeaking(false);
         currentUtterance.current = null;
+        isProcessing.current = false;
       };
 
       utterance.onerror = (event) => {
         console.error('🚫 Speech error:', event.error);
         setIsSpeaking(false);
         currentUtterance.current = null;
+        isProcessing.current = false;
       };
 
       // Start speaking
       console.log('🚀 Starting speech synthesis...');
       speechSynthesis.speak(utterance);
-      
-      // Force set speaking state after a short delay
-      setTimeout(() => {
-        if (currentUtterance.current === utterance) {
-          console.log('🔧 Force setting speaking to true');
-          setIsSpeaking(true);
-        }
-      }, 100);
 
     } catch (error) {
       console.error('🚫 Speech synthesis error:', error);
       setIsSpeaking(false);
       currentUtterance.current = null;
+      isProcessing.current = false;
     }
-  }, [autoReadEnabled, getFemaleVoice, stopSpeaking, isSpeechSynthesisSupported]);
+  }, [autoReadEnabled, getFemaleVoice, isSpeechSynthesisSupported]);
 
   const handleMuteToggle = useCallback(() => {
     const newAutoReadState = !autoReadEnabled;
@@ -163,9 +175,11 @@ export const useSpeechSynthesis = () => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopSpeaking();
+      if (currentUtterance.current) {
+        speechSynthesis.cancel();
+      }
     };
-  }, [stopSpeaking]);
+  }, []);
 
   return {
     isSpeaking,

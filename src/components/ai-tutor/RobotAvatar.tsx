@@ -43,7 +43,8 @@ const RobotAvatar = ({
         <div className="text-8xl">🤖</div>
         {isSpeaking && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-4">
+            {/* Position the blue dot in the center of the chest area */}
+            <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse opacity-80"></div>
             </div>
           </div>
@@ -62,18 +63,18 @@ const RobotAvatar = ({
         draggable={false}
       />
       
-      {/* Chest hole blinking animation when speaking */}
+      {/* Chest hole blinking animation when speaking - positioned in the circular area on her chest */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Chest hole area - positioned over Nelie's chest */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
+          {/* Position the blue dot exactly in the circular chest area */}
+          <div className="absolute top-[62%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <div className="relative">
-              {/* Main chest hole blinking effect */}
-              <div className="w-6 h-6 bg-blue-400 rounded-full animate-pulse opacity-90"></div>
+              {/* Main chest hole blinking effect - blue dot in the circle */}
+              <div className="w-4 h-4 bg-blue-400 rounded-full animate-pulse opacity-90"></div>
               {/* Inner glow effect */}
-              <div className="absolute top-1 left-1 w-4 h-4 bg-blue-300 rounded-full animate-pulse opacity-70" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute top-0.5 left-0.5 w-3 h-3 bg-blue-300 rounded-full animate-pulse opacity-70" style={{ animationDelay: '0.5s' }}></div>
               {/* Center core */}
-              <div className="absolute top-2 left-2 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.25s' }}></div>
+              <div className="absolute top-1 left-1 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.25s' }}></div>
             </div>
           </div>
         </div>

@@ -36,7 +36,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
       const timer = setTimeout(() => {
         speakText(demoQuestion.explanation[currentStep]);
         setCurrentStep(prev => prev + 1);
-      }, currentStep === 0 ? 1500 : 4500);
+      }, currentStep === 0 ? 2000 : 5000); // Longer delays to prevent overlap
       
       return () => clearTimeout(timer);
     } else if (currentStep === demoQuestion.explanation.length && !showAnswer) {
@@ -46,7 +46,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
         if (autoReadEnabled) {
           speakText("Perfect! That's how we solve addition problems step by step. Now you understand the process!");
         }
-      }, 2500);
+      }, 3000);
     }
   }, [currentStep, showAnswer, autoReadEnabled, speakText]);
 
@@ -67,6 +67,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-6">
         <div className="text-center mb-6">
+          {/* Use the same RobotAvatar component with chest animation */}
           <RobotAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
           <h3 className="text-xl font-bold text-white mt-4">Watch Nelie Solve This Problem</h3>
           <p className="text-gray-400">Learn by watching Nelie's step-by-step demonstration</p>
