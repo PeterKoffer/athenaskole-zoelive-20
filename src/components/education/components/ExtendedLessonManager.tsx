@@ -30,10 +30,9 @@ const ExtendedLessonManager = ({
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [lessonStartTime] = useState(Date.now());
   const [score, setScore] = useState(0);
-  const [waitingForAnswer, setWaitingForAnswer] = useState(false);
-  const [hasAnswered, setHasAnswered] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [activityCompleted, setActivityCompleted] = useState(false);
 
   const {
     isSpeaking,
@@ -90,6 +89,12 @@ const ExtendedLessonManager = ({
         options: ["12", "15", "18", "20"],
         correct: 1,
         explanation: "5 × 3 means 5 groups of 3! We can count: 3, 6, 9, 12, 15! So 5 × 3 = 15!"
+      },
+      {
+        question: "Which is larger: 45 or 54?",
+        options: ["45", "54", "They are equal", "Cannot tell"],
+        correct: 1,
+        explanation: "54 is larger than 45! Look at the tens place: 54 has 5 tens and 45 has 4 tens, so 54 is bigger!"
       }
     ];
 
@@ -101,6 +106,18 @@ const ExtendedLessonManager = ({
         duration: 120,
         content: q
       });
+    });
+
+    // Game activity
+    activities.push({
+      id: 'game',
+      type: 'game',
+      title: 'Number Detective Game',
+      duration: 180,
+      content: {
+        text: "Let's play Number Detective! I'm thinking of a number between 1 and 20. It's an even number, and when you add 5 to it, you get 17. Can you find my mystery number?",
+        answer: "The mystery number is 12! Because 12 + 5 = 17, and 12 is even!"
+      }
     });
 
     // Celebration
@@ -123,9 +140,16 @@ const ExtendedLessonManager = ({
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
   const totalLessonTime = 20 * 60;
 
+  // Reset states when activity changes
+  useEffect(() => {
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setActivityCompleted(false);
+  }, [currentActivityIndex]);
+
   // Speak activity content when it changes
   useEffect(() => {
-    if (currentActivity && autoReadEnabled && !hasAnswered) {
+    if (currentActivity && autoReadEnabled && !activityCompleted) {
       // Clear any previous speech first
       stopSpeaking();
       
@@ -135,21 +159,12 @@ const ExtendedLessonManager = ({
         } else if (currentActivity.type === 'question') {
           const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
           speakText(questionText);
-          setWaitingForAnswer(true);
         } else if (currentActivity.type === 'game') {
           speakText(`Let's play a game! ${currentActivity.content.text}`);
         }
       }, 1000);
     }
-  }, [currentActivityIndex, autoReadEnabled]);
-
-  // Reset states when activity changes
-  useEffect(() => {
-    setHasAnswered(false);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setWaitingForAnswer(false);
-  }, [currentActivityIndex]);
+  }, [currentActivityIndex, autoReadEnabled, activityCompleted]);
 
   const handleActivityComplete = useCallback(() => {
     stopSpeaking();
@@ -161,24 +176,26 @@ const ExtendedLessonManager = ({
     }
   }, [currentActivityIndex, lessonActivities.length, onLessonComplete, stopSpeaking]);
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (hasAnswered || !waitingForAnswer || currentActivity.type !== 'question') {
+  const handleAnswerSelect = useCallback((answerIndex: number) => {
+    if (showResult || activityCompleted || currentActivity.type !== 'question') {
+      console.log('🚫 Answer selection blocked:', { showResult, activityCompleted, type: currentActivity.type });
       return;
     }
 
     console.log('🎯 Answer selected:', answerIndex);
     
     setSelectedAnswer(answerIndex);
-    setHasAnswered(true);
     setShowResult(true);
-    setWaitingForAnswer(false);
+    setActivityCompleted(true);
 
     const isCorrect = answerIndex === currentActivity.content.correct;
     if (isCorrect) {
       setScore(prev => prev + 1);
     }
 
-    const feedback = isCorrect ? `Excellent! ${currentActivity.content.explanation}` : `Not quite right. ${currentActivity.content.explanation}`;
+    const feedback = isCorrect 
+      ? `Excellent! ${currentActivity.content.explanation}` 
+      : `Not quite right. ${currentActivity.content.explanation}`;
     
     // Stop current speech and speak feedback
     stopSpeaking();
@@ -190,7 +207,14 @@ const ExtendedLessonManager = ({
     setTimeout(() => {
       handleActivityComplete();
     }, 4000);
-  };
+  }, [showResult, activityCompleted, currentActivity, stopSpeaking, speakText, handleActivityComplete]);
+
+  const handleManualContinue = useCallback(() => {
+    if (currentActivity.type === 'explanation' || currentActivity.type === 'game') {
+      setActivityCompleted(true);
+      handleActivityComplete();
+    }
+  }, [currentActivity.type, handleActivityComplete]);
 
   if (!currentActivity) {
     return (
@@ -247,6 +271,8 @@ const ExtendedLessonManager = ({
           } else if (currentActivity.type === 'question') {
             const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
             speakText(questionText);
+          } else if (currentActivity.type === 'game') {
+            speakText(`Let's play a game! ${currentActivity.content.text}`);
           }
         }} 
       />
@@ -267,8 +293,9 @@ const ExtendedLessonManager = ({
                 {currentActivity.content.text}
               </p>
               <Button 
-                onClick={handleActivityComplete} 
+                onClick={handleManualContinue} 
                 className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
+                disabled={activityCompleted}
               >
                 Continue Lesson
               </Button>
@@ -299,7 +326,7 @@ const ExtendedLessonManager = ({
                         : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
                     }`}
                     onClick={() => handleAnswerSelect(index)}
-                    disabled={hasAnswered}
+                    disabled={showResult || activityCompleted}
                   >
                     <span className="mr-3 font-semibold">
                       {String.fromCharCode(65 + index)}.
@@ -333,8 +360,9 @@ const ExtendedLessonManager = ({
                 {currentActivity.content.text}
               </p>
               <Button 
-                onClick={handleActivityComplete} 
+                onClick={handleManualContinue} 
                 className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
+                disabled={activityCompleted}
               >
                 I solved it!
               </Button>
