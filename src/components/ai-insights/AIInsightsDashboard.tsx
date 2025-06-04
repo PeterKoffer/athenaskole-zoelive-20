@@ -146,7 +146,7 @@ const AIInsightsDashboard = ({
               {insights?.trends?.map((trend: any) => <Card key={trend.id} className="bg-gray-800 border-gray-700">
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{trend.title}</CardTitle>
+                      <CardTitle className="text-lg text-slate-50">{trend.title}</CardTitle>
                       <div className="flex space-x-2">
                         <Badge className={`${getImpactColor(trend.impact)} text-white`}>
                           {trend.impact} impact
