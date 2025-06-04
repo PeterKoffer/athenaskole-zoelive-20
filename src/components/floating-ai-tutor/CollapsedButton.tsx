@@ -83,11 +83,11 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
             src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
             alt="Nelie AI Tutor Robot"
             className="w-44 h-44 object-contain"
+            draggable={false}
             style={{ 
               pointerEvents: 'none',
               userSelect: 'none',
-              touchAction: 'none',
-              draggable: false
+              touchAction: 'none'
             }}
           />
         </div>

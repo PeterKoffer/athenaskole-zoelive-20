@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,9 +68,9 @@ const ChatInterface = ({
               src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
               alt="Nelie AI Tutor Robot"
               className="w-16 h-16 object-contain"
+              draggable={false}
               style={{ 
-                userSelect: 'none',
-                draggable: false
+                userSelect: 'none'
               }}
             />
             <span>NELIE - Your AI Tutor</span>
