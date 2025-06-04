@@ -1,9 +1,11 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { userLearningProfileService } from '@/services/userLearningProfileService';
+
 interface ExplanationCardProps {
   explanation: string;
   subject: string;
@@ -19,6 +21,7 @@ interface ExplanationCardProps {
   questionNumber?: number;
   totalQuestions?: number;
 }
+
 const ExplanationCard = ({
   explanation,
   subject,
@@ -34,11 +37,10 @@ const ExplanationCard = ({
   questionNumber,
   totalQuestions
 }: ExplanationCardProps) => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [userPreferences, setUserPreferences] = useState<any>(null);
+  const [displayTime, setDisplayTime] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Load user preferences on mount
@@ -51,6 +53,19 @@ const ExplanationCard = ({
     };
     loadPreferences();
   }, [user?.id]);
+
+  // Track how long explanation is displayed
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setInterval(() => {
+        setDisplayTime(prev => prev + 1);
+      }, 1000);
+      
+      return () => clearInterval(timer);
+    } else {
+      setDisplayTime(0);
+    }
+  }, [isVisible]);
 
   // Record question history when explanation becomes visible
   useEffect(() => {
@@ -121,7 +136,9 @@ const ExplanationCard = ({
       }, 500);
     }
   }, [isVisible, userPreferences]);
+
   if (!isVisible) return null;
+
   const handleReadAloud = () => {
     // Prevent multiple speech instances
     if (isSpeaking) {
@@ -150,7 +167,15 @@ const ExplanationCard = ({
       // Try to use user's preferred voice
       const voices = speechSynthesis.getVoices();
       const preferredVoice = userPreferences?.preferred_voice || 'female';
-      const selectedVoice = voices.find(voice => voice.name.toLowerCase().includes(preferredVoice) || voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('woman') || voice.name.toLowerCase().includes('samantha') || voice.name.toLowerCase().includes('karen') || voice.name.toLowerCase().includes('victoria') || voice.name.toLowerCase().includes('alex') && voice.lang.includes('en'));
+      const selectedVoice = voices.find(voice => 
+        voice.name.toLowerCase().includes(preferredVoice) || 
+        voice.name.toLowerCase().includes('female') || 
+        voice.name.toLowerCase().includes('woman') || 
+        voice.name.toLowerCase().includes('samantha') || 
+        voice.name.toLowerCase().includes('karen') || 
+        voice.name.toLowerCase().includes('victoria') || 
+        voice.name.toLowerCase().includes('alex') && voice.lang.includes('en')
+      );
       if (selectedVoice) {
         utterance.voice = selectedVoice;
       }
@@ -165,7 +190,12 @@ const ExplanationCard = ({
       speechSynthesis.speak(utterance);
     }, 100);
   };
-  return <Card ref={cardRef} className={`${isCorrect ? 'bg-blue-900 border-blue-600' : 'bg-red-900 border-red-600'} mt-4`}>
+
+  return (
+    <Card 
+      ref={cardRef} 
+      className={`${isCorrect ? 'bg-blue-900 border-blue-600' : 'bg-red-900 border-red-600'} mt-4`}
+    >
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className={`text-lg font-semibold text-center flex-1 ${isCorrect ? 'text-blue-100' : 'text-red-100'}`}>
@@ -176,17 +206,30 @@ const ExplanationCard = ({
               <Volume2 className="w-4 h-4 mr-2" />
               {isSpeaking ? 'Stop Nelie' : 'Listen to Nelie'}
             </Button>
-            {isSpeaking && <div className={`flex items-center ${isCorrect ? 'text-blue-300' : 'text-red-300'}`}>
+            {isSpeaking && (
+              <div className={`flex items-center ${isCorrect ? 'text-blue-300' : 'text-red-300'}`}>
                 <div className={`w-2 h-2 ${isCorrect ? 'bg-blue-400' : 'bg-red-400'} rounded-full animate-pulse mr-1`}></div>
                 <span className="text-xs">Nelie is speaking...</span>
-              </div>}
+              </div>
+            )}
           </div>
         </div>
-        {!isCorrect && correctAnswer && <p className="text-red-300 font-medium mb-2 text-center">
+        {!isCorrect && correctAnswer && (
+          <p className="text-red-300 font-medium mb-2 text-center">
             Correct answer: {correctAnswer}
-          </p>}
+          </p>
+        )}
         <p className={`text-center ${isCorrect ? 'text-blue-200' : 'text-red-200'}`}>{explanation}</p>
+        
+        {/* Display timer to show how long explanation has been visible */}
+        <div className="mt-3 text-center">
+          <span className={`text-xs ${isCorrect ? 'text-blue-400' : 'text-red-400'}`}>
+            Reading time: {displayTime}s (explanation stays visible longer now)
+          </span>
+        </div>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };
+
 export default ExplanationCard;
