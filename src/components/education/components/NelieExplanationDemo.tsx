@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, ArrowRight, CheckCircle } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
 
 interface NelieExplanationDemoProps {
   subject: string;
@@ -13,8 +14,8 @@ interface NelieExplanationDemoProps {
 
 const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExplanationDemoProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const { isSpeaking, speakText, stopSpeaking } = useSpeechSynthesis();
 
   const demoQuestion = {
     question: "What is 15 + 27?",
@@ -28,21 +29,6 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
     ],
     options: ["32", "42", "52", "38"],
     correct: 1
-  };
-
-  const speakText = (text: string) => {
-    setIsSpeaking(true);
-    speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;
-    utterance.pitch = 1.2;
-    
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    
-    speechSynthesis.speak(utterance);
   };
 
   useEffect(() => {
@@ -60,10 +46,10 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
         speakText("Perfect! That's how we solve addition problems step by step.");
       }, 2000);
     }
-  }, [currentStep, showAnswer]);
+  }, [currentStep, showAnswer, speakText]);
 
   const handleContinue = () => {
-    speechSynthesis.cancel();
+    stopSpeaking();
     onDemoComplete();
   };
 
@@ -71,7 +57,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-6">
         <div className="text-center mb-6">
-          <RobotAvatar size="lg" isActive={true} isSpeaking={isSpeaking} />
+          <RobotAvatar size="2xl" isActive={true} isSpeaking={isSpeaking} />
           <h3 className="text-xl font-bold text-white mt-4">Watch Nelie Solve This Problem</h3>
         </div>
 

@@ -1,21 +1,25 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Play } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+
 interface NelieIntroductionProps {
   subject: string;
   skillArea: string;
   onIntroductionComplete: () => void;
 }
+
 const NelieIntroduction = ({
   subject,
   skillArea,
   onIntroductionComplete
 }: NelieIntroductionProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [autoPlay, setAutoPlay] = useState(true);
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle } = useSpeechSynthesis();
+
   const introductionSteps = [{
     text: "Hi there! I'm Nelie, your AI learning companion. Today we're going to have an amazing Mathematics lesson together!",
     duration: 4000
@@ -29,28 +33,10 @@ const NelieIntroduction = ({
     text: "Our lesson will include interactive questions, fun games, and plenty of practice. Are you ready to start learning?",
     duration: 5000
   }];
-  const speakText = (text: string) => {
-    if (!autoPlay) return;
-    setIsSpeaking(true);
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;
-    utterance.pitch = 1.2;
 
-    // Try to use a female voice
-    const voices = speechSynthesis.getVoices();
-    const femaleVoice = voices.find(voice => voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('samantha') || voice.name.toLowerCase().includes('karen') || voice.name.toLowerCase().includes('victoria'));
-    if (femaleVoice) {
-      utterance.voice = femaleVoice;
-    }
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    speechSynthesis.speak(utterance);
-  };
   useEffect(() => {
     const currentStepData = introductionSteps[currentStep];
-    if (currentStepData) {
+    if (currentStepData && autoReadEnabled) {
       speakText(currentStepData.text);
       const timer = setTimeout(() => {
         if (currentStep < introductionSteps.length - 1) {
@@ -59,26 +45,19 @@ const NelieIntroduction = ({
       }, currentStepData.duration);
       return () => clearTimeout(timer);
     }
-  }, [currentStep, autoPlay]);
-  const toggleAudio = () => {
-    setAutoPlay(!autoPlay);
-    if (!autoPlay) {
-      speakText(introductionSteps[currentStep].text);
-    } else {
-      speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
-  };
+  }, [currentStep, autoReadEnabled, speakText]);
+
   const handleStartLesson = () => {
-    speechSynthesis.cancel();
-    setIsSpeaking(false);
+    stopSpeaking();
     onIntroductionComplete();
   };
-  return <div className="space-y-6">
+
+  return (
+    <div className="space-y-6">
       <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
         <CardContent className="p-8 text-center">
           <div className="mb-6">
-            <RobotAvatar size="lg" isActive={true} isSpeaking={isSpeaking} />
+            <RobotAvatar size="2xl" isActive={true} isSpeaking={isSpeaking} />
           </div>
           
           <h1 className="text-3xl font-bold text-white mb-4">Welcome to Mathematics with Nelie!</h1>
@@ -91,22 +70,42 @@ const NelieIntroduction = ({
           
           {/* Progress indicator */}
           <div className="flex justify-center space-x-2 mb-6">
-            {introductionSteps.map((_, index) => <div key={index} className={`w-3 h-3 rounded-full ${index <= currentStep ? 'bg-purple-400' : 'bg-gray-600'}`} />)}
+            {introductionSteps.map((_, index) => (
+              <div 
+                key={index} 
+                className={`w-3 h-3 rounded-full ${index <= currentStep ? 'bg-purple-400' : 'bg-gray-600'}`} 
+              />
+            ))}
           </div>
           
           <div className="flex justify-center space-x-4">
-            <Button variant="outline" onClick={toggleAudio} className="border-purple-400 text-slate-950">
-              {autoPlay ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
-              {autoPlay ? 'Mute Nelie' : 'Unmute Nelie'}
+            <Button 
+              variant="outline" 
+              onClick={handleMuteToggle} 
+              className="border-purple-400 text-slate-950"
+            >
+              {autoReadEnabled ? (
+                <VolumeX className="w-4 h-4 mr-2" />
+              ) : (
+                <Volume2 className="w-4 h-4 mr-2" />
+              )}
+              {autoReadEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
             </Button>
             
-            {currentStep >= introductionSteps.length - 1 && <Button onClick={handleStartLesson} className="bg-green-600 hover:bg-green-700 text-white">
+            {currentStep >= introductionSteps.length - 1 && (
+              <Button 
+                onClick={handleStartLesson} 
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
                 <Play className="w-4 h-4 mr-2" />
                 Start Lesson
-              </Button>}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };
+
 export default NelieIntroduction;
