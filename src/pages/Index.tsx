@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useNavbarState } from "@/hooks/useNavbarState";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ import InsightsNotification from "@/components/ai-insights/InsightsNotification"
 
 const Index = () => {
   const { user } = useAuth();
+  const { canAccessAIInsights } = useRoleAccess();
   const navigate = useNavigate();
   const { navigateToHome, scrollToTop } = useNavigation();
   const location = useLocation();
@@ -97,9 +99,12 @@ const Index = () => {
   };
 
   const handleShowInsights = () => {
-    setShowInsightsDashboard(true);
-    resetState();
-    scrollToTop();
+    // Only allow access if user has proper role
+    if (canAccessAIInsights()) {
+      setShowInsightsDashboard(true);
+      resetState();
+      scrollToTop();
+    }
   };
 
   const handleBackToHome = () => {
@@ -170,7 +175,7 @@ const Index = () => {
 
       <Footer />
 
-      {/* AI Insights Notification - shows when user logs in */}
+      {/* AI Insights Notification - only shows for authorized users */}
       {user && !showInsightsDashboard && (
         <InsightsNotification onViewDashboard={handleShowInsights} />
       )}

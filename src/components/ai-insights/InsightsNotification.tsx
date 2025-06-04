@@ -1,27 +1,38 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Brain, X, TrendingUp, Lightbulb, Sparkles } from 'lucide-react';
 import { AIInsightsScanner } from '@/services/aiInsightsScanner';
+import { useRoleAccess } from '@/hooks/useRoleAccess';
+
 interface InsightsNotificationProps {
   onViewDashboard: () => void;
 }
+
 const InsightsNotification = ({
   onViewDashboard
 }: InsightsNotificationProps) => {
   const [insights, setInsights] = useState<any>(null);
   const [showNotification, setShowNotification] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const { canAccessAIInsights } = useRoleAccess();
+
   useEffect(() => {
-    checkForNewInsights();
-  }, []);
+    // Only show insights notification for authorized users
+    if (canAccessAIInsights()) {
+      checkForNewInsights();
+    }
+  }, [canAccessAIInsights]);
+
   const checkForNewInsights = async () => {
     try {
       // Check if we should show notification
       const shouldShow = AIInsightsScanner.shouldPerformNewScan();
       const lastDismissed = localStorage.getItem('insights_notification_dismissed');
       const today = new Date().toDateString();
+
       if (shouldShow && lastDismissed !== today) {
         const results = await AIInsightsScanner.getOrUpdateInsights();
         setInsights(results);
@@ -31,23 +42,35 @@ const InsightsNotification = ({
       console.error('Error checking insights:', error);
     }
   };
+
   const handleDismiss = () => {
     setDismissed(true);
     setShowNotification(false);
     localStorage.setItem('insights_notification_dismissed', new Date().toDateString());
   };
+
   const handleViewDashboard = () => {
     onViewDashboard();
     handleDismiss();
   };
-  if (!showNotification || dismissed || !insights) {
+
+  // Don't show notification if user doesn't have access or if dismissed
+  if (!canAccessAIInsights() || !showNotification || dismissed || !insights) {
     return null;
   }
+
   const highImpactTrends = insights.trends?.filter((t: any) => t.impact === 'high') || [];
-  return <div className="fixed top-4 right-4 z-50 w-96">
+
+  return (
+    <div className="fixed top-4 right-4 z-50 w-96">
       <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-500 shadow-2xl">
         <CardHeader className="relative">
-          <Button variant="ghost" size="icon" className="absolute right-2 top-2 text-gray-300 hover:text-white" onClick={handleDismiss}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-2 top-2 text-gray-300 hover:text-white" 
+            onClick={handleDismiss}
+          >
             <X className="w-4 h-4" />
           </Button>
           <CardTitle className="flex items-center space-x-3 text-white pr-8">
@@ -87,24 +110,35 @@ const InsightsNotification = ({
             </div>
           </div>
 
-          {highImpactTrends.length > 0 && <div className="bg-black/20 rounded-lg p-3">
+          {highImpactTrends.length > 0 && (
+            <div className="bg-black/20 rounded-lg p-3">
               <h4 className="text-sm font-semibold text-purple-200 mb-2">Top Recommendation:</h4>
               <p className="text-sm text-white">{highImpactTrends[0]?.title}</p>
               <Badge className="mt-2 bg-red-500 text-white text-xs">
                 High Impact
               </Badge>
-            </div>}
+            </div>
+          )}
 
           <div className="flex space-x-2">
-            <Button onClick={handleViewDashboard} className="flex-1 bg-purple-600 hover:bg-purple-700 text-white">
+            <Button 
+              onClick={handleViewDashboard} 
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+            >
               View Full Dashboard
             </Button>
-            <Button onClick={handleDismiss} variant="outline" className="border-purple-400 bg-slate-50 text-slate-950">
+            <Button 
+              onClick={handleDismiss} 
+              variant="outline" 
+              className="border-purple-400 bg-slate-50 text-slate-950"
+            >
               Later
             </Button>
           </div>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };
+
 export default InsightsNotification;

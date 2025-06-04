@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 import MobileMenu from "./MobileMenu";
 import NavbarLogo from "./NavbarLogo";
 import NavbarDesktopMenu from "./NavbarDesktopMenu";
@@ -31,6 +32,7 @@ const Navbar = ({
   onBack
 }: NavbarProps) => {
   const { user } = useAuth();
+  const { canAccessAIInsights } = useRoleAccess();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -61,8 +63,8 @@ const Navbar = ({
               onShowAITutor={onShowAITutor}
             />
             
-            {/* AI Insights Button */}
-            {user && onShowInsights && (
+            {/* AI Insights Button - Only for admins and school leaders */}
+            {user && onShowInsights && canAccessAIInsights() && (
               <NavbarButton
                 onClick={onShowInsights}
                 variant="outline"
@@ -104,7 +106,7 @@ const Navbar = ({
         onShowProgress={onShowProgress}
         onShowGames={onShowGames}
         onShowAITutor={onShowAITutor}
-        onShowInsights={onShowInsights}
+        onShowInsights={canAccessAIInsights() ? onShowInsights : undefined}
       />
     </nav>
   );

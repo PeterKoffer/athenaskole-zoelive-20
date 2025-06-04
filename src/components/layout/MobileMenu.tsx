@@ -1,4 +1,6 @@
+
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -36,6 +38,7 @@ const MobileMenu = ({
 }: MobileMenuProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { canAccessAIInsights } = useRoleAccess();
 
   const handleLogout = async () => {
     try {
@@ -105,7 +108,7 @@ const MobileMenu = ({
               </Button>
             )}
 
-            {onShowInsights && (
+            {onShowInsights && canAccessAIInsights() && (
               <Button
                 variant="ghost"
                 className="w-full justify-start text-purple-400 hover:text-purple-300 hover:bg-gray-700 relative"

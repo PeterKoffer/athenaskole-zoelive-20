@@ -41,10 +41,10 @@ const App = () => (
           <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
           <Route path="/ai-learning" element={<AILearning />} />
           <Route path="/curriculum-system" element={<CurriculumSystem />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/parent" element={<ParentDashboard />} />
-          <Route path="/school" element={<SchoolDashboard />} />
-          <Route path="/teacher" element={<TeacherDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/parent-dashboard" element={<ParentDashboard />} />
+          <Route path="/school-dashboard" element={<SchoolDashboard />} />
+          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           
           {/* Subject-specific learning routes */}
           <Route path="/learn/english" element={<EnglishLearning />} />
