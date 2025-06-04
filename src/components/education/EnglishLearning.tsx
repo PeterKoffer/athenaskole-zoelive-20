@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import LearningHeader from "./LearningHeader";
-import EnhancedLearningSession from "@/components/adaptive-learning/components/EnhancedLearningSession";
+import AILearningModule from "@/components/adaptive-learning/AILearningModule";
 import { Card, CardContent } from "@/components/ui/card";
-import { Brain, BookOpen, Target } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
@@ -51,11 +51,6 @@ const EnglishLearning = () => {
     return null;
   }
 
-  const handleRetry = () => {
-    console.log('🔄 Retrying English learning session');
-    setSessionKey(prev => prev + 1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader 
@@ -65,7 +60,7 @@ const EnglishLearning = () => {
       />
       
       <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-6 space-y-4">
+        <div className="mb-6">
           <Card className="bg-gradient-to-r from-blue-900 to-indigo-900 border-blue-400">
             <CardContent className="p-6 text-center">
               <BookOpen className="w-8 h-8 text-blue-400 mx-auto mb-3" />
@@ -75,21 +70,9 @@ const EnglishLearning = () => {
               </p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-r from-green-900 to-emerald-900 border-green-400">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <Brain className="w-6 h-6 text-green-400" />
-                <Target className="w-6 h-6 text-green-400" />
-              </div>
-              <p className="text-white">
-                🤖 AI is generating personalized English learning exercises
-              </p>
-            </CardContent>
-          </Card>
         </div>
         
-        <EnhancedLearningSession
+        <AILearningModule
           key={sessionKey}
           subject="english" 
           skillArea="reading_comprehension" 
