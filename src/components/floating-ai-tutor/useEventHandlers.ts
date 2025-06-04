@@ -12,10 +12,14 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
   const [hasMoved, setHasMoved] = useState(false);
   const dragOffset = useRef<DragOffset>({ x: 0, y: 0 });
   const dragStartPosition = useRef<Position>({ x: 0, y: 0 });
-  const moveThreshold = 10; // Increased threshold to prevent accidental drags
+  const isHandlingDrag = useRef(false);
+  const moveThreshold = 15; // Increased threshold to prevent accidental drags
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie at position:', { x: e.clientX, y: e.clientY });
+    
+    if (isHandlingDrag.current) return;
+    isHandlingDrag.current = true;
     
     e.preventDefault();
     e.stopPropagation();
@@ -35,6 +39,9 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     console.log('👆 Touch start on Nelie');
+    
+    if (isHandlingDrag.current) return;
+    isHandlingDrag.current = true;
     
     e.preventDefault();
     e.stopPropagation();
@@ -101,12 +108,13 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     }
     
     setIsDragging(false);
+    isHandlingDrag.current = false;
     
     // Reset hasMoved after a short delay to allow click handler to check it
     setTimeout(() => {
       console.log('🔄 Resetting hasMoved to false');
       setHasMoved(false);
-    }, 50);
+    }, 100);
   }, [hasMoved, animationFrameId]);
 
   const handleTouchEnd = useCallback(() => {
@@ -117,12 +125,13 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     }
     
     setIsDragging(false);
+    isHandlingDrag.current = false;
     
     // Reset hasMoved after a short delay to allow click handler to check it
     setTimeout(() => {
       console.log('🔄 Resetting hasMoved to false');
       setHasMoved(false);
-    }, 50);
+    }, 100);
   }, [hasMoved, animationFrameId]);
 
   useEffect(() => {
@@ -135,6 +144,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
       
       document.body.style.userSelect = 'none';
       document.body.style.webkitUserSelect = 'none';
+      document.body.style.touchAction = 'none';
       
       return () => {
         console.log('🎯 Removing drag event listeners');
@@ -144,6 +154,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
         document.removeEventListener('touchend', handleTouchEnd);
         document.body.style.userSelect = '';
         document.body.style.webkitUserSelect = '';
+        document.body.style.touchAction = '';
         
         if (animationFrameId.current) {
           cancelAnimationFrame(animationFrameId.current);

@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,13 +59,18 @@ const ChatInterface = ({
         } transition-colors duration-200`} 
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
+        style={{ userSelect: 'none', touchAction: 'none' }}
       >
         <CardTitle className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-2 text-white">
             <img 
               src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
               alt="Nelie AI Tutor Robot"
-              className="w-8 h-8 object-contain"
+              className="w-16 h-16 object-contain"
+              style={{ 
+                userSelect: 'none',
+                draggable: false
+              }}
             />
             <span>NELIE - Your AI Tutor</span>
           </div>
