@@ -22,10 +22,10 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'Mathematics',
       icon: Calculator,
       skillAreas: [
-        { id: 'fractions', name: 'Fractions', description: 'Adding, subtracting, and working with fractions', route: '/mathematics' },
-        { id: 'arithmetic', name: 'Arithmetic', description: 'Basic math operations and number sense', route: '/mathematics' },
-        { id: 'geometry', name: 'Geometry', description: 'Shapes, angles, and spatial reasoning', route: '/mathematics' },
-        { id: 'algebra', name: 'Algebra', description: 'Variables, equations, and problem solving', route: '/mathematics' }
+        { id: 'fractions', name: 'Fractions', description: 'Adding, subtracting, and working with fractions', route: '/learn/mathematics' },
+        { id: 'arithmetic', name: 'Arithmetic', description: 'Basic math operations and number sense', route: '/learn/mathematics' },
+        { id: 'geometry', name: 'Geometry', description: 'Shapes, angles, and spatial reasoning', route: '/learn/mathematics' },
+        { id: 'algebra', name: 'Algebra', description: 'Variables, equations, and problem solving', route: '/learn/mathematics' }
       ]
     },
     {
@@ -33,10 +33,10 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'English',
       icon: BookOpen,
       skillAreas: [
-        { id: 'spelling', name: 'Spelling', description: 'Word recognition and spelling patterns', route: '/english' },
-        { id: 'grammar', name: 'Grammar', description: 'Sentence structure and language rules', route: '/english' },
-        { id: 'reading', name: 'Reading', description: 'Comprehension and vocabulary building', route: '/english' },
-        { id: 'writing', name: 'Writing', description: 'Expression and communication skills', route: '/english' }
+        { id: 'spelling', name: 'Spelling', description: 'Word recognition and spelling patterns', route: '/learn/english' },
+        { id: 'grammar', name: 'Grammar', description: 'Sentence structure and language rules', route: '/learn/english' },
+        { id: 'reading', name: 'Reading', description: 'Comprehension and vocabulary building', route: '/learn/english' },
+        { id: 'writing', name: 'Writing', description: 'Expression and communication skills', route: '/learn/english' }
       ]
     },
     {
@@ -44,10 +44,10 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'Computer Science',
       icon: Code,
       skillAreas: [
-        { id: 'programming', name: 'Programming', description: 'Basic coding concepts and logical thinking', route: '/computer-science' },
-        { id: 'algorithms', name: 'Algorithms', description: 'Problem-solving and computational thinking', route: '/computer-science' },
-        { id: 'ai-basics', name: 'AI Basics', description: 'Introduction to artificial intelligence concepts', route: '/computer-science' },
-        { id: 'data-structures', name: 'Data Structures', description: 'Organizing and managing information', route: '/computer-science' }
+        { id: 'programming', name: 'Programming', description: 'Basic coding concepts and logical thinking', route: '/learn/computer-science' },
+        { id: 'algorithms', name: 'Algorithms', description: 'Problem-solving and computational thinking', route: '/learn/computer-science' },
+        { id: 'ai-basics', name: 'AI Basics', description: 'Introduction to artificial intelligence concepts', route: '/learn/computer-science' },
+        { id: 'data-structures', name: 'Data Structures', description: 'Organizing and managing information', route: '/learn/computer-science' }
       ]
     },
     {
@@ -55,10 +55,10 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'Music',
       icon: Music,
       skillAreas: [
-        { id: 'music_theory', name: 'Music Theory', description: 'Understanding rhythm, melody, and harmony', route: '/music' },
-        { id: 'rhythm', name: 'Rhythm', description: 'Beat patterns and timing in music', route: '/music' },
-        { id: 'melody', name: 'Melody', description: 'Musical phrases and note sequences', route: '/music' },
-        { id: 'instruments', name: 'Instruments', description: 'Learning about different musical instruments', route: '/music' }
+        { id: 'music_theory', name: 'Music Theory', description: 'Understanding rhythm, melody, and harmony', route: '/learn/music' },
+        { id: 'rhythm', name: 'Rhythm', description: 'Beat patterns and timing in music', route: '/learn/music' },
+        { id: 'melody', name: 'Melody', description: 'Musical phrases and note sequences', route: '/learn/music' },
+        { id: 'instruments', name: 'Instruments', description: 'Learning about different musical instruments', route: '/learn/music' }
       ]
     },
     {
@@ -66,10 +66,10 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
       name: 'Science',
       icon: Globe,
       skillAreas: [
-        { id: 'biology', name: 'Biology', description: 'Living organisms and life processes', route: '/science' },
-        { id: 'chemistry', name: 'Chemistry', description: 'Matter, atoms, and chemical reactions', route: '/science' },
-        { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws', route: '/science' },
-        { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment', route: '/science' }
+        { id: 'biology', name: 'Biology', description: 'Living organisms and life processes', route: '/learn/science' },
+        { id: 'chemistry', name: 'Chemistry', description: 'Matter, atoms, and chemical reactions', route: '/learn/science' },
+        { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws', route: '/learn/science' },
+        { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment', route: '/learn/science' }
       ]
     }
   ];
