@@ -1,6 +1,4 @@
 
-import { getGradeDescriptor, getAgeRange } from './gradeAligment.ts';
-
 export interface PromptConfig {
   subject: string;
   skillArea: string;
@@ -13,193 +11,141 @@ export interface PromptConfig {
 }
 
 export function createGradeAlignedPrompt(config: PromptConfig): string {
-  const {
-    subject,
-    skillArea,
-    difficultyLevel,
-    previousQuestions,
-    diversityPrompt,
-    sessionId,
-    gradeLevel,
-    standardsAlignment
-  } = config;
-
-  console.log('🎯 Creating grade-aligned prompt for Grade', gradeLevel, 'subject:', subject);
+  console.log('🎯 Creating prompt for subject:', config.subject, 'skillArea:', config.skillArea);
   
-  const grade = gradeLevel || Math.min(12, Math.max(1, difficultyLevel));
-  const currentGrade = getGradeDescriptor(gradeLevel, difficultyLevel);
+  let prompt = '';
   
-  let basePrompt = '';
+  // Map subject names to ensure proper handling
+  const normalizedSubject = normalizeSubjectName(config.subject);
+  console.log('🔄 Normalized subject from', config.subject, 'to', normalizedSubject);
   
-  if (subject === 'mathematics') {
-    basePrompt = createMathematicsPrompt(grade, skillArea, currentGrade, standardsAlignment, diversityPrompt, sessionId);
-  } else if (subject === 'english') {
-    basePrompt = createEnglishPrompt(grade, currentGrade, standardsAlignment, diversityPrompt, sessionId);
-  } else if (subject === 'science') {
-    basePrompt = createSciencePrompt(grade, currentGrade, standardsAlignment, diversityPrompt, sessionId);
+  // Generate subject-specific prompts
+  if (normalizedSubject === 'english') {
+    prompt = createEnglishPrompt();
+  } else if (normalizedSubject === 'mathematics') {
+    prompt = createMathematicsPrompt(config.skillArea, config.difficultyLevel);
+  } else if (normalizedSubject === 'creative_writing') {
+    prompt = createCreativeWritingPrompt();
+  } else if (normalizedSubject === 'science') {
+    prompt = createSciencePrompt();
   } else {
-    basePrompt = createGeneralPrompt(grade, subject, skillArea, currentGrade, sessionId, diversityPrompt);
+    // This should never happen now with proper subject normalization
+    console.error('⚠️ Unknown subject after normalization:', normalizedSubject, 'original:', config.subject);
+    throw new Error(`Unsupported subject: ${config.subject}. Supported subjects are: english, mathematics, creative_writing, science`);
   }
 
-  // Add standards compliance
-  basePrompt += createExampleStructure(grade);
+  if (config.previousQuestions.length > 0) {
+    prompt += `\n\nIMPORTANT: Do NOT generate any of these previous questions:\n${config.previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
 
-  // Add anti-repetition for grade level
-  if (previousQuestions.length > 0) {
-    basePrompt += createAntiRepetitionSection(grade, subject, previousQuestions, sessionId);
+Create a completely different ${normalizedSubject} question that hasn't been asked before.`;
   }
 
-  console.log('📝 Grade-aligned prompt created for Grade', grade);
-  return basePrompt;
+  console.log('📝 Final prompt created for:', normalizedSubject);
+  return prompt;
 }
 
-function createMathematicsPrompt(
-  grade: number, 
-  skillArea: string, 
-  currentGrade: any, 
-  standardsAlignment: any, 
-  diversityPrompt?: string, 
-  sessionId?: number
-): string {
-  return `Generate a UNIQUE mathematics question for Grade ${grade} students about ${skillArea}.
+function normalizeSubjectName(subject: string): string {
+  // Handle different variations of subject names
+  const subjectMap: { [key: string]: string } = {
+    'english': 'english',
+    'english_reading': 'english',
+    'reading': 'english',
+    'mathematics': 'mathematics',
+    'math': 'mathematics',
+    'maths': 'mathematics',
+    'creative_writing': 'creative_writing',
+    'creative': 'creative_writing',
+    'writing': 'creative_writing',
+    'science': 'science',
+    'science_discovery': 'science',
+    'discovery': 'science'
+  };
 
-GRADE ${grade} REQUIREMENTS:
-- Use ${currentGrade.vocab}
-- Create examples involving ${currentGrade.examples}
-- Focus on ${currentGrade.cognitive}
-- Age-appropriate complexity for ${getAgeRange(grade)}
-
-${standardsAlignment ? `
-STANDARDS ALIGNMENT:
-- Standard: ${standardsAlignment.code}
-- Focus: ${standardsAlignment.title}
-- Description: ${standardsAlignment.description}
-- Domain: ${standardsAlignment.domain}
-` : ''}
-
-CRITICAL REQUIREMENTS:
-- Create a question that is appropriate for Grade ${grade} mathematics curriculum
-- Use numbers and concepts suitable for this grade level
-- ${diversityPrompt || 'Be extremely creative and unique'}
-- Ensure mathematical accuracy
-- Use fresh, age-appropriate examples
-
-Session ID: ${sessionId} - This must be completely unique for Grade ${grade}.`;
+  const normalized = subjectMap[subject.toLowerCase()] || subject.toLowerCase();
+  console.log('🔍 Subject mapping:', subject, '->', normalized);
+  return normalized;
 }
 
-function createEnglishPrompt(
-  grade: number, 
-  currentGrade: any, 
-  standardsAlignment: any, 
-  diversityPrompt?: string, 
-  sessionId?: number
-): string {
-  return `Generate a UNIQUE English/Language Arts question for Grade ${grade} students.
+function createEnglishPrompt(): string {
+  return `Generate an English reading comprehension question suitable for elementary students.
 
-GRADE ${grade} REQUIREMENTS:
-- Reading level appropriate for Grade ${grade}
-- Use ${currentGrade.vocab}
-- Examples involving ${currentGrade.examples}
-- Focus on ${currentGrade.cognitive}
-
-${standardsAlignment ? `
-STANDARDS ALIGNMENT:
-- Standard: ${standardsAlignment.code}
-- Focus: ${standardsAlignment.title}
-- Description: ${standardsAlignment.description}
-- Domain: ${standardsAlignment.domain}
-` : ''}
-
-CRITICAL REQUIREMENTS:
-- Create content appropriate for Grade ${grade} reading and comprehension level
-- Use age-appropriate themes and vocabulary
-- ${diversityPrompt || 'Be extremely creative with scenarios and examples'}
-- Focus on grade-level literacy skills
-
-Session ID: ${sessionId} - This must be original Grade ${grade} content.`;
-}
-
-function createSciencePrompt(
-  grade: number, 
-  currentGrade: any, 
-  standardsAlignment: any, 
-  diversityPrompt?: string, 
-  sessionId?: number
-): string {
-  return `Generate a UNIQUE science question for Grade ${grade} students.
-
-GRADE ${grade} REQUIREMENTS:
-- Scientific concepts appropriate for Grade ${grade}
-- Use ${currentGrade.vocab}
-- Examples involving ${currentGrade.examples}
-- Focus on ${currentGrade.cognitive}
-
-${standardsAlignment ? `
-STANDARDS ALIGNMENT:
-- Standard: ${standardsAlignment.code}
-- Focus: ${standardsAlignment.title}
-- Description: ${standardsAlignment.description}
-- Domain: ${standardsAlignment.domain}
-` : ''}
-
-CRITICAL REQUIREMENTS:
-- Create science content appropriate for Grade ${grade} understanding
-- Use age-appropriate scientific concepts and terminology
-- ${diversityPrompt || 'Explore diverse scientific topics appropriate for this grade'}
-- Focus on grade-level scientific inquiry
-
-Session ID: ${sessionId} - This must be original Grade ${grade} science content.`;
-}
-
-function createGeneralPrompt(
-  grade: number, 
-  subject: string, 
-  skillArea: string, 
-  currentGrade: any, 
-  sessionId?: number, 
-  diversityPrompt?: string
-): string {
-  return `Generate a UNIQUE educational question for Grade ${grade} students in ${subject} - ${skillArea}.
-
-GRADE ${grade} REQUIREMENTS:
-- Content appropriate for Grade ${grade} curriculum
-- Use ${currentGrade.vocab}
-- Examples involving ${currentGrade.examples}
-- Focus on ${currentGrade.cognitive}
-
-Session ID: ${sessionId} - Create grade-appropriate original content.
-${diversityPrompt || 'Be maximally creative while maintaining grade-level appropriateness'}`;
-}
-
-function createExampleStructure(grade: number): string {
-  return `
-
-EXAMPLE STRUCTURE (create something completely different with appropriate grade level):
+Return ONLY a valid JSON object with this exact structure:
 {
-  "question": "Create a Grade ${grade} appropriate question here",
-  "options": ["Grade ${grade} level option 1", "Grade ${grade} level option 2", "Grade ${grade} level option 3", "Grade ${grade} level option 4"],
-  "correct": 0,
-  "explanation": "Grade ${grade} appropriate explanation using suitable vocabulary",
-  "learningObjectives": ["Grade ${grade} skill 1", "Grade ${grade} skill 2"]
+  "question": "Read this sentence: 'The cat sat on the mat.' What did the cat do?",
+  "options": ["ran", "jumped", "sat", "flew"],
+  "correct": 2,
+  "explanation": "The sentence clearly states 'The cat sat on the mat', so the correct answer is 'sat'.",
+  "learningObjectives": ["Reading comprehension", "Verb identification"],
+  "estimatedTime": 30
 }
 
-RETURN ONLY valid JSON, no markdown formatting.`;
+Make sure:
+- The question focuses on reading comprehension, vocabulary, or grammar
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation clearly shows the reasoning
+- Return ONLY the JSON, no markdown formatting or code blocks`;
 }
 
-function createAntiRepetitionSection(
-  grade: number, 
-  subject: string, 
-  previousQuestions: string[], 
-  sessionId?: number
-): string {
-  return `\n\nCRITICAL: You MUST NOT create any question similar to these previous Grade ${grade} questions:
-${previousQuestions.slice(0, 15).map((q, i) => `${i + 1}. ${q}`).join('\n')}
+function createMathematicsPrompt(skillArea: string, difficultyLevel: number): string {
+  return `Generate a mathematics question about ${skillArea} suitable for elementary students (difficulty level ${difficultyLevel}).
 
-Your new Grade ${grade} question must be:
-- About a completely different scenario appropriate for Grade ${grade}
-- Using different numbers, examples, or concepts suitable for this grade
-- Focusing on a different aspect of Grade ${grade} ${subject} curriculum
-- Absolutely unique and never asked before at this grade level
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What is 1/2 + 1/4?",
+  "options": ["1/6", "2/6", "3/4", "3/6"],
+  "correct": 2,
+  "explanation": "To add fractions, find a common denominator. 1/2 = 2/4, so 2/4 + 1/4 = 3/4",
+  "learningObjectives": ["Adding fractions with different denominators", "Finding common denominators"],
+  "estimatedTime": 30
+}
 
-Grade ${grade} Session ${sessionId}: Generate completely fresh, grade-appropriate content!`;
+Make sure:
+- The question is about mathematics (arithmetic, fractions, geometry, etc.)
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation clearly shows how to solve the problem
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+}
+
+function createCreativeWritingPrompt(): string {
+  return `Generate a creative writing exercise suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "Complete this story starter: 'Once upon a time, in a magical forest, there lived a small dragon who...'",
+  "options": ["could not fly", "loved to sing", "was afraid of fire", "collected shiny rocks"],
+  "correct": 1,
+  "explanation": "Any of these options could work creatively, but 'loved to sing' creates an interesting contrast and story opportunity.",
+  "learningObjectives": ["Creative thinking", "Story development", "Character creation"],
+  "estimatedTime": 30
+}
+
+Make sure:
+- The question encourages creativity and imagination
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the most interesting creative choice
+- The explanation shows why this choice works well for storytelling
+- Return ONLY the JSON, no markdown formatting or code blocks`;
+}
+
+function createSciencePrompt(): string {
+  return `Generate a science discovery question suitable for elementary students.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What happens when you mix baking soda and vinegar?",
+  "options": ["Nothing happens", "It gets hot", "It fizzes and bubbles", "It changes color"],
+  "correct": 2,
+  "explanation": "When baking soda (a base) mixes with vinegar (an acid), they react to create carbon dioxide gas, which causes fizzing and bubbling.",
+  "learningObjectives": ["Chemical reactions", "Acids and bases", "Observation skills"],
+  "estimatedTime": 30
+}
+
+Make sure:
+- The question focuses on scientific concepts, experiments, or natural phenomena
+- There are exactly 4 options
+- The "correct" field is the index (0, 1, 2, or 3) of the correct answer
+- The explanation includes the scientific reasoning
+- Return ONLY the JSON, no markdown formatting or code blocks`;
 }
