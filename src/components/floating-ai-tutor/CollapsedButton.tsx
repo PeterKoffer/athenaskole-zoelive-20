@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 
@@ -12,32 +11,31 @@ interface CollapsedButtonProps {
   hasMoved?: boolean;
 }
 
-const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, isDragging, hasMoved }: CollapsedButtonProps) => {
-  console.log('🔘 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
-
+const CollapsedButton = ({ 
+  onExpand, 
+  onMouseDown, 
+  onTouchStart, 
+  onResetToHome, 
+  isDragging, 
+  hasMoved 
+}: CollapsedButtonProps) => {
   const handleButtonClick = (e: React.MouseEvent) => {
-    console.log('🖱️ Nelie button clicked - checking interaction, hasMoved:', hasMoved, 'isDragging:', isDragging);
     e.stopPropagation();
     e.preventDefault();
     
     // Only expand if we haven't moved and we're not currently dragging
     if (!hasMoved && !isDragging) {
-      console.log('✅ Expanding Nelie - valid click');
       onExpand();
-    } else {
-      console.log('❌ Not expanding Nelie - was dragging or moved');
     }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    console.log('🖱️ Mouse down on Nelie button');
     e.preventDefault();
     e.stopPropagation();
     onMouseDown(e);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    console.log('👆 Touch start on Nelie button');
     e.preventDefault();
     e.stopPropagation();
     onTouchStart(e);
@@ -46,24 +44,20 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
   const handleHomeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log('🏠 Home button clicked');
     onResetToHome();
   };
   
   return (
     <div className="relative">
-      {/* Robot button - now twice as big (48x48) */}
       <Button
         onClick={handleButtonClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         className="bg-transparent border-none hover:bg-transparent focus:bg-transparent active:bg-transparent p-0 w-48 h-48 rounded-full overflow-hidden"
         style={{
-          backgroundColor: 'transparent !important',
+          backgroundColor: 'transparent',
           border: 'none',
           boxShadow: 'none',
-          zIndex: 999999,
-          pointerEvents: 'auto',
           userSelect: 'none',
           touchAction: 'none'
         }}
@@ -93,7 +87,6 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         </div>
       </Button>
       
-      {/* Home button - adjusted position for larger button */}
       <Button
         onClick={handleHomeClick}
         className="absolute -top-2 -right-2 w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-sm"

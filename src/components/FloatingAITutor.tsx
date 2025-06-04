@@ -24,18 +24,6 @@ const FloatingAITutor = () => {
   // Only hide on auth pages - show everywhere else including daily-program
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
-  console.log('🎭 FloatingAITutor render check:', { 
-    shouldHide, 
-    currentPath: location.pathname,
-    isOpen,
-    position,
-    messagesLength: messages.length,
-    isVisible: !shouldHide,
-    isDragging,
-    hasMoved,
-    viewportWidth: typeof window !== 'undefined' ? window.innerWidth : 'unknown'
-  });
-
   // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
@@ -52,23 +40,17 @@ const FloatingAITutor = () => {
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
-      console.log('👋 Welcome message added to Nelie');
     }
   }, [shouldHide, messages.length]);
 
   const toggleOpen = () => {
-    console.log('🔄 Toggling Nelie open state from', isOpen, 'to', !isOpen, 'hasMoved:', hasMoved, 'isDragging:', isDragging);
     // Only toggle if we haven't moved and we're not dragging
     if (!hasMoved && !isDragging) {
       setIsOpen(!isOpen);
-      console.log('✅ Toggled Nelie to:', !isOpen);
-    } else {
-      console.log('❌ Not toggling - user was dragging or moved');
     }
   };
 
   const handleSendMessage = (text: string) => {
-    console.log('💬 User message to Nelie:', text);
     const newMessage: Message = { 
       role: "user", 
       content: text, 
@@ -92,12 +74,10 @@ const FloatingAITutor = () => {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
-      console.log('🤖 Nelie responded:', randomResponse);
     }, 1000);
   };
 
   const handleResetToHome = () => {
-    console.log('🏠 Resetting Nelie to home position');
     resetToHome();
     navigate('/');
   };
@@ -109,61 +89,42 @@ const FloatingAITutor = () => {
 
   // Don't render on auth pages
   if (shouldHide) {
-    console.log('🚫 FloatingAITutor hidden on auth page');
     return null;
   }
 
-  console.log('✅ FloatingAITutor rendering UI - isOpen:', isOpen, 'position:', position);
-
   return (
-    <>
-      {/* Collapsed button state - Only visible when not open */}
-      {!isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: `${position.y}px`,
-            left: `${position.x}px`,
-            zIndex: 999999,
-            pointerEvents: 'auto'
-          }}
-        >
-          <CollapsedButton 
-            onExpand={toggleOpen}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-            onResetToHome={handleResetToHome}
-            isDragging={isDragging}
-            hasMoved={hasMoved}
-          />
-        </div>
+    <div
+      style={{
+        position: 'fixed',
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        zIndex: 999999,
+        pointerEvents: 'auto'
+      }}
+    >
+      {!isOpen ? (
+        <CollapsedButton 
+          onExpand={toggleOpen}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onResetToHome={handleResetToHome}
+          isDragging={isDragging}
+          hasMoved={hasMoved}
+        />
+      ) : (
+        <ChatInterface
+          messages={messages}
+          onSendMessage={handleSendMessage}
+          onClose={toggleOpen}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onResetToHome={handleResetToHome}
+          isSpeaking={isSpeaking}
+          onStopSpeaking={handleStopSpeaking}
+          isDragging={isDragging}
+        />
       )}
-
-      {/* Chat interface state - Only visible when open */}
-      {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: `${position.y}px`,
-            left: `${position.x}px`,
-            zIndex: 999999,
-            pointerEvents: 'auto'
-          }}
-        >
-          <ChatInterface
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            onClose={toggleOpen}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-            onResetToHome={handleResetToHome}
-            isSpeaking={isSpeaking}
-            onStopSpeaking={handleStopSpeaking}
-            isDragging={isDragging}
-          />
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 
