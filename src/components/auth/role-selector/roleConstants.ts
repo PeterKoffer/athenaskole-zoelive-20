@@ -20,4 +20,6 @@ export const roleColors: Record<UserRole, string> = {
   parent: "from-green-500 to-green-600",
 };
 
+export const restrictedRoles: UserRole[] = ['admin', 'school_leader', 'school_staff'];
+
 export const clearanceCode1111 = "1111";
