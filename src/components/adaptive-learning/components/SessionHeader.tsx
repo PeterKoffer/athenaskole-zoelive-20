@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { CardTitle } from '@/components/ui/card';
-import { ArrowLeft, RefreshCw, GraduationCap } from 'lucide-react';
+import { ArrowLeft, GraduationCap } from 'lucide-react';
 
 interface SessionHeaderProps {
   onBack: () => void;
@@ -46,27 +46,14 @@ const SessionHeader = ({
         </CardTitle>
         <p className="text-gray-400 text-sm">
           Question {questionNumber} of {totalQuestions}
-          {standardCode && ` • ${standardCode}`}
         </p>
       </div>
       
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={isGenerating || showResult}
-          className="text-gray-400 hover:text-white"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </Button>
-        
-        <div className="text-right">
-          <p className="text-gray-400 text-sm">Score</p>
-          <p className="text-white font-semibold">
-            {correctAnswers}/{questionNumber - (showResult ? 0 : 1)}
-          </p>
-        </div>
+      <div className="text-right">
+        <p className="text-gray-400 text-sm">Score</p>
+        <p className="text-white font-semibold">
+          {correctAnswers}/{questionNumber - (showResult ? 0 : 1)}
+        </p>
       </div>
     </div>
   );

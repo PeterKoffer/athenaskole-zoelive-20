@@ -41,8 +41,16 @@ const QuestionDisplay = ({
   const [autoReadEnabled, setAutoReadEnabled] = useState(true);
   const hasAutoRead = useRef(false);
 
-  // Clean up question text by removing ID references and other technical details
+  // Clean up question text and provide fallback for technical IDs
   const cleanQuestionText = (text: string) => {
+    // If the question looks like a technical ID, provide a proper fallback
+    if (text.includes('Practice question') && text.match(/\d{13,}-\d+/)) {
+      if (subject === 'music') {
+        return 'Which of the following is a major scale?';
+      }
+      return 'What is the correct answer to this practice question?';
+    }
+    
     return text
       .replace(/\(ID:\s*[^)]+\)/gi, '') // Remove (ID: ...) patterns
       .replace(/\(Question\s*\d+[^)]*\)/gi, '') // Remove (Question X) patterns
@@ -50,10 +58,16 @@ const QuestionDisplay = ({
       .trim();
   };
 
-  const speakText = async (text: string) => {
+  const stopSpeaking = () => {
     if (isSpeaking) {
       speechSynthesis.cancel();
       setIsSpeaking(false);
+    }
+  };
+
+  const speakText = async (text: string) => {
+    if (isSpeaking) {
+      stopSpeaking();
       return;
     }
 
@@ -119,6 +133,18 @@ const QuestionDisplay = ({
     }
   };
 
+  // Handle mute button click
+  const handleMuteToggle = () => {
+    if (autoReadEnabled) {
+      // Turning off auto-read and stopping current speech
+      setAutoReadEnabled(false);
+      stopSpeaking();
+    } else {
+      // Turning on auto-read
+      setAutoReadEnabled(true);
+    }
+  };
+
   // Auto-read question when it first appears
   useEffect(() => {
     if (autoReadEnabled && !hasAutoRead.current && !showResult) {
@@ -142,6 +168,13 @@ const QuestionDisplay = ({
   useEffect(() => {
     hasAutoRead.current = false;
   }, [question]);
+
+  // Stop speaking when component unmounts
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+    };
+  }, []);
 
   const getOptionClassName = (index: number) => {
     if (selectedAnswer === index) {
@@ -171,9 +204,9 @@ const QuestionDisplay = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setAutoReadEnabled(!autoReadEnabled)}
+            onClick={handleMuteToggle}
             className="text-slate-950"
-            title={autoReadEnabled ? "Disable auto-read" : "Enable auto-read"}
+            title={autoReadEnabled ? "Mute Nelie" : "Unmute Nelie"}
           >
             {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </Button>
@@ -183,7 +216,7 @@ const QuestionDisplay = ({
             size="sm"
             onClick={readQuestionAndOptions}
             className="text-slate-950"
-            disabled={isSpeaking}
+            disabled={isSpeaking || !autoReadEnabled}
           >
             <Volume2 className="w-4 h-4 mr-2" />
             {isSpeaking ? 'Nelie is reading...' : 'Ask Nelie to read'}
@@ -223,7 +256,7 @@ const QuestionDisplay = ({
               size="sm"
               onClick={readExplanation}
               className="text-slate-950"
-              disabled={isSpeaking}
+              disabled={isSpeaking || !autoReadEnabled}
             >
               <Volume2 className="w-4 h-4 mr-1" />
               Listen
