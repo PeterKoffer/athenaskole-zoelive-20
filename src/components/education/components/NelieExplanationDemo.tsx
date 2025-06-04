@@ -57,7 +57,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-6">
         <div className="text-center mb-6">
-          <RobotAvatar size="3xl" isActive={true} isSpeaking={isSpeaking} />
+          <RobotAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
           <h3 className="text-xl font-bold text-white mt-4">Watch Nelie Solve This Problem</h3>
         </div>
 

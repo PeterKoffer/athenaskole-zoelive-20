@@ -57,7 +57,7 @@ const NelieIntroduction = ({
       <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
         <CardContent className="p-8 text-center">
           <div className="mb-6">
-            <RobotAvatar size="3xl" isActive={true} isSpeaking={isSpeaking} />
+            <RobotAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
           </div>
           
           <h1 className="text-3xl font-bold text-white mb-4">Welcome to Mathematics with Nelie!</h1>
