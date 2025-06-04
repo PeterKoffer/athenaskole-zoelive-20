@@ -436,6 +436,57 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_recommendations: {
+        Row: {
+          based_on: Json | null
+          completed_at: string | null
+          confidence_score: number | null
+          content_suggestion: string | null
+          created_at: string
+          estimated_time_minutes: number | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          priority: number | null
+          recommendation_type: string
+          skill_area: string
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          based_on?: Json | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          content_suggestion?: string | null
+          created_at?: string
+          estimated_time_minutes?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          recommendation_type: string
+          skill_area: string
+          subject: string
+          user_id: string
+        }
+        Update: {
+          based_on?: Json | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          content_suggestion?: string | null
+          created_at?: string
+          estimated_time_minutes?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          recommendation_type?: string
+          skill_area?: string
+          subject?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       learning_sessions: {
         Row: {
           completed: boolean
@@ -561,6 +612,87 @@ export type Database = {
         }
         Relationships: []
       }
+      user_learning_profiles: {
+        Row: {
+          attention_span_minutes: number | null
+          average_response_time: number | null
+          consistency_score: number | null
+          created_at: string
+          current_difficulty_level: number | null
+          difficulty_adjustments: Json | null
+          id: string
+          last_session_date: string | null
+          last_topic_covered: string | null
+          learning_gaps: Json | null
+          learning_style: string | null
+          mastered_concepts: Json | null
+          motivation_level: number | null
+          overall_accuracy: number | null
+          preferred_pace: string | null
+          recommended_next_topic: string | null
+          skill_area: string
+          strengths: Json | null
+          subject: string
+          total_sessions: number | null
+          total_time_spent: number | null
+          updated_at: string
+          user_id: string
+          weaknesses: Json | null
+        }
+        Insert: {
+          attention_span_minutes?: number | null
+          average_response_time?: number | null
+          consistency_score?: number | null
+          created_at?: string
+          current_difficulty_level?: number | null
+          difficulty_adjustments?: Json | null
+          id?: string
+          last_session_date?: string | null
+          last_topic_covered?: string | null
+          learning_gaps?: Json | null
+          learning_style?: string | null
+          mastered_concepts?: Json | null
+          motivation_level?: number | null
+          overall_accuracy?: number | null
+          preferred_pace?: string | null
+          recommended_next_topic?: string | null
+          skill_area: string
+          strengths?: Json | null
+          subject: string
+          total_sessions?: number | null
+          total_time_spent?: number | null
+          updated_at?: string
+          user_id: string
+          weaknesses?: Json | null
+        }
+        Update: {
+          attention_span_minutes?: number | null
+          average_response_time?: number | null
+          consistency_score?: number | null
+          created_at?: string
+          current_difficulty_level?: number | null
+          difficulty_adjustments?: Json | null
+          id?: string
+          last_session_date?: string | null
+          last_topic_covered?: string | null
+          learning_gaps?: Json | null
+          learning_style?: string | null
+          mastered_concepts?: Json | null
+          motivation_level?: number | null
+          overall_accuracy?: number | null
+          preferred_pace?: string | null
+          recommended_next_topic?: string | null
+          skill_area?: string
+          strengths?: Json | null
+          subject?: string
+          total_sessions?: number | null
+          total_time_spent?: number | null
+          updated_at?: string
+          user_id?: string
+          weaknesses?: Json | null
+        }
+        Relationships: []
+      }
       user_performance: {
         Row: {
           accuracy_rate: number
@@ -621,11 +753,143 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          animations_enabled: boolean | null
+          auto_read_explanations: boolean | null
+          auto_read_questions: boolean | null
+          created_at: string
+          font_size: string | null
+          id: string
+          preferred_voice: string | null
+          session_reminders: boolean | null
+          speech_enabled: boolean | null
+          speech_pitch: number | null
+          speech_rate: number | null
+          theme: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          animations_enabled?: boolean | null
+          auto_read_explanations?: boolean | null
+          auto_read_questions?: boolean | null
+          created_at?: string
+          font_size?: string | null
+          id?: string
+          preferred_voice?: string | null
+          session_reminders?: boolean | null
+          speech_enabled?: boolean | null
+          speech_pitch?: number | null
+          speech_rate?: number | null
+          theme?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          animations_enabled?: boolean | null
+          auto_read_explanations?: boolean | null
+          auto_read_questions?: boolean | null
+          created_at?: string
+          font_size?: string | null
+          id?: string
+          preferred_voice?: string | null
+          session_reminders?: boolean | null
+          speech_enabled?: boolean | null
+          speech_pitch?: number | null
+          speech_rate?: number | null
+          theme?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_question_history: {
+        Row: {
+          asked_at: string
+          concepts_covered: Json | null
+          correct_answer: string | null
+          difficulty_level: number
+          id: string
+          is_correct: boolean
+          mastery_indicators: Json | null
+          question_number: number | null
+          question_text: string
+          question_type: string | null
+          response_time_seconds: number | null
+          session_id: string | null
+          skill_area: string
+          struggle_indicators: Json | null
+          subject: string
+          total_questions_in_session: number | null
+          user_answer: string | null
+          user_id: string
+        }
+        Insert: {
+          asked_at?: string
+          concepts_covered?: Json | null
+          correct_answer?: string | null
+          difficulty_level: number
+          id?: string
+          is_correct: boolean
+          mastery_indicators?: Json | null
+          question_number?: number | null
+          question_text: string
+          question_type?: string | null
+          response_time_seconds?: number | null
+          session_id?: string | null
+          skill_area: string
+          struggle_indicators?: Json | null
+          subject: string
+          total_questions_in_session?: number | null
+          user_answer?: string | null
+          user_id: string
+        }
+        Update: {
+          asked_at?: string
+          concepts_covered?: Json | null
+          correct_answer?: string | null
+          difficulty_level?: number
+          id?: string
+          is_correct?: boolean
+          mastery_indicators?: Json | null
+          question_number?: number | null
+          question_text?: string
+          question_type?: string | null
+          response_time_seconds?: number | null
+          session_id?: string | null
+          skill_area?: string
+          struggle_indicators?: Json | null
+          subject?: string
+          total_questions_in_session?: number | null
+          user_answer?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_question_history_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "learning_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      analyze_and_update_learning_profile: {
+        Args: {
+          p_user_id: string
+          p_subject: string
+          p_skill_area: string
+          p_question_data: Json
+          p_user_response: Json
+        }
+        Returns: undefined
+      }
       generate_learning_path: {
         Args: {
           p_user_id: string

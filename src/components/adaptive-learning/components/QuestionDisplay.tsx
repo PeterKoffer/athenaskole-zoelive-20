@@ -1,105 +1,179 @@
+
 import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Question } from '../hooks/useQuestionGeneration';
-import QuestionTimer from './QuestionTimer';
-import QuestionCard from './QuestionCard';
+import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import ExplanationCard from './ExplanationCard';
 
-export interface QuestionDisplayProps {
-  question: Question;
-  onAnswerSelect: (selectedAnswer: number) => void;
+interface QuestionDisplayProps {
+  question: any;
+  onAnswerSelect: (answerIndex: number) => void;
   hasAnswered: boolean;
   selectedAnswer?: number;
   autoSubmit?: boolean;
-  subject?: string;
+  subject: string;
+  skillArea?: string;
+  sessionId?: string;
+  questionNumber?: number;
+  totalQuestions?: number;
+  responseStartTime?: Date;
 }
 
 const QuestionDisplay = ({ 
   question, 
   onAnswerSelect, 
   hasAnswered, 
-  selectedAnswer,
+  selectedAnswer, 
   autoSubmit = false,
-  subject = 'general'
+  subject,
+  skillArea = 'general',
+  sessionId,
+  questionNumber,
+  totalQuestions,
+  responseStartTime
 }: QuestionDisplayProps) => {
-  const [tempSelected, setTempSelected] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Show explanation when answer is submitted
+  // Show explanation after answering
   useEffect(() => {
-    if (hasAnswered && question.explanation) {
-      setShowExplanation(true);
-    }
-  }, [hasAnswered, question.explanation]);
-
-  const handleSpeechEnd = () => {
-    setShowExplanation(false);
-  };
-
-  const handleOptionClick = (optionIndex: number) => {
-    if (hasAnswered) return;
-
-    if (autoSubmit) {
-      onAnswerSelect(optionIndex);
+    if (hasAnswered) {
+      const timer = setTimeout(() => {
+        setShowExplanation(true);
+      }, 1000);
+      return () => clearTimeout(timer);
     } else {
-      setTempSelected(optionIndex);
+      setShowExplanation(false);
+    }
+  }, [hasAnswered]);
+
+  if (!question) {
+    return <div>Loading question...</div>;
+  }
+
+  const handleAnswerClick = (answerIndex: number) => {
+    if (hasAnswered) return;
+    
+    onAnswerSelect(answerIndex);
+    
+    if (autoSubmit) {
+      setTimeout(() => setShowExplanation(true), 1000);
     }
   };
 
-  const handleSubmit = () => {
-    if (tempSelected !== null) {
-      onAnswerSelect(tempSelected);
+  const handleReadQuestion = () => {
+    if (isSpeaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
     }
+
+    setIsSpeaking(true);
+    
+    const utterance = new SpeechSynthesisUtterance(question.question);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.8;
+    utterance.pitch = 1.2;
+    
+    const voices = speechSynthesis.getVoices();
+    const femaleVoice = voices.find(voice => 
+      voice.name.toLowerCase().includes('female') ||
+      voice.name.toLowerCase().includes('samantha') ||
+      voice.name.toLowerCase().includes('karen')
+    );
+    
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+    
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    
+    speechSynthesis.speak(utterance);
   };
 
-  const handleTimeUp = () => {
-    if (!hasAnswered) {
-      // Auto-select a random answer if time runs out
-      const randomAnswer = Math.floor(Math.random() * question.options.length);
-      onAnswerSelect(randomAnswer);
-    }
+  const getResponseTimeSeconds = (): number => {
+    if (!responseStartTime || !hasAnswered) return 0;
+    return Math.round((new Date().getTime() - responseStartTime.getTime()) / 1000);
   };
 
-  // Calculate if the answer was correct
-  const isCorrect = hasAnswered && selectedAnswer === question.correct;
-  const correctAnswerText = question.options[question.correct];
+  const isCorrect = selectedAnswer === question.correct;
 
   return (
     <div className="space-y-6">
-      {/* Always show countdown timer for active questions */}
-      <QuestionTimer
-        initialTime={question.estimatedTime}
-        onTimeUp={handleTimeUp}
-        isActive={!hasAnswered}
+      <Card className="bg-gray-800 border-gray-700">
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <h2 className="text-xl font-semibold text-white flex-1 pr-4">
+              {question.question}
+            </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReadQuestion}
+              className="text-gray-300 border-gray-600 hover:bg-gray-700 shrink-0"
+            >
+              <Volume2 className="w-4 h-4 mr-2" />
+              {isSpeaking ? 'Stop' : 'Listen'}
+            </Button>
+          </div>
+          
+          <div className="grid gap-3">
+            {question.options.map((option: string, index: number) => {
+              const isSelected = selectedAnswer === index;
+              const isCorrectAnswer = index === question.correct;
+              
+              let buttonStyle = "w-full p-4 text-left transition-all duration-200 border-2 ";
+              
+              if (hasAnswered) {
+                if (isCorrectAnswer) {
+                  buttonStyle += "border-green-500 bg-green-900/30 text-green-200 ";
+                } else if (isSelected && !isCorrectAnswer) {
+                  buttonStyle += "border-red-500 bg-red-900/30 text-red-200 ";
+                } else {
+                  buttonStyle += "border-gray-600 bg-gray-800 text-gray-400 ";
+                }
+              } else {
+                buttonStyle += "border-gray-600 bg-gray-800 text-white hover:border-blue-500 hover:bg-blue-900/20 ";
+              }
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleAnswerClick(index)}
+                  disabled={hasAnswered}
+                  className={buttonStyle}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-base">{option}</span>
+                    {hasAnswered && (
+                      <div className="ml-2">
+                        {isCorrectAnswer && <CheckCircle className="w-5 h-5 text-green-400" />}
+                        {isSelected && !isCorrectAnswer && <XCircle className="w-5 h-5 text-red-400" />}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <ExplanationCard
+        explanation={question.explanation || "Great job! Keep up the good work."}
+        subject={subject}
+        skillArea={skillArea}
+        isVisible={showExplanation}
+        isCorrect={isCorrect}
+        correctAnswer={hasAnswered ? question.options[question.correct] : undefined}
+        questionData={question}
+        userAnswer={hasAnswered ? question.options[selectedAnswer || 0] : undefined}
+        responseTimeSeconds={getResponseTimeSeconds()}
+        sessionId={sessionId}
+        questionNumber={questionNumber}
+        totalQuestions={totalQuestions}
       />
-
-      <QuestionCard
-        question={question}
-        hasAnswered={hasAnswered}
-        selectedAnswer={selectedAnswer}
-        tempSelected={tempSelected}
-        onOptionClick={handleOptionClick}
-      />
-
-      {!autoSubmit && !hasAnswered && tempSelected !== null && (
-        <Button 
-          onClick={handleSubmit}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold mt-4"
-        >
-          Submit Answer
-        </Button>
-      )}
-
-      {hasAnswered && question.explanation && (
-        <ExplanationCard
-          explanation={question.explanation}
-          subject={subject}
-          isVisible={showExplanation}
-          onSpeechEnd={handleSpeechEnd}
-          isCorrect={isCorrect}
-          correctAnswer={correctAnswerText}
-        />
-      )}
     </div>
   );
 };

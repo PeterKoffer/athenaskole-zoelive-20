@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useLearningProfile } from "@/hooks/useLearningProfile";
 import QuestionDisplay from "./QuestionDisplay";
 import LessonComplete from "./LessonComplete";
 import LoadingState from "./LoadingState";
@@ -24,15 +25,38 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSessionActive, setIsSessionActive] = useState(true);
+  const [questionStartTime, setQuestionStartTime] = useState<Date>(new Date());
   const questionCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const totalQuestions = 5;
 
+  // Load user learning profile and preferences
+  const {
+    profile,
+    preferences,
+    getRecommendedDifficulty,
+    getPersonalizedSettings,
+    updateProfile
+  } = useLearningProfile(subject, skillArea);
+
+  // Use recommended difficulty if available
+  const adaptiveDifficulty = profile ? getRecommendedDifficulty() : difficultyLevel;
+  const personalizedSettings = getPersonalizedSettings();
+
+  console.log('🎓 LearningSession with memory system:', {
+    subject,
+    skillArea,
+    originalDifficulty: difficultyLevel,
+    adaptiveDifficulty,
+    hasProfile: !!profile,
+    personalizedSettings
+  });
+
   const { sessionId, timeSpent, setTimeSpent } = useSessionManager({
     subject,
     skillArea,
-    difficultyLevel,
+    difficultyLevel: adaptiveDifficulty,
     onSessionReady: (id) => {
       console.log('Session ready:', id);
     }
@@ -52,7 +76,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
   } = useQuestionManager({
     subject,
     skillArea,
-    difficultyLevel,
+    difficultyLevel: adaptiveDifficulty,
     userId: user?.id || '',
     totalQuestions
   });
@@ -64,6 +88,13 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
       generateNextQuestion();
     }
   }, [sessionId, sessionQuestions.length, isGenerating, generateNextQuestion]);
+
+  // Track question start time
+  useEffect(() => {
+    if (sessionQuestions[currentQuestionIndex] && !answers[currentQuestionIndex]) {
+      setQuestionStartTime(new Date());
+    }
+  }, [currentQuestionIndex, sessionQuestions, answers]);
 
   // Auto-scroll to question card when a new question loads
   useEffect(() => {
@@ -104,9 +135,29 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
 
     const score = Math.round((correctAnswers / totalQuestions) * 100);
     await updateSessionProgress(sessionId, timeSpent, score);
+
+    // Update learning profile with session results
+    if (profile) {
+      const newTotalSessions = (profile.total_sessions || 0) + 1;
+      const newTotalTime = (profile.total_time_spent || 0) + timeSpent;
+      
+      await updateProfile({
+        total_sessions: newTotalSessions,
+        total_time_spent: newTotalTime,
+        last_session_date: new Date().toISOString(),
+        last_topic_covered: `${subject} - ${skillArea}`,
+        current_difficulty_level: adaptiveDifficulty
+      });
+
+      console.log('📈 Learning profile updated with session results');
+    }
   };
 
-  const handleAnswerSelectWithComplete = (selectedAnswer: number) => {
+  const handleAnswerSelectWithTracking = (selectedAnswer: number) => {
+    const responseTime = Math.round((new Date().getTime() - questionStartTime.getTime()) / 1000);
+    
+    console.log('📝 Answer selected with response time:', responseTime, 'seconds');
+    
     handleAnswerSelect(selectedAnswer, completeSession);
   };
 
@@ -168,7 +219,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
     <div ref={containerRef} className="max-w-4xl mx-auto">
       <SessionTimer
         onTimeUp={handleTimeUp}
-        recommendedDuration={20}
+        recommendedDuration={personalizedSettings.attentionSpan}
       />
       
       <Card ref={questionCardRef} className="bg-gray-900 border-gray-800 overflow-hidden">
@@ -177,7 +228,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
           skillArea={skillArea}
           currentQuestion={currentQuestionIndex + 1}
           totalQuestions={totalQuestions}
-          difficultyLevel={difficultyLevel}
+          difficultyLevel={adaptiveDifficulty}
           timeSpent={timeSpent}
           onBack={onBack}
         />
@@ -188,11 +239,16 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
           ) : (
             <QuestionDisplay
               question={currentQuestion}
-              onAnswerSelect={handleAnswerSelectWithComplete}
+              onAnswerSelect={handleAnswerSelectWithTracking}
               hasAnswered={hasAnswered}
               selectedAnswer={hasAnswered ? answers[currentQuestionIndex] : undefined}
               autoSubmit={true}
               subject={subject}
+              skillArea={skillArea}
+              sessionId={sessionId}
+              questionNumber={currentQuestionIndex + 1}
+              totalQuestions={totalQuestions}
+              responseStartTime={questionStartTime}
             />
           )}
         </div>

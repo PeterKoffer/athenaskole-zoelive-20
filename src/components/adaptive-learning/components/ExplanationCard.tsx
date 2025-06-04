@@ -3,26 +3,108 @@ import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { userLearningProfileService } from '@/services/userLearningProfileService';
 
 interface ExplanationCardProps {
   explanation: string;
   subject: string;
+  skillArea?: string;
   isVisible: boolean;
   onSpeechEnd?: () => void;
   isCorrect?: boolean;
   correctAnswer?: string;
+  questionData?: any;
+  userAnswer?: string;
+  responseTimeSeconds?: number;
+  sessionId?: string;
+  questionNumber?: number;
+  totalQuestions?: number;
 }
 
 const ExplanationCard = ({ 
   explanation, 
   subject, 
+  skillArea = 'general',
   isVisible, 
   onSpeechEnd,
   isCorrect = true,
-  correctAnswer
+  correctAnswer,
+  questionData,
+  userAnswer,
+  responseTimeSeconds,
+  sessionId,
+  questionNumber,
+  totalQuestions
 }: ExplanationCardProps) => {
+  const { user } = useAuth();
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [userPreferences, setUserPreferences] = useState<any>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Load user preferences on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (user?.id) {
+        const preferences = await userLearningProfileService.getUserPreferences(user.id);
+        setUserPreferences(preferences);
+      }
+    };
+    loadPreferences();
+  }, [user?.id]);
+
+  // Record question history when explanation becomes visible
+  useEffect(() => {
+    const recordQuestionHistory = async () => {
+      if (isVisible && user?.id && questionData) {
+        console.log('📝 Recording question history for learning memory...');
+        
+        const historyEntry = {
+          user_id: user.id,
+          subject: subject,
+          skill_area: skillArea,
+          question_text: questionData.question || 'Unknown question',
+          question_type: 'multiple_choice',
+          difficulty_level: questionData.difficulty_level || 1,
+          concepts_covered: questionData.concepts || [],
+          user_answer: userAnswer || '',
+          correct_answer: correctAnswer || '',
+          is_correct: isCorrect,
+          response_time_seconds: responseTimeSeconds || 0,
+          session_id: sessionId,
+          question_number: questionNumber || 1,
+          total_questions_in_session: totalQuestions || 1,
+          struggle_indicators: isCorrect ? {} : { 
+            incorrect_answer: userAnswer,
+            response_time: responseTimeSeconds 
+          },
+          mastery_indicators: isCorrect ? { 
+            quick_response: (responseTimeSeconds || 0) < 10,
+            confident_selection: true 
+          } : {}
+        };
+
+        const success = await userLearningProfileService.recordQuestionHistory(historyEntry);
+        
+        if (success) {
+          console.log('✅ Question history recorded successfully');
+          
+          // Analyze and update learning profile
+          await userLearningProfileService.analyzeAndUpdateProfile(
+            user.id,
+            subject,
+            skillArea,
+            questionData,
+            { answer: userAnswer, is_correct: isCorrect, response_time: responseTimeSeconds }
+          );
+        } else {
+          console.error('❌ Failed to record question history');
+        }
+      }
+    };
+
+    recordQuestionHistory();
+  }, [isVisible, user?.id, questionData, userAnswer, isCorrect, correctAnswer, responseTimeSeconds, sessionId, questionNumber, totalQuestions, subject, skillArea]);
 
   // Auto-scroll to explanation when it becomes visible
   useEffect(() => {
@@ -36,6 +118,16 @@ const ExplanationCard = ({
       }, 200);
     }
   }, [isVisible]);
+
+  // Auto-read explanation if user preferences allow it
+  useEffect(() => {
+    if (isVisible && userPreferences?.auto_read_explanations && userPreferences?.speech_enabled) {
+      // Small delay to ensure the card is visible before speaking
+      setTimeout(() => {
+        handleReadAloud();
+      }, 500);
+    }
+  }, [isVisible, userPreferences]);
 
   if (!isVisible) return null;
 
@@ -61,12 +153,17 @@ const ExplanationCard = ({
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(speechText);
       utterance.lang = 'en-US';
-      utterance.rate = 0.8;
-      utterance.pitch = 1.2;
       
-      // Try to use a female voice if available
+      // Apply user preferences for speech
+      utterance.rate = userPreferences?.speech_rate || 0.8;
+      utterance.pitch = userPreferences?.speech_pitch || 1.2;
+      
+      // Try to use user's preferred voice
       const voices = speechSynthesis.getVoices();
-      const femaleVoice = voices.find(voice => 
+      const preferredVoice = userPreferences?.preferred_voice || 'female';
+      
+      const selectedVoice = voices.find(voice => 
+        voice.name.toLowerCase().includes(preferredVoice) ||
         voice.name.toLowerCase().includes('female') ||
         voice.name.toLowerCase().includes('woman') ||
         voice.name.toLowerCase().includes('samantha') ||
@@ -75,8 +172,8 @@ const ExplanationCard = ({
         (voice.name.toLowerCase().includes('alex') && voice.lang.includes('en'))
       );
       
-      if (femaleVoice) {
-        utterance.voice = femaleVoice;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
       }
       
       utterance.onend = () => {
