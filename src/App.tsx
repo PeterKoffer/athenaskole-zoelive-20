@@ -14,6 +14,7 @@ import ParentDashboard from "./pages/ParentDashboard";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AILearning from "./pages/AILearning";
+import CurriculumSystem from "./pages/CurriculumSystem";
 import NotFound from "./pages/NotFound";
 import FloatingAITutor from "./components/FloatingAITutor";
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
           <Route path="/ai-learning" element={<AILearning />} />
+          <Route path="/curriculum-system" element={<CurriculumSystem />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/parent" element={<ParentDashboard />} />
           <Route path="/school" element={<SchoolDashboard />} />
