@@ -1,9 +1,12 @@
+
+import { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Brain } from 'lucide-react';
 import QuestionDisplay from './QuestionDisplay';
 import LessonHeader from './LessonHeader';
 import { SessionData } from './SessionProvider';
+
 interface SessionContentProps {
   subject: string;
   skillArea: string;
@@ -18,6 +21,7 @@ interface SessionContentProps {
   };
   sessionData: SessionData;
 }
+
 const SessionContent = ({
   subject,
   skillArea,
@@ -36,10 +40,25 @@ const SessionContent = ({
     error,
     handleAnswerSelect,
     currentQuestionIndex,
-    timeSpent
+    timeSpent,
+    generateNextQuestion,
+    sessionId
   } = sessionData;
+
+  const hasInitialized = useRef(false);
+
+  // Auto-generate first question when session is ready
+  useEffect(() => {
+    if (sessionId && !questions.length && !isLoading && !hasInitialized.current) {
+      console.log('🎬 Auto-generating first question in SessionContent...');
+      hasInitialized.current = true;
+      generateNextQuestion();
+    }
+  }, [sessionId, questions.length, isLoading, generateNextQuestion]);
+
   if (error) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -52,15 +71,18 @@ const SessionContent = ({
             <Brain className="w-12 h-12 text-red-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Error Loading Questions</h3>
             <p className="text-red-300 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => generateNextQuestion()}>
               Try Again
             </Button>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
+
   if (isLoading || !questions.length) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -70,17 +92,30 @@ const SessionContent = ({
         
         <Card className="bg-gray-900 border-gray-800">
           <CardContent className="p-6">
-            <div className="flex items-center justify-center">
-              <Brain className="w-6 h-6 text-lime-400 animate-pulse mr-2" />
-              <span className="text-white">AI is generating personalized questions...</span>
+            <div className="flex flex-col items-center justify-center text-center">
+              <Brain className="w-12 h-12 text-lime-400 animate-pulse mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Preparing Your Learning Experience
+              </h3>
+              <p className="text-gray-300 mb-4">
+                Nelie is generating personalized questions for you...
+              </p>
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
+
   const question = questions[currentQuestionIndex];
   if (!question) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -92,12 +127,18 @@ const SessionContent = ({
           <CardContent className="p-6 text-center text-white">
             <Brain className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Questions Available</h3>
-            <p className="text-yellow-300">Unable to load questions for this session.</p>
+            <p className="text-yellow-300 mb-4">Unable to load questions for this session.</p>
+            <Button onClick={() => generateNextQuestion()}>
+              Generate Question
+            </Button>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
-  return <div className="space-y-6">
+
+  return (
+    <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -105,9 +146,27 @@ const SessionContent = ({
         </Button>
       </div>
 
-      <LessonHeader subject={subject} skillArea={skillArea} currentQuestion={currentQuestionIndex} totalQuestions={totalQuestions} difficultyLevel={difficultyLevel} timeSpent={timeSpent} onBack={onBack} learningObjective={learningObjective} />
+      <LessonHeader 
+        subject={subject} 
+        skillArea={skillArea} 
+        currentQuestion={currentQuestionIndex + 1} 
+        totalQuestions={totalQuestions} 
+        difficultyLevel={difficultyLevel} 
+        timeSpent={timeSpent} 
+        onBack={onBack} 
+        learningObjective={learningObjective} 
+      />
 
-      <QuestionDisplay question={question} onAnswerSelect={handleAnswerSelect} hasAnswered={hasAnswered} selectedAnswer={selectedAnswer} autoSubmit={true} subject={subject} />
-    </div>;
+      <QuestionDisplay 
+        question={question} 
+        onAnswerSelect={handleAnswerSelect} 
+        hasAnswered={hasAnswered} 
+        selectedAnswer={selectedAnswer} 
+        autoSubmit={true} 
+        subject={subject} 
+      />
+    </div>
+  );
 };
+
 export default SessionContent;

@@ -21,7 +21,7 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
-  // Only hide on auth pages - show on ALL other pages
+  // Only hide on auth pages - show on ALL other pages including learning pages
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
   // Reset state when navigating to auth pages

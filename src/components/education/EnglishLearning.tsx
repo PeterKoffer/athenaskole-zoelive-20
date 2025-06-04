@@ -3,18 +3,18 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import LearningHeader from "./LearningHeader";
-import AILearningModule from "@/components/adaptive-learning/AILearningModule";
+import EnhancedLearningSession from "@/components/adaptive-learning/components/EnhancedLearningSession";
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [aiSessionKey, setAiSessionKey] = useState(0);
+  const [sessionKey, setSessionKey] = useState(0);
 
   console.log('📚 EnglishLearning component state:', {
     user: !!user,
     userId: user?.id,
     loading,
-    aiSessionKey,
+    sessionKey,
     subject: 'english',
     skillArea: 'reading_comprehension'
   });
@@ -48,8 +48,8 @@ const EnglishLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <AILearningModule 
-          key={aiSessionKey} 
+        <EnhancedLearningSession
+          key={sessionKey} 
           subject="english" 
           skillArea="reading_comprehension" 
           difficultyLevel={1}
