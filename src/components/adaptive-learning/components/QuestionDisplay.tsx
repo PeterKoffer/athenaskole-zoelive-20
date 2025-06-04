@@ -75,14 +75,14 @@ const QuestionDisplay = ({
       `Option ${String.fromCharCode(65 + index)}: ${option}`
     ).join('. ');
     
-    const fullText = `Question: ${cleanQuestion}. The options are: ${optionsText}`;
+    const fullText = `Nelie asks: ${cleanQuestion}. The options are: ${optionsText}`;
     speakText(fullText);
   };
 
   const readExplanation = () => {
     if (explanation) {
       const correctOptionText = `The correct answer is ${String.fromCharCode(65 + correctAnswer)}: ${options[correctAnswer]}`;
-      const fullText = `${correctOptionText}. ${explanation}`;
+      const fullText = `${correctOptionText}. Nelie explains: ${explanation}`;
       speakText(fullText);
     }
   };
@@ -93,7 +93,7 @@ const QuestionDisplay = ({
       hasAutoRead.current = true;
       setTimeout(() => {
         readQuestionAndOptions();
-      }, 1000); // Small delay to let the UI settle
+      }, 1200); // Slightly longer delay for better UX
     }
   }, [question, autoReadEnabled]);
 
@@ -102,7 +102,7 @@ const QuestionDisplay = ({
     if (autoReadEnabled && showResult && explanation) {
       setTimeout(() => {
         readExplanation();
-      }, 1500); // Delay to let the result UI appear
+      }, 1800); // Delay to let the result UI appear
     }
   }, [showResult, explanation, autoReadEnabled]);
 

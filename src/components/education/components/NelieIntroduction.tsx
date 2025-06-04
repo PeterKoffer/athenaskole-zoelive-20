@@ -22,22 +22,26 @@ const NelieIntroduction = ({
 
   const introductionSteps = [{
     text: "Hi there! I'm Nelie, your AI learning companion. Today we're going to have an amazing Mathematics lesson together!",
-    duration: 4000
+    duration: 5000
   }, {
     text: "We'll be exploring arithmetic - the foundation of all mathematics. You'll learn to solve problems step by step.",
-    duration: 5000
-  }, {
-    text: "Watch me demonstrate how to solve questions, then you'll try some on your own. I'll guide you every step of the way!",
     duration: 6000
   }, {
+    text: "Watch me demonstrate how to solve questions, then you'll try some on your own. I'll guide you every step of the way!",
+    duration: 7000
+  }, {
     text: "Our lesson will include interactive questions, fun games, and plenty of practice. Are you ready to start learning?",
-    duration: 5000
+    duration: 6000
   }];
 
   useEffect(() => {
     const currentStepData = introductionSteps[currentStep];
     if (currentStepData && autoReadEnabled) {
-      speakText(currentStepData.text);
+      // Add delay before speaking
+      setTimeout(() => {
+        speakText(currentStepData.text);
+      }, 500);
+      
       const timer = setTimeout(() => {
         if (currentStep < introductionSteps.length - 1) {
           setCurrentStep(prev => prev + 1);
@@ -50,6 +54,14 @@ const NelieIntroduction = ({
   const handleStartLesson = () => {
     stopSpeaking();
     onIntroductionComplete();
+  };
+
+  const handleManualRead = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+    } else {
+      speakText(introductionSteps[currentStep]?.text || '');
+    }
   };
 
   return (
@@ -90,6 +102,16 @@ const NelieIntroduction = ({
                 <Volume2 className="w-4 h-4 mr-2" />
               )}
               {autoReadEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={handleManualRead} 
+              className="border-purple-400 text-slate-950"
+              disabled={!autoReadEnabled}
+            >
+              <Volume2 className="w-4 h-4 mr-2" />
+              {isSpeaking ? 'Stop Nelie' : 'Ask Nelie to Repeat'}
             </Button>
             
             {currentStep >= introductionSteps.length - 1 && (

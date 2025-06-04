@@ -15,7 +15,7 @@ interface NelieExplanationDemoProps {
 const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExplanationDemoProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
-  const { isSpeaking, speakText, stopSpeaking } = useSpeechSynthesis();
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useSpeechSynthesis();
 
   const demoQuestion = {
     question: "What is 15 + 27?",
@@ -32,25 +32,35 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
   };
 
   useEffect(() => {
-    if (currentStep < demoQuestion.explanation.length) {
+    if (currentStep < demoQuestion.explanation.length && autoReadEnabled) {
       const timer = setTimeout(() => {
         speakText(demoQuestion.explanation[currentStep]);
         setCurrentStep(prev => prev + 1);
-      }, currentStep === 0 ? 1000 : 4000);
+      }, currentStep === 0 ? 1500 : 4500);
       
       return () => clearTimeout(timer);
     } else if (currentStep === demoQuestion.explanation.length && !showAnswer) {
       // Show Nelie "clicking" the correct answer
       setTimeout(() => {
         setShowAnswer(true);
-        speakText("Perfect! That's how we solve addition problems step by step.");
-      }, 2000);
+        if (autoReadEnabled) {
+          speakText("Perfect! That's how we solve addition problems step by step. Now you understand the process!");
+        }
+      }, 2500);
     }
-  }, [currentStep, showAnswer, speakText]);
+  }, [currentStep, showAnswer, autoReadEnabled, speakText]);
 
   const handleContinue = () => {
     stopSpeaking();
     onDemoComplete();
+  };
+
+  const handleManualRead = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+    } else if (currentStep > 0) {
+      speakText(demoQuestion.explanation[currentStep - 1] || "Let me explain this step by step!");
+    }
   };
 
   return (
@@ -59,6 +69,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
         <div className="text-center mb-6">
           <RobotAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
           <h3 className="text-xl font-bold text-white mt-4">Watch Nelie Solve This Problem</h3>
+          <p className="text-gray-400">Learn by watching Nelie's step-by-step demonstration</p>
         </div>
 
         {/* Question Display */}
@@ -93,14 +104,32 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
           <CardContent className="p-4">
             <div className="flex items-start space-x-3">
               <Volume2 className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-blue-200 mb-2">Nelie's Explanation:</h4>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-blue-200">Nelie's Step-by-Step Explanation:</h4>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleManualRead}
+                    className="text-slate-950"
+                    disabled={!autoReadEnabled}
+                  >
+                    <Volume2 className="w-4 h-4 mr-1" />
+                    {isSpeaking ? 'Stop' : 'Repeat'}
+                  </Button>
+                </div>
                 <div className="text-blue-100 space-y-2">
                   {demoQuestion.explanation.slice(0, currentStep).map((step, index) => (
-                    <p key={index} className={index === currentStep - 1 ? 'font-semibold' : ''}>
-                      {step}
+                    <p key={index} className={index === currentStep - 1 ? 'font-semibold text-blue-50' : ''}>
+                      {index + 1}. {step}
                     </p>
                   ))}
+                  {currentStep > 0 && currentStep < demoQuestion.explanation.length && (
+                    <div className="flex items-center text-blue-300 mt-2">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse mr-2"></div>
+                      <span className="text-sm">Nelie is explaining...</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -112,7 +141,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
           <div className="text-center">
             <Button onClick={handleContinue} className="bg-green-600 hover:bg-green-700 text-white">
               <ArrowRight className="w-4 h-4 mr-2" />
-              Now You Try Some Questions!
+              Great! Now You Try Some Questions!
             </Button>
           </div>
         )}

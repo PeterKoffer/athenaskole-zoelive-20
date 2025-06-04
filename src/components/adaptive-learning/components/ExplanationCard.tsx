@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { userLearningProfileService } from '@/services/userLearningProfileService';
+import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
 
 interface ExplanationCardProps {
   explanation: string;
@@ -38,10 +39,10 @@ const ExplanationCard = ({
   totalQuestions
 }: ExplanationCardProps) => {
   const { user } = useAuth();
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [displayTime, setDisplayTime] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useSpeechSynthesis();
 
   // Load user preferences on mount
   useEffect(() => {
@@ -127,68 +128,29 @@ const ExplanationCard = ({
     }
   }, [isVisible]);
 
-  // Auto-read explanation if user preferences allow it
+  // Auto-read explanation if enabled
   useEffect(() => {
-    if (isVisible && userPreferences?.auto_read_explanations && userPreferences?.speech_enabled) {
-      // Small delay to ensure the card is visible before speaking
+    if (isVisible && autoReadEnabled) {
       setTimeout(() => {
         handleReadAloud();
-      }, 500);
+      }, 800);
     }
-  }, [isVisible, userPreferences]);
+  }, [isVisible, autoReadEnabled]);
 
   if (!isVisible) return null;
 
   const handleReadAloud = () => {
-    // Prevent multiple speech instances
     if (isSpeaking) {
-      speechSynthesis.cancel();
-      setIsSpeaking(false);
+      stopSpeaking();
       return;
     }
-    let speechText = explanation;
+
+    let speechText = `Nelie explains: ${explanation}`;
     if (!isCorrect && correctAnswer) {
-      speechText = `That's incorrect. The correct answer is: ${correctAnswer}. ${explanation}`;
+      speechText = `That's incorrect. The correct answer is: ${correctAnswer}. Let me explain: ${explanation}`;
     }
-    setIsSpeaking(true);
-
-    // Stop any existing speech first
-    speechSynthesis.cancel();
-
-    // Small delay to ensure cancel is processed
-    setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(speechText);
-      utterance.lang = 'en-US';
-
-      // Apply user preferences for speech
-      utterance.rate = userPreferences?.speech_rate || 0.8;
-      utterance.pitch = userPreferences?.speech_pitch || 1.2;
-
-      // Try to use user's preferred voice
-      const voices = speechSynthesis.getVoices();
-      const preferredVoice = userPreferences?.preferred_voice || 'female';
-      const selectedVoice = voices.find(voice => 
-        voice.name.toLowerCase().includes(preferredVoice) || 
-        voice.name.toLowerCase().includes('female') || 
-        voice.name.toLowerCase().includes('woman') || 
-        voice.name.toLowerCase().includes('samantha') || 
-        voice.name.toLowerCase().includes('karen') || 
-        voice.name.toLowerCase().includes('victoria') || 
-        voice.name.toLowerCase().includes('alex') && voice.lang.includes('en')
-      );
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        onSpeechEnd?.();
-      };
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        onSpeechEnd?.();
-      };
-      speechSynthesis.speak(utterance);
-    }, 100);
+    
+    speakText(speechText);
   };
 
   return (
@@ -199,7 +161,7 @@ const ExplanationCard = ({
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className={`text-lg font-semibold text-center flex-1 ${isCorrect ? 'text-blue-100' : 'text-red-100'}`}>
-            {isCorrect ? 'Explanation' : 'Correction'}
+            {isCorrect ? 'Nelie\'s Explanation' : 'Nelie\'s Correction'}
           </h3>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm" onClick={handleReadAloud} className="text-slate-950">
@@ -221,10 +183,9 @@ const ExplanationCard = ({
         )}
         <p className={`text-center ${isCorrect ? 'text-blue-200' : 'text-red-200'}`}>{explanation}</p>
         
-        {/* Display timer to show how long explanation has been visible */}
         <div className="mt-3 text-center">
           <span className={`text-xs ${isCorrect ? 'text-blue-400' : 'text-red-400'}`}>
-            Reading time: {displayTime}s (explanation stays visible longer now)
+            Reading time: {displayTime}s • Nelie's explanation is always available
           </span>
         </div>
       </CardContent>
