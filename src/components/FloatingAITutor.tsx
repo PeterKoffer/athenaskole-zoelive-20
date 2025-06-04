@@ -24,6 +24,17 @@ const FloatingAITutor = () => {
   // Only hide on auth pages - show everywhere else including ALL learning pages
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
+  console.log('FloatingAITutor rendering:', { 
+    shouldHide, 
+    currentPath: location.pathname,
+    isOpen,
+    isMinimized,
+    position,
+    messagesLength: messages.length,
+    visible: !shouldHide,
+    willRender: !shouldHide
+  });
+
   // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
@@ -43,16 +54,6 @@ const FloatingAITutor = () => {
       setMessages([welcomeMessage]);
     }
   }, [shouldHide, messages.length]);
-
-  console.log('FloatingAITutor rendering:', { 
-    shouldHide, 
-    currentPath: location.pathname,
-    isOpen,
-    isMinimized,
-    position,
-    messagesLength: messages.length,
-    visible: !shouldHide
-  });
 
   // Force show Nelie on all pages except auth
   if (shouldHide) {
@@ -101,18 +102,21 @@ const FloatingAITutor = () => {
     speechSynthesis.cancel();
   };
 
+  console.log('FloatingAITutor about to render UI elements');
+
   return (
     <div
       style={{
         position: 'fixed',
         bottom: '20px',
         right: '20px',
-        zIndex: 9999999,
+        zIndex: 999999,
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab',
         pointerEvents: 'auto',
         isolation: 'isolate',
-        display: 'block'
+        display: 'block',
+        visibility: 'visible'
       }}
     >
       {!isOpen && !isMinimized && (
