@@ -41,6 +41,8 @@ export const useDragHandler = (homePosition: Position) => {
   const dragOffset = useRef<DragOffset>({ x: 0, y: 0 });
   const dragStartTime = useRef<number>(0);
   const hasMoved = useRef<boolean>(false);
+  const lastPosition = useRef<Position>(position);
+  const animationFrameId = useRef<number>();
 
   const constrainPosition = useCallback((newPosition: Position): Position => {
     const viewportWidth = window.innerWidth;
@@ -52,9 +54,25 @@ export const useDragHandler = (homePosition: Position) => {
       y: Math.max(0, Math.min(newPosition.y, viewportHeight - 100))
     };
     
-    console.log('🔒 Constraining position from', newPosition, 'to', constrained);
     return constrained;
   }, []);
+
+  const updatePosition = useCallback((newPosition: Position) => {
+    // Use requestAnimationFrame to batch position updates and prevent duplicate renders
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+    }
+    
+    animationFrameId.current = requestAnimationFrame(() => {
+      const constrainedPosition = constrainPosition(newPosition);
+      
+      // Only update if position actually changed
+      if (lastPosition.current.x !== constrainedPosition.x || lastPosition.current.y !== constrainedPosition.y) {
+        lastPosition.current = constrainedPosition;
+        setPosition(constrainedPosition);
+      }
+    });
+  }, [constrainPosition]);
 
   const resetToHome = useCallback(() => {
     const safeHomePosition = { 
@@ -62,10 +80,10 @@ export const useDragHandler = (homePosition: Position) => {
       y: 20
     };
     const constrainedHomePosition = constrainPosition(safeHomePosition);
-    setPosition(constrainedHomePosition);
+    updatePosition(constrainedHomePosition);
     localStorage.setItem('floating-tutor-position', JSON.stringify(constrainedHomePosition));
     console.log('🏠 Reset Nelie to home position:', constrainedHomePosition);
-  }, [constrainPosition]);
+  }, [constrainPosition, updatePosition]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie at position:', { x: e.clientX, y: e.clientY });
@@ -114,11 +132,9 @@ export const useDragHandler = (homePosition: Position) => {
       const newX = e.clientX - dragOffset.current.x;
       const newY = e.clientY - dragOffset.current.y;
       
-      const newPosition = constrainPosition({ x: newX, y: newY });
-      console.log('🖱️ Moving to position:', newPosition);
-      setPosition(newPosition);
+      updatePosition({ x: newX, y: newY });
     }
-  }, [isDragging, constrainPosition]);
+  }, [isDragging, updatePosition]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (isDragging) {
@@ -128,21 +144,29 @@ export const useDragHandler = (homePosition: Position) => {
       const newX = touch.clientX - dragOffset.current.x;
       const newY = touch.clientY - dragOffset.current.y;
       
-      const newPosition = constrainPosition({ x: newX, y: newY });
-      console.log('👆 Touch moving to position:', newPosition);
-      setPosition(newPosition);
+      updatePosition({ x: newX, y: newY });
       e.preventDefault();
     }
-  }, [isDragging, constrainPosition]);
+  }, [isDragging, updatePosition]);
 
   const handleMouseUp = useCallback(() => {
     console.log('🖱️ Mouse up - stopping drag, hasMoved:', hasMoved.current);
     setIsDragging(false);
+    
+    // Cancel any pending animation frame
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+    }
   }, []);
 
   const handleTouchEnd = useCallback(() => {
     console.log('👆 Touch end - stopping drag, hasMoved:', hasMoved.current);
     setIsDragging(false);
+    
+    // Cancel any pending animation frame
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+    }
   }, []);
 
   // Save position to localStorage with debouncing
@@ -161,7 +185,7 @@ export const useDragHandler = (homePosition: Position) => {
   useEffect(() => {
     const handleResize = () => {
       console.log('📏 Window resized, adjusting Nelie position');
-      setPosition(current => constrainPosition(current));
+      updatePosition(position);
     };
 
     window.addEventListener('resize', handleResize);
@@ -169,7 +193,7 @@ export const useDragHandler = (homePosition: Position) => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [constrainPosition]);
+  }, [position, updatePosition]);
 
   useEffect(() => {
     if (isDragging) {
@@ -190,6 +214,11 @@ export const useDragHandler = (homePosition: Position) => {
         document.removeEventListener('touchend', handleTouchEnd);
         document.body.style.userSelect = '';
         document.body.style.webkitUserSelect = '';
+        
+        // Cancel any pending animation frame when cleaning up
+        if (animationFrameId.current) {
+          cancelAnimationFrame(animationFrameId.current);
+        }
       };
     }
   }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
