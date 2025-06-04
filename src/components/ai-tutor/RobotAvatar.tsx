@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 interface RobotAvatarProps {
-  size?: "sm" | "md" | "lg" | "xl" | "2xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
   isActive?: boolean;
   isSpeaking?: boolean;
   className?: string;
@@ -21,7 +21,8 @@ const RobotAvatar = ({
     md: "w-16 h-16",
     lg: "w-20 h-20",
     xl: "w-32 h-32",
-    "2xl": "w-40 h-40"
+    "2xl": "w-40 h-40",
+    "3xl": "w-60 h-60"
   };
 
   const containerClasses = `
@@ -29,8 +30,6 @@ const RobotAvatar = ({
     rounded-full 
     flex items-center justify-center 
     transition-all duration-300 relative
-    ${isActive ? 'animate-pulse' : ''}
-    ${isSpeaking ? 'animate-bounce' : ''}
     ${className}
   `;
 
@@ -38,10 +37,14 @@ const RobotAvatar = ({
     // Enhanced fallback with mouth animation
     return (
       <div className={`${containerClasses} bg-gradient-to-br from-blue-400 to-purple-500 text-white font-bold relative overflow-hidden`}>
-        <div className="text-4xl">🤖</div>
+        <div className="text-6xl">🤖</div>
         {isSpeaking && (
-          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-            <div className="w-2 h-1 bg-red-400 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+            <div className="flex space-x-1">
+              <div className="w-3 h-2 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-2 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-2 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+            </div>
           </div>
         )}
       </div>
@@ -53,7 +56,7 @@ const RobotAvatar = ({
       <img 
         src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
         alt="Nelie AI Tutor Robot"
-        className={`${sizeClasses[size]} object-contain ${isSpeaking ? 'animate-pulse' : ''}`}
+        className={`${sizeClasses[size]} object-contain`}
         onError={() => setImageError(true)}
         draggable={false}
       />
@@ -61,23 +64,23 @@ const RobotAvatar = ({
       {/* Animated mouth/speech indicator when speaking */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Speaking animation overlay */}
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+          {/* Speaking mouth animation overlay */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
             <div className="flex space-x-1">
-              <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
           </div>
           
-          {/* Pulsing border when speaking */}
-          <div className="absolute inset-0 rounded-full border-2 border-green-400 animate-ping opacity-75"></div>
+          {/* Subtle glow when speaking */}
+          <div className="absolute inset-0 rounded-full border-2 border-green-400 animate-pulse opacity-60"></div>
         </div>
       )}
       
-      {/* Active status indicator */}
+      {/* Active status indicator (only when not speaking) */}
       {isActive && !isSpeaking && (
-        <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-1 right-1 w-4 h-4 bg-green-400 rounded-full"></div>
       )}
     </div>
   );

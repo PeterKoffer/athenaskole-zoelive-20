@@ -91,7 +91,7 @@ const InteractiveLessonSession = ({
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <RobotAvatar size="md" isActive={true} isSpeaking={false} />
+              <RobotAvatar size="lg" isActive={true} isSpeaking={false} />
               <div>
                 <h2 className="text-xl font-bold text-white">
                   {segmentActivities[lessonState.currentSegment - 1]?.name || 'Interactive Learning'}
