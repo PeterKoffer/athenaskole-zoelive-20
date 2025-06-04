@@ -38,13 +38,13 @@ const GoalCard = ({ goal, isRecommended = false, onSelect }: GoalCardProps) => {
 
   return (
     <div className={cardClass}>
-      <div className="flex items-center justify-between mb-2">
-        <h5 className={`font-medium ${isRecommended ? 'text-purple-200' : 'text-white text-sm'}`}>
+      <div className="flex items-start justify-between mb-2">
+        <h5 className={`font-medium flex-1 ${isRecommended ? 'text-purple-200' : 'text-white text-sm'}`}>
           {goal.title}
         </h5>
         {isRecommended && (
-          <Badge className={`${getPriorityColor(goal.priority)} text-white`}>
-            {goal.priority} priority
+          <Badge className={`${getPriorityColor(goal.priority)} text-white ml-2 flex-shrink-0`}>
+            Recommended
           </Badge>
         )}
       </div>
