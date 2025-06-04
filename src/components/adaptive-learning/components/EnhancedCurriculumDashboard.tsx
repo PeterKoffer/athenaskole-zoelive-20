@@ -10,7 +10,7 @@ import AdvancedAnalytics from './AdvancedAnalytics';
 import SmartRecommendations from './SmartRecommendations';
 import { useAdaptiveDifficulty } from './AdaptiveDifficultyEngine';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, BarChart3, Brain, Target, ArrowLeft } from 'lucide-react';
+import { TrendingUp, BarChart3, Lightbulb, Target, ArrowLeft } from 'lucide-react';
 
 interface EnhancedCurriculumDashboardProps {
   subject: string;
@@ -32,7 +32,7 @@ const EnhancedCurriculumDashboard = ({
     difficulty_level: number;
   } | null>(null);
 
-  const [activeTab, setActiveTab] = useState('ai-path');
+  const [activeTab, setActiveTab] = useState('objectives');
 
   const {
     difficultyMetrics,
@@ -40,11 +40,13 @@ const EnhancedCurriculumDashboard = ({
     applyDifficultyAdjustment
   } = useAdaptiveDifficulty(subject, skillArea);
 
-  const handleAIPathUpdate = (pathData: any) => {
-    console.log('AI has updated the learning path:', pathData);
-    // The AI automatically handles path updates - no manual intervention needed
-    if (pathData.focus) {
-      setActiveTab('objectives'); // Navigate to show the AI-selected content
+  const handleRecommendationApply = (recommendation: any) => {
+    console.log('Applying recommendation:', recommendation);
+    // Handle recommendation application logic here
+    if (recommendation.type === 'concept') {
+      setActiveTab('objectives');
+    } else if (recommendation.type === 'strategy') {
+      setActiveTab('paths');
     }
   };
 
@@ -79,7 +81,7 @@ const EnhancedCurriculumDashboard = ({
             
             <div className="flex items-center space-x-3">
               <Badge variant="outline" className="bg-blue-600 text-white border-blue-600">
-                AI Level {difficultyMetrics.currentLevel}
+                Current Level {difficultyMetrics.currentLevel}
               </Badge>
               {difficultyRecommendation.type !== 'maintain' && (
                 <Button
@@ -87,8 +89,8 @@ const EnhancedCurriculumDashboard = ({
                   onClick={applyDifficultyAdjustment}
                   className="bg-lime-500 hover:bg-lime-600"
                 >
-                  <Brain className="w-4 h-4 mr-2" />
-                  Auto-Adjust to Level {difficultyMetrics.recommendedLevel}
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Adjust to Level {difficultyMetrics.recommendedLevel}
                 </Button>
               )}
             </div>
@@ -96,16 +98,16 @@ const EnhancedCurriculumDashboard = ({
 
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-white">
-              AI-Personalized Learning
+              Enhanced Curriculum Learning
             </h1>
             <p className="text-gray-400">
-              AI-driven adaptive curriculum for {subject} • {skillArea}
+              AI-powered adaptive learning for {subject} • {skillArea}
             </p>
             
             {difficultyRecommendation.type !== 'maintain' && (
               <div className="bg-blue-900/30 border border-blue-800 rounded-lg p-3 mt-4">
                 <p className="text-blue-200 text-sm">
-                  <Brain className="w-4 h-4 inline mr-2" />
+                  <Target className="w-4 h-4 inline mr-2" />
                   {difficultyRecommendation.message}
                 </p>
               </div>
@@ -114,38 +116,44 @@ const EnhancedCurriculumDashboard = ({
         </CardContent>
       </Card>
 
+      {/* Smart Recommendations */}
+      <SmartRecommendations 
+        subject={subject} 
+        onRecommendationApply={handleRecommendationApply}
+      />
+
       {/* Enhanced Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="bg-gray-800 border-gray-700 grid w-full grid-cols-4">
-          <TabsTrigger value="ai-path" className="data-[state=active]:bg-lime-500">
-            <Brain className="w-4 h-4 mr-2" />
-            AI Learning Path
-          </TabsTrigger>
           <TabsTrigger value="objectives" className="data-[state=active]:bg-lime-500">
             <Target className="w-4 h-4 mr-2" />
-            Current Objectives
+            Learning Objectives
+          </TabsTrigger>
+          <TabsTrigger value="paths" className="data-[state=active]:bg-lime-500">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Learning Paths
           </TabsTrigger>
           <TabsTrigger value="analytics" className="data-[state=active]:bg-lime-500">
             <BarChart3 className="w-4 h-4 mr-2" />
-            Progress Analytics
+            Analytics
           </TabsTrigger>
           <TabsTrigger value="insights" className="data-[state=active]:bg-lime-500">
-            <TrendingUp className="w-4 h-4 mr-2" />
+            <Lightbulb className="w-4 h-4 mr-2" />
             AI Insights
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="ai-path">
-          <SmartRecommendations 
-            subject={subject} 
-            onPathUpdate={handleAIPathUpdate}
-          />
-        </TabsContent>
 
         <TabsContent value="objectives">
           <CurriculumAlignedContent
             subject={subject}
             onObjectiveSelect={setSelectedObjective}
+          />
+        </TabsContent>
+
+        <TabsContent value="paths">
+          <CurriculumLearningPath
+            subject={subject}
+            onStartObjective={setSelectedObjective}
           />
         </TabsContent>
 
@@ -159,14 +167,14 @@ const EnhancedCurriculumDashboard = ({
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2 text-white">
-                  <Brain className="w-5 h-5 text-lime-400" />
-                  <span>AI Learning Adaptation</span>
+                  <TrendingUp className="w-5 h-5 text-lime-400" />
+                  <span>Adaptive Difficulty Insights</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-400">Current AI Assessment Level</p>
+                    <p className="text-sm text-gray-400">Current Performance Level</p>
                     <div className="flex items-center space-x-2">
                       <div className="flex-1 bg-gray-700 rounded-full h-2">
                         <div 
@@ -179,7 +187,7 @@ const EnhancedCurriculumDashboard = ({
                   </div>
                   
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-400">AI Confidence Score</p>
+                    <p className="text-sm text-gray-400">Adaptation Confidence</p>
                     <div className="flex items-center space-x-2">
                       <div className="flex-1 bg-gray-700 rounded-full h-2">
                         <div 
@@ -196,41 +204,41 @@ const EnhancedCurriculumDashboard = ({
                 
                 <div className="bg-gray-800 rounded-lg p-3">
                   <p className="text-gray-300 text-sm">
-                    <strong>AI Decision:</strong> {difficultyMetrics.adaptationReason}
+                    <strong>Latest Adaptation:</strong> {difficultyMetrics.adaptationReason}
                   </p>
                   <p className="text-gray-500 text-xs mt-1">
-                    Last AI update: {new Date(difficultyMetrics.lastUpdated).toLocaleString()}
+                    Last updated: {new Date(difficultyMetrics.lastUpdated).toLocaleString()}
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* AI Learning Insights */}
+            {/* Additional AI Insights */}
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2 text-white">
-                  <Brain className="w-5 h-5 text-lime-400" />
-                  <span>AI Learning Intelligence</span>
+                  <Lightbulb className="w-5 h-5 text-lime-400" />
+                  <span>Learning Pattern Analysis</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-gray-800 rounded-lg">
-                    <Brain className="w-8 h-8 text-lime-400 mx-auto mb-2" />
-                    <h3 className="text-white font-medium">Personalized Content</h3>
-                    <p className="text-gray-400 text-sm">AI selects optimal learning materials</p>
+                    <Target className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                    <h3 className="text-white font-medium">Optimal Challenge</h3>
+                    <p className="text-gray-400 text-sm">Content difficulty matches your skill level</p>
                   </div>
                   
                   <div className="text-center p-4 bg-gray-800 rounded-lg">
                     <TrendingUp className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                    <h3 className="text-white font-medium">Adaptive Progression</h3>
-                    <p className="text-gray-400 text-sm">Automatic difficulty adjustment</p>
+                    <h3 className="text-white font-medium">Progress Trend</h3>
+                    <p className="text-gray-400 text-sm">Steady improvement detected</p>
                   </div>
                   
                   <div className="text-center p-4 bg-gray-800 rounded-lg">
-                    <Target className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                    <h3 className="text-white font-medium">Focused Learning</h3>
-                    <p className="text-gray-400 text-sm">AI identifies and addresses gaps</p>
+                    <BarChart3 className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                    <h3 className="text-white font-medium">Learning Efficiency</h3>
+                    <p className="text-gray-400 text-sm">Above average retention rate</p>
                   </div>
                 </div>
               </CardContent>

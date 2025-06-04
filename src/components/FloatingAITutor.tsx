@@ -14,8 +14,8 @@ const FloatingAITutor = () => {
   const navigate = useNavigate();
   
   const homePosition = {
-    x: 20,
-    y: window.innerHeight - 140 // Position from bottom instead of top
+    x: 16,
+    y: 20
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
@@ -87,19 +87,15 @@ const FloatingAITutor = () => {
     return null;
   }
 
-  console.log('🤖 FloatingAITutor rendering at position:', position, 'isOpen:', isOpen);
-
   return (
     <div
       style={{
         position: 'fixed',
         top: `${position.y}px`,
         left: `${position.x}px`,
-        zIndex: 9999999, // Increased z-index significantly
-        pointerEvents: 'auto',
-        transform: 'translateZ(0)', // Force hardware acceleration
+        zIndex: 999999,
+        pointerEvents: 'auto'
       }}
-      className="floating-tutor-container"
     >
       {!isOpen ? (
         <CollapsedButton 
