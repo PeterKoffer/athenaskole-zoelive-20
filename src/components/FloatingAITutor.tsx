@@ -122,10 +122,9 @@ const FloatingAITutor = () => {
       {!isOpen && (
         <div
           style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            transform: `translate(${Math.min(position.x, window.innerWidth - 120)}px, ${Math.min(position.y, window.innerHeight - 120)}px)`,
+            position: 'absolute',
+            top: `${position.y + 20}px`,
+            right: `${20}px`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
             zIndex: 1000001
@@ -145,10 +144,9 @@ const FloatingAITutor = () => {
       {isOpen && (
         <div
           style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            transform: `translate(${Math.min(position.x, window.innerWidth - 340)}px, ${Math.min(position.y, window.innerHeight - 420)}px)`,
+            position: 'absolute',
+            top: `${position.y + 20}px`,
+            right: `${20}px`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
             zIndex: 1000001
