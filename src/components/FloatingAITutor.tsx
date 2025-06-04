@@ -20,6 +20,7 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
 
+  // Only hide on auth pages, but always show the collapsed button otherwise
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
   useEffect(() => {
@@ -81,6 +82,7 @@ const FloatingAITutor = () => {
     speechSynthesis.cancel();
   };
 
+  // Return null only on auth pages - otherwise always show the tutor
   if (shouldHide) {
     return null;
   }
