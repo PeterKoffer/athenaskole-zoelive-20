@@ -12,9 +12,9 @@ interface NavbarButtonProps {
 const NavbarButton = ({ icon: Icon, children, onClick, variant = "outline" }: NavbarButtonProps) => {
   return (
     <Button 
-      variant={variant}
+      variant="outline"
       onClick={onClick}
-      className="bg-blue-200 text-blue-800 border-blue-300 hover:bg-blue-300 h-10 px-4"
+      className="bg-white/10 text-white border-white/20 hover:bg-white/20 h-10 px-4 rounded-lg backdrop-blur-sm"
     >
       {Icon && <Icon className="w-4 h-4 mr-2" />}
       {children}
