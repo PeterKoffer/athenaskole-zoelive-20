@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Brain } from 'lucide-react';
-import QuestionDisplay from './QuestionDisplay';
-import LessonHeader from './LessonHeader';
-import TopicExplanation from './TopicExplanation';
 import { SessionData } from './SessionProvider';
+import ExplanationPhase from './ExplanationPhase';
+import SessionErrorState from './SessionErrorState';
+import SessionLoadingState from './SessionLoadingState';
+import SessionMainView from './SessionMainView';
 
 interface SessionContentProps {
   subject: string;
@@ -33,18 +34,12 @@ const SessionContent = ({
   sessionData
 }: SessionContentProps) => {
   const {
-    currentQuestion,
     questions,
-    hasAnswered,
-    selectedAnswer,
     isLoading,
     error,
-    handleAnswerSelect,
-    currentQuestionIndex,
-    timeSpent,
     generateNextQuestion,
     sessionId,
-    showResult
+    currentQuestionIndex
   } = sessionData;
   
   const hasInitialized = useRef(false);
@@ -56,7 +51,6 @@ const SessionContent = ({
     currentQuestionIndex,
     isLoading,
     error: !!error,
-    hasAnswered,
     hasInitialized: hasInitialized.current,
     showExplanation
   });
@@ -77,86 +71,36 @@ const SessionContent = ({
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={onBack} className="text-white border-gray-600 hover:bg-gray-700">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </div>
-        
-        <Card className="bg-red-900 border-red-700">
-          <CardContent className="p-6 text-center text-white">
-            <Brain className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Error Loading Questions</h3>
-            <p className="text-red-300 mb-4">{error}</p>
-            <Button onClick={() => generateNextQuestion()}>
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <SessionErrorState
+        error={error}
+        onBack={onBack}
+        onRetry={() => generateNextQuestion()}
+      />
     );
   }
 
   // Show topic explanation first
   if (showExplanation) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </div>
-        
-        <TopicExplanation
-          subject={subject}
-          skillArea={skillArea}
-          gradeLevel={learningObjective?.difficulty_level}
-          standardInfo={learningObjective ? {
-            code: learningObjective.id,
-            title: learningObjective.title,
-            description: learningObjective.description
-          } : undefined}
-          onStartQuestions={handleStartQuestions}
-        />
-      </div>
+      <ExplanationPhase
+        subject={subject}
+        skillArea={skillArea}
+        gradeLevel={learningObjective?.difficulty_level}
+        learningObjective={learningObjective}
+        onBack={onBack}
+        onStartQuestions={handleStartQuestions}
+      />
     );
   }
 
   if (isLoading || !questions.length) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </div>
-        
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center justify-center text-center">
-              <Brain className="w-12 h-12 text-lime-400 animate-pulse mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Nelie is Preparing Your Questions
-              </h3>
-              <p className="text-gray-300 mb-4">
-                Creating personalized {subject} questions just for you...
-              </p>
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              </div>
-              <Button onClick={() => generateNextQuestion()} className="mt-4 bg-lime-400 text-black hover:bg-lime-500">
-                Generate First Question
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <SessionLoadingState
+        subject={subject}
+        onBack={onBack}
+        onGenerate={() => generateNextQuestion()}
+        showGenerateButton={!isLoading}
+      />
     );
   }
 
@@ -186,40 +130,15 @@ const SessionContent = ({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
-      </div>
-
-      <LessonHeader 
-        subject={subject}
-        skillArea={skillArea}
-        currentQuestion={currentQuestionIndex + 1}
-        totalQuestions={totalQuestions}
-        difficultyLevel={difficultyLevel}
-        timeSpent={timeSpent}
-        onBack={onBack}
-        learningObjective={learningObjective}
-      />
-
-      <QuestionDisplay
-        question={question.question}
-        options={question.options}
-        selectedAnswer={selectedAnswer}
-        correctAnswer={question.correct}
-        showResult={showResult || false}
-        explanation={question.explanation}
-        questionNumber={currentQuestionIndex + 1}
-        totalQuestions={totalQuestions}
-        onAnswerSelect={handleAnswerSelect}
-        hasAnswered={hasAnswered}
-        autoSubmit={true}
-        subject={subject}
-      />
-    </div>
+    <SessionMainView
+      subject={subject}
+      skillArea={skillArea}
+      difficultyLevel={difficultyLevel}
+      totalQuestions={totalQuestions}
+      onBack={onBack}
+      learningObjective={learningObjective}
+      sessionData={sessionData}
+    />
   );
 };
 
