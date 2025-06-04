@@ -25,8 +25,8 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
-  // Only hide on auth pages - show on all other pages including home
-  const shouldHide = location.pathname.includes('/auth');
+  // Only hide on auth pages - show on ALL other pages
+  const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
   // Reset state when navigating to auth pages
   useEffect(() => {
@@ -76,9 +76,10 @@ const FloatingAITutor = () => {
         position: 'fixed',
         bottom: '20px',
         right: '20px',
-        zIndex: 9999,
+        zIndex: 10000,
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab',
+        pointerEvents: 'auto'
       }}
     >
       {!isOpen && !isMinimized && (

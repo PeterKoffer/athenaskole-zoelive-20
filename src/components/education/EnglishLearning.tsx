@@ -4,8 +4,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import LearningHeader from "./LearningHeader";
 import AILearningModule from "@/components/adaptive-learning/AILearningModule";
-import { Card, CardContent } from "@/components/ui/card";
-import { Brain } from "lucide-react";
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
@@ -50,15 +48,6 @@ const EnglishLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-400 mb-6">
-          <CardContent className="p-4 text-center">
-            <Brain className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-white">
-              🤖 AI is generating personalized English questions for reading comprehension
-            </p>
-          </CardContent>
-        </Card>
-        
         <AILearningModule 
           key={aiSessionKey} 
           subject="english" 
