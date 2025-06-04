@@ -50,7 +50,8 @@ const FloatingAITutor = () => {
     isOpen,
     isMinimized,
     position,
-    messagesLength: messages.length
+    messagesLength: messages.length,
+    visible: !shouldHide
   });
 
   // Force show Nelie on all pages except auth
@@ -110,7 +111,8 @@ const FloatingAITutor = () => {
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab',
         pointerEvents: 'auto',
-        isolation: 'isolate'
+        isolation: 'isolate',
+        display: 'block'
       }}
     >
       {!isOpen && !isMinimized && (
