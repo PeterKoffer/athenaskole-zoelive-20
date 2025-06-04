@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Calculator, BookOpen, Globe, Music } from 'lucide-react';
+import { Brain, Calculator, BookOpen, Globe, Music, Code } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export interface SubjectSelectorProps {
@@ -37,6 +37,17 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: 'grammar', name: 'Grammar', description: 'Sentence structure and language rules', route: '/english' },
         { id: 'reading', name: 'Reading', description: 'Comprehension and vocabulary building', route: '/english' },
         { id: 'writing', name: 'Writing', description: 'Expression and communication skills', route: '/english' }
+      ]
+    },
+    {
+      id: 'computer-science',
+      name: 'Computer Science',
+      icon: Code,
+      skillAreas: [
+        { id: 'programming', name: 'Programming', description: 'Basic coding concepts and logical thinking', route: '/computer-science' },
+        { id: 'algorithms', name: 'Algorithms', description: 'Problem-solving and computational thinking', route: '/computer-science' },
+        { id: 'ai-basics', name: 'AI Basics', description: 'Introduction to artificial intelligence concepts', route: '/computer-science' },
+        { id: 'data-structures', name: 'Data Structures', description: 'Organizing and managing information', route: '/computer-science' }
       ]
     },
     {
