@@ -15,6 +15,7 @@ import { ArrowLeft, User, LogOut, BookOpen, GraduationCap, Home } from "lucide-r
 import MobileMenu from "./MobileMenu";
 import NavbarButton from "./NavbarButton";
 import UserRoleDisplay from "./UserRoleDisplay";
+import { UserRole } from "@/types/auth";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -59,6 +60,7 @@ const Navbar = ({
 
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
   const userInitials = userName.split(' ').map((n: string) => n[0]).join('').toUpperCase();
+  const userRole = (user?.user_metadata?.role as UserRole) || 'student';
 
   return (
     <>
@@ -133,7 +135,7 @@ const Navbar = ({
 
             {/* Right side */}
             <div className="flex items-center space-x-4">
-              <UserRoleDisplay />
+              <UserRoleDisplay role={userRole} />
               
               {user ? (
                 <DropdownMenu>
