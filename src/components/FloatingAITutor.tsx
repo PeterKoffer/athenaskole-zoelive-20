@@ -29,7 +29,8 @@ const FloatingAITutor = () => {
     isOpen,
     position,
     messagesLength: messages.length,
-    isVisible: !shouldHide
+    isVisible: !shouldHide,
+    viewportWidth: typeof window !== 'undefined' ? window.innerWidth : 'unknown'
   });
 
   // Reset state when navigating to auth pages
@@ -124,7 +125,7 @@ const FloatingAITutor = () => {
             position: 'fixed',
             bottom: '20px',
             right: '20px',
-            transform: `translate(${position.x}px, ${position.y}px)`,
+            transform: `translate(${Math.min(position.x, window.innerWidth - 120)}px, ${Math.min(position.y, window.innerHeight - 120)}px)`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
             zIndex: 1000001
@@ -147,7 +148,7 @@ const FloatingAITutor = () => {
             position: 'fixed',
             bottom: '20px',
             right: '20px',
-            transform: `translate(${position.x}px, ${position.y}px)`,
+            transform: `translate(${Math.min(position.x, window.innerWidth - 340)}px, ${Math.min(position.y, window.innerHeight - 420)}px)`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
             zIndex: 1000001

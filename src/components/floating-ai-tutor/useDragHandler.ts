@@ -10,20 +10,26 @@ export const useDragHandler = (homePosition: Position) => {
         try {
           const parsedPosition = JSON.parse(saved);
           // Ensure the saved position is still valid on current screen
-          if (parsedPosition.x >= -100 && parsedPosition.y >= -100 && 
-              parsedPosition.x < window.innerWidth && 
-              parsedPosition.y < window.innerHeight) {
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          
+          // Check if saved position is within reasonable bounds
+          if (parsedPosition.x >= -200 && parsedPosition.y >= -200 && 
+              parsedPosition.x < viewportWidth - 50 && 
+              parsedPosition.y < viewportHeight - 50) {
             console.log('📍 Restored Nelie position:', parsedPosition);
             return parsedPosition;
+          } else {
+            console.log('🚫 Saved position out of bounds, using default');
           }
         } catch (e) {
           console.log('❌ Failed to parse saved position');
         }
       }
-      // Default to bottom-right corner with some offset
+      // Default to bottom-right corner but ensure it's visible
       const defaultPosition = { 
-        x: 0, 
-        y: 0
+        x: Math.min(0, window.innerWidth - 400), // Ensure it doesn't go off screen
+        y: Math.min(0, window.innerHeight - 200)
       };
       console.log('📍 Using default Nelie position:', defaultPosition);
       return defaultPosition;
@@ -37,12 +43,11 @@ export const useDragHandler = (homePosition: Position) => {
   const constrainPosition = useCallback((newPosition: Position): Position => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const elementWidth = 320;
-    const elementHeight = 400;
     
+    // Allow some negative values but not too much
     const constrained = {
-      x: Math.max(-250, Math.min(newPosition.x, viewportWidth - 100)),
-      y: Math.max(-300, Math.min(newPosition.y, viewportHeight - 100))
+      x: Math.max(-200, Math.min(newPosition.x, viewportWidth - 100)),
+      y: Math.max(-200, Math.min(newPosition.y, viewportHeight - 100))
     };
     
     console.log('🔒 Constraining position from', newPosition, 'to', constrained);
@@ -56,8 +61,23 @@ export const useDragHandler = (homePosition: Position) => {
     };
     const constrainedHomePosition = constrainPosition(safeHomePosition);
     setPosition(constrainedHomePosition);
+    localStorage.setItem('floating-tutor-position', JSON.stringify(constrainedHomePosition));
     console.log('🏠 Reset Nelie to home position:', constrainedHomePosition);
   }, [constrainPosition]);
+
+  // Fix position on mount if it's out of bounds
+  useEffect(() => {
+    const fixPositionIfNeeded = () => {
+      const viewportWidth = window.innerWidth;
+      if (position.x > viewportWidth - 100) {
+        console.log('🔧 Fixing out-of-bounds position');
+        const fixedPosition = constrainPosition(position);
+        setPosition(fixedPosition);
+      }
+    };
+    
+    fixPositionIfNeeded();
+  }, [position.x, constrainPosition]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie');
@@ -126,7 +146,7 @@ export const useDragHandler = (homePosition: Position) => {
     return () => clearTimeout(timeoutId);
   }, [position]);
 
-  // Handle window resize
+  // Handle window resize and force position check
   useEffect(() => {
     const handleResize = () => {
       console.log('📏 Window resized, adjusting Nelie position');
@@ -134,7 +154,16 @@ export const useDragHandler = (homePosition: Position) => {
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    
+    // Force immediate position check
+    const timer = setTimeout(() => {
+      setPosition(current => constrainPosition(current));
+    }, 100);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
   }, [constrainPosition]);
 
   useEffect(() => {
