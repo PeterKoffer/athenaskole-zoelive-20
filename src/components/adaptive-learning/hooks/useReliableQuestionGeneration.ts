@@ -30,6 +30,7 @@ export const useReliableQuestionGeneration = ({
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationAttempts, setGenerationAttempts] = useState(0);
+  const [usedQuestionsCache, setUsedQuestionsCache] = useState<string[]>([]);
 
   const getUsedQuestions = useCallback(async () => {
     try {
@@ -40,14 +41,20 @@ export const useReliableQuestionGeneration = ({
         .eq('subject', subject)
         .eq('skill_area', skillArea)
         .order('asked_at', { ascending: false })
-        .limit(50);
+        .limit(100); // Increased to get more history
 
-      return history?.map(h => h.question_text) || [];
+      const usedQuestions = history?.map(h => h.question_text) || [];
+      
+      // Also include questions from current session
+      const allUsedQuestions = [...new Set([...usedQuestions, ...usedQuestionsCache])];
+      
+      console.log(`📚 Found ${allUsedQuestions.length} previously used questions for ${subject}/${skillArea}`);
+      return allUsedQuestions;
     } catch (error) {
       console.warn('Could not fetch question history:', error);
-      return [];
+      return usedQuestionsCache;
     }
-  }, [userId, subject, skillArea]);
+  }, [userId, subject, skillArea, usedQuestionsCache]);
 
   const generateWithAI = useCallback(async (usedQuestions: string[]): Promise<Question | null> => {
     console.log('🤖 Attempting AI generation...');
@@ -59,7 +66,8 @@ export const useReliableQuestionGeneration = ({
           skillArea,
           difficultyLevel,
           userId,
-          previousQuestions: usedQuestions
+          previousQuestions: usedQuestions,
+          avoidDuplicates: true
         }
       });
 
@@ -72,6 +80,12 @@ export const useReliableQuestionGeneration = ({
       // Validate structure
       if (!content.question || !Array.isArray(content.options) || typeof content.correct !== 'number') {
         throw new Error('Invalid content structure');
+      }
+
+      // Check if this question was already used
+      if (usedQuestions.some(used => used.toLowerCase().trim() === content.question.toLowerCase().trim())) {
+        console.log('⚠️ AI generated a duplicate question, rejecting...');
+        return null;
       }
 
       return {
@@ -98,27 +112,49 @@ export const useReliableQuestionGeneration = ({
       const usedQuestions = await getUsedQuestions();
       console.log(`📝 Generation attempt ${generationAttempts + 1}, avoiding ${usedQuestions.length} used questions`);
 
-      // Try AI generation first
-      const aiQuestion = await generateWithAI(usedQuestions);
-      
-      if (aiQuestion && !usedQuestions.includes(aiQuestion.question)) {
-        console.log('✅ AI question generated successfully');
-        toast({
-          title: "AI Question Generated! 🤖",
-          description: "Fresh question created for your learning",
-          duration: 2000
-        });
-        return aiQuestion;
+      // Try AI generation multiple times to avoid duplicates
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const aiQuestion = await generateWithAI(usedQuestions);
+        
+        if (aiQuestion && !usedQuestions.includes(aiQuestion.question)) {
+          console.log('✅ AI question generated successfully');
+          
+          // Add to cache to avoid duplicates in same session
+          setUsedQuestionsCache(prev => [...prev, aiQuestion.question]);
+          
+          toast({
+            title: "Fresh Question Generated! 🤖",
+            description: "Nelie created a new question for you",
+            duration: 2000
+          });
+          return aiQuestion;
+        }
+        
+        console.log(`⚠️ Attempt ${attempt + 1} generated duplicate or invalid question, retrying...`);
       }
 
-      // Fallback to pre-made questions
-      console.log('🔄 Using fallback question');
-      const fallbackQuestion = createFallbackQuestion();
+      // Fallback to pre-made questions with uniqueness check
+      console.log('🔄 AI attempts exhausted, using fallback question');
+      let fallbackQuestion = createFallbackQuestion();
       
       // Make fallback unique if needed
-      if (usedQuestions.includes(fallbackQuestion.question)) {
-        fallbackQuestion.question = `${fallbackQuestion.question} (Practice ${generationAttempts + 1})`;
+      let uniqueQuestionText = fallbackQuestion.question;
+      let counter = 1;
+      
+      while (usedQuestions.some(used => used.toLowerCase().trim() === uniqueQuestionText.toLowerCase().trim())) {
+        uniqueQuestionText = `${fallbackQuestion.question} (Version ${counter})`;
+        counter++;
       }
+      
+      if (uniqueQuestionText !== fallbackQuestion.question) {
+        fallbackQuestion = {
+          ...fallbackQuestion,
+          question: uniqueQuestionText
+        };
+      }
+
+      // Add to cache
+      setUsedQuestionsCache(prev => [...prev, fallbackQuestion.question]);
 
       toast({
         title: "Practice Question Ready",
@@ -134,9 +170,11 @@ export const useReliableQuestionGeneration = ({
     } catch (error) {
       console.error('Question generation completely failed:', error);
       
-      // Ultimate fallback
+      // Ultimate fallback with timestamp to ensure uniqueness
+      const uniqueQuestion = `${subject} practice question - ${new Date().toLocaleTimeString()}`;
+      
       return {
-        question: `${subject} practice question ${Date.now()}`,
+        question: uniqueQuestion,
         options: ['Option A', 'Option B', 'Option C', 'Option D'],
         correct: 0,
         explanation: 'This is a basic practice question.',
