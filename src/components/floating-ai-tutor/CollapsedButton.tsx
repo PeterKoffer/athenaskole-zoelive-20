@@ -57,7 +57,7 @@ const CollapsedButton = ({
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className="cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105 shadow-2xl"
+        className="cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105"
         style={{
           cursor: isDragging ? 'grabbing' : 'grab',
           transform: isDragging ? 'scale(1.1)' : 'scale(1)',
@@ -66,10 +66,10 @@ const CollapsedButton = ({
         }}
       >
         <RobotAvatar 
-          size="4xl" 
+          size="3xl" 
           isActive={true} 
           isSpeaking={isSpeaking}
-          className="pointer-events-none"
+          className="pointer-events-none drop-shadow-2xl"
         />
       </div>
       

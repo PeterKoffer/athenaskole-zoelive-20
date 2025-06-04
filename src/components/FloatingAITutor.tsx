@@ -15,8 +15,8 @@ const FloatingAITutor = () => {
   const navigate = useNavigate();
   
   const homePosition = {
-    x: 20,
-    y: window.innerHeight - 140
+    x: 200,
+    y: 180
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
