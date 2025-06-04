@@ -1,18 +1,15 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, Clock, Star, GamepadIcon } from 'lucide-react';
 import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
 import NelieAvatarSection from './NelieAvatarSection';
-
 interface ExtendedLessonManagerProps {
   subject: string;
   skillArea: string;
   onLessonComplete: () => void;
   onBack: () => void;
 }
-
 interface LessonActivity {
   id: string;
   type: 'question' | 'game' | 'explanation' | 'practice';
@@ -20,7 +17,6 @@ interface LessonActivity {
   duration: number; // in seconds
   content: any;
 }
-
 const ExtendedLessonManager = ({
   subject,
   skillArea,
@@ -32,7 +28,7 @@ const ExtendedLessonManager = ({
   const [activityStartTime, setActivityStartTime] = useState(Date.now());
   const [score, setScore] = useState(0);
   const [totalActivities] = useState(12); // 20 minutes with varied activities
-  
+
   const {
     isSpeaking,
     autoReadEnabled,
@@ -44,7 +40,7 @@ const ExtendedLessonManager = ({
   // Generate 20 minutes worth of activities
   const generateLessonActivities = (): LessonActivity[] => {
     const activities: LessonActivity[] = [];
-    
+
     // Introduction (2 minutes)
     activities.push({
       id: 'intro',
@@ -58,45 +54,37 @@ const ExtendedLessonManager = ({
     });
 
     // Mathematics questions with explanations (12 minutes)
-    const mathQuestions = [
-      {
-        question: "What is 8 + 7?",
-        options: ["14", "15", "16", "17"],
-        correct: 1,
-        explanation: "When we add 8 + 7, we can count up: 8, 9, 10, 11, 12, 13, 14, 15! The answer is 15!"
-      },
-      {
-        question: "Which number comes after 29?",
-        options: ["28", "30", "31", "27"],
-        correct: 1,
-        explanation: "After 29 comes 30! We're counting by ones: 28, 29, 30, 31. Great job!"
-      },
-      {
-        question: "What is 20 - 6?",
-        options: ["12", "13", "14", "15"],
-        correct: 2,
-        explanation: "To find 20 - 6, we count backward: 20, 19, 18, 17, 16, 15, 14! The answer is 14!"
-      },
-      {
-        question: "How many sides does a triangle have?",
-        options: ["2", "3", "4", "5"],
-        correct: 1,
-        explanation: "A triangle has 3 sides! Tri means three, so a triangle always has exactly 3 sides and 3 corners!"
-      },
-      {
-        question: "What is 5 × 3?",
-        options: ["12", "15", "18", "20"],
-        correct: 1,
-        explanation: "5 × 3 means 5 groups of 3! We can count: 3, 6, 9, 12, 15! So 5 × 3 = 15!"
-      },
-      {
-        question: "Which is larger: 45 or 54?",
-        options: ["45", "54", "They're equal", "Can't tell"],
-        correct: 1,
-        explanation: "54 is larger than 45! Look at the tens place: 5 tens (50) is bigger than 4 tens (40)!"
-      }
-    ];
-
+    const mathQuestions = [{
+      question: "What is 8 + 7?",
+      options: ["14", "15", "16", "17"],
+      correct: 1,
+      explanation: "When we add 8 + 7, we can count up: 8, 9, 10, 11, 12, 13, 14, 15! The answer is 15!"
+    }, {
+      question: "Which number comes after 29?",
+      options: ["28", "30", "31", "27"],
+      correct: 1,
+      explanation: "After 29 comes 30! We're counting by ones: 28, 29, 30, 31. Great job!"
+    }, {
+      question: "What is 20 - 6?",
+      options: ["12", "13", "14", "15"],
+      correct: 2,
+      explanation: "To find 20 - 6, we count backward: 20, 19, 18, 17, 16, 15, 14! The answer is 14!"
+    }, {
+      question: "How many sides does a triangle have?",
+      options: ["2", "3", "4", "5"],
+      correct: 1,
+      explanation: "A triangle has 3 sides! Tri means three, so a triangle always has exactly 3 sides and 3 corners!"
+    }, {
+      question: "What is 5 × 3?",
+      options: ["12", "15", "18", "20"],
+      correct: 1,
+      explanation: "5 × 3 means 5 groups of 3! We can count: 3, 6, 9, 12, 15! So 5 × 3 = 15!"
+    }, {
+      question: "Which is larger: 45 or 54?",
+      options: ["45", "54", "They're equal", "Can't tell"],
+      correct: 1,
+      explanation: "54 is larger than 45! Look at the tens place: 5 tens (50) is bigger than 4 tens (40)!"
+    }];
     mathQuestions.forEach((q, index) => {
       activities.push({
         id: `question-${index}`,
@@ -119,7 +107,6 @@ const ExtendedLessonManager = ({
         explanation: "The number is 12! It's even, and 12 + 5 = 17. You're such a great detective!"
       }
     });
-
     activities.push({
       id: 'pattern-game',
       type: 'game',
@@ -144,10 +131,8 @@ const ExtendedLessonManager = ({
         interactions: ['celebrate', 'applaud']
       }
     });
-
     return activities;
   };
-
   const [lessonActivities] = useState(generateLessonActivities());
   const currentActivity = lessonActivities[currentActivityIndex];
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
@@ -168,7 +153,6 @@ const ExtendedLessonManager = ({
       }, 1000);
     }
   }, [currentActivityIndex, autoReadEnabled, speakText, currentActivity]);
-
   const handleActivityComplete = useCallback(() => {
     if (currentActivityIndex < lessonActivities.length - 1) {
       setCurrentActivityIndex(prev => prev + 1);
@@ -179,38 +163,28 @@ const ExtendedLessonManager = ({
       onLessonComplete();
     }
   }, [currentActivityIndex, lessonActivities.length, onLessonComplete, stopSpeaking]);
-
   const handleAnswerSelect = (answerIndex: number) => {
     if (currentActivity.type === 'question') {
       const isCorrect = answerIndex === currentActivity.content.correct;
       if (isCorrect) {
         setScore(prev => prev + 1);
       }
-
-      const feedback = isCorrect ? 
-        `Excellent! ${currentActivity.content.explanation}` : 
-        `Not quite right. ${currentActivity.content.explanation}`;
-      
+      const feedback = isCorrect ? `Excellent! ${currentActivity.content.explanation}` : `Not quite right. ${currentActivity.content.explanation}`;
       speakText(feedback);
 
       // Auto-advance after explanation
       setTimeout(handleActivityComplete, 4000);
     }
   };
-
   if (!currentActivity) {
-    return (
-      <Card className="bg-gray-900 border-gray-800">
+    return <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-8 text-center text-white">
           <Brain className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p>Loading your lesson...</p>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Progress Header */}
       <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-4">
@@ -232,31 +206,22 @@ const ExtendedLessonManager = ({
           
           {/* Progress bar */}
           <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
-            <div 
-              className="bg-lime-400 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${(timeElapsed / totalLessonTime) * 100}%` }}
-            />
+            <div className="bg-lime-400 h-2 rounded-full transition-all duration-500" style={{
+            width: `${timeElapsed / totalLessonTime * 100}%`
+          }} />
           </div>
         </CardContent>
       </Card>
 
       {/* Nelie Avatar */}
-      <NelieAvatarSection
-        subject={subject}
-        currentQuestionIndex={currentActivityIndex}
-        totalQuestions={lessonActivities.length}
-        isSpeaking={isSpeaking}
-        autoReadEnabled={autoReadEnabled}
-        onMuteToggle={handleMuteToggle}
-        onReadQuestion={() => {
-          if (currentActivity.type === 'explanation') {
-            speakText(currentActivity.content.text);
-          } else if (currentActivity.type === 'question') {
-            const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
-            speakText(questionText);
-          }
-        }}
-      />
+      <NelieAvatarSection subject={subject} currentQuestionIndex={currentActivityIndex} totalQuestions={lessonActivities.length} isSpeaking={isSpeaking} autoReadEnabled={autoReadEnabled} onMuteToggle={handleMuteToggle} onReadQuestion={() => {
+      if (currentActivity.type === 'explanation') {
+        speakText(currentActivity.content.text);
+      } else if (currentActivity.type === 'question') {
+        const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
+        speakText(questionText);
+      }
+    }} />
 
       {/* Activity Content */}
       <Card className="bg-gray-900 border-gray-800">
@@ -268,87 +233,53 @@ const ExtendedLessonManager = ({
           </div>
 
           {/* Explanation Activity */}
-          {currentActivity.type === 'explanation' && (
-            <div className="space-y-4">
+          {currentActivity.type === 'explanation' && <div className="space-y-4">
               <p className="text-lg text-gray-300 leading-relaxed">
                 {currentActivity.content.text}
               </p>
-              <Button 
-                onClick={handleActivityComplete}
-                className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
-              >
+              <Button onClick={handleActivityComplete} className="bg-lime-500 hover:bg-lime-600 text-black font-semibold">
                 Continue Lesson
               </Button>
-            </div>
-          )}
+            </div>}
 
           {/* Question Activity */}
-          {currentActivity.type === 'question' && (
-            <div className="space-y-6">
+          {currentActivity.type === 'question' && <div className="space-y-6">
               <p className="text-lg text-white mb-6">
                 {currentActivity.content.question}
               </p>
               <div className="space-y-3">
-                {currentActivity.content.options.map((option: string, index: number) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="w-full text-left justify-start p-4 h-auto bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                    onClick={() => handleAnswerSelect(index)}
-                  >
+                {currentActivity.content.options.map((option: string, index: number) => <Button key={index} variant="outline" className="w-full text-left justify-start p-4 h-auto bg-gray-700 border-gray-600 text-white hover:bg-gray-600" onClick={() => handleAnswerSelect(index)}>
                     <span className="mr-3 font-semibold">
                       {String.fromCharCode(65 + index)}.
                     </span>
                     {option}
-                  </Button>
-                ))}
+                  </Button>)}
               </div>
-            </div>
-          )}
+            </div>}
 
           {/* Game Activity */}
-          {currentActivity.type === 'game' && (
-            <div className="space-y-6">
+          {currentActivity.type === 'game' && <div className="space-y-6">
               <p className="text-lg text-white mb-6">
                 {currentActivity.content.text}
               </p>
-              {currentActivity.content.options ? (
-                <div className="space-y-3">
-                  {currentActivity.content.options.map((option: string, index: number) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      className="w-full text-left justify-start p-4 h-auto bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                      onClick={() => handleAnswerSelect(index)}
-                    >
+              {currentActivity.content.options ? <div className="space-y-3">
+                  {currentActivity.content.options.map((option: string, index: number) => <Button key={index} variant="outline" className="w-full text-left justify-start p-4 h-auto bg-gray-700 border-gray-600 text-white hover:bg-gray-600" onClick={() => handleAnswerSelect(index)}>
                       <span className="mr-3 font-semibold">
                         {String.fromCharCode(65 + index)}.
                       </span>
                       {option}
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <Button 
-                  onClick={handleActivityComplete}
-                  className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
-                >
+                    </Button>)}
+                </div> : <Button onClick={handleActivityComplete} className="bg-lime-500 hover:bg-lime-600 text-black font-semibold">
                   I solved it!
-                </Button>
-              )}
-            </div>
-          )}
+                </Button>}
+            </div>}
         </CardContent>
       </Card>
 
       {/* Controls */}
       <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-4 flex justify-between items-center">
-          <Button 
-            variant="outline" 
-            onClick={onBack}
-            className="border-gray-600 text-white"
-          >
+          <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950">
             Exit Lesson
           </Button>
           
@@ -357,8 +288,6 @@ const ExtendedLessonManager = ({
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default ExtendedLessonManager;
