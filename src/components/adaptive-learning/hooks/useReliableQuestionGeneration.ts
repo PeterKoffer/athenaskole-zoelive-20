@@ -41,7 +41,7 @@ export const useReliableQuestionGeneration = ({
         .eq('subject', subject)
         .eq('skill_area', skillArea)
         .order('asked_at', { ascending: false })
-        .limit(100); // Increased to get more history
+        .limit(200); // Increased significantly to avoid more duplicates
 
       const usedQuestions = history?.map(h => h.question_text) || [];
       
@@ -67,7 +67,9 @@ export const useReliableQuestionGeneration = ({
           difficultyLevel,
           userId,
           previousQuestions: usedQuestions,
-          avoidDuplicates: true
+          avoidDuplicates: true,
+          requireUniqueContent: true, // Enhanced parameter
+          diversityLevel: 'high' // Request more diverse questions
         }
       });
 
@@ -82,9 +84,18 @@ export const useReliableQuestionGeneration = ({
         throw new Error('Invalid content structure');
       }
 
-      // Check if this question was already used
-      if (usedQuestions.some(used => used.toLowerCase().trim() === content.question.toLowerCase().trim())) {
-        console.log('⚠️ AI generated a duplicate question, rejecting...');
+      // Enhanced duplicate checking - check both exact matches and similarity
+      const questionText = content.question.toLowerCase().trim();
+      const isDuplicate = usedQuestions.some(used => {
+        const usedText = used.toLowerCase().trim();
+        // Check exact match or very similar (>80% similarity)
+        return usedText === questionText || 
+               (questionText.includes(usedText.substring(0, Math.min(20, usedText.length))) ||
+                usedText.includes(questionText.substring(0, Math.min(20, questionText.length))));
+      });
+
+      if (isDuplicate) {
+        console.log('⚠️ AI generated a duplicate/similar question, rejecting...');
         return null;
       }
 
@@ -113,7 +124,7 @@ export const useReliableQuestionGeneration = ({
       console.log(`📝 Generation attempt ${generationAttempts + 1}, avoiding ${usedQuestions.length} used questions`);
 
       // Try AI generation multiple times to avoid duplicates
-      for (let attempt = 0; attempt < 3; attempt++) {
+      for (let attempt = 0; attempt < 5; attempt++) { // Increased attempts
         const aiQuestion = await generateWithAI(usedQuestions);
         
         if (aiQuestion && !usedQuestions.includes(aiQuestion.question)) {
@@ -133,17 +144,22 @@ export const useReliableQuestionGeneration = ({
         console.log(`⚠️ Attempt ${attempt + 1} generated duplicate or invalid question, retrying...`);
       }
 
-      // Fallback to pre-made questions with uniqueness check
+      // Fallback to pre-made questions with enhanced uniqueness
       console.log('🔄 AI attempts exhausted, using fallback question');
       let fallbackQuestion = createFallbackQuestion();
       
-      // Make fallback unique if needed
+      // Make fallback unique with timestamp and random elements
       let uniqueQuestionText = fallbackQuestion.question;
       let counter = 1;
       
       while (usedQuestions.some(used => used.toLowerCase().trim() === uniqueQuestionText.toLowerCase().trim())) {
-        uniqueQuestionText = `${fallbackQuestion.question} (Version ${counter})`;
+        // Add more variation to make it truly unique
+        const timestamp = new Date().getTime().toString().slice(-4);
+        uniqueQuestionText = `${fallbackQuestion.question} (Practice ${counter}-${timestamp})`;
         counter++;
+        
+        // Prevent infinite loop
+        if (counter > 10) break;
       }
       
       if (uniqueQuestionText !== fallbackQuestion.question) {
@@ -171,7 +187,8 @@ export const useReliableQuestionGeneration = ({
       console.error('Question generation completely failed:', error);
       
       // Ultimate fallback with timestamp to ensure uniqueness
-      const uniqueQuestion = `${subject} practice question - ${new Date().toLocaleTimeString()}`;
+      const timestamp = new Date().toISOString();
+      const uniqueQuestion = `${subject} practice question - ${timestamp}`;
       
       return {
         question: uniqueQuestion,

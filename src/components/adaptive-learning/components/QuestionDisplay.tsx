@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import ExplanationCard from './ExplanationCard';
-import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
+import { useSpeechSynthesis } from './hooks/useSpeechSynthesis';
 
 interface QuestionDisplayProps {
   question: any;
