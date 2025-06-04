@@ -14,6 +14,8 @@ import HeroSection from "@/components/home/HeroSection";
 import SubjectsSection from "@/components/home/SubjectsSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import CTASection from "@/components/home/CTASection";
+import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
+import InsightsNotification from "@/components/ai-insights/InsightsNotification";
 
 const Index = () => {
   const { user } = useAuth();
@@ -21,6 +23,7 @@ const Index = () => {
   const { navigateToHome, scrollToTop } = useNavigation();
   const location = useLocation();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showInsightsDashboard, setShowInsightsDashboard] = useState(false);
   const { state, resetState, setActiveView } = useNavbarState();
 
   const userProgress = {
@@ -39,12 +42,11 @@ const Index = () => {
   // Scroll to top when page loads or navigation state changes
   useEffect(() => {
     scrollToTop();
-  }, [location.pathname, state.showProgress, state.showGames, state.showAITutor, scrollToTop]);
+  }, [location.pathname, state.showProgress, state.showGames, state.showAITutor, showInsightsDashboard, scrollToTop]);
 
   // Additional scroll to top specifically for AI tutor
   useEffect(() => {
     if (state.showAITutor) {
-      // Use setTimeout to ensure the component has rendered
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 100);
@@ -94,12 +96,23 @@ const Index = () => {
     scrollToTop();
   };
 
-  const handleBackToHome = () => {
+  const handleShowInsights = () => {
+    setShowInsightsDashboard(true);
     resetState();
     scrollToTop();
   };
 
+  const handleBackToHome = () => {
+    resetState();
+    setShowInsightsDashboard(false);
+    scrollToTop();
+  };
+
   const renderMainContent = () => {
+    if (showInsightsDashboard) {
+      return <AIInsightsDashboard onClose={handleBackToHome} />;
+    }
+
     if (state.showProgress && user) {
       return (
         <div className="py-8">
@@ -145,8 +158,9 @@ const Index = () => {
         onShowProgress={handleShowProgress}
         onShowGames={handleShowGames}
         onShowAITutor={handleShowAITutor}
+        onShowInsights={handleShowInsights}
         onResetNavigation={resetState}
-        showBackButton={state.showProgress || state.showGames || state.showAITutor}
+        showBackButton={state.showProgress || state.showGames || state.showAITutor || showInsightsDashboard}
         onBack={handleBackToHome}
       />
 
@@ -155,6 +169,11 @@ const Index = () => {
       </main>
 
       <Footer />
+
+      {/* AI Insights Notification - shows when user logs in */}
+      {user && !showInsightsDashboard && (
+        <InsightsNotification onViewDashboard={handleShowInsights} />
+      )}
 
       {showAuthModal && (
         <AuthModal 

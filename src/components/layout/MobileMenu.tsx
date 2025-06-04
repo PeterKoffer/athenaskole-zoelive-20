@@ -1,126 +1,159 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, User, LogOut, BookOpen, BarChart3, Gamepad2, Bot, GraduationCap, Home } from "lucide-react";
-import { User as SupabaseUser } from "@supabase/supabase-js";
+import { Badge } from "@/components/ui/badge";
+import { 
+  User, 
+  BarChart3, 
+  GameController2, 
+  MessageCircle, 
+  LogOut,
+  Brain
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface MobileMenuProps {
   isOpen: boolean;
-  onToggle: () => void;
-  user: SupabaseUser | null;
+  onClose: () => void;
+  user: any;
   onGetStarted: () => void;
-  onSignOut: () => void;
   onShowProgress?: () => void;
   onShowGames?: () => void;
   onShowAITutor?: () => void;
-  onCurriculumSystem?: () => void;
+  onShowInsights?: () => void;
 }
 
 const MobileMenu = ({ 
   isOpen, 
-  onToggle, 
+  onClose, 
   user, 
   onGetStarted, 
-  onSignOut,
-  onShowProgress,
-  onShowGames,
+  onShowProgress, 
+  onShowGames, 
   onShowAITutor,
-  onCurriculumSystem
+  onShowInsights
 }: MobileMenuProps) => {
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate('/');
+      onClose();
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleMenuItemClick = (action: () => void) => {
     action();
-    setIsSheetOpen(false);
+    onClose();
   };
 
-  const menuItems = user ? [
-    { 
-      label: "Home", 
-      icon: Home, 
-      action: () => navigate('/') 
-    },
-    { 
-      label: "Daily Program", 
-      icon: BookOpen, 
-      action: () => navigate('/daily-program') 
-    },
-    { 
-      label: "Curriculum System", 
-      icon: GraduationCap, 
-      action: () => onCurriculumSystem?.() 
-    },
-    ...(onShowProgress ? [{ 
-      label: "Progress", 
-      icon: BarChart3, 
-      action: onShowProgress 
-    }] : []),
-    ...(onShowGames ? [{ 
-      label: "Games", 
-      icon: Gamepad2, 
-      action: onShowGames 
-    }] : []),
-    ...(onShowAITutor ? [{ 
-      label: "AI Tutor", 
-      icon: Bot, 
-      action: onShowAITutor 
-    }] : []),
-    { 
-      label: "Profile", 
-      icon: User, 
-      action: () => navigate('/profile') 
-    },
-    { 
-      label: "Sign Out", 
-      icon: LogOut, 
-      action: onSignOut 
-    }
-  ] : [];
+  if (!isOpen) return null;
 
   return (
-    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-white hover:bg-gray-800">
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="bg-gray-900 border-gray-800 w-[280px]">
-        <div className="flex flex-col space-y-4 mt-8">
-          {user ? (
-            <div className="space-y-2">
-              <div className="px-3 py-2 border-b border-gray-700">
-                <p className="text-white font-medium">
-                  {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
-                </p>
-                <p className="text-gray-400 text-sm">{user.email}</p>
-              </div>
-              
-              {menuItems.map((item, index) => (
-                <Button
-                  key={index}
-                  variant="ghost"
-                  className="w-full justify-start text-white hover:bg-gray-800"
-                  onClick={() => handleMenuItemClick(item.action)}
-                >
-                  <item.icon className="mr-3 h-4 w-4" />
-                  {item.label}
-                </Button>
-              ))}
+    <div className="md:hidden bg-gray-800 border-t border-gray-700">
+      <div className="px-4 py-4 space-y-2">
+        {user ? (
+          <>
+            <div className="px-3 py-2 text-sm text-gray-300 border-b border-gray-700 mb-2">
+              Welcome, {user.user_metadata?.name || user.email}
             </div>
-          ) : (
-            <Button 
-              onClick={() => handleMenuItemClick(onGetStarted)}
-              className="bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold border-none"
+            
+            {onShowProgress && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
+                onClick={() => handleMenuItemClick(onShowProgress)}
+              >
+                <BarChart3 className="w-4 h-4 mr-3" />
+                Progress
+              </Button>
+            )}
+            
+            {onShowGames && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
+                onClick={() => handleMenuItemClick(onShowGames)}
+              >
+                <GameController2 className="w-4 h-4 mr-3" />
+                Games
+              </Button>
+            )}
+            
+            {onShowAITutor && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
+                onClick={() => handleMenuItemClick(onShowAITutor)}
+              >
+                <MessageCircle className="w-4 h-4 mr-3" />
+                AI Tutor
+              </Button>
+            )}
+
+            {onShowInsights && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-purple-400 hover:text-purple-300 hover:bg-gray-700 relative"
+                onClick={() => handleMenuItemClick(onShowInsights)}
+              >
+                <Brain className="w-4 h-4 mr-3" />
+                AI Insights
+                <Badge className="ml-auto bg-purple-500 text-white text-xs">
+                  NEW
+                </Badge>
+              </Button>
+            )}
+            
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
+              onClick={() => {
+                navigate('/profile');
+                onClose();
+              }}
             >
-              Get Started
+              <User className="w-4 h-4 mr-3" />
+              Profile
             </Button>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
+            
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-gray-700"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-3" />
+              Logout
+            </Button>
+          </>
+        ) : (
+          <Button
+            onClick={() => {
+              onGetStarted();
+              onClose();
+            }}
+            className="w-full bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold"
+          >
+            Get Started
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 

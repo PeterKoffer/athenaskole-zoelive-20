@@ -1,24 +1,50 @@
 
 import { Button } from "@/components/ui/button";
-import { LucideIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface NavbarButtonProps {
-  icon?: LucideIcon;
-  children: React.ReactNode;
   onClick: () => void;
-  variant?: "outline" | "default";
+  children: React.ReactNode;
+  variant?: "ghost" | "outline" | "default";
+  className?: string;
+  showBadge?: boolean;
+  badgeText?: string;
+  badgeColor?: string;
 }
 
-const NavbarButton = ({ icon: Icon, children, onClick, variant = "outline" }: NavbarButtonProps) => {
+const NavbarButton = ({ 
+  onClick, 
+  children, 
+  variant = "ghost", 
+  className,
+  showBadge = false,
+  badgeText = "",
+  badgeColor = "bg-red-500"
+}: NavbarButtonProps) => {
   return (
-    <Button 
-      variant="outline"
-      onClick={onClick}
-      className="bg-white/10 text-white border-white/20 hover:bg-white/20 h-10 px-4 rounded-lg backdrop-blur-sm"
-    >
-      {Icon && <Icon className="w-4 h-4 mr-2" />}
-      {children}
-    </Button>
+    <div className="relative">
+      <Button
+        variant={variant}
+        onClick={onClick}
+        className={cn(
+          "text-white hover:text-lime-400 hover:bg-gray-800 transition-colors",
+          className
+        )}
+      >
+        {children}
+      </Button>
+      {showBadge && (
+        <Badge 
+          className={cn(
+            "absolute -top-2 -right-2 px-1 min-w-[20px] h-5 text-xs text-white border-0",
+            badgeColor
+          )}
+        >
+          {badgeText}
+        </Badge>
+      )}
+    </div>
   );
 };
 
