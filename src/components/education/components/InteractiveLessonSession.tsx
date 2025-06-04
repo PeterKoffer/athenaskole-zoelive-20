@@ -1,10 +1,14 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Brain, Volume2, VolumeX, Play } from 'lucide-react';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import { Brain, Play } from 'lucide-react';
 import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+import NelieAvatarSection from './NelieAvatarSection';
+import QuestionDisplay from './QuestionDisplay';
+import AnswerOptions from './AnswerOptions';
+import QuestionResult from './QuestionResult';
+import LessonControls from './LessonControls';
 
 interface LessonState {
   phase: 'introduction' | 'interactive' | 'paused' | 'completed';
@@ -185,139 +189,48 @@ const InteractiveLessonSession = ({
 
   return (
     <div className="space-y-6">
-      {/* Nelie Avatar and Controls */}
-      <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <RobotAvatar size="xl" isActive={true} isSpeaking={isSpeaking} />
-              <div className="text-white">
-                <h3 className="text-lg font-semibold">Nelie is here to help!</h3>
-                <p className="text-purple-200">Working on {subject} • Question {currentQuestionIndex + 1} of {questions.length}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleMuteToggle}
-                className="border-purple-400 text-slate-950"
-              >
-                {autoReadEnabled ? (
-                  <Volume2 className="w-4 h-4 mr-2" />
-                ) : (
-                  <VolumeX className="w-4 h-4 mr-2" />
-                )}
-                {autoReadEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={readQuestion}
-                className="border-purple-400 text-slate-950"
-                disabled={!autoReadEnabled}
-              >
-                <Volume2 className="w-4 h-4 mr-2" />
-                {isSpeaking ? 'Nelie is speaking...' : 'Ask Nelie to repeat'}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <NelieAvatarSection
+        subject={subject}
+        currentQuestionIndex={currentQuestionIndex}
+        totalQuestions={questions.length}
+        isSpeaking={isSpeaking}
+        autoReadEnabled={autoReadEnabled}
+        onMuteToggle={handleMuteToggle}
+        onReadQuestion={readQuestion}
+      />
 
-      {/* Question Card */}
+      <QuestionDisplay
+        question={currentQuestion.question}
+        currentQuestionIndex={currentQuestionIndex}
+        totalQuestions={questions.length}
+        score={score}
+        showResult={showResult}
+      />
+
       <Card className="bg-gray-900 border-gray-800">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center justify-between">
-            <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
-            <span className="text-sm text-gray-400">Score: {score}/{currentQuestionIndex + (showResult ? 1 : 0)}</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <h3 className="text-xl font-semibold text-white">
-            {currentQuestion.question}
-          </h3>
+        <CardContent className="space-y-6 p-6">
+          <AnswerOptions
+            options={currentQuestion.options}
+            selectedAnswer={selectedAnswer}
+            correctAnswer={currentQuestion.correctAnswer}
+            showResult={showResult}
+            onAnswerSelect={handleAnswerSelect}
+          />
 
-          <div className="space-y-3">
-            {currentQuestion.options.map((option, index) => (
-              <Button
-                key={index}
-                variant={selectedAnswer === index ? "default" : "outline"}
-                className={`w-full text-left justify-start p-4 h-auto ${
-                  selectedAnswer === index
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                } ${
-                  showResult && index === currentQuestion.correctAnswer
-                    ? "bg-green-600 text-white"
-                    : ""
-                } ${
-                  showResult && selectedAnswer === index && index !== currentQuestion.correctAnswer
-                    ? "bg-red-600 text-white"
-                    : ""
-                }`}
-                onClick={() => handleAnswerSelect(index)}
-                disabled={showResult}
-              >
-                <span className="mr-3 font-semibold">
-                  {String.fromCharCode(65 + index)}.
-                </span>
-                {option}
-                {showResult && index === currentQuestion.correctAnswer && (
-                  <CheckCircle className="w-5 h-5 ml-auto text-green-200" />
-                )}
-                {showResult && selectedAnswer === index && index !== currentQuestion.correctAnswer && (
-                  <XCircle className="w-5 h-5 ml-auto text-red-200" />
-                )}
-              </Button>
-            ))}
-          </div>
+          <QuestionResult
+            showResult={showResult}
+            isCorrect={selectedAnswer === currentQuestion.correctAnswer}
+            explanation={currentQuestion.explanation}
+            isLastQuestion={currentQuestionIndex === questions.length - 1}
+          />
 
-          {showResult && (
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                {selectedAnswer === currentQuestion.correctAnswer ? (
-                  <CheckCircle className="w-5 h-5 mr-2 text-green-400" />
-                ) : (
-                  <XCircle className="w-5 h-5 mr-2 text-red-400" />
-                )}
-                <span className={
-                  selectedAnswer === currentQuestion.correctAnswer 
-                    ? 'text-green-400 font-semibold' 
-                    : 'text-red-400 font-semibold'
-                }>
-                  {selectedAnswer === currentQuestion.correctAnswer ? 'Correct!' : 'Incorrect'}
-                </span>
-              </div>
-              <p className="text-gray-300 mb-3">{currentQuestion.explanation}</p>
-              {currentQuestionIndex < questions.length - 1 ? (
-                <p className="text-gray-400 text-sm">Next question coming up...</p>
-              ) : (
-                <p className="text-gray-400 text-sm">Lesson completing...</p>
-              )}
-            </div>
-          )}
-
-          <div className="flex justify-end">
-            {!showResult ? (
-              <Button
-                onClick={handleSubmitAnswer}
-                disabled={selectedAnswer === null}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Submit Answer
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNextQuestion}
-                className="bg-green-500 hover:bg-green-600 text-white"
-              >
-                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Complete Lesson'}
-              </Button>
-            )}
-          </div>
+          <LessonControls
+            showResult={showResult}
+            selectedAnswer={selectedAnswer}
+            isLastQuestion={currentQuestionIndex === questions.length - 1}
+            onSubmitAnswer={handleSubmitAnswer}
+            onNextQuestion={handleNextQuestion}
+          />
         </CardContent>
       </Card>
     </div>
