@@ -107,27 +107,16 @@ const FloatingAITutor = () => {
   console.log('✅ FloatingAITutor rendering UI - isOpen:', isOpen, 'position:', position);
 
   return (
-    <div 
-      style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        pointerEvents: 'none',
-        zIndex: 999999
-      }}
-    >
+    <>
       {/* Collapsed button state - Always visible when not open */}
       {!isOpen && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             top: `${position.y}px`,
             left: `${position.x}px`,
-            cursor: isDragging ? 'grabbing' : 'grab',
-            pointerEvents: 'auto',
-            zIndex: 1000001
+            zIndex: 999999,
+            pointerEvents: 'auto'
           }}
         >
           <CollapsedButton 
@@ -144,12 +133,11 @@ const FloatingAITutor = () => {
       {isOpen && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             top: `${position.y}px`,
             left: `${position.x}px`,
-            cursor: isDragging ? 'grabbing' : 'grab',
-            pointerEvents: 'auto',
-            zIndex: 1000001
+            zIndex: 999999,
+            pointerEvents: 'auto'
           }}
         >
           <ChatInterface
@@ -165,7 +153,7 @@ const FloatingAITutor = () => {
           />
         </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -15,6 +15,7 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AILearning from "./pages/AILearning";
 import NotFound from "./pages/NotFound";
+import FloatingAITutor from "./components/FloatingAITutor";
 
 // Education components for specific subjects
 import EnglishLearning from "./components/education/EnglishLearning";
@@ -52,6 +53,9 @@ const App = () => (
           
           <Route path="*" element={<NotFound />} />
         </Routes>
+        
+        {/* FloatingAITutor appears on all pages except auth */}
+        <FloatingAITutor />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

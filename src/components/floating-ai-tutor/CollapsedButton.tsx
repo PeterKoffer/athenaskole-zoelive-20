@@ -14,9 +14,8 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
   console.log('🔘 CollapsedButton rendering, isDragging:', isDragging);
   
   const handleButtonClick = (e: React.MouseEvent) => {
-    console.log('🖱️ Nelie button clicked - preventing propagation and checking if dragging:', isDragging);
+    console.log('🖱️ Nelie button clicked - checking interaction');
     e.stopPropagation();
-    e.preventDefault();
     
     // Only expand if we're not dragging
     if (!isDragging) {
@@ -29,18 +28,25 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
 
   const handleMouseDown = (e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie button');
-    e.stopPropagation();
+    // Don't prevent default here, let the drag handler manage it
     onMouseDown(e);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     console.log('👆 Touch start on Nelie button');
-    e.stopPropagation();
+    // Don't prevent default here, let the drag handler manage it
     onTouchStart(e);
+  };
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('🏠 Home button clicked');
+    onResetToHome();
   };
   
   return (
-    <div className="relative">
+    <div className="relative" style={{ pointerEvents: 'auto' }}>
       <Button
         onClick={handleButtonClick}
         onMouseDown={handleMouseDown}
@@ -58,7 +64,8 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
           minWidth: '80px',
           minHeight: '80px',
           padding: '12px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          pointerEvents: 'auto'
         }}
       >
         <div className="text-3xl mb-1">👩‍🏫</div>
@@ -79,14 +86,10 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
       
       {/* Home button - larger and more visible */}
       <Button
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          console.log('🏠 Home button clicked');
-          onResetToHome();
-        }}
+        onClick={handleHomeClick}
         className="absolute -top-3 -right-3 w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white border-2 border-white rounded-full flex items-center justify-center shadow-lg"
         title="Go home"
+        style={{ pointerEvents: 'auto' }}
       >
         <Home className="w-4 h-4" />
       </Button>
