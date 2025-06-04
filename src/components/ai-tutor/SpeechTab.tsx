@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SpeechRecognition from "./SpeechRecognition";
+import RobotAvatar from "./RobotAvatar";
 
 interface SpeechTabProps {
   currentPracticeText: string;
@@ -20,11 +21,21 @@ const SpeechTab = ({ currentPracticeText, onPracticeTextChange, onScoreUpdate }:
 
   return (
     <div className="space-y-6">
-      <SpeechRecognition
-        targetText={currentPracticeText}
-        language="english"
-        onScoreUpdate={onScoreUpdate}
-      />
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center justify-center space-x-3">
+            <RobotAvatar size="md" isActive={true} />
+            <span>Practice Speech with Nelie</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SpeechRecognition
+            targetText={currentPracticeText}
+            language="english"
+            onScoreUpdate={onScoreUpdate}
+          />
+        </CardContent>
+      </Card>
       
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>

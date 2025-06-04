@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Volume2, RotateCcw } from "lucide-react";
+import RobotAvatar from "./RobotAvatar";
 
 interface SpeechRecognitionProps {
   targetText: string;
@@ -16,6 +17,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
   const [transcription, setTranscription] = useState("");
   const [pronunciationScore, setPronunciationScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [isPlayingExample, setIsPlayingExample] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -88,9 +90,12 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
 
   const playTargetAudio = () => {
     if ('speechSynthesis' in window) {
+      setIsPlayingExample(true);
       const utterance = new SpeechSynthesisUtterance(targetText);
       utterance.lang = 'en-US';
       utterance.rate = 0.8;
+      utterance.onend = () => setIsPlayingExample(false);
+      utterance.onerror = () => setIsPlayingExample(false);
       speechSynthesis.speak(utterance);
     }
   };
@@ -102,20 +107,28 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-700">
+    <Card className="bg-gray-700 border-gray-600">
       <CardContent className="p-6 space-y-4">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-white mb-2">Pronunciation Practice</h3>
-          <div className="bg-gray-700 p-3 rounded-lg mb-4">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <RobotAvatar 
+              size="lg" 
+              isActive={isListening || isPlayingExample} 
+              isSpeaking={isPlayingExample}
+            />
+            <h3 className="text-lg font-semibold text-white">Pronunciation Practice</h3>
+          </div>
+          <div className="bg-gray-600 p-3 rounded-lg mb-4">
             <p className="text-white font-medium">Say: "{targetText}"</p>
             <Button
               variant="outline"
               size="sm"
               onClick={playTargetAudio}
               className="mt-2 text-gray-300 border-gray-600 hover:bg-gray-600"
+              disabled={isPlayingExample}
             >
               <Volume2 className="w-4 h-4 mr-1" />
-              Listen to example
+              {isPlayingExample ? "Playing..." : "Listen to example"}
             </Button>
           </div>
         </div>
@@ -164,7 +177,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
 
         {transcription && (
           <div className="space-y-3">
-            <div className="bg-gray-700 p-3 rounded-lg">
+            <div className="bg-gray-600 p-3 rounded-lg">
               <p className="text-gray-300 text-sm">You said:</p>
               <p className="text-white font-medium">"{transcription}"</p>
             </div>

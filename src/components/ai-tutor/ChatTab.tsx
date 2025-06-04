@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ChatMessage from "./ChatMessage";
 import LearningOptions from "./LearningOptions";
 import ChatInput from "./ChatInput";
+import RobotAvatar from "./RobotAvatar";
 import { Message, LearningOption } from "./types";
 
 interface ChatTabProps {
@@ -48,7 +49,10 @@ const ChatTab = ({
   return (
     <Card className="h-96 bg-gray-900 border-gray-800">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg text-white text-center">Chat with Nelie</CardTitle>
+        <CardTitle className="text-lg text-white text-center flex items-center justify-center space-x-3">
+          <RobotAvatar size="md" isActive={isSpeaking} isSpeaking={isSpeaking} />
+          <span>Chat with Nelie</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="h-full flex flex-col">
         <div 
