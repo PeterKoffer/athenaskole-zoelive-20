@@ -7,6 +7,7 @@ export const useSpeechSynthesis = () => {
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
   const speechQueue = useRef<string[]>([]);
   const isProcessingQueue = useRef(false);
+  const hasAutoRead = useRef(false);
 
   // Check if speech synthesis is available
   const isSpeechSynthesisSupported = typeof speechSynthesis !== 'undefined';
@@ -191,6 +192,7 @@ export const useSpeechSynthesis = () => {
   return {
     isSpeaking,
     autoReadEnabled,
+    hasAutoRead,
     speakText,
     stopSpeaking,
     handleMuteToggle,

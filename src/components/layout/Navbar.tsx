@@ -4,9 +4,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import MobileMenu from "./MobileMenu";
 import NavbarLogo from "./NavbarLogo";
-import NavbarDesktopMenu from "./NavbarDesktopMenu";
 import NavbarUserMenu from "./NavbarUserMenu";
 import NavbarButton from "./NavbarButton";
+import UnifiedNavigationDropdown from "./UnifiedNavigationDropdown";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Brain } from "lucide-react";
 
@@ -56,7 +56,7 @@ const Navbar = ({
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6">
-            <NavbarDesktopMenu 
+            <UnifiedNavigationDropdown 
               user={user}
               onShowProgress={onShowProgress}
               onShowGames={onShowGames}
