@@ -36,6 +36,15 @@ const QuestionDisplay = ({
   autoSubmit = false,
   subject = ''
 }: QuestionDisplayProps) => {
+  // Clean up question text by removing ID references and other technical details
+  const cleanQuestionText = (text: string) => {
+    return text
+      .replace(/\(ID:\s*[^)]+\)/gi, '') // Remove (ID: ...) patterns
+      .replace(/\(Question\s*\d+[^)]*\)/gi, '') // Remove (Question X) patterns
+      .replace(/\s+/g, ' ') // Clean up extra spaces
+      .trim();
+  };
+
   const getOptionClassName = (index: number) => {
     if (selectedAnswer === index) {
       if (showResult) {
@@ -57,7 +66,7 @@ const QuestionDisplay = ({
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-semibold text-white mb-6">
-          {question}
+          {cleanQuestionText(question)}
         </h3>
       </div>
 
