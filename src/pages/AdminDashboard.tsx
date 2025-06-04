@@ -52,91 +52,91 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <AdminStatsCards stats={stats} />
 
-        {/* Admin Tools Dropdown Menu - Now Visible with Functions */}
+        {/* Admin Tools Dropdown Menu - Fixed text color to black */}
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-black bg-white border-gray-600 hover:bg-gray-100">
-                <Menu className="w-4 h-4 mr-2" />
+              <Button variant="outline" className="text-black bg-white border-gray-600 hover:bg-gray-100 hover:text-black">
+                <Menu className="w-4 h-4 mr-2 text-black" />
                 Admin Tools & Management
-                <ChevronDown className="w-4 h-4 ml-2" />
+                <ChevronDown className="w-4 h-4 ml-2 text-black" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 bg-gray-800 border-gray-700">
+            <DropdownMenuContent className="w-64 bg-white border-gray-300 z-50">
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="text-white hover:bg-gray-700">
+                <DropdownMenuSubTrigger className="text-gray-900 hover:bg-gray-100">
                   <Users className="w-4 h-4 mr-2" />
                   User Management
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700">
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                <DropdownMenuSubContent className="bg-white border-gray-300 z-50">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <UserPlus className="w-4 h-4 mr-2" />
                     Add New User
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <Shield className="w-4 h-4 mr-2" />
                     Manage Roles
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <Lock className="w-4 h-4 mr-2" />
                     User Permissions
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               
-              <DropdownMenuSeparator className="bg-gray-600" />
+              <DropdownMenuSeparator className="bg-gray-300" />
               
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="text-white hover:bg-gray-700">
+                <DropdownMenuSubTrigger className="text-gray-900 hover:bg-gray-100">
                   <School className="w-4 h-4 mr-2" />
                   School Administration
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700">
+                <DropdownMenuSubContent className="bg-white border-gray-300 z-50">
                   <DropdownMenuItem 
-                    className="text-white hover:bg-gray-700"
+                    className="text-gray-900 hover:bg-gray-100"
                     onClick={() => navigate('/school-dashboard')}
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     School Analytics
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <Users className="w-4 h-4 mr-2" />
                     Manage Schools
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <MessageSquare className="w-4 h-4 mr-2" />
                     Communication Hub
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
-              <DropdownMenuSeparator className="bg-gray-600" />
+              <DropdownMenuSeparator className="bg-gray-300" />
 
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="text-white hover:bg-gray-700">
+                <DropdownMenuSubTrigger className="text-gray-900 hover:bg-gray-100">
                   <Settings className="w-4 h-4 mr-2" />
                   System Settings
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700">
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                <DropdownMenuSubContent className="bg-white border-gray-300 z-50">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <Database className="w-4 h-4 mr-2" />
                     Database Management
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <Activity className="w-4 h-4 mr-2" />
                     System Health
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-white hover:bg-gray-700">
+                  <DropdownMenuItem className="text-gray-900 hover:bg-gray-100">
                     <Shield className="w-4 h-4 mr-2" />
                     Security Settings
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
-              <DropdownMenuSeparator className="bg-gray-600" />
+              <DropdownMenuSeparator className="bg-gray-300" />
 
               <DropdownMenuItem 
-                className="text-purple-400 hover:bg-gray-700"
+                className="text-purple-600 hover:bg-purple-50"
                 onClick={handleShowAIInsights}
               >
                 <Brain className="w-4 h-4 mr-2" />
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Quick Access AI Insights Button */}
+          {/* Quick Access AI Insights Button - More prominent */}
           <Button 
             onClick={handleShowAIInsights}
             className="bg-purple-600 hover:bg-purple-700 text-white"
@@ -153,14 +153,32 @@ const AdminDashboard = () => {
             <Brain className="w-4 h-4 mr-2" />
             AI Insights
           </Button>
+
+          {/* Additional Admin Functions - More visible */}
+          <Button 
+            onClick={() => navigate('/school-dashboard')}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <School className="w-4 h-4 mr-2" />
+            School Management
+          </Button>
+
+          <Button 
+            variant="outline"
+            className="text-gray-900 bg-white border-gray-400 hover:bg-gray-50"
+          >
+            <Users className="w-4 h-4 mr-2 text-gray-900" />
+            User Management
+          </Button>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-800">
             <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-gray-700">Users</TabsTrigger>
             <TabsTrigger value="schools" className="data-[state=active]:bg-gray-700">Schools</TabsTrigger>
             <TabsTrigger value="system" className="data-[state=active]:bg-gray-700">System</TabsTrigger>
+            <TabsTrigger value="ai-insights" className="data-[state=active]:bg-purple-700 data-[state=active]:text-white">AI Insights</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -250,6 +268,57 @@ const AdminDashboard = () => {
 
           <TabsContent value="system" className="space-y-6">
             <SystemManagement />
+          </TabsContent>
+
+          <TabsContent value="ai-insights" className="space-y-6">
+            <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-500">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Brain className="w-6 h-6 mr-3 text-purple-300" />
+                  AI Insights Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-purple-100 mb-4">
+                    Access comprehensive AI-powered insights about educational trends, student performance, and platform optimization.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-black/20 border-purple-400">
+                      <CardContent className="p-4 text-center">
+                        <Brain className="w-12 h-12 mx-auto mb-3 text-purple-300" />
+                        <h3 className="font-semibold text-white mb-2">AI Analytics</h3>
+                        <p className="text-sm text-purple-200 mb-4">
+                          Get AI-powered insights on student learning patterns and educational trends
+                        </p>
+                        <Button 
+                          onClick={handleShowAIInsights}
+                          className="bg-purple-600 hover:bg-purple-700 text-white w-full"
+                        >
+                          Open AI Dashboard
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-black/20 border-purple-400">
+                      <CardContent className="p-4 text-center">
+                        <BarChart3 className="w-12 h-12 mx-auto mb-3 text-blue-300" />
+                        <h3 className="font-semibold text-white mb-2">Smart Recommendations</h3>
+                        <p className="text-sm text-purple-200 mb-4">
+                          Receive personalized recommendations for platform improvements
+                        </p>
+                        <Button 
+                          onClick={handleShowAIInsights}
+                          variant="outline" 
+                          className="border-purple-400 text-purple-300 hover:bg-purple-600 hover:text-white w-full"
+                        >
+                          View Recommendations
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
