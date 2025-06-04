@@ -60,11 +60,16 @@ const EnhancedLearningSession = ({
         });
 
         if (sessionData.isSessionComplete) {
+          // Convert complex answers to simple scores for SessionComplete
+          const answerScores = sessionData.answers.map(answer => 
+            answer.isCorrect ? 1 : 0
+          );
+
           return (
             <SessionComplete
               subject={subject}
               skillArea={skillArea}
-              answers={sessionData.answers}
+              answers={answerScores}
               sessionQuestions={sessionData.questions}
               totalQuestions={totalQuestions}
               onRetry={handleRetry}
