@@ -1,3 +1,4 @@
+
 import { Question } from './useDiverseQuestionGeneration';
 
 export const generateFallbackQuestion = (
@@ -6,27 +7,25 @@ export const generateFallbackQuestion = (
   difficultyLevel: number,
   gradeLevel: number = 6
 ): Question => {
-  const questionId = `fallback-${Date.now()}-${Math.random()}`;
   
   if (subject === 'music') {
-    return generateMusicQuestion(skillArea, difficultyLevel, gradeLevel, questionId);
+    return generateMusicQuestion(skillArea, difficultyLevel, gradeLevel);
   }
   
   if (subject === 'mathematics' || subject === 'math') {
-    return generateMathQuestion(skillArea, difficultyLevel, gradeLevel, questionId);
+    return generateMathQuestion(skillArea, difficultyLevel, gradeLevel);
   }
   
   if (subject === 'science') {
-    return generateScienceQuestion(skillArea, difficultyLevel, gradeLevel, questionId);
+    return generateScienceQuestion(skillArea, difficultyLevel, gradeLevel);
   }
   
   if (subject === 'english') {
-    return generateEnglishQuestion(skillArea, difficultyLevel, gradeLevel, questionId);
+    return generateEnglishQuestion(skillArea, difficultyLevel, gradeLevel);
   }
   
   // Generic fallback
   return {
-    id: questionId,
     question: `What is an important concept in ${subject}?`,
     options: [
       'Understanding the basics',
@@ -41,7 +40,7 @@ export const generateFallbackQuestion = (
   };
 };
 
-const generateMusicQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number, questionId: string): Question => {
+const generateMusicQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
   const musicQuestions = {
     music_theory: [
       {
@@ -88,7 +87,6 @@ const generateMusicQuestion = (skillArea: string, difficultyLevel: number, grade
   const selectedQuestion = questions[Math.floor(Math.random() * questions.length)];
 
   return {
-    id: questionId,
     question: selectedQuestion.question,
     options: selectedQuestion.options,
     correct: selectedQuestion.correct,
@@ -102,10 +100,8 @@ const generateMusicQuestion = (skillArea: string, difficultyLevel: number, grade
   };
 };
 
-const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number, questionId: string): Question => {
-  
+const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
   return {
-    id: questionId,
     question: "What is 15 + 8?",
     options: ["21", "22", "23", "24"],
     correct: 2,
@@ -115,10 +111,8 @@ const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeL
   };
 };
 
-const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number, questionId: string): Question => {
-  
+const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
   return {
-    id: questionId,
     question: "What is the chemical symbol for water?",
     options: ["H2O", "CO2", "NaCl", "O2"],
     correct: 0,
@@ -128,10 +122,8 @@ const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gra
   };
 };
 
-const generateEnglishQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number, questionId: string): Question => {
-  
+const generateEnglishQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
   return {
-    id: questionId,
     question: "Which word is a noun?",
     options: ["run", "quickly", "beautiful", "house"],
     correct: 3,
