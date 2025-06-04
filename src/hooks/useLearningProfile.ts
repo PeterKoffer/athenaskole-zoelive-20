@@ -1,7 +1,15 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { userLearningProfileService, UserLearningProfile, UserPreferences } from '@/services/userLearningProfileService';
+import { 
+  userLearningProfileService, 
+  UserLearningProfile, 
+  UserPreferences 
+} from '@/services/userLearningProfileService';
+import type { Database } from '@/integrations/supabase/types';
+
+type UserLearningProfileInsert = Database['public']['Tables']['user_learning_profiles']['Insert'];
+type UserPreferencesInsert = Database['public']['Tables']['user_preferences']['Insert'];
 
 export const useLearningProfile = (subject: string, skillArea: string = 'general') => {
   const { user } = useAuth();
@@ -41,10 +49,10 @@ export const useLearningProfile = (subject: string, skillArea: string = 'general
     loadProfile();
   }, [user?.id, subject, skillArea]);
 
-  const updateProfile = async (updates: Partial<UserLearningProfile>) => {
+  const updateProfile = async (updates: Partial<UserLearningProfileInsert>) => {
     if (!user?.id) return false;
 
-    const updatedProfile = {
+    const updatedProfile: UserLearningProfileInsert = {
       ...updates,
       user_id: user.id,
       subject,
@@ -61,10 +69,10 @@ export const useLearningProfile = (subject: string, skillArea: string = 'general
     return success;
   };
 
-  const updatePreferences = async (updates: Partial<UserPreferences>) => {
+  const updatePreferences = async (updates: Partial<UserPreferencesInsert>) => {
     if (!user?.id) return false;
 
-    const updatedPreferences = {
+    const updatedPreferences: UserPreferencesInsert = {
       ...updates,
       user_id: user.id,
       updated_at: new Date().toISOString()
@@ -83,17 +91,19 @@ export const useLearningProfile = (subject: string, skillArea: string = 'general
     if (!profile) return 1;
     
     // Base difficulty on current level and recent performance
-    let recommendedLevel = profile.current_difficulty_level;
+    let recommendedLevel = profile.current_difficulty_level || 1;
     
     // Adjust based on accuracy
-    if (profile.overall_accuracy > 85) {
+    const accuracy = Number(profile.overall_accuracy) || 0;
+    if (accuracy > 85) {
       recommendedLevel = Math.min(10, recommendedLevel + 1);
-    } else if (profile.overall_accuracy < 60) {
+    } else if (accuracy < 60) {
       recommendedLevel = Math.max(1, recommendedLevel - 1);
     }
     
     // Consider consistency
-    if (profile.consistency_score < 50) {
+    const consistency = Number(profile.consistency_score) || 0;
+    if (consistency < 50) {
       recommendedLevel = Math.max(1, recommendedLevel - 1);
     }
     
@@ -103,8 +113,8 @@ export const useLearningProfile = (subject: string, skillArea: string = 'general
   const getPersonalizedSettings = () => {
     return {
       speechEnabled: preferences?.speech_enabled ?? true,
-      speechRate: preferences?.speech_rate ?? 0.8,
-      speechPitch: preferences?.speech_pitch ?? 1.2,
+      speechRate: Number(preferences?.speech_rate) ?? 0.8,
+      speechPitch: Number(preferences?.speech_pitch) ?? 1.2,
       preferredVoice: preferences?.preferred_voice ?? 'female',
       autoReadQuestions: preferences?.auto_read_questions ?? true,
       autoReadExplanations: preferences?.auto_read_explanations ?? true,
