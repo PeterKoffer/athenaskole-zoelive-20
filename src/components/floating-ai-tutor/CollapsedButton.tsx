@@ -13,18 +13,38 @@ interface CollapsedButtonProps {
 const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, isDragging }: CollapsedButtonProps) => {
   console.log('🔘 CollapsedButton rendering, isDragging:', isDragging);
   
+  const handleButtonClick = (e: React.MouseEvent) => {
+    console.log('🖱️ Nelie button clicked - preventing propagation and checking if dragging:', isDragging);
+    e.stopPropagation();
+    e.preventDefault();
+    
+    // Only expand if we're not dragging
+    if (!isDragging) {
+      console.log('✅ Expanding Nelie - not dragging');
+      onExpand();
+    } else {
+      console.log('❌ Not expanding Nelie - currently dragging');
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    console.log('🖱️ Mouse down on Nelie button');
+    e.stopPropagation();
+    onMouseDown(e);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    console.log('👆 Touch start on Nelie button');
+    e.stopPropagation();
+    onTouchStart(e);
+  };
+  
   return (
     <div className="relative">
       <Button
-        onClick={(e) => {
-          e.stopPropagation();
-          console.log('🖱️ Nelie button clicked, isDragging:', isDragging);
-          if (!isDragging) {
-            onExpand();
-          }
-        }}
-        onMouseDown={onMouseDown}
-        onTouchStart={onTouchStart}
+        onClick={handleButtonClick}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         className={`
           bg-gradient-to-r from-pink-500 to-purple-600 
           hover:from-pink-600 hover:to-purple-700
@@ -61,6 +81,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
       <Button
         onClick={(e) => {
           e.stopPropagation();
+          e.preventDefault();
           console.log('🏠 Home button clicked');
           onResetToHome();
         }}

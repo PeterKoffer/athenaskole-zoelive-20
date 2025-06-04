@@ -25,10 +25,10 @@ export const useDragHandler = (homePosition: Position) => {
           console.log('❌ Failed to parse saved position');
         }
       }
-      // Default to bottom-right corner but ensure it's visible
+      // Default to top-right but visible
       const defaultPosition = { 
-        x: Math.min(0, window.innerWidth - 400), // Ensure it doesn't go off screen
-        y: Math.min(0, window.innerHeight - 200)
+        x: 0,
+        y: 0
       };
       console.log('📍 Using default Nelie position:', defaultPosition);
       return defaultPosition;
@@ -43,10 +43,10 @@ export const useDragHandler = (homePosition: Position) => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // Allow some negative values but not too much
+    // Keep within reasonable bounds but allow some negative values
     const constrained = {
-      x: Math.max(-200, Math.min(newPosition.x, viewportWidth - 100)),
-      y: Math.max(-200, Math.min(newPosition.y, viewportHeight - 100))
+      x: Math.max(-150, Math.min(newPosition.x, viewportWidth - 150)),
+      y: Math.max(-150, Math.min(newPosition.y, viewportHeight - 150))
     };
     
     console.log('🔒 Constraining position from', newPosition, 'to', constrained);
@@ -64,29 +64,17 @@ export const useDragHandler = (homePosition: Position) => {
     console.log('🏠 Reset Nelie to home position:', constrainedHomePosition);
   }, [constrainPosition]);
 
-  // Fix position on mount if it's out of bounds
-  useEffect(() => {
-    const fixPositionIfNeeded = () => {
-      const viewportWidth = window.innerWidth;
-      if (position.x > viewportWidth - 100) {
-        console.log('🔧 Fixing out-of-bounds position');
-        const fixedPosition = constrainPosition(position);
-        setPosition(fixedPosition);
-      }
-    };
-    
-    fixPositionIfNeeded();
-  }, [position.x, constrainPosition]);
-
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    console.log('🖱️ Mouse down on Nelie');
+    console.log('🖱️ Mouse down on Nelie at position:', { x: e.clientX, y: e.clientY });
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
     dragOffset.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     };
+    console.log('📏 Drag offset set to:', dragOffset.current);
     e.preventDefault();
+    e.stopPropagation();
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -99,14 +87,17 @@ export const useDragHandler = (homePosition: Position) => {
       y: touch.clientY - rect.top
     };
     e.preventDefault();
+    e.stopPropagation();
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
-      const newPosition = constrainPosition({
-        x: e.clientX - dragOffset.current.x - window.innerWidth + 20,
-        y: e.clientY - dragOffset.current.y - window.innerHeight + 20
-      });
+      // Calculate new position relative to viewport
+      const newX = e.clientX - dragOffset.current.x - 20; // Account for right positioning
+      const newY = e.clientY - dragOffset.current.y - 20; // Account for top positioning
+      
+      const newPosition = constrainPosition({ x: newX, y: newY });
+      console.log('🖱️ Moving to position:', newPosition);
       setPosition(newPosition);
     }
   }, [isDragging, constrainPosition]);
@@ -114,10 +105,11 @@ export const useDragHandler = (homePosition: Position) => {
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (isDragging) {
       const touch = e.touches[0];
-      const newPosition = constrainPosition({
-        x: touch.clientX - dragOffset.current.x - window.innerWidth + 20,
-        y: touch.clientY - dragOffset.current.y - window.innerHeight + 20
-      });
+      const newX = touch.clientX - dragOffset.current.x - 20;
+      const newY = touch.clientY - dragOffset.current.y - 20;
+      
+      const newPosition = constrainPosition({ x: newX, y: newY });
+      console.log('👆 Touch moving to position:', newPosition);
       setPosition(newPosition);
       e.preventDefault();
     }
@@ -154,19 +146,14 @@ export const useDragHandler = (homePosition: Position) => {
 
     window.addEventListener('resize', handleResize);
     
-    // Force immediate position check
-    const timer = setTimeout(() => {
-      setPosition(current => constrainPosition(current));
-    }, 100);
-
     return () => {
       window.removeEventListener('resize', handleResize);
-      clearTimeout(timer);
     };
   }, [constrainPosition]);
 
   useEffect(() => {
     if (isDragging) {
+      console.log('🎯 Adding drag event listeners');
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       document.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -175,6 +162,7 @@ export const useDragHandler = (homePosition: Position) => {
       document.body.style.userSelect = 'none';
       
       return () => {
+        console.log('🎯 Removing drag event listeners');
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
         document.removeEventListener('touchmove', handleTouchMove);
