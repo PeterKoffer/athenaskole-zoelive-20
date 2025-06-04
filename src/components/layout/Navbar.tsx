@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -53,11 +52,11 @@ const Navbar = ({
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <button onClick={handleLogoClick} className="flex items-center space-x-2 hover:opacity-80 transition-opacity z-10">
-            <div className="w-16 h-16 flex items-center justify-center">
+            <div className="w-48 h-48 flex items-center justify-center">
               <img 
                 src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
                 alt="Nelie AI Tutor Robot"
-                className="w-16 h-16 object-contain"
+                className="w-48 h-48 object-contain"
                 draggable={false}
                 style={{ 
                   userSelect: 'none'
