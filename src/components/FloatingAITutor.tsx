@@ -33,14 +33,15 @@ const FloatingAITutor = () => {
     viewportWidth: typeof window !== 'undefined' ? window.innerWidth : 'unknown'
   });
 
-  // Reset state when navigating to auth pages - always call this hook
+  // ALWAYS call all hooks - never conditionally
+  // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
       setIsOpen(false);
     }
   }, [location.pathname, shouldHide]);
 
-  // Add initial welcome message - always call this hook
+  // Add initial welcome message - ALWAYS call this hook
   useEffect(() => {
     if (!shouldHide && messages.length === 0) {
       const welcomeMessage: Message = {
