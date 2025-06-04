@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Brain, Volume2, VolumeX } from 'lucide-react';
+import { CheckCircle, XCircle, Brain, Volume2, VolumeX, Play } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
 
@@ -41,6 +41,7 @@ const InteractiveLessonSession = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const [hasReadQuestion, setHasReadQuestion] = useState(false);
   
   const {
     isSpeaking,
@@ -83,10 +84,10 @@ const InteractiveLessonSession = ({
   const questions = getQuestions();
   const currentQuestion = questions[currentQuestionIndex];
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (!showResult) {
-      setSelectedAnswer(answerIndex);
-    }
+  const handleAnswerSelect = async (answerIndex: number) => {
+    if (showResult || selectedAnswer !== null) return;
+    
+    setSelectedAnswer(answerIndex);
   };
 
   const handleSubmitAnswer = () => {
@@ -94,17 +95,20 @@ const InteractiveLessonSession = ({
     
     setShowResult(true);
     
-    if (selectedAnswer === currentQuestion.correctAnswer) {
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    if (isCorrect) {
       setScore(score + 1);
     }
 
-    // Auto-speak the result and explanation if enabled
+    // Speak result with proper timing
     if (autoReadEnabled) {
-      const resultText = selectedAnswer === currentQuestion.correctAnswer ? 
+      const resultText = isCorrect ? 
         "Excellent work! That's the correct answer." : 
         `Not quite right this time. The correct answer is ${String.fromCharCode(65 + currentQuestion.correctAnswer)}.`;
       
       const fullText = `${resultText} ${currentQuestion.explanation}`;
+      
+      // Delay speech to let UI update
       setTimeout(() => {
         speakText(fullText);
       }, 1000);
@@ -116,6 +120,7 @@ const InteractiveLessonSession = ({
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      setHasReadQuestion(false); // Reset for new question
       
       // Update lesson state
       onStateUpdate({
@@ -123,13 +128,15 @@ const InteractiveLessonSession = ({
         currentSegment: currentQuestionIndex + 2
       });
     } else {
+      stopSpeaking(); // Stop any current speech before completing
       onLessonComplete();
     }
   };
 
   // Auto-read question when it first appears
   useEffect(() => {
-    if (autoReadEnabled && currentQuestion && !showResult) {
+    if (autoReadEnabled && currentQuestion && !showResult && !hasReadQuestion) {
+      setHasReadQuestion(true);
       setTimeout(() => {
         const questionText = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
         const optionsText = currentQuestion.options.map((option, index) => 
@@ -138,27 +145,39 @@ const InteractiveLessonSession = ({
         
         const fullText = `${questionText}. Your options are: ${optionsText}`;
         speakText(fullText);
-      }, 1500);
+      }, 2000);
     }
-  }, [currentQuestionIndex, autoReadEnabled, currentQuestion, showResult]);
+  }, [currentQuestionIndex, autoReadEnabled, currentQuestion, showResult, hasReadQuestion, speakText]);
 
   const readQuestion = () => {
     if (!currentQuestion) return;
     
-    const questionText = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
-    const optionsText = currentQuestion.options.map((option, index) => 
-      `Option ${String.fromCharCode(65 + index)}: ${option}`
-    ).join('. ');
+    stopSpeaking(); // Stop any current speech first
     
-    const fullText = `${questionText}. Your options are: ${optionsText}`;
-    speakText(fullText);
+    setTimeout(() => {
+      const questionText = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+      const optionsText = currentQuestion.options.map((option, index) => 
+        `Option ${String.fromCharCode(65 + index)}: ${option}`
+      ).join('. ');
+      
+      const fullText = `${questionText}. Your options are: ${optionsText}`;
+      speakText(fullText);
+    }, 500);
   };
 
   if (!currentQuestion) {
     return (
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-8 text-center text-white">
-          <p>No questions available for this subject yet.</p>
+          <Brain className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-lg mb-4">No questions available for this subject yet.</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-500 hover:bg-blue-600"
+          >
+            <Play className="w-4 h-4 mr-2" />
+            Retry Loading
+          </Button>
         </CardContent>
       </Card>
     );
@@ -186,9 +205,9 @@ const InteractiveLessonSession = ({
                 className="border-purple-400 text-slate-950"
               >
                 {autoReadEnabled ? (
-                  <VolumeX className="w-4 h-4 mr-2" />
-                ) : (
                   <Volume2 className="w-4 h-4 mr-2" />
+                ) : (
+                  <VolumeX className="w-4 h-4 mr-2" />
                 )}
                 {autoReadEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
               </Button>
@@ -198,7 +217,7 @@ const InteractiveLessonSession = ({
                 size="sm"
                 onClick={readQuestion}
                 className="border-purple-400 text-slate-950"
-                disabled={isSpeaking || !autoReadEnabled}
+                disabled={!autoReadEnabled}
               >
                 <Volume2 className="w-4 h-4 mr-2" />
                 {isSpeaking ? 'Nelie is speaking...' : 'Ask Nelie to repeat'}

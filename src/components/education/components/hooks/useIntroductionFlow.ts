@@ -10,6 +10,7 @@ interface IntroductionStep {
 export const useIntroductionFlow = (subject: string) => {
   const [currentStep, setCurrentStep] = useState(0);
   const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle } = useSpeechSynthesis();
+  const [hasSpokenStep, setHasSpokenStep] = useState<number>(-1);
 
   const getSubjectGreeting = () => {
     switch (subject) {
@@ -72,38 +73,40 @@ export const useIntroductionFlow = (subject: string) => {
   const introductionSteps: IntroductionStep[] = [
     {
       text: getSubjectGreeting(),
-      duration: 5000
+      duration: 6000
     },
     ...getSubjectContent().map(text => ({
       text,
-      duration: 6000
+      duration: 7000
     }))
   ];
 
-  // Separate useEffect for step progression
+  // Handle step progression
   useEffect(() => {
     if (currentStep >= introductionSteps.length - 1) return;
 
     const timer = setTimeout(() => {
       console.log('🎯 Advancing to step:', currentStep + 1);
       setCurrentStep(prev => prev + 1);
-    }, introductionSteps[currentStep]?.duration || 5000);
+      setHasSpokenStep(-1); // Reset speech flag for new step
+    }, introductionSteps[currentStep]?.duration || 6000);
 
     return () => clearTimeout(timer);
   }, [currentStep, introductionSteps.length]);
 
-  // Separate useEffect for speech
+  // Handle speech for current step (only once per step)
   useEffect(() => {
     const currentStepData = introductionSteps[currentStep];
-    if (!currentStepData || !autoReadEnabled) return;
+    if (!currentStepData || !autoReadEnabled || hasSpokenStep === currentStep) return;
 
     const speakTimer = setTimeout(() => {
       console.log('🎯 Speaking step:', currentStep, currentStepData.text.substring(0, 50));
       speakText(currentStepData.text);
-    }, 1000);
+      setHasSpokenStep(currentStep);
+    }, 1500);
 
     return () => clearTimeout(speakTimer);
-  }, [currentStep, autoReadEnabled, speakText]);
+  }, [currentStep, autoReadEnabled, speakText, hasSpokenStep]);
 
   const handleManualRead = () => {
     if (isSpeaking) {
