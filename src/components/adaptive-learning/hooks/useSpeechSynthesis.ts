@@ -7,6 +7,9 @@ export const useSpeechSynthesis = () => {
   const hasAutoRead = useRef(false);
   const [voicesLoaded, setVoicesLoaded] = useState(false);
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const speechQueue = useRef<string[]>([]);
+  const isProcessingQueue = useRef(false);
+  const cancelRequested = useRef(false);
 
   // Ensure voices are loaded before attempting to use them
   useEffect(() => {
@@ -92,52 +95,39 @@ export const useSpeechSynthesis = () => {
 
   const stopSpeaking = useCallback(() => {
     if (isSpeaking || speechSynthesis.speaking) {
-      console.log('🔇 Stopping speech synthesis');
+      console.log('🔇 Stopping speech synthesis - user requested');
+      cancelRequested.current = true;
       speechSynthesis.cancel();
+      speechQueue.current = []; // Clear the queue
       setIsSpeaking(false);
       currentUtterance.current = null;
+      isProcessingQueue.current = false;
+      
+      // Reset cancel flag after a short delay
+      setTimeout(() => {
+        cancelRequested.current = false;
+      }, 500);
     }
   }, [isSpeaking]);
 
-  const speakText = useCallback(async (text: string) => {
-    if (!text || text.trim() === '') {
-      console.log('🚫 No text to speak');
+  const processNextInQueue = useCallback(async () => {
+    if (isProcessingQueue.current || speechQueue.current.length === 0 || cancelRequested.current) {
       return;
     }
 
-    // Stop any current speech
-    if (isSpeaking || speechSynthesis.speaking) {
-      stopSpeaking();
-      // Wait a bit for the cancellation to take effect
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
-
-    if (!autoReadEnabled) {
-      console.log('🔇 Auto-read is disabled');
+    isProcessingQueue.current = true;
+    const textToSpeak = speechQueue.current.shift();
+    
+    if (!textToSpeak || !autoReadEnabled) {
+      isProcessingQueue.current = false;
       return;
     }
 
     try {
-      console.log('🎵 Nelie attempting to speak:', text.substring(0, 50) + '...');
+      console.log('🎵 Nelie speaking from queue:', textToSpeak.substring(0, 50) + '...');
       setIsSpeaking(true);
 
-      // Wait for voices to load if they haven't yet
-      if (!voicesLoaded && speechSynthesis.getVoices().length === 0) {
-        console.log('⏳ Waiting for voices to load...');
-        await new Promise(resolve => {
-          const checkVoices = () => {
-            if (speechSynthesis.getVoices().length > 0) {
-              setVoicesLoaded(true);
-              resolve(true);
-            } else {
-              setTimeout(checkVoices, 100);
-            }
-          };
-          checkVoices();
-        });
-      }
-
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
       currentUtterance.current = utterance;
       
       // Configure utterance for Nelie's voice
@@ -154,31 +144,88 @@ export const useSpeechSynthesis = () => {
       }
 
       utterance.onstart = () => {
-        console.log('🎵 Nelie started speaking');
-        setIsSpeaking(true);
+        if (!cancelRequested.current) {
+          console.log('🎵 Nelie started speaking');
+          setIsSpeaking(true);
+        }
       };
 
       utterance.onend = () => {
         console.log('🎵 Nelie finished speaking');
         setIsSpeaking(false);
         currentUtterance.current = null;
+        isProcessingQueue.current = false;
+        
+        // Process next item in queue after a short delay
+        setTimeout(() => {
+          if (!cancelRequested.current) {
+            processNextInQueue();
+          }
+        }, 100);
       };
 
       utterance.onerror = (event) => {
-        console.error('🚫 Speech synthesis error:', event.error);
+        if (event.error === 'canceled' && cancelRequested.current) {
+          console.log('🔇 Speech canceled by user request');
+        } else {
+          console.error('🚫 Speech synthesis error:', event.error);
+        }
         setIsSpeaking(false);
         currentUtterance.current = null;
+        isProcessingQueue.current = false;
       };
 
-      // Speak the text
-      speechSynthesis.speak(utterance);
+      // Only speak if not canceled
+      if (!cancelRequested.current) {
+        speechSynthesis.speak(utterance);
+      } else {
+        isProcessingQueue.current = false;
+      }
 
     } catch (error) {
       console.error('🚫 Speech synthesis error:', error);
       setIsSpeaking(false);
       currentUtterance.current = null;
+      isProcessingQueue.current = false;
     }
-  }, [autoReadEnabled, voicesLoaded, getFemaleVoice, stopSpeaking, isSpeaking]);
+  }, [autoReadEnabled, getFemaleVoice]);
+
+  const speakText = useCallback(async (text: string) => {
+    if (!text || text.trim() === '') {
+      console.log('🚫 No text to speak');
+      return;
+    }
+
+    if (!autoReadEnabled) {
+      console.log('🔇 Auto-read is disabled');
+      return;
+    }
+
+    // Wait for voices to load if they haven't yet
+    if (!voicesLoaded && speechSynthesis.getVoices().length === 0) {
+      console.log('⏳ Waiting for voices to load...');
+      await new Promise(resolve => {
+        const checkVoices = () => {
+          if (speechSynthesis.getVoices().length > 0) {
+            setVoicesLoaded(true);
+            resolve(true);
+          } else {
+            setTimeout(checkVoices, 100);
+          }
+        };
+        checkVoices();
+      });
+    }
+
+    // Add to queue instead of speaking immediately
+    speechQueue.current.push(text);
+    console.log('🎵 Added to speech queue:', text.substring(0, 50) + '...');
+    
+    // Process queue if not already processing
+    if (!isProcessingQueue.current && !cancelRequested.current) {
+      processNextInQueue();
+    }
+  }, [autoReadEnabled, voicesLoaded, processNextInQueue]);
 
   const handleMuteToggle = useCallback(() => {
     console.log('🔊 Toggling auto-read:', !autoReadEnabled);
@@ -189,6 +236,7 @@ export const useSpeechSynthesis = () => {
     } else {
       // Turning on auto-read
       setAutoReadEnabled(true);
+      cancelRequested.current = false;
     }
   }, [autoReadEnabled, stopSpeaking]);
 
