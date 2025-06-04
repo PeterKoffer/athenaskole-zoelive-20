@@ -16,6 +16,9 @@ interface QuestionDisplayProps {
   questionNumber: number;
   totalQuestions: number;
   onAnswerSelect: (index: number) => void;
+  hasAnswered?: boolean;
+  autoSubmit?: boolean;
+  subject?: string;
 }
 
 const QuestionDisplay = ({
@@ -28,7 +31,10 @@ const QuestionDisplay = ({
   standardInfo,
   questionNumber,
   totalQuestions,
-  onAnswerSelect
+  onAnswerSelect,
+  hasAnswered = false,
+  autoSubmit = false,
+  subject = ''
 }: QuestionDisplayProps) => {
   const getOptionClassName = (index: number) => {
     if (selectedAnswer === index) {
