@@ -76,7 +76,7 @@ const FloatingAITutor = () => {
         position: 'fixed',
         bottom: '20px',
         right: '20px',
-        zIndex: 1000,
+        zIndex: 9999,
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab',
       }}

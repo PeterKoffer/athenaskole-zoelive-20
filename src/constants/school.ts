@@ -1,6 +1,6 @@
 
 export const AVAILABLE_SUBJECTS = [
-  "Matematik", "Dansk", "Engelsk", "Naturteknik", "Historie", 
+  "Matematik", "Engelsk", "Naturteknik", "Historie", 
   "Geografi", "Fysik", "Kemi", "Biologi", "Idræt", "Musik", "Kunst"
 ];
 
