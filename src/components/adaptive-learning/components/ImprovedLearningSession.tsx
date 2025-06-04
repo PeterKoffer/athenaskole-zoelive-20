@@ -1,12 +1,14 @@
+
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useDiverseQuestionGeneration } from '../hooks/useDiverseQuestionGeneration';
 import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
-import GradeAwareContentGenerator from './GradeAwareContentGenerator';
-import { Brain, ArrowLeft, CheckCircle, XCircle, RefreshCw, GraduationCap } from 'lucide-react';
+import GradeContentSetup from './GradeContentSetup';
+import SessionHeader from './SessionHeader';
+import QuestionDisplay from './QuestionDisplay';
+import LoadingStates from './LoadingStates';
 
 interface ImprovedLearningSessionProps {
   subject: string;
@@ -156,181 +158,73 @@ const ImprovedLearningSession = ({
   };
 
   if (!user) {
-    return (
-      <Card className="bg-red-900 border-red-700">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-white text-lg font-semibold">Login Required</h3>
-          <p className="text-red-300 mt-2">Please log in to access the learning session.</p>
-        </CardContent>
-      </Card>
-    );
+    return <LoadingStates type="login-required" />;
   }
 
   // Show grade-level content configuration first
   if (!gradeContentConfig) {
     return (
-      <div className="space-y-6">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                onClick={onBack}
-                className="text-gray-400 hover:text-white"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              
-              <CardTitle className="text-white flex items-center space-x-2">
-                <GraduationCap className="w-5 h-5 text-lime-400" />
-                <span>Preparing Grade-Level Content</span>
-              </CardTitle>
-              
-              <div></div>
-            </div>
-          </CardHeader>
-        </Card>
-        
-        <GradeAwareContentGenerator
-          subject={subject}
-          skillArea={skillArea}
-          onContentGenerated={handleContentGenerated}
-        />
-      </div>
+      <GradeContentSetup
+        subject={subject}
+        skillArea={skillArea}
+        onBack={onBack}
+        onContentGenerated={handleContentGenerated}
+      />
     );
   }
 
   if (isGenerating && !currentQuestion) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6 text-center">
-          <Brain className="w-8 h-8 text-lime-400 animate-pulse mx-auto mb-4" />
-          <h3 className="text-white text-lg font-semibold mb-2">
-            Creating Grade {gradeConfig?.userGrade} Question
-          </h3>
-          <p className="text-gray-400">
-            AI is generating content aligned with {gradeContentConfig.standard?.code}...
-          </p>
-        </CardContent>
-      </Card>
+      <LoadingStates 
+        type="generating" 
+        gradeLevel={gradeConfig?.userGrade}
+        standardCode={gradeContentConfig.standard?.code}
+      />
     );
   }
 
   if (!currentQuestion) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-white text-lg font-semibold">Unable to Load Question</h3>
-          <p className="text-gray-400 mt-2">Please try refreshing.</p>
-          <Button onClick={handleRefresh} className="mt-4">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
-          </Button>
-        </CardContent>
-      </Card>
+      <LoadingStates 
+        type="no-question"
+        onRefresh={handleRefresh}
+      />
     );
   }
 
   return (
     <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={onBack}
-            className="text-gray-400 hover:text-white"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          
-          <div className="text-center">
-            <CardTitle className="text-white">
-              Grade {gradeConfig?.userGrade} - {subject.charAt(0).toUpperCase() + subject.slice(1)}
-            </CardTitle>
-            <p className="text-gray-400 text-sm">
-              Question {questionNumber} of {totalQuestions} • {gradeContentConfig.standard?.code}
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isGenerating || showResult}
-              className="text-gray-400 hover:text-white"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-            
-            <div className="text-right">
-              <p className="text-gray-400 text-sm">Score</p>
-              <p className="text-white font-semibold">{correctAnswers}/{questionNumber - (showResult ? 0 : 1)}</p>
-            </div>
-          </div>
-        </div>
+        <SessionHeader
+          onBack={onBack}
+          gradeLevel={gradeConfig?.userGrade}
+          subject={subject}
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+          standardCode={gradeContentConfig.standard?.code}
+          correctAnswers={correctAnswers}
+          showResult={showResult}
+          isGenerating={isGenerating}
+          onRefresh={handleRefresh}
+        />
       </CardHeader>
 
       <CardContent className="p-6">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold text-white mb-6">
-              {currentQuestion.question}
-            </h3>
-          </div>
-
-          <div className="space-y-3">
-            {currentQuestion.options.map((option: string, index: number) => (
-              <Button
-                key={index}
-                variant="outline"
-                className={`w-full text-left justify-start p-4 h-auto ${
-                  selectedAnswer === index
-                    ? showResult
-                      ? selectedAnswer === currentQuestion.correct
-                        ? 'bg-green-600 border-green-500 text-white'
-                        : 'bg-red-600 border-red-500 text-white'
-                      : 'bg-blue-600 border-blue-500 text-white'
-                    : showResult && index === currentQuestion.correct
-                    ? 'bg-green-600 border-green-500 text-white'
-                    : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                }`}
-                onClick={() => handleAnswerSelect(index)}
-                disabled={showResult || selectedAnswer !== null}
-              >
-                <span className="mr-3 font-semibold">
-                  {String.fromCharCode(65 + index)}.
-                </span>
-                {option}
-                {showResult && index === currentQuestion.correct && (
-                  <CheckCircle className="w-5 h-5 ml-auto text-green-400" />
-                )}
-                {showResult && selectedAnswer === index && index !== currentQuestion.correct && (
-                  <XCircle className="w-5 h-5 ml-auto text-red-400" />
-                )}
-              </Button>
-            ))}
-          </div>
-
-          {showResult && (
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-              <h4 className="text-white font-medium mb-2">Explanation:</h4>
-              <p className="text-gray-300">{currentQuestion.explanation}</p>
-              {gradeContentConfig.standard && (
-                <div className="mt-3 p-2 bg-blue-900/20 border border-blue-800 rounded">
-                  <p className="text-blue-200 text-sm">
-                    📚 Aligned with {gradeContentConfig.standard.code}: {gradeContentConfig.standard.title}
-                  </p>
-                </div>
-              )}
-              <p className="text-gray-400 text-sm mt-2">
-                {questionNumber < totalQuestions ? 'Next grade-appropriate question coming up...' : 'Session completing...'}
-              </p>
-            </div>
-          )}
-        </div>
+        <QuestionDisplay
+          question={currentQuestion.question}
+          options={currentQuestion.options}
+          selectedAnswer={selectedAnswer}
+          correctAnswer={currentQuestion.correct}
+          showResult={showResult}
+          explanation={currentQuestion.explanation}
+          standardInfo={gradeContentConfig.standard ? {
+            code: gradeContentConfig.standard.code,
+            title: gradeContentConfig.standard.title
+          } : undefined}
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+          onAnswerSelect={handleAnswerSelect}
+        />
       </CardContent>
     </Card>
   );

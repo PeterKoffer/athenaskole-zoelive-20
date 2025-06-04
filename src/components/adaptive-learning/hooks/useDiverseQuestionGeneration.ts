@@ -18,19 +18,23 @@ interface UseDiverseQuestionGenerationProps {
   skillArea: string;
   difficultyLevel: number;
   userId: string;
+  gradeLevel?: number;
+  standardsAlignment?: any;
 }
 
 export const useDiverseQuestionGeneration = ({ 
   subject, 
   skillArea, 
   difficultyLevel, 
-  userId 
+  userId,
+  gradeLevel,
+  standardsAlignment
 }: UseDiverseQuestionGenerationProps) => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [sessionQuestions, setSessionQuestions] = useState<string[]>([]);
 
-  const generateDiverseQuestion = useCallback(async (): Promise<Question> => {
+  const generateDiverseQuestion = useCallback(async (questionContext?: any): Promise<Question> => {
     setIsGenerating(true);
     
     try {
@@ -49,7 +53,7 @@ export const useDiverseQuestionGeneration = ({
         ...sessionQuestions
       ];
 
-      console.log(`🎯 Generating diverse ${subject} question, avoiding ${usedQuestions.length} used questions`);
+      console.log(`🎯 Generating diverse ${subject} question for Grade ${gradeLevel}, avoiding ${usedQuestions.length} used questions`);
 
       // Create a more diverse prompt that explicitly requests variation
       const diversityPrompts = [
@@ -69,6 +73,9 @@ export const useDiverseQuestionGeneration = ({
           skillArea,
           difficultyLevel,
           userId,
+          gradeLevel,
+          standardsAlignment,
+          questionContext,
           previousQuestions: usedQuestions,
           diversityLevel: 'maximum',
           uniqueContext: true,
@@ -121,7 +128,7 @@ export const useDiverseQuestionGeneration = ({
 
       toast({
         title: "New Question Generated! 🎯",
-        description: "Fresh content created just for you",
+        description: `Grade ${gradeLevel} content created just for you`,
         duration: 2000
       });
 
@@ -136,7 +143,7 @@ export const useDiverseQuestionGeneration = ({
       
       toast({
         title: "Question Ready",
-        description: "Created unique practice question",
+        description: `Created unique Grade ${gradeLevel} practice question`,
         duration: 2000
       });
 
@@ -144,9 +151,15 @@ export const useDiverseQuestionGeneration = ({
     } finally {
       setIsGenerating(false);
     }
-  }, [subject, skillArea, difficultyLevel, userId, sessionQuestions, toast]);
+  }, [subject, skillArea, difficultyLevel, userId, gradeLevel, standardsAlignment, sessionQuestions, toast]);
 
-  const saveQuestionHistory = useCallback(async (question: Question, userAnswer: number, isCorrect: boolean, responseTime: number) => {
+  const saveQuestionHistory = useCallback(async (
+    question: Question, 
+    userAnswer: number, 
+    isCorrect: boolean, 
+    responseTime: number,
+    additionalContext?: any
+  ) => {
     try {
       await supabase.from('user_question_history').insert({
         user_id: userId,
@@ -158,7 +171,8 @@ export const useDiverseQuestionGeneration = ({
         user_answer: userAnswer.toString(),
         correct_answer: question.correct.toString(),
         is_correct: isCorrect,
-        response_time_seconds: Math.round(responseTime / 1000)
+        response_time_seconds: Math.round(responseTime / 1000),
+        metadata: additionalContext
       });
     } catch (error) {
       console.warn('Could not save question history:', error);
