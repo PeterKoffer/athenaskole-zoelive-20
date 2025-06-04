@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,28 +5,49 @@ import { Trophy, BookOpen } from "lucide-react";
 import VikingCastleGame from "@/components/games/VikingCastleGame";
 import CurriculumGameSelector from "@/components/games/CurriculumGameSelector";
 import LeaderboardCard from "@/components/games/LeaderboardCard";
+import SampleGame from "@/components/games/SampleGame";
+import { useToast } from "@/hooks/use-toast";
 
 const GameHub = () => {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Handle game selection - you can expand this to route to different game components
+  // Handle game selection
   const handleGameSelect = (gameId: string) => {
     console.log("Selected game:", gameId);
-    
-    // For now, only the Viking Castle game is fully implemented
-    if (gameId === "viking-castle-geometry" || gameId === "viking-castle") {
-      setSelectedGame("viking-castle");
-    } else {
-      // For other games, show a coming soon message or redirect to development
-      console.log(`Game ${gameId} selected - ready for implementation!`);
-      // You can implement routing to other game components here
-    }
+    setSelectedGame(gameId);
   };
 
-  if (selectedGame === "viking-castle") {
-    return <VikingCastleGame onBack={() => setSelectedGame(null)} />;
+  // Handle game completion
+  const handleGameComplete = (score: number, achievements: string[]) => {
+    toast({
+      title: "Game Completed!",
+      description: `You earned ${score} points and ${achievements.length} achievements!`,
+      duration: 5000
+    });
+    
+    // Return to game selection screen
+    setSelectedGame(null);
+  };
+
+  // Render the selected game
+  if (selectedGame) {
+    // For backward compatibility, keep the special case for Viking Castle
+    if (selectedGame === "viking-castle" || selectedGame === "viking-castle-geometry") {
+      return <VikingCastleGame onBack={() => setSelectedGame(null)} />;
+    }
+    
+    // All other games use the new game engine
+    return (
+      <SampleGame 
+        gameId={selectedGame} 
+        onBack={() => setSelectedGame(null)}
+        onComplete={handleGameComplete}
+      />
+    );
   }
 
+  // Render game selection UI
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <Card className="bg-gray-900 border-gray-800">
