@@ -24,9 +24,9 @@ interface LearningHeaderProps {
 }
 
 const LearningHeader = ({
-  title = "Læring med Nelie",
+  title = "Learning with Nelie",
   backTo = "/daily-program",
-  backLabel = "Tilbage til Program",
+  backLabel = "Back to Program",
   onModeChange,
   currentMode = "adaptive"
 }: LearningHeaderProps) => {
@@ -69,7 +69,7 @@ const LearningHeader = ({
             
             <div className="text-center">
               <h1 className="text-lg font-bold text-white">{title}</h1>
-              <p className="text-gray-400 text-sm">AI-drevet tilpasset læring</p>
+              <p className="text-gray-400 text-sm">AI-powered adaptive learning</p>
             </div>
           </div>
         ) : (
@@ -83,13 +83,13 @@ const LearningHeader = ({
               
               <div>
                 <h1 className="text-xl font-bold text-white">{title}</h1>
-                <p className="text-gray-400 text-sm">AI-drevet tilpasset læring</p>
+                <p className="text-gray-400 text-sm">AI-powered adaptive learning</p>
               </div>
             </div>
 
             {onModeChange && (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-400 text-sm">Læringsstil:</span>
+                <span className="text-gray-400 text-sm">Learning style:</span>
                 <LearningModeDropdown selectedMode={currentMode} onModeChange={handleModeChange} />
               </div>
             )}

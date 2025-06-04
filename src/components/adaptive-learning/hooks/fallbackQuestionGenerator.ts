@@ -35,7 +35,6 @@ export const generateFallbackQuestion = (
     ],
     correct: 3,
     explanation: `All of these are important when learning ${subject}.`,
-    difficulty: difficultyLevel,
     standard: null
   };
 };
@@ -91,7 +90,6 @@ const generateMusicQuestion = (skillArea: string, difficultyLevel: number, grade
     options: selectedQuestion.options,
     correct: selectedQuestion.correct,
     explanation: selectedQuestion.explanation,
-    difficulty: difficultyLevel,
     standard: {
       code: `GRADE${gradeLevel}.MUSIC`,
       title: `Grade ${gradeLevel} Music`,
@@ -106,7 +104,6 @@ const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeL
     options: ["21", "22", "23", "24"],
     correct: 2,
     explanation: "15 + 8 = 23",
-    difficulty: difficultyLevel,
     standard: null
   };
 };
@@ -117,7 +114,6 @@ const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gra
     options: ["H2O", "CO2", "NaCl", "O2"],
     correct: 0,
     explanation: "Water's chemical formula is H2O - two hydrogen atoms and one oxygen atom.",
-    difficulty: difficultyLevel,
     standard: null
   };
 };
@@ -128,7 +124,23 @@ const generateEnglishQuestion = (skillArea: string, difficultyLevel: number, gra
     options: ["run", "quickly", "beautiful", "house"],
     correct: 3,
     explanation: "A noun is a person, place, or thing. 'House' is a thing, so it's a noun.",
-    difficulty: difficultyLevel,
     standard: null
   };
 };
+
+export class FallbackQuestionGenerator {
+  static createUniqueQuestion(
+    subject: string,
+    skillArea: string,
+    timestamp: number,
+    randomSeed: number
+  ): Question {
+    const baseQuestion = generateFallbackQuestion(subject, skillArea, 1);
+    
+    // Make question unique by adding timestamp
+    return {
+      ...baseQuestion,
+      question: `${baseQuestion.question} (Session: ${timestamp})`
+    };
+  }
+}
