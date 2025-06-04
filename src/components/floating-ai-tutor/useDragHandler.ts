@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Position, DragOffset } from "./types";
 
@@ -12,10 +13,10 @@ export const useDragHandler = (homePosition: Position) => {
           const viewportWidth = window.innerWidth;
           const viewportHeight = window.innerHeight;
           
-          // Check if saved position is within reasonable bounds
-          if (parsedPosition.x >= -200 && parsedPosition.y >= -200 && 
-              parsedPosition.x < viewportWidth - 50 && 
-              parsedPosition.y < viewportHeight - 50) {
+          // Check if saved position is within reasonable bounds (leave space for the button)
+          if (parsedPosition.x >= 0 && parsedPosition.y >= 0 && 
+              parsedPosition.x <= viewportWidth - 100 && 
+              parsedPosition.y <= viewportHeight - 100) {
             console.log('📍 Restored Nelie position:', parsedPosition);
             return parsedPosition;
           } else {
@@ -25,15 +26,15 @@ export const useDragHandler = (homePosition: Position) => {
           console.log('❌ Failed to parse saved position');
         }
       }
-      // Default to top-right but visible
+      // Default to top-right but visible (20px from edges)
       const defaultPosition = { 
-        x: 0,
-        y: 0
+        x: Math.max(0, window.innerWidth - 120),
+        y: 20
       };
       console.log('📍 Using default Nelie position:', defaultPosition);
       return defaultPosition;
     }
-    return { x: 0, y: 0 };
+    return { x: 20, y: 20 };
   });
   
   const [isDragging, setIsDragging] = useState(false);
@@ -45,8 +46,8 @@ export const useDragHandler = (homePosition: Position) => {
     
     // Keep within reasonable bounds but allow some negative values
     const constrained = {
-      x: Math.max(-150, Math.min(newPosition.x, viewportWidth - 150)),
-      y: Math.max(-150, Math.min(newPosition.y, viewportHeight - 150))
+      x: Math.max(0, Math.min(newPosition.x, viewportWidth - 100)),
+      y: Math.max(0, Math.min(newPosition.y, viewportHeight - 100))
     };
     
     console.log('🔒 Constraining position from', newPosition, 'to', constrained);
@@ -55,8 +56,8 @@ export const useDragHandler = (homePosition: Position) => {
 
   const resetToHome = useCallback(() => {
     const safeHomePosition = { 
-      x: 0, 
-      y: 0
+      x: Math.max(0, window.innerWidth - 120), 
+      y: 20
     };
     const constrainedHomePosition = constrainPosition(safeHomePosition);
     setPosition(constrainedHomePosition);
@@ -93,8 +94,8 @@ export const useDragHandler = (homePosition: Position) => {
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
       // Calculate new position relative to viewport
-      const newX = e.clientX - dragOffset.current.x - 20; // Account for right positioning
-      const newY = e.clientY - dragOffset.current.y - 20; // Account for top positioning
+      const newX = e.clientX - dragOffset.current.x;
+      const newY = e.clientY - dragOffset.current.y;
       
       const newPosition = constrainPosition({ x: newX, y: newY });
       console.log('🖱️ Moving to position:', newPosition);
@@ -105,8 +106,8 @@ export const useDragHandler = (homePosition: Position) => {
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (isDragging) {
       const touch = e.touches[0];
-      const newX = touch.clientX - dragOffset.current.x - 20;
-      const newY = touch.clientY - dragOffset.current.y - 20;
+      const newX = touch.clientX - dragOffset.current.x;
+      const newY = touch.clientY - dragOffset.current.y;
       
       const newPosition = constrainPosition({ x: newX, y: newY });
       console.log('👆 Touch moving to position:', newPosition);

@@ -23,9 +23,6 @@ import CreativeLearning from "./components/education/CreativeLearning";
 import ScienceLearning from "./components/education/ScienceLearning";
 import MusicLearning from "./components/education/MusicLearning";
 
-// Import Floating AI Tutor
-import FloatingAITutor from "./components/FloatingAITutor";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -55,9 +52,6 @@ const App = () => (
           
           <Route path="*" element={<NotFound />} />
         </Routes>
-        
-        {/* Add Floating AI Tutor to all pages */}
-        <FloatingAITutor />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

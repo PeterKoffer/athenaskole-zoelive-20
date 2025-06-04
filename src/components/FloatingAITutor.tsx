@@ -14,8 +14,8 @@ const FloatingAITutor = () => {
   const navigate = useNavigate();
   
   const homePosition = {
-    x: 0,
-    y: 0
+    x: typeof window !== 'undefined' ? Math.max(0, window.innerWidth - 120) : 20,
+    y: 20
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
@@ -123,8 +123,8 @@ const FloatingAITutor = () => {
         <div
           style={{
             position: 'absolute',
-            top: `${position.y + 20}px`,
-            right: `${20}px`,
+            top: `${position.y}px`,
+            left: `${position.x}px`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
             zIndex: 1000001
@@ -145,8 +145,8 @@ const FloatingAITutor = () => {
         <div
           style={{
             position: 'absolute',
-            top: `${position.y + 20}px`,
-            right: `${20}px`,
+            top: `${position.y}px`,
+            left: `${position.x}px`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
             zIndex: 1000001
