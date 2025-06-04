@@ -1,10 +1,12 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Brain, Clock, Star, GamepadIcon } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
 import NelieAvatarSection from './NelieAvatarSection';
+import LessonProgressHeader from './LessonProgressHeader';
+import LessonControlsFooter from './LessonControlsFooter';
+import LessonActivityManager from './LessonActivityManager';
 
 interface ExtendedLessonManagerProps {
   subject: string;
@@ -30,15 +32,11 @@ const ExtendedLessonManager = ({
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [lessonStartTime] = useState(Date.now());
   const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [activityCompleted, setActivityCompleted] = useState(false);
 
   const {
     isSpeaking,
     autoReadEnabled,
     speakText,
-    stopSpeaking,
     handleMuteToggle
   } = useSpeechSynthesis();
 
@@ -140,81 +138,28 @@ const ExtendedLessonManager = ({
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
   const totalLessonTime = 20 * 60;
 
-  // Reset states when activity changes
-  useEffect(() => {
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setActivityCompleted(false);
-  }, [currentActivityIndex]);
-
-  // Speak activity content when it changes
-  useEffect(() => {
-    if (currentActivity && autoReadEnabled && !activityCompleted) {
-      // Clear any previous speech first
-      stopSpeaking();
-      
-      setTimeout(() => {
-        if (currentActivity.type === 'explanation') {
-          speakText(currentActivity.content.text);
-        } else if (currentActivity.type === 'question') {
-          const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
-          speakText(questionText);
-        } else if (currentActivity.type === 'game') {
-          speakText(`Let's play a game! ${currentActivity.content.text}`);
-        }
-      }, 1000);
-    }
-  }, [currentActivityIndex, autoReadEnabled, activityCompleted]);
-
   const handleActivityComplete = useCallback(() => {
-    stopSpeaking();
-    
     if (currentActivityIndex < lessonActivities.length - 1) {
       setCurrentActivityIndex(prev => prev + 1);
     } else {
       onLessonComplete();
     }
-  }, [currentActivityIndex, lessonActivities.length, onLessonComplete, stopSpeaking]);
+  }, [currentActivityIndex, lessonActivities.length, onLessonComplete]);
 
-  const handleAnswerSelect = useCallback((answerIndex: number) => {
-    if (showResult || activityCompleted || currentActivity.type !== 'question') {
-      console.log('🚫 Answer selection blocked:', { showResult, activityCompleted, type: currentActivity.type });
-      return;
+  const handleScoreUpdate = useCallback((newScore: number) => {
+    setScore(newScore);
+  }, []);
+
+  const handleReadQuestion = useCallback(() => {
+    if (currentActivity.type === 'explanation') {
+      speakText(currentActivity.content.text);
+    } else if (currentActivity.type === 'question') {
+      const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
+      speakText(questionText);
+    } else if (currentActivity.type === 'game') {
+      speakText(`Let's play a game! ${currentActivity.content.text}`);
     }
-
-    console.log('🎯 Answer selected:', answerIndex);
-    
-    setSelectedAnswer(answerIndex);
-    setShowResult(true);
-    setActivityCompleted(true);
-
-    const isCorrect = answerIndex === currentActivity.content.correct;
-    if (isCorrect) {
-      setScore(prev => prev + 1);
-    }
-
-    const feedback = isCorrect 
-      ? `Excellent! ${currentActivity.content.explanation}` 
-      : `Not quite right. ${currentActivity.content.explanation}`;
-    
-    // Stop current speech and speak feedback
-    stopSpeaking();
-    setTimeout(() => {
-      speakText(feedback);
-    }, 500);
-
-    // Auto-advance after 4 seconds
-    setTimeout(() => {
-      handleActivityComplete();
-    }, 4000);
-  }, [showResult, activityCompleted, currentActivity, stopSpeaking, speakText, handleActivityComplete]);
-
-  const handleManualContinue = useCallback(() => {
-    if (currentActivity.type === 'explanation' || currentActivity.type === 'game') {
-      setActivityCompleted(true);
-      handleActivityComplete();
-    }
-  }, [currentActivity.type, handleActivityComplete]);
+  }, [currentActivity, speakText]);
 
   if (!currentActivity) {
     return (
@@ -230,32 +175,12 @@ const ExtendedLessonManager = ({
   return (
     <div className="space-y-6">
       {/* Progress Header */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between text-white">
-            <div className="flex items-center space-x-4">
-              <Clock className="w-5 h-5 text-lime-400" />
-              <span className="text-sm">
-                {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / 20:00
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Star className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm">Score: {score}</span>
-            </div>
-            <div className="text-sm">
-              Activity {currentActivityIndex + 1} of {lessonActivities.length}
-            </div>
-          </div>
-          
-          <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
-            <div 
-              className="bg-lime-400 h-2 rounded-full transition-all duration-500" 
-              style={{ width: `${(currentActivityIndex + 1) / lessonActivities.length * 100}%` }} 
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <LessonProgressHeader
+        timeElapsed={timeElapsed}
+        score={score}
+        currentActivityIndex={currentActivityIndex}
+        totalActivities={lessonActivities.length}
+      />
 
       {/* Nelie Avatar */}
       <NelieAvatarSection 
@@ -265,124 +190,24 @@ const ExtendedLessonManager = ({
         isSpeaking={isSpeaking} 
         autoReadEnabled={autoReadEnabled} 
         onMuteToggle={handleMuteToggle} 
-        onReadQuestion={() => {
-          if (currentActivity.type === 'explanation') {
-            speakText(currentActivity.content.text);
-          } else if (currentActivity.type === 'question') {
-            const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
-            speakText(questionText);
-          } else if (currentActivity.type === 'game') {
-            speakText(`Let's play a game! ${currentActivity.content.text}`);
-          }
-        }} 
+        onReadQuestion={handleReadQuestion} 
       />
 
       {/* Activity Content */}
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6">
-          <div className="flex items-center mb-4">
-            {currentActivity.type === 'game' && <GamepadIcon className="w-6 h-6 text-lime-400 mr-2" />}
-            {currentActivity.type === 'question' && <Brain className="w-6 h-6 text-blue-400 mr-2" />}
-            <h3 className="text-xl font-semibold text-white">{currentActivity.title}</h3>
-          </div>
-
-          {/* Explanation Activity */}
-          {currentActivity.type === 'explanation' && (
-            <div className="space-y-4">
-              <p className="text-lg text-gray-300 leading-relaxed">
-                {currentActivity.content.text}
-              </p>
-              <Button 
-                onClick={handleManualContinue} 
-                className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
-                disabled={activityCompleted}
-              >
-                Continue Lesson
-              </Button>
-            </div>
-          )}
-
-          {/* Question Activity */}
-          {currentActivity.type === 'question' && (
-            <div className="space-y-6">
-              <p className="text-lg text-white mb-6">
-                {currentActivity.content.question}
-              </p>
-              
-              <div className="space-y-3">
-                {currentActivity.content.options.map((option: string, index: number) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className={`w-full text-left justify-start p-4 h-auto transition-all duration-200 ${
-                      selectedAnswer === index
-                        ? showResult
-                          ? selectedAnswer === currentActivity.content.correct
-                            ? 'bg-green-600 border-green-500 text-white'
-                            : 'bg-red-600 border-red-500 text-white'
-                          : 'bg-blue-600 border-blue-500 text-white'
-                        : showResult && index === currentActivity.content.correct
-                        ? 'bg-green-600 border-green-500 text-white'
-                        : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                    }`}
-                    onClick={() => handleAnswerSelect(index)}
-                    disabled={showResult || activityCompleted}
-                  >
-                    <span className="mr-3 font-semibold">
-                      {String.fromCharCode(65 + index)}.
-                    </span>
-                    {option}
-                  </Button>
-                ))}
-              </div>
-
-              {showResult && (
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mt-4">
-                  <div className="flex items-center mb-2">
-                    <span className={
-                      selectedAnswer === currentActivity.content.correct 
-                        ? 'text-green-400 font-semibold' 
-                        : 'text-red-400 font-semibold'
-                    }>
-                      {selectedAnswer === currentActivity.content.correct ? 'Correct! 🎉' : 'Not quite right'}
-                    </span>
-                  </div>
-                  <p className="text-gray-300">{currentActivity.content.explanation}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Game Activity */}
-          {currentActivity.type === 'game' && (
-            <div className="space-y-6">
-              <p className="text-lg text-white mb-6">
-                {currentActivity.content.text}
-              </p>
-              <Button 
-                onClick={handleManualContinue} 
-                className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
-                disabled={activityCompleted}
-              >
-                I solved it!
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <LessonActivityManager
+        activities={lessonActivities}
+        currentActivityIndex={currentActivityIndex}
+        score={score}
+        onActivityComplete={handleActivityComplete}
+        onScoreUpdate={handleScoreUpdate}
+      />
 
       {/* Controls */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-4 flex justify-between items-center">
-          <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950">
-            Exit Lesson
-          </Button>
-          
-          <div className="text-white text-sm">
-            Estimated time remaining: {Math.max(0, Math.floor((totalLessonTime - timeElapsed) / 60))} minutes
-          </div>
-        </CardContent>
-      </Card>
+      <LessonControlsFooter
+        timeElapsed={timeElapsed}
+        totalLessonTime={totalLessonTime}
+        onBack={onBack}
+      />
     </div>
   );
 };
