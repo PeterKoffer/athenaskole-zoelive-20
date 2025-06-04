@@ -3,18 +3,20 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import LearningHeader from "./LearningHeader";
-import EnhancedLearningSession from "@/components/adaptive-learning/components/EnhancedLearningSession";
+import AILearningModule from "@/components/adaptive-learning/AILearningModule";
+import { Card, CardContent } from "@/components/ui/card";
+import { Brain } from "lucide-react";
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [sessionKey, setSessionKey] = useState(0);
+  const [aiSessionKey, setAiSessionKey] = useState(0);
 
   console.log('📚 EnglishLearning component state:', {
     user: !!user,
     userId: user?.id,
     loading,
-    sessionKey,
+    aiSessionKey,
     subject: 'english',
     skillArea: 'reading_comprehension'
   });
@@ -48,13 +50,17 @@ const EnglishLearning = () => {
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader />
       <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">English Learning with Nelie</h1>
-          <p className="text-gray-300">Let's practice your English reading comprehension skills!</p>
-        </div>
+        <Card className="bg-gradient-to-r from-blue-900 to-indigo-900 border-blue-400 mb-6">
+          <CardContent className="p-4 text-center">
+            <Brain className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+            <p className="text-white">
+              🤖 AI is generating personalized English learning exercises
+            </p>
+          </CardContent>
+        </Card>
         
-        <EnhancedLearningSession
-          key={`english-${sessionKey}`}
+        <AILearningModule 
+          key={aiSessionKey} 
           subject="english" 
           skillArea="reading_comprehension" 
           difficultyLevel={1}

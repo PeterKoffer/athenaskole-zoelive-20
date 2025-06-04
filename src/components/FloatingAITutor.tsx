@@ -21,7 +21,7 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
-  // Only hide on auth pages - show everywhere else including all learning pages
+  // Only hide on auth pages - show everywhere else including ALL learning pages
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
   // Reset state when navigating to auth pages
@@ -32,14 +32,28 @@ const FloatingAITutor = () => {
     }
   }, [location.pathname, shouldHide]);
 
+  // Add initial welcome message
+  useEffect(() => {
+    if (!shouldHide && messages.length === 0) {
+      const welcomeMessage: Message = {
+        role: "assistant",
+        content: "Hi! I'm Nelie, your AI tutor! 👩‍🏫 I'm here to help you learn. Ask me anything!",
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [shouldHide, messages.length]);
+
   console.log('FloatingAITutor rendering:', { 
     shouldHide, 
     currentPath: location.pathname,
     isOpen,
     isMinimized,
-    position 
+    position,
+    messagesLength: messages.length
   });
 
+  // Force show Nelie on all pages except auth
   if (shouldHide) {
     console.log('FloatingAITutor hidden due to auth page');
     return null;
@@ -56,6 +70,24 @@ const FloatingAITutor = () => {
       timestamp: new Date() 
     };
     setMessages([...messages, newMessage]);
+
+    // Auto-respond with encouraging message
+    setTimeout(() => {
+      const responses = [
+        "That's a great question! Keep exploring and learning! 🌟",
+        "I love your curiosity! Learning is an adventure! 🚀",
+        "Excellent! You're doing amazing work! 💫",
+        "Keep up the fantastic learning! I'm proud of you! 🎓"
+      ];
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      const aiResponse: Message = {
+        role: "assistant",
+        content: randomResponse,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiResponse]);
+    }, 1000);
   };
 
   const handleResetToHome = () => {
