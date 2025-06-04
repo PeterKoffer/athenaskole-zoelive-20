@@ -11,9 +11,11 @@ const NavbarLogo = ({ onLogoClick }: NavbarLogoProps) => {
       className="flex items-center space-x-2 cursor-pointer" 
       onClick={onLogoClick}
     >
-      <div className="w-8 h-8 bg-gradient-to-r from-lime-400 to-lime-600 rounded-lg flex items-center justify-center">
-        <span className="text-gray-900 font-bold text-lg">N</span>
-      </div>
+      <img 
+        src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
+        alt="Nelie AI Tutor Robot"
+        className="w-8 h-8 object-contain"
+      />
       <span className="text-white text-xl font-bold">Nelie</span>
     </div>
   );
