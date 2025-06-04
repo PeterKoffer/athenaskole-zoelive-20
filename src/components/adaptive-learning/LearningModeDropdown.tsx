@@ -23,48 +23,48 @@ const LearningModeDropdown = ({ selectedMode, onModeChange, className }: Learnin
   const learningModes: LearningMode[] = [
     {
       id: 'adaptive',
-      name: 'Adaptiv Læring',
-      description: 'AI tilpasser sværhedsgraden baseret på din præstation',
+      name: 'Adaptive Learning',
+      description: 'AI adapts difficulty based on your performance',
       icon: Brain,
-      difficulty: 'Tilpasset',
+      difficulty: 'Adaptive',
       estimatedTime: '10-15 min',
-      benefits: ['Personlig tilpasning', 'Optimal udfordring', 'Hurtigere fremgang']
+      benefits: ['Personal adaptation', 'Optimal challenge', 'Faster progress']
     },
     {
       id: 'focused',
-      name: 'Fokuseret Træning',
-      description: 'Målrettet træning inden for specifikke færdighedsområder',
+      name: 'Focused Training',
+      description: 'Targeted training in specific skill areas',
       icon: Target,
-      difficulty: 'Valgfri',
+      difficulty: 'Flexible',
       estimatedTime: '5-10 min',
-      benefits: ['Målrettet læring', 'Specifikke færdigheder', 'Hurtige sessioner']
+      benefits: ['Targeted learning', 'Specific skills', 'Quick sessions']
     },
     {
       id: 'challenge',
-      name: 'Udfordrings Mode',
-      description: 'Test dine grænser med avancerede problemer',
+      name: 'Challenge Mode',
+      description: 'Test your limits with advanced problems',
       icon: Zap,
-      difficulty: 'Høj',
+      difficulty: 'High',
       estimatedTime: '15-20 min',
-      benefits: ['Høj sværhedsgrad', 'Ekstreme udfordringer', 'Maksimal læring']
+      benefits: ['High difficulty', 'Extreme challenges', 'Maximum learning']
     },
     {
       id: 'mastery',
-      name: 'Mestring Mode',
-      description: 'Gentag og perfektioner tidligere lærte emner',
+      name: 'Mastery Mode',
+      description: 'Repeat and perfect previously learned topics',
       icon: Award,
-      difficulty: 'Gentagelse',
+      difficulty: 'Repetition',
       estimatedTime: '8-12 min',
-      benefits: ['Konsolidering', 'Perfektion', 'Selvtillid']
+      benefits: ['Consolidation', 'Perfection', 'Confidence']
     },
     {
       id: 'group',
-      name: 'Gruppe Læring',
-      description: 'Læring sammen med andre elever',
+      name: 'Group Learning',
+      description: 'Learning together with other students',
       icon: Users,
       difficulty: 'Social',
       estimatedTime: '20-30 min',
-      benefits: ['Samarbejde', 'Social læring', 'Teamwork']
+      benefits: ['Collaboration', 'Social learning', 'Teamwork']
     }
   ];
 
@@ -84,7 +84,7 @@ const LearningModeDropdown = ({ selectedMode, onModeChange, className }: Learnin
           <SelectValue>
             <div className="flex items-center space-x-2">
               {currentMode?.icon && <currentMode.icon className="w-4 h-4" />}
-              <span>{currentMode?.name || 'Vælg mode'}</span>
+              <span>{currentMode?.name || 'Select mode'}</span>
             </div>
           </SelectValue>
         </SelectTrigger>

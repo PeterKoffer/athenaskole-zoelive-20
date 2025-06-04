@@ -17,14 +17,17 @@ const QuestionDisplayHeader = ({
   onMuteToggle,
   onReadQuestion
 }: QuestionDisplayHeaderProps) => {
-  // Clean up question text and provide fallback for technical IDs
+  // Clean up question text and hide session IDs
   const cleanQuestionText = (text: string) => {
+    // Remove session IDs in parentheses - pattern like (Session: 123456789)
+    let cleanedText = text.replace(/\(Session:\s*\d+\)/gi, '');
+    
     // If the question looks like a technical ID, provide a proper fallback
     if (text.includes('Practice question') && text.match(/\d{13,}-\d+/)) {
       return 'Which of the following is a major scale?';
     }
     
-    return text
+    return cleanedText
       .replace(/\(ID:\s*[^)]+\)/gi, '') // Remove (ID: ...) patterns
       .replace(/\(Question\s*\d+[^)]*\)/gi, '') // Remove (Question X) patterns
       .replace(/\s+/g, ' ') // Clean up extra spaces

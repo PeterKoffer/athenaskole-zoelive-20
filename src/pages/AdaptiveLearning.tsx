@@ -21,12 +21,12 @@ const AdaptiveLearning = () => {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState<LearningMode | null>({
     id: 'adaptive',
-    name: 'Adaptiv Læring',
-    description: 'AI tilpasser sværhedsgraden baseret på din præstation',
+    name: 'Adaptive Learning',
+    description: 'AI adapts difficulty based on your performance',
     icon: null,
-    difficulty: 'Tilpasset',
+    difficulty: 'Adaptive',
     estimatedTime: '10-15 min',
-    benefits: ['Personlig tilpasning', 'Optimal udfordring', 'Hurtigere fremgang']
+    benefits: ['Personal adaptation', 'Optimal challenge', 'Faster progress']
   }); // Default to adaptive mode
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedSkillArea, setSelectedSkillArea] = useState<string>("");
@@ -83,13 +83,13 @@ const AdaptiveLearning = () => {
             className="text-white border-gray-600 hover:bg-gray-700 flex items-center space-x-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Tilbage</span>
+            <span>Back</span>
           </Button>
           
           <div>
-            <h1 className="text-3xl font-bold">AI Adaptiv Læring</h1>
+            <h1 className="text-3xl font-bold">AI Adaptive Learning</h1>
             <p className="text-gray-400">
-              {selectedMode ? `${selectedMode.name} Mode` : 'Vælg din læringsstrategi'}
+              {selectedMode ? `${selectedMode.name} Mode` : 'Choose your learning strategy'}
             </p>
           </div>
         </div>

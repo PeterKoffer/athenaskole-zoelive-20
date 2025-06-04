@@ -48,6 +48,9 @@ const QuestionDisplay = ({
 
   // Clean up question text and provide fallback for technical IDs
   const cleanQuestionText = (text: string) => {
+    // Remove session IDs in parentheses - pattern like (Session: 123456789)
+    let cleanedText = text.replace(/\(Session:\s*\d+\)/gi, '');
+    
     // If the question looks like a technical ID, provide a proper fallback
     if (text.includes('Practice question') && text.match(/\d{13,}-\d+/)) {
       if (subject === 'music') {
@@ -56,7 +59,7 @@ const QuestionDisplay = ({
       return 'What is the correct answer to this practice question?';
     }
     
-    return text
+    return cleanedText
       .replace(/\(ID:\s*[^)]+\)/gi, '') // Remove (ID: ...) patterns
       .replace(/\(Question\s*\d+[^)]*\)/gi, '') // Remove (Question X) patterns
       .replace(/\s+/g, ' ') // Clean up extra spaces
