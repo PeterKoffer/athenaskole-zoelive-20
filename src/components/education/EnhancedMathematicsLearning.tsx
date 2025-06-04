@@ -1,61 +1,33 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calculator, Play, Pause, ArrowLeft } from "lucide-react";
-import NelieIntroduction from "./components/NelieIntroduction";
-import ExtendedLessonManager from "./components/ExtendedLessonManager";
+import { Calculator, ArrowLeft } from "lucide-react";
 import LessonProgressTracker from "./components/LessonProgressTracker";
-
-interface LessonState {
-  phase: 'introduction' | 'lesson' | 'paused' | 'completed';
-  timeSpent: number;
-  currentSegment: number;
-  totalSegments: number;
-  canResume: boolean;
-}
+import LessonControlsCard from "./components/LessonControlsCard";
+import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
+import { useLessonStateManager } from "./components/LessonStateManager";
 
 const EnhancedMathematicsLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  
-  const [lessonState, setLessonState] = useState<LessonState>({
-    phase: 'introduction',
-    timeSpent: 0,
-    currentSegment: 1,
-    totalSegments: 12, // Extended lesson with more activities
-    canResume: false
-  });
-
   const totalLessonTime = 20 * 60; // 20 minutes in seconds
+  
+  const {
+    lessonState,
+    handleLessonStart,
+    handleLessonPause,
+    handleLessonResume,
+    handleLessonComplete
+  } = useLessonStateManager();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
-
-  const handleLessonStart = () => {
-    setLessonState(prev => ({ ...prev, phase: 'lesson' }));
-  };
-
-  const handleLessonPause = () => {
-    setLessonState(prev => ({ 
-      ...prev, 
-      phase: 'paused',
-      canResume: true 
-    }));
-  };
-
-  const handleLessonResume = () => {
-    setLessonState(prev => ({ ...prev, phase: 'lesson' }));
-  };
-
-  const handleLessonComplete = () => {
-    setLessonState(prev => ({ ...prev, phase: 'completed' }));
-  };
 
   const handleBackToProgram = () => {
     navigate('/daily-program');
@@ -101,92 +73,21 @@ const EnhancedMathematicsLearning = () => {
 
         {/* Lesson Controls */}
         {(lessonState.phase === 'lesson' || lessonState.phase === 'paused') && (
-          <Card className="bg-gray-800 border-gray-700 mb-6">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="text-white">
-                <p className="font-semibold">20-Minute Mathematics Adventure with Nelie</p>
-                <p className="text-sm text-gray-400">
-                  Interactive questions, games, and personalized tutoring
-                </p>
-              </div>
-              <div className="flex space-x-2">
-                {lessonState.phase === 'lesson' ? (
-                  <Button onClick={handleLessonPause} variant="outline" size="sm">
-                    <Pause className="w-4 h-4 mr-2" />
-                    Pause Lesson
-                  </Button>
-                ) : (
-                  <Button onClick={handleLessonResume} className="bg-green-600 hover:bg-green-700" size="sm">
-                    <Play className="w-4 h-4 mr-2" />
-                    Resume Lesson
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <LessonControlsCard
+            phase={lessonState.phase}
+            onPause={handleLessonPause}
+            onResume={handleLessonResume}
+          />
         )}
 
         {/* Lesson Content */}
-        {lessonState.phase === 'introduction' && (
-          <NelieIntroduction 
-            subject="mathematics"
-            skillArea="arithmetic"
-            onIntroductionComplete={handleLessonStart}
-          />
-        )}
-
-        {lessonState.phase === 'lesson' && (
-          <ExtendedLessonManager 
-            subject="mathematics"
-            skillArea="arithmetic"
-            onLessonComplete={handleLessonComplete}
-            onBack={handleBackToProgram}
-          />
-        )}
-
-        {lessonState.phase === 'paused' && (
-          <Card className="bg-yellow-900 border-yellow-600">
-            <CardContent className="p-8 text-center">
-              <Pause className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-4">Lesson Paused</h2>
-              <p className="text-yellow-200 mb-6">
-                Your progress has been saved. You can resume this 20-minute lesson anytime.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <Button onClick={handleLessonResume} className="bg-green-600 hover:bg-green-700">
-                  <Play className="w-4 h-4 mr-2" />
-                  Resume Lesson
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={handleBackToProgram}
-                  className="border-gray-600 text-white"
-                >
-                  Back to Program
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {lessonState.phase === 'completed' && (
-          <Card className="bg-green-900 border-green-600">
-            <CardContent className="p-8 text-center">
-              <Calculator className="w-16 h-16 text-green-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-4">Amazing Work! 🎉</h2>
-              <p className="text-green-200 mb-6">
-                Congratulations! You've completed your full 20-minute Mathematics adventure with Nelie. 
-                You solved problems, played games, and learned so much!
-              </p>
-              <Button 
-                onClick={handleBackToProgram}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Back to Program
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        <LessonPhaseRenderer
+          lessonState={lessonState}
+          onLessonStart={handleLessonStart}
+          onLessonComplete={handleLessonComplete}
+          onLessonResume={handleLessonResume}
+          onBackToProgram={handleBackToProgram}
+        />
       </div>
     </div>
   );
