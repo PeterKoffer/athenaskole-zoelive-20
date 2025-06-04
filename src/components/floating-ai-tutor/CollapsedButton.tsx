@@ -26,50 +26,60 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
         className={`
-          bg-gradient-to-r from-pink-400 to-purple-500 
-          hover:from-pink-500 hover:to-purple-600 
+          bg-gradient-to-r from-pink-500 to-purple-600 
+          hover:from-pink-600 hover:to-purple-700
           text-white border-none rounded-full 
-          w-16 h-16 shadow-lg 
+          w-20 h-20 shadow-2xl 
           transition-all duration-200 
           flex flex-col items-center justify-center
-          ${isDragging ? 'scale-105 shadow-xl cursor-grabbing' : 'cursor-grab hover:scale-105'}
+          ${isDragging ? 'scale-110 shadow-3xl cursor-grabbing' : 'cursor-grab hover:scale-105'}
         `}
         style={{
-          minWidth: '64px',
-          minHeight: '64px',
-          padding: '8px'
+          minWidth: '80px',
+          minHeight: '80px',
+          padding: '12px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
         }}
       >
-        <div className="text-2xl mb-1">👩‍🏫</div>
-        <div className="text-xs font-bold">Nelie</div>
+        <div className="text-3xl mb-1">👩‍🏫</div>
+        <div className="text-xs font-bold text-center leading-tight">Nelie<br/>AI Tutor</div>
         
-        {/* Online indicator */}
-        <MessageCircle className="w-4 h-4 absolute -bottom-1 -right-1 bg-green-500 rounded-full p-0.5 text-white" />
+        {/* Online indicator - larger and more visible */}
+        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
+          <MessageCircle className="w-3 h-3 text-white" />
+        </div>
         
         {/* Drag indicator */}
         {isDragging && (
-          <Move className="w-3 h-3 absolute -top-1 -left-1 bg-blue-500 rounded-full p-0.5 text-white" />
+          <div className="absolute -top-2 -left-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
+            <Move className="w-3 h-3 text-white" />
+          </div>
         )}
       </Button>
       
-      {/* Home button */}
+      {/* Home button - larger and more visible */}
       <Button
         onClick={(e) => {
           e.stopPropagation();
           console.log('🏠 Home button clicked');
           onResetToHome();
         }}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-gray-700 hover:bg-gray-600 text-white border-none rounded-full p-1 flex items-center justify-center"
+        className="absolute -top-3 -right-3 w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white border-2 border-white rounded-full flex items-center justify-center shadow-lg"
         title="Go home"
       >
-        <Home className="w-3 h-3" />
+        <Home className="w-4 h-4" />
       </Button>
       
       {/* Drag tooltip */}
       {isDragging && (
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-white bg-black bg-opacity-75 px-2 py-1 rounded whitespace-nowrap">
-          Drag me around
+        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black bg-opacity-75 px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
+          🚀 Drag me around!
         </div>
+      )}
+      
+      {/* Pulse animation when not dragging */}
+      {!isDragging && (
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 animate-ping opacity-20"></div>
       )}
     </div>
   );

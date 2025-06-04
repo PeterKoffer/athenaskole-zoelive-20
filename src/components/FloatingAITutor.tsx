@@ -20,7 +20,7 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
-  // Only hide on auth pages - show everywhere else
+  // Only hide on auth pages - show everywhere else including daily-program
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
   console.log('🎭 FloatingAITutor render check:', { 
@@ -117,17 +117,17 @@ const FloatingAITutor = () => {
         zIndex: 999999
       }}
     >
-      {/* Collapsed button state */}
+      {/* Collapsed button state - Always visible when not open */}
       {!isOpen && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             bottom: '20px',
             right: '20px',
             transform: `translate(${position.x}px, ${position.y}px)`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
-            zIndex: 1000000
+            zIndex: 1000001
           }}
         >
           <CollapsedButton 
@@ -144,13 +144,13 @@ const FloatingAITutor = () => {
       {isOpen && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             bottom: '20px',
             right: '20px',
             transform: `translate(${position.x}px, ${position.y}px)`,
             cursor: isDragging ? 'grabbing' : 'grab',
             pointerEvents: 'auto',
-            zIndex: 1000000
+            zIndex: 1000001
           }}
         >
           <ChatInterface
