@@ -48,8 +48,11 @@ const QuestionDisplay = ({
 
   // Clean up question text and provide fallback for technical IDs
   const cleanQuestionText = (text: string) => {
-    // Remove session IDs in parentheses - pattern like (Session: 123456789)
+    // Remove session IDs in parentheses - pattern like (Session: 1749071447550)
     let cleanedText = text.replace(/\(Session:\s*\d+\)/gi, '');
+    
+    // Remove any pattern that looks like a session ID in parentheses
+    cleanedText = cleanedText.replace(/\(\d{13,}\)/gi, '');
     
     // If the question looks like a technical ID, provide a proper fallback
     if (text.includes('Practice question') && text.match(/\d{13,}-\d+/)) {
