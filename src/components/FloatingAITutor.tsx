@@ -33,14 +33,14 @@ const FloatingAITutor = () => {
     viewportWidth: typeof window !== 'undefined' ? window.innerWidth : 'unknown'
   });
 
-  // Reset state when navigating to auth pages
+  // Reset state when navigating to auth pages - always call this hook
   useEffect(() => {
     if (shouldHide) {
       setIsOpen(false);
     }
   }, [location.pathname, shouldHide]);
 
-  // Add initial welcome message
+  // Add initial welcome message - always call this hook
   useEffect(() => {
     if (!shouldHide && messages.length === 0) {
       const welcomeMessage: Message = {
@@ -52,12 +52,6 @@ const FloatingAITutor = () => {
       console.log('👋 Welcome message added to Nelie');
     }
   }, [shouldHide, messages.length]);
-
-  // Don't render on auth pages
-  if (shouldHide) {
-    console.log('🚫 FloatingAITutor hidden on auth page');
-    return null;
-  }
 
   const toggleOpen = () => {
     console.log('🔄 Toggling Nelie open state:', !isOpen);
@@ -103,6 +97,12 @@ const FloatingAITutor = () => {
     setIsSpeaking(false);
     speechSynthesis.cancel();
   };
+
+  // Don't render on auth pages - but do this AFTER all hooks are called
+  if (shouldHide) {
+    console.log('🚫 FloatingAITutor hidden on auth page');
+    return null;
+  }
 
   console.log('✅ FloatingAITutor rendering UI - isOpen:', isOpen, 'position:', position);
 
