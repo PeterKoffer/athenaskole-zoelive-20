@@ -1,5 +1,5 @@
 
-import { BookOpen, Calculator, PenTool, Beaker } from "lucide-react";
+import { BookOpen, Calculator, PenTool, Beaker, Music } from "lucide-react";
 
 export const dailyActivities = [
   {
@@ -37,6 +37,18 @@ export const dailyActivities = [
     aiEnhanced: true,
     subject: "creative_writing",
     skillArea: "storytelling"
+  },
+  {
+    id: "music",
+    title: "Music Discovery",
+    description: "Explore rhythm, melody, and musical theory with interactive AI lessons",
+    icon: Music,
+    duration: "25 min",
+    level: "Beginner",
+    color: "from-orange-500 to-yellow-600",
+    aiEnhanced: true,
+    subject: "music",
+    skillArea: "music_theory"
   },
   {
     id: "science",

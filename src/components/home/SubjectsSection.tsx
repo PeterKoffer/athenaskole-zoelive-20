@@ -19,11 +19,18 @@ const SubjectsSection = () => {
       color: "from-purple-500 to-violet-500"
     },
     {
+      title: "Music Discovery",
+      description: "Explore rhythm, melody, and music theory with Nelie as your musical guide.",
+      icon: "🎵",
+      level: "Beginner",
+      color: "from-orange-500 to-yellow-500"
+    },
+    {
       title: "Science & Technology",
       description: "Explore the wonders of science and technology with Nelie as your guide.",
       icon: "🔬",
       level: "Progressive",
-      color: "from-orange-500 to-red-500"
+      color: "from-green-500 to-emerald-500"
     }
   ];
 
@@ -39,7 +46,7 @@ const SubjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {subjects.map((subject, index) => (
             <Card key={index} className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300 hover:scale-105">
               <CardHeader>

@@ -21,6 +21,7 @@ import EnglishLearning from "./components/education/EnglishLearning";
 import MathematicsLearning from "./components/education/MathematicsLearning";
 import CreativeLearning from "./components/education/CreativeLearning";
 import ScienceLearning from "./components/education/ScienceLearning";
+import MusicLearning from "./components/education/MusicLearning";
 
 // Import Floating AI Tutor
 import FloatingAITutor from "./components/FloatingAITutor";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/learn/english" element={<EnglishLearning />} />
           <Route path="/learn/mathematics" element={<MathematicsLearning />} />
           <Route path="/learn/creative_writing" element={<CreativeLearning />} />
+          <Route path="/learn/music" element={<MusicLearning />} />
           <Route path="/learn/science" element={<ScienceLearning />} />
           
           <Route path="*" element={<NotFound />} />

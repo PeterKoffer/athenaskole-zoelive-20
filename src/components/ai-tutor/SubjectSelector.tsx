@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Calculator, BookOpen, Globe } from 'lucide-react';
+import { Brain, Calculator, BookOpen, Globe, Music } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export interface SubjectSelectorProps {
@@ -37,6 +37,17 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: 'grammar', name: 'Grammar', description: 'Sentence structure and language rules', route: '/english' },
         { id: 'reading', name: 'Reading', description: 'Comprehension and vocabulary building', route: '/english' },
         { id: 'writing', name: 'Writing', description: 'Expression and communication skills', route: '/english' }
+      ]
+    },
+    {
+      id: 'music',
+      name: 'Music',
+      icon: Music,
+      skillAreas: [
+        { id: 'music_theory', name: 'Music Theory', description: 'Understanding rhythm, melody, and harmony', route: '/music' },
+        { id: 'rhythm', name: 'Rhythm', description: 'Beat patterns and timing in music', route: '/music' },
+        { id: 'melody', name: 'Melody', description: 'Musical phrases and note sequences', route: '/music' },
+        { id: 'instruments', name: 'Instruments', description: 'Learning about different musical instruments', route: '/music' }
       ]
     },
     {
