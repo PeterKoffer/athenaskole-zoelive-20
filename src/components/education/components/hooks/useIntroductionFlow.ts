@@ -80,36 +80,29 @@ export const useIntroductionFlow = (subject: string) => {
     }))
   ];
 
-  // Combined useEffect for step progression and speech
+  // Separate useEffect for step progression
+  useEffect(() => {
+    if (currentStep >= introductionSteps.length - 1) return;
+
+    const timer = setTimeout(() => {
+      console.log('🎯 Advancing to step:', currentStep + 1);
+      setCurrentStep(prev => prev + 1);
+    }, introductionSteps[currentStep]?.duration || 5000);
+
+    return () => clearTimeout(timer);
+  }, [currentStep, introductionSteps.length]);
+
+  // Separate useEffect for speech
   useEffect(() => {
     const currentStepData = introductionSteps[currentStep];
-    
-    if (!currentStepData) return;
+    if (!currentStepData || !autoReadEnabled) return;
 
-    let speakTimeout: NodeJS.Timeout;
-    let advanceTimeout: NodeJS.Timeout;
+    const speakTimer = setTimeout(() => {
+      console.log('🎯 Speaking step:', currentStep, currentStepData.text.substring(0, 50));
+      speakText(currentStepData.text);
+    }, 1000);
 
-    // Auto-speak if enabled
-    if (autoReadEnabled) {
-      speakTimeout = setTimeout(() => {
-        console.log('🎯 Speaking step:', currentStep, currentStepData.text.substring(0, 50));
-        speakText(currentStepData.text);
-      }, 800);
-    }
-
-    // Auto-advance to next step
-    advanceTimeout = setTimeout(() => {
-      if (currentStep < introductionSteps.length - 1) {
-        console.log('🎯 Advancing to step:', currentStep + 1);
-        setCurrentStep(prev => prev + 1);
-      }
-    }, currentStepData.duration);
-
-    // Cleanup function
-    return () => {
-      if (speakTimeout) clearTimeout(speakTimeout);
-      if (advanceTimeout) clearTimeout(advanceTimeout);
-    };
+    return () => clearTimeout(speakTimer);
   }, [currentStep, autoReadEnabled, speakText]);
 
   const handleManualRead = () => {

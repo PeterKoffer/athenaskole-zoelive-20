@@ -6,6 +6,7 @@ export const useSpeechSynthesis = () => {
   const [autoReadEnabled, setAutoReadEnabled] = useState(true);
   const hasAutoRead = useRef(false);
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const speechTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Check if speech synthesis is available
   const isSpeechSynthesisSupported = typeof speechSynthesis !== 'undefined';
@@ -14,6 +15,12 @@ export const useSpeechSynthesis = () => {
     console.log('🔇 Stopping all speech');
     
     if (!isSpeechSynthesisSupported) return;
+    
+    // Clear any pending speech timeouts
+    if (speechTimeout.current) {
+      clearTimeout(speechTimeout.current);
+      speechTimeout.current = null;
+    }
     
     // Stop any current speech
     speechSynthesis.cancel();
@@ -82,11 +89,26 @@ export const useSpeechSynthesis = () => {
 
     console.log('🔊 NELIE SPEAKING:', text.substring(0, 50) + '...');
 
-    // Stop any existing speech first
-    if (currentUtterance.current) {
+    // Stop any existing speech first with a delay to prevent conflicts
+    if (currentUtterance.current || speechSynthesis.speaking) {
+      console.log('🛑 Stopping existing speech before starting new one');
       speechSynthesis.cancel();
+      
+      // Add a small delay to ensure the previous speech is fully stopped
+      if (speechTimeout.current) {
+        clearTimeout(speechTimeout.current);
+      }
+      
+      speechTimeout.current = setTimeout(() => {
+        startSpeech(text);
+      }, 200);
+      return;
     }
 
+    startSpeech(text);
+  }, [autoReadEnabled, getFemaleVoice, isSpeechSynthesisSupported]);
+
+  const startSpeech = useCallback((text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     currentUtterance.current = utterance;
     
@@ -121,8 +143,7 @@ export const useSpeechSynthesis = () => {
     // Start speaking immediately
     console.log('🚀 Starting speech synthesis...');
     speechSynthesis.speak(utterance);
-
-  }, [autoReadEnabled, getFemaleVoice, isSpeechSynthesisSupported]);
+  }, [getFemaleVoice]);
 
   const handleMuteToggle = useCallback(() => {
     const newAutoReadState = !autoReadEnabled;
@@ -138,6 +159,9 @@ export const useSpeechSynthesis = () => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (speechTimeout.current) {
+        clearTimeout(speechTimeout.current);
+      }
       if (currentUtterance.current) {
         speechSynthesis.cancel();
       }
