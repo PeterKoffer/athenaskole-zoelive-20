@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +24,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSessionActive, setIsSessionActive] = useState(true);
+  const questionCardRef = useRef<HTMLDivElement>(null);
 
   const totalQuestions = 5;
 
@@ -62,6 +63,18 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
       generateNextQuestion();
     }
   }, [sessionId, sessionQuestions.length, isGenerating, generateNextQuestion]);
+
+  // Auto-scroll to question when it loads
+  useEffect(() => {
+    if (sessionQuestions[currentQuestionIndex] && questionCardRef.current) {
+      setTimeout(() => {
+        questionCardRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 300);
+    }
+  }, [sessionQuestions, currentQuestionIndex]);
 
   const isSessionComplete = currentQuestionIndex >= totalQuestions;
   const currentQuestion = sessionQuestions[currentQuestionIndex];
@@ -143,7 +156,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
         recommendedDuration={20}
       />
       
-      <Card className="bg-gray-900 border-gray-800 overflow-hidden">
+      <Card ref={questionCardRef} className="bg-gray-900 border-gray-800 overflow-hidden">
         <LessonHeader
           subject={subject}
           skillArea={skillArea}
