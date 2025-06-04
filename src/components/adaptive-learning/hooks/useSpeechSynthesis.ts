@@ -12,25 +12,42 @@ export const useSpeechSynthesis = () => {
   const cancelRequested = useRef(false);
   const speakingTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Ensure voices are loaded before attempting to use them
+  // Check if speech synthesis is available
+  const isSpeechSynthesisSupported = typeof speechSynthesis !== 'undefined';
+
   useEffect(() => {
+    if (!isSpeechSynthesisSupported) {
+      console.error('🚫 Speech synthesis not supported in this browser');
+      return;
+    }
+
     const loadVoices = () => {
       const voices = speechSynthesis.getVoices();
+      console.log('🎵 Loading voices, found:', voices.length, 'voices');
       if (voices.length > 0) {
         setVoicesLoaded(true);
-        console.log('🎵 Available voices loaded:', voices.length, 'voices found');
+        console.log('✅ Voices loaded successfully');
+        // Log available voices for debugging
+        voices.forEach((voice, index) => {
+          console.log(`Voice ${index}: ${voice.name} (${voice.lang})`);
+        });
       }
     };
 
+    // Load voices immediately
     loadVoices();
+    
+    // Also listen for the voiceschanged event
     speechSynthesis.addEventListener('voiceschanged', loadVoices);
 
     return () => {
       speechSynthesis.removeEventListener('voiceschanged', loadVoices);
     };
-  }, []);
+  }, [isSpeechSynthesisSupported]);
 
   const getFemaleVoice = useCallback(() => {
+    if (!isSpeechSynthesisSupported) return null;
+    
     const voices = speechSynthesis.getVoices();
     
     if (voices.length === 0) {
@@ -38,6 +55,7 @@ export const useSpeechSynthesis = () => {
       return null;
     }
     
+    // Try to find a female voice
     const femaleVoiceNames = [
       'Microsoft Zira Desktop',
       'Microsoft Hazel Desktop', 
@@ -63,17 +81,7 @@ export const useSpeechSynthesis = () => {
       }
     }
 
-    const fallbackVoice = voices.find(voice => 
-      (voice.name.toLowerCase().includes('female') || 
-       voice.name.toLowerCase().includes('woman')) &&
-      (voice.lang.includes('en') || voice.lang.includes('EN'))
-    );
-
-    if (fallbackVoice) {
-      console.log('🎵 Using fallback female voice:', fallbackVoice.name);
-      return fallbackVoice;
-    }
-
+    // Fallback to any English voice
     const englishVoice = voices.find(voice => 
       voice.lang.includes('en') || voice.lang.includes('EN')
     );
@@ -83,12 +91,15 @@ export const useSpeechSynthesis = () => {
       return englishVoice;
     }
 
-    console.log('🎵 No suitable voice found, using default');
+    // Use first available voice as last resort
+    console.log('🎵 Using default voice:', voices[0]?.name || 'none');
     return voices[0] || null;
-  }, []);
+  }, [isSpeechSynthesisSupported]);
 
   const stopSpeaking = useCallback(() => {
     console.log('🔇 Stopping speech - cleanup all speech state');
+    
+    if (!isSpeechSynthesisSupported) return;
     
     // Clear any pending timeouts
     if (speakingTimeout.current) {
@@ -115,10 +126,21 @@ export const useSpeechSynthesis = () => {
       cancelRequested.current = false;
       console.log('🔄 Speech cancel flag reset');
     }, 1000);
-  }, []);
+  }, [isSpeechSynthesisSupported]);
 
   const processNextInQueue = useCallback(async () => {
+    if (!isSpeechSynthesisSupported) {
+      console.error('🚫 Speech synthesis not supported');
+      return;
+    }
+
     if (isProcessingQueue.current || speechQueue.current.length === 0 || cancelRequested.current || !autoReadEnabled) {
+      console.log('🚫 Cannot process queue:', {
+        isProcessing: isProcessingQueue.current,
+        queueLength: speechQueue.current.length,
+        cancelRequested: cancelRequested.current,
+        autoReadEnabled
+      });
       return;
     }
 
@@ -135,6 +157,7 @@ export const useSpeechSynthesis = () => {
       
       // Wait for voices if needed
       if (!voicesLoaded) {
+        console.log('⏳ Waiting for voices to load...');
         await new Promise(resolve => {
           const checkVoices = () => {
             if (speechSynthesis.getVoices().length > 0) {
@@ -160,17 +183,19 @@ export const useSpeechSynthesis = () => {
       if (femaleVoice) {
         utterance.voice = femaleVoice;
         console.log('🎵 Using voice:', femaleVoice.name);
+      } else {
+        console.warn('⚠️ No suitable voice found, using default');
       }
 
       utterance.onstart = () => {
         if (!cancelRequested.current) {
-          console.log('🎵 Nelie speech started successfully');
+          console.log('✅ Nelie speech started successfully');
           setIsSpeaking(true);
         }
       };
 
       utterance.onend = () => {
-        console.log('🎵 Nelie finished speaking');
+        console.log('🏁 Nelie finished speaking');
         setIsSpeaking(false);
         currentUtterance.current = null;
         isProcessingQueue.current = false;
@@ -184,9 +209,7 @@ export const useSpeechSynthesis = () => {
       };
 
       utterance.onerror = (event) => {
-        if (event.error !== 'canceled') {
-          console.error('🚫 Speech synthesis error:', event.error);
-        }
+        console.error('🚫 Speech synthesis error:', event.error, event);
         setIsSpeaking(false);
         currentUtterance.current = null;
         isProcessingQueue.current = false;
@@ -194,8 +217,18 @@ export const useSpeechSynthesis = () => {
 
       // Only speak if not canceled and auto-read is enabled
       if (!cancelRequested.current && autoReadEnabled) {
+        console.log('🔊 Starting speech synthesis...');
         speechSynthesis.speak(utterance);
+        
+        // Force set speaking state in case onstart doesn't fire
+        setTimeout(() => {
+          if (!cancelRequested.current && currentUtterance.current === utterance) {
+            console.log('🔧 Force setting speaking state to true');
+            setIsSpeaking(true);
+          }
+        }, 100);
       } else {
+        console.log('🚫 Not speaking due to cancel or disabled auto-read');
         isProcessingQueue.current = false;
       }
 
@@ -205,22 +238,32 @@ export const useSpeechSynthesis = () => {
       currentUtterance.current = null;
       isProcessingQueue.current = false;
     }
-  }, [autoReadEnabled, voicesLoaded, getFemaleVoice]);
+  }, [autoReadEnabled, voicesLoaded, getFemaleVoice, isSpeechSynthesisSupported]);
 
   const speakText = useCallback(async (text: string) => {
-    if (!text || text.trim() === '' || !autoReadEnabled) {
-      console.log('🚫 Cannot speak - no text or auto-read disabled');
+    if (!isSpeechSynthesisSupported) {
+      console.error('🚫 Speech synthesis not supported');
       return;
     }
 
-    console.log('🎵 Adding to speech queue:', text.substring(0, 50) + '...');
+    if (!text || text.trim() === '' || !autoReadEnabled) {
+      console.log('🚫 Cannot speak - no text or auto-read disabled:', {
+        hasText: !!text,
+        textLength: text?.length || 0,
+        autoReadEnabled
+      });
+      return;
+    }
+
+    console.log('📝 Adding to speech queue:', text.substring(0, 50) + '...');
     speechQueue.current.push(text);
     
     // Start processing if not already processing
     if (!isProcessingQueue.current && !cancelRequested.current) {
+      console.log('🚀 Starting queue processing...');
       setTimeout(() => processNextInQueue(), 200);
     }
-  }, [autoReadEnabled, processNextInQueue]);
+  }, [autoReadEnabled, processNextInQueue, isSpeechSynthesisSupported]);
 
   const handleMuteToggle = useCallback(() => {
     const newAutoReadState = !autoReadEnabled;
@@ -251,6 +294,7 @@ export const useSpeechSynthesis = () => {
     speakText,
     stopSpeaking,
     handleMuteToggle,
-    setAutoReadEnabled
+    setAutoReadEnabled,
+    isSpeechSynthesisSupported
   };
 };

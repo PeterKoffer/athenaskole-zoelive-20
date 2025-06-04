@@ -34,6 +34,8 @@ const RobotAvatar = ({
     ${className}
   `;
 
+  console.log('🤖 RobotAvatar rendering - size:', size, 'isSpeaking:', isSpeaking, 'isActive:', isActive);
+
   if (imageError) {
     // Enhanced fallback with mouth animation
     return (
@@ -62,30 +64,47 @@ const RobotAvatar = ({
         draggable={false}
       />
       
-      {/* Animated mouth overlay when speaking */}
+      {/* Enhanced mouth animation when speaking */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Mouth movement animation positioned over Nelie's mouth area */}
+          {/* Main mouth area positioned over Nelie's mouth */}
           <div className="absolute bottom-1/3 left-1/2 transform -translate-x-1/2">
             <div className="relative">
-              {/* Main mouth animation */}
-              <div className="w-8 h-4 bg-pink-300 rounded-full opacity-80 animate-pulse"></div>
-              {/* Inner mouth detail */}
-              <div className="absolute top-1 left-2 w-4 h-2 bg-pink-400 rounded-full animate-bounce"></div>
-              {/* Speech bubbles */}
-              <div className="absolute -top-2 -right-2 flex space-x-1">
-                <div className="w-2 h-2 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
-                <div className="w-2 h-2 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
+              {/* Primary mouth animation - more visible */}
+              <div className="w-12 h-6 bg-pink-400 rounded-full opacity-90 animate-pulse"></div>
+              {/* Inner mouth movement */}
+              <div className="absolute top-1 left-3 w-6 h-3 bg-pink-500 rounded-full animate-bounce"></div>
+              {/* Additional mouth details */}
+              <div className="absolute top-2 left-4 w-4 h-2 bg-pink-600 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
+              
+              {/* Speech indicator bubbles */}
+              <div className="absolute -top-4 -right-4 flex space-x-1">
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
+              </div>
+              
+              {/* Sound waves effect */}
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <div className="w-1 h-4 bg-green-400 rounded animate-pulse" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1 h-6 bg-green-400 rounded animate-pulse" style={{ animationDelay: '100ms' }}></div>
+                <div className="w-1 h-4 bg-green-400 rounded animate-pulse" style={{ animationDelay: '200ms' }}></div>
               </div>
             </div>
           </div>
         </div>
       )}
       
-      {/* Active status indicator (only when not speaking) - removed blinking effect */}
+      {/* Active status indicator (only when not speaking) */}
       {isActive && !isSpeaking && (
-        <div className="absolute top-2 right-2 w-6 h-6 bg-green-400 rounded-full"></div>
+        <div className="absolute top-2 right-2 w-6 h-6 bg-green-400 rounded-full animate-pulse"></div>
+      )}
+      
+      {/* Speaking indicator text for debugging */}
+      {isSpeaking && (
+        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-green-400 font-bold animate-pulse">
+          Speaking...
+        </div>
       )}
     </div>
   );

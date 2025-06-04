@@ -10,7 +10,7 @@ import { Message } from "./floating-ai-tutor/types";
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle } = useSpeechSynthesis();
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle, isSpeechSynthesisSupported } = useSpeechSynthesis();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -38,14 +38,20 @@ const FloatingAITutor = () => {
       };
       setMessages([welcomeMessage]);
       
-      // Auto-speak welcome message if enabled
-      if (autoReadEnabled) {
+      // Auto-speak welcome message if enabled and supported
+      if (autoReadEnabled && isSpeechSynthesisSupported) {
+        console.log('🎵 Speaking welcome message...');
         setTimeout(() => {
           speakText("Hi! I'm Nelie, your AI tutor! I'm here to help you learn. Ask me anything!");
         }, 1000);
+      } else {
+        console.log('🚫 Not speaking welcome message:', {
+          autoReadEnabled,
+          isSpeechSynthesisSupported
+        });
       }
     }
-  }, [shouldHide, messages.length, autoReadEnabled, speakText]);
+  }, [shouldHide, messages.length, autoReadEnabled, speakText, isSpeechSynthesisSupported]);
 
   const toggleOpen = () => {
     if (!hasMoved && !isDragging) {
@@ -77,8 +83,9 @@ const FloatingAITutor = () => {
       };
       setMessages(prev => [...prev, aiResponse]);
       
-      // Speak the response if auto-read is enabled
-      if (autoReadEnabled) {
+      // Speak the response if auto-read is enabled and supported
+      if (autoReadEnabled && isSpeechSynthesisSupported) {
+        console.log('🎵 Speaking AI response...');
         speakText(randomResponse);
       }
     }, 1000);
@@ -93,7 +100,7 @@ const FloatingAITutor = () => {
     return null;
   }
 
-  console.log('🤖 FloatingAITutor rendering at position:', position, 'isOpen:', isOpen);
+  console.log('🤖 FloatingAITutor rendering at position:', position, 'isOpen:', isOpen, 'isSpeaking:', isSpeaking);
 
   return (
     <div
