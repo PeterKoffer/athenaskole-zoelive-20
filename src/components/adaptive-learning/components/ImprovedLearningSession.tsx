@@ -1,11 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useDiverseQuestionGeneration } from '../hooks/useDiverseQuestionGeneration';
-import { Brain, ArrowLeft, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
+import GradeAwareContentGenerator from './GradeAwareContentGenerator';
+import { Brain, ArrowLeft, CheckCircle, XCircle, RefreshCw, GraduationCap } from 'lucide-react';
 
 interface ImprovedLearningSessionProps {
   subject: string;
@@ -22,6 +23,7 @@ const ImprovedLearningSession = ({
 }: ImprovedLearningSessionProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { gradeConfig, isContentAppropriate } = useGradeLevelContent(subject);
   
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -30,8 +32,14 @@ const ImprovedLearningSession = ({
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [sessionStartTime] = useState(new Date());
   const [questionStartTime, setQuestionStartTime] = useState(new Date());
+  const [gradeContentConfig, setGradeContentConfig] = useState<any>(null);
   
   const totalQuestions = 5;
+  
+  // Use grade-appropriate difficulty if available
+  const adjustedDifficulty = gradeConfig 
+    ? Math.max(gradeConfig.difficultyRange[0], Math.min(gradeConfig.difficultyRange[1], difficultyLevel))
+    : difficultyLevel;
   
   const { 
     isGenerating, 
@@ -40,29 +48,44 @@ const ImprovedLearningSession = ({
   } = useDiverseQuestionGeneration({
     subject,
     skillArea,
-    difficultyLevel,
-    userId: user?.id || ''
+    difficultyLevel: adjustedDifficulty,
+    userId: user?.id || '',
+    gradeLevel: gradeConfig?.userGrade,
+    standardsAlignment: gradeContentConfig?.standard
   });
 
   // Generate first question on mount
   useEffect(() => {
-    if (user?.id && !currentQuestion && !isGenerating) {
-      console.log('🎬 Starting improved session, generating first diverse question...');
+    if (user?.id && gradeContentConfig && !currentQuestion && !isGenerating) {
+      console.log('🎬 Starting grade-appropriate session for Grade', gradeConfig?.userGrade);
       loadNextQuestion();
     }
-  }, [user?.id]);
+  }, [user?.id, gradeContentConfig]);
+
+  const handleContentGenerated = (contentConfig: any) => {
+    setGradeContentConfig(contentConfig);
+    console.log('📚 Using grade-appropriate content configuration:', contentConfig);
+  };
 
   const loadNextQuestion = async () => {
     try {
       setQuestionStartTime(new Date());
-      const question = await generateDiverseQuestion();
+      
+      // Generate question with grade-level context
+      const questionContext = gradeContentConfig ? {
+        gradeLevel: gradeContentConfig.gradeLevel,
+        standard: gradeContentConfig.standard,
+        contentPrompt: gradeContentConfig.contentPrompt
+      } : undefined;
+      
+      const question = await generateDiverseQuestion(questionContext);
       setCurrentQuestion(question);
-      console.log('📝 Loaded question:', question.question);
+      console.log('📝 Loaded grade-appropriate question for Grade', gradeConfig?.userGrade, ':', question.question);
     } catch (error) {
       console.error('Failed to load question:', error);
       toast({
         title: "Error",
-        description: "Failed to generate question. Please try again.",
+        description: "Failed to generate grade-appropriate question. Please try again.",
         variant: "destructive"
       });
     }
@@ -82,8 +105,11 @@ const ImprovedLearningSession = ({
       setCorrectAnswers(prev => prev + 1);
     }
 
-    // Save question history
-    await saveQuestionHistory(currentQuestion, answerIndex, isCorrect, responseTime);
+    // Save question history with grade context
+    await saveQuestionHistory(currentQuestion, answerIndex, isCorrect, responseTime, {
+      gradeLevel: gradeConfig?.userGrade,
+      standardCode: gradeContentConfig?.standard?.code
+    });
 
     toast({
       title: isCorrect ? "Correct! 🎉" : "Incorrect",
@@ -98,7 +124,7 @@ const ImprovedLearningSession = ({
         // Session complete
         toast({
           title: "Session Complete! 🎓",
-          description: `You got ${correctAnswers + (isCorrect ? 1 : 0)}/${totalQuestions} questions correct!`,
+          description: `You got ${correctAnswers + (isCorrect ? 1 : 0)}/${totalQuestions} questions correct for Grade ${gradeConfig?.userGrade}!`,
           duration: 5000
         });
 
@@ -113,7 +139,7 @@ const ImprovedLearningSession = ({
       setSelectedAnswer(null);
       setShowResult(false);
       
-      console.log(`🔄 Loading diverse question ${questionNumber + 1}...`);
+      console.log(`🔄 Loading Grade ${gradeConfig?.userGrade} question ${questionNumber + 1}...`);
       await loadNextQuestion();
     }, 3000);
   };
@@ -122,8 +148,8 @@ const ImprovedLearningSession = ({
     if (!isGenerating) {
       loadNextQuestion();
       toast({
-        title: "Generating New Question",
-        description: "Creating fresh content...",
+        title: "Generating New Grade-Appropriate Question",
+        description: `Creating content for Grade ${gradeConfig?.userGrade}...`,
         duration: 2000
       });
     }
@@ -140,13 +166,52 @@ const ImprovedLearningSession = ({
     );
   }
 
+  // Show grade-level content configuration first
+  if (!gradeContentConfig) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-gray-900 border-gray-800">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                onClick={onBack}
+                className="text-gray-400 hover:text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              
+              <CardTitle className="text-white flex items-center space-x-2">
+                <GraduationCap className="w-5 h-5 text-lime-400" />
+                <span>Preparing Grade-Level Content</span>
+              </CardTitle>
+              
+              <div></div>
+            </div>
+          </CardHeader>
+        </Card>
+        
+        <GradeAwareContentGenerator
+          subject={subject}
+          skillArea={skillArea}
+          onContentGenerated={handleContentGenerated}
+        />
+      </div>
+    );
+  }
+
   if (isGenerating && !currentQuestion) {
     return (
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-6 text-center">
           <Brain className="w-8 h-8 text-lime-400 animate-pulse mx-auto mb-4" />
-          <h3 className="text-white text-lg font-semibold mb-2">Creating Your Unique Question</h3>
-          <p className="text-gray-400">AI is generating completely new content...</p>
+          <h3 className="text-white text-lg font-semibold mb-2">
+            Creating Grade {gradeConfig?.userGrade} Question
+          </h3>
+          <p className="text-gray-400">
+            AI is generating content aligned with {gradeContentConfig.standard?.code}...
+          </p>
         </CardContent>
       </Card>
     );
@@ -182,10 +247,10 @@ const ImprovedLearningSession = ({
           
           <div className="text-center">
             <CardTitle className="text-white">
-              {subject.charAt(0).toUpperCase() + subject.slice(1)} - {skillArea}
+              Grade {gradeConfig?.userGrade} - {subject.charAt(0).toUpperCase() + subject.slice(1)}
             </CardTitle>
             <p className="text-gray-400 text-sm">
-              Question {questionNumber} of {totalQuestions} • Level {difficultyLevel}
+              Question {questionNumber} of {totalQuestions} • {gradeContentConfig.standard?.code}
             </p>
           </div>
           
@@ -253,8 +318,15 @@ const ImprovedLearningSession = ({
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <h4 className="text-white font-medium mb-2">Explanation:</h4>
               <p className="text-gray-300">{currentQuestion.explanation}</p>
+              {gradeContentConfig.standard && (
+                <div className="mt-3 p-2 bg-blue-900/20 border border-blue-800 rounded">
+                  <p className="text-blue-200 text-sm">
+                    📚 Aligned with {gradeContentConfig.standard.code}: {gradeContentConfig.standard.title}
+                  </p>
+                </div>
+              )}
               <p className="text-gray-400 text-sm mt-2">
-                {questionNumber < totalQuestions ? 'Next unique question coming up...' : 'Session completing...'}
+                {questionNumber < totalQuestions ? 'Next grade-appropriate question coming up...' : 'Session completing...'}
               </p>
             </div>
           )}

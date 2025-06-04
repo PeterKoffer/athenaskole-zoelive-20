@@ -1,7 +1,7 @@
 import { OpenAIResponse, GeneratedContent } from './types.ts';
 
 export async function generateContentWithOpenAI(requestData: any): Promise<GeneratedContent | null> {
-  console.log('🤖 generateContentWithOpenAI called with enhanced diversity:', requestData);
+  console.log('🤖 generateContentWithOpenAI called with grade-level alignment:', requestData);
   
   const openaiApiKey = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('OpenaiAPI');
   
@@ -10,15 +10,17 @@ export async function generateContentWithOpenAI(requestData: any): Promise<Gener
     throw new Error('OpenAI API key not configured');
   }
 
-  const prompt = createEnhancedPrompt(
+  const prompt = createGradeAlignedPrompt(
     requestData.subject, 
     requestData.skillArea, 
     requestData.difficultyLevel, 
     requestData.previousQuestions || [],
     requestData.diversityPrompt,
-    requestData.sessionId
+    requestData.sessionId,
+    requestData.gradeLevel,
+    requestData.standardsAlignment
   );
-  console.log('📝 Using enhanced diversity prompt for subject:', requestData.subject);
+  console.log('📝 Using grade-aligned prompt for Grade', requestData.gradeLevel);
 
   const result = await callOpenAI(openaiApiKey, prompt);
   
@@ -47,7 +49,7 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
         messages: [
           {
             role: 'system',
-            content: 'You are an AI education assistant that creates questions for specific subjects. Always generate questions that match the requested subject and skill area. Return only valid JSON with no formatting. CRITICAL: Make sure the "correct" field points to the INDEX of the actual correct answer in the options array.'
+            content: 'You are an AI education assistant that creates grade-level appropriate questions aligned with educational standards. Always generate questions that match the requested grade level, subject, and educational standards. Use age-appropriate language and examples. Return only valid JSON with no formatting. CRITICAL: Make sure the "correct" field points to the INDEX of the actual correct answer in the options array.'
           },
           {
             role: 'user',
@@ -152,122 +154,155 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<{ succ
   }
 }
 
-function createEnhancedPrompt(
+function createGradeAlignedPrompt(
   subject: string, 
   skillArea: string, 
   difficultyLevel: number, 
   previousQuestions: string[],
   diversityPrompt?: string,
-  sessionId?: number
+  sessionId?: number,
+  gradeLevel?: number,
+  standardsAlignment?: any
 ): string {
-  console.log('🎯 Creating enhanced diversity prompt for subject:', subject, 'skillArea:', skillArea);
+  console.log('🎯 Creating grade-aligned prompt for Grade', gradeLevel, 'subject:', subject);
+  
+  const grade = gradeLevel || Math.min(12, Math.max(1, difficultyLevel));
+  const gradeDescriptors = {
+    1: { vocab: "simple, concrete words", examples: "everyday objects and basic counting", cognitive: "recognition and recall" },
+    2: { vocab: "basic vocabulary with simple sentences", examples: "familiar situations and small numbers", cognitive: "basic understanding and application" },
+    3: { vocab: "grade-appropriate terms with clear explanations", examples: "school and community contexts", cognitive: "analysis of simple problems" },
+    4: { vocab: "intermediate vocabulary", examples: "real-world applications", cognitive: "problem-solving with multiple steps" },
+    5: { vocab: "more advanced terminology", examples: "complex real-world scenarios", cognitive: "synthesis and evaluation" },
+    6: { vocab: "middle school level vocabulary", examples: "abstract concepts with concrete examples", cognitive: "analytical thinking" },
+    7: { vocab: "pre-algebra terminology", examples: "scientific and mathematical reasoning", cognitive: "logical analysis" },
+    8: { vocab: "advanced middle school concepts", examples: "complex problem scenarios", cognitive: "abstract reasoning" },
+    9: { vocab: "high school foundation vocabulary", examples: "academic and real-world applications", cognitive: "critical thinking" },
+    10: { vocab: "intermediate academic vocabulary", examples: "complex analysis scenarios", cognitive: "synthesis and evaluation" },
+    11: { vocab: "advanced academic concepts", examples: "sophisticated real-world problems", cognitive: "advanced critical thinking" },
+    12: { vocab: "college-preparatory terminology", examples: "complex academic scenarios", cognitive: "sophisticated analysis and synthesis" }
+  };
+
+  const currentGrade = gradeDescriptors[grade as keyof typeof gradeDescriptors] || gradeDescriptors[6];
   
   let basePrompt = '';
   
-  // Generate subject-specific prompts with maximum creativity
   if (subject === 'mathematics') {
-    basePrompt = `Generate a COMPLETELY UNIQUE mathematics question about ${skillArea} for elementary students (difficulty ${difficultyLevel}).
+    basePrompt = `Generate a UNIQUE mathematics question for Grade ${grade} students about ${skillArea}.
+
+GRADE ${grade} REQUIREMENTS:
+- Use ${currentGrade.vocab}
+- Create examples involving ${currentGrade.examples}
+- Focus on ${currentGrade.cognitive}
+- Age-appropriate complexity for ${grade === 1 ? 'ages 6-7' : grade === 12 ? 'ages 17-18' : `grade ${grade}`}
+
+${standardsAlignment ? `
+STANDARDS ALIGNMENT:
+- Standard: ${standardsAlignment.code}
+- Focus: ${standardsAlignment.title}
+- Description: ${standardsAlignment.description}
+- Domain: ${standardsAlignment.domain}
+` : ''}
 
 CRITICAL REQUIREMENTS:
-- Create a question that has NEVER been asked before
-- Use different numbers, scenarios, and contexts than any previous questions
+- Create a question that is appropriate for Grade ${grade} mathematics curriculum
+- Use numbers and concepts suitable for this grade level
 - ${diversityPrompt || 'Be extremely creative and unique'}
-- Make the math calculation absolutely correct
-- Use fresh examples and contexts
+- Ensure mathematical accuracy
+- Use fresh, age-appropriate examples
 
-Session ID: ${sessionId} - This must be a completely unique question for this session.
-
-Example structure (but create something completely different):
-{
-  "question": "A farmer has 23 apple trees and 17 pear trees. How many fruit trees does the farmer have in total?",
-  "options": ["40", "39", "41", "38"],
-  "correct": 0,
-  "explanation": "To find the total, we add: 23 + 17 = 40 fruit trees",
-  "learningObjectives": ["Addition", "Word problems"]
-}
-
-IMPORTANT: 
-- Use completely different numbers than any example
-- Create a unique scenario or context
-- Verify your math is correct
-- Make sure the correct answer is properly indexed
-- Return ONLY valid JSON, no markdown`;
+Session ID: ${sessionId} - This must be completely unique for Grade ${grade}.`;
 
   } else if (subject === 'english') {
-    basePrompt = `Generate a COMPLETELY UNIQUE English reading comprehension question for elementary students.
+    basePrompt = `Generate a UNIQUE English/Language Arts question for Grade ${grade} students.
+
+GRADE ${grade} REQUIREMENTS:
+- Reading level appropriate for Grade ${grade}
+- Use ${currentGrade.vocab}
+- Examples involving ${currentGrade.examples}
+- Focus on ${currentGrade.cognitive}
+
+${standardsAlignment ? `
+STANDARDS ALIGNMENT:
+- Standard: ${standardsAlignment.code}
+- Focus: ${standardsAlignment.title}
+- Description: ${standardsAlignment.description}
+- Domain: ${standardsAlignment.domain}
+` : ''}
 
 CRITICAL REQUIREMENTS:
-- Create content that is absolutely different from any previous questions
-- Use unique sentences, scenarios, and vocabulary
-- ${diversityPrompt || 'Be extremely creative with contexts and examples'}
-- Focus on reading comprehension skills
+- Create content appropriate for Grade ${grade} reading and comprehension level
+- Use age-appropriate themes and vocabulary
+- ${diversityPrompt || 'Be extremely creative with scenarios and examples'}
+- Focus on grade-level literacy skills
 
-Session ID: ${sessionId} - This must be completely original content.
-
-Example structure (but create something totally different):
-{
-  "question": "Read this sentence: 'The curious kitten climbed the tall oak tree to watch the sunset.' What did the kitten do?",
-  "options": ["slept", "climbed", "jumped", "ran"],
-  "correct": 1,
-  "explanation": "The sentence states that the kitten 'climbed the tall oak tree'",
-  "learningObjectives": ["Reading comprehension", "Verb identification"]
-}
-
-IMPORTANT:
-- Create a completely unique sentence with different subjects, actions, and objects
-- Use fresh vocabulary and scenarios
-- Ensure clear reading comprehension focus
-- Return ONLY valid JSON, no markdown`;
+Session ID: ${sessionId} - This must be original Grade ${grade} content.`;
 
   } else if (subject === 'science') {
-    basePrompt = `Generate a COMPLETELY UNIQUE science question for elementary discovery learning.
+    basePrompt = `Generate a UNIQUE science question for Grade ${grade} students.
+
+GRADE ${grade} REQUIREMENTS:
+- Scientific concepts appropriate for Grade ${grade}
+- Use ${currentGrade.vocab}
+- Examples involving ${currentGrade.examples}
+- Focus on ${currentGrade.cognitive}
+
+${standardsAlignment ? `
+STANDARDS ALIGNMENT:
+- Standard: ${standardsAlignment.code}
+- Focus: ${standardsAlignment.title}
+- Description: ${standardsAlignment.description}
+- Domain: ${standardsAlignment.domain}
+` : ''}
 
 CRITICAL REQUIREMENTS:
-- Create a question about a different scientific concept or phenomenon
-- Use unique examples and scenarios not used before
-- ${diversityPrompt || 'Explore diverse scientific topics and creative examples'}
-- Focus on discovery and understanding
+- Create science content appropriate for Grade ${grade} understanding
+- Use age-appropriate scientific concepts and terminology
+- ${diversityPrompt || 'Explore diverse scientific topics appropriate for this grade'}
+- Focus on grade-level scientific inquiry
 
-Session ID: ${sessionId} - This must be original scientific content.
-
-Example structure (but create something entirely different):
-{
-  "question": "Why do leaves change color in autumn?",
-  "options": ["They get cold", "Chlorophyll breaks down", "They get tired", "The sun is weaker"],
-  "correct": 1,
-  "explanation": "Leaves change color because chlorophyll breaks down in autumn, revealing other pigments",
-  "learningObjectives": ["Plant biology", "Seasonal changes"]
-}
-
-IMPORTANT:
-- Choose a completely different scientific topic
-- Use unique examples and scenarios
-- Provide educational scientific explanations
-- Return ONLY valid JSON, no markdown`;
+Session ID: ${sessionId} - This must be original Grade ${grade} science content.`;
 
   } else {
-    basePrompt = `Generate a COMPLETELY UNIQUE educational question for ${subject} - ${skillArea}.
+    basePrompt = `Generate a UNIQUE educational question for Grade ${grade} students in ${subject} - ${skillArea}.
 
-Session ID: ${sessionId} - Create absolutely original content.
-${diversityPrompt || 'Be maximally creative and unique'}
+GRADE ${grade} REQUIREMENTS:
+- Content appropriate for Grade ${grade} curriculum
+- Use ${currentGrade.vocab}
+- Examples involving ${currentGrade.examples}
+- Focus on ${currentGrade.cognitive}
 
-Return ONLY valid JSON with question, options (4 choices), correct (index), explanation, and learningObjectives.`;
+Session ID: ${sessionId} - Create grade-appropriate original content.
+${diversityPrompt || 'Be maximally creative while maintaining grade-level appropriateness'}`;
   }
 
-  // Add anti-repetition instructions
+  // Add standards compliance
+  basePrompt += `
+
+EXAMPLE STRUCTURE (create something completely different with appropriate grade level):
+{
+  "question": "Create a Grade ${grade} appropriate question here",
+  "options": ["Grade ${grade} level option 1", "Grade ${grade} level option 2", "Grade ${grade} level option 3", "Grade ${grade} level option 4"],
+  "correct": 0,
+  "explanation": "Grade ${grade} appropriate explanation using suitable vocabulary",
+  "learningObjectives": ["Grade ${grade} skill 1", "Grade ${grade} skill 2"]
+}
+
+RETURN ONLY valid JSON, no markdown formatting.`;
+
+  // Add anti-repetition for grade level
   if (previousQuestions.length > 0) {
-    basePrompt += `\n\nCRITICAL: You MUST NOT create any question similar to these previous ones:
-${previousQuestions.slice(0, 20).map((q, i) => `${i + 1}. ${q}`).join('\n')}
+    basePrompt += `\n\nCRITICAL: You MUST NOT create any question similar to these previous Grade ${grade} questions:
+${previousQuestions.slice(0, 15).map((q, i) => `${i + 1}. ${q}`).join('\n')}
 
-Your new question must be:
-- About a completely different scenario/context
-- Using different numbers, words, or examples
-- Focusing on a different aspect of the topic
-- Absolutely unique and never asked before
+Your new Grade ${grade} question must be:
+- About a completely different scenario appropriate for Grade ${grade}
+- Using different numbers, examples, or concepts suitable for this grade
+- Focusing on a different aspect of Grade ${grade} ${subject} curriculum
+- Absolutely unique and never asked before at this grade level
 
-Session ${sessionId}: Generate something completely fresh and original!`;
+Grade ${grade} Session ${sessionId}: Generate completely fresh, grade-appropriate content!`;
   }
 
-  console.log('📝 Enhanced diversity prompt created for:', subject);
+  console.log('📝 Grade-aligned prompt created for Grade', grade);
   return basePrompt;
 }
