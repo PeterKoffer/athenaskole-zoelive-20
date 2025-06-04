@@ -13,9 +13,10 @@ const FloatingAITutor = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
+  // Position the floating tutor directly on top of the navbar logo
   const homePosition = {
-    x: typeof window !== 'undefined' ? Math.max(0, window.innerWidth - 120) : 20,
-    y: 20
+    x: 16, // Left padding to align with navbar logo
+    y: 20  // Top position to align with navbar
   };
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome, hasMoved } = useDragHandler(homePosition);
