@@ -8,7 +8,6 @@ import { Message } from "./floating-ai-tutor/types";
 
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const location = useLocation();
@@ -21,25 +20,22 @@ const FloatingAITutor = () => {
   
   const { position, isDragging, handleMouseDown, handleTouchStart, resetToHome } = useDragHandler(homePosition);
 
-  // Only hide on auth pages - show everywhere else including ALL learning pages
+  // Only hide on auth pages - show everywhere else
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
 
-  console.log('FloatingAITutor rendering:', { 
+  console.log('🎭 FloatingAITutor render check:', { 
     shouldHide, 
     currentPath: location.pathname,
     isOpen,
-    isMinimized,
     position,
     messagesLength: messages.length,
-    visible: !shouldHide,
-    willRender: !shouldHide
+    isVisible: !shouldHide
   });
 
   // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
       setIsOpen(false);
-      setIsMinimized(false);
     }
   }, [location.pathname, shouldHide]);
 
@@ -52,20 +48,23 @@ const FloatingAITutor = () => {
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
+      console.log('👋 Welcome message added to Nelie');
     }
   }, [shouldHide, messages.length]);
 
-  // Force show Nelie on all pages except auth
+  // Don't render on auth pages
   if (shouldHide) {
-    console.log('FloatingAITutor hidden due to auth page');
+    console.log('🚫 FloatingAITutor hidden on auth page');
     return null;
   }
 
   const toggleOpen = () => {
+    console.log('🔄 Toggling Nelie open state:', !isOpen);
     setIsOpen(!isOpen);
   };
 
   const handleSendMessage = (text: string) => {
+    console.log('💬 User message to Nelie:', text);
     const newMessage: Message = { 
       role: "user", 
       content: text, 
@@ -89,10 +88,12 @@ const FloatingAITutor = () => {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
+      console.log('🤖 Nelie responded:', randomResponse);
     }, 1000);
   };
 
   const handleResetToHome = () => {
+    console.log('🏠 Resetting Nelie to home position');
     resetToHome();
     navigate('/');
   };
@@ -102,47 +103,60 @@ const FloatingAITutor = () => {
     speechSynthesis.cancel();
   };
 
-  console.log('FloatingAITutor about to render UI elements');
+  console.log('✅ FloatingAITutor rendering UI - isOpen:', isOpen, 'position:', position);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        zIndex: 999999,
-        transform: `translate(${position.x}px, ${position.y}px)`,
-        cursor: isDragging ? 'grabbing' : 'grab',
-        pointerEvents: 'auto',
-        isolation: 'isolate',
-        display: 'block',
-        visibility: 'visible'
-      }}
-    >
-      {!isOpen && !isMinimized && (
-        <CollapsedButton 
-          onExpand={toggleOpen}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onResetToHome={handleResetToHome}
-          isDragging={isDragging}
-        />
+    <>
+      {/* Collapsed button state */}
+      {!isOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 999999,
+            transform: `translate(${position.x}px, ${position.y}px)`,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            pointerEvents: 'auto'
+          }}
+        >
+          <CollapsedButton 
+            onExpand={toggleOpen}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onResetToHome={handleResetToHome}
+            isDragging={isDragging}
+          />
+        </div>
       )}
 
-      {isOpen && !isMinimized && (
-        <ChatInterface
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          onClose={toggleOpen}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onResetToHome={handleResetToHome}
-          isSpeaking={isSpeaking}
-          onStopSpeaking={handleStopSpeaking}
-          isDragging={isDragging}
-        />
+      {/* Chat interface state */}
+      {isOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 999999,
+            transform: `translate(${position.x}px, ${position.y}px)`,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            pointerEvents: 'auto'
+          }}
+        >
+          <ChatInterface
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            onClose={toggleOpen}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onResetToHome={handleResetToHome}
+            isSpeaking={isSpeaking}
+            onStopSpeaking={handleStopSpeaking}
+            isDragging={isDragging}
+          />
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

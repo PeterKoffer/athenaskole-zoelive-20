@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Position, DragOffset } from "./types";
 
@@ -12,19 +13,22 @@ export const useDragHandler = (homePosition: Position) => {
           if (parsedPosition.x >= 0 && parsedPosition.y >= 0 && 
               parsedPosition.x < window.innerWidth - 100 && 
               parsedPosition.y < window.innerHeight - 100) {
+            console.log('📍 Restored Nelie position:', parsedPosition);
             return parsedPosition;
           }
         } catch (e) {
-          console.log('Failed to parse saved position');
+          console.log('❌ Failed to parse saved position');
         }
       }
-      // Default to a safe visible position
-      return { 
-        x: window.innerWidth - 120, 
-        y: 20 
+      // Default to bottom-right corner
+      const defaultPosition = { 
+        x: Math.max(0, window.innerWidth - 200), 
+        y: Math.max(0, window.innerHeight - 200)
       };
+      console.log('📍 Using default Nelie position:', defaultPosition);
+      return defaultPosition;
     }
-    return { x: 20, y: 20 };
+    return { x: 0, y: 0 };
   });
   
   const [isDragging, setIsDragging] = useState(false);
@@ -36,23 +40,27 @@ export const useDragHandler = (homePosition: Position) => {
     const elementWidth = 320;
     const elementHeight = 400;
     
-    return {
+    const constrained = {
       x: Math.max(0, Math.min(newPosition.x, viewportWidth - elementWidth)),
       y: Math.max(0, Math.min(newPosition.y, viewportHeight - elementHeight))
     };
+    
+    console.log('🔒 Constraining position from', newPosition, 'to', constrained);
+    return constrained;
   }, []);
 
   const resetToHome = useCallback(() => {
     const safeHomePosition = { 
-      x: window.innerWidth - 120, 
-      y: 20 
+      x: Math.max(0, window.innerWidth - 200), 
+      y: 20
     };
     const constrainedHomePosition = constrainPosition(safeHomePosition);
     setPosition(constrainedHomePosition);
-    console.log('Reset tutor to home position:', constrainedHomePosition);
+    console.log('🏠 Reset Nelie to home position:', constrainedHomePosition);
   }, [constrainPosition]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    console.log('🖱️ Mouse down on Nelie');
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
     dragOffset.current = {
@@ -63,6 +71,7 @@ export const useDragHandler = (homePosition: Position) => {
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    console.log('👆 Touch start on Nelie');
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
     const touch = e.touches[0];
@@ -96,10 +105,12 @@ export const useDragHandler = (homePosition: Position) => {
   }, [isDragging, constrainPosition]);
 
   const handleMouseUp = useCallback(() => {
+    console.log('🖱️ Mouse up - stopping drag');
     setIsDragging(false);
   }, []);
 
   const handleTouchEnd = useCallback(() => {
+    console.log('👆 Touch end - stopping drag');
     setIsDragging(false);
   }, []);
 
@@ -108,6 +119,7 @@ export const useDragHandler = (homePosition: Position) => {
     const timeoutId = setTimeout(() => {
       if (typeof window !== 'undefined') {
         localStorage.setItem('floating-tutor-position', JSON.stringify(position));
+        console.log('💾 Saved Nelie position:', position);
       }
     }, 100);
 
@@ -117,6 +129,7 @@ export const useDragHandler = (homePosition: Position) => {
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
+      console.log('📏 Window resized, adjusting Nelie position');
       setPosition(current => constrainPosition(current));
     };
 
