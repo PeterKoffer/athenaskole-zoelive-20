@@ -1,14 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import CurriculumDashboard from "@/components/curriculum/CurriculumDashboard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-
 const CurriculumSystem = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const {
+    user,
+    loading
+  } = useAuth();
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -19,33 +20,24 @@ const CurriculumSystem = () => {
 
   // Show loading state while authentication is being checked
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+    return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">📚</div>
           <p className="text-lg">Loading curriculum system...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // Don't render if user is not authenticated
   if (!user) {
     return null;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
+  return <div className="min-h-screen bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Button
-              onClick={() => navigate('/')}
-              variant="outline"
-              size="sm"
-              className="border-gray-600 text-white"
-            >
+            <Button onClick={() => navigate('/')} variant="outline" size="sm" className="border-gray-600 text-slate-950">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
@@ -59,8 +51,6 @@ const CurriculumSystem = () => {
         {/* Main Content */}
         <CurriculumDashboard />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default CurriculumSystem;
