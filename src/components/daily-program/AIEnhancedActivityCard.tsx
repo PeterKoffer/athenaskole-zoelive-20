@@ -39,7 +39,7 @@ const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivit
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-lg bg-gradient-to-r ${activity.color}`}>
-              <IconComponent className="w-6 h-6" />
+              <IconComponent className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="text-white font-bold">{activity.title}</h3>
