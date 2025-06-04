@@ -60,15 +60,12 @@ const SimplifiedLearningSession = ({
     }
   }, [user?.id, currentQuestion, isGenerating, generateQuestion]);
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult) return;
+  const handleAnswerSelect = async (answerIndex: number) => {
+    if (showResult || selectedAnswer !== null) return;
+    
     setSelectedAnswer(answerIndex);
-  };
-
-  const handleSubmitAnswer = async () => {
-    if (selectedAnswer === null || !currentQuestion) return;
-
-    const isCorrect = selectedAnswer === currentQuestion.correct;
+    
+    const isCorrect = answerIndex === currentQuestion.correct;
     const responseTime = Date.now() - questionStartTime.getTime();
     
     setShowResult(true);
@@ -78,47 +75,48 @@ const SimplifiedLearningSession = ({
     }
 
     // Save question history
-    await saveQuestionHistory(currentQuestion, selectedAnswer, isCorrect, responseTime);
+    await saveQuestionHistory(currentQuestion, answerIndex, isCorrect, responseTime);
 
     toast({
       title: isCorrect ? "Correct! 🎉" : "Incorrect",
       description: isCorrect ? "Well done!" : currentQuestion.explanation,
-      duration: 3000,
+      duration: 2000,
       variant: isCorrect ? "default" : "destructive"
     });
-  };
 
-  const handleNextQuestion = async () => {
-    if (questionNumber >= totalQuestions) {
-      // Session complete
-      const sessionDuration = Date.now() - sessionStartTime.getTime();
+    // Auto-advance to next question after 3 seconds
+    setTimeout(async () => {
+      if (questionNumber >= totalQuestions) {
+        // Session complete
+        const sessionDuration = Date.now() - sessionStartTime.getTime();
+        
+        await updateProgress({
+          questionsAnswered: totalQuestions,
+          correctAnswers,
+          conceptsWorkedOn: [skillArea],
+          timeSpent: sessionDuration
+        });
+
+        toast({
+          title: "Session Complete! 🎓",
+          description: `You got ${correctAnswers}/${totalQuestions} questions correct!`,
+          duration: 5000
+        });
+
+        onBack();
+        return;
+      }
+
+      // Next question
+      setQuestionNumber(prev => prev + 1);
+      setSelectedAnswer(null);
+      setShowResult(false);
+      setQuestionStartTime(new Date());
       
-      await updateProgress({
-        questionsAnswered: totalQuestions,
-        correctAnswers,
-        conceptsWorkedOn: [skillArea],
-        timeSpent: sessionDuration
-      });
-
-      toast({
-        title: "Session Complete! 🎓",
-        description: `You got ${correctAnswers}/${totalQuestions} questions correct!`,
-        duration: 5000
-      });
-
-      onBack();
-      return;
-    }
-
-    // Next question
-    setQuestionNumber(prev => prev + 1);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setQuestionStartTime(new Date());
-    
-    console.log(`🔄 Generating question ${questionNumber + 1}...`);
-    const nextQuestion = await generateQuestion();
-    setCurrentQuestion(nextQuestion);
+      console.log(`🔄 Generating question ${questionNumber + 1}...`);
+      const nextQuestion = await generateQuestion();
+      setCurrentQuestion(nextQuestion);
+    }, 3000);
   };
 
   if (!user) {
@@ -212,7 +210,7 @@ const SimplifiedLearningSession = ({
                     : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
                 }`}
                 onClick={() => handleAnswerSelect(index)}
-                disabled={showResult}
+                disabled={showResult || selectedAnswer !== null}
               >
                 <span className="mr-3 font-semibold">
                   {String.fromCharCode(65 + index)}.
@@ -232,27 +230,11 @@ const SimplifiedLearningSession = ({
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <h4 className="text-white font-medium mb-2">Explanation:</h4>
               <p className="text-gray-300">{currentQuestion.explanation}</p>
+              <p className="text-gray-400 text-sm mt-2">
+                {questionNumber < totalQuestions ? 'Next question coming up...' : 'Session completing...'}
+              </p>
             </div>
           )}
-
-          <div className="flex justify-end">
-            {!showResult ? (
-              <Button
-                onClick={handleSubmitAnswer}
-                disabled={selectedAnswer === null}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Submit Answer
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNextQuestion}
-                className="bg-green-500 hover:bg-green-600 text-white"
-              >
-                {questionNumber >= totalQuestions ? 'Complete Session' : 'Next Question'}
-              </Button>
-            )}
-          </div>
         </div>
       </CardContent>
     </Card>
