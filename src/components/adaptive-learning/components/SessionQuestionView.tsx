@@ -43,6 +43,7 @@ const SessionQuestionView = ({
 }: SessionQuestionViewProps) => {
   return (
     <div className="space-y-6">
+      {/* Single back button at the top */}
       <div className="flex items-center space-x-4">
         <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
           <ArrowLeft className="w-4 h-4 mr-2" />
