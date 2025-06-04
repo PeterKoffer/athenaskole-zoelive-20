@@ -28,13 +28,11 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
 
   const handleMouseDown = (e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie button');
-    // Don't prevent default here, let the drag handler manage it
     onMouseDown(e);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     console.log('👆 Touch start on Nelie button');
-    // Don't prevent default here, let the drag handler manage it
     onTouchStart(e);
   };
 
@@ -46,7 +44,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
   };
   
   return (
-    <div className="relative" style={{ pointerEvents: 'auto' }}>
+    <div className="relative">
       <Button
         onClick={handleButtonClick}
         onMouseDown={handleMouseDown}
@@ -65,6 +63,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
           minHeight: '80px',
           padding: '12px',
           boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          zIndex: 999999,
           pointerEvents: 'auto'
         }}
       >
@@ -89,7 +88,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         onClick={handleHomeClick}
         className="absolute -top-3 -right-3 w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white border-2 border-white rounded-full flex items-center justify-center shadow-lg"
         title="Go home"
-        style={{ pointerEvents: 'auto' }}
+        style={{ pointerEvents: 'auto', zIndex: 999999 }}
       >
         <Home className="w-4 h-4" />
       </Button>
@@ -99,11 +98,6 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black bg-opacity-75 px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
           🚀 Drag me around!
         </div>
-      )}
-      
-      {/* Pulse animation when not dragging */}
-      {!isDragging && (
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 animate-ping opacity-20"></div>
       )}
     </div>
   );
