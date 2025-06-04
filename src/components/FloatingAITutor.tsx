@@ -35,7 +35,6 @@ const FloatingAITutor = () => {
     viewportWidth: typeof window !== 'undefined' ? window.innerWidth : 'unknown'
   });
 
-  // ALWAYS call all hooks - never conditionally
   // Reset state when navigating to auth pages
   useEffect(() => {
     if (shouldHide) {
@@ -43,7 +42,7 @@ const FloatingAITutor = () => {
     }
   }, [location.pathname, shouldHide]);
 
-  // Add initial welcome message - ALWAYS call this hook
+  // Add initial welcome message
   useEffect(() => {
     if (!shouldHide && messages.length === 0) {
       const welcomeMessage: Message = {
@@ -57,12 +56,13 @@ const FloatingAITutor = () => {
   }, [shouldHide, messages.length]);
 
   const toggleOpen = () => {
-    console.log('🔄 Toggling Nelie open state from', isOpen, 'to', !isOpen, 'hasMoved:', hasMoved);
-    // Only toggle if we haven't moved (i.e., it was a genuine click, not a drag)
-    if (!hasMoved) {
+    console.log('🔄 Toggling Nelie open state from', isOpen, 'to', !isOpen, 'hasMoved:', hasMoved, 'isDragging:', isDragging);
+    // Only toggle if we haven't moved and we're not dragging
+    if (!hasMoved && !isDragging) {
       setIsOpen(!isOpen);
+      console.log('✅ Toggled Nelie to:', !isOpen);
     } else {
-      console.log('❌ Not toggling - user was dragging');
+      console.log('❌ Not toggling - user was dragging or moved');
     }
   };
 
@@ -106,7 +106,7 @@ const FloatingAITutor = () => {
     speechSynthesis.cancel();
   };
 
-  // Don't render on auth pages - but do this AFTER all hooks are called
+  // Don't render on auth pages
   if (shouldHide) {
     console.log('🚫 FloatingAITutor hidden on auth page');
     return null;
