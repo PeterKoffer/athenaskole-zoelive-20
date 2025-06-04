@@ -194,7 +194,7 @@ const AIInsightsDashboard = ({
 
           <TabsContent value="technologies" className="space-y-4">
             {insights?.emergingTechnologies?.map((tech: string, index: number) => <Card key={index} className="bg-gray-800 border-gray-700">
-                <CardContent className="p-6">
+                <CardContent className="p-6 bg-slate-700">
                   <div className="flex items-center space-x-4">
                     <div className="bg-cyan-600 p-2 rounded-full">
                       <Sparkles className="w-5 h-5" />
