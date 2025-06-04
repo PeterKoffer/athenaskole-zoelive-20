@@ -1,6 +1,13 @@
 
 import { useNavigate } from "react-router-dom";
-import { Home, BookOpen, GraduationCap } from "lucide-react";
+import { Home, BookOpen, GraduationCap, BarChart3, Gamepad2, Bot } from "lucide-react";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import NavbarButton from "./NavbarButton";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 
@@ -26,41 +33,69 @@ const NavbarDesktopMenu = ({
   if (!user) return null;
 
   return (
-    <div className="hidden md:flex items-center space-x-1">
-      <NavbarButton 
-        onClick={() => navigate('/')} 
-        icon={Home}
-      >
-        Home
-      </NavbarButton>
-      <NavbarButton 
-        onClick={() => navigate('/daily-program')} 
-        icon={BookOpen}
-      >
-        Daily Program
-      </NavbarButton>
-      <NavbarButton 
-        onClick={handleCurriculumSystem} 
-        icon={GraduationCap}
-      >
-        Curriculum System
-      </NavbarButton>
-      {onShowProgress && (
-        <NavbarButton onClick={onShowProgress}>
-          Progress
-        </NavbarButton>
-      )}
-      {onShowGames && (
-        <NavbarButton onClick={onShowGames}>
-          Games
-        </NavbarButton>
-      )}
-      {onShowAITutor && (
-        <NavbarButton onClick={onShowAITutor}>
-          AI Tutor
-        </NavbarButton>
-      )}
-    </div>
+    <NavigationMenu className="hidden md:flex">
+      <NavigationMenuList className="space-x-1">
+        <NavigationMenuItem>
+          <NavbarButton 
+            onClick={() => navigate('/')} 
+            icon={Home}
+          >
+            Home
+          </NavbarButton>
+        </NavigationMenuItem>
+        
+        <NavigationMenuItem>
+          <NavbarButton 
+            onClick={() => navigate('/daily-program')} 
+            icon={BookOpen}
+          >
+            Daily Program
+          </NavbarButton>
+        </NavigationMenuItem>
+        
+        <NavigationMenuItem>
+          <NavbarButton 
+            onClick={handleCurriculumSystem} 
+            icon={GraduationCap}
+          >
+            Curriculum System
+          </NavbarButton>
+        </NavigationMenuItem>
+        
+        {onShowProgress && (
+          <NavigationMenuItem>
+            <NavbarButton 
+              onClick={onShowProgress}
+              icon={BarChart3}
+            >
+              Progress
+            </NavbarButton>
+          </NavigationMenuItem>
+        )}
+        
+        {onShowGames && (
+          <NavigationMenuItem>
+            <NavbarButton 
+              onClick={onShowGames}
+              icon={Gamepad2}
+            >
+              Games
+            </NavbarButton>
+          </NavigationMenuItem>
+        )}
+        
+        {onShowAITutor && (
+          <NavigationMenuItem>
+            <NavbarButton 
+              onClick={onShowAITutor}
+              icon={Bot}
+            >
+              AI Tutor
+            </NavbarButton>
+          </NavigationMenuItem>
+        )}
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 };
 
