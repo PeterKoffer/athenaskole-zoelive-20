@@ -58,6 +58,12 @@ const QuestionDisplay = ({
     if (text.includes('Practice question') && text.match(/\d{13,}-\d+/)) {
       if (subject === 'music') {
         return 'Which of the following is a major scale?';
+      } else if (subject === 'mathematics') {
+        return 'What is the correct answer to this math problem?';
+      } else if (subject === 'science') {
+        return 'Which scientific concept is correct?';
+      } else if (subject === 'english') {
+        return 'Which reading comprehension answer is correct?';
       }
       return 'What is the correct answer to this practice question?';
     }
@@ -81,8 +87,11 @@ const QuestionDisplay = ({
 
   const readExplanation = () => {
     if (explanation) {
-      const correctOptionText = `The correct answer is ${String.fromCharCode(65 + correctAnswer)}: ${options[correctAnswer]}`;
-      const fullText = `${correctOptionText}. Nelie explains: ${explanation}`;
+      const resultText = selectedAnswer === correctAnswer ? 
+        "Excellent work! That's the correct answer." : 
+        `Not quite right this time. The correct answer is ${String.fromCharCode(65 + correctAnswer)}: ${options[correctAnswer]}.`;
+      
+      const fullText = `${resultText} Nelie explains: ${explanation}`;
       speakText(fullText);
     }
   };
@@ -93,7 +102,7 @@ const QuestionDisplay = ({
       hasAutoRead.current = true;
       setTimeout(() => {
         readQuestionAndOptions();
-      }, 1200); // Slightly longer delay for better UX
+      }, 1500); // Longer delay for better UX
     }
   }, [question, autoReadEnabled]);
 
@@ -102,7 +111,7 @@ const QuestionDisplay = ({
     if (autoReadEnabled && showResult && explanation) {
       setTimeout(() => {
         readExplanation();
-      }, 1800); // Delay to let the result UI appear
+      }, 2000); // Delay to let the result UI appear
     }
   }, [showResult, explanation, autoReadEnabled]);
 

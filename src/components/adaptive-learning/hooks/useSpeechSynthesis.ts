@@ -37,15 +37,17 @@ export const useSpeechSynthesis = () => {
       return null;
     }
     
-    // Priority order for female voices
+    // Priority order for female voices - enhanced list
     const femaleVoiceNames = [
       'Microsoft Zira Desktop',
       'Microsoft Hazel Desktop', 
       'Google UK English Female',
+      'Google US English Female',
       'Samantha',
       'Karen',
       'Victoria',
       'Zira',
+      'Aria',
       'Female',
       'Woman'
     ];
@@ -107,7 +109,7 @@ export const useSpeechSynthesis = () => {
     if (isSpeaking || speechSynthesis.speaking) {
       stopSpeaking();
       // Wait a bit for the cancellation to take effect
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
 
     if (!autoReadEnabled) {
@@ -138,10 +140,10 @@ export const useSpeechSynthesis = () => {
       const utterance = new SpeechSynthesisUtterance(text);
       currentUtterance.current = utterance;
       
-      // Configure utterance
+      // Configure utterance for Nelie's voice
       utterance.lang = 'en-US';
       utterance.rate = 0.85;
-      utterance.pitch = 1.2; // Higher pitch for female voice
+      utterance.pitch = 1.3; // Higher pitch for female voice
       utterance.volume = 1.0;
 
       // Set the female voice
@@ -152,12 +154,12 @@ export const useSpeechSynthesis = () => {
       }
 
       utterance.onstart = () => {
-        console.log('🎵 Speech started');
+        console.log('🎵 Nelie started speaking');
         setIsSpeaking(true);
       };
 
       utterance.onend = () => {
-        console.log('🎵 Speech ended');
+        console.log('🎵 Nelie finished speaking');
         setIsSpeaking(false);
         currentUtterance.current = null;
       };

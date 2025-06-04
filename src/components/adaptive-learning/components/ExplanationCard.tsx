@@ -133,7 +133,7 @@ const ExplanationCard = ({
     if (isVisible && autoReadEnabled) {
       setTimeout(() => {
         handleReadAloud();
-      }, 800);
+      }, 1200);
     }
   }, [isVisible, autoReadEnabled]);
 
@@ -147,7 +147,7 @@ const ExplanationCard = ({
 
     let speechText = `Nelie explains: ${explanation}`;
     if (!isCorrect && correctAnswer) {
-      speechText = `That's incorrect. The correct answer is: ${correctAnswer}. Let me explain: ${explanation}`;
+      speechText = `That's not quite right. The correct answer is: ${correctAnswer}. Let me explain: ${explanation}`;
     }
     
     speakText(speechText);
