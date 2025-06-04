@@ -19,10 +19,18 @@ interface LearningMode {
 
 const AdaptiveLearning = () => {
   const navigate = useNavigate();
-  const [selectedMode, setSelectedMode] = useState<LearningMode | null>(null);
+  const [selectedMode, setSelectedMode] = useState<LearningMode | null>({
+    id: 'adaptive',
+    name: 'Adaptiv Læring',
+    description: 'AI tilpasser sværhedsgraden baseret på din præstation',
+    icon: null,
+    difficulty: 'Tilpasset',
+    estimatedTime: '10-15 min',
+    benefits: ['Personlig tilpasning', 'Optimal udfordring', 'Hurtigere fremgang']
+  }); // Default to adaptive mode
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedSkillArea, setSelectedSkillArea] = useState<string>("");
-  const [difficultyLevel, setDifficultyLevel] = useState<number>(1);
+  const [difficultyLevel, setDifficultyLevel] = useState<number>(2); // Default adaptive difficulty
 
   const handleBack = () => {
     if (selectedSubject && selectedSkillArea) {
