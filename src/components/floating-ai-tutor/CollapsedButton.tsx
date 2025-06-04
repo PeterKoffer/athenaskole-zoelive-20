@@ -46,21 +46,16 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
   
   return (
     <div className="relative">
+      {/* Robot button - completely transparent background */}
       <Button
         onClick={handleButtonClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className={`
-          bg-transparent border-none rounded-full 
-          w-20 h-20 
-          transition-all duration-200 
-          flex items-center justify-center
-          ${isDragging ? 'scale-110 cursor-grabbing' : 'cursor-grab hover:scale-105'}
-        `}
+        className="bg-transparent border-none hover:bg-transparent focus:bg-transparent p-0 w-20 h-20"
         style={{
-          minWidth: '80px',
-          minHeight: '80px',
-          padding: '0',
+          backgroundColor: 'transparent !important',
+          border: 'none',
+          boxShadow: 'none',
           zIndex: 999999,
           pointerEvents: 'auto'
         }}
@@ -69,18 +64,22 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
           src="/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png" 
           alt="Nelie AI Tutor Robot"
           className="w-20 h-20 object-contain"
-          style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }}
+          style={{ 
+            cursor: isDragging ? 'grabbing' : 'grab',
+            transition: isDragging ? 'none' : 'transform 0.2s ease',
+            transform: isDragging ? 'scale(1.05)' : 'scale(1)'
+          }}
         />
       </Button>
       
-      {/* Home button - positioned at top-right */}
+      {/* Home button - small and minimal */}
       <Button
         onClick={handleHomeClick}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-gray-700 hover:bg-gray-600 text-white border border-white rounded-full flex items-center justify-center shadow-lg"
+        className="absolute -top-1 -right-1 w-5 h-5 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-sm"
         title="Go home"
         style={{ pointerEvents: 'auto', zIndex: 999999 }}
       >
-        <Home className="w-3 h-3" />
+        <Home className="w-2.5 h-2.5" />
       </Button>
     </div>
   );

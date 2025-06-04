@@ -1,9 +1,9 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, X, Move, Home } from "lucide-react";
+import { Send, X, Home } from "lucide-react";
 import { Message } from "./types";
 import VoiceControls from "./VoiceControls";
 
@@ -63,9 +63,6 @@ const ChatInterface = ({
       >
         <CardTitle className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-2 text-white">
-            <Move className={`w-4 h-4 transition-colors duration-200 ${
-              isDragging ? 'text-blue-400' : 'text-gray-400'
-            }`} />
             <img 
               src="/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png" 
               alt="Nelie AI Tutor Robot"
@@ -74,9 +71,6 @@ const ChatInterface = ({
             <span>Nelie - Your AI Tutor</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="bg-gradient-to-r from-cyan-400 to-purple-500 text-white border-cyan-400 text-xs">
-              Live
-            </Badge>
             <Button
               variant="ghost"
               size="sm"
@@ -96,11 +90,6 @@ const ChatInterface = ({
             </Button>
           </div>
         </CardTitle>
-        {isDragging && (
-          <div className="text-xs text-blue-400 mt-1 text-center">
-            Drag me around the page - I'll follow you everywhere! 🚀
-          </div>
-        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div 
