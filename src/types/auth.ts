@@ -1,5 +1,5 @@
 
-export type UserRole = 'admin' | 'school_leader' | 'teacher' | 'student' | 'parent';
+export type UserRole = 'admin' | 'school_leader' | 'school_staff' | 'teacher' | 'student' | 'parent';
 
 export interface UserProfile {
   id: string;
@@ -31,6 +31,12 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     allowedRoutes: ['/school-dashboard', '/teacher-dashboard', '/parent-dashboard', '/daily-program'],
     dashboardRoute: '/school-dashboard',
   },
+  school_staff: {
+    title: "School Staff",
+    description: "Administrative support and school operations",
+    allowedRoutes: ['/school-dashboard', '/daily-program', '/profile'],
+    dashboardRoute: '/school-dashboard',
+  },
   teacher: {
     title: "Teacher",
     description: "Manage classes and student progress",
@@ -42,13 +48,13 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     description: "Access learning materials and games",
     allowedRoutes: ['/daily-program', '/learn', '/profile'],
     dashboardRoute: '/daily-program',
-    restrictedFrom: ['admin', 'school_leader', 'teacher', 'parent'],
+    restrictedFrom: ['admin', 'school_leader', 'school_staff', 'teacher', 'parent'],
   },
   parent: {
     title: "Parent",
     description: "Monitor child's progress and communicate with school",
     allowedRoutes: ['/parent-dashboard', '/profile'],
     dashboardRoute: '/parent-dashboard',
-    restrictedFrom: ['admin', 'school_leader', 'teacher', 'student'],
+    restrictedFrom: ['admin', 'school_leader', 'school_staff', 'teacher', 'student'],
   },
 };

@@ -1,6 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
-import { Shield, School, BookOpen, GraduationCap, Users } from "lucide-react";
+import { Shield, School, BookOpen, GraduationCap, Users, UserCheck } from "lucide-react";
 import { UserRole } from "@/types/auth";
 
 interface UserRoleDisplayProps {
@@ -15,6 +15,8 @@ const UserRoleDisplay = ({ role, className }: UserRoleDisplayProps) => {
         return { icon: Shield, label: 'Administrator', color: 'bg-red-500' };
       case 'school_leader':
         return { icon: School, label: 'School Leader', color: 'bg-orange-500' };
+      case 'school_staff':
+        return { icon: UserCheck, label: 'School Staff', color: 'bg-teal-500' };
       case 'teacher':
         return { icon: BookOpen, label: 'Teacher', color: 'bg-purple-500' };
       case 'student':

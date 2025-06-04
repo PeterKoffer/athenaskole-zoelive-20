@@ -11,6 +11,12 @@ interface AdminToolsDropdownProps {
 const AdminToolsDropdown = ({ onShowAIInsights }: AdminToolsDropdownProps) => {
   const navigate = useNavigate();
 
+  const handleSchoolAnalyticsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate('/school-dashboard');
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -52,7 +58,7 @@ const AdminToolsDropdown = ({ onShowAIInsights }: AdminToolsDropdownProps) => {
           <DropdownMenuSubContent className="bg-white border-gray-300 z-50">
             <DropdownMenuItem 
               className="text-gray-900 hover:bg-gray-100"
-              onClick={() => navigate('/school-dashboard')}
+              onClick={handleSchoolAnalyticsClick}
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               School Analytics

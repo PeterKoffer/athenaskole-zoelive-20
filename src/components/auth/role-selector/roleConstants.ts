@@ -1,25 +1,23 @@
 
-import { GraduationCap, Users, BookOpen, Building, Shield } from "lucide-react";
+import { Shield, School, Users, BookOpen, GraduationCap, UserCheck } from "lucide-react";
 import { UserRole } from "@/types/auth";
 
-export const roleIcons = {
+export const roleIcons: Record<UserRole, React.ComponentType<any>> = {
   admin: Shield,
-  school_leader: Building,
+  school_leader: School,
+  school_staff: UserCheck,
   teacher: BookOpen,
   student: GraduationCap,
-  parent: Users
-} as const;
+  parent: Users,
+};
 
-export const roleColors = {
-  admin: "from-red-400 to-red-600",
-  school_leader: "from-orange-400 to-orange-600",
-  teacher: "from-purple-400 to-purple-600",
-  student: "from-blue-400 to-blue-600",
-  parent: "from-green-400 to-green-600"
-} as const;
+export const roleColors: Record<UserRole, string> = {
+  admin: "from-red-500 to-red-600",
+  school_leader: "from-orange-500 to-orange-600", 
+  school_staff: "from-teal-500 to-teal-600",
+  teacher: "from-purple-500 to-purple-600",
+  student: "from-blue-500 to-blue-600",
+  parent: "from-green-500 to-green-600",
+};
 
-// Roles that require special clearance
-export const restrictedRoles: UserRole[] = ['admin', 'teacher', 'school_leader'];
-
-// Updated clearance code to "1111" for all restricted roles
-export const clearanceCode1111 = '1111';
+export const clearanceCode1111 = "1111";

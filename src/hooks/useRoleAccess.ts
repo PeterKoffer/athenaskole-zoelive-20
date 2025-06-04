@@ -29,6 +29,10 @@ export const useRoleAccess = () => {
     return userRole === 'school_leader';
   };
 
+  const isSchoolStaff = (): boolean => {
+    return userRole === 'school_staff';
+  };
+
   const isTeacher = (): boolean => {
     return userRole === 'teacher';
   };
@@ -37,12 +41,18 @@ export const useRoleAccess = () => {
     return hasRole(['admin', 'school_leader']);
   };
 
+  const canAccessSchoolDashboard = (): boolean => {
+    return hasRole(['admin', 'school_leader', 'school_staff']);
+  };
+
   return {
     userRole,
     hasRole,
     isAdmin,
     isSchoolLeader,
+    isSchoolStaff,
     isTeacher,
-    canAccessAIInsights
+    canAccessAIInsights,
+    canAccessSchoolDashboard
   };
 };
