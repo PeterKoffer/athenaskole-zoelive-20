@@ -212,7 +212,7 @@ const AIInsightsDashboard = ({
                     <div className="bg-orange-600 p-2 rounded-full">
                       <Users className="w-5 h-5" />
                     </div>
-                    <p className="flex-1">{improvement}</p>
+                    <p className="flex-1 text-gray-950">{improvement}</p>
                   </div>
                 </CardContent>
               </Card>)}
