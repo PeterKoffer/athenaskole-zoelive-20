@@ -37,16 +37,14 @@ const RobotAvatar = ({
   console.log('🤖 RobotAvatar rendering - size:', size, 'isSpeaking:', isSpeaking, 'isActive:', isActive);
 
   if (imageError) {
-    // Enhanced fallback with mouth animation
+    // Enhanced fallback with chest hole blinking
     return (
       <div className={`${containerClasses} bg-gradient-to-br from-blue-400 to-purple-500 text-white font-bold relative overflow-hidden`}>
         <div className="text-8xl">🤖</div>
         {isSpeaking && (
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-            <div className="flex space-x-2">
-              <div className="w-4 h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-4 h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-4 h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-4">
+              <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse opacity-80"></div>
             </div>
           </div>
         )}
@@ -64,32 +62,18 @@ const RobotAvatar = ({
         draggable={false}
       />
       
-      {/* Enhanced mouth animation when speaking */}
+      {/* Chest hole blinking animation when speaking */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Main mouth area positioned over Nelie's mouth */}
-          <div className="absolute bottom-1/3 left-1/2 transform -translate-x-1/2">
+          {/* Chest hole area - positioned over Nelie's chest */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
             <div className="relative">
-              {/* Primary mouth animation - more visible */}
-              <div className="w-12 h-6 bg-pink-400 rounded-full opacity-90 animate-pulse"></div>
-              {/* Inner mouth movement */}
-              <div className="absolute top-1 left-3 w-6 h-3 bg-pink-500 rounded-full animate-bounce"></div>
-              {/* Additional mouth details */}
-              <div className="absolute top-2 left-4 w-4 h-2 bg-pink-600 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
-              
-              {/* Speech indicator bubbles */}
-              <div className="absolute -top-4 -right-4 flex space-x-1">
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
-              </div>
-              
-              {/* Sound waves effect */}
-              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                <div className="w-1 h-4 bg-green-400 rounded animate-pulse" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-1 h-6 bg-green-400 rounded animate-pulse" style={{ animationDelay: '100ms' }}></div>
-                <div className="w-1 h-4 bg-green-400 rounded animate-pulse" style={{ animationDelay: '200ms' }}></div>
-              </div>
+              {/* Main chest hole blinking effect */}
+              <div className="w-6 h-6 bg-blue-400 rounded-full animate-pulse opacity-90"></div>
+              {/* Inner glow effect */}
+              <div className="absolute top-1 left-1 w-4 h-4 bg-blue-300 rounded-full animate-pulse opacity-70" style={{ animationDelay: '0.5s' }}></div>
+              {/* Center core */}
+              <div className="absolute top-2 left-2 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.25s' }}></div>
             </div>
           </div>
         </div>
@@ -102,7 +86,7 @@ const RobotAvatar = ({
       
       {/* Speaking indicator text for debugging */}
       {isSpeaking && (
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-green-400 font-bold animate-pulse">
+        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-bold animate-pulse">
           Speaking...
         </div>
       )}
