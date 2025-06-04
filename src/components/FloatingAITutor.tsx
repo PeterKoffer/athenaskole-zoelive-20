@@ -1,9 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { MessageCircle, X, Minimize2, Maximize2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useLocation, useNavigate } from "react-router-dom";
 import ChatInterface from "./floating-ai-tutor/ChatInterface";
 import CollapsedButton from "./floating-ai-tutor/CollapsedButton";
@@ -47,10 +43,6 @@ const FloatingAITutor = () => {
     setIsOpen(!isOpen);
   };
 
-  const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
-  };
-
   const handleSendMessage = (text: string) => {
     const newMessage: Message = { 
       role: "user", 
@@ -71,49 +63,44 @@ const FloatingAITutor = () => {
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        zIndex: 999999,
-        transform: `translate(${position.x}px, ${position.y}px)`,
-        cursor: isDragging ? 'grabbing' : 'grab',
-        pointerEvents: 'auto',
-        isolation: 'isolate'
-      }}
-    >
-      {!isOpen && !isMinimized && (
-        <CollapsedButton 
-          onExpand={toggleOpen}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onResetToHome={handleResetToHome}
-          isDragging={isDragging}
-        />
-      )}
+    <>
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 999999,
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          cursor: isDragging ? 'grabbing' : 'grab',
+          pointerEvents: 'auto',
+          isolation: 'isolate'
+        }}
+      >
+        {!isOpen && !isMinimized && (
+          <CollapsedButton 
+            onExpand={toggleOpen}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onResetToHome={handleResetToHome}
+            isDragging={isDragging}
+          />
+        )}
 
-      {isOpen && !isMinimized && (
-        <ChatInterface
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          onClose={toggleOpen}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onResetToHome={handleResetToHome}
-          isSpeaking={isSpeaking}
-          onStopSpeaking={handleStopSpeaking}
-          isDragging={isDragging}
-        />
-      )}
-
-      {isMinimized && (
-        <Button variant="outline" size="sm" onClick={toggleMinimize} className="bg-gray-800 text-white hover:bg-gray-700">
-          <Maximize2 className="w-4 h-4 mr-2" />
-          Expand Nelie
-        </Button>
-      )}
-    </div>
+        {isOpen && !isMinimized && (
+          <ChatInterface
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            onClose={toggleOpen}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onResetToHome={handleResetToHome}
+            isSpeaking={isSpeaking}
+            onStopSpeaking={handleStopSpeaking}
+            isDragging={isDragging}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

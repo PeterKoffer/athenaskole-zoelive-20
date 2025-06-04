@@ -25,6 +25,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
   const { toast } = useToast();
   const [isSessionActive, setIsSessionActive] = useState(true);
   const questionCardRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const totalQuestions = 5;
 
@@ -64,17 +65,31 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
     }
   }, [sessionId, sessionQuestions.length, isGenerating, generateNextQuestion]);
 
-  // Auto-scroll to question when it loads
+  // Auto-scroll to question card when a new question loads
   useEffect(() => {
     if (sessionQuestions[currentQuestionIndex] && questionCardRef.current) {
       setTimeout(() => {
         questionCardRef.current?.scrollIntoView({ 
           behavior: 'smooth', 
-          block: 'start' 
+          block: 'start',
+          inline: 'nearest'
         });
       }, 300);
     }
   }, [sessionQuestions, currentQuestionIndex]);
+
+  // Auto-scroll to top when starting new session
+  useEffect(() => {
+    if (containerRef.current && sessionQuestions.length > 0) {
+      setTimeout(() => {
+        containerRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      }, 100);
+    }
+  }, [sessionQuestions.length]);
 
   const isSessionComplete = currentQuestionIndex >= totalQuestions;
   const currentQuestion = sessionQuestions[currentQuestionIndex];
@@ -150,7 +165,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div ref={containerRef} className="max-w-4xl mx-auto">
       <SessionTimer
         onTimeUp={handleTimeUp}
         recommendedDuration={20}
@@ -177,6 +192,7 @@ const LearningSession = ({ subject, skillArea, difficultyLevel, onBack }: Learni
               hasAnswered={hasAnswered}
               selectedAnswer={hasAnswered ? answers[currentQuestionIndex] : undefined}
               autoSubmit={true}
+              subject={subject}
             />
           )}
         </div>
