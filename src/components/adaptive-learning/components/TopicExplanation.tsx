@@ -1,7 +1,8 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen, Target, TrendingUp, Award } from 'lucide-react';
 
 interface TopicExplanationProps {
   subject: string;
@@ -10,7 +11,7 @@ interface TopicExplanationProps {
   standardInfo?: {
     code: string;
     title: string;
-    description: string;
+    description?: string;
   };
   onStartQuestions: () => void;
 }
@@ -18,132 +19,97 @@ interface TopicExplanationProps {
 const TopicExplanation = ({
   subject,
   skillArea,
-  gradeLevel,
+  gradeLevel = 6,
   standardInfo,
   onStartQuestions
 }: TopicExplanationProps) => {
-  const getExplanationContent = () => {
-    const gradeText = gradeLevel ? `Grade ${gradeLevel}` : '';
-    
-    switch (subject.toLowerCase()) {
-      case 'mathematics':
-      case 'math':
-        return {
-          title: `${gradeText} ${skillArea}`,
-          explanation: `Welcome to your ${skillArea} lesson! In this session, we'll explore key concepts and practice problems to strengthen your understanding. ${skillArea} is an important mathematical skill that builds on previous knowledge and prepares you for more advanced topics.`,
-          keyPoints: [
-            'We\'ll start with fundamental concepts',
-            'Practice with guided examples',
-            'Apply your knowledge to solve problems',
-            'Build confidence through step-by-step learning'
-          ]
-        };
-      
-      case 'science':
-        return {
-          title: `${gradeText} ${skillArea}`,
-          explanation: `Welcome to your ${skillArea} lesson! Science is all about understanding how the world around us works. In this session, we'll explore fascinating concepts through observation, questioning, and discovery.`,
-          keyPoints: [
-            'Observe and analyze scientific phenomena',
-            'Learn through hands-on examples',
-            'Develop critical thinking skills',
-            'Connect science to everyday life'
-          ]
-        };
-      
-      case 'english':
-      case 'language arts':
-        return {
-          title: `${gradeText} ${skillArea}`,
-          explanation: `Welcome to your ${skillArea} lesson! Language arts helps us communicate effectively and understand the world through reading and writing. Let's develop your skills together!`,
-          keyPoints: [
-            'Improve reading comprehension',
-            'Enhance writing techniques',
-            'Build vocabulary and grammar skills',
-            'Express ideas clearly and creatively'
-          ]
-        };
-      
-      default:
-        return {
-          title: `${gradeText} ${skillArea}`,
-          explanation: `Welcome to your ${skillArea} lesson! Today we'll explore this important topic step by step, building your understanding through clear explanations and practical examples.`,
-          keyPoints: [
-            'Learn fundamental concepts',
-            'Practice with real examples',
-            'Build understanding gradually',
-            'Apply knowledge confidently'
-          ]
-        };
-    }
+  const [isStarting, setIsStarting] = useState(false);
+
+  const handleStart = () => {
+    setIsStarting(true);
+    setTimeout(() => {
+      onStartQuestions();
+    }, 500);
   };
 
-  const content = getExplanationContent();
+  const learningSteps = [
+    {
+      icon: <Target className="w-5 h-5 text-green-400" />,
+      text: "We'll start with fundamental concepts"
+    },
+    {
+      icon: <BookOpen className="w-5 h-5 text-green-400" />,
+      text: "Practice with guided examples"
+    },
+    {
+      icon: <TrendingUp className="w-5 h-5 text-green-400" />,
+      text: "Apply your knowledge to solve problems"
+    },
+    {
+      icon: <Award className="w-5 h-5 text-green-400" />,
+      text: "Build confidence through step-by-step learning"
+    }
+  ];
 
   return (
-    <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-3 text-white">
-          <BookOpen className="w-6 h-6 text-lime-400" />
-          <div>
-            <h2 className="text-2xl font-bold">{content.title}</h2>
-            {standardInfo && (
-              <p className="text-sm text-gray-400 mt-1">
-                Aligned with {standardInfo.code}: {standardInfo.title}
-              </p>
-            )}
-          </div>
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent className="p-6 space-y-6">
-        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-200 mb-3">
-            📚 What You'll Learn Today
-          </h3>
-          <p className="text-blue-100 leading-relaxed">
-            {content.explanation}
-          </p>
-        </div>
-
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">
-            🎯 Learning Objectives
-          </h3>
-          <ul className="space-y-2">
-            {content.keyPoints.map((point, index) => (
-              <li key={index} className="flex items-start space-x-3 text-gray-300">
-                <span className="text-lime-400 font-bold text-sm mt-1">✓</span>
-                <span>{point}</span>
-              </li>
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Learning Steps */}
+      <Card className="bg-gray-900 border-gray-800">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            {learningSteps.map((step, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                {step.icon}
+                <span className="text-white">{step.text}</span>
+              </div>
             ))}
-          </ul>
-        </div>
-
-        {standardInfo && (
-          <div className="bg-green-900/20 border border-green-800 rounded-lg p-4">
-            <h4 className="text-green-200 font-medium mb-2">📖 Curriculum Standard</h4>
-            <p className="text-green-100 text-sm">{standardInfo.description}</p>
           </div>
-        )}
+        </CardContent>
+      </Card>
 
-        <div className="bg-gradient-to-r from-lime-900/30 to-green-900/30 border border-lime-700 rounded-lg p-6 text-center">
-          <h3 className="text-xl font-semibold text-lime-200 mb-2">
+      {/* Curriculum Standard Info */}
+      {standardInfo && (
+        <Card className="bg-gray-800 border-gray-700">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2 text-blue-400">
+              <BookOpen className="w-4 h-4" />
+              <span className="text-sm font-medium">Curriculum Standard</span>
+            </div>
+            <p className="text-gray-300 mt-1">
+              {standardInfo.title || `${skillArea} for Grade ${gradeLevel}`}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Start Learning Section */}
+      <Card className="bg-gradient-to-br from-green-900 to-green-800 border-green-700">
+        <CardContent className="p-6 text-center">
+          <h3 className="text-xl font-bold text-green-400 mb-2">
             Ready to Start Learning? 🚀
           </h3>
-          <p className="text-lime-300 mb-4">
+          <p className="text-green-300 mb-6">
             Your personalized questions are ready! Let's practice what we've discussed.
           </p>
-          <Button 
-            onClick={onStartQuestions}
-            className="bg-lime-500 hover:bg-lime-600 text-black font-semibold px-8 py-3 text-lg"
-          >
-            Start Practice Questions
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="flex justify-center">
+            <Button
+              onClick={handleStart}
+              disabled={isStarting}
+              className="bg-green-500 hover:bg-green-600 text-black font-semibold px-8 py-3 text-lg min-w-[280px]"
+            >
+              {isStarting ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  <span>Starting...</span>
+                </div>
+              ) : (
+                <>Start Practice Questions →</>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
