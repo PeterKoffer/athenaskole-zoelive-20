@@ -180,7 +180,7 @@ const AIInsightsDashboard = ({
 
           <TabsContent value="recommendations" className="space-y-4">
             {insights?.recommendations?.map((rec: string, index: number) => <Card key={index} className="bg-gray-800 border-gray-700">
-                <CardContent className="p-6">
+                <CardContent className="p-6 bg-slate-700">
                   <div className="flex items-center space-x-4">
                     <div className="bg-purple-600 p-2 rounded-full">
                       <Target className="w-5 h-5" />
