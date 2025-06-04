@@ -8,6 +8,7 @@ import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
 import GradeContentSetup from './GradeContentSetup';
 import SessionHeader from './SessionHeader';
 import QuestionDisplay from './QuestionDisplay';
+import TopicExplanation from './TopicExplanation';
 import LoadingStates from './LoadingStates';
 
 interface ImprovedLearningSessionProps {
@@ -35,6 +36,7 @@ const ImprovedLearningSession = ({
   const [sessionStartTime] = useState(new Date());
   const [questionStartTime, setQuestionStartTime] = useState(new Date());
   const [gradeContentConfig, setGradeContentConfig] = useState<any>(null);
+  const [showExplanation, setShowExplanation] = useState(true);
   
   const totalQuestions = 5;
   
@@ -56,18 +58,27 @@ const ImprovedLearningSession = ({
     standardsAlignment: gradeContentConfig?.standard
   });
 
-  // Generate first question on mount
-  useEffect(() => {
-    if (user?.id && gradeContentConfig && !currentQuestion && !isGenerating) {
-      console.log('🎬 Starting grade-appropriate session for Grade', gradeConfig?.userGrade);
-      loadNextQuestion();
-    }
-  }, [user?.id, gradeContentConfig]);
-
   const handleContentGenerated = (contentConfig: any) => {
     setGradeContentConfig(contentConfig);
     console.log('📚 Using grade-appropriate content configuration:', contentConfig);
   };
+
+  const handleStartQuestions = () => {
+    console.log('📖 Moving from explanation to questions phase');
+    setShowExplanation(false);
+    // Generate first question when starting questions
+    if (user?.id && gradeContentConfig && !currentQuestion && !isGenerating) {
+      loadNextQuestion();
+    }
+  };
+
+  // Generate first question after explanation phase
+  useEffect(() => {
+    if (user?.id && gradeContentConfig && !currentQuestion && !isGenerating && !showExplanation) {
+      console.log('🎬 Starting grade-appropriate session for Grade', gradeConfig?.userGrade);
+      loadNextQuestion();
+    }
+  }, [user?.id, gradeContentConfig, showExplanation]);
 
   const loadNextQuestion = async () => {
     try {
@@ -169,6 +180,19 @@ const ImprovedLearningSession = ({
         skillArea={skillArea}
         onBack={onBack}
         onContentGenerated={handleContentGenerated}
+      />
+    );
+  }
+
+  // Show topic explanation before questions
+  if (showExplanation) {
+    return (
+      <TopicExplanation
+        subject={subject}
+        skillArea={skillArea}
+        gradeLevel={gradeConfig?.userGrade}
+        standardInfo={gradeContentConfig.standard}
+        onStartQuestions={handleStartQuestions}
       />
     );
   }

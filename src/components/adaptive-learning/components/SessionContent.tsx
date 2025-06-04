@@ -1,10 +1,11 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Brain } from 'lucide-react';
 import QuestionDisplay from './QuestionDisplay';
 import LessonHeader from './LessonHeader';
+import TopicExplanation from './TopicExplanation';
 import { SessionData } from './SessionProvider';
 
 interface SessionContentProps {
@@ -47,6 +48,7 @@ const SessionContent = ({
   } = sessionData;
   
   const hasInitialized = useRef(false);
+  const [showExplanation, setShowExplanation] = useState(true);
 
   console.log('📚 SessionContent state:', {
     sessionId: !!sessionId,
@@ -55,33 +57,23 @@ const SessionContent = ({
     isLoading,
     error: !!error,
     hasAnswered,
-    hasInitialized: hasInitialized.current
+    hasInitialized: hasInitialized.current,
+    showExplanation
   });
 
-  // Immediately start generating the first question when session is ready
+  // Generate first question when explanation phase is complete
   useEffect(() => {
-    console.log('🔍 SessionContent effect check:', {
-      sessionId: !!sessionId,
-      questionsLength: questions.length,
-      isLoading,
-      hasInitialized: hasInitialized.current
-    });
-    if (sessionId && !questions.length && !isLoading && !hasInitialized.current) {
-      console.log('🚀 Starting first question generation in SessionContent');
+    if (sessionId && !questions.length && !isLoading && !hasInitialized.current && !showExplanation) {
+      console.log('🚀 Starting first question generation after explanation');
       hasInitialized.current = true;
       generateNextQuestion();
     }
-  }, [sessionId, questions.length, isLoading, generateNextQuestion]);
+  }, [sessionId, questions.length, isLoading, generateNextQuestion, showExplanation]);
 
-  // Force generation if we have sessionId but no questions and not loading
-  useEffect(() => {
-    if (sessionId && !questions.length && !isLoading && hasInitialized.current) {
-      console.log('🔧 Force generating question - session ready but no questions');
-      setTimeout(() => {
-        generateNextQuestion();
-      }, 1000);
-    }
-  }, [sessionId, questions.length, isLoading, generateNextQuestion]);
+  const handleStartQuestions = () => {
+    console.log('📖 Moving from explanation to questions phase');
+    setShowExplanation(false);
+  };
 
   if (error) {
     return (
@@ -103,6 +95,32 @@ const SessionContent = ({
             </Button>
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  // Show topic explanation first
+  if (showExplanation) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" onClick={onBack} className="border-gray-600 text-slate-950 bg-slate-50">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </div>
+        
+        <TopicExplanation
+          subject={subject}
+          skillArea={skillArea}
+          gradeLevel={learningObjective?.difficulty_level}
+          standardInfo={learningObjective ? {
+            code: learningObjective.id,
+            title: learningObjective.title,
+            description: learningObjective.description
+          } : undefined}
+          onStartQuestions={handleStartQuestions}
+        />
       </div>
     );
   }
