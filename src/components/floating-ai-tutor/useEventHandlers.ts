@@ -12,7 +12,7 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
   const [hasMoved, setHasMoved] = useState(false);
   const dragOffset = useRef<DragOffset>({ x: 0, y: 0 });
   const dragStartPosition = useRef<Position>({ x: 0, y: 0 });
-  const moveThreshold = 5; // Minimum pixels to consider as movement
+  const moveThreshold = 10; // Increased threshold to prevent accidental drags
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     console.log('🖱️ Mouse down on Nelie at position:', { x: e.clientX, y: e.clientY });
@@ -102,11 +102,11 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     
     setIsDragging(false);
     
-    // Reset hasMoved after a delay to allow click handler to check it
+    // Reset hasMoved after a short delay to allow click handler to check it
     setTimeout(() => {
       console.log('🔄 Resetting hasMoved to false');
       setHasMoved(false);
-    }, 100);
+    }, 50);
   }, [hasMoved, animationFrameId]);
 
   const handleTouchEnd = useCallback(() => {
@@ -118,11 +118,11 @@ export const useEventHandlers = ({ updatePosition, animationFrameId }: UseEventH
     
     setIsDragging(false);
     
-    // Reset hasMoved after a delay to allow click handler to check it
+    // Reset hasMoved after a short delay to allow click handler to check it
     setTimeout(() => {
       console.log('🔄 Resetting hasMoved to false');
       setHasMoved(false);
-    }, 100);
+    }, 50);
   }, [hasMoved, animationFrameId]);
 
   useEffect(() => {

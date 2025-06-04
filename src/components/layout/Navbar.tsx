@@ -53,8 +53,12 @@ const Navbar = ({
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <button onClick={handleLogoClick} className="flex items-center space-x-2 hover:opacity-80 transition-opacity z-10">
-            <div className="w-8 h-8 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-lg">👩‍🏫</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
+                alt="Nelie AI Tutor Robot"
+                className="w-8 h-8 object-contain"
+              />
             </div>
             <span className="font-bold text-xl bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
               NELIE

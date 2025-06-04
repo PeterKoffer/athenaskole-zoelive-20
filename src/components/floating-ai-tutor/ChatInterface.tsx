@@ -64,11 +64,11 @@ const ChatInterface = ({
         <CardTitle className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-2 text-white">
             <img 
-              src="/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png" 
+              src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" 
               alt="Nelie AI Tutor Robot"
-              className="w-6 h-6 object-contain"
+              className="w-8 h-8 object-contain"
             />
-            <span>Nelie - Your AI Tutor</span>
+            <span>NELIE - Your AI Tutor</span>
           </div>
           <div className="flex items-center space-x-2">
             <Button

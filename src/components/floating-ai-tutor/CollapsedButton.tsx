@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
-import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
 
 interface CollapsedButtonProps {
   onExpand: () => void;
@@ -14,41 +13,7 @@ interface CollapsedButtonProps {
 }
 
 const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, isDragging, hasMoved }: CollapsedButtonProps) => {
-  const [processedImageUrl, setProcessedImageUrl] = useState<string>("");
-  
   console.log('🔘 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
-  
-  useEffect(() => {
-    const processRobotImage = async () => {
-      try {
-        console.log('🤖 Processing robot image...');
-        
-        // Load the original image
-        const response = await fetch("/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png");
-        const blob = await response.blob();
-        const imageElement = await loadImage(blob);
-        
-        // Remove background
-        const processedBlob = await removeBackground(imageElement);
-        const processedUrl = URL.createObjectURL(processedBlob);
-        
-        setProcessedImageUrl(processedUrl);
-        console.log('✅ Robot image processed successfully');
-      } catch (error) {
-        console.error('❌ Failed to process robot image:', error);
-        // Fallback to original image
-        setProcessedImageUrl("/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png");
-      }
-    };
-
-    processRobotImage();
-    
-    return () => {
-      if (processedImageUrl && processedImageUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(processedImageUrl);
-      }
-    };
-  }, []);
 
   const handleButtonClick = (e: React.MouseEvent) => {
     console.log('🖱️ Nelie button clicked - checking interaction, hasMoved:', hasMoved, 'isDragging:', isDragging);
@@ -87,12 +52,12 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
   
   return (
     <div className="relative">
-      {/* Robot button with transparent background and processed image */}
+      {/* Robot button with new larger image */}
       <Button
         onClick={handleButtonClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className="bg-transparent border-none hover:bg-transparent focus:bg-transparent active:bg-transparent p-0 w-20 h-20 rounded-full overflow-hidden"
+        className="bg-transparent border-none hover:bg-transparent focus:bg-transparent active:bg-transparent p-0 w-24 h-24 rounded-full overflow-hidden"
         style={{
           backgroundColor: 'transparent !important',
           border: 'none',
@@ -102,7 +67,7 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
         }}
       >
         <div 
-          className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center"
+          className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center"
           style={{ 
             cursor: isDragging ? 'grabbing' : 'grab',
             transition: isDragging ? 'none' : 'transform 0.2s ease',
@@ -110,17 +75,15 @@ const CollapsedButton = ({ onExpand, onMouseDown, onTouchStart, onResetToHome, i
             backgroundColor: 'transparent'
           }}
         >
-          {processedImageUrl && (
-            <img 
-              src={processedImageUrl}
-              alt="Nelie AI Tutor Robot"
-              className="w-18 h-18 object-contain"
-              style={{ 
-                pointerEvents: 'none',
-                userSelect: 'none'
-              }}
-            />
-          )}
+          <img 
+            src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
+            alt="Nelie AI Tutor Robot"
+            className="w-22 h-22 object-contain"
+            style={{ 
+              pointerEvents: 'none',
+              userSelect: 'none'
+            }}
+          />
         </div>
       </Button>
       
