@@ -88,13 +88,6 @@ const QuestionDisplay = ({
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <h4 className="text-white font-medium mb-2">Explanation:</h4>
           <p className="text-gray-300">{explanation}</p>
-          {standardInfo && (
-            <div className="mt-3 p-2 bg-blue-900/20 border border-blue-800 rounded">
-              <p className="text-blue-200 text-sm">
-                📚 Aligned with {standardInfo.code}: {standardInfo.title}
-              </p>
-            </div>
-          )}
           <p className="text-gray-400 text-sm mt-2">
             {questionNumber < totalQuestions ? 'Next grade-appropriate question coming up...' : 'Session completing...'}
           </p>
