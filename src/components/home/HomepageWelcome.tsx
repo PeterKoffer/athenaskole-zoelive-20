@@ -90,8 +90,8 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
               onClick={handleTestSpeech}
               variant="outline"
               size="sm"
-              className={`border-white/20 text-white hover:bg-white/10 ${
-                isSpeaking ? 'animate-pulse bg-white/20' : ''
+              className={`border-white/20 text-black bg-white hover:bg-gray-100 hover:text-black ${
+                isSpeaking ? 'animate-pulse' : ''
               }`}
             >
               {autoReadEnabled ? (
