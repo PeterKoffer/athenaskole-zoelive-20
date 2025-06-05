@@ -8,38 +8,49 @@ export const useReliableSpeech = () => {
   const speechQueue = useRef<string[]>([]);
   const isProcessing = useRef(false);
   const hasInitialized = useRef(false);
+  const initializationAttempts = useRef(0);
 
-  // Enhanced speech synthesis initialization
+  // Enhanced speech synthesis initialization with retry logic
   useEffect(() => {
     const initializeSpeech = () => {
       if (typeof speechSynthesis !== 'undefined' && !hasInitialized.current) {
-        // Cancel any existing speech
-        speechSynthesis.cancel();
-        
-        // Load voices
-        const voices = speechSynthesis.getVoices();
-        console.log('🎵 Speech synthesis initialized with', voices.length, 'voices');
-        hasInitialized.current = true;
-        
-        // Test speech synthesis availability
-        if (voices.length > 0) {
-          console.log('✅ Speech synthesis is ready with voices');
+        try {
+          // Cancel any existing speech
+          speechSynthesis.cancel();
+          
+          // Force load voices
+          const voices = speechSynthesis.getVoices();
+          console.log('🎵 Speech synthesis initialized with', voices.length, 'voices');
+          
+          if (voices.length > 0 || initializationAttempts.current > 3) {
+            hasInitialized.current = true;
+            console.log('✅ Speech synthesis is ready');
+          } else {
+            initializationAttempts.current++;
+            // Retry initialization
+            setTimeout(initializeSpeech, 1000);
+          }
+        } catch (error) {
+          console.error('❌ Speech initialization error:', error);
         }
       }
     };
 
-    // Initialize immediately if voices are already loaded
+    // Initialize immediately
     initializeSpeech();
     
-    // Listen for voices changed event (some browsers load voices asynchronously)
+    // Listen for voices changed event
     if (typeof speechSynthesis !== 'undefined') {
-      speechSynthesis.addEventListener('voiceschanged', initializeSpeech);
+      const handleVoicesChanged = () => {
+        console.log('🔄 Voices changed, reinitializing...');
+        hasInitialized.current = false;
+        initializeSpeech();
+      };
       
-      // Also try initialization after a short delay
-      setTimeout(initializeSpeech, 1000);
+      speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
       
       return () => {
-        speechSynthesis.removeEventListener('voiceschanged', initializeSpeech);
+        speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
       };
     }
   }, []);
@@ -59,7 +70,6 @@ export const useReliableSpeech = () => {
     if (typeof speechSynthesis === 'undefined') return null;
     
     const voices = speechSynthesis.getVoices();
-    console.log('🎵 Selecting from', voices.length, 'available voices');
     
     if (voices.length === 0) {
       console.warn('⚠️ No voices available yet');
@@ -75,9 +85,7 @@ export const useReliableSpeech = () => {
       'Samantha',
       'Victoria',
       'Allison',
-      'Susan',
-      'Alex',
-      'Fiona'
+      'Susan'
     ];
 
     // First try to find preferred female voices
@@ -92,19 +100,7 @@ export const useReliableSpeech = () => {
       }
     }
 
-    // Fallback to any English female voice
-    const femaleVoice = voices.find(voice => 
-      voice.lang.startsWith('en') && 
-      (voice.name.toLowerCase().includes('female') || 
-       voice.name.toLowerCase().includes('woman'))
-    );
-    
-    if (femaleVoice) {
-      console.log('🎵 Selected fallback female voice:', femaleVoice.name);
-      return femaleVoice;
-    }
-
-    // Final fallback to any English voice
+    // Fallback to any English voice
     const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
     if (englishVoice) {
       console.log('🎵 Using fallback English voice:', englishVoice.name);
@@ -128,7 +124,6 @@ export const useReliableSpeech = () => {
 
     const textToSpeak = speechQueue.current.shift();
     if (!textToSpeak || textToSpeak.trim() === '') {
-      // Continue processing queue if this item was empty
       setTimeout(processQueue, 100);
       return;
     }
@@ -147,7 +142,7 @@ export const useReliableSpeech = () => {
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
         currentUtterance.current = utterance;
         
-        // Configure speech parameters
+        // Configure speech parameters for Nelie
         utterance.lang = 'en-US';
         utterance.rate = 0.85;
         utterance.pitch = 1.1;
@@ -158,8 +153,6 @@ export const useReliableSpeech = () => {
         if (voice) {
           utterance.voice = voice;
           console.log('🎵 Using voice:', voice.name);
-        } else {
-          console.warn('⚠️ No voice selected, using default');
         }
 
         // Set up event handlers
@@ -175,9 +168,7 @@ export const useReliableSpeech = () => {
           isProcessing.current = false;
           
           // Process next item in queue after a pause
-          setTimeout(() => {
-            processQueue();
-          }, 500);
+          setTimeout(processQueue, 500);
         };
 
         utterance.onerror = (event) => {
@@ -187,17 +178,7 @@ export const useReliableSpeech = () => {
           isProcessing.current = false;
           
           // Continue with queue even after error
-          setTimeout(() => {
-            processQueue();
-          }, 1000);
-        };
-
-        utterance.onpause = () => {
-          console.log('⏸️ Speech paused');
-        };
-
-        utterance.onresume = () => {
-          console.log('▶️ Speech resumed');
+          setTimeout(processQueue, 1000);
         };
 
         // Start speaking
@@ -205,22 +186,21 @@ export const useReliableSpeech = () => {
           console.log('🚀 Starting speech synthesis for:', textToSpeak.substring(0, 30) + '...');
           speechSynthesis.speak(utterance);
           
-          // Additional check to ensure speech started
+          // Backup check to ensure speech started
           setTimeout(() => {
             if (!isSpeaking && currentUtterance.current === utterance) {
               console.warn('⚠️ Speech may not have started, retrying...');
-              speechSynthesis.cancel();
-              speechSynthesis.speak(utterance);
+              if (speechSynthesis.speaking) {
+                setIsSpeaking(true);
+              } else {
+                speechSynthesis.speak(utterance);
+              }
             }
           }, 1000);
-        } else {
-          console.error('🚫 Speech synthesis not available');
-          isProcessing.current = false;
         }
       } catch (error) {
         console.error('🚫 Error creating utterance:', error);
         isProcessing.current = false;
-        // Continue with queue
         setTimeout(processQueue, 1000);
       }
     }, 250);
@@ -244,16 +224,12 @@ export const useReliableSpeech = () => {
       console.log('🔥 Priority speech - clearing queue');
       speechQueue.current = [text];
       stopSpeaking();
-      setTimeout(() => {
-        processQueue();
-      }, 300);
+      setTimeout(processQueue, 300);
     } else {
       // Add to queue
       speechQueue.current.push(text);
       if (!isProcessing.current) {
-        setTimeout(() => {
-          processQueue();
-        }, 200);
+        setTimeout(processQueue, 200);
       }
     }
   }, [autoReadEnabled, processQueue, stopSpeaking]);
@@ -268,11 +244,10 @@ export const useReliableSpeech = () => {
     }
   }, [autoReadEnabled, stopSpeaking]);
 
-  // Ensure speech synthesis is working
   const testSpeech = useCallback(() => {
     if (typeof speechSynthesis !== 'undefined' && autoReadEnabled) {
       console.log('🧪 Testing speech synthesis...');
-      speakText('Hello, I am Nelie, your AI learning companion!', true);
+      speakText('Hello! I am Nelie, your AI learning companion! Can you hear me now?', true);
     }
   }, [autoReadEnabled, speakText]);
 

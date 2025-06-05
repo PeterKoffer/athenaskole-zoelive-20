@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { userLearningProfileService } from '@/services/userLearningProfileService';
-import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
+import { useReliableSpeech } from '../hooks/useReliableSpeech';
 
 interface ExplanationCardProps {
   explanation: string;
@@ -42,7 +42,7 @@ const ExplanationCard = ({
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [displayTime, setDisplayTime] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useSpeechSynthesis();
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useReliableSpeech();
 
   // Load user preferences on mount
   useEffect(() => {
@@ -101,7 +101,6 @@ const ExplanationCard = ({
         if (success) {
           console.log('✅ Question history recorded successfully');
 
-          // Analyze and update learning profile
           await userLearningProfileService.analyzeAndUpdateProfile(user.id, subject, skillArea, questionData, {
             answer: userAnswer,
             is_correct: isCorrect,
@@ -150,7 +149,7 @@ const ExplanationCard = ({
       speechText = `That's not quite right. The correct answer is: ${correctAnswer}. Let me explain: ${explanation}`;
     }
     
-    speakText(speechText);
+    speakText(speechText, true);
   };
 
   return (

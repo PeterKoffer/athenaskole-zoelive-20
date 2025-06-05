@@ -19,8 +19,19 @@ export const useActivitySpeech = (
     autoReadEnabled,
     speakText,
     stopSpeaking,
-    isReady
+    isReady,
+    testSpeech
   } = useReliableSpeech();
+
+  // Test speech when component mounts
+  useEffect(() => {
+    if (isReady && autoReadEnabled) {
+      console.log('🧪 Activity speech system ready, testing...');
+      setTimeout(() => {
+        testSpeech();
+      }, 1000);
+    }
+  }, [isReady, autoReadEnabled, testSpeech]);
 
   // Speak activity content when it changes
   useEffect(() => {
@@ -37,7 +48,7 @@ export const useActivitySpeech = (
         } else if (currentActivity.type === 'game') {
           speakText(`Let's play a game! ${currentActivity.content.text}`, true);
         }
-      }, 1000);
+      }, 1500);
     }
   }, [currentActivityIndex, autoReadEnabled, activityCompleted, currentActivity, speakText, stopSpeaking, isReady]);
 
