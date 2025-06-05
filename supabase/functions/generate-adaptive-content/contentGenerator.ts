@@ -1,16 +1,15 @@
-
 import { GeneratedContent } from './types.ts';
 import { createGradeAlignedPrompt, PromptConfig } from './promptBuilder.ts';
-import { callOpenAI } from './apiClient.ts';
+import { callDeepSeek } from './apiClient.ts';
 
-export async function generateContentWithOpenAI(requestData: any): Promise<GeneratedContent | null> {
-  console.log('🤖 generateContentWithOpenAI called with grade-level alignment:', requestData);
+export async function generateContentWithDeepSeek(requestData: any): Promise<GeneratedContent | null> {
+  console.log('🤖 generateContentWithDeepSeek called with grade-level alignment:', requestData);
   
-  const openaiApiKey = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('OpenaiAPI');
+  const deepSeekApiKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
   
-  if (!openaiApiKey) {
-    console.error('❌ No OpenAI API key found');
-    throw new Error('OpenAI API key not configured');
+  if (!deepSeekApiKey) {
+    console.error('❌ No DeepSeek API key found');
+    throw new Error('DeepSeek API key not configured');
   }
 
   const promptConfig: PromptConfig = {
@@ -27,12 +26,15 @@ export async function generateContentWithOpenAI(requestData: any): Promise<Gener
   const prompt = createGradeAlignedPrompt(promptConfig);
   console.log('📝 Using grade-aligned prompt for Grade', requestData.gradeLevel);
 
-  const result = await callOpenAI(openaiApiKey, prompt);
+  const result = await callDeepSeek(deepSeekApiKey, prompt);
   
   if (!result.success) {
-    console.error('❌ OpenAI call failed:', result.error);
-    throw new Error(result.error || 'OpenAI call failed');
+    console.error('❌ DeepSeek call failed:', result.error);
+    throw new Error(result.error || 'DeepSeek call failed');
   }
 
   return result.data || null;
 }
+
+// Keep the old function for backward compatibility
+export const generateContentWithOpenAI = generateContentWithDeepSeek;

@@ -4,11 +4,11 @@ import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes'
 
 export class AIContentGenerator {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
-    console.log('🤖 AIContentGenerator: Starting generation');
+    console.log('🤖 AIContentGenerator: Starting generation with DeepSeek');
     console.log('📋 Request:', request);
 
     try {
-      console.log('📞 Calling edge function: generate-adaptive-content');
+      console.log('📞 Calling edge function: generate-adaptive-content (using DeepSeek)');
       
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: request
@@ -37,7 +37,7 @@ export class AIContentGenerator {
       }
 
       const content = data.generatedContent;
-      console.log('🎯 Generated content:', content);
+      console.log('🎯 Generated content with DeepSeek:', content);
 
       // Validate structure
       if (!content.question || !Array.isArray(content.options) || typeof content.correct !== 'number') {
@@ -54,12 +54,12 @@ export class AIContentGenerator {
         estimatedTime: content.estimatedTime || 30
       };
 
-      console.log('✅ Returning validated content:', validatedContent);
+      console.log('✅ Returning validated content from DeepSeek:', validatedContent);
       return validatedContent;
 
     } catch (error: any) {
-      console.error('💥 AI generation error:', error);
-      throw new Error(`AI generation failed: ${error.message}`);
+      console.error('💥 AI generation error with DeepSeek:', error);
+      throw new Error(`DeepSeek AI generation failed: ${error.message}`);
     }
   }
 }

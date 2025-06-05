@@ -4,7 +4,7 @@ import { contentRepository } from './content/contentRepository';
 import { fallbackContentService } from './content/fallbackContentService';
 import { GenerateContentRequest, GeneratedContent } from './types/contentTypes';
 
-export class OpenAIContentService {
+export class DeepSeekContentService {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
     return aiContentGenerator.generateAdaptiveContent(request);
   }
@@ -25,8 +25,8 @@ export class OpenAIContentService {
         return existingContent;
       }
 
-      // If no existing content, generate new content
-      console.log('🆕 No existing content found, generating new content with AI');
+      // If no existing content, generate new content with DeepSeek
+      console.log('🆕 No existing content found, generating new content with DeepSeek AI');
       
       try {
         const generatedContent = await this.generateAdaptiveContent({
@@ -40,7 +40,7 @@ export class OpenAIContentService {
         return await contentRepository.saveGeneratedContent(subject, skillArea, difficultyLevel, generatedContent);
 
       } catch (aiError) {
-        console.error('❌ AI generation failed, using fallback content:', aiError);
+        console.error('❌ DeepSeek AI generation failed, using fallback content:', aiError);
         
         // Create fallback content when AI generation fails
         const fallbackContent = fallbackContentService.createFallbackContent(subject, skillArea, difficultyLevel);
@@ -58,7 +58,10 @@ export class OpenAIContentService {
   }
 }
 
-export const openaiContentService = new OpenAIContentService();
+export const deepSeekContentService = new DeepSeekContentService();
+
+// Export aliases for backward compatibility
+export const openaiContentService = deepSeekContentService;
 
 // Re-export types for backward compatibility
 export type { GenerateContentRequest, GeneratedContent } from './types/contentTypes';

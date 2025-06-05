@@ -1,6 +1,6 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { generateContentWithOpenAI } from './contentGenerator.ts';
+import { generateContentWithDeepSeek } from './contentGenerator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,14 +41,14 @@ serve(async (req) => {
       );
     }
 
-    // Generate content using OpenAI
-    const generatedContent = await generateContentWithOpenAI(body);
+    // Generate content using DeepSeek
+    const generatedContent = await generateContentWithDeepSeek(body);
 
     if (!generatedContent) {
       throw new Error('Failed to generate content');
     }
 
-    console.log('🎯 Content generation successful');
+    console.log('🎯 Content generation successful with DeepSeek');
     return new Response(
       JSON.stringify({ success: true, generatedContent }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
