@@ -96,8 +96,7 @@ export const useReliableSpeech = () => {
     const femaleVoice = voices.find(voice => 
       voice.lang.startsWith('en') && 
       (voice.name.toLowerCase().includes('female') || 
-       voice.name.toLowerCase().includes('woman') ||
-       voice.gender === 'female')
+       voice.name.toLowerCase().includes('woman'))
     );
     
     if (femaleVoice) {
