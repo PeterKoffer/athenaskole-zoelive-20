@@ -37,6 +37,8 @@ const LessonActivitySpeechManager = ({
           speechText = `Here's your question: ${currentActivity.content.question}`;
         } else if (currentActivity.type === 'game') {
           speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
+        } else if (currentActivity.type === 'welcome') {
+          speechText = `${currentActivity.content.message}`;
         } else {
           speechText = `Let's work on: ${currentActivity.title}`;
         }
@@ -45,11 +47,11 @@ const LessonActivitySpeechManager = ({
           console.log('🔊 Activity speech manager speaking:', speechText.substring(0, 50));
           speakText(speechText, true);
         }
-      }, 1500);
+      }, 1000);
     }
   }, [currentActivityIndex, autoReadEnabled, isReady, currentActivity, speakText, stopSpeaking]);
 
-  return null; // This component only manages side effects
+  return null;
 };
 
 export default LessonActivitySpeechManager;

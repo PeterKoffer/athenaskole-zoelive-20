@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { useWorkingSpeech } from '@/components/adaptive-learning/hooks/useWorkingSpeech';
+import { useNelieVoice } from '@/components/adaptive-learning/hooks/useNelieVoice';
 import { createMathematicsLesson, createEnglishLesson, createScienceLesson, LessonActivity } from '../EnhancedLessonContent';
 
 interface UseLessonManagerProps {
@@ -27,7 +27,7 @@ export const useLessonManager = ({
     stopSpeaking,
     toggleMute,
     testSpeech
-  } = useWorkingSpeech();
+  } = useNelieVoice();
 
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
@@ -39,7 +39,7 @@ export const useLessonManager = ({
       case 'science':
         return createScienceLesson();
       default:
-        return createMathematicsLesson(); // fallback
+        return createMathematicsLesson();
     }
   }, [subject]);
 
@@ -47,14 +47,13 @@ export const useLessonManager = ({
   const currentActivity = lessonActivities[currentActivityIndex];
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
 
-  // Test speech when component mounts and speech is ready
+  // Test speech when ready
   useEffect(() => {
     if (isReady && autoReadEnabled) {
-      console.log('🧪 Lesson Manager - Speech system is ready, testing in 3 seconds...');
+      console.log('🧪 Testing Nelie voice system...');
       setTimeout(() => {
-        console.log('🧪 Running initial speech test...');
         testSpeech();
-      }, 3000);
+      }, 2000);
     }
   }, [isReady, autoReadEnabled, testSpeech]);
 
@@ -65,13 +64,11 @@ export const useLessonManager = ({
       setTotalCorrectAnswers(prev => prev + 1);
       setScore(prev => prev + 10);
       
-      // Nelie celebrates correct answers
       const celebrations = [
         "Fantastic work! You're absolutely brilliant!",
         "Amazing! You're becoming such a great learner!",
         "Wonderful! Your thinking is incredible!",
-        "Excellent! I'm so proud of you!",
-        "Outstanding! You're a true champion!"
+        "Excellent! I'm so proud of you!"
       ];
       
       setTimeout(() => {
@@ -81,7 +78,6 @@ export const useLessonManager = ({
       }, 1000);
     }
 
-    // Move to next activity after a brief pause
     setTimeout(() => {
       if (currentActivityIndex < lessonActivities.length - 1) {
         console.log('📍 Moving to next activity');
@@ -89,9 +85,8 @@ export const useLessonManager = ({
       } else {
         console.log('🎉 Lesson complete!');
         
-        // Final celebration from Nelie
         setTimeout(() => {
-          const finalMessage = "You've completed your lesson! You did absolutely amazing work today. I'm so proud of how much you've learned!";
+          const finalMessage = "You've completed your lesson! You did absolutely amazing work today!";
           console.log('🎓 Final message:', finalMessage);
           speakText(finalMessage, true);
         }, 1000);
@@ -106,6 +101,7 @@ export const useLessonManager = ({
   const handleReadRequest = useCallback(() => {
     if (currentActivity) {
       if (isSpeaking) {
+        console.log('🔇 Stopping current speech');
         stopSpeaking();
       } else {
         let speechText = '';
