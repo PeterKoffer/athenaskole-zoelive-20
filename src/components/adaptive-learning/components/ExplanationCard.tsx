@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { userLearningProfileService } from '@/services/userLearningProfileService';
-import { useReliableSpeech } from '../hooks/useReliableSpeech';
+import { useSimplifiedSpeech } from '../hooks/useSimplifiedSpeech';
 
 interface ExplanationCardProps {
   explanation: string;
@@ -42,7 +42,7 @@ const ExplanationCard = ({
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [displayTime, setDisplayTime] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useReliableSpeech();
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useSimplifiedSpeech();
 
   // Load user preferences on mount
   useEffect(() => {
@@ -149,6 +149,7 @@ const ExplanationCard = ({
       speechText = `That's not quite right. The correct answer is: ${correctAnswer}. Let me explain: ${explanation}`;
     }
     
+    console.log('🔊 ExplanationCard speaking:', speechText.substring(0, 50));
     speakText(speechText, true);
   };
 

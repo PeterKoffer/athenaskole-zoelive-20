@@ -1,11 +1,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useReliableSpeech } from '@/components/adaptive-learning/hooks/useReliableSpeech';
+import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 import { createMathematicsLesson, createEnglishLesson, createScienceLesson, LessonActivity } from './EnhancedLessonContent';
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
 import EnhancedActivityRenderer from './EnhancedActivityRenderer';
+import SpeechTestCard from './SpeechTestCard';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -33,7 +34,7 @@ const EnhancedLessonManager = ({
     toggleMute,
     testSpeech,
     isReady
-  } = useReliableSpeech();
+  } = useSimplifiedSpeech();
 
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
@@ -56,25 +57,38 @@ const EnhancedLessonManager = ({
   // Test speech when component mounts and speech is ready
   useEffect(() => {
     if (isReady && autoReadEnabled) {
-      console.log('🧪 Speech system is ready, testing...');
+      console.log('🧪 Enhanced Lesson Manager - Speech system is ready, testing in 3 seconds...');
       setTimeout(() => {
         testSpeech();
-      }, 2000);
+      }, 3000);
     }
   }, [isReady, autoReadEnabled, testSpeech]);
 
   // Auto-speak when activity changes
   useEffect(() => {
     if (currentActivity && autoReadEnabled && isReady) {
-      console.log('🎯 New activity, Nelie will speak:', currentActivity.title);
+      console.log('🎯 Enhanced Lesson Manager - New activity, Nelie will speak:', currentActivity.title);
       
       // Stop any current speech and speak new content
       stopSpeaking();
       
       // Wait for UI to render, then speak
       setTimeout(() => {
-        if (currentActivity.speech) {
-          speakText(currentActivity.speech, true); // High priority speech
+        let speechText = '';
+        
+        if (currentActivity.type === 'explanation') {
+          speechText = `Let me explain: ${currentActivity.content.text}`;
+        } else if (currentActivity.type === 'question') {
+          speechText = `Here's your question: ${currentActivity.content.question}`;
+        } else if (currentActivity.type === 'game') {
+          speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
+        } else {
+          speechText = `Let's work on: ${currentActivity.title}`;
+        }
+        
+        if (speechText) {
+          console.log('🔊 Enhanced Lesson Manager speaking:', speechText.substring(0, 50));
+          speakText(speechText, true);
         }
       }, 1500);
     }
@@ -98,6 +112,7 @@ const EnhancedLessonManager = ({
       
       setTimeout(() => {
         const celebration = celebrations[Math.floor(Math.random() * celebrations.length)];
+        console.log('🎉 Nelie celebrating:', celebration);
         speakText(celebration, true);
       }, 1000);
     }
@@ -112,7 +127,9 @@ const EnhancedLessonManager = ({
         
         // Final celebration from Nelie
         setTimeout(() => {
-          speakText("You've completed your lesson! You did absolutely amazing work today. I'm so proud of how much you've learned!", true);
+          const finalMessage = "You've completed your lesson! You did absolutely amazing work today. I'm so proud of how much you've learned!";
+          console.log('🎓 Final message:', finalMessage);
+          speakText(finalMessage, true);
         }, 1000);
         
         setTimeout(() => {
@@ -127,14 +144,23 @@ const EnhancedLessonManager = ({
       if (isSpeaking) {
         stopSpeaking();
       } else {
-        speakText(currentActivity.speech, true);
+        let speechText = '';
+        
+        if (currentActivity.type === 'explanation') {
+          speechText = `Let me explain: ${currentActivity.content.text}`;
+        } else if (currentActivity.type === 'question') {
+          speechText = `Here's your question: ${currentActivity.content.question}`;
+        } else if (currentActivity.type === 'game') {
+          speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
+        } else {
+          speechText = `Let me read this for you: ${currentActivity.title}`;
+        }
+        
+        console.log('🔊 Manual read request:', speechText.substring(0, 50));
+        speakText(speechText, true);
       }
     }
   }, [currentActivity, isSpeaking, speakText, stopSpeaking]);
-
-  const handleMuteToggle = useCallback(() => {
-    toggleMute();
-  }, [toggleMute]);
 
   if (!currentActivity) {
     return (
@@ -151,6 +177,9 @@ const EnhancedLessonManager = ({
 
   return (
     <div className="space-y-6">
+      {/* Speech Test Card - for debugging */}
+      <SpeechTestCard />
+
       {/* Progress Header */}
       <LessonProgressHeader
         timeElapsed={timeElapsed}
@@ -166,7 +195,7 @@ const EnhancedLessonManager = ({
         totalQuestions={lessonActivities.length} 
         isSpeaking={isSpeaking} 
         autoReadEnabled={autoReadEnabled} 
-        onMuteToggle={handleMuteToggle} 
+        onMuteToggle={toggleMute} 
         onReadQuestion={handleReadRequest} 
       />
 
@@ -196,20 +225,6 @@ const EnhancedLessonManager = ({
         onActivityComplete={handleActivityComplete}
         isNelieReady={isReady}
       />
-
-      {/* Debug Info (remove in production) */}
-      {process.env.NODE_ENV === 'development' && (
-        <Card className="bg-gray-800 border-gray-600">
-          <CardContent className="p-4">
-            <div className="text-xs text-gray-400">
-              <div>Speech Ready: {isReady ? '✅' : '❌'}</div>
-              <div>Auto Read: {autoReadEnabled ? '✅' : '❌'}</div>
-              <div>Is Speaking: {isSpeaking ? '🔊' : '🔇'}</div>
-              <div>Voices Available: {typeof speechSynthesis !== 'undefined' ? speechSynthesis.getVoices().length : 0}</div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

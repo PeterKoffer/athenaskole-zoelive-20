@@ -1,6 +1,6 @@
 
 import { useEffect, useCallback } from 'react';
-import { useReliableSpeech } from '@/components/adaptive-learning/hooks/useReliableSpeech';
+import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 
 interface LessonActivity {
   id: string;
@@ -8,6 +8,7 @@ interface LessonActivity {
   title: string;
   duration: number;
   content: any;
+  speech?: string;
 }
 
 export const useActivitySpeech = (
@@ -20,42 +21,69 @@ export const useActivitySpeech = (
     speakText,
     stopSpeaking,
     isReady,
-    testSpeech
-  } = useReliableSpeech();
+    testSpeech,
+    isSpeaking
+  } = useSimplifiedSpeech();
 
   // Test speech when component mounts
   useEffect(() => {
     if (isReady && autoReadEnabled) {
-      console.log('🧪 Activity speech system ready, testing...');
+      console.log('🧪 Activity speech system ready, testing in 2 seconds...');
       setTimeout(() => {
         testSpeech();
-      }, 1000);
+      }, 2000);
     }
   }, [isReady, autoReadEnabled, testSpeech]);
 
   // Speak activity content when it changes
   useEffect(() => {
     if (currentActivity && autoReadEnabled && !activityCompleted && isReady) {
-      console.log('🎯 Activity speech: speaking for activity', currentActivity.title);
+      console.log('🎯 New activity - Nelie will speak:', currentActivity.title);
+      
+      // Stop any current speech
       stopSpeaking();
       
+      // Wait for UI to render, then speak
       setTimeout(() => {
-        if (currentActivity.type === 'explanation') {
-          speakText(currentActivity.content.text, true);
+        let speechText = '';
+        
+        if (currentActivity.speech) {
+          // Use custom speech if available
+          speechText = currentActivity.speech;
+        } else if (currentActivity.type === 'explanation') {
+          speechText = `Let me explain: ${currentActivity.content.text}`;
         } else if (currentActivity.type === 'question') {
-          const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
-          speakText(questionText, true);
+          speechText = `Here's your question: ${currentActivity.content.question}`;
         } else if (currentActivity.type === 'game') {
-          speakText(`Let's play a game! ${currentActivity.content.text}`, true);
+          speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
+        } else {
+          speechText = `Let's work on: ${currentActivity.title}`;
+        }
+        
+        if (speechText) {
+          speakText(speechText, true);
         }
       }, 1500);
     }
   }, [currentActivityIndex, autoReadEnabled, activityCompleted, currentActivity, speakText, stopSpeaking, isReady]);
 
+  const handleReadRequest = useCallback(() => {
+    if (currentActivity) {
+      if (isSpeaking) {
+        stopSpeaking();
+      } else {
+        const speechText = currentActivity.speech || `Let me read this for you: ${currentActivity.title}`;
+        speakText(speechText, true);
+      }
+    }
+  }, [currentActivity, isSpeaking, speakText, stopSpeaking]);
+
   return {
     autoReadEnabled,
     speakText,
     stopSpeaking,
-    isReady
+    isReady,
+    isSpeaking,
+    handleReadRequest
   };
 };
