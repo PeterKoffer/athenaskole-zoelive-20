@@ -1,10 +1,10 @@
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 
 interface LessonActivity {
   id: string;
-  type: 'question' | 'game' | 'explanation' | 'practice';
+  type: 'question' | 'game' | 'explanation' | 'practice' | 'welcome';
   title: string;
   duration: number;
   content: any;
@@ -25,6 +25,9 @@ export const useActivitySpeech = (
     isSpeaking
   } = useSimplifiedSpeech();
 
+  const lastSpokenActivityRef = useRef<string | null>(null);
+  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Test speech when component mounts
   useEffect(() => {
     if (isReady && autoReadEnabled) {
@@ -35,16 +38,31 @@ export const useActivitySpeech = (
     }
   }, [isReady, autoReadEnabled, testSpeech]);
 
-  // Speak activity content when it changes
+  // Speak activity content when it changes - with protection against interruption
   useEffect(() => {
     if (currentActivity && autoReadEnabled && !activityCompleted && isReady) {
+      // Don't speak the same activity twice
+      if (lastSpokenActivityRef.current === currentActivity.id) {
+        return;
+      }
+
       console.log('🎯 New activity - Nelie will speak:', currentActivity.title);
+      
+      // Clear any existing speech timeout
+      if (speechTimeoutRef.current) {
+        clearTimeout(speechTimeoutRef.current);
+      }
       
       // Stop any current speech
       stopSpeaking();
       
-      // Wait for UI to render, then speak
-      setTimeout(() => {
+      // Mark this activity as being spoken
+      lastSpokenActivityRef.current = currentActivity.id;
+      
+      // Wait for UI to render, then speak with longer delay for welcome messages
+      const delay = currentActivity.type === 'welcome' ? 2000 : 1500;
+      
+      speechTimeoutRef.current = setTimeout(() => {
         let speechText = '';
         
         if (currentActivity.speech) {
@@ -56,6 +74,8 @@ export const useActivitySpeech = (
           speechText = `Here's your question: ${currentActivity.content.question}`;
         } else if (currentActivity.type === 'game') {
           speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
+        } else if (currentActivity.type === 'welcome') {
+          speechText = currentActivity.content.message;
         } else {
           speechText = `Let's work on: ${currentActivity.title}`;
         }
@@ -63,16 +83,32 @@ export const useActivitySpeech = (
         if (speechText) {
           speakText(speechText, true);
         }
-      }, 1500);
+      }, delay);
     }
   }, [currentActivityIndex, autoReadEnabled, activityCompleted, currentActivity, speakText, stopSpeaking, isReady]);
+
+  // Reset spoken activity tracker when activity changes
+  useEffect(() => {
+    return () => {
+      lastSpokenActivityRef.current = null;
+    };
+  }, [currentActivityIndex]);
+
+  // Cleanup timeouts
+  useEffect(() => {
+    return () => {
+      if (speechTimeoutRef.current) {
+        clearTimeout(speechTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleReadRequest = useCallback(() => {
     if (currentActivity) {
       if (isSpeaking) {
         stopSpeaking();
       } else {
-        const speechText = currentActivity.speech || `Let me read this for you: ${currentActivity.title}`;
+        const speechText = currentActivity.speech || currentActivity.content.message || `Let me read this for you: ${currentActivity.title}`;
         speakText(speechText, true);
       }
     }
