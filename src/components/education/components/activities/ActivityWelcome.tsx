@@ -14,37 +14,35 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
   const [displayedText, setDisplayedText] = useState('');
   const [isTextComplete, setIsTextComplete] = useState(false);
 
-  // Use the full message instead of breaking it into segments to prevent shifting
   const fullMessage = activity.content.message;
 
-  // Display text progressively with a slower, smoother approach
+  // Faster text display to sync with faster speech
   useEffect(() => {
     if (isNelieReady && fullMessage) {
       setDisplayedText('');
       setIsTextComplete(false);
       
-      // Start showing text after a delay to let speech begin
+      // Start showing text after a shorter delay
       const startDelay = setTimeout(() => {
-        // Show text gradually word by word to sync with speech
         const words = fullMessage.split(' ');
         let currentIndex = 0;
         
         const showNextWords = () => {
           if (currentIndex < words.length) {
-            // Show 2-3 words at a time for smoother flow
-            const wordsToShow = words.slice(0, currentIndex + 2).join(' ');
+            // Show 3-4 words at a time for faster flow
+            const wordsToShow = words.slice(0, currentIndex + 3).join(' ');
             setDisplayedText(wordsToShow);
-            currentIndex += 2;
+            currentIndex += 3;
             
-            // Delay between word groups to match speech pace (slower)
-            setTimeout(showNextWords, 800); // Increased delay
+            // Reduced delay to sync with faster speech (1.3x speed)
+            setTimeout(showNextWords, 600); // Reduced from 800ms to 600ms
           } else {
             setIsTextComplete(true);
           }
         };
         
         showNextWords();
-      }, 2000); // Initial delay for speech to start
+      }, 1500); // Reduced from 2000ms to 1500ms
       
       return () => clearTimeout(startDelay);
     }

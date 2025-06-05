@@ -18,13 +18,13 @@ const EnhancedActivityRenderer = ({
 }: EnhancedActivityRendererProps) => {
   const [timeRemaining, setTimeRemaining] = useState(activity.duration);
 
-  // Timer for activity duration - reduced timing for faster flow
+  // Timer for activity duration - optimized for 20-25 minute lessons
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           if (activity.type === 'explanation' || activity.type === 'welcome') {
-            setTimeout(() => onActivityComplete(), 200); // Reduced delay
+            setTimeout(() => onActivityComplete(), 500); // Smooth transition
           }
           return 0;
         }
@@ -35,12 +35,21 @@ const EnhancedActivityRenderer = ({
     return () => clearInterval(timer);
   }, [activity, onActivityComplete]);
 
-  // Reset timer when activity changes - with faster timing
+  // Reset timer when activity changes - with optimal timing for engagement
   useEffect(() => {
-    // Reduce welcome and explanation durations for faster lesson start
-    const adjustedDuration = activity.type === 'welcome' ? 5 : 
-                            activity.type === 'explanation' ? 8 : 
-                            activity.duration;
+    // Balanced durations for comprehensive learning experience
+    let adjustedDuration = activity.duration;
+    
+    if (activity.type === 'welcome') {
+      adjustedDuration = 4; // Quick welcome to start learning faster
+    } else if (activity.type === 'explanation') {
+      adjustedDuration = 8; // Sufficient time for understanding concepts
+    } else if (activity.type === 'question') {
+      adjustedDuration = 25; // Adequate time for thinking and answering
+    } else if (activity.type === 'game') {
+      adjustedDuration = 30; // Extra time for interactive fun
+    }
+    
     setTimeRemaining(adjustedDuration);
   }, [activity]);
 
@@ -68,6 +77,7 @@ const EnhancedActivityRenderer = ({
       );
     
     case 'question':
+    case 'game':
       return (
         <ActivityQuestion 
           activity={activity} 
