@@ -15,6 +15,7 @@ import HeroSection from "@/components/home/HeroSection";
 import SubjectsSection from "@/components/home/SubjectsSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import CTASection from "@/components/home/CTASection";
+import HomepageWelcome from "@/components/home/HomepageWelcome";
 import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
 import InsightsNotification from "@/components/ai-insights/InsightsNotification";
 
@@ -144,6 +145,13 @@ const Index = () => {
 
     return (
       <>
+        {/* Show welcome message for logged-in users */}
+        {user && (
+          <div className="pt-8">
+            <HomepageWelcome userName={user?.user_metadata?.name?.split(' ')[0] || 'Student'} />
+          </div>
+        )}
+        
         <HeroSection onGetStarted={handleGetStarted} />
         <SubjectsSection />
         <FeaturesSection />
