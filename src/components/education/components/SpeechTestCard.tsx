@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, TestTube, AlertTriangle, Hand, CheckCircle } from 'lucide-react';
-import { useSimpleNelieSpeech } from '@/components/adaptive-learning/hooks/useSimpleNelieSpeech';
+import { useBasicSpeech } from '@/components/adaptive-learning/hooks/useBasicSpeech';
 
 const SpeechTestCard = () => {
   const { 
@@ -14,7 +14,7 @@ const SpeechTestCard = () => {
     stopSpeaking, 
     toggleMute, 
     testSpeech 
-  } = useSimpleNelieSpeech();
+  } = useBasicSpeech();
 
   const handleTestSpeech = () => {
     console.log('🧪 Test button clicked - isSpeaking:', isSpeaking);
@@ -34,7 +34,7 @@ const SpeechTestCard = () => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <TestTube className="w-5 h-5 text-yellow-400" />
-            <span className="text-white font-medium">Nelie Speech System - SIMPLE VERSION</span>
+            <span className="text-white font-medium">Nelie Speech System - BASIC VERSION</span>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -79,7 +79,7 @@ const SpeechTestCard = () => {
               <div>
                 <div className="font-medium">Nelie's Voice is Active!</div>
                 <div className="text-sm text-green-300">
-                  Simple speech system is ready to help you learn
+                  Basic speech system is ready to help you learn
                 </div>
               </div>
             </div>
@@ -101,7 +101,7 @@ const SpeechTestCard = () => {
               <div className="ml-2">
                 • Available Voices: {voicesCount}<br/>
                 • System: Web Speech API<br/>
-                • Version: SIMPLE<br/>
+                • Version: BASIC<br/>
                 • Queue: {hasUserInteracted ? 'Active' : 'Waiting'}
               </div>
             </div>
