@@ -1,8 +1,8 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
-import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+import { useReliableSpeech } from '@/components/adaptive-learning/hooks/useReliableSpeech';
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonControlsFooter from './LessonControlsFooter';
@@ -37,8 +37,19 @@ const ExtendedLessonManager = ({
     isSpeaking,
     autoReadEnabled,
     speakText,
-    handleMuteToggle
-  } = useSpeechSynthesis();
+    toggleMute,
+    testSpeech,
+    isReady
+  } = useReliableSpeech();
+
+  // Test speech when ready
+  useEffect(() => {
+    if (isReady && autoReadEnabled) {
+      setTimeout(() => {
+        testSpeech();
+      }, 1000);
+    }
+  }, [isReady, autoReadEnabled, testSpeech]);
 
   // Generate lesson activities
   const generateLessonActivities = (): LessonActivity[] => {
@@ -152,12 +163,12 @@ const ExtendedLessonManager = ({
 
   const handleReadQuestion = useCallback(() => {
     if (currentActivity.type === 'explanation') {
-      speakText(currentActivity.content.text);
+      speakText(currentActivity.content.text, true);
     } else if (currentActivity.type === 'question') {
       const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
-      speakText(questionText);
+      speakText(questionText, true);
     } else if (currentActivity.type === 'game') {
-      speakText(`Let's play a game! ${currentActivity.content.text}`);
+      speakText(`Let's play a game! ${currentActivity.content.text}`, true);
     }
   }, [currentActivity, speakText]);
 
@@ -189,7 +200,7 @@ const ExtendedLessonManager = ({
         totalQuestions={lessonActivities.length} 
         isSpeaking={isSpeaking} 
         autoReadEnabled={autoReadEnabled} 
-        onMuteToggle={handleMuteToggle} 
+        onMuteToggle={toggleMute} 
         onReadQuestion={handleReadQuestion} 
       />
 

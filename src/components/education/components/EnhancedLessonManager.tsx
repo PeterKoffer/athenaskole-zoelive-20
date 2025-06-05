@@ -31,6 +31,7 @@ const EnhancedLessonManager = ({
     speakText,
     stopSpeaking,
     toggleMute,
+    testSpeech,
     isReady
   } = useReliableSpeech();
 
@@ -52,17 +53,32 @@ const EnhancedLessonManager = ({
   const currentActivity = lessonActivities[currentActivityIndex];
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
 
+  // Test speech when component mounts and speech is ready
+  useEffect(() => {
+    if (isReady && autoReadEnabled) {
+      console.log('🧪 Speech system is ready, testing...');
+      setTimeout(() => {
+        testSpeech();
+      }, 2000);
+    }
+  }, [isReady, autoReadEnabled, testSpeech]);
+
   // Auto-speak when activity changes
   useEffect(() => {
     if (currentActivity && autoReadEnabled && isReady) {
       console.log('🎯 New activity, Nelie will speak:', currentActivity.title);
       
-      // Small delay to ensure UI is ready
+      // Stop any current speech and speak new content
+      stopSpeaking();
+      
+      // Wait for UI to render, then speak
       setTimeout(() => {
-        speakText(currentActivity.speech, true); // High priority speech
-      }, 1000);
+        if (currentActivity.speech) {
+          speakText(currentActivity.speech, true); // High priority speech
+        }
+      }, 1500);
     }
-  }, [currentActivityIndex, autoReadEnabled, isReady, currentActivity, speakText]);
+  }, [currentActivityIndex, autoReadEnabled, isReady, currentActivity, speakText, stopSpeaking]);
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     console.log('✅ Activity completed, wasCorrect:', wasCorrect);
@@ -82,8 +98,8 @@ const EnhancedLessonManager = ({
       
       setTimeout(() => {
         const celebration = celebrations[Math.floor(Math.random() * celebrations.length)];
-        speakText(celebration);
-      }, 1500);
+        speakText(celebration, true);
+      }, 1000);
     }
 
     // Move to next activity after a brief pause
@@ -101,9 +117,9 @@ const EnhancedLessonManager = ({
         
         setTimeout(() => {
           onLessonComplete();
-        }, 3000);
+        }, 4000);
       }
-    }, 1000);
+    }, 2000);
   }, [currentActivityIndex, lessonActivities.length, onLessonComplete, speakText]);
 
   const handleReadRequest = useCallback(() => {
@@ -180,6 +196,20 @@ const EnhancedLessonManager = ({
         onActivityComplete={handleActivityComplete}
         isNelieReady={isReady}
       />
+
+      {/* Debug Info (remove in production) */}
+      {process.env.NODE_ENV === 'development' && (
+        <Card className="bg-gray-800 border-gray-600">
+          <CardContent className="p-4">
+            <div className="text-xs text-gray-400">
+              <div>Speech Ready: {isReady ? '✅' : '❌'}</div>
+              <div>Auto Read: {autoReadEnabled ? '✅' : '❌'}</div>
+              <div>Is Speaking: {isSpeaking ? '🔊' : '🔇'}</div>
+              <div>Voices Available: {typeof speechSynthesis !== 'undefined' ? speechSynthesis.getVoices().length : 0}</div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

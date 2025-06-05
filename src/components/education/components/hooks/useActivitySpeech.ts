@@ -1,6 +1,6 @@
 
 import { useEffect, useCallback } from 'react';
-import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+import { useReliableSpeech } from '@/components/adaptive-learning/hooks/useReliableSpeech';
 
 interface LessonActivity {
   id: string;
@@ -18,30 +18,33 @@ export const useActivitySpeech = (
   const {
     autoReadEnabled,
     speakText,
-    stopSpeaking
-  } = useSpeechSynthesis();
+    stopSpeaking,
+    isReady
+  } = useReliableSpeech();
 
   // Speak activity content when it changes
   useEffect(() => {
-    if (currentActivity && autoReadEnabled && !activityCompleted) {
+    if (currentActivity && autoReadEnabled && !activityCompleted && isReady) {
+      console.log('🎯 Activity speech: speaking for activity', currentActivity.title);
       stopSpeaking();
       
       setTimeout(() => {
         if (currentActivity.type === 'explanation') {
-          speakText(currentActivity.content.text);
+          speakText(currentActivity.content.text, true);
         } else if (currentActivity.type === 'question') {
           const questionText = `${currentActivity.content.question}. Your options are: ${currentActivity.content.options.map((opt: string, i: number) => `${String.fromCharCode(65 + i)}: ${opt}`).join(', ')}`;
-          speakText(questionText);
+          speakText(questionText, true);
         } else if (currentActivity.type === 'game') {
-          speakText(`Let's play a game! ${currentActivity.content.text}`);
+          speakText(`Let's play a game! ${currentActivity.content.text}`, true);
         }
       }, 1000);
     }
-  }, [currentActivityIndex, autoReadEnabled, activityCompleted, currentActivity, speakText, stopSpeaking]);
+  }, [currentActivityIndex, autoReadEnabled, activityCompleted, currentActivity, speakText, stopSpeaking, isReady]);
 
   return {
     autoReadEnabled,
     speakText,
-    stopSpeaking
+    stopSpeaking,
+    isReady
   };
 };
