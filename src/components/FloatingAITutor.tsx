@@ -10,6 +10,7 @@ import { Message } from "./floating-ai-tutor/types";
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [hasWelcomedOnHomepage, setHasWelcomedOnHomepage] = useState(false);
   const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle, isSpeechSynthesisSupported } = useSpeechSynthesis();
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,14 +30,16 @@ const FloatingAITutor = () => {
     }
   }, [location.pathname, shouldHide]);
 
+  // Only show welcome message once on homepage after login
   useEffect(() => {
-    if (!shouldHide && messages.length === 0) {
+    if (!shouldHide && messages.length === 0 && location.pathname === '/' && !hasWelcomedOnHomepage) {
       const welcomeMessage: Message = {
         role: "assistant",
         content: "Hi! I'm Nelie, your AI tutor! 👩‍🏫 I'm here to help you learn. Ask me anything!",
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
+      setHasWelcomedOnHomepage(true);
       
       // Auto-speak welcome message if enabled and supported
       if (autoReadEnabled && isSpeechSynthesisSupported) {
@@ -50,8 +53,11 @@ const FloatingAITutor = () => {
           isSpeechSynthesisSupported
         });
       }
+    } else if (!shouldHide && messages.length === 0 && location.pathname !== '/') {
+      // On other pages, just initialize with empty messages (no welcome)
+      setMessages([]);
     }
-  }, [shouldHide, messages.length, autoReadEnabled, speakText, isSpeechSynthesisSupported]);
+  }, [shouldHide, messages.length, location.pathname, hasWelcomedOnHomepage, autoReadEnabled, speakText, isSpeechSynthesisSupported]);
 
   const toggleOpen = () => {
     if (!hasMoved && !isDragging) {

@@ -52,7 +52,15 @@ const CollapsedButton = ({
   console.log('🎯 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
   
   return (
-    <div className="relative select-none">
+    <div className="relative select-none flex items-center space-x-2">
+      <Button
+        onClick={handleHomeClick}
+        className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-lg p-0 min-w-0 z-10"
+        title="Go home"
+      >
+        <Home className="w-4 h-4" />
+      </Button>
+      
       <div
         onClick={handleClick}
         onMouseDown={handleMouseDown}
@@ -72,14 +80,6 @@ const CollapsedButton = ({
           className="pointer-events-none drop-shadow-2xl"
         />
       </div>
-      
-      <Button
-        onClick={handleHomeClick}
-        className="absolute -top-2 -right-2 w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-lg p-0 min-w-0 z-10"
-        title="Go home"
-      >
-        <Home className="w-4 h-4" />
-      </Button>
     </div>
   );
 };
