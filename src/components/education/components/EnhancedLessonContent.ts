@@ -58,6 +58,7 @@ const createWelcomeActivity = (subject: string): LessonActivity => {
   };
 };
 
+// Update all lesson creation functions to ensure they start with welcome activities
 export const createMathematicsLesson = (): LessonActivity[] => [
   createWelcomeActivity('mathematics'),
   {

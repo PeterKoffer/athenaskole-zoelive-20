@@ -1,10 +1,12 @@
 
+import { Calculator, BookOpen, Microscope, Music, Code, Palette } from 'lucide-react';
+
 export const dailyActivities = [
   {
     id: "mathematics",
     title: "Mathematics Adventure",
     description: "Join Nelie for number magic, pattern puzzles, and problem-solving fun!",
-    icon: "🔢",
+    icon: Calculator,
     level: "Progressive",
     duration: "25-30 min",
     completed: false,
@@ -15,7 +17,7 @@ export const dailyActivities = [
     id: "english",
     title: "English Exploration",
     description: "Discover stories, expand vocabulary, and master language with Nelie!",
-    icon: "📚",
+    icon: BookOpen,
     level: "Adaptive",
     duration: "20-25 min",
     completed: false,
@@ -26,7 +28,7 @@ export const dailyActivities = [
     id: "science",
     title: "Science Discovery",
     description: "Explore the wonders of science and conduct amazing experiments!",
-    icon: "🔬",
+    icon: Microscope,
     level: "Exploratory",
     duration: "30-35 min",
     completed: false,
@@ -37,7 +39,7 @@ export const dailyActivities = [
     id: "music",
     title: "Music Journey",
     description: "Learn rhythm, melody, and musical creativity with Nelie!",
-    icon: "🎵",
+    icon: Music,
     level: "Creative",
     duration: "20-25 min",
     completed: false,
@@ -48,7 +50,7 @@ export const dailyActivities = [
     id: "computer-science",
     title: "Computer Science & AI",
     description: "Learn coding basics and computational thinking with Nelie!",
-    icon: "💻",
+    icon: Code,
     level: "Progressive",
     duration: "25-30 min",
     completed: false,
@@ -59,7 +61,7 @@ export const dailyActivities = [
     id: "creative-arts",
     title: "Creative Arts Studio",
     description: "Express yourself through art, design, and creative storytelling!",
-    icon: "🎨",
+    icon: Palette,
     level: "Creative",
     duration: "25-30 min",
     completed: false,
