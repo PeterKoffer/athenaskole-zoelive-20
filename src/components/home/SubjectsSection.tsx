@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const SubjectsSection = () => {
@@ -60,7 +59,11 @@ const SubjectsSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {subjects.map((subject, index) => (
-            <Card key={index} className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300 hover:scale-105 cursor-pointer group">
+            <Card 
+              key={index} 
+              className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300 hover:scale-105 cursor-pointer group"
+              onClick={() => handleSubjectClick(subject.route)}
+            >
               <CardHeader>
                 <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center text-2xl mb-4`}>
                   {subject.icon}
@@ -71,13 +74,7 @@ const SubjectsSection = () => {
                 </Badge>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-400 leading-relaxed mb-4">{subject.description}</p>
-                <Button 
-                  onClick={() => handleSubjectClick(subject.route)}
-                  className="w-full bg-white text-black hover:bg-gray-200 font-semibold"
-                >
-                  Start Learning with Nelie
-                </Button>
+                <p className="text-gray-400 leading-relaxed">{subject.description}</p>
               </CardContent>
             </Card>
           ))}
