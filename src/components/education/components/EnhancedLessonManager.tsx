@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { useLessonManager } from './hooks/useLessonManager';
+import { useRoleAccess } from '@/hooks/useRoleAccess';
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonProgressSection from './LessonProgressSection';
@@ -21,6 +22,8 @@ const EnhancedLessonManager = ({
   onLessonComplete,
   onBack
 }: EnhancedLessonManagerProps) => {
+  const { isAdmin } = useRoleAccess();
+  
   const {
     currentActivityIndex,
     lessonActivities,
@@ -55,8 +58,8 @@ const EnhancedLessonManager = ({
 
   return (
     <div className="space-y-6">
-      {/* Speech Test Card - for debugging */}
-      <SpeechTestCard />
+      {/* Speech Test Card - only show for admin users */}
+      {isAdmin() && <SpeechTestCard />}
 
       {/* Progress Header */}
       <LessonProgressHeader

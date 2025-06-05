@@ -54,13 +54,6 @@ export const useIntroductionFlow = (subject: string) => {
     toggleMute
   } = useWorkingNelieSpeech();
 
-  // Only enable speech once - don't auto-trigger
-  useEffect(() => {
-    if (isReady && !hasUserInteracted) {
-      console.log('🎵 Speech ready but waiting for user interaction');
-    }
-  }, [isReady, hasUserInteracted]);
-
   // Start speaking ONLY ONCE when speech is ready and user has interacted
   useEffect(() => {
     if (autoReadEnabled && hasUserInteracted && !hasStartedSpeech && currentStep === 0 && introductionSteps[0]) {
@@ -73,7 +66,20 @@ export const useIntroductionFlow = (subject: string) => {
     }
   }, [autoReadEnabled, hasUserInteracted, hasStartedSpeech, currentStep, introductionSteps, speakText]);
 
-  // Auto-advance through introduction steps - but don't speak them automatically
+  // Automatically read new steps when they change (after initial setup)
+  useEffect(() => {
+    if (hasStartedSpeech && autoReadEnabled && hasUserInteracted && currentStep > 0) {
+      const currentStepText = introductionSteps[currentStep]?.text;
+      if (currentStepText) {
+        console.log('🎤 Reading new introduction step:', currentStep);
+        setTimeout(() => {
+          speakText(currentStepText, true);
+        }, 500);
+      }
+    }
+  }, [currentStep, hasStartedSpeech, autoReadEnabled, hasUserInteracted, introductionSteps, speakText]);
+
+  // Auto-advance through introduction steps
   useEffect(() => {
     if (currentStep < introductionSteps.length - 1 && hasStartedSpeech) {
       const timer = setTimeout(() => {
@@ -86,8 +92,7 @@ export const useIntroductionFlow = (subject: string) => {
 
   const handleMuteToggle = useCallback(() => {
     if (!hasUserInteracted) {
-      // This will enable speech for the first time
-      setHasStartedSpeech(false); // Reset so speech can start
+      setHasStartedSpeech(false);
     }
     toggleMute();
   }, [toggleMute, hasUserInteracted]);
