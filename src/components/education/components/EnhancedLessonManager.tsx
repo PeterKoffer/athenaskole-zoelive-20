@@ -29,6 +29,7 @@ const EnhancedLessonManager = ({
     score,
     isSpeaking,
     autoReadEnabled,
+    hasUserInteracted,
     isReady,
     speakText,
     stopSpeaking,
@@ -87,8 +88,8 @@ const EnhancedLessonManager = ({
       <LessonActivitySpeechManager
         currentActivity={currentActivity}
         currentActivityIndex={currentActivityIndex}
-        autoReadEnabled={autoReadEnabled}
-        isReady={isReady}
+        autoReadEnabled={autoReadEnabled && hasUserInteracted}
+        isReady={isReady && hasUserInteracted}
         speakText={speakText}
         stopSpeaking={stopSpeaking}
       />
@@ -97,7 +98,7 @@ const EnhancedLessonManager = ({
       <EnhancedActivityRenderer
         activity={currentActivity}
         onActivityComplete={handleActivityComplete}
-        isNelieReady={isReady}
+        isNelieReady={isReady && hasUserInteracted}
       />
     </div>
   );

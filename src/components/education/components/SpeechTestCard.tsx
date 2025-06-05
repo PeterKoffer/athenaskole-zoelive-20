@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, TestTube, AlertTriangle, Hand } from 'lucide-react';
+import { Volume2, VolumeX, TestTube, AlertTriangle, Hand, CheckCircle } from 'lucide-react';
 import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 
 const SpeechTestCard = () => {
@@ -52,6 +52,7 @@ const SpeechTestCard = () => {
               size="sm"
               onClick={handleTestSpeech}
               className="text-slate-950"
+              disabled={!speechSynthesisSupported}
             >
               {isSpeaking ? 'Stop Nelie' : 'Test Nelie Voice'}
             </Button>
@@ -63,9 +64,21 @@ const SpeechTestCard = () => {
             <div className="flex items-center space-x-2 text-yellow-400 bg-yellow-900/20 p-3 rounded">
               <Hand className="w-5 h-5" />
               <div>
-                <div className="font-medium">Click to Enable Nelie's Voice</div>
+                <div className="font-medium">Click "Test Nelie Voice" to Enable Speech</div>
                 <div className="text-sm text-yellow-300">
                   Browser security requires user interaction before speech can work
+                </div>
+              </div>
+            </div>
+          )}
+
+          {hasUserInteracted && autoReadEnabled && (
+            <div className="flex items-center space-x-2 text-green-400 bg-green-900/20 p-3 rounded">
+              <CheckCircle className="w-5 h-5" />
+              <div>
+                <div className="font-medium">Nelie's Voice is Active!</div>
+                <div className="text-sm text-green-300">
+                  Speech system is working and ready to help you learn
                 </div>
               </div>
             </div>
@@ -86,7 +99,8 @@ const SpeechTestCard = () => {
               <strong>Voice Info:</strong>
               <div className="ml-2">
                 • Available Voices: {voicesCount}<br/>
-                • System: Web Speech API
+                • System: Web Speech API<br/>
+                • Queue: {hasUserInteracted ? 'Active' : 'Waiting'}
               </div>
             </div>
           </div>

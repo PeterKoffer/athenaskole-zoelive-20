@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { useNelieVoice } from '@/components/adaptive-learning/hooks/useNelieVoice';
+import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 import { createMathematicsLesson, createEnglishLesson, createScienceLesson, LessonActivity } from '../EnhancedLessonContent';
 
 interface UseLessonManagerProps {
@@ -22,12 +22,13 @@ export const useLessonManager = ({
   const {
     isSpeaking,
     autoReadEnabled,
+    hasUserInteracted,
     isReady,
     speakText,
     stopSpeaking,
     toggleMute,
     testSpeech
-  } = useNelieVoice();
+  } = useSimplifiedSpeech();
 
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
@@ -46,16 +47,6 @@ export const useLessonManager = ({
   const [lessonActivities] = useState(generateLessonActivities());
   const currentActivity = lessonActivities[currentActivityIndex];
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
-
-  // Test speech when ready
-  useEffect(() => {
-    if (isReady && autoReadEnabled) {
-      console.log('🧪 Testing Nelie voice system...');
-      setTimeout(() => {
-        testSpeech();
-      }, 2000);
-    }
-  }, [isReady, autoReadEnabled, testSpeech]);
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     console.log('✅ Activity completed, wasCorrect:', wasCorrect);
@@ -131,6 +122,7 @@ export const useLessonManager = ({
     totalCorrectAnswers,
     isSpeaking,
     autoReadEnabled,
+    hasUserInteracted,
     isReady,
     speakText,
     stopSpeaking,
