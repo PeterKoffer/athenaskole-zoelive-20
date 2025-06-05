@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, TestTube, AlertTriangle, Hand, CheckCircle } from 'lucide-react';
-import { useNelieVoiceFixed } from '@/components/adaptive-learning/hooks/useNelieVoiceFixed';
+import { useSimpleNelieSpeech } from '@/components/adaptive-learning/hooks/useSimpleNelieSpeech';
 
 const SpeechTestCard = () => {
   const { 
@@ -14,7 +14,7 @@ const SpeechTestCard = () => {
     stopSpeaking, 
     toggleMute, 
     testSpeech 
-  } = useNelieVoiceFixed();
+  } = useSimpleNelieSpeech();
 
   const handleTestSpeech = () => {
     console.log('🧪 Test button clicked - isSpeaking:', isSpeaking);
@@ -34,7 +34,7 @@ const SpeechTestCard = () => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <TestTube className="w-5 h-5 text-yellow-400" />
-            <span className="text-white font-medium">Nelie Speech System - FIXED VERSION</span>
+            <span className="text-white font-medium">Nelie Speech System - SIMPLE VERSION</span>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -79,7 +79,7 @@ const SpeechTestCard = () => {
               <div>
                 <div className="font-medium">Nelie's Voice is Active!</div>
                 <div className="text-sm text-green-300">
-                  Fixed speech system is ready to help you learn
+                  Simple speech system is ready to help you learn
                 </div>
               </div>
             </div>
@@ -101,7 +101,7 @@ const SpeechTestCard = () => {
               <div className="ml-2">
                 • Available Voices: {voicesCount}<br/>
                 • System: Web Speech API<br/>
-                • Version: FIXED<br/>
+                • Version: SIMPLE<br/>
                 • Queue: {hasUserInteracted ? 'Active' : 'Waiting'}
               </div>
             </div>
@@ -112,7 +112,7 @@ const SpeechTestCard = () => {
               <AlertTriangle className="w-4 h-4" />
               <span className="text-sm">Speech synthesis is not supported in this browser</span>
             </div>
-          )}
+            )}
         </div>
       </CardContent>
     </Card>

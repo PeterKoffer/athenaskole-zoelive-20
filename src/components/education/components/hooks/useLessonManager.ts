@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { useNelieVoiceFixed } from '@/components/adaptive-learning/hooks/useNelieVoiceFixed';
+import { useSimpleNelieSpeech } from '@/components/adaptive-learning/hooks/useSimpleNelieSpeech';
 import { createMathematicsLesson, createEnglishLesson, createScienceLesson, LessonActivity } from '../EnhancedLessonContent';
 
 interface UseLessonManagerProps {
@@ -28,7 +28,7 @@ export const useLessonManager = ({
     stopSpeaking,
     toggleMute,
     testSpeech
-  } = useNelieVoiceFixed();
+  } = useSimpleNelieSpeech();
 
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
