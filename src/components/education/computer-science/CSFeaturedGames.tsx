@@ -79,8 +79,8 @@ const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {featuredGames.map((game) => (
-          <Card key={game.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300">
-            <CardContent className="p-4">
+          <Card key={game.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300 h-full flex flex-col">
+            <CardContent className="p-4 flex flex-col h-full">
               <div className="flex justify-between items-start mb-3">
                 <Badge variant="outline" className="text-purple-400 border-purple-400">
                   {game.difficulty}
@@ -89,7 +89,7 @@ const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
               </div>
               
               <h4 className="text-white font-semibold mb-2">{game.title}</h4>
-              <p className="text-gray-400 text-sm mb-4">{game.description}</p>
+              <p className="text-gray-400 text-sm mb-4 flex-grow">{game.description}</p>
               
               <div className="flex flex-wrap gap-1 mb-4">
                 {game.tags.slice(0, 2).map((tag, index) => (
@@ -104,12 +104,14 @@ const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
                 )}
               </div>
               
-              <Button 
-                onClick={() => handlePlayNow(game.id, game.skillArea)}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                Play Now
-              </Button>
+              <div className="mt-auto">
+                <Button 
+                  onClick={() => handlePlayNow(game.id, game.skillArea)}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  Play Now
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}

@@ -93,7 +93,7 @@ const CreativeLearning = () => {
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-pink-900 to-purple-900 border-pink-400 rounded-lg p-6 mb-6">
               <h2 className="text-2xl font-bold text-white mb-2">🎨 Welcome to Creative Arts Class!</h2>
-              <p className="text-pink-200">
+              <p className="text-white font-medium">
                 Welcome to our creative studio! Today we'll explore art, design, and imagination. 
                 We'll create beautiful artwork, learn about colors and shapes, and express ourselves through creative projects!
               </p>
@@ -103,7 +103,7 @@ const CreativeLearning = () => {
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-pink-900 to-purple-900 border-pink-400 rounded-lg p-6 mb-6">
               <h2 className="text-2xl font-bold text-white mb-2">🎨 Creative Arts & Design</h2>
-              <p className="text-pink-200">
+              <p className="text-white font-medium">
                 Express your creativity through art, design, and hands-on projects. 
                 Learn about colors, shapes, and various artistic techniques!
               </p>
@@ -114,21 +114,23 @@ const CreativeLearning = () => {
                 const IconComponent = activity.icon;
                 
                 return (
-                  <Card key={activity.id} className="bg-gray-800 border-gray-700 hover:border-pink-500 transition-all duration-300">
-                    <CardContent className="p-6">
+                  <Card key={activity.id} className="bg-gray-800 border-gray-700 hover:border-pink-500 transition-all duration-300 h-full flex flex-col">
+                    <CardContent className="p-6 flex flex-col h-full">
                       <div className="flex items-center space-x-3 mb-4">
                         <IconComponent className="w-8 h-8 text-pink-400" />
                         <h3 className="text-xl font-semibold text-white">{activity.title}</h3>
                       </div>
                       
-                      <p className="text-gray-300 mb-6">{activity.description}</p>
+                      <p className="text-gray-300 mb-6 flex-grow">{activity.description}</p>
                       
-                      <Button 
-                        onClick={() => handleActivitySelect(activity.skillArea)}
-                        className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-                      >
-                        Start Creating
-                      </Button>
+                      <div className="mt-auto">
+                        <Button 
+                          onClick={() => handleActivitySelect(activity.skillArea)}
+                          className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                        >
+                          Start Creating
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 );

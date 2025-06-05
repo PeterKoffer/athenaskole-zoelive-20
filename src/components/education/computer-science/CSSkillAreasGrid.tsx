@@ -114,7 +114,7 @@ const CSSkillAreasGrid = () => {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold text-white mb-4">🖥️ Explore the Digital World</h3>
-      <p className="text-gray-300 mb-6">
+      <p className="text-white mb-6 font-medium">
         Dive into programming, algorithms, AI, and computer science concepts through interactive games and challenges designed to build critical computational thinking skills.
       </p>
       
@@ -123,8 +123,8 @@ const CSSkillAreasGrid = () => {
           const IconComponent = area.icon;
           
           return (
-            <Card key={area.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300">
-              <CardContent className="p-4">
+            <Card key={area.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300 h-full flex flex-col">
+              <CardContent className="p-4 flex flex-col h-full">
                 <div className="flex items-center justify-between mb-3">
                   <IconComponent className="w-6 h-6 text-purple-400" />
                   <Badge className={`${area.badgeColor} text-white`}>
@@ -133,7 +133,7 @@ const CSSkillAreasGrid = () => {
                 </div>
                 
                 <h4 className="text-white font-semibold mb-2">{area.title}</h4>
-                <p className="text-gray-400 text-sm mb-3">{area.description}</p>
+                <p className="text-gray-400 text-sm mb-3 flex-grow">{area.description}</p>
                 
                 <div className="space-y-2 mb-4">
                   {area.games.slice(0, 2).map((game, index) => (
@@ -144,12 +144,14 @@ const CSSkillAreasGrid = () => {
                   ))}
                 </div>
                 
-                <Button 
-                  onClick={() => handleExploreArea(area.id)}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  Explore Area
-                </Button>
+                <div className="mt-auto">
+                  <Button 
+                    onClick={() => handleExploreArea(area.id)}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    Explore Area
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           );
