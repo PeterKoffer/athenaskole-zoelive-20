@@ -1,7 +1,6 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
+import { useWorkingSpeech } from '@/components/adaptive-learning/hooks/useWorkingSpeech';
 import { createMathematicsLesson, createEnglishLesson, createScienceLesson, LessonActivity } from './EnhancedLessonContent';
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
@@ -29,12 +28,12 @@ const EnhancedLessonManager = ({
   const {
     isSpeaking,
     autoReadEnabled,
+    isReady,
     speakText,
     stopSpeaking,
     toggleMute,
-    testSpeech,
-    isReady
-  } = useSimplifiedSpeech();
+    testSpeech
+  } = useWorkingSpeech();
 
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
@@ -59,6 +58,7 @@ const EnhancedLessonManager = ({
     if (isReady && autoReadEnabled) {
       console.log('🧪 Enhanced Lesson Manager - Speech system is ready, testing in 3 seconds...');
       setTimeout(() => {
+        console.log('🧪 Running initial speech test...');
         testSpeech();
       }, 3000);
     }

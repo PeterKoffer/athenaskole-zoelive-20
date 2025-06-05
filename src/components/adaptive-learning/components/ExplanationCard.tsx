@@ -1,11 +1,10 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { userLearningProfileService } from '@/services/userLearningProfileService';
-import { useSimplifiedSpeech } from '../hooks/useSimplifiedSpeech';
+import { useWorkingSpeech } from '../hooks/useWorkingSpeech';
 
 interface ExplanationCardProps {
   explanation: string;
@@ -42,7 +41,7 @@ const ExplanationCard = ({
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [displayTime, setDisplayTime] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useSimplifiedSpeech();
+  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useWorkingSpeech();
 
   // Load user preferences on mount
   useEffect(() => {
