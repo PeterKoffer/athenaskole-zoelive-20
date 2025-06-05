@@ -30,6 +30,18 @@ const createWelcomeActivity = (subject: string): LessonActivity => {
     science: {
       title: "Welcome to Science Class!",
       message: "Welcome, young scientist! Today we'll explore the fascinating world around us, conduct experiments, and discover how things work. Get ready for some amazing scientific discoveries!"
+    },
+    music: {
+      title: "Welcome to Music Class!",
+      message: "Welcome to our musical adventure! Today we'll explore rhythm, melody, and harmony. We'll learn about different instruments and create beautiful music together. Let's make some magical sounds!"
+    },
+    'computer-science': {
+      title: "Welcome to Computer Science Class!",
+      message: "Welcome to the exciting world of technology! Today we'll learn about coding, problem-solving, and how computers work. Get ready to think like a programmer and create amazing digital projects!"
+    },
+    'creative-arts': {
+      title: "Welcome to Creative Arts Class!",
+      message: "Welcome to our creative studio! Today we'll explore art, design, and imagination. We'll create beautiful artwork, learn about colors and shapes, and express ourselves through creative projects!"
     }
   };
 
@@ -165,6 +177,81 @@ export const createScienceLesson = (): LessonActivity[] => [
       options: ['Only water', 'Only sunlight', 'Water, sunlight, and nutrients', 'Only soil'],
       correctAnswer: 2,
       explanation: 'Great job! Plants need water, sunlight, and nutrients from soil to grow big and healthy!'
+    }
+  }
+];
+
+export const createMusicLesson = (): LessonActivity[] => [
+  createWelcomeActivity('music'),
+  {
+    id: 'music-explanation-1',
+    type: 'explanation',
+    title: 'Understanding Rhythm',
+    duration: 10,
+    content: {
+      text: 'Rhythm is the beat in music - like a heartbeat! It helps us know when to clap, dance, or play instruments. Every song has its own special rhythm pattern.'
+    }
+  },
+  {
+    id: 'music-question-1',
+    type: 'question',
+    title: 'Musical Instruments',
+    duration: 30,
+    content: {
+      question: 'Which instrument do you hit to make music?',
+      options: ['Piano', 'Drums', 'Flute', 'Guitar'],
+      correctAnswer: 1,
+      explanation: 'Perfect! Drums are percussion instruments - you hit them with sticks or your hands to make rhythmic sounds!'
+    }
+  }
+];
+
+export const createComputerScienceLesson = (): LessonActivity[] => [
+  createWelcomeActivity('computer-science'),
+  {
+    id: 'cs-explanation-1',
+    type: 'explanation',
+    title: 'What is Programming?',
+    duration: 10,
+    content: {
+      text: 'Programming is like giving instructions to a computer! We write step-by-step directions that tell the computer exactly what to do, just like following a recipe.'
+    }
+  },
+  {
+    id: 'cs-question-1',
+    type: 'question',
+    title: 'Computer Logic',
+    duration: 30,
+    content: {
+      question: 'If you want a robot to make a sandwich, what should be the first step?',
+      options: ['Eat the sandwich', 'Get the bread', 'Put on the roof', 'Dance'],
+      correctAnswer: 1,
+      explanation: 'Excellent thinking! Just like in programming, we need to start with the first logical step - getting the bread!'
+    }
+  }
+];
+
+export const createCreativeArtsLesson = (): LessonActivity[] => [
+  createWelcomeActivity('creative-arts'),
+  {
+    id: 'art-explanation-1',
+    type: 'explanation',
+    title: 'Primary Colors',
+    duration: 10,
+    content: {
+      text: 'Primary colors are red, blue, and yellow! These are special colors because we can mix them together to create all other colors. They are like the building blocks of art!'
+    }
+  },
+  {
+    id: 'art-question-1',
+    type: 'question',
+    title: 'Color Mixing',
+    duration: 30,
+    content: {
+      question: 'What color do you get when you mix red and yellow?',
+      options: ['Purple', 'Orange', 'Green', 'Pink'],
+      correctAnswer: 1,
+      explanation: 'Wonderful! Red and yellow make orange - just like a beautiful sunset or a pumpkin!'
     }
   }
 ];
