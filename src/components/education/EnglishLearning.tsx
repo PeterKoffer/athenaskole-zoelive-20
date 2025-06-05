@@ -2,22 +2,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import LearningHeader from "./LearningHeader";
 import AILearningModule from "@/components/adaptive-learning/AILearningModule";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NelieIntroduction from "./components/NelieIntroduction";
-
-interface LearningMode {
-  id: string;
-  name: string;
-  description: string;
-  icon: any;
-  difficulty: string;
-  estimatedTime: string;
-  benefits: string[];
-}
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
@@ -51,34 +40,6 @@ const EnglishLearning = () => {
       setIsInitialized(true);
     }
   }, [user, loading, navigate]);
-
-  const handleModeChange = (mode: LearningMode) => {
-    setCurrentMode(mode.id);
-    
-    // Set difficulty based on mode
-    switch (mode.id) {
-      case 'adaptive':
-        setDifficultyLevel(2);
-        break;
-      case 'focused':
-        setDifficultyLevel(1);
-        break;
-      case 'challenge':
-        setDifficultyLevel(4);
-        break;
-      case 'mastery':
-        setDifficultyLevel(1);
-        break;
-      case 'group':
-        setDifficultyLevel(2);
-        break;
-      default:
-        setDifficultyLevel(2);
-    }
-    
-    // Restart the AI session with new mode
-    setSessionKey(prev => prev + 1);
-  };
 
   const handleIntroductionComplete = () => {
     console.log("✅ English introduction completed, starting main lesson");
@@ -145,10 +106,7 @@ const EnglishLearning = () => {
                     Let's practice your English reading comprehension skills with Nelie!
                   </p>
                   <p className="text-xs text-blue-300">
-                    Mode: {currentMode === 'adaptive' ? 'Adaptive Learning' : 
-                           currentMode === 'focused' ? 'Focused Training' :
-                           currentMode === 'challenge' ? 'Challenge Mode' :
-                           currentMode === 'mastery' ? 'Mastery Mode' : 'Group Learning'}
+                    Mode: Adaptive Learning - Difficulty: Level {difficultyLevel}
                   </p>
                 </CardContent>
               </Card>
