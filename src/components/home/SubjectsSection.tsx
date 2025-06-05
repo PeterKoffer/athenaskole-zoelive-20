@@ -38,6 +38,22 @@ const SubjectsSection = () => {
       level: "Progressive",
       color: "from-green-500 to-emerald-500",
       route: "/learn/science"
+    },
+    {
+      title: "Computer Science",
+      description: "Learn programming and computational thinking with Nelie guiding your journey.",
+      icon: "💻",
+      level: "Beginner to Advanced",
+      color: "from-indigo-500 to-purple-500",
+      route: "/learn/computer-science"
+    },
+    {
+      title: "Creative Arts",
+      description: "Express your creativity through art, design, and storytelling with Nelie's inspiration.",
+      icon: "🎨",
+      level: "Creative",
+      color: "from-pink-500 to-rose-500",
+      route: "/learn/creative-arts"
     }
   ];
 
@@ -57,7 +73,7 @@ const SubjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {subjects.map((subject, index) => (
             <Card 
               key={index} 

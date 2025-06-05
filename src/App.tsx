@@ -24,6 +24,7 @@ import MathematicsLearning from "./components/education/MathematicsLearning";
 import CreativeLearning from "./components/education/CreativeLearning";
 import ScienceLearning from "./components/education/ScienceLearning";
 import MusicLearning from "./components/education/MusicLearning";
+import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,8 @@ const App = () => (
           <Route path="/learn/creative_writing" element={<CreativeLearning />} />
           <Route path="/learn/music" element={<MusicLearning />} />
           <Route path="/learn/science" element={<ScienceLearning />} />
+          <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
+          <Route path="/learn/creative-arts" element={<CreativeLearning />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
