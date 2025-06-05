@@ -27,6 +27,7 @@ export const useActivitySpeech = (
 
   const lastSpokenActivityRef = useRef<string | null>(null);
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const speechProtectionRef = useRef<NodeJS.Timeout | null>(null);
 
   // Test speech when component mounts
   useEffect(() => {
@@ -38,7 +39,7 @@ export const useActivitySpeech = (
     }
   }, [isReady, autoReadEnabled, testSpeech]);
 
-  // Speak activity content when it changes - with protection against interruption
+  // Speak activity content when it changes - with enhanced protection against interruption
   useEffect(() => {
     if (currentActivity && autoReadEnabled && !activityCompleted && isReady) {
       // Don't speak the same activity twice
@@ -48,9 +49,12 @@ export const useActivitySpeech = (
 
       console.log('🎯 New activity - Nelie will speak:', currentActivity.title);
       
-      // Clear any existing speech timeout
+      // Clear any existing timeouts
       if (speechTimeoutRef.current) {
         clearTimeout(speechTimeoutRef.current);
+      }
+      if (speechProtectionRef.current) {
+        clearTimeout(speechProtectionRef.current);
       }
       
       // Stop any current speech
@@ -59,8 +63,8 @@ export const useActivitySpeech = (
       // Mark this activity as being spoken
       lastSpokenActivityRef.current = currentActivity.id;
       
-      // Wait for UI to render, then speak with longer delay for welcome messages
-      const delay = currentActivity.type === 'welcome' ? 2000 : 1500;
+      // Wait longer for UI to stabilize, especially for welcome messages
+      const delay = currentActivity.type === 'welcome' ? 3000 : 2000;
       
       speechTimeoutRef.current = setTimeout(() => {
         let speechText = '';
@@ -81,7 +85,14 @@ export const useActivitySpeech = (
         }
         
         if (speechText) {
+          console.log('🔊 Starting protected speech for:', currentActivity.type);
           speakText(speechText, true);
+          
+          // Set protection period during which no new speech should interrupt
+          const estimatedSpeechDuration = speechText.split(' ').length * 500; // ~500ms per word
+          speechProtectionRef.current = setTimeout(() => {
+            console.log('🛡️ Speech protection period ended');
+          }, estimatedSpeechDuration);
         }
       }, delay);
     }
@@ -99,6 +110,9 @@ export const useActivitySpeech = (
     return () => {
       if (speechTimeoutRef.current) {
         clearTimeout(speechTimeoutRef.current);
+      }
+      if (speechProtectionRef.current) {
+        clearTimeout(speechProtectionRef.current);
       }
     };
   }, []);

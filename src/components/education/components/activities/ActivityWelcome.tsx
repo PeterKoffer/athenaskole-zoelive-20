@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, BookOpen, Calculator, Microscope, Palette, Music, Code } from 'lucide-react';
@@ -10,51 +11,49 @@ interface ActivityWelcomeProps {
 }
 
 const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelcomeProps) => {
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [isDisplayingText, setIsDisplayingText] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTextComplete, setIsTextComplete] = useState(false);
 
-  // Split the welcome message into sentences for progressive display
-  const getTextSegments = (message: string) => {
-    // Split by sentences but keep punctuation
-    const segments = message.split(/(?<=[.!?])\s+/).filter(segment => segment.trim().length > 0);
-    return segments.length > 1 ? segments : [message]; // Fallback to full message if no sentences found
-  };
+  // Use the full message instead of breaking it into segments to prevent shifting
+  const fullMessage = activity.content.message;
 
-  const textSegments = getTextSegments(activity.content.message);
-
-  // Start displaying text segments progressively when Nelie is ready
+  // Display text progressively with a slower, smoother approach
   useEffect(() => {
-    if (isNelieReady && !isDisplayingText) {
-      setIsDisplayingText(true);
+    if (isNelieReady && fullMessage) {
+      setDisplayedText('');
+      setIsTextComplete(false);
       
-      // Start with first segment immediately
-      setCurrentTextIndex(1);
-      
-      // Show subsequent segments with timing that allows speech to complete
-      if (textSegments.length > 1) {
-        const showNextSegment = (index: number) => {
-          if (index < textSegments.length) {
-            setTimeout(() => {
-              setCurrentTextIndex(index + 1);
-              if (index + 1 < textSegments.length) {
-                // Calculate delay based on text length (roughly 150 words per minute speech rate)
-                const wordsInSegment = textSegments[index].split(' ').length;
-                const delay = Math.max(2000, wordsInSegment * 400); // Minimum 2 seconds, ~400ms per word
-                showNextSegment(index + 1);
-              }
-            }, index === 0 ? 1000 : Math.max(2000, textSegments[index - 1].split(' ').length * 400));
+      // Start showing text after a delay to let speech begin
+      const startDelay = setTimeout(() => {
+        // Show text gradually word by word to sync with speech
+        const words = fullMessage.split(' ');
+        let currentIndex = 0;
+        
+        const showNextWords = () => {
+          if (currentIndex < words.length) {
+            // Show 2-3 words at a time for smoother flow
+            const wordsToShow = words.slice(0, currentIndex + 2).join(' ');
+            setDisplayedText(wordsToShow);
+            currentIndex += 2;
+            
+            // Delay between word groups to match speech pace (slower)
+            setTimeout(showNextWords, 800); // Increased delay
+          } else {
+            setIsTextComplete(true);
           }
         };
         
-        showNextSegment(1);
-      }
+        showNextWords();
+      }, 2000); // Initial delay for speech to start
+      
+      return () => clearTimeout(startDelay);
     }
-  }, [isNelieReady, isDisplayingText, textSegments]);
+  }, [isNelieReady, fullMessage]);
 
   // Reset when activity changes
   useEffect(() => {
-    setCurrentTextIndex(0);
-    setIsDisplayingText(false);
+    setDisplayedText('');
+    setIsTextComplete(false);
   }, [activity.id]);
 
   const getSubjectIcon = (title: string) => {
@@ -104,9 +103,6 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
   const SubjectIcon = getSubjectIcon(activity.title);
   const subjectEmoji = getSubjectEmoji(activity.title);
 
-  // Display text progressively as segments become available
-  const displayedText = textSegments.slice(0, currentTextIndex).join(' ');
-
   return (
     <Card className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-purple-400">
       <CardContent className="p-8 text-center">
@@ -117,17 +113,19 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
         
         <h2 className="text-3xl font-bold text-white mb-4">{activity.title}</h2>
         
-        <div className="text-xl text-purple-200 mb-6 leading-relaxed min-h-[3rem]">
-          {displayedText && (
-            <p className="animate-fade-in">{displayedText}</p>
-          )}
-          {currentTextIndex < textSegments.length && (
-            <div className="flex items-center justify-center mt-2">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse mx-1" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-            </div>
-          )}
+        <div className="text-xl text-purple-200 mb-6 leading-relaxed min-h-[8rem] flex items-center justify-center">
+          <div className="max-w-2xl">
+            {displayedText && (
+              <p className="animate-fade-in">{displayedText}</p>
+            )}
+            {!isTextComplete && displayedText && (
+              <div className="flex items-center justify-center mt-4">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse mx-1" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+              </div>
+            )}
+          </div>
         </div>
         
         {isNelieReady && (

@@ -11,6 +11,8 @@ interface LessonPhaseRendererProps {
   onLessonComplete: () => void;
   onLessonResume: () => void;
   onBackToProgram: () => void;
+  subject?: string;
+  skillArea?: string;
 }
 
 const LessonPhaseRenderer = ({
@@ -18,14 +20,18 @@ const LessonPhaseRenderer = ({
   onLessonStart,
   onLessonComplete,
   onLessonResume,
-  onBackToProgram
+  onBackToProgram,
+  subject = "mathematics",
+  skillArea = "arithmetic"
 }: LessonPhaseRendererProps) => {
+  console.log('🎬 LessonPhaseRenderer rendering phase:', lessonState.phase, 'for subject:', subject);
+
   switch (lessonState.phase) {
     case 'introduction':
       return (
         <NelieIntroduction 
-          subject="mathematics"
-          skillArea="arithmetic"
+          subject={subject}
+          skillArea={skillArea}
           onIntroductionComplete={onLessonStart}
         />
       );
@@ -33,8 +39,8 @@ const LessonPhaseRenderer = ({
     case 'lesson':
       return (
         <EnhancedLessonManager 
-          subject="mathematics"
-          skillArea="arithmetic"
+          subject={subject}
+          skillArea={skillArea}
           onLessonComplete={onLessonComplete}
           onBack={onBackToProgram}
         />
