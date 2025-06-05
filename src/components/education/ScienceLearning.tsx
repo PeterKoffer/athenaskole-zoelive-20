@@ -23,11 +23,10 @@ const ScienceLearning = () => {
 
   const {
     lessonState,
-    startLesson,
-    completeLesson,
-    pauseLesson,
-    resumeLesson,
-    backToProgram
+    handleLessonStart,
+    handleLessonComplete,
+    handleLessonPause,
+    handleLessonResume
   } = useLessonStateManager();
 
   console.log('🔬 ScienceLearning component state:', {
@@ -53,7 +52,6 @@ const ScienceLearning = () => {
   };
 
   const handleBackToProgram = () => {
-    backToProgram();
     navigate('/daily-program');
   };
 
@@ -84,9 +82,9 @@ const ScienceLearning = () => {
       <div className="max-w-4xl mx-auto p-6">
         <LessonPhaseRenderer
           lessonState={lessonState}
-          onLessonStart={startLesson}
-          onLessonComplete={completeLesson}
-          onLessonResume={resumeLesson}
+          onLessonStart={handleLessonStart}
+          onLessonComplete={handleLessonComplete}
+          onLessonResume={handleLessonResume}
           onBackToProgram={handleBackToProgram}
           subject="science"
           skillArea="general_science"
