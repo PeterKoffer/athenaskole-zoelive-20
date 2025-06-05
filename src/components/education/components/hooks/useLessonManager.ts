@@ -18,6 +18,7 @@ export const useLessonManager = ({
   const [lessonStartTime] = useState(Date.now());
   const [score, setScore] = useState(0);
   const [totalCorrectAnswers, setTotalCorrectAnswers] = useState(0);
+  const [hasInitializedSpeech, setHasInitializedSpeech] = useState(false);
 
   const {
     isSpeaking,
@@ -30,16 +31,13 @@ export const useLessonManager = ({
     testSpeech
   } = useWorkingNelieSpeech();
 
-  // Auto-enable speech when component loads
+  // Don't auto-enable speech here - let the introduction handle it
   useEffect(() => {
-    if (isReady && !hasUserInteracted) {
-      console.log('🎵 Auto-enabling speech for lesson');
-      // Enable speech automatically by triggering user interaction
-      setTimeout(() => {
-        toggleMute();
-      }, 500);
+    if (isReady && !hasInitializedSpeech) {
+      console.log('🎵 Lesson speech system ready');
+      setHasInitializedSpeech(true);
     }
-  }, [isReady, hasUserInteracted, toggleMute]);
+  }, [isReady, hasInitializedSpeech]);
 
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
@@ -77,7 +75,7 @@ export const useLessonManager = ({
         const celebration = celebrations[Math.floor(Math.random() * celebrations.length)];
         console.log('🎉 Nelie celebrating:', celebration);
         speakText(celebration, true);
-      }, 800); // Reduced delay
+      }, 800);
     }
 
     setTimeout(() => {
@@ -91,13 +89,13 @@ export const useLessonManager = ({
           const finalMessage = "You've completed your lesson! You did absolutely amazing work today!";
           console.log('🎓 Final message:', finalMessage);
           speakText(finalMessage, true);
-        }, 800); // Reduced delay
+        }, 800);
         
         setTimeout(() => {
           onLessonComplete();
-        }, 3000); // Reduced delay
+        }, 3000);
       }
-    }, 1500); // Reduced delay
+    }, 1500);
   }, [currentActivityIndex, lessonActivities.length, onLessonComplete, speakText]);
 
   const handleReadRequest = useCallback(() => {

@@ -41,6 +41,7 @@ const getIntroductionSteps = (subject: string) => {
 
 export const useIntroductionFlow = (subject: string) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [hasStartedSpeech, setHasStartedSpeech] = useState(false);
   const introductionSteps = getIntroductionSteps(subject);
   
   const {
@@ -53,53 +54,43 @@ export const useIntroductionFlow = (subject: string) => {
     toggleMute
   } = useWorkingNelieSpeech();
 
-  // Automatically enable speech and start introduction
+  // Only enable speech once - don't auto-trigger
   useEffect(() => {
     if (isReady && !hasUserInteracted) {
-      console.log('🎵 Auto-enabling speech for introduction');
-      // Simulate user interaction to enable speech
-      const clickEvent = new MouseEvent('click', { bubbles: true });
-      document.dispatchEvent(clickEvent);
-      
-      // Enable speech automatically
-      setTimeout(() => {
-        toggleMute(); // This will enable speech
-      }, 500);
+      console.log('🎵 Speech ready but waiting for user interaction');
     }
-  }, [isReady, hasUserInteracted, toggleMute]);
+  }, [isReady, hasUserInteracted]);
 
-  // Start speaking the first step automatically when speech is ready
+  // Start speaking ONLY ONCE when speech is ready and user has interacted
   useEffect(() => {
-    if (autoReadEnabled && hasUserInteracted && currentStep === 0 && introductionSteps[0]) {
-      console.log('🎤 Auto-starting introduction speech');
+    if (autoReadEnabled && hasUserInteracted && !hasStartedSpeech && currentStep === 0 && introductionSteps[0]) {
+      console.log('🎤 Starting introduction speech - ONCE ONLY');
+      setHasStartedSpeech(true);
+      
       setTimeout(() => {
         speakText(introductionSteps[0].text, true);
       }, 1000);
     }
-  }, [autoReadEnabled, hasUserInteracted, currentStep, introductionSteps, speakText]);
+  }, [autoReadEnabled, hasUserInteracted, hasStartedSpeech, currentStep, introductionSteps, speakText]);
 
-  // Auto-advance through introduction steps
+  // Auto-advance through introduction steps - but don't speak them automatically
   useEffect(() => {
-    if (currentStep < introductionSteps.length - 1 && autoReadEnabled) {
+    if (currentStep < introductionSteps.length - 1 && hasStartedSpeech) {
       const timer = setTimeout(() => {
         setCurrentStep(prev => prev + 1);
-        
-        // Speak the next step
-        const nextStep = introductionSteps[currentStep + 1];
-        if (nextStep) {
-          setTimeout(() => {
-            speakText(nextStep.text, true);
-          }, 500);
-        }
-      }, 3000); // Reduced from longer delays
+      }, 3000);
       
       return () => clearTimeout(timer);
     }
-  }, [currentStep, introductionSteps, autoReadEnabled, speakText]);
+  }, [currentStep, introductionSteps, hasStartedSpeech]);
 
   const handleMuteToggle = useCallback(() => {
+    if (!hasUserInteracted) {
+      // This will enable speech for the first time
+      setHasStartedSpeech(false); // Reset so speech can start
+    }
     toggleMute();
-  }, [toggleMute]);
+  }, [toggleMute, hasUserInteracted]);
 
   const handleManualRead = useCallback(() => {
     const currentStepText = introductionSteps[currentStep]?.text;

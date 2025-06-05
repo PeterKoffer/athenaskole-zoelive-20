@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { LessonActivity } from './EnhancedLessonContent';
 
 interface LessonActivitySpeechManagerProps {
@@ -19,10 +19,15 @@ const LessonActivitySpeechManager = ({
   speakText,
   stopSpeaking
 }: LessonActivitySpeechManagerProps) => {
-  // Auto-speak when activity changes
+  const lastSpokenActivityIndex = useRef(-1);
+
+  // Auto-speak when activity changes - but only once per activity
   useEffect(() => {
-    if (currentActivity && autoReadEnabled && isReady) {
-      console.log('🎯 New activity, Nelie will speak:', currentActivity.title);
+    if (currentActivity && autoReadEnabled && isReady && 
+        currentActivityIndex !== lastSpokenActivityIndex.current) {
+      
+      console.log('🎯 New activity detected, Nelie will speak:', currentActivity.title);
+      lastSpokenActivityIndex.current = currentActivityIndex;
       
       // Stop any current speech and speak new content
       stopSpeaking();
