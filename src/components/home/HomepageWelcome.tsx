@@ -11,7 +11,10 @@ interface HomepageWelcomeProps {
 
 const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
   const [hasWelcomed, setHasWelcomed] = useState(false);
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [hasShownOnce, setHasShownOnce] = useState(() => {
+    // Check if we've already welcomed this session
+    return sessionStorage.getItem('nelieWelcomedHomepage') === 'true';
+  });
   
   const {
     isSpeaking,
@@ -23,37 +26,23 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     toggleMute
   } = useWorkingNelieSpeech();
 
-  const welcomeMessages = [
-    `Hello ${userName}! Welcome back to your learning platform!`,
-    "I'm Nelie, your AI learning companion.",
-    "I'm so excited to help you learn today!",
-    "Click on any subject to start your learning adventure with me!"
-  ];
-
-  // Welcome the user once when they arrive and speech is ready
+  // Welcome the user ONLY ONCE per session when they first arrive at homepage
   useEffect(() => {
-    if (isReady && !hasWelcomed && autoReadEnabled && hasUserInteracted) {
-      console.log('🎤 Nelie welcoming user to homepage');
+    if (isReady && !hasWelcomed && !hasShownOnce && autoReadEnabled && hasUserInteracted) {
+      console.log('🎤 Nelie welcoming user to homepage - ONCE ONLY');
       setHasWelcomed(true);
+      setHasShownOnce(true);
       
-      const fullWelcomeMessage = welcomeMessages.join(' ');
+      // Mark that we've welcomed this session
+      sessionStorage.setItem('nelieWelcomedHomepage', 'true');
+      
+      const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
       
       setTimeout(() => {
-        speakText(fullWelcomeMessage, true);
+        speakText(welcomeMessage, true);
       }, 1000);
     }
-  }, [isReady, hasWelcomed, autoReadEnabled, hasUserInteracted, userName, speakText]);
-
-  // Cycle through welcome messages with proper timing for speech
-  useEffect(() => {
-    if (hasWelcomed) {
-      const timer = setInterval(() => {
-        setCurrentMessageIndex(prev => (prev + 1) % welcomeMessages.length);
-      }, 4000); // Increased to 4 seconds to give Nelie time to read
-
-      return () => clearInterval(timer);
-    }
-  }, [hasWelcomed, welcomeMessages.length]);
+  }, [isReady, hasWelcomed, hasShownOnce, autoReadEnabled, hasUserInteracted, userName, speakText]);
 
   const handleTestSpeech = () => {
     if (!hasUserInteracted) {
@@ -67,21 +56,16 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     }
   };
 
-  const currentMessage = hasWelcomed ? welcomeMessages[currentMessageIndex] : `Hello ${userName}! 🎓`;
-
   return (
     <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-none mb-6">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">
-              {hasWelcomed ? `Welcome back, ${userName}! 👋` : `Hello ${userName}! 🎓`}
+              Welcome back, {userName}! 👋
             </h2>
-            <p className="text-purple-100 min-h-[1.5rem]">
-              {hasWelcomed 
-                ? currentMessage
-                : "Click the voice button to let Nelie welcome you!"
-              }
+            <p className="text-purple-100">
+              Ready to continue your amazing learning journey? Choose a subject below to get started!
             </p>
           </div>
           

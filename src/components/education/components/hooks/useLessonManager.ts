@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
+import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { 
   createMathematicsLesson, 
   createEnglishLesson, 
@@ -25,168 +25,188 @@ export const useLessonManager = ({
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [lessonStartTime] = useState(Date.now());
   const [score, setScore] = useState(0);
+  const [correctStreak, setCorrectStreak] = useState(0);
+  const [lastResponseTime, setLastResponseTime] = useState(0);
 
-  // Generate comprehensive lesson activities for 20-25 minutes
+  // Enhanced teaching engine configuration
+  const teachingEngine = useEnhancedTeachingEngine({
+    subject,
+    difficulty: 3,
+    studentEngagement: 75,
+    learningSpeed: 'adaptive'
+  });
+
+  // Generate optimized lesson activities for faster learning (15-18 minutes)
   const [lessonActivities] = useState<LessonActivity[]>(() => {
-    console.log('🎯 Creating comprehensive 20-25 minute lesson for subject:', subject);
+    console.log('🚀 Creating enhanced 15-18 minute lesson for subject:', subject);
+    
+    let activities: LessonActivity[] = [];
     
     switch (subject.toLowerCase()) {
       case 'mathematics':
-        return createMathematicsLesson();
+        activities = createMathematicsLesson();
+        break;
       case 'english':
-        return createEnglishLesson();
+        activities = createEnglishLesson();
+        break;
       case 'science':
-        return createScienceLesson();
+        activities = createScienceLesson();
+        break;
       case 'music':
-        return createMusicLesson();
+        activities = createMusicLesson();
+        break;
       case 'computer-science':
-        return createComputerScienceLesson();
+        activities = createComputerScienceLesson();
+        break;
       case 'creative-arts':
-        return createCreativeArtsLesson();
+        activities = createCreativeArtsLesson();
+        break;
       default:
         console.log('⚠️ Unknown subject, using mathematics lesson');
-        return createMathematicsLesson();
+        activities = createMathematicsLesson();
     }
-  });
 
-  const {
-    isSpeaking,
-    autoReadEnabled,
-    hasUserInteracted,
-    isReady,
-    speakText,
-    stopSpeaking,
-    toggleMute
-  } = useWorkingNelieSpeech();
+    // Enhance all activities with the teaching engine
+    return activities.map(activity => teachingEngine.enhanceActivityContent(activity));
+  });
 
   const currentActivity = lessonActivities[currentActivityIndex];
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
 
-  // Calculate total estimated lesson time (sum of all activity durations)
-  const totalEstimatedTime = lessonActivities.reduce((total, activity) => total + activity.duration, 0);
+  console.log(`🧠 Enhanced lesson: ${lessonActivities.length} activities, optimized for accelerated learning`);
 
-  console.log(`📚 Lesson structure: ${lessonActivities.length} activities, estimated ${Math.round(totalEstimatedTime / 60)} minutes`);
-
-  // Enhanced auto-speak with faster, more natural delivery
+  // Enhanced auto-speak with subject-specific welcome
   useEffect(() => {
-    if (currentActivity && autoReadEnabled && isReady && hasUserInteracted) {
-      console.log('🎯 New activity - Nelie will speak with enhanced delivery:', currentActivity.title);
+    if (currentActivity && teachingEngine.autoReadEnabled && teachingEngine.isReady && teachingEngine.hasUserInteracted) {
+      console.log('🎯 Enhanced Nelie speaking for:', currentActivity.title);
       
       setTimeout(() => {
         let speechText = '';
+        let context: 'explanation' | 'question' | 'encouragement' | 'humor' = 'explanation';
         
         if (currentActivity.type === 'welcome') {
-          speechText = currentActivity.content.message || `Welcome to an amazing ${subject} adventure!`;
+          speechText = currentActivity.content.message || `Welcome to an incredible ${subject} adventure! Get ready to learn faster than ever before!`;
+          context = 'humor';
         } else if (currentActivity.type === 'explanation') {
-          speechText = `Let me explain this exciting concept: ${currentActivity.content.text}`;
+          speechText = currentActivity.content.text;
+          context = 'explanation';
         } else if (currentActivity.type === 'question') {
-          speechText = `Here's a fun question for you: ${currentActivity.content.question}`;
+          speechText = currentActivity.content.question;
+          context = 'question';
         } else if (currentActivity.type === 'game') {
-          speechText = `Time for an exciting game! ${currentActivity.content.question || currentActivity.content.text || currentActivity.title}`;
+          speechText = `Time for an amazing learning game! ${currentActivity.content.question || currentActivity.content.text || currentActivity.title}`;
+          context = 'humor';
         } else {
           speechText = `Let's explore: ${currentActivity.title}`;
+          context = 'explanation';
         }
         
         if (speechText) {
-          console.log('🔊 Enhanced auto-speaking:', speechText.substring(0, 50));
-          speakText(speechText, true);
+          console.log('🔊 Enhanced speaking with personality:', speechText.substring(0, 50));
+          teachingEngine.speakWithPersonality(speechText, context);
         }
-      }, 1000); // Reduced delay for faster lesson flow
+      }, 800); // Faster response time
     }
-  }, [currentActivityIndex, currentActivity, autoReadEnabled, isReady, hasUserInteracted, speakText, subject]);
+  }, [currentActivityIndex, currentActivity, teachingEngine]);
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
-    console.log('✅ Activity completed:', currentActivity?.id, 'Correct:', wasCorrect);
+    const responseTime = Date.now() - lessonStartTime - (timeElapsed * 1000);
+    setLastResponseTime(responseTime);
+    
+    console.log('✅ Enhanced activity completed:', currentActivity?.id, 'Correct:', wasCorrect, 'Time:', responseTime);
     
     if (wasCorrect === true) {
-      setScore(prev => prev + 10);
+      setScore(prev => prev + 15); // Higher score rewards
+      setCorrectStreak(prev => prev + 1);
       
-      const celebrations = [
-        "Fantastic work! You're absolutely brilliant!",
-        "Amazing! You're becoming such a smart learner!",
-        "Excellent job! Keep up the wonderful work!",
-        "Outstanding! You're doing so incredibly well!",
-        "Brilliant thinking! I'm so proud of you!",
-        "Wow! You're really mastering this subject!"
-      ];
+      // Adjust teaching speed based on performance
+      teachingEngine.adjustTeachingSpeed(true, responseTime);
       
       setTimeout(() => {
-        const celebration = celebrations[Math.floor(Math.random() * celebrations.length)];
-        console.log('🎉 Speaking celebration:', celebration);
-        speakText(celebration, true);
-      }, 800);
+        const celebration = teachingEngine.generateEncouragement(true, correctStreak + 1);
+        console.log('🎉 Enhanced celebration:', celebration);
+        teachingEngine.speakWithPersonality(celebration, 'encouragement');
+      }, 600);
     } else if (wasCorrect === false) {
-      const encouragements = [
-        "That's okay! Learning means trying new things. Let's keep going!",
-        "Good try! Every mistake helps us learn something new!",
-        "No worries! You're doing great by thinking it through!"
-      ];
+      setCorrectStreak(0);
+      teachingEngine.adjustTeachingSpeed(false, responseTime);
       
       setTimeout(() => {
-        const encouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
-        console.log('💪 Speaking encouragement:', encouragement);
-        speakText(encouragement, true);
-      }, 800);
+        const encouragement = teachingEngine.generateEncouragement(false, 0);
+        console.log('💪 Enhanced encouragement:', encouragement);
+        teachingEngine.speakWithPersonality(encouragement, 'encouragement');
+      }, 600);
     }
 
     setTimeout(() => {
       if (currentActivityIndex < lessonActivities.length - 1) {
-        console.log('📚 Moving to next activity');
+        console.log('📚 Moving to next enhanced activity');
         setCurrentActivityIndex(prev => prev + 1);
       } else {
-        console.log('🏁 Comprehensive lesson completed!');
+        console.log('🏁 Enhanced lesson completed!');
         const finalMinutes = Math.round(timeElapsed / 60);
         setTimeout(() => {
-          speakText(`Congratulations! You've completed your ${finalMinutes}-minute ${subject} lesson! You're becoming such an amazing learner!`, true);
+          const completionMessage = `Absolutely incredible! You've mastered your ${finalMinutes}-minute ${subject} lesson! You're becoming such an amazing learner, and I'm so proud of your progress!`;
+          teachingEngine.speakWithPersonality(completionMessage, 'encouragement');
         }, 1000);
         
         setTimeout(() => {
           onLessonComplete();
-        }, 5000);
+        }, 4000);
       }
-    }, wasCorrect !== undefined ? 3000 : 1500); // Longer pause for questions with feedback
-  }, [currentActivityIndex, lessonActivities.length, onLessonComplete, speakText, currentActivity, timeElapsed, subject]);
+    }, wasCorrect !== undefined ? 2500 : 1200); // Faster transitions
+  }, [currentActivityIndex, lessonActivities.length, onLessonComplete, teachingEngine, currentActivity, timeElapsed, subject, correctStreak, lessonStartTime]);
 
   const handleReadRequest = useCallback(() => {
     if (currentActivity) {
-      if (isSpeaking) {
-        console.log('🔇 User requested to stop Nelie');
+      if (teachingEngine.isSpeaking) {
+        console.log('🔇 User requested to stop enhanced Nelie');
+        teachingEngine.stopSpeaking();
         return;
       }
       
       let speechText = '';
+      let context: 'explanation' | 'question' | 'encouragement' | 'humor' = 'explanation';
       
       if (currentActivity.type === 'welcome') {
-        speechText = currentActivity.content.message || `Welcome to your ${subject} class!`;
+        speechText = currentActivity.content.message || `Welcome to your enhanced ${subject} class!`;
+        context = 'humor';
       } else if (currentActivity.type === 'explanation') {
-        speechText = `Let me explain: ${currentActivity.content.text}`;
+        speechText = currentActivity.content.text;
+        context = 'explanation';
       } else if (currentActivity.type === 'question') {
-        speechText = `Here's your question: ${currentActivity.content.question}`;
+        speechText = currentActivity.content.question;
+        context = 'question';
       } else if (currentActivity.type === 'game') {
-        speechText = `Let's play this game! ${currentActivity.content.question || currentActivity.content.text}`;
+        speechText = `Let's play this amazing game! ${currentActivity.content.question || currentActivity.content.text}`;
+        context = 'humor';
       } else {
-        speechText = `Let me read this for you: ${currentActivity.title}`;
+        speechText = `Let me explain this exciting topic: ${currentActivity.title}`;
+        context = 'explanation';
       }
       
-      console.log('🔊 Manual repeat request:', speechText.substring(0, 50));
-      speakText(speechText, true);
+      console.log('🔊 Enhanced manual repeat request:', speechText.substring(0, 50));
+      teachingEngine.speakWithPersonality(speechText, context);
     }
-  }, [currentActivity, isSpeaking, speakText, subject]);
+  }, [currentActivity, teachingEngine, subject]);
 
   return {
     currentActivityIndex,
     lessonActivities,
     currentActivity,
     timeElapsed,
-    totalEstimatedTime,
+    totalEstimatedTime: lessonActivities.reduce((total, activity) => total + activity.duration, 0),
     score,
-    isSpeaking,
-    autoReadEnabled,
-    hasUserInteracted,
-    isReady,
-    speakText,
-    stopSpeaking,
-    toggleMute,
+    correctStreak,
+    engagementLevel: teachingEngine.engagementLevel,
+    adaptiveSpeed: teachingEngine.adaptiveSpeed,
+    isSpeaking: teachingEngine.isSpeaking,
+    autoReadEnabled: teachingEngine.autoReadEnabled,
+    hasUserInteracted: teachingEngine.hasUserInteracted,
+    isReady: teachingEngine.isReady,
+    speakText: teachingEngine.speakWithPersonality,
+    stopSpeaking: teachingEngine.stopSpeaking,
+    toggleMute: teachingEngine.toggleMute,
     handleActivityComplete,
     handleReadRequest
   };

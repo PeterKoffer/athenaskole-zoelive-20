@@ -18,13 +18,13 @@ const EnhancedActivityRenderer = ({
 }: EnhancedActivityRendererProps) => {
   const [timeRemaining, setTimeRemaining] = useState(activity.duration);
 
-  // Timer for activity duration - optimized for 20-25 minute lessons
+  // Enhanced timer for accelerated learning - optimized for 15-18 minute lessons
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           if (activity.type === 'explanation' || activity.type === 'welcome') {
-            setTimeout(() => onActivityComplete(), 500); // Smooth transition
+            setTimeout(() => onActivityComplete(), 300); // Even smoother transition
           }
           return 0;
         }
@@ -35,19 +35,18 @@ const EnhancedActivityRenderer = ({
     return () => clearInterval(timer);
   }, [activity, onActivityComplete]);
 
-  // Reset timer when activity changes - with optimal timing for engagement
+  // Reset timer with enhanced durations for faster learning
   useEffect(() => {
-    // Balanced durations for comprehensive learning experience
     let adjustedDuration = activity.duration;
     
     if (activity.type === 'welcome') {
-      adjustedDuration = 4; // Quick welcome to start learning faster
+      adjustedDuration = 3; // Even quicker welcome to start learning faster
     } else if (activity.type === 'explanation') {
-      adjustedDuration = 8; // Sufficient time for understanding concepts
+      adjustedDuration = 6; // Reduced time but still effective for understanding
     } else if (activity.type === 'question') {
-      adjustedDuration = 25; // Adequate time for thinking and answering
+      adjustedDuration = 20; // Adequate time for thinking while maintaining pace
     } else if (activity.type === 'game') {
-      adjustedDuration = 30; // Extra time for interactive fun
+      adjustedDuration = 25; // Balanced time for interactive learning
     }
     
     setTimeRemaining(adjustedDuration);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, BookOpen, Calculator, Microscope, Palette, Music, Code } from 'lucide-react';
@@ -16,33 +15,33 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
 
   const fullMessage = activity.content.message;
 
-  // Faster text display to sync with faster speech
+  // Much faster text display for accelerated learning
   useEffect(() => {
     if (isNelieReady && fullMessage) {
       setDisplayedText('');
       setIsTextComplete(false);
       
-      // Start showing text after a shorter delay
+      // Start showing text immediately
       const startDelay = setTimeout(() => {
         const words = fullMessage.split(' ');
         let currentIndex = 0;
         
         const showNextWords = () => {
           if (currentIndex < words.length) {
-            // Show 3-4 words at a time for faster flow
-            const wordsToShow = words.slice(0, currentIndex + 3).join(' ');
+            // Show 4-5 words at a time for much faster flow
+            const wordsToShow = words.slice(0, currentIndex + 4).join(' ');
             setDisplayedText(wordsToShow);
-            currentIndex += 3;
+            currentIndex += 4;
             
-            // Reduced delay to sync with faster speech (1.3x speed)
-            setTimeout(showNextWords, 600); // Reduced from 800ms to 600ms
+            // Much faster display to match enhanced speech (1.5x speed)
+            setTimeout(showNextWords, 400); // Reduced from 600ms to 400ms
           } else {
             setIsTextComplete(true);
           }
         };
         
         showNextWords();
-      }, 1500); // Reduced from 2000ms to 1500ms
+      }, 1000); // Reduced from 1500ms to 1000ms
       
       return () => clearTimeout(startDelay);
     }
@@ -129,12 +128,12 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
         {isNelieReady && (
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-300">Nelie is welcoming you to class...</span>
+            <span className="text-green-300">Nelie is ready to teach you amazing things...</span>
           </div>
         )}
         
         <div className="text-purple-300">
-          Class starting in {timeRemaining} seconds...
+          Enhanced lesson starting in {timeRemaining} seconds...
         </div>
       </CardContent>
     </Card>
