@@ -1,124 +1,116 @@
 
-import { useState, useEffect } from 'react';
-import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+import { useState, useEffect, useCallback } from 'react';
+import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
 
-interface IntroductionStep {
-  text: string;
-  duration: number;
-}
+const getIntroductionSteps = (subject: string) => {
+  const baseSteps = [
+    { text: "Hello! I'm Nelie, your friendly AI learning companion!" },
+    { text: "I'm so excited to learn with you today!" },
+    { text: "Let's make this an amazing learning adventure together!" }
+  ];
+
+  switch (subject.toLowerCase()) {
+    case 'mathematics':
+      return [
+        ...baseSteps,
+        { text: "Today we're going to explore the wonderful world of mathematics!" },
+        { text: "We'll solve problems, play games, and discover how math is all around us!" },
+        { text: "Are you ready to become a math superstar?" }
+      ];
+    case 'english':
+      return [
+        ...baseSteps,
+        { text: "Today we're diving into the exciting world of English!" },
+        { text: "We'll read stories, learn new words, and improve our language skills!" },
+        { text: "Let's become amazing readers and writers together!" }
+      ];
+    case 'science':
+      return [
+        ...baseSteps,
+        { text: "Today we're exploring the fascinating world of science!" },
+        { text: "We'll discover how things work and conduct fun experiments!" },
+        { text: "Ready to become a young scientist?" }
+      ];
+    default:
+      return [
+        ...baseSteps,
+        { text: "Let's start this amazing learning journey together!" }
+      ];
+  }
+};
 
 export const useIntroductionFlow = (subject: string) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle } = useSpeechSynthesis();
-  const [hasSpokenStep, setHasSpokenStep] = useState<number>(-1);
+  const introductionSteps = getIntroductionSteps(subject);
+  
+  const {
+    isSpeaking,
+    autoReadEnabled,
+    hasUserInteracted,
+    isReady,
+    speakText,
+    stopSpeaking,
+    toggleMute
+  } = useWorkingNelieSpeech();
 
-  const getSubjectGreeting = () => {
-    switch (subject) {
-      case 'mathematics':
-        return "Hi there! I'm Nelie, your AI learning companion. Today we're going to have an amazing Mathematics lesson together!";
-      case 'music':
-        return "Hi there! I'm Nelie, your AI learning companion. Today we're going to explore the wonderful world of Music together!";
-      case 'science':
-        return "Hi there! I'm Nelie, your AI learning companion. Today we're going to discover exciting Science concepts together!";
-      case 'english':
-        return "Hi there! I'm Nelie, your AI learning companion. Today we're going to have a fantastic English lesson together!";
-      case 'creative_writing':
-        return "Hi there! I'm Nelie, your AI learning companion. Today we're going to unleash your creativity with writing together!";
-      default:
-        return "Hi there! I'm Nelie, your AI learning companion. Today we're going to have an amazing lesson together!";
-    }
-  };
-
-  const getSubjectContent = () => {
-    switch (subject) {
-      case 'mathematics':
-        return [
-          "We'll be exploring arithmetic - the foundation of all mathematics. You'll learn to solve problems step by step.",
-          "Watch me demonstrate how to solve questions, then you'll try some on your own. I'll guide you every step of the way!",
-          "Our lesson will include interactive questions, fun games, and plenty of practice. Are you ready to start learning?"
-        ];
-      case 'music':
-        return [
-          "We'll be exploring music theory - scales, notes, and rhythm. You'll discover the building blocks of beautiful music.",
-          "I'll explain musical concepts clearly, then you'll practice with interactive questions. Music theory is easier than you think!",
-          "Our lesson will include listening exercises, theory questions, and musical discoveries. Are you ready to make music?"
-        ];
-      case 'science':
-        return [
-          "We'll be exploring fascinating scientific concepts. You'll learn how the world around us works through fun experiments and discoveries.",
-          "I'll explain science concepts step by step, then you'll apply what you've learned. Science is all around us!",
-          "Our lesson will include interactive experiments, discovery questions, and amazing facts. Are you ready to explore science?"
-        ];
-      case 'english':
-        return [
-          "We'll be improving your reading and language skills. You'll discover new vocabulary and improve your comprehension.",
-          "I'll guide you through reading exercises and explain concepts clearly. Reading opens up amazing worlds!",
-          "Our lesson will include reading comprehension, vocabulary building, and language practice. Are you ready to read?"
-        ];
-      case 'creative_writing':
-        return [
-          "We'll be crafting amazing stories together. You'll learn storytelling techniques and unleash your imagination.",
-          "I'll guide you through creative exercises and help you express your ideas. Every great writer started somewhere!",
-          "Our lesson will include story prompts, character development, and creative expression. Are you ready to write?"
-        ];
-      default:
-        return [
-          "We'll be exploring exciting educational concepts together. You'll learn step by step with my guidance.",
-          "I'll explain everything clearly and help you practice. Learning is an adventure!",
-          "Our lesson will include interactive questions and plenty of practice. Are you ready to learn?"
-        ];
-    }
-  };
-
-  const introductionSteps: IntroductionStep[] = [
-    {
-      text: getSubjectGreeting(),
-      duration: 6000
-    },
-    ...getSubjectContent().map(text => ({
-      text,
-      duration: 7000
-    }))
-  ];
-
-  // Handle step progression
+  // Automatically enable speech and start introduction
   useEffect(() => {
-    if (currentStep >= introductionSteps.length - 1) return;
+    if (isReady && !hasUserInteracted) {
+      console.log('🎵 Auto-enabling speech for introduction');
+      // Simulate user interaction to enable speech
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      document.dispatchEvent(clickEvent);
+      
+      // Enable speech automatically
+      setTimeout(() => {
+        toggleMute(); // This will enable speech
+      }, 500);
+    }
+  }, [isReady, hasUserInteracted, toggleMute]);
 
-    const timer = setTimeout(() => {
-      console.log('🎯 Advancing to step:', currentStep + 1);
-      setCurrentStep(prev => prev + 1);
-      setHasSpokenStep(-1); // Reset speech flag for new step
-    }, introductionSteps[currentStep]?.duration || 6000);
-
-    return () => clearTimeout(timer);
-  }, [currentStep, introductionSteps.length]);
-
-  // Handle speech for current step (only once per step)
+  // Start speaking the first step automatically when speech is ready
   useEffect(() => {
-    const currentStepData = introductionSteps[currentStep];
-    if (!currentStepData || !autoReadEnabled || hasSpokenStep === currentStep) return;
+    if (autoReadEnabled && hasUserInteracted && currentStep === 0 && introductionSteps[0]) {
+      console.log('🎤 Auto-starting introduction speech');
+      setTimeout(() => {
+        speakText(introductionSteps[0].text, true);
+      }, 1000);
+    }
+  }, [autoReadEnabled, hasUserInteracted, currentStep, introductionSteps, speakText]);
 
-    const speakTimer = setTimeout(() => {
-      console.log('🎯 Speaking step:', currentStep, currentStepData.text.substring(0, 50));
-      speakText(currentStepData.text);
-      setHasSpokenStep(currentStep);
-    }, 1500);
+  // Auto-advance through introduction steps
+  useEffect(() => {
+    if (currentStep < introductionSteps.length - 1 && autoReadEnabled) {
+      const timer = setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+        
+        // Speak the next step
+        const nextStep = introductionSteps[currentStep + 1];
+        if (nextStep) {
+          setTimeout(() => {
+            speakText(nextStep.text, true);
+          }, 500);
+        }
+      }, 3000); // Reduced from longer delays
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, introductionSteps, autoReadEnabled, speakText]);
 
-    return () => clearTimeout(speakTimer);
-  }, [currentStep, autoReadEnabled, speakText, hasSpokenStep]);
+  const handleMuteToggle = useCallback(() => {
+    toggleMute();
+  }, [toggleMute]);
 
-  const handleManualRead = () => {
-    if (isSpeaking) {
-      stopSpeaking();
-    } else {
-      const currentText = introductionSteps[currentStep]?.text;
-      if (currentText) {
-        console.log('🎯 Manual read triggered for step:', currentStep);
-        speakText(currentText);
+  const handleManualRead = useCallback(() => {
+    const currentStepText = introductionSteps[currentStep]?.text;
+    if (currentStepText) {
+      if (isSpeaking) {
+        stopSpeaking();
+      } else {
+        speakText(currentStepText, true);
       }
     }
-  };
+  }, [currentStep, introductionSteps, isSpeaking, speakText, stopSpeaking]);
 
   return {
     currentStep,

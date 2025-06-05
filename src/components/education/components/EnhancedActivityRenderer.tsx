@@ -18,13 +18,13 @@ const EnhancedActivityRenderer = ({
 }: EnhancedActivityRendererProps) => {
   const [timeRemaining, setTimeRemaining] = useState(activity.duration);
 
-  // Timer for activity duration
+  // Timer for activity duration - reduced timing for faster flow
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           if (activity.type === 'explanation' || activity.type === 'welcome') {
-            setTimeout(() => onActivityComplete(), 500);
+            setTimeout(() => onActivityComplete(), 200); // Reduced delay
           }
           return 0;
         }
@@ -35,9 +35,13 @@ const EnhancedActivityRenderer = ({
     return () => clearInterval(timer);
   }, [activity, onActivityComplete]);
 
-  // Reset timer when activity changes
+  // Reset timer when activity changes - with faster timing
   useEffect(() => {
-    setTimeRemaining(activity.duration);
+    // Reduce welcome and explanation durations for faster lesson start
+    const adjustedDuration = activity.type === 'welcome' ? 5 : 
+                            activity.type === 'explanation' ? 8 : 
+                            activity.duration;
+    setTimeRemaining(adjustedDuration);
   }, [activity]);
 
   const handleContinue = () => {

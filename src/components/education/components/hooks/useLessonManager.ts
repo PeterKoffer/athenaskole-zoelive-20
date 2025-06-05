@@ -30,6 +30,17 @@ export const useLessonManager = ({
     testSpeech
   } = useWorkingNelieSpeech();
 
+  // Auto-enable speech when component loads
+  useEffect(() => {
+    if (isReady && !hasUserInteracted) {
+      console.log('🎵 Auto-enabling speech for lesson');
+      // Enable speech automatically by triggering user interaction
+      setTimeout(() => {
+        toggleMute();
+      }, 500);
+    }
+  }, [isReady, hasUserInteracted, toggleMute]);
+
   // Generate lesson content based on subject
   const generateLessonActivities = useCallback((): LessonActivity[] => {
     switch (subject.toLowerCase()) {
@@ -66,7 +77,7 @@ export const useLessonManager = ({
         const celebration = celebrations[Math.floor(Math.random() * celebrations.length)];
         console.log('🎉 Nelie celebrating:', celebration);
         speakText(celebration, true);
-      }, 1000);
+      }, 800); // Reduced delay
     }
 
     setTimeout(() => {
@@ -80,13 +91,13 @@ export const useLessonManager = ({
           const finalMessage = "You've completed your lesson! You did absolutely amazing work today!";
           console.log('🎓 Final message:', finalMessage);
           speakText(finalMessage, true);
-        }, 1000);
+        }, 800); // Reduced delay
         
         setTimeout(() => {
           onLessonComplete();
-        }, 4000);
+        }, 3000); // Reduced delay
       }
-    }, 2000);
+    }, 1500); // Reduced delay
   }, [currentActivityIndex, lessonActivities.length, onLessonComplete, speakText]);
 
   const handleReadRequest = useCallback(() => {
