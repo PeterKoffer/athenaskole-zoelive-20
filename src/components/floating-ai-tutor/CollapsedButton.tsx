@@ -52,13 +52,13 @@ const CollapsedButton = ({
   console.log('🎯 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
   
   return (
-    <div className="relative select-none flex items-center space-x-2">
+    <div className="relative select-none flex items-center space-x-1">
       <Button
         onClick={handleHomeClick}
-        className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-lg p-0 min-w-0 z-10"
+        className="w-6 h-6 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-lg p-0 min-w-0 z-10"
         title="Go home"
       >
-        <Home className="w-4 h-4" />
+        <Home className="w-3 h-3" />
       </Button>
       
       <div
