@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Trophy } from 'lucide-react';
+import { CheckCircle, XCircle, Trophy, BookOpen } from 'lucide-react';
 import { LessonActivity } from '../EnhancedLessonContent';
 
 interface ActivityQuestionProps {
@@ -15,8 +15,17 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
 
+  console.log('🎯 ActivityQuestion rendered:', {
+    activityId: activity.id,
+    activityTitle: activity.title,
+    question: activity.content.question?.substring(0, 50),
+    hasOptions: !!activity.content.options,
+    correctAnswer: activity.content.correctAnswer || activity.content.correct
+  });
+
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return;
+    console.log('📝 Answer selected:', answerIndex);
     setSelectedAnswer(answerIndex);
   };
 
@@ -24,21 +33,25 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
     if (selectedAnswer === null) return;
     
     setShowResult(true);
-    // Fix: Ensure correct comparison - activity.content.correct should be the correct answer index
-    const isCorrect = selectedAnswer === activity.content.correctAnswer || selectedAnswer === activity.content.correct;
+    const correctAnswerIndex = activity.content.correctAnswer !== undefined 
+      ? activity.content.correctAnswer 
+      : activity.content.correct;
     
-    console.log('Answer validation:', {
+    const isCorrect = selectedAnswer === correctAnswerIndex;
+    
+    console.log('✅ Answer submitted:', {
       selectedAnswer,
-      correctAnswer: activity.content.correctAnswer || activity.content.correct,
-      isCorrect
+      correctAnswer: correctAnswerIndex,
+      isCorrect,
+      activityId: activity.id
     });
     
+    // Faster progression for 20-minute lessons
     setTimeout(() => {
       onActivityComplete(isCorrect);
-    }, 3000);
+    }, 2500);
   };
 
-  // Get the correct answer index
   const correctAnswerIndex = activity.content.correctAnswer !== undefined 
     ? activity.content.correctAnswer 
     : activity.content.correct;
@@ -47,8 +60,11 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
     <Card className="bg-gradient-to-br from-green-900 to-emerald-900 border-green-400">
       <CardContent className="p-8">
         <div className="flex items-center mb-6">
-          <Trophy className="w-8 h-8 text-green-400 mr-3" />
-          <h3 className="text-2xl font-bold text-white">{activity.title}</h3>
+          <BookOpen className="w-8 h-8 text-green-400 mr-3" />
+          <div>
+            <h3 className="text-2xl font-bold text-white">{activity.title}</h3>
+            <p className="text-green-200 text-sm">Question ID: {activity.id}</p>
+          </div>
         </div>
         
         {activity.content.story && (
@@ -58,12 +74,12 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
           </div>
         )}
         
-        <div className="text-xl text-white mb-6 font-medium">
+        <div className="text-xl text-white mb-6 font-medium leading-relaxed">
           {activity.content.question}
         </div>
         
         <div className="space-y-3 mb-6">
-          {activity.content.options.map((option: string, index: number) => (
+          {activity.content.options?.map((option: string, index: number) => (
             <Button
               key={index}
               variant={selectedAnswer === index ? "default" : "outline"}
@@ -92,7 +108,11 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
                 <XCircle className="w-5 h-5 ml-auto text-red-200" />
               )}
             </Button>
-          ))}
+          )) || (
+            <div className="text-red-400 p-4 border border-red-600 rounded-lg">
+              ⚠️ No options available for this question
+            </div>
+          )}
         </div>
 
         {showResult && (
@@ -123,7 +143,7 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
             <Button
               onClick={handleSubmitAnswer}
               disabled={selectedAnswer === null}
-              className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Submit Answer
             </Button>
@@ -131,6 +151,9 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
         ) : (
           <div className="text-center">
             <div className="text-green-300 mb-2">Moving to next activity...</div>
+            <div className="w-full bg-green-800 rounded-full h-2 animate-pulse">
+              <div className="bg-green-400 h-2 rounded-full w-3/4 animate-pulse"></div>
+            </div>
           </div>
         )}
       </CardContent>

@@ -17,39 +17,34 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
 
   const fullMessage = activity.content.message;
 
-  // Much faster text display for accelerated learning
+  // Faster text display for accelerated learning
   useEffect(() => {
     if (isNelieReady && fullMessage) {
       setDisplayedText('');
       setIsTextComplete(false);
       
-      // Start showing text immediately
       const startDelay = setTimeout(() => {
         const words = fullMessage.split(' ');
         let currentIndex = 0;
         
         const showNextWords = () => {
           if (currentIndex < words.length) {
-            // Show 4-5 words at a time for much faster flow
             const wordsToShow = words.slice(0, currentIndex + 4).join(' ');
             setDisplayedText(wordsToShow);
             currentIndex += 4;
-            
-            // Much faster display to match enhanced speech (1.5x speed)
-            setTimeout(showNextWords, 400); // Reduced from 600ms to 400ms
+            setTimeout(showNextWords, 400);
           } else {
             setIsTextComplete(true);
           }
         };
         
         showNextWords();
-      }, 1000); // Reduced from 1500ms to 1000ms
+      }, 1000);
       
       return () => clearTimeout(startDelay);
     }
   }, [isNelieReady, fullMessage]);
 
-  // Reset when activity changes
   useEffect(() => {
     setDisplayedText('');
     setIsTextComplete(false);
@@ -135,15 +130,15 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
         )}
         
         <div className="text-purple-300 mb-6">
-          Enhanced lesson starting in {timeRemaining} seconds...
+          20-minute enhanced lesson starting in {timeRemaining} seconds...
         </div>
 
-        {/* Fixed button alignment */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+        {/* Fixed button alignment with proper responsive layout */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center max-w-3xl mx-auto">
           <Button
             variant="outline"
             size="sm"
-            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
+            className="w-full sm:w-auto border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
           >
             <VolumeX className="w-4 h-4 mr-2" />
             Mute Nelie
@@ -152,7 +147,7 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
           <Button
             variant="outline"
             size="sm"
-            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
+            className="w-full sm:w-auto border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
           >
             <Volume2 className="w-4 h-4 mr-2" />
             Ask Nelie to Repeat
@@ -160,7 +155,7 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
           
           <Button
             size="sm"
-            className="bg-green-600 hover:bg-green-700 text-white transition-colors"
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white transition-colors font-semibold px-6"
           >
             ▶ Start Learning
           </Button>

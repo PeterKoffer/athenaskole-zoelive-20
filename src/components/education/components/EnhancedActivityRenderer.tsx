@@ -18,13 +18,24 @@ const EnhancedActivityRenderer = ({
 }: EnhancedActivityRendererProps) => {
   const [timeRemaining, setTimeRemaining] = useState(activity.duration);
 
-  // Enhanced timer for accelerated learning - optimized for 15-18 minute lessons
+  console.log('🎬 EnhancedActivityRenderer rendering:', {
+    activityId: activity.id,
+    activityType: activity.type,
+    activityTitle: activity.title,
+    duration: activity.duration,
+    isNelieReady
+  });
+
+  // Optimized timer for 20-minute lessons with smooth progression
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           if (activity.type === 'explanation' || activity.type === 'welcome') {
-            setTimeout(() => onActivityComplete(), 300); // Even smoother transition
+            setTimeout(() => {
+              console.log('⏱️ Auto-advancing from:', activity.type);
+              onActivityComplete();
+            }, 200);
           }
           return 0;
         }
@@ -35,24 +46,33 @@ const EnhancedActivityRenderer = ({
     return () => clearInterval(timer);
   }, [activity, onActivityComplete]);
 
-  // Reset timer with enhanced durations for faster learning
+  // Reset timer with optimized durations for 20-minute lessons
   useEffect(() => {
     let adjustedDuration = activity.duration;
     
+    // Optimize timing for engaging 20-minute experience
     if (activity.type === 'welcome') {
-      adjustedDuration = 3; // Even quicker welcome to start learning faster
+      adjustedDuration = 5; // Quick welcome to start learning
     } else if (activity.type === 'explanation') {
-      adjustedDuration = 6; // Reduced time but still effective for understanding
+      adjustedDuration = 8; // Sufficient time for understanding concepts
     } else if (activity.type === 'question') {
-      adjustedDuration = 20; // Adequate time for thinking while maintaining pace
+      adjustedDuration = 25; // Adequate thinking time without dragging
     } else if (activity.type === 'game') {
-      adjustedDuration = 25; // Balanced time for interactive learning
+      adjustedDuration = 30; // Interactive learning time
     }
+    
+    console.log('⏰ Setting timer for activity:', {
+      activityId: activity.id,
+      type: activity.type,
+      originalDuration: activity.duration,
+      adjustedDuration
+    });
     
     setTimeRemaining(adjustedDuration);
   }, [activity]);
 
   const handleContinue = () => {
+    console.log('➡️ Manual continue for activity:', activity.id);
     onActivityComplete();
   };
 
@@ -86,6 +106,7 @@ const EnhancedActivityRenderer = ({
       );
     
     default:
+      console.warn('⚠️ Unknown activity type:', activity.type);
       return (
         <ActivityExplanation 
           activity={activity} 
