@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, BookOpen, Calculator, Microscope, Palette, Music, Code } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Star, BookOpen, Calculator, Microscope, Palette, Music, Code, Volume2, VolumeX } from 'lucide-react';
 import { LessonActivity } from '../EnhancedLessonContent';
 
 interface ActivityWelcomeProps {
@@ -126,14 +128,42 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
         </div>
         
         {isNelieReady && (
-          <div className="flex items-center justify-center space-x-2 mb-4">
+          <div className="flex items-center justify-center space-x-2 mb-6">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-green-300">Nelie is ready to teach you amazing things...</span>
           </div>
         )}
         
-        <div className="text-purple-300">
+        <div className="text-purple-300 mb-6">
           Enhanced lesson starting in {timeRemaining} seconds...
+        </div>
+
+        {/* Fixed button alignment */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
+          >
+            <VolumeX className="w-4 h-4 mr-2" />
+            Mute Nelie
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
+          >
+            <Volume2 className="w-4 h-4 mr-2" />
+            Ask Nelie to Repeat
+          </Button>
+          
+          <Button
+            size="sm"
+            className="bg-green-600 hover:bg-green-700 text-white transition-colors"
+          >
+            ▶ Start Learning
+          </Button>
         </div>
       </CardContent>
     </Card>

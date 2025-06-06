@@ -21,7 +21,8 @@ export const createMathematicsLesson = (): LessonActivity[] => [
     content: {
       question: 'What is 4 + 6?',
       options: ['8', '9', '10', '11'],
-      correctAnswer: 2,
+      correct: 2, // Index 2 = '10' which is the correct answer
+      correctAnswer: 2, // Backup field for compatibility
       explanation: 'Great! 4 + 6 = 10. You can count: 4, 5, 6, 7, 8, 9, 10!'
     }
   },
@@ -32,8 +33,10 @@ export const createMathematicsLesson = (): LessonActivity[] => [
     duration: 45,
     content: {
       text: 'Look at this pattern: 2, 4, 6, 8, ?. What number comes next?',
+      question: 'Look at this pattern: 2, 4, 6, 8, ?. What number comes next?',
       options: ['9', '10', '11', '12'],
-      correctAnswer: 1,
+      correct: 1, // Index 1 = '10' which is the correct answer
+      correctAnswer: 1, // Backup field for compatibility
       explanation: 'Excellent! The pattern adds 2 each time, so 8 + 2 = 10!'
     }
   },
@@ -45,7 +48,8 @@ export const createMathematicsLesson = (): LessonActivity[] => [
     content: {
       question: 'Maya went to the zoo and saw 12 monkeys playing in the trees. Then 4 monkeys went inside for lunch. How many monkeys were still playing outside?',
       options: ['6', '7', '8', '9'],
-      correctAnswer: 2,
+      correct: 2, // Index 2 = '8' which is the correct answer (12 - 4 = 8)
+      correctAnswer: 2, // Backup field for compatibility
       explanation: 'Perfect! 12 - 4 = 8 monkeys were still playing outside!'
     }
   }

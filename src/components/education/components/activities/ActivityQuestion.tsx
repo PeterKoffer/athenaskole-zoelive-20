@@ -24,12 +24,24 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
     if (selectedAnswer === null) return;
     
     setShowResult(true);
-    const isCorrect = selectedAnswer === activity.content.correct;
+    // Fix: Ensure correct comparison - activity.content.correct should be the correct answer index
+    const isCorrect = selectedAnswer === activity.content.correctAnswer || selectedAnswer === activity.content.correct;
+    
+    console.log('Answer validation:', {
+      selectedAnswer,
+      correctAnswer: activity.content.correctAnswer || activity.content.correct,
+      isCorrect
+    });
     
     setTimeout(() => {
       onActivityComplete(isCorrect);
     }, 3000);
   };
+
+  // Get the correct answer index
+  const correctAnswerIndex = activity.content.correctAnswer !== undefined 
+    ? activity.content.correctAnswer 
+    : activity.content.correct;
 
   return (
     <Card className="bg-gradient-to-br from-green-900 to-emerald-900 border-green-400">
@@ -57,7 +69,7 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
               variant={selectedAnswer === index ? "default" : "outline"}
               className={`w-full text-left justify-start p-4 h-auto transition-all duration-200 ${
                 showResult
-                  ? index === activity.content.correct
+                  ? index === correctAnswerIndex
                     ? "bg-green-600 border-green-400 text-white"
                     : selectedAnswer === index
                     ? "bg-red-600 border-red-400 text-white"
@@ -73,10 +85,10 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
                 {String.fromCharCode(65 + index)}.
               </span>
               {option}
-              {showResult && index === activity.content.correct && (
+              {showResult && index === correctAnswerIndex && (
                 <CheckCircle className="w-5 h-5 ml-auto text-green-200" />
               )}
-              {showResult && selectedAnswer === index && index !== activity.content.correct && (
+              {showResult && selectedAnswer === index && index !== correctAnswerIndex && (
                 <XCircle className="w-5 h-5 ml-auto text-red-200" />
               )}
             </Button>
@@ -85,20 +97,20 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
 
         {showResult && (
           <div className={`p-4 rounded-lg mb-4 ${
-            selectedAnswer === activity.content.correct 
+            selectedAnswer === correctAnswerIndex 
               ? 'bg-green-800/50 border border-green-600' 
               : 'bg-red-800/50 border border-red-600'
           }`}>
             <div className="flex items-center mb-2">
-              {selectedAnswer === activity.content.correct ? (
+              {selectedAnswer === correctAnswerIndex ? (
                 <CheckCircle className="w-6 h-6 text-green-400 mr-2" />
               ) : (
                 <XCircle className="w-6 h-6 text-red-400 mr-2" />
               )}
               <span className={`font-bold text-lg ${
-                selectedAnswer === activity.content.correct ? 'text-green-300' : 'text-red-300'
+                selectedAnswer === correctAnswerIndex ? 'text-green-300' : 'text-red-300'
               }`}>
-                {selectedAnswer === activity.content.correct ? 'Excellent!' : 'Not quite right!'}
+                {selectedAnswer === correctAnswerIndex ? 'Excellent!' : 'Not quite right!'}
               </span>
             </div>
             <p className="text-gray-200 leading-relaxed">{activity.content.explanation}</p>

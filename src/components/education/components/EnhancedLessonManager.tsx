@@ -45,6 +45,11 @@ const EnhancedLessonManager = ({
     onLessonComplete
   });
 
+  // Wrapper function to match expected interface
+  const speakTextWrapper = (text: string, priority?: boolean) => {
+    speakText(text, 'explanation');
+  };
+
   if (!currentActivity) {
     return (
       <Card className="bg-gray-900 border-gray-800">
@@ -93,7 +98,7 @@ const EnhancedLessonManager = ({
         currentActivityIndex={currentActivityIndex}
         autoReadEnabled={autoReadEnabled && hasUserInteracted}
         isReady={isReady && hasUserInteracted}
-        speakText={speakText}
+        speakText={speakTextWrapper}
         stopSpeaking={stopSpeaking}
       />
 
