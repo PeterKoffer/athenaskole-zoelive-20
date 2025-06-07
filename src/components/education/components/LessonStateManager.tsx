@@ -1,48 +1,68 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+
+export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';
 
 export interface LessonState {
-  phase: 'introduction' | 'lesson' | 'paused' | 'completed';
+  phase: LessonPhase;
   timeSpent: number;
   currentSegment: number;
   totalSegments: number;
-  canResume: boolean;
+  score: number;
 }
 
-export const useLessonStateManager = (totalSegments: number = 12) => {
+export const useLessonStateManager = () => {
   const [lessonState, setLessonState] = useState<LessonState>({
     phase: 'introduction',
     timeSpent: 0,
-    currentSegment: 1,
-    totalSegments,
-    canResume: false
+    currentSegment: 0,
+    totalSegments: 6, // Standard lesson structure
+    score: 0
   });
 
-  const handleLessonStart = () => {
-    setLessonState(prev => ({ ...prev, phase: 'lesson' }));
-  };
-
-  const handleLessonPause = () => {
-    setLessonState(prev => ({ 
-      ...prev, 
-      phase: 'paused',
-      canResume: true 
+  const handleLessonStart = useCallback(() => {
+    setLessonState(prev => ({
+      ...prev,
+      phase: 'lesson'
     }));
-  };
+  }, []);
 
-  const handleLessonResume = () => {
-    setLessonState(prev => ({ ...prev, phase: 'lesson' }));
-  };
+  const handleLessonPause = useCallback(() => {
+    setLessonState(prev => ({
+      ...prev,
+      phase: 'paused'
+    }));
+  }, []);
 
-  const handleLessonComplete = () => {
-    setLessonState(prev => ({ ...prev, phase: 'completed' }));
-  };
+  const handleLessonResume = useCallback(() => {
+    setLessonState(prev => ({
+      ...prev,
+      phase: 'lesson'
+    }));
+  }, []);
+
+  const handleLessonComplete = useCallback(() => {
+    setLessonState(prev => ({
+      ...prev,
+      phase: 'completed'
+    }));
+  }, []);
+
+  const updateProgress = useCallback((segment: number, timeSpent: number, score: number) => {
+    setLessonState(prev => ({
+      ...prev,
+      currentSegment: segment,
+      timeSpent,
+      score
+    }));
+  }, []);
 
   return {
     lessonState,
     handleLessonStart,
     handleLessonPause,
     handleLessonResume,
-    handleLessonComplete
+    handleLessonComplete,
+    updateProgress
   };
 };

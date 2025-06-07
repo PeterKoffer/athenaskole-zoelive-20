@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Target, Lightbulb, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Clock, ArrowRight, Lightbulb, Target } from 'lucide-react';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface ActivityApplicationProps {
@@ -11,95 +11,75 @@ interface ActivityApplicationProps {
   onContinue: () => void;
 }
 
-const ActivityApplication = ({ activity, timeRemaining, onContinue }: ActivityApplicationProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [showSolution, setShowSolution] = useState(false);
-
-  const problemSteps = activity.content.problemSteps || [];
-
-  useEffect(() => {
-    if (problemSteps.length === 0) return;
-
-    const stepDuration = activity.duration / problemSteps.length;
-    const timer = setTimeout(() => {
-      setShowSolution(true);
-    }, (stepDuration * 0.6) * 1000); // Show step for 60% of time, then solution
-
-    return () => clearTimeout(timer);
-  }, [currentStep, problemSteps, activity.duration]);
-
-  const moveToNextStep = () => {
-    if (currentStep < problemSteps.length - 1) {
-      setCurrentStep(prev => prev + 1);
-      setShowSolution(false);
-    } else {
-      onContinue();
-    }
-  };
-
-  const currentStepData = problemSteps[currentStep];
-
+const ActivityApplication = ({
+  activity,
+  timeRemaining,
+  onContinue
+}: ActivityApplicationProps) => {
   return (
-    <Card className="bg-gradient-to-br from-blue-900 to-indigo-900 border-blue-400">
-      <CardContent className="p-8">
-        <div className="flex items-center mb-6">
-          <Target className="w-8 h-8 text-blue-400 mr-3" />
-          <div>
-            <h3 className="text-2xl font-bold text-white">{activity.title}</h3>
-            <p className="text-blue-200 text-sm">{activity.phaseDescription}</p>
+    <Card className="bg-gray-900 border-gray-800">
+      <CardContent className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <Badge variant="outline" className="bg-orange-900 text-orange-400 border-orange-400">
+            <Target className="w-3 h-3 mr-1" />
+            {activity.phaseDescription}
+          </Badge>
+          <div className="flex items-center space-x-2 text-gray-400 text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{Math.ceil(timeRemaining / 60)} min remaining</span>
           </div>
         </div>
-        
-        <div className="bg-blue-800/30 rounded-lg p-6 mb-6">
-          <h4 className="text-blue-300 font-bold text-lg mb-3">Real-World Scenario</h4>
-          <p className="text-blue-100 leading-relaxed">{activity.content.scenario}</p>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="bg-indigo-800/40 rounded-lg p-6">
-            <div className="flex items-center mb-4">
-              <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">
-                {currentStep + 1}
-              </span>
-              <h5 className="text-blue-200 font-semibold">Problem Step {currentStep + 1} of {problemSteps.length}</h5>
-            </div>
-            <p className="text-white text-lg leading-relaxed mb-4">{currentStepData?.step}</p>
-            
-            {!showSolution && currentStepData?.hint && (
-              <div className="bg-blue-700/30 rounded-lg p-4 border-l-4 border-blue-400">
-                <div className="flex items-center mb-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-400 mr-2" />
-                  <span className="text-blue-200 font-medium">Hint</span>
+
+        <h2 className="text-2xl font-bold text-white mb-4">
+          {activity.title}
+        </h2>
+
+        <div className="bg-orange-800/20 border border-orange-600 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-orange-300 mb-4">Real-World Scenario</h3>
+          <p className="text-white text-lg leading-relaxed mb-6">
+            {activity.content.scenario}
+          </p>
+
+          {activity.content.problemSteps && (
+            <div className="space-y-4">
+              {activity.content.problemSteps.map((step, index) => (
+                <div key={index} className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <Badge className="bg-orange-500 text-white mt-1">
+                      {index + 1}
+                    </Badge>
+                    <div className="flex-1">
+                      <p className="text-white font-medium mb-2">{step.step}</p>
+                      {step.hint && (
+                        <div className="flex items-start space-x-2 text-yellow-300 text-sm">
+                          <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Hint: {step.hint}</span>
+                        </div>
+                      )}
+                      {step.solution && (
+                        <div className="mt-2 p-3 bg-green-800/30 border border-green-600 rounded">
+                          <p className="text-green-300 text-sm">
+                            <strong>Solution:</strong> {step.solution}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <p className="text-blue-100">{currentStepData.hint}</p>
-              </div>
-            )}
-            
-            {showSolution && (
-              <div className="bg-green-800/30 rounded-lg p-4 border-l-4 border-green-400">
-                <div className="flex items-center mb-2">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-                  <span className="text-green-200 font-medium">Solution</span>
-                </div>
-                <p className="text-green-100 font-medium">{currentStepData?.solution}</p>
-              </div>
-            )}
-          </div>
-          
-          {showSolution && (
-            <div className="text-center">
-              <Button
-                onClick={moveToNextStep}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-              >
-                {currentStep < problemSteps.length - 1 ? 'Next Problem Step' : 'Complete Application Phase'}
-              </Button>
+              ))}
             </div>
           )}
         </div>
-        
-        <div className="text-center text-blue-300 mt-6">
-          Phase 4 of 6 • Real-World Application • {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')} remaining
+
+        {/* Next button to continue to next phase */}
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={onContinue}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2"
+          >
+            <ArrowRight className="w-4 h-4 mr-2" />
+            Continue to Next Activity
+          </Button>
         </div>
       </CardContent>
     </Card>

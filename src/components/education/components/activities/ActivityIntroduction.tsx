@@ -1,8 +1,7 @@
 
-import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, Brain, ArrowRight } from 'lucide-react';
+import { Clock, ArrowRight } from 'lucide-react';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface ActivityIntroductionProps {
@@ -12,92 +11,53 @@ interface ActivityIntroductionProps {
   isNelieReady: boolean;
 }
 
-const ActivityIntroduction = ({ activity, timeRemaining, onContinue, isNelieReady }: ActivityIntroductionProps) => {
-  const [currentSection, setCurrentSection] = useState(0);
-  const [isTextComplete, setIsTextComplete] = useState(false);
-
-  const sections = [
-    { icon: Lightbulb, content: activity.content.hook, title: "Real-World Connection" },
-    { icon: Brain, content: activity.content.realWorldExample, title: "Why This Matters" },
-    { icon: ArrowRight, content: activity.content.thoughtQuestion, title: "Think About This" }
-  ].filter(section => section.content);
-
-  useEffect(() => {
-    if (sections.length === 0) return;
-
-    const sectionDuration = activity.duration / sections.length;
-    const timer = setTimeout(() => {
-      if (currentSection < sections.length - 1) {
-        setCurrentSection(prev => prev + 1);
-        setIsTextComplete(false);
-      } else {
-        setIsTextComplete(true);
-      }
-    }, sectionDuration * 1000);
-
-    return () => clearTimeout(timer);
-  }, [currentSection, sections.length, activity.duration]);
-
-  useEffect(() => {
-    setCurrentSection(0);
-    setIsTextComplete(false);
-  }, [activity.id]);
-
-  const currentSectionData = sections[currentSection];
-  const IconComponent = currentSectionData?.icon || Lightbulb;
-
+const ActivityIntroduction = ({
+  activity,
+  timeRemaining,
+  onContinue,
+  isNelieReady
+}: ActivityIntroductionProps) => {
   return (
-    <Card className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-purple-400">
-      <CardContent className="p-8 text-center">
-        <div className="mb-6">
-          <IconComponent className="w-16 h-16 text-yellow-400 mx-auto mb-4 animate-pulse" />
-        </div>
-        
-        <h2 className="text-3xl font-bold text-white mb-2">{activity.title}</h2>
-        <p className="text-purple-200 mb-6">{activity.phaseDescription}</p>
-        
-        <div className="text-xl text-purple-100 mb-6 leading-relaxed min-h-[8rem] flex items-center justify-center">
-          <div className="max-w-3xl">
-            {currentSectionData && (
-              <div className="animate-fade-in">
-                <h3 className="text-yellow-300 font-semibold mb-3">{currentSectionData.title}</h3>
-                <p className="leading-relaxed">{currentSectionData.content}</p>
-              </div>
-            )}
+    <Card className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-gray-700 min-h-[500px]">
+      <CardContent className="p-8 text-center text-white flex flex-col justify-between min-h-[500px]">
+        <div className="flex-1 flex flex-col justify-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            {activity.title}
+          </h2>
+          
+          <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-6 backdrop-blur-sm">
+            <p className="text-lg md:text-xl leading-relaxed text-gray-100">
+              {activity.content.hook}
+            </p>
           </div>
-        </div>
-        
-        {/* Phase Progress Indicator */}
-        <div className="flex justify-center space-x-2 mb-6">
-          {sections.map((_, index) => (
-            <div
-              key={index}
-              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                index <= currentSection ? 'bg-yellow-400' : 'bg-purple-600'
-              }`}
-            />
-          ))}
-        </div>
-        
-        {isNelieReady && (
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-300">Nelie is excited to guide your learning journey...</span>
-          </div>
-        )}
-        
-        <div className="text-purple-300 mb-6">
-          Phase 1 of 6 • {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')} remaining
+          
+          {activity.content.realWorldExample && (
+            <div className="bg-blue-800/30 border border-blue-600 rounded-lg p-4 backdrop-blur-sm">
+              <p className="text-base text-blue-200">
+                💡 {activity.content.realWorldExample}
+              </p>
+            </div>
+          )}
         </div>
 
-        {(isTextComplete || currentSection === sections.length - 1) && (
-          <Button
-            onClick={onContinue}
-            className="bg-green-600 hover:bg-green-700 text-white transition-colors font-semibold px-8 py-3 text-lg animate-fade-in"
-          >
-            Let's Start Learning! <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        )}
+        <div className="space-y-4">
+          <div className="flex items-center justify-center space-x-2 text-gray-300 text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{Math.ceil(timeRemaining / 60)} minutes remaining in this phase</span>
+          </div>
+          
+          {/* Properly centered Start Lesson button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={onContinue}
+              size="lg"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              <ArrowRight className="w-5 h-5 mr-2" />
+              Start Lesson
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

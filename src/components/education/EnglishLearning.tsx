@@ -1,76 +1,55 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import AILearningModule from "@/components/adaptive-learning/AILearningModule";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import NelieIntroduction from "./components/NelieIntroduction";
+import { BookOpen, ArrowLeft } from "lucide-react";
+import LessonProgressTracker from "./components/LessonProgressTracker";
+import LessonControlsCard from "./components/LessonControlsCard";
+import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
+import { useLessonStateManager } from "./components/LessonStateManager";
 
 const EnglishLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [sessionKey, setSessionKey] = useState(0);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [currentMode, setCurrentMode] = useState("adaptive");
-  const [difficultyLevel, setDifficultyLevel] = useState(2);
-  const [showIntroduction, setShowIntroduction] = useState(true);
+  const totalLessonTime = 20 * 60; // 20 minutes in seconds
+  
+  const {
+    lessonState,
+    handleLessonStart,
+    handleLessonPause,
+    handleLessonResume,
+    handleLessonComplete
+  } = useLessonStateManager();
 
-  console.log('📚 EnglishLearning component state:', {
-    user: !!user,
-    userId: user?.id,
-    loading,
-    sessionKey,
-    isInitialized,
-    currentMode,
-    difficultyLevel,
-    subject: 'english',
-    skillArea: 'reading_comprehension',
-    showIntroduction
-  });
-
-  // Redirect to auth if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      console.log("🚪 User not authenticated in EnglishLearning, redirecting to auth");
       navigate('/auth');
-    } else if (!loading && user) {
-      console.log("✅ User authenticated, initializing English learning");
-      setIsInitialized(true);
     }
   }, [user, loading, navigate]);
-
-  const handleIntroductionComplete = () => {
-    console.log("✅ English introduction completed, starting main lesson");
-    setShowIntroduction(false);
-  };
 
   const handleBackToProgram = () => {
     navigate('/daily-program');
   };
 
-  // Show loading state while authentication is being checked
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">📚</div>
+          <BookOpen className="w-16 h-16 text-lime-400 mx-auto mb-4 animate-pulse" />
           <p className="text-lg">Loading your English lesson with Nelie...</p>
         </div>
       </div>
     );
   }
 
-  // Don't render the component if user is not authenticated
-  if (!user || !isInitialized) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="max-w-4xl mx-auto p-6">
-        {/* Header with navigation */}
+        {/* Header with navigation and progress */}
         <div className="flex items-center justify-between mb-6">
           <Button 
             variant="outline" 
@@ -81,46 +60,34 @@ const EnglishLearning = () => {
             Back to Program
           </Button>
           
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-white">English Learning with Nelie</h1>
-            <p className="text-gray-400">Reading comprehension and language skills</p>
-          </div>
-          
-          <div className="w-32"></div> {/* Spacer for balance */}
+          {lessonState.phase !== 'introduction' && (
+            <LessonProgressTracker 
+              currentTime={lessonState.timeSpent}
+              totalTime={totalLessonTime}
+              currentSegment={lessonState.currentSegment}
+              totalSegments={lessonState.totalSegments}
+              phase={lessonState.phase}
+            />
+          )}
         </div>
 
-        {showIntroduction ? (
-          <NelieIntroduction 
-            subject="english"
-            skillArea="reading_comprehension"
-            onIntroductionComplete={handleIntroductionComplete}
+        {/* Lesson Controls */}
+        {(lessonState.phase === 'lesson' || lessonState.phase === 'paused') && (
+          <LessonControlsCard
+            phase={lessonState.phase}
+            onPause={handleLessonPause}
+            onResume={handleLessonResume}
           />
-        ) : (
-          <div className="space-y-6">
-            <div className="mb-6">
-              <Card className="bg-gradient-to-r from-blue-900 to-indigo-900 border-blue-400">
-                <CardContent className="p-6 text-center">
-                  <BookOpen className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                  <h2 className="text-xl font-bold text-white mb-2">English Reading Comprehension</h2>
-                  <p className="text-blue-200 mb-2">
-                    Let's practice your English reading comprehension skills with Nelie!
-                  </p>
-                  <p className="text-xs text-blue-300">
-                    Mode: Adaptive Learning - Difficulty: Level {difficultyLevel}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <AILearningModule
-              key={sessionKey}
-              subject="english" 
-              skillArea="reading_comprehension" 
-              difficultyLevel={difficultyLevel}
-              onBack={handleBackToProgram}
-            />
-          </div>
         )}
+
+        {/* Lesson Content */}
+        <LessonPhaseRenderer
+          lessonState={lessonState}
+          onLessonStart={handleLessonStart}
+          onLessonComplete={handleLessonComplete}
+          onLessonResume={handleLessonResume}
+          onBackToProgram={handleBackToProgram}
+        />
       </div>
     </div>
   );
