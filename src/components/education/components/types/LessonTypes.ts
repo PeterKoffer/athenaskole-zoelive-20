@@ -1,18 +1,73 @@
 
 export interface LessonActivity {
   id: string;
-  type: 'welcome' | 'explanation' | 'question' | 'game';
+  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
+  phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
   title: string;
-  duration: number;
+  duration: number; // in seconds
+  phaseDescription: string;
   content: {
-    message?: string;
+    // Introduction phase
+    hook?: string;
+    realWorldExample?: string;
+    thoughtQuestion?: string;
+    
+    // Content delivery phase
     text?: string;
+    segments?: Array<{
+      concept: string;
+      explanation: string;
+      checkQuestion?: {
+        question: string;
+        options: string[];
+        correctAnswer: number;
+        explanation: string;
+      };
+    }>;
+    
+    // Interactive game phase
+    gameType?: 'fill-blanks' | 'drag-drop' | 'true-false' | 'matching' | 'problem-solving';
+    gameInstructions?: string;
     question?: string;
     options?: string[];
     correctAnswer?: number;
-    correct?: number; // Alternative property name used in some components
+    correct?: number;
     explanation?: string;
-    examples?: string[]; // For explanation activities
-    story?: string; // For question activities with story context
+    
+    // Application phase
+    scenario?: string;
+    problemSteps?: Array<{
+      step: string;
+      hint?: string;
+      solution: string;
+    }>;
+    
+    // Creative exploration phase
+    creativePrompt?: string;
+    explorationTask?: string;
+    whatIfScenario?: string;
+    
+    // Summary phase
+    keyTakeaways?: string[];
+    selfAssessment?: {
+      question: string;
+      options: string[];
+      correctAnswer: number;
+    };
+    nextTopicSuggestion?: string;
+    
+    // Legacy support
+    message?: string;
+    examples?: string[];
+    story?: string;
   };
+}
+
+export interface SubjectLessonPlan {
+  subject: string;
+  skillArea: string;
+  totalDuration: number; // 20 minutes = 1200 seconds
+  phases: LessonActivity[];
+  learningObjectives: string[];
+  prerequisites: string[];
 }

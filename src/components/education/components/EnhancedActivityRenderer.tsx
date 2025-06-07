@@ -1,9 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { LessonActivity } from './EnhancedLessonContent';
-import ActivityWelcome from './activities/ActivityWelcome';
-import ActivityExplanation from './activities/ActivityExplanation';
-import ActivityQuestion from './activities/ActivityQuestion';
+import { LessonActivity } from './types/LessonTypes';
+import ActivityIntroduction from './activities/ActivityIntroduction';
+import ActivityContentDelivery from './activities/ActivityContentDelivery';
+import ActivityInteractiveGame from './activities/ActivityInteractiveGame';
+import ActivityApplication from './activities/ActivityApplication';
+import ActivityCreativeExploration from './activities/ActivityCreativeExploration';
+import ActivitySummary from './activities/ActivitySummary';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -20,20 +23,21 @@ const EnhancedActivityRenderer = ({
 
   console.log('🎬 EnhancedActivityRenderer rendering:', {
     activityId: activity.id,
-    activityType: activity.type,
+    activityPhase: activity.phase,
     activityTitle: activity.title,
     duration: activity.duration,
     isNelieReady
   });
 
-  // Optimized timer for 20-minute lessons with smooth progression
+  // Timer for each phase
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          if (activity.type === 'explanation' || activity.type === 'welcome') {
+          // Auto-advance for content phases, allow manual progression for interactive phases
+          if (activity.phase === 'introduction' || activity.phase === 'content-delivery' || activity.phase === 'summary') {
             setTimeout(() => {
-              console.log('⏱️ Auto-advancing from:', activity.type);
+              console.log('⏱️ Auto-advancing from phase:', activity.phase);
               onActivityComplete();
             }, 200);
           }
@@ -46,72 +50,93 @@ const EnhancedActivityRenderer = ({
     return () => clearInterval(timer);
   }, [activity, onActivityComplete]);
 
-  // Reset timer with optimized durations for 20-minute lessons
+  // Reset timer when activity changes
   useEffect(() => {
-    let adjustedDuration = activity.duration;
-    
-    // Optimize timing for engaging 20-minute experience
-    if (activity.type === 'welcome') {
-      adjustedDuration = 5; // Quick welcome to start learning
-    } else if (activity.type === 'explanation') {
-      adjustedDuration = 8; // Sufficient time for understanding concepts
-    } else if (activity.type === 'question') {
-      adjustedDuration = 25; // Adequate thinking time without dragging
-    } else if (activity.type === 'game') {
-      adjustedDuration = 30; // Interactive learning time
-    }
-    
-    console.log('⏰ Setting timer for activity:', {
+    console.log('⏰ Setting timer for phase:', {
       activityId: activity.id,
-      type: activity.type,
-      originalDuration: activity.duration,
-      adjustedDuration
+      phase: activity.phase,
+      duration: activity.duration
     });
     
-    setTimeRemaining(adjustedDuration);
+    setTimeRemaining(activity.duration);
   }, [activity]);
 
   const handleContinue = () => {
-    console.log('➡️ Manual continue for activity:', activity.id);
+    console.log('➡️ Manual continue for phase:', activity.phase);
     onActivityComplete();
   };
 
-  switch (activity.type) {
-    case 'welcome':
+  const handleAnswerSubmit = (wasCorrect: boolean) => {
+    console.log('✅ Answer submitted for phase:', activity.phase, 'Correct:', wasCorrect);
+    onActivityComplete(wasCorrect);
+  };
+
+  switch (activity.phase) {
+    case 'introduction':
       return (
-        <ActivityWelcome 
+        <ActivityIntroduction 
           activity={activity} 
-          timeRemaining={timeRemaining} 
+          timeRemaining={timeRemaining}
+          onContinue={handleContinue}
           isNelieReady={isNelieReady} 
         />
       );
     
-    case 'explanation':
+    case 'content-delivery':
       return (
-        <ActivityExplanation 
+        <ActivityContentDelivery 
           activity={activity} 
-          timeRemaining={timeRemaining} 
-          onActivityComplete={handleContinue} 
+          timeRemaining={timeRemaining}
+          onContinue={handleContinue}
+          onAnswerSubmit={handleAnswerSubmit}
         />
       );
     
-    case 'question':
-    case 'game':
+    case 'interactive-game':
       return (
-        <ActivityQuestion 
+        <ActivityInteractiveGame 
           activity={activity} 
-          timeRemaining={timeRemaining} 
-          onActivityComplete={onActivityComplete} 
+          timeRemaining={timeRemaining}
+          onAnswerSubmit={handleAnswerSubmit}
+        />
+      );
+    
+    case 'application':
+      return (
+        <ActivityApplication 
+          activity={activity} 
+          timeRemaining={timeRemaining}
+          onContinue={handleContinue}
+        />
+      );
+    
+    case 'creative-exploration':
+      return (
+        <ActivityCreativeExploration 
+          activity={activity} 
+          timeRemaining={timeRemaining}
+          onContinue={handleContinue}
+        />
+      );
+    
+    case 'summary':
+      return (
+        <ActivitySummary 
+          activity={activity} 
+          timeRemaining={timeRemaining}
+          onContinue={handleContinue}
+          onAnswerSubmit={handleAnswerSubmit}
         />
       );
     
     default:
-      console.warn('⚠️ Unknown activity type:', activity.type);
+      console.warn('⚠️ Unknown activity phase:', activity.phase);
       return (
-        <ActivityExplanation 
+        <ActivityContentDelivery 
           activity={activity} 
-          timeRemaining={timeRemaining} 
-          onActivityComplete={handleContinue} 
+          timeRemaining={timeRemaining}
+          onContinue={handleContinue}
+          onAnswerSubmit={handleAnswerSubmit}
         />
       );
   }
