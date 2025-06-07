@@ -93,8 +93,8 @@ export const useLessonManager = ({
         } else if (currentActivity.phase === 'interactive-game') {
           speechText = currentActivity.content.question || '';
           context = 'question';
-        } else if (currentActivity.phase === 'interactive-game') {
-          speechText = `Time for an amazing learning game! ${currentActivity.content.question || currentActivity.content.text || currentActivity.title}`;
+        } else if (currentActivity.phase === 'application') {
+          speechText = `Time for an amazing learning game! ${currentActivity.content.scenario || currentActivity.content.text || currentActivity.title}`;
           context = 'humor';
         } else {
           speechText = `Let's explore: ${currentActivity.title}`;
@@ -177,8 +177,8 @@ export const useLessonManager = ({
       } else if (currentActivity.phase === 'interactive-game') {
         speechText = currentActivity.content.question || '';
         context = 'question';
-      } else if (currentActivity.phase === 'interactive-game') {
-        speechText = `Let's play this amazing game! ${currentActivity.content.question || currentActivity.content.text || ''}`;
+      } else if (currentActivity.phase === 'application') {
+        speechText = `Let's play this amazing game! ${currentActivity.content.scenario || currentActivity.content.text || ''}`;
         context = 'humor';
       } else {
         speechText = `Let me explain this exciting topic: ${currentActivity.title}`;

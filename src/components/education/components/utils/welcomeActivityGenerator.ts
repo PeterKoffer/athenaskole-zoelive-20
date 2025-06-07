@@ -34,11 +34,13 @@ export const createWelcomeActivity = (subject: string): LessonActivity => {
 
   return {
     id: `welcome-${subjectKey}`,
-    type: 'welcome',
+    type: 'introduction',
+    phase: 'introduction',
     title: welcomeData.title,
     duration: 15,
+    phaseDescription: 'Welcome to your learning adventure!',
     content: {
-      message: welcomeData.message
+      hook: welcomeData.message
     }
   };
 };

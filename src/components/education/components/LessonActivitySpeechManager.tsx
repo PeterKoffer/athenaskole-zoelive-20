@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from 'react';
-import { LessonActivity } from './EnhancedLessonContent';
+import { LessonActivity } from './types/LessonTypes';
 
 interface LessonActivitySpeechManagerProps {
   currentActivity: LessonActivity | undefined;
@@ -36,14 +36,14 @@ const LessonActivitySpeechManager = ({
       setTimeout(() => {
         let speechText = '';
         
-        if (currentActivity.type === 'explanation') {
-          speechText = `Let me explain: ${currentActivity.content.text}`;
-        } else if (currentActivity.type === 'question') {
-          speechText = `Here's your question: ${currentActivity.content.question}`;
-        } else if (currentActivity.type === 'game') {
-          speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
-        } else if (currentActivity.type === 'welcome') {
-          speechText = `${currentActivity.content.message}`;
+        if (currentActivity.phase === 'content-delivery') {
+          speechText = `Let me explain: ${currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || ''}`;
+        } else if (currentActivity.phase === 'interactive-game') {
+          speechText = `Here's your question: ${currentActivity.content.question || ''}`;
+        } else if (currentActivity.phase === 'introduction') {
+          speechText = `Let's play a game! ${currentActivity.content.hook || currentActivity.title}`;
+        } else if (currentActivity.phase === 'introduction') {
+          speechText = `${currentActivity.content.hook || currentActivity.content.realWorldExample || ''}`;
         } else {
           speechText = `Let's work on: ${currentActivity.title}`;
         }

@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
-import { LessonActivity } from '../EnhancedLessonContent';
+import { LessonActivity } from '../types/LessonTypes';
 
 interface TeachingEngineConfig {
   subject: string;
@@ -128,7 +128,7 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
     enhanced.duration = Math.max(Math.floor(activity.duration * 0.7), 3);
     
     // Add engaging elements to content
-    if (activity.type === 'explanation') {
+    if (activity.phase === 'content-delivery') {
       const funElements = [
         "🤔 Think about this:",
         "💡 Here's the cool part:",
@@ -138,7 +138,11 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
       ];
       
       const randomElement = funElements[Math.floor(Math.random() * funElements.length)];
-      enhanced.content.text = `${randomElement} ${activity.content.text}`;
+      if (enhanced.content.segments?.[0]?.explanation) {
+        enhanced.content.segments[0].explanation = `${randomElement} ${activity.content.segments[0].explanation}`;
+      } else if (enhanced.content.text) {
+        enhanced.content.text = `${randomElement} ${activity.content.text}`;
+      }
     }
     
     return enhanced;
