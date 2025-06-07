@@ -42,8 +42,12 @@ const LessonActivitySpeechManager = ({
           speechText = `Here's your question: ${currentActivity.content.question || ''}`;
         } else if (currentActivity.phase === 'introduction') {
           speechText = `Let's play a game! ${currentActivity.content.hook || currentActivity.title}`;
-        } else if (currentActivity.phase === 'introduction') {
-          speechText = `${currentActivity.content.hook || currentActivity.content.realWorldExample || ''}`;
+        } else if (currentActivity.phase === 'application') {
+          speechText = `${currentActivity.content.scenario || currentActivity.content.realWorldExample || ''}`;
+        } else if (currentActivity.phase === 'creative-exploration') {
+          speechText = `Let's explore creatively: ${currentActivity.content.text || currentActivity.title}`;
+        } else if (currentActivity.phase === 'summary') {
+          speechText = `Let's review what we learned: ${currentActivity.content.text || currentActivity.title}`;
         } else {
           speechText = `Let's work on: ${currentActivity.title}`;
         }
