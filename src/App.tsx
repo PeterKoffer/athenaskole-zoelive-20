@@ -17,6 +17,7 @@ import AILearning from "./pages/AILearning";
 import CurriculumSystem from "./pages/CurriculumSystem";
 import NotFound from "./pages/NotFound";
 import FloatingAITutor from "./components/FloatingAITutor";
+import JointCalendar from "./components/calendar/JointCalendar";
 
 // Education components for specific subjects
 import EnglishLearning from "./components/education/EnglishLearning";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
           <Route path="/ai-learning" element={<AILearning />} />
           <Route path="/curriculum-system" element={<CurriculumSystem />} />
+          <Route path="/calendar" element={<JointCalendar />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/school-dashboard" element={<SchoolDashboard />} />

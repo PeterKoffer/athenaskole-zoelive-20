@@ -1,28 +1,21 @@
 
-import { useNavigate } from "react-router-dom";
-import { 
-  Home, 
-  BookOpen, 
-  GraduationCap, 
-  BarChart3, 
-  Gamepad2, 
-  Bot, 
-  ChevronDown,
-  Menu
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { User as SupabaseUser } from "@supabase/supabase-js";
+import { ChevronDown, BarChart3, Gamepad2, MessageCircle, Calendar, BookOpen, GraduationCap, School, Users, Settings, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 
 interface UnifiedNavigationDropdownProps {
-  user: SupabaseUser | null;
+  user: any;
   onShowProgress?: () => void;
   onShowGames?: () => void;
   onShowAITutor?: () => void;
@@ -35,83 +28,125 @@ const UnifiedNavigationDropdown = ({
   onShowAITutor 
 }: UnifiedNavigationDropdownProps) => {
   const navigate = useNavigate();
-
-  const handleCurriculumSystem = () => {
-    navigate('/curriculum-system');
-  };
+  const { userRole, canAccessSchoolDashboard } = useRoleAccess();
 
   if (!user) return null;
+
+  const isStudent = userRole === 'student';
+  const isParent = userRole === 'parent';
+  const canAccessCalendar = userRole !== null; // All authenticated users can access calendar
+  const hasReadOnlyCalendar = isStudent || isParent;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline"
-          className="bg-white/10 text-white border-white/20 hover:bg-white/20 h-10 px-4 rounded-lg backdrop-blur-sm"
-        >
-          <Menu className="w-4 h-4 mr-2" />
+        <Button variant="ghost" className="text-white hover:text-lime-400 hover:bg-gray-800">
           Navigation
           <ChevronDown className="w-4 h-4 ml-2" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-gray-800 border-gray-700 z-50" align="start">
-        <DropdownMenuLabel className="text-white">Home</DropdownMenuLabel>
-        <DropdownMenuItem 
-          onClick={() => navigate('/')}
-          className="text-white hover:bg-gray-700 focus:bg-gray-700"
-        >
-          <Home className="mr-2 h-4 w-4" />
-          Home
-        </DropdownMenuItem>
+      <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64 z-50">
         
+        {/* Dashboard Access */}
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="hover:bg-gray-700">
+            <GraduationCap className="w-4 h-4 mr-2" />
+            Dashboards
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+            {userRole === 'admin' && (
+              <DropdownMenuItem onClick={() => navigate('/admin-dashboard')} className="hover:bg-gray-700">
+                <Settings className="w-4 h-4 mr-2" />
+                Admin Dashboard
+              </DropdownMenuItem>
+            )}
+            {canAccessSchoolDashboard() && (
+              <DropdownMenuItem onClick={() => navigate('/school-dashboard')} className="hover:bg-gray-700">
+                <School className="w-4 h-4 mr-2" />
+                School Dashboard
+              </DropdownMenuItem>
+            )}
+            {userRole === 'teacher' && (
+              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard')} className="hover:bg-gray-700">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Teacher Dashboard
+              </DropdownMenuItem>
+            )}
+            {userRole === 'parent' && (
+              <DropdownMenuItem onClick={() => navigate('/parent-dashboard')} className="hover:bg-gray-700">
+                <Users className="w-4 h-4 mr-2" />
+                Parent Dashboard
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
         <DropdownMenuSeparator className="bg-gray-700" />
-        
-        <DropdownMenuLabel className="text-white">Learning</DropdownMenuLabel>
-        <DropdownMenuItem 
-          onClick={() => navigate('/daily-program')}
-          className="text-white hover:bg-gray-700 focus:bg-gray-700"
-        >
-          <BookOpen className="mr-2 h-4 w-4" />
-          Daily Program
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={handleCurriculumSystem}
-          className="text-white hover:bg-gray-700 focus:bg-gray-700"
-        >
-          <GraduationCap className="mr-2 h-4 w-4" />
-          Curriculum System
-        </DropdownMenuItem>
-        {onShowAITutor && (
-          <DropdownMenuItem 
-            onClick={onShowAITutor}
-            className="text-white hover:bg-gray-700 focus:bg-gray-700"
-          >
-            <Bot className="mr-2 h-4 w-4" />
-            AI Tutor
-          </DropdownMenuItem>
+
+        {/* Calendar Access */}
+        {canAccessCalendar && (
+          <>
+            <DropdownMenuItem onClick={() => navigate('/calendar')} className="hover:bg-gray-700">
+              <Calendar className="w-4 h-4 mr-2" />
+              School Calendar {hasReadOnlyCalendar && "(View Only)"}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-gray-700" />
+          </>
         )}
-        
+
+        {/* Learning Tools */}
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="hover:bg-gray-700">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Learning Tools
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+            <DropdownMenuItem onClick={() => navigate('/daily-program')} className="hover:bg-gray-700">
+              <BookOpen className="w-4 h-4 mr-2" />
+              Daily Program
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/adaptive-learning')} className="hover:bg-gray-700">
+              <GraduationCap className="w-4 h-4 mr-2" />
+              Adaptive Learning
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/ai-learning')} className="hover:bg-gray-700">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              AI Learning
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
         <DropdownMenuSeparator className="bg-gray-700" />
-        
-        <DropdownMenuLabel className="text-white">Activities</DropdownMenuLabel>
-        {onShowGames && (
-          <DropdownMenuItem 
-            onClick={onShowGames}
-            className="text-white hover:bg-gray-700 focus:bg-gray-700"
-          >
-            <Gamepad2 className="mr-2 h-4 w-4" />
-            Games
-          </DropdownMenuItem>
-        )}
+
+        {/* Interactive Features */}
         {onShowProgress && (
-          <DropdownMenuItem 
-            onClick={onShowProgress}
-            className="text-white hover:bg-gray-700 focus:bg-gray-700"
-          >
-            <BarChart3 className="mr-2 h-4 w-4" />
+          <DropdownMenuItem onClick={onShowProgress} className="hover:bg-gray-700">
+            <BarChart3 className="w-4 h-4 mr-2" />
             Progress
           </DropdownMenuItem>
         )}
+
+        {onShowGames && (
+          <DropdownMenuItem onClick={onShowGames} className="hover:bg-gray-700">
+            <Gamepad2 className="w-4 h-4 mr-2" />
+            Games
+          </DropdownMenuItem>
+        )}
+
+        {onShowAITutor && (
+          <DropdownMenuItem onClick={onShowAITutor} className="hover:bg-gray-700">
+            <MessageCircle className="w-4 h-4 mr-2" />
+            AI Tutor
+          </DropdownMenuItem>
+        )}
+
+        <DropdownMenuSeparator className="bg-gray-700" />
+
+        {/* Profile */}
+        <DropdownMenuItem onClick={() => navigate('/profile')} className="hover:bg-gray-700">
+          <User className="w-4 h-4 mr-2" />
+          Profile
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

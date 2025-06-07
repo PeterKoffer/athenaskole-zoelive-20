@@ -9,7 +9,8 @@ import {
   Gamepad2, 
   MessageCircle, 
   LogOut,
-  Brain
+  Brain,
+  Calendar
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,7 +39,7 @@ const MobileMenu = ({
 }: MobileMenuProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { canAccessAIInsights } = useRoleAccess();
+  const { canAccessAIInsights, userRole } = useRoleAccess();
 
   const handleLogout = async () => {
     try {
@@ -64,6 +65,9 @@ const MobileMenu = ({
     onClose();
   };
 
+  const canAccessCalendar = userRole !== null;
+  const hasReadOnlyCalendar = userRole === 'student' || userRole === 'parent';
+
   if (!isOpen) return null;
 
   return (
@@ -74,6 +78,18 @@ const MobileMenu = ({
             <div className="px-3 py-2 text-sm text-gray-300 border-b border-gray-700 mb-2">
               Welcome, {user.user_metadata?.name || user.email}
             </div>
+
+            {/* Calendar Access */}
+            {canAccessCalendar && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
+                onClick={() => handleMenuItemClick(() => navigate('/calendar'))}
+              >
+                <Calendar className="w-4 h-4 mr-3" />
+                School Calendar {hasReadOnlyCalendar && "(View Only)"}
+              </Button>
+            )}
             
             {onShowProgress && (
               <Button
