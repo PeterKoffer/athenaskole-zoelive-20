@@ -7,7 +7,8 @@ import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonControlsFooter from './LessonControlsFooter';
 import EnhancedActivityRenderer from './EnhancedActivityRenderer';
-import { createMathematicsLesson, LessonActivity } from './EnhancedLessonContent';
+import { createMathematicsLesson } from './lessons/MathematicsLessons';
+import { LessonActivity } from './types/LessonTypes';
 
 interface ExtendedLessonManagerProps {
   subject: string;
@@ -61,12 +62,12 @@ const ExtendedLessonManager = ({
       setTimeout(() => {
         let speechText = '';
         
-        if (currentActivity.type === 'explanation') {
-          speechText = `Let me explain: ${currentActivity.content.text}`;
-        } else if (currentActivity.type === 'question') {
-          speechText = `Here's your question: ${currentActivity.content.question}`;
-        } else if (currentActivity.type === 'welcome') {
-          speechText = currentActivity.content.message;
+        if (currentActivity.phase === 'content-delivery') {
+          speechText = `Let me explain: ${currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || ''}`;
+        } else if (currentActivity.phase === 'interactive-game') {
+          speechText = `Here's your question: ${currentActivity.content.question || ''}`;
+        } else if (currentActivity.phase === 'introduction') {
+          speechText = currentActivity.content.hook || '';
         } else {
           speechText = `Let's work on: ${currentActivity.title}`;
         }
@@ -119,12 +120,12 @@ const ExtendedLessonManager = ({
       
       let speechText = '';
       
-      if (currentActivity.type === 'explanation') {
-        speechText = `Let me explain: ${currentActivity.content.text}`;
-      } else if (currentActivity.type === 'question') {
-        speechText = `Here's your question: ${currentActivity.content.question}`;
-      } else if (currentActivity.type === 'welcome') {
-        speechText = currentActivity.content.message;
+      if (currentActivity.phase === 'content-delivery') {
+        speechText = `Let me explain: ${currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || ''}`;
+      } else if (currentActivity.phase === 'interactive-game') {
+        speechText = `Here's your question: ${currentActivity.content.question || ''}`;
+      } else if (currentActivity.phase === 'introduction') {
+        speechText = currentActivity.content.hook || '';
       } else {
         speechText = `Let me read this for you: ${currentActivity.title}`;
       }

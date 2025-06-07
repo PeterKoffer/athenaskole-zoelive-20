@@ -2,14 +2,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { 
-  createMathematicsLesson, 
-  createEnglishLesson, 
-  createScienceLesson, 
-  createMusicLesson, 
-  createComputerScienceLesson, 
-  createCreativeArtsLesson, 
-  LessonActivity 
-} from '../EnhancedLessonContent';
+  createMathematicsLesson
+} from '../lessons/MathematicsLessons';
+import { createEnglishLesson } from '../lessons/EnglishLessons';
+import { createScienceLesson } from '../lessons/ScienceLessons';
+import { createMusicLesson } from '../lessons/MusicLessons';
+import { createComputerScienceLesson } from '../lessons/ComputerScienceLessons';
+import { createCreativeArtsLesson } from '../lessons/CreativeArtsLessons';
+import { LessonActivity } from '../types/LessonTypes';
 
 interface UseLessonManagerProps {
   subject: string;
@@ -84,16 +84,16 @@ export const useLessonManager = ({
         let speechText = '';
         let context: 'explanation' | 'question' | 'encouragement' | 'humor' = 'explanation';
         
-        if (currentActivity.type === 'welcome') {
-          speechText = currentActivity.content.message || `Welcome to an incredible ${subject} adventure! Get ready to learn faster than ever before!`;
+        if (currentActivity.phase === 'introduction') {
+          speechText = currentActivity.content.hook || `Welcome to an incredible ${subject} adventure! Get ready to learn faster than ever before!`;
           context = 'humor';
-        } else if (currentActivity.type === 'explanation') {
-          speechText = currentActivity.content.text;
+        } else if (currentActivity.phase === 'content-delivery') {
+          speechText = currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || '';
           context = 'explanation';
-        } else if (currentActivity.type === 'question') {
-          speechText = currentActivity.content.question;
+        } else if (currentActivity.phase === 'interactive-game') {
+          speechText = currentActivity.content.question || '';
           context = 'question';
-        } else if (currentActivity.type === 'game') {
+        } else if (currentActivity.phase === 'interactive-game') {
           speechText = `Time for an amazing learning game! ${currentActivity.content.question || currentActivity.content.text || currentActivity.title}`;
           context = 'humor';
         } else {
@@ -168,17 +168,17 @@ export const useLessonManager = ({
       let speechText = '';
       let context: 'explanation' | 'question' | 'encouragement' | 'humor' = 'explanation';
       
-      if (currentActivity.type === 'welcome') {
-        speechText = currentActivity.content.message || `Welcome to your enhanced ${subject} class!`;
+      if (currentActivity.phase === 'introduction') {
+        speechText = currentActivity.content.hook || `Welcome to your enhanced ${subject} class!`;
         context = 'humor';
-      } else if (currentActivity.type === 'explanation') {
-        speechText = currentActivity.content.text;
+      } else if (currentActivity.phase === 'content-delivery') {
+        speechText = currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || '';
         context = 'explanation';
-      } else if (currentActivity.type === 'question') {
-        speechText = currentActivity.content.question;
+      } else if (currentActivity.phase === 'interactive-game') {
+        speechText = currentActivity.content.question || '';
         context = 'question';
-      } else if (currentActivity.type === 'game') {
-        speechText = `Let's play this amazing game! ${currentActivity.content.question || currentActivity.content.text}`;
+      } else if (currentActivity.phase === 'interactive-game') {
+        speechText = `Let's play this amazing game! ${currentActivity.content.question || currentActivity.content.text || ''}`;
         context = 'humor';
       } else {
         speechText = `Let me explain this exciting topic: ${currentActivity.title}`;
