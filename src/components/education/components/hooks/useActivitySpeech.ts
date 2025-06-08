@@ -27,17 +27,16 @@ export const useActivitySpeech = (
 
   const lastSpokenActivityRef = useRef<string | null>(null);
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const speechProtectionRef = useRef<NodeJS.Timeout | null>(null);
+  const hasSpokenForActivityRef = useRef<Set<string>>(new Set());
 
   // Enhanced speech function with faster rate
   const speakTextFaster = useCallback((text: string, priority: boolean = true) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.3; // Increased from default 1.0 to 1.3 for faster speech
-      utterance.pitch = 1.1; // Slightly higher pitch for Nelie's voice
+      utterance.rate = 1.3;
+      utterance.pitch = 1.1;
       utterance.volume = 0.9;
       
-      // Try to use a more natural voice
       const voices = speechSynthesis.getVoices();
       const preferredVoice = voices.find(voice => 
         voice.name.includes('Google') || 
@@ -49,50 +48,48 @@ export const useActivitySpeech = (
       }
       
       if (priority) {
-        speechSynthesis.cancel(); // Stop current speech for priority
+        speechSynthesis.cancel();
       }
       speechSynthesis.speak(utterance);
     } else {
-      // Fallback to original method
       speakText(text, priority);
     }
   }, [speakText]);
 
-  // Test speech when component mounts
+  // Test speech when component mounts - only once
   useEffect(() => {
-    if (isReady && autoReadEnabled) {
-      console.log('🧪 Activity speech system ready, testing in 1.5 seconds...');
+    if (isReady && autoReadEnabled && !hasSpokenForActivityRef.current.has('welcome')) {
+      console.log('🧪 Activity speech system ready, testing once...');
+      hasSpokenForActivityRef.current.add('welcome');
       setTimeout(() => {
         speakTextFaster("Hello! I'm Nelie, your learning companion. Let's have an amazing lesson together!");
       }, 1500);
     }
   }, [isReady, autoReadEnabled, speakTextFaster]);
 
-  // Speak activity content when it changes - with enhanced protection against interruption
+  // Speak activity content when it changes - with better duplicate prevention
   useEffect(() => {
     if (currentActivity && autoReadEnabled && !activityCompleted && isReady) {
-      // Don't speak the same activity twice
-      if (lastSpokenActivityRef.current === currentActivity.id) {
+      // Prevent speaking the same activity multiple times
+      if (hasSpokenForActivityRef.current.has(currentActivity.id)) {
+        console.log('🚫 Activity already spoken, skipping:', currentActivity.id);
         return;
       }
 
-      console.log('🎯 New activity - Nelie will speak faster:', currentActivity.title);
+      console.log('🎯 New activity - Nelie will speak:', currentActivity.title);
       
       // Clear any existing timeouts
       if (speechTimeoutRef.current) {
         clearTimeout(speechTimeoutRef.current);
-      }
-      if (speechProtectionRef.current) {
-        clearTimeout(speechProtectionRef.current);
       }
       
       // Stop any current speech
       stopSpeaking();
       
       // Mark this activity as being spoken
+      hasSpokenForActivityRef.current.add(currentActivity.id);
       lastSpokenActivityRef.current = currentActivity.id;
       
-      // Reduced delay for faster lesson flow
       const delay = currentActivity.type === 'welcome' ? 2000 : 1000;
       
       speechTimeoutRef.current = setTimeout(() => {
@@ -113,24 +110,19 @@ export const useActivitySpeech = (
         }
         
         if (speechText) {
-          console.log('🔊 Starting faster speech for:', currentActivity.type);
+          console.log('🔊 Speaking for activity:', currentActivity.type, currentActivity.id);
           speakTextFaster(speechText, true);
-          
-          // Adjusted protection period for faster speech
-          const estimatedSpeechDuration = speechText.split(' ').length * 400; // Reduced from 500ms to 400ms per word
-          speechProtectionRef.current = setTimeout(() => {
-            console.log('🛡️ Speech protection period ended');
-          }, estimatedSpeechDuration);
         }
       }, delay);
     }
-  }, [currentActivityIndex, autoReadEnabled, activityCompleted, currentActivity, speakTextFaster, stopSpeaking, isReady]);
+  }, [currentActivity, autoReadEnabled, activityCompleted, isReady, speakTextFaster, stopSpeaking]);
 
-  // Reset spoken activity tracker when activity changes
+  // Reset spoken activities when lesson restarts
   useEffect(() => {
-    return () => {
+    if (currentActivityIndex === 0) {
+      hasSpokenForActivityRef.current.clear();
       lastSpokenActivityRef.current = null;
-    };
+    }
   }, [currentActivityIndex]);
 
   // Cleanup timeouts
@@ -138,9 +130,6 @@ export const useActivitySpeech = (
     return () => {
       if (speechTimeoutRef.current) {
         clearTimeout(speechTimeoutRef.current);
-      }
-      if (speechProtectionRef.current) {
-        clearTimeout(speechProtectionRef.current);
       }
     };
   }, []);

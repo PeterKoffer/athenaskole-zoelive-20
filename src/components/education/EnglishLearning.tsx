@@ -87,6 +87,8 @@ const EnglishLearning = () => {
           onLessonComplete={handleLessonComplete}
           onLessonResume={handleLessonResume}
           onBackToProgram={handleBackToProgram}
+          subject="english"
+          skillArea="grade-appropriate"
         />
       </div>
     </div>

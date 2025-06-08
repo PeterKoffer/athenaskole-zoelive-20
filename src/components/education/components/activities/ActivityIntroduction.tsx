@@ -40,7 +40,7 @@ const ActivityIntroduction = ({
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 mt-8">
           <div className="flex items-center justify-center space-x-2 text-gray-300 text-sm">
             <Clock className="w-4 h-4" />
             <span>{Math.ceil(timeRemaining / 60)} minutes remaining in this phase</span>
