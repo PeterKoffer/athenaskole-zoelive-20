@@ -11,6 +11,8 @@ interface LessonPhaseRendererProps {
   onLessonComplete: () => void;
   onLessonResume: () => void;
   onBackToProgram: () => void;
+  subject?: string;
+  skillArea?: string;
 }
 
 const LessonPhaseRenderer = ({
@@ -18,7 +20,9 @@ const LessonPhaseRenderer = ({
   onLessonStart,
   onLessonComplete,
   onLessonResume,
-  onBackToProgram
+  onBackToProgram,
+  subject,
+  skillArea
 }: LessonPhaseRendererProps) => {
   switch (lessonState.phase) {
     case 'introduction':
@@ -45,18 +49,23 @@ const LessonPhaseRenderer = ({
       );
 
     case 'lesson':
-      const currentUrl = window.location.pathname;
-      const subject = currentUrl.includes('/mathematics') ? 'mathematics' : 
-                    currentUrl.includes('/english') ? 'english' :
-                    currentUrl.includes('/science') ? 'science' :
-                    currentUrl.includes('/music') ? 'music' :
-                    currentUrl.includes('/computer-science') ? 'computer-science' :
-                    currentUrl.includes('/creative-arts') ? 'creative-arts' : 'mathematics';
+      // Use the passed subject prop or fall back to detecting from URL
+      const currentSubject = subject || (() => {
+        const currentUrl = window.location.pathname;
+        return currentUrl.includes('/mathematics') ? 'mathematics' : 
+               currentUrl.includes('/english') ? 'english' :
+               currentUrl.includes('/science') ? 'science' :
+               currentUrl.includes('/music') ? 'music' :
+               currentUrl.includes('/computer-science') ? 'computer-science' :
+               currentUrl.includes('/creative-arts') ? 'creative-arts' : 'mathematics';
+      })();
+      
+      const currentSkillArea = skillArea || 'grade-appropriate';
       
       return (
         <EnhancedLessonManager
-          subject={subject}
-          skillArea="grade-appropriate"
+          subject={currentSubject}
+          skillArea={currentSkillArea}
           onLessonComplete={onLessonComplete}
           onBack={onBackToProgram}
         />
