@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback, useRef } from 'react';
 import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 
@@ -28,13 +27,14 @@ export const useActivitySpeech = (
   const lastSpokenActivityRef = useRef<string | null>(null);
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasSpokenForActivityRef = useRef<Set<string>>(new Set());
+  const welcomeSpokenRef = useRef<boolean>(false);
 
-  // Enhanced speech function with faster rate
-  const speakTextFaster = useCallback((text: string, priority: boolean = true) => {
+  // Enhanced speech function with slower, more natural pace
+  const speakTextSlower = useCallback((text: string, priority: boolean = true) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.3;
-      utterance.pitch = 1.1;
+      utterance.rate = 0.85; // Much slower for better comprehension
+      utterance.pitch = 1.0; // More natural pitch
       utterance.volume = 0.9;
       
       const voices = speechSynthesis.getVoices();
@@ -56,23 +56,32 @@ export const useActivitySpeech = (
     }
   }, [speakText]);
 
-  // Test speech when component mounts - only once
+  // Welcome message - only once per session
   useEffect(() => {
-    if (isReady && autoReadEnabled && !hasSpokenForActivityRef.current.has('welcome')) {
-      console.log('🧪 Activity speech system ready, testing once...');
-      hasSpokenForActivityRef.current.add('welcome');
+    if (isReady && autoReadEnabled && !welcomeSpokenRef.current) {
+      console.log('🧪 Nelie welcoming student - first time only');
+      welcomeSpokenRef.current = true;
       setTimeout(() => {
-        speakTextFaster("Hello! I'm Nelie, your learning companion. Let's have an amazing lesson together!");
-      }, 1500);
+        speakTextSlower("Hello! I'm Nelie, your learning companion. Let's take our time and have an amazing lesson together!");
+      }, 2000);
     }
-  }, [isReady, autoReadEnabled, speakTextFaster]);
+  }, [isReady, autoReadEnabled, speakTextSlower]);
 
-  // Speak activity content when it changes - with better duplicate prevention
+  // Speak activity content when it changes - with strict duplicate prevention
   useEffect(() => {
     if (currentActivity && autoReadEnabled && !activityCompleted && isReady) {
+      // Create unique activity identifier
+      const activityKey = `${currentActivity.id}-${currentActivityIndex}`;
+      
       // Prevent speaking the same activity multiple times
-      if (hasSpokenForActivityRef.current.has(currentActivity.id)) {
-        console.log('🚫 Activity already spoken, skipping:', currentActivity.id);
+      if (hasSpokenForActivityRef.current.has(activityKey)) {
+        console.log('🚫 Activity already spoken, skipping:', activityKey);
+        return;
+      }
+
+      // Additional check to prevent immediate repetition
+      if (lastSpokenActivityRef.current === activityKey) {
+        console.log('🚫 Same activity as last spoken, skipping:', activityKey);
         return;
       }
 
@@ -87,10 +96,10 @@ export const useActivitySpeech = (
       stopSpeaking();
       
       // Mark this activity as being spoken
-      hasSpokenForActivityRef.current.add(currentActivity.id);
-      lastSpokenActivityRef.current = currentActivity.id;
+      hasSpokenForActivityRef.current.add(activityKey);
+      lastSpokenActivityRef.current = activityKey;
       
-      const delay = currentActivity.type === 'welcome' ? 2000 : 1000;
+      const delay = currentActivity.type === 'welcome' ? 2500 : 1500; // Longer delays
       
       speechTimeoutRef.current = setTimeout(() => {
         let speechText = '';
@@ -98,30 +107,31 @@ export const useActivitySpeech = (
         if (currentActivity.speech) {
           speechText = currentActivity.speech;
         } else if (currentActivity.type === 'explanation') {
-          speechText = `Let me explain: ${currentActivity.content.text}`;
+          speechText = `Let me explain this step by step: ${currentActivity.content.text}`;
         } else if (currentActivity.type === 'question') {
-          speechText = `Here's your question: ${currentActivity.content.question}`;
+          speechText = `Here's your next question. Take your time: ${currentActivity.content.question}`;
         } else if (currentActivity.type === 'game') {
-          speechText = `Let's play a game! ${currentActivity.content.text || currentActivity.title}`;
+          speechText = `Let's try this fun activity: ${currentActivity.content.text || currentActivity.title}`;
         } else if (currentActivity.type === 'welcome') {
           speechText = currentActivity.content.message;
         } else {
-          speechText = `Let's work on: ${currentActivity.title}`;
+          speechText = `Now let's work on: ${currentActivity.title}`;
         }
         
         if (speechText) {
-          console.log('🔊 Speaking for activity:', currentActivity.type, currentActivity.id);
-          speakTextFaster(speechText, true);
+          console.log('🔊 Speaking for activity:', currentActivity.type, activityKey);
+          speakTextSlower(speechText, true);
         }
       }, delay);
     }
-  }, [currentActivity, autoReadEnabled, activityCompleted, isReady, speakTextFaster, stopSpeaking]);
+  }, [currentActivity, autoReadEnabled, activityCompleted, isReady, speakTextSlower, stopSpeaking, currentActivityIndex]);
 
-  // Reset spoken activities when lesson restarts
+  // Reset spoken activities when lesson restarts, but keep welcome spoken
   useEffect(() => {
     if (currentActivityIndex === 0) {
       hasSpokenForActivityRef.current.clear();
       lastSpokenActivityRef.current = null;
+      // Don't reset welcomeSpokenRef to prevent re-welcome
     }
   }, [currentActivityIndex]);
 
@@ -140,14 +150,14 @@ export const useActivitySpeech = (
         stopSpeaking();
       } else {
         const speechText = currentActivity.speech || currentActivity.content.message || `Let me read this for you: ${currentActivity.title}`;
-        speakTextFaster(speechText, true);
+        speakTextSlower(speechText, true);
       }
     }
-  }, [currentActivity, isSpeaking, speakTextFaster, stopSpeaking]);
+  }, [currentActivity, isSpeaking, speakTextSlower, stopSpeaking]);
 
   return {
     autoReadEnabled,
-    speakText: speakTextFaster,
+    speakText: speakTextSlower,
     stopSpeaking,
     isReady,
     isSpeaking,

@@ -13,8 +13,8 @@ interface TeachingEngineConfig {
 export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
   const [studentProgress, setStudentProgress] = useState(0);
   const [engagementLevel, setEngagementLevel] = useState(75);
-  const [adaptiveSpeed, setAdaptiveSpeed] = useState(1.4); // 40% faster than normal
-  const [humorLevel, setHumorLevel] = useState(3); // Scale 1-5
+  const [adaptiveSpeed, setAdaptiveSpeed] = useState(0.85); // Much slower for better comprehension
+  const [humorLevel, setHumorLevel] = useState(3);
   
   const {
     isSpeaking,
@@ -26,7 +26,7 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
     toggleMute
   } = useWorkingNelieSpeech();
 
-  // Enhanced speech with personality and humor
+  // Enhanced speech with slower, more natural pace and personality
   const speakWithPersonality = useCallback((text: string, context: 'explanation' | 'question' | 'encouragement' | 'humor') => {
     if (!autoReadEnabled || !hasUserInteracted) return;
 
@@ -35,37 +35,38 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
     
     switch (context) {
       case 'explanation':
-        enhancedText = `Let me share something super cool with you! ${text}`;
+        enhancedText = `Let me share this with you: ${text}`;
         break;
       case 'question':
-        enhancedText = `Here's an exciting brain teaser for you! ${text}`;
+        enhancedText = `Here's your question. Take your time to think: ${text}`;
         break;
       case 'encouragement':
-        enhancedText = `${text} You're absolutely brilliant at this!`;
+        enhancedText = `${text} Keep up the great work!`;
         break;
       case 'humor':
-        const funnyIntros = [
-          "Here's a fun fact that might blow your mind:",
-          "Get ready for something awesome:",
-          "This is so cool, I can hardly contain my excitement:",
-          "Wait until you hear this amazing thing:"
+        const gentleIntros = [
+          "Here's something interesting:",
+          "Let me tell you about this:",
+          "This is pretty cool:",
+          "Here's what we're going to explore:"
         ];
-        enhancedText = `${funnyIntros[Math.floor(Math.random() * funnyIntros.length)]} ${text}`;
+        enhancedText = `${gentleIntros[Math.floor(Math.random() * gentleIntros.length)]} ${text}`;
         break;
     }
 
-    // Use faster speech synthesis with enhanced personality
+    // Use slower speech synthesis with calm, patient delivery
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(enhancedText);
-      utterance.rate = adaptiveSpeed; // Dynamic speed based on engagement
-      utterance.pitch = 1.2; // Higher pitch for Nelie's enthusiastic personality
-      utterance.volume = 0.9;
+      utterance.rate = 0.85; // Slower, more patient pace
+      utterance.pitch = 1.0; // Natural pitch for calmness
+      utterance.volume = 0.8; // Slightly quieter for gentle approach
       
-      // Try to use a more expressive voice
+      // Try to use a calmer, more patient voice
       const voices = speechSynthesis.getVoices();
       const preferredVoice = voices.find(voice => 
         voice.name.includes('Google UK English Female') || 
         voice.name.includes('Microsoft Zira') ||
+        voice.name.includes('Samantha') ||
         voice.lang.startsWith('en')
       );
       if (preferredVoice) {
@@ -75,69 +76,69 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     }
-  }, [autoReadEnabled, hasUserInteracted, adaptiveSpeed]);
+  }, [autoReadEnabled, hasUserInteracted]);
 
-  // Adaptive learning speed based on student performance
+  // Adaptive learning speed based on student performance (more conservative)
   const adjustTeachingSpeed = useCallback((correct: boolean, responseTime: number) => {
-    if (correct && responseTime < 10000) { // Quick correct answer
-      setAdaptiveSpeed(prev => Math.min(prev + 0.1, 1.8)); // Speed up
-      setEngagementLevel(prev => Math.min(prev + 5, 100));
-    } else if (!correct || responseTime > 20000) { // Wrong or slow answer
-      setAdaptiveSpeed(prev => Math.max(prev - 0.1, 1.0)); // Slow down
-      setEngagementLevel(prev => Math.max(prev - 3, 20));
+    if (correct && responseTime < 8000) { // Quick correct answer
+      setAdaptiveSpeed(prev => Math.min(prev + 0.05, 1.0)); // Slower speed increases
+      setEngagementLevel(prev => Math.min(prev + 3, 100));
+    } else if (!correct || responseTime > 25000) { // Wrong or very slow answer
+      setAdaptiveSpeed(prev => Math.max(prev - 0.05, 0.7)); // Don't go too slow
+      setEngagementLevel(prev => Math.max(prev - 2, 20));
     }
   }, []);
 
-  // Generate encouraging responses with humor
+  // Generate encouraging responses with patience and kindness
   const generateEncouragement = useCallback((isCorrect: boolean, streak: number) => {
     if (isCorrect) {
       const celebrations = [
-        "Fantastic! You're like a learning superhero!",
-        "Brilliant! Your brain is absolutely amazing!",
-        "Outstanding! You're making learning look easy!",
-        "Incredible! You're becoming a real expert!",
-        "Phenomenal! That was perfect thinking!",
-        "Spectacular! You're on fire today!",
-        "Magnificent! Your intelligence is shining bright!"
+        "Excellent work! You're really understanding this.",
+        "That's absolutely right! You're doing great.",
+        "Perfect! Your thinking is spot on.",
+        "Wonderful! You've got this concept down.",
+        "Outstanding! You're making great progress.",
+        "Fantastic! That shows real understanding.",
+        "Brilliant thinking! You're learning so well."
       ];
       
       if (streak >= 3) {
-        return `🔥 WOW! ${streak} correct in a row! ${celebrations[Math.floor(Math.random() * celebrations.length)]} You're unstoppable!`;
+        return `Amazing! ${streak} correct answers in a row! ${celebrations[Math.floor(Math.random() * celebrations.length)]}`;
       }
       
       return celebrations[Math.floor(Math.random() * celebrations.length)];
     } else {
       const encouragements = [
-        "No worries! Even Einstein made mistakes while learning!",
-        "That's okay! Every mistake is a step closer to mastery!",
-        "Don't worry! The best learners try, adjust, and try again!",
-        "It's all good! Learning means exploring, and you're exploring perfectly!",
-        "No problem! Your brain is processing new information - that's amazing!",
-        "That's fine! Every great thinker has moments like this!"
+        "That's okay! Learning takes time, and you're doing great.",
+        "No worries at all! Every mistake helps us learn better.",
+        "Don't worry about it! Let's think through this together.",
+        "That's perfectly fine! Learning is all about practicing.",
+        "No problem! Everyone learns at their own pace.",
+        "It's all good! Let's explore this concept a bit more."
       ];
       
       return encouragements[Math.floor(Math.random() * encouragements.length)];
     }
   }, []);
 
-  // Enhanced activity content with micro-learning chunks
+  // Enhanced activity content with longer durations and clearer instructions
   const enhanceActivityContent = useCallback((activity: LessonActivity) => {
     const enhanced = { ...activity };
     
-    // Reduce duration by 30% for faster learning
-    enhanced.duration = Math.max(Math.floor(activity.duration * 0.7), 3);
+    // Increase duration for better pacing (minimum 3 minutes per activity)
+    enhanced.duration = Math.max(activity.duration * 1.5, 180);
     
-    // Add engaging elements to content
+    // Add patience-focused elements to content
     if (activity.phase === 'content-delivery') {
-      const funElements = [
-        "🤔 Think about this:",
-        "💡 Here's the cool part:",
-        "🎯 The secret is:",
-        "✨ Amazing fact:",
-        "🚀 Ready for this?"
+      const patientElements = [
+        "Let's take our time to understand:",
+        "Here's what we need to know:",
+        "Let me explain this clearly:",
+        "Take a moment to think about this:",
+        "Here's an important concept:"
       ];
       
-      const randomElement = funElements[Math.floor(Math.random() * funElements.length)];
+      const randomElement = patientElements[Math.floor(Math.random() * patientElements.length)];
       if (enhanced.content.segments?.[0]?.explanation) {
         enhanced.content.segments[0].explanation = `${randomElement} ${activity.content.segments[0].explanation}`;
       } else if (enhanced.content.text) {

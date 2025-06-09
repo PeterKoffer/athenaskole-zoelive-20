@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { useLessonManager } from './hooks/useLessonManager';
+import { useExtendedLessonManager } from './hooks/useExtendedLessonManager';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
@@ -30,6 +30,8 @@ const EnhancedLessonManager = ({
     currentActivity,
     timeElapsed,
     score,
+    questionsGenerated,
+    targetLessonLength,
     isSpeaking,
     autoReadEnabled,
     hasUserInteracted,
@@ -39,7 +41,7 @@ const EnhancedLessonManager = ({
     toggleMute,
     handleActivityComplete,
     handleReadRequest
-  } = useLessonManager({
+  } = useExtendedLessonManager({
     subject,
     skillArea,
     onLessonComplete
@@ -55,7 +57,12 @@ const EnhancedLessonManager = ({
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-8 text-center text-white">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Nelie is preparing your amazing lesson...</p>
+          <p>Nelie is preparing your extended {targetLessonLength}-minute lesson...</p>
+          {questionsGenerated > 0 && (
+            <p className="text-sm text-gray-400 mt-2">
+              Generated {questionsGenerated} adaptive questions so far
+            </p>
+          )}
         </CardContent>
       </Card>
     );
@@ -66,13 +73,25 @@ const EnhancedLessonManager = ({
       {/* Speech Test Card - only show for admin users */}
       {isAdmin() && <SpeechTestCard />}
 
-      {/* Progress Header */}
+      {/* Progress Header with extended info */}
       <LessonProgressHeader
         timeElapsed={timeElapsed}
         score={score}
         currentActivityIndex={currentActivityIndex}
         totalActivities={lessonActivities.length}
       />
+
+      {/* Show lesson extension status */}
+      <Card className="bg-blue-900/20 border-blue-700">
+        <CardContent className="p-4 text-center">
+          <p className="text-blue-300 text-sm">
+            Extended {targetLessonLength}-minute lesson • {questionsGenerated} adaptive questions generated
+          </p>
+          <p className="text-blue-400 text-xs mt-1">
+            Lesson adapts to your pace and generates more content as needed
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Nelie Avatar Section */}
       <NelieAvatarSection 
