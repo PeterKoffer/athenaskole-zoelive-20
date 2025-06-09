@@ -35,24 +35,24 @@ const QuestionOptions = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3 px-2 sm:px-0">
       {options.map((option: string, index: number) => (
         <Button
           key={index}
           variant="outline"
-          className={`w-full text-left justify-start p-4 h-auto ${getOptionClassName(index)}`}
+          className={`w-full text-left justify-start p-3 sm:p-4 h-auto transition-all duration-200 text-sm sm:text-base ${getOptionClassName(index)}`}
           onClick={() => onAnswerSelect(index)}
           disabled={showResult || selectedAnswer !== null}
         >
-          <span className="mr-3 font-semibold">
+          <span className="mr-2 sm:mr-3 font-semibold text-base sm:text-lg">
             {String.fromCharCode(65 + index)}.
           </span>
-          {option}
+          <span className="flex-1 break-words">{option}</span>
           {showResult && index === correctAnswer && (
-            <CheckCircle className="w-5 h-5 ml-auto text-green-400" />
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-green-400 flex-shrink-0" />
           )}
           {showResult && selectedAnswer === index && index !== correctAnswer && (
-            <XCircle className="w-5 h-5 ml-auto text-red-400" />
+            <XCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-red-400 flex-shrink-0" />
           )}
         </Button>
       ))}

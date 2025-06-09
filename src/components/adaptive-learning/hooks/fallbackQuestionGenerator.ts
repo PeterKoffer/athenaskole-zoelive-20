@@ -79,7 +79,10 @@ export class FallbackQuestionGenerator {
       question,
       options: allOptions.map(String),
       correct: correctIndex,
-      explanation: `${character} solved this ${operation.name} problem! The answer is ${answer}.`
+      explanation: `${character} solved this ${operation.name} problem! The answer is ${answer}.`,
+      learningObjectives: [`${operation.name} practice`, 'Problem solving', 'Real-world math'],
+      estimatedTime: 30,
+      conceptsCovered: [operation.name]
     };
   }
 
@@ -99,7 +102,10 @@ export class FallbackQuestionGenerator {
       question,
       options: topic.options,
       correct: topic.correct,
-      explanation: `Great job! ${character} learned that "${topic.options[topic.correct]}" is the correct ${topic.type} for "${topic.word}".`
+      explanation: `Great job! ${character} learned that "${topic.options[topic.correct]}" is the correct ${topic.type} for "${topic.word}".`,
+      learningObjectives: [`${topic.type} identification`, 'Vocabulary building', 'Language skills'],
+      estimatedTime: 30,
+      conceptsCovered: [topic.type]
     };
   }
 
@@ -118,7 +124,10 @@ export class FallbackQuestionGenerator {
       question,
       options: topic.options,
       correct: topic.correct,
-      explanation: `Excellent! ${character} learned something new today!`
+      explanation: `Excellent! ${character} learned something new today!`,
+      learningObjectives: ['General knowledge', 'Critical thinking', 'Learning exploration'],
+      estimatedTime: 30,
+      conceptsCovered: ['general knowledge']
     };
   }
 }
