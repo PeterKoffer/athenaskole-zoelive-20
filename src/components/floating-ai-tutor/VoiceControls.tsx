@@ -4,18 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { RealtimeChat } from "@/utils/RealtimeAudio";
+import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 
 interface VoiceControlsProps {
-  isSpeaking: boolean;
-  onStopSpeaking: () => void;
   onVoiceInput: (message: string) => void;
 }
 
-const VoiceControls = ({ isSpeaking, onStopSpeaking, onVoiceInput }: VoiceControlsProps) => {
+const VoiceControls = ({ onVoiceInput }: VoiceControlsProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const realtimeChatRef = useRef<RealtimeChat | null>(null);
+  
+  const { isSpeaking, stop: stopSpeaking } = useUnifiedSpeech();
 
   const handleMessage = (event: any) => {
     console.log('Voice control received message:', event.type);
@@ -43,7 +44,6 @@ const VoiceControls = ({ isSpeaking, onStopSpeaking, onVoiceInput }: VoiceContro
       console.log('Voice chat started successfully');
     } catch (error) {
       console.error('Failed to start voice chat:', error);
-      // Fallback to simple voice input
       fallbackVoiceInput();
     }
   };
@@ -96,7 +96,7 @@ const VoiceControls = ({ isSpeaking, onStopSpeaking, onVoiceInput }: VoiceContro
       <Button
         variant="outline"
         size="sm"
-        onClick={isSpeaking ? onStopSpeaking : () => {}}
+        onClick={isSpeaking ? stopSpeaking : () => {}}
         className={`border-gray-600 p-1 ${isSpeaking ? "bg-red-600 text-white border-red-600" : "bg-gray-800 text-gray-300"}`}
         disabled={!isSpeaking}
       >

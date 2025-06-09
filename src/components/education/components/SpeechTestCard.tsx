@@ -2,26 +2,25 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, TestTube, AlertTriangle, Hand, CheckCircle } from 'lucide-react';
-import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 const SpeechTestCard = () => {
   const { 
     isSpeaking, 
-    autoReadEnabled, 
+    isEnabled, 
     hasUserInteracted,
     isReady, 
-    speakText, 
-    stopSpeaking, 
-    toggleMute, 
-    testSpeech 
-  } = useWorkingNelieSpeech();
+    test, 
+    stop, 
+    toggleEnabled
+  } = useUnifiedSpeech();
 
   const handleTestSpeech = () => {
     console.log('🧪 Test button clicked - isSpeaking:', isSpeaking);
     if (isSpeaking) {
-      stopSpeaking();
+      stop();
     } else {
-      testSpeech();
+      test();
     }
   };
 
@@ -34,17 +33,17 @@ const SpeechTestCard = () => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <TestTube className="w-5 h-5 text-yellow-400" />
-            <span className="text-white font-medium">Nelie Speech System - WORKING VERSION</span>
+            <span className="text-white font-medium">Nelie Speech System - UNIFIED VERSION</span>
           </div>
           
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={toggleMute}
+              onClick={toggleEnabled}
               className="text-slate-950"
             >
-              {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
               {!hasUserInteracted && <Hand className="w-3 h-3 ml-1" />}
             </Button>
             
@@ -73,13 +72,13 @@ const SpeechTestCard = () => {
             </div>
           )}
 
-          {hasUserInteracted && autoReadEnabled && (
+          {hasUserInteracted && isEnabled && (
             <div className="flex items-center space-x-2 text-green-400 bg-green-900/20 p-3 rounded">
               <CheckCircle className="w-5 h-5" />
               <div>
-                <div className="font-medium">Nelie's Voice is Active!</div>
+                <div className="font-medium">Nelie's Unified Voice is Active!</div>
                 <div className="text-sm text-green-300">
-                  Working speech system is ready to help you learn
+                  Unified speech system provides consistent experience across all components
                 </div>
               </div>
             </div>
@@ -93,15 +92,15 @@ const SpeechTestCard = () => {
                 • User Interaction: {hasUserInteracted ? '✅' : '❌'}<br/>
                 • Speech Ready: {isReady && hasUserInteracted ? '✅' : '❌'}<br/>
                 • Currently Speaking: {isSpeaking ? '🔊' : '🔇'}<br/>
-                • Auto-Read: {autoReadEnabled ? '✅' : '❌'}
+                • Speech Enabled: {isEnabled ? '✅' : '❌'}
               </div>
             </div>
             <div>
-              <strong>Voice Info:</strong>
+              <strong>System Info:</strong>
               <div className="ml-2">
                 • Available Voices: {voicesCount}<br/>
-                • System: Web Speech API<br/>
-                • Version: WORKING<br/>
+                • System: Unified Speech API<br/>
+                • Version: UNIFIED<br/>
                 • Queue: {hasUserInteracted ? 'Active' : 'Waiting'}
               </div>
             </div>
@@ -112,7 +111,7 @@ const SpeechTestCard = () => {
               <AlertTriangle className="w-4 h-4" />
               <span className="text-sm">Speech synthesis is not supported in this browser</span>
             </div>
-            )}
+          )}
         </div>
       </CardContent>
     </Card>

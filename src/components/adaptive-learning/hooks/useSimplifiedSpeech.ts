@@ -1,170 +1,236 @@
-
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 export const useSimplifiedSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [autoReadEnabled, setAutoReadEnabled] = useState(false);
+  const [autoReadEnabled, setAutoReadEnabled] = useState(true);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
   const speechQueue = useRef<string[]>([]);
   const isProcessingQueue = useRef(false);
 
-  // Check if speech synthesis is available
-  const isReady = typeof speechSynthesis !== 'undefined';
-
-  // Enable auto-read with user interaction
-  const enableSpeechWithUserInteraction = useCallback(() => {
-    console.log('🎵 User interaction detected - enabling speech');
-    setHasUserInteracted(true);
-    setAutoReadEnabled(true);
-    
-    // Test speech immediately after enabling
-    setTimeout(() => {
-      speakText('Hello! I am Nelie, your AI learning companion!', true);
-    }, 100);
-  }, []);
+  const isSpeechSynthesisSupported = typeof speechSynthesis !== 'undefined';
 
   const stopSpeaking = useCallback(() => {
-    console.log('🔇 Stopping speech');
-    if (typeof speechSynthesis !== 'undefined') {
-      speechSynthesis.cancel();
-    }
+    console.log('🔇 Stopping all speech and clearing queue');
+    
+    if (!isSpeechSynthesisSupported) return;
+    
+    // Clear the queue and stop processing
     speechQueue.current = [];
     isProcessingQueue.current = false;
+    
+    // Cancel current speech
+    speechSynthesis.cancel();
     setIsSpeaking(false);
     currentUtterance.current = null;
-  }, []);
+  }, [isSpeechSynthesisSupported]);
+
+  const getFemaleVoice = useCallback(() => {
+    if (!isSpeechSynthesisSupported) return null;
+    
+    const voices = speechSynthesis.getVoices();
+    console.log('🎵 Available voices:', voices.length);
+    
+    if (voices.length === 0) {
+      return null;
+    }
+    
+    // Try to find a good female voice
+    const preferredVoices = [
+      'Google UK English Female',
+      'Google US English Female',
+      'Microsoft Zira',
+      'Karen',
+      'Samantha',
+      'Victoria'
+    ];
+
+    for (const voiceName of preferredVoices) {
+      const voice = voices.find(v => 
+        v.name.toLowerCase().includes(voiceName.toLowerCase()) && 
+        v.lang.startsWith('en')
+      );
+      if (voice) {
+        console.log('🎵 Selected voice:', voice.name);
+        return voice;
+      }
+    }
+
+    const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+    if (englishVoice) {
+      console.log('🎵 Using fallback English voice:', englishVoice.name);
+      return englishVoice;
+    }
+
+    return voices[0] || null;
+  }, [isSpeechSynthesisSupported]);
 
   const processQueue = useCallback(() => {
-    if (!autoReadEnabled || !hasUserInteracted || isProcessingQueue.current || speechQueue.current.length === 0) {
+    if (!autoReadEnabled || isProcessingQueue.current || speechQueue.current.length === 0) {
       return;
     }
 
-    const text = speechQueue.current.shift();
-    if (!text?.trim()) {
-      setTimeout(() => processQueue(), 100);
-      return;
-    }
+    const textToSpeak = speechQueue.current.shift();
+    if (!textToSpeak) return;
 
-    console.log('🔊 Speaking:', text.substring(0, 50));
+    console.log('🎤 Processing speech queue:', textToSpeak.substring(0, 50) + '...');
     isProcessingQueue.current = true;
 
-    try {
-      const utterance = new SpeechSynthesisUtterance(text);
+    // Ensure any previous speech is completely stopped
+    speechSynthesis.cancel();
+
+    // Wait for cancel to complete
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
       currentUtterance.current = utterance;
       
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      utterance.volume = 1.0;
       utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.2;
+      utterance.volume = 1.0;
 
-      // Try to get a female voice
-      const voices = speechSynthesis.getVoices();
-      const femaleVoice = voices.find(voice => 
-        voice.lang.startsWith('en') && 
-        (voice.name.includes('Female') || voice.name.includes('Zira') || voice.name.includes('Karen'))
-      );
-      
-      if (femaleVoice) {
-        utterance.voice = femaleVoice;
-        console.log('🎵 Using voice:', femaleVoice.name);
+      const voice = getFemaleVoice();
+      if (voice) {
+        utterance.voice = voice;
       }
 
       utterance.onstart = () => {
-        console.log('✅ Speech started successfully');
+        console.log('✅ Nelie speech STARTED');
         setIsSpeaking(true);
       };
 
       utterance.onend = () => {
-        console.log('🏁 Speech ended');
+        console.log('🏁 Nelie speech ENDED');
         setIsSpeaking(false);
-        isProcessingQueue.current = false;
         currentUtterance.current = null;
-        setTimeout(() => processQueue(), 300);
+        isProcessingQueue.current = false;
+        
+        // Process next item in queue after a short delay
+        setTimeout(() => {
+          processQueue();
+        }, 800);
       };
 
       utterance.onerror = (event) => {
         console.error('🚫 Speech error:', event.error);
         setIsSpeaking(false);
-        isProcessingQueue.current = false;
         currentUtterance.current = null;
-        setTimeout(() => processQueue(), 500);
+        isProcessingQueue.current = false;
+        
+        // Continue with queue even after error
+        setTimeout(() => {
+          processQueue();
+        }, 1000);
       };
 
+      console.log('🚀 Starting speech synthesis...');
       speechSynthesis.speak(utterance);
-    } catch (error) {
-      console.error('🚫 Error creating speech:', error);
-      isProcessingQueue.current = false;
-    }
-  }, [autoReadEnabled, hasUserInteracted]);
+    }, 300);
+  }, [autoReadEnabled, getFemaleVoice]);
 
   const speakText = useCallback((text: string, priority: boolean = false) => {
-    if (!text?.trim()) {
-      console.log('🚫 Empty text provided');
+    if (!isSpeechSynthesisSupported) {
+      console.error('🚫 Speech synthesis not supported');
       return;
     }
 
-    if (!hasUserInteracted) {
-      console.log('🚫 No user interaction yet - speech blocked');
+    if (!text || text.trim() === '') {
+      console.log('🚫 Cannot speak - no text provided');
       return;
     }
 
     if (!autoReadEnabled) {
-      console.log('🚫 Auto-read disabled');
+      console.log('🚫 Cannot speak - auto read disabled');
       return;
     }
 
-    if (!isReady) {
-      console.log('🚫 Speech synthesis not supported');
+    if (!hasUserInteracted) {
+      console.log('🚫 Cannot speak - no user interaction yet');
       return;
     }
 
-    console.log('🔊 Queuing speech:', text.substring(0, 50));
+    console.log('🔊 NELIE QUEUING SPEECH:', text.substring(0, 50) + '...');
     
+    // Add to queue (at beginning if priority)
     if (priority) {
-      speechQueue.current = [text];
-      stopSpeaking();
-      setTimeout(() => processQueue(), 200);
+      speechQueue.current.unshift(text);
+      // Stop current speech for priority messages
+      speechSynthesis.cancel();
+      isProcessingQueue.current = false;
     } else {
       speechQueue.current.push(text);
-      if (!isProcessingQueue.current) {
-        setTimeout(() => processQueue(), 100);
-      }
     }
-  }, [hasUserInteracted, autoReadEnabled, isReady, processQueue, stopSpeaking]);
+    
+    // Start processing if not already processing
+    if (!isProcessingQueue.current) {
+      setTimeout(() => {
+        processQueue();
+      }, 200);
+    }
+  }, [autoReadEnabled, processQueue, isSpeechSynthesisSupported, hasUserInteracted]);
 
   const toggleMute = useCallback(() => {
-    if (!hasUserInteracted) {
-      // First toggle enables speech with user interaction
-      enableSpeechWithUserInteraction();
-      return;
-    }
+    const newAutoReadState = !autoReadEnabled;
+    console.log('🔊 Toggling auto-read to:', newAutoReadState);
     
-    const newState = !autoReadEnabled;
-    console.log('🔊 Toggling speech to:', newState);
-    setAutoReadEnabled(newState);
+    setAutoReadEnabled(newAutoReadState);
     
-    if (!newState) {
+    if (!newAutoReadState) {
       stopSpeaking();
     }
-  }, [autoReadEnabled, hasUserInteracted, enableSpeechWithUserInteraction, stopSpeaking]);
+
+    // This counts as user interaction
+    if (!hasUserInteracted) {
+      setHasUserInteracted(true);
+    }
+  }, [autoReadEnabled, stopSpeaking, hasUserInteracted]);
 
   const testSpeech = useCallback(() => {
+    // This counts as user interaction
     if (!hasUserInteracted) {
-      enableSpeechWithUserInteraction();
-    } else {
-      speakText('Hello! I am Nelie, your AI learning companion!', true);
+      setHasUserInteracted(true);
     }
-  }, [hasUserInteracted, enableSpeechWithUserInteraction, speakText]);
+    
+    speakText("Hello! I'm Nelie, your AI learning companion. I'm here to help you learn!", true);
+  }, [speakText, hasUserInteracted]);
+
+  // Initialize voices on component mount
+  useEffect(() => {
+    if (isSpeechSynthesisSupported) {
+      const loadVoices = () => {
+        speechSynthesis.getVoices();
+        console.log('🎵 Speech synthesis voices loaded');
+        setIsReady(true);
+      };
+      
+      loadVoices();
+      speechSynthesis.addEventListener('voiceschanged', loadVoices);
+      
+      return () => {
+        speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      };
+    }
+  }, [isSpeechSynthesisSupported]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      speechQueue.current = [];
+      if (currentUtterance.current) {
+        speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   return {
     isSpeaking,
     autoReadEnabled,
     hasUserInteracted,
+    isReady,
     speakText,
     stopSpeaking,
     toggleMute,
-    testSpeech,
-    isReady
+    testSpeech
   };
 };

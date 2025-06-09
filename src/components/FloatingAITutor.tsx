@@ -4,14 +4,22 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ChatInterface from "./floating-ai-tutor/ChatInterface";
 import CollapsedButton from "./floating-ai-tutor/CollapsedButton";
 import { useDragHandler } from "./floating-ai-tutor/useDragHandler";
-import { useSpeechSynthesis } from "./adaptive-learning/hooks/useSpeechSynthesis";
+import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 import { Message } from "./floating-ai-tutor/types";
 
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [hasWelcomedOnHomepage, setHasWelcomedOnHomepage] = useState(false);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking, handleMuteToggle, isSpeechSynthesisSupported } = useSpeechSynthesis();
+  const { 
+    isSpeaking, 
+    isEnabled, 
+    speakAsNelie, 
+    stop, 
+    toggleEnabled, 
+    hasUserInteracted, 
+    isReady 
+  } = useUnifiedSpeech();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -41,23 +49,23 @@ const FloatingAITutor = () => {
       setMessages([welcomeMessage]);
       setHasWelcomedOnHomepage(true);
       
-      // Auto-speak welcome message if enabled and supported
-      if (autoReadEnabled && isSpeechSynthesisSupported) {
-        console.log('🎵 Speaking welcome message...');
+      // Auto-speak welcome message if enabled and ready
+      if (isEnabled && isReady && hasUserInteracted) {
+        console.log('🎵 Speaking welcome message via unified system...');
         setTimeout(() => {
-          speakText("Hi! I'm Nelie, your AI tutor! I'm here to help you learn. Ask me anything!");
+          speakAsNelie("Hi! I'm Nelie, your AI tutor! I'm here to help you learn. Ask me anything!");
         }, 1000);
       } else {
         console.log('🚫 Not speaking welcome message:', {
-          autoReadEnabled,
-          isSpeechSynthesisSupported
+          isEnabled,
+          isReady,
+          hasUserInteracted
         });
       }
     } else if (!shouldHide && messages.length === 0 && location.pathname !== '/') {
-      // On other pages, just initialize with empty messages (no welcome)
       setMessages([]);
     }
-  }, [shouldHide, messages.length, location.pathname, hasWelcomedOnHomepage, autoReadEnabled, speakText, isSpeechSynthesisSupported]);
+  }, [shouldHide, messages.length, location.pathname, hasWelcomedOnHomepage, isEnabled, speakAsNelie, isReady, hasUserInteracted]);
 
   const toggleOpen = () => {
     if (!hasMoved && !isDragging) {
@@ -89,10 +97,10 @@ const FloatingAITutor = () => {
       };
       setMessages(prev => [...prev, aiResponse]);
       
-      // Speak the response if auto-read is enabled and supported
-      if (autoReadEnabled && isSpeechSynthesisSupported) {
-        console.log('🎵 Speaking AI response...');
-        speakText(randomResponse);
+      // Speak the response if enabled and ready
+      if (isEnabled && isReady && hasUserInteracted) {
+        console.log('🎵 Speaking AI response via unified system...');
+        speakAsNelie(randomResponse);
       }
     }, 1000);
   };
@@ -106,7 +114,7 @@ const FloatingAITutor = () => {
     return null;
   }
 
-  console.log('🤖 FloatingAITutor rendering at position:', position, 'isOpen:', isOpen, 'isSpeaking:', isSpeaking);
+  console.log('🤖 FloatingAITutor rendering with unified speech:', { isSpeaking, isEnabled, isReady });
 
   return (
     <div
@@ -139,10 +147,10 @@ const FloatingAITutor = () => {
           onTouchStart={handleTouchStart}
           onResetToHome={handleResetToHome}
           isSpeaking={isSpeaking}
-          onStopSpeaking={stopSpeaking}
+          onStopSpeaking={stop}
           isDragging={isDragging}
-          autoReadEnabled={autoReadEnabled}
-          onMuteToggle={handleMuteToggle}
+          autoReadEnabled={isEnabled}
+          onMuteToggle={toggleEnabled}
         />
       )}
     </div>
