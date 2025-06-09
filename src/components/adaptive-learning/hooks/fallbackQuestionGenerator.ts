@@ -1,152 +1,124 @@
 
-import { Question } from './useDiverseQuestionGeneration';
-
-export const generateFallbackQuestion = (
-  subject: string,
-  skillArea: string,
-  difficultyLevel: number,
-  gradeLevel: number = 6
-): Question => {
-  
-  if (subject === 'music') {
-    return generateMusicQuestion(skillArea, difficultyLevel, gradeLevel);
-  }
-  
-  if (subject === 'mathematics' || subject === 'math') {
-    return generateMathQuestion(skillArea, difficultyLevel, gradeLevel);
-  }
-  
-  if (subject === 'science') {
-    return generateScienceQuestion(skillArea, difficultyLevel, gradeLevel);
-  }
-  
-  if (subject === 'english') {
-    return generateEnglishQuestion(skillArea, difficultyLevel, gradeLevel);
-  }
-  
-  // Generic fallback
-  return {
-    question: `What is an important concept in ${subject}?`,
-    options: [
-      'Understanding the basics',
-      'Practicing regularly',
-      'Learning from examples',
-      'All of the above'
-    ],
-    correct: 3,
-    explanation: `All of these are important when learning ${subject}.`,
-    learningObjectives: [`Understanding ${subject} fundamentals`],
-    estimatedTime: 30,
-    conceptsCovered: [skillArea]
-  };
-};
-
-const generateMusicQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
-  const musicQuestions = {
-    music_theory: [
-      {
-        question: "Which of the following is a major scale pattern?",
-        options: [
-          "Whole-Half-Whole-Whole-Half-Whole-Whole",
-          "Whole-Whole-Half-Whole-Whole-Whole-Half",
-          "Half-Whole-Whole-Half-Whole-Whole-Whole",
-          "Whole-Whole-Whole-Half-Whole-Whole-Half"
-        ],
-        correct: 1,
-        explanation: "The major scale pattern is Whole-Whole-Half-Whole-Whole-Whole-Half, which creates the familiar 'Do-Re-Mi' sound."
-      },
-      {
-        question: "How many beats does a whole note get in 4/4 time?",
-        options: ["1 beat", "2 beats", "3 beats", "4 beats"],
-        correct: 3,
-        explanation: "In 4/4 time, a whole note gets 4 beats, filling the entire measure."
-      },
-      {
-        question: "What is the distance between C and E called?",
-        options: ["Minor third", "Major third", "Perfect fourth", "Perfect fifth"],
-        correct: 1,
-        explanation: "The distance between C and E is a major third, consisting of 4 half steps."
-      }
-    ],
-    rhythm: [
-      {
-        question: "In 4/4 time, how many quarter notes fit in one measure?",
-        options: ["2", "3", "4", "8"],
-        correct: 2,
-        explanation: "In 4/4 time signature, there are 4 quarter note beats per measure."
-      },
-      {
-        question: "What type of note gets half a beat in 4/4 time?",
-        options: ["Whole note", "Half note", "Quarter note", "Eighth note"],
-        correct: 3,
-        explanation: "An eighth note gets half a beat in 4/4 time."
-      }
-    ]
-  };
-
-  const questions = musicQuestions[skillArea as keyof typeof musicQuestions] || musicQuestions.music_theory;
-  const selectedQuestion = questions[Math.floor(Math.random() * questions.length)];
-
-  return {
-    question: selectedQuestion.question,
-    options: selectedQuestion.options,
-    correct: selectedQuestion.correct,
-    explanation: selectedQuestion.explanation,
-    learningObjectives: [`Grade ${gradeLevel} Music Theory`],
-    estimatedTime: 45,
-    conceptsCovered: [skillArea]
-  };
-};
-
-const generateMathQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
-  return {
-    question: "What is 15 + 8?",
-    options: ["21", "22", "23", "24"],
-    correct: 2,
-    explanation: "15 + 8 = 23",
-    learningObjectives: [`Grade ${gradeLevel} Mathematics`],
-    estimatedTime: 30,
-    conceptsCovered: [skillArea]
-  };
-};
-
-const generateScienceQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
-  return {
-    question: "What is the chemical symbol for water?",
-    options: ["H2O", "CO2", "NaCl", "O2"],
-    correct: 0,
-    explanation: "Water's chemical formula is H2O - two hydrogen atoms and one oxygen atom.",
-    learningObjectives: [`Grade ${gradeLevel} Science`],
-    estimatedTime: 30,
-    conceptsCovered: [skillArea]
-  };
-};
-
-const generateEnglishQuestion = (skillArea: string, difficultyLevel: number, gradeLevel: number): Question => {
-  return {
-    question: "Which word is a noun?",
-    options: ["run", "quickly", "beautiful", "house"],
-    correct: 3,
-    explanation: "A noun is a person, place, or thing. 'House' is a thing, so it's a noun.",
-    learningObjectives: [`Grade ${gradeLevel} English`],
-    estimatedTime: 30,
-    conceptsCovered: [skillArea]
-  };
-};
-
 export class FallbackQuestionGenerator {
-  static createUniqueQuestion(
-    subject: string,
-    skillArea: string,
-    timestamp: number,
-    randomSeed: number
-  ): Question {
-    const baseQuestion = generateFallbackQuestion(subject, skillArea, 1);
+  static createUniqueQuestion(subject: string, skillArea: string, timestamp: number, seed: number) {
+    const uniqueId = Math.floor(timestamp + seed);
+    const scenarios = [
+      'At the space station',
+      'During a treasure hunt', 
+      'At the magical carnival',
+      'In the enchanted forest',
+      'At the robot factory',
+      'During the dinosaur expedition',
+      'At the underwater kingdom',
+      'In the future city',
+      'At the superhero academy',
+      'During the time travel adventure'
+    ];
     
-    // Make question unique by adding timestamp
+    const characters = [
+      'Captain Nova', 'Princess Luna', 'Robot Rex', 'Wizard Zane',
+      'Explorer Emma', 'Detective Sam', 'Pilot Pete', 'Chef Clara',
+      'Scientist Sara', 'Artist Alex', 'Builder Bob', 'Teacher Tina'
+    ];
+
+    const randomScenario = scenarios[uniqueId % scenarios.length];
+    const randomCharacter = characters[uniqueId % characters.length];
+
+    if (subject.toLowerCase().includes('math')) {
+      return this.createMathQuestion(randomScenario, randomCharacter, uniqueId);
+    } else if (subject.toLowerCase().includes('english')) {
+      return this.createEnglishQuestion(randomScenario, randomCharacter, uniqueId);
+    } else {
+      return this.createGeneralQuestion(randomScenario, randomCharacter, uniqueId);
+    }
+  }
+
+  private static createMathQuestion(scenario: string, character: string, uniqueId: number) {
+    const operations = [
+      { op: '+', symbol: '+', name: 'addition' },
+      { op: '-', symbol: '-', name: 'subtraction' },
+      { op: '*', symbol: '×', name: 'multiplication' },
+      { op: 'division', symbol: '÷', name: 'division' }
+    ];
+
+    const operation = operations[uniqueId % operations.length];
+    const num1 = (uniqueId % 20) + 5; // 5-24
+    const num2 = (uniqueId % 15) + 3; // 3-17
+
+    let question, answer, wrongAnswers;
+
+    switch (operation.op) {
+      case '+':
+        answer = num1 + num2;
+        question = `${scenario}: ${character} collected ${num1} magical crystals in the morning and ${num2} more in the afternoon. How many crystals does ${character} have altogether?`;
+        wrongAnswers = [answer - 1, answer + 1, answer + 2];
+        break;
+      case '-':
+        const larger = Math.max(num1, num2);
+        const smaller = Math.min(num1, num2);
+        answer = larger - smaller;
+        question = `${scenario}: ${character} started with ${larger} power gems but used ${smaller} of them. How many power gems are left?`;
+        wrongAnswers = [answer + 1, answer - 1, answer + 2];
+        break;
+      case '*':
+        answer = Math.min(num1, 12) * Math.min(num2, 12);
+        question = `${scenario}: ${character} found ${Math.min(num1, 12)} treasure chests, each containing ${Math.min(num2, 12)} gold coins. How many gold coins did ${character} find in total?`;
+        wrongAnswers = [answer + Math.min(num1, 12), answer - Math.min(num2, 12), answer + 5];
+        break;
+      default: // division
+        const dividend = num1 * num2;
+        answer = num1;
+        question = `${scenario}: ${character} needs to share ${dividend} magic potions equally among ${num2} friends. How many potions will each friend get?`;
+        wrongAnswers = [answer + 1, answer - 1, num2];
+    }
+
+    const allOptions = [answer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+    const correctIndex = allOptions.indexOf(answer);
+
     return {
-      ...baseQuestion,
-      question: `${baseQuestion.question} (Session: ${timestamp})`
+      question,
+      options: allOptions.map(String),
+      correct: correctIndex,
+      explanation: `${character} solved this ${operation.name} problem! The answer is ${answer}.`
+    };
+  }
+
+  private static createEnglishQuestion(scenario: string, character: string, uniqueId: number) {
+    const topics = [
+      { type: 'synonym', word: 'happy', options: ['joyful', 'sad', 'angry', 'tired'], correct: 0 },
+      { type: 'antonym', word: 'big', options: ['huge', 'small', 'wide', 'tall'], correct: 1 },
+      { type: 'rhyme', word: 'cat', options: ['bat', 'dog', 'fish', 'bird'], correct: 0 },
+      { type: 'plural', word: 'child', options: ['children', 'childs', 'childes', 'child'], correct: 0 }
+    ];
+
+    const topic = topics[uniqueId % topics.length];
+    
+    const question = `${scenario}: ${character} is learning about words! What ${topic.type} of "${topic.word}" should ${character} choose?`;
+    
+    return {
+      question,
+      options: topic.options,
+      correct: topic.correct,
+      explanation: `Great job! ${character} learned that "${topic.options[topic.correct]}" is the correct ${topic.type} for "${topic.word}".`
+    };
+  }
+
+  private static createGeneralQuestion(scenario: string, character: string, uniqueId: number) {
+    const topics = [
+      { q: 'What color do you get when you mix red and blue?', options: ['purple', 'green', 'orange', 'yellow'], correct: 0 },
+      { q: 'How many legs does a spider have?', options: ['6', '8', '10', '12'], correct: 1 },
+      { q: 'What do plants need to grow?', options: ['music', 'sunlight', 'toys', 'books'], correct: 1 },
+      { q: 'Which planet is closest to the sun?', options: ['Earth', 'Mars', 'Mercury', 'Venus'], correct: 2 }
+    ];
+
+    const topic = topics[uniqueId % topics.length];
+    const question = `${scenario}: ${character} wants to know: ${topic.q}`;
+    
+    return {
+      question,
+      options: topic.options,
+      correct: topic.correct,
+      explanation: `Excellent! ${character} learned something new today!`
     };
   }
 }
