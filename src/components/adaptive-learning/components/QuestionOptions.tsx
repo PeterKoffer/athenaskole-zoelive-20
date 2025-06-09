@@ -8,6 +8,7 @@ interface QuestionOptionsProps {
   correctAnswer: number;
   showResult: boolean;
   onAnswerSelect: (index: number) => void;
+  disabled?: boolean;
 }
 
 const QuestionOptions = ({
@@ -15,7 +16,8 @@ const QuestionOptions = ({
   selectedAnswer,
   correctAnswer,
   showResult,
-  onAnswerSelect
+  onAnswerSelect,
+  disabled = false
 }: QuestionOptionsProps) => {
   const getOptionClassName = (index: number) => {
     if (selectedAnswer === index) {
@@ -41,8 +43,8 @@ const QuestionOptions = ({
           key={index}
           variant="outline"
           className={`w-full text-left justify-start p-3 sm:p-4 h-auto transition-all duration-200 text-sm sm:text-base ${getOptionClassName(index)}`}
-          onClick={() => onAnswerSelect(index)}
-          disabled={showResult || selectedAnswer !== null}
+          onClick={() => !disabled && !showResult && onAnswerSelect(index)}
+          disabled={showResult || selectedAnswer !== null || disabled}
         >
           <span className="mr-2 sm:mr-3 font-semibold text-base sm:text-lg">
             {String.fromCharCode(65 + index)}.

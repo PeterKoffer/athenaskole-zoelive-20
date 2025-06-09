@@ -47,13 +47,10 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
       isCorrect,
       activityId: activity.id
     });
-    
-    // Prevent auto-advancement - user must click next
-    // Auto-advance removed to prevent skipping
   };
 
   const handleNextQuestion = () => {
-    if (!hasSubmitted) return; // Cannot proceed without submitting
+    if (!hasSubmitted) return;
     
     const correctAnswerIndex = activity.content.correctAnswer !== undefined 
       ? activity.content.correctAnswer 
@@ -148,7 +145,6 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
           </div>
         )}
 
-        {/* Fixed button alignment and disabled skip functionality */}
         <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 px-2">
           <div className="text-green-300 text-sm sm:text-base order-2 sm:order-1">
             Time: {timeRemaining}s
@@ -165,7 +161,8 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
           ) : (
             <Button
               onClick={handleNextQuestion}
-              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg order-1 sm:order-2"
+              disabled={!hasSubmitted}
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg order-1 sm:order-2"
             >
               Continue to Next Question
             </Button>

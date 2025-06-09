@@ -1,7 +1,22 @@
 
 export class FallbackQuestionGenerator {
+  private static usedQuestions = new Set<string>();
+  
   static createUniqueQuestion(subject: string, skillArea: string, timestamp: number, seed: number) {
-    const uniqueId = Math.floor(timestamp + seed);
+    let attempts = 0;
+    let question;
+    
+    do {
+      const uniqueId = Math.floor(timestamp + seed + attempts);
+      question = this.generateQuestion(subject, skillArea, uniqueId);
+      attempts++;
+    } while (this.usedQuestions.has(question.question) && attempts < 10);
+    
+    this.usedQuestions.add(question.question);
+    return question;
+  }
+  
+  private static generateQuestion(subject: string, skillArea: string, uniqueId: number) {
     const scenarios = [
       'At the space station',
       'During a treasure hunt', 
@@ -23,17 +38,18 @@ export class FallbackQuestionGenerator {
 
     const randomScenario = scenarios[uniqueId % scenarios.length];
     const randomCharacter = characters[uniqueId % characters.length];
+    const uniqueSuffix = `(${Date.now()}-${uniqueId})`;
 
     if (subject.toLowerCase().includes('math')) {
-      return this.createMathQuestion(randomScenario, randomCharacter, uniqueId);
+      return this.createMathQuestion(randomScenario, randomCharacter, uniqueId, uniqueSuffix);
     } else if (subject.toLowerCase().includes('english')) {
-      return this.createEnglishQuestion(randomScenario, randomCharacter, uniqueId);
+      return this.createEnglishQuestion(randomScenario, randomCharacter, uniqueId, uniqueSuffix);
     } else {
-      return this.createGeneralQuestion(randomScenario, randomCharacter, uniqueId);
+      return this.createGeneralQuestion(randomScenario, randomCharacter, uniqueId, uniqueSuffix);
     }
   }
 
-  private static createMathQuestion(scenario: string, character: string, uniqueId: number) {
+  private static createMathQuestion(scenario: string, character: string, uniqueId: number, suffix: string) {
     const operations = [
       { op: '+', symbol: '+', name: 'addition' },
       { op: '-', symbol: '-', name: 'subtraction' },
@@ -42,33 +58,33 @@ export class FallbackQuestionGenerator {
     ];
 
     const operation = operations[uniqueId % operations.length];
-    const num1 = (uniqueId % 20) + 5; // 5-24
-    const num2 = (uniqueId % 15) + 3; // 3-17
+    const num1 = (uniqueId % 20) + 5;
+    const num2 = (uniqueId % 15) + 3;
 
     let question, answer, wrongAnswers;
 
     switch (operation.op) {
       case '+':
         answer = num1 + num2;
-        question = `${scenario}: ${character} collected ${num1} magical crystals in the morning and ${num2} more in the afternoon. How many crystals does ${character} have altogether?`;
+        question = `${scenario}: ${character} collected ${num1} magical crystals in the morning and ${num2} more in the afternoon. How many crystals does ${character} have altogether? ${suffix}`;
         wrongAnswers = [answer - 1, answer + 1, answer + 2];
         break;
       case '-':
         const larger = Math.max(num1, num2);
         const smaller = Math.min(num1, num2);
         answer = larger - smaller;
-        question = `${scenario}: ${character} started with ${larger} power gems but used ${smaller} of them. How many power gems are left?`;
+        question = `${scenario}: ${character} started with ${larger} power gems but used ${smaller} of them. How many power gems are left? ${suffix}`;
         wrongAnswers = [answer + 1, answer - 1, answer + 2];
         break;
       case '*':
         answer = Math.min(num1, 12) * Math.min(num2, 12);
-        question = `${scenario}: ${character} found ${Math.min(num1, 12)} treasure chests, each containing ${Math.min(num2, 12)} gold coins. How many gold coins did ${character} find in total?`;
+        question = `${scenario}: ${character} found ${Math.min(num1, 12)} treasure chests, each containing ${Math.min(num2, 12)} gold coins. How many gold coins did ${character} find in total? ${suffix}`;
         wrongAnswers = [answer + Math.min(num1, 12), answer - Math.min(num2, 12), answer + 5];
         break;
-      default: // division
+      default:
         const dividend = num1 * num2;
         answer = num1;
-        question = `${scenario}: ${character} needs to share ${dividend} magic potions equally among ${num2} friends. How many potions will each friend get?`;
+        question = `${scenario}: ${character} needs to share ${dividend} magic potions equally among ${num2} friends. How many potions will each friend get? ${suffix}`;
         wrongAnswers = [answer + 1, answer - 1, num2];
     }
 
@@ -86,7 +102,7 @@ export class FallbackQuestionGenerator {
     };
   }
 
-  private static createEnglishQuestion(scenario: string, character: string, uniqueId: number) {
+  private static createEnglishQuestion(scenario: string, character: string, uniqueId: number, suffix: string) {
     const topics = [
       { type: 'synonym', word: 'happy', options: ['joyful', 'sad', 'angry', 'tired'], correct: 0 },
       { type: 'antonym', word: 'big', options: ['huge', 'small', 'wide', 'tall'], correct: 1 },
@@ -96,7 +112,7 @@ export class FallbackQuestionGenerator {
 
     const topic = topics[uniqueId % topics.length];
     
-    const question = `${scenario}: ${character} is learning about words! What ${topic.type} of "${topic.word}" should ${character} choose?`;
+    const question = `${scenario}: ${character} is learning about words! What ${topic.type} of "${topic.word}" should ${character} choose? ${suffix}`;
     
     return {
       question,
@@ -109,7 +125,7 @@ export class FallbackQuestionGenerator {
     };
   }
 
-  private static createGeneralQuestion(scenario: string, character: string, uniqueId: number) {
+  private static createGeneralQuestion(scenario: string, character: string, uniqueId: number, suffix: string) {
     const topics = [
       { q: 'What color do you get when you mix red and blue?', options: ['purple', 'green', 'orange', 'yellow'], correct: 0 },
       { q: 'How many legs does a spider have?', options: ['6', '8', '10', '12'], correct: 1 },
@@ -118,7 +134,7 @@ export class FallbackQuestionGenerator {
     ];
 
     const topic = topics[uniqueId % topics.length];
-    const question = `${scenario}: ${character} wants to know: ${topic.q}`;
+    const question = `${scenario}: ${character} wants to know: ${topic.q} ${suffix}`;
     
     return {
       question,
@@ -129,5 +145,9 @@ export class FallbackQuestionGenerator {
       estimatedTime: 30,
       conceptsCovered: ['general knowledge']
     };
+  }
+  
+  static clearUsedQuestions() {
+    this.usedQuestions.clear();
   }
 }

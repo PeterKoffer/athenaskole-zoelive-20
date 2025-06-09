@@ -5,15 +5,17 @@ import { Play, Pause, SkipForward } from "lucide-react";
 interface LessonControlsProps {
   isSessionActive: boolean;
   onToggleSession: () => void;
-  onNextQuestion: () => void;
+  onNextQuestion?: () => void;
   canSkip: boolean;
+  showSkip?: boolean;
 }
 
 const LessonControls = ({
   isSessionActive,
   onToggleSession,
   onNextQuestion,
-  canSkip
+  canSkip,
+  showSkip = false
 }: LessonControlsProps) => {
   return (
     <div className="flex justify-center space-x-4 p-4 bg-gray-900 border-t border-gray-700">
@@ -34,7 +36,7 @@ const LessonControls = ({
         )}
       </Button>
       
-      {canSkip && (
+      {showSkip && canSkip && onNextQuestion && (
         <Button 
           onClick={onNextQuestion} 
           variant="outline" 
