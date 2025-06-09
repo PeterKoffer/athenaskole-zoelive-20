@@ -20,13 +20,15 @@ const EnhancedActivityRenderer = ({
   isNelieReady
 }: EnhancedActivityRendererProps) => {
   const [timeRemaining, setTimeRemaining] = useState(activity.duration);
+  const [hasAnswered, setHasAnswered] = useState(false);
 
   console.log('🎬 EnhancedActivityRenderer rendering:', {
     activityId: activity.id,
     activityPhase: activity.phase,
     activityTitle: activity.title,
     duration: activity.duration,
-    isNelieReady
+    isNelieReady,
+    hasContent: !!activity.content.question
   });
 
   // Timer for each phase
@@ -34,8 +36,12 @@ const EnhancedActivityRenderer = ({
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          // Auto-advance for content phases, allow manual progression for interactive phases
-          if (activity.phase === 'introduction' || activity.phase === 'content-delivery' || activity.phase === 'summary') {
+          // Only auto-advance for non-interactive phases
+          if (!hasAnswered && (
+            activity.phase === 'introduction' || 
+            activity.phase === 'content-delivery' || 
+            activity.phase === 'summary'
+          )) {
             setTimeout(() => {
               console.log('⏱️ Auto-advancing from phase:', activity.phase);
               onActivityComplete();
@@ -48,9 +54,9 @@ const EnhancedActivityRenderer = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [activity, onActivityComplete]);
+  }, [activity, onActivityComplete, hasAnswered]);
 
-  // Reset timer when activity changes
+  // Reset timer and answer state when activity changes
   useEffect(() => {
     console.log('⏰ Setting timer for phase:', {
       activityId: activity.id,
@@ -59,6 +65,7 @@ const EnhancedActivityRenderer = ({
     });
     
     setTimeRemaining(activity.duration);
+    setHasAnswered(false);
   }, [activity]);
 
   const handleContinue = () => {
@@ -68,6 +75,7 @@ const EnhancedActivityRenderer = ({
 
   const handleAnswerSubmit = (wasCorrect: boolean) => {
     console.log('✅ Answer submitted for phase:', activity.phase, 'Correct:', wasCorrect);
+    setHasAnswered(true);
     onActivityComplete(wasCorrect);
   };
 

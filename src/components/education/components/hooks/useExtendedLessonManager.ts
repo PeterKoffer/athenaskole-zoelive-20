@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { useDiverseQuestionGeneration } from '@/components/adaptive-learning/hooks/useDiverseQuestionGeneration';
@@ -32,6 +33,7 @@ export const useExtendedLessonManager = ({
   const [dynamicActivities, setDynamicActivities] = useState<LessonActivity[]>([]);
   const [targetLessonLength] = useState(18); // 18 minutes target
   const [questionsGenerated, setQuestionsGenerated] = useState(0);
+  const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
 
   // Enhanced teaching engine configuration
   const teachingEngine = useEnhancedTeachingEngine({
@@ -41,17 +43,17 @@ export const useExtendedLessonManager = ({
     learningSpeed: 'adaptive'
   });
 
-  // Dynamic question generation
+  // Dynamic question generation with proper parameters
   const { generateDiverseQuestion } = useDiverseQuestionGeneration({
     subject,
     skillArea,
     difficultyLevel: 3,
     userId: user?.id || '',
     gradeLevel: 5,
-    standardsAlignment: { standard: { code: 'CCSS.ELA' } }
+    standardsAlignment: { standard: { code: 'CCSS.MATH' } }
   });
 
-  // Generate initial lesson activities (now longer baseline)
+  // Generate initial lesson activities
   const [baseLessonActivities] = useState<LessonActivity[]>(() => {
     console.log('🚀 Creating extended 18+ minute lesson for subject:', subject);
     
@@ -80,28 +82,7 @@ export const useExtendedLessonManager = ({
         activities = createEnglishLesson();
     }
 
-    // Extend activities for longer lesson - double the practice questions
-    const extendedActivities = [...activities];
-    
-    // Add more practice activities
-    for (let i = 0; i < 4; i++) {
-      extendedActivities.push({
-        id: `extended-practice-${i}`,
-        type: 'interactive-game',
-        phase: 'interactive-game',
-        title: `Practice Question ${i + 1}`,
-        duration: 240, // 4 minutes each
-        phaseDescription: 'Interactive Practice',
-        content: {
-          question: `This will be dynamically generated based on your progress`,
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correct: 0,
-          explanation: 'Great job! Let\'s keep practicing.'
-        }
-      });
-    }
-
-    return extendedActivities.map(activity => ({
+    return activities.map(activity => ({
       ...teachingEngine.enhanceActivityContent(activity),
       duration: Math.max(activity.duration * 1.2, 180) // Minimum 3 minutes per activity
     }));
@@ -114,16 +95,18 @@ export const useExtendedLessonManager = ({
 
   console.log(`🧠 Extended lesson: ${allActivities.length} activities, targeting ${targetLessonLength} minutes`);
 
-  // Generate dynamic questions based on performance
+  // Generate dynamic questions based on performance - fixed parameters
   const generateDynamicActivity = useCallback(async () => {
-    if (!user?.id) return null;
+    if (!user?.id || isGeneratingQuestion) return null;
 
     try {
+      setIsGeneratingQuestion(true);
       console.log('🎯 Generating dynamic question based on student performance...');
       
+      // Use proper parameters that match the hook interface
       const question = await generateDiverseQuestion({
-        strugglingAreas: correctStreak < 2 ? [skillArea] : [],
-        timeSpent: timeElapsed
+        timeSpent: timeElapsed,
+        usedQuestions: dynamicActivities.map(a => a.content.question || '')
       });
 
       const dynamicActivity: LessonActivity = {
@@ -146,9 +129,35 @@ export const useExtendedLessonManager = ({
       return dynamicActivity;
     } catch (error) {
       console.error('❌ Failed to generate dynamic activity:', error);
-      return null;
+      
+      // Generate fallback question with real content
+      const fallbackActivity: LessonActivity = {
+        id: `fallback-${questionsGenerated}-${Date.now()}`,
+        type: 'interactive-game',
+        phase: 'interactive-game',
+        title: `Practice Question ${questionsGenerated + 1}`,
+        duration: 240,
+        phaseDescription: 'Practice',
+        content: {
+          question: subject.toLowerCase() === 'mathematics' 
+            ? "What is 15 + 27?"
+            : "Which word is a synonym for 'happy'?",
+          options: subject.toLowerCase() === 'mathematics'
+            ? ["40", "42", "44", "46"]
+            : ["Sad", "Joyful", "Angry", "Tired"],
+          correct: subject.toLowerCase() === 'mathematics' ? 1 : 1,
+          explanation: subject.toLowerCase() === 'mathematics'
+            ? "15 + 27 = 42. We can break this down as 15 + 20 = 35, then 35 + 7 = 42."
+            : "Joyful means the same thing as happy - both describe feeling good and cheerful!"
+        }
+      };
+      
+      setQuestionsGenerated(prev => prev + 1);
+      return fallbackActivity;
+    } finally {
+      setIsGeneratingQuestion(false);
     }
-  }, [user?.id, generateDiverseQuestion, skillArea, correctStreak, timeElapsed, questionsGenerated]);
+  }, [user?.id, generateDiverseQuestion, timeElapsed, questionsGenerated, dynamicActivities, subject, isGeneratingQuestion]);
 
   // Check if we need to extend the lesson
   const shouldExtendLesson = useCallback(() => {
@@ -161,7 +170,7 @@ export const useExtendedLessonManager = ({
 
   // Auto-generate more activities if lesson is too short
   useEffect(() => {
-    if (currentActivityIndex > 2 && shouldExtendLesson() && dynamicActivities.length < 6) {
+    if (currentActivityIndex > 2 && shouldExtendLesson() && dynamicActivities.length < 6 && !isGeneratingQuestion) {
       console.log('📚 Lesson seems short, generating additional content...');
       generateDynamicActivity().then(newActivity => {
         if (newActivity) {
@@ -169,7 +178,7 @@ export const useExtendedLessonManager = ({
         }
       });
     }
-  }, [currentActivityIndex, shouldExtendLesson, dynamicActivities.length, generateDynamicActivity]);
+  }, [currentActivityIndex, shouldExtendLesson, dynamicActivities.length, generateDynamicActivity, isGeneratingQuestion]);
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     const responseTime = Date.now() - lessonStartTime - (timeElapsed * 1000);
@@ -187,7 +196,7 @@ export const useExtendedLessonManager = ({
         const celebration = teachingEngine.generateEncouragement(true, correctStreak + 1);
         console.log('🎉 Extended celebration:', celebration);
         teachingEngine.speakWithPersonality(celebration, 'encouragement');
-      }, 800); // Slower pace
+      }, 800);
     } else if (wasCorrect === false) {
       setCorrectStreak(0);
       teachingEngine.adjustTeachingSpeed(false, responseTime);
@@ -199,6 +208,7 @@ export const useExtendedLessonManager = ({
       }, 800);
     }
 
+    // Ensure lesson progresses properly
     setTimeout(() => {
       if (currentActivityIndex < allActivities.length - 1) {
         console.log('📚 Moving to next extended activity');
@@ -215,7 +225,7 @@ export const useExtendedLessonManager = ({
           onLessonComplete();
         }, 5000);
       }
-    }, wasCorrect !== undefined ? 3000 : 1500); // Slower transitions
+    }, wasCorrect !== undefined ? 2500 : 1000); // Faster progression
   }, [currentActivityIndex, allActivities.length, onLessonComplete, teachingEngine, currentActivity, timeElapsed, subject, correctStreak, lessonStartTime]);
 
   const handleReadRequest = useCallback(() => {
