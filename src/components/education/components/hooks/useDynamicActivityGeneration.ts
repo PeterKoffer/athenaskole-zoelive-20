@@ -38,9 +38,10 @@ export const useDynamicActivityGeneration = ({
       setIsGeneratingQuestion(true);
       console.log('🎯 Generating dynamic question based on student performance...');
       
-      // Use proper parameters that match the hook interface
+      // Use proper QuestionContext without usedQuestions - that should be handled internally
       const question = await generateDiverseQuestion({
-        usedQuestions: dynamicActivities.map(a => a.content.question || '')
+        gradeLevel: 5,
+        contentPrompt: `Generate a ${subject} question for ${skillArea}`
       });
 
       const dynamicActivity: LessonActivity = {
@@ -91,7 +92,7 @@ export const useDynamicActivityGeneration = ({
     } finally {
       setIsGeneratingQuestion(false);
     }
-  }, [user?.id, generateDiverseQuestion, questionsGenerated, dynamicActivities, subject, isGeneratingQuestion]);
+  }, [user?.id, generateDiverseQuestion, questionsGenerated, subject, skillArea, isGeneratingQuestion]);
 
   return {
     dynamicActivities,
