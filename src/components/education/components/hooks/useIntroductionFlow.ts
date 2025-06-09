@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
 
@@ -71,7 +70,7 @@ export const useIntroductionFlow = (subject: string) => {
     isReady,
     speakText,
     stopSpeaking,
-    toggleMute
+    handleMuteToggle
   } = useWorkingNelieSpeech();
 
   // Enhanced speech with personality for introductions
@@ -136,12 +135,12 @@ export const useIntroductionFlow = (subject: string) => {
     }
   }, [currentStep, introductionSteps, hasStartedSpeech]);
 
-  const handleMuteToggle = useCallback(() => {
+  const handleMuteToggleWrapper = useCallback(() => {
     if (!hasUserInteracted) {
       setHasStartedSpeech(false);
     }
-    toggleMute();
-  }, [toggleMute, hasUserInteracted]);
+    handleMuteToggle();
+  }, [handleMuteToggle, hasUserInteracted]);
 
   const handleManualRead = useCallback(() => {
     const currentStepText = introductionSteps[currentStep]?.text;
@@ -159,7 +158,7 @@ export const useIntroductionFlow = (subject: string) => {
     introductionSteps,
     isSpeaking,
     autoReadEnabled,
-    handleMuteToggle,
+    handleMuteToggle: handleMuteToggleWrapper,
     handleManualRead,
     stopSpeaking
   };

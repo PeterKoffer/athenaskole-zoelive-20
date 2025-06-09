@@ -23,7 +23,7 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
     isReady,
     speakText,
     stopSpeaking,
-    toggleMute
+    handleMuteToggle
   } = useWorkingNelieSpeech();
 
   // Enhanced speech with slower, more natural pace and personality
@@ -162,7 +162,7 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
     autoReadEnabled,
     hasUserInteracted,
     isReady,
-    toggleMute,
+    toggleMute: handleMuteToggle,
     stopSpeaking
   };
 };

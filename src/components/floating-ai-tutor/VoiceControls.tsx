@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,15 +7,21 @@ import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 
 interface VoiceControlsProps {
   onVoiceInput: (message: string) => void;
+  isSpeaking?: boolean;
+  onStopSpeaking?: () => void;
 }
 
-const VoiceControls = ({ onVoiceInput }: VoiceControlsProps) => {
+const VoiceControls = ({ onVoiceInput, isSpeaking, onStopSpeaking }: VoiceControlsProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const realtimeChatRef = useRef<RealtimeChat | null>(null);
   
-  const { isSpeaking, stop: stopSpeaking } = useUnifiedSpeech();
+  const { isSpeaking: unifiedSpeaking, stop: stopSpeaking } = useUnifiedSpeech();
+
+  // Use the prop if provided, otherwise fall back to unified speech state
+  const actualIsSpeaking = isSpeaking !== undefined ? isSpeaking : unifiedSpeaking;
+  const actualStopSpeaking = onStopSpeaking || stopSpeaking;
 
   const handleMessage = (event: any) => {
     console.log('Voice control received message:', event.type);
@@ -96,11 +101,11 @@ const VoiceControls = ({ onVoiceInput }: VoiceControlsProps) => {
       <Button
         variant="outline"
         size="sm"
-        onClick={isSpeaking ? stopSpeaking : () => {}}
-        className={`border-gray-600 p-1 ${isSpeaking ? "bg-red-600 text-white border-red-600" : "bg-gray-800 text-gray-300"}`}
-        disabled={!isSpeaking}
+        onClick={actualIsSpeaking ? actualStopSpeaking : () => {}}
+        className={`border-gray-600 p-1 ${actualIsSpeaking ? "bg-red-600 text-white border-red-600" : "bg-gray-800 text-gray-300"}`}
+        disabled={!actualIsSpeaking}
       >
-        {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+        {actualIsSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
       </Button>
       {(isListening || isConnected) && (
         <div className="text-center mt-2">
