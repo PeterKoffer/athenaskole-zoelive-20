@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { useDiverseQuestionGeneration } from '@/components/adaptive-learning/hooks/useDiverseQuestionGeneration';
@@ -88,10 +87,11 @@ export const useExtendedLessonManager = ({
     for (let i = 0; i < 4; i++) {
       extendedActivities.push({
         id: `extended-practice-${i}`,
-        type: 'question',
+        type: 'interactive-game',
         phase: 'interactive-game',
         title: `Practice Question ${i + 1}`,
         duration: 240, // 4 minutes each
+        phaseDescription: 'Interactive Practice',
         content: {
           question: `This will be dynamically generated based on your progress`,
           options: ['Option A', 'Option B', 'Option C', 'Option D'],
@@ -122,17 +122,17 @@ export const useExtendedLessonManager = ({
       console.log('🎯 Generating dynamic question based on student performance...');
       
       const question = await generateDiverseQuestion({
-        previousPerformance: { accuracy: score / Math.max(currentActivityIndex, 1) * 100 },
         strugglingAreas: correctStreak < 2 ? [skillArea] : [],
         timeSpent: timeElapsed
       });
 
       const dynamicActivity: LessonActivity = {
         id: `dynamic-${questionsGenerated}-${Date.now()}`,
-        type: 'question',
+        type: 'interactive-game',
         phase: 'interactive-game',
         title: `Adaptive Practice Question ${questionsGenerated + 1}`,
         duration: 240, // 4 minutes
+        phaseDescription: 'Adaptive Practice',
         content: {
           question: question.question,
           options: question.options,
@@ -148,7 +148,7 @@ export const useExtendedLessonManager = ({
       console.error('❌ Failed to generate dynamic activity:', error);
       return null;
     }
-  }, [user?.id, generateDiverseQuestion, skillArea, score, currentActivityIndex, timeElapsed, questionsGenerated]);
+  }, [user?.id, generateDiverseQuestion, skillArea, correctStreak, timeElapsed, questionsGenerated]);
 
   // Check if we need to extend the lesson
   const shouldExtendLesson = useCallback(() => {
