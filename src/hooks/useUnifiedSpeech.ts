@@ -40,6 +40,8 @@ export const useUnifiedSpeech = () => {
     isEnabled: speechState.isEnabled,
     hasUserInteracted: speechState.hasUserInteracted,
     isReady: speechState.isReady,
+    lastError: speechState.lastError,
+    isLoading: speechState.isLoading,
     
     // Actions
     speak,

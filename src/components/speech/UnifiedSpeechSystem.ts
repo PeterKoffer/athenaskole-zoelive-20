@@ -12,6 +12,8 @@ interface SpeechState {
   hasUserInteracted: boolean;
   isReady: boolean;
   currentUtterance: SpeechSynthesisUtterance | null;
+  lastError?: string;
+  isLoading: boolean;
 }
 
 export class UnifiedSpeechSystem {
@@ -21,7 +23,9 @@ export class UnifiedSpeechSystem {
     isEnabled: true,
     hasUserInteracted: false,
     isReady: false,
-    currentUtterance: null
+    currentUtterance: null,
+    lastError: undefined,
+    isLoading: true
   };
   
   private config: SpeechConfig = {
@@ -49,49 +53,109 @@ export class UnifiedSpeechSystem {
 
   private async waitForVoices(): Promise<void> {
     return new Promise((resolve) => {
-      if (speechSynthesis.getVoices().length > 0) {
-        resolve();
-        return;
-      }
-
       const checkVoices = () => {
-        if (speechSynthesis.getVoices().length > 0) {
+        const voices = speechSynthesis.getVoices();
+        if (voices.length > 0) {
           speechSynthesis.removeEventListener('voiceschanged', checkVoices);
+          this.updateState({ isLoading: false });
+          console.log('🎤 Speech voices loaded:', voices.length);
           resolve();
+          return true;
         }
+        return false;
       };
 
+      // Check immediately
+      if (checkVoices()) return;
+
+      // Listen for voices to load
       speechSynthesis.addEventListener('voiceschanged', checkVoices);
       
-      // Fallback timeout
+      // Fallback timeout with better error handling
       setTimeout(() => {
         speechSynthesis.removeEventListener('voiceschanged', checkVoices);
+        const voices = speechSynthesis.getVoices();
+        
+        if (voices.length === 0) {
+          console.warn('🚫 No speech voices loaded after timeout');
+          this.updateState({ 
+            lastError: 'Speech voices failed to load. Try refreshing the page.',
+            isLoading: false 
+          });
+        } else {
+          this.updateState({ isLoading: false });
+        }
+        
         resolve();
-      }, 3000);
+      }, 5000); // Increased timeout for slower devices
     });
   }
 
   private setupSpeechSynthesis(): void {
     if (!('speechSynthesis' in window)) {
-      console.warn('Speech synthesis not supported');
+      console.warn('🚫 Speech synthesis not supported in this browser');
+      this.updateState({ 
+        lastError: 'Speech synthesis not supported in this browser. Try Chrome, Edge, or Firefox.',
+        isReady: false,
+        isLoading: false 
+      });
       return;
     }
 
     this.voicesLoadedPromise.then(() => {
       const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(voice => 
-        voice.name.includes('Google') && voice.lang.startsWith('en') ||
-        voice.name.includes('Microsoft') && voice.lang.startsWith('en') ||
-        voice.lang.startsWith('en-US')
-      );
+      
+      if (voices.length === 0) {
+        console.warn('🚫 No speech voices available');
+        this.updateState({ 
+          lastError: 'No speech voices available. Check browser settings or try a different browser.',
+          isReady: false 
+        });
+        return;
+      }
+
+      // Enhanced voice selection with fallbacks
+      const preferredVoice = this.selectBestVoice(voices);
       
       if (preferredVoice) {
         this.config.voice = preferredVoice;
+        console.log('🎤 Selected voice:', preferredVoice.name, '(', preferredVoice.lang, ')');
+      } else {
+        console.warn('🚫 No suitable voice found, using default');
       }
       
-      this.updateState({ isReady: true });
-      console.log('🎤 Unified Speech System ready with voice:', preferredVoice?.name || 'default');
+      this.updateState({ 
+        isReady: true,
+        lastError: undefined 
+      });
+      console.log('🎤 Unified Speech System ready with', voices.length, 'voices available');
+    }).catch((error) => {
+      console.error('🚫 Failed to setup speech synthesis:', error);
+      this.updateState({ 
+        lastError: 'Failed to initialize speech system. Please try refreshing the page.',
+        isReady: false 
+      });
     });
+  }
+
+  private selectBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+    // Priority order: Google > Microsoft > Apple > other English voices > any voice
+    const priorities = [
+      (v: SpeechSynthesisVoice) => v.name.includes('Google') && v.lang.startsWith('en'),
+      (v: SpeechSynthesisVoice) => v.name.includes('Microsoft') && v.lang.startsWith('en'),
+      (v: SpeechSynthesisVoice) => v.name.includes('Apple') && v.lang.startsWith('en'),
+      (v: SpeechSynthesisVoice) => v.lang.startsWith('en-US'),
+      (v: SpeechSynthesisVoice) => v.lang.startsWith('en'),
+      (v: SpeechSynthesisVoice) => v.default,
+      () => true // Any voice as last resort
+    ];
+
+    for (const priority of priorities) {
+      const voice = voices.find(priority);
+      if (voice) return voice;
+    }
+
+    return voices[0] || null;
   }
 
   private updateState(updates: Partial<SpeechState>): void {
@@ -108,9 +172,40 @@ export class UnifiedSpeechSystem {
     return { ...this.state };
   }
 
+  private getSpeechErrorMessage(error: SpeechSynthesisErrorEvent['error']): string {
+    switch (error) {
+      case 'network':
+        return 'Network error during speech. Check your internet connection.';
+      case 'synthesis-failed':
+        return 'Speech synthesis failed. Try refreshing the page.';
+      case 'synthesis-unavailable':
+        return 'Speech synthesis unavailable. Try a different browser.';
+      case 'audio-busy':
+        return 'Audio system busy. Wait a moment and try again.';
+      case 'audio-hardware':
+        return 'Audio hardware issue. Check your speakers/headphones.';
+      case 'language-unavailable':
+        return 'Speech language not available. Trying default voice.';
+      case 'voice-unavailable':
+        return 'Selected voice unavailable. Using default voice.';
+      case 'text-too-long':
+        return 'Text too long for speech synthesis.';
+      case 'invalid-argument':
+        return 'Invalid speech parameters. Using defaults.';
+      case 'not-allowed':
+        return 'Speech not allowed. Check browser permissions.';
+      default:
+        return `Speech error: ${error}. Try refreshing the page.`;
+    }
+  }
+
+  // Clear error state when user interaction is enabled
   enableUserInteraction(): void {
     if (!this.state.hasUserInteracted) {
-      this.updateState({ hasUserInteracted: true });
+      this.updateState({ 
+        hasUserInteracted: true,
+        lastError: undefined // Clear any previous errors
+      });
       console.log('🎤 User interaction enabled for speech');
     }
   }
@@ -128,11 +223,9 @@ export class UnifiedSpeechSystem {
 
   async speak(text: string, priority: boolean = false): Promise<void> {
     if (!this.canSpeak()) {
-      console.log('🚫 Cannot speak:', { 
-        enabled: this.state.isEnabled, 
-        hasUserInteracted: this.state.hasUserInteracted,
-        isReady: this.state.isReady 
-      });
+      const reason = this.getCannotSpeakReason();
+      console.log('🚫 Cannot speak:', reason);
+      this.updateState({ lastError: reason });
       return;
     }
 
@@ -145,6 +238,25 @@ export class UnifiedSpeechSystem {
     if (!this.isProcessingQueue) {
       await this.processQueue();
     }
+  }
+
+  private getCannotSpeakReason(): string {
+    if (!('speechSynthesis' in window)) {
+      return 'Speech synthesis not supported in this browser. Try Chrome, Edge, or Firefox.';
+    }
+    if (!this.state.isEnabled) {
+      return 'Speech is disabled. Click the volume button to enable it.';
+    }
+    if (!this.state.hasUserInteracted) {
+      return 'User interaction required. Click any speech button to enable audio.';
+    }
+    if (!this.state.isReady) {
+      if (this.state.isLoading) {
+        return 'Speech system is still loading. Please wait...';
+      }
+      return 'Speech system not ready. Try refreshing the page.';
+    }
+    return 'Speech unavailable for unknown reason.';
   }
 
   private async processQueue(): Promise<void> {
@@ -208,7 +320,12 @@ export class UnifiedSpeechSystem {
 
       utterance.onerror = (event) => {
         console.error('🚫 Speech error:', event.error);
-        this.updateState({ isSpeaking: false, currentUtterance: null });
+        const errorMessage = this.getSpeechErrorMessage(event.error);
+        this.updateState({ 
+          isSpeaking: false, 
+          currentUtterance: null,
+          lastError: errorMessage 
+        });
         resolve();
       };
 
