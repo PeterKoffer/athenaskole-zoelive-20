@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, CheckCircle, ArrowLeft } from 'lucide-react';
-import { LessonState } from './LessonStateManager';
+import { LessonState } from '../contexts/UnifiedLessonContext';
 import EnhancedLessonManager from './EnhancedLessonManager';
 
 interface LessonPhaseRendererProps {

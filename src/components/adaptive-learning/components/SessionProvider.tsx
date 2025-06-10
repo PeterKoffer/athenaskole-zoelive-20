@@ -1,4 +1,8 @@
 
+// DEPRECATED: This file has been replaced by UnifiedSessionContext.tsx
+// The functionality of this component has been consolidated into the unified session state management
+// Please use UnifiedSessionProvider instead
+
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useDiverseQuestionGeneration, Question } from '../hooks/useDiverseQuestionGeneration';

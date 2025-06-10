@@ -1,4 +1,8 @@
 
+// Note: This timer hook is now incorporated into UnifiedSessionContext.tsx
+// The timer logic has been consolidated to avoid conflicts with multiple timers
+// Consider using UnifiedSessionProvider for new implementations
+
 import { useState, useEffect, useCallback } from 'react';
 
 export const useQuestionTimer = (initialTime: number, onTimeUp: () => void) => {

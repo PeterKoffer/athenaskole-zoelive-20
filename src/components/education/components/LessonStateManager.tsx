@@ -1,4 +1,8 @@
 
+// DEPRECATED: This file has been replaced by UnifiedLessonContext.tsx
+// The functionality of this hook has been consolidated into the unified lesson state management
+// Please use UnifiedLessonProvider and useUnifiedLesson instead
+
 import { useState, useCallback } from 'react';
 
 export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';

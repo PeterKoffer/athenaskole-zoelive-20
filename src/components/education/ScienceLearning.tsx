@@ -4,7 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import LearningHeader from "./LearningHeader";
 import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
-import { useLessonStateManager } from "./components/LessonStateManager";
+import { UnifiedLessonProvider, useUnifiedLesson } from "./contexts/UnifiedLessonContext";
+import { LessonActivity } from "./components/types/LessonTypes";
 
 interface LearningMode {
   id: string;
@@ -16,18 +17,53 @@ interface LearningMode {
   benefits: string[];
 }
 
-const ScienceLearning = () => {
+// Sample activities for Science - these would normally come from a curriculum system
+const scienceActivities: LessonActivity[] = [
+  {
+    id: 'science-intro-1',
+    title: 'Introduction to the Solar System',
+    phase: 'explanation',
+    content: {
+      explanation: 'Welcome to today\'s science lesson! We\'ll explore our solar system and the planets within it.'
+    }
+  },
+  {
+    id: 'science-practice-1',
+    title: 'Planet Classification',
+    phase: 'interactive-game',
+    content: {
+      question: 'Which planet is known as the "Red Planet"?',
+      options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
+      correctAnswer: 1
+    }
+  },
+  {
+    id: 'science-practice-2',
+    title: 'Solar System Facts',
+    phase: 'interactive-game',
+    content: {
+      question: 'What is at the center of our solar system?',
+      options: ['The Moon', 'Earth', 'The Sun', 'Mars'],
+      correctAnswer: 2
+    }
+  }
+];
+
+const ScienceLearningContent = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [currentMode, setCurrentMode] = useState("adaptive");
 
   const {
-    lessonState,
+    phase,
+    timeSpent,
+    currentSegment,
+    totalSegments,
     handleLessonStart,
     handleLessonComplete,
     handleLessonPause,
     handleLessonResume
-  } = useLessonStateManager();
+  } = useUnifiedLesson();
 
   console.log('🔬 ScienceLearning component state:', {
     user: !!user,
@@ -36,7 +72,7 @@ const ScienceLearning = () => {
     currentMode,
     subject: 'science',
     skillArea: 'general_science',
-    lessonPhase: lessonState.phase
+    lessonPhase: phase
   });
 
   // Redirect to auth if not logged in
@@ -81,7 +117,13 @@ const ScienceLearning = () => {
       />
       <div className="max-w-4xl mx-auto p-6">
         <LessonPhaseRenderer
-          lessonState={lessonState}
+          lessonState={{
+            phase,
+            timeSpent,
+            currentSegment,
+            totalSegments,
+            score: 0 // Will be managed by unified context
+          }}
           onLessonStart={handleLessonStart}
           onLessonComplete={handleLessonComplete}
           onLessonResume={handleLessonResume}
@@ -91,6 +133,24 @@ const ScienceLearning = () => {
         />
       </div>
     </div>
+  );
+};
+
+const ScienceLearning = () => {
+  const navigate = useNavigate();
+  
+  const handleLessonComplete = () => {
+    navigate('/daily-program');
+  };
+
+  return (
+    <UnifiedLessonProvider
+      subject="Science"
+      allActivities={scienceActivities}
+      onLessonComplete={handleLessonComplete}
+    >
+      <ScienceLearningContent />
+    </UnifiedLessonProvider>
   );
 };
 

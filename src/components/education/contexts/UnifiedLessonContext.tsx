@@ -4,6 +4,14 @@ import { LessonActivity } from '../components/types/LessonTypes';
 
 export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';
 
+export interface LessonState {
+  phase: LessonPhase;
+  timeSpent: number;
+  currentSegment: number;
+  totalSegments: number;
+  score: number;
+}
+
 export interface UnifiedLessonState {
   // Core lesson state
   phase: LessonPhase;
