@@ -1,22 +1,13 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, Play } from 'lucide-react';
-import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
+import { useInteractiveLessonState, LessonState } from './hooks/useInteractiveLessonState';
+import { useInteractiveLessonQuestions } from './hooks/useInteractiveLessonQuestions';
 import NelieAvatarSection from './NelieAvatarSection';
-import QuestionDisplay from './QuestionDisplay';
-import AnswerOptions from './AnswerOptions';
-import QuestionResult from './QuestionResult';
-import LessonControls from './LessonControls';
-
-interface LessonState {
-  phase: 'introduction' | 'interactive' | 'paused' | 'completed';
-  timeSpent: number;
-  currentSegment: number;
-  totalSegments: number;
-  canResume: boolean;
-}
+import LessonQuestionCard from './LessonQuestionCard';
 
 interface InteractiveLessonSessionProps {
   subject: string;
@@ -26,14 +17,6 @@ interface InteractiveLessonSessionProps {
   onLessonComplete: () => void;
 }
 
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-}
-
 const InteractiveLessonSession = ({
   subject,
   skillArea,
@@ -41,69 +24,34 @@ const InteractiveLessonSession = ({
   onStateUpdate,
   onLessonComplete
 }: InteractiveLessonSessionProps) => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [score, setScore] = useState(0);
-  const [hasReadQuestion, setHasReadQuestion] = useState(false);
+  const {
+    currentQuestionIndex,
+    selectedAnswer,
+    showResult,
+    score,
+    hasReadQuestion,
+    setHasReadQuestion,
+    handleAnswerSelect,
+    handleSubmitAnswer,
+    moveToNextQuestion
+  } = useInteractiveLessonState();
+
+  const questions = useInteractiveLessonQuestions(subject);
+  const currentQuestion = questions[currentQuestionIndex];
   
   const {
     isSpeaking,
-    autoReadEnabled,
-    speakText,
-    stopSpeaking,
-    handleMuteToggle
-  } = useSpeechSynthesis();
+    isEnabled: autoReadEnabled,
+    speakAsNelie: speakText,
+    stop: stopSpeaking,
+    toggleEnabled: handleMuteToggle
+  } = useConsolidatedSpeech();
 
-  // Sample questions based on subject
-  const getQuestions = (): Question[] => {
-    if (subject === 'mathematics') {
-      return [
-        {
-          id: 1,
-          question: "What is 7 + 5?",
-          options: ["10", "11", "12", "13"],
-          correctAnswer: 2,
-          explanation: "When we add 7 + 5, we count forward: 7, 8, 9, 10, 11, 12. So the answer is 12!"
-        },
-        {
-          id: 2,
-          question: "Which number is greater: 15 or 9?",
-          options: ["15", "9", "They are equal", "Cannot tell"],
-          correctAnswer: 0,
-          explanation: "15 is greater than 9. When comparing numbers, the one with more digits or the larger value is greater."
-        },
-        {
-          id: 3,
-          question: "What is 20 - 8?",
-          options: ["10", "11", "12", "13"],
-          correctAnswer: 2,
-          explanation: "When we subtract 8 from 20, we count backward: 20, 19, 18, 17, 16, 15, 14, 13, 12. So 20 - 8 = 12!"
-        }
-      ];
-    }
-    return [];
-  };
-
-  const questions = getQuestions();
-  const currentQuestion = questions[currentQuestionIndex];
-
-  const handleAnswerSelect = async (answerIndex: number) => {
-    if (showResult || selectedAnswer !== null) return;
+  const handleSubmitAnswerWithSpeech = () => {
+    if (!currentQuestion) return;
     
-    setSelectedAnswer(answerIndex);
-  };
-
-  const handleSubmitAnswer = () => {
-    if (selectedAnswer === null) return;
+    const isCorrect = handleSubmitAnswer(currentQuestion);
     
-    setShowResult(true);
-    
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
-    if (isCorrect) {
-      setScore(score + 1);
-    }
-
     // Speak result with proper timing
     if (autoReadEnabled) {
       const resultText = isCorrect ? 
@@ -119,12 +67,9 @@ const InteractiveLessonSession = ({
     }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestionWithState = () => {
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setHasReadQuestion(false); // Reset for new question
+      moveToNextQuestion();
       
       // Update lesson state
       onStateUpdate({
@@ -151,7 +96,7 @@ const InteractiveLessonSession = ({
         speakText(fullText);
       }, 2000);
     }
-  }, [currentQuestionIndex, autoReadEnabled, currentQuestion, showResult, hasReadQuestion, speakText]);
+  }, [currentQuestionIndex, autoReadEnabled, currentQuestion, showResult, hasReadQuestion, speakText, setHasReadQuestion]);
 
   const readQuestion = () => {
     if (!currentQuestion) return;
@@ -199,40 +144,17 @@ const InteractiveLessonSession = ({
         onReadQuestion={readQuestion}
       />
 
-      <QuestionDisplay
-        question={currentQuestion.question}
+      <LessonQuestionCard
+        question={currentQuestion}
         currentQuestionIndex={currentQuestionIndex}
         totalQuestions={questions.length}
-        score={score}
+        selectedAnswer={selectedAnswer}
         showResult={showResult}
+        score={score}
+        onAnswerSelect={handleAnswerSelect}
+        onSubmitAnswer={handleSubmitAnswerWithSpeech}
+        onNextQuestion={handleNextQuestionWithState}
       />
-
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="space-y-6 p-6">
-          <AnswerOptions
-            options={currentQuestion.options}
-            selectedAnswer={selectedAnswer}
-            correctAnswer={currentQuestion.correctAnswer}
-            showResult={showResult}
-            onAnswerSelect={handleAnswerSelect}
-          />
-
-          <QuestionResult
-            showResult={showResult}
-            isCorrect={selectedAnswer === currentQuestion.correctAnswer}
-            explanation={currentQuestion.explanation}
-            isLastQuestion={currentQuestionIndex === questions.length - 1}
-          />
-
-          <LessonControls
-            showResult={showResult}
-            selectedAnswer={selectedAnswer}
-            isLastQuestion={currentQuestionIndex === questions.length - 1}
-            onSubmitAnswer={handleSubmitAnswer}
-            onNextQuestion={handleNextQuestion}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 };

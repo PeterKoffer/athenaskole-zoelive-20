@@ -1,11 +1,3 @@
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
-export const useWorkingSpeech = () => {
-  const unifiedSpeech = useUnifiedSpeech();
-  
-  return {
-    ...unifiedSpeech,
-    // Keep the original method names for backward compatibility
-    speakText: unifiedSpeech.speakAsNelie
-  };
-};
+// Deprecated: Use useConsolidatedSpeech instead
+export { useConsolidatedSpeech as useWorkingSpeech } from '@/hooks/useConsolidatedSpeech';

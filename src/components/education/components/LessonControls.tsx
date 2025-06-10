@@ -1,5 +1,5 @@
-
-import { Button } from '@/components/ui/button';
+import UnifiedLessonControls from './UnifiedLessonControls';
+import { QuestionLessonControlsProps } from './interfaces/LessonControlsTypes';
 
 interface LessonControlsProps {
   showResult: boolean;
@@ -10,35 +10,17 @@ interface LessonControlsProps {
   disabled?: boolean;
 }
 
-const LessonControls = ({
-  showResult,
-  selectedAnswer,
-  isLastQuestion,
-  onSubmitAnswer,
-  onNextQuestion,
-  disabled = false
-}: LessonControlsProps) => {
-  return (
-    <div className="flex justify-center w-full px-4 sm:px-6 md:px-8">
-      {!showResult ? (
-        <Button
-          onClick={onSubmitAnswer}
-          disabled={selectedAnswer === null || disabled}
-          className="bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg max-w-xs sm:max-w-sm"
-        >
-          Submit Answer
-        </Button>
-      ) : (
-        <Button
-          onClick={onNextQuestion}
-          disabled={disabled}
-          className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg max-w-xs sm:max-w-sm"
-        >
-          {isLastQuestion ? 'Complete Lesson' : 'Next Question'}
-        </Button>
-      )}
-    </div>
-  );
+const LessonControls = (props: LessonControlsProps) => {
+  const unifiedProps: QuestionLessonControlsProps = {
+    showResult: props.showResult,
+    selectedAnswer: props.selectedAnswer,
+    isLastQuestion: props.isLastQuestion,
+    onSubmitAnswer: props.onSubmitAnswer,
+    onNextQuestion: props.onNextQuestion,
+    disabled: props.disabled
+  };
+
+  return <UnifiedLessonControls {...unifiedProps} />;
 };
 
 export default LessonControls;
