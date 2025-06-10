@@ -1,7 +1,7 @@
 
 import { Progress } from '@/components/ui/progress';
 import { Clock, BookOpen } from 'lucide-react';
-import { LessonPhase } from './LessonStateManager';
+import { LessonPhase } from '../contexts/UnifiedLessonContext';
 
 interface LessonProgressTrackerProps {
   currentTime: number;

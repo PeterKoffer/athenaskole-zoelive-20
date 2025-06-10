@@ -1,5 +1,5 @@
 
-import { useSessionState } from '../hooks/useSessionState';
+import { UnifiedSessionProvider, useUnifiedSession } from '../contexts/UnifiedSessionContext';
 import SessionLoadingView from './SessionLoadingView';
 import SessionErrorView from './SessionErrorView';
 import SessionQuestionView from './SessionQuestionView';
@@ -18,14 +18,14 @@ interface LearningSessionProps {
   };
 }
 
-const LearningSession = ({
+const LearningSessionContent = ({
   subject,
   skillArea,
   difficultyLevel,
   totalQuestions,
   onBack,
   learningObjective
-}: LearningSessionProps) => {
+}: Omit<LearningSessionProps, 'onBack'> & { onBack: () => void }) => {
   const {
     currentQuestion,
     currentQuestionIndex,
@@ -33,15 +33,10 @@ const LearningSession = ({
     hasAnswered,
     showResult,
     isLoading,
-    totalResponseTime,
+    timers,
     generateNextQuestion,
     handleAnswerSelect
-  } = useSessionState({
-    subject,
-    skillArea,
-    difficultyLevel,
-    totalQuestions
-  });
+  } = useUnifiedSession();
 
   if (isLoading && !currentQuestion) {
     return (
@@ -76,9 +71,37 @@ const LearningSession = ({
       selectedAnswer={selectedAnswer}
       showResult={showResult}
       hasAnswered={hasAnswered}
-      totalResponseTime={totalResponseTime}
+      totalResponseTime={Date.now() - timers.sessionStartTime} // Use unified timer
       onAnswerSelect={handleAnswerSelect}
     />
+  );
+};
+
+const LearningSession = ({
+  subject,
+  skillArea,
+  difficultyLevel,
+  totalQuestions,
+  onBack,
+  learningObjective
+}: LearningSessionProps) => {
+  return (
+    <UnifiedSessionProvider
+      subject={subject}
+      skillArea={skillArea}
+      difficultyLevel={difficultyLevel}
+      totalQuestions={totalQuestions}
+      onSessionComplete={onBack}
+    >
+      <LearningSessionContent
+        subject={subject}
+        skillArea={skillArea}
+        difficultyLevel={difficultyLevel}
+        totalQuestions={totalQuestions}
+        onBack={onBack}
+        learningObjective={learningObjective}
+      />
+    </UnifiedSessionProvider>
   );
 };
 

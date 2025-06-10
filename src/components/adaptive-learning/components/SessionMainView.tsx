@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import QuestionDisplay from './QuestionDisplay';
 import LessonHeader from './LessonHeader';
-import { SessionData } from './SessionProvider';
+import { UnifiedSessionState } from '../contexts/UnifiedSessionContext';
 
 interface SessionMainViewProps {
   subject: string;
@@ -17,7 +17,7 @@ interface SessionMainViewProps {
     description: string;
     difficulty_level: number;
   };
-  sessionData: SessionData;
+  sessionData: UnifiedSessionState;
 }
 
 const SessionMainView = ({

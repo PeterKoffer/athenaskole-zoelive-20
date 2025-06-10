@@ -8,20 +8,56 @@ import { Calculator, ArrowLeft } from "lucide-react";
 import LessonProgressTracker from "./components/LessonProgressTracker";
 import LessonControlsCard from "./components/LessonControlsCard";
 import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
-import { useLessonStateManager } from "./components/LessonStateManager";
+import { UnifiedLessonProvider, useUnifiedLesson } from "./contexts/UnifiedLessonContext";
+import { LessonActivity } from "./components/types/LessonTypes";
 
-const EnhancedMathematicsLearning = () => {
+// Sample activities for mathematics - these would normally come from a curriculum system
+const mathActivities: LessonActivity[] = [
+  {
+    id: 'math-intro-1',
+    title: 'Introduction to Algebra',
+    phase: 'explanation',
+    content: {
+      explanation: 'Welcome to today\'s algebra lesson! We\'ll explore variables and expressions.'
+    }
+  },
+  {
+    id: 'math-practice-1',
+    title: 'Solving Simple Equations',
+    phase: 'interactive-game',
+    content: {
+      question: 'Solve for x: 2x + 5 = 13',
+      options: ['x = 4', 'x = 6', 'x = 8', 'x = 9'],
+      correctAnswer: 0
+    }
+  },
+  {
+    id: 'math-practice-2',
+    title: 'Variable Substitution',
+    phase: 'interactive-game',
+    content: {
+      question: 'If x = 3, what is 4x - 7?',
+      options: ['5', '7', '12', '19'],
+      correctAnswer: 0
+    }
+  }
+];
+
+const EnhancedMathematicsLearningContent = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const totalLessonTime = 20 * 60; // 20 minutes in seconds
   
   const {
-    lessonState,
+    phase,
+    timeSpent,
+    currentSegment,
+    totalSegments,
     handleLessonStart,
     handleLessonPause,
     handleLessonResume,
     handleLessonComplete
-  } = useLessonStateManager();
+  } = useUnifiedLesson();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -60,21 +96,21 @@ const EnhancedMathematicsLearning = () => {
             Back to Program
           </Button>
           
-          {lessonState.phase !== 'introduction' && (
+          {phase !== 'introduction' && (
             <LessonProgressTracker 
-              currentTime={lessonState.timeSpent}
+              currentTime={timeSpent}
               totalTime={totalLessonTime}
-              currentSegment={lessonState.currentSegment}
-              totalSegments={lessonState.totalSegments}
-              phase={lessonState.phase}
+              currentSegment={currentSegment}
+              totalSegments={totalSegments}
+              phase={phase}
             />
           )}
         </div>
 
         {/* Lesson Controls */}
-        {(lessonState.phase === 'lesson' || lessonState.phase === 'paused') && (
+        {(phase === 'lesson' || phase === 'paused') && (
           <LessonControlsCard
-            phase={lessonState.phase}
+            phase={phase}
             onPause={handleLessonPause}
             onResume={handleLessonResume}
           />
@@ -82,7 +118,13 @@ const EnhancedMathematicsLearning = () => {
 
         {/* Lesson Content */}
         <LessonPhaseRenderer
-          lessonState={lessonState}
+          lessonState={{
+            phase,
+            timeSpent,
+            currentSegment,
+            totalSegments,
+            score: 0 // Will be managed by unified context
+          }}
           onLessonStart={handleLessonStart}
           onLessonComplete={handleLessonComplete}
           onLessonResume={handleLessonResume}
@@ -90,6 +132,24 @@ const EnhancedMathematicsLearning = () => {
         />
       </div>
     </div>
+  );
+};
+
+const EnhancedMathematicsLearning = () => {
+  const navigate = useNavigate();
+  
+  const handleLessonComplete = () => {
+    navigate('/daily-program');
+  };
+
+  return (
+    <UnifiedLessonProvider
+      subject="Mathematics"
+      allActivities={mathActivities}
+      onLessonComplete={handleLessonComplete}
+    >
+      <EnhancedMathematicsLearningContent />
+    </UnifiedLessonProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import SessionProvider from "./SessionProvider";
+import { UnifiedSessionProvider, useUnifiedSession } from "../contexts/UnifiedSessionContext";
 import SessionComplete from "./SessionComplete";
 import SessionContent from "./SessionContent";
 
@@ -16,6 +16,66 @@ export interface EnhancedLearningSessionProps {
     difficulty_level: number;
   };
 }
+
+const EnhancedLearningSessionContent = ({ 
+  subject, 
+  skillArea, 
+  difficultyLevel, 
+  totalQuestions, 
+  onBack, 
+  onRetry, 
+  learningObjective 
+}: {
+  subject: string;
+  skillArea: string;
+  difficultyLevel: number;
+  totalQuestions: number;
+  onBack: () => void;
+  onRetry: () => void;
+  learningObjective?: any;
+}) => {
+  const sessionData = useUnifiedSession();
+
+  console.log('📊 SessionData:', {
+    isSessionComplete: sessionData.isSessionComplete,
+    questionsLength: sessionData.questions.length,
+    answersLength: sessionData.answers.length,
+    currentIndex: sessionData.currentQuestionIndex,
+    isLoading: sessionData.isLoading,
+    error: sessionData.error
+  });
+
+  if (sessionData.isSessionComplete) {
+    // Convert complex answers to simple scores for SessionComplete
+    const answerScores = sessionData.answers.map(answer => 
+      answer.isCorrect ? 1 : 0
+    );
+
+    return (
+      <SessionComplete
+        subject={subject}
+        skillArea={skillArea}
+        answers={answerScores}
+        sessionQuestions={sessionData.questions}
+        totalQuestions={totalQuestions}
+        onRetry={onRetry}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <SessionContent
+      subject={subject}
+      skillArea={skillArea}
+      difficultyLevel={difficultyLevel}
+      totalQuestions={totalQuestions}
+      onBack={onBack}
+      learningObjective={learningObjective}
+      sessionData={sessionData}
+    />
+  );
+};
 
 const EnhancedLearningSession = ({ 
   subject, 
@@ -41,56 +101,24 @@ const EnhancedLearningSession = ({
   };
 
   return (
-    <SessionProvider
+    <UnifiedSessionProvider
       key={sessionKey}
       subject={subject}
       skillArea={skillArea}
       difficultyLevel={difficultyLevel}
       totalQuestions={totalQuestions}
-      learningObjective={learningObjective}
+      onSessionComplete={onBack}
     >
-      {(sessionData) => {
-        console.log('📊 SessionData:', {
-          isSessionComplete: sessionData.isSessionComplete,
-          questionsLength: sessionData.questions.length,
-          answersLength: sessionData.answers.length,
-          currentIndex: sessionData.currentQuestionIndex,
-          isLoading: sessionData.isLoading,
-          error: sessionData.error
-        });
-
-        if (sessionData.isSessionComplete) {
-          // Convert complex answers to simple scores for SessionComplete
-          const answerScores = sessionData.answers.map(answer => 
-            answer.isCorrect ? 1 : 0
-          );
-
-          return (
-            <SessionComplete
-              subject={subject}
-              skillArea={skillArea}
-              answers={answerScores}
-              sessionQuestions={sessionData.questions}
-              totalQuestions={totalQuestions}
-              onRetry={handleRetry}
-              onBack={onBack}
-            />
-          );
-        }
-
-        return (
-          <SessionContent
-            subject={subject}
-            skillArea={skillArea}
-            difficultyLevel={difficultyLevel}
-            totalQuestions={totalQuestions}
-            onBack={onBack}
-            learningObjective={learningObjective}
-            sessionData={sessionData}
-          />
-        );
-      }}
-    </SessionProvider>
+      <EnhancedLearningSessionContent
+        subject={subject}
+        skillArea={skillArea}
+        difficultyLevel={difficultyLevel}
+        totalQuestions={totalQuestions}
+        onBack={onBack}
+        onRetry={handleRetry}
+        learningObjective={learningObjective}
+      />
+    </UnifiedSessionProvider>
   );
 };
 

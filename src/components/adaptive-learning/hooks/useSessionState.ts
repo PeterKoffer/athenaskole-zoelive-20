@@ -1,4 +1,8 @@
 
+// DEPRECATED: This file has been replaced by UnifiedSessionContext.tsx
+// The functionality of this hook has been consolidated into the unified session state management
+// Please use UnifiedSessionProvider and useUnifiedSession instead
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useSessionMetrics } from '@/hooks/useSessionMetrics';

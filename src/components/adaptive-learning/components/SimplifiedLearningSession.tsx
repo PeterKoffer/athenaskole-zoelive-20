@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { useSimplifiedSessionState } from './SimplifiedSessionState';
+import { UnifiedSessionProvider, useUnifiedSession } from '../contexts/UnifiedSessionContext';
 import SimplifiedSessionHeader from './SimplifiedSessionHeader';
 import SimplifiedQuestionDisplay from './SimplifiedQuestionDisplay';
 import SimplifiedSessionExplanation from './SimplifiedSessionExplanation';
@@ -13,42 +13,52 @@ interface SimplifiedLearningSessionProps {
   onBack: () => void;
 }
 
-const SimplifiedLearningSession = ({ 
-  subject, 
-  skillArea, 
-  difficultyLevel, 
-  onBack 
-}: SimplifiedLearningSessionProps) => {
-  const totalQuestions = 5;
-  
+interface SimplifiedLearningSessionProps {
+  subject: string;
+  skillArea: string;
+  difficultyLevel: number;
+  onBack: () => void;
+}
+
+const SimplifiedLearningSessionContent = ({ onBack }: { onBack: () => void }) => {
   const {
-    user,
+    subject,
+    skillArea,
     currentQuestion,
     selectedAnswer,
     showResult,
     questionNumber,
     correctAnswers,
-    isGenerating,
-    getRecommendedDifficulty,
-    handleAnswerSelect
-  } = useSimplifiedSessionState({
-    subject,
-    skillArea,
-    difficultyLevel,
     totalQuestions,
-    onBack
-  });
-
-  // Handle loading states
-  const loadingComponent = SimplifiedSessionLoadingStates({
-    user,
+    isLoading,
     isGenerating,
-    currentQuestion,
-    onBack
-  });
+    error,
+    handleAnswerSelect
+  } = useUnifiedSession();
 
-  if (loadingComponent) {
-    return loadingComponent;
+  // Handle loading states - simplified since auth is handled in context
+  if (isLoading || isGenerating || !currentQuestion) {
+    return (
+      <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
+        <CardContent className="p-6">
+          <div className="text-center text-white">
+            {isGenerating ? "Generating question..." : "Loading..."}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
+        <CardContent className="p-6">
+          <div className="text-center text-red-400">
+            Error: {error}
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -59,7 +69,7 @@ const SimplifiedLearningSession = ({
         questionNumber={questionNumber}
         totalQuestions={totalQuestions}
         correctAnswers={correctAnswers}
-        getRecommendedDifficulty={getRecommendedDifficulty}
+        getRecommendedDifficulty={() => 3} // Simplified for now
         onBack={onBack}
       />
 
@@ -79,6 +89,27 @@ const SimplifiedLearningSession = ({
         />
       </CardContent>
     </Card>
+  );
+};
+
+const SimplifiedLearningSession = ({ 
+  subject, 
+  skillArea, 
+  difficultyLevel, 
+  onBack 
+}: SimplifiedLearningSessionProps) => {
+  const totalQuestions = 5;
+
+  return (
+    <UnifiedSessionProvider
+      subject={subject}
+      skillArea={skillArea}
+      difficultyLevel={difficultyLevel}
+      totalQuestions={totalQuestions}
+      onSessionComplete={onBack}
+    >
+      <SimplifiedLearningSessionContent onBack={onBack} />
+    </UnifiedSessionProvider>
   );
 };
 

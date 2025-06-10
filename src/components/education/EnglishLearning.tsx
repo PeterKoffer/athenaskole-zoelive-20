@@ -8,20 +8,56 @@ import { BookOpen, ArrowLeft } from "lucide-react";
 import LessonProgressTracker from "./components/LessonProgressTracker";
 import LessonControlsCard from "./components/LessonControlsCard";
 import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
-import { useLessonStateManager } from "./components/LessonStateManager";
+import { UnifiedLessonProvider, useUnifiedLesson } from "./contexts/UnifiedLessonContext";
+import { LessonActivity } from "./components/types/LessonTypes";
 
-const EnglishLearning = () => {
+// Sample activities for English - these would normally come from a curriculum system
+const englishActivities: LessonActivity[] = [
+  {
+    id: 'english-intro-1',
+    title: 'Introduction to Creative Writing',
+    phase: 'explanation',
+    content: {
+      explanation: 'Welcome to today\'s English lesson! We\'ll explore storytelling and creative writing techniques.'
+    }
+  },
+  {
+    id: 'english-practice-1',
+    title: 'Identifying Literary Devices',
+    phase: 'interactive-game',
+    content: {
+      question: 'Which literary device is used in: "The wind whispered through the trees"?',
+      options: ['Metaphor', 'Personification', 'Simile', 'Alliteration'],
+      correctAnswer: 1
+    }
+  },
+  {
+    id: 'english-practice-2',
+    title: 'Story Structure',
+    phase: 'interactive-game',
+    content: {
+      question: 'What are the three main parts of a story structure?',
+      options: ['Beginning, middle, end', 'Setting, character, plot', 'Problem, action, solution', 'Introduction, body, conclusion'],
+      correctAnswer: 0
+    }
+  }
+];
+
+const EnglishLearningContent = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const totalLessonTime = 20 * 60; // 20 minutes in seconds
   
   const {
-    lessonState,
+    phase,
+    timeSpent,
+    currentSegment,
+    totalSegments,
     handleLessonStart,
     handleLessonPause,
     handleLessonResume,
     handleLessonComplete
-  } = useLessonStateManager();
+  } = useUnifiedLesson();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -60,21 +96,21 @@ const EnglishLearning = () => {
             Back to Program
           </Button>
           
-          {lessonState.phase !== 'introduction' && (
+          {phase !== 'introduction' && (
             <LessonProgressTracker 
-              currentTime={lessonState.timeSpent}
+              currentTime={timeSpent}
               totalTime={totalLessonTime}
-              currentSegment={lessonState.currentSegment}
-              totalSegments={lessonState.totalSegments}
-              phase={lessonState.phase}
+              currentSegment={currentSegment}
+              totalSegments={totalSegments}
+              phase={phase}
             />
           )}
         </div>
 
         {/* Lesson Controls */}
-        {(lessonState.phase === 'lesson' || lessonState.phase === 'paused') && (
+        {(phase === 'lesson' || phase === 'paused') && (
           <LessonControlsCard
-            phase={lessonState.phase}
+            phase={phase}
             onPause={handleLessonPause}
             onResume={handleLessonResume}
           />
@@ -82,7 +118,13 @@ const EnglishLearning = () => {
 
         {/* Lesson Content */}
         <LessonPhaseRenderer
-          lessonState={lessonState}
+          lessonState={{
+            phase,
+            timeSpent,
+            currentSegment,
+            totalSegments,
+            score: 0 // Will be managed by unified context
+          }}
           onLessonStart={handleLessonStart}
           onLessonComplete={handleLessonComplete}
           onLessonResume={handleLessonResume}
@@ -92,6 +134,24 @@ const EnglishLearning = () => {
         />
       </div>
     </div>
+  );
+};
+
+const EnglishLearning = () => {
+  const navigate = useNavigate();
+  
+  const handleLessonComplete = () => {
+    navigate('/daily-program');
+  };
+
+  return (
+    <UnifiedLessonProvider
+      subject="English"
+      allActivities={englishActivities}
+      onLessonComplete={handleLessonComplete}
+    >
+      <EnglishLearningContent />
+    </UnifiedLessonProvider>
   );
 };
 

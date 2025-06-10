@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
-import { LessonPhase } from './LessonStateManager';
+import { LessonPhase } from '../contexts/UnifiedLessonContext';
 
 interface LessonControlsCardProps {
   phase: LessonPhase;
