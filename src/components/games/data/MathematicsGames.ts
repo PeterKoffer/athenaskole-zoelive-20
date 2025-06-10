@@ -1,7 +1,9 @@
 
 import { CurriculumGame } from '../types/GameTypes';
+import { staticDataService } from '@/services/staticDataService';
 
-export const mathematicsGames: CurriculumGame[] = [
+// Fallback data in case external data fails to load
+const fallbackMathematicsGames: CurriculumGame[] = [
   {
     id: "math-addition-castle",
     title: "Addition Castle Quest",
@@ -23,225 +25,26 @@ export const mathematicsGames: CurriculumGame[] = [
       coins: 150,
       badges: ["Math Explorer", "Castle Defender"]
     }
-  },
-  {
-    id: "geometry-shape-builder",
-    title: "Geometry Shape Builder",
-    description: "Build and explore geometric shapes while learning about their properties and relationships!",
-    emoji: "📐",
-    subject: "Mathematics",
-    gradeLevel: [4, 5, 6],
-    difficulty: "intermediate",
-    interactionType: "drag-drop",
-    timeEstimate: "20-25 min",
-    skillAreas: ["geometric_shapes", "spatial_reasoning", "measurement"],
-    learningObjectives: [
-      "Identify geometric shapes",
-      "Understand shape properties",
-      "Practice spatial reasoning"
-    ],
-    status: "available",
-    rewards: {
-      coins: 220,
-      badges: ["Shape Master", "Geometry Expert"]
-    }
-  },
-  {
-    id: "counting-kingdom",
-    title: "Counting Kingdom",
-    description: "Learn to count, add, and subtract in this magical number kingdom adventure!",
-    emoji: "👑",
-    subject: "Mathematics",
-    gradeLevel: [1, 2],
-    difficulty: "beginner",
-    interactionType: "click-sequence",
-    timeEstimate: "15-20 min",
-    skillAreas: ["counting", "basic_addition", "basic_subtraction", "number_recognition"],
-    learningObjectives: [
-      "Count objects from 1-100",
-      "Understand number order",
-      "Basic addition within 20"
-    ],
-    status: "available",
-    rewards: {
-      coins: 120,
-      badges: ["Count Master", "Number Explorer"]
-    }
-  },
-  {
-    id: "multiplication-mission",
-    title: "Multiplication Mission",
-    description: "Master multiplication tables through exciting space missions and alien encounters!",
-    emoji: "🚀",
-    subject: "Mathematics",
-    gradeLevel: [3, 4, 5],
-    difficulty: "intermediate",
-    interactionType: "multiple-choice",
-    timeEstimate: "20-25 min",
-    skillAreas: ["multiplication", "times_tables", "problem_solving"],
-    learningObjectives: [
-      "Memorize multiplication tables 1-12",
-      "Understand multiplication as repeated addition",
-      "Apply multiplication to word problems"
-    ],
-    status: "available",
-    rewards: {
-      coins: 180,
-      badges: ["Multiplication Hero", "Space Explorer"]
-    }
-  },
-  {
-    id: "fraction-pizza-party",
-    title: "Fraction Pizza Party",
-    description: "Learn fractions by sharing pizzas at the ultimate fraction party!",
-    emoji: "🍕",
-    subject: "Mathematics",
-    gradeLevel: [3, 4, 5, 6],
-    difficulty: "intermediate",
-    interactionType: "drag-drop",
-    timeEstimate: "25-30 min",
-    skillAreas: ["fractions", "equivalent_fractions", "fraction_operations"],
-    learningObjectives: [
-      "Understand fraction notation",
-      "Compare and order fractions",
-      "Add and subtract fractions"
-    ],
-    status: "available",
-    rewards: {
-      coins: 200,
-      badges: ["Fraction Master", "Pizza Chef"]
-    }
-  },
-  {
-    id: "decimal-treasure-hunt",
-    title: "Decimal Treasure Hunt",
-    description: "Navigate through decimal challenges to find hidden treasures on mysterious islands!",
-    emoji: "🏴‍☠️",
-    subject: "Mathematics",
-    gradeLevel: [4, 5, 6],
-    difficulty: "intermediate",
-    interactionType: "puzzle",
-    timeEstimate: "20-25 min",
-    skillAreas: ["decimals", "place_value", "decimal_operations"],
-    learningObjectives: [
-      "Understand decimal place value",
-      "Compare and order decimals",
-      "Add and subtract decimals"
-    ],
-    status: "available",
-    rewards: {
-      coins: 190,
-      badges: ["Decimal Detective", "Treasure Hunter"]
-    }
-  },
-  {
-    id: "algebra-adventure",
-    title: "Algebra Adventure",
-    description: "Solve algebraic equations to unlock ancient mysteries and save the kingdom!",
-    emoji: "🗝️",
-    subject: "Mathematics",
-    gradeLevel: [6, 7, 8],
-    difficulty: "intermediate",
-    interactionType: "typing",
-    timeEstimate: "30-35 min",
-    skillAreas: ["algebra", "equations", "variables", "linear_expressions"],
-    learningObjectives: [
-      "Solve one-step equations",
-      "Understand variables and expressions",
-      "Graph linear equations"
-    ],
-    status: "available",
-    rewards: {
-      coins: 280,
-      badges: ["Algebra Hero", "Equation Solver"]
-    }
-  },
-  {
-    id: "geometry-architect",
-    title: "Geometry Architect",
-    description: "Design and build structures while mastering angles, areas, and geometric theorems!",
-    emoji: "🏗️",
-    subject: "Mathematics",
-    gradeLevel: [6, 7, 8],
-    difficulty: "intermediate",
-    interactionType: "drawing",
-    timeEstimate: "35-40 min",
-    skillAreas: ["geometry", "angles", "area", "perimeter", "volume"],
-    learningObjectives: [
-      "Calculate area and perimeter",
-      "Understand angle relationships",
-      "Apply Pythagorean theorem"
-    ],
-    status: "available",
-    rewards: {
-      coins: 300,
-      badges: ["Geometry Architect", "Shape Builder"]
-    }
-  },
-  {
-    id: "statistics-sports-analyzer",
-    title: "Statistics Sports Analyzer",
-    description: "Analyze sports data and learn statistics while predicting game outcomes!",
-    emoji: "⚽",
-    subject: "Mathematics",
-    gradeLevel: [6, 7, 8],
-    difficulty: "intermediate",
-    interactionType: "multiple-choice",
-    timeEstimate: "25-30 min",
-    skillAreas: ["statistics", "data_analysis", "probability", "graphs"],
-    learningObjectives: [
-      "Calculate mean, median, mode",
-      "Interpret graphs and charts",
-      "Understand basic probability"
-    ],
-    status: "available",
-    rewards: {
-      coins: 250,
-      badges: ["Data Analyst", "Sports Statistician"]
-    }
-  },
-  {
-    id: "calculus-rollercoaster",
-    title: "Calculus Rollercoaster",
-    description: "Design thrilling rollercoasters using calculus concepts of derivatives and integrals!",
-    emoji: "🎢",
-    subject: "Mathematics",
-    gradeLevel: [11, 12],
-    difficulty: "advanced",
-    interactionType: "simulation",
-    timeEstimate: "40-45 min",
-    skillAreas: ["calculus", "derivatives", "integrals", "optimization"],
-    learningObjectives: [
-      "Understand derivative concepts",
-      "Apply integration techniques",
-      "Solve optimization problems"
-    ],
-    status: "available",
-    rewards: {
-      coins: 400,
-      badges: ["Calculus Master", "Coaster Engineer"]
-    }
-  },
-  {
-    id: "trigonometry-tower",
-    title: "Trigonometry Tower",
-    description: "Scale the trigonometry tower using sine, cosine, and tangent to reach new heights!",
-    emoji: "🗼",
-    subject: "Mathematics",
-    gradeLevel: [9, 10, 11],
-    difficulty: "advanced",
-    interactionType: "puzzle",
-    timeEstimate: "35-40 min",
-    skillAreas: ["trigonometry", "sine", "cosine", "tangent", "unit_circle"],
-    learningObjectives: [
-      "Master trigonometric ratios",
-      "Understand the unit circle",
-      "Solve trigonometric equations"
-    ],
-    status: "available",
-    rewards: {
-      coins: 350,
-      badges: ["Trig Master", "Tower Climber"]
-    }
   }
 ];
+
+let cachedMathematicsGames: CurriculumGame[] | null = null;
+
+export const getMathematicsGames = async (): Promise<CurriculumGame[]> => {
+  if (cachedMathematicsGames) {
+    return cachedMathematicsGames;
+  }
+
+  try {
+    const games = await staticDataService.loadGamesData('mathematics');
+    cachedMathematicsGames = games.length > 0 ? games : fallbackMathematicsGames;
+    return cachedMathematicsGames;
+  } catch (error) {
+    console.error('Failed to load mathematics games, using fallback:', error);
+    cachedMathematicsGames = fallbackMathematicsGames;
+    return cachedMathematicsGames;
+  }
+};
+
+// Export sync version for backward compatibility
+export const mathematicsGames: CurriculumGame[] = fallbackMathematicsGames;

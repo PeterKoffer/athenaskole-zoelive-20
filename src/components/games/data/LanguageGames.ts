@@ -1,7 +1,9 @@
 
 import { CurriculumGame } from '../types/GameTypes';
+import { staticDataService } from '@/services/staticDataService';
 
-export const languageGames: CurriculumGame[] = [
+// Fallback data in case external data fails to load
+const fallbackLanguageGames: CurriculumGame[] = [
   {
     id: "spanish-fiesta",
     title: "Spanish Fiesta",
@@ -23,27 +25,26 @@ export const languageGames: CurriculumGame[] = [
       coins: 240,
       badges: ["Spanish Speaker", "Culture Explorer"]
     }
-  },
-  {
-    id: "french-cafe-conversations",
-    title: "French Café Conversations",
-    description: "Practice French in a charming café setting while learning everyday phrases!",
-    emoji: "☕",
-    subject: "French",
-    gradeLevel: [6, 7, 8, 9, 10],
-    difficulty: "beginner",
-    interactionType: "multiple-choice",
-    timeEstimate: "30-35 min",
-    skillAreas: ["french_vocabulary", "conversation", "grammar", "culture"],
-    learningObjectives: [
-      "Master basic French phrases",
-      "Understand French grammar",
-      "Learn about French culture"
-    ],
-    status: "available",
-    rewards: {
-      coins: 260,
-      badges: ["French Speaker", "Café Linguist"]
-    }
   }
 ];
+
+let cachedLanguageGames: CurriculumGame[] | null = null;
+
+export const getLanguageGames = async (): Promise<CurriculumGame[]> => {
+  if (cachedLanguageGames) {
+    return cachedLanguageGames;
+  }
+
+  try {
+    const games = await staticDataService.loadGamesData('language');
+    cachedLanguageGames = games.length > 0 ? games : fallbackLanguageGames;
+    return cachedLanguageGames;
+  } catch (error) {
+    console.error('Failed to load language games, using fallback:', error);
+    cachedLanguageGames = fallbackLanguageGames;
+    return cachedLanguageGames;
+  }
+};
+
+// Export sync version for backward compatibility
+export const languageGames: CurriculumGame[] = fallbackLanguageGames;

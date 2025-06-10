@@ -1,0 +1,46 @@
+[
+  {
+    "id": "solar-system-explorer",
+    "title": "Solar System Explorer",
+    "description": "Journey through space and learn about planets, stars, and cosmic phenomena!",
+    "emoji": "🌌",
+    "subject": "Science",
+    "gradeLevel": [3, 4, 5, 6],
+    "difficulty": "beginner",
+    "interactionType": "multiple-choice",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["astronomy", "space_science", "planetary_science"],
+    "learningObjectives": [
+      "Learn about the solar system",
+      "Understand planetary characteristics",
+      "Explore space phenomena"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 220,
+      "badges": ["Space Explorer", "Astronomy Expert"]
+    }
+  },
+  {
+    "id": "chemistry-lab-adventure",
+    "title": "Chemistry Lab Adventure",
+    "description": "Conduct safe virtual experiments and learn about chemical reactions!",
+    "emoji": "🧪",
+    "subject": "Science",
+    "gradeLevel": [7, 8, 9, 10],
+    "difficulty": "intermediate",
+    "interactionType": "simulation",
+    "timeEstimate": "35-40 min",
+    "skillAreas": ["chemistry", "chemical_reactions", "laboratory_skills"],
+    "learningObjectives": [
+      "Understand chemical reactions",
+      "Learn laboratory safety",
+      "Practice scientific method"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 300,
+      "badges": ["Chemistry Expert", "Lab Scientist"]
+    }
+  }
+]

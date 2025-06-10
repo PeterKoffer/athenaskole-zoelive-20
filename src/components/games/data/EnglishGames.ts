@@ -1,7 +1,9 @@
 
 import { CurriculumGame } from '../types/GameTypes';
+import { staticDataService } from '@/services/staticDataService';
 
-export const englishGames: CurriculumGame[] = [
+// Fallback data in case external data fails to load
+const fallbackEnglishGames: CurriculumGame[] = [
   {
     id: "reading-adventure-forest",
     title: "Reading Adventure Forest",
@@ -23,115 +25,26 @@ export const englishGames: CurriculumGame[] = [
       coins: 200,
       badges: ["Book Worm", "Forest Explorer"]
     }
-  },
-  {
-    id: "phonics-playground",
-    title: "Phonics Playground",
-    description: "Learn letter sounds and build reading skills in this interactive phonics adventure!",
-    emoji: "🔤",
-    subject: "English",
-    gradeLevel: [1, 2],
-    difficulty: "beginner",
-    interactionType: "click-sequence",
-    timeEstimate: "15-20 min",
-    skillAreas: ["phonics", "letter_sounds", "reading_basics", "decoding"],
-    learningObjectives: [
-      "Recognize letter sounds",
-      "Blend sounds to make words",
-      "Decode simple words"
-    ],
-    status: "available",
-    rewards: {
-      coins: 130,
-      badges: ["Phonics Hero", "Sound Master"]
-    }
-  },
-  {
-    id: "vocabulary-village",
-    title: "Vocabulary Village",
-    description: "Explore a charming village while learning new words and their meanings!",
-    emoji: "🏘️",
-    subject: "English",
-    gradeLevel: [2, 3, 4, 5],
-    difficulty: "beginner",
-    interactionType: "multiple-choice",
-    timeEstimate: "20-25 min",
-    skillAreas: ["vocabulary", "word_meanings", "context_clues", "synonyms"],
-    learningObjectives: [
-      "Learn grade-appropriate vocabulary",
-      "Use context clues",
-      "Identify synonyms and antonyms"
-    ],
-    status: "available",
-    rewards: {
-      coins: 170,
-      badges: ["Word Explorer", "Village Guide"]
-    }
-  },
-  {
-    id: "grammar-galaxy",
-    title: "Grammar Galaxy",
-    description: "Journey through space while mastering grammar rules and sentence structure!",
-    emoji: "🌌",
-    subject: "English",
-    gradeLevel: [3, 4, 5, 6],
-    difficulty: "intermediate",
-    interactionType: "drag-drop",
-    timeEstimate: "25-30 min",
-    skillAreas: ["grammar", "parts_of_speech", "sentence_structure", "punctuation"],
-    learningObjectives: [
-      "Identify parts of speech",
-      "Build proper sentences",
-      "Use correct punctuation"
-    ],
-    status: "available",
-    rewards: {
-      coins: 210,
-      badges: ["Grammar Guardian", "Space Explorer"]
-    }
-  },
-  {
-    id: "literature-legends",
-    title: "Literature Legends",
-    description: "Meet famous authors and analyze classic literature in this immersive literary journey!",
-    emoji: "📖",
-    subject: "English",
-    gradeLevel: [6, 7, 8, 9],
-    difficulty: "intermediate",
-    interactionType: "multiple-choice",
-    timeEstimate: "35-40 min",
-    skillAreas: ["literature", "reading_comprehension", "literary_analysis", "themes"],
-    learningObjectives: [
-      "Analyze literary themes",
-      "Understand character development",
-      "Interpret symbolism"
-    ],
-    status: "available",
-    rewards: {
-      coins: 320,
-      badges: ["Literature Scholar", "Story Analyst"]
-    }
-  },
-  {
-    id: "essay-excellence",
-    title: "Essay Excellence Academy",
-    description: "Master the art of persuasive writing and essay composition in this writing workshop!",
-    emoji: "✍️",
-    subject: "English",
-    gradeLevel: [8, 9, 10, 11, 12],
-    difficulty: "advanced",
-    interactionType: "typing",
-    timeEstimate: "40-45 min",
-    skillAreas: ["writing", "essay_structure", "persuasive_writing", "citations"],
-    learningObjectives: [
-      "Structure persuasive essays",
-      "Use evidence effectively",
-      "Master MLA citations"
-    ],
-    status: "available",
-    rewards: {
-      coins: 380,
-      badges: ["Essay Expert", "Writing Master"]
-    }
   }
 ];
+
+let cachedEnglishGames: CurriculumGame[] | null = null;
+
+export const getEnglishGames = async (): Promise<CurriculumGame[]> => {
+  if (cachedEnglishGames) {
+    return cachedEnglishGames;
+  }
+
+  try {
+    const games = await staticDataService.loadGamesData('english');
+    cachedEnglishGames = games.length > 0 ? games : fallbackEnglishGames;
+    return cachedEnglishGames;
+  } catch (error) {
+    console.error('Failed to load english games, using fallback:', error);
+    cachedEnglishGames = fallbackEnglishGames;
+    return cachedEnglishGames;
+  }
+};
+
+// Export sync version for backward compatibility
+export const englishGames: CurriculumGame[] = fallbackEnglishGames;

@@ -1,0 +1,168 @@
+{
+  "mathematics": [
+    {
+      "id": "1.OA.1",
+      "code": "1.OA.1",
+      "title": "Addition and Subtraction within 20",
+      "description": "Use addition and subtraction within 20 to solve problems",
+      "subject": "mathematics",
+      "gradeLevel": 1,
+      "domain": "Operations & Algebraic Thinking",
+      "difficulty": 1
+    },
+    {
+      "id": "1.NBT.1",
+      "code": "1.NBT.1",
+      "title": "Count to 120",
+      "description": "Count to 120, starting at any number less than 120",
+      "subject": "mathematics",
+      "gradeLevel": 1,
+      "domain": "Number & Operations in Base Ten",
+      "difficulty": 1
+    },
+    {
+      "id": "2.OA.1",
+      "code": "2.OA.1",
+      "title": "Addition and Subtraction within 100",
+      "description": "Use addition and subtraction within 100 to solve problems",
+      "subject": "mathematics",
+      "gradeLevel": 2,
+      "domain": "Operations & Algebraic Thinking",
+      "difficulty": 2
+    },
+    {
+      "id": "3.OA.8",
+      "code": "3.OA.8",
+      "title": "Two-step word problems",
+      "description": "Solve two-step word problems using four operations",
+      "subject": "mathematics",
+      "gradeLevel": 3,
+      "domain": "Operations & Algebraic Thinking",
+      "difficulty": 3
+    },
+    {
+      "id": "4.OA.3",
+      "code": "4.OA.3",
+      "title": "Multi-step word problems",
+      "description": "Solve multistep word problems with whole numbers and remainders",
+      "subject": "mathematics",
+      "gradeLevel": 4,
+      "domain": "Operations & Algebraic Thinking",
+      "difficulty": 4
+    },
+    {
+      "id": "5.NBT.7",
+      "code": "5.NBT.7",
+      "title": "Decimal operations",
+      "description": "Add, subtract, multiply, and divide decimals to hundredths",
+      "subject": "mathematics",
+      "gradeLevel": 5,
+      "domain": "Number & Operations in Base Ten",
+      "difficulty": 5
+    },
+    {
+      "id": "6.RP.3",
+      "code": "6.RP.3",
+      "title": "Ratios and proportions",
+      "description": "Use ratio and rate reasoning to solve problems",
+      "subject": "mathematics",
+      "gradeLevel": 6,
+      "domain": "Ratios & Proportional Relationships",
+      "difficulty": 6
+    },
+    {
+      "id": "7.EE.4",
+      "code": "7.EE.4",
+      "title": "Linear equations",
+      "description": "Use variables to represent quantities in linear equations",
+      "subject": "mathematics",
+      "gradeLevel": 7,
+      "domain": "Expressions & Equations",
+      "difficulty": 7
+    },
+    {
+      "id": "8.F.1",
+      "code": "8.F.1",
+      "title": "Functions",
+      "description": "Understand that a function is a rule that assigns exactly one output",
+      "subject": "mathematics",
+      "gradeLevel": 8,
+      "domain": "Functions",
+      "difficulty": 8
+    }
+  ],
+  "english": [
+    {
+      "id": "1.RF.3",
+      "code": "1.RF.3",
+      "title": "Phonics and word recognition",
+      "description": "Know and apply grade-level phonics and word analysis skills",
+      "subject": "english",
+      "gradeLevel": 1,
+      "domain": "Reading: Foundational Skills",
+      "difficulty": 1
+    },
+    {
+      "id": "2.RL.1",
+      "code": "2.RL.1",
+      "title": "Reading comprehension",
+      "description": "Ask and answer questions about key details in a text",
+      "subject": "english",
+      "gradeLevel": 2,
+      "domain": "Reading: Literature",
+      "difficulty": 2
+    },
+    {
+      "id": "3.W.1",
+      "code": "3.W.1",
+      "title": "Opinion writing",
+      "description": "Write opinion pieces on topics or texts",
+      "subject": "english",
+      "gradeLevel": 3,
+      "domain": "Writing",
+      "difficulty": 3
+    },
+    {
+      "id": "4.RI.2",
+      "code": "4.RI.2",
+      "title": "Main idea and details",
+      "description": "Determine the main idea and explain how details support it",
+      "subject": "english",
+      "gradeLevel": 4,
+      "domain": "Reading: Informational Text",
+      "difficulty": 4
+    }
+  ],
+  "science": [
+    {
+      "id": "1.LS1.1",
+      "code": "1-LS1-1",
+      "title": "Living vs Non-living",
+      "description": "Use materials to design solutions based on how plants and animals use their parts",
+      "subject": "science",
+      "gradeLevel": 1,
+      "domain": "Life Science",
+      "difficulty": 1
+    },
+    {
+      "id": "2.PS1.1",
+      "code": "2-PS1-1",
+      "title": "Properties of materials",
+      "description": "Plan and conduct investigations to describe and classify materials",
+      "subject": "science",
+      "gradeLevel": 2,
+      "domain": "Physical Science",
+      "difficulty": 2
+    },
+    {
+      "id": "5.ESS1.1",
+      "code": "5-ESS1-1",
+      "title": "Solar system",
+      "description": "Develop a model to describe the sun as a star",
+      "subject": "science",
+      "gradeLevel": 5,
+      "domain": "Earth & Space Science",
+      "difficulty": 5
+    }
+  ]
+}

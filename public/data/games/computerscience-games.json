@@ -1,0 +1,46 @@
+[
+  {
+    "id": "coding-robot-challenge",
+    "title": "Robot Programming Challenge",
+    "description": "Program your robot companion to navigate mazes and solve puzzles using basic coding concepts!",
+    "emoji": "🤖",
+    "subject": "Computer Science",
+    "gradeLevel": [3, 4, 5, 6],
+    "difficulty": "intermediate",
+    "interactionType": "drag-drop",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["basic_programming", "logical_thinking", "sequencing"],
+    "learningObjectives": [
+      "Understand programming sequences",
+      "Practice logical problem solving",
+      "Learn basic coding concepts"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 250,
+      "badges": ["Code Master", "Robot Engineer"]
+    }
+  },
+  {
+    "id": "algorithm-puzzle-palace",
+    "title": "Algorithm Puzzle Palace",
+    "description": "Solve complex algorithmic puzzles and learn computational thinking!",
+    "emoji": "🧩",
+    "subject": "Computer Science",
+    "gradeLevel": [5, 6, 7, 8],
+    "difficulty": "intermediate",
+    "interactionType": "puzzle",
+    "timeEstimate": "30-35 min",
+    "skillAreas": ["algorithms", "computational_thinking", "problem_solving"],
+    "learningObjectives": [
+      "Understand algorithmic thinking",
+      "Break down complex problems",
+      "Optimize solution strategies"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 270,
+      "badges": ["Algorithm Expert", "Puzzle Master"]
+    }
+  }
+]

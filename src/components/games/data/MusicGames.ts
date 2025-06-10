@@ -1,7 +1,9 @@
 
 import { CurriculumGame } from '../types/GameTypes';
+import { staticDataService } from '@/services/staticDataService';
 
-export const musicGames: CurriculumGame[] = [
+// Fallback data in case external data fails to load
+const fallbackMusicGames: CurriculumGame[] = [
   {
     id: "music-rhythm-maker",
     title: "Rhythm Maker Studio",
@@ -25,3 +27,24 @@ export const musicGames: CurriculumGame[] = [
     }
   }
 ];
+
+let cachedMusicGames: CurriculumGame[] | null = null;
+
+export const getMusicGames = async (): Promise<CurriculumGame[]> => {
+  if (cachedMusicGames) {
+    return cachedMusicGames;
+  }
+
+  try {
+    const games = await staticDataService.loadGamesData('music');
+    cachedMusicGames = games.length > 0 ? games : fallbackMusicGames;
+    return cachedMusicGames;
+  } catch (error) {
+    console.error('Failed to load music games, using fallback:', error);
+    cachedMusicGames = fallbackMusicGames;
+    return cachedMusicGames;
+  }
+};
+
+// Export sync version for backward compatibility
+export const musicGames: CurriculumGame[] = fallbackMusicGames;
