@@ -6,7 +6,7 @@ import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
  */
 export const STANDARD_LESSON_TIMING = {
   introduction: { min: 120, max: 180, target: 150 }, // 2-3 minutes
-  contentDelivery: { min: 300, max: 420, target: 360 }, // 5-7 minutes (split across segments)
+  contentDelivery: { min: 300, max: 420, target: 330 }, // 5-7 minutes (split across segments)
   interactiveGame: { min: 240, max: 300, target: 270 }, // 4-5 minutes
   application: { min: 180, max: 240, target: 210 }, // 3-4 minutes
   creativeExploration: { min: 120, max: 180, target: 150 }, // 2-3 minutes
