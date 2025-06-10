@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Brain } from 'lucide-react';
-import { SessionData } from './SessionProvider';
+import { UnifiedSessionState } from '../contexts/UnifiedSessionContext';
 import ExplanationPhase from './ExplanationPhase';
 import SessionErrorState from './SessionErrorState';
 import SessionLoadingState from './SessionLoadingState';
@@ -21,7 +21,7 @@ interface SessionContentProps {
     description: string;
     difficulty_level: number;
   };
-  sessionData: SessionData;
+  sessionData: UnifiedSessionState;
 }
 
 const SessionContent = ({
