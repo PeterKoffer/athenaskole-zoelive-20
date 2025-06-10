@@ -12,10 +12,10 @@ export interface CommonStandard {
   title: string;
   description: string;
   subject: string;
-  gradeLevel: number;
+  gradeLevel: number; // Changed from grade to gradeLevel
   domain?: string;
   cluster?: string;
-  difficulty: number;
+  difficulty: number; // Added required difficulty property
 }
 
 export interface GradeLevelMapping {

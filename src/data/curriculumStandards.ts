@@ -1,3 +1,4 @@
+
 import { CommonStandard } from "@/types/gradeStandards";
 
 // Math Standards
@@ -9,9 +10,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.",
     subject: "mathematics",
-    grade: 1,
+    gradeLevel: 1,
     domain: "Operations and Algebraic Thinking",
     cluster: "Represent and solve problems involving addition and subtraction.",
+    difficulty: 2,
   },
   {
     id: "math-1-oa-6",
@@ -20,9 +22,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Add and subtract within 20, demonstrating fluency for addition and subtraction within 10. Use strategies such as counting on; making ten (e.g., 8 + 6 = 8 + 2 + 4 = 10 + 4 = 14); decomposing a number leading to ten (e.g., 13 – 4 = 13 – 3 – 1 = 10 – 1 = 9); using the relationship between addition and subtraction (e.g., knowing that 8 + 4 = 12, one knows 12 – 8 = 4); and creating equivalent but easier or known sums (e.g., adding 6 + 7 by creating the known equivalent 6 + 6 + 1 = 12 + 1 = 13).",
     subject: "mathematics",
-    grade: 1,
+    gradeLevel: 1,
     domain: "Operations and Algebraic Thinking",
     cluster: "Understand and apply properties of operations and the relationship between addition and subtraction.",
+    difficulty: 3,
   },
   {
     id: "math-2-oa-2",
@@ -31,9 +34,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Fluently add and subtract within 20 using mental strategies. By end of Grade 2, know from memory all sums of two one-digit numbers.",
     subject: "mathematics",
-    grade: 2,
+    gradeLevel: 2,
     domain: "Operations and Algebraic Thinking",
     cluster: "Add and subtract within 20.",
+    difficulty: 3,
   },
   {
     id: "math-3-oa-7",
@@ -42,9 +46,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division (e.g., knowing that 8 × 5 = 40, one knows 40 ÷ 5 = 8) or properties of operations. By the end of Grade 3, know from memory all products of two one-digit numbers.",
     subject: "mathematics",
-    grade: 3,
+    gradeLevel: 3,
     domain: "Operations and Algebraic Thinking",
     cluster: "Multiply and divide within 100.",
+    difficulty: 4,
   },
   {
     id: "math-4-nf-3",
@@ -53,9 +58,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Understand a fraction a/b with a > 1 as a sum of fractions 1/b.",
     subject: "mathematics",
-    grade: 4,
+    gradeLevel: 4,
     domain: "Number and Operations—Fractions",
     cluster: "Build fractions from unit fractions by applying and extending previous understandings of operations on whole numbers.",
+    difficulty: 5,
   },
   {
     id: "math-5-nf-1",
@@ -64,9 +70,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Add and subtract fractions with unlike denominators (including mixed numbers) by replacing given fractions with equivalent fractions in such a way as to produce an equivalent sum or difference of fractions with like denominators.",
     subject: "mathematics",
-    grade: 5,
+    gradeLevel: 5,
     domain: "Number and Operations—Fractions",
     cluster: "Use equivalent fractions as a strategy to add and subtract fractions.",
+    difficulty: 6,
   },
   {
     id: "math-6-rp-3",
@@ -75,10 +82,11 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Use ratio and rate reasoning to solve real-world and mathematical problems, e.g., by reasoning about tables of equivalent ratios, tape diagrams, double number line diagrams, or equations.",
     subject: "mathematics",
-    grade: 6,
+    gradeLevel: 6,
     domain: "Ratios and Proportional Relationships",
     cluster:
       "Understand ratio concepts and use ratio reasoning to solve problems.",
+    difficulty: 6,
   },
   {
     id: "math-7-rp-2",
@@ -87,9 +95,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Recognize and represent proportional relationships between quantities.",
     subject: "mathematics",
-    grade: 7,
+    gradeLevel: 7,
     domain: "Ratios and Proportional Relationships",
     cluster: "Analyze proportional relationships and use them to solve real-world and mathematical problems.",
+    difficulty: 7,
   },
   {
     id: "math-8-ee-7",
@@ -98,9 +107,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Solve linear equations in one variable. a. Give examples of linear equations in one variable with one solution, infinitely many solutions, or no solutions. Show which of these possibilities is the case by successively transforming the given equation into simpler forms, until an equivalent equation of the form x = a, a = a, or a = b results (where a and b are different numbers). b. Solve linear equations with rational number coefficients, including equations whose solutions require expanding expressions using the distributive property and collecting like terms.",
     subject: "mathematics",
-    grade: 8,
+    gradeLevel: 8,
     domain: "Expressions and Equations",
     cluster: "Analyze and solve linear equations and pairs of simultaneous linear equations.",
+    difficulty: 8,
   },
   {
     id: "math-hs-n-rn-2",
@@ -110,9 +120,10 @@ export const mathStandards: CommonStandard[] = [
     description:
       "Rewrite expressions involving radicals and rational exponents using the properties of exponents",
     subject: "mathematics",
-    grade: 9,
+    gradeLevel: 9,
     domain: "Number and Quantity",
     cluster: "Extend the properties of exponents to rational exponents.",
+    difficulty: 9,
   },
 ];
 
@@ -125,9 +136,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Ask and answer questions about key details in a text. (Literature)",
     subject: "english",
-    grade: 1,
+    gradeLevel: 1,
     domain: "Reading: Literature",
     cluster: "Key Ideas and Details",
+    difficulty: 2,
   },
   {
     id: "ela-2-ri-3",
@@ -136,9 +148,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Describe the connection between a series of historical events, scientific ideas or concepts, or steps in technical procedures in a text. (Informational Text)",
     subject: "english",
-    grade: 2,
+    gradeLevel: 2,
     domain: "Reading: Informational Text",
     cluster: "Key Ideas and Details",
+    difficulty: 3,
   },
   {
     id: "ela-3-w-2",
@@ -147,9 +160,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Write informative/explanatory texts to examine a topic and convey ideas and information clearly.",
     subject: "english",
-    grade: 3,
+    gradeLevel: 3,
     domain: "Writing",
     cluster: "Text Types and Purposes",
+    difficulty: 4,
   },
   {
     id: "ela-4-l-3",
@@ -158,9 +172,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Use knowledge of language and its conventions when writing, speaking, reading, or listening.",
     subject: "english",
-    grade: 4,
+    gradeLevel: 4,
     domain: "Language",
     cluster: "Conventions of Standard English",
+    difficulty: 5,
   },
   {
     id: "ela-5-r-7",
@@ -169,9 +184,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Analyze how visual and multimedia elements contribute to the meaning, tone, or beauty of a text (e.g., graphic novel, multimedia presentation).",
     subject: "english",
-    grade: 5,
+    gradeLevel: 5,
     domain: "Reading",
     cluster: "Integration of Knowledge and Ideas",
+    difficulty: 6,
   },
   {
     id: "ela-6-w-1",
@@ -180,9 +196,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Write arguments to support claims with clear reasons and relevant evidence.",
     subject: "english",
-    grade: 6,
+    gradeLevel: 6,
     domain: "Writing",
     cluster: "Text Types and Purposes",
+    difficulty: 6,
   },
   {
     id: "ela-7-ri-1",
@@ -191,9 +208,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Cite several pieces of textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text.",
     subject: "english",
-    grade: 7,
+    gradeLevel: 7,
     domain: "Reading: Informational Text",
     cluster: "Key Ideas and Details",
+    difficulty: 7,
   },
   {
     id: "ela-8-l-5",
@@ -202,9 +220,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Demonstrate understanding of figurative language, word relationships, and nuances in word meanings.",
     subject: "english",
-    grade: 8,
+    gradeLevel: 8,
     domain: "Language",
     cluster: "Vocabulary Acquisition and Use",
+    difficulty: 8,
   },
   {
     id: "ela-9-10-r-3",
@@ -214,9 +233,10 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Analyze how complex characters (e.g., those with multiple or conflicting motivations) develop over the course of a text, interact with other characters, and advance the plot or develop the theme.",
     subject: "english",
-    grade: 9,
+    gradeLevel: 9,
     domain: "Reading",
     cluster: "Key Ideas and Details",
+    difficulty: 9,
   },
   {
     id: "ela-11-12-w-2",
@@ -225,13 +245,14 @@ export const englishStandards: CommonStandard[] = [
     description:
       "Write informative/explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization, and analysis of content.",
     subject: "english",
-    grade: 11,
+    gradeLevel: 11,
     domain: "Writing",
     cluster: "Text Types and Purposes",
+    difficulty: 10,
   },
 ];
 
-// Science Standards
+// Science Standards - updating all to use gradeLevel and add difficulty
 export const scienceStandards: CommonStandard[] = [
   {
     id: "sci-k-ps2-1",
@@ -241,9 +262,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Plan and conduct an investigation to compare the effects of different strengths or different directions of pushes and pulls on the motion of an object.",
     subject: "science",
-    grade: 0,
+    gradeLevel: 0,
     domain: "Physical Science",
     cluster: "Motion and Stability: Forces and Interactions",
+    difficulty: 1,
   },
   {
     id: "sci-1-ls1-1",
@@ -253,9 +275,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Use observations to describe patterns of what plants and animals (including humans) need to survive.",
     subject: "science",
-    grade: 1,
+    gradeLevel: 1,
     domain: "Life Science",
     cluster: "From Molecules to Organisms: Structures and Processes",
+    difficulty: 2,
   },
   {
     id: "sci-2-ess2-1",
@@ -265,9 +288,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Compare different solutions to reduce the impacts of humans on the land, water, air, and/or other living things in the local environment.",
     subject: "science",
-    grade: 2,
+    gradeLevel: 2,
     domain: "Earth and Space Science",
     cluster: "Earth's Systems",
+    difficulty: 3,
   },
   {
     id: "sci-3-ls3-1",
@@ -277,9 +301,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Analyze and interpret data to provide evidence that plants and animals have traits inherited from parents and that variation of these traits exists in a group of similar organisms.",
     subject: "science",
-    grade: 3,
+    gradeLevel: 3,
     domain: "Life Science",
     cluster: "Heredity: Inheritance and Variation of Traits",
+    difficulty: 4,
   },
   {
     id: "sci-4-ps4-1",
@@ -289,9 +314,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Develop a model of waves to describe patterns of waves in terms of amplitude and wavelength and that waves can cause objects to move.",
     subject: "science",
-    grade: 4,
+    gradeLevel: 4,
     domain: "Physical Science",
     cluster: "Waves and Their Applications in Technologies for Information Transfer",
+    difficulty: 5,
   },
   {
     id: "sci-5-ess1-1",
@@ -301,9 +327,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Support an argument that differences in the apparent brightness of the sun compared to other stars is due to their relative distances from Earth.",
     subject: "science",
-    grade: 5,
+    gradeLevel: 5,
     domain: "Earth and Space Science",
     cluster: "Earth's Place in the Universe",
+    difficulty: 6,
   },
   {
     id: "sci-ms-ps1-1",
@@ -313,9 +340,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Develop models to describe the atomic composition of simple molecules and extended structures.",
     subject: "science",
-    grade: 6,
+    gradeLevel: 6,
     domain: "Physical Science",
     cluster: "Matter and Its Interactions",
+    difficulty: 7,
   },
   {
     id: "sci-ms-ls2-1",
@@ -325,9 +353,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Analyze and interpret data to provide evidence for the effects of resource availability on organisms and populations of organisms in an ecosystem.",
     subject: "science",
-    grade: 7,
+    gradeLevel: 7,
     domain: "Life Science",
     cluster: "Ecosystems: Interactions, Energy, and Dynamics",
+    difficulty: 7,
   },
   {
     id: "sci-ms-ess3-3",
@@ -337,9 +366,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Apply scientific principles to design a method for monitoring and minimizing a human impact on the environment.",
     subject: "science",
-    grade: 8,
+    gradeLevel: 8,
     domain: "Earth and Space Science",
     cluster: "Earth and Human Activity",
+    difficulty: 8,
   },
   {
     id: "sci-hs-ps1-1",
@@ -349,9 +379,10 @@ export const scienceStandards: CommonStandard[] = [
     description:
       "Use the periodic table as a model to predict the relative properties of elements based on the patterns of electrons in the outermost energy level of atoms.",
     subject: "science",
-    grade: 9,
+    gradeLevel: 9,
     domain: "Physical Science",
     cluster: "Matter and Its Interactions",
+    difficulty: 9,
   },
 ];
 
@@ -363,9 +394,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     title: "Use maps and other geographic tools",
     description: "Use maps and other geographic tools to identify locations.",
     subject: "social-studies",
-    grade: 0,
+    gradeLevel: 0,
     domain: "Geography",
     cluster: "The World in Spatial Terms",
+    difficulty: 1,
   },
   {
     id: "ss-1-h-1",
@@ -374,9 +406,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Understand how events relate to one another in time. (History)",
     subject: "social-studies",
-    grade: 1,
+    gradeLevel: 1,
     domain: "History",
     cluster: "Time, Continuity, and Change",
+    difficulty: 2,
   },
   {
     id: "ss-2-c-2",
@@ -385,9 +418,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Identify the rights and responsibilities of citizens. (Civics)",
     subject: "social-studies",
-    grade: 2,
+    gradeLevel: 2,
     domain: "Civics",
     cluster: "Civic Ideals and Practices",
+    difficulty: 3,
   },
   {
     id: "ss-3-e-3",
@@ -396,9 +430,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Explain how people in a community make choices to produce goods and services. (Economics)",
     subject: "social-studies",
-    grade: 3,
+    gradeLevel: 3,
     domain: "Economics",
     cluster: "Production, Distribution, and Consumption",
+    difficulty: 4,
   },
   {
     id: "ss-4-g-4",
@@ -407,9 +442,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Analyze the human and physical characteristics of regions. (Geography)",
     subject: "social-studies",
-    grade: 4,
+    gradeLevel: 4,
     domain: "Geography",
     cluster: "Human Systems",
+    difficulty: 5,
   },
   {
     id: "ss-5-h-5",
@@ -418,9 +454,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Explain the causes and consequences of exploration and colonization. (History)",
     subject: "social-studies",
-    grade: 5,
+    gradeLevel: 5,
     domain: "History",
     cluster: "Time, Continuity, and Change",
+    difficulty: 6,
   },
   {
     id: "ss-6-c-6",
@@ -429,9 +466,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Evaluate the roles, rights, and responsibilities of citizens in various societies. (Civics)",
     subject: "social-studies",
-    grade: 6,
+    gradeLevel: 6,
     domain: "Civics",
     cluster: "Civic Ideals and Practices",
+    difficulty: 6,
   },
   {
     id: "ss-7-e-7",
@@ -440,9 +478,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Analyze economic systems and their impact on resource allocation. (Economics)",
     subject: "social-studies",
-    grade: 7,
+    gradeLevel: 7,
     domain: "Economics",
     cluster: "Production, Distribution, and Consumption",
+    difficulty: 7,
   },
   {
     id: "ss-8-g-8",
@@ -451,9 +490,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Analyze the interactions between humans and the environment. (Geography)",
     subject: "social-studies",
-    grade: 8,
+    gradeLevel: 8,
     domain: "Geography",
     cluster: "Environment and Society",
+    difficulty: 8,
   },
   {
     id: "ss-9-12-h-9",
@@ -462,9 +502,10 @@ export const socialStudiesStandards: CommonStandard[] = [
     description:
       "Evaluate historical sources for accuracy, bias, and perspective. (History)",
     subject: "social-studies",
-    grade: 9,
+    gradeLevel: 9,
     domain: "History",
     cluster: "Historical Skills",
+    difficulty: 9,
   },
 ];
 
@@ -477,9 +518,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Model daily processes by creating and following algorithms (sets of step-by-step instructions) to complete tasks.",
     subject: "computer-science",
-    grade: 0,
+    gradeLevel: 0,
     domain: "Algorithms and Programming",
     cluster: "Algorithms",
+    difficulty: 2,
   },
   {
     id: "cs-3-5-cd-2",
@@ -489,9 +531,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Describe how internal and external parts of computing devices function to form a system.",
     subject: "computer-science",
-    grade: 3,
+    gradeLevel: 3,
     domain: "Computing Devices",
     cluster: "Hardware and Software",
+    difficulty: 4,
   },
   {
     id: "cs-6-8-ni-3",
@@ -501,9 +544,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Explain how network devices work together to form the Internet.",
     subject: "computer-science",
-    grade: 6,
+    gradeLevel: 6,
     domain: "Networks and the Internet",
     cluster: "Network Communication and Organization",
+    difficulty: 6,
   },
   {
     id: "cs-9-12-ap-4",
@@ -513,9 +557,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Evaluate and refine algorithms to improve efficiency and usability.",
     subject: "computer-science",
-    grade: 9,
+    gradeLevel: 9,
     domain: "Algorithms and Programming",
     cluster: "Algorithms",
+    difficulty: 9,
   },
   {
     id: "cs-k-2-da-5",
@@ -524,9 +569,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Store, copy, search, retrieve, modify, and delete data using a computing device and define the attributes of the data.",
     subject: "computer-science",
-    grade: 0,
+    gradeLevel: 0,
     domain: "Data and Analysis",
     cluster: "Collection, Visualization, and Transformation",
+    difficulty: 2,
   },
   {
     id: "cs-3-5-ap-6",
@@ -536,9 +582,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Decompose problems into smaller, manageable subproblems to facilitate the program development process.",
     subject: "computer-science",
-    grade: 3,
+    gradeLevel: 3,
     domain: "Algorithms and Programming",
     cluster: "Program Development",
+    difficulty: 4,
   },
   {
     id: "cs-6-8-si-7",
@@ -548,9 +595,10 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Identify and correct errors in algorithms and programs, including syntax and logic errors.",
     subject: "computer-science",
-    grade: 6,
+    gradeLevel: 6,
     domain: "System Interactions",
     cluster: "Human-Computer Interaction",
+    difficulty: 7,
   },
   {
     id: "cs-9-12-ap-8",
@@ -560,13 +608,14 @@ export const computerScienceStandards: CommonStandard[] = [
     description:
       "Evaluate algorithms in terms of their efficiency, correctness, and clarity.",
     subject: "computer-science",
-    grade: 9,
+    gradeLevel: 9,
     domain: "Algorithms and Programming",
     cluster: "Algorithms",
+    difficulty: 9,
   },
 ];
 
-// Safely access standards data with proper type checking
+// Update all helper functions to use gradeLevel instead of grade
 export const getStandardsBySubject = (subject: string) => {
   const subjectMap: Record<string, any> = {
     mathematics: mathStandards,
@@ -599,8 +648,8 @@ export const getStandardsByGrade = (grade: number) => {
   return allStandards.filter(standard => 
     standard && 
     typeof standard === 'object' && 
-    'grade' in standard && 
-    standard.grade === grade
+    'gradeLevel' in standard && 
+    standard.gradeLevel === grade
   );
 };
 
@@ -626,7 +675,7 @@ export const loadCurriculumData = async () => {
         typeof standard.title === 'string' &&
         typeof standard.description === 'string' &&
         typeof standard.subject === 'string' &&
-        typeof standard.grade === 'number'
+        typeof standard.gradeLevel === 'number'
       );
     }).map((item: any) => ({
       id: item.id,
@@ -634,9 +683,10 @@ export const loadCurriculumData = async () => {
       title: item.title,
       description: item.description,
       subject: item.subject,
-      grade: item.grade,
+      gradeLevel: item.gradeLevel || item.grade || 1, // Handle both gradeLevel and grade
       domain: item.domain || item.cluster || '',
-      cluster: item.cluster || item.domain || ''
+      cluster: item.cluster || item.domain || '',
+      difficulty: item.difficulty || 1
     } as CommonStandard));
 
   } catch (error) {
@@ -680,8 +730,8 @@ export const getFilteredStandards = (subject?: string, grade?: number): CommonSt
     standards = standards.filter((standard: any) => 
       standard && 
       typeof standard === 'object' && 
-      'grade' in standard &&
-      standard.grade === grade
+      'gradeLevel' in standard &&
+      standard.gradeLevel === grade
     );
   }
   

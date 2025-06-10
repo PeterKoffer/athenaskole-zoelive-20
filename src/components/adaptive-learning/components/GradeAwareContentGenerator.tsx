@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
 import { commonStandardsAPI } from '@/services/commonStandardsAPI';
 import { dailyLearningSessionOrchestrator } from '@/services/dailyLearningSessionOrchestrator';
-import { contentDeduplicationService } from '@/services/contentDeduplicationService';
+import { ContentDeduplicationService } from '@/services/contentDeduplicationService';
 import { useAuth } from '@/hooks/useAuth';
 import { GraduationCap, Target, BookOpen, Play, AlertCircle, Sparkles, TrendingUp } from 'lucide-react';
 
