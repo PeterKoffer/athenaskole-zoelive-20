@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -117,7 +116,7 @@ const GradeAwareContentGenerator = ({
         
         if (user?.id) {
           try {
-            const uniquenessCheck = await contentDeduplicationService.checkContentUniqueness(
+            const uniquenessCheck = await ContentDeduplicationService.checkContentUniqueness(
               user.id,
               'question',
               `${subject}-${skillArea}-${gradeConfig.userGrade}`,

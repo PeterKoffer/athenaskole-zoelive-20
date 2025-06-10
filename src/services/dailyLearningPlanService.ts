@@ -1,7 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { GRADE_LEVELS, type GradeLevel } from '@/types/gradeStandards';
-import { userLearningProfileService } from './userLearningProfileService';
-import { conceptMasteryService } from './conceptMasteryService';
+
+// Simplified Daily Learning Plan Service without database dependencies
 
 export interface DailyLearningPlan {
   id: string;
@@ -68,21 +66,14 @@ class DailyLearningPlanService {
       return existingPlan;
     }
 
-    // Get user's learning profile and progress
-    const [profile, conceptMastery, usedContent] = await Promise.all([
-      userLearningProfileService.getUserLearningProfile(userId),
-      conceptMasteryService.getConceptMastery(userId),
-      this.getUsedContentHistory(userId, 30) // Last 30 days
-    ]);
-
     // Get curriculum goals for the grade
     const curriculumGoals = await this.getCurriculumGoalsForGrade(gradeLevel);
     
-    // Determine focus areas based on progress and curriculum
-    const focusAreas = this.determineFocusAreas(profile, conceptMastery, curriculumGoals);
+    // Create mock focus areas
+    const focusAreas = this.getMockFocusAreas(gradeLevel);
 
     // Generate personalized adjustments
-    const personalizedAdjustments = this.generatePersonalizedAdjustments(profile, focusAreas);
+    const personalizedAdjustments = this.generatePersonalizedAdjustments({}, focusAreas);
 
     // Create learning sessions
     const sessions = await this.createLearningSessions(
@@ -90,7 +81,7 @@ class DailyLearningPlanService {
       gradeLevel, 
       focusAreas, 
       personalizedAdjustments,
-      usedContent
+      []
     );
 
     // Calculate total time
@@ -109,35 +100,17 @@ class DailyLearningPlanService {
       createdAt: new Date().toISOString()
     };
 
-    // Save plan to database
-    await this.saveDailyPlan(plan);
-
     console.log(`✅ Generated daily plan with ${sessions.length} sessions (${totalMinutes} minutes)`);
     return plan;
   }
 
   /**
-   * Get existing daily plan for a user and date
+   * Get existing daily plan for a user and date (mock implementation)
    */
   async getDailyPlan(userId: string, date: string): Promise<DailyLearningPlan | null> {
-    try {
-      const { data, error } = await supabase
-        .from('daily_learning_plans')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('date', date)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') return null; // No rows found
-        throw error;
-      }
-
-      return this.transformDatabasePlan(data);
-    } catch (error) {
-      console.error('Error fetching daily plan:', error);
-      return null;
-    }
+    console.log('Getting daily plan for user:', userId, 'date:', date);
+    // Mock implementation - return null to always generate new plans
+    return null;
   }
 
   /**
@@ -193,87 +166,14 @@ class DailyLearningPlanService {
   }
 
   /**
-   * Determine focus areas based on student progress and curriculum
+   * Get mock focus areas for testing
    */
-  private determineFocusAreas(
-    profile: any, 
-    conceptMastery: any[], 
-    curriculumGoals: GradeCurriculumGoal[]
-  ): { subject: string; skillArea: string; priority: number }[] {
-    const focusAreas: { subject: string; skillArea: string; priority: number }[] = [];
-
-    // Analyze weaknesses and gaps
-    const weaknesses = profile?.weaknesses || [];
-    const learningGaps = profile?.learning_gaps || [];
-
-    // Add high-priority areas from weaknesses
-    weaknesses.forEach((weakness: string) => {
-      focusAreas.push({
-        subject: this.inferSubjectFromSkill(weakness),
-        skillArea: weakness,
-        priority: 1 // High priority
-      });
-    });
-
-    // Add medium-priority areas from learning gaps
-    learningGaps.forEach((gap: string) => {
-      focusAreas.push({
-        subject: this.inferSubjectFromSkill(gap),
-        skillArea: gap,
-        priority: 2 // Medium priority
-      });
-    });
-
-    // Add low-priority areas from curriculum goals
-    curriculumGoals.forEach(goal => {
-      goal.skillAreas.forEach(skillArea => {
-        const mastery = conceptMastery.find(m => m.conceptName === skillArea);
-        if (!mastery || mastery.masteryLevel < goal.masteryThreshold) {
-          focusAreas.push({
-            subject: goal.subject,
-            skillArea,
-            priority: 3 // Low priority
-          });
-        }
-      });
-    });
-
-    // Remove duplicates and sort by priority
-    const uniqueFocusAreas = focusAreas.filter((area, index, self) => 
-      index === self.findIndex(a => a.subject === area.subject && a.skillArea === area.skillArea)
-    );
-
-    return uniqueFocusAreas.sort((a, b) => a.priority - b.priority);
-  }
-
-  /**
-   * Infer subject from skill name
-   */
-  private inferSubjectFromSkill(skillName: string): string {
-    const skillToSubject: Record<string, string> = {
-      'number_sense': 'mathematics',
-      'addition_subtraction': 'mathematics',
-      'multiplication_division': 'mathematics',
-      'fractions': 'mathematics',
-      'geometry': 'mathematics',
-      'algebra': 'mathematics',
-      'reading_comprehension': 'english',
-      'vocabulary': 'english',
-      'grammar': 'english',
-      'writing': 'english',
-      'life_science': 'science',
-      'earth_science': 'science',
-      'physical_science': 'science',
-      'biology': 'science',
-      'chemistry': 'science',
-      'physics': 'science',
-      'history': 'social_studies',
-      'geography': 'social_studies',
-      'civics': 'social_studies',
-      'economics': 'social_studies'
-    };
-
-    return skillToSubject[skillName] || 'mathematics'; // Default to mathematics
+  private getMockFocusAreas(gradeLevel: number): { subject: string; skillArea: string; priority: number }[] {
+    return [
+      { subject: 'mathematics', skillArea: 'number_sense', priority: 1 },
+      { subject: 'english', skillArea: 'reading_comprehension', priority: 2 },
+      { subject: 'science', skillArea: 'life_science', priority: 3 }
+    ];
   }
 
   /**
@@ -285,48 +185,12 @@ class DailyLearningPlanService {
   ): PersonalizedAdjustment[] {
     const adjustments: PersonalizedAdjustment[] = [];
 
-    // Difficulty adjustment based on accuracy
-    if (profile?.overall_accuracy !== null) {
-      if (profile.overall_accuracy > 85) {
-        adjustments.push({
-          type: 'difficulty',
-          reason: 'High accuracy rate indicates readiness for increased challenge',
-          adjustment: { increase: 1 }
-        });
-      } else if (profile.overall_accuracy < 60) {
-        adjustments.push({
-          type: 'difficulty',
-          reason: 'Lower accuracy rate requires foundational reinforcement',
-          adjustment: { decrease: 1 }
-        });
-      }
-    }
-
-    // Pace adjustment based on attention span
-    if (profile?.attention_span_minutes !== null) {
-      if (profile.attention_span_minutes < 15) {
-        adjustments.push({
-          type: 'pace',
-          reason: 'Short attention span requires frequent breaks and varied activities',
-          adjustment: { sessionLength: 10, breakFrequency: 'high' }
-        });
-      } else if (profile.attention_span_minutes > 30) {
-        adjustments.push({
-          type: 'pace',
-          reason: 'Good attention span allows for longer focused sessions',
-          adjustment: { sessionLength: 25, breakFrequency: 'low' }
-        });
-      }
-    }
-
-    // Content type adjustment based on learning style
-    if (profile?.learning_style) {
-      adjustments.push({
-        type: 'content_type',
-        reason: `Learning style preference: ${profile.learning_style}`,
-        adjustment: { preferredTypes: this.getContentTypesForLearningStyle(profile.learning_style) }
-      });
-    }
+    // Default adjustments for testing
+    adjustments.push({
+      type: 'difficulty',
+      reason: 'Standard difficulty adjustment',
+      adjustment: { level: 'medium' }
+    });
 
     return adjustments;
   }
@@ -360,12 +224,10 @@ class DailyLearningPlanService {
     const targetMinutes = this.TARGET_DAILY_MINUTES;
 
     // Determine session length based on adjustments
-    const paceAdjustment = adjustments.find(a => a.type === 'pace');
-    const sessionLength = paceAdjustment?.adjustment?.sessionLength || 20;
+    const sessionLength = 20; // Default session length
 
     // Determine content type preferences
-    const contentTypeAdjustment = adjustments.find(a => a.type === 'content_type');
-    const preferredTypes = contentTypeAdjustment?.adjustment?.preferredTypes || ['question', 'game', 'activity'];
+    const preferredTypes = ['question', 'game', 'activity'];
 
     // Create sessions from focus areas
     for (const focusArea of focusAreas) {
@@ -393,29 +255,6 @@ class DailyLearningPlanService {
       totalMinutes += sessionMinutes;
     }
 
-    // If we haven't reached target minutes, add more sessions
-    while (totalMinutes < this.MIN_DAILY_MINUTES && sessions.length < 15) {
-      const randomFocusArea = focusAreas[Math.floor(Math.random() * focusAreas.length)];
-      const remainingMinutes = targetMinutes - totalMinutes;
-      const sessionMinutes = Math.min(sessionLength, remainingMinutes);
-      const contentType = preferredTypes[sessions.length % preferredTypes.length] as 'question' | 'game' | 'activity';
-
-      const session: LearningSession = {
-        id: `${userId}-${Date.now()}-${sessions.length}`,
-        subject: randomFocusArea.subject,
-        skillArea: randomFocusArea.skillArea,
-        difficultyLevel: this.getDifficultyForGrade(gradeLevel),
-        estimatedMinutes: sessionMinutes,
-        contentType,
-        curriculumStandardId: `${gradeLevel}-${randomFocusArea.subject}-${randomFocusArea.skillArea}`,
-        prerequisites: [],
-        completed: false
-      };
-
-      sessions.push(session);
-      totalMinutes += sessionMinutes;
-    }
-
     return sessions;
   }
 
@@ -432,152 +271,29 @@ class DailyLearningPlanService {
   }
 
   /**
-   * Get used content history to avoid repetition
-   */
-  private async getUsedContentHistory(userId: string, days: number): Promise<string[]> {
-    try {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - days);
-
-      const { data, error } = await supabase
-        .from('user_question_history')
-        .select('question_text')
-        .eq('user_id', userId)
-        .gte('created_at', cutoffDate.toISOString());
-
-      if (error) throw error;
-
-      return data?.map(item => item.question_text) || [];
-    } catch (error) {
-      console.error('Error fetching used content history:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Save daily learning plan to database
-   */
-  private async saveDailyPlan(plan: DailyLearningPlan): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('daily_learning_plans')
-        .insert({
-          id: plan.id,
-          user_id: plan.userId,
-          grade_level: plan.gradeLevel,
-          date: plan.date,
-          total_minutes: plan.totalMinutes,
-          sessions: plan.sessions,
-          curriculum_goals: plan.curriculumGoals,
-          personalized_adjustments: plan.personalizedAdjustments,
-          completed: plan.completed,
-          created_at: plan.createdAt
-        });
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error saving daily plan:', error);
-      // Continue without throwing - plan will be regenerated if needed
-    }
-  }
-
-  /**
-   * Transform database plan to application format
-   */
-  private transformDatabasePlan(data: any): DailyLearningPlan {
-    return {
-      id: data.id,
-      userId: data.user_id,
-      gradeLevel: data.grade_level,
-      date: data.date,
-      totalMinutes: data.total_minutes,
-      sessions: data.sessions || [],
-      curriculumGoals: data.curriculum_goals || [],
-      personalizedAdjustments: data.personalized_adjustments || [],
-      completed: data.completed || false,
-      createdAt: data.created_at
-    };
-  }
-
-  /**
    * Mark a session as completed
    */
   async markSessionCompleted(userId: string, date: string, sessionId: string): Promise<void> {
-    const plan = await this.getDailyPlan(userId, date);
-    if (!plan) return;
-
-    const sessionIndex = plan.sessions.findIndex(s => s.id === sessionId);
-    if (sessionIndex >= 0) {
-      plan.sessions[sessionIndex].completed = true;
-      
-      // Check if all sessions are completed
-      const allCompleted = plan.sessions.every(s => s.completed);
-      if (allCompleted) {
-        plan.completed = true;
-      }
-
-      await this.saveDailyPlan(plan);
-    }
+    console.log('Marking session completed:', { userId, date, sessionId });
+    // Mock implementation
   }
 
   /**
    * Get learning analytics for a user
    */
   async getLearningAnalytics(userId: string, days: number = 30): Promise<any> {
-    try {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - days);
-
-      const { data, error } = await supabase
-        .from('daily_learning_plans')
-        .select('*')
-        .eq('user_id', userId)
-        .gte('date', cutoffDate.toISOString().split('T')[0]);
-
-      if (error) throw error;
-
-      const plans = data || [];
-      const totalPlans = plans.length;
-      const completedPlans = plans.filter(p => p.completed).length;
-      const totalMinutes = plans.reduce((sum, p) => sum + (p.total_minutes || 0), 0);
-      const completedMinutes = plans.filter(p => p.completed).reduce((sum, p) => sum + (p.total_minutes || 0), 0);
-
-      return {
-        totalPlans,
-        completedPlans,
-        completionRate: totalPlans > 0 ? (completedPlans / totalPlans) * 100 : 0,
-        totalMinutes,
-        completedMinutes,
-        averageMinutesPerDay: totalPlans > 0 ? totalMinutes / totalPlans : 0,
-        streakDays: this.calculateStreakDays(plans)
-      };
-    } catch (error) {
-      console.error('Error getting learning analytics:', error);
-      return {};
-    }
-  }
-
-  /**
-   * Calculate streak days from completed plans
-   */
-  private calculateStreakDays(plans: any[]): number {
-    const completedPlans = plans.filter(p => p.completed).sort((a, b) => b.date.localeCompare(a.date));
-    let streak = 0;
-    let currentDate = new Date();
-
-    for (const plan of completedPlans) {
-      const planDate = new Date(plan.date);
-      const daysDiff = Math.floor((currentDate.getTime() - planDate.getTime()) / (1000 * 60 * 60 * 24));
-
-      if (daysDiff === streak) {
-        streak++;
-        currentDate = planDate;
-      } else if (daysDiff > streak) {
-        break;
-      }
-    }
-
-    return streak;
+    console.log('Getting learning analytics for user:', userId, 'days:', days);
+    
+    // Mock analytics data
+    return {
+      totalPlans: 10,
+      completedPlans: 7,
+      completionRate: 70,
+      totalMinutes: 1200,
+      completedMinutes: 840,
+      averageMinutesPerDay: 120,
+      streakDays: 3
+    };
   }
 }
 
