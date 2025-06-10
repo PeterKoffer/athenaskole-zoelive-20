@@ -31,17 +31,17 @@ export const useGradeLevelContent = (subject: string) => {
       // Get user's grade level (defaulting to grade 1 if not set)
       const userGrade = getUserGradeLevel();
       
-      // Get appropriate standards for the user's grade
-      const appropriateStandards = commonStandardsAPI.getStandardsByGradeAndSubject(userGrade, subject);
+      // Get appropriate standards for the user's grade - await the promises
+      const appropriateStandards = await commonStandardsAPI.getStandardsByGradeAndSubject(userGrade, subject);
       
-      // Get skill areas for this grade and subject
-      const skillAreas = commonStandardsAPI.getSkillAreasForGradeAndSubject(userGrade, subject);
+      // Get skill areas for this grade and subject - await the promise
+      const skillAreas = await commonStandardsAPI.getSkillAreasForGradeAndSubject(userGrade, subject);
       
       // Get difficulty range appropriate for this grade
       const difficultyRange = commonStandardsAPI.getDifficultyRangeForGrade(userGrade);
       
-      // Get prerequisite standards from previous grades
-      const prerequisites = commonStandardsAPI.getPrerequisiteStandards(userGrade, subject);
+      // Get prerequisite standards from previous grades - await the promise
+      const prerequisites = await commonStandardsAPI.getPrerequisiteStandards(userGrade, subject);
 
       const config: GradeContentConfig = {
         userGrade,

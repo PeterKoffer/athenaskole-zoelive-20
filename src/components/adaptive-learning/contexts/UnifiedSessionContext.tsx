@@ -21,12 +21,30 @@ export interface UnifiedSessionState {
   correctAnswers: number;
   accuracy: number;
   
+  // Enhanced session properties for compatibility
+  subject: string;
+  skillArea: string;
+  totalQuestions: number;
+  isSessionComplete: boolean;
+  answers: Array<{ isCorrect: boolean; userAnswer: number; questionId?: string }>;
+  isLoading: boolean;
+  isGenerating: boolean;
+  error: string | null;
+  questionNumber: number;
+  
+  // Timer management
+  timers: {
+    sessionStartTime: number;
+    questionStartTime: number;
+  };
+  
   // Actions
   handleAnswerSelect: (answerIndex: number) => void;
   handleSubmitAnswer: () => void;
   handleNextQuestion: () => void;
   handleSessionComplete: () => void;
   handleRetry: () => void;
+  generateNextQuestion: () => Promise<void>;
 }
 
 interface UnifiedSessionContextProps {
@@ -34,7 +52,9 @@ interface UnifiedSessionContextProps {
   subject: string;
   skillArea: string;
   difficultyLevel: number;
+  totalQuestions: number;
   onSessionReady?: (data: any) => void;
+  onSessionComplete?: () => void;
 }
 
 const UnifiedSessionContext = createContext<UnifiedSessionState | null>(null);
@@ -52,7 +72,9 @@ export const UnifiedSessionProvider = ({
   subject,
   skillArea,
   difficultyLevel,
-  onSessionReady
+  totalQuestions,
+  onSessionReady,
+  onSessionComplete
 }: UnifiedSessionContextProps) => {
   const [sessionId] = useState(() => `session-${Date.now()}`);
   const [isActive, setIsActive] = useState(false);
@@ -65,11 +87,24 @@ export const UnifiedSessionProvider = ({
   const [timeSpent, setTimeSpent] = useState(0);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [answers, setAnswers] = useState<Array<{ isCorrect: boolean; userAnswer: number; questionId?: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const sessionStartTime = useRef(Date.now());
+  const questionStartTime = useRef(Date.now());
 
   const currentQuestion = questions[currentQuestionIndex] || null;
   const accuracy = questionsAnswered > 0 ? (correctAnswers / questionsAnswered) * 100 : 0;
+  const isSessionComplete = questionsAnswered >= totalQuestions;
+  const questionNumber = currentQuestionIndex + 1;
+
+  const timers = {
+    sessionStartTime: sessionStartTime.current,
+    questionStartTime: questionStartTime.current
+  };
 
   // Timer management
   useEffect(() => {
@@ -88,6 +123,30 @@ export const UnifiedSessionProvider = ({
     };
   }, [isActive, isComplete]);
 
+  const generateNextQuestion = useCallback(async () => {
+    try {
+      setIsGenerating(true);
+      setError(null);
+      
+      // Mock question generation for demo
+      const newQuestion = {
+        id: `q-${Date.now()}`,
+        question: `Sample ${subject} question ${questionNumber}`,
+        options: ['Option A', 'Option B', 'Option C', 'Option D'],
+        correct: Math.floor(Math.random() * 4),
+        explanation: `This is the explanation for ${subject} question ${questionNumber}`
+      };
+      
+      setQuestions(prev => [...prev, newQuestion]);
+      questionStartTime.current = Date.now();
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate question');
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [subject, questionNumber]);
+
   const handleAnswerSelect = useCallback((answerIndex: number) => {
     if (!hasAnswered) {
       setSelectedAnswer(answerIndex);
@@ -95,14 +154,22 @@ export const UnifiedSessionProvider = ({
   }, [hasAnswered]);
 
   const handleSubmitAnswer = useCallback(() => {
-    if (selectedAnswer !== null && !hasAnswered) {
+    if (selectedAnswer !== null && !hasAnswered && currentQuestion) {
       setHasAnswered(true);
       setShowResult(true);
       setQuestionsAnswered(prev => prev + 1);
       
-      if (currentQuestion && selectedAnswer === currentQuestion.correct) {
+      const isCorrect = selectedAnswer === currentQuestion.correct;
+      if (isCorrect) {
         setCorrectAnswers(prev => prev + 1);
       }
+      
+      // Store answer
+      setAnswers(prev => [...prev, {
+        isCorrect,
+        userAnswer: selectedAnswer,
+        questionId: currentQuestion.id
+      }]);
     }
   }, [selectedAnswer, hasAnswered, currentQuestion]);
 
@@ -112,10 +179,16 @@ export const UnifiedSessionProvider = ({
       setSelectedAnswer(null);
       setShowResult(false);
       setHasAnswered(false);
+      questionStartTime.current = Date.now();
+    } else if (questionsAnswered < totalQuestions) {
+      generateNextQuestion();
+      setSelectedAnswer(null);
+      setShowResult(false);
+      setHasAnswered(false);
     } else {
       handleSessionComplete();
     }
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, questions.length, questionsAnswered, totalQuestions, generateNextQuestion]);
 
   const handleSessionComplete = useCallback(() => {
     setIsComplete(true);
@@ -123,7 +196,10 @@ export const UnifiedSessionProvider = ({
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-  }, []);
+    if (onSessionComplete) {
+      onSessionComplete();
+    }
+  }, [onSessionComplete]);
 
   const handleRetry = useCallback(() => {
     setCurrentQuestionIndex(0);
@@ -133,8 +209,12 @@ export const UnifiedSessionProvider = ({
     setTimeSpent(0);
     setQuestionsAnswered(0);
     setCorrectAnswers(0);
+    setAnswers([]);
     setIsComplete(false);
     setIsActive(true);
+    setError(null);
+    sessionStartTime.current = Date.now();
+    questionStartTime.current = Date.now();
   }, []);
 
   // Initialize session
@@ -144,17 +224,17 @@ export const UnifiedSessionProvider = ({
       const mockQuestions = [
         {
           id: '1',
-          question: 'Sample question 1',
+          question: `Sample ${subject} question 1`,
           options: ['Option A', 'Option B', 'Option C', 'Option D'],
           correct: 0,
-          explanation: 'This is the explanation for question 1'
+          explanation: `This is the explanation for ${subject} question 1`
         },
         {
           id: '2',
-          question: 'Sample question 2',
+          question: `Sample ${subject} question 2`,
           options: ['Option A', 'Option B', 'Option C', 'Option D'],
           correct: 1,
-          explanation: 'This is the explanation for question 2'
+          explanation: `This is the explanation for ${subject} question 2`
         }
       ];
       
@@ -165,7 +245,7 @@ export const UnifiedSessionProvider = ({
         onSessionReady({ questions: mockQuestions, sessionId });
       }
     }
-  }, [isActive, questions.length, sessionId, onSessionReady]);
+  }, [isActive, questions.length, sessionId, onSessionReady, subject]);
 
   const sessionState: UnifiedSessionState = {
     sessionId,
@@ -181,11 +261,22 @@ export const UnifiedSessionProvider = ({
     questionsAnswered,
     correctAnswers,
     accuracy,
+    subject,
+    skillArea,
+    totalQuestions,
+    isSessionComplete,
+    answers,
+    isLoading,
+    isGenerating,
+    error,
+    questionNumber,
+    timers,
     handleAnswerSelect,
     handleSubmitAnswer,
     handleNextQuestion,
     handleSessionComplete,
-    handleRetry
+    handleRetry,
+    generateNextQuestion
   };
 
   return (
