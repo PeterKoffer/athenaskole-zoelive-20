@@ -5,7 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
 import { commonStandardsAPI } from '@/services/commonStandardsAPI';
-import { GraduationCap, Target, BookOpen, Play, AlertCircle } from 'lucide-react';
+import { dailyLearningSessionOrchestrator } from '@/services/dailyLearningSessionOrchestrator';
+import { contentDeduplicationService } from '@/services/contentDeduplicationService';
+import { useAuth } from '@/hooks/useAuth';
+import { GraduationCap, Target, BookOpen, Play, AlertCircle, Sparkles, TrendingUp } from 'lucide-react';
 
 interface GradeAwareContentGeneratorProps {
   subject: string;
@@ -18,24 +21,58 @@ const GradeAwareContentGenerator = ({
   skillArea, 
   onContentGenerated 
 }: GradeAwareContentGeneratorProps) => {
+  const { user } = useAuth();
   const { gradeConfig, loading, getStandardForSkillArea } = useGradeLevelContent(subject);
   const [selectedStandard, setSelectedStandard] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [currentSession, setCurrentSession] = useState<any>(null);
+  const [contentMetrics, setContentMetrics] = useState<any>(null);
+  const [personalizedRecommendations, setPersonalizedRecommendations] = useState<string[]>([]);
 
   useEffect(() => {
-    if (gradeConfig && skillArea && !isGenerating && !error && retryCount === 0) {
-      // Auto-generate content after a short delay
-      const timer = setTimeout(() => {
-        generateGradeAppropriateContent();
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [gradeConfig, skillArea, retryCount]);
+    const initializePersonalizedSession = async () => {
+      if (user?.id && gradeConfig && !isGenerating && !error && retryCount === 0) {
+        // Load current daily session and content metrics
+        await loadPersonalizedData();
+        
+        // Auto-generate content after a short delay
+        const timer = setTimeout(() => {
+          generatePersonalizedContent();
+        }, 1000);
+        
+        return () => clearTimeout(timer);
+      }
+    };
 
-  const generateGradeAppropriateContent = async () => {
+    initializePersonalizedSession();
+  }, [gradeConfig, skillArea, retryCount, user?.id]);
+
+  const loadPersonalizedData = async () => {
+    if (!user?.id || !gradeConfig) return;
+
+    try {
+      // Get current daily session
+      const today = new Date().toISOString().split('T')[0];
+      const sessionData = await dailyLearningSessionOrchestrator.getCurrentLearningActivity(user.id, today);
+      setCurrentSession(sessionData);
+
+      // Get content metrics for this subject/skill area
+      const metrics = await dailyLearningSessionOrchestrator.getContentMetrics(
+        user.id, 
+        subject, 
+        skillArea
+      );
+      setContentMetrics(metrics);
+      setPersonalizedRecommendations(metrics.recommendations);
+
+    } catch (error) {
+      console.error('Error loading personalized data:', error);
+    }
+  };
+
+  const generatePersonalizedContent = async () => {
     if (!gradeConfig) {
       setError('Grade configuration not available');
       return;
@@ -46,20 +83,59 @@ const GradeAwareContentGenerator = ({
     console.log('🎯 Starting grade-appropriate content generation...');
 
     try {
+      // Check if we have a current daily session
+      if (user?.id && !currentSession?.session) {
+        // Start a new daily session if none exists
+        console.log('🚀 Starting new daily learning session...');
+        const newSession = await dailyLearningSessionOrchestrator.startDailySession(
+          user.id, 
+          gradeConfig.userGrade
+        );
+        setCurrentSession({ 
+          session: newSession, 
+          currentActivity: newSession.sessions[0] || null, 
+          isComplete: false 
+        });
+      }
+
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Content generation timeout')), 5000);
       });
 
-      const contentGenerationPromise = new Promise((resolve) => {
+      const contentGenerationPromise = new Promise(async (resolve) => {
         // Find the most appropriate standard for the skill area
         const standard = getStandardForSkillArea(skillArea);
         
         if (standard) {
           setSelectedStandard(standard);
         }
+
+        // Check content uniqueness if user is logged in
+        let uniquenessScore = 100;
+        let diversityRecommendations: string[] = [];
         
-        // Generate content configuration based on the standard or fallback
+        if (user?.id) {
+          try {
+            const uniquenessCheck = await contentDeduplicationService.checkContentUniqueness(
+              user.id,
+              'question',
+              `${subject}-${skillArea}-${gradeConfig.userGrade}`,
+              subject,
+              skillArea,
+              gradeConfig.userGrade
+            );
+            
+            uniquenessScore = (1 - uniquenessCheck.similarityScore) * 100;
+            if (uniquenessCheck.recommendations) {
+              diversityRecommendations = uniquenessCheck.recommendations;
+            }
+          } catch (error) {
+            console.warn('Content uniqueness check failed:', error);
+          }
+        }
+        
+        // Generate personalized content configuration
         const contentConfig = {
           gradeLevel: gradeConfig.userGrade,
           standard: standard || {
@@ -81,10 +157,19 @@ const GradeAwareContentGenerator = ({
               description: skillArea 
             }, 
             gradeConfig.userGrade
-          )
+          ),
+          // Enhanced personalization features
+          personalization: {
+            userId: user?.id,
+            uniquenessScore,
+            diversityRecommendations,
+            contentMetrics: contentMetrics,
+            currentSession: currentSession?.currentActivity,
+            adaptiveAdjustments: currentSession?.session?.adaptiveAdjustments || []
+          }
         };
 
-        console.log('🎯 Generated grade-appropriate content config:', contentConfig);
+        console.log('🎯 Generated personalized grade-appropriate content config:', contentConfig);
         resolve(contentConfig);
       });
 
@@ -130,7 +215,7 @@ Ensure content builds on previous grade knowledge and prepares for next grade co
   const handleRetry = () => {
     setError(null);
     setRetryCount(0);
-    generateGradeAppropriateContent();
+    generatePersonalizedContent();
   };
 
   if (loading) {
@@ -151,7 +236,7 @@ Ensure content builds on previous grade knowledge and prepares for next grade co
           <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-4" />
           <p className="text-white">Unable to determine appropriate grade level</p>
           <Button 
-            onClick={generateGradeAppropriateContent}
+            onClick={handleRetry}
             className="mt-4 bg-red-600 hover:bg-red-700"
           >
             Retry Setup
@@ -195,7 +280,86 @@ Ensure content builds on previous grade knowledge and prepares for next grade co
             <Badge variant="outline" className="bg-green-600 text-white border-green-600">
               Standards-Aligned
             </Badge>
+            {user?.id && (
+              <Badge variant="outline" className="bg-purple-600 text-white border-purple-600">
+                <Sparkles className="w-3 h-3 mr-1" />
+                Personalized
+              </Badge>
+            )}
           </div>
+
+          {/* Personalization Metrics */}
+          {user?.id && contentMetrics && (
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <TrendingUp className="w-5 h-5 text-purple-400 mt-1" />
+                <div className="flex-1">
+                  <h4 className="text-white font-medium mb-2">Personalization Status</h4>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-400">Content Freshness</p>
+                      <p className="text-white font-medium">{Math.round(contentMetrics.freshness)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Diversity Score</p>
+                      <p className="text-white font-medium">{Math.round(contentMetrics.diversity)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Uniqueness</p>
+                      <p className="text-white font-medium">{Math.round(contentMetrics.uniqueness)}%</p>
+                    </div>
+                  </div>
+                  {personalizedRecommendations.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-gray-400 text-xs mb-1">Recommendations:</p>
+                      <ul className="text-xs text-gray-300 space-y-1">
+                        {personalizedRecommendations.slice(0, 2).map((rec, index) => (
+                          <li key={index} className="flex items-start space-x-1">
+                            <span className="text-purple-400">•</span>
+                            <span>{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Current Session Info */}
+          {currentSession?.currentActivity && (
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <Play className="w-5 h-5 text-lime-400 mt-1" />
+                <div className="flex-1">
+                  <h4 className="text-white font-medium">Current Learning Session</h4>
+                  <p className="text-gray-300 text-sm">
+                    {currentSession.currentActivity.subject} - {currentSession.currentActivity.skillArea}
+                  </p>
+                  <p className="text-gray-400 text-xs">
+                    Session {(currentSession.session?.currentSessionIndex || 0) + 1} of {currentSession.session?.sessions.length || 0}
+                  </p>
+                  {currentSession.session?.progress && (
+                    <div className="mt-2">
+                      <div className="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Progress</span>
+                        <span>{currentSession.session.progress.completedSessions}/{currentSession.session.progress.totalSessions}</span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-lime-500 h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${(currentSession.session.progress.completedSessions / currentSession.session.progress.totalSessions) * 100}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {selectedStandard && (
             <div className="bg-gray-800 rounded-lg p-4">
