@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 
 export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';
+export type StandardLessonPhase = 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
 
 export interface LessonState {
   phase: LessonPhase;
@@ -9,6 +10,10 @@ export interface LessonState {
   currentSegment: number;
   totalSegments: number;
   score: number;
+  // Enhanced tracking for standardized lessons
+  currentActivityPhase?: StandardLessonPhase;
+  phaseProgress?: number; // Percentage completion of current phase
+  totalLessonTime?: number; // Total lesson duration in seconds (should be 1200 for standard lessons)
 }
 
 export const useLessonStateManager = () => {
@@ -16,14 +21,17 @@ export const useLessonStateManager = () => {
     phase: 'introduction',
     timeSpent: 0,
     currentSegment: 0,
-    totalSegments: 6, // Standard lesson structure
-    score: 0
+    totalSegments: 6, // Standard lesson structure: 6 phases
+    score: 0,
+    totalLessonTime: 1200, // 20 minutes standard
+    phaseProgress: 0
   });
 
   const handleLessonStart = useCallback(() => {
     setLessonState(prev => ({
       ...prev,
-      phase: 'lesson'
+      phase: 'lesson',
+      currentActivityPhase: 'introduction'
     }));
   }, []);
 
@@ -44,7 +52,9 @@ export const useLessonStateManager = () => {
   const handleLessonComplete = useCallback(() => {
     setLessonState(prev => ({
       ...prev,
-      phase: 'completed'
+      phase: 'completed',
+      currentActivityPhase: 'summary',
+      phaseProgress: 100
     }));
   }, []);
 
@@ -53,8 +63,24 @@ export const useLessonStateManager = () => {
       ...prev,
       currentSegment: segment,
       timeSpent,
-      score
+      score,
+      phaseProgress: prev.totalLessonTime ? (timeSpent / prev.totalLessonTime) * 100 : 0
     }));
+  }, []);
+
+  // Enhanced method for updating current activity phase
+  const updateActivityPhase = useCallback((activityPhase: StandardLessonPhase, segment: number) => {
+    setLessonState(prev => ({
+      ...prev,
+      currentActivityPhase: activityPhase,
+      currentSegment: segment
+    }));
+  }, []);
+
+  // Method to calculate phase progress for better UX
+  const calculatePhaseProgress = useCallback((currentTime: number, phaseStartTime: number, phaseDuration: number) => {
+    const phaseElapsed = currentTime - phaseStartTime;
+    return Math.min((phaseElapsed / phaseDuration) * 100, 100);
   }, []);
 
   return {
@@ -63,6 +89,8 @@ export const useLessonStateManager = () => {
     handleLessonPause,
     handleLessonResume,
     handleLessonComplete,
-    updateProgress
+    updateProgress,
+    updateActivityPhase,
+    calculatePhaseProgress
   };
 };
