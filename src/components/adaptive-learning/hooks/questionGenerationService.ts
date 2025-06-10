@@ -28,7 +28,7 @@ export class QuestionGenerationService {
     const timestamp = Date.now();
     const sessionId = `${userId}-${timestamp}-${Math.random().toString(36).substring(7)}`;
 
-    // Create comprehensive uniqueness instructions
+    // Create comprehensive uniqueness instructions with more context
     const uniquenessInstructions = `
 ABSOLUTE UNIQUENESS REQUIRED:
 
@@ -42,9 +42,19 @@ STRICT REQUIREMENTS:
 4. Use creative real-world applications
 5. Ensure question is age-appropriate for Grade ${gradeLevel || 5}
 6. Make it engaging and educational
+7. Avoid repeating any patterns from previous questions
+8. Use diverse vocabulary and sentence structures
 
-Session ID: ${sessionId}
-Attempt: ${Math.floor(Math.random() * 1000)}
+GENERATION CONTEXT:
+- User ID: ${userId.substring(0, 8)}...
+- Session ID: ${sessionId}
+- Subject: ${subject}
+- Skill Area: ${skillArea}
+- Difficulty: ${difficultyLevel}/5
+- Attempt: ${Math.floor(Math.random() * 1000)}
+- Timestamp: ${timestamp}
+
+ENSURE MAXIMUM CREATIVITY AND ORIGINALITY!
 `;
 
     const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
@@ -60,7 +70,8 @@ Attempt: ${Math.floor(Math.random() * 1000)}
           uniquenessInstructions,
           forceUnique: true,
           avoidRepetition: true,
-          requireOriginalContent: true
+          requireOriginalContent: true,
+          maximizeCreativity: true
         },
         previousQuestions: usedQuestions,
         diversityLevel: 'maximum',
@@ -86,7 +97,7 @@ Attempt: ${Math.floor(Math.random() * 1000)}
       explanation: content.explanation || 'Great work on this question!',
       learningObjectives: content.learningObjectives || [],
       estimatedTime: content.estimatedTime || 30,
-      conceptsCovered: [skillArea]
+      conceptsCovered: content.conceptsCovered || [skillArea]
     };
   }
 
