@@ -12,251 +12,248 @@ interface SpeechState {
   hasUserInteracted: boolean;
   isReady: boolean;
   currentUtterance: SpeechSynthesisUtterance | null;
-  lastError?: string;
+  lastError: string | null;
   isLoading: boolean;
+  voicesLoaded: boolean;
 }
 
-export class UnifiedSpeechSystem {
-  private static instance: UnifiedSpeechSystem;
+interface SpeechQueue {
+  text: string;
+  priority: boolean;
+  timestamp: number;
+  id: string;
+}
+
+class UnifiedSpeechSystem {
   private state: SpeechState = {
     isSpeaking: false,
     isEnabled: true,
     hasUserInteracted: false,
     isReady: false,
     currentUtterance: null,
-    lastError: undefined,
-    isLoading: true
+    lastError: null,
+    isLoading: false,
+    voicesLoaded: false
   };
-  
+
   private config: SpeechConfig = {
     rate: 0.85,
-    pitch: 1.0,
+    pitch: 1.1,
     volume: 0.9
   };
-  
-  private listeners: Set<(state: SpeechState) => void> = new Set();
-  private voicesLoadedPromise: Promise<void>;
-  private speechQueue: Array<{ text: string; priority: boolean }> = [];
+
+  private listeners: ((state: SpeechState) => void)[] = [];
+  private speechQueue: SpeechQueue[] = [];
   private isProcessingQueue = false;
+  private lastSpokenText = '';
+  private lastSpokenTime = 0;
+  private repeatPreventionTime = 3000; // Prevent same text within 3 seconds
+  private maxRetries = 3;
+  private retryCount = 0;
 
-  private constructor() {
-    this.voicesLoadedPromise = this.waitForVoices();
-    this.setupSpeechSynthesis();
+  constructor() {
+    this.initializeSpeechSystem();
   }
 
-  static getInstance(): UnifiedSpeechSystem {
-    if (!UnifiedSpeechSystem.instance) {
-      UnifiedSpeechSystem.instance = new UnifiedSpeechSystem();
-    }
-    return UnifiedSpeechSystem.instance;
-  }
-
-  private async waitForVoices(): Promise<void> {
-    return new Promise((resolve) => {
-      const checkVoices = () => {
-        const voices = speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          speechSynthesis.removeEventListener('voiceschanged', checkVoices);
-          this.updateState({ isLoading: false });
-          console.log('🎤 Speech voices loaded:', voices.length);
-          resolve();
-          return true;
-        }
-        return false;
-      };
-
-      // Check immediately
-      if (checkVoices()) return;
-
-      // Listen for voices to load
-      speechSynthesis.addEventListener('voiceschanged', checkVoices);
-      
-      // Fallback timeout with better error handling
-      setTimeout(() => {
-        speechSynthesis.removeEventListener('voiceschanged', checkVoices);
-        const voices = speechSynthesis.getVoices();
-        
-        if (voices.length === 0) {
-          console.warn('🚫 No speech voices loaded after timeout');
-          this.updateState({ 
-            lastError: 'Speech voices failed to load. Try refreshing the page.',
-            isLoading: false 
-          });
-        } else {
-          this.updateState({ isLoading: false });
-        }
-        
-        resolve();
-      }, 5000); // Increased timeout for slower devices
-    });
-  }
-
-  private setupSpeechSynthesis(): void {
-    if (!('speechSynthesis' in window)) {
-      console.warn('🚫 Speech synthesis not supported in this browser');
+  private async initializeSpeechSystem() {
+    console.log('🎤 Initializing Unified Speech System...');
+    
+    if (typeof speechSynthesis === 'undefined') {
       this.updateState({ 
-        lastError: 'Speech synthesis not supported in this browser. Try Chrome, Edge, or Firefox.',
-        isReady: false,
-        isLoading: false 
+        lastError: 'Speech synthesis not supported in this browser',
+        isReady: false 
       });
       return;
     }
 
-    this.voicesLoadedPromise.then(() => {
-      const voices = speechSynthesis.getVoices();
-      
-      if (voices.length === 0) {
-        console.warn('🚫 No speech voices available');
-        this.updateState({ 
-          lastError: 'No speech voices available. Check browser settings or try a different browser.',
-          isReady: false 
-        });
-        return;
-      }
+    this.updateState({ isLoading: true });
 
-      // Enhanced voice selection with fallbacks
-      const preferredVoice = this.selectBestVoice(voices);
+    // Wait for voices to load with timeout
+    await this.waitForVoices();
+    
+    // Set up event listeners
+    this.setupEventListeners();
+    
+    // Test basic functionality
+    await this.performInitialTest();
+  }
+
+  private async waitForVoices(timeout = 5000): Promise<void> {
+    return new Promise((resolve) => {
+      const checkVoices = () => {
+        const voices = speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          console.log('✅ Speech voices loaded:', voices.length);
+          this.selectOptimalVoice(voices);
+          this.updateState({ 
+            voicesLoaded: true,
+            isLoading: false,
+            isReady: true,
+            lastError: null 
+          });
+          resolve();
+        }
+      };
+
+      // Check immediately
+      checkVoices();
       
-      if (preferredVoice) {
-        this.config.voice = preferredVoice;
-        console.log('🎤 Selected voice:', preferredVoice.name, '(', preferredVoice.lang, ')');
-      } else {
-        console.warn('🚫 No suitable voice found, using default');
-      }
+      // Set up event listener for voice changes
+      speechSynthesis.addEventListener('voiceschanged', checkVoices);
       
-      this.updateState({ 
-        isReady: true,
-        lastError: undefined 
-      });
-      console.log('🎤 Unified Speech System ready with', voices.length, 'voices available');
-    }).catch((error) => {
-      console.error('🚫 Failed to setup speech synthesis:', error);
-      this.updateState({ 
-        lastError: 'Failed to initialize speech system. Please try refreshing the page.',
-        isReady: false 
-      });
+      // Timeout fallback
+      setTimeout(() => {
+        if (!this.state.voicesLoaded) {
+          console.log('⚠️ Voice loading timeout - using browser default');
+          this.updateState({ 
+            voicesLoaded: true,
+            isLoading: false,
+            isReady: true,
+            lastError: 'Using browser default voice'
+          });
+        }
+        resolve();
+      }, timeout);
     });
   }
 
-  private selectBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-    // Priority order: Google > Microsoft > Apple > other English voices > any voice
-    const priorities = [
-      (v: SpeechSynthesisVoice) => v.name.includes('Google') && v.lang.startsWith('en'),
-      (v: SpeechSynthesisVoice) => v.name.includes('Microsoft') && v.lang.startsWith('en'),
-      (v: SpeechSynthesisVoice) => v.name.includes('Apple') && v.lang.startsWith('en'),
-      (v: SpeechSynthesisVoice) => v.lang.startsWith('en-US'),
-      (v: SpeechSynthesisVoice) => v.lang.startsWith('en'),
-      (v: SpeechSynthesisVoice) => v.default,
-      () => true // Any voice as last resort
+  private selectOptimalVoice(voices: SpeechSynthesisVoice[]) {
+    // Priority order for voice selection
+    const preferredVoices = [
+      'Google US English Female',
+      'Microsoft Zira',
+      'Samantha',
+      'Karen',
+      'Victoria',
+      'Google UK English Female'
     ];
 
-    for (const priority of priorities) {
-      const voice = voices.find(priority);
-      if (voice) return voice;
+    let selectedVoice = null;
+
+    // Try to find preferred voices
+    for (const preferred of preferredVoices) {
+      selectedVoice = voices.find(voice => 
+        voice.name.includes(preferred) && voice.lang.startsWith('en')
+      );
+      if (selectedVoice) break;
     }
 
-    return voices[0] || null;
+    // Fallback to any female English voice
+    if (!selectedVoice) {
+      selectedVoice = voices.find(voice => 
+        voice.lang.startsWith('en') && 
+        (voice.name.toLowerCase().includes('female') || 
+         voice.name.toLowerCase().includes('woman'))
+      );
+    }
+
+    // Final fallback to any English voice
+    if (!selectedVoice) {
+      selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+    }
+
+    this.config.voice = selectedVoice || undefined;
+    console.log('🎤 Selected voice:', selectedVoice?.name || 'Browser default');
   }
 
-  private updateState(updates: Partial<SpeechState>): void {
+  private setupEventListeners() {
+    // Listen for visibility changes to pause/resume speech
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && this.state.isSpeaking) {
+        this.stop();
+      }
+    });
+
+    // Listen for user interaction to enable speech
+    const enableOnInteraction = () => {
+      if (!this.state.hasUserInteracted) {
+        this.updateState({ hasUserInteracted: true });
+        console.log('✅ User interaction detected - speech enabled');
+      }
+    };
+
+    ['click', 'touchstart', 'keydown'].forEach(event => {
+      document.addEventListener(event, enableOnInteraction, { once: true });
+    });
+  }
+
+  private async performInitialTest(): Promise<void> {
+    try {
+      // Test if speech synthesis is working
+      const testUtterance = new SpeechSynthesisUtterance('');
+      testUtterance.volume = 0; // Silent test
+      speechSynthesis.speak(testUtterance);
+      
+      console.log('✅ Speech synthesis test passed');
+    } catch (error) {
+      console.error('❌ Speech synthesis test failed:', error);
+      this.updateState({ 
+        lastError: 'Speech test failed: ' + (error as Error).message 
+      });
+    }
+  }
+
+  private updateState(updates: Partial<SpeechState>) {
     this.state = { ...this.state, ...updates };
+    this.notifyListeners();
+  }
+
+  private notifyListeners() {
     this.listeners.forEach(listener => listener(this.state));
   }
 
   subscribe(listener: (state: SpeechState) => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    this.listeners.push(listener);
+    listener(this.state); // Immediate call with current state
+    
+    return () => {
+      const index = this.listeners.indexOf(listener);
+      if (index > -1) {
+        this.listeners.splice(index, 1);
+      }
+    };
   }
 
   getState(): SpeechState {
     return { ...this.state };
   }
 
-  private getSpeechErrorMessage(error: SpeechSynthesisErrorEvent['error']): string {
-    switch (error) {
-      case 'network':
-        return 'Network error during speech. Check your internet connection.';
-      case 'synthesis-failed':
-        return 'Speech synthesis failed. Try refreshing the page.';
-      case 'synthesis-unavailable':
-        return 'Speech synthesis unavailable. Try a different browser.';
-      case 'audio-busy':
-        return 'Audio system busy. Wait a moment and try again.';
-      case 'audio-hardware':
-        return 'Audio hardware issue. Check your speakers/headphones.';
-      case 'language-unavailable':
-        return 'Speech language not available. Trying default voice.';
-      case 'voice-unavailable':
-        return 'Selected voice unavailable. Using default voice.';
-      case 'text-too-long':
-        return 'Text too long for speech synthesis.';
-      case 'invalid-argument':
-        return 'Invalid speech parameters. Using defaults.';
-      case 'not-allowed':
-        return 'Speech not allowed. Check browser permissions.';
-      default:
-        return `Speech error: ${error}. Try refreshing the page.`;
-    }
-  }
-
-  // Clear error state when user interaction is enabled
-  enableUserInteraction(): void {
-    if (!this.state.hasUserInteracted) {
-      this.updateState({ 
-        hasUserInteracted: true,
-        lastError: undefined // Clear any previous errors
-      });
-      console.log('🎤 User interaction enabled for speech');
-    }
-  }
-
-  toggleEnabled(): void {
-    const newEnabled = !this.state.isEnabled;
-    this.updateState({ isEnabled: newEnabled });
-    
-    if (!newEnabled && this.state.isSpeaking) {
-      this.stop();
-    }
-    
-    console.log('🎤 Speech', newEnabled ? 'enabled' : 'disabled');
-  }
-
   async speak(text: string, priority: boolean = false): Promise<void> {
-    if (!this.canSpeak()) {
-      const reason = this.getCannotSpeakReason();
-      console.log('🚫 Cannot speak:', reason);
-      this.updateState({ lastError: reason });
+    if (!text || text.trim().length === 0) {
+      console.log('🚫 Empty text, skipping speech');
       return;
     }
 
-    if (priority) {
-      this.speechQueue.unshift({ text, priority });
-    } else {
-      this.speechQueue.push({ text, priority });
+    // Prevent repetition
+    const now = Date.now();
+    if (text === this.lastSpokenText && (now - this.lastSpokenTime) < this.repeatPreventionTime) {
+      console.log('🚫 Preventing repetition of:', text.substring(0, 30) + '...');
+      return;
     }
 
-    if (!this.isProcessingQueue) {
-      await this.processQueue();
+    const speechItem: SpeechQueue = {
+      text: text.trim(),
+      priority,
+      timestamp: now,
+      id: Math.random().toString(36).substr(2, 9)
+    };
+
+    if (priority) {
+      this.speechQueue.unshift(speechItem); // Add to front
+      this.stop(); // Stop current speech
+    } else {
+      this.speechQueue.push(speechItem); // Add to end
     }
+
+    this.processQueue();
   }
 
-  private getCannotSpeakReason(): string {
-    if (!('speechSynthesis' in window)) {
-      return 'Speech synthesis not supported in this browser. Try Chrome, Edge, or Firefox.';
-    }
-    if (!this.state.isEnabled) {
-      return 'Speech is disabled. Click the volume button to enable it.';
-    }
-    if (!this.state.hasUserInteracted) {
-      return 'User interaction required. Click any speech button to enable audio.';
-    }
-    if (!this.state.isReady) {
-      if (this.state.isLoading) {
-        return 'Speech system is still loading. Please wait...';
-      }
-      return 'Speech system not ready. Try refreshing the page.';
-    }
-    return 'Speech unavailable for unknown reason.';
+  async speakAsNelie(text: string, priority: boolean = false): Promise<void> {
+    if (!text) return;
+    
+    // Add Nelie's personality to the speech
+    const nelieText = text.startsWith('Nelie') ? text : text;
+    await this.speak(nelieText, priority);
   }
 
   private async processQueue(): Promise<void> {
@@ -264,41 +261,38 @@ export class UnifiedSpeechSystem {
       return;
     }
 
+    if (!this.state.isEnabled || !this.state.hasUserInteracted) {
+      console.log('🚫 Speech disabled or no user interaction');
+      this.speechQueue = []; // Clear queue
+      return;
+    }
+
     this.isProcessingQueue = true;
 
     while (this.speechQueue.length > 0) {
-      const { text, priority } = this.speechQueue.shift()!;
+      const item = this.speechQueue.shift()!;
+      await this.speakItem(item);
       
-      if (priority) {
-        this.stop(); // Clear any current speech for priority messages
-      }
-
-      await this.speakImmediate(text);
+      // Small delay between items
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
 
     this.isProcessingQueue = false;
   }
 
-  private async speakImmediate(text: string): Promise<void> {
+  private async speakItem(item: SpeechQueue): Promise<void> {
     return new Promise((resolve) => {
-      if (!this.canSpeak()) {
+      if (typeof speechSynthesis === 'undefined') {
+        console.error('❌ Speech synthesis not available');
         resolve();
         return;
       }
 
-      // Clean up text
-      const cleanText = text
-        .replace(/\(Session:\s*\d+\)/gi, '')
-        .replace(/\(\d{13,}\)/gi, '')
-        .replace(/\s+/g, ' ')
-        .trim();
+      console.log('🔊 Nelie speaking:', item.text.substring(0, 50) + '...');
 
-      if (!cleanText) {
-        resolve();
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const utterance = new SpeechSynthesisUtterance(item.text);
+      
+      // Apply configuration
       utterance.rate = this.config.rate;
       utterance.pitch = this.config.pitch;
       utterance.volume = this.config.volume;
@@ -307,59 +301,98 @@ export class UnifiedSpeechSystem {
         utterance.voice = this.config.voice;
       }
 
+      // Set up event handlers
       utterance.onstart = () => {
-        this.updateState({ isSpeaking: true, currentUtterance: utterance });
-        console.log('🔊 Nelie speaking:', cleanText.substring(0, 50) + '...');
+        this.updateState({ 
+          isSpeaking: true, 
+          currentUtterance: utterance,
+          lastError: null 
+        });
       };
 
       utterance.onend = () => {
-        this.updateState({ isSpeaking: false, currentUtterance: null });
-        console.log('🔇 Nelie finished speaking');
+        this.updateState({ 
+          isSpeaking: false, 
+          currentUtterance: null 
+        });
+        this.lastSpokenText = item.text;
+        this.lastSpokenTime = Date.now();
+        this.retryCount = 0;
         resolve();
       };
 
       utterance.onerror = (event) => {
-        console.error('🚫 Speech error:', event.error);
-        const errorMessage = this.getSpeechErrorMessage(event.error);
+        console.error('❌ Speech error:', event.error);
         this.updateState({ 
           isSpeaking: false, 
           currentUtterance: null,
-          lastError: errorMessage 
+          lastError: `Speech error: ${event.error}` 
         });
-        resolve();
+        
+        // Retry logic
+        if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
+          this.retryCount++;
+          console.log(`🔄 Retrying speech (${this.retryCount}/${this.maxRetries})`);
+          setTimeout(() => {
+            speechSynthesis.speak(utterance);
+          }, 1000);
+        } else {
+          resolve();
+        }
       };
 
-      speechSynthesis.speak(utterance);
+      // Cancel any existing speech
+      speechSynthesis.cancel();
+      
+      // Start speaking
+      try {
+        speechSynthesis.speak(utterance);
+      } catch (error) {
+        console.error('❌ Failed to start speech:', error);
+        this.updateState({ 
+          lastError: 'Failed to start speech: ' + (error as Error).message 
+        });
+        resolve();
+      }
     });
   }
 
   stop(): void {
-    speechSynthesis.cancel();
-    this.speechQueue.length = 0; // Clear queue
-    this.updateState({ isSpeaking: false, currentUtterance: null });
-    console.log('🛑 Nelie stopped speaking');
+    if (typeof speechSynthesis !== 'undefined') {
+      speechSynthesis.cancel();
+    }
+    
+    this.speechQueue = []; // Clear queue
+    this.updateState({ 
+      isSpeaking: false, 
+      currentUtterance: null 
+    });
+    
+    console.log('🔇 Speech stopped and queue cleared');
   }
 
-  private canSpeak(): boolean {
-    return (
-      'speechSynthesis' in window &&
-      this.state.isEnabled &&
-      this.state.hasUserInteracted &&
-      this.state.isReady
-    );
+  toggleEnabled(): void {
+    const newState = !this.state.isEnabled;
+    this.updateState({ isEnabled: newState });
+    
+    if (!newState) {
+      this.stop(); // Stop current speech when disabled
+    }
+    
+    console.log(newState ? '🔊 Speech enabled' : '🔇 Speech disabled');
   }
 
-  // Test speech functionality
+  enableUserInteraction(): void {
+    this.updateState({ hasUserInteracted: true });
+    console.log('✅ User interaction manually enabled');
+  }
+
   async test(): Promise<void> {
-    this.enableUserInteraction();
-    await this.speak("Hello! I'm Nelie, your AI learning companion. Speech system test successful!", true);
-  }
-
-  // Nelie personality speaking
-  async speakAsNelie(text: string, priority: boolean = false): Promise<void> {
-    const nelieText = text.startsWith('Nelie') ? text : `Nelie says: ${text}`;
-    await this.speak(nelieText, priority);
+    const testMessage = "Hi! I'm Nelie, your learning companion. My voice system is working perfectly!";
+    console.log('🧪 Testing Nelie\'s voice...');
+    await this.speak(testMessage, true);
   }
 }
 
-export const unifiedSpeech = UnifiedSpeechSystem.getInstance();
+// Create singleton instance
+export const unifiedSpeech = new UnifiedSpeechSystem();
