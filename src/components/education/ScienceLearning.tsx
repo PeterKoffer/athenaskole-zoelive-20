@@ -22,15 +22,21 @@ const scienceActivities: LessonActivity[] = [
   {
     id: 'science-intro-1',
     title: 'Introduction to the Solar System',
-    phase: 'explanation',
+    type: 'introduction',
+    phase: 'introduction',
+    duration: 300,
+    phaseDescription: 'Welcome introduction to solar system concepts',
     content: {
-      explanation: 'Welcome to today\'s science lesson! We\'ll explore our solar system and the planets within it.'
+      hook: 'Welcome to today\'s science lesson! We\'ll explore our solar system and the planets within it.'
     }
   },
   {
     id: 'science-practice-1',
     title: 'Planet Classification',
+    type: 'interactive-game',
     phase: 'interactive-game',
+    duration: 600,
+    phaseDescription: 'Interactive quiz about planet classification',
     content: {
       question: 'Which planet is known as the "Red Planet"?',
       options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
@@ -40,7 +46,10 @@ const scienceActivities: LessonActivity[] = [
   {
     id: 'science-practice-2',
     title: 'Solar System Facts',
+    type: 'interactive-game',
     phase: 'interactive-game',
+    duration: 600,
+    phaseDescription: 'Quiz about solar system fundamentals',
     content: {
       question: 'What is at the center of our solar system?',
       options: ['The Moon', 'Earth', 'The Sun', 'Mars'],

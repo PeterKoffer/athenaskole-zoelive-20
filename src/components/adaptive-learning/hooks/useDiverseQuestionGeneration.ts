@@ -2,12 +2,19 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Question, UseDiverseQuestionGenerationProps, QuestionContext } from './types';
+import { Question, UseDiverseQuestionGenerationProps } from './types';
 import { QuestionHistoryService } from './questionHistoryService';
 import { useUnifiedQuestionGeneration } from '@/hooks/useUnifiedQuestionGeneration';
 import { UniqueQuestion } from '@/services/globalQuestionUniquenessService';
 
 export { type Question } from './types';
+
+interface QuestionContext extends Record<string, unknown> {
+  previousQuestions?: string[];
+  topicFocus?: string;
+  conceptualArea?: string;
+  bloomLevel?: number;
+}
 
 export const useDiverseQuestionGeneration = ({ 
   subject, 
@@ -66,7 +73,7 @@ export const useDiverseQuestionGeneration = ({
       console.log(`📊 Current stats: ${sessionQuestions.length} session questions, ${questionTopics.size} topics covered`);
 
       // Use the unified generation system
-      const uniqueQuestion: UniqueQuestion = await generateUnified(questionContext);
+      const uniqueQuestion: UniqueQuestion = await generateUnified(questionContext || {});
       
       // Convert UniqueQuestion back to legacy Question format for compatibility
       const legacyQuestion: Question = {

@@ -16,15 +16,21 @@ const englishActivities: LessonActivity[] = [
   {
     id: 'english-intro-1',
     title: 'Introduction to Creative Writing',
-    phase: 'explanation',
+    type: 'introduction',
+    phase: 'introduction',
+    duration: 300,
+    phaseDescription: 'Welcome introduction to creative writing',
     content: {
-      explanation: 'Welcome to today\'s English lesson! We\'ll explore storytelling and creative writing techniques.'
+      hook: 'Welcome to today\'s English lesson! We\'ll explore storytelling and creative writing techniques.'
     }
   },
   {
     id: 'english-practice-1',
     title: 'Identifying Literary Devices',
+    type: 'interactive-game',
     phase: 'interactive-game',
+    duration: 600,
+    phaseDescription: 'Interactive practice with literary devices',
     content: {
       question: 'Which literary device is used in: "The wind whispered through the trees"?',
       options: ['Metaphor', 'Personification', 'Simile', 'Alliteration'],
@@ -34,7 +40,10 @@ const englishActivities: LessonActivity[] = [
   {
     id: 'english-practice-2',
     title: 'Story Structure',
+    type: 'interactive-game',
     phase: 'interactive-game',
+    duration: 600,
+    phaseDescription: 'Understanding story structure components',
     content: {
       question: 'What are the three main parts of a story structure?',
       options: ['Beginning, middle, end', 'Setting, character, plot', 'Problem, action, solution', 'Introduction, body, conclusion'],

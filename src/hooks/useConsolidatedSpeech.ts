@@ -1,5 +1,6 @@
 
 import { useUnifiedSpeech } from './useUnifiedSpeech';
+import { useRef } from 'react';
 
 /**
  * Consolidated speech hook that replaces all redundant speech hooks
@@ -7,6 +8,7 @@ import { useUnifiedSpeech } from './useUnifiedSpeech';
  */
 export const useConsolidatedSpeech = () => {
   const unifiedSpeech = useUnifiedSpeech();
+  const hasAutoRead = useRef(false);
   
   return {
     // Primary interface
@@ -23,7 +25,10 @@ export const useConsolidatedSpeech = () => {
     
     // State aliases for backward compatibility
     autoReadEnabled: unifiedSpeech.isEnabled,
-    isReady: unifiedSpeech.isReady
+    isReady: unifiedSpeech.isReady,
+    
+    // Add the hasAutoRead ref for components that need it
+    hasAutoRead
   };
 };
 

@@ -1,71 +1,40 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { useDiverseQuestionGeneration, Question } from '../hooks/useDiverseQuestionGeneration';
-import { useStudentProgressTracker } from '../hooks/useStudentProgressTracker';
 
-export interface SessionTimers {
-  sessionStartTime: number;
-  questionStartTime: number;
-  timeLeft: number;
-  isTimerRunning: boolean;
-}
-
-export interface SessionAnswer {
-  question: Question;
-  selectedAnswer: number;
-  isCorrect: boolean;
-  responseTime: number;
-}
+import { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect } from 'react';
 
 export interface UnifiedSessionState {
-  // Core session data
+  // Session management
   sessionId: string;
-  subject: string;
-  skillArea: string;
-  difficultyLevel: number;
-  currentQuestion: Question | null;
-  questions: Question[];
-  answers: SessionAnswer[];
+  isActive: boolean;
+  isComplete: boolean;
   
-  // Answer and display state
-  selectedAnswer: number | null;
-  hasAnswered: boolean;
-  showResult: boolean;
-  
-  // Session progress
+  // Question management
   currentQuestionIndex: number;
-  questionNumber: number;
+  questions: any[];
+  currentQuestion: any;
+  selectedAnswer: number | null;
+  showResult: boolean;
+  hasAnswered: boolean;
+  
+  // Progress tracking
+  timeSpent: number;
+  questionsAnswered: number;
   correctAnswers: number;
-  totalQuestions: number;
-  
-  // Loading and error states
-  isLoading: boolean;
-  isGenerating: boolean;
-  error: string | null;
-  
-  // Timers
-  timers: SessionTimers;
-  
-  // Session completion
-  isSessionComplete: boolean;
+  accuracy: number;
   
   // Actions
-  handleAnswerSelect: (answerIndex: number) => Promise<void>;
-  generateNextQuestion: () => Promise<void>;
-  startTimer: (time?: number) => void;
-  stopTimer: () => void;
-  resetSession: () => void;
+  handleAnswerSelect: (answerIndex: number) => void;
+  handleSubmitAnswer: () => void;
+  handleNextQuestion: () => void;
+  handleSessionComplete: () => void;
+  handleRetry: () => void;
 }
 
 interface UnifiedSessionContextProps {
+  children: ReactNode;
   subject: string;
   skillArea: string;
   difficultyLevel: number;
-  totalQuestions: number;
-  timerDuration?: number;
-  onSessionComplete?: () => void;
-  children: ReactNode;
+  onSessionReady?: (data: any) => void;
 }
 
 const UnifiedSessionContext = createContext<UnifiedSessionState | null>(null);
@@ -79,273 +48,144 @@ export const useUnifiedSession = () => {
 };
 
 export const UnifiedSessionProvider = ({
+  children,
   subject,
   skillArea,
   difficultyLevel,
-  totalQuestions,
-  timerDuration = 30,
-  onSessionComplete,
-  children
+  onSessionReady
 }: UnifiedSessionContextProps) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  
-  // Core session state
-  const [sessionId] = useState(() => `session-${Date.now()}-${Math.random()}`);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<SessionAnswer[]>([]);
+  const [sessionId] = useState(() => `session-${Date.now()}`);
+  const [isActive, setIsActive] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
-  // Answer state
+  const [questions, setQuestions] = useState<any[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [hasAnswered, setHasAnswered] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  
-  // Loading and error states
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Timer state
-  const [sessionStartTime] = useState(Date.now());
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
-  const [timeLeft, setTimeLeft] = useState(timerDuration);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [hasAnswered, setHasAnswered] = useState(false);
+  const [timeSpent, setTimeSpent] = useState(0);
+  const [questionsAnswered, setQuestionsAnswered] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const autoAdvanceRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Hooks
-  const { generateDiverseQuestion, saveQuestionHistory, isGenerating } = useDiverseQuestionGeneration({
-    subject,
-    skillArea,
-    difficultyLevel,
-    userId: user?.id || '',
-    gradeLevel: 6,
-    standardsAlignment: null
-  });
 
-  const { updateProgress } = useStudentProgressTracker(subject, skillArea);
-  
-  // Computed values
   const currentQuestion = questions[currentQuestionIndex] || null;
-  const questionNumber = currentQuestionIndex + 1;
-  const correctAnswers = answers.filter(a => a.isCorrect).length;
-  const isSessionComplete = answers.length >= totalQuestions;
-  
-  // Timer functions
-  const startTimer = useCallback((time = timerDuration) => {
-    setTimeLeft(time);
-    setIsTimerRunning(true);
-    setQuestionStartTime(Date.now());
-  }, [timerDuration]);
+  const accuracy = questionsAnswered > 0 ? (correctAnswers / questionsAnswered) * 100 : 0;
 
-  const stopTimer = useCallback(() => {
-    setIsTimerRunning(false);
+  // Timer management
+  useEffect(() => {
+    if (isActive && !isComplete) {
+      timerRef.current = setInterval(() => {
+        setTimeSpent(prev => prev + 1);
+      }, 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isActive, isComplete]);
+
+  const handleAnswerSelect = useCallback((answerIndex: number) => {
+    if (!hasAnswered) {
+      setSelectedAnswer(answerIndex);
+    }
+  }, [hasAnswered]);
+
+  const handleSubmitAnswer = useCallback(() => {
+    if (selectedAnswer !== null && !hasAnswered) {
+      setHasAnswered(true);
+      setShowResult(true);
+      setQuestionsAnswered(prev => prev + 1);
+      
+      if (currentQuestion && selectedAnswer === currentQuestion.correct) {
+        setCorrectAnswers(prev => prev + 1);
+      }
+    }
+  }, [selectedAnswer, hasAnswered, currentQuestion]);
+
+  const handleNextQuestion = useCallback(() => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setSelectedAnswer(null);
+      setShowResult(false);
+      setHasAnswered(false);
+    } else {
+      handleSessionComplete();
+    }
+  }, [currentQuestionIndex, questions.length]);
+
+  const handleSessionComplete = useCallback(() => {
+    setIsComplete(true);
+    setIsActive(false);
     if (timerRef.current) {
-      clearTimeout(timerRef.current);
+      clearInterval(timerRef.current);
     }
   }, []);
 
-  // Timer effect
-  useEffect(() => {
-    if (isTimerRunning && timeLeft > 0) {
-      timerRef.current = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
-    } else if (timeLeft === 0 && isTimerRunning) {
-      // Auto-select first answer if time runs out
-      if (!hasAnswered && currentQuestion) {
-        handleAnswerSelect(0);
-      }
-    }
-    
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [timeLeft, isTimerRunning, hasAnswered, currentQuestion]);
-
-  const generateNextQuestion = useCallback(async () => {
-    if (!user?.id) {
-      setError('User not authenticated');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const question = await generateDiverseQuestion();
-      setQuestions(prev => [...prev, question]);
-      
-      // Reset question state
-      setSelectedAnswer(null);
-      setHasAnswered(false);
-      setShowResult(false);
-      startTimer();
-      
-      console.log('✅ Generated question:', question.question);
-    } catch (error) {
-      console.error('Failed to generate question:', error);
-      setError('Failed to generate question. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id, generateDiverseQuestion, startTimer]);
-
-  const handleAnswerSelect = useCallback(async (answerIndex: number) => {
-    if (hasAnswered || !currentQuestion) return;
-    
-    // Clear any existing auto-advance timer
-    if (autoAdvanceRef.current) {
-      clearTimeout(autoAdvanceRef.current);
-    }
-    
-    setSelectedAnswer(answerIndex);
-    setHasAnswered(true);
-    setShowResult(true);
-    stopTimer();
-    
-    const isCorrect = answerIndex === currentQuestion.correct;
-    const responseTime = Date.now() - questionStartTime;
-    
-    const answerData: SessionAnswer = {
-      question: currentQuestion,
-      selectedAnswer: answerIndex,
-      isCorrect,
-      responseTime
-    };
-    
-    // Save to history
-    if (user?.id) {
-      await saveQuestionHistory(currentQuestion, answerIndex, isCorrect, responseTime);
-    }
-    
-    // Show toast
-    toast({
-      title: isCorrect ? "Correct! 🎉" : "Incorrect",
-      description: isCorrect ? "Well done!" : currentQuestion.explanation,
-      duration: 2000,
-      variant: isCorrect ? "default" : "destructive"
-    });
-    
-    // Update answers state and handle auto-advance
-    setAnswers(prev => {
-      const newAnswers = [...prev, answerData];
-      
-      // Schedule auto-advance after state update
-      autoAdvanceRef.current = setTimeout(async () => {
-        if (newAnswers.length >= totalQuestions) {
-          // Session complete
-          const sessionDuration = Date.now() - sessionStartTime;
-          const finalCorrectAnswers = newAnswers.filter(a => a.isCorrect).length;
-          
-          await updateProgress({
-            questionsAnswered: totalQuestions,
-            correctAnswers: finalCorrectAnswers,
-            conceptsWorkedOn: [skillArea],
-            timeSpent: sessionDuration
-          });
-          
-          toast({
-            title: "Session Complete! 🎓",
-            description: `You got ${finalCorrectAnswers}/${totalQuestions} questions correct!`,
-            duration: 5000
-          });
-          
-          onSessionComplete?.();
-        } else {
-          // Next question
-          setCurrentQuestionIndex(prev => prev + 1);
-          // Generate next question will be triggered by useEffect when currentQuestionIndex changes
-        }
-      }, 3000);
-      
-      return newAnswers;
-    });
-  }, [
-    hasAnswered,
-    currentQuestion,
-    stopTimer,
-    questionStartTime,
-    user?.id,
-    saveQuestionHistory,
-    toast,
-    totalQuestions,
-    sessionStartTime,
-    updateProgress,
-    skillArea,
-    onSessionComplete
-  ]);
-
-  const resetSession = useCallback(() => {
-    setQuestions([]);
-    setAnswers([]);
+  const handleRetry = useCallback(() => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
-    setHasAnswered(false);
     setShowResult(false);
-    setError(null);
-    stopTimer();
-    if (autoAdvanceRef.current) {
-      clearTimeout(autoAdvanceRef.current);
-    }
-  }, [stopTimer]);
-
-  // Initialize first question
-  useEffect(() => {
-    if (user?.id && questions.length === 0 && !isLoading && !isGenerating) {
-      generateNextQuestion();
-    }
-  }, [user?.id, questions.length, isLoading, isGenerating, generateNextQuestion]);
-
-  // Generate next question when index advances
-  useEffect(() => {
-    if (currentQuestionIndex > 0 && currentQuestionIndex >= questions.length && !isLoading && !isGenerating) {
-      generateNextQuestion();
-    }
-  }, [currentQuestionIndex, questions.length, isLoading, isGenerating, generateNextQuestion]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      if (autoAdvanceRef.current) {
-        clearTimeout(autoAdvanceRef.current);
-      }
-    };
+    setHasAnswered(false);
+    setTimeSpent(0);
+    setQuestionsAnswered(0);
+    setCorrectAnswers(0);
+    setIsComplete(false);
+    setIsActive(true);
   }, []);
+
+  // Initialize session
+  useEffect(() => {
+    if (!isActive && questions.length === 0) {
+      // Mock questions for demo
+      const mockQuestions = [
+        {
+          id: '1',
+          question: 'Sample question 1',
+          options: ['Option A', 'Option B', 'Option C', 'Option D'],
+          correct: 0,
+          explanation: 'This is the explanation for question 1'
+        },
+        {
+          id: '2',
+          question: 'Sample question 2',
+          options: ['Option A', 'Option B', 'Option C', 'Option D'],
+          correct: 1,
+          explanation: 'This is the explanation for question 2'
+        }
+      ];
+      
+      setQuestions(mockQuestions);
+      setIsActive(true);
+      
+      if (onSessionReady) {
+        onSessionReady({ questions: mockQuestions, sessionId });
+      }
+    }
+  }, [isActive, questions.length, sessionId, onSessionReady]);
 
   const sessionState: UnifiedSessionState = {
     sessionId,
-    subject,
-    skillArea,
-    difficultyLevel,
-    currentQuestion,
-    questions,
-    answers,
-    selectedAnswer,
-    hasAnswered,
-    showResult,
+    isActive,
+    isComplete,
     currentQuestionIndex,
-    questionNumber,
+    questions,
+    currentQuestion,
+    selectedAnswer,
+    showResult,
+    hasAnswered,
+    timeSpent,
+    questionsAnswered,
     correctAnswers,
-    totalQuestions,
-    isLoading: isLoading || isGenerating,
-    isGenerating,
-    error,
-    timers: {
-      sessionStartTime,
-      questionStartTime,
-      timeLeft,
-      isTimerRunning
-    },
-    isSessionComplete,
+    accuracy,
     handleAnswerSelect,
-    generateNextQuestion,
-    startTimer,
-    stopTimer,
-    resetSession
+    handleSubmitAnswer,
+    handleNextQuestion,
+    handleSessionComplete,
+    handleRetry
   };
 
   return (

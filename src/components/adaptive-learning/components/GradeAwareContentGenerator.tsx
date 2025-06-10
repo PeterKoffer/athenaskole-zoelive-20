@@ -418,7 +418,7 @@ Ensure content builds on previous grade knowledge and prepares for next grade co
 
           {!isGenerating && !selectedStandard && !error && (
             <Button 
-              onClick={generateGradeAppropriateContent}
+              onClick={generatePersonalizedContent}
               className="w-full bg-lime-600 hover:bg-lime-700 text-white"
             >
               <Play className="w-4 h-4 mr-2" />

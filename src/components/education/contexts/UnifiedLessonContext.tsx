@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from '../components/hooks/useEnhancedTeachingEngine';
 import { LessonActivity } from '../components/types/LessonTypes';
@@ -146,6 +147,13 @@ export const UnifiedLessonProvider = ({
     onLessonComplete();
   }, [onLessonComplete]);
 
+  const setScore = useCallback((value: React.SetStateAction<number>) => {
+    setLessonState(prev => ({
+      ...prev,
+      score: typeof value === 'function' ? value(prev.score) : value
+    }));
+  }, []);
+
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     const responseTime = Date.now() - lessonStartTime - (timeElapsed * 1000);
     setLastResponseTime(responseTime);
@@ -166,7 +174,7 @@ export const UnifiedLessonProvider = ({
         const responseMessage = wasCorrect 
           ? `Excellent work! You're really mastering this ${subject} concept!`
           : `Good try! Let's keep working on this together. You're learning!`;
-        teachingEngine.speakWithPersonality(responseMessage, wasCorrect ? 'encouragement' : 'supportive');
+        teachingEngine.speakWithPersonality(responseMessage, wasCorrect ? 'encouragement' : 'encouragement');
       }
     }
 
@@ -204,16 +212,17 @@ export const UnifiedLessonProvider = ({
     currentActivityIndex,
     subject,
     teachingEngine,
-    handleLessonComplete
+    handleLessonComplete,
+    setScore
   ]);
 
   const handleReadRequest = useCallback(() => {
     if (currentActivity) {
       let speechText: string;
-      let context: string;
+      let context: 'question' | 'explanation' | 'encouragement' | 'humor' = 'explanation';
       
-      if (currentActivity.phase === 'explanation') {
-        speechText = currentActivity.content.explanation || '';
+      if (currentActivity.phase === 'content-delivery') {
+        speechText = currentActivity.content.text || '';
         context = 'explanation';
       } else if (currentActivity.phase === 'interactive-game') {
         speechText = currentActivity.content.question || '';

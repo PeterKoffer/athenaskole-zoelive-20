@@ -16,15 +16,21 @@ const mathActivities: LessonActivity[] = [
   {
     id: 'math-intro-1',
     title: 'Introduction to Algebra',
-    phase: 'explanation',
+    type: 'introduction',
+    phase: 'introduction',
+    duration: 300,
+    phaseDescription: 'Welcome introduction to algebra concepts',
     content: {
-      explanation: 'Welcome to today\'s algebra lesson! We\'ll explore variables and expressions.'
+      hook: 'Welcome to today\'s algebra lesson! We\'ll explore variables and expressions.'
     }
   },
   {
     id: 'math-practice-1',
     title: 'Solving Simple Equations',
+    type: 'interactive-game',
     phase: 'interactive-game',
+    duration: 600,
+    phaseDescription: 'Interactive practice with simple equations',
     content: {
       question: 'Solve for x: 2x + 5 = 13',
       options: ['x = 4', 'x = 6', 'x = 8', 'x = 9'],
@@ -34,7 +40,10 @@ const mathActivities: LessonActivity[] = [
   {
     id: 'math-practice-2',
     title: 'Variable Substitution',
+    type: 'interactive-game',
     phase: 'interactive-game',
+    duration: 600,
+    phaseDescription: 'Practice with variable substitution',
     content: {
       question: 'If x = 3, what is 4x - 7?',
       options: ['5', '7', '12', '19'],
