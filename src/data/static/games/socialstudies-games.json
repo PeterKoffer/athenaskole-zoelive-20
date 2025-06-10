@@ -1,0 +1,46 @@
+[
+  {
+    "id": "history-time-travel",
+    "title": "Time Travel Chronicles",
+    "description": "Travel through different historical periods and learn about important events and figures!",
+    "emoji": "⏰",
+    "subject": "History",
+    "gradeLevel": [5, 6, 7, 8],
+    "difficulty": "intermediate",
+    "interactionType": "multiple-choice",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["historical_knowledge", "chronological_thinking", "cause_and_effect"],
+    "learningObjectives": [
+      "Understand historical chronology",
+      "Learn about key historical figures",
+      "Analyze cause and effect relationships"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 275,
+      "badges": ["Time Traveler", "History Scholar"]
+    }
+  },
+  {
+    "id": "world-geography-quest",
+    "title": "World Geography Quest",
+    "description": "Travel the globe and learn about countries, capitals, and geographic features!",
+    "emoji": "🌍",
+    "subject": "Geography",
+    "gradeLevel": [3, 4, 5, 6, 7],
+    "difficulty": "intermediate",
+    "interactionType": "multiple-choice",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["geography", "countries", "capitals", "continents", "landmarks"],
+    "learningObjectives": [
+      "Identify world countries",
+      "Locate major geographic features",
+      "Understand cultural diversity"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 230,
+      "badges": ["Geography Expert", "World Explorer"]
+    }
+  }
+]
