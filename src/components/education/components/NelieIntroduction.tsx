@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import IntroductionHeader from './IntroductionHeader';
 import IntroductionContent from './IntroductionContent';
 import { useIntroductionFlow } from './hooks/useIntroductionFlow';
-import { useEffect } from 'react';
 
 interface NelieIntroductionProps {
   subject: string;
@@ -27,27 +26,12 @@ const NelieIntroduction = ({
   } = useIntroductionFlow(subject);
 
   const handleStartLesson = () => {
-    console.log('🎯 Starting lesson from Nelie introduction');
     stopSpeaking();
-    // Call the callback to properly transition to lesson phase
     onIntroductionComplete();
   };
 
-  // Check if introduction is complete
   const isIntroductionComplete = currentStep >= introductionSteps.length - 1;
   const currentStepText = introductionSteps[currentStep]?.text || '';
-
-  // Auto-advance to lesson after introduction is complete
-  useEffect(() => {
-    if (isIntroductionComplete) {
-      console.log('✅ Introduction complete, auto-advancing to lesson in 3 seconds');
-      const timer = setTimeout(() => {
-        handleStartLesson();
-      }, 3000); // 3 second delay after introduction completes
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isIntroductionComplete]);
 
   return (
     <div className="space-y-6">

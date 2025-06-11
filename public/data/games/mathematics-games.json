@@ -1,14 +1,13 @@
-
 [
   {
     "id": "math-addition-castle",
     "title": "Addition Castle Quest",
-    "description": "Help the brave knight solve addition problems by dragging the correct answers to unlock castle doors and rescue the princess!",
+    "description": "Help the brave knight solve addition problems to unlock castle doors and rescue the princess!",
     "emoji": "🏰",
     "subject": "Mathematics",
     "gradeLevel": [1, 2, 3],
     "difficulty": "beginner",
-    "interactionType": "drag-drop",
+    "interactionType": "click-sequence",
     "timeEstimate": "15-20 min",
     "skillAreas": ["basic_addition", "number_recognition", "problem_solving"],
     "learningObjectives": [
@@ -19,13 +18,13 @@
     "status": "available",
     "rewards": {
       "coins": 150,
-      "badges": ["Math Explorer", "Castle Defender", "Addition Master"]
+      "badges": ["Math Explorer", "Castle Defender"]
     }
   },
   {
     "id": "geometry-shape-builder",
     "title": "Geometry Shape Builder",
-    "description": "Build and explore geometric shapes by dragging them to their correct descriptions! Learn about their properties and relationships!",
+    "description": "Build and explore geometric shapes while learning about their properties and relationships!",
     "emoji": "📐",
     "subject": "Mathematics",
     "gradeLevel": [4, 5, 6],
@@ -47,12 +46,12 @@
   {
     "id": "counting-kingdom",
     "title": "Counting Kingdom",
-    "description": "Learn to count, add, and subtract in this magical number kingdom adventure with interactive drag-and-drop challenges!",
+    "description": "Learn to count, add, and subtract in this magical number kingdom adventure!",
     "emoji": "👑",
     "subject": "Mathematics",
     "gradeLevel": [1, 2],
     "difficulty": "beginner",
-    "interactionType": "drag-drop",
+    "interactionType": "click-sequence",
     "timeEstimate": "15-20 min",
     "skillAreas": ["counting", "basic_addition", "basic_subtraction", "number_recognition"],
     "learningObjectives": [
@@ -69,12 +68,12 @@
   {
     "id": "multiplication-mission",
     "title": "Multiplication Mission",
-    "description": "Master multiplication tables through exciting space missions! Use the number line to find products and save the galaxy!",
+    "description": "Master multiplication tables through exciting space missions and alien encounters!",
     "emoji": "🚀",
     "subject": "Mathematics",
     "gradeLevel": [3, 4, 5],
     "difficulty": "intermediate",
-    "interactionType": "click-sequence",
+    "interactionType": "multiple-choice",
     "timeEstimate": "20-25 min",
     "skillAreas": ["multiplication", "times_tables", "problem_solving"],
     "learningObjectives": [
@@ -91,12 +90,12 @@
   {
     "id": "fraction-pizza-party",
     "title": "Fraction Pizza Party",
-    "description": "Learn fractions by sharing pizzas at the ultimate fraction party! Click on pizza slices to create the perfect fractions!",
+    "description": "Learn fractions by sharing pizzas at the ultimate fraction party!",
     "emoji": "🍕",
     "subject": "Mathematics",
     "gradeLevel": [3, 4, 5, 6],
     "difficulty": "intermediate",
-    "interactionType": "click-sequence",
+    "interactionType": "drag-drop",
     "timeEstimate": "25-30 min",
     "skillAreas": ["fractions", "equivalent_fractions", "fraction_operations"],
     "learningObjectives": [
@@ -113,12 +112,12 @@
   {
     "id": "decimal-treasure-hunt",
     "title": "Decimal Treasure Hunt",
-    "description": "Navigate through decimal challenges to find hidden treasures on mysterious islands! Use the number line to locate decimal treasures!",
+    "description": "Navigate through decimal challenges to find hidden treasures on mysterious islands!",
     "emoji": "🏴‍☠️",
     "subject": "Mathematics",
     "gradeLevel": [4, 5, 6],
     "difficulty": "intermediate",
-    "interactionType": "click-sequence",
+    "interactionType": "puzzle",
     "timeEstimate": "20-25 min",
     "skillAreas": ["decimals", "place_value", "decimal_operations"],
     "learningObjectives": [
@@ -135,7 +134,7 @@
   {
     "id": "algebra-adventure",
     "title": "Algebra Adventure",
-    "description": "Solve algebraic equations to unlock ancient mysteries and save the kingdom! Interactive problem-solving awaits!",
+    "description": "Solve algebraic equations to unlock ancient mysteries and save the kingdom!",
     "emoji": "🗝️",
     "subject": "Mathematics",
     "gradeLevel": [6, 7, 8],
@@ -157,7 +156,7 @@
   {
     "id": "geometry-architect",
     "title": "Geometry Architect",
-    "description": "Design and build structures while mastering angles, areas, and geometric theorems! Draw and create geometric masterpieces!",
+    "description": "Design and build structures while mastering angles, areas, and geometric theorems!",
     "emoji": "🏗️",
     "subject": "Mathematics",
     "gradeLevel": [6, 7, 8],
@@ -177,47 +176,69 @@
     }
   },
   {
-    "id": "pattern-detective",
-    "title": "Pattern Detective",
-    "description": "Become a mathematical detective and solve number pattern mysteries! Drag and drop numbers to complete sequences!",
-    "emoji": "🔍",
+    "id": "statistics-sports-analyzer",
+    "title": "Statistics Sports Analyzer",
+    "description": "Analyze sports data and learn statistics while predicting game outcomes!",
+    "emoji": "⚽",
     "subject": "Mathematics",
-    "gradeLevel": [2, 3, 4],
-    "difficulty": "beginner",
-    "interactionType": "drag-drop",
-    "timeEstimate": "18-22 min",
-    "skillAreas": ["patterns", "sequences", "logical_thinking"],
+    "gradeLevel": [6, 7, 8],
+    "difficulty": "intermediate",
+    "interactionType": "multiple-choice",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["statistics", "data_analysis", "probability", "graphs"],
     "learningObjectives": [
-      "Identify number patterns",
-      "Extend sequences",
-      "Understand pattern rules"
+      "Calculate mean, median, mode",
+      "Interpret graphs and charts",
+      "Understand basic probability"
     ],
     "status": "available",
     "rewards": {
-      "coins": 160,
-      "badges": ["Pattern Detective", "Sequence Solver"]
+      "coins": 250,
+      "badges": ["Data Analyst", "Sports Statistician"]
     }
   },
   {
-    "id": "money-marketplace",
-    "title": "Money Marketplace",
-    "description": "Learn about money, making change, and financial math in this interactive marketplace simulation!",
-    "emoji": "💰",
+    "id": "calculus-rollercoaster",
+    "title": "Calculus Rollercoaster",
+    "description": "Design thrilling rollercoasters using calculus concepts of derivatives and integrals!",
+    "emoji": "🎢",
     "subject": "Mathematics",
-    "gradeLevel": [2, 3, 4, 5],
-    "difficulty": "beginner",
+    "gradeLevel": [11, 12],
+    "difficulty": "advanced",
     "interactionType": "simulation",
-    "timeEstimate": "25-30 min",
-    "skillAreas": ["money", "addition", "subtraction", "real_world_math"],
+    "timeEstimate": "40-45 min",
+    "skillAreas": ["calculus", "derivatives", "integrals", "optimization"],
     "learningObjectives": [
-      "Count money accurately",
-      "Make correct change",
-      "Solve money word problems"
+      "Understand derivative concepts",
+      "Apply integration techniques",
+      "Solve optimization problems"
     ],
     "status": "available",
     "rewards": {
-      "coins": 200,
-      "badges": ["Money Master", "Marketplace Champion"]
+      "coins": 400,
+      "badges": ["Calculus Master", "Coaster Engineer"]
+    }
+  },
+  {
+    "id": "trigonometry-tower",
+    "title": "Trigonometry Tower",
+    "description": "Scale the trigonometry tower using sine, cosine, and tangent to reach new heights!",
+    "emoji": "🗼",
+    "subject": "Mathematics",
+    "gradeLevel": [9, 10, 11],
+    "difficulty": "advanced",
+    "interactionType": "puzzle",
+    "timeEstimate": "35-40 min",
+    "skillAreas": ["trigonometry", "sine", "cosine", "tangent", "unit_circle"],
+    "learningObjectives": [
+      "Master trigonometric ratios",
+      "Understand the unit circle",
+      "Solve trigonometric equations"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 350,
+      "badges": ["Trig Master", "Tower Climber"]
     }
   }
 ]
