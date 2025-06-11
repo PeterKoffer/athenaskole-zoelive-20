@@ -1,101 +1,126 @@
 
-import { useUnifiedSpeech } from './useUnifiedSpeech';
-import { useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-/**
- * Consolidated speech hook that replaces all redundant speech hooks
- * This provides a unified interface for all speech functionality with improved reliability
- */
+interface SpeechState {
+  isSpeaking: boolean;
+  isEnabled: boolean;
+  hasUserInteracted: boolean;
+  isReady: boolean;
+  lastError: string | null;
+  isLoading: boolean;
+}
+
 export const useConsolidatedSpeech = () => {
-  const unifiedSpeech = useUnifiedSpeech();
-  const hasAutoRead = useRef(false);
-  const lastReadContent = useRef('');
-  const lastReadTime = useRef(0);
-  
-  // Enhanced speak function with repetition prevention
-  const enhancedSpeak = useCallback(async (text: string, priority: boolean = false) => {
-    if (!text || text.trim().length === 0) {
-      console.log('🚫 Empty text provided to enhancedSpeak');
-      return;
+  const [speechState, setSpeechState] = useState<SpeechState>({
+    isSpeaking: false,
+    isEnabled: false,
+    hasUserInteracted: false,
+    isReady: true,
+    lastError: null,
+    isLoading: false
+  });
+
+  const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const isInitialized = useRef(false);
+
+  // Initialize speech synthesis
+  useEffect(() => {
+    if (!isInitialized.current && 'speechSynthesis' in window) {
+      isInitialized.current = true;
+      setSpeechState(prev => ({ ...prev, isReady: true }));
     }
-
-    const now = Date.now();
-    const timeSinceLastRead = now - lastReadTime.current;
-    
-    // Prevent reading the same content within 5 seconds
-    if (text === lastReadContent.current && timeSinceLastRead < 5000) {
-      console.log('🚫 Preventing duplicate speech:', text.substring(0, 30) + '...');
-      return;
-    }
-
-    lastReadContent.current = text;
-    lastReadTime.current = now;
-    
-    await unifiedSpeech.speakAsNelie(text, priority);
-  }, [unifiedSpeech]);
-
-  // Auto-read with smart prevention
-  const smartAutoRead = useCallback(async (text: string) => {
-    if (!unifiedSpeech.isEnabled || !unifiedSpeech.hasUserInteracted) {
-      console.log('🚫 Auto-read skipped: speech not enabled or no user interaction');
-      return;
-    }
-
-    if (hasAutoRead.current) {
-      console.log('🚫 Auto-read already performed for this content');
-      return;
-    }
-
-    hasAutoRead.current = true;
-    setTimeout(() => {
-      enhancedSpeak(text, false);
-    }, 1500); // Delay to prevent overwhelming user
-  }, [unifiedSpeech.isEnabled, unifiedSpeech.hasUserInteracted, enhancedSpeak]);
-
-  // Reset auto-read flag
-  const resetAutoRead = useCallback(() => {
-    hasAutoRead.current = false;
   }, []);
 
+  const speak = useCallback(async (text: string, priority: boolean = false) => {
+    if (!text.trim()) return;
+
+    try {
+      // Stop current speech if priority or if already speaking
+      if (currentUtterance.current || priority) {
+        window.speechSynthesis.cancel();
+        currentUtterance.current = null;
+      }
+
+      setSpeechState(prev => ({ ...prev, isSpeaking: true, lastError: null }));
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      currentUtterance.current = utterance;
+
+      // Configure voice settings
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
+      utterance.volume = 0.8;
+
+      // Set up event handlers
+      utterance.onend = () => {
+        setSpeechState(prev => ({ ...prev, isSpeaking: false }));
+        currentUtterance.current = null;
+      };
+
+      utterance.onerror = (event) => {
+        setSpeechState(prev => ({ 
+          ...prev, 
+          isSpeaking: false, 
+          lastError: `Speech error: ${event.error}` 
+        }));
+        currentUtterance.current = null;
+      };
+
+      // Start speaking
+      window.speechSynthesis.speak(utterance);
+
+    } catch (error) {
+      setSpeechState(prev => ({ 
+        ...prev, 
+        isSpeaking: false, 
+        lastError: error instanceof Error ? error.message : 'Speech failed' 
+      }));
+    }
+  }, []);
+
+  const stop = useCallback(() => {
+    window.speechSynthesis.cancel();
+    currentUtterance.current = null;
+    setSpeechState(prev => ({ ...prev, isSpeaking: false }));
+  }, []);
+
+  const toggleEnabled = useCallback(() => {
+    setSpeechState(prev => ({ 
+      ...prev, 
+      isEnabled: !prev.isEnabled,
+      hasUserInteracted: true 
+    }));
+  }, []);
+
+  const enableUserInteraction = useCallback(() => {
+    setSpeechState(prev => ({ 
+      ...prev, 
+      hasUserInteracted: true,
+      isEnabled: true 
+    }));
+  }, []);
+
+  const test = useCallback(async () => {
+    if (!speechState.hasUserInteracted) {
+      enableUserInteraction();
+    }
+    await speak("Hello! This is Nelie, your AI learning companion. I'm ready to help you learn!", true);
+  }, [speechState.hasUserInteracted, enableUserInteraction, speak]);
+
   return {
-    // Primary interface with enhanced functions
-    speak: enhancedSpeak,
-    speakAsNelie: enhancedSpeak,
-    autoRead: smartAutoRead,
-    resetAutoRead,
-    
-    // State from unified speech
-    isSpeaking: unifiedSpeech.isSpeaking,
-    isEnabled: unifiedSpeech.isEnabled,
-    hasUserInteracted: unifiedSpeech.hasUserInteracted,
-    isReady: unifiedSpeech.isReady,
-    lastError: unifiedSpeech.lastError,
-    isLoading: unifiedSpeech.isLoading,
+    // State
+    isSpeaking: speechState.isSpeaking,
+    isEnabled: speechState.isEnabled,
+    hasUserInteracted: speechState.hasUserInteracted,
+    isReady: speechState.isReady,
+    lastError: speechState.lastError,
+    isLoading: speechState.isLoading,
     
     // Actions
-    stop: unifiedSpeech.stop,
-    toggleEnabled: unifiedSpeech.toggleEnabled,
-    enableUserInteraction: unifiedSpeech.enableUserInteraction,
-    test: unifiedSpeech.test,
-    
-    // Legacy compatibility methods
-    speakText: enhancedSpeak,
-    handleMuteToggle: unifiedSpeech.toggleEnabled,
-    isSpeechSynthesisSupported: typeof speechSynthesis !== 'undefined',
-    speakWithPersonality: enhancedSpeak,
-    
-    // State aliases for backward compatibility
-    autoReadEnabled: unifiedSpeech.isEnabled,
-    stopSpeaking: unifiedSpeech.stop,
-    testSpeech: unifiedSpeech.test,
-    
-    // Add the hasAutoRead ref for components that need it
-    hasAutoRead
+    speak,
+    stop,
+    toggleEnabled,
+    enableUserInteraction,
+    test
   };
 };
-
-// Export specific variations for different use cases
-export const useSpeechSynthesis = useConsolidatedSpeech;
-export const useWorkingSpeech = useConsolidatedSpeech;
-export const useWorkingNelieSpeech = useConsolidatedSpeech;
-export const useSimplifiedSpeech = useConsolidatedSpeech;

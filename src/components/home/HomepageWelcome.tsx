@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -19,11 +19,11 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     isEnabled,
     hasUserInteracted,
     isReady,
-    speakAsNelie,
+    speak,
     stop,
     toggleEnabled,
     enableUserInteraction
-  } = useUnifiedSpeech();
+  } = useConsolidatedSpeech();
 
   // Welcome the user ONLY ONCE per session
   useEffect(() => {
@@ -38,10 +38,10 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       
       // Small delay to ensure speech system is ready
       setTimeout(() => {
-        speakAsNelie(welcomeMessage, true);
+        speak(welcomeMessage, true);
       }, 1500);
     }
-  }, [isReady, hasWelcomedThisSession, isEnabled, hasUserInteracted, userName, speakAsNelie]);
+  }, [isReady, hasWelcomedThisSession, isEnabled, hasUserInteracted, userName, speak]);
 
   const handleTestSpeech = () => {
     console.log('🔊 Enable Nelie button clicked', { isEnabled, hasUserInteracted, isSpeaking });
@@ -49,12 +49,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     if (!hasUserInteracted) {
       console.log('🔊 Enabling user interaction first');
       enableUserInteraction();
-      // Force enable speech after interaction
-      if (!isEnabled) {
-        setTimeout(() => {
-          toggleEnabled();
-        }, 100);
-      }
     } else if (isSpeaking) {
       console.log('🔊 Stopping current speech');
       stop();
@@ -64,7 +58,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     } else {
       console.log('🔊 Testing speech');
       const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
-      speakAsNelie(testMessage, true);
+      speak(testMessage, true);
     }
   };
 

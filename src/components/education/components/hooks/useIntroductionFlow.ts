@@ -46,15 +46,10 @@ export const useIntroductionFlow = (subject: string) => {
       console.log('🎯 Starting Nelie introduction flow');
       setHasStartedFlow(true);
       
-      // Enable user interaction immediately for introduction
-      if (!hasUserInteracted) {
-        enableUserInteraction();
-      }
-      
       // Start speaking the first step after a short delay
       const timer = setTimeout(() => {
         const firstStep = introductionSteps[0]?.text;
-        if (firstStep && isEnabled) {
+        if (firstStep && isEnabled && hasUserInteracted) {
           console.log('🔊 Nelie starting first introduction step');
           speak(firstStep, true);
         }
@@ -62,7 +57,7 @@ export const useIntroductionFlow = (subject: string) => {
 
       return () => clearTimeout(timer);
     }
-  }, [hasStartedFlow, isReady, introductionSteps, isEnabled, hasUserInteracted, speak, enableUserInteraction]);
+  }, [hasStartedFlow, isReady, introductionSteps, isEnabled, hasUserInteracted, speak]);
 
   // Auto-advance through introduction steps with longer delays
   useEffect(() => {
@@ -73,7 +68,7 @@ export const useIntroductionFlow = (subject: string) => {
         
         // Speak the next step
         const nextStepText = introductionSteps[nextStep]?.text;
-        if (nextStepText && isEnabled) {
+        if (nextStepText && isEnabled && hasUserInteracted) {
           console.log('🔊 Nelie speaking step:', nextStep + 1);
           speak(nextStepText, true);
         }
@@ -81,14 +76,15 @@ export const useIntroductionFlow = (subject: string) => {
       
       return () => clearTimeout(timer);
     }
-  }, [currentStep, hasStartedFlow, introductionSteps, isEnabled, speak]);
+  }, [currentStep, hasStartedFlow, introductionSteps, isEnabled, hasUserInteracted, speak]);
 
   const handleMuteToggleWrapper = useCallback(() => {
     console.log('🔊 Mute toggle clicked, current enabled state:', isEnabled);
     if (!hasUserInteracted) {
       enableUserInteraction();
+    } else {
+      toggleEnabled();
     }
-    toggleEnabled();
   }, [hasUserInteracted, enableUserInteraction, toggleEnabled, isEnabled]);
 
   const handleManualRead = useCallback(() => {
@@ -98,9 +94,11 @@ export const useIntroductionFlow = (subject: string) => {
       if (!hasUserInteracted) {
         console.log('🔊 Enabling user interaction for manual read');
         enableUserInteraction();
-      }
-      
-      if (isSpeaking) {
+        // Wait a bit then speak
+        setTimeout(() => {
+          speak(currentStepText, true);
+        }, 500);
+      } else if (isSpeaking) {
         console.log('🔊 Stopping current speech');
         stop();
       } else {
