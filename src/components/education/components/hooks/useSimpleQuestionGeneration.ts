@@ -100,7 +100,9 @@ export const useSimpleQuestionGeneration = ({
     return {
       id: uniqueId,
       title: `${subject} Practice Question ${currentCount}`,
+      type: 'interactive-game',
       phase: 'interactive-game' as const,
+      phaseDescription: 'Interactive question and answer activity',
       duration: 60,
       content: {
         question: questionText,

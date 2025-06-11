@@ -22,6 +22,7 @@ export const useConsolidatedSpeech = () => {
 
   const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
   const isInitialized = useRef(false);
+  const hasAutoRead = useRef(false);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -107,6 +108,12 @@ export const useConsolidatedSpeech = () => {
     await speak("Hello! This is Nelie, your AI learning companion. I'm ready to help you learn!", true);
   }, [speechState.hasUserInteracted, enableUserInteraction, speak]);
 
+  // Alias functions to match expected interface
+  const speakText = speak;
+  const stopSpeaking = stop;
+  const handleMuteToggle = toggleEnabled;
+  const speakAsNelie = speak;
+
   return {
     // State
     isSpeaking: speechState.isSpeaking,
@@ -116,11 +123,19 @@ export const useConsolidatedSpeech = () => {
     lastError: speechState.lastError,
     isLoading: speechState.isLoading,
     
-    // Actions
+    // Legacy compatibility properties
+    autoReadEnabled: speechState.isEnabled,
+    hasAutoRead,
+    
+    // Actions with both new and legacy names
     speak,
     stop,
     toggleEnabled,
     enableUserInteraction,
-    test
+    test,
+    speakText,
+    stopSpeaking,
+    handleMuteToggle,
+    speakAsNelie
   };
 };
