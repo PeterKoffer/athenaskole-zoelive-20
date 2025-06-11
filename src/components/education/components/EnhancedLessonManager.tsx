@@ -57,10 +57,10 @@ const EnhancedLessonManager = ({
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-8 text-center text-white">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Nelie is preparing your extended {targetLessonLength}-minute lesson...</p>
+          <p>Nelie is preparing your {targetLessonLength}-minute lesson...</p>
           {questionsGenerated > 0 && (
             <p className="text-sm text-gray-400 mt-2">
-              Generated {questionsGenerated} adaptive questions so far
+              Generated {questionsGenerated} questions so far
             </p>
           )}
         </CardContent>
@@ -69,40 +69,50 @@ const EnhancedLessonManager = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto px-4">
       {/* Speech Test Card - only show for admin users */}
       {isAdmin() && <SpeechTestCard />}
 
-      {/* Progress Header with extended info */}
-      <LessonProgressHeader
-        timeElapsed={timeElapsed}
-        score={score}
-        currentActivityIndex={currentActivityIndex}
-        totalActivities={lessonActivities.length}
-      />
+      {/* Progress Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <LessonProgressHeader
+          timeElapsed={timeElapsed}
+          score={score}
+          currentActivityIndex={currentActivityIndex}
+          totalActivities={lessonActivities.length}
+        />
+      </div>
 
-      {/* Show lesson extension status */}
+      {/* Lesson info card */}
       <Card className="bg-blue-900/20 border-blue-700">
         <CardContent className="p-4 text-center">
-          <p className="text-blue-300 text-sm">
-            Extended {targetLessonLength}-minute lesson • {questionsGenerated} adaptive questions generated
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm">
+            <span className="text-blue-300">
+              {targetLessonLength}-minute lesson
+            </span>
+            <span className="hidden sm:inline text-blue-400">•</span>
+            <span className="text-blue-400">
+              {questionsGenerated} questions generated
+            </span>
+          </div>
           <p className="text-blue-400 text-xs mt-1">
-            Lesson adapts to your pace and generates more content as needed
+            Adaptive content that grows with your learning
           </p>
         </CardContent>
       </Card>
 
       {/* Nelie Avatar Section */}
-      <NelieAvatarSection 
-        subject={subject} 
-        currentQuestionIndex={currentActivityIndex} 
-        totalQuestions={lessonActivities.length} 
-        isSpeaking={isSpeaking} 
-        autoReadEnabled={autoReadEnabled} 
-        onMuteToggle={toggleMute} 
-        onReadQuestion={handleReadRequest} 
-      />
+      <div className="flex justify-center">
+        <NelieAvatarSection 
+          subject={subject} 
+          currentQuestionIndex={currentActivityIndex} 
+          totalQuestions={lessonActivities.length} 
+          isSpeaking={isSpeaking} 
+          autoReadEnabled={autoReadEnabled} 
+          onMuteToggle={toggleMute} 
+          onReadQuestion={handleReadRequest} 
+        />
+      </div>
 
       {/* Progress Bar */}
       <LessonProgressSection
@@ -122,11 +132,13 @@ const EnhancedLessonManager = ({
       />
 
       {/* Activity Content */}
-      <EnhancedActivityRenderer
-        activity={currentActivity}
-        onActivityComplete={handleActivityComplete}
-        isNelieReady={isReady && hasUserInteracted}
-      />
+      <div className="w-full">
+        <EnhancedActivityRenderer
+          activity={currentActivity}
+          onActivityComplete={handleActivityComplete}
+          isNelieReady={isReady && hasUserInteracted}
+        />
+      </div>
     </div>
   );
 };

@@ -21,17 +21,12 @@ const LessonActivitySpeechManager = ({
 }: LessonActivitySpeechManagerProps) => {
   const lastSpokenActivityRef = useRef<string>('');
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const spokenActivitiesRef = useRef<Set<string>>(new Set());
   const lastSpeechTimeRef = useRef<number>(0);
+  const isProcessingRef = useRef<boolean>(false);
 
-  // Auto-speak when activity changes - with strict duplicate prevention
+  // Auto-speak when activity changes with strict duplicate prevention
   useEffect(() => {
-    if (!currentActivity || !autoReadEnabled || !isReady) {
-      console.log('🚫 Speech conditions not met:', { 
-        hasActivity: !!currentActivity, 
-        autoReadEnabled, 
-        isReady 
-      });
+    if (!currentActivity || !autoReadEnabled || !isReady || isProcessingRef.current) {
       return;
     }
 
@@ -39,27 +34,21 @@ const LessonActivitySpeechManager = ({
     const activityKey = `${currentActivity.id}-${currentActivityIndex}`;
     const now = Date.now();
     
-    // Multiple prevention checks
-    if (spokenActivitiesRef.current.has(activityKey)) {
-      console.log('🚫 Activity already spoken (set check):', activityKey);
-      return;
-    }
-
+    // Prevent speaking the same activity multiple times
     if (lastSpokenActivityRef.current === activityKey) {
-      console.log('🚫 Activity already spoken (ref check):', activityKey);
       return;
     }
 
     // Time-based prevention (don't speak too frequently)
-    if (now - lastSpeechTimeRef.current < 3000) {
+    if (now - lastSpeechTimeRef.current < 5000) {
       console.log('🚫 Too soon since last speech, waiting...');
       return;
     }
 
-    console.log('🎯 New activity detected, Nelie will speak:', currentActivity.title);
+    console.log('🎯 New activity detected for speech:', currentActivity.title);
     
-    // Mark as spoken immediately to prevent race conditions
-    spokenActivitiesRef.current.add(activityKey);
+    // Mark as processing to prevent race conditions
+    isProcessingRef.current = true;
     lastSpokenActivityRef.current = activityKey;
     lastSpeechTimeRef.current = now;
     
@@ -75,47 +64,46 @@ const LessonActivitySpeechManager = ({
       let speechText = '';
       
       if (currentActivity.phase === 'content-delivery') {
-        speechText = `Let me explain this step by step: ${currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || currentActivity.title}`;
+        speechText = `Let me explain this concept: ${currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || currentActivity.title}`;
       } else if (currentActivity.phase === 'interactive-game') {
         const question = currentActivity.content.question || '';
-        // Don't speak placeholder or empty questions
         if (question.includes('dynamically generated') || question.trim().length === 0) {
-          speechText = `Here's your next practice question. Take your time to think about it.`;
+          speechText = `Here's your practice question. Take your time to think about it.`;
         } else {
           speechText = `Here's your question: ${question}`;
         }
       } else if (currentActivity.phase === 'introduction') {
-        speechText = `Let's start with something fun! ${currentActivity.content.hook || currentActivity.title}`;
+        speechText = `Welcome! ${currentActivity.content.hook || currentActivity.title}`;
       } else if (currentActivity.phase === 'application') {
-        speechText = `Now let's apply what we've learned: ${currentActivity.content.scenario || currentActivity.content.realWorldExample || currentActivity.title}`;
-      } else if (currentActivity.phase === 'creative-exploration') {
-        speechText = `Time to be creative! ${currentActivity.content.text || currentActivity.title}`;
+        speechText = `Now let's apply what we've learned: ${currentActivity.content.scenario || currentActivity.title}`;
       } else if (currentActivity.phase === 'summary') {
-        speechText = `Let's review what we learned: ${currentActivity.content.text || currentActivity.title}`;
+        speechText = `Let's review: ${currentActivity.content.text || currentActivity.title}`;
       } else {
         speechText = `Let's work on: ${currentActivity.title}`;
       }
       
       // Only speak if we have meaningful content
       if (speechText && speechText.length > 10 && !speechText.includes('undefined')) {
-        console.log('🔊 Activity speech manager speaking:', speechText.substring(0, 50) + '...');
+        console.log('🔊 Speaking activity:', speechText.substring(0, 50) + '...');
         speakText(speechText, true);
-      } else {
-        console.log('🚫 Skipping speech for insufficient content');
-        // Remove from spoken set if we didn't actually speak
-        spokenActivitiesRef.current.delete(activityKey);
       }
-    }, 2000); // Longer delay to prevent overwhelming
+      
+      // Reset processing flag after speech
+      setTimeout(() => {
+        isProcessingRef.current = false;
+      }, 1000);
+      
+    }, 3000); // Longer delay to prevent overwhelming
 
-  }, [currentActivity, currentActivityIndex, autoReadEnabled, isReady, speakText, stopSpeaking]);
+  }, [currentActivity?.id, currentActivityIndex, autoReadEnabled, isReady, speakText, stopSpeaking]);
 
-  // Reset spoken activities when lesson restarts
+  // Reset when lesson restarts
   useEffect(() => {
     if (currentActivityIndex === 0) {
-      console.log('🔄 Resetting spoken activities for new lesson');
-      spokenActivitiesRef.current.clear();
+      console.log('🔄 Resetting speech manager for new lesson');
       lastSpokenActivityRef.current = '';
       lastSpeechTimeRef.current = 0;
+      isProcessingRef.current = false;
     }
   }, [currentActivityIndex]);
 
@@ -125,6 +113,7 @@ const LessonActivitySpeechManager = ({
       if (speechTimeoutRef.current) {
         clearTimeout(speechTimeoutRef.current);
       }
+      isProcessingRef.current = false;
     };
   }, []);
 
