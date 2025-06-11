@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { useExtendedLessonManager } from './hooks/useExtendedLessonManager';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
@@ -97,12 +98,12 @@ const EnhancedLessonManager = ({
 
   if (!currentActivity) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-8 text-center text-white">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Nelie is preparing your {targetLessonLength}-minute lesson...</p>
+      <Card className="bg-gray-900 border-gray-800 mx-2 sm:mx-4">
+        <CardContent className="p-4 sm:p-8 text-center text-white">
+          <div className="animate-spin w-6 h-6 sm:w-8 sm:h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-sm sm:text-base">Nelie is preparing your {targetLessonLength}-minute lesson...</p>
           {questionsGenerated > 0 && (
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-xs sm:text-sm text-gray-400 mt-2">
               Generated {questionsGenerated} questions so far
             </p>
           )}
@@ -112,12 +113,12 @@ const EnhancedLessonManager = ({
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-2 sm:px-4">
       {/* Speech Test Card - only show for admin users */}
       {isAdmin() && <SpeechTestCard />}
 
       {/* Progress Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col space-y-2 sm:space-y-4">
         <LessonProgressHeader
           timeElapsed={timeElapsed}
           score={score}
@@ -128,8 +129,8 @@ const EnhancedLessonManager = ({
 
       {/* Lesson info card */}
       <Card className="bg-blue-900/20 border-blue-700">
-        <CardContent className="p-4 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm">
+        <CardContent className="p-3 sm:p-4 text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm">
             <span className="text-blue-300">
               {targetLessonLength}-minute lesson
             </span>
@@ -147,8 +148,8 @@ const EnhancedLessonManager = ({
       {/* User Interaction Prompt */}
       {!consolidatedSpeech.hasUserInteracted && (
         <Card className="bg-yellow-900/20 border-yellow-700">
-          <CardContent className="p-4 text-center">
-            <p className="text-yellow-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <p className="text-yellow-300 text-xs sm:text-sm">
               👆 Click anywhere to enable Nelie's voice guidance!
             </p>
           </CardContent>
@@ -157,15 +158,17 @@ const EnhancedLessonManager = ({
 
       {/* Nelie Avatar Section */}
       <div className="flex justify-center">
-        <NelieAvatarSection 
-          subject={subject} 
-          currentQuestionIndex={currentActivityIndex} 
-          totalQuestions={lessonActivities.length} 
-          isSpeaking={consolidatedSpeech.isSpeaking} 
-          autoReadEnabled={consolidatedSpeech.isEnabled} 
-          onMuteToggle={handleMuteToggle} 
-          onReadQuestion={handleReadRequestWrapper} 
-        />
+        <div className="w-full max-w-sm sm:max-w-none">
+          <NelieAvatarSection 
+            subject={subject} 
+            currentQuestionIndex={currentActivityIndex} 
+            totalQuestions={lessonActivities.length} 
+            isSpeaking={consolidatedSpeech.isSpeaking} 
+            autoReadEnabled={consolidatedSpeech.isEnabled} 
+            onMuteToggle={handleMuteToggle} 
+            onReadQuestion={handleReadRequestWrapper} 
+          />
+        </div>
       </div>
 
       {/* Progress Bar */}

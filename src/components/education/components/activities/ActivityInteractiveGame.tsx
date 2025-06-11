@@ -46,30 +46,30 @@ const ActivityInteractiveGame = ({
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center justify-between">
-          <span>{activity.title}</span>
-          <div className="flex items-center space-x-2">
+    <Card className="bg-gray-800 border-gray-700 mx-2 sm:mx-0">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-lg sm:text-xl">
+          <span className="break-words">{activity.title}</span>
+          <div className="flex items-center space-x-2 text-sm sm:text-base">
             <Clock className="w-4 h-4" />
-            <span className="text-sm">{Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}</span>
+            <span>{Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}</span>
           </div>
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
         <div className="bg-gray-700 rounded-lg p-4">
-          <p className="text-white text-lg">{activity.content.question}</p>
+          <p className="text-white text-base sm:text-lg leading-relaxed">{activity.content.question}</p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {activity.content.options?.map((option: string, index: number) => (
             <Button
               key={index}
               variant={selectedAnswer === index ? "default" : "outline"}
               onClick={() => handleAnswerSelect(index)}
               disabled={hasAnswered}
-              className={`w-full text-left justify-start p-4 h-auto text-wrap ${
+              className={`w-full text-left justify-start p-3 sm:p-4 h-auto text-wrap min-h-[3rem] ${
                 selectedAnswer === index
                   ? "bg-blue-600 text-white border-blue-600"
                   : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
@@ -83,29 +83,29 @@ const ActivityInteractiveGame = ({
                   : ""
               }`}
             >
-              <span className="mr-3 font-semibold text-sm">
+              <span className="mr-2 sm:mr-3 font-semibold text-sm flex-shrink-0">
                 {String.fromCharCode(65 + index)}.
               </span>
-              <span className="flex-1">{option}</span>
+              <span className="flex-1 text-sm sm:text-base">{option}</span>
               {showResult && index === activity.content.correctAnswer && (
-                <CheckCircle className="w-5 h-5 ml-2 text-white" />
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-2 text-white flex-shrink-0" />
               )}
               {showResult && selectedAnswer === index && index !== activity.content.correctAnswer && (
-                <XCircle className="w-5 h-5 ml-2 text-white" />
+                <XCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-2 text-white flex-shrink-0" />
               )}
             </Button>
           ))}
         </div>
 
         {showResult && (
-          <div className="bg-gray-700 rounded-lg p-4">
-            <p className={`font-semibold ${
+          <div className="bg-gray-700 rounded-lg p-3 sm:p-4">
+            <p className={`font-semibold text-sm sm:text-base ${
               selectedAnswer === activity.content.correctAnswer ? 'text-green-400' : 'text-red-400'
             }`}>
               {selectedAnswer === activity.content.correctAnswer ? 'Excellent work!' : 'Not quite right, but great effort!'}
             </p>
             {selectedAnswer !== activity.content.correctAnswer && (
-              <p className="text-gray-300 mt-2">
+              <p className="text-gray-300 mt-2 text-sm sm:text-base">
                 The correct answer was: {activity.content.options[activity.content.correctAnswer]}
               </p>
             )}
@@ -117,13 +117,13 @@ const ActivityInteractiveGame = ({
             <Button
               onClick={handleSubmit}
               disabled={selectedAnswer === null}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold w-full sm:w-auto"
             >
               Submit Answer
             </Button>
           ) : (
             <div className="text-center text-gray-400">
-              <p>Moving to next activity...</p>
+              <p className="text-sm sm:text-base">Moving to next activity...</p>
             </div>
           )}
         </div>
