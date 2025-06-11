@@ -12,6 +12,7 @@ export interface Question {
   learningObjectives: string[];
   estimatedTime: number;
   conceptsCovered: string[];
+  isRecap?: boolean; // Flag to allow repeated questions for recap/review
 }
 
 interface UseReliableQuestionGenerationProps {

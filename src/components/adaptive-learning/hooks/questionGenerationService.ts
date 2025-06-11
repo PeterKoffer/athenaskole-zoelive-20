@@ -101,7 +101,12 @@ ENSURE MAXIMUM CREATIVITY AND ORIGINALITY!
     };
   }
 
-  static isDuplicateQuestion(questionText: string, usedQuestions: string[]): boolean {
+  static isDuplicateQuestion(questionText: string, usedQuestions: string[], isRecap = false): boolean {
+    // Allow recap questions to repeat
+    if (isRecap) {
+      return false;
+    }
+
     const questionTextLower = questionText.toLowerCase().replace(/[^\w\s]/g, '').trim();
     return usedQuestions.some(used => {
       const usedText = used.toLowerCase().replace(/[^\w\s]/g, '').trim();
