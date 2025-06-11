@@ -146,10 +146,10 @@ const EnhancedActivityRenderer = ({
                 {segment.checkQuestion.options.map((option, index) => (
                   <Button
                     key={index}
-                    variant={selectedAnswer === index ? "default" : "outline"}
-                    className={`w-full text-left justify-start p-4 h-auto ${
+                    variant="outline"
+                    className={`w-full text-left justify-start p-4 h-auto transition-colors ${
                       selectedAnswer === index
-                        ? "bg-green-500 text-white"
+                        ? "bg-green-500 text-white border-green-500"
                         : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
                     }`}
                     onClick={() => handleAnswerSelect(index)}
@@ -248,10 +248,10 @@ const EnhancedActivityRenderer = ({
             {activity.content.options?.map((option, index) => (
               <Button
                 key={index}
-                variant={selectedAnswer === index ? "default" : "outline"}
-                className={`w-full text-left justify-start p-4 h-auto ${
+                variant="outline"
+                className={`w-full text-left justify-start p-4 h-auto transition-colors ${
                   selectedAnswer === index
-                    ? "bg-green-500 text-white"
+                    ? "bg-green-500 text-white border-green-500"
                     : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
                 }`}
                 onClick={() => handleAnswerSelect(index)}
