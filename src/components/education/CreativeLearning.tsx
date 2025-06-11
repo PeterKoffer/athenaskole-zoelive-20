@@ -71,8 +71,7 @@ const CreativeLearning = () => {
         <EnhancedLessonManager
           subject="creative-arts"
           skillArea={selectedActivity}
-          onLessonComplete={handleLessonComplete}
-          onBack={handleBackToOverview}
+          onBackToProgram={handleBackToOverview}
         />
       </div>
     );

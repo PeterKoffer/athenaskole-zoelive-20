@@ -66,8 +66,7 @@ const LessonPhaseRenderer = ({
         <EnhancedLessonManager
           subject={currentSubject}
           skillArea={currentSkillArea}
-          onLessonComplete={onLessonComplete}
-          onBack={onBackToProgram}
+          onBackToProgram={onBackToProgram}
         />
       );
 

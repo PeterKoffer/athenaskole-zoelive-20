@@ -19,8 +19,8 @@ interface UseLessonProgressionProps {
   score: number;
   lessonStartTime: number;
   setCurrentActivityIndex: (index: number) => void;
-  setScore: (score: number) => void;
-  setCorrectStreak: (streak: number) => void;
+  setScore: (score: number | ((prev: number) => number)) => void;
+  setCorrectStreak: (streak: number | ((prev: number) => number)) => void;
   setLastResponseTime: (time: Date | null) => void;
   onLessonComplete: () => void;
 }
@@ -41,7 +41,6 @@ export const useLessonProgression = ({
 }: UseLessonProgressionProps) => {
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
-    currentActivityIndex,
     totalActivities: allActivities.length,
     timeElapsed,
     correctStreak,

@@ -60,11 +60,8 @@ const EnhancedLessonManager = ({
     return (
       <NelieIntroduction
         subject={subject}
-        onStartLesson={handleReadRequest}
-        isSpeaking={isSpeaking}
-        autoReadEnabled={autoReadEnabled}
-        onMuteToggle={toggleMute}
-        isReady={isReady}
+        skillArea={skillArea}
+        onIntroductionComplete={handleReadRequest}
       />
     );
   }
@@ -96,7 +93,6 @@ const EnhancedLessonManager = ({
   return (
     <div className="max-w-4xl mx-auto">
       <LessonProgressHeader
-        subject={subject}
         currentActivityIndex={currentActivityIndex}
         totalActivities={lessonActivities.length}
         timeElapsed={timeElapsed}

@@ -43,7 +43,6 @@ const ExtendedLessonManager = ({
 
   const currentActivity = lessonActivities[currentActivityIndex];
   const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
-  const totalLessonTime = 20 * 60;
 
   // Test speech when ready
   useEffect(() => {
@@ -114,7 +113,6 @@ const ExtendedLessonManager = ({
     if (currentActivity) {
       if (isSpeaking) {
         console.log('🔇 User requested to stop Nelie');
-        // Don't stop here - let them hear it out
         return;
       }
       
@@ -176,9 +174,13 @@ const ExtendedLessonManager = ({
 
       {/* Controls */}
       <LessonControlsFooter
-        timeElapsed={timeElapsed}
-        totalLessonTime={totalLessonTime}
-        onBack={onBack}
+        autoReadEnabled={autoReadEnabled}
+        isSpeaking={isSpeaking}
+        isReady={isReady}
+        adaptiveSpeed={1.0}
+        onMuteToggle={toggleMute}
+        onManualRead={handleReadQuestion}
+        onResetProgress={() => window.location.reload()}
       />
     </div>
   );
