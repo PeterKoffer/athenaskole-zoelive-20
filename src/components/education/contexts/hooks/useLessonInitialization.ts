@@ -11,9 +11,9 @@ export const useLessonInitialization = ({
   phase,
   handleLessonStart
 }: UseLessonInitializationProps) => {
-  // Remove auto-start - let user control when to begin
+  // Only log the phase - no auto-start behavior
   useEffect(() => {
     console.log('🎯 Lesson initialization phase:', phase);
-    // No auto-start - user must click to begin
-  }, [phase, handleLessonStart]);
+    // User must manually start the lesson
+  }, [phase]);
 };

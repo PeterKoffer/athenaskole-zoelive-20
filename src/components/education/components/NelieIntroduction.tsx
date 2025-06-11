@@ -26,10 +26,12 @@ const NelieIntroduction = ({
   } = useIntroductionFlow(subject);
 
   const handleStartLesson = () => {
+    console.log('🎯 Starting lesson from Nelie introduction');
     stopSpeaking();
     onIntroductionComplete();
   };
 
+  // Auto-complete introduction after all steps are shown
   const isIntroductionComplete = currentStep >= introductionSteps.length - 1;
   const currentStepText = introductionSteps[currentStep]?.text || '';
 

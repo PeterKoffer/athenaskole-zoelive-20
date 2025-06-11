@@ -11,24 +11,19 @@ interface ActivityIntroductionProps {
 
 const ActivityIntroduction = ({ activity, onActivityComplete }: ActivityIntroductionProps) => {
   const [showContinueButton, setShowContinueButton] = useState(false);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   console.log('🎭 ActivityIntroduction rendering:', {
     activityId: activity.id,
     title: activity.title
   });
 
-  // Show continue button after a delay, but don't auto-advance
+  // Show continue button immediately - no delay
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContinueButton(true);
-    }, 3000); // 3 second delay before showing button
-
-    return () => clearTimeout(timer);
+    setShowContinueButton(true);
   }, []);
 
   const handleContinue = () => {
-    setHasUserInteracted(true);
+    console.log('🚀 User clicked to start lesson');
     onActivityComplete();
   };
 
@@ -45,13 +40,13 @@ const ActivityIntroduction = ({ activity, onActivityComplete }: ActivityIntroduc
             onClick={handleContinue}
             className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3"
           >
-            Let's Begin!
+            Start Lesson
           </Button>
         )}
         
         {!showContinueButton && (
           <div className="text-gray-300">
-            Get ready to start learning...
+            Loading...
           </div>
         )}
       </CardContent>
