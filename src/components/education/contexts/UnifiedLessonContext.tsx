@@ -1,10 +1,12 @@
-
 import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from '../components/hooks/useEnhancedTeachingEngine';
 import { LessonActivity } from '../components/types/LessonTypes';
 import { useTimerManager } from '../hooks/useTimerManager';
 import { useLessonStateManager, LessonPhase, LessonState } from '../hooks/useLessonStateManager';
 import { useActivityProgression } from '../hooks/useActivityProgression';
+
+// Re-export types for use in other components
+export type { LessonPhase, LessonState };
 
 export interface UnifiedLessonState {
   // Core lesson state
