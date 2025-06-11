@@ -543,6 +543,51 @@ export type Database = {
           },
         ]
       }
+      lesson_progress: {
+        Row: {
+          created_at: string
+          current_activity_index: number
+          id: string
+          is_completed: boolean | null
+          lesson_data: Json | null
+          score: number | null
+          skill_area: string
+          subject: string
+          time_elapsed: number | null
+          total_activities: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_activity_index?: number
+          id?: string
+          is_completed?: boolean | null
+          lesson_data?: Json | null
+          score?: number | null
+          skill_area: string
+          subject: string
+          time_elapsed?: number | null
+          total_activities?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_activity_index?: number
+          id?: string
+          is_completed?: boolean | null
+          lesson_data?: Json | null
+          score?: number | null
+          skill_area?: string
+          subject?: string
+          time_elapsed?: number | null
+          total_activities?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
@@ -609,6 +654,42 @@ export type Database = {
           id?: string
           interaction_type?: string
           name?: string
+        }
+        Relationships: []
+      }
+      subject_question_templates: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          difficulty_level: number | null
+          explanation_template: string | null
+          id: string
+          options_template: Json
+          question_template: string
+          skill_area: string
+          subject: string
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          difficulty_level?: number | null
+          explanation_template?: string | null
+          id?: string
+          options_template: Json
+          question_template: string
+          skill_area: string
+          subject: string
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          difficulty_level?: number | null
+          explanation_template?: string | null
+          id?: string
+          options_template?: Json
+          question_template?: string
+          skill_area?: string
+          subject?: string
         }
         Relationships: []
       }

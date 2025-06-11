@@ -1,9 +1,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { useLessonState } from './useLessonState';
 import { useDynamicActivityGeneration } from './useDynamicActivityGeneration';
 import { useLessonProgression } from './useLessonProgression';
 import { useLessonContentGeneration } from './useLessonContentGeneration';
+import { useLessonProgressManager } from './useLessonProgressManager';
 
 interface UseExtendedLessonManagerProps {
   subject: string;
@@ -16,6 +18,9 @@ export const useExtendedLessonManager = ({
   skillArea,
   onLessonComplete
 }: UseExtendedLessonManagerProps) => {
+  const { user } = useAuth();
+  const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
+
   // Use the smaller, focused hooks
   const {
     currentActivityIndex,
@@ -31,6 +36,33 @@ export const useExtendedLessonManager = ({
     timeElapsed
   } = useLessonState();
 
+  const { baseLessonActivities } = useLessonContentGeneration({ subject });
+
+  // Initialize progress manager
+  const {
+    isLoadingProgress,
+    usedQuestionIds,
+    saveProgress,
+    completeLessonProgress,
+    generateSubjectQuestion,
+    resetProgress
+  } = useLessonProgressManager({
+    subject,
+    skillArea,
+    lessonActivities: baseLessonActivities,
+    currentActivityIndex,
+    score,
+    timeElapsed,
+    onProgressLoaded: (progress) => {
+      if (!hasRestoredProgress && progress) {
+        console.log('🔄 Restoring lesson progress:', progress);
+        setCurrentActivityIndex(progress.current_activity_index);
+        setScore(progress.score);
+        setHasRestoredProgress(true);
+      }
+    }
+  });
+
   const {
     dynamicActivities,
     setDynamicActivities,
@@ -40,10 +72,11 @@ export const useExtendedLessonManager = ({
   } = useDynamicActivityGeneration({
     subject,
     skillArea,
-    timeElapsed
+    timeElapsed,
+    usedQuestionIds,
+    onQuestionUsed: () => {} // Handled by progress manager
   });
 
-  const { baseLessonActivities } = useLessonContentGeneration({ subject });
   const [hasGeneratedInitialQuestions, setHasGeneratedInitialQuestions] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -57,7 +90,7 @@ export const useExtendedLessonManager = ({
   const {
     teachingEngine,
     currentActivity,
-    handleActivityComplete,
+    handleActivityComplete: originalHandleActivityComplete,
     handleReadRequest
   } = useLessonProgression({
     subject,
@@ -71,73 +104,67 @@ export const useExtendedLessonManager = ({
     setScore,
     setCorrectStreak,
     setLastResponseTime,
-    onLessonComplete
+    onLessonComplete: async () => {
+      if (user?.id) {
+        await completeLessonProgress();
+      }
+      onLessonComplete();
+    }
   });
 
-  console.log(`🧠 Extended lesson: ${allActivities.length} activities, targeting ${targetLessonLength} minutes`);
+  // Enhanced activity completion handler with progress saving
+  const handleActivityComplete = useCallback(async (wasCorrect?: boolean) => {
+    console.log('✅ Activity completed, saving progress...');
+    
+    // Call original handler first
+    originalHandleActivityComplete(wasCorrect);
+    
+    // Save progress after state updates
+    setTimeout(async () => {
+      await saveProgress();
+    }, 100);
+  }, [originalHandleActivityComplete, saveProgress]);
 
-  // Generate initial questions immediately when lesson starts
+  // Generate initial questions with subject specificity
   useEffect(() => {
-    if (!hasGeneratedInitialQuestions && !isGeneratingQuestion) {
-      console.log('🎯 Starting initial question generation for lesson...');
+    if (!hasGeneratedInitialQuestions && !isGeneratingQuestion && !isLoadingProgress) {
+      console.log('🎯 Starting initial subject-specific question generation...');
       setHasGeneratedInitialQuestions(true);
       
-      // Generate questions immediately to ensure interactive content
       const generateInitialQuestions = async () => {
-        console.log('🔄 Generating 8 initial questions...');
+        console.log('🔄 Generating 8 subject-specific questions...');
         
-        for (let i = 0; i < 8; i++) { // Generate 8 questions for good variety
+        for (let i = 0; i < 8; i++) {
           try {
-            console.log(`📝 Generating question ${i + 1}/8...`);
-            const newActivity = await generateDynamicActivity();
+            console.log(`📝 Generating question ${i + 1}/8 for ${subject}...`);
+            const newActivity = await generateSubjectQuestion();
             if (newActivity) {
               setDynamicActivities(prev => {
                 const updated = [...prev, newActivity];
-                console.log(`✅ Added question ${i + 1}: ${newActivity.content.question.substring(0, 50)}...`);
+                console.log(`✅ Added ${subject} question ${i + 1}: ${newActivity.content.question.substring(0, 50)}...`);
                 return updated;
               });
             } else {
-              console.warn(`⚠️ Failed to generate question ${i + 1}`);
+              console.warn(`⚠️ Failed to generate ${subject} question ${i + 1}`);
             }
           } catch (error) {
-            console.error(`❌ Error generating question ${i + 1}:`, error);
+            console.error(`❌ Error generating ${subject} question ${i + 1}:`, error);
           }
           
-          // Small delay between generations to prevent overwhelming
           if (i < 7) {
             await new Promise(resolve => setTimeout(resolve, 200));
           }
         }
         
-        console.log('✅ Initial question generation completed');
+        console.log(`✅ Initial ${subject} question generation completed`);
         setIsInitializing(false);
       };
       
       generateInitialQuestions();
     }
-  }, [hasGeneratedInitialQuestions, isGeneratingQuestion, generateDynamicActivity, setDynamicActivities]);
+  }, [hasGeneratedInitialQuestions, isGeneratingQuestion, isLoadingProgress, generateSubjectQuestion, setDynamicActivities, subject]);
 
-  // Check if we need to extend the lesson
-  const shouldExtendLesson = useCallback(() => {
-    const currentMinutes = timeElapsed / 60;
-    const remainingActivities = allActivities.length - currentActivityIndex - 1;
-    const estimatedRemainingTime = remainingActivities * 2; // 2 minutes per activity average
-    
-    return currentMinutes + estimatedRemainingTime < targetLessonLength && dynamicActivities.length < 12;
-  }, [timeElapsed, allActivities.length, currentActivityIndex, targetLessonLength, dynamicActivities.length]);
-
-  // Auto-generate more activities if lesson is too short
-  useEffect(() => {
-    if (currentActivityIndex > 0 && shouldExtendLesson() && !isGeneratingQuestion && !isInitializing) {
-      console.log('📚 Lesson needs more content, generating additional questions...');
-      generateDynamicActivity().then(newActivity => {
-        if (newActivity) {
-          setDynamicActivities(prev => [...prev, newActivity]);
-          console.log('✅ Added additional question:', newActivity.content.question.substring(0, 50) + '...');
-        }
-      });
-    }
-  }, [currentActivityIndex, shouldExtendLesson, generateDynamicActivity, isGeneratingQuestion, setDynamicActivities, isInitializing]);
+  console.log(`🧠 Extended ${subject} lesson: ${allActivities.length} activities, targeting ${targetLessonLength} minutes`);
 
   return {
     currentActivityIndex,
@@ -149,7 +176,7 @@ export const useExtendedLessonManager = ({
     correctStreak,
     questionsGenerated,
     targetLessonLength,
-    isInitializing,
+    isInitializing: isInitializing || isLoadingProgress,
     engagementLevel: teachingEngine.engagementLevel,
     adaptiveSpeed: teachingEngine.adaptiveSpeed,
     isSpeaking: teachingEngine.isSpeaking,
@@ -160,6 +187,7 @@ export const useExtendedLessonManager = ({
     stopSpeaking: teachingEngine.stopSpeaking,
     toggleMute: teachingEngine.toggleMute,
     handleActivityComplete,
-    handleReadRequest
+    handleReadRequest,
+    resetProgress
   };
 };
