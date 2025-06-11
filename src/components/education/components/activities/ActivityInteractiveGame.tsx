@@ -1,130 +1,168 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Volume2, CheckCircle, XCircle } from 'lucide-react';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface ActivityInteractiveGameProps {
   activity: LessonActivity;
-  timeRemaining: number;
-  onAnswerSubmit: (wasCorrect: boolean) => void;
+  onActivityComplete: (wasCorrect?: boolean) => void;
 }
 
-const ActivityInteractiveGame = ({
-  activity,
-  timeRemaining,
-  onAnswerSubmit
-}: ActivityInteractiveGameProps) => {
+const ActivityInteractiveGame = ({ activity, onActivityComplete }: ActivityInteractiveGameProps) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [hasAnswered, setHasAnswered] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [startTime] = useState(Date.now());
 
-  // Reset state when activity changes
-  useEffect(() => {
-    setSelectedAnswer(null);
-    setHasAnswered(false);
-    setShowResult(false);
-  }, [activity.id]);
+  console.log('🎭 ActivityInteractiveGame rendering:', {
+    activityId: activity.id,
+    title: activity.title,
+    selectedAnswer,
+    showResult
+  });
+
+  const getCorrectAnswerIndex = () => {
+    if (activity.content.correctAnswer !== undefined) {
+      return activity.content.correctAnswer;
+    }
+    
+    if (activity.content.correct !== undefined) {
+      return activity.content.correct;
+    }
+    
+    if (activity.content.segments?.[0]?.checkQuestion?.correctAnswer !== undefined) {
+      return activity.content.segments[0].checkQuestion.correctAnswer;
+    }
+    
+    console.warn('⚠️ No correct answer found for activity:', activity.id);
+    return 0;
+  };
+
+  const playAudio = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      speechSynthesis.speak(utterance);
+    }
+  };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (hasAnswered) return;
+    if (showResult) return;
+    console.log('🎯 User selected answer:', answerIndex);
     setSelectedAnswer(answerIndex);
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer === null || hasAnswered) return;
+    if (selectedAnswer === null || showResult) return;
     
-    setHasAnswered(true);
+    const responseTime = Date.now() - startTime;
+    const correctAnswerIndex = getCorrectAnswerIndex();
+    const isCorrect = selectedAnswer === correctAnswerIndex;
+    
+    console.log('✅ Activity submitted:', {
+      selectedAnswer,
+      correctAnswer: correctAnswerIndex,
+      isCorrect,
+      responseTime,
+      activityId: activity.id
+    });
+    
     setShowResult(true);
     
-    const isCorrect = selectedAnswer === activity.content.correctAnswer;
-    
     setTimeout(() => {
-      onAnswerSubmit(isCorrect);
+      onActivityComplete(isCorrect);
     }, 2000);
   };
 
+  const handleNext = () => {
+    console.log('➡️ Moving to next activity');
+    onActivityComplete();
+  };
+
+  const correctAnswerIndex = getCorrectAnswerIndex();
+
   return (
-    <Card className="bg-gray-800 border-gray-700 mx-2 sm:mx-0">
-      <CardHeader className="p-4 sm:p-6">
-        <CardTitle className="text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-lg sm:text-xl">
-          <span className="break-words">{activity.title}</span>
-          <div className="flex items-center space-x-2 text-sm sm:text-base">
-            <Clock className="w-4 h-4" />
-            <span>{Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}</span>
-          </div>
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center justify-between">
+          <span>{activity.title}</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => playAudio(activity.content.question || '')}
+            className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
+          >
+            <Volume2 className="w-4 h-4" />
+          </Button>
         </CardTitle>
       </CardHeader>
-      
-      <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-        <div className="bg-gray-700 rounded-lg p-4">
-          <p className="text-white text-base sm:text-lg leading-relaxed">{activity.content.question}</p>
-        </div>
+      <CardContent className="space-y-6">
+        <h4 className="text-lg font-medium text-white">
+          {activity.content.question}
+        </h4>
 
-        <div className="space-y-2 sm:space-y-3">
-          {activity.content.options?.map((option: string, index: number) => (
+        <div className="space-y-3">
+          {activity.content.options?.map((option, index) => (
             <Button
               key={index}
-              variant={selectedAnswer === index ? "default" : "outline"}
-              onClick={() => handleAnswerSelect(index)}
-              disabled={hasAnswered}
-              className={`w-full text-left justify-start p-3 sm:p-4 h-auto text-wrap min-h-[3rem] ${
+              variant="outline"
+              className={`w-full text-left justify-start p-4 h-auto transition-colors ${
                 selectedAnswer === index
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-green-500 text-white border-green-500"
                   : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-              } ${
-                showResult && index === activity.content.correctAnswer
-                  ? "bg-green-600 border-green-600"
-                  : ""
-              } ${
-                showResult && selectedAnswer === index && index !== activity.content.correctAnswer
-                  ? "bg-red-600 border-red-600"
-                  : ""
               }`}
+              onClick={() => handleAnswerSelect(index)}
+              disabled={showResult}
             >
-              <span className="mr-2 sm:mr-3 font-semibold text-sm flex-shrink-0">
+              <span className="mr-3 font-semibold">
                 {String.fromCharCode(65 + index)}.
               </span>
-              <span className="flex-1 text-sm sm:text-base">{option}</span>
-              {showResult && index === activity.content.correctAnswer && (
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-2 text-white flex-shrink-0" />
-              )}
-              {showResult && selectedAnswer === index && index !== activity.content.correctAnswer && (
-                <XCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-2 text-white flex-shrink-0" />
-              )}
+              {option}
             </Button>
           ))}
         </div>
 
         {showResult && (
-          <div className="bg-gray-700 rounded-lg p-3 sm:p-4">
-            <p className={`font-semibold text-sm sm:text-base ${
-              selectedAnswer === activity.content.correctAnswer ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {selectedAnswer === activity.content.correctAnswer ? 'Excellent work!' : 'Not quite right, but great effort!'}
-            </p>
-            {selectedAnswer !== activity.content.correctAnswer && (
-              <p className="text-gray-300 mt-2 text-sm sm:text-base">
-                The correct answer was: {activity.content.options[activity.content.correctAnswer]}
+          <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
+            <div className="flex items-center space-x-2 mb-2">
+              {selectedAnswer === correctAnswerIndex ? (
+                <CheckCircle className="w-5 h-5 text-green-400" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-400" />
+              )}
+              <p className={`font-semibold ${
+                selectedAnswer === correctAnswerIndex
+                  ? 'text-green-400' 
+                  : 'text-red-400'
+              }`}>
+                {selectedAnswer === correctAnswerIndex ? 'Excellent!' : 'Try again next time!'}
               </p>
-            )}
+            </div>
+            <p className="text-gray-300">
+              {activity.content.explanation || 
+               `The correct answer is: ${activity.content.options?.[correctAnswerIndex] || 'Not available'}`}
+            </p>
           </div>
         )}
 
-        <div className="flex justify-center">
-          {!hasAnswered ? (
+        <div className="flex justify-end">
+          {!showResult ? (
             <Button
               onClick={handleSubmit}
               disabled={selectedAnswer === null}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold w-full sm:w-auto"
+              className="bg-green-500 hover:bg-green-600 text-white"
             >
               Submit Answer
             </Button>
           ) : (
-            <div className="text-center text-gray-400">
-              <p className="text-sm sm:text-base">Moving to next activity...</p>
-            </div>
+            <Button
+              onClick={handleNext}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              Continue
+            </Button>
           )}
         </div>
       </CardContent>
