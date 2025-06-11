@@ -64,7 +64,12 @@ export const useSubjectSpecificQuestions = ({
         return null;
       }
 
-      // Convert to lesson activity format
+      // Convert to lesson activity format - handle different possible structures
+      const correctAnswerIndex = uniqueQuestion.correctAnswer ?? 
+                                uniqueQuestion.correct_answer ?? 
+                                (uniqueQuestion.answer ? parseInt(uniqueQuestion.answer.toString()) : 0) ?? 
+                                0;
+
       const dynamicQuestion = {
         id: `dynamic-${subject}-${Date.now()}-${Math.random().toString(36).substring(7)}`,
         title: `${subject} Practice Question`,
@@ -73,7 +78,7 @@ export const useSubjectSpecificQuestions = ({
         content: {
           question: uniqueQuestion.question,
           options: uniqueQuestion.options,
-          correctAnswer: uniqueQuestion.correctAnswer,
+          correctAnswer: correctAnswerIndex,
           explanation: uniqueQuestion.explanation || 'Great job working through this problem!'
         }
       };
