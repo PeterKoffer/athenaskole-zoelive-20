@@ -26,36 +26,25 @@ const EnhancedActivityRenderer = ({
     activityPhase: activity.phase,
     activityTitle: activity.title,
     hasContent: !!activity.content,
-    contentStructure: {
-      correctAnswer: activity.content.correctAnswer,
-      correct: activity.content.correct,
-      options: activity.content.options?.length || 0,
-      segments: activity.content.segments?.length || 0
-    }
+    selectedAnswer,
+    showResult
   });
 
-  // Helper function to get the correct answer index consistently
   const getCorrectAnswerIndex = () => {
-    // Direct correctAnswer property
     if (activity.content.correctAnswer !== undefined) {
-      console.log('✅ Found correctAnswer:', activity.content.correctAnswer);
       return activity.content.correctAnswer;
     }
     
-    // Alternative 'correct' property
     if (activity.content.correct !== undefined) {
-      console.log('✅ Found correct:', activity.content.correct);
       return activity.content.correct;
     }
     
-    // Fallback for content-delivery phase with segments
     if (activity.content.segments?.[0]?.checkQuestion?.correctAnswer !== undefined) {
-      console.log('✅ Found segment correctAnswer:', activity.content.segments[0].checkQuestion.correctAnswer);
       return activity.content.segments[0].checkQuestion.correctAnswer;
     }
     
-    console.warn('⚠️ No correct answer found for activity:', activity.id, 'Content:', activity.content);
-    return 0; // Default fallback
+    console.warn('⚠️ No correct answer found for activity:', activity.id);
+    return 0;
   };
 
   const playAudio = (text: string) => {
@@ -69,12 +58,12 @@ const EnhancedActivityRenderer = ({
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return;
+    console.log('🎯 User selected answer:', answerIndex);
     setSelectedAnswer(answerIndex);
-    console.log('🎯 Answer selected:', answerIndex);
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer === null) return;
+    if (selectedAnswer === null || showResult) return;
     
     const responseTime = Date.now() - startTime;
     const correctAnswerIndex = getCorrectAnswerIndex();

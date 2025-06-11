@@ -9,219 +9,251 @@ import { UnifiedLessonProvider } from "./contexts/UnifiedLessonContext";
 import EnhancedLessonManager from "./components/EnhancedLessonManager";
 import { LessonActivity } from "./components/types/LessonTypes";
 
-// Comprehensive math activities with all lesson phases restored
+// Diverse math activities with proper timing (total ~20 minutes = 1200 seconds)
 const mathActivities: LessonActivity[] = [
   {
     id: 'math-intro-1',
-    title: 'Welcome to Algebra Adventures!',
+    title: 'Welcome to Math Adventures!',
     type: 'introduction',
     phase: 'introduction',
-    duration: 180,
-    phaseDescription: 'Welcome introduction to algebra concepts',
+    duration: 60, // 1 minute
+    phaseDescription: 'Welcome introduction to math concepts',
     content: {
-      hook: 'Welcome to an amazing algebra adventure! Today we\'ll discover the magic of variables, solve exciting equations, and become mathematical detectives. Are you ready to unlock the secrets of algebra?'
+      hook: 'Welcome to an amazing math adventure! Today we\'ll explore numbers, shapes, patterns, and solve exciting problems. Get ready to become a math detective!'
     }
   },
+  
+  // COUNTING & BASIC OPERATIONS (3 minutes)
   {
-    id: 'math-content-1',
-    title: 'What Are Variables?',
-    type: 'content-delivery',
-    phase: 'content-delivery',
-    duration: 300,
-    phaseDescription: 'Understanding variables in algebra',
-    content: {
-      segments: [{
-        concept: 'Introduction to Variables',
-        explanation: 'Variables are like mystery boxes in mathematics! They are letters (like x, y, or z) that represent unknown numbers. Think of them as placeholders waiting to be solved. For example, if x = 5, then x + 3 = 8!',
-        checkQuestion: {
-          question: 'If a variable represents an unknown number, which of these is a variable?',
-          options: ['7', 'x', '15', '+'],
-          correctAnswer: 1,
-          explanation: 'Correct! The letter \'x\' is a variable because it represents an unknown value that we need to find.'
-        }
-      }]
-    }
-  },
-  {
-    id: 'math-content-2',
-    title: 'Understanding Expressions',
-    type: 'content-delivery',
-    phase: 'content-delivery',
-    duration: 350,
-    phaseDescription: 'Learning about algebraic expressions',
-    content: {
-      segments: [{
-        concept: 'Algebraic Expressions',
-        explanation: 'An algebraic expression is like a mathematical sentence with variables and numbers. For example, 2x + 5 means "two times some number, plus five." We can substitute different values for x to see what the expression equals!',
-        checkQuestion: {
-          question: 'In the expression 3y + 7, what does the "3y" mean?',
-          options: ['3 plus y', '3 times y', '3 divided by y', '3 minus y'],
-          correctAnswer: 1,
-          explanation: 'Excellent! When a number is written next to a variable like 3y, it means multiplication: 3 times y.'
-        }
-      }]
-    }
-  },
-  {
-    id: 'math-practice-1',
-    title: 'Solving Simple Equations',
+    id: 'math-counting-1',
+    title: 'Counting Fun with Animals',
     type: 'interactive-game',
     phase: 'interactive-game',
-    duration: 400,
-    phaseDescription: 'Practice solving basic equations',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Count objects and learn basic numbers',
     content: {
-      question: 'Let\'s solve our first equation! If 2x + 4 = 12, what is the value of x?',
-      options: ['x = 2', 'x = 4', 'x = 6', 'x = 8'],
-      correctAnswer: 1,
-      explanation: 'Perfect! To solve 2x + 4 = 12: First subtract 4 from both sides: 2x = 8. Then divide both sides by 2: x = 4. Great job!'
-    }
-  },
-  {
-    id: 'math-practice-2',
-    title: 'Variable Substitution Challenge',
-    type: 'interactive-game',
-    phase: 'interactive-game',
-    duration: 350,
-    phaseDescription: 'Practice substituting values into expressions',
-    content: {
-      question: 'If y = 6, what is the value of 3y - 8?',
-      options: ['10', '12', '14', '16'],
+      question: 'Count the animals: 🐶🐶🐶🐱🐱 How many pets are there in total?',
+      options: ['5 pets', '4 pets', '6 pets', '3 pets'],
       correctAnswer: 0,
-      explanation: 'Wonderful! Substitute y = 6 into 3y - 8: 3(6) - 8 = 18 - 8 = 10. You\'re becoming an algebra expert!'
+      explanation: 'Great counting! There are 3 dogs + 2 cats = 5 pets total!'
     }
   },
   {
-    id: 'math-practice-3',
-    title: 'Equation Detective Work',
+    id: 'math-addition-1',
+    title: 'Pizza Party Addition',
     type: 'interactive-game',
     phase: 'interactive-game',
-    duration: 400,
-    phaseDescription: 'More challenging equation solving',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Basic addition with real-world context',
     content: {
-      question: 'Detective challenge! If x + 7 = 15, what mysterious value is x hiding?',
-      options: ['x = 6', 'x = 7', 'x = 8', 'x = 9'],
-      correctAnswer: 2,
-      explanation: 'Amazing detective work! To find x in x + 7 = 15, subtract 7 from both sides: x = 15 - 7 = 8. Mystery solved!'
-    }
-  },
-  {
-    id: 'math-content-3',
-    title: 'Real-World Applications',
-    type: 'content-delivery',
-    phase: 'content-delivery',
-    duration: 380,
-    phaseDescription: 'How algebra applies to everyday life',
-    content: {
-      segments: [{
-        concept: 'Algebra in Daily Life',
-        explanation: 'Algebra is everywhere! When you calculate how much allowance you\'ll have after buying something, or figure out how many pizza slices each person gets at a party, you\'re using algebra. It helps us solve real problems!',
-        checkQuestion: {
-          question: 'Sarah has $20 and wants to buy books that cost $3 each. Which equation helps find how many books (b) she can buy?',
-          options: ['3 + b = 20', '3b = 20', 'b - 3 = 20', '20 - b = 3'],
-          correctAnswer: 1,
-          explanation: 'Perfect! Since each book costs $3 and she can buy b books, the total cost is 3b, which must equal her $20: 3b = 20.'
-        }
-      }]
-    }
-  },
-  {
-    id: 'math-practice-4',
-    title: 'Word Problem Adventure',
-    type: 'interactive-game',
-    phase: 'interactive-game',
-    duration: 450,
-    phaseDescription: 'Solving real-world word problems',
-    content: {
-      question: 'Adventure time! Tom collected some stickers. After giving away 5 stickers, he had 12 left. How many stickers did Tom start with?',
-      options: ['15 stickers', '17 stickers', '19 stickers', '21 stickers'],
+      question: 'At the pizza party, there are 4 cheese pizzas and 3 pepperoni pizzas. How many pizzas in total?',
+      options: ['6 pizzas', '7 pizzas', '8 pizzas', '5 pizzas'],
       correctAnswer: 1,
-      explanation: 'Excellent problem-solving! If Tom had 12 stickers after giving away 5, then he started with 12 + 5 = 17 stickers. You can also write this as: x - 5 = 12, so x = 17!'
+      explanation: 'Perfect! 4 + 3 = 7 pizzas. Everyone will have plenty to eat!'
     }
   },
+
+  // SHAPES & GEOMETRY (3 minutes)
   {
-    id: 'math-content-4',
-    title: 'Pattern Recognition',
+    id: 'math-shapes-intro',
+    title: 'Exploring Shapes Around Us',
     type: 'content-delivery',
     phase: 'content-delivery',
-    duration: 320,
-    phaseDescription: 'Finding patterns in algebraic sequences',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Learning about basic geometric shapes',
     content: {
       segments: [{
-        concept: 'Algebraic Patterns',
-        explanation: 'Patterns are the secret language of mathematics! In algebra, we can describe patterns using variables. For example, the pattern 2, 4, 6, 8... can be written as 2n, where n = 1, 2, 3, 4...',
+        concept: 'Basic Shapes',
+        explanation: 'Shapes are everywhere! A circle is round like a ball, a square has 4 equal sides like a window, and a triangle has 3 sides like a slice of pizza. Can you find shapes around your room?',
         checkQuestion: {
-          question: 'What\'s the next number in this pattern: 5, 10, 15, 20, ?',
-          options: ['23', '24', '25', '30'],
+          question: 'Which shape has 3 sides?',
+          options: ['Circle', 'Square', 'Triangle', 'Rectangle'],
           correctAnswer: 2,
-          explanation: 'Great pattern recognition! This sequence increases by 5 each time (5×1, 5×2, 5×3, 5×4, 5×5), so the next number is 25!'
+          explanation: 'Excellent! A triangle has exactly 3 sides and 3 corners.'
         }
       }]
     }
   },
   {
-    id: 'math-practice-5',
-    title: 'Pattern Equation Challenge',
+    id: 'math-shapes-game',
+    title: 'Shape Detective Challenge',
     type: 'interactive-game',
     phase: 'interactive-game',
-    duration: 400,
-    phaseDescription: 'Creating equations from patterns',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Identify shapes in everyday objects',
     content: {
-      question: 'Super challenge! If the pattern is 3, 7, 11, 15..., which equation represents the nth term?',
-      options: ['n + 3', '3n + 1', '4n - 1', '2n + 5'],
+      question: 'A clock face is what shape?',
+      options: ['Triangle', 'Square', 'Circle', 'Rectangle'],
       correctAnswer: 2,
-      explanation: 'Incredible work! The pattern increases by 4 each time. When n=1: 4(1)-1=3, n=2: 4(2)-1=7, n=3: 4(3)-1=11. The formula is 4n - 1!'
+      explanation: 'Correct! Clock faces are circles because they are perfectly round.'
+    }
+  },
+
+  // PATTERNS & SEQUENCES (3 minutes)
+  {
+    id: 'math-patterns-1',
+    title: 'Number Pattern Detective',
+    type: 'interactive-game',
+    phase: 'interactive-game',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Finding patterns in number sequences',
+    content: {
+      question: 'What comes next in this pattern? 2, 4, 6, 8, ?',
+      options: ['9', '10', '11', '12'],
+      correctAnswer: 1,
+      explanation: 'Amazing! The pattern adds 2 each time: 2, 4, 6, 8, 10. These are called even numbers!'
     }
   },
   {
-    id: 'math-content-5',
-    title: 'Advanced Problem Solving',
+    id: 'math-patterns-2',
+    title: 'Color Pattern Challenge',
+    type: 'interactive-game',
+    phase: 'interactive-game',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Recognizing visual patterns',
+    content: {
+      question: 'Complete the pattern: Red, Blue, Red, Blue, Red, ?',
+      options: ['Red', 'Blue', 'Green', 'Yellow'],
+      correctAnswer: 1,
+      explanation: 'Perfect pattern recognition! The colors alternate: Red, Blue, Red, Blue, so Blue comes next!'
+    }
+  },
+
+  // MEASUREMENT & TIME (3 minutes)
+  {
+    id: 'math-measurement-1',
+    title: 'Measuring with Fun',
     type: 'content-delivery',
     phase: 'content-delivery',
-    duration: 360,
-    phaseDescription: 'Strategic approaches to complex problems',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Understanding measurement concepts',
     content: {
       segments: [{
-        concept: 'Problem Solving Strategies',
-        explanation: 'Great mathematicians use strategies! When solving algebra problems: 1) Read carefully and identify what you know, 2) Choose a variable for what you don\'t know, 3) Write an equation, 4) Solve step by step, 5) Check your answer!',
+        concept: 'Big and Small, Long and Short',
+        explanation: 'We can measure how long, how tall, and how heavy things are! A pencil is shorter than a ruler. An elephant is heavier than a mouse. We use words like bigger, smaller, longer, and shorter to compare!',
         checkQuestion: {
-          question: 'What\'s the FIRST step when solving a word problem?',
-          options: ['Write an equation', 'Choose a variable', 'Read and understand the problem', 'Start calculating'],
-          correctAnswer: 2,
-          explanation: 'Absolutely right! Always read and understand the problem first. You need to know what the problem is asking before you can solve it!'
+          question: 'Which is longer?',
+          options: ['A paperclip', 'A school bus', 'A penny', 'A button'],
+          correctAnswer: 1,
+          explanation: 'Great thinking! A school bus is much longer than all the other objects!'
         }
       }]
     }
   },
   {
-    id: 'math-practice-6',
-    title: 'Multi-Step Challenge',
+    id: 'math-time-1',
+    title: 'Time Adventure',
     type: 'interactive-game',
     phase: 'interactive-game',
-    duration: 500,
-    phaseDescription: 'Complex problem with multiple steps',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Learning to tell time',
     content: {
-      question: 'Final challenge! A rectangle\'s length is 3 more than twice its width. If the width is 4 units, what\'s the length?',
-      options: ['7 units', '9 units', '11 units', '13 units'],
+      question: 'How many minutes are in one hour?',
+      options: ['30 minutes', '45 minutes', '60 minutes', '90 minutes'],
       correctAnswer: 2,
-      explanation: 'Outstanding! Length = 3 + 2×width. If width = 4, then length = 3 + 2(4) = 3 + 8 = 11 units. You\'ve mastered multi-step problems!'
+      explanation: 'Fantastic! There are 60 minutes in 1 hour. That\'s like 60 seconds in 1 minute!'
     }
   },
+
+  // MONEY & REAL-WORLD MATH (3 minutes)
+  {
+    id: 'math-money-1',
+    title: 'Counting Coins',
+    type: 'interactive-game',
+    phase: 'interactive-game',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Learning about money and counting coins',
+    content: {
+      question: 'If you have 2 quarters (25¢ each), how much money do you have?',
+      options: ['25¢', '40¢', '50¢', '75¢'],
+      correctAnswer: 2,
+      explanation: 'Excellent money math! 25¢ + 25¢ = 50¢. Two quarters make half a dollar!'
+    }
+  },
+  {
+    id: 'math-shopping-1',
+    title: 'Store Shopping Challenge',
+    type: 'interactive-game',
+    phase: 'interactive-game',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Real-world problem solving with money',
+    content: {
+      question: 'You want to buy a toy for $3 and a book for $2. How much do you need in total?',
+      options: ['$4', '$5', '$6', '$7'],
+      correctAnswer: 1,
+      explanation: 'Perfect shopping math! $3 + $2 = $5 total. You\'re ready to go shopping!'
+    }
+  },
+
+  // SUBTRACTION & PROBLEM SOLVING (3 minutes)
+  {
+    id: 'math-subtraction-1',
+    title: 'Cookie Subtraction Story',
+    type: 'interactive-game',
+    phase: 'interactive-game',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Learning subtraction through stories',
+    content: {
+      question: 'Mom baked 10 cookies. The family ate 3 cookies. How many cookies are left?',
+      options: ['6 cookies', '7 cookies', '8 cookies', '9 cookies'],
+      correctAnswer: 1,
+      explanation: 'Great subtraction! 10 - 3 = 7 cookies left. Yummy cookies for later!'
+    }
+  },
+  {
+    id: 'math-problem-solving-1',
+    title: 'Math Detective Mystery',
+    type: 'interactive-game',
+    phase: 'interactive-game',
+    duration: 90, // 1.5 minutes
+    phaseDescription: 'Multi-step problem solving',
+    content: {
+      question: 'There are 12 birds in a tree. 4 birds fly away, then 2 more birds come. How many birds are in the tree now?',
+      options: ['8 birds', '9 birds', '10 birds', '11 birds'],
+      correctAnswer: 2,
+      explanation: 'Amazing detective work! 12 - 4 = 8, then 8 + 2 = 10 birds. You solved the mystery!'
+    }
+  },
+
+  // MULTIPLICATION INTRO (2 minutes)
+  {
+    id: 'math-multiplication-1',
+    title: 'Groups and Multiplication Magic',
+    type: 'content-delivery',
+    phase: 'content-delivery',
+    duration: 120, // 2 minutes
+    phaseDescription: 'Introduction to multiplication concepts',
+    content: {
+      segments: [{
+        concept: 'Making Groups',
+        explanation: 'Multiplication is like making equal groups! If you have 3 bags with 2 apples each, that\'s 3 × 2 = 6 apples total. It\'s faster than counting 2 + 2 + 2!',
+        checkQuestion: {
+          question: 'If you have 4 boxes with 3 toys each, how many toys in total?',
+          options: ['7 toys', '10 toys', '12 toys', '15 toys'],
+          correctAnswer: 2,
+          explanation: 'Wonderful! 4 × 3 = 12 toys. You have 4 groups of 3 toys each!'
+        }
+      }]
+    }
+  },
+
+  // SUMMARY & CELEBRATION (1 minute)
   {
     id: 'math-summary',
-    title: 'Algebra Mastery Summary',
+    title: 'Math Adventure Complete!',
     type: 'content-delivery',
     phase: 'content-delivery',
-    duration: 240,
-    phaseDescription: 'Reviewing key concepts learned',
+    duration: 60, // 1 minute
+    phaseDescription: 'Celebrating math learning achievements',
     content: {
       segments: [{
-        concept: 'What We\'ve Learned',
-        explanation: 'Congratulations! You\'ve learned that variables are mystery numbers waiting to be solved, expressions combine variables and numbers, equations can be solved step-by-step, and algebra helps us solve real-world problems. You\'re now ready for more advanced mathematical adventures!',
+        concept: 'You\'re a Math Star!',
+        explanation: 'Congratulations! You\'ve learned about counting, shapes, patterns, time, money, and problem-solving. Math is everywhere around us, and you\'re becoming a real math detective! Keep practicing and exploring numbers!',
         checkQuestion: {
-          question: 'What\'s the most important thing to remember about algebra?',
-          options: ['It\'s only about numbers', 'It helps solve real problems', 'It\'s too difficult', 'Variables are scary'],
-          correctAnswer: 1,
-          explanation: 'Perfect! Algebra is a powerful tool that helps us solve real-world problems and understand patterns in our world. Keep practicing and you\'ll become even better!'
+          question: 'What\'s your favorite thing about math?',
+          options: ['Solving problems', 'Finding patterns', 'Counting things', 'All of the above!'],
+          correctAnswer: 3,
+          explanation: 'Perfect answer! Math has so many exciting parts, and you can enjoy them all!'
         }
       }]
     }
@@ -247,7 +279,7 @@ const EnhancedMathematicsLearningContent = () => {
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <Calculator className="w-16 h-16 text-lime-400 mx-auto mb-4 animate-pulse" />
-          <p className="text-lg">Loading your comprehensive Mathematics lesson with Nelie...</p>
+          <p className="text-lg">Loading your diverse Mathematics lesson with Nelie...</p>
         </div>
       </div>
     );
@@ -260,7 +292,7 @@ const EnhancedMathematicsLearningContent = () => {
       <div className="max-w-4xl mx-auto p-6">
         <EnhancedLessonManager
           subject="Mathematics"
-          skillArea="Algebra Fundamentals"
+          skillArea="Mixed Math Skills"
           onBackToProgram={handleBackToProgram}
         />
       </div>
