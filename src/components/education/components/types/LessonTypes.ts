@@ -49,10 +49,12 @@ export interface LessonActivity {
     
     // Summary phase
     keyTakeaways?: string[];
+    whatNext?: string;
     selfAssessment?: {
       question: string;
       options: string[];
       correctAnswer: number;
+      explanation: string;
     };
     nextTopicSuggestion?: string;
     
