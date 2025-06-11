@@ -45,6 +45,7 @@ export const useExtendedLessonManager = ({
 
   const { baseLessonActivities } = useLessonContentGeneration({ subject });
   const [hasGeneratedInitialQuestions, setHasGeneratedInitialQuestions] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // Ensure we always have interactive questions mixed with content
   const allActivities = [
@@ -78,24 +79,38 @@ export const useExtendedLessonManager = ({
   // Generate initial questions immediately when lesson starts
   useEffect(() => {
     if (!hasGeneratedInitialQuestions && !isGeneratingQuestion) {
-      console.log('🎯 Generating initial interactive questions for lesson...');
+      console.log('🎯 Starting initial question generation for lesson...');
       setHasGeneratedInitialQuestions(true);
       
       // Generate questions immediately to ensure interactive content
       const generateInitialQuestions = async () => {
-        for (let i = 0; i < 6; i++) { // Generate more questions
+        console.log('🔄 Generating 8 initial questions...');
+        
+        for (let i = 0; i < 8; i++) { // Generate 8 questions for good variety
           try {
+            console.log(`📝 Generating question ${i + 1}/8...`);
             const newActivity = await generateDynamicActivity();
             if (newActivity) {
-              setDynamicActivities(prev => [...prev, newActivity]);
-              console.log(`✅ Generated question ${i + 1}:`, newActivity.content.question);
+              setDynamicActivities(prev => {
+                const updated = [...prev, newActivity];
+                console.log(`✅ Added question ${i + 1}: ${newActivity.content.question.substring(0, 50)}...`);
+                return updated;
+              });
+            } else {
+              console.warn(`⚠️ Failed to generate question ${i + 1}`);
             }
           } catch (error) {
-            console.error(`❌ Failed to generate question ${i + 1}:`, error);
+            console.error(`❌ Error generating question ${i + 1}:`, error);
           }
-          // Small delay between generations
-          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Small delay between generations to prevent overwhelming
+          if (i < 7) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
         }
+        
+        console.log('✅ Initial question generation completed');
+        setIsInitializing(false);
       };
       
       generateInitialQuestions();
@@ -108,21 +123,21 @@ export const useExtendedLessonManager = ({
     const remainingActivities = allActivities.length - currentActivityIndex - 1;
     const estimatedRemainingTime = remainingActivities * 2; // 2 minutes per activity average
     
-    return currentMinutes + estimatedRemainingTime < targetLessonLength && dynamicActivities.length < 10;
+    return currentMinutes + estimatedRemainingTime < targetLessonLength && dynamicActivities.length < 12;
   }, [timeElapsed, allActivities.length, currentActivityIndex, targetLessonLength, dynamicActivities.length]);
 
   // Auto-generate more activities if lesson is too short
   useEffect(() => {
-    if (currentActivityIndex > 0 && shouldExtendLesson() && !isGeneratingQuestion) {
+    if (currentActivityIndex > 0 && shouldExtendLesson() && !isGeneratingQuestion && !isInitializing) {
       console.log('📚 Lesson needs more content, generating additional questions...');
       generateDynamicActivity().then(newActivity => {
         if (newActivity) {
           setDynamicActivities(prev => [...prev, newActivity]);
-          console.log('✅ Added additional question:', newActivity.content.question);
+          console.log('✅ Added additional question:', newActivity.content.question.substring(0, 50) + '...');
         }
       });
     }
-  }, [currentActivityIndex, shouldExtendLesson, generateDynamicActivity, isGeneratingQuestion, setDynamicActivities]);
+  }, [currentActivityIndex, shouldExtendLesson, generateDynamicActivity, isGeneratingQuestion, setDynamicActivities, isInitializing]);
 
   return {
     currentActivityIndex,
@@ -134,6 +149,7 @@ export const useExtendedLessonManager = ({
     correctStreak,
     questionsGenerated,
     targetLessonLength,
+    isInitializing,
     engagementLevel: teachingEngine.engagementLevel,
     adaptiveSpeed: teachingEngine.adaptiveSpeed,
     isSpeaking: teachingEngine.isSpeaking,
