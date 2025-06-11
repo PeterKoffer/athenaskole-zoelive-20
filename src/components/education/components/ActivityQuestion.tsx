@@ -86,7 +86,7 @@ const ActivityQuestion = ({
                   {showResult && isCorrect && (
                     <CheckCircle className="w-5 h-5 ml-2 text-green-400" />
                   )}
-                  {showResult && isIncorrected && (
+                  {showResult && isIncorrect && (
                     <XCircle className="w-5 h-5 ml-2 text-red-400" />
                   )}
                 </Button>

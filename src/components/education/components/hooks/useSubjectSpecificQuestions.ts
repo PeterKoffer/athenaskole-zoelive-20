@@ -125,8 +125,8 @@ export const useSubjectSpecificQuestions = ({
       const sessionVariation = sessionQuestions.length + 1;
       
       // Generate truly unique numbers for math problems
-      const num1 = 13 + (randomSeed % 47) + sessionVariation * 3;
-      const num2 = 7 + (randomSeed % 23) + sessionVariation * 2;
+      let num1 = 13 + (randomSeed % 47) + sessionVariation * 3;
+      let num2 = 7 + (randomSeed % 23) + sessionVariation * 2;
       const operation = ['+', '-', '*'][randomSeed % 3];
       
       let result, questionText, explanation;

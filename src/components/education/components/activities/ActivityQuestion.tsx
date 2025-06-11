@@ -27,6 +27,39 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
     hasSubmitted
   });
 
+  // Play sound effect for correct/incorrect answers
+  const playSound = (isCorrect: boolean) => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      if (isCorrect) {
+        // Success sound: ascending chime
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } else {
+        // Error sound: low buzz
+        oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+        oscillator.type = 'square';
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+      }
+    } catch (error) {
+      console.log('🔇 Audio not available:', error);
+    }
+  };
+
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult || hasSubmitted) {
       console.log('🚫 Answer selection blocked - already submitted or showing result');
@@ -56,6 +89,9 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
       isCorrect,
       activityId: activity.id
     });
+
+    // Play sound effect immediately
+    playSound(isCorrect);
 
     // Immediately trigger sound effect and progression
     setTimeout(() => {
