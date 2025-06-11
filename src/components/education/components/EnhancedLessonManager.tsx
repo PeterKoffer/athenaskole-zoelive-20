@@ -10,7 +10,7 @@ import EnhancedActivityRenderer from './EnhancedActivityRenderer';
 import SpeechTestCard from './SpeechTestCard';
 import { useSimpleMobileSpeech } from '@/hooks/useSimpleMobileSpeech';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -26,6 +26,7 @@ const EnhancedLessonManager = ({
   onBack
 }: EnhancedLessonManagerProps) => {
   const { isAdmin } = useRoleAccess();
+  const assignmentSectionRef = useRef<HTMLDivElement>(null);
   
   // Use simplified speech system
   const simpleSpeech = useSimpleMobileSpeech();
@@ -61,6 +62,23 @@ const EnhancedLessonManager = ({
       }, 2000);
     }
   }, [simpleSpeech.isReady, simpleSpeech.hasUserInteracted]);
+
+  // Auto-scroll to assignment section when activity changes to interactive phases
+  useEffect(() => {
+    if (currentActivity && 
+        (currentActivity.phase === 'interactive-game' || 
+         currentActivity.phase === 'application' || 
+         currentActivity.phase === 'creative-exploration')) {
+      
+      // Scroll to assignment section with smooth animation
+      setTimeout(() => {
+        assignmentSectionRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 1000); // Delay to allow content to render
+    }
+  }, [currentActivity?.phase, currentActivityIndex]);
 
   const handleMuteToggle = useCallback(() => {
     simpleSpeech.toggleEnabled();
@@ -105,14 +123,14 @@ const EnhancedLessonManager = ({
 
   if (!currentActivity) {
     return (
-      <div className="min-h-screen w-full bg-gray-900 p-2 sm:p-4">
+      <div className="min-h-screen w-full bg-slate-950 p-2 sm:p-4">
         <div className="w-full max-w-4xl mx-auto">
-          <Card className="bg-gray-900 border-gray-800 w-full">
+          <Card className="bg-slate-900 border-slate-800 w-full">
             <CardContent className="p-4 sm:p-8 text-center text-white">
               <div className="animate-spin w-6 h-6 sm:w-8 sm:h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-sm sm:text-base">Nelie is preparing your {targetLessonLength}-minute lesson...</p>
               {questionsGenerated > 0 && (
-                <p className="text-xs sm:text-sm text-gray-400 mt-2">
+                <p className="text-xs sm:text-sm text-slate-400 mt-2">
                   Generated {questionsGenerated} questions so far
                 </p>
               )}
@@ -124,13 +142,13 @@ const EnhancedLessonManager = ({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-900">
+    <div className="min-h-screen w-full bg-slate-950">
       <div className="w-full max-w-4xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6">
         {/* Speech Test Card - only show for admin users */}
         {isAdmin() && <SpeechTestCard />}
 
         {/* Progress Header - Fixed positioning */}
-        <div className="w-full sticky top-0 z-10 bg-gray-900 pb-2">
+        <div className="w-full sticky top-0 z-10 bg-slate-950 pb-2">
           <LessonProgressHeader
             timeElapsed={timeElapsed}
             score={score}
@@ -140,7 +158,7 @@ const EnhancedLessonManager = ({
         </div>
 
         {/* Lesson info card */}
-        <Card className="bg-blue-900/20 border-blue-700 w-full">
+        <Card className="bg-blue-950/30 border-blue-800 w-full">
           <CardContent className="p-3 sm:p-4 text-center">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm">
               <span className="text-blue-300">
@@ -158,7 +176,7 @@ const EnhancedLessonManager = ({
         </Card>
 
         {/* Speech Status */}
-        <Card className="bg-green-900/20 border-green-700 w-full">
+        <Card className="bg-green-950/30 border-green-800 w-full">
           <CardContent className="p-3 sm:p-4 text-center">
             <p className="text-green-300 text-xs sm:text-sm">
               🎤 Nelie's voice is {simpleSpeech.isEnabled ? 'enabled' : 'muted'} - 
@@ -203,8 +221,8 @@ const EnhancedLessonManager = ({
           stopSpeaking={simpleSpeech.stop}
         />
 
-        {/* Activity Content */}
-        <div className="w-full">
+        {/* Assignment Section - Reference for auto-scroll */}
+        <div ref={assignmentSectionRef} className="w-full">
           <EnhancedActivityRenderer
             activity={currentActivity}
             onActivityComplete={handleActivityCompleteWithSound}

@@ -27,11 +27,23 @@ const ActivityIntroduction = ({
 
   const handleStartClick = () => {
     setHasStarted(true);
+    
+    // Trigger scroll to assignment section after short delay
+    setTimeout(() => {
+      const assignmentSection = document.querySelector('[data-assignment-section]');
+      if (assignmentSection) {
+        assignmentSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 500);
+    
     onContinue();
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-700 mx-2 sm:mx-0">
+    <Card className="bg-slate-900 border-slate-700 mx-2 sm:mx-0">
       <CardHeader className="p-4 sm:p-6">
         <CardTitle className="text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-lg sm:text-xl">
           <span className="break-words">{activity.title}</span>
@@ -43,17 +55,17 @@ const ActivityIntroduction = ({
       </CardHeader>
       
       <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-        <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-lg p-4 sm:p-6 border border-blue-700/50">
+        <div className="bg-gradient-to-r from-blue-950/50 to-purple-950/50 rounded-lg p-4 sm:p-6 border border-blue-800/50">
           <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Welcome to Your Learning Journey!</h3>
-          <p className="text-gray-200 text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-200 text-base sm:text-lg leading-relaxed">
             {activity.content.hook || activity.content.text || 'Let\'s begin this exciting lesson together!'}
           </p>
         </div>
 
         {isNelieReady && (
-          <div className="bg-gray-700 rounded-lg p-3 sm:p-4 border-l-4 border-green-500">
+          <div className="bg-slate-800 rounded-lg p-3 sm:p-4 border-l-4 border-green-500">
             <p className="text-green-400 font-medium text-sm sm:text-base">🎤 Nelie is ready to guide you!</p>
-            <p className="text-gray-300 text-xs sm:text-sm">Your AI learning companion will help explain concepts and answer questions.</p>
+            <p className="text-slate-300 text-xs sm:text-sm">Your AI learning companion will help explain concepts and answer questions.</p>
           </div>
         )}
 
