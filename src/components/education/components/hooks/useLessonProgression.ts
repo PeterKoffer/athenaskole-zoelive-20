@@ -41,7 +41,6 @@ export const useLessonProgression = ({
 }: UseLessonProgressionProps) => {
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
-    totalActivities: allActivities.length,
     timeElapsed,
     correctStreak,
     score,

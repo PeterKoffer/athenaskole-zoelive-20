@@ -1,8 +1,8 @@
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX } from 'lucide-react';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import { Volume2, VolumeX, RotateCcw } from 'lucide-react';
 
 interface NelieAvatarSectionProps {
   subject: string;
@@ -23,56 +23,85 @@ const NelieAvatarSection = ({
   onMuteToggle,
   onReadQuestion
 }: NelieAvatarSectionProps) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (isSpeaking) {
+      setIsAnimating(true);
+    } else {
+      const timer = setTimeout(() => setIsAnimating(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSpeaking]);
+
+  const getSubjectColor = (subject: string) => {
+    switch (subject) {
+      case 'mathematics': return 'from-blue-500 to-cyan-500';
+      case 'english': return 'from-purple-500 to-violet-500';
+      case 'science': return 'from-green-500 to-emerald-500';
+      case 'music': return 'from-orange-500 to-yellow-500';
+      case 'computer-science': return 'from-indigo-500 to-purple-500';
+      case 'creative-arts': return 'from-pink-500 to-rose-500';
+      default: return 'from-gray-500 to-gray-600';
+    }
+  };
+
+  const getSubjectEmoji = (subject: string) => {
+    switch (subject) {
+      case 'mathematics': return '🔢';
+      case 'english': return '📚';
+      case 'science': return '🔬';
+      case 'music': return '🎵';
+      case 'computer-science': return '💻';
+      case 'creative-arts': return '🎨';
+      default: return '📖';
+    }
+  };
+
   return (
-    <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400 w-full">
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-          {/* Avatar and Info Section */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            <RobotAvatar size="xl" isActive={true} isSpeaking={isSpeaking} />
-            <div className="text-white flex-1">
-              <h3 className="text-base sm:text-lg font-semibold">Nelie is here to help!</h3>
-              <p className="text-purple-200 text-sm sm:text-base">
-                Working on {subject} • Question {currentQuestionIndex + 1} of {totalQuestions}
+    <Card className="bg-gray-800 border-gray-700 overflow-hidden">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            {/* Nelie Avatar */}
+            <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${getSubjectColor(subject)} flex items-center justify-center ${isAnimating ? 'animate-pulse' : ''}`}>
+              <div className="text-2xl">
+                {getSubjectEmoji(subject)}
+              </div>
+              {isSpeaking && (
+                <div className="absolute -inset-1 rounded-full border-2 border-lime-400 animate-ping"></div>
+              )}
+            </div>
+
+            {/* Nelie Info */}
+            <div>
+              <h3 className="text-white font-semibold">
+                Nelie - Your {subject.charAt(0).toUpperCase() + subject.slice(1)} Tutor
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Question {currentQuestionIndex + 1} of {totalQuestions}
               </p>
             </div>
           </div>
-          
-          {/* Button Controls Section - Properly Aligned */}
-          <div className="flex flex-col gap-2 sm:gap-0 sm:flex-row sm:items-center sm:space-x-3 w-full sm:w-auto">
+
+          {/* Controls */}
+          <div className="flex items-center space-x-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => {
-                console.log('🔊 Mute button clicked, autoReadEnabled:', autoReadEnabled);
-                onMuteToggle();
-              }}
-              className="bg-white text-purple-900 border-purple-400 hover:bg-purple-50 w-full sm:w-auto h-9 px-3 flex items-center justify-center gap-2"
+              onClick={onMuteToggle}
+              className={`${autoReadEnabled ? 'text-lime-400 hover:text-lime-300' : 'text-gray-400 hover:text-gray-300'}`}
             >
-              {autoReadEnabled ? (
-                <Volume2 className="w-4 h-4" />
-              ) : (
-                <VolumeX className="w-4 h-4" />
-              )}
-              <span className="text-sm font-medium">
-                {autoReadEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
-              </span>
+              {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
             
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => {
-                console.log('🔊 Read button clicked, autoReadEnabled:', autoReadEnabled);
-                onReadQuestion();
-              }}
-              className="bg-white text-purple-900 border-purple-400 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto h-9 px-3 flex items-center justify-center gap-2"
-              disabled={!autoReadEnabled}
+              onClick={onReadQuestion}
+              className="text-blue-400 hover:text-blue-300"
             >
-              <Volume2 className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {isSpeaking ? 'Nelie is speaking...' : 'Ask Nelie to repeat'}
-              </span>
+              <RotateCcw className="w-4 h-4" />
             </Button>
           </div>
         </div>

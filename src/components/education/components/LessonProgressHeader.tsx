@@ -7,13 +7,22 @@ interface LessonProgressHeaderProps {
   score: number;
   currentActivityIndex: number;
   totalActivities: number;
+  targetLessonLength?: number;
+  correctStreak?: number;
+  engagementLevel?: number;
+  questionsGenerated?: number;
+  onBackToProgram?: () => void;
 }
 
 const LessonProgressHeader = ({
   timeElapsed,
   score,
   currentActivityIndex,
-  totalActivities
+  totalActivities,
+  targetLessonLength = 20,
+  correctStreak,
+  engagementLevel,
+  questionsGenerated
 }: LessonProgressHeaderProps) => {
   return (
     <Card className="bg-gray-800 border-gray-700">
@@ -22,7 +31,7 @@ const LessonProgressHeader = ({
           <div className="flex items-center space-x-4">
             <Clock className="w-5 h-5 text-lime-400" />
             <span className="text-sm">
-              {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / 20:00
+              {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / {targetLessonLength}:00
             </span>
           </div>
           <div className="flex items-center space-x-4">

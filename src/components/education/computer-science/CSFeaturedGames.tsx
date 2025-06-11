@@ -1,120 +1,118 @@
 
-import { useState } from "react";
-import { Star } from "lucide-react";
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Code, Zap, Brain, ArrowLeft } from 'lucide-react';
 import EnhancedLessonManager from '../components/EnhancedLessonManager';
 
-interface CSFeaturedGamesProps {
-  onGameSelect: (gameId: string) => void;
-}
-
-const featuredGames = [
-  {
-    id: 'robot-programming-challenge',
-    title: 'Robot Programming Challenge',
-    description: 'Program your robot companion to navigate mazes and solve puzzles using basic coding concepts!',
-    skillArea: 'programming-basics',
-    difficulty: 'beginner',
-    timeEstimate: '25-30 min',
-    tags: ['basic programming', 'logical thinking']
-  },
-  {
-    id: 'algorithm-puzzle-palace',
-    title: 'Algorithm Puzzle Palace',
-    description: 'Solve algorithmic puzzles and optimize solutions in this strategy-based computer science adventure!',
-    skillArea: 'algorithms-logic',
-    difficulty: 'intermediate',
-    timeEstimate: '30-35 min',
-    tags: ['algorithms', 'optimization']
-  },
-  {
-    id: 'web-design-studio',
-    title: 'Web Design Studio',
-    description: 'Create and design websites using HTML, CSS, and basic web development principles!',
-    skillArea: 'web-development',
-    difficulty: 'beginner',
-    timeEstimate: '25-30 min',
-    tags: ['web development', 'html', 'css']
-  }
-];
-
-const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
+const CSFeaturedGames = () => {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
-  const handlePlayNow = (gameId: string, skillArea: string) => {
-    console.log('🎮 Starting game lesson:', gameId, 'for skill area:', skillArea);
-    setSelectedGame(skillArea);
-    onGameSelect(gameId);
-  };
+  const featuredGames = [
+    {
+      id: 'coding-basics',
+      title: 'Coding Fundamentals',
+      description: 'Learn the building blocks of programming with interactive exercises',
+      icon: Code,
+      difficulty: 'Beginner',
+      duration: '15-20 min',
+      color: 'from-blue-500 to-cyan-500',
+      skillArea: 'programming-basics'
+    },
+    {
+      id: 'algorithm-adventure',
+      title: 'Algorithm Adventure',
+      description: 'Solve puzzles using computational thinking and logic',
+      icon: Brain,
+      difficulty: 'Intermediate',
+      duration: '20-25 min',
+      color: 'from-purple-500 to-pink-500',
+      skillArea: 'algorithms'
+    },
+    {
+      id: 'ai-exploration',
+      title: 'AI & Machine Learning Basics',
+      description: 'Discover how artificial intelligence works through hands-on activities',
+      icon: Zap,
+      difficulty: 'Advanced',
+      duration: '25-30 min',
+      color: 'from-orange-500 to-red-500',
+      skillArea: 'artificial-intelligence'
+    }
+  ];
 
   const handleBackToGames = () => {
     setSelectedGame(null);
   };
 
-  const handleLessonComplete = () => {
-    console.log('🎉 Game lesson completed!');
-    setSelectedGame(null);
-  };
-
-  // If a game is selected, show the lesson
+  // Show lesson if game is selected
   if (selectedGame) {
+    const game = featuredGames.find(g => g.id === selectedGame);
     return (
-      <EnhancedLessonManager
-        subject="computer-science"
-        skillArea={selectedGame}
-        onLessonComplete={handleLessonComplete}
-        onBack={handleBackToGames}
-      />
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={handleBackToGames}
+            className="text-white hover:text-lime-400 hover:bg-gray-800"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Games
+          </Button>
+        </div>
+        <EnhancedLessonManager
+          subject="computer-science"
+          skillArea={game?.skillArea || 'programming-basics'}
+          onBackToProgram={handleBackToGames}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <Star className="w-5 h-5 text-yellow-400" />
-        <h3 className="text-lg font-semibold text-white">Featured Computer Science Games</h3>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-2">Featured Computer Science Games</h2>
+        <p className="text-gray-400">
+          Explore computational thinking through interactive coding challenges and AI adventures.
+        </p>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {featuredGames.map((game) => (
-          <Card key={game.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300 h-full flex flex-col">
-            <CardContent className="p-4 flex flex-col h-full">
-              <div className="flex justify-between items-start mb-3">
-                <Badge variant="outline" className="text-purple-400 border-purple-400">
-                  {game.difficulty}
-                </Badge>
-                <span className="text-xs text-gray-400">{game.timeEstimate}</span>
-              </div>
-              
-              <h4 className="text-white font-semibold mb-2">{game.title}</h4>
-              <p className="text-gray-400 text-sm mb-4 flex-grow">{game.description}</p>
-              
-              <div className="flex flex-wrap gap-1 mb-4">
-                {game.tags.slice(0, 2).map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs bg-gray-700 text-gray-300">
-                    {tag}
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredGames.map((game) => {
+          const IconComponent = game.icon;
+          
+          return (
+            <Card key={game.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg bg-gradient-to-r ${game.color}`}>
+                    <IconComponent className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-white">{game.title}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 mb-4">{game.description}</p>
+                
+                <div className="flex items-center justify-between mb-4">
+                  <Badge variant="outline" className="text-purple-400 border-purple-400">
+                    {game.difficulty}
                   </Badge>
-                ))}
-                {game.tags.length > 2 && (
-                  <Badge variant="secondary" className="text-xs bg-gray-700 text-gray-300">
-                    +{game.tags.length - 2} more
-                  </Badge>
-                )}
-              </div>
-              
-              <div className="mt-auto">
+                  <span className="text-gray-400 text-sm">{game.duration}</span>
+                </div>
+                
                 <Button 
-                  onClick={() => handlePlayNow(game.id, game.skillArea)}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={() => setSelectedGame(game.id)}
+                  className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white`}
                 >
-                  Play Now
+                  Start Game
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
