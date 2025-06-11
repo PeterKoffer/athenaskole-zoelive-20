@@ -94,9 +94,10 @@ export const UnifiedLessonProvider = ({
   // Enhanced teaching engine
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
-    difficulty: 3,
-    studentEngagement: 75,
-    learningSpeed: 'adaptive'
+    timeElapsed: Math.floor((Date.now() - lessonStartTime) / 1000),
+    correctStreak,
+    score: lessonState.score,
+    lessonStartTime
   });
 
   const currentActivity = allActivities[currentActivityIndex] || null;

@@ -14,7 +14,6 @@ const ComputerScienceLearning = () => {
         selectedMode, 
         performanceMetrics, 
         handleModeChange, 
-        handleGameSelect, 
         handleDifficultyChange 
       }) => (
         <div className="max-w-6xl mx-auto">
@@ -41,7 +40,6 @@ const ComputerScienceLearning = () => {
           ) : (
             <CSMainView
               performanceMetrics={performanceMetrics}
-              onGameSelect={handleGameSelect}
               onDifficultyChange={handleDifficultyChange}
             />
           )}

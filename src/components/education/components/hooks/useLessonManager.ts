@@ -31,9 +31,10 @@ export const useLessonManager = ({
   // Enhanced teaching engine configuration
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
-    difficulty: 3,
-    studentEngagement: 75,
-    learningSpeed: 'adaptive'
+    timeElapsed: Math.floor((Date.now() - lessonStartTime) / 1000),
+    correctStreak,
+    score,
+    lessonStartTime
   });
 
   // Generate optimized lesson activities for faster learning (15-18 minutes)
