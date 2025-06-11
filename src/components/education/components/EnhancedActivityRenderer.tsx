@@ -25,8 +25,26 @@ const EnhancedActivityRenderer = ({
     activityType: activity.type,
     activityPhase: activity.phase,
     activityTitle: activity.title,
-    hasContent: !!activity.content
+    hasContent: !!activity.content,
+    correctAnswer: activity.content.correctAnswer,
+    correct: activity.content.correct
   });
+
+  // Helper function to get the correct answer index consistently
+  const getCorrectAnswerIndex = () => {
+    if (activity.content.correctAnswer !== undefined) {
+      return activity.content.correctAnswer;
+    }
+    if (activity.content.correct !== undefined) {
+      return activity.content.correct;
+    }
+    // Fallback for content-delivery phase with segments
+    if (activity.content.segments?.[0]?.checkQuestion?.correctAnswer !== undefined) {
+      return activity.content.segments[0].checkQuestion.correctAnswer;
+    }
+    console.warn('⚠️ No correct answer found for activity:', activity.id);
+    return 0; // Default fallback
+  };
 
   const playAudio = (text: string) => {
     if ('speechSynthesis' in window) {
@@ -47,19 +65,15 @@ const EnhancedActivityRenderer = ({
     if (selectedAnswer === null) return;
     
     const responseTime = Date.now() - startTime;
-    let isCorrect = false;
-    
-    if (activity.content.correctAnswer !== undefined) {
-      isCorrect = selectedAnswer === activity.content.correctAnswer;
-    } else if (activity.content.correct !== undefined) {
-      isCorrect = selectedAnswer === activity.content.correct;
-    }
+    const correctAnswerIndex = getCorrectAnswerIndex();
+    const isCorrect = selectedAnswer === correctAnswerIndex;
     
     console.log('✅ Activity submitted:', {
       selectedAnswer,
-      correctAnswer: activity.content.correctAnswer || activity.content.correct,
+      correctAnswer: correctAnswerIndex,
       isCorrect,
-      responseTime
+      responseTime,
+      activityId: activity.id
     });
     
     setShowResult(true);
@@ -207,6 +221,8 @@ const EnhancedActivityRenderer = ({
   }
 
   if (activity.phase === 'interactive-game' || activity.type === 'interactive-game') {
+    const correctAnswerIndex = getCorrectAnswerIndex();
+    
     return (
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
@@ -251,21 +267,22 @@ const EnhancedActivityRenderer = ({
           {showResult && (
             <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-2">
-                {selectedAnswer === (activity.content.correctAnswer || activity.content.correct) ? (
+                {selectedAnswer === correctAnswerIndex ? (
                   <CheckCircle className="w-5 h-5 text-green-400" />
                 ) : (
                   <XCircle className="w-5 h-5 text-red-400" />
                 )}
                 <p className={`font-semibold ${
-                  selectedAnswer === (activity.content.correctAnswer || activity.content.correct)
+                  selectedAnswer === correctAnswerIndex
                     ? 'text-green-400' 
                     : 'text-red-400'
                 }`}>
-                  {selectedAnswer === (activity.content.correctAnswer || activity.content.correct) ? 'Excellent!' : 'Try again next time!'}
+                  {selectedAnswer === correctAnswerIndex ? 'Excellent!' : 'Try again next time!'}
                 </p>
               </div>
               <p className="text-gray-300">
-                {activity.content.explanation || `The correct answer is: ${activity.content.options?.[activity.content.correctAnswer || activity.content.correct]}`}
+                {activity.content.explanation || 
+                 `The correct answer is: ${activity.content.options?.[correctAnswerIndex] || 'Not available'}`}
               </p>
             </div>
           )}
