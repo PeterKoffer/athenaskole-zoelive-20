@@ -1,6 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { Home } from "lucide-react";
 import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
 
 interface CollapsedButtonProps {
@@ -43,24 +42,10 @@ const CollapsedButton = ({
     onTouchStart(e);
   };
 
-  const handleHomeClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onResetToHome();
-  };
-
   console.log('🎯 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
   
   return (
-    <div className="relative select-none flex items-center space-x-1">
-      <Button
-        onClick={handleHomeClick}
-        className="w-6 h-6 bg-gray-600 hover:bg-gray-500 text-white border-none rounded-full flex items-center justify-center shadow-lg p-0 min-w-0 z-10"
-        title="Go home"
-      >
-        <Home className="w-3 h-3" />
-      </Button>
-      
+    <div className="relative select-none flex items-center space-x-1">      
       <div
         onClick={handleClick}
         onMouseDown={handleMouseDown}

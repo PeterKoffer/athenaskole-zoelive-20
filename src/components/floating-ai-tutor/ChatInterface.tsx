@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send, X, Home, Volume2, VolumeX } from "lucide-react";
+import { Send, X, Volume2, VolumeX } from "lucide-react";
 import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
 import VoiceControls from "./VoiceControls";
 import { Message } from "./types";
@@ -105,14 +105,6 @@ const ChatInterface = ({
             )}
           </div>
           <div className="flex space-x-1">
-            <Button
-              onClick={onResetToHome}
-              variant="outline"
-              size="sm"
-              className="border-white/20 text-white bg-white/10 hover:bg-white/20 p-1"
-            >
-              <Home className="w-4 h-4" />
-            </Button>
             <Button
               onClick={onClose}
               variant="outline"
