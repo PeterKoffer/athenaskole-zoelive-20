@@ -1,6 +1,5 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import IntroductionHeader from './IntroductionHeader';
 import IntroductionContent from './IntroductionContent';
 import { useIntroductionFlow } from './hooks/useIntroductionFlow';
@@ -36,12 +35,6 @@ const NelieIntroduction = ({
 
   const handleStartLesson = () => {
     console.log('🎯 Starting lesson from Nelie introduction');
-    stopSpeaking();
-    onIntroductionComplete();
-  };
-
-  const handleSkipIntroduction = () => {
-    console.log('⏭️ Skipping Nelie introduction');
     stopSpeaking();
     onIntroductionComplete();
   };
@@ -82,26 +75,6 @@ const NelieIntroduction = ({
             onManualRead={handleManualRead}
             onStartLesson={handleStartLesson}
           />
-
-          {/* Add skip button for users who don't want the introduction */}
-          <div className="mt-6 flex justify-center space-x-4">
-            <Button
-              onClick={handleSkipIntroduction}
-              variant="outline"
-              className="border-purple-400 text-purple-200 hover:bg-purple-800"
-            >
-              Skip Introduction
-            </Button>
-            
-            {!isIntroductionComplete && (
-              <Button
-                onClick={handleManualRead}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                {isSpeaking ? 'Stop Reading' : 'Read Current Step'}
-              </Button>
-            )}
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -77,32 +77,38 @@ export const useIntroductionFlow = (subject: string) => {
           console.log('🔊 Nelie speaking step:', nextStep + 1);
           speak(nextStepText, true);
         }
-      }, 8000); // Increased from 5 seconds to 8 seconds per step for better pacing
+      }, 8000); // 8 seconds per step for better pacing
       
       return () => clearTimeout(timer);
     }
   }, [currentStep, hasStartedFlow, introductionSteps, isEnabled, speak]);
 
   const handleMuteToggleWrapper = useCallback(() => {
+    console.log('🔊 Mute toggle clicked, current enabled state:', isEnabled);
     if (!hasUserInteracted) {
       enableUserInteraction();
     }
     toggleEnabled();
-  }, [hasUserInteracted, enableUserInteraction, toggleEnabled]);
+  }, [hasUserInteracted, enableUserInteraction, toggleEnabled, isEnabled]);
 
   const handleManualRead = useCallback(() => {
+    console.log('🔊 Manual read button clicked');
     const currentStepText = introductionSteps[currentStep]?.text;
     if (currentStepText) {
       if (!hasUserInteracted) {
+        console.log('🔊 Enabling user interaction for manual read');
         enableUserInteraction();
       }
       
       if (isSpeaking) {
+        console.log('🔊 Stopping current speech');
         stop();
       } else {
-        console.log('🔊 Manual read requested:', currentStepText.substring(0, 50) + '...');
+        console.log('🔊 Starting manual read:', currentStepText.substring(0, 50) + '...');
         speak(currentStepText, true);
       }
+    } else {
+      console.warn('⚠️ No current step text available for manual read');
     }
   }, [currentStep, introductionSteps, isSpeaking, hasUserInteracted, speak, stop, enableUserInteraction]);
 

@@ -1,7 +1,6 @@
 
-import IntroductionSteps from './IntroductionSteps';
-import ProgressIndicator from './ProgressIndicator';
-import IntroductionControls from './IntroductionControls';
+import { Button } from '@/components/ui/button';
+import { Volume2, VolumeX, RotateCcw } from 'lucide-react';
 
 interface IntroductionContentProps {
   currentStepText: string;
@@ -28,21 +27,70 @@ const IntroductionContent = ({
 }: IntroductionContentProps) => {
   return (
     <>
-      <IntroductionSteps currentStepText={currentStepText} />
-      
-      <ProgressIndicator 
-        currentStep={currentStep} 
-        totalSteps={totalSteps} 
-      />
-      
-      <IntroductionControls
-        autoReadEnabled={autoReadEnabled}
-        isSpeaking={isSpeaking}
-        isIntroductionComplete={isIntroductionComplete}
-        onMuteToggle={onMuteToggle}
-        onManualRead={onManualRead}
-        onStartLesson={onStartLesson}
-      />
+      {/* Nelie's current message */}
+      <div className="bg-purple-800/30 rounded-lg p-6 mb-6">
+        <div className="text-purple-100 text-lg leading-relaxed mb-4">
+          {currentStepText}
+        </div>
+        
+        {/* Progress indicator */}
+        <div className="flex items-center space-x-2 mb-4">
+          <div className="text-purple-300 text-sm">
+            Step {currentStep + 1} of {totalSteps}
+          </div>
+          <div className="flex-1 bg-purple-900 rounded-full h-2">
+            <div 
+              className="bg-purple-400 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Simplified controls - only 2 buttons */}
+      <div className="flex justify-center gap-4">
+        <Button
+          onClick={onMuteToggle}
+          variant="outline"
+          className="border-purple-400 text-purple-200 hover:bg-purple-800"
+        >
+          {autoReadEnabled ? (
+            <>
+              <Volume2 className="w-4 h-4 mr-2" />
+              Sound On
+            </>
+          ) : (
+            <>
+              <VolumeX className="w-4 h-4 mr-2" />
+              Sound Off
+            </>
+          )}
+        </Button>
+        
+        <Button
+          onClick={onManualRead}
+          variant="outline"
+          className="border-purple-400 text-purple-200 hover:bg-purple-800"
+        >
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Ask Nelie to Repeat
+        </Button>
+      </div>
+
+      {/* Auto-advance message when complete */}
+      {isIntroductionComplete && (
+        <div className="mt-6 text-center">
+          <div className="text-purple-200 text-sm mb-3">
+            Introduction complete! Starting lesson in 3 seconds...
+          </div>
+          <Button
+            onClick={onStartLesson}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            Start Lesson Now
+          </Button>
+        </div>
+      )}
     </>
   );
 };
