@@ -46,8 +46,12 @@ export const useExtendedLessonManager = ({
   const { baseLessonActivities } = useLessonContentGeneration({ subject });
   const [hasGeneratedInitialQuestions, setHasGeneratedInitialQuestions] = useState(false);
 
-  // Combine base activities with dynamic ones
-  const allActivities = [...baseLessonActivities, ...dynamicActivities];
+  // Ensure we always have interactive questions mixed with content
+  const allActivities = [
+    ...baseLessonActivities.slice(0, 2), // First 2 base activities
+    ...dynamicActivities, // All dynamic questions
+    ...baseLessonActivities.slice(2) // Remaining base activities
+  ];
 
   const {
     teachingEngine,
@@ -77,9 +81,9 @@ export const useExtendedLessonManager = ({
       console.log('🎯 Generating initial interactive questions for lesson...');
       setHasGeneratedInitialQuestions(true);
       
-      // Generate 3-4 questions immediately
+      // Generate questions immediately to ensure interactive content
       const generateInitialQuestions = async () => {
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 6; i++) { // Generate more questions
           try {
             const newActivity = await generateDynamicActivity();
             if (newActivity) {
@@ -90,7 +94,7 @@ export const useExtendedLessonManager = ({
             console.error(`❌ Failed to generate question ${i + 1}:`, error);
           }
           // Small delay between generations
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       };
       
@@ -102,14 +106,14 @@ export const useExtendedLessonManager = ({
   const shouldExtendLesson = useCallback(() => {
     const currentMinutes = timeElapsed / 60;
     const remainingActivities = allActivities.length - currentActivityIndex - 1;
-    const estimatedRemainingTime = remainingActivities * 3; // 3 minutes per activity average
+    const estimatedRemainingTime = remainingActivities * 2; // 2 minutes per activity average
     
-    return currentMinutes + estimatedRemainingTime < targetLessonLength;
-  }, [timeElapsed, allActivities.length, currentActivityIndex, targetLessonLength]);
+    return currentMinutes + estimatedRemainingTime < targetLessonLength && dynamicActivities.length < 10;
+  }, [timeElapsed, allActivities.length, currentActivityIndex, targetLessonLength, dynamicActivities.length]);
 
   // Auto-generate more activities if lesson is too short
   useEffect(() => {
-    if (currentActivityIndex > 1 && shouldExtendLesson() && dynamicActivities.length < 8 && !isGeneratingQuestion) {
+    if (currentActivityIndex > 0 && shouldExtendLesson() && !isGeneratingQuestion) {
       console.log('📚 Lesson needs more content, generating additional questions...');
       generateDynamicActivity().then(newActivity => {
         if (newActivity) {
@@ -118,7 +122,7 @@ export const useExtendedLessonManager = ({
         }
       });
     }
-  }, [currentActivityIndex, shouldExtendLesson, dynamicActivities.length, generateDynamicActivity, isGeneratingQuestion, setDynamicActivities]);
+  }, [currentActivityIndex, shouldExtendLesson, generateDynamicActivity, isGeneratingQuestion, setDynamicActivities]);
 
   return {
     currentActivityIndex,

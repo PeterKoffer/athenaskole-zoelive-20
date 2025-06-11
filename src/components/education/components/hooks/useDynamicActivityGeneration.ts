@@ -61,6 +61,21 @@ const questionTemplates = {
       question: "What is the area of a rectangle with length 8 cm and width 5 cm?",
       options: ['26 cm²', '32 cm²', '40 cm²', '45 cm²'],
       correctAnswer: 2
+    },
+    {
+      question: "If you have 24 students and want to make groups of 6, how many groups will you have?",
+      options: ['3 groups', '4 groups', '5 groups', '6 groups'],
+      correctAnswer: 1
+    },
+    {
+      question: "What comes next in this pattern: 5, 10, 15, 20, ?",
+      options: ['22', '24', '25', '30'],
+      correctAnswer: 2
+    },
+    {
+      question: "If you buy 3 packs of pencils with 8 pencils each, how many pencils do you have?",
+      options: ['21 pencils', '24 pencils', '26 pencils', '28 pencils'],
+      correctAnswer: 1
     }
   ],
   science: [
@@ -110,7 +125,7 @@ export const useDynamicActivityGeneration = ({
     try {
       // Get subject-specific questions
       const subjectKey = subject.toLowerCase() as keyof typeof questionTemplates;
-      const availableQuestions = questionTemplates[subjectKey] || questionTemplates.english;
+      const availableQuestions = questionTemplates[subjectKey] || questionTemplates.mathematics;
       
       // Find unused questions
       const unusedIndices = availableQuestions
@@ -135,7 +150,7 @@ export const useDynamicActivityGeneration = ({
         title: `${subject} Practice Question ${questionsGenerated + 1}`,
         type: 'interactive-game',
         phase: 'interactive-game',
-        duration: 300, // 5 minutes
+        duration: 180, // 3 minutes for questions
         phaseDescription: `Practice question for ${subject}`,
         content: {
           question: selectedQuestion.question,

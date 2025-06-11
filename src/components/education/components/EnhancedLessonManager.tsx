@@ -45,21 +45,15 @@ const EnhancedLessonManager = ({
     onLessonComplete
   });
 
-  // Enable user interaction on any click in the lesson area
+  // Enable user interaction immediately when component loads
   useEffect(() => {
-    const handleUserInteraction = () => {
-      if (!consolidatedSpeech.hasUserInteracted) {
+    if (!consolidatedSpeech.hasUserInteracted) {
+      // Auto-enable user interaction after a brief delay
+      setTimeout(() => {
         consolidatedSpeech.enableUserInteraction();
-        console.log('✅ User interaction enabled for speech');
-      }
-    };
-
-    // Add click listener to document
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-    };
+        console.log('✅ Auto-enabled user interaction for speech');
+      }, 1000);
+    }
   }, [consolidatedSpeech]);
 
   // Test speech when ready and user has interacted
@@ -140,21 +134,20 @@ const EnhancedLessonManager = ({
             </span>
           </div>
           <p className="text-blue-400 text-xs mt-1">
-            Adaptive content that grows with your learning
+            Interactive questions and learning content
           </p>
         </CardContent>
       </Card>
 
-      {/* User Interaction Prompt */}
-      {!consolidatedSpeech.hasUserInteracted && (
-        <Card className="bg-yellow-900/20 border-yellow-700">
-          <CardContent className="p-3 sm:p-4 text-center">
-            <p className="text-yellow-300 text-xs sm:text-sm">
-              👆 Click anywhere to enable Nelie's voice guidance!
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {/* Speech Status */}
+      <Card className="bg-green-900/20 border-green-700">
+        <CardContent className="p-3 sm:p-4 text-center">
+          <p className="text-green-300 text-xs sm:text-sm">
+            🎤 Nelie's voice is {consolidatedSpeech.isEnabled ? 'enabled' : 'muted'} - 
+            {consolidatedSpeech.isSpeaking ? ' Currently speaking...' : ' Ready to help!'}
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Nelie Avatar Section */}
       <div className="flex justify-center">
