@@ -28,7 +28,7 @@ const EnhancedLessonManager = ({
     phase,
     isTimerActive,
     handleActivityComplete,
-    handleReadRequest
+    handleLessonStart
   } = useUnifiedLesson();
 
   console.log(`🎯 Enhanced ${subject} Lesson:`, {
@@ -46,7 +46,7 @@ const EnhancedLessonManager = ({
       <NelieIntroduction
         subject={subject}
         skillArea={skillArea}
-        onIntroductionComplete={handleReadRequest}
+        onIntroductionComplete={handleLessonStart}
       />
     );
   }
@@ -105,7 +105,12 @@ const EnhancedLessonManager = ({
         isReady={true}
         adaptiveSpeed={1.0}
         onMuteToggle={() => {}}
-        onManualRead={handleReadRequest}
+        onManualRead={() => {
+          if (currentActivity) {
+            console.log('🔊 Manual read request for:', currentActivity.title);
+            // Add speech logic here if needed
+          }
+        }}
         onResetProgress={() => window.location.reload()}
       />
     </div>

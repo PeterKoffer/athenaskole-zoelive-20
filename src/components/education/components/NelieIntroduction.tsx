@@ -29,6 +29,7 @@ const NelieIntroduction = ({
   const handleStartLesson = () => {
     console.log('🎯 Starting lesson from Nelie introduction');
     stopSpeaking();
+    // Call the callback to properly transition to lesson phase
     onIntroductionComplete();
   };
 
