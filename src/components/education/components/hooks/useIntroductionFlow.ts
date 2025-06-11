@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
+import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
 
 const getSubjectSpecificIntroduction = (subject: string) => {
   const baseSteps = [
@@ -26,80 +26,91 @@ const getSubjectSpecificIntroduction = (subject: string) => {
 
 export const useIntroductionFlow = (subject: string) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [hasStartedSpeech, setHasStartedSpeech] = useState(false);
+  const [hasStartedFlow, setHasStartedFlow] = useState(false);
   const introductionSteps = getSubjectSpecificIntroduction(subject);
   
   const {
     isSpeaking,
-    autoReadEnabled,
+    isEnabled,
     hasUserInteracted,
     isReady,
-    speakText,
-    stopSpeaking,
-    handleMuteToggle
-  } = useWorkingNelieSpeech();
+    speak,
+    stop,
+    toggleEnabled,
+    enableUserInteraction
+  } = useConsolidatedSpeech();
 
-  // Enhanced speech with personality for introductions
-  const speakWithEnthusiasm = useCallback((text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.1;
-      utterance.pitch = 1.1;
-      utterance.volume = 0.8;
+  // Start the introduction flow automatically
+  useEffect(() => {
+    if (!hasStartedFlow && isReady) {
+      console.log('🎯 Starting Nelie introduction flow');
+      setHasStartedFlow(true);
       
-      const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(voice => 
-        voice.name.includes('Google UK English Female') || 
-        voice.name.includes('Microsoft Zira') ||
-        voice.lang.startsWith('en')
-      );
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
+      // Enable user interaction immediately for introduction
+      if (!hasUserInteracted) {
+        enableUserInteraction();
       }
       
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-    } else {
-      speakText(text, true);
+      // Start speaking the first step after a short delay
+      setTimeout(() => {
+        const firstStep = introductionSteps[0]?.text;
+        if (firstStep && isEnabled) {
+          console.log('🔊 Nelie starting first introduction step');
+          speak(firstStep, true);
+        }
+      }, 1000);
     }
-  }, [speakText]);
+  }, [hasStartedFlow, isReady, introductionSteps, isEnabled, hasUserInteracted, speak, enableUserInteraction]);
 
-  // Auto-advance through introduction steps with longer delays
+  // Auto-advance through introduction steps
   useEffect(() => {
-    if (currentStep < introductionSteps.length - 1 && hasStartedSpeech) {
+    if (hasStartedFlow && currentStep < introductionSteps.length - 1) {
       const timer = setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
-      }, 4000); // Slower 4-second transitions
+        const nextStep = currentStep + 1;
+        setCurrentStep(nextStep);
+        
+        // Speak the next step
+        const nextStepText = introductionSteps[nextStep]?.text;
+        if (nextStepText && isEnabled) {
+          console.log('🔊 Nelie speaking step:', nextStep + 1);
+          speak(nextStepText, true);
+        }
+      }, 5000); // 5 seconds per step
       
       return () => clearTimeout(timer);
     }
-  }, [currentStep, introductionSteps, hasStartedSpeech]);
+  }, [currentStep, hasStartedFlow, introductionSteps, isEnabled, speak]);
 
   const handleMuteToggleWrapper = useCallback(() => {
     if (!hasUserInteracted) {
-      setHasStartedSpeech(false);
+      enableUserInteraction();
     }
-    handleMuteToggle();
-  }, [handleMuteToggle, hasUserInteracted]);
+    toggleEnabled();
+  }, [hasUserInteracted, enableUserInteraction, toggleEnabled]);
 
   const handleManualRead = useCallback(() => {
     const currentStepText = introductionSteps[currentStep]?.text;
     if (currentStepText) {
+      if (!hasUserInteracted) {
+        enableUserInteraction();
+      }
+      
       if (isSpeaking) {
-        stopSpeaking();
+        stop();
       } else {
-        speakWithEnthusiasm(currentStepText);
+        console.log('🔊 Manual read requested:', currentStepText.substring(0, 50) + '...');
+        speak(currentStepText, true);
       }
     }
-  }, [currentStep, introductionSteps, isSpeaking, speakWithEnthusiasm, stopSpeaking]);
+  }, [currentStep, introductionSteps, isSpeaking, hasUserInteracted, speak, stop, enableUserInteraction]);
 
   return {
     currentStep,
     introductionSteps,
     isSpeaking,
-    autoReadEnabled,
+    autoReadEnabled: isEnabled,
     handleMuteToggle: handleMuteToggleWrapper,
     handleManualRead,
-    stopSpeaking
+    stopSpeaking: stop
   };
 };
