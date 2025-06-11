@@ -104,7 +104,7 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
                   variant="outline"
                   className={`w-full text-left justify-start p-4 h-auto transition-colors ${
                     selectedAnswer === index
-                      ? "bg-green-500 text-white border-green-500"
+                      ? "bg-blue-500 text-white border-blue-500"
                       : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
                   }`}
                   onClick={() => handleAnswerSelect(index)}
