@@ -1,45 +1,64 @@
 
-import { Button } from "@/components/ui/button";
-import { Lock } from "lucide-react";
-import { UserRole, RoleConfig } from "@/types/auth";
-import { roleIcons, roleColors, restrictedRoles } from "./roleConstants";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { LucideIcon } from "lucide-react";
+import { UserRole } from "@/types/auth";
 
 interface RoleCardProps {
   role: UserRole;
-  config: RoleConfig;
-  onRoleClick: (role: UserRole) => void;
+  config: {
+    title: string;
+    description: string;
+    icon: LucideIcon;
+    color: string;
+  };
+  isRestricted: boolean;
+  onClick: () => void;
 }
 
-const RoleCard = ({ role, config, onRoleClick }: RoleCardProps) => {
-  const IconComponent = roleIcons[role];
-  const colorClass = roleColors[role];
-  const requiresClearance = restrictedRoles.includes(role);
+const RoleCard = ({ role, config, isRestricted, onClick }: RoleCardProps) => {
+  const Icon = config.icon;
 
   return (
-    <Button
-      variant="outline"
-      className="h-auto p-6 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white flex flex-col items-center justify-center space-y-4 min-h-[200px] relative"
-      onClick={() => onRoleClick(role)}
+    <Card 
+      className="bg-gray-700 border-gray-600 hover:bg-gray-600 transition-colors cursor-pointer h-full"
+      onClick={onClick}
     >
-      {requiresClearance && (
-        <div className="absolute top-2 right-2">
-          <Lock className="w-4 h-4 text-yellow-400" />
-        </div>
-      )}
-      
-      <div className={`w-16 h-16 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center`}>
-        <IconComponent className="w-8 h-8 text-white" />
-      </div>
-      <div className="text-center space-y-2">
-        <span className="font-semibold text-lg">{config.title}</span>
-        <span className="text-sm text-gray-300 block">{config.description}</span>
-        {requiresClearance && (
-          <span className="text-xs text-yellow-400 block">
-            Requires clearance (1111)
-          </span>
+      <CardContent className="p-6 text-center h-full flex flex-col">
+        {isRestricted && (
+          <div className="flex justify-end mb-2">
+            <Badge variant="secondary" className="bg-yellow-600 text-yellow-100 text-xs">
+              🔒
+            </Badge>
+          </div>
         )}
-      </div>
-    </Button>
+        
+        <div className="flex-1 flex flex-col justify-center items-center space-y-4">
+          <div 
+            className={`w-16 h-16 rounded-full flex items-center justify-center ${config.color}`}
+          >
+            <Icon className="w-8 h-8 text-white" />
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-white">
+              {config.title}
+            </h3>
+            <p className="text-sm text-gray-300 leading-relaxed min-h-[2.5rem] flex items-center">
+              {config.description}
+            </p>
+          </div>
+        </div>
+        
+        {isRestricted && (
+          <div className="mt-4">
+            <p className="text-xs text-yellow-400">
+              Requires clearance (1111)
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

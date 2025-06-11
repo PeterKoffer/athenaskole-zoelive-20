@@ -64,10 +64,10 @@ export const useSubjectSpecificQuestions = ({
         return null;
       }
 
-      // Convert to lesson activity format - handle different possible structures
-      const correctAnswerIndex = uniqueQuestion.correctAnswer ?? 
-                                uniqueQuestion.correct_answer ?? 
-                                (uniqueQuestion.answer ? parseInt(uniqueQuestion.answer.toString()) : 0) ?? 
+      // Convert to lesson activity format - safely handle different possible structures
+      const correctAnswerIndex = (uniqueQuestion as any).correctAnswer ?? 
+                                (uniqueQuestion as any).correct_answer ?? 
+                                ((uniqueQuestion as any).answer ? parseInt((uniqueQuestion as any).answer.toString()) : 0) ?? 
                                 0;
 
       const dynamicQuestion = {

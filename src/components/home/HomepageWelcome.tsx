@@ -10,9 +10,8 @@ interface HomepageWelcomeProps {
 }
 
 const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
-  const [hasWelcomed, setHasWelcomed] = useState(false);
-  const [hasShownOnce, setHasShownOnce] = useState(() => {
-    return sessionStorage.getItem('nelieWelcomedHomepage') === 'true';
+  const [hasWelcomedThisSession, setHasWelcomedThisSession] = useState(() => {
+    return sessionStorage.getItem('nelieHomepageWelcomed') === 'true';
   });
   
   const {
@@ -26,22 +25,23 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     enableUserInteraction
   } = useUnifiedSpeech();
 
-  // Welcome the user ONLY ONCE per session when they first arrive at homepage
+  // Welcome the user ONLY ONCE per session
   useEffect(() => {
-    if (isReady && !hasWelcomed && !hasShownOnce && isEnabled && hasUserInteracted) {
-      console.log('🎤 Nelie welcoming user to homepage - UNIFIED SYSTEM');
-      setHasWelcomed(true);
-      setHasShownOnce(true);
+    if (isReady && !hasWelcomedThisSession && isEnabled && hasUserInteracted) {
+      console.log('🎤 Nelie welcoming user to homepage - ONCE PER SESSION');
       
-      sessionStorage.setItem('nelieWelcomedHomepage', 'true');
+      // Mark as welcomed for this session
+      setHasWelcomedThisSession(true);
+      sessionStorage.setItem('nelieHomepageWelcomed', 'true');
       
       const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
       
+      // Small delay to ensure speech system is ready
       setTimeout(() => {
         speakAsNelie(welcomeMessage, true);
-      }, 1000);
+      }, 1500);
     }
-  }, [isReady, hasWelcomed, hasShownOnce, isEnabled, hasUserInteracted, userName, speakAsNelie]);
+  }, [isReady, hasWelcomedThisSession, isEnabled, hasUserInteracted, userName, speakAsNelie]);
 
   const handleTestSpeech = () => {
     if (!hasUserInteracted) {
@@ -50,7 +50,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     } else if (isSpeaking) {
       stop();
     } else {
-      const testMessage = `Hi ${userName}! This is Nelie speaking from the unified speech system. I'm ready to help you learn today!`;
+      const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
       speakAsNelie(testMessage, true);
     }
   };
@@ -90,7 +90,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
         {isSpeaking && (
           <div className="mt-4 flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-200">Nelie is speaking via unified system...</span>
+            <span className="text-green-200">Nelie is speaking...</span>
           </div>
         )}
       </CardContent>
