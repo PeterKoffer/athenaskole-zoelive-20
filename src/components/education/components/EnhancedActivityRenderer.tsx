@@ -26,23 +26,35 @@ const EnhancedActivityRenderer = ({
     activityPhase: activity.phase,
     activityTitle: activity.title,
     hasContent: !!activity.content,
-    correctAnswer: activity.content.correctAnswer,
-    correct: activity.content.correct
+    contentStructure: {
+      correctAnswer: activity.content.correctAnswer,
+      correct: activity.content.correct,
+      options: activity.content.options?.length || 0,
+      segments: activity.content.segments?.length || 0
+    }
   });
 
   // Helper function to get the correct answer index consistently
   const getCorrectAnswerIndex = () => {
+    // Direct correctAnswer property
     if (activity.content.correctAnswer !== undefined) {
+      console.log('✅ Found correctAnswer:', activity.content.correctAnswer);
       return activity.content.correctAnswer;
     }
+    
+    // Alternative 'correct' property
     if (activity.content.correct !== undefined) {
+      console.log('✅ Found correct:', activity.content.correct);
       return activity.content.correct;
     }
+    
     // Fallback for content-delivery phase with segments
     if (activity.content.segments?.[0]?.checkQuestion?.correctAnswer !== undefined) {
+      console.log('✅ Found segment correctAnswer:', activity.content.segments[0].checkQuestion.correctAnswer);
       return activity.content.segments[0].checkQuestion.correctAnswer;
     }
-    console.warn('⚠️ No correct answer found for activity:', activity.id);
+    
+    console.warn('⚠️ No correct answer found for activity:', activity.id, 'Content:', activity.content);
     return 0; // Default fallback
   };
 

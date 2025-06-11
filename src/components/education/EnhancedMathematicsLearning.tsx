@@ -5,13 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calculator, ArrowLeft } from "lucide-react";
-import LessonProgressTracker from "./components/LessonProgressTracker";
-import LessonControlsCard from "./components/LessonControlsCard";
-import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
-import { UnifiedLessonProvider, useUnifiedLesson } from "./contexts/UnifiedLessonContext";
+import { UnifiedLessonProvider } from "./contexts/UnifiedLessonContext";
+import EnhancedLessonManager from "./components/EnhancedLessonManager";
 import { LessonActivity } from "./components/types/LessonTypes";
 
-// Sample activities for mathematics - these would normally come from a curriculum system
+// Fixed math activities with consistent structure
 const mathActivities: LessonActivity[] = [
   {
     id: 'math-intro-1',
@@ -21,7 +19,7 @@ const mathActivities: LessonActivity[] = [
     duration: 300,
     phaseDescription: 'Welcome introduction to algebra concepts',
     content: {
-      hook: 'Welcome to today\'s algebra lesson! We\'ll explore variables and expressions.'
+      hook: 'Welcome to today\'s algebra lesson! We\'ll explore variables and expressions together.'
     }
   },
   {
@@ -34,7 +32,8 @@ const mathActivities: LessonActivity[] = [
     content: {
       question: 'Solve for x: 2x + 5 = 13',
       options: ['x = 4', 'x = 6', 'x = 8', 'x = 9'],
-      correctAnswer: 0
+      correctAnswer: 0,
+      explanation: 'To solve 2x + 5 = 13, first subtract 5 from both sides: 2x = 8, then divide by 2: x = 4'
     }
   },
   {
@@ -47,7 +46,28 @@ const mathActivities: LessonActivity[] = [
     content: {
       question: 'If x = 3, what is 4x - 7?',
       options: ['5', '7', '12', '19'],
-      correctAnswer: 0
+      correctAnswer: 0,
+      explanation: 'Substitute x = 3 into 4x - 7: 4(3) - 7 = 12 - 7 = 5'
+    }
+  },
+  {
+    id: 'math-content-1',
+    title: 'Understanding Variables',
+    type: 'content-delivery',
+    phase: 'content-delivery',
+    duration: 400,
+    phaseDescription: 'Learn about variables in algebra',
+    content: {
+      segments: [{
+        concept: 'What are Variables?',
+        explanation: 'Variables are symbols (usually letters) that represent unknown numbers. In algebra, we use variables like x, y, and z to solve problems.',
+        checkQuestion: {
+          question: 'Which of the following is a variable?',
+          options: ['5', 'x', '10', '+'],
+          correctAnswer: 1,
+          explanation: 'x is a variable because it represents an unknown value that can change.'
+        }
+      }]
     }
   }
 ];
@@ -55,18 +75,6 @@ const mathActivities: LessonActivity[] = [
 const EnhancedMathematicsLearningContent = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const totalLessonTime = 20 * 60; // 20 minutes in seconds
-  
-  const {
-    phase,
-    timeSpent,
-    currentSegment,
-    totalSegments,
-    handleLessonStart,
-    handleLessonPause,
-    handleLessonResume,
-    handleLessonComplete
-  } = useUnifiedLesson();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -94,49 +102,9 @@ const EnhancedMathematicsLearningContent = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="max-w-4xl mx-auto p-6">
-        {/* Header with navigation and progress */}
-        <div className="flex items-center justify-between mb-6">
-          <Button 
-            variant="outline" 
-            onClick={handleBackToProgram}
-            className="border-gray-600 text-white bg-gray-800 hover:bg-gray-700"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Program
-          </Button>
-          
-          {phase !== 'introduction' && (
-            <LessonProgressTracker 
-              currentTime={timeSpent}
-              totalTime={totalLessonTime}
-              currentSegment={currentSegment}
-              totalSegments={totalSegments}
-              phase={phase}
-            />
-          )}
-        </div>
-
-        {/* Lesson Controls */}
-        {(phase === 'lesson' || phase === 'paused') && (
-          <LessonControlsCard
-            phase={phase}
-            onPause={handleLessonPause}
-            onResume={handleLessonResume}
-          />
-        )}
-
-        {/* Lesson Content */}
-        <LessonPhaseRenderer
-          lessonState={{
-            phase,
-            timeSpent,
-            currentSegment,
-            totalSegments,
-            score: 0 // Will be managed by unified context
-          }}
-          onLessonStart={handleLessonStart}
-          onLessonComplete={handleLessonComplete}
-          onLessonResume={handleLessonResume}
+        <EnhancedLessonManager
+          subject="Mathematics"
+          skillArea="Algebra"
           onBackToProgram={handleBackToProgram}
         />
       </div>
