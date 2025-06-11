@@ -1,3 +1,4 @@
+
 import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
 
 /**
@@ -64,6 +65,7 @@ export interface StandardLessonConfig {
     question: string;
     options: string[];
     correctAnswer: number;
+    explanation: string;
   };
   nextTopicSuggestion: string;
 }
@@ -166,7 +168,12 @@ export function createStandardLesson(config: StandardLessonConfig): SubjectLesso
       phaseDescription: 'Consolidate understanding and plan continued learning',
       content: {
         keyTakeaways: config.keyTakeaways,
-        selfAssessment: config.selfAssessment,
+        selfAssessment: {
+          question: config.selfAssessment.question,
+          options: config.selfAssessment.options,
+          correctAnswer: config.selfAssessment.correctAnswer,
+          explanation: config.selfAssessment.explanation
+        },
         nextTopicSuggestion: config.nextTopicSuggestion
       }
     }

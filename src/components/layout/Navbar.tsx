@@ -8,7 +8,7 @@ import NavbarUserMenu from "./NavbarUserMenu";
 import NavbarButton from "./NavbarButton";
 import UnifiedNavigationDropdown from "./UnifiedNavigationDropdown";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Brain } from "lucide-react";
+import { ArrowLeft, Brain, Home } from "lucide-react";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -52,6 +52,19 @@ const Navbar = ({
               </Button>
             )}
             <NavbarLogo onResetNavigation={onResetNavigation} />
+            
+            {/* Home button close to Nelie */}
+            {onResetNavigation && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onResetNavigation}
+                className="text-white hover:text-lime-400 hover:bg-gray-800 flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">Home</span>
+              </Button>
+            )}
           </div>
 
           {/* Desktop Menu */}

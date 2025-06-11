@@ -1,11 +1,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Palette, Sparkles, HelpCircle, Volume2, VolumeX, CheckCircle, Lightbulb } from 'lucide-react';
+import { Palette, Sparkles, HelpCircle } from 'lucide-react';
 import { LessonActivity } from '../types/LessonTypes';
 import { useSimpleMobileSpeech } from '@/hooks/useSimpleMobileSpeech';
+import CreativeHeader from './creative/CreativeHeader';
+import CreativePrompt from './creative/CreativePrompt';
+import CreativeProgressIndicator from './creative/CreativeProgressIndicator';
+import CreativeControls from './creative/CreativeControls';
 
 interface ActivityCreativeExplorationProps {
   activity: LessonActivity;
@@ -116,132 +118,46 @@ const ActivityCreativeExploration = ({ activity, timeRemaining, onContinue }: Ac
   const hasEnoughTimePassedForReading = () => {
     if (!readingStartTime) return false;
     const timeElapsed = Date.now() - readingStartTime;
-    return timeElapsed >= 10000; // 10 seconds minimum
+    return timeElapsed >= 10000;
   };
 
   const canProceed = hasNelieRead || hasEnoughTimePassedForReading();
-  const hasWrittenSomething = currentResponse.trim().length >= 20; // At least 20 characters
-  
+  const hasWrittenSomething = currentResponse.trim().length >= 20;
   const currentPromptData = prompts[currentPrompt];
-  const IconComponent = currentPromptData?.icon || Palette;
 
   return (
     <Card className="bg-gradient-to-br from-purple-900 to-pink-900 border-purple-400 mx-2 sm:mx-0">
       <CardContent className="p-4 sm:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div className="flex items-center">
-            <Palette className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 mr-3" />
-            <div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white">{activity.title}</h3>
-              <p className="text-purple-200 text-sm">{activity.phaseDescription}</p>
-            </div>
-          </div>
-          
-          {/* Let Nelie Read Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNelieRead}
-            disabled={simpleSpeech.isSpeaking || !simpleSpeech.isEnabled}
-            className="bg-white text-purple-900 border-purple-400 hover:bg-purple-50 flex items-center gap-2 whitespace-nowrap"
-          >
-            {simpleSpeech.isEnabled ? (
-              <Volume2 className="w-4 h-4" />
-            ) : (
-              <VolumeX className="w-4 h-4" />
-            )}
-            {simpleSpeech.isSpeaking ? 'Nelie is reading...' : 'Let Nelie Read'}
-          </Button>
-        </div>
+        <CreativeHeader
+          title={activity.title}
+          phaseDescription={activity.phaseDescription}
+          onNelieRead={handleNelieRead}
+          isSpeaking={simpleSpeech.isSpeaking}
+          isEnabled={simpleSpeech.isEnabled}
+        />
         
         <div className="space-y-6">
-          <div className="bg-purple-800/30 rounded-lg p-4 sm:p-6">
-            <div className="flex items-center mb-4">
-              <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-purple-300 mr-3" />
-              <h4 className="text-purple-200 font-bold text-lg sm:text-xl">{currentPromptData?.title}</h4>
-            </div>
-            <p className="text-purple-100 text-base sm:text-lg leading-relaxed mb-6">{currentPromptData?.content}</p>
-            
-            {/* Interactive Response Area */}
-            <div className="space-y-4">
-              <div className="bg-purple-700/30 rounded-lg p-4">
-                <div className="flex items-center mb-3">
-                  <Lightbulb className="w-5 h-5 text-yellow-400 mr-2" />
-                  <span className="text-purple-200 font-medium">Your Creative Response:</span>
-                </div>
-                <Textarea
-                  value={currentResponse}
-                  onChange={(e) => setCurrentResponse(e.target.value)}
-                  placeholder={currentPromptData?.placeholder}
-                  className="w-full min-h-[120px] bg-purple-800/50 border-purple-600 text-white placeholder:text-purple-300 resize-none"
-                  disabled={!canProceed}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-purple-300 text-sm">
-                    {currentResponse.length} characters
-                  </span>
-                  {hasWrittenSomething && (
-                    <div className="flex items-center text-green-400 text-sm">
-                      <CheckCircle className="w-4 h-4 mr-1" />
-                      Great work!
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {!canProceed && (
-                <div className="bg-pink-800/20 rounded-lg p-3 border border-pink-600/30">
-                  <p className="text-pink-200 text-sm">
-                    💭 Please listen to Nelie's instructions first before writing your response.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <CreativePrompt
+            prompt={currentPromptData}
+            response={currentResponse}
+            onResponseChange={setCurrentResponse}
+            canRespond={canProceed}
+          />
           
-          {/* Prompt Progress Indicator */}
-          <div className="flex justify-center space-x-2 mb-6">
-            {prompts.map((_, index) => (
-              <div
-                key={index}
-                className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                  index < currentPrompt ? 'bg-green-400' : 
-                  index === currentPrompt ? 'bg-purple-400' : 'bg-purple-700'
-                }`}
-              />
-            ))}
-          </div>
+          <CreativeProgressIndicator
+            currentPrompt={currentPrompt}
+            totalPrompts={prompts.length}
+          />
           
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-purple-300 text-sm order-2 sm:order-1">
-              Phase 5 of 6 • Creative Exploration • {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')} remaining
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
-              {!hasWrittenSomething && canProceed && (
-                <Button
-                  onClick={handleSkipToNext}
-                  variant="outline"
-                  className="w-full sm:w-auto border-purple-400 text-purple-200 hover:bg-purple-800"
-                >
-                  Skip This One
-                </Button>
-              )}
-              
-              <Button
-                onClick={handleNextPrompt}
-                disabled={!canProceed}
-                className={`w-full sm:w-auto px-6 py-3 text-base font-semibold ${
-                  canProceed 
-                    ? "bg-purple-600 hover:bg-purple-700 text-white" 
-                    : "bg-gray-600 text-gray-300 cursor-not-allowed"
-                }`}
-              >
-                {!canProceed ? 'Listen to Nelie first...' : 
-                 currentPrompt < prompts.length - 1 ? 'Next Creative Challenge' : 'Complete Creative Phase'}
-              </Button>
-            </div>
-          </div>
+          <CreativeControls
+            currentPrompt={currentPrompt}
+            totalPrompts={prompts.length}
+            timeRemaining={timeRemaining}
+            canProceed={canProceed}
+            hasWrittenSomething={hasWrittenSomething}
+            onNext={handleNextPrompt}
+            onSkip={handleSkipToNext}
+          />
         </div>
       </CardContent>
     </Card>
