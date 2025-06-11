@@ -1,11 +1,13 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import LessonActivityManager from './LessonActivityManager';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonControlsFooter from './LessonControlsFooter';
 import LessonCompletedView from './LessonCompletedView';
 import NelieIntroduction from './NelieIntroduction';
+import LessonActivitySpeechManager from './LessonActivitySpeechManager';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -31,13 +33,25 @@ const EnhancedLessonManager = ({
     handleLessonStart
   } = useUnifiedLesson();
 
+  // Add speech functionality back
+  const {
+    isEnabled: autoReadEnabled,
+    isSpeaking,
+    hasUserInteracted,
+    speakAsNelie,
+    stop: stopSpeaking,
+    toggleEnabled: handleMuteToggle
+  } = useUnifiedSpeech();
+
   console.log(`🎯 Enhanced ${subject} Lesson:`, {
     currentActivityIndex,
     totalActivities: allActivities.length,
     timeElapsed: sessionTimer,
     score,
     phase,
-    currentActivity: currentActivity?.title
+    currentActivity: currentActivity?.title,
+    speechEnabled: autoReadEnabled,
+    hasUserInteracted
   });
 
   // Show introduction if lesson hasn't started yet
@@ -77,8 +91,39 @@ const EnhancedLessonManager = ({
 
   const targetLessonLength = Math.max(15 * 60, allActivities.reduce((total, activity) => total + activity.duration, 0));
 
+  const handleManualRead = () => {
+    if (currentActivity) {
+      let speechText = '';
+      
+      if (currentActivity.phase === 'introduction') {
+        speechText = currentActivity.content.hook || `Welcome to your ${subject} lesson!`;
+      } else if (currentActivity.phase === 'content-delivery') {
+        speechText = currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || '';
+      } else if (currentActivity.phase === 'interactive-game') {
+        speechText = currentActivity.content.question || '';
+      } else {
+        speechText = `Let me explain: ${currentActivity.title}`;
+      }
+      
+      if (speechText) {
+        console.log('🔊 Manual read request:', speechText.substring(0, 50) + '...');
+        speakAsNelie(speechText, true);
+      }
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Add speech manager back */}
+      <LessonActivitySpeechManager
+        currentActivity={currentActivity}
+        currentActivityIndex={currentActivityIndex}
+        autoReadEnabled={autoReadEnabled && hasUserInteracted}
+        isReady={hasUserInteracted}
+        speakText={speakAsNelie}
+        stopSpeaking={stopSpeaking}
+      />
+
       <LessonProgressHeader
         currentActivityIndex={currentActivityIndex}
         totalActivities={allActivities.length}
@@ -86,7 +131,7 @@ const EnhancedLessonManager = ({
         targetLessonLength={targetLessonLength}
         score={score}
         correctStreak={correctStreak}
-        engagementLevel={85} // Default engagement level
+        engagementLevel={85}
         questionsGenerated={allActivities.length}
         onBackToProgram={onBackToProgram}
       />
@@ -96,21 +141,16 @@ const EnhancedLessonManager = ({
         currentActivityIndex={currentActivityIndex}
         score={score}
         onActivityComplete={handleActivityComplete}
-        onScoreUpdate={() => {}} // Score updates handled in context
+        onScoreUpdate={() => {}}
       />
 
       <LessonControlsFooter
-        autoReadEnabled={true}
-        isSpeaking={false}
-        isReady={true}
+        autoReadEnabled={autoReadEnabled}
+        isSpeaking={isSpeaking}
+        isReady={hasUserInteracted}
         adaptiveSpeed={1.0}
-        onMuteToggle={() => {}}
-        onManualRead={() => {
-          if (currentActivity) {
-            console.log('🔊 Manual read request for:', currentActivity.title);
-            // Add speech logic here if needed
-          }
-        }}
+        onMuteToggle={handleMuteToggle}
+        onManualRead={handleManualRead}
         onResetProgress={() => window.location.reload()}
       />
     </div>
