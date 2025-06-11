@@ -4,118 +4,159 @@ import { createStandardLesson, StandardLessonConfig } from '../utils/StandardLes
 
 const englishLessonConfig: StandardLessonConfig = {
   subject: 'english',
-  skillArea: 'Grammar and Word Usage',
+  skillArea: 'Creative Writing and Grammar',
   learningObjectives: [
-    'Identify and use nouns, verbs, and adjectives correctly',
-    'Build descriptive sentences with specific word choices',
-    'Adapt language style for different audiences',
-    'Apply grammar knowledge to improve communication'
+    'Master descriptive writing techniques',
+    'Use vivid adjectives and strong verbs effectively',
+    'Create engaging stories with clear structure',
+    'Develop vocabulary through context and usage'
   ],
   prerequisites: [
-    'Basic reading comprehension',
-    'Understanding of simple sentences'
+    'Basic sentence structure understanding',
+    'Familiarity with parts of speech'
   ],
   
   // Phase 1: Introduction (2-3 min)
-  hook: "Every day, you use thousands of words to share your thoughts, feelings, and ideas. But have you ever wondered how these words work together like a perfectly choreographed dance?",
-  realWorldExample: "When you text your friends, write a story, or even order your favorite food, you're using the building blocks of language that we'll explore today!",
-  thoughtQuestion: "What if I told you that understanding how words work could make you a more powerful communicator and help you express exactly what you're thinking?",
+  hook: "Welcome to your English adventure! Today, we're going to unlock the magic of words and learn how to paint beautiful pictures with language. Are you ready to become a word wizard?",
+  realWorldExample: "Every time you tell a story, write a text message, or describe your day, you're using the powerful tools of language that we'll explore together!",
+  thoughtQuestion: "What if I told you that the right words can make someone laugh, cry, or feel excited just by reading what you wrote?",
   
   // Phase 2: Content Delivery (5-7 min, split into segments)
   contentSegments: [
     {
-      concept: "Nouns: The Naming Stars",
-      explanation: "Nouns are the naming champions of language! They tell us about people (teacher, friend), places (school, park), things (book, computer), and even ideas (happiness, courage).",
+      concept: "Adjectives: The Color Paintbrush of Language",
+      explanation: "Adjectives are like magic paintbrushes that add color and life to our writing! Instead of saying 'dog,' we can say 'fluffy, energetic, golden dog' and suddenly everyone can picture exactly what we mean!",
       checkQuestion: {
-        question: "In this sentence: 'The excited dog ran through the beautiful garden,' which word is a noun?",
-        options: ["excited", "dog", "ran", "beautiful"],
-        correctAnswer: 1,
-        explanation: "Perfect! 'Dog' is a noun because it names an animal. Nouns are the foundation of every sentence!"
-      }
-    },
-    {
-      concept: "Verbs: The Action Heroes",
-      explanation: "Verbs are the action stars that tell us what's happening! They show actions (run, jump, think) or states of being (is, was, feel). Without verbs, sentences would just be lists of things!",
-      checkQuestion: {
-        question: "Which word is the verb in: 'Sarah carefully painted a colorful masterpiece'?",
-        options: ["Sarah", "carefully", "painted", "colorful"],
+        question: "In the sentence 'The mysterious, ancient castle stood on the misty hill,' how many adjectives can you find?",
+        options: ["1", "2", "3", "4"],
         correctAnswer: 2,
-        explanation: "Excellent! 'Painted' is the verb showing the action Sarah performed. Verbs bring sentences to life!"
+        explanation: "Fantastic! 'Mysterious,' 'ancient,' and 'misty' are all adjectives - that's 3 descriptive words that help us imagine this spooky castle!"
       }
     },
     {
-      concept: "Adjectives: The Detail Artists",
-      explanation: "Adjectives are like artists who paint pictures with words! They describe and give us more information about nouns. Instead of just 'cat,' we can have a 'fluffy, orange, playful cat.'",
+      concept: "Strong Verbs: The Action Heroes",
+      explanation: "Verbs are the heartbeat of every sentence! But some verbs are stronger than others. Instead of 'walked quickly,' we can say 'sprinted' or 'dashed.' Strong verbs make your writing come alive!",
       checkQuestion: {
-        question: "In 'The clever detective solved the mysterious case,' which word is an adjective describing the detective?",
-        options: ["clever", "detective", "solved", "mysterious"],
-        correctAnswer: 0,
-        explanation: "Brilliant! 'Clever' is an adjective that describes what kind of detective. Adjectives make our writing colorful and specific!"
+        question: "Which verb makes this sentence more exciting: 'The cat _____ across the room to catch the mouse'?",
+        options: ["went", "moved", "pounced", "was"],
+        correctAnswer: 2,
+        explanation: "Perfect choice! 'Pounced' is a strong, specific verb that shows exactly how a cat moves when hunting. It's much more exciting than 'went' or 'moved'!"
+      }
+    },
+    {
+      concept: "Show Don't Tell: The Secret of Great Writing",
+      explanation: "Instead of telling readers 'Sarah was nervous,' great writers show it: 'Sarah's hands trembled as she twisted her hair around her finger.' This lets readers feel the nervousness themselves!",
+      checkQuestion: {
+        question: "Which sentence shows that Tom is happy instead of just telling us?",
+        options: ["Tom was happy", "Tom felt good", "Tom's face lit up with a huge grin", "Tom was in a good mood"],
+        correctAnswer: 2,
+        explanation: "Excellent! 'Tom's face lit up with a huge grin' shows us his happiness through his actions and expression. We can actually picture his joy!"
       }
     }
   ],
   
   // Phase 3: Interactive Game (4-5 min)
-  gameType: 'matching',
-  gameInstructions: "You're a Word Architect! Help build the most exciting sentence by choosing the best words for each category.",
-  gameQuestion: "Build an amazing sentence! Start with this framework: 'The [adjective] [noun] [verb] [adverb] through the [adjective] [noun].' Which combination creates the most vivid image?",
+  gameType: 'creative-writing',
+  gameInstructions: "You're a story detective! Help solve the mystery by choosing the most vivid and exciting words to complete this adventure story.",
+  gameQuestion: "Complete this exciting story: 'The brave explorer _____ through the dark jungle when suddenly, a _____ creature _____ from behind the ancient tree!' Choose the combination that creates the most thrilling scene:",
   gameOptions: [
-    "The big cat walked slowly through the nice yard.",
-    "The majestic tiger prowled silently through the moonlit jungle.",
-    "The small animal moved quickly through the green place.",
-    "The good pet ran fast through the big area."
+    "walked, big, came",
+    "crept, mysterious, emerged", 
+    "went, nice, appeared",
+    "moved, small, jumped"
   ],
   gameCorrectAnswer: 1,
-  gameExplanation: "Incredible word architecture! 'The majestic tiger prowled silently through the moonlit jungle' uses specific, powerful words that help us see, hear, and feel the scene!",
+  gameExplanation: "Incredible choice! 'Crept, mysterious, emerged' creates suspense and excitement. These words help us feel the tension and wonder what's going to happen next!",
   
   // Phase 4: Application (3-4 min)
-  applicationScenario: "You want to convince your family to adopt a pet from the local animal shelter. You need to write a persuasive message that will help them understand why this is important to you.",
+  applicationScenario: "Your best friend moved to another country and you want to write them a letter that makes them feel like they're right there with you, experiencing your day.",
   problemSteps: [
     {
-      step: "Choose powerful nouns to describe the pet and the situation",
-      hint: "Think about specific types of animals and emotional words",
-      solution: "Use specific nouns like 'golden retriever puppy' instead of just 'dog,' and 'companion' instead of 'pet'"
+      step: "Choose a memorable moment from your day to describe",
+      hint: "Think about something that made you laugh, surprised you, or made you feel proud",
+      solution: "Pick a specific moment with clear details - like 'lunch break when my sandwich fell apart' rather than 'school was okay'"
     },
     {
-      step: "Select action verbs that show the positive impact",
-      hint: "What actions show how a pet improves life?",
-      solution: "Use strong verbs like 'brighten,' 'comfort,' 'teach,' and 'enrich' instead of weak verbs like 'be' or 'have'"
+      step: "Use your senses to make the scene come alive",
+      hint: "What did you see, hear, smell, feel, or taste?",
+      solution: "Add sensory details like 'the crispy leaves crunched under my feet' or 'the warm chocolate chip cookies smelled amazing'"
     },
     {
-      step: "Add descriptive adjectives that appeal to emotions",
-      hint: "What adjectives make readers care about your cause?",
-      solution: "Use emotional adjectives like 'lovable,' 'loyal,' 'gentle,' and 'deserving' to create connection"
+      step: "Replace boring words with exciting ones",
+      hint: "Change 'walked' to 'strolled,' 'big' to 'enormous,' 'said' to 'whispered'",
+      solution: "Transform 'I was happy' into 'I couldn't stop grinning' or 'My heart felt like it was dancing'"
     }
   ],
   
   // Phase 5: Creative Exploration (2-3 min)
-  creativePrompt: "Imagine you could create a new word that doesn't exist in English yet. What would it mean, and how would you use it in a sentence?",
-  whatIfScenario: "What if you could only use 10 words to describe your perfect day? Which words would you choose and why?",
-  explorationTask: "Think about how the same message might sound different when texting a friend, writing to a teacher, or talking to a grandparent. How does your word choice change based on your audience?",
+  creativePrompt: "Imagine you could interview your favorite book character. What three questions would you ask them, and how do you think they would answer in their own unique voice?",
+  whatIfScenario: "What if you had to describe your bedroom to an alien who has never seen Earth? What details would help them understand what it's like?",
+  explorationTask: "Think about your favorite place in the world. Write one sentence that would make someone who's never been there feel like they're standing right beside you.",
   
   // Phase 6: Summary (1-2 min)
   keyTakeaways: [
-    "Nouns name people, places, things, and ideas",
-    "Verbs show actions and bring sentences to life",
-    "Adjectives add color and detail to our descriptions",
-    "Specific word choices create clearer communication",
-    "Different audiences require different language styles"
+    "Adjectives add color and detail to make writing vivid",
+    "Strong verbs create action and excitement in stories",
+    "Showing instead of telling helps readers feel emotions",
+    "Using all five senses makes writing come alive",
+    "Specific details create clearer mental pictures"
   ],
   selfAssessment: {
-    question: "What makes communication most effective?",
+    question: "What makes writing most engaging for readers?",
     options: [
       "Using the biggest words possible",
-      "Choosing specific, appropriate words for your audience and purpose",
       "Writing as much as possible",
-      "Using only simple words"
+      "Creating vivid images with specific, sensory details",
+      "Never using simple words"
     ],
-    correctAnswer: 1,
-    explanation: "Perfect! Effective communication comes from choosing the right words for your specific audience and purpose. It's about clarity and connection, not complexity!"
+    correctAnswer: 2,
+    explanation: "Perfect! Engaging writing uses specific, sensory details that help readers see, feel, and experience what you're describing. It's about creating a movie in their mind!"
   },
-  nextTopicSuggestion: "Next, we'll explore how sentences connect to form paragraphs and discover the power of storytelling structure!"
+  nextTopicSuggestion: "Next time, we'll explore dialogue writing and learn how to make characters sound real and unique when they speak!"
 };
 
 export const createEnglishLesson = (): LessonActivity[] => {
   const standardLesson = createStandardLesson(englishLessonConfig);
-  return standardLesson.phases;
+  
+  // Add some additional interactive activities to make it more engaging
+  const enhancedActivities: LessonActivity[] = [
+    ...standardLesson.phases.slice(0, 2),
+    {
+      id: 'english-word-choice-1',
+      title: 'Word Choice Challenge',
+      type: 'interactive-game',
+      phase: 'interactive-game',
+      duration: 240,
+      phaseDescription: 'Practice choosing the most vivid words',
+      content: {
+        question: 'Which word makes this sentence more exciting: "The thunder _____ across the dark sky"?',
+        options: ['went', 'moved', 'rumbled', 'was'],
+        correctAnswer: 2,
+        explanation: 'Excellent! "Rumbled" is a specific, powerful verb that helps us hear and feel the thunder!'
+      }
+    },
+    ...standardLesson.phases.slice(2, 4),
+    {
+      id: 'english-sensory-writing-1',
+      title: 'Sensory Description Game',
+      type: 'interactive-game', 
+      phase: 'interactive-game',
+      duration: 300,
+      phaseDescription: 'Use all five senses to describe scenes',
+      content: {
+        question: 'You\'re describing a bakery to someone. Which description uses the most senses?',
+        options: [
+          'The bakery was nice and had good food',
+          'Warm cinnamon scent filled the air as golden bread crackled in the oven, and flour dusted the wooden counter',
+          'The bakery sold bread and pastries',
+          'It was a place where they made food'
+        ],
+        correctAnswer: 1,
+        explanation: 'Perfect! This description lets us smell the cinnamon, see the golden bread, hear it crackling, and feel the texture of flour-dusted wood!'
+      }
+    },
+    ...standardLesson.phases.slice(4)
+  ];
+  
+  return enhancedActivities;
 };

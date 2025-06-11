@@ -121,10 +121,29 @@ export const UnifiedLessonProvider = ({
     };
   }, [isTimerActive]);
 
+  // Auto-start lesson after introduction phase
+  useEffect(() => {
+    if (lessonState.phase === 'introduction') {
+      console.log('🎓 Starting lesson automatically after introduction');
+      setTimeout(() => {
+        handleLessonStart();
+      }, 2000);
+    }
+  }, []);
+
   const handleLessonStart = useCallback(() => {
+    console.log('🚀 Lesson started');
     setLessonState(prev => ({ ...prev, phase: 'lesson' }));
     setIsTimerActive(true);
-  }, []);
+    
+    // Auto-speak first activity
+    setTimeout(() => {
+      if (currentActivity && teachingEngine.autoReadEnabled) {
+        const welcomeMessage = `Welcome to your ${subject} lesson! Let's begin our learning journey together!`;
+        teachingEngine.speakWithPersonality(welcomeMessage, 'encouragement');
+      }
+    }, 1000);
+  }, [currentActivity, teachingEngine, subject]);
 
   const handleLessonPause = useCallback(() => {
     setLessonState(prev => ({ ...prev, phase: 'paused' }));
@@ -159,23 +178,24 @@ export const UnifiedLessonProvider = ({
     const responseTime = Date.now() - lessonStartTime - (timeElapsed * 1000);
     setLastResponseTime(responseTime);
 
+    console.log('✅ Activity completed:', currentActivityIndex, 'wasCorrect:', wasCorrect);
+
     if (wasCorrect !== undefined) {
       if (wasCorrect) {
         setScore(prev => prev + 10);
         setCorrectStreak(prev => prev + 1);
+        
+        // Immediate positive feedback
+        setTimeout(() => {
+          teachingEngine.speakWithPersonality("Excellent work! You're doing fantastic!", 'encouragement');
+        }, 500);
       } else {
         setCorrectStreak(0);
-      }
-    }
-
-    // Provide immediate feedback
-    const currentActivity = allActivities[currentActivityIndex];
-    if (currentActivity) {
-      if (currentActivity.phase === 'interactive-game' && wasCorrect !== undefined) {
-        const responseMessage = wasCorrect 
-          ? `Excellent work! You're really mastering this ${subject} concept!`
-          : `Good try! Let's keep working on this together. You're learning!`;
-        teachingEngine.speakWithPersonality(responseMessage, wasCorrect ? 'encouragement' : 'encouragement');
+        
+        // Encouraging feedback for incorrect answers
+        setTimeout(() => {
+          teachingEngine.speakWithPersonality("That's okay! Learning takes practice. Let's keep going!", 'encouragement');
+        }, 500);
       }
     }
 
@@ -187,7 +207,7 @@ export const UnifiedLessonProvider = ({
     // Schedule progression to next activity
     progressionRef.current = setTimeout(() => {
       if (currentActivityIndex < allActivities.length - 1) {
-        console.log('📚 Moving to next activity');
+        console.log('📚 Moving to next activity:', currentActivityIndex + 1);
         setCurrentActivityIndex(prev => prev + 1);
         setLessonState(prev => ({
           ...prev,
@@ -197,7 +217,7 @@ export const UnifiedLessonProvider = ({
         console.log('🏁 Lesson completed!');
         const finalMinutes = Math.round(timeElapsed / 60);
         setTimeout(() => {
-          const completionMessage = `Outstanding work! You've completed your ${finalMinutes}-minute ${subject} lesson! You've really grown as a learner today, and I'm so proud of your dedication!`;
+          const completionMessage = `Outstanding work! You've completed your ${finalMinutes}-minute ${subject} lesson! You've really grown as a learner today!`;
           teachingEngine.speakWithPersonality(completionMessage, 'encouragement');
         }, 1200);
         
@@ -205,7 +225,7 @@ export const UnifiedLessonProvider = ({
           handleLessonComplete();
         }, 5000);
       }
-    }, wasCorrect !== undefined ? 2500 : 1000);
+    }, wasCorrect !== undefined ? 2500 : 1500);
   }, [
     lessonStartTime,
     timeElapsed,
@@ -223,11 +243,14 @@ export const UnifiedLessonProvider = ({
       let context: 'question' | 'explanation' | 'encouragement' | 'humor' = 'explanation';
       
       if (currentActivity.phase === 'content-delivery') {
-        speechText = currentActivity.content.text || '';
+        speechText = currentActivity.content.text || currentActivity.content.segments?.[0]?.explanation || '';
         context = 'explanation';
       } else if (currentActivity.phase === 'interactive-game') {
         speechText = currentActivity.content.question || '';
         context = 'question';
+      } else if (currentActivity.phase === 'introduction') {
+        speechText = currentActivity.content.hook || `Welcome to your ${subject} lesson!`;
+        context = 'humor';
       } else {
         speechText = `Let me explain this step by step: ${currentActivity.title}`;
         context = 'explanation';
@@ -236,7 +259,7 @@ export const UnifiedLessonProvider = ({
       console.log('🔊 Read request:', speechText.substring(0, 50));
       teachingEngine.speakWithPersonality(speechText, context);
     }
-  }, [currentActivity, teachingEngine]);
+  }, [currentActivity, teachingEngine, subject]);
 
   const updateProgress = useCallback((segment: number, timeSpent: number, score: number) => {
     setLessonState(prev => ({

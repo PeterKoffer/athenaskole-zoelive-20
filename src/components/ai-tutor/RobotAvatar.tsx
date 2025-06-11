@@ -37,15 +37,17 @@ const RobotAvatar = ({
   console.log('🤖 RobotAvatar rendering - size:', size, 'isSpeaking:', isSpeaking, 'isActive:', isActive);
 
   if (imageError) {
-    // Enhanced fallback with chest hole blinking
+    // Enhanced fallback with larger, more visible chest blinking
     return (
       <div className={`${containerClasses} bg-gradient-to-br from-blue-400 to-purple-500 text-white font-bold relative overflow-hidden`}>
         <div className="text-8xl">🤖</div>
         {isSpeaking && (
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* Position the blue dot in the center of the chest area */}
+            {/* Much larger and more visible blinking effect */}
             <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse opacity-80"></div>
+              <div className="w-12 h-12 bg-cyan-400 rounded-full animate-pulse opacity-90 shadow-lg shadow-cyan-400/50"></div>
+              <div className="absolute top-1 left-1 w-10 h-10 bg-blue-300 rounded-full animate-pulse opacity-80" style={{ animationDelay: '0.3s' }}></div>
+              <div className="absolute top-2 left-2 w-8 h-8 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
             </div>
           </div>
         )}
@@ -63,18 +65,26 @@ const RobotAvatar = ({
         draggable={false}
       />
       
-      {/* Chest hole blinking animation when speaking - positioned in the circular area on her chest */}
+      {/* Enhanced chest hole blinking animation - much more prominent and visible */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Position the blue dot exactly in the circular chest area */}
+          {/* Position the blinking effect in the circular chest area with enhanced visibility */}
           <div className="absolute top-[62%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <div className="relative">
-              {/* Main chest hole blinking effect - blue dot in the circle */}
-              <div className="w-4 h-4 bg-blue-400 rounded-full animate-pulse opacity-90"></div>
-              {/* Inner glow effect */}
-              <div className="absolute top-0.5 left-0.5 w-3 h-3 bg-blue-300 rounded-full animate-pulse opacity-70" style={{ animationDelay: '0.5s' }}></div>
-              {/* Center core */}
-              <div className="absolute top-1 left-1 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.25s' }}></div>
+              {/* Outer glow ring for more visibility */}
+              <div className="absolute -inset-2 bg-cyan-400 rounded-full animate-ping opacity-40"></div>
+              
+              {/* Main chest hole blinking effect - larger and brighter */}
+              <div className="w-8 h-8 bg-cyan-400 rounded-full animate-pulse opacity-95 shadow-lg shadow-cyan-400/60"></div>
+              
+              {/* Secondary pulsing layer */}
+              <div className="absolute top-0.5 left-0.5 w-7 h-7 bg-blue-300 rounded-full animate-pulse opacity-80" style={{ animationDelay: '0.25s' }}></div>
+              
+              {/* Bright center core */}
+              <div className="absolute top-1.5 left-1.5 w-5 h-5 bg-white rounded-full animate-pulse shadow-white/50 shadow-md" style={{ animationDelay: '0.5s' }}></div>
+              
+              {/* Inner sparkle effect */}
+              <div className="absolute top-2.5 left-2.5 w-3 h-3 bg-cyan-200 rounded-full animate-pulse" style={{ animationDelay: '0.75s' }}></div>
             </div>
           </div>
         </div>
@@ -87,7 +97,7 @@ const RobotAvatar = ({
       
       {/* Speaking indicator text for debugging */}
       {isSpeaking && (
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-bold animate-pulse">
+        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-cyan-400 font-bold animate-pulse">
           Speaking...
         </div>
       )}

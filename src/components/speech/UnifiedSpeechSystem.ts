@@ -37,9 +37,9 @@ class UnifiedSpeechSystem {
   };
 
   private config: SpeechConfig = {
-    rate: 0.85,
-    pitch: 1.1,
-    volume: 0.9
+    rate: 0.8, // Slightly slower for more natural speech
+    pitch: 1.1, // Slightly higher pitch for Nelie's friendly personality
+    volume: 0.85
   };
 
   private listeners: ((state: SpeechState) => void)[] = [];
@@ -47,7 +47,7 @@ class UnifiedSpeechSystem {
   private isProcessingQueue = false;
   private lastSpokenText = '';
   private lastSpokenTime = 0;
-  private repeatPreventionTime = 3000; // Prevent same text within 3 seconds
+  private repeatPreventionTime = 3000;
   private maxRetries = 3;
   private retryCount = 0;
 
@@ -56,7 +56,7 @@ class UnifiedSpeechSystem {
   }
 
   private async initializeSpeechSystem() {
-    console.log('🎤 Initializing Unified Speech System...');
+    console.log('🎤 Initializing Enhanced Speech System for Nelie...');
     
     if (typeof speechSynthesis === 'undefined') {
       this.updateState({ 
@@ -84,7 +84,7 @@ class UnifiedSpeechSystem {
         const voices = speechSynthesis.getVoices();
         if (voices.length > 0) {
           console.log('✅ Speech voices loaded:', voices.length);
-          this.selectOptimalVoice(voices);
+          this.selectOptimalVoiceForNelie(voices);
           this.updateState({ 
             voicesLoaded: true,
             isLoading: false,
@@ -117,15 +117,20 @@ class UnifiedSpeechSystem {
     });
   }
 
-  private selectOptimalVoice(voices: SpeechSynthesisVoice[]) {
-    // Priority order for voice selection
+  private selectOptimalVoiceForNelie(voices: SpeechSynthesisVoice[]) {
+    // Priority order for Nelie's voice - looking for young, friendly, clear female voices
     const preferredVoices = [
       'Google US English Female',
-      'Microsoft Zira',
-      'Samantha',
+      'Microsoft Zira Desktop', // Young, clear voice
       'Karen',
-      'Victoria',
-      'Google UK English Female'
+      'Samantha', // Mac voice - very natural
+      'Victoria', // Mac voice - also good
+      'Google UK English Female',
+      'Microsoft Zira',
+      'Fiona', // Scottish accent but friendly
+      'Moira', // Irish accent, warm
+      'Tessa', // South African, clear
+      'Veena' // Indian accent, clear
     ];
 
     let selectedVoice = null;
@@ -135,7 +140,10 @@ class UnifiedSpeechSystem {
       selectedVoice = voices.find(voice => 
         voice.name.includes(preferred) && voice.lang.startsWith('en')
       );
-      if (selectedVoice) break;
+      if (selectedVoice) {
+        console.log('🎯 Found preferred voice for Nelie:', selectedVoice.name);
+        break;
+      }
     }
 
     // Fallback to any female English voice
@@ -143,7 +151,10 @@ class UnifiedSpeechSystem {
       selectedVoice = voices.find(voice => 
         voice.lang.startsWith('en') && 
         (voice.name.toLowerCase().includes('female') || 
-         voice.name.toLowerCase().includes('woman'))
+         voice.name.toLowerCase().includes('woman') ||
+         voice.name.toLowerCase().includes('zira') ||
+         voice.name.toLowerCase().includes('karen') ||
+         voice.name.toLowerCase().includes('samantha'))
       );
     }
 
@@ -153,7 +164,10 @@ class UnifiedSpeechSystem {
     }
 
     this.config.voice = selectedVoice || undefined;
-    console.log('🎤 Selected voice:', selectedVoice?.name || 'Browser default');
+    console.log('🎤 Selected voice for Nelie:', selectedVoice?.name || 'Browser default');
+    
+    // Log all available voices for debugging
+    console.log('📋 Available voices:', voices.map(v => `${v.name} (${v.lang})`));
   }
 
   private setupEventListeners() {
@@ -168,7 +182,7 @@ class UnifiedSpeechSystem {
     const enableOnInteraction = () => {
       if (!this.state.hasUserInteracted) {
         this.updateState({ hasUserInteracted: true });
-        console.log('✅ User interaction detected - speech enabled');
+        console.log('✅ User interaction detected - Nelie can now speak!');
       }
     };
 
@@ -184,7 +198,7 @@ class UnifiedSpeechSystem {
       testUtterance.volume = 0; // Silent test
       speechSynthesis.speak(testUtterance);
       
-      console.log('✅ Speech synthesis test passed');
+      console.log('✅ Speech synthesis test passed for Nelie');
     } catch (error) {
       console.error('❌ Speech synthesis test failed:', error);
       this.updateState({ 
@@ -251,8 +265,22 @@ class UnifiedSpeechSystem {
   async speakAsNelie(text: string, priority: boolean = false): Promise<void> {
     if (!text) return;
     
-    // Add Nelie's personality to the speech
-    const nelieText = text.startsWith('Nelie') ? text : text;
+    // Add Nelie's personality markers to the speech
+    const neliePersonalityPhrases = [
+      "Hi there!",
+      "Let me help you with that!",
+      "That's a great question!",
+      "You're doing wonderfully!",
+      "Let's explore this together!"
+    ];
+    
+    // Occasionally add personality (but not always to avoid being annoying)
+    let nelieText = text;
+    if (Math.random() < 0.3 && !text.includes('Hi') && !text.includes('Let')) {
+      const phrase = neliePersonalityPhrases[Math.floor(Math.random() * neliePersonalityPhrases.length)];
+      nelieText = `${phrase} ${text}`;
+    }
+    
     await this.speak(nelieText, priority);
   }
 
@@ -274,7 +302,7 @@ class UnifiedSpeechSystem {
       await this.speakItem(item);
       
       // Small delay between items
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
 
     this.isProcessingQueue = false;
@@ -292,9 +320,9 @@ class UnifiedSpeechSystem {
 
       const utterance = new SpeechSynthesisUtterance(item.text);
       
-      // Apply configuration
-      utterance.rate = this.config.rate;
-      utterance.pitch = this.config.pitch;
+      // Apply Nelie's optimized configuration
+      utterance.rate = this.config.rate; // Slower, more natural pace
+      utterance.pitch = this.config.pitch; // Slightly higher for friendliness
       utterance.volume = this.config.volume;
       
       if (this.config.voice) {
@@ -308,6 +336,7 @@ class UnifiedSpeechSystem {
           currentUtterance: utterance,
           lastError: null 
         });
+        console.log('🎤 Nelie started speaking');
       };
 
       utterance.onend = () => {
@@ -318,11 +347,12 @@ class UnifiedSpeechSystem {
         this.lastSpokenText = item.text;
         this.lastSpokenTime = Date.now();
         this.retryCount = 0;
+        console.log('🎤 Nelie finished speaking');
         resolve();
       };
 
       utterance.onerror = (event) => {
-        console.error('❌ Speech error:', event.error);
+        console.error('❌ Nelie speech error:', event.error);
         this.updateState({ 
           isSpeaking: false, 
           currentUtterance: null,
@@ -332,7 +362,7 @@ class UnifiedSpeechSystem {
         // Retry logic
         if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
           this.retryCount++;
-          console.log(`🔄 Retrying speech (${this.retryCount}/${this.maxRetries})`);
+          console.log(`🔄 Retrying Nelie speech (${this.retryCount}/${this.maxRetries})`);
           setTimeout(() => {
             speechSynthesis.speak(utterance);
           }, 1000);
@@ -348,7 +378,7 @@ class UnifiedSpeechSystem {
       try {
         speechSynthesis.speak(utterance);
       } catch (error) {
-        console.error('❌ Failed to start speech:', error);
+        console.error('❌ Failed to start Nelie speech:', error);
         this.updateState({ 
           lastError: 'Failed to start speech: ' + (error as Error).message 
         });
@@ -368,7 +398,7 @@ class UnifiedSpeechSystem {
       currentUtterance: null 
     });
     
-    console.log('🔇 Speech stopped and queue cleared');
+    console.log('🔇 Nelie speech stopped and queue cleared');
   }
 
   toggleEnabled(): void {
@@ -379,17 +409,17 @@ class UnifiedSpeechSystem {
       this.stop(); // Stop current speech when disabled
     }
     
-    console.log(newState ? '🔊 Speech enabled' : '🔇 Speech disabled');
+    console.log(newState ? '🔊 Nelie speech enabled' : '🔇 Nelie speech disabled');
   }
 
   enableUserInteraction(): void {
     this.updateState({ hasUserInteracted: true });
-    console.log('✅ User interaction manually enabled');
+    console.log('✅ User interaction manually enabled for Nelie');
   }
 
   async test(): Promise<void> {
-    const testMessage = "Hi! I'm Nelie, your learning companion. My voice system is working perfectly!";
-    console.log('🧪 Testing Nelie\'s voice...');
+    const testMessage = "Hi! I'm Nelie, your learning companion. My voice system is working perfectly! I'm so excited to help you learn!";
+    console.log('🧪 Testing Nelie\'s enhanced voice...');
     await this.speak(testMessage, true);
   }
 }
