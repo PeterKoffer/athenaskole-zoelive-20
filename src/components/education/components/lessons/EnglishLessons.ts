@@ -56,7 +56,7 @@ const englishLessonConfig: StandardLessonConfig = {
   ],
   
   // Phase 3: Interactive Game (4-5 min)
-  gameType: 'creative-writing',
+  gameType: 'matching',
   gameInstructions: "You're a story detective! Help solve the mystery by choosing the most vivid and exciting words to complete this adventure story.",
   gameQuestion: "Complete this exciting story: 'The brave explorer _____ through the dark jungle when suddenly, a _____ creature _____ from behind the ancient tree!' Choose the combination that creates the most thrilling scene:",
   gameOptions: [
