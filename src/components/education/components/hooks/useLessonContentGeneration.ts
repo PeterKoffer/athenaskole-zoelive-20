@@ -1,65 +1,51 @@
 
-import { useState } from 'react';
-import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
-import { 
-  createMathematicsLesson
-} from '../lessons/MathematicsLessons';
+import { useMemo } from 'react';
+import { createWelcomeActivity } from '../utils/welcomeActivityGenerator';
+import { createMathematicsLesson } from '../lessons/MathematicsLessons';
 import { createEnglishLesson } from '../lessons/EnglishLessons';
 import { createScienceLesson } from '../lessons/ScienceLessons';
 import { createMusicLesson } from '../lessons/MusicLessons';
 import { createComputerScienceLesson } from '../lessons/ComputerScienceLessons';
 import { createCreativeArtsLesson } from '../lessons/CreativeArtsLessons';
-import { LessonActivity } from '../types/LessonTypes';
 
 interface UseLessonContentGenerationProps {
   subject: string;
 }
 
 export const useLessonContentGeneration = ({ subject }: UseLessonContentGenerationProps) => {
-  // Enhanced teaching engine configuration
-  const teachingEngine = useEnhancedTeachingEngine({
-    subject,
-    difficulty: 3,
-    studentEngagement: 75,
-    learningSpeed: 'adaptive'
-  });
-
-  // Generate initial lesson activities
-  const [baseLessonActivities] = useState<LessonActivity[]>(() => {
-    console.log('🚀 Creating extended 18+ minute lesson for subject:', subject);
+  const baseLessonActivities = useMemo(() => {
+    console.log(`🎯 Generating base lesson activities for ${subject}`);
     
-    let activities: LessonActivity[] = [];
+    const welcomeActivity = createWelcomeActivity(subject);
+    
+    let subjectActivities = [];
     
     switch (subject.toLowerCase()) {
       case 'mathematics':
-        activities = createMathematicsLesson();
+        subjectActivities = createMathematicsLesson();
         break;
       case 'english':
-        activities = createEnglishLesson();
+        subjectActivities = createEnglishLesson();
         break;
       case 'science':
-        activities = createScienceLesson();
+        subjectActivities = createScienceLesson();
         break;
       case 'music':
-        activities = createMusicLesson();
+        subjectActivities = createMusicLesson();
         break;
       case 'computer-science':
-        activities = createComputerScienceLesson();
+        subjectActivities = createComputerScienceLesson();
         break;
       case 'creative-arts':
-        activities = createCreativeArtsLesson();
+        subjectActivities = createCreativeArtsLesson();
         break;
       default:
-        activities = createEnglishLesson();
+        console.warn(`No specific lesson content for subject: ${subject}`);
+        subjectActivities = [];
     }
+    
+    return [welcomeActivity, ...subjectActivities];
+  }, [subject]);
 
-    return activities.map(activity => ({
-      ...teachingEngine.enhanceActivityContent(activity),
-      duration: Math.max(activity.duration * 1.2, 180) // Minimum 3 minutes per activity
-    }));
-  });
-
-  return {
-    baseLessonActivities
-  };
+  return { baseLessonActivities };
 };
