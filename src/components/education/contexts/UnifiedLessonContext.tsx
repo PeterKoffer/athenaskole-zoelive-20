@@ -1,17 +1,10 @@
 
-import { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from '../components/hooks/useEnhancedTeachingEngine';
 import { LessonActivity } from '../components/types/LessonTypes';
-
-export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';
-
-export interface LessonState {
-  phase: LessonPhase;
-  timeSpent: number;
-  currentSegment: number;
-  totalSegments: number;
-  score: number;
-}
+import { useTimerManager } from '../hooks/useTimerManager';
+import { useLessonStateManager, LessonPhase, LessonState } from '../hooks/useLessonStateManager';
+import { useActivityProgression } from '../hooks/useActivityProgression';
 
 export interface UnifiedLessonState {
   // Core lesson state
@@ -29,7 +22,7 @@ export interface UnifiedLessonState {
   lessonStartTime: number;
   lastResponseTime: number;
   
-  // Timer management (unified with session context)
+  // Timer management
   sessionTimer: number;
   isTimerActive: boolean;
   
@@ -70,71 +63,66 @@ export const UnifiedLessonProvider = ({
   onLessonComplete,
   children
 }: UnifiedLessonContextProps) => {
-  // Core lesson state
-  const [lessonState, setLessonState] = useState({
-    phase: 'introduction' as LessonPhase,
-    timeSpent: 0,
-    currentSegment: 0,
+  const lessonStartTime = Date.now();
+  
+  // Timer management
+  const { 
+    timeElapsed: sessionTimer, 
+    isActive: isTimerActive,
+    startTimer,
+    stopTimer,
+    pauseTimer,
+    resumeTimer
+  } = useTimerManager();
+
+  // Lesson state management
+  const {
+    lessonState,
+    updatePhase,
+    updateScore,
+    updateProgress,
+    completeLesson
+  } = useLessonStateManager({
     totalSegments: allActivities.length,
-    score: 0
+    onLessonComplete
   });
 
-  // Activity progression state
-  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
-  const [correctStreak, setCorrectStreak] = useState(0);
-  const [lastResponseTime, setLastResponseTime] = useState(0);
-  const [lessonStartTime] = useState(Date.now());
-  
-  // Timer state
-  const [sessionTimer, setSessionTimer] = useState(0);
-  const [isTimerActive, setIsTimerActive] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const progressionRef = useRef<NodeJS.Timeout | null>(null);
+  // Activity progression
+  const {
+    currentActivityIndex,
+    currentActivity,
+    correctStreak,
+    lastResponseTime,
+    handleActivityComplete: handleActivityCompleteBase,
+    setCurrentActivityIndex,
+    setCorrectStreak,
+    setLastResponseTime
+  } = useActivityProgression({
+    allActivities,
+    onLessonComplete: completeLesson
+  });
 
   // Enhanced teaching engine
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
-    timeElapsed: Math.floor((Date.now() - lessonStartTime) / 1000),
+    timeElapsed: sessionTimer,
     correctStreak,
     score: lessonState.score,
     lessonStartTime
   });
 
-  const currentActivity = allActivities[currentActivityIndex] || null;
-  const timeElapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
-
-  // Timer effect
-  useEffect(() => {
-    if (isTimerActive) {
-      timerRef.current = setInterval(() => {
-        setSessionTimer(prev => prev + 1);
-        setLessonState(prev => ({ ...prev, timeSpent: prev.timeSpent + 1 }));
-      }, 1000);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [isTimerActive]);
-
   // Auto-start lesson after introduction phase
   useEffect(() => {
     if (lessonState.phase === 'introduction') {
-      console.log('🎓 Starting lesson automatically after introduction');
       setTimeout(() => {
         handleLessonStart();
       }, 2000);
     }
   }, []);
 
-  const handleLessonStart = useCallback(() => {
-    console.log('🚀 Lesson started');
-    setLessonState(prev => ({ ...prev, phase: 'lesson' }));
-    setIsTimerActive(true);
+  const handleLessonStart = () => {
+    updatePhase('lesson');
+    startTimer();
     
     // Auto-speak first activity
     setTimeout(() => {
@@ -143,101 +131,42 @@ export const UnifiedLessonProvider = ({
         teachingEngine.speakWithPersonality(welcomeMessage, 'encouragement');
       }
     }, 1000);
-  }, [currentActivity, teachingEngine, subject]);
+  };
 
-  const handleLessonPause = useCallback(() => {
-    setLessonState(prev => ({ ...prev, phase: 'paused' }));
-    setIsTimerActive(false);
-  }, []);
+  const handleLessonPause = () => {
+    updatePhase('paused');
+    pauseTimer();
+  };
 
-  const handleLessonResume = useCallback(() => {
-    setLessonState(prev => ({ ...prev, phase: 'lesson' }));
-    setIsTimerActive(true);
-  }, []);
+  const handleLessonResume = () => {
+    updatePhase('lesson');
+    resumeTimer();
+  };
 
-  const handleLessonComplete = useCallback(() => {
-    setLessonState(prev => ({ ...prev, phase: 'completed' }));
-    setIsTimerActive(false);
-    
-    // Clear any pending progression timers
-    if (progressionRef.current) {
-      clearTimeout(progressionRef.current);
-    }
-    
-    onLessonComplete();
-  }, [onLessonComplete]);
+  const handleLessonComplete = () => {
+    updatePhase('completed');
+    stopTimer();
+    completeLesson();
+  };
 
-  const setScore = useCallback((value: React.SetStateAction<number>) => {
-    setLessonState(prev => ({
-      ...prev,
-      score: typeof value === 'function' ? value(prev.score) : value
-    }));
-  }, []);
-
-  const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
-    const responseTime = Date.now() - lessonStartTime - (timeElapsed * 1000);
-    setLastResponseTime(responseTime);
-
-    console.log('✅ Activity completed:', currentActivityIndex, 'wasCorrect:', wasCorrect);
-
+  const handleActivityComplete = (wasCorrect?: boolean) => {
     if (wasCorrect !== undefined) {
       if (wasCorrect) {
-        setScore(prev => prev + 10);
-        setCorrectStreak(prev => prev + 1);
-        
-        // Immediate positive feedback
+        updateScore(prev => prev + 10);
         setTimeout(() => {
           teachingEngine.speakWithPersonality("Excellent work! You're doing fantastic!", 'encouragement');
         }, 500);
       } else {
-        setCorrectStreak(0);
-        
-        // Encouraging feedback for incorrect answers
         setTimeout(() => {
           teachingEngine.speakWithPersonality("That's okay! Learning takes practice. Let's keep going!", 'encouragement');
         }, 500);
       }
     }
 
-    // Clear any existing progression timer
-    if (progressionRef.current) {
-      clearTimeout(progressionRef.current);
-    }
+    handleActivityCompleteBase(wasCorrect);
+  };
 
-    // Schedule progression to next activity
-    progressionRef.current = setTimeout(() => {
-      if (currentActivityIndex < allActivities.length - 1) {
-        console.log('📚 Moving to next activity:', currentActivityIndex + 1);
-        setCurrentActivityIndex(prev => prev + 1);
-        setLessonState(prev => ({
-          ...prev,
-          currentSegment: currentActivityIndex + 1
-        }));
-      } else {
-        console.log('🏁 Lesson completed!');
-        const finalMinutes = Math.round(timeElapsed / 60);
-        setTimeout(() => {
-          const completionMessage = `Outstanding work! You've completed your ${finalMinutes}-minute ${subject} lesson! You've really grown as a learner today!`;
-          teachingEngine.speakWithPersonality(completionMessage, 'encouragement');
-        }, 1200);
-        
-        setTimeout(() => {
-          handleLessonComplete();
-        }, 5000);
-      }
-    }, wasCorrect !== undefined ? 2500 : 1500);
-  }, [
-    lessonStartTime,
-    timeElapsed,
-    allActivities,
-    currentActivityIndex,
-    subject,
-    teachingEngine,
-    handleLessonComplete,
-    setScore
-  ]);
-
-  const handleReadRequest = useCallback(() => {
+  const handleReadRequest = () => {
     if (currentActivity) {
       let speechText: string;
       let context: 'question' | 'explanation' | 'encouragement' | 'humor' = 'explanation';
@@ -256,31 +185,9 @@ export const UnifiedLessonProvider = ({
         context = 'explanation';
       }
       
-      console.log('🔊 Read request:', speechText.substring(0, 50));
       teachingEngine.speakWithPersonality(speechText, context);
     }
-  }, [currentActivity, teachingEngine, subject]);
-
-  const updateProgress = useCallback((segment: number, timeSpent: number, score: number) => {
-    setLessonState(prev => ({
-      ...prev,
-      currentSegment: segment,
-      timeSpent,
-      score
-    }));
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      if (progressionRef.current) {
-        clearTimeout(progressionRef.current);
-      }
-    };
-  }, []);
+  };
 
   const lessonStateValue: UnifiedLessonState = {
     ...lessonState,
@@ -300,7 +207,7 @@ export const UnifiedLessonProvider = ({
     handleReadRequest,
     updateProgress,
     setCurrentActivityIndex,
-    setScore,
+    setScore: updateScore,
     setCorrectStreak,
     setLastResponseTime
   };
