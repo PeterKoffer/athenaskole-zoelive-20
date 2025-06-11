@@ -47,6 +47,12 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
       isCorrect,
       activityId: activity.id
     });
+
+    // Immediately trigger sound effect and progression
+    setTimeout(() => {
+      console.log('🎯 Calling onActivityComplete with result:', isCorrect);
+      onActivityComplete(isCorrect);
+    }, 1500); // Short delay to show result
   };
 
   const handleNextQuestion = () => {
@@ -57,6 +63,7 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
       : activity.content.correct;
     const isCorrect = selectedAnswer === correctAnswerIndex;
     
+    console.log('🎯 Next question clicked, calling onActivityComplete with:', isCorrect);
     onActivityComplete(isCorrect);
   };
 
@@ -138,10 +145,13 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
               <span className={`font-bold text-base sm:text-lg ${
                 selectedAnswer === correctAnswerIndex ? 'text-green-300' : 'text-red-300'
               }`}>
-                {selectedAnswer === correctAnswerIndex ? 'Excellent!' : 'Not quite right!'}
+                {selectedAnswer === correctAnswerIndex ? 'Excellent! 🎉' : 'Not quite right! 📚'}
               </span>
             </div>
             <p className="text-gray-200 leading-relaxed text-sm sm:text-base">{activity.content.explanation}</p>
+            {!hasSubmitted && (
+              <p className="text-gray-400 text-xs mt-2">Moving to next question...</p>
+            )}
           </div>
         )}
 

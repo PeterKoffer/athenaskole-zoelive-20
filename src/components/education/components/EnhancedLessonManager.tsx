@@ -9,6 +9,7 @@ import LessonActivitySpeechManager from './LessonActivitySpeechManager';
 import EnhancedActivityRenderer from './EnhancedActivityRenderer';
 import SpeechTestCard from './SpeechTestCard';
 import { useSimpleMobileSpeech } from '@/hooks/useSimpleMobileSpeech';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useCallback, useEffect } from 'react';
 
 interface EnhancedLessonManagerProps {
@@ -28,6 +29,9 @@ const EnhancedLessonManager = ({
   
   // Use simplified speech system
   const simpleSpeech = useSimpleMobileSpeech();
+  
+  // Add sound effects system
+  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
   
   const {
     currentActivityIndex,
@@ -81,6 +85,23 @@ const EnhancedLessonManager = ({
       }
     }
   }, [currentActivity, simpleSpeech]);
+
+  // Enhanced activity completion handler with sound effects
+  const handleActivityCompleteWithSound = useCallback((wasCorrect?: boolean) => {
+    console.log('🎯 Activity completed with result:', wasCorrect);
+    
+    // Play appropriate sound effect
+    if (wasCorrect === true) {
+      console.log('🔊 Playing correct answer sound!');
+      playCorrectAnswerSound();
+    } else if (wasCorrect === false) {
+      console.log('🔊 Playing wrong answer sound');
+      playWrongAnswerSound();
+    }
+    
+    // Call the original handler
+    handleActivityComplete(wasCorrect);
+  }, [handleActivityComplete, playCorrectAnswerSound, playWrongAnswerSound]);
 
   if (!currentActivity) {
     return (
@@ -186,7 +207,7 @@ const EnhancedLessonManager = ({
         <div className="w-full">
           <EnhancedActivityRenderer
             activity={currentActivity}
-            onActivityComplete={handleActivityComplete}
+            onActivityComplete={handleActivityCompleteWithSound}
             isNelieReady={simpleSpeech.isReady && simpleSpeech.hasUserInteracted}
           />
         </div>

@@ -34,6 +34,21 @@ const questionTemplates = {
       question: "Which punctuation mark is used to join two independent clauses?",
       options: ['Comma', 'Semicolon', 'Colon', 'Apostrophe'],
       correctAnswer: 1
+    },
+    {
+      question: "What is an antonym for the word 'generous'?",
+      options: ['Kind', 'Selfish', 'Helpful', 'Caring'],
+      correctAnswer: 1
+    },
+    {
+      question: "Which type of poem has 14 lines?",
+      options: ['Haiku', 'Limerick', 'Sonnet', 'Ballad'],
+      correctAnswer: 2
+    },
+    {
+      question: "What is the past tense of 'run'?",
+      options: ['Runned', 'Ran', 'Running', 'Runs'],
+      correctAnswer: 1
     }
   ],
   mathematics: [
@@ -76,6 +91,26 @@ const questionTemplates = {
       question: "If you buy 3 packs of pencils with 8 pencils each, how many pencils do you have?",
       options: ['21 pencils', '24 pencils', '26 pencils', '28 pencils'],
       correctAnswer: 1
+    },
+    {
+      question: "What is 144 ÷ 12?",
+      options: ['11', '12', '13', '14'],
+      correctAnswer: 1
+    },
+    {
+      question: "If a circle has a radius of 5 cm, what is its diameter?",
+      options: ['5 cm', '10 cm', '15 cm', '25 cm'],
+      correctAnswer: 1
+    },
+    {
+      question: "What is 7² (7 squared)?",
+      options: ['14', '49', '21', '42'],
+      correctAnswer: 1
+    },
+    {
+      question: "What is the sum of the angles in a triangle?",
+      options: ['90°', '180°', '270°', '360°'],
+      correctAnswer: 1
     }
   ],
   science: [
@@ -103,6 +138,21 @@ const questionTemplates = {
       question: "Which organ in the human body pumps blood?",
       options: ['Lungs', 'Liver', 'Heart', 'Kidneys'],
       correctAnswer: 2
+    },
+    {
+      question: "What force pulls objects toward the Earth?",
+      options: ['Magnetism', 'Gravity', 'Friction', 'Electricity'],
+      correctAnswer: 1
+    },
+    {
+      question: "Which state of matter has a definite shape and volume?",
+      options: ['Gas', 'Liquid', 'Solid', 'Plasma'],
+      correctAnswer: 2
+    },
+    {
+      question: "How many bones are in an adult human body?",
+      options: ['106', '206', '306', '406'],
+      correctAnswer: 1
     }
   ]
 };
@@ -116,6 +166,12 @@ export const useDynamicActivityGeneration = ({
   const [questionsGenerated, setQuestionsGenerated] = useState(0);
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
   const [usedQuestionIndices, setUsedQuestionIndices] = useState<Set<number>>(new Set());
+  const [sessionQuestionHashes, setSessionQuestionHashes] = useState<Set<string>>(new Set());
+
+  // Create a unique hash for each question to prevent exact duplicates
+  const createQuestionHash = useCallback((question: string, options: string[]) => {
+    return `${question}-${options.join('|')}`;
+  }, []);
 
   const generateDynamicActivity = useCallback(async (): Promise<LessonActivity | null> => {
     if (isGeneratingQuestion) return null;
@@ -127,26 +183,47 @@ export const useDynamicActivityGeneration = ({
       const subjectKey = subject.toLowerCase() as keyof typeof questionTemplates;
       const availableQuestions = questionTemplates[subjectKey] || questionTemplates.mathematics;
       
-      // Find unused questions
-      const unusedIndices = availableQuestions
+      // Find questions that haven't been used in this session
+      const availableIndices = availableQuestions
         .map((_, index) => index)
-        .filter(index => !usedQuestionIndices.has(index));
+        .filter(index => {
+          const question = availableQuestions[index];
+          const questionHash = createQuestionHash(question.question, question.options);
+          return !sessionQuestionHashes.has(questionHash);
+        });
       
-      // If all questions used, reset the set
-      if (unusedIndices.length === 0) {
-        setUsedQuestionIndices(new Set());
-        unusedIndices.push(...availableQuestions.map((_, index) => index));
+      // If all questions have been used in this session, reset and allow reuse
+      // but prefer unused questions from the current batch
+      let selectedIndex: number;
+      let selectedQuestion: any;
+      
+      if (availableIndices.length === 0) {
+        console.log('🔄 All questions used in session, allowing reuse...');
+        // Use questions that haven't been used recently in the current batch
+        const recentlyUnusedIndices = availableQuestions
+          .map((_, index) => index)
+          .filter(index => !usedQuestionIndices.has(index));
+        
+        if (recentlyUnusedIndices.length > 0) {
+          selectedIndex = recentlyUnusedIndices[Math.floor(Math.random() * recentlyUnusedIndices.length)];
+        } else {
+          // Reset used indices and pick randomly
+          setUsedQuestionIndices(new Set());
+          selectedIndex = Math.floor(Math.random() * availableQuestions.length);
+        }
+      } else {
+        selectedIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
       }
       
-      // Select random unused question
-      const randomIndex = unusedIndices[Math.floor(Math.random() * unusedIndices.length)];
-      const selectedQuestion = availableQuestions[randomIndex];
+      selectedQuestion = availableQuestions[selectedIndex];
       
-      // Mark as used
-      setUsedQuestionIndices(prev => new Set([...prev, randomIndex]));
+      // Mark this question as used
+      const questionHash = createQuestionHash(selectedQuestion.question, selectedQuestion.options);
+      setSessionQuestionHashes(prev => new Set([...prev, questionHash]));
+      setUsedQuestionIndices(prev => new Set([...prev, selectedIndex]));
       
       const newActivity: LessonActivity = {
-        id: `dynamic-${subject}-${Date.now()}-${randomIndex}`,
+        id: `dynamic-${subject}-${Date.now()}-${selectedIndex}-${Math.random().toString(36).substr(2, 9)}`,
         title: `${subject} Practice Question ${questionsGenerated + 1}`,
         type: 'interactive-game',
         phase: 'interactive-game',
@@ -156,12 +233,12 @@ export const useDynamicActivityGeneration = ({
           question: selectedQuestion.question,
           options: selectedQuestion.options,
           correctAnswer: selectedQuestion.correctAnswer,
-          explanation: `This question tests your understanding of ${subject} concepts.`
+          explanation: `This question tests your understanding of ${subject} concepts. Great job working through it!`
         }
       };
       
       setQuestionsGenerated(prev => prev + 1);
-      console.log(`🎯 Generated new ${subject} question:`, selectedQuestion.question);
+      console.log(`🎯 Generated unique ${subject} question (${availableIndices.length} unused remaining):`, selectedQuestion.question.substring(0, 50) + '...');
       
       return newActivity;
     } catch (error) {
@@ -170,7 +247,7 @@ export const useDynamicActivityGeneration = ({
     } finally {
       setIsGeneratingQuestion(false);
     }
-  }, [subject, skillArea, isGeneratingQuestion, questionsGenerated, usedQuestionIndices]);
+  }, [subject, skillArea, isGeneratingQuestion, questionsGenerated, usedQuestionIndices, sessionQuestionHashes, createQuestionHash]);
 
   return {
     dynamicActivities,
