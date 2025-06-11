@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { useExtendedLessonManager } from './hooks/useExtendedLessonManager';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
@@ -8,6 +7,8 @@ import LessonProgressSection from './LessonProgressSection';
 import LessonActivitySpeechManager from './LessonActivitySpeechManager';
 import EnhancedActivityRenderer from './EnhancedActivityRenderer';
 import SpeechTestCard from './SpeechTestCard';
+import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
+import { useCallback, useEffect } from 'react';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -24,6 +25,9 @@ const EnhancedLessonManager = ({
 }: EnhancedLessonManagerProps) => {
   const { isAdmin } = useRoleAccess();
   
+  // Use consolidated speech instead of the complex lesson manager speech
+  const consolidatedSpeech = useConsolidatedSpeech();
+  
   const {
     currentActivityIndex,
     lessonActivities,
@@ -32,13 +36,6 @@ const EnhancedLessonManager = ({
     score,
     questionsGenerated,
     targetLessonLength,
-    isSpeaking,
-    autoReadEnabled,
-    hasUserInteracted,
-    isReady,
-    speakText,
-    stopSpeaking,
-    toggleMute,
     handleActivityComplete,
     handleReadRequest
   } = useExtendedLessonManager({
@@ -47,10 +44,56 @@ const EnhancedLessonManager = ({
     onLessonComplete
   });
 
-  // Wrapper function to match expected interface
-  const speakTextWrapper = (text: string, priority?: boolean) => {
-    speakText(text, 'explanation');
-  };
+  // Enable user interaction on any click in the lesson area
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (!consolidatedSpeech.hasUserInteracted) {
+        consolidatedSpeech.enableUserInteraction();
+        console.log('✅ User interaction enabled for speech');
+      }
+    };
+
+    // Add click listener to document
+    document.addEventListener('click', handleUserInteraction, { once: true });
+    
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, [consolidatedSpeech]);
+
+  // Test speech when ready and user has interacted
+  useEffect(() => {
+    if (consolidatedSpeech.isReady && consolidatedSpeech.hasUserInteracted && consolidatedSpeech.isEnabled) {
+      // Brief delay to ensure everything is ready
+      setTimeout(() => {
+        consolidatedSpeech.speak("Hello! I'm Nelie, your learning companion. I'm here to help guide you through today's lesson!", true);
+      }, 2000);
+    }
+  }, [consolidatedSpeech.isReady, consolidatedSpeech.hasUserInteracted, consolidatedSpeech.isEnabled]);
+
+  const handleMuteToggle = useCallback(() => {
+    consolidatedSpeech.toggleEnabled();
+  }, [consolidatedSpeech]);
+
+  const handleReadRequestWrapper = useCallback(() => {
+    if (currentActivity) {
+      let speechText = '';
+      
+      if (currentActivity.phase === 'content-delivery') {
+        speechText = `Let me explain: ${currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || currentActivity.title}`;
+      } else if (currentActivity.phase === 'interactive-game') {
+        speechText = `Here's your question: ${currentActivity.content.question || 'Take your time to think about this.'}`;
+      } else if (currentActivity.phase === 'introduction') {
+        speechText = currentActivity.content.hook || currentActivity.title;
+      } else {
+        speechText = `Let me read this for you: ${currentActivity.title}`;
+      }
+      
+      if (speechText.trim()) {
+        consolidatedSpeech.speak(speechText, true);
+      }
+    }
+  }, [currentActivity, consolidatedSpeech]);
 
   if (!currentActivity) {
     return (
@@ -101,16 +144,27 @@ const EnhancedLessonManager = ({
         </CardContent>
       </Card>
 
+      {/* User Interaction Prompt */}
+      {!consolidatedSpeech.hasUserInteracted && (
+        <Card className="bg-yellow-900/20 border-yellow-700">
+          <CardContent className="p-4 text-center">
+            <p className="text-yellow-300">
+              👆 Click anywhere to enable Nelie's voice guidance!
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Nelie Avatar Section */}
       <div className="flex justify-center">
         <NelieAvatarSection 
           subject={subject} 
           currentQuestionIndex={currentActivityIndex} 
           totalQuestions={lessonActivities.length} 
-          isSpeaking={isSpeaking} 
-          autoReadEnabled={autoReadEnabled} 
-          onMuteToggle={toggleMute} 
-          onReadQuestion={handleReadRequest} 
+          isSpeaking={consolidatedSpeech.isSpeaking} 
+          autoReadEnabled={consolidatedSpeech.isEnabled} 
+          onMuteToggle={handleMuteToggle} 
+          onReadQuestion={handleReadRequestWrapper} 
         />
       </div>
 
@@ -125,10 +179,10 @@ const EnhancedLessonManager = ({
       <LessonActivitySpeechManager
         currentActivity={currentActivity}
         currentActivityIndex={currentActivityIndex}
-        autoReadEnabled={autoReadEnabled && hasUserInteracted}
-        isReady={isReady && hasUserInteracted}
-        speakText={speakTextWrapper}
-        stopSpeaking={stopSpeaking}
+        autoReadEnabled={consolidatedSpeech.isEnabled && consolidatedSpeech.hasUserInteracted}
+        isReady={consolidatedSpeech.isReady && consolidatedSpeech.hasUserInteracted}
+        speakText={consolidatedSpeech.speak}
+        stopSpeaking={consolidatedSpeech.stop}
       />
 
       {/* Activity Content */}
@@ -136,7 +190,7 @@ const EnhancedLessonManager = ({
         <EnhancedActivityRenderer
           activity={currentActivity}
           onActivityComplete={handleActivityComplete}
-          isNelieReady={isReady && hasUserInteracted}
+          isNelieReady={consolidatedSpeech.isReady && consolidatedSpeech.hasUserInteracted}
         />
       </div>
     </div>

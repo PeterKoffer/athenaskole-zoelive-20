@@ -1,7 +1,8 @@
 
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, ArrowRight } from 'lucide-react';
+import { Clock, Play } from 'lucide-react';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface ActivityIntroductionProps {
@@ -17,46 +18,54 @@ const ActivityIntroduction = ({
   onContinue,
   isNelieReady
 }: ActivityIntroductionProps) => {
+  const [hasStarted, setHasStarted] = useState(false);
+
+  // Reset state when activity changes
+  useEffect(() => {
+    setHasStarted(false);
+  }, [activity.id]);
+
+  const handleStartClick = () => {
+    setHasStarted(true);
+    onContinue();
+  };
+
   return (
-    <Card className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-gray-700 min-h-[500px]">
-      <CardContent className="p-4 sm:p-6 md:p-8 text-center text-white flex flex-col justify-between min-h-[500px]">
-        <div className="flex-1 flex flex-col justify-center space-y-4 sm:space-y-6">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 px-2">
-            {activity.title}
-          </h2>
-          
-          <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4 sm:p-6 backdrop-blur-sm mx-2">
-            <p className="text-base sm:text-lg md:text-xl leading-relaxed text-gray-100">
-              {activity.content.hook}
-            </p>
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center justify-between">
+          <span>{activity.title}</span>
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4" />
+            <span className="text-sm">{Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}</span>
           </div>
-          
-          {activity.content.realWorldExample && (
-            <div className="bg-blue-800/30 border border-blue-600 rounded-lg p-3 sm:p-4 backdrop-blur-sm mx-2">
-              <p className="text-sm sm:text-base text-blue-200">
-                💡 {activity.content.realWorldExample}
-              </p>
-            </div>
-          )}
+        </CardTitle>
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-lg p-6 border border-blue-700/50">
+          <h3 className="text-xl font-semibold text-white mb-4">Welcome to Your Learning Journey!</h3>
+          <p className="text-gray-200 text-lg leading-relaxed">
+            {activity.content.hook || activity.content.text || 'Let\'s begin this exciting lesson together!'}
+          </p>
         </div>
 
-        <div className="space-y-4 mt-6 sm:mt-8 px-2">
-          <div className="flex items-center justify-center space-x-2 text-gray-300 text-xs sm:text-sm">
-            <Clock className="w-4 h-4" />
-            <span>{Math.ceil(timeRemaining / 60)} minutes remaining in this phase</span>
+        {isNelieReady && (
+          <div className="bg-gray-700 rounded-lg p-4 border-l-4 border-green-500">
+            <p className="text-green-400 font-medium">🎤 Nelie is ready to guide you!</p>
+            <p className="text-gray-300 text-sm">Your AI learning companion will help explain concepts and answer questions.</p>
           </div>
-          
-          {/* Properly centered and responsive Start Lesson button */}
-          <div className="flex justify-center w-full">
-            <Button
-              onClick={onContinue}
-              size="lg"
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg shadow-lg transform hover:scale-105 transition-all duration-200 w-full max-w-xs sm:max-w-sm md:w-auto"
-            >
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Start Lesson
-            </Button>
-          </div>
+        )}
+
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={handleStartClick}
+            disabled={hasStarted}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
+          >
+            <Play className="w-5 h-5 mr-2" />
+            {hasStarted ? 'Starting Lesson...' : 'Start Learning'}
+          </Button>
         </div>
       </CardContent>
     </Card>
