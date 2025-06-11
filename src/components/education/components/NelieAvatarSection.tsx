@@ -38,8 +38,8 @@ const NelieAvatarSection = ({
             </div>
           </div>
           
-          {/* Button Controls Section */}
-          <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-2 w-full sm:w-auto">
+          {/* Button Controls Section - Properly Aligned */}
+          <div className="flex flex-col gap-2 sm:gap-0 sm:flex-row sm:items-center sm:space-x-3 w-full sm:w-auto">
             <Button
               variant="outline"
               size="sm"
@@ -47,14 +47,14 @@ const NelieAvatarSection = ({
                 console.log('🔊 Mute button clicked, autoReadEnabled:', autoReadEnabled);
                 onMuteToggle();
               }}
-              className="border-purple-400 text-purple-900 bg-white hover:bg-purple-50 w-full sm:w-auto flex items-center justify-center"
+              className="bg-white text-purple-900 border-purple-400 hover:bg-purple-50 w-full sm:w-auto h-9 px-3 flex items-center justify-center gap-2"
             >
               {autoReadEnabled ? (
-                <Volume2 className="w-4 h-4 mr-2" />
+                <Volume2 className="w-4 h-4" />
               ) : (
-                <VolumeX className="w-4 h-4 mr-2" />
+                <VolumeX className="w-4 h-4" />
               )}
-              <span className="text-sm sm:text-base">
+              <span className="text-sm font-medium">
                 {autoReadEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
               </span>
             </Button>
@@ -66,11 +66,11 @@ const NelieAvatarSection = ({
                 console.log('🔊 Read button clicked, autoReadEnabled:', autoReadEnabled);
                 onReadQuestion();
               }}
-              className="border-purple-400 text-purple-900 bg-white hover:bg-purple-50 disabled:opacity-50 w-full sm:w-auto flex items-center justify-center"
+              className="bg-white text-purple-900 border-purple-400 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto h-9 px-3 flex items-center justify-center gap-2"
               disabled={!autoReadEnabled}
             >
-              <Volume2 className="w-4 h-4 mr-2" />
-              <span className="text-sm sm:text-base">
+              <Volume2 className="w-4 h-4" />
+              <span className="text-sm font-medium">
                 {isSpeaking ? 'Nelie is speaking...' : 'Ask Nelie to repeat'}
               </span>
             </Button>
