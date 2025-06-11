@@ -41,7 +41,12 @@ export class GlobalQuestionUniquenessService {
   /**
    * Check if a question text is unique globally
    */
-  async isQuestionUnique(questionText: string, userId: string, subject: string, skipPersistenceCheck = false): Promise<boolean> {
+  async isQuestionUnique(questionText: string, userId: string, subject: string, skipPersistenceCheck = false, isRecap = false): Promise<boolean> {
+    // Allow recap/review questions to repeat
+    if (isRecap) {
+      return true;
+    }
+
     // Check local cache first
     const normalizedText = this.normalizeQuestionText(questionText);
     
@@ -120,8 +125,66 @@ export class GlobalQuestionUniquenessService {
   }
 
   /**
-   * Get all question texts used by a user for a specific subject
+   * Get questions for recap/review purposes
+   * Returns questions the user has answered correctly before
    */
+  async getQuestionsForRecap(userId: string, subject: string, skillArea: string, limit = 10): Promise<UniqueQuestion[]> {
+    try {
+      // Get correctly answered questions from database
+      const { data: correctQuestions } = await supabase
+        .from('user_question_history')
+        .select('question_text, concepts_covered, difficulty_level')
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .eq('is_correct', true)
+        .order('asked_at', { ascending: false })
+        .limit(limit);
+
+      if (!correctQuestions) return [];
+
+      // Convert to UniqueQuestion format with recap flag
+      return correctQuestions.map((q, index) => ({
+        id: this.generateUniqueQuestionId(userId, subject, skillArea) + '_recap',
+        question: q.question_text,
+        options: [], // Would need to be populated from original question
+        correct: 0, // Would need to be populated from original question  
+        explanation: 'This is a recap question to reinforce your learning.',
+        learningObjectives: [],
+        estimatedTime: 30,
+        conceptsCovered: Array.isArray(q.concepts_covered) ? q.concepts_covered : [skillArea],
+        createdAt: new Date(),
+        userId,
+        subject,
+        skillArea,
+        difficultyLevel: q.difficulty_level,
+        isRecap: true
+      }));
+    } catch (error) {
+      console.warn('Could not fetch recap questions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check if a user has answered enough questions to warrant recap
+   */
+  async canGenerateRecap(userId: string, subject: string, skillArea: string, minQuestions = 5): Promise<boolean> {
+    try {
+      const { data, count } = await supabase
+        .from('user_question_history')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .eq('is_correct', true);
+
+      return (count || 0) >= minQuestions;
+    } catch (error) {
+      console.warn('Could not check recap eligibility:', error);
+      return false;
+    }
+  }
   async getUserQuestionTexts(userId: string, subject: string, skillArea: string, limit = 50): Promise<string[]> {
     // Get from local cache first
     const localQuestions = this.getUserQuestions(userId)

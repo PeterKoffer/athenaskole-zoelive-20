@@ -28,6 +28,11 @@ export class QuestionHistoryService {
     additionalContext?: any
   ): Promise<void> {
     try {
+      const metadata = {
+        ...additionalContext,
+        isRecap: question.isRecap || false
+      };
+
       await supabase.from('user_question_history').insert({
         user_id: userId,
         subject,
@@ -39,7 +44,7 @@ export class QuestionHistoryService {
         correct_answer: question.correct.toString(),
         is_correct: isCorrect,
         response_time_seconds: Math.round(responseTime / 1000),
-        metadata: additionalContext
+        metadata: metadata
       });
     } catch (error) {
       console.warn('Could not save question history:', error);

@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuestionGeneration, Question } from "../hooks/useQuestionGeneration";
 import { createFallbackQuestion } from "../utils/fallbackQuestions";
+import { globalQuestionUniquenessService } from "@/services/globalQuestionUniquenessService";
 
 export interface QuestionManagerProps {
   subject: string;
@@ -10,6 +11,7 @@ export interface QuestionManagerProps {
   difficultyLevel: number;
   userId: string;
   totalQuestions: number;
+  allowRecap?: boolean; // New prop to enable recap questions
 }
 
 export interface QuestionManagerData {
@@ -20,12 +22,13 @@ export interface QuestionManagerData {
   generationError: string | null;
   hasTriedFallback: boolean;
   generateNextQuestion: () => Promise<void>;
+  generateRecapQuestion: () => Promise<void>; // New method for recap questions
   handleAnswerSelect: (selectedAnswer: number, onComplete?: () => void) => void;
   setCurrentQuestionIndex: (index: number | ((prev: number) => number)) => void;
   resetQuestions: () => void;
 }
 
-export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId, totalQuestions }: QuestionManagerProps): QuestionManagerData => {
+export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId, totalQuestions, allowRecap = false }: QuestionManagerProps): QuestionManagerData => {
   const { toast } = useToast();
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -67,8 +70,9 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       if (newQuestion) {
         console.log('✅ AI question generated successfully:', newQuestion.question);
         
-        // Check if this question has been used before
-        if (usedQuestions.includes(newQuestion.question)) {
+        // Check if this question has been used before (unless it's a recap question)
+        const currentQuestion = newQuestion as Question & { isRecap?: boolean };
+        if (!currentQuestion.isRecap && usedQuestions.includes(newQuestion.question)) {
           console.log('⚠️ Duplicate question detected, retrying...');
           // Add to attempts and try again
           setQuestionAttempts(prev => new Set([...prev, newQuestion.question]));
@@ -170,6 +174,60 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
 
   }, [answers, sessionQuestions, currentQuestionIndex, totalQuestions, generateNextQuestion, toast]);
 
+  const generateRecapQuestion = useCallback(async () => {
+    if (!allowRecap) {
+      console.log('🚫 Recap not enabled for this session');
+      return;
+    }
+
+    console.log('🔄 Generating recap question for subject:', subject);
+    
+    try {
+      const canRecap = await globalQuestionUniquenessService.canGenerateRecap(userId, subject, skillArea);
+      
+      if (!canRecap) {
+        console.log('⚠️ Not enough questions answered to generate recap');
+        toast({
+          title: "No Recap Available",
+          description: "Answer more questions first to unlock recap mode",
+          duration: 3000
+        });
+        return;
+      }
+
+      const recapQuestions = await globalQuestionUniquenessService.getQuestionsForRecap(userId, subject, skillArea, 1);
+      
+      if (recapQuestions.length > 0) {
+        const recapQuestion = recapQuestions[0];
+        recapQuestion.isRecap = true;
+        
+        setSessionQuestions(prev => [...prev, recapQuestion]);
+        
+        toast({
+          title: "Recap Question Ready",
+          description: "Let's review what you've learned!",
+          duration: 3000
+        });
+        
+        console.log('✅ Recap question generated:', recapQuestion.question);
+      } else {
+        console.log('⚠️ No recap questions available');
+        toast({
+          title: "No Recap Questions",
+          description: "No previous questions available for recap",
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error('❌ Failed to generate recap question:', error);
+      toast({
+        title: "Recap Error",
+        description: "Could not generate recap question",
+        variant: "destructive"
+      });
+    }
+  }, [allowRecap, subject, skillArea, userId, toast]);
+
   const resetQuestions = useCallback(() => {
     setCurrentQuestionIndex(0);
     setSessionQuestions([]);
@@ -186,6 +244,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
     generationError,
     hasTriedFallback,
     generateNextQuestion,
+    generateRecapQuestion,
     handleAnswerSelect,
     setCurrentQuestionIndex,
     resetQuestions
