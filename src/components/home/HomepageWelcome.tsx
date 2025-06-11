@@ -44,15 +44,35 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
   }, [isReady, hasWelcomedThisSession, isEnabled, hasUserInteracted, userName, speakAsNelie]);
 
   const handleTestSpeech = () => {
+    console.log('🔊 Enable Nelie button clicked', { isEnabled, hasUserInteracted, isSpeaking });
+    
     if (!hasUserInteracted) {
+      console.log('🔊 Enabling user interaction first');
       enableUserInteraction();
-      toggleEnabled();
+      // Force enable speech after interaction
+      if (!isEnabled) {
+        setTimeout(() => {
+          toggleEnabled();
+        }, 100);
+      }
     } else if (isSpeaking) {
+      console.log('🔊 Stopping current speech');
       stop();
+    } else if (!isEnabled) {
+      console.log('🔊 Enabling speech');
+      toggleEnabled();
     } else {
+      console.log('🔊 Testing speech');
       const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
       speakAsNelie(testMessage, true);
     }
+  };
+
+  const getButtonText = () => {
+    if (!hasUserInteracted) return 'Enable Nelie';
+    if (isSpeaking) return 'Speaking...';
+    if (!isEnabled) return 'Enable Nelie';
+    return 'Nelie Voice';
   };
 
   return (
@@ -73,7 +93,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
               onClick={handleTestSpeech}
               variant="outline"
               size="sm"
-              className={`border-white/20 text-black bg-white hover:bg-gray-100 hover:text-black ${
+              className={`border-white/20 bg-white hover:bg-gray-100 text-black font-medium ${
                 isSpeaking ? 'animate-pulse' : ''
               }`}
             >
@@ -82,7 +102,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
               ) : (
                 <VolumeX className="w-4 h-4 mr-2" />
               )}
-              {isSpeaking ? 'Speaking...' : isEnabled ? 'Nelie Voice' : 'Enable Nelie'}
+              {getButtonText()}
             </Button>
           </div>
         </div>

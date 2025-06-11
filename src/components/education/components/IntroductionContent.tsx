@@ -47,12 +47,12 @@ const IntroductionContent = ({
         </div>
       </div>
 
-      {/* Simplified controls - only 2 buttons */}
+      {/* Fixed contrast buttons */}
       <div className="flex justify-center gap-4">
         <Button
           onClick={onMuteToggle}
           variant="outline"
-          className="border-purple-400 text-purple-200 hover:bg-purple-800"
+          className="border-purple-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
         >
           {autoReadEnabled ? (
             <>
@@ -70,7 +70,7 @@ const IntroductionContent = ({
         <Button
           onClick={onManualRead}
           variant="outline"
-          className="border-purple-400 text-purple-200 hover:bg-purple-800"
+          className="border-purple-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
           Ask Nelie to Repeat
@@ -85,7 +85,7 @@ const IntroductionContent = ({
           </div>
           <Button
             onClick={onStartLesson}
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white font-medium"
           >
             Start Lesson Now
           </Button>
