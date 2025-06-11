@@ -4,7 +4,7 @@ import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
 
 const getSubjectSpecificIntroduction = (subject: string) => {
   const baseSteps = [
-    { text: "Hello! I'm Nelie, your personal AI learning companion for this subject!" },
+    { text: "Hello! I'm Nelie, your personal AI learning companion!" },
     { text: "I'm absolutely thrilled to explore this amazing topic with you today!" }
   ];
 
@@ -40,7 +40,7 @@ export const useIntroductionFlow = (subject: string) => {
     enableUserInteraction
   } = useConsolidatedSpeech();
 
-  // Start the introduction flow automatically
+  // Start the introduction flow automatically when ready
   useEffect(() => {
     if (!hasStartedFlow && isReady) {
       console.log('🎯 Starting Nelie introduction flow');
@@ -52,17 +52,19 @@ export const useIntroductionFlow = (subject: string) => {
       }
       
       // Start speaking the first step after a short delay
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         const firstStep = introductionSteps[0]?.text;
         if (firstStep && isEnabled) {
           console.log('🔊 Nelie starting first introduction step');
           speak(firstStep, true);
         }
       }, 1000);
+
+      return () => clearTimeout(timer);
     }
   }, [hasStartedFlow, isReady, introductionSteps, isEnabled, hasUserInteracted, speak, enableUserInteraction]);
 
-  // Auto-advance through introduction steps
+  // Auto-advance through introduction steps with longer delays
   useEffect(() => {
     if (hasStartedFlow && currentStep < introductionSteps.length - 1) {
       const timer = setTimeout(() => {
@@ -75,7 +77,7 @@ export const useIntroductionFlow = (subject: string) => {
           console.log('🔊 Nelie speaking step:', nextStep + 1);
           speak(nextStepText, true);
         }
-      }, 5000); // 5 seconds per step
+      }, 8000); // Increased from 5 seconds to 8 seconds per step for better pacing
       
       return () => clearTimeout(timer);
     }

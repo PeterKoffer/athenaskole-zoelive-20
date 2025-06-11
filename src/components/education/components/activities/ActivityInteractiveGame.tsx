@@ -49,13 +49,19 @@ const ActivityInteractiveGame = ({ activity, onActivityComplete }: ActivityInter
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult) return;
+    if (showResult) {
+      console.log('🚫 Answer selection blocked - already showing result');
+      return;
+    }
     console.log('🎯 User selected answer:', answerIndex);
     setSelectedAnswer(answerIndex);
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer === null || showResult) return;
+    if (selectedAnswer === null || showResult) {
+      console.log('🚫 Submit blocked - no answer selected or already showing result');
+      return;
+    }
     
     const responseTime = Date.now() - startTime;
     const correctAnswerIndex = getCorrectAnswerIndex();
@@ -106,7 +112,7 @@ const ActivityInteractiveGame = ({ activity, onActivityComplete }: ActivityInter
         <div className="space-y-3">
           {activity.content.options?.map((option, index) => (
             <Button
-              key={index}
+              key={`${activity.id}-interactive-option-${index}`}
               variant="outline"
               className={`w-full text-left justify-start p-4 h-auto transition-colors ${
                 selectedAnswer === index

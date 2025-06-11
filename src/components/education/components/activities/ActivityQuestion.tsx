@@ -21,17 +21,26 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
     activityTitle: activity.title,
     question: activity.content.question?.substring(0, 50),
     hasOptions: !!activity.content.options,
-    correctAnswer: activity.content.correctAnswer || activity.content.correct
+    correctAnswer: activity.content.correctAnswer || activity.content.correct,
+    selectedAnswer,
+    showResult,
+    hasSubmitted
   });
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult || hasSubmitted) return;
+    if (showResult || hasSubmitted) {
+      console.log('🚫 Answer selection blocked - already submitted or showing result');
+      return;
+    }
     console.log('📝 Answer selected:', answerIndex);
     setSelectedAnswer(answerIndex);
   };
 
   const handleSubmitAnswer = () => {
-    if (selectedAnswer === null || hasSubmitted) return;
+    if (selectedAnswer === null || hasSubmitted) {
+      console.log('🚫 Submit blocked - no answer selected or already submitted');
+      return;
+    }
     
     setHasSubmitted(true);
     setShowResult(true);
@@ -56,7 +65,10 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
   };
 
   const handleNextQuestion = () => {
-    if (!hasSubmitted) return;
+    if (!hasSubmitted) {
+      console.log('🚫 Next blocked - not submitted yet');
+      return;
+    }
     
     const correctAnswerIndex = activity.content.correctAnswer !== undefined 
       ? activity.content.correctAnswer 
@@ -96,7 +108,7 @@ const ActivityQuestion = ({ activity, timeRemaining, onActivityComplete }: Activ
         <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
           {activity.content.options?.map((option: string, index: number) => (
             <Button
-              key={index}
+              key={`${activity.id}-option-${index}`}
               variant={selectedAnswer === index ? "default" : "outline"}
               className={`w-full text-left justify-start p-3 sm:p-4 h-auto transition-all duration-200 text-sm sm:text-base ${
                 showResult
