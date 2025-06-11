@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { useExtendedLessonManager } from './hooks/useExtendedLessonManager';
+import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
 import LessonActivityManager from './LessonActivityManager';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonControlsFooter from './LessonControlsFooter';
@@ -20,43 +20,28 @@ const EnhancedLessonManager = ({
 }: EnhancedLessonManagerProps) => {
   const {
     currentActivityIndex,
-    lessonActivities,
+    allActivities,
     currentActivity,
-    timeElapsed,
-    totalEstimatedTime,
+    sessionTimer,
     score,
     correctStreak,
-    questionsGenerated,
-    targetLessonLength,
-    isInitializing,
-    engagementLevel,
-    adaptiveSpeed,
-    isSpeaking,
-    autoReadEnabled,
-    hasUserInteracted,
-    isReady,
-    speakText,
-    stopSpeaking,
-    toggleMute,
+    phase,
+    isTimerActive,
     handleActivityComplete,
-    handleReadRequest,
-    resetProgress
-  } = useExtendedLessonManager({
-    subject,
-    skillArea,
-    onLessonComplete: onBackToProgram
-  });
+    handleReadRequest
+  } = useUnifiedLesson();
 
   console.log(`🎯 Enhanced ${subject} Lesson:`, {
     currentActivityIndex,
-    totalActivities: lessonActivities.length,
-    timeElapsed,
+    totalActivities: allActivities.length,
+    timeElapsed: sessionTimer,
     score,
-    isInitializing
+    phase,
+    currentActivity: currentActivity?.title
   });
 
-  // Show introduction if no user interaction yet
-  if (!hasUserInteracted) {
+  // Show introduction if lesson hasn't started yet
+  if (phase === 'introduction') {
     return (
       <NelieIntroduction
         subject={subject}
@@ -67,22 +52,22 @@ const EnhancedLessonManager = ({
   }
 
   // Show completed view when lesson is done
-  if (currentActivityIndex >= lessonActivities.length || timeElapsed >= targetLessonLength) {
+  if (phase === 'completed' || currentActivityIndex >= allActivities.length) {
     return <LessonCompletedView onBackToProgram={onBackToProgram} />;
   }
 
-  // Show loading state during initialization
-  if (isInitializing || !currentActivity) {
+  // Show loading state if no current activity
+  if (!currentActivity) {
     return (
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-6 text-center">
           <div className="animate-pulse">
             <div className="w-16 h-16 bg-purple-600 rounded-full mx-auto mb-4"></div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              Preparing your {subject} lesson...
+              Loading your {subject} lesson...
             </h3>
             <p className="text-gray-400">
-              Generating {questionsGenerated} subject-specific questions
+              Preparing {allActivities.length} learning activities
             </p>
           </div>
         </CardContent>
@@ -90,36 +75,38 @@ const EnhancedLessonManager = ({
     );
   }
 
+  const targetLessonLength = Math.max(15 * 60, allActivities.reduce((total, activity) => total + activity.duration, 0));
+
   return (
     <div className="max-w-4xl mx-auto">
       <LessonProgressHeader
         currentActivityIndex={currentActivityIndex}
-        totalActivities={lessonActivities.length}
-        timeElapsed={timeElapsed}
+        totalActivities={allActivities.length}
+        timeElapsed={sessionTimer}
         targetLessonLength={targetLessonLength}
         score={score}
         correctStreak={correctStreak}
-        engagementLevel={engagementLevel}
-        questionsGenerated={questionsGenerated}
+        engagementLevel={85} // Default engagement level
+        questionsGenerated={allActivities.length}
         onBackToProgram={onBackToProgram}
       />
 
       <LessonActivityManager
-        activities={lessonActivities}
+        activities={allActivities}
         currentActivityIndex={currentActivityIndex}
         score={score}
         onActivityComplete={handleActivityComplete}
-        onScoreUpdate={() => {}} // Score updates handled in handleActivityComplete
+        onScoreUpdate={() => {}} // Score updates handled in context
       />
 
       <LessonControlsFooter
-        autoReadEnabled={autoReadEnabled}
-        isSpeaking={isSpeaking}
-        isReady={isReady}
-        adaptiveSpeed={adaptiveSpeed}
-        onMuteToggle={toggleMute}
+        autoReadEnabled={true}
+        isSpeaking={false}
+        isReady={true}
+        adaptiveSpeed={1.0}
+        onMuteToggle={() => {}}
         onManualRead={handleReadRequest}
-        onResetProgress={resetProgress}
+        onResetProgress={() => window.location.reload()}
       />
     </div>
   );

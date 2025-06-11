@@ -1,23 +1,13 @@
 
-import { useActivityState } from './hooks/useActivityState';
-import { useActivitySpeech } from './hooks/useActivitySpeech';
-import { useActivityAnswerHandler } from './ActivityAnswerHandler';
-import LessonActivityRenderer from './LessonActivityRenderer';
-
-interface LessonActivity {
-  id: string;
-  type: 'question' | 'game' | 'explanation' | 'practice';
-  title: string;
-  duration: number;
-  content: any;
-}
+import { LessonActivity } from './types/LessonTypes';
+import EnhancedActivityRenderer from './EnhancedActivityRenderer';
 
 interface LessonActivityManagerProps {
   activities: LessonActivity[];
   currentActivityIndex: number;
   score: number;
-  onActivityComplete: () => void;
-  onScoreUpdate: (newScore: number) => void;
+  onActivityComplete: (wasCorrect?: boolean) => void;
+  onScoreUpdate: (score: number) => void;
 }
 
 const LessonActivityManager = ({
@@ -28,48 +18,32 @@ const LessonActivityManager = ({
   onScoreUpdate
 }: LessonActivityManagerProps) => {
   const currentActivity = activities[currentActivityIndex];
-  
-  const {
-    selectedAnswer,
-    setSelectedAnswer,
-    showResult,
-    setShowResult,
-    activityCompleted,
-    setActivityCompleted
-  } = useActivityState(currentActivityIndex);
 
-  const {
-    stopSpeaking,
-    speakText
-  } = useActivitySpeech(currentActivity, currentActivityIndex, activityCompleted);
-
-  const { handleAnswerSelect, handleManualContinue } = useActivityAnswerHandler({
-    currentActivity,
-    showResult,
-    activityCompleted,
-    score,
-    onScoreUpdate,
-    onActivityComplete,
-    setSelectedAnswer,
-    setShowResult,
-    setActivityCompleted,
-    stopSpeaking,
-    speakText
+  console.log('🎮 LessonActivityManager rendering:', {
+    currentActivityIndex,
+    totalActivities: activities.length,
+    currentActivity: currentActivity?.title,
+    currentActivityType: currentActivity?.type
   });
 
   if (!currentActivity) {
-    return null;
+    console.warn('⚠️ No current activity found');
+    return (
+      <div className="text-center text-white p-8">
+        <p>No activity available at index {currentActivityIndex}</p>
+        <p>Total activities: {activities.length}</p>
+      </div>
+    );
   }
 
   return (
-    <LessonActivityRenderer
-      currentActivity={currentActivity}
-      selectedAnswer={selectedAnswer}
-      showResult={showResult}
-      activityCompleted={activityCompleted}
-      onAnswerSelect={handleAnswerSelect}
-      onManualContinue={handleManualContinue}
-    />
+    <div className="mb-6">
+      <EnhancedActivityRenderer
+        activity={currentActivity}
+        onActivityComplete={onActivityComplete}
+        isNelieReady={true}
+      />
+    </div>
   );
 };
 

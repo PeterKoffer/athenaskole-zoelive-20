@@ -1,12 +1,9 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Volume2, CheckCircle, XCircle } from 'lucide-react';
 import { LessonActivity } from './types/LessonTypes';
-import ActivityIntroduction from './activities/ActivityIntroduction';
-import ActivityContentDelivery from './activities/ActivityContentDelivery';
-import ActivityInteractiveGame from './activities/ActivityInteractiveGame';
-import ActivityApplication from './activities/ActivityApplication';
-import ActivityCreativeExploration from './activities/ActivityCreativeExploration';
-import ActivitySummary from './activities/ActivitySummary';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -19,174 +16,300 @@ const EnhancedActivityRenderer = ({
   onActivityComplete,
   isNelieReady
 }: EnhancedActivityRendererProps) => {
-  const [timeRemaining, setTimeRemaining] = useState(activity.duration);
-  const [hasAnswered, setHasAnswered] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const activityIdRef = useRef(activity.id);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [startTime] = useState(Date.now());
 
-  console.log('🎬 EnhancedActivityRenderer rendering:', {
+  console.log('🎭 EnhancedActivityRenderer rendering:', {
     activityId: activity.id,
+    activityType: activity.type,
     activityPhase: activity.phase,
     activityTitle: activity.title,
-    isCompleted,
-    hasAnswered
+    hasContent: !!activity.content
   });
 
-  // Reset state when activity changes
-  useEffect(() => {
-    if (activityIdRef.current !== activity.id) {
-      console.log('🔄 Activity changed, resetting state:', activity.id);
-      activityIdRef.current = activity.id;
-      setTimeRemaining(activity.duration);
-      setHasAnswered(false);
-      setIsCompleted(false);
+  const playAudio = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      speechSynthesis.speak(utterance);
     }
-  }, [activity.id, activity.duration]);
+  };
 
-  // Timer management - only for non-interactive activities
-  useEffect(() => {
-    // Clear any existing timer
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (showResult) return;
+    setSelectedAnswer(answerIndex);
+    console.log('🎯 Answer selected:', answerIndex);
+  };
 
-    // Don't start timer if already completed
-    if (isCompleted) {
-      return;
-    }
-
-    // Only auto-advance for specific phases
-    const shouldAutoAdvance = (
-      activity.phase === 'introduction' || 
-      activity.phase === 'content-delivery' || 
-      activity.phase === 'summary'
-    ) && !hasAnswered;
-
-    if (shouldAutoAdvance) {
-      timerRef.current = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1 && !isCompleted) {
-            console.log('⏱️ Timer completed for phase:', activity.phase);
-            setIsCompleted(true);
-            setTimeout(() => {
-              onActivityComplete();
-            }, 100);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [activity.phase, activity.id, hasAnswered, isCompleted, onActivityComplete]);
-
-  const handleContinue = () => {
-    if (isCompleted) return;
+  const handleSubmit = () => {
+    if (selectedAnswer === null) return;
     
-    console.log('➡️ Manual continue for phase:', activity.phase);
-    setIsCompleted(true);
+    const responseTime = Date.now() - startTime;
+    let isCorrect = false;
+    
+    if (activity.content.correctAnswer !== undefined) {
+      isCorrect = selectedAnswer === activity.content.correctAnswer;
+    } else if (activity.content.correct !== undefined) {
+      isCorrect = selectedAnswer === activity.content.correct;
+    }
+    
+    console.log('✅ Activity submitted:', {
+      selectedAnswer,
+      correctAnswer: activity.content.correctAnswer || activity.content.correct,
+      isCorrect,
+      responseTime
+    });
+    
+    setShowResult(true);
+    
+    setTimeout(() => {
+      onActivityComplete(isCorrect);
+    }, 2000);
+  };
+
+  const handleNext = () => {
+    console.log('➡️ Moving to next activity');
     onActivityComplete();
   };
 
-  const handleAnswerSubmit = (wasCorrect: boolean) => {
-    if (isCompleted) return;
-    
-    console.log('✅ Answer submitted for phase:', activity.phase, 'Correct:', wasCorrect);
-    setHasAnswered(true);
-    setIsCompleted(true);
-    
-    // Clear timer since user has answered
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    
-    onActivityComplete(wasCorrect);
-  };
-
-  // Prevent rendering if completed to avoid race conditions
-  if (isCompleted) {
+  // Render based on activity type and phase
+  if (activity.phase === 'introduction') {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-      </div>
+      <Card className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-gray-700">
+        <CardContent className="p-8 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">{activity.title}</h2>
+          <p className="text-xl mb-6 text-gray-200">
+            {activity.content.hook || 'Welcome to your lesson!'}
+          </p>
+          <Button
+            onClick={handleNext}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3"
+          >
+            Let's Begin!
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
-  switch (activity.phase) {
-    case 'introduction':
-      return (
-        <ActivityIntroduction 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onContinue={handleContinue}
-          isNelieReady={isNelieReady} 
-        />
-      );
-    
-    case 'content-delivery':
-      return (
-        <ActivityContentDelivery 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onContinue={handleContinue}
-          onAnswerSubmit={handleAnswerSubmit}
-        />
-      );
-    
-    case 'interactive-game':
-      return (
-        <ActivityInteractiveGame 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onAnswerSubmit={handleAnswerSubmit}
-        />
-      );
-    
-    case 'application':
-      return (
-        <ActivityApplication 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onContinue={handleContinue}
-        />
-      );
-    
-    case 'creative-exploration':
-      return (
-        <ActivityCreativeExploration 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onContinue={handleContinue}
-        />
-      );
-    
-    case 'summary':
-      return (
-        <ActivitySummary 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onContinue={handleContinue}
-          onAnswerSubmit={handleAnswerSubmit}
-        />
-      );
-    
-    default:
-      console.warn('⚠️ Unknown activity phase:', activity.phase);
-      return (
-        <ActivityContentDelivery 
-          activity={activity} 
-          timeRemaining={timeRemaining}
-          onContinue={handleContinue}
-          onAnswerSubmit={handleAnswerSubmit}
-        />
-      );
+  if (activity.phase === 'content-delivery') {
+    const segment = activity.content.segments?.[0];
+    return (
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center justify-between">
+            <span>{activity.title}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => playAudio(segment?.explanation || activity.content.text || '')}
+              className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
+            >
+              <Volume2 className="w-4 h-4" />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="bg-gray-700 border border-gray-600 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-white mb-3">
+              {segment?.concept || 'Learning Content'}
+            </h3>
+            <p className="text-gray-200 text-lg leading-relaxed">
+              {segment?.explanation || activity.content.text || 'Content coming soon...'}
+            </p>
+          </div>
+          
+          {segment?.checkQuestion && (
+            <div className="space-y-4">
+              <h4 className="text-lg font-medium text-white">
+                {segment.checkQuestion.question}
+              </h4>
+              
+              <div className="space-y-3">
+                {segment.checkQuestion.options.map((option, index) => (
+                  <Button
+                    key={index}
+                    variant={selectedAnswer === index ? "default" : "outline"}
+                    className={`w-full text-left justify-start p-4 h-auto ${
+                      selectedAnswer === index
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                    }`}
+                    onClick={() => handleAnswerSelect(index)}
+                    disabled={showResult}
+                  >
+                    <span className="mr-3 font-semibold">
+                      {String.fromCharCode(65 + index)}.
+                    </span>
+                    {option}
+                  </Button>
+                ))}
+              </div>
+
+              {showResult && (
+                <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    {selectedAnswer === segment.checkQuestion.correctAnswer ? (
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-400" />
+                    )}
+                    <p className={`font-semibold ${
+                      selectedAnswer === segment.checkQuestion.correctAnswer 
+                        ? 'text-green-400' 
+                        : 'text-red-400'
+                    }`}>
+                      {selectedAnswer === segment.checkQuestion.correctAnswer ? 'Excellent!' : 'Try again next time!'}
+                    </p>
+                  </div>
+                  <p className="text-gray-300">
+                    {segment.checkQuestion.explanation}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                {!showResult ? (
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={selectedAnswer === null}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Submit Answer
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleNext}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    Continue
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {!segment?.checkQuestion && (
+            <div className="flex justify-end">
+              <Button
+                onClick={handleNext}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
   }
+
+  if (activity.phase === 'interactive-game' || activity.type === 'interactive-game') {
+    return (
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center justify-between">
+            <span>{activity.title}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => playAudio(activity.content.question || '')}
+              className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
+            >
+              <Volume2 className="w-4 h-4" />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <h4 className="text-lg font-medium text-white">
+            {activity.content.question}
+          </h4>
+
+          <div className="space-y-3">
+            {activity.content.options?.map((option, index) => (
+              <Button
+                key={index}
+                variant={selectedAnswer === index ? "default" : "outline"}
+                className={`w-full text-left justify-start p-4 h-auto ${
+                  selectedAnswer === index
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                }`}
+                onClick={() => handleAnswerSelect(index)}
+                disabled={showResult}
+              >
+                <span className="mr-3 font-semibold">
+                  {String.fromCharCode(65 + index)}.
+                </span>
+                {option}
+              </Button>
+            ))}
+          </div>
+
+          {showResult && (
+            <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                {selectedAnswer === (activity.content.correctAnswer || activity.content.correct) ? (
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-400" />
+                )}
+                <p className={`font-semibold ${
+                  selectedAnswer === (activity.content.correctAnswer || activity.content.correct)
+                    ? 'text-green-400' 
+                    : 'text-red-400'
+                }`}>
+                  {selectedAnswer === (activity.content.correctAnswer || activity.content.correct) ? 'Excellent!' : 'Try again next time!'}
+                </p>
+              </div>
+              <p className="text-gray-300">
+                {activity.content.explanation || `The correct answer is: ${activity.content.options?.[activity.content.correctAnswer || activity.content.correct]}`}
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-end">
+            {!showResult ? (
+              <Button
+                onClick={handleSubmit}
+                disabled={selectedAnswer === null}
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                Submit Answer
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNext}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Continue
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Default fallback for any other activity type
+  return (
+    <Card className="bg-gray-800 border-gray-700">
+      <CardContent className="p-6 text-center text-white">
+        <h3 className="text-xl font-semibold mb-4">{activity.title}</h3>
+        <p className="text-gray-300 mb-6">
+          {activity.content.text || activity.content.hook || 'Activity content loading...'}
+        </p>
+        <Button
+          onClick={handleNext}
+          className="bg-blue-500 hover:bg-blue-600 text-white"
+        >
+          Continue
+        </Button>
+      </CardContent>
+    </Card>
+  );
 };
 
 export default EnhancedActivityRenderer;
