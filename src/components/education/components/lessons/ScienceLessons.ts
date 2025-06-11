@@ -105,7 +105,8 @@ const scienceLessonConfig: StandardLessonConfig = {
       "It would quickly die because it can't get oxygen from air",
       "It would grow legs and walk around"
     ],
-    correctAnswer: 2
+    correctAnswer: 2,
+    explanation: "Correct! Fish have gills that are specially designed to extract oxygen from water, not air. Out of water, they cannot breathe and would quickly die."
   },
   nextTopicSuggestion: "Next, we'll explore the human body and discover how your heart, lungs, and brain work together to keep you healthy and active!"
 };

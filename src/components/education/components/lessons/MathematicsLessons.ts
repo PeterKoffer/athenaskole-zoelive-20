@@ -105,7 +105,8 @@ const mathematicsLessonConfig: StandardLessonConfig = {
       "Use a calculator",
       "Draw 28 circles and 9 more circles"
     ],
-    correctAnswer: 1
+    correctAnswer: 1,
+    explanation: "Excellent! The mental math strategy of adding 10 and subtracting 1 (28 + 10 - 1 = 37) is much faster than other methods!"
   },
   nextTopicSuggestion: "Next, we'll explore multiplication as repeated addition and discover the amazing patterns in times tables!"
 };

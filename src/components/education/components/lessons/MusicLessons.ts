@@ -105,7 +105,8 @@ const musicLessonConfig: StandardLessonConfig = {
       "The combination of rhythm, melody, and harmony working together",
       "Only the instruments used"
     ],
-    correctAnswer: 2
+    correctAnswer: 2,
+    explanation: "Excellent! Music's emotional power comes from how rhythm, melody, and harmony work together to create feelings and moods that connect with our hearts and minds!"
   },
   nextTopicSuggestion: "Next, we'll explore how to compose your own simple melodies and discover the mathematical patterns that make music sound beautiful!"
 };

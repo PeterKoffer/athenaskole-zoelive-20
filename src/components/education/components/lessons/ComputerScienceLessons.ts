@@ -115,7 +115,8 @@ const computerScienceLessonConfig: StandardLessonConfig = {
       "Breaking problems into logical, step-by-step solutions",
       "Using the most complicated words possible"
     ],
-    correctAnswer: 2
+    correctAnswer: 2,
+    explanation: "Perfect! The most important programming skill is computational thinking - breaking complex problems into clear, logical steps that can be solved systematically!"
   },
   nextTopicSuggestion: "Next, we'll explore how to create simple animations and interactive stories using visual programming tools!"
 };

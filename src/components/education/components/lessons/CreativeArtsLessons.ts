@@ -110,7 +110,8 @@ const creativeArtsLessonConfig: StandardLessonConfig = {
       "Express yourself creatively and enjoy the process",
       "Only use expensive art supplies"
     ],
-    correctAnswer: 2
+    correctAnswer: 2,
+    explanation: "Perfect! Art is about creative expression and enjoying the process of creating. There's no 'wrong' way to be creative - every artist's unique perspective is valuable!"
   },
   nextTopicSuggestion: "Next, we'll explore different art techniques like painting, drawing, and sculpture, and learn how famous artists created their masterpieces!"
 };

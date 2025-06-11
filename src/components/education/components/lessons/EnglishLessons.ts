@@ -109,7 +109,8 @@ const englishLessonConfig: StandardLessonConfig = {
       "Writing as much as possible",
       "Using only simple words"
     ],
-    correctAnswer: 1
+    correctAnswer: 1,
+    explanation: "Perfect! Effective communication comes from choosing the right words for your specific audience and purpose. It's about clarity and connection, not complexity!"
   },
   nextTopicSuggestion: "Next, we'll explore how sentences connect to form paragraphs and discover the power of storytelling structure!"
 };
