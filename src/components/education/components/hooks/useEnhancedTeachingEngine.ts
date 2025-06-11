@@ -5,9 +5,10 @@ import { LessonActivity } from '../types/LessonTypes';
 
 interface TeachingEngineConfig {
   subject: string;
-  difficulty: number;
-  studentEngagement: number;
-  learningSpeed: 'fast' | 'normal' | 'adaptive';
+  timeElapsed: number;
+  correctStreak: number;
+  score: number;
+  lessonStartTime: number;
 }
 
 export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
@@ -27,7 +28,7 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
   } = useWorkingNelieSpeech();
 
   // Enhanced speech with slower, more natural pace and personality
-  const speakWithPersonality = useCallback((text: string, context: 'explanation' | 'question' | 'encouragement' | 'humor') => {
+  const speakWithPersonality = useCallback((text: string, context: 'explanation' | 'question' | 'encouragement' | 'humor' = 'explanation') => {
     if (!autoReadEnabled || !hasUserInteracted) return;
 
     // Add personality modifiers based on context

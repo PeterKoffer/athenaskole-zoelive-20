@@ -6,7 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Code, Zap, Brain, ArrowLeft } from 'lucide-react';
 import EnhancedLessonManager from '../components/EnhancedLessonManager';
 
-const CSFeaturedGames = () => {
+interface CSFeaturedGamesProps {
+  onGameSelect?: (gameId: string) => void;
+}
+
+const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
   const featuredGames = [
@@ -41,6 +45,11 @@ const CSFeaturedGames = () => {
       skillArea: 'artificial-intelligence'
     }
   ];
+
+  const handleGameSelect = (gameId: string) => {
+    setSelectedGame(gameId);
+    onGameSelect?.(gameId);
+  };
 
   const handleBackToGames = () => {
     setSelectedGame(null);
@@ -104,7 +113,7 @@ const CSFeaturedGames = () => {
                 </div>
                 
                 <Button 
-                  onClick={() => setSelectedGame(game.id)}
+                  onClick={() => handleGameSelect(game.id)}
                   className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white`}
                 >
                   Start Game

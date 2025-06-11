@@ -12,11 +12,10 @@ interface CSMainViewProps {
     consecutiveIncorrect: number;
     totalAttempts: number;
   };
-  onGameSelect: (gameId: string) => void;
   onDifficultyChange: (newLevel: number, reason: string) => void;
 }
 
-const CSMainView = ({ performanceMetrics, onGameSelect, onDifficultyChange }: CSMainViewProps) => {
+const CSMainView = ({ performanceMetrics, onDifficultyChange }: CSMainViewProps) => {
   return (
     <div className="p-6">
       <CSLearningHeader
@@ -26,7 +25,7 @@ const CSMainView = ({ performanceMetrics, onGameSelect, onDifficultyChange }: CS
       
       <CSSkillAreasGrid />
       
-      <CSFeaturedGames onGameSelect={onGameSelect} />
+      <CSFeaturedGames />
       
       <CSLearningJourney />
     </div>
