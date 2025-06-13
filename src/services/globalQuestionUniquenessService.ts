@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Question } from '@/components/adaptive-learning/hooks/types';
 
@@ -144,22 +145,32 @@ export class GlobalQuestionUniquenessService {
       if (!correctQuestions) return [];
 
       // Convert to UniqueQuestion format with recap flag
-      return correctQuestions.map((q, index) => ({
-        id: this.generateUniqueQuestionId(userId, subject, skillArea) + '_recap',
-        question: q.question_text,
-        options: [], // Would need to be populated from original question
-        correct: 0, // Would need to be populated from original question  
-        explanation: 'This is a recap question to reinforce your learning.',
-        learningObjectives: [],
-        estimatedTime: 30,
-        conceptsCovered: Array.isArray(q.concepts_covered) ? q.concepts_covered : [skillArea],
-        createdAt: new Date(),
-        userId,
-        subject,
-        skillArea,
-        difficultyLevel: q.difficulty_level,
-        isRecap: true
-      }));
+      return correctQuestions.map((q, index) => {
+        // Safely convert concepts_covered from Json[] to string[]
+        let conceptsCovered: string[] = [skillArea]; // Default fallback
+        if (Array.isArray(q.concepts_covered)) {
+          conceptsCovered = q.concepts_covered.map(concept => 
+            typeof concept === 'string' ? concept : String(concept)
+          );
+        }
+
+        return {
+          id: this.generateUniqueQuestionId(userId, subject, skillArea) + '_recap',
+          question: q.question_text,
+          options: [], // Would need to be populated from original question
+          correct: 0, // Would need to be populated from original question  
+          explanation: 'This is a recap question to reinforce your learning.',
+          learningObjectives: [],
+          estimatedTime: 30,
+          conceptsCovered,
+          createdAt: new Date(),
+          userId,
+          subject,
+          skillArea,
+          difficultyLevel: q.difficulty_level,
+          isRecap: true
+        } as UniqueQuestion;
+      });
     } catch (error) {
       console.warn('Could not fetch recap questions:', error);
       return [];
