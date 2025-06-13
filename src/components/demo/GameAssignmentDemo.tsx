@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TeacherGameAssignments from '@/components/teacher/TeacherGameAssignments';
 import GameAnalyticsDashboard from '@/components/teacher/GameAnalyticsDashboard';
 import StudentGameAssignments from '@/components/games/StudentGameAssignments';
-import { GameEngine } from '@/components/games/GameEngine';
+import GameEngine from '@/components/games/GameEngine';
 import { useAuth } from '@/hooks/useAuth';
 
 /**

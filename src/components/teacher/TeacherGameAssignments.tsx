@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { 
   Plus, 
-  GameController, 
+  Gamepad2, 
   Calendar as CalendarIcon, 
   Users, 
   BookOpen,
@@ -343,7 +344,7 @@ const TeacherGameAssignments = () => {
         {assignments.length === 0 && !isLoading && (
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="text-center py-12">
-              <GameController className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <Gamepad2 className="w-12 h-12 text-gray-600 mx-auto mb-4" />
               <h3 className="text-white text-lg font-medium mb-2">No Game Assignments</h3>
               <p className="text-gray-400 mb-4">
                 Create your first game assignment to enhance student learning with interactive activities.

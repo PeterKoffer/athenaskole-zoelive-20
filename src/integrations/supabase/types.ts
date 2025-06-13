@@ -289,6 +289,116 @@ export type Database = {
         }
         Relationships: []
       }
+      game_assignments: {
+        Row: {
+          assigned_to_class: string | null
+          assigned_to_students: string[] | null
+          created_at: string
+          due_date: string | null
+          game_id: string
+          id: string
+          is_active: boolean | null
+          learning_objective: string | null
+          lesson_id: string | null
+          skill_area: string | null
+          subject: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to_class?: string | null
+          assigned_to_students?: string[] | null
+          created_at?: string
+          due_date?: string | null
+          game_id: string
+          id?: string
+          is_active?: boolean | null
+          learning_objective?: string | null
+          lesson_id?: string | null
+          skill_area?: string | null
+          subject: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to_class?: string | null
+          assigned_to_students?: string[] | null
+          created_at?: string
+          due_date?: string | null
+          game_id?: string
+          id?: string
+          is_active?: boolean | null
+          learning_objective?: string | null
+          lesson_id?: string | null
+          skill_area?: string | null
+          subject?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      game_sessions: {
+        Row: {
+          assignment_id: string | null
+          completion_status: string | null
+          created_at: string
+          duration_seconds: number | null
+          end_time: string | null
+          engagement_metrics: Json | null
+          game_id: string
+          id: string
+          learning_objectives_met: string[] | null
+          performance_data: Json | null
+          score: number | null
+          skill_area: string | null
+          start_time: string
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          completion_status?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          end_time?: string | null
+          engagement_metrics?: Json | null
+          game_id: string
+          id?: string
+          learning_objectives_met?: string[] | null
+          performance_data?: Json | null
+          score?: number | null
+          skill_area?: string | null
+          start_time?: string
+          subject: string
+          user_id: string
+        }
+        Update: {
+          assignment_id?: string | null
+          completion_status?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          end_time?: string | null
+          engagement_metrics?: Json | null
+          game_id?: string
+          id?: string
+          learning_objectives_met?: string[] | null
+          performance_data?: Json | null
+          score?: number | null
+          skill_area?: string | null
+          start_time?: string
+          subject?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_sessions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "game_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learning_objectives: {
         Row: {
           created_at: string
