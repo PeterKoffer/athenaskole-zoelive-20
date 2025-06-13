@@ -8,7 +8,7 @@ import {
   Users, 
   ClipboardList, 
   MessageSquare,
-  GameController
+  Gamepad2
 } from "lucide-react";
 
 const TeacherOverviewTab = () => {
@@ -71,7 +71,7 @@ const TeacherOverviewTab = () => {
             Grade Assignments
           </Button>
           <Button className="w-full bg-orange-600 hover:bg-orange-700 justify-start">
-            <GameController className="w-4 h-4 mr-2" />
+            <Gamepad2 className="w-4 h-4 mr-2" />
             Assign Games
           </Button>
           <Button className="w-full bg-teal-600 hover:bg-teal-700 justify-start">
