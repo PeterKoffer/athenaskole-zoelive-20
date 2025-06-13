@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTimerManager } from '../education/hooks/useTimerManager';
 import { useGameStateManager } from './hooks/useGameStateManager';
-import { useGameTracking } from '@/hooks/useGameTracking';
 import { GameHeader } from './components/GameHeader';
 
 export interface GameState {
@@ -38,7 +37,6 @@ export interface GameConfig {
 
 interface GameEngineProps {
   gameConfig: GameConfig;
-  assignmentId?: string; // Optional assignment ID for tracking
   onComplete: (finalScore: number, achievements: string[]) => void;
   onBack: () => void;
   children: (gameState: GameState, gameActions: GameActions) => React.ReactNode;
@@ -52,27 +50,11 @@ export interface GameActions {
   updateGameData: (data: any) => void;
   completeGame: () => void;
   adaptDifficulty: (performance: number) => void;
-  // Enhanced tracking actions
-  recordAction: () => void;
-  recordHintUsed: () => void;
-  recordAttempt: () => void;
 }
 
-const GameEngine = ({ gameConfig, assignmentId, onComplete, onBack, children }: GameEngineProps) => {
+const GameEngine = ({ gameConfig, onComplete, onBack, children }: GameEngineProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  // Enhanced game tracking
-  const {
-    isTracking,
-    recordAction,
-    recordHintUsed,
-    recordAttempt,
-    updateLearningOutcome,
-    startGameTracking,
-    endGameTracking,
-    abandonGameTracking
-  } = useGameTracking(gameConfig.id, assignmentId);
   
   // Timer management
   const { 
@@ -104,13 +86,6 @@ const GameEngine = ({ gameConfig, assignmentId, onComplete, onBack, children }: 
     maxScore: gameConfig.maxScore
   });
 
-  // Initialize tracking when game starts
-  useEffect(() => {
-    if (user && !isTracking) {
-      startGameTracking(gameConfig.subject, gameConfig.objectives[0]);
-    }
-  }, [user, gameConfig, startGameTracking, isTracking]);
-
   // Auto-complete on time limit
   useEffect(() => {
     if (gameConfig.timeLimit && timeElapsed >= gameConfig.timeLimit) {
@@ -119,25 +94,20 @@ const GameEngine = ({ gameConfig, assignmentId, onComplete, onBack, children }: 
   }, [timeElapsed, gameConfig.timeLimit]);
 
   const completeObjective = useCallback((objective: string) => {
-    recordAction(); // Track the action
-    updateLearningOutcome(objective, true, 100); // Mark objective as achieved
-    
     const shouldComplete = completeObjectiveBase(objective);
     if (shouldComplete) {
       completeGame();
     }
-  }, [completeObjectiveBase, recordAction, updateLearningOutcome]);
+  }, [completeObjectiveBase]);
 
   const loseLife = useCallback(() => {
-    recordAttempt(); // Track the failed attempt
     loseLifeBase();
     if (gameState.lives <= 1) { // Will be 0 after loseLifeBase
       completeGame();
     }
-  }, [loseLifeBase, gameState.lives, recordAttempt]);
+  }, [loseLifeBase, gameState.lives]);
 
   const addAchievement = useCallback((achievement: string) => {
-    recordAction(); // Track achievement action
     addAchievementBase(achievement);
     
     toast({
@@ -145,7 +115,7 @@ const GameEngine = ({ gameConfig, assignmentId, onComplete, onBack, children }: 
       description: achievement,
       duration: 3000
     });
-  }, [addAchievementBase, toast, recordAction]);
+  }, [addAchievementBase, toast]);
 
   const adaptDifficulty = useCallback((performance: number) => {
     const { successThreshold, failureThreshold, difficultyIncrease, difficultyDecrease } = gameConfig.adaptiveRules;
@@ -171,53 +141,21 @@ const GameEngine = ({ gameConfig, assignmentId, onComplete, onBack, children }: 
     adaptDifficultyBase(newLevel);
   }, [gameConfig.adaptiveRules, gameState.level, toast, adaptDifficultyBase]);
 
-  const completeGame = useCallback(async () => {
+  const completeGame = useCallback(() => {
     completeGameBase();
     stopTimer();
-    
-    // End tracking with detailed outcomes
-    if (isTracking) {
-      const completedObjectives = gameConfig.objectives.map(obj => ({
-        objectiveId: obj,
-        description: obj,
-        achieved: gameState.achievements.includes(obj),
-        confidenceLevel: gameState.achievements.includes(obj) ? 100 : 0
-      }));
-      
-      await endGameTracking(gameState.score, completedObjectives);
-    }
-    
     onComplete(gameState.score, gameState.achievements);
-  }, [completeGameBase, stopTimer, endGameTracking, gameState.score, gameState.achievements, gameConfig.objectives, isTracking, onComplete]);
+  }, [completeGameBase, stopTimer, onComplete, gameState.score, gameState.achievements]);
 
   const gameActions: GameActions = {
-    updateScore: (points: number) => {
-      recordAction(); // Track score update action
-      updateScore(points);
-    },
+    updateScore,
     completeObjective,
     loseLife,
     addAchievement,
     updateGameData,
     completeGame,
-    adaptDifficulty,
-    // Enhanced tracking actions
-    recordAction,
-    recordHintUsed,
-    recordAttempt
+    adaptDifficulty
   };
-
-  // Handle navigation away from game
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (isTracking) {
-        abandonGameTracking();
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isTracking, abandonGameTracking]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
