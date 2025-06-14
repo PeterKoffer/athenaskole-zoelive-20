@@ -1,160 +1,135 @@
 
-import { getDefaultSpeechConfig, SpeechConfig } from './SpeechConfig';
-import { SpeechState } from './SpeechState';
-import { setupPageVisibilityListener, setupUserInteractionListeners } from './EventListeners';
-import { SpeechSystemQueue } from "./SpeechSystemQueue";
-import { initializeSpeechEngines } from "./SpeechInitializer";
 import { SpeechStateManager } from './SpeechStateManager';
 import { SpeechOrchestrator } from './SpeechOrchestrator';
+import { SpeechSystemQueue } from './SpeechSystemQueue';
 import { SpeechQueueProcessor } from './SpeechQueueProcessor';
+import { SpeechConfig } from './SpeechConfig';
+import { speechDeduplication } from './SpeechDeduplicationManager';
 
 class UnifiedSpeechSystem {
-  private config: SpeechConfig = getDefaultSpeechConfig();
   private stateManager = new SpeechStateManager();
-  private queue = new SpeechSystemQueue();
   private orchestrator = new SpeechOrchestrator();
-  private queueProcessor = new SpeechQueueProcessor(this.queue, this.orchestrator);
+  private queue = new SpeechSystemQueue();
+  private processor = new SpeechQueueProcessor(this.queue, this.orchestrator);
+  private config = new SpeechConfig();
 
   constructor() {
     this.initializeSpeechSystem();
   }
 
   private async initializeSpeechSystem() {
-    this.stateManager.updateState({ isCheckingElevenLabs: true, isLoading: true });
-    
-    try {
-      await initializeSpeechEngines(
-        this.config, 
-        (updates) => this.stateManager.updateState(updates),
-        this.stateManager.getState()
-      );
-    } catch (error) {
-      console.error("[UnifiedSpeechSystem] CRITICAL ERROR during initialization:", error);
-      this.stateManager.updateState({ 
-          lastError: "Critical initialization error",
-          isReady: false,
-          isLoading: false,
-      });
-    } finally {
-      this.stateManager.updateState({ isCheckingElevenLabs: false });
-    }
-
-    console.log("🔧 [UnifiedSpeechSystem] initializeSpeechSystem done", {
-      usingElevenLabs: this.stateManager.getState().usingElevenLabs,
-      isReady: this.stateManager.getState().isReady,
-      isLoading: this.stateManager.getState().isLoading,
-      lastError: this.stateManager.getState().lastError,
-      isCheckingElevenLabs: this.stateManager.getState().isCheckingElevenLabs
-    });
-
-    const state = this.stateManager.getState();
-    setupPageVisibilityListener(() => this.stop(), state.isSpeaking);
-    setupUserInteractionListeners(
-      () => this.stateManager.updateState({ hasUserInteracted: true }),
-      state.hasUserInteracted
-    );
+    console.log('🔧 [UnifiedSpeechSystem] Initializing...');
+    await this.stateManager.initialize();
+    console.log('🔧 [UnifiedSpeechSystem] initializeSpeechSystem done', this.stateManager.getState());
   }
 
-  subscribe(listener: (state: SpeechState) => void): () => void {
-    return this.stateManager.subscribe(listener);
-  }
+  async speak(text: string, priority: boolean = false, context?: string): Promise<void> {
+    if (!text?.trim()) return;
 
-  getState(): SpeechState {
-    return this.stateManager.getState();
-  }
-
-  async speak(text: string, priority: boolean = false): Promise<void> {
-    if (!text || text.trim().length === 0) {
-      console.log('[UnifiedSpeechSystem] speak() called with empty or blank text, aborting.');
-      return;
-    }
-    
-    const state = this.stateManager.getState();
-    console.log("📝 [UnifiedSpeechSystem] speak() called", {
-      text,
-      priority,
-      isCheckingElevenLabs: state.isCheckingElevenLabs,
-      usingElevenLabs: state.usingElevenLabs,
-      isReady: state.isReady,
-      hasUserInteracted: state.hasUserInteracted,
-      isEnabled: state.isEnabled
-    });
-
-    if (state.isCheckingElevenLabs) {
-      console.log('⏳ [UnifiedSpeechSystem] Waiting for ElevenLabs readiness before speaking:', text.substring(0, 40));
-      setTimeout(() => this.speak(text, priority), 300);
+    // Check if this content has already been spoken
+    if (speechDeduplication.hasBeenSpoken(text, context)) {
+      console.log('🔇 Content already spoken, skipping:', text.substring(0, 50));
       return;
     }
 
-    if (!state.isReady) {
-      console.log('[UnifiedSpeechSystem] Speech system not ready, re-initializing...');
-      await this.initializeSpeechSystem();
-    }
+    console.log('[UnifiedSpeechSystem] Speaking:', text.substring(0, 50), { priority, context });
 
-    // Change: Stop before queuing if priority
-    if (priority) {
-      console.log('[UnifiedSpeechSystem] Priority speech requested, calling stop() before queueing');
-      this.stop();
-    }
+    // Mark as spoken before adding to queue
+    speechDeduplication.markAsSpoken(text, context);
 
-    console.log(`[UnifiedSpeechSystem] Adding item to queue: "${text.substring(0,40)}..." with priority=${priority}`);
-    this.queue.addItem(text, priority);
-
-    // Debug queue items
-    console.log("[UnifiedSpeechSystem] Queue after add:", this.queue);
-
-    this.processQueue();
-  }
-
-  async speakAsNelie(text: string, priority: boolean = false): Promise<void> {
-    if (!text) return;
-    const nelieText = this.orchestrator.addNeliePersonality(text);
-    await this.speak(nelieText, priority);
-  }
-
-  private async processQueue(): Promise<void> {
-    const state = this.stateManager.getState();
-    console.log("[UnifiedSpeechSystem] processQueue called", {
-      isSpeaking: state.isSpeaking,
-      isReady: state.isReady,
-      isEnabled: state.isEnabled,
-      queue: this.queue,
-    });
-    await this.queueProcessor.processQueue(
+    this.queue.add({ text, priority });
+    await this.processor.processQueue(
       this.config,
-      state,
+      this.stateManager.getState(),
       (updates) => this.stateManager.updateState(updates)
     );
   }
 
+  async speakAsNelie(text: string, priority: boolean = false, context?: string): Promise<void> {
+    if (!text?.trim()) return;
+
+    // Check if this content has already been spoken
+    if (speechDeduplication.hasBeenSpoken(text, context)) {
+      console.log('🔇 Nelie content already spoken, skipping:', text.substring(0, 50));
+      return;
+    }
+
+    const nelieText = this.orchestrator.addNeliePersonality(text);
+    
+    // Mark as spoken before processing
+    speechDeduplication.markAsSpoken(text, context);
+    
+    console.log('[UnifiedSpeechSystem] Nelie speaking:', nelieText.substring(0, 50), { priority, context });
+
+    this.queue.add({ text: nelieText, priority });
+    await this.processor.processQueue(
+      this.config,
+      this.stateManager.getState(),
+      (updates) => this.stateManager.updateState(updates)
+    );
+  }
+
+  // Allow content to be repeated (for manual repeat buttons)
+  async repeatLastSpeech(text: string, context?: string): Promise<void> {
+    if (!text?.trim()) return;
+
+    console.log('[UnifiedSpeechSystem] Allowing repeat for:', text.substring(0, 50));
+    speechDeduplication.allowRepeat(text, context);
+    
+    // Now speak it again
+    await this.speak(text, true, context);
+  }
+
   stop(): void {
-    console.log('[UnifiedSpeechSystem] stop() called - this will cancel current speech & clear queue');
-    if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+    console.log('[UnifiedSpeechSystem] Stopping speech');
     this.queue.clear();
-    this.stateManager.updateState({
-      isSpeaking: false,
-      currentUtterance: null,
+    this.stateManager.updateState({ 
+      isSpeaking: false, 
+      currentUtterance: null 
     });
   }
 
   toggleEnabled(): void {
     const currentState = this.stateManager.getState();
-    const newState = !currentState.isEnabled;
-    console.log(`[UnifiedSpeechSystem] toggleEnabled() - switching isEnabled from ${currentState.isEnabled} to ${newState}`);
-    this.stateManager.updateState({ isEnabled: newState });
-    if (!newState) this.stop();
+    const newEnabledState = !currentState.isEnabled;
+    
+    console.log('[UnifiedSpeechSystem] Toggling enabled:', newEnabledState);
+    
+    if (!newEnabledState) {
+      this.stop();
+      speechDeduplication.clearAll(); // Clear spoken content when disabling
+    }
+    
+    this.stateManager.updateState({ isEnabled: newEnabledState });
   }
 
   enableUserInteraction(): void {
-    console.log("[UnifiedSpeechSystem] enableUserInteraction() called");
-    this.stateManager.updateState({ hasUserInteracted: true });
+    console.log('[UnifiedSpeechSystem] Enabling user interaction');
+    this.stateManager.updateState({ 
+      hasUserInteracted: true,
+      isEnabled: true 
+    });
   }
 
   async test(): Promise<void> {
-    const testMessage = "Hi! I'm Nelie, your learning companion. My enhanced voice system with ElevenLabs is working perfectly! I'm so excited to help you learn!";
-    await this.speak(testMessage, true);
+    const testText = "This is a test of Nelie's voice system.";
+    // Don't use deduplication for test messages
+    speechDeduplication.allowRepeat(testText, 'test');
+    await this.speak(testText, true, 'test');
+  }
+
+  getState() {
+    return this.stateManager.getState();
+  }
+
+  subscribe(callback: (state: any) => void) {
+    return this.stateManager.subscribe(callback);
+  }
+
+  // Clear spoken content for new sessions
+  clearSpokenContent(): void {
+    speechDeduplication.clearAll();
   }
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
-

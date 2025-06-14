@@ -20,28 +20,31 @@ const LessonActivitySpeechManager = ({
   stopSpeaking
 }: LessonActivitySpeechManagerProps) => {
   const lastActivityId = useRef<string>('');
-  const hasSpoken = useRef<boolean>(false);
+  const hasAutoSpoken = useRef<boolean>(false);
 
-  // Reset speech flag when activity changes
+  // Reset auto-speech flag when activity changes
   useEffect(() => {
     if (currentActivity?.id !== lastActivityId.current) {
       lastActivityId.current = currentActivity?.id || '';
-      hasSpoken.current = false;
+      hasAutoSpoken.current = false;
+      console.log('🔄 New activity detected, resetting auto-speech flag');
     }
   }, [currentActivity?.id]);
 
-  // Auto-speak when activity changes using ONLY Fena voice
+  // Auto-speak when activity changes using ONLY Fena voice with deduplication
   useEffect(() => {
     if (
       currentActivity && 
       autoReadEnabled && 
       isReady && 
-      !hasSpoken.current &&
+      !hasAutoSpoken.current &&
       currentActivity.id !== lastActivityId.current
     ) {
-      hasSpoken.current = true;
+      hasAutoSpoken.current = true;
       
-      // Use ElevenLabs Fena voice only - fast response timing
+      // Use activity-specific context for deduplication
+      const context = `activity-${currentActivity.id}-${currentActivity.phase}`;
+      
       setTimeout(() => {
         let speechText = '';
         
@@ -62,7 +65,8 @@ const LessonActivitySpeechManager = ({
         }
         
         if (speechText && speechText.trim()) {
-          console.log('🎭 Auto-speaking using ONLY Fena voice:', speechText.substring(0, 50) + '...');
+          console.log('🎭 Auto-speaking activity with context:', context, speechText.substring(0, 50) + '...');
+          // The speakText function will handle deduplication through UnifiedSpeechSystem
           speakText(speechText, true);
         }
       }, 800);

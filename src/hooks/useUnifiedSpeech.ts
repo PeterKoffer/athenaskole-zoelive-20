@@ -10,12 +10,16 @@ export const useUnifiedSpeech = () => {
     return unsubscribe;
   }, []);
 
-  const speak = useCallback(async (text: string, priority: boolean = false) => {
-    await unifiedSpeech.speak(text, priority);
+  const speak = useCallback(async (text: string, priority: boolean = false, context?: string) => {
+    await unifiedSpeech.speak(text, priority, context);
   }, []);
 
-  const speakAsNelie = useCallback(async (text: string, priority: boolean = false) => {
-    await unifiedSpeech.speakAsNelie(text, priority);
+  const speakAsNelie = useCallback(async (text: string, priority: boolean = false, context?: string) => {
+    await unifiedSpeech.speakAsNelie(text, priority, context);
+  }, []);
+
+  const repeatSpeech = useCallback(async (text: string, context?: string) => {
+    await unifiedSpeech.repeatLastSpeech(text, context);
   }, []);
 
   const stop = useCallback(() => {
@@ -34,6 +38,10 @@ export const useUnifiedSpeech = () => {
     await unifiedSpeech.test();
   }, []);
 
+  const clearSpokenContent = useCallback(() => {
+    unifiedSpeech.clearSpokenContent();
+  }, []);
+
   return {
     // State
     isSpeaking: speechState.isSpeaking,
@@ -47,10 +55,12 @@ export const useUnifiedSpeech = () => {
     // Actions
     speak,
     speakAsNelie,
+    repeatSpeech,
     stop,
     toggleEnabled,
     enableUserInteraction,
     test,
+    clearSpokenContent,
 
     // Legacy compatibility
     autoReadEnabled: speechState.isEnabled,
@@ -60,4 +70,3 @@ export const useUnifiedSpeech = () => {
     testSpeech: test
   };
 };
-

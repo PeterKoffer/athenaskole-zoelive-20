@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,6 +41,7 @@ const ExplanationCard = ({
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [displayTime, setDisplayTime] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
+  const hasAutoSpoken = useRef(false);
   const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useWorkingSpeech();
 
   // Load user preferences on mount
@@ -65,6 +65,7 @@ const ExplanationCard = ({
       return () => clearInterval(timer);
     } else {
       setDisplayTime(0);
+      hasAutoSpoken.current = false; // Reset when explanation becomes invisible
     }
   }, [isVisible]);
 
@@ -127,9 +128,10 @@ const ExplanationCard = ({
     }
   }, [isVisible]);
 
-  // Auto-read explanation if enabled
+  // Auto-read explanation if enabled (only once per explanation)
   useEffect(() => {
-    if (isVisible && autoReadEnabled) {
+    if (isVisible && autoReadEnabled && !hasAutoSpoken.current) {
+      hasAutoSpoken.current = true;
       setTimeout(() => {
         handleReadAloud();
       }, 1200);
@@ -149,7 +151,9 @@ const ExplanationCard = ({
       speechText = `That's not quite right. The correct answer is: ${correctAnswer}. Let me explain: ${explanation}`;
     }
     
-    console.log('🔊 ExplanationCard speaking:', speechText.substring(0, 50));
+    // Create unique context for this explanation
+    const context = `explanation-${questionNumber}-${isCorrect ? 'correct' : 'incorrect'}`;
+    console.log('🔊 ExplanationCard speaking with context:', context, speechText.substring(0, 50));
     speakText(speechText, true);
   };
 
