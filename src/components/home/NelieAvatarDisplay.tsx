@@ -10,7 +10,7 @@ const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
   return (
     <div className="flex items-center space-x-4">
       <RobotAvatar 
-        size="3xl" 
+        size="xl" 
         isActive={true} 
         isSpeaking={isSpeaking}
       />

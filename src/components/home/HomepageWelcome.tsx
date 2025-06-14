@@ -76,7 +76,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
 
   return (
     <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-none mb-6">
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <WelcomeContent userName={userName} />
           <NelieAvatarDisplay 
