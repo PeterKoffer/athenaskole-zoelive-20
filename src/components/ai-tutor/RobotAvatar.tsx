@@ -65,12 +65,12 @@ const RobotAvatar = ({
         draggable={false}
       />
       
-      {/* Blinking animation positioned at top-65% and shifted right with angled dot */}
+      {/* Blinking animation positioned at top-65% and shifted right with more angled dot */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Position the blinking effect at top-65% and shifted 4-5mm to the right */}
-          <div className="absolute top-[65%] left-[52%] transform -translate-x-1/2 -translate-y-1/2">
-            <div className="relative transform rotate-12">
+          {/* Position the blinking effect at top-65% and shifted more to the right */}
+          <div className="absolute top-[65%] left-[55%] transform -translate-x-1/2 -translate-y-1/2">
+            <div className="relative transform rotate-[18deg]">
               {/* Outer glow ring - sized to match the belly dot */}
               <div className="absolute -inset-1 bg-cyan-400 rounded-full animate-ping opacity-30"></div>
               
