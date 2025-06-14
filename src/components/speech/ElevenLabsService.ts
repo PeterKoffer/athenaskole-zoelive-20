@@ -1,6 +1,6 @@
 
 interface ElevenLabsConfig {
-  apiKey: string;
+  apiKey: string; // Not used anymore, but kept for compatibility
   voiceId: string;
   model: string;
 }
@@ -10,8 +10,9 @@ interface AudioResponse {
   error?: string;
 }
 
-// Fena's official ID from ElevenLabs: https://api.elevenlabs.io/docs#voices
-// Fena - YvMZb1i5lC3pIbB08jiB
+// Supabase Edge Function URL (replace with actual project ref if needed)
+const EDGE_BASE =
+  "https://tgjudtnjhtumrfthegis.functions.supabase.co/elevenlabs-proxy";
 
 class ElevenLabsService {
   private config: ElevenLabsConfig;
@@ -19,36 +20,32 @@ class ElevenLabsService {
   private availabilityPromise: Promise<void>;
 
   constructor() {
-    // Ensure we use the API key from environment variables (via Supabase secrets)
-    const apiKey = import.meta.env.PUBLIC_ELEVENLABS_API_KEY || '';
-
     this.config = {
-      apiKey: apiKey, // Secure API key from Supabase secret
-      voiceId: 'YvMZb1i5lC3pIbB08jiB', // Fena
-      model: 'eleven_turbo_v2_5'
+      apiKey: "", // No longer needed on client
+      voiceId: "YvMZb1i5lC3pIbB08jiB", // Fena
+      model: "eleven_turbo_v2_5",
     };
-
-    // Perform the async check and expose the promise
     this.availabilityPromise = this.checkAvailability();
   }
 
   private async checkAvailability(): Promise<void> {
     try {
-      const response = await fetch('https://api.elevenlabs.io/v1/voices', {
-        method: 'GET',
-        headers: {
-          'xi-api-key': this.config.apiKey
-        }
+      const response = await fetch(EDGE_BASE + "/check-availability", {
+        method: "GET",
       });
       this.isAvailable = response.ok;
-      console.log('🎤 ElevenLabs availability:', this.isAvailable ? 'Available' : 'Unavailable');
+      console.log(
+        "🎤 ElevenLabs availability (via Supabase):",
+        this.isAvailable ? "Available" : "Unavailable"
+      );
     } catch (error) {
       this.isAvailable = false;
-      console.log('🎤 ElevenLabs not available, will use browser speech synthesis');
+      console.log(
+        "🎤 ElevenLabs not available (via Supabase), will use browser speech synthesis"
+      );
     }
   }
 
-  // Expose a promise the consumer can await to ensure up-to-date availability
   ensureAvailability(): Promise<void> {
     return this.availabilityPromise;
   }
@@ -59,51 +56,40 @@ class ElevenLabsService {
 
   async generateSpeech(text: string): Promise<AudioResponse> {
     if (!this.isAvailable) {
-      return { audioContent: '', error: 'ElevenLabs not available' };
+      return {
+        audioContent: "",
+        error: "ElevenLabs not available",
+      };
     }
 
     try {
-      console.log('🎤 Generating ElevenLabs speech for:', text.substring(0, 50) + '...');
-      const response = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${this.config.voiceId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Accept': 'audio/mpeg',
-            'Content-Type': 'application/json',
-            'xi-api-key': this.config.apiKey
-          },
-          body: JSON.stringify({
-            text: text,
-            model_id: this.config.model,
-            voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.5,
-              style: 0.3,
-              use_speaker_boost: true
-            }
-          })
-        }
+      console.log(
+        "🎤 Generating ElevenLabs speech (via Supabase) for:",
+        text.substring(0, 50) + "..."
       );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `ElevenLabs API error: ${response.status} - ${errorData.detail?.message || 'Unknown error'}`
-        );
+      const response = await fetch(EDGE_BASE + "/generate-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: text,
+          voiceId: this.config.voiceId,
+          model: this.config.model,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.audioContent) {
+        throw new Error(data.error || "Unknown TTS error");
       }
-
-      const audioBuffer = await response.arrayBuffer();
-      const base64Audio = btoa(
-        String.fromCharCode(...new Uint8Array(audioBuffer))
-      );
-
-      return { audioContent: base64Audio };
+      return { audioContent: data.audioContent };
     } catch (error) {
-      console.error('❌ ElevenLabs speech generation failed:', error);
+      console.error("❌ ElevenLabs speech generation failed:", error);
       return {
-        audioContent: '',
-        error: error instanceof Error ? error.message : 'Speech generation failed'
+        audioContent: "",
+        error: error instanceof Error
+          ? error.message
+          : "Speech generation failed",
       };
     }
   }
@@ -115,7 +101,7 @@ class ElevenLabsService {
         const audio = new Audio(audioData);
 
         audio.onended = () => resolve();
-        audio.onerror = () => reject(new Error('Audio playback failed'));
+        audio.onerror = () => reject(new Error("Audio playback failed"));
 
         audio.play().catch(reject);
       } catch (error) {
@@ -134,4 +120,3 @@ class ElevenLabsService {
 }
 
 export const elevenLabsService = new ElevenLabsService();
-

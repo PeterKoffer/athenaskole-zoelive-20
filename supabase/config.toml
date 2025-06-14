@@ -1,1 +1,4 @@
 project_id = "tgjudtnjhtumrfthegis"
+
+[functions.elevenlabs-proxy]
+verify_jwt = false
