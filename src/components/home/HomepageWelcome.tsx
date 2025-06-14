@@ -14,6 +14,8 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     return sessionStorage.getItem('nelieHomepageWelcomed') === 'true';
   });
   
+  const [hasManuallyTriggered, setHasManuallyTriggered] = useState(false);
+  
   const {
     isSpeaking,
     isEnabled,
@@ -27,28 +29,36 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
 
   console.log('🏠 Homepage Welcome State:', {
     hasWelcomedThisSession,
+    hasManuallyTriggered,
     isSpeaking,
     isEnabled,
     hasUserInteracted,
     isReady
   });
 
-  // Auto-enable Nelie and trigger welcome speech after first interaction
+  // Auto-enable Nelie and trigger welcome speech after first interaction (but only if not manually triggered)
   useEffect(() => {
     if (
       isReady &&
       hasUserInteracted &&
       !hasWelcomedThisSession &&
+      !hasManuallyTriggered &&
       !isEnabled
     ) {
       toggleEnabled();
     }
-  }, [isReady, hasUserInteracted, hasWelcomedThisSession, isEnabled, toggleEnabled]);
+  }, [isReady, hasUserInteracted, hasWelcomedThisSession, hasManuallyTriggered, isEnabled, toggleEnabled]);
 
-  // Welcome the user ONLY ONCE per session
+  // Welcome the user ONLY ONCE per session and only if not manually triggered
   useEffect(() => {
-    if (isReady && !hasWelcomedThisSession && isEnabled && hasUserInteracted) {
-      console.log('🎤 Nelie welcoming user to homepage - ONCE PER SESSION (Unified)');
+    if (
+      isReady && 
+      !hasWelcomedThisSession && 
+      !hasManuallyTriggered &&
+      isEnabled && 
+      hasUserInteracted
+    ) {
+      console.log('🎤 Nelie auto-welcoming user to homepage - ONCE PER SESSION (Unified)');
       setHasWelcomedThisSession(true);
       sessionStorage.setItem('nelieHomepageWelcomed', 'true');
       const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
@@ -56,7 +66,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
         speak(welcomeMessage, true);
       }, 1500);
     }
-  }, [isReady, hasWelcomedThisSession, isEnabled, hasUserInteracted, userName, speak]);
+  }, [isReady, hasWelcomedThisSession, hasManuallyTriggered, isEnabled, hasUserInteracted, userName, speak]);
 
   const handleTestSpeech = async () => {
     console.log('🔊 Enable Nelie button clicked (Homepage)', { 
@@ -65,6 +75,11 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       isSpeaking, 
       isReady 
     });
+    
+    // Mark that user manually triggered speech to prevent auto-welcome
+    setHasManuallyTriggered(true);
+    setHasWelcomedThisSession(true);
+    sessionStorage.setItem('nelieHomepageWelcomed', 'true');
     
     if (!hasUserInteracted) {
       console.log('🔊 First interaction - enabling user interaction');
