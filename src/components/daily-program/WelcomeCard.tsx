@@ -5,9 +5,10 @@ import { Star } from "lucide-react";
 interface WelcomeCardProps {
   firstName: string;
   todaysDate: string;
+  activityCount?: number;
 }
 
-const WelcomeCard = ({ firstName, todaysDate }: WelcomeCardProps) => {
+const WelcomeCard = ({ firstName, todaysDate, activityCount = 6 }: WelcomeCardProps) => {
   return (
     <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-none mb-8">
       <CardContent className="p-6 text-white">
@@ -17,7 +18,7 @@ const WelcomeCard = ({ firstName, todaysDate }: WelcomeCardProps) => {
         <p className="text-lg opacity-90 mb-4">{todaysDate}</p>
         <div className="flex items-center space-x-2">
           <Star className="w-5 h-5 text-yellow-400" />
-          <span className="text-lg">You have 5 activities to choose from today!</span>
+          <span className="text-lg">You have {activityCount} activities to choose from today!</span>
         </div>
       </CardContent>
     </Card>

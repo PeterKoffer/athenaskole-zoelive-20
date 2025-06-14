@@ -71,7 +71,11 @@ const DailyProgram = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
       <div className="max-w-4xl mx-auto">
-        <WelcomeCard firstName={firstName} todaysDate={todaysDate} />
+        <WelcomeCard 
+          firstName={firstName} 
+          todaysDate={todaysDate} 
+          activityCount={dailyActivities.length}
+        />
         <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
         <NeliesTips />
 
