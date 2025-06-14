@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { VolumeX } from 'lucide-react';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import WelcomeContent from './WelcomeContent';
+import NelieAvatarDisplay from './NelieAvatarDisplay';
 
 interface HomepageWelcomeProps {
   userName: string;
@@ -79,44 +78,11 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-none mb-6">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Welcome back, {userName}! 👋
-            </h2>
-            <p className="text-purple-100">
-              Ready to continue your amazing learning journey? Choose a subject below to get started!
-            </p>
-          </div>
-          
-          {/* Nelie Avatar Section */}
-          <div className="flex flex-col items-center space-y-4">
-            <RobotAvatar 
-              size="xl" 
-              isActive={true} 
-              isSpeaking={isSpeaking}
-              className="drop-shadow-lg"
-            />
-            
-            {/* Stop button when speaking */}
-            {isSpeaking && (
-              <Button
-                onClick={handleStopSpeech}
-                variant="outline"
-                className="border-white/20 bg-red-500 hover:bg-red-600 text-white font-medium animate-pulse"
-              >
-                <VolumeX className="w-4 h-4 mr-2" />
-                Stop Nelie
-              </Button>
-            )}
-            
-            {/* Status indicator */}
-            {isSpeaking && (
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-200 text-sm font-medium">Nelie is speaking...</span>
-              </div>
-            )}
-          </div>
+          <WelcomeContent userName={userName} />
+          <NelieAvatarDisplay 
+            isSpeaking={isSpeaking}
+            onStopSpeech={handleStopSpeech}
+          />
         </div>
       </CardContent>
     </Card>
