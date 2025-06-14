@@ -22,44 +22,48 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     speak,
     stop,
     toggleEnabled,
-    enableUserInteraction
+    enableUserInteraction,
+    test,
   } = useConsolidatedSpeech();
 
   // Welcome the user ONLY ONCE per session
   useEffect(() => {
     if (isReady && !hasWelcomedThisSession && isEnabled && hasUserInteracted) {
       console.log('🎤 Nelie welcoming user to homepage - ONCE PER SESSION');
-      
-      // Mark as welcomed for this session
       setHasWelcomedThisSession(true);
       sessionStorage.setItem('nelieHomepageWelcomed', 'true');
-      
       const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
-      
-      // Small delay to ensure speech system is ready
       setTimeout(() => {
         speak(welcomeMessage, true);
       }, 1500);
     }
   }, [isReady, hasWelcomedThisSession, isEnabled, hasUserInteracted, userName, speak]);
 
-  const handleTestSpeech = () => {
-    console.log('🔊 Enable Nelie button clicked', { isEnabled, hasUserInteracted, isSpeaking });
+  // Ensures ElevenLabs is available before speaking on first interaction
+  const handleTestSpeech = async () => {
+    console.log('🔊 Enable Nelie button clicked', { isEnabled, hasUserInteracted, isSpeaking, isReady });
     
     if (!hasUserInteracted) {
-      console.log('🔊 Enabling user interaction first');
       enableUserInteraction();
-    } else if (isSpeaking) {
-      console.log('🔊 Stopping current speech');
-      stop();
-    } else if (!isEnabled) {
-      console.log('🔊 Enabling speech');
-      toggleEnabled();
-    } else {
-      console.log('🔊 Testing speech');
-      const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
-      speak(testMessage, true);
+      return;
     }
+    if (isSpeaking) {
+      stop();
+      return;
+    }
+    if (!isEnabled) {
+      toggleEnabled();
+      return;
+    }
+    // Only allow test once ElevenLabs check is complete
+    if (!isReady) {
+      console.log('🔊 Waiting for speech system readiness...');
+      setTimeout(() => handleTestSpeech(), 600); // Wait then try again
+      return;
+    }
+    console.log('🔊 Testing speech');
+    const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
+    speak(testMessage, true);
   };
 
   const getButtonText = () => {

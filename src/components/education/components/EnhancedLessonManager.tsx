@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
@@ -33,11 +32,11 @@ const EnhancedLessonManager = ({
     handleLessonStart
   } = useUnifiedLesson();
 
-  // Add speech functionality back
   const {
     isEnabled: autoReadEnabled,
     isSpeaking,
     hasUserInteracted,
+    isReady,
     speakAsNelie,
     stop: stopSpeaking,
     toggleEnabled: handleMuteToggle
@@ -54,7 +53,6 @@ const EnhancedLessonManager = ({
     hasUserInteracted
   });
 
-  // Show introduction if lesson hasn't started yet
   if (phase === 'introduction') {
     return (
       <NelieIntroduction
@@ -65,12 +63,10 @@ const EnhancedLessonManager = ({
     );
   }
 
-  // Show completed view when lesson is done
   if (phase === 'completed' || currentActivityIndex >= allActivities.length) {
     return <LessonCompletedView onBackToProgram={onBackToProgram} />;
   }
 
-  // Show loading state if no current activity
   if (!currentActivity) {
     return (
       <Card className="bg-gray-900 border-gray-800">
@@ -91,10 +87,9 @@ const EnhancedLessonManager = ({
 
   const targetLessonLength = Math.max(15 * 60, allActivities.reduce((total, activity) => total + activity.duration, 0));
 
-  const handleManualRead = () => {
+  const handleManualRead = async () => {
     if (currentActivity) {
       let speechText = '';
-      
       if (currentActivity.phase === 'introduction') {
         speechText = currentActivity.content.hook || `Welcome to your ${subject} lesson!`;
       } else if (currentActivity.phase === 'content-delivery') {
@@ -104,8 +99,12 @@ const EnhancedLessonManager = ({
       } else {
         speechText = `Let me explain: ${currentActivity.title}`;
       }
-      
       if (speechText) {
+        if (!isReady) {
+          console.log('🔊 [ManualRead] Waiting for speech system readiness...');
+          setTimeout(handleManualRead, 600);
+          return;
+        }
         console.log('🔊 Manual read request:', speechText.substring(0, 50) + '...');
         speakAsNelie(speechText, true);
       }
@@ -114,7 +113,6 @@ const EnhancedLessonManager = ({
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Add speech manager back */}
       <LessonActivitySpeechManager
         currentActivity={currentActivity}
         currentActivityIndex={currentActivityIndex}
