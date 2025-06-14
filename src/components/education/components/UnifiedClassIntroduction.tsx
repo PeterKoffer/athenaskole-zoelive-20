@@ -46,8 +46,8 @@ const UnifiedClassIntroduction = ({
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen w-full bg-gray-900 text-white">
+      <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-8">
             <IntroductionHeader 
