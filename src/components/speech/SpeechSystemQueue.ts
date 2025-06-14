@@ -27,6 +27,15 @@ export class SpeechSystemQueue {
     return this.queue.shift();
   }
 
+  getNext(): string | undefined {
+    const item = this.queue.shift();
+    return item?.text;
+  }
+
+  isEmpty(): boolean {
+    return this.queue.length === 0;
+  }
+
   clear() {
     this.queue = [];
   }
