@@ -24,10 +24,25 @@ serve(async (req) => {
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
         headers: { "xi-api-key": ELEVENLABS_API_KEY },
       });
-      const status = voicesRes.status;
-      const body = await voicesRes.text();
-      return new Response(body, {
-        status,
+      let body;
+      let status = voicesRes.status;
+      try {
+        body = await voicesRes.json();
+      } catch (e) {
+        return new Response(JSON.stringify({ error: "Failed to parse ElevenLabs voices response" }), {
+          status: 502,
+          headers: corsHeaders,
+        });
+      }
+      if (!voicesRes.ok) {
+        return new Response(JSON.stringify({ error: body?.detail?.message || "Could not fetch voices" }), {
+          status,
+          headers: corsHeaders,
+        });
+      }
+      // Always return a clear JSON structure
+      return new Response(JSON.stringify({ voices: body.voices ?? [], ...body }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     } else if (type === "generate-speech") {
@@ -75,3 +90,4 @@ serve(async (req) => {
     });
   }
 });
+

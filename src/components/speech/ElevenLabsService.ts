@@ -37,15 +37,43 @@ class ElevenLabsService {
         },
         body: JSON.stringify({ type: "check-availability" })
       });
-      this.isAvailable = response.ok;
+      const text = await response.text();
+      let result: any = null;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("🎤 ElevenLabs availability: Failed to parse response JSON", text);
+        this.isAvailable = false;
+        return;
+      }
+
+      // LOG what we receive for troubleshooting
       console.log(
-        "🎤 ElevenLabs availability (via Supabase):",
-        this.isAvailable ? "Available" : "Unavailable"
+        "🎤 ElevenLabs availability (via Supabase) - Status:",
+        response.status,
+        "Body:",
+        result
       );
+
+      if (
+        response.ok &&
+        result &&
+        Array.isArray(result.voices) &&
+        result.voices.length > 0
+      ) {
+        this.isAvailable = true;
+        console.log("🎤 ElevenLabs availability detected voices:", result.voices.map((v: any) => v.name));
+      } else if (result && result.error) {
+        console.error("❌ ElevenLabs availability: returned error", result.error);
+        this.isAvailable = false;
+      } else {
+        console.error("❌ ElevenLabs availability: Unknown response", result);
+        this.isAvailable = false;
+      }
     } catch (error) {
       this.isAvailable = false;
       console.log(
-        "🎤 ElevenLabs not available (via Supabase), will use browser speech synthesis"
+        "🎤 ElevenLabs not available (via Supabase), will use browser speech synthesis. Error:", error
       );
     }
   }
