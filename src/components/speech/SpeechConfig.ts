@@ -1,5 +1,5 @@
 
-import { SpeechSynthesisVoice } from "./UnifiedSpeechSystem";
+// Removed invalid import: SpeechSynthesisVoice is a global type in browser environments
 
 export interface SpeechConfig {
   rate: number;
