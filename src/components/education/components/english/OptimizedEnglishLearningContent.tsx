@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
 import { useStudentName } from '../math/hooks/useStudentName';
@@ -15,10 +15,21 @@ interface OptimizedEnglishLearningContentProps {
 const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLearningContentProps) => {
   const [showIntroduction, setShowIntroduction] = useState(true);
   const studentName = useStudentName();
-  const { stop: stopSpeaking } = useUnifiedSpeech();
+  const { stop: stopSpeaking, forceStopAll } = useUnifiedSpeech();
 
-  // Set up speech cleanup
-  useSpeechCleanup(stopSpeaking);
+  // Enhanced speech cleanup for all navigation scenarios
+  useSpeechCleanup(() => {
+    console.log('🔇 [EnglishLearning] Cleanup triggered - force stopping all speech');
+    forceStopAll();
+  });
+
+  // Additional cleanup on unmount
+  useEffect(() => {
+    return () => {
+      console.log('🔇 [EnglishLearning] Component unmounting - force stopping speech');
+      forceStopAll();
+    };
+  }, [forceStopAll]);
 
   const {
     currentActivityIndex,
@@ -37,13 +48,15 @@ const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLe
     subject: 'english',
     skillArea: 'creative_writing',
     onLessonComplete: () => {
-      stopSpeaking(); // Stop speech before navigating back
+      console.log('🔇 [EnglishLearning] Lesson completing - stopping speech');
+      forceStopAll();
       onBackToProgram();
     }
   });
 
   const handleBackToProgram = () => {
-    stopSpeaking(); // Stop speech before navigating back
+    console.log('🔇 [EnglishLearning] Back to program - stopping speech');
+    forceStopAll();
     onBackToProgram();
   };
 
@@ -80,7 +93,10 @@ const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLe
       onBackToProgram={handleBackToProgram}
       onToggleMute={toggleMute}
       onReadRequest={handleReadRequest}
-      onStopSpeaking={stopSpeaking}
+      onStopSpeaking={() => {
+        console.log('🔇 [EnglishLearning] Stop speaking button - force stopping');
+        forceStopAll();
+      }}
       onActivityComplete={handleActivityComplete}
     />
   );

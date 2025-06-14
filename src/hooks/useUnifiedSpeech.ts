@@ -26,6 +26,10 @@ export const useUnifiedSpeech = () => {
     unifiedSpeech.stop();
   }, []);
 
+  const forceStopAll = useCallback(() => {
+    unifiedSpeech.forceStopAll();
+  }, []);
+
   const toggleEnabled = useCallback(() => {
     unifiedSpeech.toggleEnabled();
   }, []);
@@ -57,6 +61,7 @@ export const useUnifiedSpeech = () => {
     speakAsNelie,
     repeatSpeech,
     stop,
+    forceStopAll,
     toggleEnabled,
     enableUserInteraction,
     test,

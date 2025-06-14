@@ -81,12 +81,51 @@ class UnifiedSpeechSystem {
   }
 
   stop(): void {
-    console.log('[UnifiedSpeechSystem] Stopping speech');
+    console.log('🔇 [UnifiedSpeechSystem] EMERGENCY STOP - Clearing all speech');
+    
+    // Clear the queue immediately
     this.queue.clear();
+    
+    // Stop any current utterance
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    // Update state to reflect stopped status
     this.stateManager.updateState({ 
       isSpeaking: false, 
-      currentUtterance: null 
+      currentUtterance: null,
+      lastError: null
     });
+
+    // Clear any pending timeouts or intervals that might restart speech
+    speechDeduplication.clearAll();
+    
+    console.log('🔇 [UnifiedSpeechSystem] Speech fully stopped and cleaned up');
+  }
+
+  forceStopAll(): void {
+    console.log('🚨 [UnifiedSpeechSystem] FORCE STOP ALL SPEECH');
+    this.stop();
+    
+    // Additional cleanup for stubborn speech engines
+    try {
+      // Cancel any ongoing speech synthesis
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume(); // Sometimes needed to clear stuck state
+        window.speechSynthesis.cancel(); // Cancel again
+      }
+      
+      // Clear any audio elements that might be playing
+      const audioElements = document.querySelectorAll('audio');
+      audioElements.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+    } catch (error) {
+      console.warn('🔇 [UnifiedSpeechSystem] Error during force stop:', error);
+    }
   }
 
   toggleEnabled(): void {
@@ -96,8 +135,7 @@ class UnifiedSpeechSystem {
     console.log('[UnifiedSpeechSystem] Toggling enabled:', newEnabledState);
     
     if (!newEnabledState) {
-      this.stop();
-      speechDeduplication.clearAll(); // Clear spoken content when disabling
+      this.forceStopAll();
     }
     
     this.stateManager.updateState({ isEnabled: newEnabledState });

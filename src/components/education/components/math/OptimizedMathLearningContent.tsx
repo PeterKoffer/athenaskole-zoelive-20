@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
 import { useStudentName } from './hooks/useStudentName';
@@ -15,10 +15,21 @@ interface OptimizedMathLearningContentProps {
 const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearningContentProps) => {
   const [showIntroduction, setShowIntroduction] = useState(true);
   const studentName = useStudentName();
-  const { stop: stopSpeaking } = useUnifiedSpeech();
+  const { stop: stopSpeaking, forceStopAll } = useUnifiedSpeech();
 
-  // Set up speech cleanup
-  useSpeechCleanup(stopSpeaking);
+  // Enhanced speech cleanup for all navigation scenarios
+  useSpeechCleanup(() => {
+    console.log('🔇 [MathLearning] Cleanup triggered - force stopping all speech');
+    forceStopAll();
+  });
+
+  // Additional cleanup on unmount
+  useEffect(() => {
+    return () => {
+      console.log('🔇 [MathLearning] Component unmounting - force stopping speech');
+      forceStopAll();
+    };
+  }, [forceStopAll]);
 
   const {
     currentActivityIndex,
@@ -37,13 +48,15 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     subject: 'mathematics',
     skillArea: 'general_math',
     onLessonComplete: () => {
-      stopSpeaking(); // Stop speech before navigating back
+      console.log('🔇 [MathLearning] Lesson completing - stopping speech');
+      forceStopAll();
       onBackToProgram();
     }
   });
 
   const handleBackToProgram = () => {
-    stopSpeaking(); // Stop speech before navigating back
+    console.log('🔇 [MathLearning] Back to program - stopping speech');
+    forceStopAll();
     onBackToProgram();
   };
 
@@ -80,7 +93,10 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
       onBackToProgram={handleBackToProgram}
       onToggleMute={toggleMute}
       onReadRequest={handleReadRequest}
-      onStopSpeaking={stopSpeaking}
+      onStopSpeaking={() => {
+        console.log('🔇 [MathLearning] Stop speaking button - force stopping');
+        forceStopAll();
+      }}
       onActivityComplete={handleActivityComplete}
     />
   );
