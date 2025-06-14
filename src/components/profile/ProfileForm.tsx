@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Calendar, School, MapPin } from "lucide-react";
+import AvatarColorPicker from "./AvatarColorPicker";
 
 interface ProfileData {
   name: string;
@@ -12,6 +13,7 @@ interface ProfileData {
   school: string;
   address: string;
   avatar_url: string;
+  avatar_color?: string;
 }
 
 interface ProfileFormProps {
@@ -24,6 +26,10 @@ interface ProfileFormProps {
 const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFormProps) => {
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     onDataChange({ ...profileData, [field]: value });
+  };
+
+  const handleColorChange = (color: string) => {
+    onDataChange({ ...profileData, avatar_color: color });
   };
 
   return (
@@ -108,6 +114,14 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
             onChange={(e) => handleInputChange('address', e.target.value)}
             placeholder="Your address"
             className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <AvatarColorPicker
+            selectedColor={profileData.avatar_color || "from-purple-400 to-cyan-400"}
+            onColorChange={handleColorChange}
+            userName={profileData.name}
           />
         </div>
       </div>

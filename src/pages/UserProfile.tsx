@@ -18,6 +18,7 @@ interface ProfileData {
   school: string;
   address: string;
   avatar_url: string;
+  avatar_color?: string;
 }
 
 const UserProfile = () => {
@@ -35,7 +36,8 @@ const UserProfile = () => {
     grade: "",
     school: "",
     address: "",
-    avatar_url: ""
+    avatar_url: "",
+    avatar_color: "from-purple-400 to-cyan-400"
   });
 
   // Scroll to top when page loads
@@ -76,7 +78,8 @@ const UserProfile = () => {
           grade: data.grade || "",
           school: data.school || "",
           address: data.address || "",
-          avatar_url: data.avatar_url || ""
+          avatar_url: data.avatar_url || "",
+          avatar_color: data.avatar_color || "from-purple-400 to-cyan-400"
         });
       } else {
         console.log('ℹ️ No profile found, using user metadata');
@@ -88,7 +91,8 @@ const UserProfile = () => {
           grade: "",
           school: "",
           address: "",
-          avatar_url: ""
+          avatar_url: "",
+          avatar_color: "from-purple-400 to-cyan-400"
         });
       }
     } catch (error) {
@@ -101,7 +105,8 @@ const UserProfile = () => {
         grade: "",
         school: "",
         address: "",
-        avatar_url: ""
+        avatar_url: "",
+        avatar_color: "from-purple-400 to-cyan-400"
       });
     }
   };
@@ -168,6 +173,7 @@ const UserProfile = () => {
             school: profileData.school,
             address: profileData.address,
             avatar_url: profileData.avatar_url,
+            avatar_color: profileData.avatar_color,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', user.id);
@@ -186,7 +192,8 @@ const UserProfile = () => {
             grade: profileData.grade,
             school: profileData.school,
             address: profileData.address,
-            avatar_url: profileData.avatar_url
+            avatar_url: profileData.avatar_url,
+            avatar_color: profileData.avatar_color
           });
 
         if (error) throw error;

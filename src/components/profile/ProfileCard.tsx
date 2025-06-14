@@ -12,6 +12,7 @@ interface ProfileData {
   school: string;
   address: string;
   avatar_url: string;
+  avatar_color?: string;
 }
 
 interface ProfileCardProps {
@@ -45,6 +46,7 @@ const ProfileCard = ({
           name={profileData.name}
           uploading={uploading}
           onUpload={onAvatarUpload}
+          avatarColor={profileData.avatar_color}
         />
         <ProfileForm
           profileData={profileData}

@@ -16,15 +16,20 @@ interface AvatarUploadProps {
   name: string;
   uploading: boolean;
   onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  avatarColor?: string;
 }
 
-const AvatarUpload = ({ avatarUrl, name, uploading, onUpload }: AvatarUploadProps) => {
+const AvatarUpload = ({ avatarUrl, name, uploading, onUpload, avatarColor }: AvatarUploadProps) => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
   const handleRoleSelector = () => {
     navigate('/auth');
   };
+
+  const fallbackClass = avatarColor 
+    ? `bg-gradient-to-br ${avatarColor} text-white text-xl`
+    : "bg-gradient-to-br from-purple-400 to-cyan-400 text-white text-xl";
 
   return (
     <div className="flex flex-col items-center mb-8">
@@ -34,7 +39,7 @@ const AvatarUpload = ({ avatarUrl, name, uploading, onUpload }: AvatarUploadProp
             <div className="relative cursor-pointer">
               <Avatar className="w-24 h-24 mb-4 hover:opacity-80 transition-opacity">
                 <AvatarImage src={avatarUrl} />
-                <AvatarFallback className="bg-gradient-to-br from-purple-400 to-cyan-400 text-white text-xl">
+                <AvatarFallback className={fallbackClass}>
                   {name ? name.charAt(0).toUpperCase() : 'U'}
                 </AvatarFallback>
               </Avatar>
