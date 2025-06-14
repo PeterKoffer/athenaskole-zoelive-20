@@ -70,7 +70,7 @@ const WelcomeCard = ({ userName }: WelcomeCardProps) => {
           </p>
           <div className="flex items-center justify-center space-x-2">
             <Star className="w-6 h-6 text-yellow-300" />
-            <span className="text-lg">Let's learn something amazing together!</span>
+            <span className="text-lg">Let's learn something amazing together, {actualUserName}!</span>
           </div>
         </div>
       </CardContent>
