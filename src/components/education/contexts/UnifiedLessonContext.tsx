@@ -7,6 +7,9 @@ import { useLessonActions } from './hooks/useLessonActions';
 import { LessonActivity } from '../components/types/LessonTypes';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 
+// Export the LessonPhase type for other components
+export type { LessonPhase };
+
 interface UnifiedLessonContextType {
   // Lesson state
   currentActivityIndex: number;
@@ -20,6 +23,11 @@ interface UnifiedLessonContextType {
   correctStreak: number;
   isTimerActive: boolean;
   lessonStartTime: number;
+  
+  // Additional state properties for compatibility
+  timeSpent: number;
+  currentSegment: number;
+  totalSegments: number;
   
   // Actions
   handleActivityComplete: (wasCorrect?: boolean) => void;
@@ -57,6 +65,8 @@ export const UnifiedLessonProvider = ({
   const [allActivities, setAllActivities] = useState<LessonActivity[]>(staticActivities);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [lastGeneratedDate, setLastGeneratedDate] = useState<string>('');
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
+  const [correctStreak, setCorrectStreak] = useState(0);
 
   // Get today's date for lesson generation
   const getCurrentDate = () => new Date().toISOString().split('T')[0];
@@ -130,15 +140,15 @@ export const UnifiedLessonProvider = ({
 
   // Initialize lesson state management
   const {
-    currentActivityIndex,
-    score,
-    correctStreak,
-    phase,
-    updateCurrentActivityIndex,
-    updateScore,
+    lessonState,
     updatePhase,
+    updateScore,
+    updateProgress,
     completeLesson
-  } = useLessonStateManager(allActivities);
+  } = useLessonStateManager({
+    totalSegments: allActivities.length,
+    onLessonComplete
+  });
 
   // Initialize timer
   const {
@@ -157,7 +167,7 @@ export const UnifiedLessonProvider = ({
   // Handle activity completion
   const handleActivityCompleteBase = useCallback((wasCorrect?: boolean) => {
     if (currentActivityIndex < allActivities.length - 1) {
-      updateCurrentActivityIndex(currentActivityIndex + 1);
+      setCurrentActivityIndex(currentActivityIndex + 1);
     } else {
       // Lesson completed
       setTimeout(() => {
@@ -166,7 +176,7 @@ export const UnifiedLessonProvider = ({
         onLessonComplete();
       }, 2000);
     }
-  }, [currentActivityIndex, allActivities.length, updateCurrentActivityIndex, updatePhase, stopTimer, onLessonComplete]);
+  }, [currentActivityIndex, allActivities.length, updatePhase, stopTimer, onLessonComplete]);
 
   // Initialize lesson actions
   const {
@@ -179,8 +189,8 @@ export const UnifiedLessonProvider = ({
   } = useLessonActions({
     subject,
     sessionTimer,
-    correctStreak,
-    score,
+    correctStreak: correctStreak,
+    score: lessonState.score,
     lessonStartTime,
     currentActivity,
     updatePhase,
@@ -204,14 +214,19 @@ export const UnifiedLessonProvider = ({
     currentActivityIndex,
     allActivities,
     currentActivity,
-    phase,
+    phase: lessonState.phase,
     
     // Progress tracking
     sessionTimer,
-    score,
+    score: lessonState.score,
     correctStreak,
     isTimerActive,
     lessonStartTime,
+    
+    // Compatibility properties
+    timeSpent: sessionTimer,
+    currentSegment: currentActivityIndex,
+    totalSegments: allActivities.length,
     
     // Actions
     handleActivityComplete,
