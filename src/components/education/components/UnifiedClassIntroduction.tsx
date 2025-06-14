@@ -155,6 +155,13 @@ const UnifiedClassIntroduction = ({
     onIntroductionComplete();
   };
 
+  // Handle "Start Lesson" button click - stop speech and advance immediately
+  const handleStartLesson = () => {
+    console.log('🔇 User choosing to start lesson - stopping speech and advancing');
+    stop();
+    onIntroductionComplete();
+  };
+
   // Allow skipping to lesson without any speech interaction
   const handleProceedWithoutSpeech = () => {
     console.log('🔇 User choosing to proceed without speech');
@@ -263,13 +270,25 @@ const UnifiedClassIntroduction = ({
                       Start Class
                     </Button>
                   ) : (
-                    <Button
-                      variant="outline"
-                      onClick={handleSkip}
-                      className="border-gray-400 text-gray-200 bg-gray-800/50"
-                    >
-                      Skip Introduction
-                    </Button>
+                    <>
+                      {/* Show "Start Lesson" button when Nelie has started speaking */}
+                      {(isSpeaking || hasStarted) && (
+                        <Button
+                          onClick={handleStartLesson}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                        >
+                          Start Lesson
+                        </Button>
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        onClick={handleSkip}
+                        className="border-gray-400 text-gray-200 bg-gray-800/50"
+                      >
+                        Skip Introduction
+                      </Button>
+                    </>
                   )}
                 </>
               )}
