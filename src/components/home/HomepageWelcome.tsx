@@ -32,6 +32,20 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     isReady
   });
 
+  // NEW: Auto-enable Nelie and trigger welcome speech after first interaction
+  useEffect(() => {
+    if (
+      isReady &&
+      hasUserInteracted &&
+      !hasWelcomedThisSession &&
+      !isEnabled // user hasn't enabled already
+    ) {
+      // Auto-enable Nelie upon first user interaction/session readiness
+      toggleEnabled();
+      // No return; we'll allow the next effect to handle the speech
+    }
+  }, [isReady, hasUserInteracted, hasWelcomedThisSession, isEnabled, toggleEnabled]);
+
   // Welcome the user ONLY ONCE per session
   useEffect(() => {
     if (isReady && !hasWelcomedThisSession && isEnabled && hasUserInteracted) {

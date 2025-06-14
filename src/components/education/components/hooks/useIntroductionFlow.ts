@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
@@ -49,21 +48,24 @@ export const useIntroductionFlow = (subject: string) => {
     isReady
   });
 
-  // Start the introduction flow automatically when ready
+  // NEW: Ensure Nelie voice is enabled after first user interaction/session readiness
+  useEffect(() => {
+    if (isReady && hasUserInteracted && !isEnabled) {
+      toggleEnabled();
+      // Don't return; let the other effects handle step speech
+    }
+  }, [isReady, hasUserInteracted, isEnabled, toggleEnabled]);
+
+  // Start introduction flow automatically when ready
   useEffect(() => {
     if (!hasStartedFlow && isReady) {
-      console.log('🎯 Starting Nelie introduction flow');
       setHasStartedFlow(true);
-      
-      // Start speaking the first step after a short delay
       const timer = setTimeout(() => {
         const firstStep = introductionSteps[0]?.text;
         if (firstStep && isEnabled && hasUserInteracted) {
-          console.log('🔊 Nelie starting first introduction step');
           speak(firstStep, true);
         }
       }, 1000);
-
       return () => clearTimeout(timer);
     }
   }, [hasStartedFlow, isReady, introductionSteps, isEnabled, hasUserInteracted, speak]);
