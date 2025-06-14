@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import DateWidget from "./DateWidget";
 
 interface CTASectionProps {
   onGetStarted: () => void;
@@ -11,13 +12,6 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
     onGetStarted();
   };
 
-  const todaysDate = new Date().toLocaleDateString(undefined, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
   return (
     <section className="py-16 relative z-10">
       <div className="text-center">
@@ -27,8 +21,8 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
         <p className="text-gray-400 mb-8">
           Your personalized program is waiting! Nelie has prepared today's lessons just for you.
         </p>
-        <div className="space-y-3">
-          <p className="text-pink-300 text-lg font-medium">{todaysDate}</p>
+        <div className="flex flex-col items-center space-y-6">
+          <DateWidget className="max-w-xs" />
           <Button
             size="lg"
             className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white relative z-10 text-xl px-12 py-6 h-16 font-semibold"
