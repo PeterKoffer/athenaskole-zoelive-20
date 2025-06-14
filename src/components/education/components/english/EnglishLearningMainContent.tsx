@@ -39,6 +39,23 @@ const EnglishLearningMainContent = ({
   onStopSpeaking,
   onActivityComplete
 }: EnglishLearningMainContentProps) => {
+  const handleNavigateBack = () => {
+    if (currentActivityIndex > 0) {
+      // Logic to go to previous activity would go here
+      console.log('Navigate to previous activity');
+    }
+  };
+
+  const handleNavigateForward = () => {
+    if (currentActivityIndex < totalRealActivities - 1) {
+      // Logic to go to next activity would go here
+      console.log('Navigate to next activity');
+    }
+  };
+
+  const canNavigateBack = currentActivityIndex > 0;
+  const canNavigateForward = currentActivityIndex < totalRealActivities - 1;
+
   return (
     <div className="min-h-screen w-full bg-gray-900 text-white">
       <div className="w-full space-y-0">
@@ -51,6 +68,10 @@ const EnglishLearningMainContent = ({
           totalRealActivities={totalRealActivities}
           correctStreak={correctStreak}
           onBackToProgram={onBackToProgram}
+          onNavigateBack={handleNavigateBack}
+          onNavigateForward={handleNavigateForward}
+          canNavigateBack={canNavigateBack}
+          canNavigateForward={canNavigateForward}
           currentActivityType={currentActivity?.type}
           currentActivityPhase={currentActivity?.phase}
         />

@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, Star, Trophy } from 'lucide-react';
+import { Clock, Star, Trophy } from 'lucide-react';
+import UnifiedLessonNavigation from '../shared/UnifiedLessonNavigation';
 
 interface EnglishLessonHeaderProps {
   studentName: string;
@@ -11,6 +12,10 @@ interface EnglishLessonHeaderProps {
   totalRealActivities: number;
   correctStreak: number;
   onBackToProgram: () => void;
+  onNavigateBack?: () => void;
+  onNavigateForward?: () => void;
+  canNavigateBack?: boolean;
+  canNavigateForward?: boolean;
   currentActivityType?: string;
   currentActivityPhase?: string;
 }
@@ -24,6 +29,10 @@ const EnglishLessonHeader = ({
   totalRealActivities,
   correctStreak,
   onBackToProgram,
+  onNavigateBack,
+  onNavigateForward,
+  canNavigateBack = false,
+  canNavigateForward = false,
   currentActivityType,
   currentActivityPhase
 }: EnglishLessonHeaderProps) => {
@@ -49,7 +58,6 @@ const EnglishLessonHeader = ({
             onClick={onBackToProgram}
             className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Program
           </Button>
           
@@ -59,6 +67,18 @@ const EnglishLessonHeader = ({
           </div>
           
           <div className="w-24"></div> {/* Spacer for balance */}
+        </div>
+
+        {/* Lesson Navigation Arrows */}
+        <div className="mb-4">
+          <UnifiedLessonNavigation
+            onBack={onNavigateBack || (() => {})}
+            onForward={onNavigateForward}
+            canGoBack={canNavigateBack}
+            canGoForward={canNavigateForward}
+            backLabel="Previous Step"
+            forwardLabel="Next Step"
+          />
         </div>
 
         {/* Progress and Stats Row */}

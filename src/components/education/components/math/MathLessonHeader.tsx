@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, Target } from 'lucide-react';
+import { Clock, Target } from 'lucide-react';
+import UnifiedLessonNavigation from '../shared/UnifiedLessonNavigation';
 
 interface MathLessonHeaderProps {
   studentName: string;
@@ -11,6 +12,10 @@ interface MathLessonHeaderProps {
   totalRealActivities: number;
   correctStreak: number;
   onBackToProgram: () => void;
+  onNavigateBack?: () => void;
+  onNavigateForward?: () => void;
+  canNavigateBack?: boolean;
+  canNavigateForward?: boolean;
   currentActivityType?: string;
   currentActivityPhase?: string;
 }
@@ -24,6 +29,10 @@ const MathLessonHeader = ({
   totalRealActivities,
   correctStreak,
   onBackToProgram,
+  onNavigateBack,
+  onNavigateForward,
+  canNavigateBack = false,
+  canNavigateForward = false,
   currentActivityType,
   currentActivityPhase
 }: MathLessonHeaderProps) => {
@@ -34,13 +43,12 @@ const MathLessonHeader = ({
   return (
     <div className="w-full bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-400">
       <div className="w-full max-w-4xl mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-4">
           <Button
             variant="ghost"
             onClick={onBackToProgram}
             className="text-white hover:bg-white/10"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Program
           </Button>
           
@@ -62,8 +70,20 @@ const MathLessonHeader = ({
             )}
           </div>
         </div>
+
+        {/* Lesson Navigation Arrows */}
+        <div className="mb-4">
+          <UnifiedLessonNavigation
+            onBack={onNavigateBack || (() => {})}
+            onForward={onNavigateForward}
+            canGoBack={canNavigateBack}
+            canGoForward={canNavigateForward}
+            backLabel="Previous Step"
+            forwardLabel="Next Step"
+          />
+        </div>
         
-        <div className="text-center mt-4">
+        <div className="text-center">
           <h1 className="text-xl font-bold text-white">
             Mathematics with Nelie - {studentName}'s Lesson
             {correctStreak > 0 && (
