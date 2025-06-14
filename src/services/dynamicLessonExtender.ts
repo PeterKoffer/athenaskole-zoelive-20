@@ -60,8 +60,8 @@ export class DynamicLessonExtender {
     return newActivities;
   }
 
-  private static getActivityTypeForExtension(index: number): string {
-    const types = ['interactive-game', 'content-delivery', 'interactive-game', 'application'];
+  private static getActivityTypeForExtension(index: number): 'interactive-game' | 'content-delivery' | 'application' {
+    const types: ('interactive-game' | 'content-delivery' | 'application')[] = ['interactive-game', 'content-delivery', 'interactive-game', 'application'];
     return types[index % types.length];
   }
 
@@ -69,7 +69,7 @@ export class DynamicLessonExtender {
     return {
       id: `extension-question-${Date.now()}-${index}`,
       title: `${questionTemplate.subject} Challenge ${index + 1}`,
-      type: 'activity',
+      type: 'interactive-game',
       phase: 'interactive-game',
       duration: 180, // 3 minutes
       content: {
@@ -91,7 +91,7 @@ export class DynamicLessonExtender {
   private static createContentActivity(
     subject: string, 
     skillArea: string, 
-    activityType: string, 
+    activityType: 'content-delivery' | 'application', 
     index: number,
     gradeLevel: number
   ): LessonActivity {
@@ -107,11 +107,19 @@ export class DynamicLessonExtender {
         content: {
           text: `Let's explore another important concept in ${subject}. This builds on what we've learned so far.`,
           segments: [{
+            concept: `${skillArea.replace(/_/g, ' ')} Concepts`,
             explanation: `Here's an interesting way to think about ${skillArea.replace(/_/g, ' ')} at your grade level.`,
-            examples: [
-              `Example: This relates to your everyday life`,
-              `Think about: How this applies to real situations`
-            ]
+            checkQuestion: {
+              question: `How does this relate to your everyday life?`,
+              options: [
+                `It helps me understand patterns`,
+                `It connects to real situations`,
+                `It builds problem-solving skills`,
+                `All of the above`
+              ],
+              correctAnswer: 3,
+              explanation: `This concept applies to many areas of learning and life.`
+            }
           }]
         },
         metadata: {

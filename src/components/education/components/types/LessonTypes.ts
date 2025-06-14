@@ -5,7 +5,15 @@ export interface LessonActivity {
   phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
   title: string;
   duration: number; // in seconds
-  phaseDescription: string;
+  phaseDescription?: string;
+  metadata?: {
+    subject?: string;
+    skillArea?: string;
+    difficultyLevel?: number;
+    templateId?: string;
+    isExtension?: boolean;
+    gradeLevel?: number;
+  };
   content: {
     // Introduction phase
     hook?: string;
@@ -36,6 +44,8 @@ export interface LessonActivity {
     
     // Application phase
     scenario?: string;
+    task?: string;
+    guidance?: string;
     problemSteps?: Array<{
       step: string;
       hint?: string;
