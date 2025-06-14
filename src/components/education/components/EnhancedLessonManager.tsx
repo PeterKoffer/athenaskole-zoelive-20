@@ -1,14 +1,13 @@
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import LessonActivityManager from './LessonActivityManager';
-import LessonProgressHeader from './LessonProgressHeader';
-import LessonControlsFooter from './LessonControlsFooter';
 import LessonCompletedView from './LessonCompletedView';
 import LessonActivitySpeechManager from './LessonActivitySpeechManager';
-import { RefreshCw, Clock } from 'lucide-react';
+import LessonLoadingState from './lessonManager/LessonLoadingState';
+import LessonPreparationState from './lessonManager/LessonPreparationState';
+import LessonProgressDisplay from './lessonManager/LessonProgressDisplay';
+import LessonControls from './lessonManager/LessonControls';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -60,31 +59,7 @@ const EnhancedLessonManager = ({
 
   // Show loading state while generating daily lesson
   if (isLoadingActivities) {
-    return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-8 text-center">
-          <div className="space-y-6">
-            <div className="flex items-center justify-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-pulse">
-                <Clock className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-white">
-                Generating Your Daily {subject.charAt(0).toUpperCase() + subject.slice(1)} Lesson
-              </h3>
-              <p className="text-gray-400 text-lg">
-                Creating a personalized lesson based on your progress and grade level...
-              </p>
-              <div className="flex items-center justify-center space-x-2 text-sm text-lime-400 mt-4">
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Analyzing your learning progress</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <LessonLoadingState subject={subject} />;
   }
 
   if (phase === 'completed' || currentActivityIndex >= allActivities.length) {
@@ -93,27 +68,11 @@ const EnhancedLessonManager = ({
 
   if (!currentActivity) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6 text-center space-y-4">
-          <div className="animate-pulse">
-            <div className="w-16 h-16 bg-purple-600 rounded-full mx-auto mb-4"></div>
-            <h3 className="text-xl font-semibold text-white mb-2">
-              Preparing your {subject} lesson...
-            </h3>
-            <p className="text-gray-400">
-              Setting up {allActivities.length} personalized learning activities
-            </p>
-          </div>
-          <Button 
-            onClick={regenerateLesson}
-            variant="outline"
-            className="mt-4"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Generate New Lesson
-          </Button>
-        </CardContent>
-      </Card>
+      <LessonPreparationState
+        subject={subject}
+        activitiesCount={allActivities.length}
+        onRegenerate={regenerateLesson}
+      />
     );
   }
 
@@ -153,15 +112,13 @@ const EnhancedLessonManager = ({
         stopSpeaking={stopSpeaking}
       />
 
-      <LessonProgressHeader
+      <LessonProgressDisplay
         currentActivityIndex={currentActivityIndex}
         totalActivities={allActivities.length}
-        timeElapsed={sessionTimer}
+        sessionTimer={sessionTimer}
         targetLessonLength={targetLessonLength}
         score={score}
         correctStreak={correctStreak}
-        engagementLevel={85}
-        questionsGenerated={allActivities.length}
         onBackToProgram={onBackToProgram}
       />
 
@@ -173,28 +130,14 @@ const EnhancedLessonManager = ({
         onScoreUpdate={() => {}}
       />
 
-      <LessonControlsFooter
+      <LessonControls
         autoReadEnabled={autoReadEnabled}
         isSpeaking={isSpeaking}
         isReady={hasUserInteracted}
-        adaptiveSpeed={1.0}
         onMuteToggle={handleMuteToggle}
         onManualRead={handleManualRead}
-        onResetProgress={regenerateLesson}
+        onRegenerate={regenerateLesson}
       />
-
-      {/* Quick regenerate button for testing */}
-      <div className="text-center">
-        <Button 
-          onClick={regenerateLesson}
-          variant="ghost"
-          size="sm"
-          className="text-gray-400 hover:text-white"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Generate New Lesson
-        </Button>
-      </div>
     </div>
   );
 };
