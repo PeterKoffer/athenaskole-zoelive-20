@@ -1,6 +1,6 @@
 
 import { SpeechConfig } from "./SpeechConfig";
-import { speakWithElevenLabs } from "./engine/ElevenLabsSpeak";
+import { ElevenLabsEngine } from "./engine/ElevenLabsEngine";
 import { browserSpeakFallback } from "./engine/BrowserEngine";
 import { showSpeechToast } from "./ToastUtils";
 
@@ -24,31 +24,24 @@ export async function speakWithEngines(
   // If we should try ElevenLabs, and it is user preference, always try first!
   if (shouldTryElevenLabs && useElevenLabs) {
     console.log("🔎 [SpeechEngines] Trying ElevenLabs speech engine...");
-    showSpeechToast("Trying ElevenLabs...", "Attempting Aria voice via ElevenLabs", "default");
-    const elevenDone = await speakWithElevenLabs(
-      text,
-      () => {
-        showSpeechToast("ElevenLabs Finished", "Audio playback completed.", "success");
-        updateState({ isSpeaking: false, lastError: null });
-        onDone();
-      },
-      (msg) => {
-        updateState({
-          usingElevenLabs: false,
-          lastError: "ElevenLabs error, fallback to browser: " + msg,
-        });
-        showSpeechToast("ElevenLabs Error", "Falling back to browser voice: " + msg, "destructive");
-        console.warn("🛑 [SpeechEngines] ElevenLabs failed with:", msg);
-        // No return, continue to fallback (browser)
-      }
-    );
-    if (elevenDone) {
-      showSpeechToast("ElevenLabs Used", "Voice: Aria (premium) [Audio playback should be Aria]", "success");
-      console.log("✅ [SpeechEngines] ElevenLabs speech finished successfully (Aria, premium).");
+    showSpeechToast("Trying ElevenLabs...", "Attempting to generate premium voice...", "default");
+
+    const success = await ElevenLabsEngine.speak(text);
+
+    if (success) {
+      showSpeechToast("ElevenLabs Success", "Premium voice playback complete.", "success");
+      console.log("✅ [SpeechEngines] ElevenLabs speech finished successfully.");
+      updateState({ isSpeaking: false, lastError: null });
+      onDone();
       return;
     } else {
-      showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech (Aria/Nelie unavailable)", "destructive");
-      console.warn("❗ [SpeechEngines] ElevenLabs failed, will attempt browser fallback.");
+      const errorMsg = "ElevenLabs engine failed. Falling back to browser voice.";
+      updateState({
+        usingElevenLabs: false,
+        lastError: errorMsg,
+      });
+      showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech.", "destructive");
+      console.warn(`❗ [SpeechEngines] ${errorMsg}`);
     }
   } else {
     if (!shouldTryElevenLabs) {

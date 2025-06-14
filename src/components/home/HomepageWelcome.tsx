@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
@@ -78,9 +77,9 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     }
     
     if (!isEnabled) {
-      console.log('🔊 Enabling speech');
+      console.log('🔊 Enabling speech and will attempt to test...');
       toggleEnabled();
-      return;
+      // We no longer return here. The code will now fall through and attempt to speak.
     }
     
     // Only test speech if everything is ready
