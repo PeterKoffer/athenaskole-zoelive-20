@@ -30,7 +30,7 @@ const FloatingAvatarButton = ({
   isOnHomepage
 }: FloatingAvatarButtonProps) => {
   return (
-    <div className="flex flex-col items-center space-y-0.5">
+    <div className="relative flex items-center justify-center">
       <CollapsedButton 
         onExpand={onToggleOpen}
         onMouseDown={onMouseDown}
@@ -41,12 +41,15 @@ const FloatingAvatarButton = ({
         isSpeaking={isSpeaking}
       />
       
-      <EnableNelieButton
-        showEnableButton={showEnableButton}
-        hasUserInteracted={hasUserInteracted}
-        isOnHomepage={isOnHomepage}
-        onEnableNelie={onEnableNelie}
-      />
+      {/* Position the Enable Nelie button closer to the avatar */}
+      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+        <EnableNelieButton
+          showEnableButton={showEnableButton}
+          hasUserInteracted={hasUserInteracted}
+          isOnHomepage={isOnHomepage}
+          onEnableNelie={onEnableNelie}
+        />
+      </div>
     </div>
   );
 };

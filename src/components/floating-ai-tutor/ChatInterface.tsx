@@ -75,7 +75,7 @@ const ChatInterface = ({
 
   return (
     <Card className="w-96 h-[500px] bg-gray-900 border-gray-700 shadow-2xl flex flex-col overflow-hidden">
-      {/* Header with Nelie */}
+      {/* Simplified Header */}
       <div 
         className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 cursor-grab active:cursor-grabbing select-none"
         style={{
@@ -87,33 +87,15 @@ const ChatInterface = ({
         onTouchStart={handleHeaderTouchStart}
       >
         <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2">
-            <Button
-              onClick={onMuteToggle}
-              variant="outline"
-              size="sm"
-              className="border-white/20 text-white bg-white/10 hover:bg-white/20"
-            >
-              {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            </Button>
-            <h3 className="text-white font-semibold">Nelie AI Tutor</h3>
-            {isSpeaking && (
-              <div className="flex items-center text-green-300">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-1"></div>
-                <span className="text-xs">Speaking...</span>
-              </div>
-            )}
-          </div>
-          <div className="flex space-x-1">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              size="sm"
-              className="border-white/20 text-white bg-white/10 hover:bg-white/20 p-1"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+          <h3 className="text-white font-semibold">Nelie AI Tutor</h3>
+          <Button
+            onClick={onClose}
+            variant="outline"
+            size="sm"
+            className="border-white/20 text-white bg-white/10 hover:bg-white/20 p-1"
+          >
+            <X className="w-4 h-4" />
+          </Button>
         </div>
         
         {/* Large Nelie Avatar */}
