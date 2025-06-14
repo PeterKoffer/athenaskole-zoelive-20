@@ -13,7 +13,7 @@ export const ElevenLabsEngine = {
       showSpeechToast("ElevenLabs", "Generating premium voice...", "default");
 
       const audioResponse = await elevenLabsService.generateSpeech(text);
-      
+
       console.log(
         "‼️ [ElevenLabsEngine V2] Audio response received.",
         "Has audioContent:", !!audioResponse.audioContent,
@@ -35,7 +35,7 @@ export const ElevenLabsEngine = {
       }
 
       showSpeechToast("ElevenLabs", "Playing audio...", "success");
-      console.log("‼️ [ElevenLabsEngine V2] About to play audio...");
+      console.log("‼️ [ElevenLabsEngine V2] About to play audio... (this is where premium female should play)");
       await elevenLabsService.playAudio(audioResponse.audioContent);
       console.log("‼️ [ElevenLabsEngine V2] ElevenLabs playback finished.");
       showSpeechToast("ElevenLabs Audio", "Playback completed!", "default");

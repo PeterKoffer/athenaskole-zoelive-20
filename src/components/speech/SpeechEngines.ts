@@ -1,4 +1,3 @@
-
 import { SpeechConfig } from "./SpeechConfig";
 import { ElevenLabsEngine } from "./engine/ElevenLabsEngine";
 import { browserSpeakFallback } from "./engine/BrowserEngine";
@@ -11,7 +10,7 @@ export async function speakWithEngines(
   updateState: (partial: any) => void,
   onDone: () => void,
   shouldTryElevenLabs: boolean,
-  isCheckingElevenLabs?: boolean // new argument, to track EL check state
+  isCheckingElevenLabs?: boolean
 ) {
   console.log("‼️‼️ [SpeechEngines] ENTERING speakWithEngines ‼️‼️", {
     text: text.substring(0, 50),
@@ -19,7 +18,6 @@ export async function speakWithEngines(
     shouldTryElevenLabs,
   });
 
-  // If we should try ElevenLabs, and it is user preference, always try first!
   if (shouldTryElevenLabs && useElevenLabs) {
     console.log("‼️ [SpeechEngines] Condition MET. Trying ElevenLabs.");
     showSpeechToast("Trying ElevenLabs...", "Attempting to generate premium voice...", "default");
@@ -51,6 +49,8 @@ export async function speakWithEngines(
     }
   }
 
+  // DEBUG: Mark browser fallback use
+  console.warn("*** [SpeechEngines] USING BROWSER VOICE FALLBACK NOW! ***");
   // The check for isCheckingElevenLabs was removed from here because it was causing silent failures.
   // The main guard in UnifiedSpeechSystem.speak() is sufficient and handles retries gracefully.
 
