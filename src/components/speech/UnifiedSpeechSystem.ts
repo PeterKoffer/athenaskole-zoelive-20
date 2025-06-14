@@ -1,4 +1,5 @@
-import { elevenLabsService } from './ElevenLabsService';
+import { elevenLabsSpeechEngine } from './ElevenLabsSpeechEngine';
+import { browserSpeechEngine } from './BrowserSpeechEngine';
 
 interface SpeechConfig {
   rate: number;
@@ -64,27 +65,22 @@ class UnifiedSpeechSystem {
   private async initializeSpeechSystem() {
     console.log('🎤 Initializing Enhanced Speech System with ElevenLabs...');
     this.updateState({ isLoading: true });
-
     // Await ElevenLabs check
-    await elevenLabsService.ensureAvailability();
-    const elevenLabsAvailable = elevenLabsService.isServiceAvailable();
-    
+    const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
+
     if (elevenLabsAvailable && this.config.preferElevenLabs) {
-      console.log('✅ ElevenLabs available - using high-quality voice synthesis');
-      this.updateState({ 
+      this.updateState({
         usingElevenLabs: true,
         isReady: true,
         isLoading: false,
-        lastError: null 
+        lastError: null
       });
     } else {
-      console.log('🔄 Falling back to browser speech synthesis');
       await this.initializeBrowserSpeech();
       this.updateState({
         usingElevenLabs: false
       });
     }
-
     this.setupEventListeners();
   }
 
@@ -238,32 +234,26 @@ class UnifiedSpeechSystem {
       console.log('🚫 Empty text, skipping speech');
       return;
     }
-
-    // Also, if not ready (availability race), force init
     if (!this.state.isReady) {
       await this.initializeSpeechSystem();
     }
-
     const now = Date.now();
     if (text === this.lastSpokenText && (now - this.lastSpokenTime) < this.repeatPreventionTime) {
       console.log('🚫 Preventing repetition of:', text.substring(0, 30) + '...');
       return;
     }
-
     const speechItem: SpeechQueue = {
       text: text.trim(),
       priority,
       timestamp: now,
       id: Math.random().toString(36).substr(2, 9)
     };
-
     if (priority) {
       this.speechQueue.unshift(speechItem);
       this.stop();
     } else {
       this.speechQueue.push(speechItem);
     }
-
     this.processQueue();
   }
 
@@ -285,72 +275,46 @@ class UnifiedSpeechSystem {
   }
 
   private async processQueue(): Promise<void> {
-    if (this.isProcessingQueue || this.speechQueue.length === 0) {
-      return;
-    }
-
+    if (this.isProcessingQueue || this.speechQueue.length === 0) return;
     if (!this.state.isEnabled || !this.state.hasUserInteracted) {
-      console.log('🚫 Speech disabled or no user interaction');
       this.speechQueue = [];
       return;
     }
-
     this.isProcessingQueue = true;
-
     while (this.speechQueue.length > 0) {
       const item = this.speechQueue.shift()!;
       await this.speakItem(item);
       await new Promise(resolve => setTimeout(resolve, 300));
     }
-
     this.isProcessingQueue = false;
   }
 
   private async speakItem(item: SpeechQueue): Promise<void> {
     return new Promise(async (resolve) => {
       console.log('🔊 Nelie speaking:', item.text.substring(0, 50) + '...');
-      // Double check ElevenLabs status before speaking, in case API restored after fallback
+      // Double check ElevenLabs status before speaking
       if (this.config.preferElevenLabs) {
         if (!this.state.usingElevenLabs) {
-          await elevenLabsService.refreshAvailability();
-          if (elevenLabsService.isServiceAvailable()) {
-            // If now available, set state and re-init.
-            this.updateState({
-              usingElevenLabs: true
-            });
+          await elevenLabsSpeechEngine.refreshAvailability();
+          if (await elevenLabsSpeechEngine.isAvailable()) {
+            this.updateState({ usingElevenLabs: true });
           }
         }
         if (this.state.usingElevenLabs) {
-          try {
-            const audioResponse = await elevenLabsService.generateSpeech(item.text);
-
-            if (audioResponse.audioContent && !audioResponse.error) {
-              this.updateState({
-                isSpeaking: true,
-                lastError: null
-              });
-
-              await elevenLabsService.playAudio(audioResponse.audioContent);
-
-              this.updateState({
-                isSpeaking: false
-              });
-
-              this.lastSpokenText = item.text;
-              this.lastSpokenTime = Date.now();
-              console.log('🎤 ElevenLabs speech completed successfully');
-              resolve();
-              return;
-            } else {
-              console.log('🔄 ElevenLabs failed, falling back to browser speech:', audioResponse.error);
-              this.updateState({
-                usingElevenLabs: false,
-                lastError: audioResponse.error || null
-              });
-            }
-          } catch (error) {
-            console.log('🔄 ElevenLabs error, falling back to browser speech:', error);
-            this.updateState({ usingElevenLabs: false });
+          const success = await elevenLabsSpeechEngine.speak(item.text);
+          if (success) {
+            this.updateState({
+              isSpeaking: false
+            });
+            this.lastSpokenText = item.text;
+            this.lastSpokenTime = Date.now();
+            resolve();
+            return;
+          } else {
+            this.updateState({
+              usingElevenLabs: false,
+              lastError: 'ElevenLabs error, fallback to browser'
+            });
           }
         }
       }
@@ -360,72 +324,45 @@ class UnifiedSpeechSystem {
 
   private speakWithBrowserSynthesis(item: SpeechQueue, resolve: () => void): void {
     if (typeof speechSynthesis === 'undefined') {
-      console.error('❌ Browser speech synthesis not available');
       resolve();
       return;
     }
-
-    const utterance = new SpeechSynthesisUtterance(item.text);
-    
-    utterance.rate = this.config.rate;
-    utterance.pitch = this.config.pitch;
-    utterance.volume = this.config.volume;
-    
-    if (this.config.voice) {
-      utterance.voice = this.config.voice;
-    }
-
-    utterance.onstart = () => {
-      this.updateState({ 
-        isSpeaking: true, 
-        currentUtterance: utterance,
-        lastError: null 
-      });
-      console.log('🎤 Browser speech started');
-    };
-
-    utterance.onend = () => {
-      this.updateState({ 
-        isSpeaking: false, 
-        currentUtterance: null 
-      });
-      this.lastSpokenText = item.text;
-      this.lastSpokenTime = Date.now();
-      this.retryCount = 0;
-      console.log('🎤 Browser speech finished');
-      resolve();
-    };
-
-    utterance.onerror = (event) => {
-      console.error('❌ Browser speech error:', event.error);
-      this.updateState({ 
-        isSpeaking: false, 
-        currentUtterance: null,
-        lastError: `Browser speech error: ${event.error}` 
-      });
-      
-      if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
-        this.retryCount++;
-        console.log(`🔄 Retrying browser speech (${this.retryCount}/${this.maxRetries})`);
-        setTimeout(() => {
-          speechSynthesis.speak(utterance);
-        }, 1000);
-      } else {
+    const utterance = browserSpeechEngine.speak(
+      item.text,
+      this.config,
+      () => {
+        this.updateState({
+          isSpeaking: true,
+          currentUtterance: utterance,
+          lastError: null
+        });
+      },
+      () => {
+        this.updateState({
+          isSpeaking: false,
+          currentUtterance: null
+        });
+        this.lastSpokenText = item.text;
+        this.lastSpokenTime = Date.now();
+        this.retryCount = 0;
         resolve();
+      },
+      (event) => {
+        this.updateState({
+          isSpeaking: false,
+          currentUtterance: null,
+          lastError: event.error || 'Unknown error'
+        });
+        if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
+          this.retryCount++;
+          setTimeout(() => {
+            browserSpeechEngine.speak(item.text, this.config, () => {}, () => resolve(), () => resolve());
+          }, 1000);
+        } else {
+          resolve();
+        }
       }
-    };
-
-    speechSynthesis.cancel();
-    
-    try {
-      speechSynthesis.speak(utterance);
-    } catch (error) {
-      console.error('❌ Failed to start browser speech:', error);
-      this.updateState({ 
-        lastError: 'Failed to start speech: ' + (error as Error).message 
-      });
-      resolve();
-    }
+    );
   }
 
   stop(): void {
