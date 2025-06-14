@@ -1,13 +1,14 @@
 
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import LessonActivityManager from './LessonActivityManager';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonControlsFooter from './LessonControlsFooter';
 import LessonCompletedView from './LessonCompletedView';
-import NelieIntroduction from './NelieIntroduction';
 import LessonActivitySpeechManager from './LessonActivitySpeechManager';
+import { RefreshCw, Clock } from 'lucide-react';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -30,7 +31,9 @@ const EnhancedLessonManager = ({
     phase,
     isTimerActive,
     handleActivityComplete,
-    handleLessonStart
+    handleLessonStart,
+    isLoadingActivities,
+    regenerateLesson
   } = useUnifiedLesson();
 
   const {
@@ -51,16 +54,36 @@ const EnhancedLessonManager = ({
     phase,
     currentActivity: currentActivity?.title,
     speechEnabled: autoReadEnabled,
-    hasUserInteracted
+    hasUserInteracted,
+    isLoadingActivities
   });
 
-  if (phase === 'introduction') {
+  // Show loading state while generating daily lesson
+  if (isLoadingActivities) {
     return (
-      <NelieIntroduction
-        subject={subject}
-        skillArea={skillArea}
-        onIntroductionComplete={handleLessonStart}
-      />
+      <Card className="bg-gray-900 border-gray-800">
+        <CardContent className="p-8 text-center">
+          <div className="space-y-6">
+            <div className="flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-pulse">
+                <Clock className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-2xl font-bold text-white">
+                Generating Your Daily {subject.charAt(0).toUpperCase() + subject.slice(1)} Lesson
+              </h3>
+              <p className="text-gray-400 text-lg">
+                Creating a personalized lesson based on your progress and grade level...
+              </p>
+              <div className="flex items-center justify-center space-x-2 text-sm text-lime-400 mt-4">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span>Analyzing your learning progress</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -71,16 +94,24 @@ const EnhancedLessonManager = ({
   if (!currentActivity) {
     return (
       <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6 text-center">
+        <CardContent className="p-6 text-center space-y-4">
           <div className="animate-pulse">
             <div className="w-16 h-16 bg-purple-600 rounded-full mx-auto mb-4"></div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              Loading your {subject} lesson...
+              Preparing your {subject} lesson...
             </h3>
             <p className="text-gray-400">
-              Preparing {allActivities.length} learning activities
+              Setting up {allActivities.length} personalized learning activities
             </p>
           </div>
+          <Button 
+            onClick={regenerateLesson}
+            variant="outline"
+            className="mt-4"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Generate New Lesson
+          </Button>
         </CardContent>
       </Card>
     );
@@ -92,9 +123,7 @@ const EnhancedLessonManager = ({
   const handleManualRead = async () => {
     if (currentActivity) {
       let speechText = '';
-      if (currentActivity.phase === 'introduction') {
-        speechText = currentActivity.content.hook || `Welcome to your ${subject} lesson!`;
-      } else if (currentActivity.phase === 'content-delivery') {
+      if (currentActivity.phase === 'content-delivery') {
         speechText = currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || '';
       } else if (currentActivity.phase === 'interactive-game') {
         speechText = currentActivity.content.question || '';
@@ -114,7 +143,7 @@ const EnhancedLessonManager = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-6">
       <LessonActivitySpeechManager
         currentActivity={currentActivity}
         currentActivityIndex={currentActivityIndex}
@@ -151,8 +180,21 @@ const EnhancedLessonManager = ({
         adaptiveSpeed={1.0}
         onMuteToggle={handleMuteToggle}
         onManualRead={handleManualRead}
-        onResetProgress={() => window.location.reload()}
+        onResetProgress={regenerateLesson}
       />
+
+      {/* Quick regenerate button for testing */}
+      <div className="text-center">
+        <Button 
+          onClick={regenerateLesson}
+          variant="ghost"
+          size="sm"
+          className="text-gray-400 hover:text-white"
+        >
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Generate New Lesson
+        </Button>
+      </div>
     </div>
   );
 };

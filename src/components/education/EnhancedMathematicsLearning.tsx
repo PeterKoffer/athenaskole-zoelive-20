@@ -2,7 +2,6 @@
 import { useNavigate } from "react-router-dom";
 import { UnifiedLessonProvider } from "./contexts/UnifiedLessonContext";
 import { MathLearningContent } from "./components/math/MathLearningContent";
-import { mathActivities } from "./components/math/MathActivitiesData";
 
 const EnhancedMathematicsLearning = () => {
   const navigate = useNavigate();
@@ -17,8 +16,9 @@ const EnhancedMathematicsLearning = () => {
 
   return (
     <UnifiedLessonProvider
-      subject="Mathematics"
-      allActivities={mathActivities}
+      subject="mathematics"
+      skillArea="general_math"
+      gradeLevel={6} // This should come from user profile
       onLessonComplete={handleLessonComplete}
     >
       <MathLearningContent onBackToProgram={handleBackToProgram} />
