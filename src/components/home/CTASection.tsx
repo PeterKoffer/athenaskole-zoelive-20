@@ -15,17 +15,17 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
     <section className="py-16 relative z-10">
       <div className="text-center">
         <h2 className="text-3xl font-semibold text-white mb-4">
-          Ready to meet Nelie?
+          Ready to start your daily learning?
         </h2>
         <p className="text-gray-400 mb-8">
-          Create a free account and start your personal learning journey with Nelie today!
+          Your personalized program is waiting! Nelie has prepared today's lessons just for you.
         </p>
         <Button
           size="lg"
           className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white relative z-10"
           onClick={handleGetStartedClick}
         >
-          Get Started with Nelie
+          Your Program for Today
         </Button>
       </div>
     </section>
