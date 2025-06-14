@@ -46,7 +46,7 @@ const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLe
     toggleMute
   } = useOptimizedLessonManager({
     subject: 'english',
-    skillArea: 'creative_writing',
+    skillArea: 'general_english',
     onLessonComplete: () => {
       console.log('🔇 [EnglishLearning] Lesson completing - stopping speech');
       forceStopAll();
@@ -61,7 +61,7 @@ const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLe
   };
 
   const handleIntroductionComplete = () => {
-    console.log('🎭 Introduction completed, starting optimized English lesson');
+    console.log('🎭 English Introduction completed, starting optimized lesson');
     setShowIntroduction(false);
   };
 

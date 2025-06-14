@@ -4,6 +4,8 @@ import EnglishLessonHeader from './EnglishLessonHeader';
 import EnglishLessonControlPanel from './EnglishLessonControlPanel';
 import EnglishWritingStrategies from './EnglishWritingStrategies';
 import EnglishLessonContentRenderer from './EnglishLessonContentRenderer';
+import ClassroomEnvironment from '../shared/ClassroomEnvironment';
+import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface EnglishLearningMainContentProps {
@@ -39,6 +41,8 @@ const EnglishLearningMainContent = ({
   onStopSpeaking,
   onActivityComplete
 }: EnglishLearningMainContentProps) => {
+  const classroomConfig = getClassroomConfig('english');
+
   const handleNavigateBack = () => {
     if (currentActivityIndex > 0) {
       // Logic to go to previous activity would go here
@@ -57,7 +61,7 @@ const EnglishLearningMainContent = ({
   const canNavigateForward = currentActivityIndex < totalRealActivities - 1;
 
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white">
+    <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full space-y-0">
         <EnglishLessonHeader
           studentName={studentName}
@@ -83,7 +87,7 @@ const EnglishLearningMainContent = ({
           onStopSpeaking={onStopSpeaking}
         />
 
-        {/* Current Activity Content - Full width content area */}
+        {/* Current Activity Content - Full width content area with classroom-aware styling */}
         <div className="w-full px-4 py-6">
           <div className="w-full max-w-4xl mx-auto">
             {currentActivity ? (
@@ -91,7 +95,7 @@ const EnglishLearningMainContent = ({
                 {currentActivity.type === 'interactive-game' ? (
                   <OptimizedQuestionActivity
                     subject="english"
-                    skillArea="creative_writing"
+                    skillArea="general_english"
                     difficultyLevel={2}
                     onComplete={onActivityComplete}
                     questionNumber={currentActivityIndex + 1}
@@ -115,7 +119,7 @@ const EnglishLearningMainContent = ({
                 )}
               </div>
             ) : (
-              <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center">
+              <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">
                 <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
                 <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
               </div>
@@ -123,7 +127,7 @@ const EnglishLearningMainContent = ({
           </div>
         </div>
       </div>
-    </div>
+    </ClassroomEnvironment>
   );
 };
 

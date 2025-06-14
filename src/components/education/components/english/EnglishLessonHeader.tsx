@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Clock, Star, Trophy } from 'lucide-react';
+import { Clock, Target } from 'lucide-react';
 import UnifiedLessonNavigation from '../shared/UnifiedLessonNavigation';
 
 interface EnglishLessonHeaderProps {
@@ -36,37 +36,39 @@ const EnglishLessonHeader = ({
   currentActivityType,
   currentActivityPhase
 }: EnglishLessonHeaderProps) => {
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatTargetTime = (seconds: number) => {
-    return Math.round(seconds / 60);
-  };
-
-  const progressPercentage = Math.min((timeElapsed / targetLessonLength) * 100, 100);
+  // Only show activity counter for interactive content
+  const shouldShowActivityCounter = currentActivityType === 'interactive-game' || 
+                                   currentActivityPhase === 'interactive-game';
 
   return (
-    <div className="w-full bg-gray-800 border-b border-gray-700">
+    <div className="w-full bg-gradient-to-r from-cyan-900/90 to-blue-900/90 border-b border-cyan-400 backdrop-blur-md">
       <div className="w-full max-w-4xl mx-auto px-4 py-4">
-        {/* Top Navigation Row */}
-        <div className="flex items-center justify-between mb-4">
-          <Button 
-            variant="outline" 
+        <div className="flex justify-between items-center mb-4">
+          <Button
+            variant="ghost"
             onClick={onBackToProgram}
-            className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
+            className="text-white hover:bg-white/10 backdrop-blur-sm"
           >
             Back to Program
           </Button>
           
-          <div className="text-center">
-            <h1 className="text-xl font-semibold text-white">English with Nelie</h1>
-            <p className="text-gray-300 text-sm">Welcome {studentName}!</p>
+          <div className="flex items-center space-x-6 text-white">
+            <div className="flex items-center space-x-2 bg-black/20 rounded-lg px-3 py-1 backdrop-blur-sm">
+              <Clock className="w-4 h-4" />
+              <span>{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / {targetLessonLength}:00</span>
+            </div>
+            
+            <div className="flex items-center space-x-2 bg-black/20 rounded-lg px-3 py-1 backdrop-blur-sm">
+              <Target className="w-4 h-4" />
+              <span>Score: {score}</span>
+            </div>
+            
+            {shouldShowActivityCounter && (
+              <div className="text-sm bg-black/20 rounded-lg px-3 py-1 backdrop-blur-sm">
+                Activity {currentActivityIndex + 1}
+              </div>
+            )}
           </div>
-          
-          <div className="w-24"></div> {/* Spacer for balance */}
         </div>
 
         {/* Lesson Navigation Arrows */}
@@ -80,75 +82,15 @@ const EnglishLessonHeader = ({
             forwardLabel="Next Step"
           />
         </div>
-
-        {/* Progress and Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Time Progress */}
-          <div className="bg-gray-700 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 text-blue-400 mr-2" />
-                <span className="text-white text-sm font-medium">Time</span>
-              </div>
-              <span className="text-gray-300 text-sm">
-                {formatTime(timeElapsed)} / {formatTargetTime(targetLessonLength)}min
-              </span>
-            </div>
-            <div className="w-full bg-gray-600 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Activity Progress */}
-          <div className="bg-gray-700 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white text-sm font-medium">Progress</span>
-              <span className="text-gray-300 text-sm">
-                {currentActivityIndex + 1} / {totalRealActivities}
-              </span>
-            </div>
-            <div className="w-full bg-gray-600 rounded-full h-2">
-              <div 
-                className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${((currentActivityIndex + 1) / totalRealActivities) * 100}%` }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Score */}
-          <div className="bg-gray-700 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Star className="w-4 h-4 text-yellow-400 mr-2" />
-                <span className="text-white text-sm font-medium">Score</span>
-              </div>
-              <span className="text-yellow-400 font-semibold">{score}</span>
-            </div>
-          </div>
-
-          {/* Streak */}
-          <div className="bg-gray-700 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Trophy className="w-4 h-4 text-purple-400 mr-2" />
-                <span className="text-white text-sm font-medium">Streak</span>
-              </div>
-              <span className="text-purple-400 font-semibold">{correctStreak}</span>
-            </div>
-          </div>
+        
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-white bg-black/20 rounded-lg px-4 py-2 backdrop-blur-sm inline-block">
+            English Language Arts with Nelie - {studentName}'s Lesson
+            {correctStreak > 0 && (
+              <span className="ml-2 text-green-400">🔥 {correctStreak} streak!</span>
+            )}
+          </h1>
         </div>
-
-        {/* Current Activity Indicator */}
-        {currentActivityType && (
-          <div className="mt-4 text-center">
-            <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded-full">
-              {currentActivityPhase?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Learning'}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
