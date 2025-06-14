@@ -1,8 +1,17 @@
 
+// Utility for browser speech synthesis (purely speaking, config, and event handler wiring)
+// No knowledge of unified system state or queues is in this file.
+
 export const browserSpeechEngine = {
-  speak(text: string, config: {rate: number, pitch: number, volume: number, voice?: SpeechSynthesisVoice}, onStart: () => void, onEnd: () => void, onError: (event: any) => void) {
+  speak(
+    text: string,
+    config: { rate: number; pitch: number; volume: number; voice?: SpeechSynthesisVoice },
+    onStart: () => void,
+    onEnd: () => void,
+    onError: (event: any) => void
+  ) {
     if (typeof speechSynthesis === 'undefined') {
-      onError({error: 'not_supported'});
+      onError({ error: 'not_supported' });
       return;
     }
     const utterance = new SpeechSynthesisUtterance(text);

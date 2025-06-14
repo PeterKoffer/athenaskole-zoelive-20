@@ -1,3 +1,7 @@
+
+// The unified orchestrator: queueing, logic, preference, state handling
+// Delegates engine-specific functionality to BrowserSpeechEngine and ElevenLabsSpeechEngine
+
 import { elevenLabsSpeechEngine } from './ElevenLabsSpeechEngine';
 import { browserSpeechEngine } from './BrowserSpeechEngine';
 
@@ -65,7 +69,6 @@ class UnifiedSpeechSystem {
   private async initializeSpeechSystem() {
     console.log('🎤 Initializing Enhanced Speech System with ElevenLabs...');
     this.updateState({ isLoading: true });
-    // Await ElevenLabs check
     const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
 
     if (elevenLabsAvailable && this.config.preferElevenLabs) {
@@ -86,7 +89,7 @@ class UnifiedSpeechSystem {
 
   private async initializeBrowserSpeech() {
     if (typeof speechSynthesis === 'undefined') {
-      this.updateState({ 
+      this.updateState({
         lastError: 'Speech synthesis not supported in this browser',
         isReady: false,
         isLoading: false
@@ -105,11 +108,11 @@ class UnifiedSpeechSystem {
         if (voices.length > 0) {
           console.log('✅ Browser speech voices loaded:', voices.length);
           this.selectOptimalVoiceForNelie(voices);
-          this.updateState({ 
+          this.updateState({
             voicesLoaded: true,
             isLoading: false,
             isReady: true,
-            lastError: null 
+            lastError: null
           });
           resolve();
         }
@@ -117,11 +120,11 @@ class UnifiedSpeechSystem {
 
       checkVoices();
       speechSynthesis.addEventListener('voiceschanged', checkVoices);
-      
+
       setTimeout(() => {
         if (!this.state.voicesLoaded) {
           console.log('⚠️ Voice loading timeout - using browser default');
-          this.updateState({ 
+          this.updateState({
             voicesLoaded: true,
             isLoading: false,
             isReady: true,
@@ -145,7 +148,7 @@ class UnifiedSpeechSystem {
     let selectedVoice = null;
 
     for (const preferred of preferredVoices) {
-      selectedVoice = voices.find(voice => 
+      selectedVoice = voices.find(voice =>
         voice.name.includes(preferred) && voice.lang.startsWith('en')
       );
       if (selectedVoice) {
@@ -155,10 +158,10 @@ class UnifiedSpeechSystem {
     }
 
     if (!selectedVoice) {
-      selectedVoice = voices.find(voice => 
-        voice.lang.startsWith('en') && 
-        (voice.name.toLowerCase().includes('female') || 
-         voice.name.toLowerCase().includes('woman'))
+      selectedVoice = voices.find(voice =>
+        voice.lang.startsWith('en') &&
+        (voice.name.toLowerCase().includes('female') ||
+          voice.name.toLowerCase().includes('woman'))
       );
     }
 
@@ -194,12 +197,12 @@ class UnifiedSpeechSystem {
       const testUtterance = new SpeechSynthesisUtterance('');
       testUtterance.volume = 0;
       speechSynthesis.speak(testUtterance);
-      
+
       console.log('✅ Browser speech synthesis test passed');
     } catch (error) {
       console.error('❌ Browser speech synthesis test failed:', error);
-      this.updateState({ 
-        lastError: 'Speech test failed: ' + (error as Error).message 
+      this.updateState({
+        lastError: 'Speech test failed: ' + (error as Error).message
       });
     }
   }
@@ -216,7 +219,7 @@ class UnifiedSpeechSystem {
   subscribe(listener: (state: SpeechState) => void): () => void {
     this.listeners.push(listener);
     listener(this.state);
-    
+
     return () => {
       const index = this.listeners.indexOf(listener);
       if (index > -1) {
@@ -259,7 +262,7 @@ class UnifiedSpeechSystem {
 
   async speakAsNelie(text: string, priority: boolean = false): Promise<void> {
     if (!text) return;
-    
+
     let nelieText = text;
     if (Math.random() < 0.2 && !text.includes('Hi') && !text.includes('Let')) {
       const phrases = [
@@ -270,7 +273,7 @@ class UnifiedSpeechSystem {
       const phrase = phrases[Math.floor(Math.random() * phrases.length)];
       nelieText = `${phrase} ${text}`;
     }
-    
+
     await this.speak(nelieText, priority);
   }
 
@@ -356,7 +359,7 @@ class UnifiedSpeechSystem {
         if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
           this.retryCount++;
           setTimeout(() => {
-            browserSpeechEngine.speak(item.text, this.config, () => {}, () => resolve(), () => resolve());
+            browserSpeechEngine.speak(item.text, this.config, () => { }, () => resolve(), () => resolve());
           }, 1000);
         } else {
           resolve();
@@ -376,24 +379,24 @@ class UnifiedSpeechSystem {
     if (typeof speechSynthesis !== 'undefined') {
       speechSynthesis.cancel();
     }
-    
+
     this.speechQueue = [];
-    this.updateState({ 
-      isSpeaking: false, 
-      currentUtterance: null 
+    this.updateState({
+      isSpeaking: false,
+      currentUtterance: null
     });
-    
+
     console.log('🔇 All Nelie speech stopped and queue cleared');
   }
 
   toggleEnabled(): void {
     const newState = !this.state.isEnabled;
     this.updateState({ isEnabled: newState });
-    
+
     if (!newState) {
       this.stop();
     }
-    
+
     console.log(newState ? '🔊 Nelie speech enabled' : '🔇 Nelie speech disabled');
   }
 
@@ -410,3 +413,4 @@ class UnifiedSpeechSystem {
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
+
