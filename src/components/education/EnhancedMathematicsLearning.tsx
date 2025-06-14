@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { UnifiedLessonProvider } from "./contexts/UnifiedLessonContext";
+import { UnifiedLessonProvider } from "./contexts/UnifiedLessonProvider";
 import { MathLearningContent } from "./components/math/MathLearningContent";
 
 const EnhancedMathematicsLearning = () => {
