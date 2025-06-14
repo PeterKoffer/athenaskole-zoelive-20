@@ -47,10 +47,13 @@ const IntroductionContent = ({
         </div>
       </div>
 
-      {/* Fixed contrast buttons */}
+      {/* Enhanced buttons with proper interaction handling */}
       <div className="flex justify-center gap-4">
         <Button
-          onClick={onMuteToggle}
+          onClick={() => {
+            console.log('🔊 Sound toggle clicked in introduction');
+            onMuteToggle();
+          }}
           variant="outline"
           className="border-purple-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
         >
@@ -68,12 +71,16 @@ const IntroductionContent = ({
         </Button>
         
         <Button
-          onClick={onManualRead}
+          onClick={() => {
+            console.log('🔊 Ask Nelie to Repeat clicked in introduction');
+            onManualRead();
+          }}
           variant="outline"
           className="border-purple-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
+          disabled={isSpeaking}
         >
           <RotateCcw className="w-4 h-4 mr-2" />
-          Ask Nelie to Repeat
+          {isSpeaking ? 'Nelie is Speaking...' : 'Ask Nelie to Repeat'}
         </Button>
       </div>
 

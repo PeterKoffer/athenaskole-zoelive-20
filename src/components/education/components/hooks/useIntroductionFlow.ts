@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 const getSubjectSpecificIntroduction = (subject: string) => {
   const baseSteps = [
@@ -38,7 +38,16 @@ export const useIntroductionFlow = (subject: string) => {
     stop,
     toggleEnabled,
     enableUserInteraction
-  } = useConsolidatedSpeech();
+  } = useUnifiedSpeech();
+
+  console.log('🎭 Introduction Flow State:', {
+    currentStep,
+    hasStartedFlow,
+    isSpeaking,
+    isEnabled,
+    hasUserInteracted,
+    isReady
+  });
 
   // Start the introduction flow automatically when ready
   useEffect(() => {
@@ -79,9 +88,17 @@ export const useIntroductionFlow = (subject: string) => {
   }, [currentStep, hasStartedFlow, introductionSteps, isEnabled, hasUserInteracted, speak]);
 
   const handleMuteToggleWrapper = useCallback(() => {
-    console.log('🔊 Mute toggle clicked, current enabled state:', isEnabled);
+    console.log('🔊 Mute toggle clicked, current state:', { isEnabled, hasUserInteracted });
+    
     if (!hasUserInteracted) {
+      console.log('🔊 Enabling user interaction for first time');
       enableUserInteraction();
+      // Wait a moment then enable speech
+      setTimeout(() => {
+        if (!isEnabled) {
+          toggleEnabled();
+        }
+      }, 100);
     } else {
       toggleEnabled();
     }
@@ -90,25 +107,32 @@ export const useIntroductionFlow = (subject: string) => {
   const handleManualRead = useCallback(() => {
     console.log('🔊 Manual read button clicked');
     const currentStepText = introductionSteps[currentStep]?.text;
-    if (currentStepText) {
-      if (!hasUserInteracted) {
-        console.log('🔊 Enabling user interaction for manual read');
-        enableUserInteraction();
-        // Wait a bit then speak
+    
+    if (!currentStepText) {
+      console.warn('⚠️ No current step text available for manual read');
+      return;
+    }
+
+    if (!hasUserInteracted) {
+      console.log('🔊 Enabling user interaction for manual read');
+      enableUserInteraction();
+      // Wait a bit then enable speech and speak
+      setTimeout(() => {
+        if (!isEnabled) {
+          toggleEnabled();
+        }
         setTimeout(() => {
           speak(currentStepText, true);
-        }, 500);
-      } else if (isSpeaking) {
-        console.log('🔊 Stopping current speech');
-        stop();
-      } else {
-        console.log('🔊 Starting manual read:', currentStepText.substring(0, 50) + '...');
-        speak(currentStepText, true);
-      }
+        }, 200);
+      }, 100);
+    } else if (isSpeaking) {
+      console.log('🔊 Stopping current speech');
+      stop();
     } else {
-      console.warn('⚠️ No current step text available for manual read');
+      console.log('🔊 Starting manual read:', currentStepText.substring(0, 50) + '...');
+      speak(currentStepText, true);
     }
-  }, [currentStep, introductionSteps, isSpeaking, hasUserInteracted, speak, stop, enableUserInteraction]);
+  }, [currentStep, introductionSteps, isSpeaking, hasUserInteracted, speak, stop, enableUserInteraction, toggleEnabled, isEnabled]);
 
   return {
     currentStep,
