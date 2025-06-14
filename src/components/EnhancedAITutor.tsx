@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,13 +7,9 @@ import LanguageSelector from "./ai-tutor/LanguageSelector";
 import WelcomeCard from "./ai-tutor/WelcomeCard";
 import TutorHeader from "./ai-tutor/TutorHeader";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
-
-// Extracted tab components
-import EnhancedTutorChatTab from "./ai-tutor/tabs/EnhancedTutorChatTab";
-import EnhancedTutorSpeechTab from "./ai-tutor/tabs/EnhancedTutorSpeechTab";
-import EnhancedTutorChallengesTab from "./ai-tutor/tabs/EnhancedTutorChallengesTab";
-import EnhancedTutorRewardsTab from "./ai-tutor/tabs/EnhancedTutorRewardsTab";
-import EnhancedTutorParentsTab from "./ai-tutor/tabs/EnhancedTutorParentsTab";
+import TutorLanguageSelectionView from "./ai-tutor/TutorLanguageSelectionView";
+import TutorLanguageLearningView from "./ai-tutor/TutorLanguageLearningView";
+import { getChildProgress } from "./ai-tutor/childProgressUtil";
 
 interface EnhancedAITutorProps {
   user: any;
@@ -37,15 +32,7 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
   });
 
   // Child progress for Parents Tab
-  const childProgress = {
-    childName: user?.user_metadata?.name?.split(' ')[0] || "Emma",
-    weeklyMinutes: 95,
-    completedLessons: 8,
-    pronunciationScore: 87,
-    challengesCompleted: 12,
-    streak: 5,
-    newAchievements: ["Pronunciation Master", "7 Day Streak"]
-  };
+  const childProgress = getChildProgress(user);
 
   const handleLearningOptionWithLanguageCheck = (option: any) => {
     if (option.id === "language") {
@@ -88,75 +75,36 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
   // Language selection or learning flows
   if (showLanguageSelection) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          {onBack && (
-            <Button
-              variant="outline"
-              onClick={onBack}
-              className="text-white border-gray-600 hover:bg-gray-700 flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home</span>
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            onClick={() => setShowLanguageSelection(false)}
-            className="text-white border-gray-600 hover:bg-gray-700"
-          >
-            ← Back to AI Tutor
-          </Button>
-        </div>
-        <LanguageSelector
-          onLanguageSelect={handleLanguageSelect}
-          onBack={() => setShowLanguageSelection(false)}
-        />
-      </div>
+      <TutorLanguageSelectionView
+        onBackToHome={onBack}
+        onBackToTutor={() => setShowLanguageSelection(false)}
+        onLanguageSelect={handleLanguageSelect}
+      />
     );
   }
 
   if (showLanguageLearning) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          {onBack && (
-            <Button
-              variant="outline"
-              onClick={onBack}
-              className="text-white border-gray-600 hover:bg-gray-700 flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home</span>
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            onClick={() => {
-              setShowLanguageLearning(false);
-              setSelectedLanguage("");
-            }}
-            className="text-white border-gray-600 hover:bg-gray-700"
-          >
-            ← Back to AI Tutor
-          </Button>
-        </div>
-        <LanguageLearning initialLanguage={selectedLanguage} />
-      </div>
+      <TutorLanguageLearningView
+        selectedLanguage={selectedLanguage}
+        onBackToHome={onBack}
+        onBackToTutor={() => {
+          setShowLanguageLearning(false);
+          setSelectedLanguage("");
+        }}
+      />
     );
   }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <WelcomeCard userName={userName} />
-      
       <TutorHeader
         currentCoins={currentCoins}
         currentSubject={currentSubject}
         onSubjectChange={setCurrentSubject}
         onLanguageSelect={() => setShowLanguageSelection(true)}
       />
-
       <Tabs defaultValue="chat" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5 bg-gray-800">
           <TabsTrigger value="chat" className="data-[state=active]:bg-gray-700 text-white">AI Chat</TabsTrigger>
