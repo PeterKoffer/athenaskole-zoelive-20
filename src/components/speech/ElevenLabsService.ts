@@ -22,7 +22,7 @@ class ElevenLabsService {
   constructor() {
     this.config = {
       apiKey: "", // No longer needed on client
-      voiceId: "9BWtsMINqrJLrRacOk9x", // Aria (Premium English Female per ElevenLabs doc)
+      voiceId: "YvMZb1i5lC3pIbB08jiB", // Fena (Female English per ElevenLabs, as requested)
       model: "eleven_turbo_v2_5",
     };
     this.availabilityPromise = this.checkAvailability();
