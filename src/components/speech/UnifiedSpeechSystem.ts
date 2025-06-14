@@ -1,9 +1,12 @@
 
+import { elevenLabsService } from './ElevenLabsService';
+
 interface SpeechConfig {
   rate: number;
   pitch: number;
   volume: number;
   voice?: SpeechSynthesisVoice;
+  preferElevenLabs: boolean;
 }
 
 interface SpeechState {
@@ -15,6 +18,7 @@ interface SpeechState {
   lastError: string | null;
   isLoading: boolean;
   voicesLoaded: boolean;
+  usingElevenLabs: boolean;
 }
 
 interface SpeechQueue {
@@ -33,13 +37,15 @@ class UnifiedSpeechSystem {
     currentUtterance: null,
     lastError: null,
     isLoading: false,
-    voicesLoaded: false
+    voicesLoaded: false,
+    usingElevenLabs: false
   };
 
   private config: SpeechConfig = {
-    rate: 0.8, // Slightly slower for more natural speech
-    pitch: 1.1, // Slightly higher pitch for Nelie's friendly personality
-    volume: 0.85
+    rate: 0.8,
+    pitch: 1.1,
+    volume: 0.85,
+    preferElevenLabs: true
   };
 
   private listeners: ((state: SpeechState) => void)[] = [];
@@ -50,31 +56,47 @@ class UnifiedSpeechSystem {
   private repeatPreventionTime = 3000;
   private maxRetries = 3;
   private retryCount = 0;
+  private currentAudio: HTMLAudioElement | null = null;
 
   constructor() {
     this.initializeSpeechSystem();
   }
 
   private async initializeSpeechSystem() {
-    console.log('🎤 Initializing Enhanced Speech System for Nelie...');
+    console.log('🎤 Initializing Enhanced Speech System with ElevenLabs...');
     
+    this.updateState({ isLoading: true });
+
+    // Check ElevenLabs availability
+    const elevenLabsAvailable = elevenLabsService.isServiceAvailable();
+    
+    if (elevenLabsAvailable && this.config.preferElevenLabs) {
+      console.log('✅ ElevenLabs available - using high-quality voice synthesis');
+      this.updateState({ 
+        usingElevenLabs: true,
+        isReady: true,
+        isLoading: false,
+        lastError: null 
+      });
+    } else {
+      console.log('🔄 Falling back to browser speech synthesis');
+      await this.initializeBrowserSpeech();
+    }
+
+    this.setupEventListeners();
+  }
+
+  private async initializeBrowserSpeech() {
     if (typeof speechSynthesis === 'undefined') {
       this.updateState({ 
         lastError: 'Speech synthesis not supported in this browser',
-        isReady: false 
+        isReady: false,
+        isLoading: false
       });
       return;
     }
 
-    this.updateState({ isLoading: true });
-
-    // Wait for voices to load with timeout
     await this.waitForVoices();
-    
-    // Set up event listeners
-    this.setupEventListeners();
-    
-    // Test basic functionality
     await this.performInitialTest();
   }
 
@@ -83,7 +105,7 @@ class UnifiedSpeechSystem {
       const checkVoices = () => {
         const voices = speechSynthesis.getVoices();
         if (voices.length > 0) {
-          console.log('✅ Speech voices loaded:', voices.length);
+          console.log('✅ Browser speech voices loaded:', voices.length);
           this.selectOptimalVoiceForNelie(voices);
           this.updateState({ 
             voicesLoaded: true,
@@ -95,13 +117,9 @@ class UnifiedSpeechSystem {
         }
       };
 
-      // Check immediately
       checkVoices();
-      
-      // Set up event listener for voice changes
       speechSynthesis.addEventListener('voiceschanged', checkVoices);
       
-      // Timeout fallback
       setTimeout(() => {
         if (!this.state.voicesLoaded) {
           console.log('⚠️ Voice loading timeout - using browser default');
@@ -118,24 +136,16 @@ class UnifiedSpeechSystem {
   }
 
   private selectOptimalVoiceForNelie(voices: SpeechSynthesisVoice[]) {
-    // Priority order for Nelie's voice - looking for young, friendly, clear female voices
     const preferredVoices = [
       'Google US English Female',
-      'Microsoft Zira Desktop', // Young, clear voice
+      'Microsoft Zira Desktop',
       'Karen',
-      'Samantha', // Mac voice - very natural
-      'Victoria', // Mac voice - also good
-      'Google UK English Female',
-      'Microsoft Zira',
-      'Fiona', // Scottish accent but friendly
-      'Moira', // Irish accent, warm
-      'Tessa', // South African, clear
-      'Veena' // Indian accent, clear
+      'Samantha',
+      'Victoria'
     ];
 
     let selectedVoice = null;
 
-    // Try to find preferred voices
     for (const preferred of preferredVoices) {
       selectedVoice = voices.find(voice => 
         voice.name.includes(preferred) && voice.lang.startsWith('en')
@@ -146,39 +156,29 @@ class UnifiedSpeechSystem {
       }
     }
 
-    // Fallback to any female English voice
     if (!selectedVoice) {
       selectedVoice = voices.find(voice => 
         voice.lang.startsWith('en') && 
         (voice.name.toLowerCase().includes('female') || 
-         voice.name.toLowerCase().includes('woman') ||
-         voice.name.toLowerCase().includes('zira') ||
-         voice.name.toLowerCase().includes('karen') ||
-         voice.name.toLowerCase().includes('samantha'))
+         voice.name.toLowerCase().includes('woman'))
       );
     }
 
-    // Final fallback to any English voice
     if (!selectedVoice) {
       selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
     }
 
     this.config.voice = selectedVoice || undefined;
-    console.log('🎤 Selected voice for Nelie:', selectedVoice?.name || 'Browser default');
-    
-    // Log all available voices for debugging
-    console.log('📋 Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+    console.log('🎤 Selected browser voice for Nelie:', selectedVoice?.name || 'Browser default');
   }
 
   private setupEventListeners() {
-    // Listen for visibility changes to pause/resume speech
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.state.isSpeaking) {
         this.stop();
       }
     });
 
-    // Listen for user interaction to enable speech
     const enableOnInteraction = () => {
       if (!this.state.hasUserInteracted) {
         this.updateState({ hasUserInteracted: true });
@@ -193,14 +193,13 @@ class UnifiedSpeechSystem {
 
   private async performInitialTest(): Promise<void> {
     try {
-      // Test if speech synthesis is working
       const testUtterance = new SpeechSynthesisUtterance('');
-      testUtterance.volume = 0; // Silent test
+      testUtterance.volume = 0;
       speechSynthesis.speak(testUtterance);
       
-      console.log('✅ Speech synthesis test passed for Nelie');
+      console.log('✅ Browser speech synthesis test passed');
     } catch (error) {
-      console.error('❌ Speech synthesis test failed:', error);
+      console.error('❌ Browser speech synthesis test failed:', error);
       this.updateState({ 
         lastError: 'Speech test failed: ' + (error as Error).message 
       });
@@ -218,7 +217,7 @@ class UnifiedSpeechSystem {
 
   subscribe(listener: (state: SpeechState) => void): () => void {
     this.listeners.push(listener);
-    listener(this.state); // Immediate call with current state
+    listener(this.state);
     
     return () => {
       const index = this.listeners.indexOf(listener);
@@ -238,7 +237,6 @@ class UnifiedSpeechSystem {
       return;
     }
 
-    // Prevent repetition
     const now = Date.now();
     if (text === this.lastSpokenText && (now - this.lastSpokenTime) < this.repeatPreventionTime) {
       console.log('🚫 Preventing repetition of:', text.substring(0, 30) + '...');
@@ -253,10 +251,10 @@ class UnifiedSpeechSystem {
     };
 
     if (priority) {
-      this.speechQueue.unshift(speechItem); // Add to front
-      this.stop(); // Stop current speech
+      this.speechQueue.unshift(speechItem);
+      this.stop();
     } else {
-      this.speechQueue.push(speechItem); // Add to end
+      this.speechQueue.push(speechItem);
     }
 
     this.processQueue();
@@ -265,19 +263,14 @@ class UnifiedSpeechSystem {
   async speakAsNelie(text: string, priority: boolean = false): Promise<void> {
     if (!text) return;
     
-    // Add Nelie's personality markers to the speech
-    const neliePersonalityPhrases = [
-      "Hi there!",
-      "Let me help you with that!",
-      "That's a great question!",
-      "You're doing wonderfully!",
-      "Let's explore this together!"
-    ];
-    
-    // Occasionally add personality (but not always to avoid being annoying)
     let nelieText = text;
-    if (Math.random() < 0.3 && !text.includes('Hi') && !text.includes('Let')) {
-      const phrase = neliePersonalityPhrases[Math.floor(Math.random() * neliePersonalityPhrases.length)];
+    if (Math.random() < 0.2 && !text.includes('Hi') && !text.includes('Let')) {
+      const phrases = [
+        "Hi there!",
+        "Let me help you with that!",
+        "That's a great question!"
+      ];
+      const phrase = phrases[Math.floor(Math.random() * phrases.length)];
       nelieText = `${phrase} ${text}`;
     }
     
@@ -291,7 +284,7 @@ class UnifiedSpeechSystem {
 
     if (!this.state.isEnabled || !this.state.hasUserInteracted) {
       console.log('🚫 Speech disabled or no user interaction');
-      this.speechQueue = []; // Clear queue
+      this.speechQueue = [];
       return;
     }
 
@@ -300,8 +293,6 @@ class UnifiedSpeechSystem {
     while (this.speechQueue.length > 0) {
       const item = this.speechQueue.shift()!;
       await this.speakItem(item);
-      
-      // Small delay between items
       await new Promise(resolve => setTimeout(resolve, 300));
     }
 
@@ -309,96 +300,135 @@ class UnifiedSpeechSystem {
   }
 
   private async speakItem(item: SpeechQueue): Promise<void> {
-    return new Promise((resolve) => {
-      if (typeof speechSynthesis === 'undefined') {
-        console.error('❌ Speech synthesis not available');
-        resolve();
-        return;
-      }
-
+    return new Promise(async (resolve) => {
       console.log('🔊 Nelie speaking:', item.text.substring(0, 50) + '...');
 
-      const utterance = new SpeechSynthesisUtterance(item.text);
-      
-      // Apply Nelie's optimized configuration
-      utterance.rate = this.config.rate; // Slower, more natural pace
-      utterance.pitch = this.config.pitch; // Slightly higher for friendliness
-      utterance.volume = this.config.volume;
-      
-      if (this.config.voice) {
-        utterance.voice = this.config.voice;
-      }
+      // Try ElevenLabs first if available and preferred
+      if (this.state.usingElevenLabs && this.config.preferElevenLabs) {
+        try {
+          const audioResponse = await elevenLabsService.generateSpeech(item.text);
+          
+          if (audioResponse.audioContent && !audioResponse.error) {
+            this.updateState({ 
+              isSpeaking: true, 
+              lastError: null 
+            });
 
-      // Set up event handlers
-      utterance.onstart = () => {
-        this.updateState({ 
-          isSpeaking: true, 
-          currentUtterance: utterance,
-          lastError: null 
-        });
-        console.log('🎤 Nelie started speaking');
-      };
-
-      utterance.onend = () => {
-        this.updateState({ 
-          isSpeaking: false, 
-          currentUtterance: null 
-        });
-        this.lastSpokenText = item.text;
-        this.lastSpokenTime = Date.now();
-        this.retryCount = 0;
-        console.log('🎤 Nelie finished speaking');
-        resolve();
-      };
-
-      utterance.onerror = (event) => {
-        console.error('❌ Nelie speech error:', event.error);
-        this.updateState({ 
-          isSpeaking: false, 
-          currentUtterance: null,
-          lastError: `Speech error: ${event.error}` 
-        });
-        
-        // Retry logic
-        if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
-          this.retryCount++;
-          console.log(`🔄 Retrying Nelie speech (${this.retryCount}/${this.maxRetries})`);
-          setTimeout(() => {
-            speechSynthesis.speak(utterance);
-          }, 1000);
-        } else {
-          resolve();
+            await elevenLabsService.playAudio(audioResponse.audioContent);
+            
+            this.updateState({ 
+              isSpeaking: false 
+            });
+            
+            this.lastSpokenText = item.text;
+            this.lastSpokenTime = Date.now();
+            console.log('🎤 ElevenLabs speech completed successfully');
+            resolve();
+            return;
+          } else {
+            console.log('🔄 ElevenLabs failed, falling back to browser speech:', audioResponse.error);
+            // Fall through to browser speech
+          }
+        } catch (error) {
+          console.log('🔄 ElevenLabs error, falling back to browser speech:', error);
+          // Fall through to browser speech
         }
-      };
-
-      // Cancel any existing speech
-      speechSynthesis.cancel();
-      
-      // Start speaking
-      try {
-        speechSynthesis.speak(utterance);
-      } catch (error) {
-        console.error('❌ Failed to start Nelie speech:', error);
-        this.updateState({ 
-          lastError: 'Failed to start speech: ' + (error as Error).message 
-        });
-        resolve();
       }
+
+      // Fallback to browser speech synthesis
+      this.speakWithBrowserSynthesis(item, resolve);
     });
   }
 
+  private speakWithBrowserSynthesis(item: SpeechQueue, resolve: () => void): void {
+    if (typeof speechSynthesis === 'undefined') {
+      console.error('❌ Browser speech synthesis not available');
+      resolve();
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(item.text);
+    
+    utterance.rate = this.config.rate;
+    utterance.pitch = this.config.pitch;
+    utterance.volume = this.config.volume;
+    
+    if (this.config.voice) {
+      utterance.voice = this.config.voice;
+    }
+
+    utterance.onstart = () => {
+      this.updateState({ 
+        isSpeaking: true, 
+        currentUtterance: utterance,
+        lastError: null 
+      });
+      console.log('🎤 Browser speech started');
+    };
+
+    utterance.onend = () => {
+      this.updateState({ 
+        isSpeaking: false, 
+        currentUtterance: null 
+      });
+      this.lastSpokenText = item.text;
+      this.lastSpokenTime = Date.now();
+      this.retryCount = 0;
+      console.log('🎤 Browser speech finished');
+      resolve();
+    };
+
+    utterance.onerror = (event) => {
+      console.error('❌ Browser speech error:', event.error);
+      this.updateState({ 
+        isSpeaking: false, 
+        currentUtterance: null,
+        lastError: `Browser speech error: ${event.error}` 
+      });
+      
+      if (this.retryCount < this.maxRetries && event.error !== 'canceled') {
+        this.retryCount++;
+        console.log(`🔄 Retrying browser speech (${this.retryCount}/${this.maxRetries})`);
+        setTimeout(() => {
+          speechSynthesis.speak(utterance);
+        }, 1000);
+      } else {
+        resolve();
+      }
+    };
+
+    speechSynthesis.cancel();
+    
+    try {
+      speechSynthesis.speak(utterance);
+    } catch (error) {
+      console.error('❌ Failed to start browser speech:', error);
+      this.updateState({ 
+        lastError: 'Failed to start speech: ' + (error as Error).message 
+      });
+      resolve();
+    }
+  }
+
   stop(): void {
+    // Stop ElevenLabs audio if playing
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio = null;
+    }
+
+    // Stop browser speech synthesis
     if (typeof speechSynthesis !== 'undefined') {
       speechSynthesis.cancel();
     }
     
-    this.speechQueue = []; // Clear queue
+    this.speechQueue = [];
     this.updateState({ 
       isSpeaking: false, 
       currentUtterance: null 
     });
     
-    console.log('🔇 Nelie speech stopped and queue cleared');
+    console.log('🔇 All Nelie speech stopped and queue cleared');
   }
 
   toggleEnabled(): void {
@@ -406,7 +436,7 @@ class UnifiedSpeechSystem {
     this.updateState({ isEnabled: newState });
     
     if (!newState) {
-      this.stop(); // Stop current speech when disabled
+      this.stop();
     }
     
     console.log(newState ? '🔊 Nelie speech enabled' : '🔇 Nelie speech disabled');
@@ -418,11 +448,10 @@ class UnifiedSpeechSystem {
   }
 
   async test(): Promise<void> {
-    const testMessage = "Hi! I'm Nelie, your learning companion. My voice system is working perfectly! I'm so excited to help you learn!";
-    console.log('🧪 Testing Nelie\'s enhanced voice...');
+    const testMessage = "Hi! I'm Nelie, your learning companion. My enhanced voice system with ElevenLabs is working perfectly! I'm so excited to help you learn!";
+    console.log('🧪 Testing Nelie\'s enhanced ElevenLabs voice...');
     await this.speak(testMessage, true);
   }
 }
 
-// Create singleton instance
 export const unifiedSpeech = new UnifiedSpeechSystem();
