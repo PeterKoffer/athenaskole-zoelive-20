@@ -10,7 +10,6 @@ export const ElevenLabsEngine = {
   async speak(text: string): Promise<boolean> {
     try {
       console.log("‼️ [ElevenLabsEngine V2] ENTERING speak method.");
-      showSpeechToast("ElevenLabs", "Generating premium voice...", "default");
 
       const audioResponse = await elevenLabsService.generateSpeech(text);
 
@@ -36,14 +35,12 @@ export const ElevenLabsEngine = {
         return false;
       }
 
-      showSpeechToast("ElevenLabs", "Playing audio...", "success");
       console.log("‼️ [ElevenLabsEngine V2] About to play audio... (should play premium voice: Fena)");
       // Add event before and after playing audio
       window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "elevenlabs", source: "about-to-play" } }));
       await elevenLabsService.playAudio(audioResponse.audioContent);
       console.log("‼️ [ElevenLabsEngine V2] ElevenLabs playback finished.");
       window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "elevenlabs", source: "did-play" } }));
-      showSpeechToast("ElevenLabs Audio", "Playback completed!", "default");
       return true;
 
     } catch (e) {
