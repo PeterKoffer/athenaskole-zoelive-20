@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Brain } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -146,6 +145,8 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
           totalRealActivities={totalRealActivities}
           correctStreak={correctStreak}
           onBackToProgram={handleBackToProgram}
+          currentActivityType={currentActivity?.type}
+          currentActivityPhase={currentActivity?.phase}
         />
 
         <MathLessonControlPanel

@@ -11,6 +11,8 @@ interface MathLessonHeaderProps {
   totalRealActivities: number;
   correctStreak: number;
   onBackToProgram: () => void;
+  currentActivityType?: string;
+  currentActivityPhase?: string;
 }
 
 const MathLessonHeader = ({
@@ -21,8 +23,14 @@ const MathLessonHeader = ({
   currentActivityIndex,
   totalRealActivities,
   correctStreak,
-  onBackToProgram
+  onBackToProgram,
+  currentActivityType,
+  currentActivityPhase
 }: MathLessonHeaderProps) => {
+  // Only show activity counter for interactive content
+  const shouldShowActivityCounter = currentActivityType === 'interactive-game' || 
+                                   currentActivityPhase === 'interactive-game';
+
   return (
     <div className="w-full bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-400">
       <div className="w-full max-w-4xl mx-auto px-4 py-4">
@@ -47,9 +55,11 @@ const MathLessonHeader = ({
               <span>Score: {score}</span>
             </div>
             
-            <div className="text-sm">
-              Activity {currentActivityIndex + 1}
-            </div>
+            {shouldShowActivityCounter && (
+              <div className="text-sm">
+                Activity {currentActivityIndex + 1}
+              </div>
+            )}
           </div>
         </div>
         
