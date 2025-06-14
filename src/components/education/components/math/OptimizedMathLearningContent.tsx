@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
 import OptimizedQuestionActivity from '../OptimizedQuestionActivity';
 import NelieIntroduction from '../NelieIntroduction';
+import AskNelieButtons from '../shared/AskNelieButtons';
 
 interface OptimizedMathLearningContentProps {
   onBackToProgram: () => void;
@@ -112,17 +112,37 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
       
       <div className="text-gray-300 space-y-6">
         <div className="bg-blue-900/30 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-200 mb-3">Key Strategies for {studentName}:</h3>
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="font-semibold text-blue-200">Key Strategies for {studentName}:</h3>
+            <AskNelieButtons 
+              content="Key mental math strategies include number bonds, compensation, doubling and halving, and using benchmark numbers"
+              context="mental-math-overview"
+              className="ml-4"
+            />
+          </div>
+          
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <div className="bg-purple-800/30 rounded p-3">
-                <h4 className="font-medium text-purple-200 mb-2">🔢 Number Bonds</h4>
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-medium text-purple-200">🔢 Number Bonds</h4>
+                  <AskNelieButtons 
+                    content="Number bonds help you break numbers into friendly parts that add up to 10. For example, 8 plus 7 equals 8 plus 2 plus 5, which equals 10 plus 5, which equals 15"
+                    context="number-bonds"
+                  />
+                </div>
                 <p className="text-sm text-purple-100">Break numbers into friendly parts that add up to 10</p>
                 <p className="text-xs text-purple-300 mt-1">Example: 8 + 7 = 8 + 2 + 5 = 10 + 5 = 15</p>
               </div>
               
               <div className="bg-green-800/30 rounded p-3">
-                <h4 className="font-medium text-green-200 mb-2">➕ Compensation</h4>
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-medium text-green-200">➕ Compensation</h4>
+                  <AskNelieButtons 
+                    content="Compensation means rounding to easier numbers, then adjusting your answer. For example, 29 plus 15 becomes 30 plus 15 minus 1, which equals 44"
+                    context="compensation"
+                  />
+                </div>
                 <p className="text-sm text-green-100">Round to easier numbers, then adjust</p>
                 <p className="text-xs text-green-300 mt-1">Example: 29 + 15 = 30 + 15 - 1 = 44</p>
               </div>
@@ -130,13 +150,25 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
             
             <div className="space-y-3">
               <div className="bg-orange-800/30 rounded p-3">
-                <h4 className="font-medium text-orange-200 mb-2">✖️ Doubling & Halving</h4>
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-medium text-orange-200">✖️ Doubling & Halving</h4>
+                  <AskNelieButtons 
+                    content="Doubling and halving uses known doubles to solve problems. For example, 6 times 8 equals 6 times 4 times 2, which equals 24 times 2, which equals 48"
+                    context="doubling-halving"
+                  />
+                </div>
                 <p className="text-sm text-orange-100">Use known doubles to solve problems</p>
                 <p className="text-xs text-orange-300 mt-1">Example: 6 × 8 = (6 × 4) × 2 = 24 × 2 = 48</p>
               </div>
               
               <div className="bg-red-800/30 rounded p-3">
-                <h4 className="font-medium text-red-200 mb-2">🎯 Benchmark Numbers</h4>
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-medium text-red-200">🎯 Benchmark Numbers</h4>
+                  <AskNelieButtons 
+                    content="Benchmark numbers like 10, 100, or 1000 serve as reference points. For example, 98 plus 47 becomes 100 plus 47 minus 2, which equals 145"
+                    context="benchmark-numbers"
+                  />
+                </div>
                 <p className="text-sm text-red-100">Use 10, 100, or 1000 as reference points</p>
                 <p className="text-xs text-red-300 mt-1">Example: 98 + 47 = 100 + 47 - 2 = 145</p>
               </div>
@@ -145,7 +177,13 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
         </div>
 
         <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-4">
-          <h3 className="font-semibold text-white mb-3">💡 Quick Tips for Mental Math Success:</h3>
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="font-semibold text-white">💡 Quick Tips for Mental Math Success:</h3>
+            <AskNelieButtons 
+              content="Here are quick tips for mental math success: Practice with small numbers first, then work up to larger ones. Look for patterns and number relationships. Use the strategy that feels most comfortable for each problem. Don't rush, accuracy is more important than speed"
+              context="mental-math-tips"
+            />
+          </div>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start">
               <span className="text-yellow-400 mr-2">•</span>
@@ -300,13 +338,18 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
                     totalQuestions={totalRealActivities}
                   />
                 ) : (
-                  // Content delivery activities - Check if it's mental math strategies
                   <>
                     {currentActivity.title?.toLowerCase().includes('mental math strategies') ? (
                       renderMentalMathStrategies()
                     ) : (
                       <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
-                        <h2 className="text-xl font-semibold text-white mb-4">{currentActivity.title}</h2>
+                        <div className="flex justify-between items-start mb-4">
+                          <h2 className="text-xl font-semibold text-white">{currentActivity.title}</h2>
+                          <AskNelieButtons 
+                            content={currentActivity.content?.text || currentActivity.title || ''}
+                            context="lesson-content"
+                          />
+                        </div>
                         
                         <div className="text-gray-300 space-y-4">
                           {currentActivity.content?.text && (
@@ -315,7 +358,13 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
                           
                           {currentActivity.content?.examples && (
                             <div className="bg-blue-900/30 rounded-lg p-4">
-                              <h4 className="font-semibold text-blue-200 mb-2">Examples for {studentName}:</h4>
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="font-semibold text-blue-200">Examples for {studentName}:</h4>
+                                <AskNelieButtons 
+                                  content={`Here are some examples: ${currentActivity.content.examples.join('. ')}`}
+                                  context="examples"
+                                />
+                              </div>
                               <ul className="space-y-2">
                                 {currentActivity.content.examples.map((example: string, index: number) => (
                                   <li key={index} className="text-blue-100">• {example}</li>
