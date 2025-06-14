@@ -15,11 +15,15 @@ export const UnifiedLessonProvider = ({
   gradeLevel = 6
 }: UnifiedLessonProviderProps) => {
   
-  // Generate daily lessons
+  // Generate daily lessons with dynamic extension
   const {
     allActivities,
     isLoadingActivities,
-    regenerateLesson
+    regenerateLesson,
+    extendLessonDynamically,
+    isExtending,
+    targetDuration,
+    usedQuestionIds
   } = useDailyLessonGeneration({
     subject,
     skillArea,
@@ -50,13 +54,13 @@ export const UnifiedLessonProvider = ({
     onLessonComplete
   });
 
-  // Handle lesson actions
+  // Handle lesson actions with dynamic extension
   const {
     handleLessonStart,
     handleLessonPause,
     handleLessonResume,
     handleLessonComplete,
-    handleActivityComplete,
+    handleActivityComplete: baseHandleActivityComplete,
     handleReadRequest
   } = useUnifiedLessonActions({
     subject,
@@ -77,6 +81,26 @@ export const UnifiedLessonProvider = ({
     resumeTimer,
     onLessonComplete
   });
+
+  // Enhanced activity completion with dynamic extension
+  const handleActivityComplete = React.useCallback((wasCorrect?: boolean) => {
+    // Call base handler first
+    baseHandleActivityComplete(wasCorrect);
+    
+    // Check if we should extend the lesson
+    const timeElapsedMinutes = Math.floor(sessionTimer / 60);
+    const engagementLevel = 85; // You can calculate this based on performance
+    
+    // Trigger extension check after a short delay to allow state updates
+    setTimeout(() => {
+      extendLessonDynamically(
+        sessionTimer,
+        lessonState.score,
+        correctStreak,
+        engagementLevel
+      );
+    }, 1000);
+  }, [baseHandleActivityComplete, sessionTimer, lessonState.score, correctStreak, extendLessonDynamically]);
 
   const contextValue: UnifiedLessonContextType = {
     // Lesson state
@@ -106,8 +130,13 @@ export const UnifiedLessonProvider = ({
     handleReadRequest,
     
     // Loading states
-    isLoadingActivities,
-    regenerateLesson
+    isLoadingActivities: isLoadingActivities || isExtending,
+    regenerateLesson,
+    
+    // Dynamic extension properties
+    targetDuration,
+    isExtending,
+    usedQuestionCount: usedQuestionIds
   };
 
   return (

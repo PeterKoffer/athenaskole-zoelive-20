@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { LessonActivity } from '../../components/types/LessonTypes';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
+import { DynamicLessonExtender, DynamicContentRequest } from '@/services/dynamicLessonExtender';
 
 interface UseDailyLessonGenerationProps {
   subject: string;
@@ -21,6 +22,11 @@ export const useDailyLessonGeneration = ({
   const [allActivities, setAllActivities] = useState<LessonActivity[]>(staticActivities);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [lastGeneratedDate, setLastGeneratedDate] = useState<string>('');
+  const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
+  const [isExtending, setIsExtending] = useState(false);
+
+  // Target lesson duration in minutes (20 minutes)
+  const TARGET_LESSON_DURATION = 20;
 
   // Get today's date for lesson generation
   const getCurrentDate = () => new Date().toISOString().split('T')[0];
@@ -50,6 +56,7 @@ export const useDailyLessonGeneration = ({
       // Clear cache if force regenerating
       if (forceRegenerate) {
         dailyLessonGenerator.clearTodaysLesson(user.id, subject, currentDate);
+        setUsedQuestionIds([]);
       }
 
       const newActivities = await dailyLessonGenerator.generateDailyLesson({
@@ -72,6 +79,59 @@ export const useDailyLessonGeneration = ({
       setIsLoadingActivities(false);
     }
   }, [user?.id, subject, skillArea, gradeLevel, staticActivities, lastGeneratedDate, allActivities.length]);
+
+  // Extend lesson dynamically based on time and engagement
+  const extendLessonDynamically = useCallback(async (
+    timeElapsed: number,
+    currentScore: number,
+    correctStreak: number,
+    engagementLevel: number = 85
+  ) => {
+    if (!user?.id || isExtending) return;
+
+    const shouldExtend = DynamicLessonExtender.shouldExtendLesson(
+      timeElapsed,
+      TARGET_LESSON_DURATION * 60, // Convert to seconds
+      engagementLevel,
+      allActivities.length
+    );
+
+    if (!shouldExtend) return;
+
+    console.log('🚀 Extending lesson with dynamic content...');
+    setIsExtending(true);
+
+    try {
+      const extensionRequest: DynamicContentRequest = {
+        subject,
+        skillArea,
+        gradeLevel,
+        timeElapsed,
+        currentScore,
+        correctStreak,
+        usedQuestionIds,
+        targetDuration: TARGET_LESSON_DURATION
+      };
+
+      const extensionActivities = await DynamicLessonExtender.generateExtensionContent(extensionRequest);
+      
+      if (extensionActivities.length > 0) {
+        setAllActivities(prev => [...prev, ...extensionActivities]);
+        
+        // Track new question IDs
+        const newQuestionIds = extensionActivities
+          .filter(activity => activity.metadata?.templateId)
+          .map(activity => activity.metadata!.templateId);
+        setUsedQuestionIds(prev => [...prev, ...newQuestionIds]);
+        
+        console.log(`✅ Extended lesson with ${extensionActivities.length} new activities`);
+      }
+    } catch (error) {
+      console.error('❌ Failed to extend lesson:', error);
+    } finally {
+      setIsExtending(false);
+    }
+  }, [user?.id, subject, skillArea, gradeLevel, isExtending, allActivities.length, usedQuestionIds]);
 
   // Generate lesson on mount and when date changes
   useEffect(() => {
@@ -101,6 +161,10 @@ export const useDailyLessonGeneration = ({
   return {
     allActivities,
     isLoadingActivities,
-    regenerateLesson
+    regenerateLesson,
+    extendLessonDynamically,
+    isExtending,
+    targetDuration: TARGET_LESSON_DURATION,
+    usedQuestionIds: usedQuestionIds.length
   };
 };

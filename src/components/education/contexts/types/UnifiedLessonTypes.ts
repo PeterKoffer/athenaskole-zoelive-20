@@ -3,16 +3,8 @@ import { LessonActivity } from '../../components/types/LessonTypes';
 
 export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';
 
-export interface LessonState {
-  phase: LessonPhase;
-  timeSpent: number;
-  currentSegment: number;
-  totalSegments: number;
-  score: number;
-}
-
 export interface UnifiedLessonContextType {
-  // Lesson state
+  // Core lesson state
   currentActivityIndex: number;
   allActivities: LessonActivity[];
   currentActivity: LessonActivity | null;
@@ -25,7 +17,7 @@ export interface UnifiedLessonContextType {
   isTimerActive: boolean;
   lessonStartTime: number;
   
-  // Additional state properties for compatibility
+  // Compatibility properties for existing components
   timeSpent: number;
   currentSegment: number;
   totalSegments: number;
@@ -38,16 +30,21 @@ export interface UnifiedLessonContextType {
   handleLessonComplete: () => void;
   handleReadRequest: () => void;
   
-  // Loading states
+  // Loading and generation states
   isLoadingActivities: boolean;
   regenerateLesson: () => Promise<void>;
+  
+  // Dynamic extension properties
+  targetDuration?: number;
+  isExtending?: boolean;
+  usedQuestionCount?: number;
 }
 
 export interface UnifiedLessonProviderProps {
   children: React.ReactNode;
   subject: string;
-  allActivities?: LessonActivity[];
-  onLessonComplete: () => void;
   skillArea?: string;
   gradeLevel?: number;
+  allActivities?: LessonActivity[];
+  onLessonComplete: () => void;
 }
