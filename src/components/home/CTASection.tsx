@@ -34,7 +34,7 @@ const CTASection = ({ onGetStarted }: CTASectionProps) => {
             className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white relative z-10 text-xl px-12 py-6 h-16 font-semibold"
             onClick={handleGetStartedClick}
           >
-            Your Program for Today
+            Click here to start today's schoolday
           </Button>
         </div>
       </div>
