@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
@@ -85,7 +86,8 @@ const EnhancedLessonManager = ({
     );
   }
 
-  const targetLessonLength = Math.max(15 * 60, allActivities.reduce((total, activity) => total + activity.duration, 0));
+  // Target lesson length is 20 minutes (1200 seconds)
+  const targetLessonLength = 1200;
 
   const handleManualRead = async () => {
     if (currentActivity) {

@@ -19,11 +19,18 @@ const LessonProgressHeader = ({
   score,
   currentActivityIndex,
   totalActivities,
-  targetLessonLength = 20,
+  targetLessonLength = 1200, // 20 minutes in seconds
   correctStreak,
   engagementLevel,
   questionsGenerated
 }: LessonProgressHeaderProps) => {
+  // Convert timeElapsed (seconds) to minutes for display
+  const timeElapsedMinutes = Math.floor(timeElapsed / 60);
+  const timeElapsedSeconds = timeElapsed % 60;
+  
+  // Convert target length (seconds) to minutes for display
+  const targetMinutes = Math.floor(targetLessonLength / 60);
+  
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-4">
@@ -31,7 +38,7 @@ const LessonProgressHeader = ({
           <div className="flex items-center space-x-4">
             <Clock className="w-5 h-5 text-lime-400" />
             <span className="text-sm">
-              {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / {targetLessonLength}:00
+              {timeElapsedMinutes}:{timeElapsedSeconds.toString().padStart(2, '0')} / {targetMinutes}:00
             </span>
           </div>
           <div className="flex items-center space-x-4">
