@@ -30,7 +30,7 @@ const LessonActivitySpeechManager = ({
     }
   }, [currentActivity?.id]);
 
-  // Auto-speak when activity changes (faster timing - 10 seconds per line)
+  // Auto-speak when activity changes using ONLY Fena voice
   useEffect(() => {
     if (
       currentActivity && 
@@ -41,7 +41,7 @@ const LessonActivitySpeechManager = ({
     ) {
       hasSpoken.current = true;
       
-      // Faster speech timing - reduced from 1500ms to 800ms
+      // Use ElevenLabs Fena voice only - fast response timing
       setTimeout(() => {
         let speechText = '';
         
@@ -62,10 +62,10 @@ const LessonActivitySpeechManager = ({
         }
         
         if (speechText && speechText.trim()) {
-          console.log('🔊 Auto-speaking (faster timing):', speechText.substring(0, 50) + '...');
+          console.log('🎭 Auto-speaking using ONLY Fena voice:', speechText.substring(0, 50) + '...');
           speakText(speechText, true);
         }
-      }, 800); // Reduced from 1500ms to 800ms for faster response
+      }, 800);
     }
   }, [currentActivity, autoReadEnabled, isReady, speakText]);
 

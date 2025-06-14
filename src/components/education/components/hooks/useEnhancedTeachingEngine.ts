@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useWorkingNelieSpeech } from '@/components/adaptive-learning/hooks/useWorkingNelieSpeech';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface TeachingEngineConfig {
@@ -14,22 +14,25 @@ interface TeachingEngineConfig {
 export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
   const [studentProgress, setStudentProgress] = useState(0);
   const [engagementLevel, setEngagementLevel] = useState(75);
-  const [adaptiveSpeed, setAdaptiveSpeed] = useState(0.85); // Much slower for better comprehension
+  const [adaptiveSpeed, setAdaptiveSpeed] = useState(0.85);
   const [humorLevel, setHumorLevel] = useState(3);
   
   const {
     isSpeaking,
-    autoReadEnabled,
+    isEnabled: autoReadEnabled,
     hasUserInteracted,
     isReady,
-    speakText,
-    stopSpeaking,
-    handleMuteToggle
-  } = useWorkingNelieSpeech();
+    speakAsNelie,
+    stop: stopSpeaking,
+    toggleEnabled: handleMuteToggle
+  } = useUnifiedSpeech();
 
-  // Enhanced speech with slower, more natural pace and personality
+  // Enhanced speech with Fena voice ONLY - no browser fallback
   const speakWithPersonality = useCallback((text: string, context: 'explanation' | 'question' | 'encouragement' | 'humor' = 'explanation') => {
-    if (!autoReadEnabled || !hasUserInteracted) return;
+    if (!autoReadEnabled || !hasUserInteracted) {
+      console.log('🔇 Speech disabled or no user interaction');
+      return;
+    }
 
     // Add personality modifiers based on context
     let enhancedText = text;
@@ -55,42 +58,23 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
         break;
     }
 
-    // Use slower speech synthesis with calm, patient delivery
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(enhancedText);
-      utterance.rate = 0.85; // Slower, more patient pace
-      utterance.pitch = 1.0; // Natural pitch for calmness
-      utterance.volume = 0.8; // Slightly quieter for gentle approach
-      
-      // Try to use a calmer, more patient voice
-      const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(voice => 
-        voice.name.includes('Google UK English Female') || 
-        voice.name.includes('Microsoft Zira') ||
-        voice.name.includes('Samantha') ||
-        voice.lang.startsWith('en')
-      );
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-      }
-      
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-    }
-  }, [autoReadEnabled, hasUserInteracted]);
+    // ALWAYS use ElevenLabs Fena voice through UnifiedSpeech - never browser fallback
+    console.log('🎭 Using ONLY Fena voice for:', enhancedText.substring(0, 50));
+    speakAsNelie(enhancedText, true);
+  }, [autoReadEnabled, hasUserInteracted, speakAsNelie]);
 
-  // Adaptive learning speed based on student performance (more conservative)
+  // Adaptive learning speed based on student performance
   const adjustTeachingSpeed = useCallback((correct: boolean, responseTime: number) => {
-    if (correct && responseTime < 8000) { // Quick correct answer
-      setAdaptiveSpeed(prev => Math.min(prev + 0.05, 1.0)); // Slower speed increases
+    if (correct && responseTime < 8000) {
+      setAdaptiveSpeed(prev => Math.min(prev + 0.05, 1.0));
       setEngagementLevel(prev => Math.min(prev + 3, 100));
-    } else if (!correct || responseTime > 25000) { // Wrong or very slow answer
-      setAdaptiveSpeed(prev => Math.max(prev - 0.05, 0.7)); // Don't go too slow
+    } else if (!correct || responseTime > 25000) {
+      setAdaptiveSpeed(prev => Math.max(prev - 0.05, 0.7));
       setEngagementLevel(prev => Math.max(prev - 2, 20));
     }
   }, []);
 
-  // Generate encouraging responses with patience and kindness
+  // Generate encouraging responses using only Fena voice
   const generateEncouragement = useCallback((isCorrect: boolean, streak: number) => {
     if (isCorrect) {
       const celebrations = [

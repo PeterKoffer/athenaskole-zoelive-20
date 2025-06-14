@@ -37,7 +37,7 @@ export const useLessonActions = ({
   pauseTimer,
   resumeTimer
 }: UseLessonActionsProps) => {
-  // Enhanced teaching engine
+  // Enhanced teaching engine - now uses ONLY Fena voice
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
     timeElapsed: sessionTimer,
@@ -50,10 +50,11 @@ export const useLessonActions = ({
     updatePhase('lesson');
     startTimer();
     
-    // Auto-speak first activity
+    // Auto-speak first activity using ONLY Fena voice
     setTimeout(() => {
       if (currentActivity && teachingEngine.autoReadEnabled) {
         const welcomeMessage = `Welcome to your ${subject} lesson! Let's begin our learning journey together!`;
+        console.log('🎭 Welcome message using ONLY Fena voice');
         teachingEngine.speakWithPersonality(welcomeMessage, 'encouragement');
       }
     }, 1000);
@@ -80,10 +81,12 @@ export const useLessonActions = ({
       if (wasCorrect) {
         updateScore(prev => prev + 10);
         setTimeout(() => {
+          console.log('🎭 Correct answer encouragement using ONLY Fena voice');
           teachingEngine.speakWithPersonality("Excellent work! You're doing fantastic!", 'encouragement');
         }, 500);
       } else {
         setTimeout(() => {
+          console.log('🎭 Incorrect answer encouragement using ONLY Fena voice');
           teachingEngine.speakWithPersonality("That's okay! Learning takes practice. Let's keep going!", 'encouragement');
         }, 500);
       }
@@ -111,6 +114,7 @@ export const useLessonActions = ({
         context = 'explanation';
       }
       
+      console.log('🎭 Manual read using ONLY Fena voice');
       teachingEngine.speakWithPersonality(speechText, context);
     }
   }, [currentActivity, teachingEngine, subject]);
