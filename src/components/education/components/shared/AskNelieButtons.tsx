@@ -32,7 +32,7 @@ const AskNelieButtons = ({ content, context = 'explanation', className = '' }: A
     }
   };
 
-  const handleReadAndExplain = async () => {
+  const handleExplainOnly = async () => {
     if (isSpeaking) {
       stop();
       setIsExplaining(false);
@@ -43,10 +43,10 @@ const AskNelieButtons = ({ content, context = 'explanation', className = '' }: A
     setIsExplaining(true);
     setIsReading(false);
     
-    const readAndExplainText = `${content}. Now let me explain this further: This concept is designed to make math easier and more intuitive for you. Practice using this strategy, and it will become second nature!`;
+    const explanationText = `Let me explain this concept: ${content}. This is an important idea to understand because it helps you solve problems more efficiently.`;
     
     try {
-      await speakAsNelie(readAndExplainText, true, context);
+      await speakAsNelie(explanationText, true, context);
     } finally {
       setIsExplaining(false);
     }
@@ -68,14 +68,14 @@ const AskNelieButtons = ({ content, context = 'explanation', className = '' }: A
       </button>
       
       <button
-        onClick={handleReadAndExplain}
+        onClick={handleExplainOnly}
         disabled={isReading}
         className={`p-1 rounded transition-all ${
           isExplaining 
             ? 'bg-purple-600 text-white' 
             : 'text-purple-300 hover:bg-purple-600/20 hover:text-purple-200'
         }`}
-        title="Ask Nelie to Read & Explain"
+        title="Ask Nelie to Explain"
       >
         <MessageCircle className="w-4 h-4" />
       </button>
