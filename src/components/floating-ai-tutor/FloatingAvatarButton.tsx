@@ -30,7 +30,7 @@ const FloatingAvatarButton = ({
   isOnHomepage
 }: FloatingAvatarButtonProps) => {
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-2">
       <CollapsedButton 
         onExpand={onToggleOpen}
         onMouseDown={onMouseDown}

@@ -22,9 +22,9 @@ const EnableNelieButton = ({
   return (
     <Button
       onClick={onEnableNelie}
-      className="bg-white hover:bg-gray-100 text-purple-600 font-bold px-6 py-3 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 animate-bounce"
+      className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-4 py-2 rounded-full shadow-md transform transition-all duration-300 hover:scale-105 text-sm"
     >
-      <Volume2 className="w-5 h-5 mr-2" />
+      <Volume2 className="w-4 h-4 mr-2" />
       Enable Nelie
     </Button>
   );
