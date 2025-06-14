@@ -3,7 +3,7 @@ import { ClassroomConfig } from './ClassroomEnvironment';
 
 export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   mathematics: {
-    backgroundImage: '/lovable-uploads/math-classroom.png', // Upload your math classroom image
+    backgroundImage: '/lovable-uploads/cbb7dd63-109c-4bd4-b49c-cbfc55dea8a1.png', // Math classroom with equations
     subjectColor: '#1e1b4b', // Deep indigo for math
     accentColor: '#8b5cf6', // Purple accent
     overlayOpacity: 0.85,
@@ -12,7 +12,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   },
   
   english: {
-    backgroundImage: '/lovable-uploads/english-classroom.png', // Upload your English classroom image
+    backgroundImage: '/lovable-uploads/cbb7dd63-109c-4bd4-b49c-cbfc55dea8a1.png', // Using math classroom for now
     subjectColor: '#164e63', // Deep cyan for English
     accentColor: '#06b6d4', // Cyan accent
     overlayOpacity: 0.85,
@@ -21,7 +21,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   },
   
   science: {
-    backgroundImage: '/lovable-uploads/science-classroom.png', // Upload your science classroom image
+    backgroundImage: '/lovable-uploads/4cc17a8b-1d30-4146-993f-7b97b7e6be5b.png', // Science classroom with "Science in History"
     subjectColor: '#14532d', // Deep green for science
     accentColor: '#10b981', // Green accent
     overlayOpacity: 0.85,
@@ -30,7 +30,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   },
   
   computerscience: {
-    backgroundImage: '/lovable-uploads/cs-classroom.png', // Upload your computer science classroom image
+    backgroundImage: '/lovable-uploads/4cc17a8b-1d30-4146-993f-7b97b7e6be5b.png', // Using science classroom for now
     subjectColor: '#0f172a', // Dark slate for CS
     accentColor: '#3b82f6', // Blue accent
     overlayOpacity: 0.85,
@@ -39,7 +39,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   },
 
   music: {
-    backgroundImage: '/lovable-uploads/music-classroom.png', // Upload your music classroom image
+    backgroundImage: '/lovable-uploads/cbb7dd63-109c-4bd4-b49c-cbfc55dea8a1.png', // Using math classroom for now
     subjectColor: '#581c87', // Deep purple for music
     accentColor: '#a855f7', // Purple accent
     overlayOpacity: 0.85,
@@ -48,7 +48,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   },
 
   creative: {
-    backgroundImage: '/lovable-uploads/art-classroom.png', // Upload your art/creative classroom image
+    backgroundImage: '/lovable-uploads/cbb7dd63-109c-4bd4-b49c-cbfc55dea8a1.png', // Using math classroom for now
     subjectColor: '#7c2d12', // Deep orange for creative arts
     accentColor: '#f97316', // Orange accent
     overlayOpacity: 0.85,
@@ -57,7 +57,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   },
 
   language: {
-    backgroundImage: '/lovable-uploads/language-classroom.png', // Upload your language learning classroom image
+    backgroundImage: '/lovable-uploads/cbb7dd63-109c-4bd4-b49c-cbfc55dea8a1.png', // Using math classroom for now
     subjectColor: '#be123c', // Deep rose for language
     accentColor: '#f43f5e', // Rose accent
     overlayOpacity: 0.85,
