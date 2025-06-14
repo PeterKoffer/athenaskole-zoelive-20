@@ -4,6 +4,8 @@ import MathLessonHeader from './MathLessonHeader';
 import MathLessonControlPanel from './MathLessonControlPanel';
 import MentalMathStrategies from './MentalMathStrategies';
 import MathLessonContentRenderer from './MathLessonContentRenderer';
+import ClassroomEnvironment from '../shared/ClassroomEnvironment';
+import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface MathLearningMainContentProps {
@@ -39,6 +41,8 @@ const MathLearningMainContent = ({
   onStopSpeaking,
   onActivityComplete
 }: MathLearningMainContentProps) => {
+  const classroomConfig = getClassroomConfig('mathematics');
+
   const handleNavigateBack = () => {
     if (currentActivityIndex > 0) {
       // Logic to go to previous activity would go here
@@ -57,7 +61,7 @@ const MathLearningMainContent = ({
   const canNavigateForward = currentActivityIndex < totalRealActivities - 1;
 
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white">
+    <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full space-y-0">
         <MathLessonHeader
           studentName={studentName}
@@ -83,7 +87,7 @@ const MathLearningMainContent = ({
           onStopSpeaking={onStopSpeaking}
         />
 
-        {/* Current Activity Content - Full width content area */}
+        {/* Current Activity Content - Full width content area with classroom-aware styling */}
         <div className="w-full px-4 py-6">
           <div className="w-full max-w-4xl mx-auto">
             {currentActivity ? (
@@ -115,7 +119,7 @@ const MathLearningMainContent = ({
                 )}
               </div>
             ) : (
-              <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center">
+              <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">
                 <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
                 <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
               </div>
@@ -123,7 +127,7 @@ const MathLearningMainContent = ({
           </div>
         </div>
       </div>
-    </div>
+    </ClassroomEnvironment>
   );
 };
 

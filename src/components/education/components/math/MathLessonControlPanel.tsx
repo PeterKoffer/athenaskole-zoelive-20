@@ -15,13 +15,13 @@ const MathLessonControlPanel = ({
   onStopSpeaking
 }: MathLessonControlPanelProps) => {
   return (
-    <div className="w-full bg-gray-800 border-b border-gray-700">
+    <div className="w-full bg-gray-800/80 border-b border-gray-700 backdrop-blur-md">
       <div className="w-full max-w-4xl mx-auto px-4 py-4">
         <div className="flex justify-center space-x-4">
           <Button
             variant="outline"
             onClick={onToggleMute}
-            className="border-purple-400 text-purple-200 bg-gray-700/50"
+            className="border-purple-400 text-purple-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
           >
             {isSpeaking ? 'Mute Nelie' : 'Unmute Nelie'}
           </Button>
@@ -29,7 +29,7 @@ const MathLessonControlPanel = ({
           <Button
             variant="outline"
             onClick={onReadRequest}
-            className="border-blue-400 text-blue-200 bg-gray-700/50"
+            className="border-blue-400 text-blue-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
           >
             Ask Nelie to Repeat
           </Button>
@@ -38,7 +38,7 @@ const MathLessonControlPanel = ({
             <Button
               variant="outline"
               onClick={onStopSpeaking}
-              className="border-red-400 text-red-200 bg-gray-700/50"
+              className="border-red-400 text-red-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
             >
               Stop Nelie
             </Button>

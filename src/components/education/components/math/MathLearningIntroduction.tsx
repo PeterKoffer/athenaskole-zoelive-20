@@ -1,13 +1,17 @@
 
 import NelieIntroduction from '../NelieIntroduction';
+import ClassroomEnvironment from '../shared/ClassroomEnvironment';
+import { getClassroomConfig } from '../shared/classroomConfigs';
 
 interface MathLearningIntroductionProps {
   onIntroductionComplete: () => void;
 }
 
 const MathLearningIntroduction = ({ onIntroductionComplete }: MathLearningIntroductionProps) => {
+  const classroomConfig = getClassroomConfig('mathematics');
+
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white">
+    <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
         <NelieIntroduction
           subject="mathematics"
@@ -15,7 +19,7 @@ const MathLearningIntroduction = ({ onIntroductionComplete }: MathLearningIntrod
           onIntroductionComplete={onIntroductionComplete}
         />
       </div>
-    </div>
+    </ClassroomEnvironment>
   );
 };
 
