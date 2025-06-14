@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Play } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
 
 interface UnifiedClassIntroductionProps {
@@ -20,8 +22,10 @@ const UnifiedClassIntroduction = ({
   userLevel = 'beginner',
   onIntroductionComplete
 }: UnifiedClassIntroductionProps) => {
+  const { user } = useAuth();
   const [hasStarted, setHasStarted] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
+  const [userName, setUserName] = useState('Student');
   
   const {
     isSpeaking,
@@ -33,12 +37,41 @@ const UnifiedClassIntroduction = ({
     toggleEnabled
   } = useUnifiedSpeech();
 
-  const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
+  // Fetch user's name from profile
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profile?.name) {
+          setUserName(profile.name.split(' ')[0]); // Use first name
+        } else if (user.user_metadata?.name) {
+          setUserName(user.user_metadata.name.split(' ')[0]); // Fallback to auth metadata
+        }
+      } catch (error) {
+        console.log('Could not fetch user name, using default');
+        if (user.user_metadata?.name) {
+          setUserName(user.user_metadata.name.split(' ')[0]);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [user]);
+
+  const introduction = getSubjectIntroduction(subject, skillArea, userLevel, userName);
   const currentContent = introduction.sections[currentSection];
 
   console.log('🎭 Class Introduction:', {
     subject,
     skillArea,
+    userName,
     currentSection,
     totalSections: introduction.sections.length,
     hasStarted,
@@ -120,7 +153,7 @@ const UnifiedClassIntroduction = ({
               {introduction.title}
             </h2>
             <p className="text-purple-200">
-              Welcome to your {subject} class with Nelie!
+              Welcome to your {subject} class with Nelie, {userName}!
             </p>
           </div>
 
