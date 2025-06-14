@@ -1,14 +1,13 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useLessonStateManager, LessonPhase } from '../hooks/useLessonStateManager';
+import { useLessonStateManager, LessonPhase, LessonState } from '../hooks/useLessonStateManager';
 import { useLessonTimer } from '../hooks/useLessonTimer';
 import { useLessonActions } from './hooks/useLessonActions';
 import { LessonActivity } from '../components/types/LessonTypes';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 
-// Export the LessonPhase type for other components
-export type { LessonPhase };
+// Export the types for other components
+export type { LessonPhase, LessonState };
 
 interface UnifiedLessonContextType {
   // Lesson state
@@ -43,6 +42,9 @@ interface UnifiedLessonContextType {
 }
 
 const UnifiedLessonContext = createContext<UnifiedLessonContextType | undefined>(undefined);
+
+// Export the context
+export { UnifiedLessonContext };
 
 interface UnifiedLessonProviderProps {
   children: React.ReactNode;

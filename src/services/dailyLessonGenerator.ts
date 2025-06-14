@@ -198,10 +198,11 @@ export class DailyLessonGenerator {
     return {
       id: activityId,
       title: `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Challenge`,
+      type: this.mapActivityTypeToPhase(activityType),
       phase: this.mapActivityTypeToPhase(activityType),
       duration: 180, // 3 minutes per activity
+      phaseDescription: `Learn about ${focusArea.replace(/_/g, ' ')}`,
       content,
-      order: index,
       completed: false
     };
   }
