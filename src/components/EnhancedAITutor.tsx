@@ -11,6 +11,14 @@ import TutorLanguageSelectionView from "./ai-tutor/TutorLanguageSelectionView";
 import TutorLanguageLearningView from "./ai-tutor/TutorLanguageLearningView";
 import { getChildProgress } from "./ai-tutor/childProgressUtil";
 
+// --- Added missing tab imports below ---
+import EnhancedTutorChatTab from "./ai-tutor/tabs/EnhancedTutorChatTab";
+import EnhancedTutorSpeechTab from "./ai-tutor/tabs/EnhancedTutorSpeechTab";
+import EnhancedTutorChallengesTab from "./ai-tutor/tabs/EnhancedTutorChallengesTab";
+import EnhancedTutorRewardsTab from "./ai-tutor/tabs/EnhancedTutorRewardsTab";
+import EnhancedTutorParentsTab from "./ai-tutor/tabs/EnhancedTutorParentsTab";
+// --- end import additions ---
+
 interface EnhancedAITutorProps {
   user: any;
   onBack?: () => void;
