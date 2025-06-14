@@ -1,8 +1,7 @@
 
 import { SpeechConfig } from "./SpeechConfig";
 import { speakWithElevenLabs } from "./engine/ElevenLabsSpeak";
-import { speakWithBrowser } from "./engine/BrowserSpeak";
-import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
+import { browserSpeakFallback } from "./engine/BrowserEngine";
 import { showSpeechToast } from "./ToastUtils";
 
 export async function speakWithEngines(
@@ -25,12 +24,10 @@ export async function speakWithEngines(
   // If we should try ElevenLabs, and it is user preference, always try first!
   if (shouldTryElevenLabs && useElevenLabs) {
     console.log("🔎 [SpeechEngines] Trying ElevenLabs speech engine...");
-    // NEW: Toast pre-attempt
     showSpeechToast("Trying ElevenLabs...", "Attempting Aria voice via ElevenLabs", "default");
     const elevenDone = await speakWithElevenLabs(
       text,
       () => {
-        // NEW: Toast on ElevenLabs finish
         showSpeechToast("ElevenLabs Finished", "Audio playback completed.", "success");
         updateState({ isSpeaking: false, lastError: null });
         onDone();
@@ -47,11 +44,11 @@ export async function speakWithEngines(
     );
     if (elevenDone) {
       showSpeechToast("ElevenLabs Used", "Voice: Aria (premium) [Audio playback should be Aria]", "success");
-      console.log('✅ [SpeechEngines] ElevenLabs speech finished successfully (Aria, premium).');
+      console.log("✅ [SpeechEngines] ElevenLabs speech finished successfully (Aria, premium).");
       return;
     } else {
       showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech (Aria/Nelie unavailable)", "destructive");
-      console.warn('❗ [SpeechEngines] ElevenLabs failed, will attempt browser fallback.');
+      console.warn("❗ [SpeechEngines] ElevenLabs failed, will attempt browser fallback.");
     }
   } else {
     if (!shouldTryElevenLabs) {
@@ -64,37 +61,14 @@ export async function speakWithEngines(
   if (isCheckingElevenLabs) {
     // Don't fallback or do anything else until EL check is over
     showSpeechToast("Speech Delayed", "Still checking for premium voice (ElevenLabs)...", "default");
-    console.log('⏳ [SpeechEngines] Still checking for ElevenLabs, not falling back to browser. Speech request paused.');
+    console.log("⏳ [SpeechEngines] Still checking for ElevenLabs, not falling back to browser. Speech request paused.");
     return;
   }
 
-  // Fallback to browser TTS only when allowed (never until EL is fully checked)
-  if (typeof speechSynthesis === "undefined") {
-    showSpeechToast("Speech Error", "Browser speech synthesis not supported", "destructive");
-    updateState({
-      isSpeaking: false,
-      currentUtterance: null,
-      lastError: "Browser TTS not supported"
-    });
-    onDone();
-    return;
-  }
-
-  console.warn("[SpeechEngines] Invoking browser fallback speech engine.");
-  showSpeechToast("Browser Voice", "Using browser voice (default or male)", "default");
-  speakWithBrowser(
+  browserSpeakFallback({
     text,
     config,
     updateState,
     onDone,
-    (event) => {
-      updateState({
-        isSpeaking: false,
-        currentUtterance: null,
-        lastError: event.error || "Unknown error (browser TTS)",
-      });
-      showSpeechToast("Browser Voice Error", event.error || "Unknown error (browser TTS)", "destructive");
-      console.error('[SpeechEngines] [Browser TTS error]', event);
-    }
-  );
+  });
 }
