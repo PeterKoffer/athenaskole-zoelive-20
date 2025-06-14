@@ -9,7 +9,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log("[ElevenLabs] Function invoked at", new Date().toISOString());
+  const invocationTime = new Date().toISOString();
+  console.log("[ElevenLabs] Function invoked at", invocationTime);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -31,6 +33,8 @@ serve(async (req) => {
 
     const payload = await req.json();
     const type = payload.type || "";
+    // Log the request payload for debugging
+    console.log(`[ElevenLabs] Incoming payload:`, JSON.stringify(payload));
 
     if (type === "check-availability") {
       // Check for voices (availability)
@@ -63,8 +67,13 @@ serve(async (req) => {
     if (type === "generate-speech") {
       const { text, voiceId, model } = payload;
       if (!text || !voiceId || !model) {
+        console.error("[ElevenLabs] Missing required params in generate-speech:", { text, voiceId, model });
         return new Response(JSON.stringify({ error: "Missing required params" }), { status: 400, headers: corsHeaders });
       }
+      // Log the params being sent to ElevenLabs API
+      console.log(`[ElevenLabs] Generating speech for text (first 60): "${text.substring(0,60)}..."`);
+      console.log(`[ElevenLabs] Using voiceId:`, voiceId, " model:", model);
+
       // Generate speech from text
       const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: "POST",
@@ -93,11 +102,29 @@ serve(async (req) => {
         } catch (err) {
           errorMsg = "Could not parse error body";
         }
+        console.error("[ElevenLabs] TTS request failed:", errorMsg);
         return new Response(JSON.stringify({ error: errorMsg }), { status: ttsRes.status, headers: corsHeaders });
       }
 
+      // We expect a binary audio (mp3)
       const audioBuffer = await ttsRes.arrayBuffer();
-      const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+
+      console.log(`[ElevenLabs] Received audio buffer of byteLength:`, audioBuffer.byteLength);
+
+      let base64Audio = "";
+      if (audioBuffer && audioBuffer.byteLength > 0) {
+        try {
+          base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+        } catch (err) {
+          console.error("[ElevenLabs] Error base64 encoding audio:", err);
+          return new Response(JSON.stringify({ error: "Failed to encode audio to base64" }), { status: 500, headers: corsHeaders });
+        }
+      } else {
+        console.error("[ElevenLabs] Empty audio buffer received!");
+      }
+      // Log the size of what will be sent
+      console.log(`[ElevenLabs] Returning base64Audio length:`, base64Audio.length);
+
       return new Response(JSON.stringify({ audioContent: base64Audio }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
@@ -105,11 +132,13 @@ serve(async (req) => {
     }
 
     // Unknown type
+    console.error("[ElevenLabs] Unknown type in payload:", type);
     return new Response(JSON.stringify({ error: "Unknown type" }), { status: 400, headers: corsHeaders });
 
   } catch (e) {
     // Always use a plain error string, never a circular structure
     const errMsg = e instanceof Error ? e.message : "Proxy error";
+    console.error("[ElevenLabs] Exception thrown in handler:", errMsg);
     return new Response(JSON.stringify({ error: errMsg }), {
       status: 500,
       headers: corsHeaders,

@@ -30,17 +30,32 @@ export class ElevenLabsSpeechGenerator {
         },
         body: JSON.stringify(requestPayload),
       });
-      
-      const data = await response.json();
-      console.log("📥 [ElevenLabsSpeechGenerator] Response status:", response.status, "Has audioContent:", !!data.audioContent);
-      
-      if (!response.ok || !data.audioContent) {
-        console.error("❌ [ElevenLabsSpeechGenerator] Speech generation failed:", data.error || "No audio content");
-        throw new Error(data.error || "Unknown TTS error");
+
+      // Try to dump as much as possible if not ok
+      let rawJson = null;
+      try {
+        rawJson = await response.json();
+      } catch (e) {
+        console.error("❌ [ElevenLabsSpeechGenerator] Could not parse response JSON", e);
+        throw new Error("Could not parse response JSON from edge function");
       }
-      
-      console.log("✅ [ElevenLabsSpeechGenerator] Successfully generated speech with Fena voice, audio length:", data.audioContent.length);
-      return { audioContent: data.audioContent };
+
+      console.log(
+        "📥 [ElevenLabsSpeechGenerator] Response status:", response.status,
+        "Has audioContent:", !!rawJson.audioContent,
+        "audioContent length:", rawJson.audioContent?.length,
+        "Error:", rawJson.error
+      );
+
+      if (!response.ok || !rawJson.audioContent) {
+        console.error("❌ [ElevenLabsSpeechGenerator] Speech generation failed:", rawJson.error || "No audio content");
+        throw new Error(rawJson.error || "Unknown TTS error");
+      }
+
+      // Log a snippet of the base64 content for debugging (don't log it all)
+      console.log("✅ [ElevenLabsSpeechGenerator] Generated speech. base64 (first 32):", rawJson.audioContent?.substring(0,32), "len:", rawJson.audioContent?.length);
+
+      return { audioContent: rawJson.audioContent };
     } catch (error) {
       console.error("❌ ElevenLabs speech generation failed:", error);
       return {
