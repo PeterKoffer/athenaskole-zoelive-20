@@ -1,8 +1,8 @@
-
 import { SpeechConfig } from "./SpeechConfig";
 import { speakWithElevenLabs } from "./engine/ElevenLabsSpeak";
 import { speakWithBrowser } from "./engine/BrowserSpeak";
 import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
+import { showSpeechToast } from "./ToastUtils";
 
 export async function speakWithEngines(
   text: string,
@@ -35,14 +35,17 @@ export async function speakWithEngines(
           usingElevenLabs: false,
           lastError: "ElevenLabs error, fallback to browser: " + msg,
         });
+        showSpeechToast("ElevenLabs Error", "Falling back to browser voice: " + msg, "destructive");
         console.warn("🛑 [SpeechEngines] ElevenLabs failed with:", msg);
         // No return, continue to fallback (browser)
       }
     );
     if (elevenDone) {
+      showSpeechToast("ElevenLabs Used", "Voice: Aria (premium)", "success");
       console.log('✅ [SpeechEngines] ElevenLabs speech finished successfully.');
       return;
     } else {
+      showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech (Aria/Nelie unavailable)", "destructive");
       console.warn('❗ [SpeechEngines] ElevenLabs failed, will attempt browser fallback.');
     }
   } else {
@@ -55,13 +58,14 @@ export async function speakWithEngines(
 
   if (isCheckingElevenLabs) {
     // Don't fallback or do anything else until EL check is over
+    showSpeechToast("Speech Delayed", "Still checking for premium voice (ElevenLabs)...", "default");
     console.log('⏳ [SpeechEngines] Still checking for ElevenLabs, not falling back to browser. Speech request paused.');
     return;
   }
 
   // Fallback to browser TTS only when allowed (never until EL is fully checked)
   if (typeof speechSynthesis === "undefined") {
-    console.error('🚫 [SpeechEngines] Browser speech synthesis not supported.');
+    showSpeechToast("Speech Error", "Browser speech synthesis not supported", "destructive");
     updateState({
       isSpeaking: false,
       currentUtterance: null,
@@ -71,7 +75,7 @@ export async function speakWithEngines(
     return;
   }
 
-  console.log('🗣️ [SpeechEngines] Using browser speech synthesis fallback.');
+  showSpeechToast("Browser Voice", "Using browser voice (default or male)", "default");
   speakWithBrowser(
     text,
     config,
@@ -83,8 +87,8 @@ export async function speakWithEngines(
         currentUtterance: null,
         lastError: event.error || "Unknown error (browser TTS)",
       });
+      showSpeechToast("Browser Voice Error", event.error || "Unknown error (browser TTS)", "destructive");
       console.error('[SpeechEngines] [Browser TTS error]', event);
     }
   );
 }
-
