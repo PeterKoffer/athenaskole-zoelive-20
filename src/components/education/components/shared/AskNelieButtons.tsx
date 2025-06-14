@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { MessageCircle, Volume2 } from 'lucide-react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
@@ -15,7 +14,7 @@ const AskNelieButtons = ({ content, context = 'explanation', className = '' }: A
   const [isReading, setIsReading] = useState(false);
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
-  const handleExplainOnly = async () => {
+  const handleReadOnly = async () => {
     if (isSpeaking) {
       stop();
       setIsExplaining(false);
@@ -23,15 +22,13 @@ const AskNelieButtons = ({ content, context = 'explanation', className = '' }: A
       return;
     }
 
-    setIsExplaining(true);
-    setIsReading(false);
-    
-    const explanationText = `Let me explain this concept: ${content}. This is an important idea to understand because it helps you solve problems more efficiently.`;
+    setIsReading(true);
+    setIsExplaining(false);
     
     try {
-      await speakAsNelie(explanationText, true, context);
+      await speakAsNelie(content, true, context);
     } finally {
-      setIsExplaining(false);
+      setIsReading(false);
     }
   };
 
@@ -43,49 +40,45 @@ const AskNelieButtons = ({ content, context = 'explanation', className = '' }: A
       return;
     }
 
-    setIsReading(true);
-    setIsExplaining(false);
+    setIsExplaining(true);
+    setIsReading(false);
     
     const readAndExplainText = `${content}. Now let me explain this further: This concept is designed to make math easier and more intuitive for you. Practice using this strategy, and it will become second nature!`;
     
     try {
       await speakAsNelie(readAndExplainText, true, context);
     } finally {
-      setIsReading(false);
+      setIsExplaining(false);
     }
   };
 
   return (
-    <div className={`flex flex-col sm:flex-row gap-2 ${className}`}>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleExplainOnly}
-        disabled={isReading}
-        className={`flex items-center space-x-2 text-xs transition-all ${
-          isExplaining 
-            ? 'bg-purple-600 text-white border-purple-500' 
-            : 'border-purple-400 text-purple-200 bg-gray-700/50 hover:bg-purple-600/20'
-        }`}
-      >
-        <MessageCircle className="w-3 h-3" />
-        <span>{isExplaining ? 'Explaining...' : 'Ask Nelie to Explain'}</span>
-      </Button>
-      
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleReadAndExplain}
+    <div className={`flex gap-1 ${className}`}>
+      <button
+        onClick={handleReadOnly}
         disabled={isExplaining}
-        className={`flex items-center space-x-2 text-xs transition-all ${
+        className={`p-1 rounded transition-all ${
           isReading 
-            ? 'bg-blue-600 text-white border-blue-500' 
-            : 'border-blue-400 text-blue-200 bg-gray-700/50 hover:bg-blue-600/20'
+            ? 'bg-blue-600 text-white' 
+            : 'text-blue-300 hover:bg-blue-600/20 hover:text-blue-200'
         }`}
+        title="Ask Nelie to Read"
       >
-        <Volume2 className="w-3 h-3" />
-        <span>{isReading ? 'Reading...' : 'Ask Nelie to Read & Explain'}</span>
-      </Button>
+        <Volume2 className="w-4 h-4" />
+      </button>
+      
+      <button
+        onClick={handleReadAndExplain}
+        disabled={isReading}
+        className={`p-1 rounded transition-all ${
+          isExplaining 
+            ? 'bg-purple-600 text-white' 
+            : 'text-purple-300 hover:bg-purple-600/20 hover:text-purple-200'
+        }`}
+        title="Ask Nelie to Read & Explain"
+      >
+        <MessageCircle className="w-4 h-4" />
+      </button>
     </div>
   );
 };
