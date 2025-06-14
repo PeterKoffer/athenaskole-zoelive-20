@@ -90,11 +90,6 @@ const RobotAvatar = ({
         </div>
       )}
       
-      {/* Active status indicator (only when not speaking) */}
-      {isActive && !isSpeaking && (
-        <div className="absolute top-2 right-2 w-6 h-6 bg-green-400 rounded-full animate-pulse"></div>
-      )}
-      
       {/* Speaking indicator text for debugging */}
       {isSpeaking && (
         <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-cyan-400 font-bold animate-pulse">
