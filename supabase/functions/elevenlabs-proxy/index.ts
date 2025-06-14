@@ -76,7 +76,9 @@ serve(async (req) => {
         console.log("[ElevenLabs] Missing params", { text, voiceId, model });
         return new Response(JSON.stringify({ error: "Missing required params" }), { status: 400, headers: corsHeaders });
       }
-      console.log("[ElevenLabs] Generating speech via ElevenLabs API...");
+      
+      console.log("[ElevenLabs] 🎭 Generating speech with voice:", voiceId, "model:", model);
+      console.log("[ElevenLabs] 🎤 Text to speak:", text.substring(0, 100) + "...");
 
       const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: "POST",
@@ -96,6 +98,9 @@ serve(async (req) => {
           },
         }),
       });
+      
+      console.log("[ElevenLabs] 📡 TTS API response status:", ttsRes.status);
+      
       if (!ttsRes.ok) {
         let errorMsg = "Unknown error";
         try {
@@ -109,7 +114,7 @@ serve(async (req) => {
       }
       const audioBuffer = await ttsRes.arrayBuffer();
       const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
-      console.log("[ElevenLabs] Speech generated and encoded, sending response");
+      console.log("[ElevenLabs] ✅ Speech generated successfully, audio size:", audioBuffer.byteLength, "bytes");
       return new Response(JSON.stringify({ audioContent: base64Audio }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -125,4 +130,3 @@ serve(async (req) => {
     });
   }
 });
-

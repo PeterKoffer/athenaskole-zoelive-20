@@ -1,3 +1,4 @@
+
 interface ElevenLabsConfig {
   apiKey: string;
   voiceId: string;
@@ -12,8 +13,8 @@ interface AudioResponse {
 const EDGE_BASE =
   "https://tgjudtnjhtumrfthegis.functions.supabase.co/elevenlabs-proxy";
 
-// Aria: 9BWtsMINqrJLrRacOk9x (Official ElevenLabs voice)
-const DEFAULT_VOICE_ID = "9BWtsMINqrJLrRacOk9x";
+// Aria: 9BWtsMINqrJLrRacOk9x (Official ElevenLabs voice - FEMALE)
+const ARIA_VOICE_ID = "9BWtsMINqrJLrRacOk9x";
 const DEFAULT_MODEL_ID = "eleven_turbo_v2_5";
 
 class ElevenLabsService {
@@ -25,9 +26,10 @@ class ElevenLabsService {
   constructor() {
     this.config = {
       apiKey: "",
-      voiceId: DEFAULT_VOICE_ID,
+      voiceId: ARIA_VOICE_ID, // Explicitly use Aria
       model: DEFAULT_MODEL_ID,
     };
+    console.log("🎤 [ElevenLabsService] Initialized with Aria voice ID:", ARIA_VOICE_ID);
   }
 
   public async checkAvailability(): Promise<boolean> {
@@ -72,7 +74,16 @@ class ElevenLabsService {
       ) {
         this.isAvailable = true;
         this.lastError = null;
-        console.log("🎤 [ElevenLabsService] Available voices:", result.voices.map((v: any) => v.name));
+        console.log("🎤 [ElevenLabsService] Available voices:", result.voices.map((v: any) => `${v.name} (${v.voice_id})`));
+        
+        // Check if Aria is available
+        const ariaVoice = result.voices.find((v: any) => v.voice_id === ARIA_VOICE_ID);
+        if (ariaVoice) {
+          console.log("✅ [ElevenLabsService] Aria voice found:", ariaVoice.name, "ID:", ariaVoice.voice_id);
+        } else {
+          console.warn("⚠️ [ElevenLabsService] Aria voice not found in available voices!");
+        }
+        
         return true;
       } else if (result && result.error) {
         console.error("❌ [ElevenLabsService] Error returned", result.error);
@@ -113,26 +124,39 @@ class ElevenLabsService {
     }
     try {
       console.log(
-        "🎤 Generating ElevenLabs speech (via Supabase) for:",
+        "🎤 [ElevenLabsService] Generating speech with ARIA voice for:",
         text.substring(0, 50) + "...",
-        "VoiceID:", this.config.voiceId, "Model:", this.config.model
+        "\n🎭 VoiceID:", this.config.voiceId,
+        "\n🎛️ Model:", this.config.model,
+        "\n🎀 Expected: Female voice (Aria)"
       );
+      
+      const requestPayload = {
+        type: "generate-speech",
+        text: text,
+        voiceId: this.config.voiceId,
+        model: this.config.model,
+      };
+      
+      console.log("📤 [ElevenLabsService] Request payload:", JSON.stringify(requestPayload, null, 2));
+      
       const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          type: "generate-speech",
-          text: text,
-          voiceId: this.config.voiceId,
-          model: this.config.model,
-        }),
+        body: JSON.stringify(requestPayload),
       });
+      
       const data = await response.json();
+      console.log("📥 [ElevenLabsService] Response status:", response.status, "Has audioContent:", !!data.audioContent);
+      
       if (!response.ok || !data.audioContent) {
+        console.error("❌ [ElevenLabsService] Speech generation failed:", data.error || "No audio content");
         throw new Error(data.error || "Unknown TTS error");
       }
+      
+      console.log("✅ [ElevenLabsService] Successfully generated speech with Aria voice, audio length:", data.audioContent.length);
       return { audioContent: data.audioContent };
     } catch (error) {
       console.error("❌ ElevenLabs speech generation failed:", error);
@@ -148,23 +172,54 @@ class ElevenLabsService {
   async playAudio(base64Audio: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
+        console.log("🔊 [ElevenLabsService] Starting audio playback, data length:", base64Audio.length);
         const audioData = `data:audio/mpeg;base64,${base64Audio}`;
         const audio = new Audio(audioData);
 
-        audio.onended = () => resolve();
-        audio.onerror = () => reject(new Error("Audio playback failed"));
+        audio.onended = () => {
+          console.log("✅ [ElevenLabsService] Audio playback completed successfully");
+          resolve();
+        };
+        
+        audio.onerror = (e) => {
+          console.error("❌ [ElevenLabsService] Audio playback error:", e);
+          reject(new Error("Audio playback failed"));
+        };
 
-        audio.play().catch(reject);
+        audio.onloadstart = () => {
+          console.log("🎵 [ElevenLabsService] Audio loading started");
+        };
+
+        audio.oncanplay = () => {
+          console.log("🎵 [ElevenLabsService] Audio can start playing");
+        };
+
+        audio.play().then(() => {
+          console.log("🎵 [ElevenLabsService] Audio.play() called successfully");
+        }).catch((playError) => {
+          console.error("❌ [ElevenLabsService] Audio.play() failed:", playError);
+          reject(playError);
+        });
       } catch (error) {
+        console.error("❌ [ElevenLabsService] Audio setup failed:", error);
         reject(error);
       }
     });
   }
 
   setVoice(voiceId: string): void {
-    console.log("🛠️ ElevenLabsService.setVoice called! Now using:", voiceId);
+    console.log("🛠️ [ElevenLabsService] setVoice called! Changing from:", this.config.voiceId, "to:", voiceId);
     this.config.voiceId = voiceId;
+  }
+
+  // Force Aria voice (for debugging)
+  forceAriaVoice(): void {
+    console.log("🎭 [ElevenLabsService] Forcing Aria voice ID:", ARIA_VOICE_ID);
+    this.config.voiceId = ARIA_VOICE_ID;
   }
 }
 
 export const elevenLabsService = new ElevenLabsService();
+
+// Force Aria voice on initialization
+elevenLabsService.forceAriaVoice();
