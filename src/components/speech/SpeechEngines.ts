@@ -1,7 +1,7 @@
+
 import { SpeechConfig } from "./SpeechConfig";
 import { ElevenLabsEngine } from "./engine/ElevenLabsEngine";
 import { browserSpeakFallback } from "./engine/BrowserEngine";
-import { showSpeechToast } from "./ToastUtils";
 
 export async function speakWithEngines(
   text: string,
@@ -18,28 +18,19 @@ export async function speakWithEngines(
     shouldTryElevenLabs,
   });
 
-  // Listen for our debugging event for playback source (for transparency)
+  // Remove toast notifications to avoid confusing students
   window.addEventListener("nelie-tts-engine", (evt) => {
     const detail = (evt as CustomEvent).detail || {};
-    if (detail.engine === "elevenlabs") {
-      showSpeechToast("Speech Engine", "✅ ElevenLabs premium voice played!", "success");
-      console.info("[SpeechEngines] ElevenLabs premium audio was played (nelie-tts-engine event)", detail);
-    }
-    if (detail.engine === "browser-fallback") {
-      showSpeechToast("Speech Engine", "⚠️ Browser fallback was used (male voice expected)", "destructive");
-      console.warn("[SpeechEngines] Browser fallback played (nelie-tts-engine event)", detail);
-    }
+    console.info("[SpeechEngines] Speech engine event:", detail);
   }, { once: true });
 
   if (shouldTryElevenLabs && useElevenLabs) {
     console.log("‼️ [SpeechEngines] Condition MET. Trying ElevenLabs.");
-    showSpeechToast("Trying ElevenLabs...", "Attempting to generate premium voice...", "default");
 
     const success = await ElevenLabsEngine.speak(text);
     console.log("‼️ [SpeechEngines] ElevenLabs success status:", success);
 
     if (success) {
-      showSpeechToast("ElevenLabs Success", "Premium voice playback complete.", "success");
       console.log("✅ [SpeechEngines] ElevenLabs speech finished successfully.");
       updateState({ isSpeaking: false, lastError: null });
       onDone();
@@ -51,7 +42,6 @@ export async function speakWithEngines(
         usingElevenLabs: false,
         lastError: errorMsg,
       });
-      showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech.", "destructive");
       window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "elevenlabs-failed" } }));
       console.warn(`❗ [SpeechEngines] ${errorMsg}`);
     }
@@ -63,13 +53,9 @@ export async function speakWithEngines(
     }
   }
 
-  // DEBUG: Mark browser fallback use
+  // Use browser fallback without showing technical messages to students
   console.warn("*** [SpeechEngines] USING BROWSER VOICE FALLBACK NOW! ***");
-  showSpeechToast("Speech Engine", "⚠️ Browser fallback was used (male voice expected)", "destructive");
   window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "direct-fallback" } }));
-
-  // The check for isCheckingElevenLabs was removed from here because it was causing silent failures.
-  // The main guard in UnifiedSpeechSystem.speak() is sufficient and handles retries gracefully.
 
   console.log("‼️ [SpeechEngines] Executing browser fallback.");
   browserSpeakFallback({

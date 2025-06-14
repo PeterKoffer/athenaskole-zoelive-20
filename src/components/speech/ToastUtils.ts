@@ -6,13 +6,15 @@ export const showSpeechToast = (
   description?: string,
   variant: "success" | "destructive" | "default" = "default"
 ) => {
-  // Map "success" to "default" due to allowed type restriction
-  const mappedVariant: "destructive" | "default" =
-    variant === "success" ? "default" : variant;
-  toast({
-    title,
-    description,
-    variant: mappedVariant,
-    duration: 5000,
-  });
+  // Only show error toasts to avoid confusing students with technical details
+  if (variant === "destructive") {
+    const mappedVariant: "destructive" | "default" = "destructive";
+    toast({
+      title: "Audio Issue",
+      description: "There was a problem with audio playback.",
+      variant: mappedVariant,
+      duration: 3000,
+    });
+  }
+  // Silently handle success and default toasts to avoid technical noise
 };
