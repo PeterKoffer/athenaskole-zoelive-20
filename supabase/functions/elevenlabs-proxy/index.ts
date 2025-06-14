@@ -9,39 +9,36 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Extra logging for DEBUG
   console.log("[ElevenLabs] Function invoked at", new Date().toISOString());
-  console.log("[ElevenLabs] ELEVENLABS_API_KEY present:", !!ELEVENLABS_API_KEY, "| length:", ELEVENLABS_API_KEY?.length);
-
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     if (req.method !== "POST") {
-      return new Response(JSON.stringify({ error: "Only POST supported" }), { status: 405, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Only POST supported" }), {
+        status: 405,
+        headers: corsHeaders,
+      });
     }
+    if (!ELEVENLABS_API_KEY) {
+      console.error("[ElevenLabs] API KEY IS MISSING.");
+      return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY in server environment." }), {
+        status: 500,
+        headers: corsHeaders
+      });
+    }
+
     const payload = await req.json();
     const type = payload.type || "";
 
-    console.log("[ElevenLabs] Payload received:", JSON.stringify(payload));
-
     if (type === "check-availability") {
-      if (!ELEVENLABS_API_KEY) {
-        console.error("[ElevenLabs] API KEY IS MISSING.");
-        return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY in server environment." }), {
-          status: 500,
-          headers: corsHeaders
-        });
-      }
-      console.log("[ElevenLabs] Checking voices on ElevenLabs...");
+      // Check for voices (availability)
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
-        headers: { "xi-api-key": ELEVENLABS_API_KEY },
+        headers: { "xi-api-key": ELEVENLABS_API_KEY }
       });
-      
       const status = voicesRes.status;
-      let body;
-      
+      let body = null;
       try {
         body = await voicesRes.json();
       } catch (e) {
@@ -51,39 +48,24 @@ serve(async (req) => {
           headers: corsHeaders,
         });
       }
-      
-      console.log("[ElevenLabs] Voices fetch status:", status, "| Body keys:", body ? Object.keys(body).join(', ') : 'null');
-
       if (!voicesRes.ok) {
-        console.error("[ElevenLabs] Voices fetch error:", body);
         return new Response(JSON.stringify({ error: body?.detail?.message || "Could not fetch voices" }), {
           status,
           headers: corsHeaders,
         });
       }
-
-      // Simply forward the JSON response from ElevenLabs.
       return new Response(JSON.stringify(body), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-    } else if (type === "generate-speech") {
+    }
+
+    if (type === "generate-speech") {
       const { text, voiceId, model } = payload;
-      if (!ELEVENLABS_API_KEY) {
-        console.log("[ElevenLabs] API KEY IS MISSING during generate-speech.");
-        return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY in server environment." }), {
-          status: 500,
-          headers: corsHeaders
-        });
-      }
       if (!text || !voiceId || !model) {
-        console.log("[ElevenLabs] Missing params", { text, voiceId, model });
         return new Response(JSON.stringify({ error: "Missing required params" }), { status: 400, headers: corsHeaders });
       }
-      
-      console.log("[ElevenLabs] 🎭 Generating speech with voice:", voiceId, "model:", model);
-      console.log("[ElevenLabs] 🎤 Text to speak:", text.substring(0, 100) + "...");
-
+      // Generate speech from text
       const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: "POST",
         headers: {
@@ -102,33 +84,33 @@ serve(async (req) => {
           },
         }),
       });
-      
-      console.log("[ElevenLabs] 📡 TTS API response status:", ttsRes.status);
-      
+
       if (!ttsRes.ok) {
         let errorMsg = "Unknown error";
         try {
           const errData = await ttsRes.json();
           errorMsg = errData?.detail?.message || JSON.stringify(errData);
-          console.log("[ElevenLabs] TTS Generation API error:", errorMsg);
         } catch (err) {
-          console.log("[ElevenLabs] TTS Generation API: could not parse error body", err);
+          errorMsg = "Could not parse error body";
         }
         return new Response(JSON.stringify({ error: errorMsg }), { status: ttsRes.status, headers: corsHeaders });
       }
+
       const audioBuffer = await ttsRes.arrayBuffer();
       const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
-      console.log("[ElevenLabs] ✅ Speech generated successfully, audio size:", audioBuffer.byteLength, "bytes");
       return new Response(JSON.stringify({ audioContent: base64Audio }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
     }
 
-    console.log("[ElevenLabs] Unknown type:", type);
+    // Unknown type
     return new Response(JSON.stringify({ error: "Unknown type" }), { status: 400, headers: corsHeaders });
+
   } catch (e) {
-    console.log("[ElevenLabs] Top-level error: ", e?.message || e);
-    return new Response(JSON.stringify({ error: e?.message || "Proxy error" }), {
+    // Always use a plain error string, never a circular structure
+    const errMsg = e instanceof Error ? e.message : "Proxy error";
+    return new Response(JSON.stringify({ error: errMsg }), {
       status: 500,
       headers: corsHeaders,
     });
