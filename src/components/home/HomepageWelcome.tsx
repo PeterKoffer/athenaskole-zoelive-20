@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -23,13 +23,12 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     stop,
     toggleEnabled,
     enableUserInteraction,
-    test,
-  } = useConsolidatedSpeech();
+  } = useUnifiedSpeech();
 
   // Welcome the user ONLY ONCE per session
   useEffect(() => {
     if (isReady && !hasWelcomedThisSession && isEnabled && hasUserInteracted) {
-      console.log('🎤 Nelie welcoming user to homepage - ONCE PER SESSION');
+      console.log('🎤 Nelie welcoming user to homepage - ONCE PER SESSION (Unified)');
       setHasWelcomedThisSession(true);
       sessionStorage.setItem('nelieHomepageWelcomed', 'true');
       const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
@@ -41,10 +40,14 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
 
   // Ensures ElevenLabs is available before speaking on first interaction
   const handleTestSpeech = async () => {
-    console.log('🔊 Enable Nelie button clicked', { isEnabled, hasUserInteracted, isSpeaking, isReady });
+    console.log('🔊 Enable Nelie button clicked (Unified)', { isEnabled, hasUserInteracted, isSpeaking, isReady });
     
     if (!hasUserInteracted) {
       enableUserInteraction();
+      // After first interaction, also enable speech if it's not already.
+      if (!isEnabled) {
+        toggleEnabled();
+      }
       return;
     }
     if (isSpeaking) {
@@ -61,7 +64,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       setTimeout(() => handleTestSpeech(), 600); // Wait then try again
       return;
     }
-    console.log('🔊 Testing speech');
+    console.log('🔊 Testing speech (Unified)');
     const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
     speak(testMessage, true);
   };
@@ -70,7 +73,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     if (!hasUserInteracted) return 'Enable Nelie';
     if (isSpeaking) return 'Speaking...';
     if (!isEnabled) return 'Enable Nelie';
-    return 'Nelie Voice';
+    return 'Test Nelie Voice';
   };
 
   return (
