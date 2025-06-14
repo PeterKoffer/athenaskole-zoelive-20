@@ -1,25 +1,18 @@
 
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
-import SpeechControls from './SpeechControls';
+import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
 
 interface NelieAvatarDisplayProps {
   isSpeaking: boolean;
   onStopSpeech: () => void;
 }
 
-const NelieAvatarDisplay = ({ isSpeaking, onStopSpeech }: NelieAvatarDisplayProps) => {
+const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex items-center space-x-4">
       <RobotAvatar 
-        size="xl" 
+        size="3xl" 
         isActive={true} 
         isSpeaking={isSpeaking}
-        className="drop-shadow-lg"
-      />
-      
-      <SpeechControls 
-        isSpeaking={isSpeaking} 
-        onStopSpeech={onStopSpeech}
       />
     </div>
   );
