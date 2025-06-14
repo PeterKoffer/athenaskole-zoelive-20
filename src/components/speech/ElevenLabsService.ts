@@ -36,14 +36,20 @@ class ElevenLabsService {
   }
 
   async generateSpeech(text: string): Promise<AudioResponse> {
-    if (!(await this.isServiceAvailable())) {
+    console.log("‼️ [ElevenLabsService] ENTERING generateSpeech. Checking availability...");
+    const available = await this.isServiceAvailable();
+    console.log(`‼️ [ElevenLabsService] Availability check result: ${available}`);
+
+    if (!available) {
       const lastError = this.voiceManager.getLastError();
-      console.error("🎤 [ElevenLabsService] Service not available when trying to generate speech. Last error:", lastError);
+      console.error("‼️ [ElevenLabsService] Service NOT available. Returning error. Last error:", lastError);
       return {
         audioContent: "",
         error: lastError || "ElevenLabs not available",
       };
     }
+
+    console.log("‼️ [ElevenLabsService] Service IS available. Calling speechGenerator.");
     return await this.speechGenerator.generateSpeech(text, this.config);
   }
 

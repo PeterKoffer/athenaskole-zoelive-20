@@ -22,6 +22,7 @@ export class ElevenLabsSpeechGenerator {
       
       console.log("📤 [ElevenLabsSpeechGenerator] Request payload:", JSON.stringify(requestPayload, null, 2));
       
+      console.log("‼️‼️ [ElevenLabsSpeechGenerator] ABOUT TO FETCH from edge function... ‼️‼️");
       const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {

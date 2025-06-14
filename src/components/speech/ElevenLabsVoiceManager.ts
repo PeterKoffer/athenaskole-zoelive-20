@@ -1,4 +1,3 @@
-
 import { EDGE_BASE, FENA_VOICE_ID } from "./ElevenLabsConfig";
 import { VoicesResponse } from "./ElevenLabsTypes";
 
@@ -8,12 +7,12 @@ export class ElevenLabsVoiceManager {
   private lastError: string | null = null;
 
   public async checkAvailability(): Promise<boolean> {
-    // Only check once every 5 seconds unless forced
     const now = Date.now();
     if (now - this.lastCheck < 5000 && this.cachedAvailability !== null) {
-      console.log("🎤 [ElevenLabsVoiceManager] Skipping re-check, recent result:", this.cachedAvailability);
+      console.log(`‼️ [ElevenLabsVoiceManager] Using CACHED availability: ${this.cachedAvailability}`);
       return this.cachedAvailability;
     }
+    console.log("‼️ [ElevenLabsVoiceManager] Cache expired or empty. Performing LIVE check.");
     this.lastCheck = now;
 
     try {
@@ -31,17 +30,17 @@ export class ElevenLabsVoiceManager {
       try {
         result = JSON.parse(text);
       } catch (e) {
-        console.error("🎤 ElevenLabs availability: Failed to parse response JSON", text);
+        console.error("‼️ [ElevenLabsVoiceManager] Failed to parse response JSON", text);
         this.cachedAvailability = false;
         this.lastError = "Parse error when checking ElevenLabs";
         return false;
       }
 
       console.log(
-        "🎤 [ElevenLabsVoiceManager] checkAvailability - Status:",
+        "‼️ [ElevenLabsVoiceManager] LIVE check response - Status:",
         response.status,
-        "Body:",
-        result
+        "Body keys:",
+        result ? Object.keys(result) : "null"
       );
 
       if (
@@ -52,9 +51,8 @@ export class ElevenLabsVoiceManager {
       ) {
         this.cachedAvailability = true;
         this.lastError = null;
-        console.log("🎤 [ElevenLabsVoiceManager] Available voices:", result.voices.map((v) => `${v.name} (${v.voice_id})`));
+        console.log("✅ [ElevenLabsVoiceManager] LIVE check SUCCESS. Caching availability: true.");
         
-        // Check if Fena is available
         const fenaVoice = result.voices.find((v) => v.voice_id === FENA_VOICE_ID);
         if (fenaVoice) {
           console.log("✅ [ElevenLabsVoiceManager] Fena voice found:", fenaVoice.name, "ID:", fenaVoice.voice_id);
@@ -64,12 +62,12 @@ export class ElevenLabsVoiceManager {
         
         return true;
       } else if (result && result.error) {
-        console.error("❌ [ElevenLabsVoiceManager] Error returned", result.error);
+        console.error("❌ [ElevenLabsVoiceManager] LIVE check FAILED (API Error). Caching availability: false.", result.error);
         this.cachedAvailability = false;
         this.lastError = result.error;
         return false;
       } else {
-        console.error("❌ [ElevenLabsVoiceManager] Unknown response", result);
+        console.error("❌ [ElevenLabsVoiceManager] LIVE check FAILED (Unknown Response). Caching availability: false.", result);
         this.cachedAvailability = false;
         this.lastError = "Unknown response";
         return false;
@@ -77,8 +75,8 @@ export class ElevenLabsVoiceManager {
     } catch (error) {
       this.cachedAvailability = false;
       this.lastError = error instanceof Error ? error.message : "Unknown error";
-      console.log(
-        "🎤 [ElevenLabsVoiceManager] Not available, will use browser synthesis. Error:", error
+      console.error(
+        "❌ [ElevenLabsVoiceManager] CRITICAL LIVE check FAILED (Catch Block). Caching availability: false. Error:", error
       );
       return false;
     }
