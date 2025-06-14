@@ -202,8 +202,7 @@ export class DailyLessonGenerator {
       phase: this.mapActivityTypeToPhase(activityType),
       duration: 180, // 3 minutes per activity
       phaseDescription: `Learn about ${focusArea.replace(/_/g, ' ')}`,
-      content,
-      completed: false
+      content
     };
   }
 
