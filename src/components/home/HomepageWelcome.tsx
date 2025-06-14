@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,17 +33,15 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     isReady
   });
 
-  // NEW: Auto-enable Nelie and trigger welcome speech after first interaction
+  // Auto-enable Nelie and trigger welcome speech after first interaction
   useEffect(() => {
     if (
       isReady &&
       hasUserInteracted &&
       !hasWelcomedThisSession &&
-      !isEnabled // user hasn't enabled already
+      !isEnabled
     ) {
-      // Auto-enable Nelie upon first user interaction/session readiness
       toggleEnabled();
-      // No return; we'll allow the next effect to handle the speech
     }
   }, [isReady, hasUserInteracted, hasWelcomedThisSession, isEnabled, toggleEnabled]);
 
@@ -70,14 +69,12 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     if (!hasUserInteracted) {
       console.log('🔊 First interaction - enabling user interaction');
       enableUserInteraction();
-      // Auto-enable speech after user interaction
       setTimeout(() => {
         if (!isEnabled) {
           toggleEnabled();
         }
-        // Test speech after enabling
         setTimeout(() => {
-          const testMessage = `Hi ${userName}! This is Nelie speaking with my enhanced ElevenLabs voice. I'm ready to help you learn today!`;
+          const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
           speak(testMessage, true);
         }, 500);
       }, 200);
@@ -93,18 +90,16 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     if (!isEnabled) {
       console.log('🔊 Enabling speech and will attempt to test...');
       toggleEnabled();
-      // We no longer return here. The code will now fall through and attempt to speak.
     }
     
-    // Only test speech if everything is ready
     if (!isReady) {
       console.log('🔊 Waiting for speech system readiness...');
       setTimeout(() => handleTestSpeech(), 600);
       return;
     }
     
-    console.log('🔊 Testing ElevenLabs speech');
-    const testMessage = `Hi ${userName}! This is Nelie speaking with my enhanced ElevenLabs voice. Can you hear my beautiful voice clearly?`;
+    console.log('🔊 Testing speech');
+    const testMessage = `Hi ${userName}! This is Nelie speaking. Can you hear my voice clearly?`;
     speak(testMessage, true);
   };
 
@@ -150,13 +145,13 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
         {isSpeaking && (
           <div className="mt-4 flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-200">Nelie is speaking with ElevenLabs voice...</span>
+            <span className="text-green-200">Nelie is speaking...</span>
           </div>
         )}
         
         {!hasUserInteracted && (
           <div className="mt-4 text-purple-200 text-sm">
-            💡 Click "Enable Nelie" to activate the enhanced ElevenLabs voice system
+            💡 Click "Enable Nelie" to activate the voice system
           </div>
         )}
       </CardContent>
