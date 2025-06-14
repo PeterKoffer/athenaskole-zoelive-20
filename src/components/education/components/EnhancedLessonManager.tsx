@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
@@ -8,7 +7,6 @@ import LessonControlsFooter from './LessonControlsFooter';
 import LessonCompletedView from './LessonCompletedView';
 import NelieIntroduction from './NelieIntroduction';
 import LessonActivitySpeechManager from './LessonActivitySpeechManager';
-import { useEffect } from 'react';
 
 interface EnhancedLessonManagerProps {
   subject: string;
@@ -55,16 +53,7 @@ const EnhancedLessonManager = ({
     hasUserInteracted
   });
 
-  // SKIP introduction entirely for Mathematics: immediately start lesson
-  useEffect(() => {
-    if (phase === 'introduction' && subject.toLowerCase() === 'mathematics') {
-      handleLessonStart();
-    }
-    // Only dependencies phase, subject, handleLessonStart
-    // eslint-disable-next-line
-  }, [phase, subject, handleLessonStart]);
-
-  if (phase === 'introduction' && subject.toLowerCase() !== 'mathematics') {
+  if (phase === 'introduction') {
     return (
       <NelieIntroduction
         subject={subject}
