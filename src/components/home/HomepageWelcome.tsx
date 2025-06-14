@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX } from 'lucide-react';
+import { VolumeX } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 
 interface HomepageWelcomeProps {
@@ -16,7 +16,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
   });
   
   const [hasManuallyTriggered, setHasManuallyTriggered] = useState(false);
-  const [showEnableButton, setShowEnableButton] = useState(true);
   
   const {
     isSpeaking,
@@ -26,7 +25,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     speak,
     stop,
     toggleEnabled,
-    enableUserInteraction,
   } = useUnifiedSpeech();
 
   console.log('🏠 Homepage Welcome State:', {
@@ -35,19 +33,11 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     isSpeaking,
     isEnabled,
     hasUserInteracted,
-    isReady,
-    showEnableButton
+    isReady
   });
 
   // Create the welcome message that will be used for both scenarios
   const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
-
-  // Hide button when speech starts (either manually or automatically)
-  useEffect(() => {
-    if (isSpeaking || (isEnabled && hasUserInteracted)) {
-      setShowEnableButton(false);
-    }
-  }, [isSpeaking, isEnabled, hasUserInteracted]);
 
   // Auto-enable Nelie and trigger welcome speech after first interaction (but only if not manually triggered)
   useEffect(() => {
@@ -80,51 +70,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     }
   }, [isReady, hasWelcomedThisSession, hasManuallyTriggered, isEnabled, hasUserInteracted, userName, speak, welcomeMessage]);
 
-  const handleEnableNelie = async () => {
-    console.log('🔊 Enable Nelie button clicked (Homepage)', { 
-      isEnabled, 
-      hasUserInteracted, 
-      isSpeaking, 
-      isReady 
-    });
-    
-    // Hide the button immediately when clicked
-    setShowEnableButton(false);
-    
-    // Mark that user manually triggered speech to prevent auto-welcome
-    setHasManuallyTriggered(true);
-    setHasWelcomedThisSession(true);
-    sessionStorage.setItem('nelieHomepageWelcomed', 'true');
-    
-    if (!hasUserInteracted) {
-      console.log('🔊 First interaction - enabling user interaction');
-      enableUserInteraction();
-      setTimeout(() => {
-        if (!isEnabled) {
-          toggleEnabled();
-        }
-        setTimeout(() => {
-          speak(welcomeMessage, true);
-        }, 500);
-      }, 200);
-      return;
-    }
-    
-    if (!isEnabled) {
-      console.log('🔊 Enabling speech and will speak welcome message...');
-      toggleEnabled();
-    }
-    
-    if (!isReady) {
-      console.log('🔊 Waiting for speech system readiness...');
-      setTimeout(() => handleEnableNelie(), 600);
-      return;
-    }
-    
-    console.log('🔊 Speaking welcome message');
-    speak(welcomeMessage, true);
-  };
-
   const handleStopSpeech = () => {
     console.log('🔊 Stopping Nelie speech');
     stop();
@@ -152,17 +97,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
               className="drop-shadow-lg"
             />
             
-            {/* Fun Enable Button that appears under Nelie */}
-            {showEnableButton && !hasUserInteracted && (
-              <Button
-                onClick={handleEnableNelie}
-                className="bg-white hover:bg-gray-100 text-purple-600 font-bold px-6 py-3 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 animate-bounce"
-              >
-                <Volume2 className="w-5 h-5 mr-2" />
-                Enable Nelie
-              </Button>
-            )}
-            
             {/* Stop button when speaking */}
             {isSpeaking && (
               <Button
@@ -184,14 +118,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
             )}
           </div>
         </div>
-        
-        {!hasUserInteracted && showEnableButton && (
-          <div className="mt-4 text-center">
-            <p className="text-purple-200 text-sm">
-              💡 Click the button above to hear Nelie's voice!
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

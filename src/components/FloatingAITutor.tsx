@@ -6,11 +6,14 @@ import CollapsedButton from "./floating-ai-tutor/CollapsedButton";
 import { useDragHandler } from "./floating-ai-tutor/useDragHandler";
 import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 import { Message } from "./floating-ai-tutor/types";
+import { Button } from "@/components/ui/button";
+import { Volume2 } from "lucide-react";
 
 const FloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [hasWelcomedOnHomepage, setHasWelcomedOnHomepage] = useState(false);
+  const [showEnableButton, setShowEnableButton] = useState(true);
   const { 
     isSpeaking, 
     isEnabled, 
@@ -18,7 +21,8 @@ const FloatingAITutor = () => {
     stop, 
     toggleEnabled, 
     hasUserInteracted, 
-    isReady 
+    isReady,
+    enableUserInteraction
   } = useUnifiedSpeech();
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +41,13 @@ const FloatingAITutor = () => {
       setIsOpen(false);
     }
   }, [location.pathname, shouldHide]);
+
+  // Hide button when speech starts or user has interacted
+  useEffect(() => {
+    if (isSpeaking || (isEnabled && hasUserInteracted)) {
+      setShowEnableButton(false);
+    }
+  }, [isSpeaking, isEnabled, hasUserInteracted]);
 
   // Only show welcome message once on homepage after login
   useEffect(() => {
@@ -66,6 +77,48 @@ const FloatingAITutor = () => {
       setMessages([]);
     }
   }, [shouldHide, messages.length, location.pathname, hasWelcomedOnHomepage, isEnabled, speakAsNelie, isReady, hasUserInteracted]);
+
+  const handleEnableNelie = async () => {
+    console.log('🔊 Enable Nelie button clicked (Floating)', { 
+      isEnabled, 
+      hasUserInteracted, 
+      isSpeaking, 
+      isReady 
+    });
+    
+    // Hide the button immediately when clicked
+    setShowEnableButton(false);
+    
+    const welcomeMessage = "Hi! I'm Nelie, your AI tutor! I'm here to help you learn. Ask me anything!";
+    
+    if (!hasUserInteracted) {
+      console.log('🔊 First interaction - enabling user interaction');
+      enableUserInteraction();
+      setTimeout(() => {
+        if (!isEnabled) {
+          toggleEnabled();
+        }
+        setTimeout(() => {
+          speakAsNelie(welcomeMessage);
+        }, 500);
+      }, 200);
+      return;
+    }
+    
+    if (!isEnabled) {
+      console.log('🔊 Enabling speech and will speak welcome message...');
+      toggleEnabled();
+    }
+    
+    if (!isReady) {
+      console.log('🔊 Waiting for speech system readiness...');
+      setTimeout(() => handleEnableNelie(), 600);
+      return;
+    }
+    
+    console.log('🔊 Speaking welcome message');
+    speakAsNelie(welcomeMessage);
+  };
 
   const toggleOpen = () => {
     if (!hasMoved && !isDragging) {
@@ -129,15 +182,28 @@ const FloatingAITutor = () => {
       className="floating-tutor-container"
     >
       {!isOpen ? (
-        <CollapsedButton 
-          onExpand={toggleOpen}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onResetToHome={handleResetToHome}
-          isDragging={isDragging}
-          hasMoved={hasMoved}
-          isSpeaking={isSpeaking}
-        />
+        <div className="flex flex-col items-center space-y-4">
+          <CollapsedButton 
+            onExpand={toggleOpen}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onResetToHome={handleResetToHome}
+            isDragging={isDragging}
+            hasMoved={hasMoved}
+            isSpeaking={isSpeaking}
+          />
+          
+          {/* Enable Nelie Button under the floating avatar */}
+          {showEnableButton && !hasUserInteracted && location.pathname === '/' && (
+            <Button
+              onClick={handleEnableNelie}
+              className="bg-white hover:bg-gray-100 text-purple-600 font-bold px-6 py-3 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 animate-bounce"
+            >
+              <Volume2 className="w-5 h-5 mr-2" />
+              Enable Nelie
+            </Button>
+          )}
+        </div>
       ) : (
         <ChatInterface
           messages={messages}
