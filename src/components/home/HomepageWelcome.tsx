@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,6 +35,9 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     isReady
   });
 
+  // Create the welcome message that will be used for both scenarios
+  const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
+
   // Auto-enable Nelie and trigger welcome speech after first interaction (but only if not manually triggered)
   useEffect(() => {
     if (
@@ -61,12 +63,11 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       console.log('🎤 Nelie auto-welcoming user to homepage - ONCE PER SESSION (Unified)');
       setHasWelcomedThisSession(true);
       sessionStorage.setItem('nelieHomepageWelcomed', 'true');
-      const welcomeMessage = `Hello ${userName}! Welcome back to your learning platform! I'm Nelie, your AI learning companion, and I'm so excited to help you learn today! Click on any subject to start your learning adventure with me!`;
       setTimeout(() => {
         speak(welcomeMessage, true);
       }, 1500);
     }
-  }, [isReady, hasWelcomedThisSession, hasManuallyTriggered, isEnabled, hasUserInteracted, userName, speak]);
+  }, [isReady, hasWelcomedThisSession, hasManuallyTriggered, isEnabled, hasUserInteracted, userName, speak, welcomeMessage]);
 
   const handleTestSpeech = async () => {
     console.log('🔊 Enable Nelie button clicked (Homepage)', { 
@@ -89,8 +90,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
           toggleEnabled();
         }
         setTimeout(() => {
-          const testMessage = `Hi ${userName}! This is Nelie speaking. I'm ready to help you learn today!`;
-          speak(testMessage, true);
+          speak(welcomeMessage, true);
         }, 500);
       }, 200);
       return;
@@ -103,7 +103,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     }
     
     if (!isEnabled) {
-      console.log('🔊 Enabling speech and will attempt to test...');
+      console.log('🔊 Enabling speech and will speak welcome message...');
       toggleEnabled();
     }
     
@@ -113,9 +113,8 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       return;
     }
     
-    console.log('🔊 Testing speech');
-    const testMessage = `Hi ${userName}! This is Nelie speaking. Can you hear my voice clearly?`;
-    speak(testMessage, true);
+    console.log('🔊 Speaking welcome message');
+    speak(welcomeMessage, true);
   };
 
   const getButtonText = () => {
