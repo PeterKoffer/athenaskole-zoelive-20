@@ -1,19 +1,17 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 const getSubjectSpecificIntroduction = (subject: string) => {
   const baseSteps = [
-    { text: "Hello! I'm Nelie, your personal AI learning companion!" },
-    { text: "I'm absolutely thrilled to explore this amazing topic with you today!" }
+    { text: "Hello! I'm Nelie, your personal AI learning companion!" }
   ];
 
   switch (subject.toLowerCase()) {
     case 'mathematics':
+      // REDUCED TO ONLY 1 STEP FOR FAST INTRO
       return [
-        ...baseSteps,
-        { text: "Welcome to the incredible world of mathematics! Get ready to discover patterns, solve puzzles, and unlock the secrets of numbers!" },
-        { text: "We'll explore mind-bending problems and learn super cool mathematical tricks that will amaze your friends!" },
-        { text: "Mathematics is like a superpower - once you master it, you can understand the entire universe! Are you ready to become a math wizard?" }
+        { text: "Hello! I'm Nelie, your personal AI learning companion!" }
       ];
     default:
       return [
