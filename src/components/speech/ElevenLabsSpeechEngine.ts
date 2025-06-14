@@ -11,10 +11,15 @@ export const elevenLabsSpeechEngine = {
     try {
       console.log("[ElevenLabsSpeechEngine] Attempting to speak with ElevenLabs...");
       const audioResponse = await elevenLabsService.generateSpeech(text);
+      // NEW: LOG audio length
+      console.log("[ElevenLabsSpeechEngine] audioContent length:", audioResponse.audioContent?.length, "error:", audioResponse.error);
       if (audioResponse.audioContent && !audioResponse.error) {
-        showSpeechToast("ElevenLabs Voice", "Playing with Aria (ElevenLabs premium voice)", "success");
+        showSpeechToast("ElevenLabs Voice 💜", "Playing with Aria (ElevenLabs premium voice) [You should be hearing Aria now!]", "success");
+        // SIGNIFICANT: Log before, during, and after playback
+        console.log("[ElevenLabsSpeechEngine] About to play audio...");
         await elevenLabsService.playAudio(audioResponse.audioContent);
         console.log("[ElevenLabsSpeechEngine] ElevenLabs playback succeeded.");
+        showSpeechToast("ElevenLabs Audio", "Playback completed!", "default");
         return true;
       }
       showSpeechToast("ElevenLabs Fallback", "Error: " + (audioResponse.error ?? "Unknown audio error"), "destructive");

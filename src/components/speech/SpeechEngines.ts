@@ -1,3 +1,4 @@
+
 import { SpeechConfig } from "./SpeechConfig";
 import { speakWithElevenLabs } from "./engine/ElevenLabsSpeak";
 import { speakWithBrowser } from "./engine/BrowserSpeak";
@@ -24,9 +25,13 @@ export async function speakWithEngines(
   // If we should try ElevenLabs, and it is user preference, always try first!
   if (shouldTryElevenLabs && useElevenLabs) {
     console.log("🔎 [SpeechEngines] Trying ElevenLabs speech engine...");
+    // NEW: Toast pre-attempt
+    showSpeechToast("Trying ElevenLabs...", "Attempting Aria voice via ElevenLabs", "default");
     const elevenDone = await speakWithElevenLabs(
       text,
       () => {
+        // NEW: Toast on ElevenLabs finish
+        showSpeechToast("ElevenLabs Finished", "Audio playback completed.", "success");
         updateState({ isSpeaking: false, lastError: null });
         onDone();
       },
@@ -41,8 +46,8 @@ export async function speakWithEngines(
       }
     );
     if (elevenDone) {
-      showSpeechToast("ElevenLabs Used", "Voice: Aria (premium)", "success");
-      console.log('✅ [SpeechEngines] ElevenLabs speech finished successfully.');
+      showSpeechToast("ElevenLabs Used", "Voice: Aria (premium) [Audio playback should be Aria]", "success");
+      console.log('✅ [SpeechEngines] ElevenLabs speech finished successfully (Aria, premium).');
       return;
     } else {
       showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech (Aria/Nelie unavailable)", "destructive");
@@ -75,6 +80,7 @@ export async function speakWithEngines(
     return;
   }
 
+  console.warn("[SpeechEngines] Invoking browser fallback speech engine.");
   showSpeechToast("Browser Voice", "Using browser voice (default or male)", "default");
   speakWithBrowser(
     text,
