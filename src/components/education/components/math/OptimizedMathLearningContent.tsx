@@ -102,6 +102,82 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     setShowIntroduction(false);
   };
 
+  // Enhanced content renderer for mental math strategies
+  const renderMentalMathStrategies = () => (
+    <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+      <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
+        <Brain className="w-6 h-6 mr-3 text-purple-400" />
+        Mental Math Strategies
+      </h2>
+      
+      <div className="text-gray-300 space-y-6">
+        <div className="bg-blue-900/30 rounded-lg p-4">
+          <h3 className="font-semibold text-blue-200 mb-3">Key Strategies for {studentName}:</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="bg-purple-800/30 rounded p-3">
+                <h4 className="font-medium text-purple-200 mb-2">🔢 Number Bonds</h4>
+                <p className="text-sm text-purple-100">Break numbers into friendly parts that add up to 10</p>
+                <p className="text-xs text-purple-300 mt-1">Example: 8 + 7 = 8 + 2 + 5 = 10 + 5 = 15</p>
+              </div>
+              
+              <div className="bg-green-800/30 rounded p-3">
+                <h4 className="font-medium text-green-200 mb-2">➕ Compensation</h4>
+                <p className="text-sm text-green-100">Round to easier numbers, then adjust</p>
+                <p className="text-xs text-green-300 mt-1">Example: 29 + 15 = 30 + 15 - 1 = 44</p>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="bg-orange-800/30 rounded p-3">
+                <h4 className="font-medium text-orange-200 mb-2">✖️ Doubling & Halving</h4>
+                <p className="text-sm text-orange-100">Use known doubles to solve problems</p>
+                <p className="text-xs text-orange-300 mt-1">Example: 6 × 8 = (6 × 4) × 2 = 24 × 2 = 48</p>
+              </div>
+              
+              <div className="bg-red-800/30 rounded p-3">
+                <h4 className="font-medium text-red-200 mb-2">🎯 Benchmark Numbers</h4>
+                <p className="text-sm text-red-100">Use 10, 100, or 1000 as reference points</p>
+                <p className="text-xs text-red-300 mt-1">Example: 98 + 47 = 100 + 47 - 2 = 145</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-4">
+          <h3 className="font-semibold text-white mb-3">💡 Quick Tips for Mental Math Success:</h3>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-start">
+              <span className="text-yellow-400 mr-2">•</span>
+              <span>Practice with small numbers first, then work up to larger ones</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-yellow-400 mr-2">•</span>
+              <span>Look for patterns and number relationships</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-yellow-400 mr-2">•</span>
+              <span>Use the strategy that feels most comfortable for each problem</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-yellow-400 mr-2">•</span>
+              <span>Don't rush - accuracy is more important than speed</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div className="mt-6 text-center">
+        <Button
+          onClick={() => handleActivityComplete()}
+          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8"
+        >
+          Ready to Practice These Strategies, {studentName}!
+        </Button>
+      </div>
+    </div>
+  );
+
   // Show introduction first
   if (showIntroduction) {
     return (
@@ -224,36 +300,42 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
                     totalQuestions={totalRealActivities}
                   />
                 ) : (
-                  // Content delivery activities - Remove card wrapper
-                  <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
-                    <h2 className="text-xl font-semibold text-white mb-4">{currentActivity.title}</h2>
-                    
-                    <div className="text-gray-300 space-y-4">
-                      {currentActivity.content?.text && (
-                        <p className="text-lg leading-relaxed">{currentActivity.content.text}</p>
-                      )}
-                      
-                      {currentActivity.content?.examples && (
-                        <div className="bg-blue-900/30 rounded-lg p-4">
-                          <h4 className="font-semibold text-blue-200 mb-2">Examples for {studentName}:</h4>
-                          <ul className="space-y-2">
-                            {currentActivity.content.examples.map((example: string, index: number) => (
-                              <li key={index} className="text-blue-100">• {example}</li>
-                            ))}
-                          </ul>
+                  // Content delivery activities - Check if it's mental math strategies
+                  <>
+                    {currentActivity.title?.toLowerCase().includes('mental math strategies') ? (
+                      renderMentalMathStrategies()
+                    ) : (
+                      <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+                        <h2 className="text-xl font-semibold text-white mb-4">{currentActivity.title}</h2>
+                        
+                        <div className="text-gray-300 space-y-4">
+                          {currentActivity.content?.text && (
+                            <p className="text-lg leading-relaxed">{currentActivity.content.text}</p>
+                          )}
+                          
+                          {currentActivity.content?.examples && (
+                            <div className="bg-blue-900/30 rounded-lg p-4">
+                              <h4 className="font-semibold text-blue-200 mb-2">Examples for {studentName}:</h4>
+                              <ul className="space-y-2">
+                                {currentActivity.content.examples.map((example: string, index: number) => (
+                                  <li key={index} className="text-blue-100">• {example}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    
-                    <div className="mt-6 text-center">
-                      <Button
-                        onClick={() => handleActivityComplete()}
-                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8"
-                      >
-                        Continue, {studentName}
-                      </Button>
-                    </div>
-                  </div>
+                        
+                        <div className="mt-6 text-center">
+                          <Button
+                            onClick={() => handleActivityComplete()}
+                            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8"
+                          >
+                            Continue, {studentName}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             ) : (
