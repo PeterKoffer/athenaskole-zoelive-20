@@ -5,6 +5,20 @@ export class SpeechStateManager {
   private state: SpeechState = getDefaultSpeechState();
   private listeners: ((state: SpeechState) => void)[] = [];
 
+  async initialize(): Promise<void> {
+    console.log('🔧 [SpeechStateManager] Initializing...');
+    
+    // Initialize speech state
+    this.updateState({
+      isReady: true,
+      isLoading: false,
+      voicesLoaded: true,
+      isCheckingElevenLabs: false
+    });
+    
+    console.log('🔧 [SpeechStateManager] Initialization complete');
+  }
+
   getState(): SpeechState {
     return { ...this.state };
   }

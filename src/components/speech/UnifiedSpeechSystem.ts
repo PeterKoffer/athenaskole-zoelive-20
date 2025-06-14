@@ -3,7 +3,7 @@ import { SpeechStateManager } from './SpeechStateManager';
 import { SpeechOrchestrator } from './SpeechOrchestrator';
 import { SpeechSystemQueue } from './SpeechSystemQueue';
 import { SpeechQueueProcessor } from './SpeechQueueProcessor';
-import { SpeechConfig } from './SpeechConfig';
+import { getDefaultSpeechConfig } from './SpeechConfig';
 import { speechDeduplication } from './SpeechDeduplicationManager';
 
 class UnifiedSpeechSystem {
@@ -11,7 +11,7 @@ class UnifiedSpeechSystem {
   private orchestrator = new SpeechOrchestrator();
   private queue = new SpeechSystemQueue();
   private processor = new SpeechQueueProcessor(this.queue, this.orchestrator);
-  private config = new SpeechConfig();
+  private config = getDefaultSpeechConfig();
 
   constructor() {
     this.initializeSpeechSystem();
@@ -37,7 +37,7 @@ class UnifiedSpeechSystem {
     // Mark as spoken before adding to queue
     speechDeduplication.markAsSpoken(text, context);
 
-    this.queue.add({ text, priority });
+    this.queue.addItem(text, priority);
     await this.processor.processQueue(
       this.config,
       this.stateManager.getState(),
@@ -61,7 +61,7 @@ class UnifiedSpeechSystem {
     
     console.log('[UnifiedSpeechSystem] Nelie speaking:', nelieText.substring(0, 50), { priority, context });
 
-    this.queue.add({ text: nelieText, priority });
+    this.queue.addItem(nelieText, priority);
     await this.processor.processQueue(
       this.config,
       this.stateManager.getState(),
