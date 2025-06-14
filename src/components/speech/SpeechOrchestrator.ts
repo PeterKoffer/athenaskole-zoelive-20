@@ -15,11 +15,13 @@ export class SpeechOrchestrator {
     updateState: (updates: Partial<SpeechState>) => void,
     onComplete: () => void
   ): Promise<void> {
+    /*
     const now = Date.now();
     if (text === this.lastSpokenText && now - this.lastSpokenTime < this.repeatPreventionTime) {
       onComplete();
       return;
     }
+    */
 
     console.log("[SpeechOrchestrator] Processing speech request:", text.substring(0, 50));
     
