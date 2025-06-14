@@ -19,16 +19,16 @@ const LessonActivitySpeechManager = ({
   speakText,
   stopSpeaking
 }: LessonActivitySpeechManagerProps) => {
-  const lastActivityId = useRef<string>('');
+  const lastActivityIndex = useRef<number>(-1);
   const hasSpoken = useRef<boolean>(false);
 
-  // Reset speech flag when activity changes
+  // Reset speech flag when activity index changes (or lesson restarts)
   useEffect(() => {
-    if (currentActivity?.id !== lastActivityId.current) {
-      lastActivityId.current = currentActivity?.id || '';
+    if (currentActivityIndex !== lastActivityIndex.current) {
+      lastActivityIndex.current = currentActivityIndex;
       hasSpoken.current = false;
     }
-  }, [currentActivity?.id]);
+  }, [currentActivityIndex]);
 
   // Auto-speak when activity changes (faster timing - 10 seconds per line)
   useEffect(() => {
@@ -36,15 +36,13 @@ const LessonActivitySpeechManager = ({
       currentActivity && 
       autoReadEnabled && 
       isReady && 
-      !hasSpoken.current &&
-      currentActivity.id !== lastActivityId.current
+      !hasSpoken.current
     ) {
       hasSpoken.current = true;
-      
-      // Faster speech timing - reduced from 1500ms to 800ms
+
       setTimeout(() => {
         let speechText = '';
-        
+
         if (currentActivity.phase === 'introduction') {
           speechText = currentActivity.content.hook || `Welcome to your ${currentActivity.title} lesson!`;
         } else if (currentActivity.phase === 'content-delivery') {
@@ -58,11 +56,12 @@ const LessonActivitySpeechManager = ({
         } else if (currentActivity.phase === 'summary') {
           speechText = `Great work! Let's review what we've learned.`;
         } else {
-          speechText = currentActivity.title;
+          // Use message or title for a welcome activity
+          speechText = currentActivity.content?.message || currentActivity.title;
         }
-        
+
         if (speechText && speechText.trim()) {
-          console.log('🔊 Auto-speaking (faster timing):', speechText.substring(0, 50) + '...');
+          console.log('🔊 Auto-speaking (math welcome/faster timing):', speechText.substring(0, 50) + '...');
           speakText(speechText, true);
         }
       }, 800); // Reduced from 1500ms to 800ms for faster response
