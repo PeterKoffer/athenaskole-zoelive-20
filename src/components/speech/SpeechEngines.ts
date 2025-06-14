@@ -58,12 +58,8 @@ export async function speakWithEngines(
     }
   }
 
-  if (isCheckingElevenLabs) {
-    // Don't fallback or do anything else until EL check is over
-    showSpeechToast("Speech Delayed", "Still checking for premium voice (ElevenLabs)...", "default");
-    console.log("⏳ [SpeechEngines] Still checking for ElevenLabs, not falling back to browser. Speech request paused.");
-    return;
-  }
+  // The check for isCheckingElevenLabs was removed from here because it was causing silent failures.
+  // The main guard in UnifiedSpeechSystem.speak() is sufficient and handles retries gracefully.
 
   browserSpeakFallback({
     text,

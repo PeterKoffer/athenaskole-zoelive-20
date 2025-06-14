@@ -1,4 +1,3 @@
-
 import { getDefaultSpeechConfig, SpeechConfig } from './SpeechConfig';
 import { SpeechState } from './SpeechState';
 import { setupPageVisibilityListener, setupUserInteractionListeners } from './EventListeners';
@@ -22,13 +21,22 @@ class UnifiedSpeechSystem {
   private async initializeSpeechSystem() {
     this.stateManager.updateState({ isCheckingElevenLabs: true, isLoading: true });
     
-    await initializeSpeechEngines(
-      this.config, 
-      (updates) => this.stateManager.updateState(updates),
-      this.stateManager.getState()
-    );
-    
-    this.stateManager.updateState({ isCheckingElevenLabs: false });
+    try {
+      await initializeSpeechEngines(
+        this.config, 
+        (updates) => this.stateManager.updateState(updates),
+        this.stateManager.getState()
+      );
+    } catch (error) {
+      console.error("[UnifiedSpeechSystem] CRITICAL ERROR during initialization:", error);
+      this.stateManager.updateState({ 
+          lastError: "Critical initialization error",
+          isReady: false,
+          isLoading: false,
+      });
+    } finally {
+      this.stateManager.updateState({ isCheckingElevenLabs: false });
+    }
 
     console.log("🔧 [UnifiedSpeechSystem] initializeSpeechSystem done", {
       usingElevenLabs: this.stateManager.getState().usingElevenLabs,
