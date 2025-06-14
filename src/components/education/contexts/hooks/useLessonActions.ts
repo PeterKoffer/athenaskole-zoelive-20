@@ -47,8 +47,9 @@ export const useLessonActions = ({
   });
 
   const handleLessonStart = useCallback(() => {
+    console.log('🎯 Starting lesson - updating phase and timer');
     updatePhase('lesson');
-    startTimer();
+    startTimer(); // Ensure timer starts immediately
     
     // Auto-speak first activity using ONLY Fena voice
     setTimeout(() => {
@@ -59,6 +60,14 @@ export const useLessonActions = ({
       }
     }, 1000);
   }, [updatePhase, startTimer, currentActivity, teachingEngine, subject]);
+
+  // Auto-start lesson when we have activities and are in introduction phase
+  useEffect(() => {
+    if (currentActivity && sessionTimer === 0) {
+      console.log('🚀 Auto-starting lesson with timer');
+      handleLessonStart();
+    }
+  }, [currentActivity, sessionTimer, handleLessonStart]);
 
   const handleLessonPause = useCallback(() => {
     updatePhase('paused');
