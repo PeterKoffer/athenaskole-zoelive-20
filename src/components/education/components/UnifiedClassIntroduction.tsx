@@ -26,6 +26,7 @@ const UnifiedClassIntroduction = ({
   const [hasStarted, setHasStarted] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
   const [userName, setUserName] = useState('Student');
+  const [canProceedWithoutSpeech, setCanProceedWithoutSpeech] = useState(false);
   
   const {
     isSpeaking,
@@ -34,7 +35,8 @@ const UnifiedClassIntroduction = ({
     isReady,
     speakAsNelie,
     stop,
-    toggleEnabled
+    toggleEnabled,
+    enableUserInteraction
   } = useUnifiedSpeech();
 
   // Fetch user's name from profile
@@ -65,6 +67,14 @@ const UnifiedClassIntroduction = ({
     fetchUserName();
   }, [user]);
 
+  // Allow proceeding without speech after a short delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCanProceedWithoutSpeech(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel, userName);
   const currentContent = introduction.sections[currentSection];
 
@@ -75,10 +85,11 @@ const UnifiedClassIntroduction = ({
     currentSection,
     totalSections: introduction.sections.length,
     hasStarted,
-    isSpeaking
+    isSpeaking,
+    canProceedWithoutSpeech
   });
 
-  // Auto-start introduction when component mounts and speech is ready
+  // Auto-start introduction when component mounts and speech is ready (only if user has interacted)
   useEffect(() => {
     if (isReady && isEnabled && hasUserInteracted && !hasStarted) {
       console.log('🎯 Auto-starting class introduction');
@@ -107,21 +118,31 @@ const UnifiedClassIntroduction = ({
 
   // Speak new section content when section changes
   useEffect(() => {
-    if (hasStarted && currentSection > 0) {
+    if (hasStarted && currentSection > 0 && isEnabled) {
       setTimeout(() => {
         speakAsNelie(currentContent.text, true, `intro-${subject}-${currentSection}`);
       }, 500);
     }
-  }, [currentSection, hasStarted, currentContent.text, speakAsNelie, subject]);
+  }, [currentSection, hasStarted, currentContent.text, speakAsNelie, subject, isEnabled]);
 
   const handleManualStart = () => {
     if (!hasStarted) {
       setHasStarted(true);
-      speakAsNelie(currentContent.text, true, `intro-${subject}-${currentSection}`);
+      if (!hasUserInteracted) {
+        enableUserInteraction();
+      }
+      if (isEnabled || !hasUserInteracted) {
+        setTimeout(() => {
+          speakAsNelie(currentContent.text, true, `intro-${subject}-${currentSection}`);
+        }, 200);
+      }
     }
   };
 
   const handleManualRead = () => {
+    if (!hasUserInteracted) {
+      enableUserInteraction();
+    }
     if (isSpeaking) {
       stop();
     } else {
@@ -134,126 +155,155 @@ const UnifiedClassIntroduction = ({
     onIntroductionComplete();
   };
 
+  // Allow skipping to lesson without any speech interaction
+  const handleProceedWithoutSpeech = () => {
+    console.log('🔇 User choosing to proceed without speech');
+    stop();
+    onIntroductionComplete();
+  };
+
   const isComplete = currentSection >= introduction.sections.length - 1 && !isSpeaking;
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
-        <CardContent className="p-8">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              <RobotAvatar 
-                size="xl" 
-                isActive={true} 
-                isSpeaking={isSpeaking}
-              />
-            </div>
-            <h2 className="text-3xl font-bold text-white mb-2">
-              {introduction.title}
-            </h2>
-            <p className="text-purple-200">
-              Welcome to your {subject} class with Nelie, {userName}!
-            </p>
-          </div>
-
-          {/* Progress Indicator */}
-          <div className="flex justify-center mb-6">
-            <div className="flex space-x-2">
-              {introduction.sections.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full ${
-                    index <= currentSection 
-                      ? 'bg-purple-400' 
-                      : 'bg-purple-700'
-                  }`}
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
+          <CardContent className="p-8">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="flex justify-center mb-4">
+                <RobotAvatar 
+                  size="xl" 
+                  isActive={true} 
+                  isSpeaking={isSpeaking}
                 />
-              ))}
-            </div>
-          </div>
-
-          {/* Current Content */}
-          <div className="bg-purple-800/50 rounded-lg p-6 mb-6">
-            <h3 className="text-xl font-semibold text-white mb-3">
-              {currentContent.title}
-            </h3>
-            <p className="text-purple-100 leading-relaxed text-lg">
-              {currentContent.text}
-            </p>
-          </div>
-
-          {/* Controls */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            {!hasStarted ? (
-              <Button
-                onClick={handleManualStart}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
-                disabled={!isReady || !hasUserInteracted}
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Start Introduction
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => toggleEnabled()}
-                  className="border-purple-400 text-purple-200 bg-purple-800/50"
-                >
-                  {isEnabled ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
-                  {isEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={handleManualRead}
-                  className="border-purple-400 text-purple-200 bg-purple-800/50"
-                  disabled={!isEnabled}
-                >
-                  <Volume2 className="w-4 h-4 mr-2" />
-                  {isSpeaking ? 'Stop Reading' : 'Read Again'}
-                </Button>
-                
-                {isComplete ? (
-                  <Button
-                    onClick={onIntroductionComplete}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6"
-                  >
-                    Start Class
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={handleSkip}
-                    className="border-gray-400 text-gray-200 bg-gray-800/50"
-                  >
-                    Skip Introduction
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Status Indicator */}
-          {hasStarted && (
-            <div className="text-center mt-4">
-              <p className="text-purple-300 text-sm">
-                {isSpeaking ? (
-                  <>
-                    <div className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
-                    Nelie is speaking...
-                  </>
-                ) : isComplete ? (
-                  'Introduction complete! Ready to start your class.'
-                ) : (
-                  'Moving to next section...'
-                )}
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                {introduction.title}
+              </h2>
+              <p className="text-purple-200">
+                Welcome to your {subject} class with Nelie, {userName}!
               </p>
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            {/* Progress Indicator */}
+            <div className="flex justify-center mb-6">
+              <div className="flex space-x-2">
+                {introduction.sections.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-3 h-3 rounded-full ${
+                      index <= currentSection 
+                        ? 'bg-purple-400' 
+                        : 'bg-purple-700'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Current Content */}
+            <div className="bg-purple-800/50 rounded-lg p-6 mb-6">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                {currentContent.title}
+              </h3>
+              <p className="text-purple-100 leading-relaxed text-lg">
+                {currentContent.text}
+              </p>
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              {!hasStarted ? (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    onClick={handleManualStart}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Introduction with Nelie
+                  </Button>
+                  
+                  {canProceedWithoutSpeech && (
+                    <Button
+                      onClick={handleProceedWithoutSpeech}
+                      variant="outline"
+                      className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
+                    >
+                      Start Lesson Without Speech
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => toggleEnabled()}
+                    className="border-purple-400 text-purple-200 bg-purple-800/50"
+                  >
+                    {isEnabled ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
+                    {isEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={handleManualRead}
+                    className="border-purple-400 text-purple-200 bg-purple-800/50"
+                    disabled={!isEnabled && hasUserInteracted}
+                  >
+                    <Volume2 className="w-4 h-4 mr-2" />
+                    {isSpeaking ? 'Stop Reading' : 'Read Again'}
+                  </Button>
+                  
+                  {isComplete ? (
+                    <Button
+                      onClick={onIntroductionComplete}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                    >
+                      Start Class
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={handleSkip}
+                      className="border-gray-400 text-gray-200 bg-gray-800/50"
+                    >
+                      Skip Introduction
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Status Indicator */}
+            {hasStarted && (
+              <div className="text-center mt-4">
+                <p className="text-purple-300 text-sm">
+                  {isSpeaking ? (
+                    <>
+                      <div className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                      Nelie is speaking...
+                    </>
+                  ) : isComplete ? (
+                    'Introduction complete! Ready to start your class.'
+                  ) : (
+                    'Moving to next section...'
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Help Text for Direct Navigation */}
+            {!hasStarted && (
+              <div className="text-center mt-4">
+                <p className="text-purple-300 text-sm">
+                  You can start with Nelie's voice guidance or proceed directly to the lesson
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
