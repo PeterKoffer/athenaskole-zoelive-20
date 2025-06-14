@@ -13,8 +13,8 @@ interface AudioResponse {
 const EDGE_BASE =
   "https://tgjudtnjhtumrfthegis.functions.supabase.co/elevenlabs-proxy";
 
-// Aria: 9BWtsMINqrJLrRacOk9x (Official ElevenLabs voice - FEMALE)
-const ARIA_VOICE_ID = "9BWtsMINqrJLrRacOk9x";
+// Fena - Character: BlgEcC0TfWpBak7FmvHW (Official ElevenLabs voice - FEMALE CHARACTER)
+const FENA_VOICE_ID = "BlgEcC0TfWpBak7FmvHW";
 const DEFAULT_MODEL_ID = "eleven_turbo_v2_5";
 
 class ElevenLabsService {
@@ -26,10 +26,10 @@ class ElevenLabsService {
   constructor() {
     this.config = {
       apiKey: "",
-      voiceId: ARIA_VOICE_ID, // Explicitly use Aria
+      voiceId: FENA_VOICE_ID, // Explicitly use Fena
       model: DEFAULT_MODEL_ID,
     };
-    console.log("🎤 [ElevenLabsService] Initialized with Aria voice ID:", ARIA_VOICE_ID);
+    console.log("🎤 [ElevenLabsService] Initialized with Fena voice ID:", FENA_VOICE_ID);
   }
 
   public async checkAvailability(): Promise<boolean> {
@@ -76,12 +76,12 @@ class ElevenLabsService {
         this.lastError = null;
         console.log("🎤 [ElevenLabsService] Available voices:", result.voices.map((v: any) => `${v.name} (${v.voice_id})`));
         
-        // Check if Aria is available
-        const ariaVoice = result.voices.find((v: any) => v.voice_id === ARIA_VOICE_ID);
-        if (ariaVoice) {
-          console.log("✅ [ElevenLabsService] Aria voice found:", ariaVoice.name, "ID:", ariaVoice.voice_id);
+        // Check if Fena is available
+        const fenaVoice = result.voices.find((v: any) => v.voice_id === FENA_VOICE_ID);
+        if (fenaVoice) {
+          console.log("✅ [ElevenLabsService] Fena voice found:", fenaVoice.name, "ID:", fenaVoice.voice_id);
         } else {
-          console.warn("⚠️ [ElevenLabsService] Aria voice not found in available voices!");
+          console.warn("⚠️ [ElevenLabsService] Fena voice not found in available voices!");
         }
         
         return true;
@@ -124,11 +124,11 @@ class ElevenLabsService {
     }
     try {
       console.log(
-        "🎤 [ElevenLabsService] Generating speech with ARIA voice for:",
+        "🎤 [ElevenLabsService] Generating speech with FENA voice for:",
         text.substring(0, 50) + "...",
         "\n🎭 VoiceID:", this.config.voiceId,
         "\n🎛️ Model:", this.config.model,
-        "\n🎀 Expected: Female voice (Aria)"
+        "\n🎀 Expected: Female character voice (Fena)"
       );
       
       const requestPayload = {
@@ -156,7 +156,7 @@ class ElevenLabsService {
         throw new Error(data.error || "Unknown TTS error");
       }
       
-      console.log("✅ [ElevenLabsService] Successfully generated speech with Aria voice, audio length:", data.audioContent.length);
+      console.log("✅ [ElevenLabsService] Successfully generated speech with Fena voice, audio length:", data.audioContent.length);
       return { audioContent: data.audioContent };
     } catch (error) {
       console.error("❌ ElevenLabs speech generation failed:", error);
@@ -212,14 +212,14 @@ class ElevenLabsService {
     this.config.voiceId = voiceId;
   }
 
-  // Force Aria voice (for debugging)
-  forceAriaVoice(): void {
-    console.log("🎭 [ElevenLabsService] Forcing Aria voice ID:", ARIA_VOICE_ID);
-    this.config.voiceId = ARIA_VOICE_ID;
+  // Force Fena voice (for debugging)
+  forceFenaVoice(): void {
+    console.log("🎭 [ElevenLabsService] Forcing Fena voice ID:", FENA_VOICE_ID);
+    this.config.voiceId = FENA_VOICE_ID;
   }
 }
 
 export const elevenLabsService = new ElevenLabsService();
 
-// Force Aria voice on initialization
-elevenLabsService.forceAriaVoice();
+// Force Fena voice on initialization
+elevenLabsService.forceFenaVoice();
