@@ -65,11 +65,11 @@ const RobotAvatar = ({
         draggable={false}
       />
       
-      {/* Blinking animation positioned precisely on Nelie's belly dot */}
+      {/* Blinking animation positioned at top-65% and shifted right */}
       {isSpeaking && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Position the blinking effect to match the round dot on Nelie's belly */}
-          <div className="absolute top-[68%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          {/* Position the blinking effect at top-65% and shifted 4-5mm to the right */}
+          <div className="absolute top-[65%] left-[52%] transform -translate-x-1/2 -translate-y-1/2">
             <div className="relative">
               {/* Outer glow ring - sized to match the belly dot */}
               <div className="absolute -inset-1 bg-cyan-400 rounded-full animate-ping opacity-30"></div>
