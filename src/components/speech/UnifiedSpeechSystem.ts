@@ -3,18 +3,19 @@
 
 import { elevenLabsSpeechEngine } from './ElevenLabsSpeechEngine';
 import { browserSpeechEngine } from './BrowserSpeechEngine';
-import { getDefaultSpeechConfig, selectOptimalVoice, SpeechConfig } from './SpeechConfig';
+import { getDefaultSpeechConfig, SpeechConfig } from './SpeechConfig';
 import { SpeechState, getDefaultSpeechState } from './SpeechState';
-import { SpeechQueueManager } from './SpeechQueueManager';
 import { setupPageVisibilityListener, setupUserInteractionListeners } from './EventListeners';
 import { speakWithEngines } from './SpeechEngines';
+import { SpeechSystemQueue } from "./SpeechSystemQueue";
+import { initializeSpeechEngines } from "./SpeechInitializer";
 
 class UnifiedSpeechSystem {
   private state: SpeechState = getDefaultSpeechState();
   private config: SpeechConfig = getDefaultSpeechConfig();
 
   private listeners: ((state: SpeechState) => void)[] = [];
-  private queue = new SpeechQueueManager();
+  private queue = new SpeechSystemQueue();
   private isProcessingQueue = false;
   private lastSpokenText = '';
   private lastSpokenTime = 0;
@@ -27,78 +28,9 @@ class UnifiedSpeechSystem {
   }
 
   private async initializeSpeechSystem() {
-    this.updateState({ isLoading: true });
-    const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
-
-    if (elevenLabsAvailable && this.config.preferElevenLabs) {
-      this.updateState({
-        usingElevenLabs: true,
-        isReady: true,
-        isLoading: false,
-        lastError: null,
-      });
-    } else {
-      await this.initializeBrowserSpeech();
-      this.updateState({ usingElevenLabs: false });
-    }
+    await initializeSpeechEngines(this.config, (updates) => this.updateState(updates), this.state);
     setupPageVisibilityListener(() => this.stop(), this.state.isSpeaking);
     setupUserInteractionListeners(() => this.updateState({ hasUserInteracted: true }), this.state.hasUserInteracted);
-  }
-
-  private async initializeBrowserSpeech() {
-    if (typeof speechSynthesis === 'undefined') {
-      this.updateState({
-        lastError: 'Speech synthesis not supported in this browser',
-        isReady: false,
-        isLoading: false,
-      });
-      return;
-    }
-    await this.waitForVoices();
-    await this.performInitialTest();
-  }
-
-  private async waitForVoices(timeout = 5000): Promise<void> {
-    return new Promise((resolve) => {
-      const checkVoices = () => {
-        const voices = speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          this.config.voice = selectOptimalVoice(voices) || undefined;
-          this.updateState({
-            voicesLoaded: true,
-            isLoading: false,
-            isReady: true,
-            lastError: null,
-          });
-          resolve();
-        }
-      };
-      checkVoices();
-      speechSynthesis.addEventListener('voiceschanged', checkVoices);
-      setTimeout(() => {
-        if (!this.state.voicesLoaded) {
-          this.updateState({
-            voicesLoaded: true,
-            isLoading: false,
-            isReady: true,
-            lastError: 'Using browser default voice',
-          });
-        }
-        resolve();
-      }, timeout);
-    });
-  }
-
-  private async performInitialTest(): Promise<void> {
-    try {
-      const testUtterance = new SpeechSynthesisUtterance('');
-      testUtterance.volume = 0;
-      speechSynthesis.speak(testUtterance);
-    } catch (error) {
-      this.updateState({
-        lastError: 'Speech test failed: ' + (error as Error).message,
-      });
-    }
   }
 
   private updateState(updates: Partial<SpeechState>) {
@@ -212,3 +144,4 @@ class UnifiedSpeechSystem {
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
+
