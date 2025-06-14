@@ -1,19 +1,20 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import LanguageLearning from "./LanguageLearning";
 import LanguageSelector from "./ai-tutor/LanguageSelector";
-import DailyChallenges from "./gamification/DailyChallenges";
-import RewardsSystem from "./gamification/RewardsSystem";
-import ParentNotifications from "./parent/ParentNotifications";
 import WelcomeCard from "./ai-tutor/WelcomeCard";
 import TutorHeader from "./ai-tutor/TutorHeader";
-import ChatTab from "./ai-tutor/ChatTab";
-import SpeechTab from "./ai-tutor/SpeechTab";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
+
+// Extracted tab components
+import EnhancedTutorChatTab from "./ai-tutor/tabs/EnhancedTutorChatTab";
+import EnhancedTutorSpeechTab from "./ai-tutor/tabs/EnhancedTutorSpeechTab";
+import EnhancedTutorChallengesTab from "./ai-tutor/tabs/EnhancedTutorChallengesTab";
+import EnhancedTutorRewardsTab from "./ai-tutor/tabs/EnhancedTutorRewardsTab";
+import EnhancedTutorParentsTab from "./ai-tutor/tabs/EnhancedTutorParentsTab";
 
 interface EnhancedAITutorProps {
   user: any;
@@ -35,7 +36,7 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
     setIsSpeaking
   });
 
-  // Mock child progress data for parent notifications
+  // Child progress for Parents Tab
   const childProgress = {
     childName: user?.user_metadata?.name?.split(' ')[0] || "Emma",
     weeklyMinutes: 95,
@@ -46,7 +47,7 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
     newAchievements: ["Pronunciation Master", "7 Day Streak"]
   };
 
-  const handleLearningOptionWithLanguageCheck = (option) => {
+  const handleLearningOptionWithLanguageCheck = (option: any) => {
     if (option.id === "language") {
       setShowLanguageSelection(true);
       return;
@@ -57,7 +58,7 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
     handleLearningOption(option);
   };
 
-  const handleLanguageSelect = (languageCode) => {
+  const handleLanguageSelect = (languageCode: string) => {
     setSelectedLanguage(languageCode);
     setShowLanguageSelection(false);
     setShowLanguageLearning(true);
@@ -84,6 +85,7 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
 
   const userName = user?.user_metadata?.name?.split(' ')[0] || 'Student';
 
+  // Language selection or learning flows
   if (showLanguageSelection) {
     return (
       <div className="space-y-6">
@@ -163,9 +165,8 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
           <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700 text-white">Rewards</TabsTrigger>
           <TabsTrigger value="parents" className="data-[state=active]:bg-gray-700 text-white">Parents</TabsTrigger>
         </TabsList>
-
         <TabsContent value="chat" className="space-y-6">
-          <ChatTab
+          <EnhancedTutorChatTab
             messages={messages}
             isSpeaking={isSpeaking}
             onSendMessage={handleSendMessage}
@@ -173,31 +174,24 @@ const EnhancedAITutor = ({ user, onBack }: EnhancedAITutorProps) => {
             onLearningOptionSelect={handleLearningOptionWithLanguageCheck}
           />
         </TabsContent>
-
         <TabsContent value="speech" className="space-y-6">
-          <SpeechTab
+          <EnhancedTutorSpeechTab
             currentPracticeText={currentPracticeText}
             onPracticeTextChange={setCurrentPracticeText}
             onScoreUpdate={handlePronunciationScore}
           />
         </TabsContent>
-
         <TabsContent value="challenges" className="space-y-6">
-          <DailyChallenges onChallengeComplete={handleChallengeComplete} />
+          <EnhancedTutorChallengesTab onChallengeComplete={handleChallengeComplete} />
         </TabsContent>
-
         <TabsContent value="rewards" className="space-y-6">
-          <RewardsSystem 
+          <EnhancedTutorRewardsTab
             currentCoins={currentCoins}
             onPurchase={handleRewardPurchase}
           />
         </TabsContent>
-
         <TabsContent value="parents" className="space-y-6">
-          <ParentNotifications
-            childProgress={childProgress}
-            parentEmail="parents@example.com"
-          />
+          <EnhancedTutorParentsTab childProgress={childProgress} />
         </TabsContent>
       </Tabs>
     </div>
