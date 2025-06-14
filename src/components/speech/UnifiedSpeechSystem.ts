@@ -1,4 +1,3 @@
-
 // The unified orchestrator: now delegates state, config, queue, listener logic to submodules.
 
 import { elevenLabsSpeechEngine } from './ElevenLabsSpeechEngine';
@@ -37,12 +36,26 @@ class UnifiedSpeechSystem {
       this.state
     );
     this.updateState({ isCheckingElevenLabs: false }); // ElevenLabs check done, even if fallback
+
+    // Logging for initialization path
+    console.log("🔧 [UnifiedSpeechSystem] initializeSpeechSystem done", {
+      usingElevenLabs: this.state.usingElevenLabs,
+      isReady: this.state.isReady,
+      isLoading: this.state.isLoading,
+      lastError: this.state.lastError,
+      isCheckingElevenLabs: this.state.isCheckingElevenLabs
+    });
+
     setupPageVisibilityListener(() => this.stop(), this.state.isSpeaking);
-    setupUserInteractionListeners(() => this.updateState({ hasUserInteracted: true }), this.state.hasUserInteracted);
+    setupUserInteractionListeners(
+      () => this.updateState({ hasUserInteracted: true }),
+      this.state.hasUserInteracted
+    );
   }
 
   private updateState(updates: Partial<SpeechState>) {
     this.state = { ...this.state, ...updates };
+    console.log("🔄 [UnifiedSpeechSystem] State updated", this.state);
     this.notifyListeners();
   }
 
@@ -68,14 +81,25 @@ class UnifiedSpeechSystem {
 
   async speak(text: string, priority: boolean = false): Promise<void> {
     if (!text || text.trim().length === 0) return;
+    console.log("📝 [UnifiedSpeechSystem] speak() called", {
+      text,
+      isCheckingElevenLabs: this.state.isCheckingElevenLabs,
+      usingElevenLabs: this.state.usingElevenLabs,
+      isReady: this.state.isReady,
+      hasUserInteracted: this.state.hasUserInteracted,
+      isEnabled: this.state.isEnabled
+    });
     // If still checking for ElevenLabs, queue up until ready
     if (this.state.isCheckingElevenLabs) {
-      console.log('⏳ Waiting for ElevenLabs readiness before speaking:', text.substring(0, 40));
+      console.log('⏳ [UnifiedSpeechSystem] Waiting for ElevenLabs readiness before speaking:', text.substring(0, 40));
       // Try again after readiness resolves
       setTimeout(() => this.speak(text, priority), 300);
       return;
     }
-    if (!this.state.isReady) await this.initializeSpeechSystem();
+    if (!this.state.isReady) {
+      console.log('[UnifiedSpeechSystem] Speech system not ready, re-initializing...');
+      await this.initializeSpeechSystem();
+    }
 
     const now = Date.now();
     if (text === this.lastSpokenText && now - this.lastSpokenTime < this.repeatPreventionTime) return;
@@ -106,12 +130,14 @@ class UnifiedSpeechSystem {
   private async processQueue(): Promise<void> {
     if (this.isProcessingQueue || this.queue.length === 0) return;
     if (!this.state.isEnabled || !this.state.hasUserInteracted) {
+      console.warn("[UnifiedSpeechSystem] Speech is not enabled or user has not interacted - queue will be cleared.");
       this.queue.clear();
       return;
     }
     this.isProcessingQueue = true;
     while (this.queue.length > 0) {
       const item = this.queue.shift()!;
+      console.log("[UnifiedSpeechSystem] Processing next speech item:", item.text.substring(0, 50));
       await new Promise<void>((resolve) => {
         speakWithEngines(
           item.text,
@@ -160,5 +186,3 @@ class UnifiedSpeechSystem {
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
-
-
