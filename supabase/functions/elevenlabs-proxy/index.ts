@@ -13,11 +13,14 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const url = new URL(req.url);
-  let path = url.pathname.split("/").slice(3).join("/"); // Skip /functions/v1/
   try {
-    if (path === "elevenlabs-proxy/check-availability") {
-      // Proxy ElevenLabs voices list for availability check
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Only POST supported" }), { status: 405, headers: corsHeaders });
+    }
+    const payload = await req.json();
+    const type = payload.type || "";
+
+    if (type === "check-availability") {
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
         headers: { "xi-api-key": ELEVENLABS_API_KEY },
       });
@@ -27,8 +30,8 @@ serve(async (req) => {
         status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-    } else if (path === "elevenlabs-proxy/generate-speech") {
-      const { text, voiceId, model } = await req.json();
+    } else if (type === "generate-speech") {
+      const { text, voiceId, model } = payload;
       if (!text || !voiceId || !model) {
         return new Response(JSON.stringify({ error: "Missing required params" }), { status: 400, headers: corsHeaders });
       }
@@ -64,7 +67,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    return new Response("Not found", { status: 404, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Unknown type" }), { status: 400, headers: corsHeaders });
   } catch (e) {
     return new Response(JSON.stringify({ error: e?.message || "Proxy error" }), {
       status: 500,

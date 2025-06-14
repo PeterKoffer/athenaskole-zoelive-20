@@ -30,8 +30,12 @@ class ElevenLabsService {
 
   private async checkAvailability(): Promise<void> {
     try {
-      const response = await fetch(EDGE_BASE + "/check-availability", {
-        method: "GET",
+      const response = await fetch(EDGE_BASE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ type: "check-availability" })
       });
       this.isAvailable = response.ok;
       console.log(
@@ -67,12 +71,13 @@ class ElevenLabsService {
         "🎤 Generating ElevenLabs speech (via Supabase) for:",
         text.substring(0, 50) + "..."
       );
-      const response = await fetch(EDGE_BASE + "/generate-speech", {
+      const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          type: "generate-speech",
           text: text,
           voiceId: this.config.voiceId,
           model: this.config.model,
