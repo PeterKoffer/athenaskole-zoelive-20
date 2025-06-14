@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import QuestionDisplayHeader from './QuestionDisplayHeader';
 import QuestionOptions from './QuestionOptions';
 import QuestionExplanation from './QuestionExplanation';
@@ -41,10 +40,10 @@ const QuestionDisplay = ({
   const {
     isSpeaking,
     autoReadEnabled,
-    hasAutoRead,
     speakText,
     handleMuteToggle
   } = useSpeechSynthesis();
+  const hasAutoRead = useRef(false);
 
   // Clean up question text and provide fallback for technical IDs
   const cleanQuestionText = (text: string) => {
