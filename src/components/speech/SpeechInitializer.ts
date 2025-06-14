@@ -1,4 +1,3 @@
-
 import { selectOptimalVoice, SpeechConfig } from "./SpeechConfig";
 import { SpeechState } from "./SpeechState";
 import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
@@ -8,7 +7,7 @@ export async function initializeSpeechEngines(
   updateState: (updates: Partial<SpeechState>) => void,
   currentState: SpeechState
 ) {
-  updateState({ isLoading: true });
+  updateState({ isLoading: true, isCheckingElevenLabs: true });
   const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
 
   if (elevenLabsAvailable && config.preferElevenLabs) {
@@ -17,10 +16,11 @@ export async function initializeSpeechEngines(
       isReady: true,
       isLoading: false,
       lastError: null,
+      isCheckingElevenLabs: false
     });
   } else {
     await initializeBrowserSpeech(config, updateState);
-    updateState({ usingElevenLabs: false });
+    updateState({ usingElevenLabs: false, isCheckingElevenLabs: false });
   }
 }
 

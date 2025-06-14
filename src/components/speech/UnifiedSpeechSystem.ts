@@ -22,13 +22,21 @@ class UnifiedSpeechSystem {
   private repeatPreventionTime = 3000;
   private maxRetries = 3;
   private retryCount = 0;
+  private checkingElevenLabs = false;
 
   constructor() {
     this.initializeSpeechSystem();
   }
 
   private async initializeSpeechSystem() {
-    await initializeSpeechEngines(this.config, (updates) => this.updateState(updates), this.state);
+    this.updateState({ isCheckingElevenLabs: true, isLoading: true });
+    // Start ElevenLabs check & only then proceed
+    await initializeSpeechEngines(
+      this.config, 
+      (updates) => this.updateState(updates),
+      this.state
+    );
+    this.updateState({ isCheckingElevenLabs: false }); // ElevenLabs check done, even if fallback
     setupPageVisibilityListener(() => this.stop(), this.state.isSpeaking);
     setupUserInteractionListeners(() => this.updateState({ hasUserInteracted: true }), this.state.hasUserInteracted);
   }
@@ -60,6 +68,13 @@ class UnifiedSpeechSystem {
 
   async speak(text: string, priority: boolean = false): Promise<void> {
     if (!text || text.trim().length === 0) return;
+    // If still checking for ElevenLabs, queue up until ready
+    if (this.state.isCheckingElevenLabs) {
+      console.log('⏳ Waiting for ElevenLabs readiness before speaking:', text.substring(0, 40));
+      // Try again after readiness resolves
+      setTimeout(() => this.speak(text, priority), 300);
+      return;
+    }
     if (!this.state.isReady) await this.initializeSpeechSystem();
 
     const now = Date.now();
@@ -109,7 +124,8 @@ class UnifiedSpeechSystem {
             this.retryCount = 0;
             resolve();
           },
-          this.config.preferElevenLabs
+          this.config.preferElevenLabs,
+          this.state.isCheckingElevenLabs
         );
       });
       await new Promise((res) => setTimeout(res, 300));
@@ -144,4 +160,5 @@ class UnifiedSpeechSystem {
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
+
 

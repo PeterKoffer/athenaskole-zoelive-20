@@ -10,9 +10,10 @@ export async function speakWithEngines(
   config: SpeechConfig,
   updateState: (partial: any) => void,
   onDone: () => void,
-  shouldTryElevenLabs: boolean
+  shouldTryElevenLabs: boolean,
+  isCheckingElevenLabs?: boolean // new argument, to track EL check state
 ) {
-  // Try ElevenLabs first if requested
+  // Never allow browser fallback if EL check is not finished yet
   if (shouldTryElevenLabs && useElevenLabs) {
     const elevenDone = await speakWithElevenLabs(
       text,
@@ -29,7 +30,12 @@ export async function speakWithEngines(
     );
     if (elevenDone) return;
   }
-  // Fallback to browser TTS
+  if (isCheckingElevenLabs) {
+    // Don't fallback until EL check is over, will retry after state update
+    console.log('⏳ Still checking for ElevenLabs, not falling back to browser');
+    return;
+  }
+  // Fallback to browser TTS only when allowed
   if (typeof speechSynthesis === "undefined") {
     onDone();
     return;
@@ -48,3 +54,4 @@ export async function speakWithEngines(
     }
   );
 }
+

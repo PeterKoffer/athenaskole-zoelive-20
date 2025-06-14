@@ -42,7 +42,8 @@ export const useUnifiedSpeech = () => {
     isReady: speechState.isReady,
     lastError: speechState.lastError,
     isLoading: speechState.isLoading,
-    
+    isCheckingElevenLabs: speechState.isCheckingElevenLabs,
+
     // Actions
     speak,
     speakAsNelie,
@@ -50,7 +51,7 @@ export const useUnifiedSpeech = () => {
     toggleEnabled,
     enableUserInteraction,
     test,
-    
+
     // Legacy compatibility
     autoReadEnabled: speechState.isEnabled,
     handleMuteToggle: toggleEnabled,
@@ -59,3 +60,4 @@ export const useUnifiedSpeech = () => {
     testSpeech: test
   };
 };
+

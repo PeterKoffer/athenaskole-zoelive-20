@@ -1,27 +1,28 @@
 
 export interface SpeechState {
   isSpeaking: boolean;
+  currentUtterance: any;
   isEnabled: boolean;
   hasUserInteracted: boolean;
   isReady: boolean;
-  currentUtterance: SpeechSynthesisUtterance | null;
-  lastError: string | null;
   isLoading: boolean;
+  lastError: string | null;
   voicesLoaded: boolean;
   usingElevenLabs: boolean;
+  isCheckingElevenLabs: boolean;
 }
 
-// Factory for default state
-export function getDefaultSpeechState(): SpeechState {
+export function getDefaultSpeechState() : SpeechState {
   return {
     isSpeaking: false,
-    isEnabled: true,
+    currentUtterance: null,
+    isEnabled: false,
     hasUserInteracted: false,
     isReady: false,
-    currentUtterance: null,
-    lastError: null,
     isLoading: false,
+    lastError: null,
     voicesLoaded: false,
     usingElevenLabs: false,
-  };
+    isCheckingElevenLabs: true,
+  }
 }
