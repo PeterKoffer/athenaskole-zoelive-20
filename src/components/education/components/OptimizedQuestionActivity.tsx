@@ -1,16 +1,15 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Clock, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
-import { useAdvancedQuestionQueue } from '@/hooks/useAdvancedQuestionQueue';
-import { UniqueQuestion } from '@/services/globalQuestionUniquenessService';
+import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useSimpleQuestionGeneration } from './hooks/useSimpleQuestionGeneration';
 
 interface OptimizedQuestionActivityProps {
   subject: string;
   skillArea: string;
   difficultyLevel: number;
-  onComplete: (wasCorrect: boolean) => void;
+  onComplete: (success: boolean) => void;
   questionNumber: number;
   totalQuestions: number;
 }
@@ -23,187 +22,194 @@ const OptimizedQuestionActivity = ({
   questionNumber,
   totalQuestions
 }: OptimizedQuestionActivityProps) => {
+  const { user } = useAuth();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [startTime, setStartTime] = useState<number>(Date.now());
-  
+  const [timeSpent, setTimeSpent] = useState(0);
+
   const {
     currentQuestion,
-    getNextQuestion,
-    saveQuestionResponse,
-    isQueueReady,
-    queueSize,
-    isPreGenerating
-  } = useAdvancedQuestionQueue({
-    subject,
-    skillArea,
-    difficultyLevel,
-    maxQueueSize: 3,
-    preGenerateOnStart: true
-  });
+    isLoading,
+    error,
+    generateQuestion
+  } = useSimpleQuestionGeneration(subject, skillArea, difficultyLevel);
 
-  // Load the first question when queue is ready
+  // Timer for question
   useEffect(() => {
-    if (isQueueReady && !currentQuestion) {
-      console.log('📚 Loading first question from pre-generated queue');
-      getNextQuestion();
-      setStartTime(Date.now());
+    const timer = setInterval(() => {
+      setTimeSpent(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Generate question on mount
+  useEffect(() => {
+    if (!currentQuestion && !isLoading) {
+      generateQuestion();
     }
-  }, [isQueueReady, currentQuestion, getNextQuestion]);
+  }, [currentQuestion, isLoading, generateQuestion]);
 
-  const handleAnswerSelect = useCallback((answerIndex: number) => {
-    if (showResult) return;
-    setSelectedAnswer(answerIndex);
-  }, [showResult]);
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (!showResult) {
+      setSelectedAnswer(answerIndex);
+    }
+  };
 
-  const handleSubmitAnswer = useCallback(async () => {
-    if (!currentQuestion || selectedAnswer === null) return;
+  const handleSubmitAnswer = () => {
+    if (selectedAnswer !== null) {
+      setShowResult(true);
+    }
+  };
 
-    const responseTime = Date.now() - startTime;
-    const correct = selectedAnswer === currentQuestion.correct;
-    
-    setIsCorrect(correct);
-    setShowResult(true);
+  const handleNextQuestion = () => {
+    const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
+    onComplete(isCorrect);
+  };
 
-    // Save the response
-    await saveQuestionResponse(currentQuestion, selectedAnswer, correct, responseTime);
-
-    // Auto-advance after showing result
-    setTimeout(() => {
-      onComplete(correct);
-    }, 2500);
-  }, [currentQuestion, selectedAnswer, startTime, saveQuestionResponse, onComplete]);
-
-  const handleContinue = useCallback(() => {
-    // Reset for next question
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setStartTime(Date.now());
-    
-    // Get next question from queue (this won't cause loading since it's pre-generated)
-    getNextQuestion();
-  }, [getNextQuestion]);
-
-  // Show loading only if no question is available and queue isn't ready
-  if (!currentQuestion && !isQueueReady) {
+  if (isLoading) {
     return (
-      <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
-        <CardContent className="p-8 text-center">
-          <div className="animate-pulse">
-            <div className="w-12 h-12 bg-blue-600 rounded-full mx-auto mb-4"></div>
-            <p className="text-white">Preparing your questions...</p>
-            <p className="text-gray-400 text-sm mt-2">
-              {isPreGenerating ? 'Generating questions in advance...' : 'Getting ready...'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-gray-800 border-gray-700 rounded-lg p-8 text-center">
+        <div className="animate-pulse">
+          <div className="w-8 h-8 bg-blue-400 rounded-full mx-auto mb-4"></div>
+          <h3 className="text-white text-lg font-semibold mb-2">Generating Question</h3>
+          <p className="text-gray-400">Creating a personalized question for you...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center">
+        <h3 className="text-white text-lg font-semibold mb-2">Question Generation Error</h3>
+        <p className="text-red-300">{error}</p>
+        <Button 
+          onClick={generateQuestion} 
+          className="mt-4 bg-red-600 hover:bg-red-700"
+        >
+          Try Again
+        </Button>
+      </div>
     );
   }
 
   if (!currentQuestion) {
     return (
-      <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
-        <CardContent className="p-8 text-center">
-          <p className="text-red-400">No question available. Please try again.</p>
-        </CardContent>
-      </Card>
+      <div className="bg-gray-800 border-gray-700 rounded-lg p-8 text-center">
+        <h3 className="text-white text-lg font-semibold mb-2">Question Not Available</h3>
+        <p className="text-gray-400">Unable to load question content.</p>
+        <Button 
+          onClick={generateQuestion} 
+          className="mt-4 bg-blue-600 hover:bg-blue-700"
+        >
+          Retry
+        </Button>
+      </div>
     );
   }
 
+  const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+  const isLastQuestion = questionNumber === totalQuestions;
+
   return (
-    <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
-      <CardHeader>
-        <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      {/* Question Header */}
+      <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <Clock className="w-5 h-5 text-blue-400" />
-            <span className="text-white">Question {questionNumber} of {totalQuestions}</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-400">
-              Queue: {queueSize} ready
+            <Clock className="w-4 h-4 text-blue-400" />
+            <span className="text-gray-300 text-sm">
+              Question {questionNumber} of {totalQuestions}
             </span>
-            {isPreGenerating && (
-              <span className="text-xs text-blue-400 animate-pulse">
-                Generating...
-              </span>
-            )}
+          </div>
+          <div className="text-gray-300 text-sm">
+            {Math.floor(timeSpent / 60)}:{(timeSpent % 60).toString().padStart(2, '0')}
           </div>
         </div>
-      </CardHeader>
+        
+        <h3 className="text-xl font-semibold text-white mb-6">
+          {currentQuestion.question}
+        </h3>
+      </div>
 
-      <CardContent className="p-6 space-y-6">
-        {/* Question */}
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">
-            {currentQuestion.question}
-          </h3>
-        </div>
+      {/* Answer Options */}
+      <div className="space-y-3">
+        {currentQuestion.options.map((option, index) => (
+          <Button
+            key={index}
+            variant="outline"
+            className={`w-full text-left justify-start p-4 h-auto ${
+              selectedAnswer === index
+                ? showResult
+                  ? isCorrect
+                    ? 'bg-green-600 border-green-500 text-white'
+                    : 'bg-red-600 border-red-500 text-white'
+                  : 'bg-blue-600 border-blue-500 text-white'
+                : showResult && index === currentQuestion.correctAnswer
+                ? 'bg-green-600 border-green-500 text-white'
+                : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+            }`}
+            onClick={() => handleAnswerSelect(index)}
+            disabled={showResult}
+          >
+            <span className="mr-3 font-semibold">
+              {String.fromCharCode(65 + index)}.
+            </span>
+            {option}
+            {showResult && index === currentQuestion.correctAnswer && (
+              <CheckCircle className="w-5 h-5 ml-auto text-green-400" />
+            )}
+            {showResult && selectedAnswer === index && !isCorrect && (
+              <XCircle className="w-5 h-5 ml-auto text-red-400" />
+            )}
+          </Button>
+        ))}
+      </div>
 
-        {/* Answer Options */}
-        <div className="grid gap-3">
-          {currentQuestion.options.map((option, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              className={`h-auto p-4 text-left justify-start text-wrap ${
-                selectedAnswer === index
-                  ? showResult
-                    ? isCorrect && selectedAnswer === index
-                      ? 'bg-green-600 border-green-500 text-white'
-                      : selectedAnswer === index
-                      ? 'bg-red-600 border-red-500 text-white'
-                      : 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-blue-600 border-blue-500 text-white'
-                  : showResult && currentQuestion.correct === index
-                  ? 'bg-green-600 border-green-500 text-white'
-                  : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-              }`}
-              onClick={() => handleAnswerSelect(index)}
-              disabled={showResult}
-            >
-              <span className="mr-3 font-semibold">
-                {String.fromCharCode(65 + index)}.
-              </span>
-              {option}
-            </Button>
-          ))}
-        </div>
-
-        {/* Result Display */}
-        {showResult && (
-          <div className={`rounded-lg p-4 ${
-            isCorrect ? 'bg-green-900/50 border border-green-600' : 'bg-red-900/50 border border-red-600'
-          }`}>
-            <div className="flex items-center space-x-2 mb-2">
-              {isCorrect ? (
-                <CheckCircle className="w-5 h-5 text-green-400" />
-              ) : (
-                <XCircle className="w-5 h-5 text-red-400" />
-              )}
-              <span className="font-semibold text-white">
-                {isCorrect ? 'Correct!' : 'Incorrect'}
-              </span>
+      {/* Result and Explanation */}
+      {showResult && (
+        <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+          <div className="flex items-center mb-4">
+            {isCorrect ? (
+              <CheckCircle className="w-6 h-6 text-green-400 mr-3" />
+            ) : (
+              <XCircle className="w-6 h-6 text-red-400 mr-3" />
+            )}
+            <span className={`font-semibold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+              {isCorrect ? 'Correct! Well done!' : 'Incorrect, but keep trying!'}
+            </span>
+          </div>
+          
+          {currentQuestion.explanation && (
+            <div className="mb-4">
+              <h4 className="text-white font-medium mb-2">Explanation:</h4>
+              <p className="text-gray-300">{currentQuestion.explanation}</p>
             </div>
-            {currentQuestion.explanation && (
-              <p className="text-gray-300 mt-2">{currentQuestion.explanation}</p>
-            )}
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Submit Button */}
-        {!showResult && (
+      {/* Action Button */}
+      <div className="text-center">
+        {!showResult ? (
           <Button
             onClick={handleSubmitAnswer}
             disabled={selectedAnswer === null}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none"
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3"
           >
             Submit Answer
           </Button>
+        ) : (
+          <Button
+            onClick={handleNextQuestion}
+            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3"
+          >
+            {isLastQuestion ? 'Complete Lesson' : 'Next Question'}
+          </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

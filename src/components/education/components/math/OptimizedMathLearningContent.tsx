@@ -105,12 +105,14 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
   // Show introduction first
   if (showIntroduction) {
     return (
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        <NelieIntroduction
-          subject="mathematics"
-          skillArea="general_math"
-          onIntroductionComplete={handleIntroductionComplete}
-        />
+      <div className="min-h-screen w-full bg-gray-900 text-white">
+        <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
+          <NelieIntroduction
+            subject="mathematics"
+            skillArea="general_math"
+            onIntroductionComplete={handleIntroductionComplete}
+          />
+        </div>
       </div>
     );
   }
@@ -118,148 +120,151 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
   // Show loading state during initialization
   if (isInitializing) {
     return (
-      <div className="container mx-auto px-4 py-6">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-8 text-center">
+      <div className="min-h-screen w-full bg-gray-900 text-white">
+        <div className="w-full max-w-4xl mx-auto px-4 py-6">
+          <div className="bg-gray-800 border-gray-700 rounded-lg p-8 text-center">
             <Brain className="w-12 h-12 text-blue-400 animate-pulse mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Preparing Your Math Lesson</h3>
             <p className="text-gray-400">Setting up your personalized learning experience, {studentName}...</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      {/* Header with student's name */}
-      <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-400">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <Button
-              variant="ghost"
-              onClick={handleBackToProgram}
-              className="text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Program
-            </Button>
-            
-            <div className="flex items-center space-x-6 text-white">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4" />
-                <span>{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / {targetLessonLength}:00</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Target className="w-4 h-4" />
-                <span>Score: {score}</span>
-              </div>
-              
-              <div className="text-sm">
-                Activity {currentActivityIndex + 1} of {totalRealActivities}
-              </div>
-            </div>
-          </div>
-          
-          <CardTitle className="text-center text-white">
-            Mathematics with Nelie - {studentName}'s Lesson
-            {correctStreak > 0 && (
-              <span className="ml-2 text-green-400">🔥 {correctStreak} streak!</span>
-            )}
-          </CardTitle>
-        </CardHeader>
-      </Card>
-
-      {/* Control Panel */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex justify-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={toggleMute}
-              className="border-purple-400 text-purple-200"
-            >
-              {isSpeaking ? 'Mute Nelie' : 'Unmute Nelie'}
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={handleReadRequest}
-              className="border-blue-400 text-blue-200"
-            >
-              Ask Nelie to Repeat
-            </Button>
-            
-            {isSpeaking && (
+    <div className="min-h-screen w-full bg-gray-900 text-white">
+      <div className="w-full space-y-0">
+        {/* Header with student's name - Full width purple header */}
+        <div className="w-full bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-400">
+          <div className="w-full max-w-4xl mx-auto px-4 py-4">
+            <div className="flex justify-between items-center">
               <Button
-                variant="outline"
-                onClick={stopSpeaking}
-                className="border-red-400 text-red-200"
+                variant="ghost"
+                onClick={handleBackToProgram}
+                className="text-white hover:bg-white/10"
               >
-                Stop Nelie
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Program
               </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Current Activity Content */}
-      {currentActivity ? (
-        <div className="space-y-6">
-          {currentActivity.type === 'interactive-game' ? (
-            <OptimizedQuestionActivity
-              subject="mathematics"
-              skillArea="general_math"
-              difficultyLevel={2}
-              onComplete={handleActivityComplete}
-              questionNumber={currentActivityIndex + 1}
-              totalQuestions={totalRealActivities}
-            />
-          ) : (
-            // Content delivery activities
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white">{currentActivity.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-gray-300 space-y-4">
-                  {currentActivity.content?.text && (
-                    <p className="text-lg leading-relaxed">{currentActivity.content.text}</p>
-                  )}
-                  
-                  {currentActivity.content?.examples && (
-                    <div className="bg-blue-900/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-blue-200 mb-2">Examples for {studentName}:</h4>
-                      <ul className="space-y-2">
-                        {currentActivity.content.examples.map((example: string, index: number) => (
-                          <li key={index} className="text-blue-100">• {example}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+              
+              <div className="flex items-center space-x-6 text-white">
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4" />
+                  <span>{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / {targetLessonLength}:00</span>
                 </div>
                 
-                <div className="mt-6 text-center">
-                  <Button
-                    onClick={() => handleActivityComplete()}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8"
-                  >
-                    Continue, {studentName}
-                  </Button>
+                <div className="flex items-center space-x-2">
+                  <Target className="w-4 h-4" />
+                  <span>Score: {score}</span>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+                
+                <div className="text-sm">
+                  Activity {currentActivityIndex + 1} of {totalRealActivities}
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center mt-4">
+              <h1 className="text-xl font-bold text-white">
+                Mathematics with Nelie - {studentName}'s Lesson
+                {correctStreak > 0 && (
+                  <span className="ml-2 text-green-400">🔥 {correctStreak} streak!</span>
+                )}
+              </h1>
+            </div>
+          </div>
         </div>
-      ) : (
-        <Card className="bg-red-900 border-red-700">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
-            <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
-          </CardContent>
-        </Card>
-      )}
+
+        {/* Control Panel - Full width dark section */}
+        <div className="w-full bg-gray-800 border-b border-gray-700">
+          <div className="w-full max-w-4xl mx-auto px-4 py-4">
+            <div className="flex justify-center space-x-4">
+              <Button
+                variant="outline"
+                onClick={toggleMute}
+                className="border-purple-400 text-purple-200 bg-gray-700/50"
+              >
+                {isSpeaking ? 'Mute Nelie' : 'Unmute Nelie'}
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handleReadRequest}
+                className="border-blue-400 text-blue-200 bg-gray-700/50"
+              >
+                Ask Nelie to Repeat
+              </Button>
+              
+              {isSpeaking && (
+                <Button
+                  variant="outline"
+                  onClick={stopSpeaking}
+                  className="border-red-400 text-red-200 bg-gray-700/50"
+                >
+                  Stop Nelie
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Current Activity Content - Full width content area */}
+        <div className="w-full px-4 py-6">
+          <div className="w-full max-w-4xl mx-auto">
+            {currentActivity ? (
+              <div className="space-y-6">
+                {currentActivity.type === 'interactive-game' ? (
+                  <OptimizedQuestionActivity
+                    subject="mathematics"
+                    skillArea="general_math"
+                    difficultyLevel={2}
+                    onComplete={handleActivityComplete}
+                    questionNumber={currentActivityIndex + 1}
+                    totalQuestions={totalRealActivities}
+                  />
+                ) : (
+                  // Content delivery activities - Remove card wrapper
+                  <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+                    <h2 className="text-xl font-semibold text-white mb-4">{currentActivity.title}</h2>
+                    
+                    <div className="text-gray-300 space-y-4">
+                      {currentActivity.content?.text && (
+                        <p className="text-lg leading-relaxed">{currentActivity.content.text}</p>
+                      )}
+                      
+                      {currentActivity.content?.examples && (
+                        <div className="bg-blue-900/30 rounded-lg p-4">
+                          <h4 className="font-semibold text-blue-200 mb-2">Examples for {studentName}:</h4>
+                          <ul className="space-y-2">
+                            {currentActivity.content.examples.map((example: string, index: number) => (
+                              <li key={index} className="text-blue-100">• {example}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="mt-6 text-center">
+                      <Button
+                        onClick={() => handleActivityComplete()}
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8"
+                      >
+                        Continue, {studentName}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center">
+                <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
+                <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
