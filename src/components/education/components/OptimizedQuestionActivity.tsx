@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useSimpleQuestionGeneration } from './hooks/useSimpleQuestionGeneration';
+import { LessonActivity } from './types/LessonTypes';
 
 interface OptimizedQuestionActivityProps {
   subject: string;
@@ -26,13 +27,14 @@ const OptimizedQuestionActivity = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState<LessonActivity | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const {
-    currentQuestion,
-    isLoading,
-    error,
-    generateQuestion
-  } = useSimpleQuestionGeneration(subject, skillArea, difficultyLevel);
+  const { generateUniqueQuestion } = useSimpleQuestionGeneration({
+    subject,
+    skillArea
+  });
 
   // Timer for question
   useEffect(() => {
@@ -48,7 +50,22 @@ const OptimizedQuestionActivity = ({
     if (!currentQuestion && !isLoading) {
       generateQuestion();
     }
-  }, [currentQuestion, isLoading, generateQuestion]);
+  }, [currentQuestion, isLoading]);
+
+  const generateQuestion = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const newQuestion = generateUniqueQuestion();
+      setCurrentQuestion(newQuestion);
+    } catch (err) {
+      console.error('Error generating question:', err);
+      setError('Failed to generate question. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!showResult) {
@@ -63,7 +80,7 @@ const OptimizedQuestionActivity = ({
   };
 
   const handleNextQuestion = () => {
-    const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
+    const isCorrect = selectedAnswer === currentQuestion?.content?.correctAnswer;
     onComplete(isCorrect);
   };
 
@@ -109,7 +126,7 @@ const OptimizedQuestionActivity = ({
     );
   }
 
-  const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+  const isCorrect = selectedAnswer === currentQuestion.content?.correctAnswer;
   const isLastQuestion = questionNumber === totalQuestions;
 
   return (
@@ -129,13 +146,13 @@ const OptimizedQuestionActivity = ({
         </div>
         
         <h3 className="text-xl font-semibold text-white mb-6">
-          {currentQuestion.question}
+          {currentQuestion.content?.question}
         </h3>
       </div>
 
       {/* Answer Options */}
       <div className="space-y-3">
-        {currentQuestion.options.map((option, index) => (
+        {currentQuestion.content?.options?.map((option, index) => (
           <Button
             key={index}
             variant="outline"
@@ -146,7 +163,7 @@ const OptimizedQuestionActivity = ({
                     ? 'bg-green-600 border-green-500 text-white'
                     : 'bg-red-600 border-red-500 text-white'
                   : 'bg-blue-600 border-blue-500 text-white'
-                : showResult && index === currentQuestion.correctAnswer
+                : showResult && index === currentQuestion.content?.correctAnswer
                 ? 'bg-green-600 border-green-500 text-white'
                 : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
             }`}
@@ -157,7 +174,7 @@ const OptimizedQuestionActivity = ({
               {String.fromCharCode(65 + index)}.
             </span>
             {option}
-            {showResult && index === currentQuestion.correctAnswer && (
+            {showResult && index === currentQuestion.content?.correctAnswer && (
               <CheckCircle className="w-5 h-5 ml-auto text-green-400" />
             )}
             {showResult && selectedAnswer === index && !isCorrect && (
@@ -181,10 +198,10 @@ const OptimizedQuestionActivity = ({
             </span>
           </div>
           
-          {currentQuestion.explanation && (
+          {currentQuestion.content?.explanation && (
             <div className="mb-4">
               <h4 className="text-white font-medium mb-2">Explanation:</h4>
-              <p className="text-gray-300">{currentQuestion.explanation}</p>
+              <p className="text-gray-300">{currentQuestion.content.explanation}</p>
             </div>
           )}
         </div>
