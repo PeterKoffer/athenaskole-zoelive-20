@@ -1,4 +1,3 @@
-
 interface ElevenLabsConfig {
   apiKey: string;
   voiceId: string;
@@ -13,6 +12,10 @@ interface AudioResponse {
 const EDGE_BASE =
   "https://tgjudtnjhtumrfthegis.functions.supabase.co/elevenlabs-proxy";
 
+// Aria: 9BWtsMINqrJLrRacOk9x (Official ElevenLabs voice)
+const DEFAULT_VOICE_ID = "9BWtsMINqrJLrRacOk9x";
+const DEFAULT_MODEL_ID = "eleven_turbo_v2_5";
+
 class ElevenLabsService {
   private config: ElevenLabsConfig;
   private isAvailable: boolean = false;
@@ -22,8 +25,8 @@ class ElevenLabsService {
   constructor() {
     this.config = {
       apiKey: "",
-      voiceId: "YvMZb1i5lC3pIbB08jiB",
-      model: "eleven_turbo_v2_5",
+      voiceId: DEFAULT_VOICE_ID,
+      model: DEFAULT_MODEL_ID,
     };
   }
 
@@ -111,7 +114,8 @@ class ElevenLabsService {
     try {
       console.log(
         "🎤 Generating ElevenLabs speech (via Supabase) for:",
-        text.substring(0, 50) + "..."
+        text.substring(0, 50) + "...",
+        "VoiceID:", this.config.voiceId, "Model:", this.config.model
       );
       const response = await fetch(EDGE_BASE, {
         method: "POST",
@@ -158,6 +162,7 @@ class ElevenLabsService {
   }
 
   setVoice(voiceId: string): void {
+    console.log("🛠️ ElevenLabsService.setVoice called! Now using:", voiceId);
     this.config.voiceId = voiceId;
   }
 }
