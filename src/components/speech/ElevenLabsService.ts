@@ -19,8 +19,11 @@ class ElevenLabsService {
   private availabilityPromise: Promise<void>;
 
   constructor() {
+    // Ensure we use the API key from environment variables (via Supabase secrets)
+    const apiKey = import.meta.env.PUBLIC_ELEVENLABS_API_KEY || '';
+
     this.config = {
-      apiKey: 'sk_d4604edcd1d6fd5fdcd107a3c28b796927864370ded00c7', // Provided working key
+      apiKey: apiKey, // Secure API key from Supabase secret
       voiceId: 'YvMZb1i5lC3pIbB08jiB', // Fena
       model: 'eleven_turbo_v2_5'
     };
