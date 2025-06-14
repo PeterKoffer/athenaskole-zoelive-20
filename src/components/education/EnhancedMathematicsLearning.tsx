@@ -1,28 +1,16 @@
 
 import { useNavigate } from "react-router-dom";
-import { UnifiedLessonProvider } from "./contexts/UnifiedLessonProvider";
-import { MathLearningContent } from "./components/math/MathLearningContent";
+import OptimizedMathLearningContent from "./components/math/OptimizedMathLearningContent";
 
 const EnhancedMathematicsLearning = () => {
   const navigate = useNavigate();
   
-  const handleLessonComplete = () => {
-    navigate('/daily-program');
-  };
-
   const handleBackToProgram = () => {
     navigate('/daily-program');
   };
 
   return (
-    <UnifiedLessonProvider
-      subject="mathematics"
-      skillArea="general_math"
-      gradeLevel={6} // This should come from user profile
-      onLessonComplete={handleLessonComplete}
-    >
-      <MathLearningContent onBackToProgram={handleBackToProgram} />
-    </UnifiedLessonProvider>
+    <OptimizedMathLearningContent onBackToProgram={handleBackToProgram} />
   );
 };
 
