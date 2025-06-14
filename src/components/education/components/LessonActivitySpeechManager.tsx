@@ -43,7 +43,15 @@ const LessonActivitySpeechManager = ({
       setTimeout(() => {
         let speechText = '';
 
-        if (currentActivity.phase === 'introduction') {
+        // ALWAYS prioritize the welcome/message for the first math activity card
+        if (
+          currentActivityIndex === 0 &&
+          currentActivity.content?.message &&
+          currentActivity.content?.message.trim()
+        ) {
+          speechText = currentActivity.content.message;
+        }
+        else if (currentActivity.phase === 'introduction') {
           speechText = currentActivity.content.hook || `Welcome to your ${currentActivity.title} lesson!`;
         } else if (currentActivity.phase === 'content-delivery') {
           speechText = currentActivity.content.segments?.[0]?.explanation || currentActivity.content.text || '';
@@ -55,20 +63,24 @@ const LessonActivitySpeechManager = ({
           speechText = `Time to be creative! ${currentActivity.content.creativePrompt || currentActivity.content.text || ''}`;
         } else if (currentActivity.phase === 'summary') {
           speechText = `Great work! Let's review what we've learned.`;
+        } else if (currentActivity.content?.message) {
+          // fallback for any activity with a message
+          speechText = currentActivity.content.message;
         } else {
-          // Use message or title for a welcome activity
-          speechText = currentActivity.content?.message || currentActivity.title;
+          // fallback to title if nothing else available
+          speechText = currentActivity.title;
         }
 
         if (speechText && speechText.trim()) {
-          console.log('🔊 Auto-speaking (math welcome/faster timing):', speechText.substring(0, 50) + '...');
+          console.log('🔊 Auto-speaking (math welcome/faster timing):', speechText.substring(0, 80) + '...');
           speakText(speechText, true);
         }
       }, 800); // Reduced from 1500ms to 800ms for faster response
     }
-  }, [currentActivity, autoReadEnabled, isReady, speakText]);
+  }, [currentActivity, autoReadEnabled, isReady, speakText, currentActivityIndex]);
 
   return null; // This is a logic-only component
 };
 
 export default LessonActivitySpeechManager;
+
