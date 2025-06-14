@@ -1,5 +1,6 @@
 
 import { SpeechState, getDefaultSpeechState } from './SpeechState';
+import { elevenLabsSpeechEngine } from './ElevenLabsSpeechEngine';
 
 export class SpeechStateManager {
   private state: SpeechState = getDefaultSpeechState();
@@ -8,13 +9,43 @@ export class SpeechStateManager {
   async initialize(): Promise<void> {
     console.log('🔧 [SpeechStateManager] Initializing...');
     
-    // Initialize speech state
-    this.updateState({
-      isReady: true,
-      isLoading: false,
-      voicesLoaded: true,
-      isCheckingElevenLabs: false
-    });
+    // Check ElevenLabs availability first
+    this.updateState({ isCheckingElevenLabs: true });
+    
+    try {
+      const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
+      console.log('🎭 [SpeechStateManager] ElevenLabs available:', elevenLabsAvailable);
+      
+      if (elevenLabsAvailable) {
+        console.log('🎤 [SpeechStateManager] Using ElevenLabs with Fena voice');
+        this.updateState({
+          isReady: true,
+          isLoading: false,
+          voicesLoaded: true,
+          usingElevenLabs: true,
+          isCheckingElevenLabs: false
+        });
+      } else {
+        console.warn('⚠️ [SpeechStateManager] ElevenLabs not available, falling back to browser');
+        this.updateState({
+          isReady: true,
+          isLoading: false,
+          voicesLoaded: true,
+          usingElevenLabs: false,
+          isCheckingElevenLabs: false
+        });
+      }
+    } catch (error) {
+      console.error('❌ [SpeechStateManager] Error during initialization:', error);
+      this.updateState({
+        isReady: true,
+        isLoading: false,
+        voicesLoaded: true,
+        usingElevenLabs: false,
+        isCheckingElevenLabs: false,
+        lastError: 'Failed to initialize ElevenLabs'
+      });
+    }
     
     console.log('🔧 [SpeechStateManager] Initialization complete');
   }
