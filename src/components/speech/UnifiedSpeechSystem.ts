@@ -1,3 +1,4 @@
+
 import { getDefaultSpeechConfig, SpeechConfig } from './SpeechConfig';
 import { SpeechState } from './SpeechState';
 import { setupPageVisibilityListener, setupUserInteractionListeners } from './EventListeners';
@@ -63,11 +64,15 @@ class UnifiedSpeechSystem {
   }
 
   async speak(text: string, priority: boolean = false): Promise<void> {
-    if (!text || text.trim().length === 0) return;
+    if (!text || text.trim().length === 0) {
+      console.log('[UnifiedSpeechSystem] speak() called with empty or blank text, aborting.');
+      return;
+    }
     
     const state = this.stateManager.getState();
     console.log("📝 [UnifiedSpeechSystem] speak() called", {
       text,
+      priority,
       isCheckingElevenLabs: state.isCheckingElevenLabs,
       usingElevenLabs: state.usingElevenLabs,
       isReady: state.isReady,
@@ -86,8 +91,17 @@ class UnifiedSpeechSystem {
       await this.initializeSpeechSystem();
     }
 
+    console.log(`[UnifiedSpeechSystem] Adding item to queue: "${text.substring(0,40)}..." with priority=${priority}`);
     this.queue.addItem(text, priority);
-    if (priority) this.stop();
+
+    if (priority) {
+      console.log('[UnifiedSpeechSystem] Priority speech requested, calling stop()');
+      this.stop();
+    }
+
+    // Debug queue items
+    console.log("[UnifiedSpeechSystem] Queue after add:", this.queue);
+
     this.processQueue();
   }
 
@@ -99,6 +113,12 @@ class UnifiedSpeechSystem {
 
   private async processQueue(): Promise<void> {
     const state = this.stateManager.getState();
+    console.log("[UnifiedSpeechSystem] processQueue called", {
+      isSpeaking: state.isSpeaking,
+      isReady: state.isReady,
+      isEnabled: state.isEnabled,
+      queue: this.queue,
+    });
     await this.queueProcessor.processQueue(
       this.config,
       state,
@@ -107,6 +127,7 @@ class UnifiedSpeechSystem {
   }
 
   stop(): void {
+    console.log('[UnifiedSpeechSystem] stop() called - this will cancel current speech & clear queue');
     if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
     this.queue.clear();
     this.stateManager.updateState({
@@ -118,11 +139,13 @@ class UnifiedSpeechSystem {
   toggleEnabled(): void {
     const currentState = this.stateManager.getState();
     const newState = !currentState.isEnabled;
+    console.log(`[UnifiedSpeechSystem] toggleEnabled() - switching isEnabled from ${currentState.isEnabled} to ${newState}`);
     this.stateManager.updateState({ isEnabled: newState });
     if (!newState) this.stop();
   }
 
   enableUserInteraction(): void {
+    console.log("[UnifiedSpeechSystem] enableUserInteraction() called");
     this.stateManager.updateState({ hasUserInteracted: true });
   }
 
@@ -133,3 +156,4 @@ class UnifiedSpeechSystem {
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
+
