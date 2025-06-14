@@ -3,7 +3,7 @@ import { ClassroomConfig } from './ClassroomEnvironment';
 
 export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
   mathematics: {
-    backgroundImage: '/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png',
+    backgroundImage: '/lovable-uploads/7da0d8ba-b565-4d22-b0e1-d7a2216fced8.png',
     subjectColor: '#1e1b4b', // Deep indigo for math
     accentColor: '#8b5cf6', // Purple accent
     overlayOpacity: 0.85,
