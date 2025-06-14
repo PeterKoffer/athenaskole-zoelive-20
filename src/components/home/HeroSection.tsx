@@ -11,7 +11,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
     onGetStarted();
   };
 
-  const todaysDate = new Date().toLocaleDateString('en-US', {
+  const todaysDate = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
