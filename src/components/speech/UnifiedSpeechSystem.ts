@@ -1,4 +1,3 @@
-
 import { elevenLabsService } from './ElevenLabsService';
 
 interface SpeechConfig {
@@ -64,10 +63,10 @@ class UnifiedSpeechSystem {
 
   private async initializeSpeechSystem() {
     console.log('🎤 Initializing Enhanced Speech System with ElevenLabs...');
-    
     this.updateState({ isLoading: true });
 
-    // Check ElevenLabs availability
+    // Await ElevenLabs check
+    await elevenLabsService.ensureAvailability();
     const elevenLabsAvailable = elevenLabsService.isServiceAvailable();
     
     if (elevenLabsAvailable && this.config.preferElevenLabs) {
@@ -81,6 +80,9 @@ class UnifiedSpeechSystem {
     } else {
       console.log('🔄 Falling back to browser speech synthesis');
       await this.initializeBrowserSpeech();
+      this.updateState({
+        usingElevenLabs: false
+      });
     }
 
     this.setupEventListeners();
@@ -237,6 +239,11 @@ class UnifiedSpeechSystem {
       return;
     }
 
+    // Also, if not ready (availability race), force init
+    if (!this.state.isReady) {
+      await this.initializeSpeechSystem();
+    }
+
     const now = Date.now();
     if (text === this.lastSpokenText && (now - this.lastSpokenTime) < this.repeatPreventionTime) {
       console.log('🚫 Preventing repetition of:', text.substring(0, 30) + '...');
@@ -302,40 +309,51 @@ class UnifiedSpeechSystem {
   private async speakItem(item: SpeechQueue): Promise<void> {
     return new Promise(async (resolve) => {
       console.log('🔊 Nelie speaking:', item.text.substring(0, 50) + '...');
-
-      // Try ElevenLabs first if available and preferred
-      if (this.state.usingElevenLabs && this.config.preferElevenLabs) {
-        try {
-          const audioResponse = await elevenLabsService.generateSpeech(item.text);
-          
-          if (audioResponse.audioContent && !audioResponse.error) {
-            this.updateState({ 
-              isSpeaking: true, 
-              lastError: null 
+      // Double check ElevenLabs status before speaking, in case API restored after fallback
+      if (this.config.preferElevenLabs) {
+        if (!this.state.usingElevenLabs) {
+          await elevenLabsService.refreshAvailability();
+          if (elevenLabsService.isServiceAvailable()) {
+            // If now available, set state and re-init.
+            this.updateState({
+              usingElevenLabs: true
             });
-
-            await elevenLabsService.playAudio(audioResponse.audioContent);
-            
-            this.updateState({ 
-              isSpeaking: false 
-            });
-            
-            this.lastSpokenText = item.text;
-            this.lastSpokenTime = Date.now();
-            console.log('🎤 ElevenLabs speech completed successfully');
-            resolve();
-            return;
-          } else {
-            console.log('🔄 ElevenLabs failed, falling back to browser speech:', audioResponse.error);
-            // Fall through to browser speech
           }
-        } catch (error) {
-          console.log('🔄 ElevenLabs error, falling back to browser speech:', error);
-          // Fall through to browser speech
+        }
+        if (this.state.usingElevenLabs) {
+          try {
+            const audioResponse = await elevenLabsService.generateSpeech(item.text);
+
+            if (audioResponse.audioContent && !audioResponse.error) {
+              this.updateState({
+                isSpeaking: true,
+                lastError: null
+              });
+
+              await elevenLabsService.playAudio(audioResponse.audioContent);
+
+              this.updateState({
+                isSpeaking: false
+              });
+
+              this.lastSpokenText = item.text;
+              this.lastSpokenTime = Date.now();
+              console.log('🎤 ElevenLabs speech completed successfully');
+              resolve();
+              return;
+            } else {
+              console.log('🔄 ElevenLabs failed, falling back to browser speech:', audioResponse.error);
+              this.updateState({
+                usingElevenLabs: false,
+                lastError: audioResponse.error || null
+              });
+            }
+          } catch (error) {
+            console.log('🔄 ElevenLabs error, falling back to browser speech:', error);
+            this.updateState({ usingElevenLabs: false });
+          }
         }
       }
-
-      // Fallback to browser speech synthesis
       this.speakWithBrowserSynthesis(item, resolve);
     });
   }

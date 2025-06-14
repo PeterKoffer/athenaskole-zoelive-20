@@ -13,33 +13,42 @@ interface AudioResponse {
 class ElevenLabsService {
   private config: ElevenLabsConfig;
   private isAvailable: boolean = false;
+  private availabilityPromise: Promise<void>;
 
   constructor() {
     this.config = {
       apiKey: 'sk_d4604edcd1d6fd5fdcd107a3c28b796927864370ded00c7',
-      voiceId: '9BWtsMINqrJLrRacOk9x', // Aria - young, friendly female voice perfect for Nelie
-      model: 'eleven_turbo_v2_5' // Low latency, high quality
+      voiceId: '9BWtsMINqrJLrRacOk9x',
+      model: 'eleven_turbo_v2_5'
     };
-    
-    this.checkAvailability();
+
+    // Perform the async check and expose the promise
+    this.availabilityPromise = this.checkAvailability();
   }
 
   private async checkAvailability(): Promise<void> {
     try {
-      // Test if we can reach ElevenLabs API
       const response = await fetch('https://api.elevenlabs.io/v1/voices', {
         method: 'GET',
         headers: {
           'xi-api-key': this.config.apiKey
         }
       });
-      
       this.isAvailable = response.ok;
       console.log('🎤 ElevenLabs availability:', this.isAvailable ? 'Available' : 'Unavailable');
     } catch (error) {
-      console.log('🎤 ElevenLabs not available, will use browser speech synthesis');
       this.isAvailable = false;
+      console.log('🎤 ElevenLabs not available, will use browser speech synthesis');
     }
+  }
+
+  // Expose a promise the consumer can await to ensure up-to-date availability
+  ensureAvailability(): Promise<void> {
+    return this.availabilityPromise;
+  }
+
+  async refreshAvailability(): Promise<void> {
+    await this.checkAvailability();
   }
 
   async generateSpeech(text: string): Promise<AudioResponse> {
@@ -49,29 +58,33 @@ class ElevenLabsService {
 
     try {
       console.log('🎤 Generating ElevenLabs speech for:', text.substring(0, 50) + '...');
-      
-      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + this.config.voiceId, {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': this.config.apiKey
-        },
-        body: JSON.stringify({
-          text: text,
-          model_id: this.config.model,
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.5,
-            style: 0.3,
-            use_speaker_boost: true
-          }
-        })
-      });
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/text-to-speech/' + this.config.voiceId,
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': this.config.apiKey
+          },
+          body: JSON.stringify({
+            text: text,
+            model_id: this.config.model,
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.5,
+              style: 0.3,
+              use_speaker_boost: true
+            }
+          })
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`ElevenLabs API error: ${response.status} - ${errorData.detail?.message || 'Unknown error'}`);
+        throw new Error(
+          `ElevenLabs API error: ${response.status} - ${errorData.detail?.message || 'Unknown error'}`
+        );
       }
 
       const audioBuffer = await response.arrayBuffer();
@@ -82,9 +95,9 @@ class ElevenLabsService {
       return { audioContent: base64Audio };
     } catch (error) {
       console.error('❌ ElevenLabs speech generation failed:', error);
-      return { 
-        audioContent: '', 
-        error: error instanceof Error ? error.message : 'Speech generation failed' 
+      return {
+        audioContent: '',
+        error: error instanceof Error ? error.message : 'Speech generation failed'
       };
     }
   }
@@ -94,10 +107,10 @@ class ElevenLabsService {
       try {
         const audioData = `data:audio/mpeg;base64,${base64Audio}`;
         const audio = new Audio(audioData);
-        
+
         audio.onended = () => resolve();
         audio.onerror = () => reject(new Error('Audio playback failed'));
-        
+
         audio.play().catch(reject);
       } catch (error) {
         reject(error);
