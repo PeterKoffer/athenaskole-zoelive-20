@@ -113,7 +113,7 @@ const EnglishWritingStrategies = ({ studentName, onComplete }: EnglishWritingStr
           onClick={onComplete}
           className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-3 text-lg"
         >
-          Ready to Practice These Strategies, {studentName}!
+          Continue to Class
         </Button>
       </div>
     </div>
