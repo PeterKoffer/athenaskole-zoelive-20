@@ -25,19 +25,24 @@ export const ElevenLabsEngine = {
       if (audioResponse.error) {
         showSpeechToast("ElevenLabs Error", `Generation failed: ${audioResponse.error}`, "destructive");
         console.error("‼️ [ElevenLabsEngine V2] Speech generation failed with error:", audioResponse.error);
+        window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "error" } }));
         return false;
       }
 
       if (!audioResponse.audioContent) {
         showSpeechToast("ElevenLabs Error", "Generation resulted in empty audio.", "destructive");
         console.error("‼️ [ElevenLabsEngine V2] Speech generation failed: No audio content.");
+        window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "empty-audio" } }));
         return false;
       }
 
       showSpeechToast("ElevenLabs", "Playing audio...", "success");
-      console.log("‼️ [ElevenLabsEngine V2] About to play audio... (this is where premium female should play)");
+      console.log("‼️ [ElevenLabsEngine V2] About to play audio... (should play premium voice: Fena)");
+      // Add event before and after playing audio
+      window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "elevenlabs", source: "about-to-play" } }));
       await elevenLabsService.playAudio(audioResponse.audioContent);
       console.log("‼️ [ElevenLabsEngine V2] ElevenLabs playback finished.");
+      window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "elevenlabs", source: "did-play" } }));
       showSpeechToast("ElevenLabs Audio", "Playback completed!", "default");
       return true;
 
@@ -45,6 +50,7 @@ export const ElevenLabsEngine = {
       const errorMessage = e instanceof Error ? e.message : String(e);
       showSpeechToast("ElevenLabs Critical Error", errorMessage, "destructive");
       console.error("‼️ [ElevenLabsEngine V2] CRITICAL ERROR in speak method:", e);
+      window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "exception" } }));
       return false;
     }
   },

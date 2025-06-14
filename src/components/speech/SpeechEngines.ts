@@ -18,6 +18,19 @@ export async function speakWithEngines(
     shouldTryElevenLabs,
   });
 
+  // Listen for our debugging event for playback source (for transparency)
+  window.addEventListener("nelie-tts-engine", (evt) => {
+    const detail = evt.detail || {};
+    if (detail.engine === "elevenlabs") {
+      showSpeechToast("Speech Engine", "✅ ElevenLabs premium voice played!", "success");
+      console.info("[SpeechEngines] ElevenLabs premium audio was played (nelie-tts-engine event)", detail);
+    }
+    if (detail.engine === "browser-fallback") {
+      showSpeechToast("Speech Engine", "⚠️ Browser fallback was used (male voice expected)", "destructive");
+      console.warn("[SpeechEngines] Browser fallback played (nelie-tts-engine event)", detail);
+    }
+  }, { once: true });
+
   if (shouldTryElevenLabs && useElevenLabs) {
     console.log("‼️ [SpeechEngines] Condition MET. Trying ElevenLabs.");
     showSpeechToast("Trying ElevenLabs...", "Attempting to generate premium voice...", "default");
@@ -39,6 +52,7 @@ export async function speakWithEngines(
         lastError: errorMsg,
       });
       showSpeechToast("ElevenLabs Fallback", "Falling back to browser speech.", "destructive");
+      window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "elevenlabs-failed" } }));
       console.warn(`❗ [SpeechEngines] ${errorMsg}`);
     }
   } else {
@@ -51,6 +65,9 @@ export async function speakWithEngines(
 
   // DEBUG: Mark browser fallback use
   console.warn("*** [SpeechEngines] USING BROWSER VOICE FALLBACK NOW! ***");
+  showSpeechToast("Speech Engine", "⚠️ Browser fallback was used (male voice expected)", "destructive");
+  window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "direct-fallback" } }));
+
   // The check for isCheckingElevenLabs was removed from here because it was causing silent failures.
   // The main guard in UnifiedSpeechSystem.speak() is sufficient and handles retries gracefully.
 
