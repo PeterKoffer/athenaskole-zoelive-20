@@ -1,10 +1,10 @@
 
-import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Volume2, RotateCcw } from "lucide-react";
 import RobotAvatar from "./RobotAvatar";
+import { usePronunciationPractice } from "./hooks/usePronunciationPractice";
+import { PronunciationFeedbackBadge } from "./PronunciationFeedbackBadge";
 
 interface SpeechRecognitionProps {
   targetText: string;
@@ -12,108 +12,35 @@ interface SpeechRecognitionProps {
   onScoreUpdate: (score: number) => void;
 }
 
-const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecognitionProps) => {
-  const [isListening, setIsListening] = useState(false);
-  const [transcription, setTranscription] = useState("");
-  const [pronunciationScore, setPronunciationScore] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState("");
-  const [isPlayingExample, setIsPlayingExample] = useState(false);
-  const recognitionRef = useRef<any>(null);
-
-  useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'en-US';
-      
-      recognitionRef.current.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setTranscription(transcript);
-        analyzePronunciation(transcript, targetText);
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-    }
-  }, [language, targetText]);
-
-  const analyzePronunciation = (spoken: string, target: string) => {
-    // Simple pronunciation analysis - in production, use more sophisticated algorithms
-    const similarity = calculateSimilarity(spoken.toLowerCase(), target.toLowerCase());
-    const score = Math.round(similarity * 100);
-    setPronunciationScore(score);
-    onScoreUpdate(score);
-
-    if (score >= 90) {
-      setFeedback("Perfect pronunciation! 🌟");
-    } else if (score >= 75) {
-      setFeedback("Really good! Try again to improve 👍");
-    } else if (score >= 60) {
-      setFeedback("Good try! Focus on pronunciation 🎯");
-    } else {
-      setFeedback("Try again - listen to the example first 🔄");
-    }
-  };
-
-  const calculateSimilarity = (str1: string, str2: string): number => {
-    const words1 = str1.split(' ');
-    const words2 = str2.split(' ');
-    let matches = 0;
-    
-    words1.forEach(word1 => {
-      if (words2.some(word2 => word2.includes(word1) || word1.includes(word2))) {
-        matches++;
-      }
-    });
-    
-    return matches / Math.max(words1.length, words2.length);
-  };
-
-  const startListening = () => {
-    if (recognitionRef.current) {
-      setIsListening(true);
-      setTranscription("");
-      setPronunciationScore(null);
-      setFeedback("");
-      recognitionRef.current.start();
-    }
-  };
-
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-  };
-
-  const playTargetAudio = () => {
-    if ('speechSynthesis' in window) {
-      setIsPlayingExample(true);
-      const utterance = new SpeechSynthesisUtterance(targetText);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.8;
-      utterance.onend = () => setIsPlayingExample(false);
-      utterance.onerror = () => setIsPlayingExample(false);
-      speechSynthesis.speak(utterance);
-    }
-  };
-
-  const reset = () => {
-    setTranscription("");
-    setPronunciationScore(null);
-    setFeedback("");
-  };
+const SpeechRecognition = ({
+  targetText,
+  language,
+  onScoreUpdate,
+}: SpeechRecognitionProps) => {
+  const {
+    isListening,
+    isPlayingExample,
+    transcription,
+    pronunciationScore,
+    feedback,
+    startListening,
+    stopListening,
+    playTargetAudio,
+    reset,
+  } = usePronunciationPractice({
+    targetText,
+    language,
+    onScoreUpdate,
+  });
 
   return (
     <Card className="bg-gray-700 border-gray-600">
       <CardContent className="p-6 space-y-4">
         <div className="text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <RobotAvatar 
-              size="lg" 
-              isActive={isListening || isPlayingExample} 
+            <RobotAvatar
+              size="lg"
+              isActive={isListening || isPlayingExample}
               isSpeaking={isPlayingExample}
             />
             <h3 className="text-lg font-semibold text-white">Pronunciation Practice</h3>
@@ -137,9 +64,9 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
           <Button
             onClick={isListening ? stopListening : startListening}
             className={`${
-              isListening 
-                ? 'bg-red-600 hover:bg-red-700' 
-                : 'bg-green-600 hover:bg-green-700'
+              isListening
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-green-600 hover:bg-green-700"
             } transition-colors`}
             size="lg"
           >
@@ -181,23 +108,7 @@ const SpeechRecognition = ({ targetText, language, onScoreUpdate }: SpeechRecogn
               <p className="text-gray-300 text-sm">You said:</p>
               <p className="text-white font-medium">"{transcription}"</p>
             </div>
-
-            {pronunciationScore !== null && (
-              <div className="text-center space-y-2">
-                <Badge 
-                  variant="outline"
-                  className={`text-lg px-4 py-2 ${
-                    pronunciationScore >= 90 ? 'bg-green-600 text-white border-green-600' :
-                    pronunciationScore >= 75 ? 'bg-blue-600 text-white border-blue-600' :
-                    pronunciationScore >= 60 ? 'bg-yellow-600 text-white border-yellow-600' :
-                    'bg-orange-600 text-white border-orange-600'
-                  }`}
-                >
-                  {pronunciationScore}% accuracy
-                </Badge>
-                <p className="text-gray-300">{feedback}</p>
-              </div>
-            )}
+            <PronunciationFeedbackBadge score={pronunciationScore} feedback={feedback} />
           </div>
         )}
       </CardContent>
