@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
@@ -18,6 +17,7 @@ import CTASection from "@/components/home/CTASection";
 import HomepageWelcome from "@/components/home/HomepageWelcome";
 import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
 import InsightsNotification from "@/components/ai-insights/InsightsNotification";
+import HomeMainContent from "@/components/home/HomeMainContent";
 
 const Index = () => {
   const { user } = useAuth();
@@ -143,22 +143,9 @@ const Index = () => {
       );
     }
 
+    // Delegate homepage content to new component
     return (
-      <>
-        {/* Show welcome message for logged-in users */}
-        {user && (
-          <div className="pt-8">
-            <HomepageWelcome userName={user?.user_metadata?.name?.split(' ')[0] || 'Student'} />
-          </div>
-        )}
-        
-        <HeroSection onGetStarted={handleGetStarted} />
-        <SubjectsSection />
-        <FeaturesSection />
-        <div className="pb-20">
-          <CTASection onGetStarted={handleGetStarted} />
-        </div>
-      </>
+      <HomeMainContent user={user} onGetStarted={handleGetStarted} />
     );
   };
 
