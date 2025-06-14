@@ -28,7 +28,7 @@ serve(async (req) => {
 
     if (type === "check-availability") {
       if (!ELEVENLABS_API_KEY) {
-        console.log("[ElevenLabs] API KEY IS MISSING.");
+        console.error("[ElevenLabs] API KEY IS MISSING.");
         return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY in server environment." }), {
           status: 500,
           headers: corsHeaders
@@ -38,28 +38,32 @@ serve(async (req) => {
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
         headers: { "xi-api-key": ELEVENLABS_API_KEY },
       });
+      
+      const status = voicesRes.status;
       let body;
-      let status = voicesRes.status;
+      
       try {
         body = await voicesRes.json();
       } catch (e) {
-        console.log("[ElevenLabs] Failed to parse ElevenLabs voices response", e);
+        console.error("[ElevenLabs] Failed to parse ElevenLabs voices response", e);
         return new Response(JSON.stringify({ error: "Failed to parse ElevenLabs voices response" }), {
           status: 502,
           headers: corsHeaders,
         });
       }
-      console.log("[ElevenLabs] Voices fetch status:", status, "body:", JSON.stringify(body));
+      
+      console.log("[ElevenLabs] Voices fetch status:", status, "| Body keys:", body ? Object.keys(body).join(', ') : 'null');
 
       if (!voicesRes.ok) {
-        console.log("[ElevenLabs] Voices fetch error", body);
+        console.error("[ElevenLabs] Voices fetch error:", body);
         return new Response(JSON.stringify({ error: body?.detail?.message || "Could not fetch voices" }), {
           status,
           headers: corsHeaders,
         });
       }
-      // Always return a clear JSON structure
-      return new Response(JSON.stringify({ voices: body.voices ?? [], ...body }), {
+
+      // Simply forward the JSON response from ElevenLabs.
+      return new Response(JSON.stringify(body), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

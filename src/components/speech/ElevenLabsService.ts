@@ -37,9 +37,11 @@ class ElevenLabsService {
 
   async generateSpeech(text: string): Promise<AudioResponse> {
     if (!(await this.isServiceAvailable())) {
+      const lastError = this.voiceManager.getLastError();
+      console.error("🎤 [ElevenLabsService] Service not available when trying to generate speech. Last error:", lastError);
       return {
         audioContent: "",
-        error: this.voiceManager.getLastError() || "ElevenLabs not available",
+        error: lastError || "ElevenLabs not available",
       };
     }
     return await this.speechGenerator.generateSpeech(text, this.config);
