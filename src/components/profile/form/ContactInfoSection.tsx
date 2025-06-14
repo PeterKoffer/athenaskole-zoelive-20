@@ -2,17 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, MapPin } from "lucide-react";
-
-interface ProfileData {
-  name: string;
-  email: string;
-  birth_date: string;
-  grade: string;
-  school: string;
-  address: string;
-  avatar_url: string;
-  avatar_color?: string;
-}
+import { ProfileData } from "../hooks/types";
 
 interface ContactInfoSectionProps {
   profileData: ProfileData;

@@ -4,17 +4,7 @@ import PersonalInfoSection from "./form/PersonalInfoSection";
 import ContactInfoSection from "./form/ContactInfoSection";
 import AcademicInfoSection from "./form/AcademicInfoSection";
 import ProfileFormActions from "./form/ProfileFormActions";
-
-interface ProfileData {
-  name: string;
-  email: string;
-  birth_date: string;
-  grade: string;
-  school: string;
-  address: string;
-  avatar_url: string;
-  avatar_color?: string;
-}
+import { ProfileData } from "./hooks/types";
 
 interface ProfileFormProps {
   profileData: ProfileData;

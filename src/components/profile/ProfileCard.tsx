@@ -3,17 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User } from "lucide-react";
 import AvatarUpload from "./AvatarUpload";
 import ProfileForm from "./ProfileForm";
-
-interface ProfileData {
-  name: string;
-  email: string;
-  birth_date: string;
-  grade: string;
-  school: string;
-  address: string;
-  avatar_url: string;
-  avatar_color?: string;
-}
+import { ProfileData } from "./hooks/types";
 
 interface ProfileCardProps {
   profileData: ProfileData;
