@@ -1,7 +1,8 @@
 
-import { browserSpeechEngine } from "./BrowserSpeechEngine";
-import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
 import { SpeechConfig } from "./SpeechConfig";
+import { speakWithElevenLabs } from "./engine/ElevenLabsSpeak";
+import { speakWithBrowser } from "./engine/BrowserSpeak";
+import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
 
 export async function speakWithEngines(
   text: string,
@@ -13,40 +14,37 @@ export async function speakWithEngines(
 ) {
   // Try ElevenLabs first if requested
   if (shouldTryElevenLabs && useElevenLabs) {
-    const success = await elevenLabsSpeechEngine.speak(text);
-    if (success) {
-      updateState({ isSpeaking: false });
-      onDone();
-      return;
-    } else {
-      updateState({
-        usingElevenLabs: false,
-        lastError: "ElevenLabs error, fallback to browser",
-      });
-    }
+    const elevenDone = await speakWithElevenLabs(
+      text,
+      () => {
+        updateState({ isSpeaking: false });
+        onDone();
+      },
+      (msg) => {
+        updateState({
+          usingElevenLabs: false,
+          lastError: "ElevenLabs error, fallback to browser: " + msg,
+        });
+      }
+    );
+    if (elevenDone) return;
   }
-
   // Fallback to browser TTS
   if (typeof speechSynthesis === "undefined") {
     onDone();
     return;
   }
-  let utteranceRef: SpeechSynthesisUtterance | null = null;
-  browserSpeechEngine.speak(
+  speakWithBrowser(
     text,
     config,
-    () => updateState({ isSpeaking: true, currentUtterance: utteranceRef }),
-    () => {
-      updateState({ isSpeaking: false, currentUtterance: null });
-      onDone();
-    },
+    updateState,
+    onDone,
     (event) => {
       updateState({
         isSpeaking: false,
         currentUtterance: null,
         lastError: event.error || "Unknown error",
       });
-      onDone();
     }
   );
 }
