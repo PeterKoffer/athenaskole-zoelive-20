@@ -20,7 +20,7 @@ export async function speakWithEngines(
 
   // Listen for our debugging event for playback source (for transparency)
   window.addEventListener("nelie-tts-engine", (evt) => {
-    const detail = evt.detail || {};
+    const detail = (evt as CustomEvent).detail || {};
     if (detail.engine === "elevenlabs") {
       showSpeechToast("Speech Engine", "✅ ElevenLabs premium voice played!", "success");
       console.info("[SpeechEngines] ElevenLabs premium audio was played (nelie-tts-engine event)", detail);
