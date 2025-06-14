@@ -10,6 +10,9 @@ interface AudioResponse {
   error?: string;
 }
 
+// Fena's official ID from ElevenLabs: https://api.elevenlabs.io/docs#voices
+// Fena - YvMZb1i5lC3pIbB08jiB
+
 class ElevenLabsService {
   private config: ElevenLabsConfig;
   private isAvailable: boolean = false;
@@ -17,8 +20,8 @@ class ElevenLabsService {
 
   constructor() {
     this.config = {
-      apiKey: 'sk_d4604edcd1d6fd5fdcd107a3c28b796927864370ded00c7',
-      voiceId: '9BWtsMINqrJLrRacOk9x',
+      apiKey: 'sk_d4604edcd1d6fd5fdcd107a3c28b796927864370ded00c7', // Provided working key
+      voiceId: 'YvMZb1i5lC3pIbB08jiB', // Fena
       model: 'eleven_turbo_v2_5'
     };
 
@@ -59,7 +62,7 @@ class ElevenLabsService {
     try {
       console.log('🎤 Generating ElevenLabs speech for:', text.substring(0, 50) + '...');
       const response = await fetch(
-        'https://api.elevenlabs.io/v1/text-to-speech/' + this.config.voiceId,
+        `https://api.elevenlabs.io/v1/text-to-speech/${this.config.voiceId}`,
         {
           method: 'POST',
           headers: {
@@ -128,3 +131,4 @@ class ElevenLabsService {
 }
 
 export const elevenLabsService = new ElevenLabsService();
+
