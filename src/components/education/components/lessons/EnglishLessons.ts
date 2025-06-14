@@ -118,9 +118,21 @@ const englishLessonConfig: StandardLessonConfig = {
 export const createEnglishLesson = (): LessonActivity[] => {
   const standardLesson = createStandardLesson(englishLessonConfig);
   
-  // Add some additional interactive activities to make it more engaging
+  // Add the Writing Strategies activity similar to Mental Math Strategies
   const enhancedActivities: LessonActivity[] = [
-    ...standardLesson.phases.slice(0, 2),
+    ...standardLesson.phases.slice(0, 1), // Introduction
+    {
+      id: 'english-writing-strategies',
+      title: 'English Writing Strategies',
+      type: 'content-delivery',
+      phase: 'content-delivery',
+      duration: 360,
+      phaseDescription: 'Learn key writing strategies and techniques',
+      content: {
+        text: 'Master essential writing strategies that will make your stories and essays come alive!'
+      }
+    },
+    ...standardLesson.phases.slice(1, 2), // Content delivery
     {
       id: 'english-word-choice-1',
       title: 'Word Choice Challenge',
