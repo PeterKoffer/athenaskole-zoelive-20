@@ -4,8 +4,8 @@ import { elevenLabsService } from './ElevenLabsService';
 
 export const elevenLabsSpeechEngine = {
   async isAvailable(): Promise<boolean> {
-    await elevenLabsService.ensureAvailability();
-    return elevenLabsService.isServiceAvailable();
+    // Always force a re-check on every call (ensures non-racy result)
+    return await elevenLabsService.isServiceAvailable();
   },
 
   async speak(text: string): Promise<boolean> {

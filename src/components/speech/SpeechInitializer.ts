@@ -1,3 +1,4 @@
+
 import { selectOptimalVoice, SpeechConfig } from "./SpeechConfig";
 import { SpeechState } from "./SpeechState";
 import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
@@ -8,7 +9,11 @@ export async function initializeSpeechEngines(
   currentState: SpeechState
 ) {
   updateState({ isLoading: true, isCheckingElevenLabs: true });
+
   const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
+
+  // Immediately update logging for debugging
+  console.log("[SpeechInitializer] initializeSpeechEngines result:", { elevenLabsAvailable, preferElevenLabs: config.preferElevenLabs });
 
   if (elevenLabsAvailable && config.preferElevenLabs) {
     updateState({

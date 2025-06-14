@@ -1,6 +1,6 @@
 
 interface ElevenLabsConfig {
-  apiKey: string; // Not used anymore, but kept for compatibility
+  apiKey: string;
   voiceId: string;
   model: string;
 }
@@ -10,25 +10,31 @@ interface AudioResponse {
   error?: string;
 }
 
-// Supabase Edge Function URL (replace with actual project ref if needed)
 const EDGE_BASE =
   "https://tgjudtnjhtumrfthegis.functions.supabase.co/elevenlabs-proxy";
 
 class ElevenLabsService {
   private config: ElevenLabsConfig;
   private isAvailable: boolean = false;
-  private availabilityPromise: Promise<void>;
+  private lastCheck: number = 0;
+  private lastError: string | null = null;
 
   constructor() {
     this.config = {
-      apiKey: "", // No longer needed on client
-      voiceId: "YvMZb1i5lC3pIbB08jiB", // Fena (Female English per ElevenLabs, as requested)
+      apiKey: "",
+      voiceId: "YvMZb1i5lC3pIbB08jiB",
       model: "eleven_turbo_v2_5",
     };
-    this.availabilityPromise = this.checkAvailability();
   }
 
-  private async checkAvailability(): Promise<void> {
+  public async checkAvailability(): Promise<boolean> {
+    // Only check once every 5 seconds unless forced
+    const now = Date.now();
+    if (now - this.lastCheck < 5000 && typeof this.isAvailable === "boolean") {
+      console.log("🎤 [ElevenLabsService] Skipping re-check, recent result:", this.isAvailable);
+      return this.isAvailable;
+    }
+    this.lastCheck = now;
     try {
       const response = await fetch(EDGE_BASE, {
         method: "POST",
@@ -44,12 +50,12 @@ class ElevenLabsService {
       } catch (e) {
         console.error("🎤 ElevenLabs availability: Failed to parse response JSON", text);
         this.isAvailable = false;
-        return;
+        this.lastError = "Parse error when checking ElevenLabs";
+        return false;
       }
 
-      // LOG what we receive for troubleshooting
       console.log(
-        "🎤 ElevenLabs availability (via Supabase) - Status:",
+        "🎤 [ElevenLabsService] checkAvailability - Status:",
         response.status,
         "Body:",
         result
@@ -62,24 +68,33 @@ class ElevenLabsService {
         result.voices.length > 0
       ) {
         this.isAvailable = true;
-        console.log("🎤 ElevenLabs availability detected voices:", result.voices.map((v: any) => v.name));
+        this.lastError = null;
+        console.log("🎤 [ElevenLabsService] Available voices:", result.voices.map((v: any) => v.name));
+        return true;
       } else if (result && result.error) {
-        console.error("❌ ElevenLabs availability: returned error", result.error);
+        console.error("❌ [ElevenLabsService] Error returned", result.error);
         this.isAvailable = false;
+        this.lastError = result.error;
+        return false;
       } else {
-        console.error("❌ ElevenLabs availability: Unknown response", result);
+        console.error("❌ [ElevenLabsService] Unknown response", result);
         this.isAvailable = false;
+        this.lastError = "Unknown response";
+        return false;
       }
     } catch (error) {
       this.isAvailable = false;
+      this.lastError = error instanceof Error ? error.message : "Unknown error";
       console.log(
-        "🎤 ElevenLabs not available (via Supabase), will use browser speech synthesis. Error:", error
+        "🎤 [ElevenLabsService] Not available, will use browser synthesis. Error:", error
       );
+      return false;
     }
   }
 
-  ensureAvailability(): Promise<void> {
-    return this.availabilityPromise;
+  public async isServiceAvailable(): Promise<boolean> {
+    const available = await this.checkAvailability();
+    return available;
   }
 
   async refreshAvailability(): Promise<void> {
@@ -87,13 +102,12 @@ class ElevenLabsService {
   }
 
   async generateSpeech(text: string): Promise<AudioResponse> {
-    if (!this.isAvailable) {
+    if (!(await this.isServiceAvailable())) {
       return {
         audioContent: "",
-        error: "ElevenLabs not available",
+        error: this.lastError || "ElevenLabs not available",
       };
     }
-
     try {
       console.log(
         "🎤 Generating ElevenLabs speech (via Supabase) for:",
@@ -143,14 +157,9 @@ class ElevenLabsService {
     });
   }
 
-  isServiceAvailable(): boolean {
-    return this.isAvailable;
-  }
-
   setVoice(voiceId: string): void {
     this.config.voiceId = voiceId;
   }
 }
 
 export const elevenLabsService = new ElevenLabsService();
-
