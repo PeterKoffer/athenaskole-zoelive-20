@@ -91,13 +91,14 @@ class UnifiedSpeechSystem {
       await this.initializeSpeechSystem();
     }
 
-    console.log(`[UnifiedSpeechSystem] Adding item to queue: "${text.substring(0,40)}..." with priority=${priority}`);
-    this.queue.addItem(text, priority);
-
+    // Change: Stop before queuing if priority
     if (priority) {
-      console.log('[UnifiedSpeechSystem] Priority speech requested, calling stop()');
+      console.log('[UnifiedSpeechSystem] Priority speech requested, calling stop() before queueing');
       this.stop();
     }
+
+    console.log(`[UnifiedSpeechSystem] Adding item to queue: "${text.substring(0,40)}..." with priority=${priority}`);
+    this.queue.addItem(text, priority);
 
     // Debug queue items
     console.log("[UnifiedSpeechSystem] Queue after add:", this.queue);
