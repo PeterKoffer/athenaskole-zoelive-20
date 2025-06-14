@@ -48,7 +48,7 @@ const MathLessonHeader = ({
             </div>
             
             <div className="text-sm">
-              Activity {currentActivityIndex + 1} of {totalRealActivities}
+              Activity {currentActivityIndex + 1}
             </div>
           </div>
         </div>
