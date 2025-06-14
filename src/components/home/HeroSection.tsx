@@ -11,6 +11,13 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
     onGetStarted();
   };
 
+  const todaysDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <div className="text-center py-20">
       <h1 className="text-5xl font-bold text-white mb-4">
@@ -22,13 +29,16 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
       <p className="text-lg text-gray-400 mb-8">
         Meet Nelie - your AI tutor who guides you through your daily learning program
       </p>
-      <Button
-        size="lg"
-        className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
-        onClick={handleGetStartedClick}
-      >
-        Your Program for Today
-      </Button>
+      <div className="space-y-3">
+        <p className="text-purple-300 text-lg font-medium">{todaysDate}</p>
+        <Button
+          size="lg"
+          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white text-xl px-12 py-6 h-16 font-semibold"
+          onClick={handleGetStartedClick}
+        >
+          Your Program for Today
+        </Button>
+      </div>
     </div>
   );
 };
