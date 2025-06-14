@@ -26,7 +26,7 @@ const EnableNelieButton = ({
     >
       <div className="flex flex-col items-center justify-center">
         <Volume2 className="w-3 h-3 mb-0.5" />
-        <span className="text-xs font-semibold leading-tight">START</span>
+        <span className="text-[10px] font-semibold leading-tight">START</span>
       </div>
     </Button>
   );
