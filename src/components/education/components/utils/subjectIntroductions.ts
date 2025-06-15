@@ -1,3 +1,4 @@
+
 interface IntroductionSection {
   title: string;
   text: string;
@@ -11,7 +12,7 @@ interface SubjectIntroduction {
 
 const createWelcomeSection = (subject: string, userName: string = 'Student'): IntroductionSection => ({
   title: "Welcome to Class",
-  text: `Welcome to your math lesson! Today we'll be exploring different mathematical concepts.`,
+  text: `Welcome to your ${subject.toLowerCase()} lesson, ${userName}! Today we'll be exploring different concepts together.`,
   duration: 8
 });
 

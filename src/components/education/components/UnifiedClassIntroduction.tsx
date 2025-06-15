@@ -1,9 +1,12 @@
+
+import { useMemo } from 'react';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
 import { useNavigate } from 'react-router-dom';
 import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import { useStudentName } from './math/hooks/useStudentName';
 
 import UnifiedClassIntroductionHeader from './UnifiedClassIntroductionHeader';
 import UnifiedClassIntroductionProgress from './UnifiedClassIntroductionProgress';
@@ -25,8 +28,12 @@ const UnifiedClassIntroduction = ({
   onIntroductionComplete,
   isAdvancing,
 }: UnifiedClassIntroductionProps) => {
+  const studentName = useStudentName();
   const classroomConfig = getClassroomConfig(subject);
-  const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
+  const introduction = useMemo(
+    () => getSubjectIntroduction(subject, skillArea, userLevel, studentName),
+    [subject, skillArea, userLevel, studentName]
+  );
   const navigate = useNavigate();
 
   const { stop } = useUnifiedSpeech();
@@ -87,7 +94,6 @@ const UnifiedClassIntroduction = ({
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
         <UnifiedClassIntroductionHeader
-          title={introduction.title}
           userName={userName}
           subject={subject}
           isSpeaking={isSpeaking}
