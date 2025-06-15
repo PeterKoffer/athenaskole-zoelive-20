@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Play } from 'lucide-react';
+import { Volume2, VolumeX, Play, Home } from 'lucide-react';
 
 interface IntroductionControlsProps {
   hasStarted: boolean;
@@ -16,6 +16,7 @@ interface IntroductionControlsProps {
   onIntroductionComplete: () => void;
   onStartLesson: () => void;
   onSkip: () => void;
+  onHome?: () => void; // NEW
 }
 
 const IntroductionControls = ({
@@ -31,11 +32,21 @@ const IntroductionControls = ({
   onManualRead,
   onIntroductionComplete,
   onStartLesson,
-  onSkip
+  onSkip,
+  onHome // NEW
 }: IntroductionControlsProps) => {
   if (!hasStarted) {
     return (
       <div className="flex flex-col sm:flex-row gap-3">
+        {/* Home (or Back) button now replaces "Unmute Nelie" */}
+        <Button
+          variant="outline"
+          className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
+          onClick={onHome}
+        >
+          <Home className="w-4 h-4 mr-2" />
+          Home
+        </Button>
         <Button
           onClick={onManualStart}
           className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
@@ -43,7 +54,6 @@ const IntroductionControls = ({
           <Play className="w-4 h-4 mr-2" />
           Start Introduction with Nelie
         </Button>
-        
         {canProceedWithoutSpeech && (
           <Button
             onClick={onProceedWithoutSpeech}
@@ -67,7 +77,6 @@ const IntroductionControls = ({
         {isEnabled ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
         {isEnabled ? 'Mute Nelie' : 'Unmute Nelie'}
       </Button>
-      
       <Button
         variant="outline"
         onClick={onManualRead}
@@ -77,7 +86,6 @@ const IntroductionControls = ({
         <Volume2 className="w-4 h-4 mr-2" />
         {isSpeaking ? 'Stop Reading' : 'Read Again'}
       </Button>
-      
       {isComplete ? (
         <Button
           onClick={onIntroductionComplete}
@@ -87,7 +95,6 @@ const IntroductionControls = ({
         </Button>
       ) : (
         <>
-          {/* Show "Start Lesson" button when Nelie has started speaking */}
           {(isSpeaking || hasStarted) && (
             <Button
               onClick={onStartLesson}
@@ -96,7 +103,6 @@ const IntroductionControls = ({
               Start Lesson
             </Button>
           )}
-          
           <Button
             variant="outline"
             onClick={onSkip}
@@ -111,3 +117,4 @@ const IntroductionControls = ({
 };
 
 export default IntroductionControls;
+

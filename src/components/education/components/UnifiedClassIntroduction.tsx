@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Play } from 'lucide-react';
@@ -7,6 +6,7 @@ import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
+import IntroductionControls from './introduction/IntroductionControls';
 
 interface UnifiedClassIntroductionProps {
   subject: string;
@@ -62,6 +62,11 @@ const UnifiedClassIntroduction = ({
     );
   }
 
+  // NEW handler for Home/Back navigation, goes to daily program
+  const handleHome = () => {
+    window.location.href = "/daily-program";
+  };
+
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -108,7 +113,6 @@ const UnifiedClassIntroduction = ({
               {currentContent.text}
             </p>
           </div>
-
           <div className="mt-6 flex justify-between items-center">
             <div className="flex space-x-2">
               <Button
@@ -120,7 +124,6 @@ const UnifiedClassIntroduction = ({
                 {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 {isEnabled ? 'Mute' : 'Unmute'} Nelie
               </Button>
-              
               <Button
                 variant="outline"
                 size="sm"
@@ -131,58 +134,25 @@ const UnifiedClassIntroduction = ({
                 Repeat
               </Button>
             </div>
-
             {/* Introduction Controls */}
             <div className="flex space-x-2">
-              {!hasStarted ? (
-                <>
-                  <Button
-                    onClick={handleManualStart}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Introduction with Nelie
-                  </Button>
-                  
-                  {canProceedWithoutSpeech && (
-                    <Button
-                      onClick={handleProceedWithoutSpeech}
-                      variant="outline"
-                      className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
-                    >
-                      Start Lesson Without Speech
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <>
-                  {isComplete ? (
-                    <Button
-                      onClick={onIntroductionComplete}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6"
-                    >
-                      Start Class
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        onClick={handleStartLesson}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6"
-                      >
-                        Start Lesson
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        onClick={handleSkip}
-                        className="border-gray-400 text-gray-200 bg-gray-800/50"
-                      >
-                        Skip Introduction
-                      </Button>
-                    </>
-                  )}
-                </>
-              )}
+              {/* Pass new onHome handler to controls */}
+              <IntroductionControls
+                hasStarted={hasStarted}
+                canProceedWithoutSpeech={canProceedWithoutSpeech}
+                isEnabled={isEnabled}
+                isSpeaking={isSpeaking}
+                isComplete={isComplete}
+                hasUserInteracted={hasUserInteracted}
+                onManualStart={handleManualStart}
+                onProceedWithoutSpeech={handleProceedWithoutSpeech}
+                onToggleEnabled={toggleEnabled}
+                onManualRead={handleManualRead}
+                onIntroductionComplete={onIntroductionComplete}
+                onStartLesson={handleStartLesson}
+                onSkip={handleSkip}
+                onHome={handleHome}
+              />
             </div>
           </div>
         </div>
