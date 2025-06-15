@@ -196,21 +196,17 @@ export const useOptimizedLessonManager = ({
       }
     }
 
-    // Navigation
+    // Navigation: Immediately go to the next activity if possible, unless finished
     const nextIndex = currentActivityIndex + 1;
     const hasMoreActivities = nextIndex < allActivities.length;
     const hasReachedTimeLimit = timeElapsed >= 1200;
 
     if (!hasMoreActivities || hasReachedTimeLimit) {
+      console.log('🎓 Lesson completed! (handleActivityComplete)');
       onLessonComplete();
     } else {
-      // Move to next activity ONLY if not already completed (prevents jumping forward before button shows)
-      setTimeout(() => {
-        setCurrentActivityIndex(idx => {
-          // Don't auto-advance if the UI expects a button to appear first
-          return idx;
-        });
-      }, 500);
+      console.log('➡️ Advancing to next activity:', nextIndex);
+      setCurrentActivityIndex(nextIndex);
     }
   }, [currentActivityIndex, allActivities.length, timeElapsed, onLessonComplete]);
 
