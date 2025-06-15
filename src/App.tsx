@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +25,7 @@ import CreativeLearning from "./components/education/CreativeLearning";
 import ScienceLearning from "./components/education/ScienceLearning";
 import MusicLearning from "./components/education/MusicLearning";
 import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
+import './i18n'; // Add this import to initialize i18n
 
 const queryClient = new QueryClient();
 
