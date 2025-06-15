@@ -37,72 +37,65 @@ const UnifiedClassIntroductionControls = ({
   handleHome,
   isAdvancing = false,
 }: UnifiedClassIntroductionControlsProps) => {
-  // Show "Repeat", "Home", and "Start Introduction with Nelie" on FIRST ROW always when intro is not started.
-  // Show "Start Lesson Without Speech" on a new SECOND ROW (full width) if available and not started.
+  // All four buttons should display together before the intro has started.
   return (
     <div className="mt-6 flex flex-col gap-2 w-full">
-      {
-        !hasStarted && (
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleManualRead}
-              className="border-purple-400 text-purple-200 bg-gray-800/50"
-              disabled={!isEnabled && hasUserInteracted || isAdvancing}
-            >
-              <span className="flex items-center">
-                <span className="mr-2">
-                  <Play className="w-4 h-4" />
-                </span>
-                Repeat
+      {!hasStarted && (
+        <div className="flex flex-wrap gap-2 justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleManualRead}
+            className="border-purple-400 text-purple-200 bg-gray-800/50"
+            disabled={(!isEnabled && hasUserInteracted) || isAdvancing}
+          >
+            <span className="flex items-center">
+              <span className="mr-2">
+                <Play className="w-4 h-4" />
               </span>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="border-gray-400 text-gray-200 bg-gray-800/50"
-              onClick={handleHome}
-              disabled={isAdvancing}
-            >
-              <span className="flex items-center">
-                <span className="mr-2">
-                  <Home className="w-4 h-4" />
-                </span>
-                Home
+              Repeat
+            </span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="border-gray-400 text-gray-200 bg-gray-800/50"
+            onClick={handleHome}
+            disabled={isAdvancing}
+          >
+            <span className="flex items-center">
+              <span className="mr-2">
+                <Home className="w-4 h-4" />
               </span>
-            </Button>
-            <Button
-              type="button"
-              onClick={handleManualStart}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
-              disabled={isAdvancing}
-            >
-              <span className="flex items-center">
-                <span className="mr-2">
-                  <Play className="w-4 h-4" />
-                </span>
-                Start Introduction with Nelie
+              Home
+            </span>
+          </Button>
+          <Button
+            type="button"
+            onClick={handleManualStart}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+            disabled={isAdvancing}
+          >
+            <span className="flex items-center">
+              <span className="mr-2">
+                <Play className="w-4 h-4" />
               </span>
-            </Button>
-          </div>
-        )
-      }
-      {
-        !hasStarted && canProceedWithoutSpeech && (
-          <div className="flex">
+              Start Introduction with Nelie
+            </span>
+          </Button>
+          {canProceedWithoutSpeech && (
             <Button
               type="button"
               onClick={handleProceedWithoutSpeech}
               variant="outline"
-              className="border-gray-400 text-gray-200 bg-gray-800/50 w-full px-6 py-3"
+              className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
               disabled={isAdvancing}
             >
               Start Lesson Without Speech
             </Button>
-          </div>
-        )
-      }
+          )}
+        </div>
+      )}
       {hasStarted && (
         <div className="flex flex-wrap gap-2">
           {isComplete ? (
