@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -11,6 +10,7 @@ import ClassManagement from "@/components/school/ClassManagement";
 import AnalyticsDashboard from "@/components/school/AnalyticsDashboard";
 import StudentRegistration from "@/components/school/StudentRegistration";
 import CommunicationCenter from "@/components/communication/CommunicationCenter";
+import TeachingPerspectiveSettingsPanel from "@/components/school/TeachingPerspectiveSettings";
 
 const SchoolDashboard = () => {
   const stats = {
@@ -26,6 +26,9 @@ const SchoolDashboard = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <SchoolStatsCards stats={stats} />
+
+        {/* Render Teaching Perspective Settings Panel for admins and school leaders */}
+        <TeachingPerspectiveSettingsPanel />
 
         {/* Unified School Management Dropdown Menu */}
         <div className="flex gap-4 mb-6">
