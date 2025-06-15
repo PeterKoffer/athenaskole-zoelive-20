@@ -52,7 +52,7 @@ export const useOptimizedLessonManager = ({
     }
   }, [manualActivityIndex]);
 
-  // Initialize activities
+  // Initialize activities and reset to activity 0
   useEffect(() => {
     const initializeActivities = async () => {
       console.log('🎯 Initializing optimized lesson activities for:', subject, skillArea);
@@ -61,6 +61,7 @@ export const useOptimizedLessonManager = ({
         const activities = await generateMathActivities();
         console.log('✅ Generated activities:', activities.length);
         setAllActivities(activities);
+        setCurrentActivityIndex(0); // Always start at activity 0 (Activity 1)
         setIsInitializing(false);
         startTimer();
       } catch (error) {
