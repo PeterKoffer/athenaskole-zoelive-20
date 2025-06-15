@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -39,11 +38,6 @@ const EnglishLessonHeader = ({
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatTargetTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    return `${mins.toString().padStart(2, '0')}:00`;
   };
 
   const shouldShowActivityCounter = currentActivityType === 'interactive-game' || 
@@ -92,9 +86,6 @@ const EnglishLessonHeader = ({
             <div className="text-green-400 text-xs font-mono uppercase tracking-wider mb-1">TIME</div>
             <div className="text-green-400 text-xl font-mono font-bold tracking-wider">
               {formatTime(timeElapsed)}
-            </div>
-            <div className="text-green-400/60 text-xs font-mono">
-              / {formatTargetTime(targetLessonLength)}
             </div>
           </div>
           
