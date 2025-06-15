@@ -206,7 +206,6 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
           explanation: baseRecapQuestion.explanation || "",
           learningObjectives: [],
           estimatedTime: 0,
-          conceptsCovered: [],
           isRecap: true
         };
 
