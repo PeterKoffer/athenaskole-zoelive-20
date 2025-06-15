@@ -13,7 +13,7 @@ import { useRoleAccess } from "@/hooks/useRoleAccess";
 export function useRoleUpgrade() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
-  const { setUserRoleManually } = useRoleAccess();
+  const { setUserRoleManually, userRole } = useRoleAccess();
 
   useEffect(() => {
     async function maybeUpgradeRole() {
@@ -26,10 +26,9 @@ export function useRoleUpgrade() {
       const metaRole = user.user_metadata?.role;
       console.log("[useRoleUpgrade] Current meta role:", metaRole);
       
-      if (metaRole && ROLE_CONFIGS[metaRole as UserRole]) {
-        // Correct role already set, ensure it's in local state too
-        console.log("[useRoleUpgrade] Role is valid, ensuring local state");
-        setUserRoleManually(metaRole as UserRole);
+      // If we already have a valid role (either from metadata or session), don't interfere
+      if ((metaRole && ROLE_CONFIGS[metaRole as UserRole]) || userRole) {
+        console.log("[useRoleUpgrade] Valid role already exists, no upgrade needed");
         return;
       }
 
@@ -86,6 +85,6 @@ export function useRoleUpgrade() {
     }
     
     maybeUpgradeRole();
-    // Only run when user or loading state changes
+    // Only run when user or loading state changes, not when userRole changes
   }, [user, loading, setUserRoleManually, toast]);
 }

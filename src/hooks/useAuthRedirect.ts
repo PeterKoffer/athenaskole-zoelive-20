@@ -6,6 +6,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 
 /**
  * Handles automatic redirection after authentication based on user role
+ * Also handles navigation after role switching
  */
 export const useAuthRedirect = () => {
   const { user, loading } = useAuth();
@@ -17,10 +18,19 @@ export const useAuthRedirect = () => {
     // Don't redirect while still loading or if no user
     if (loading || !user || !userRole) return;
 
-    // Only redirect from auth page or home page
-    if (location.pathname !== '/auth' && location.pathname !== '/') return;
+    // Only redirect from auth page, home page, or if we're on a dashboard that doesn't match the current role
+    const shouldRedirect = 
+      location.pathname === '/auth' || 
+      location.pathname === '/' ||
+      (location.pathname === '/daily-program' && userRole !== 'student') ||
+      (location.pathname === '/school-dashboard' && !['admin', 'school_leader', 'school_staff'].includes(userRole)) ||
+      (location.pathname === '/teacher-dashboard' && userRole !== 'teacher') ||
+      (location.pathname === '/parent-dashboard' && userRole !== 'parent') ||
+      (location.pathname === '/admin-dashboard' && userRole !== 'admin');
 
-    console.log('[useAuthRedirect] Redirecting user with role:', userRole);
+    if (!shouldRedirect) return;
+
+    console.log('[useAuthRedirect] Redirecting user with role:', userRole, 'from:', location.pathname);
 
     // Redirect based on role
     switch (userRole) {

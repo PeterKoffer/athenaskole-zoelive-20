@@ -6,11 +6,10 @@ import { UserRole } from '@/types/auth';
 const SESSION_ROLE_KEY = "lovable-session-userRole";
 
 /**
- * Loads and persists the *last known valid* role for navigation durability.
- * - Always prefers user.user_metadata.role if present (profile from Supabase)
- * - Otherwise, falls back to last persisted sessionStorage role
- * - *Never downgrades* to "student" during navigation if prior valid role exists.
- * - Only falls back to "student" if both user and saved session role are missing (i.e., signed out, or truly no assigned role).
+ * Loads and persists user roles with proper handling for role switching.
+ * - Prioritizes manually set roles (from role switching)
+ * - Falls back to user.user_metadata.role if present
+ * - Only defaults to "student" for truly unauthenticated users
  */
 export const useRoleAccess = () => {
   const { user, loading } = useAuth();
@@ -52,37 +51,42 @@ export const useRoleAccess = () => {
       return;
     }
 
-    // 1. Try the freshest user profile first
+    // 1. Check session storage first (this preserves manual role switches)
+    const sessionRole = getRoleFromSession();
+    
+    // 2. Get role from user profile
     const profileRole = getRoleFromUser();
 
-    debugLog("useEffect ran: user", user?.id, "profileRole", profileRole, "loading", loading);
+    debugLog("useEffect ran: user", user?.id, "sessionRole", sessionRole, "profileRole", profileRole, "loading", loading);
 
-    if (profileRole) {
-      debugLog("Effect: Setting userRole to profileRole", profileRole);
-      setUserRole(profileRole);
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem(SESSION_ROLE_KEY, profileRole);
-      }
-      return;
-    }
-
-    // 2. If user is authenticated but no role in metadata, check session storage
+    // If user is authenticated
     if (user) {
-      const priorSessionRole = getRoleFromSession();
-      if (priorSessionRole) {
-        debugLog("Effect: User authenticated, using sessionStorage role", priorSessionRole);
-        setUserRole(priorSessionRole);
+      // Priority 1: Use session role if it exists (preserves manual switches)
+      if (sessionRole) {
+        debugLog("Effect: User authenticated, using sessionStorage role", sessionRole);
+        setUserRole(sessionRole);
+        return;
+      }
+      
+      // Priority 2: Use profile role if available
+      if (profileRole) {
+        debugLog("Effect: Setting userRole to profileRole", profileRole);
+        setUserRole(profileRole);
+        // Save to session storage for persistence
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(SESSION_ROLE_KEY, profileRole);
+        }
         return;
       }
       
       // User is authenticated but has no role - this shouldn't happen in normal flow
-      // Don't default to student, leave as null so they can be properly redirected
+      // Don't default to student, leave as null so they can be properly handled
       debugLog("Effect: Authenticated user with no role detected, keeping null");
       setUserRole(null);
       return;
     }
 
-    // 3. User is not authenticated - fall back to student for guest access
+    // 3. User is not authenticated - only then fall back to student for guest access
     debugLog("Effect: No user authenticated, setting to student");
     setUserRole("student");
     if (typeof window !== "undefined") {
@@ -90,7 +94,7 @@ export const useRoleAccess = () => {
     }
   }, [user, loading]);
 
-  // Set user role manually, and persist
+  // Set user role manually, and persist (used for role switching)
   const setUserRoleManually = (role: UserRole) => {
     debugLog("setUserRoleManually:", role);
     setUserRole(role);
