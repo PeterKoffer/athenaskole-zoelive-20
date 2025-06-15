@@ -1,100 +1,84 @@
 
-import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useLessonState } from './useLessonState';
-import { useLessonContentGeneration } from './useLessonContentGeneration';
-import { useLessonProgressManager } from './useLessonProgressManager';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import { useTimerManager } from '../../hooks/useTimerManager';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
+import { generateMathActivities } from '../math/utils/mathActivityGenerator';
+import { LessonActivity } from '../types/LessonTypes';
 
 interface UseOptimizedLessonManagerProps {
   subject: string;
   skillArea: string;
   onLessonComplete: () => void;
+  manualActivityIndex?: number | null;
 }
 
 export const useOptimizedLessonManager = ({
   subject,
   skillArea,
-  onLessonComplete
+  onLessonComplete,
+  manualActivityIndex
 }: UseOptimizedLessonManagerProps) => {
-  const { user } = useAuth();
-  const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
-  const [realActivityCount, setRealActivityCount] = useState(0);
+  const [allActivities, setAllActivities] = useState<LessonActivity[]>([]);
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [correctStreak, setCorrectStreak] = useState(0);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const lessonStartTime = useRef(Date.now());
 
-  // Use the smaller, focused hooks
+  const { timeElapsed, startTimer } = useTimerManager({ autoStart: false });
+
   const {
-    currentActivityIndex,
-    setCurrentActivityIndex,
-    lessonStartTime,
-    score,
-    setScore,
-    correctStreak,
-    setCorrectStreak,
-    lastResponseTime,
-    setLastResponseTime,
-    targetLessonLength,
-    timeElapsed
-  } = useLessonState();
+    isEnabled: autoReadEnabled,
+    isSpeaking,
+    hasUserInteracted,
+    toggleEnabled: toggleMute,
+    speakAsNelie
+  } = useUnifiedSpeech();
 
-  const { baseLessonActivities } = useLessonContentGeneration({ subject });
-
-  // Enhanced teaching engine
   const teachingEngine = useEnhancedTeachingEngine({
     subject,
     timeElapsed,
     correctStreak,
     score,
-    lessonStartTime
+    lessonStartTime: lessonStartTime.current
   });
 
-  // Filter out non-activities (loading states, transitions) for counting
-  const realActivities = baseLessonActivities.filter(activity => 
-    activity.type !== 'loading' && 
-    activity.type !== 'transition' && 
-    !activity.title.toLowerCase().includes('loading') &&
-    !activity.title.toLowerCase().includes('continue')
-  );
-
-  // Update real activity count when activities change
+  // Handle manual navigation
   useEffect(() => {
-    setRealActivityCount(realActivities.length);
-  }, [realActivities.length]);
-
-  // Initialize progress manager with real activities only
-  const {
-    isLoadingProgress,
-    usedQuestionIds,
-    saveProgress,
-    completeLessonProgress,
-    generateSubjectQuestion,
-    resetProgress
-  } = useLessonProgressManager({
-    subject,
-    skillArea,
-    lessonActivities: realActivities, // Only track real activities
-    currentActivityIndex,
-    score,
-    timeElapsed,
-    onProgressLoaded: (progress) => {
-      if (!hasRestoredProgress && progress) {
-        console.log('🔄 Restoring lesson progress:', progress);
-        setCurrentActivityIndex(progress.current_activity_index);
-        setScore(progress.score);
-        setHasRestoredProgress(true);
-      }
+    if (manualActivityIndex !== null && manualActivityIndex !== undefined) {
+      console.log('🧭 Manual navigation triggered:', manualActivityIndex);
+      setCurrentActivityIndex(manualActivityIndex);
     }
-  });
+  }, [manualActivityIndex]);
 
-  const currentActivity = realActivities[currentActivityIndex] || null;
+  // Initialize activities
+  useEffect(() => {
+    const initializeActivities = async () => {
+      console.log('🎯 Initializing optimized lesson activities for:', subject, skillArea);
+      
+      try {
+        const activities = await generateMathActivities();
+        console.log('✅ Generated activities:', activities.length);
+        setAllActivities(activities);
+        setIsInitializing(false);
+        startTimer();
+      } catch (error) {
+        console.error('❌ Failed to generate activities:', error);
+        setIsInitializing(false);
+      }
+    };
 
-  // Enhanced activity completion handler with progress saving
-  const handleActivityComplete = useCallback(async (wasCorrect?: boolean) => {
-    console.log('✅ Real activity completed, saving progress...');
+    initializeActivities();
+  }, [subject, skillArea, startTimer]);
+
+  const currentActivity = allActivities[currentActivityIndex] || null;
+  const totalRealActivities = allActivities.length;
+  const targetLessonLength = 20; // 20 minutes
+
+  const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
+    console.log('📚 Activity completed:', currentActivityIndex, wasCorrect);
     
-    // Update response time
-    setLastResponseTime(new Date());
-    
-    // Handle scoring and streaks
     if (wasCorrect !== undefined) {
       if (wasCorrect) {
         setCorrectStreak(prev => prev + 1);
@@ -104,39 +88,16 @@ export const useOptimizedLessonManager = ({
       }
     }
 
-    // Check if lesson should complete
-    const nextRealActivityIndex = currentActivityIndex + 1;
-    if (nextRealActivityIndex >= realActivities.length || timeElapsed >= targetLessonLength) {
+    // Check if lesson is complete
+    const nextIndex = currentActivityIndex + 1;
+    if (nextIndex >= allActivities.length || timeElapsed >= 1200) { // 20 minutes = 1200 seconds
       console.log('🎓 Lesson completed!');
-      if (user?.id) {
-        await completeLessonProgress();
-      }
       onLessonComplete();
-      return;
+    } else {
+      console.log('➡️ Moving to next activity:', nextIndex);
+      setCurrentActivityIndex(nextIndex);
     }
-
-    // Move to next real activity
-    console.log('➡️ Moving to next real activity:', nextRealActivityIndex);
-    setCurrentActivityIndex(nextRealActivityIndex);
-    
-    // Save progress after state updates
-    setTimeout(async () => {
-      await saveProgress();
-    }, 100);
-  }, [
-    currentActivityIndex, 
-    realActivities.length, 
-    timeElapsed, 
-    targetLessonLength,
-    user?.id,
-    completeLessonProgress,
-    onLessonComplete,
-    setLastResponseTime,
-    setCorrectStreak,
-    setScore,
-    setCurrentActivityIndex,
-    saveProgress
-  ]);
+  }, [currentActivityIndex, allActivities.length, timeElapsed, onLessonComplete]);
 
   const handleReadRequest = useCallback(() => {
     if (currentActivity && teachingEngine.isReady) {
@@ -149,43 +110,22 @@ export const useOptimizedLessonManager = ({
     }
   }, [currentActivity, teachingEngine]);
 
-  console.log(`🧠 Optimized ${subject} lesson: ${realActivityCount} real activities, targeting ${targetLessonLength} minutes`);
-
   return {
-    // Activity management - only counting real activities
     currentActivityIndex,
-    lessonActivities: realActivities,
+    setCurrentActivityIndex,
     currentActivity,
-    totalRealActivities: realActivityCount,
-    
-    // Progress tracking
+    totalRealActivities,
     timeElapsed,
-    totalEstimatedTime: realActivities.reduce((total, activity) => total + activity.duration, 0),
     score,
     correctStreak,
     targetLessonLength,
-    
-    // State management
-    isInitializing: isLoadingProgress,
-    
-    // Teaching engine integration
-    engagementLevel: teachingEngine.engagementLevel,
-    adaptiveSpeed: teachingEngine.adaptiveSpeed,
-    isSpeaking: teachingEngine.isSpeaking,
-    autoReadEnabled: teachingEngine.autoReadEnabled,
-    hasUserInteracted: teachingEngine.hasUserInteracted,
-    isReady: teachingEngine.isReady,
-    speakText: teachingEngine.speakWithPersonality,
-    stopSpeaking: teachingEngine.stopSpeaking,
-    toggleMute: teachingEngine.toggleMute,
-    
-    // Event handlers
+    isInitializing,
     handleActivityComplete,
     handleReadRequest,
-    resetProgress,
-
-    // Question generation for interactive activities
-    generateSubjectQuestion,
-    usedQuestionIds
+    isSpeaking,
+    toggleMute,
+    autoReadEnabled,
+    hasUserInteracted,
+    teachingEngine
   };
 };

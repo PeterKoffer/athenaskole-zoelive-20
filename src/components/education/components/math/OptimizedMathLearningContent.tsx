@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
-import { useStudentName } from './hooks/useStudentName';
-import { useSpeechCleanup } from './hooks/useSpeechCleanup';
+import { useStudentName } from '../math/hooks/useStudentName';
+import { useSpeechCleanup } from '../math/hooks/useSpeechCleanup';
 import MathLearningIntroduction from './MathLearningIntroduction';
 import MathLearningLoading from './MathLearningLoading';
 import MathLearningMainContent from './MathLearningMainContent';
@@ -14,6 +14,7 @@ interface OptimizedMathLearningContentProps {
 
 const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearningContentProps) => {
   const [showIntroduction, setShowIntroduction] = useState(true);
+  const [manualActivityIndex, setManualActivityIndex] = useState<number | null>(null);
   const studentName = useStudentName();
   const { stop: stopSpeaking, forceStopAll } = useUnifiedSpeech();
 
@@ -43,7 +44,8 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     handleActivityComplete,
     handleReadRequest,
     isSpeaking,
-    toggleMute
+    toggleMute,
+    setCurrentActivityIndex
   } = useOptimizedLessonManager({
     subject: 'mathematics',
     skillArea: 'general_math',
@@ -51,7 +53,8 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
       console.log('🔇 [MathLearning] Lesson completing - stopping speech');
       forceStopAll();
       onBackToProgram();
-    }
+    },
+    manualActivityIndex
   });
 
   const handleBackToProgram = () => {
@@ -61,8 +64,14 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
   };
 
   const handleIntroductionComplete = () => {
-    console.log('🎭 Introduction completed, starting optimized lesson');
+    console.log('🎭 Math Introduction completed, starting optimized lesson');
     setShowIntroduction(false);
+  };
+
+  const handleNavigateToActivity = (index: number) => {
+    console.log('🧭 Manual navigation to activity:', index);
+    setManualActivityIndex(index);
+    setCurrentActivityIndex(index);
   };
 
   // Show introduction first
@@ -98,6 +107,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
         forceStopAll();
       }}
       onActivityComplete={handleActivityComplete}
+      onNavigateToActivity={handleNavigateToActivity}
     />
   );
 };

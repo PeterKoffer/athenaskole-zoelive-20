@@ -23,6 +23,7 @@ interface MathLearningMainContentProps {
   onReadRequest: () => void;
   onStopSpeaking: () => void;
   onActivityComplete: (wasCorrect?: boolean) => void;
+  onNavigateToActivity?: (index: number) => void;
 }
 
 const MathLearningMainContent = ({
@@ -39,21 +40,22 @@ const MathLearningMainContent = ({
   onToggleMute,
   onReadRequest,
   onStopSpeaking,
-  onActivityComplete
+  onActivityComplete,
+  onNavigateToActivity
 }: MathLearningMainContentProps) => {
   const classroomConfig = getClassroomConfig('mathematics');
 
   const handleNavigateBack = () => {
-    if (currentActivityIndex > 0) {
-      // Logic to go to previous activity would go here
-      console.log('Navigate to previous activity');
+    if (currentActivityIndex > 0 && onNavigateToActivity) {
+      console.log('🔙 Navigating to previous activity:', currentActivityIndex - 1);
+      onNavigateToActivity(currentActivityIndex - 1);
     }
   };
 
   const handleNavigateForward = () => {
-    if (currentActivityIndex < totalRealActivities - 1) {
-      // Logic to go to next activity would go here
-      console.log('Navigate to next activity');
+    if (currentActivityIndex < totalRealActivities - 1 && onNavigateToActivity) {
+      console.log('🔜 Navigating to next activity:', currentActivityIndex + 1);
+      onNavigateToActivity(currentActivityIndex + 1);
     }
   };
 
