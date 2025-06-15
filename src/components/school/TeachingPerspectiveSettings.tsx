@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
-import Slider from "@/components/ui/slider";
+import { Slider } from "@/components/ui/slider"; // ✅ Correct named import
 import { TeachingPerspectiveSettings, TeachingPerspectiveType } from "@/types/school";
 import { useTeachingPerspectiveSettings } from "./hooks/useTeachingPerspectiveSettings";
 
