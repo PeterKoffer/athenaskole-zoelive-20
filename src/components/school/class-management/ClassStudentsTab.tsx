@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import EditStudentModal from "./EditStudentModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ const ClassStudentsTab = ({ currentClass, selectedClass, classes, onUpdateClasse
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [newStudentName, setNewStudentName] = useState("");
   const [newStudentEmail, setNewStudentEmail] = useState("");
+  const [editingStudent, setEditingStudent] = useState<null | (typeof currentClass.students[0] & {classId?: string; grade?: string; currentStepId?: string})>(null);
 
   const handleAddStudent = () => {
     if (!newStudentName.trim() || !newStudentEmail.trim()) return;
@@ -58,6 +59,36 @@ const ClassStudentsTab = ({ currentClass, selectedClass, classes, onUpdateClasse
         ? { ...cls, students: cls.students.filter(s => s.id !== studentId) }
         : cls
     );
+    onUpdateClasses(updatedClasses);
+  };
+
+  const handleSaveStudentEdit = (partialUpdate: { classId?: string; grade?: string; currentStepId?: string }) => {
+    const updatedClasses = classes.map(cls => {
+      if (editingStudent && partialUpdate.classId && cls.students.some(s => s.id === editingStudent.id)) {
+        if (cls.id === selectedClass && cls.id !== partialUpdate.classId) {
+          return { ...cls, students: cls.students.filter(s => s.id !== editingStudent.id) };
+        }
+      }
+      if (partialUpdate.classId && cls.id === partialUpdate.classId) {
+        const updated = editingStudent 
+          ? { ...editingStudent, ...partialUpdate, classId: partialUpdate.classId }
+          : null;
+        if (updated && cls.students.some(s => s.id === updated.id)) {
+          return { ...cls, students: cls.students.map(s => s.id === updated.id ? updated : s) };
+        } else if (updated) {
+          return { ...cls, students: [...cls.students, updated] };
+        }
+      }
+      if (cls.id === selectedClass && cls.students.some(s => s.id === (editingStudent?.id ?? ""))) {
+        return {
+          ...cls,
+          students: cls.students.map(s =>
+            s.id === (editingStudent?.id ?? "") ? { ...s, ...partialUpdate } : s
+          )
+        };
+      }
+      return cls;
+    });
     onUpdateClasses(updatedClasses);
   };
 
@@ -144,7 +175,14 @@ const ClassStudentsTab = ({ currentClass, selectedClass, classes, onUpdateClasse
                 <TableCell className="text-gray-300">{student.enrollmentDate}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-900">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-blue-400 border-blue-400 hover:bg-blue-900"
+                      onClick={() =>
+                        setEditingStudent({ ...student, classId: selectedClass, grade: undefined, currentStepId: undefined })
+                      }
+                    >
                       <Edit className="w-4 h-4" />
                     </Button>
                     <Button 
@@ -161,6 +199,15 @@ const ClassStudentsTab = ({ currentClass, selectedClass, classes, onUpdateClasse
             ))}
           </TableBody>
         </Table>
+        {editingStudent && (
+          <EditStudentModal
+            open={!!editingStudent}
+            onClose={() => setEditingStudent(null)}
+            student={editingStudent}
+            allClasses={classes}
+            onSave={handleSaveStudentEdit}
+          />
+        )}
       </CardContent>
     </Card>
   );
