@@ -19,7 +19,7 @@ export const generateMathActivities = async (): Promise<LessonActivity[]> => {
     {
       id: 'math-concept-1',
       type: 'content-delivery',
-      phase: 'content',
+      phase: 'content-delivery',
       title: 'Basic Math Concepts',
       content: {
         text: 'Let\'s start with some fundamental math concepts. We\'ll work through problems step by step.',
@@ -30,7 +30,7 @@ export const generateMathActivities = async (): Promise<LessonActivity[]> => {
     {
       id: 'math-interactive-1',
       type: 'interactive-game',
-      phase: 'practice',
+      phase: 'interactive-game',
       title: 'Math Practice Game',
       content: {
         text: 'Time for some interactive practice!',
@@ -40,8 +40,8 @@ export const generateMathActivities = async (): Promise<LessonActivity[]> => {
     },
     {
       id: 'math-explanation-1',
-      type: 'explanation',
-      phase: 'explanation',
+      type: 'content-delivery',
+      phase: 'content-delivery',
       title: 'Understanding Math Solutions',
       content: {
         text: 'Let me explain how we solve these types of problems.',
