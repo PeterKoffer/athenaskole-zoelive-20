@@ -6,7 +6,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
     backgroundImage: '/lovable-uploads/5f9c6e95-d949-47f5-bb3a-08f0c1c84d72.png', // Modern math classroom with equations on blackboard
     subjectColor: '#1e1b4b', // Deep indigo for math
     accentColor: '#8b5cf6', // Purple accent
-    overlayOpacity: 0.85,
+    overlayOpacity: 0, // No overlay
     subjectName: 'Mathematics',
     environmentDescription: 'Interactive Math Classroom with Nelie'
   },
@@ -89,3 +89,4 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
 export const getClassroomConfig = (subject: string): ClassroomConfig => {
   return CLASSROOM_CONFIGS[subject] || CLASSROOM_CONFIGS.mathematics;
 };
+
