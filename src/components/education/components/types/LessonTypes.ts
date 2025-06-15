@@ -1,4 +1,3 @@
-
 export interface LessonActivity {
   id: string;
   type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
@@ -132,7 +131,6 @@ export interface LessonActivity {
       hint?: string;
       solution: string;
     }>;
-    scenario?: string;
     
     // Creative exploration phase
     explorationTask?: string;
