@@ -4,6 +4,8 @@ import ActivityIntroduction from './activities/ActivityIntroduction';
 import ActivityContentDelivery from './activities/ActivityContentDelivery';
 import ActivityInteractiveGame from './activities/ActivityInteractiveGame';
 import ActivityFallback from './activities/ActivityFallback';
+import ActivityPuzzle from './activities/ActivityPuzzle';
+import ActivityMiniGame from './activities/ActivityMiniGame';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -21,7 +23,8 @@ const EnhancedActivityRenderer = ({
     activityType: activity.type,
     activityPhase: activity.phase,
     activityTitle: activity.title,
-    hasContent: !!activity.content
+    hasContent: !!activity.content,
+    contentKeys: activity.content ? Object.keys(activity.content) : []
   });
 
   // Render based on activity type and phase
@@ -37,6 +40,25 @@ const EnhancedActivityRenderer = ({
   if (activity.phase === 'content-delivery') {
     return (
       <ActivityContentDelivery
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Render specific game/puzzle types first
+  if (activity.content?.puzzleDescription) {
+    return (
+      <ActivityPuzzle
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  if (activity.content?.gameDescription) {
+    return (
+      <ActivityMiniGame
         activity={activity}
         onActivityComplete={onActivityComplete}
       />
