@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import AskNelieButtons from '../shared/AskNelieButtons';
 import { LessonActivity } from '../types/LessonTypes';
+import Blackboard from '../shared/Blackboard';
 
 interface MathLessonContentRendererProps {
   activity: LessonActivity;
@@ -15,7 +16,7 @@ const MathLessonContentRenderer = ({
   onComplete
 }: MathLessonContentRendererProps) => {
   return (
-    <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+    <Blackboard>
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-xl font-semibold text-white">{activity.title}</h2>
         <AskNelieButtons 
@@ -55,7 +56,7 @@ const MathLessonContentRenderer = ({
           Continue, {studentName}
         </Button>
       </div>
-    </div>
+    </Blackboard>
   );
 };
 

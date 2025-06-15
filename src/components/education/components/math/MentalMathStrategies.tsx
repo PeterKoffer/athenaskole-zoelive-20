@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Brain } from 'lucide-react';
 import AskNelieButtons from '../shared/AskNelieButtons';
+import Blackboard from '../shared/Blackboard';
 
 interface MentalMathStrategiesProps {
   studentName: string;
@@ -10,7 +11,7 @@ interface MentalMathStrategiesProps {
 
 const MentalMathStrategies = ({ studentName, onComplete }: MentalMathStrategiesProps) => {
   return (
-    <div className="bg-gray-800 border-gray-700 rounded-lg p-6">
+    <Blackboard>
       <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
         <Brain className="w-6 h-6 mr-3 text-purple-400" />
         Mental Math Strategies
@@ -119,7 +120,7 @@ const MentalMathStrategies = ({ studentName, onComplete }: MentalMathStrategiesP
           Ready to Practice These Strategies, {studentName}!
         </Button>
       </div>
-    </div>
+    </Blackboard>
   );
 };
 
