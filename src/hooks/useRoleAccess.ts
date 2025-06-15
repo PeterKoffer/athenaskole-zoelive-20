@@ -9,6 +9,7 @@ const MANUAL_ROLE_CHANGE_FLAG = "lovable-manual-role-change";
 export const useRoleAccess = () => {
   const { user, loading } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [isManuallyChangingRole, setIsManuallyChangingRole] = useState(false);
 
   const debugLog = (...args: any[]) => {
     console.log("[useRoleAccess]", ...args);
@@ -29,6 +30,9 @@ export const useRoleAccess = () => {
   };
 
   const isManualRoleChange = (): boolean => {
+    // Check both the state and the session storage flag
+    if (isManuallyChangingRole) return true;
+    
     if (typeof window !== "undefined") {
       const flag = sessionStorage.getItem(MANUAL_ROLE_CHANGE_FLAG);
       return flag === "true";
@@ -37,6 +41,7 @@ export const useRoleAccess = () => {
   };
 
   const clearManualRoleChangeFlag = () => {
+    setIsManuallyChangingRole(false);
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(MANUAL_ROLE_CHANGE_FLAG);
     }
@@ -45,6 +50,12 @@ export const useRoleAccess = () => {
   useEffect(() => {
     if (loading) {
       debugLog("Auth still loading, waiting...");
+      return;
+    }
+
+    // Don't auto-set role if we're in the middle of a manual change
+    if (isManualRoleChange()) {
+      debugLog("Manual role change in progress, skipping auto role assignment");
       return;
     }
 
@@ -84,26 +95,28 @@ export const useRoleAccess = () => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem(SESSION_ROLE_KEY, "school_leader");
     }
-  }, [user, loading]);
+  }, [user, loading, isManuallyChangingRole]);
 
   const setUserRoleManually = (role: UserRole) => {
-    debugLog("MANUAL ROLE CHANGE:", role, "- Setting flag to prevent auto-redirects");
+    debugLog("🔄 MANUAL ROLE CHANGE TO:", role, "- BLOCKING all auto-redirects");
     
-    // Set flag to prevent automatic redirects
+    // Set both flags immediately to prevent any redirects
+    setIsManuallyChangingRole(true);
     if (typeof window !== "undefined") {
       sessionStorage.setItem(MANUAL_ROLE_CHANGE_FLAG, "true");
     }
     
+    // Update the role
     setUserRole(role);
     if (typeof window !== "undefined") {
       sessionStorage.setItem(SESSION_ROLE_KEY, role);
     }
 
-    // Clear the flag after a short delay to allow navigation to complete
+    // Clear the flags after a longer delay to ensure navigation completes
     setTimeout(() => {
       clearManualRoleChangeFlag();
-      debugLog("Manual role change flag cleared");
-    }, 2000);
+      debugLog("✅ Manual role change complete - auto-redirects re-enabled");
+    }, 3000); // Increased from 2000 to 3000ms
   };
 
   const hasRole = (requiredRoles: UserRole[]): boolean => {
