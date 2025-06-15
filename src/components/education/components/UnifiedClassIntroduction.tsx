@@ -106,34 +106,48 @@ const UnifiedClassIntroduction = ({
                 className="border-purple-400 text-purple-200 bg-gray-800/50"
                 disabled={!isEnabled && hasUserInteracted}
               >
-                <Play className="w-4 h-4 mr-2" />
-                Repeat
+                <span className="flex items-center">
+                  <span className="mr-2">
+                    <Play className="w-4 h-4" />
+                  </span>
+                  Repeat
+                </span>
               </Button>
               <Button
                 variant="outline"
                 className="border-gray-400 text-gray-200 bg-gray-800/50"
                 onClick={handleHome}
               >
-                <Home className="w-4 h-4 mr-2" />
-                Home
+                <span className="flex items-center">
+                  <span className="mr-2">
+                    <Home className="w-4 h-4" />
+                  </span>
+                  Home
+                </span>
               </Button>
               {!hasStarted && (
-                <Button
-                  onClick={handleManualStart}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Start Introduction with Nelie
-                </Button>
-              )}
-              {!hasStarted && canProceedWithoutSpeech && (
-                <Button
-                  onClick={handleProceedWithoutSpeech}
-                  variant="outline"
-                  className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
-                >
-                  Start Lesson Without Speech
-                </Button>
+                <>
+                  <Button
+                    onClick={handleManualStart}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+                  >
+                    <span className="flex items-center">
+                      <span className="mr-2">
+                        <Play className="w-4 h-4" />
+                      </span>
+                      Start Introduction with Nelie
+                    </span>
+                  </Button>
+                  {canProceedWithoutSpeech && (
+                    <Button
+                      onClick={handleProceedWithoutSpeech}
+                      variant="outline"
+                      className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
+                    >
+                      Start Lesson Without Speech
+                    </Button>
+                  )}
+                </>
               )}
             </div>
             {hasStarted && (
