@@ -11,11 +11,6 @@ interface LessonControlsProps {
 }
 
 const LessonControls = ({
-  autoReadEnabled,
-  isSpeaking,
-  isReady,
-  onMuteToggle,
-  onManualRead,
   onRegenerate
 }: LessonControlsProps) => {
   // Only render the footer (no controls above or banner with the removed buttons)
@@ -28,4 +23,3 @@ const LessonControls = ({
 };
 
 export default LessonControls;
-
