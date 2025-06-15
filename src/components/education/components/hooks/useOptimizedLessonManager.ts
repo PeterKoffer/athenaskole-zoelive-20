@@ -80,10 +80,17 @@ export const useOptimizedLessonManager = ({
       console.log('🎯 Initializing optimized lesson activities for:', subject, skillArea);
       
       try {
-        const activities = await generateMathActivities();
+        let activities = await generateMathActivities();
         console.log('✅ Generated activities:', activities.length);
+        
+        // If the first activity is the intro "Basic Math Concepts", remove it.
+        if (activities.length > 0 && activities[0].title?.toLowerCase() === 'basic math concepts') {
+          console.log('🚮 Removing introductory "Basic Math Concepts" activity.');
+          activities = activities.slice(1);
+        }
+
         setAllActivities(activities);
-        setCurrentActivityIndex(0); // Always start at activity 0 (Activity 1)
+        setCurrentActivityIndex(0); // Always start at activity 0
         setCompletedActivities(new Set()); // Reset completion tracking
         setIsInitializing(false);
         startTimer();
