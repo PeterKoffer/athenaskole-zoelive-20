@@ -51,7 +51,7 @@ export const useActivityProgression = ({
           onLessonComplete();
         }
       }
-    }, wasCorrect !== undefined ? 2500 : 1500);
+    }, wasCorrect !== undefined ? 1000 : 500);
   }, [currentActivityIndex, allActivities.length, onActivityComplete, onLessonComplete]);
 
   const moveToNextActivity = useCallback(() => {

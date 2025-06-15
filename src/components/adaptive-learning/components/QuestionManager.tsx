@@ -155,7 +155,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       duration: 3000
     });
     
-    // Only proceed to next question after explanation time - increased to 6s to allow full explanation
+    // Only proceed to next question after explanation time - reduced to 2s to speed up lesson flow
     setTimeout(() => {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
@@ -169,7 +169,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       if (nextIndex >= totalQuestions && onComplete) {
         onComplete();
       }
-    }, 6000);
+    }, 2000);
 
   }, [answers, sessionQuestions, currentQuestionIndex, totalQuestions, generateNextQuestion, toast]);
 

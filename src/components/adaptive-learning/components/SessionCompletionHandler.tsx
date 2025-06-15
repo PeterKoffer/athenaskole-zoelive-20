@@ -28,7 +28,7 @@ const SessionCompletionHandler = ({
   useEffect(() => {
     if (!hasAnswered) return;
 
-    // Auto-advance to next question after 3 seconds
+    // Auto-advance to next question after 1.5 seconds
     const timer = setTimeout(() => {
       if (questionNumber >= totalQuestions) {
         // Session complete
@@ -46,7 +46,7 @@ const SessionCompletionHandler = ({
 
       // Next question
       onNextQuestion();
-    }, 3000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [hasAnswered, questionNumber, totalQuestions, correctAnswers, isCorrect, gradeLevel, onBack, onNextQuestion, toast]);
