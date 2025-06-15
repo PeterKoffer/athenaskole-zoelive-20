@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider"; // ✅ Correct named import
+import { Slider } from "@/components/ui/slider";
 import { TeachingPerspectiveSettings, TeachingPerspectiveType } from "@/types/school";
 import { useTeachingPerspectiveSettings } from "./hooks/useTeachingPerspectiveSettings";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 
 const perspectiveOptions: { label: string, value: TeachingPerspectiveType }[] = [
   { label: "None", value: "none" },
@@ -20,6 +21,12 @@ const perspectiveOptions: { label: string, value: TeachingPerspectiveType }[] = 
 ];
 
 export default function TeachingPerspectiveSettingsPanel() {
+  const { userRole } = useRoleAccess();
+  // Only allow "admin" or "school_leader"
+  if (userRole !== "admin" && userRole !== "school_leader") {
+    return null;
+  }
+
   const { settings, saveSettings } = useTeachingPerspectiveSettings();
   const [form, setForm] = useState<TeachingPerspectiveSettings>(settings);
 
