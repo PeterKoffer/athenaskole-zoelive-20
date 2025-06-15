@@ -13,7 +13,7 @@ export const generateMathActivities = async () => {
         text: 'Let\'s learn some powerful mental math strategies that will make solving problems faster and easier!',
         segments: [
           {
-            type: 'explanation',
+            concept: 'Mental Math Strategies Overview',
             explanation: 'Mental math strategies help you solve problems in your head quickly and accurately. We\'ll explore number bonds, compensation, doubling and halving, and benchmark numbers.'
           }
         ]
