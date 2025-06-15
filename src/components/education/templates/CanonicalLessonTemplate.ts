@@ -41,7 +41,7 @@ export interface CanonicalLessonActivityConfig {
 export interface CanonicalFinaleConfig {
   title: string;
   description: string;
-  type: 'boss-battle' | 'celebration' | 'presentation' | 'final-project';
+  type: 'boss-battle' | 'presentation' | 'final-project' | 'epic-quest';
   celebration: string;
 }
 
@@ -169,7 +169,7 @@ export function createCanonicalMathematicsLesson(options?: Partial<CanonicalLess
     finale: {
       title: "You Escaped the Math Forest!",
       description: "Celebrate your adventure and prepare for the next quest.",
-      type: 'celebration',
+      type: 'presentation', // was "celebration", which is not a valid type; changed to "presentation"
       celebration: "You are a true Math Explorer! 🎉"
     }
   };
