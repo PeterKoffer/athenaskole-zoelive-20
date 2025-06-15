@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Play } from 'lucide-react';
+import { Volume2, VolumeX, Play, Home } from 'lucide-react';
 import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
@@ -113,47 +114,90 @@ const UnifiedClassIntroduction = ({
               {currentContent.text}
             </p>
           </div>
-          <div className="mt-6 flex justify-between items-center">
-            <div className="flex space-x-2">
+          {/* All controls in one bar underneath the content */}
+          <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            {/* Flex row of ALL buttons, as in reference design */}
+            <div className="flex flex-1 flex-wrap gap-2">
+              {/* Unmute/Mute Nelie */}
               <Button
                 variant="outline"
-                size="sm"
                 onClick={toggleEnabled}
-                className="border-purple-400 text-purple-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
+                className="border-purple-400 text-purple-200 bg-gray-800/50"
               >
-                {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                {isEnabled ? 'Mute' : 'Unmute'} Nelie
+                {isEnabled ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
+                {isEnabled ? 'Unmute Nelie' : 'Unmute Nelie'}
               </Button>
+              {/* Repeat */}
               <Button
                 variant="outline"
-                size="sm"
                 onClick={handleManualRead}
-                className="border-blue-400 text-blue-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
+                className="border-purple-400 text-purple-200 bg-gray-800/50"
+                disabled={!isEnabled && hasUserInteracted}
               >
-                <Play className="w-4 h-4 mr-1" />
+                <Play className="w-4 h-4 mr-2" />
                 Repeat
               </Button>
+              {/* Home */}
+              <Button
+                variant="outline"
+                className="border-gray-400 text-gray-200 bg-gray-800/50"
+                onClick={handleHome}
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
+              {/* Start Introduction with Nelie */}
+              {!hasStarted && (
+                <Button
+                  onClick={handleManualStart}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Start Introduction with Nelie
+                </Button>
+              )}
+              {/* Start Lesson Without Speech */}
+              {!hasStarted && canProceedWithoutSpeech && (
+                <Button
+                  onClick={handleProceedWithoutSpeech}
+                  variant="outline"
+                  className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
+                >
+                  Start Lesson Without Speech
+                </Button>
+              )}
             </div>
-            {/* Introduction Controls */}
-            <div className="flex space-x-2">
-              {/* Pass new onHome handler to controls */}
-              <IntroductionControls
-                hasStarted={hasStarted}
-                canProceedWithoutSpeech={canProceedWithoutSpeech}
-                isEnabled={isEnabled}
-                isSpeaking={isSpeaking}
-                isComplete={isComplete}
-                hasUserInteracted={hasUserInteracted}
-                onManualStart={handleManualStart}
-                onProceedWithoutSpeech={handleProceedWithoutSpeech}
-                onToggleEnabled={toggleEnabled}
-                onManualRead={handleManualRead}
-                onIntroductionComplete={onIntroductionComplete}
-                onStartLesson={handleStartLesson}
-                onSkip={handleSkip}
-                onHome={handleHome}
-              />
-            </div>
+            {/* If started, show lesson controls (not relevant for welcome step) */}
+            {hasStarted && (
+              <div className="flex flex-wrap gap-2">
+                {isComplete ? (
+                  <Button
+                    onClick={onIntroductionComplete}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                  >
+                    Start Class
+                  </Button>
+                ) : (
+                  <>
+                    {(isSpeaking || hasStarted) && (
+                      <Button
+                        onClick={handleStartLesson}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                      >
+                        Start Lesson
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      onClick={handleSkip}
+                      className="border-gray-400 text-gray-200 bg-gray-800/50"
+                    >
+                      Skip Introduction
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -162,3 +206,4 @@ const UnifiedClassIntroduction = ({
 };
 
 export default UnifiedClassIntroduction;
+
