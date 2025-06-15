@@ -52,8 +52,8 @@ const FloatingAvatarButton = ({
         isSpeaking={isSpeaking}
       />
       
-      {/* Small control buttons under Nelie */}
-      <div className="flex gap-1 mt-2">
+      {/* Small control buttons very close to Nelie */}
+      <div className="flex gap-1 -mt-1">
         <Button
           variant="outline"
           size="sm"
