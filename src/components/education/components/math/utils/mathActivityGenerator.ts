@@ -1,77 +1,121 @@
 
-import { LessonActivity } from '../../types/LessonTypes';
-
-// Generate math activities for the optimized lesson manager
-export const generateMathActivities = async (): Promise<LessonActivity[]> => {
-  // Return a set of math activities that match the LessonActivity type
-  const activities: LessonActivity[] = [
+export const generateMathActivities = async () => {
+  console.log('🔢 Generating optimized math activities');
+  
+  // Start directly with Mental Math Strategies
+  const activities = [
     {
-      id: 'math-intro',
-      type: 'introduction',
-      phase: 'introduction',
-      title: 'Welcome to Math Class',
+      id: 'mental-math-strategies',
+      type: 'content-delivery' as const,
+      phase: 'content-delivery' as const,
+      title: 'Mental Math Strategies',
       content: {
-        text: 'Welcome to your math lesson! Today we\'ll be exploring different mathematical concepts.',
-        question: 'Are you ready to start learning?'
+        text: 'Let\'s learn some powerful mental math strategies that will make solving problems faster and easier!',
+        segments: [
+          {
+            type: 'explanation',
+            explanation: 'Mental math strategies help you solve problems in your head quickly and accurately. We\'ll explore number bonds, compensation, doubling and halving, and benchmark numbers.'
+          }
+        ]
       },
-      duration: 2
+      difficulty: 1,
+      estimatedDuration: 180,
+      learningObjectives: ['Understanding mental math strategies', 'Learning number bonds', 'Practicing compensation techniques']
     },
+    
+    // Practice activities
     {
-      id: 'math-concept-1',
-      type: 'content-delivery',
-      phase: 'content-delivery',
-      title: 'Basic Math Concepts',
+      id: 'number-bonds-practice',
+      type: 'interactive-game' as const,
+      phase: 'interactive-game' as const,
+      title: 'Number Bonds Practice',
       content: {
-        text: 'Let\'s start with some fundamental math concepts. We\'ll work through problems step by step.',
-        question: 'What is 5 + 3?'
+        question: 'What is 8 + 7?',
+        options: ['14', '15', '16', '17'],
+        correctAnswer: '15',
+        explanation: 'Using number bonds: 8 + 7 = 8 + 2 + 5 = 10 + 5 = 15'
       },
-      duration: 5
+      difficulty: 2,
+      estimatedDuration: 120
     },
+    
     {
-      id: 'math-interactive-1',
-      type: 'interactive-game',
-      phase: 'interactive-game',
-      title: 'Math Practice Game',
+      id: 'compensation-practice',
+      type: 'interactive-game' as const,
+      phase: 'interactive-game' as const,
+      title: 'Compensation Strategy',
       content: {
-        text: 'Time for some interactive practice!',
-        question: 'Solve the following problem:'
+        question: 'What is 29 + 15?',
+        options: ['42', '43', '44', '45'],
+        correctAnswer: '44',
+        explanation: 'Using compensation: 29 + 15 = 30 + 15 - 1 = 45 - 1 = 44'
       },
-      duration: 8
+      difficulty: 2,
+      estimatedDuration: 120
     },
+    
     {
-      id: 'math-explanation-1',
-      type: 'content-delivery',
-      phase: 'content-delivery',
-      title: 'Understanding Math Solutions',
+      id: 'doubling-halving-practice',
+      type: 'interactive-game' as const,
+      phase: 'interactive-game' as const,
+      title: 'Doubling & Halving',
       content: {
-        text: 'Let me explain how we solve these types of problems.',
-        question: 'Do you understand the solution method?'
+        question: 'What is 6 × 8?',
+        options: ['46', '47', '48', '49'],
+        correctAnswer: '48',
+        explanation: 'Using doubling: 6 × 8 = (6 × 4) × 2 = 24 × 2 = 48'
       },
-      duration: 4
+      difficulty: 3,
+      estimatedDuration: 120
     },
+    
     {
-      id: 'math-application-1',
-      type: 'application',
-      phase: 'application',
-      title: 'Real-World Math Applications',
+      id: 'benchmark-numbers-practice',
+      type: 'interactive-game' as const,
+      phase: 'interactive-game' as const,
+      title: 'Benchmark Numbers',
       content: {
-        text: 'Now let\'s see how we can apply these concepts in real situations.',
-        question: 'Can you think of a real-world example?'
+        question: 'What is 98 + 47?',
+        options: ['143', '144', '145', '146'],
+        correctAnswer: '145',
+        explanation: 'Using benchmark numbers: 98 + 47 = 100 + 47 - 2 = 147 - 2 = 145'
       },
-      duration: 6
+      difficulty: 3,
+      estimatedDuration: 120
     },
+    
+    // Additional practice problems
     {
-      id: 'math-summary',
-      type: 'summary',
-      phase: 'summary',
-      title: 'Math Lesson Summary',
+      id: 'mixed-strategies-1',
+      type: 'interactive-game' as const,
+      phase: 'interactive-game' as const,
+      title: 'Mixed Strategy Practice',
       content: {
-        text: 'Great work! Let\'s review what we\'ve learned today.',
-        question: 'What was your favorite part of today\'s lesson?'
+        question: 'What is 25 + 38?',
+        options: ['61', '62', '63', '64'],
+        correctAnswer: '63',
+        explanation: 'Using compensation: 25 + 38 = 25 + 40 - 2 = 65 - 2 = 63'
       },
-      duration: 3
+      difficulty: 2,
+      estimatedDuration: 120
+    },
+    
+    {
+      id: 'mixed-strategies-2',
+      type: 'interactive-game' as const,
+      phase: 'interactive-game' as const,
+      title: 'Mental Math Challenge',
+      content: {
+        question: 'What is 7 × 9?',
+        options: ['61', '62', '63', '64'],
+        correctAnswer: '63',
+        explanation: 'Using known facts: 7 × 9 = 7 × 10 - 7 = 70 - 7 = 63'
+      },
+      difficulty: 3,
+      estimatedDuration: 120
     }
   ];
 
+  console.log('✅ Generated', activities.length, 'math activities starting with Mental Math Strategies');
   return activities;
 };
