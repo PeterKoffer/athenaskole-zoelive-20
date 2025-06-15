@@ -7,6 +7,7 @@ import MathLessonContentRenderer from './MathLessonContentRenderer';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
+import { Button } from '@/components/ui/button';
 
 interface MathLearningMainContentProps {
   studentName: string;
@@ -125,10 +126,21 @@ const MathLearningMainContent = ({
                 
                 {/* Activity completion status indicator */}
                 {isCurrentActivityCompleted && (
-                  <div className="text-center">
+                  <div className="text-center space-y-2">
                     <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
                       ✓ Activity Completed
                     </div>
+                    {canNavigateForward && (
+                      <Button
+                        onClick={handleNavigateForward}
+                        className="mt-4 bg-lime-500 hover:bg-lime-600 text-black px-8 py-3 text-lg font-bold transition"
+                        size="lg"
+                        tabIndex={0}
+                        autoFocus
+                      >
+                        Next Activity
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
