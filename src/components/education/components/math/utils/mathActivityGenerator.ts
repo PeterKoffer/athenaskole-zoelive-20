@@ -1,4 +1,5 @@
 
+
 export const generateMathActivities = async () => {
   console.log('🔢 Generating optimized math activities');
   
@@ -32,7 +33,7 @@ export const generateMathActivities = async () => {
       content: {
         question: 'What is 8 + 7?',
         options: ['14', '15', '16', '17'],
-        correctAnswer: '15',
+        correctAnswer: 1,
         explanation: 'Using number bonds: 8 + 7 = 8 + 2 + 5 = 10 + 5 = 15'
       },
       difficulty: 2,
@@ -47,7 +48,7 @@ export const generateMathActivities = async () => {
       content: {
         question: 'What is 29 + 15?',
         options: ['42', '43', '44', '45'],
-        correctAnswer: '44',
+        correctAnswer: 2,
         explanation: 'Using compensation: 29 + 15 = 30 + 15 - 1 = 45 - 1 = 44'
       },
       difficulty: 2,
@@ -62,7 +63,7 @@ export const generateMathActivities = async () => {
       content: {
         question: 'What is 6 × 8?',
         options: ['46', '47', '48', '49'],
-        correctAnswer: '48',
+        correctAnswer: 2,
         explanation: 'Using doubling: 6 × 8 = (6 × 4) × 2 = 24 × 2 = 48'
       },
       difficulty: 3,
@@ -77,7 +78,7 @@ export const generateMathActivities = async () => {
       content: {
         question: 'What is 98 + 47?',
         options: ['143', '144', '145', '146'],
-        correctAnswer: '145',
+        correctAnswer: 2,
         explanation: 'Using benchmark numbers: 98 + 47 = 100 + 47 - 2 = 147 - 2 = 145'
       },
       difficulty: 3,
@@ -93,7 +94,7 @@ export const generateMathActivities = async () => {
       content: {
         question: 'What is 25 + 38?',
         options: ['61', '62', '63', '64'],
-        correctAnswer: '63',
+        correctAnswer: 2,
         explanation: 'Using compensation: 25 + 38 = 25 + 40 - 2 = 65 - 2 = 63'
       },
       difficulty: 2,
@@ -108,7 +109,7 @@ export const generateMathActivities = async () => {
       content: {
         question: 'What is 7 × 9?',
         options: ['61', '62', '63', '64'],
-        correctAnswer: '63',
+        correctAnswer: 2,
         explanation: 'Using known facts: 7 × 9 = 7 × 10 - 7 = 70 - 7 = 63'
       },
       difficulty: 3,
@@ -119,3 +120,4 @@ export const generateMathActivities = async () => {
   console.log('✅ Generated', activities.length, 'math activities starting with Mental Math Strategies');
   return activities;
 };
+
