@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Repeat, Home, Play } from 'lucide-react';
 
@@ -70,11 +71,12 @@ const UnifiedClassIntroductionControls = ({
           <Button
             type="button"
             onClick={handleManualStart}
-            className="min-w-[140px] sm:min-w-[180px] px-3 py-2 font-semibold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-sm"
+            className="min-w-[220px] px-5 py-2 font-bold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-base shadow-none"
             disabled={isAdvancing}
+            style={{ letterSpacing: "0.01em" }}
           >
-            <Play className="w-4 h-4 mr-1" />
-            Start Introduction with Nelie
+            <Play className="w-5 h-5 mr-2" />
+            <span className="whitespace-nowrap">Start Introduction with Nelie</span>
           </Button>
 
           {/* Start Lesson Without Speech */}
@@ -82,10 +84,11 @@ const UnifiedClassIntroductionControls = ({
             type="button"
             onClick={handleProceedWithoutSpeech}
             variant="outline"
-            className="min-w-[170px] px-3 py-2 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm"
+            className="min-w-[220px] px-5 py-2 font-bold border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-base shadow-none"
             disabled={!canProceedWithoutSpeech || isAdvancing}
+            style={{ letterSpacing: "0.01em" }}
           >
-            Start Lesson Without Speech
+            <span className="whitespace-nowrap">Start Lesson Without Speech</span>
           </Button>
         </div>
       </div>
@@ -136,3 +139,4 @@ const UnifiedClassIntroductionControls = ({
 };
 
 export default UnifiedClassIntroductionControls;
+
