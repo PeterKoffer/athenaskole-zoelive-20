@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
@@ -6,55 +5,73 @@ import { UserRole } from '@/types/auth';
 const SESSION_ROLE_KEY = "lovable-session-userRole";
 
 /**
- * Loads role from Supabase user, sessionStorage or fallback.
- * - Prefers user.user_metadata.role if present (tied to profile/email!)
- * - Persists to sessionStorage for navigation durability.
- * - Falls back to sessionStorage or "student" if truly unavailable.
+ * Loads and persists the *last known valid* role for navigation durability.
+ * - Always prefers user.user_metadata.role if present (profile from Supabase)
+ * - Otherwise, falls back to last persisted sessionStorage role
+ * - *Never downgrades* to "student" during navigation if prior valid role exists.
+ * - Only falls back to "student" if both user and saved session role are missing.
  */
 export const useRoleAccess = () => {
   const { user } = useAuth();
 
-  // Helper to read role from Supabase profile/user metadata
+  // Get role from user profile
   const getRoleFromUser = (): UserRole | null => {
-    if (user?.user_metadata?.role) return user.user_metadata.role as UserRole;
+    const meta = user?.user_metadata;
+    if (meta?.role) return meta.role as UserRole;
     return null;
   };
 
-  // Helper to read from sessionStorage
+  // Get role from sessionStorage
   const getRoleFromSession = (): UserRole | null => {
     if (typeof window !== "undefined") {
-      const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY);
-      if (sessionRole) return sessionRole as UserRole;
+      const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY) as UserRole | null;
+      if (sessionRole) return sessionRole;
     }
     return null;
   };
 
-  // Initial state setup - prefer Supabase profile if already loaded, else session
+  // Setup role, but NEVER lose a privileged role when navigating.
   const [userRole, setUserRole] = useState<UserRole | null>(() => {
-    // At time of first render, user might not be ready - fallback to sessionStorage
-    return getRoleFromUser() || getRoleFromSession() || null;
+    const userMetaRole = getRoleFromUser();
+    if (userMetaRole) return userMetaRole;
+    const saved = getRoleFromSession();
+    return saved || null;
   });
 
   useEffect(() => {
-    // Always prefer role from Supabase user.profile
-    const newRole = getRoleFromUser();
-    if (newRole) {
-      setUserRole(newRole);
+    // 1. Get the current role from Supabase user profile if available
+    const profileRole = getRoleFromUser();
+
+    if (profileRole) {
+      setUserRole(profileRole);
       if (typeof window !== "undefined") {
-        sessionStorage.setItem(SESSION_ROLE_KEY, newRole);
+        sessionStorage.setItem(SESSION_ROLE_KEY, profileRole);
       }
-    } else {
-      // If not logged in or no profile role, fallback to last session or "student"
-      const sessionRole = getRoleFromSession();
-      if (sessionRole) {
-        setUserRole(sessionRole);
-      } else {
-        setUserRole('student');
-      }
+      return;
     }
+
+    // 2. Otherwise use the last session storage role
+    const priorSessionRole = getRoleFromSession();
+    if (priorSessionRole) {
+      // Don't auto downgrade to student if previously leader/admin
+      if (userRole !== priorSessionRole) {
+        setUserRole(priorSessionRole);
+      }
+      // Keep highest role sticky
+      return;
+    }
+
+    // 3. If signed out or no profile, clear session, fall back ONLY NOW to student
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(SESSION_ROLE_KEY);
+    }
+    setUserRole('student');
+  // Intentionally depend on "user" only - this ensures we sync up on auth change
+  // and avoid unnecessary resets
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Manual role setter (e.g., from UI role switcher)
+  // Manual "role switcher"
   const setUserRoleManually = (role: UserRole) => {
     setUserRole(role);
     if (typeof window !== "undefined") {
@@ -62,18 +79,16 @@ export const useRoleAccess = () => {
     }
   };
 
-  const hasRole = (requiredRoles: UserRole[]): boolean => {
-    if (!userRole) return false;
-    return requiredRoles.includes(userRole);
-  };
+  const hasRole = (requiredRoles: UserRole[]): boolean =>
+    !!userRole && requiredRoles.includes(userRole);
 
-  // Helpers for common role cases
-  const isAdmin = (): boolean => userRole === 'admin';
-  const isSchoolLeader = (): boolean => userRole === 'school_leader';
-  const isSchoolStaff = (): boolean => userRole === 'school_staff';
-  const isTeacher = (): boolean => userRole === 'teacher';
-  const canAccessAIInsights = (): boolean => hasRole(['admin', 'school_leader']);
-  const canAccessSchoolDashboard = (): boolean => hasRole(['admin', 'school_leader', 'school_staff']);
+  // Convenient role checks
+  const isAdmin = () => userRole === 'admin';
+  const isSchoolLeader = () => userRole === 'school_leader';
+  const isSchoolStaff = () => userRole === 'school_staff';
+  const isTeacher = () => userRole === 'teacher';
+  const canAccessAIInsights = () => hasRole(['admin', 'school_leader']);
+  const canAccessSchoolDashboard = () => hasRole(['admin', 'school_leader', 'school_staff']);
 
   return {
     userRole,
