@@ -13,12 +13,11 @@ const SESSION_ROLE_KEY = "lovable-session-userRole";
  * - Only falls back to "student" if both user and saved session role are missing (i.e., signed out, or truly no assigned role).
  */
 export const useRoleAccess = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   // Helper: logging, for debugging if needed
   const debugLog = (...args: any[]) => {
-    // Uncomment to debug:
-    // console.log("[useRoleAccess]", ...args);
+    console.log("[useRoleAccess]", ...args);
   };
 
   // Role from live user object
@@ -41,27 +40,22 @@ export const useRoleAccess = () => {
 
   // The role state (null at first; updated after user or session storage checked)
   const [userRole, setUserRole] = useState<UserRole | null>(() => {
-    // Try in priority order:
-    const fromUser = getRoleFromUser();
-    if (fromUser) {
-      debugLog("Init: using userMetaRole", fromUser);
-      return fromUser;
-    }
-    const fromSession = getRoleFromSession();
-    if (fromSession) {
-      debugLog("Init: using sessionStorage role", fromSession);
-      return fromSession;
-    }
-    // Don't default to student yet; wait for useEffect!
-    debugLog("Init: no role found, returning null");
+    // Don't initialize with any role - wait for useEffect
+    debugLog("Init: waiting for auth to load");
     return null;
   });
 
   useEffect(() => {
-    // 1. Try the freshest user profile
+    // Don't do anything while auth is still loading
+    if (loading) {
+      debugLog("useEffect: auth still loading, waiting...");
+      return;
+    }
+
+    // 1. Try the freshest user profile first
     const profileRole = getRoleFromUser();
 
-    debugLog("useEffect ran: user", user, "profileRole", profileRole);
+    debugLog("useEffect ran: user", user?.id, "profileRole", profileRole, "loading", loading);
 
     if (profileRole) {
       debugLog("Effect: Setting userRole to profileRole", profileRole);
@@ -72,31 +66,29 @@ export const useRoleAccess = () => {
       return;
     }
 
-    // 2. Otherwise use the last session storage role
-    const priorSessionRole = getRoleFromSession();
-    if (priorSessionRole) {
-      if (userRole !== priorSessionRole) {
-        debugLog("Effect: Restoring role from sessionStorage", priorSessionRole);
+    // 2. If user is authenticated but no role in metadata, check session storage
+    if (user) {
+      const priorSessionRole = getRoleFromSession();
+      if (priorSessionRole) {
+        debugLog("Effect: User authenticated, using sessionStorage role", priorSessionRole);
         setUserRole(priorSessionRole);
+        return;
       }
+      
+      // User is authenticated but has no role - this shouldn't happen in normal flow
+      // Don't default to student, leave as null so they can be properly redirected
+      debugLog("Effect: Authenticated user with no role detected, keeping null");
+      setUserRole(null);
       return;
     }
 
-    // 3. If user *really* has no role and nothing in session => guest fallback: "student"
-    // Only set student if actually not authenticated OR everything else cleared.
-    if (!user) {
-      debugLog("Effect: No user/role/session, fallback to 'student'");
-      setUserRole("student");
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem(SESSION_ROLE_KEY, "student");
-      }
-    } else {
-      // We're signed in but no role from profile or session: don't force "student", just null!
-      debugLog("Effect: Authenticated but NO role detected, setting userRole to null");
-      setUserRole(null);
+    // 3. User is not authenticated - fall back to student for guest access
+    debugLog("Effect: No user authenticated, setting to student");
+    setUserRole("student");
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(SESSION_ROLE_KEY, "student");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, loading]);
 
   // Set user role manually, and persist
   const setUserRoleManually = (role: UserRole) => {

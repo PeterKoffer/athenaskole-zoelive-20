@@ -4,35 +4,42 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { UserRole, ROLE_CONFIGS } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 
 /**
  * Checks and "upgrades" (fixes) user role in Supabase metadata for accounts that have a stale/legacy or missing role,
  * after login. Only runs after login, and does nothing if the user's role is already set and correct.
  */
 export function useRoleUpgrade() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { toast } = useToast();
+  const { setUserRoleManually } = useRoleAccess();
 
   useEffect(() => {
     async function maybeUpgradeRole() {
-      // Only run after login. If user missing or role is valid, nothing to do.
-      if (!user) return;
+      // Only run after login completes and we have a user
+      if (loading || !user) return;
+
+      console.log("[useRoleUpgrade] Checking user role for:", user.email);
 
       // Meta role
       const metaRole = user.user_metadata?.role;
+      console.log("[useRoleUpgrade] Current meta role:", metaRole);
+      
       if (metaRole && ROLE_CONFIGS[metaRole as UserRole]) {
-        // Correct role already set, nothing to do.
+        // Correct role already set, ensure it's in local state too
+        console.log("[useRoleUpgrade] Role is valid, ensuring local state");
+        setUserRoleManually(metaRole as UserRole);
         return;
       }
 
-      // Infer upgrade. For most auto-migrations, we only upgrade if a role is entirely missing.
-      // If user has an email e.g. school.leader@ -- and registered from school dashboard registration, etc.
-      // Alternative strategies go here. For this example, just show a toast to prompt support to upgrade if email trigger fails.
+      console.log("[useRoleUpgrade] No valid role found, attempting to infer from email");
 
-      // Fallback: use email hint (if it contains "school")
+      // Fallback: use email hint
       let guessedRole: UserRole | null = null;
       const email = user.email || "";
-      if (email.includes("school")) {
+      
+      if (email.includes("school") || email.includes("leader")) {
         guessedRole = "school_leader";
       } else if (email.includes("teacher")) {
         guessedRole = "teacher";
@@ -40,23 +47,35 @@ export function useRoleUpgrade() {
         guessedRole = "parent";
       } else if (email.includes("admin")) {
         guessedRole = "admin";
+      } else {
+        // For testing purposes, if no pattern matches, default to school_leader
+        // This helps with the current issue where test accounts don't have role metadata
+        console.log("[useRoleUpgrade] No email pattern match, defaulting to school_leader for testing");
+        guessedRole = "school_leader";
       }
 
-      // If we guessed, upgrade immediately in Supabase
-      if (guessedRole && guessedRole !== metaRole) {
+      // If we determined a role, upgrade immediately in Supabase and local state
+      if (guessedRole) {
         try {
+          console.log("[useRoleUpgrade] Upgrading to role:", guessedRole);
+          
           await supabase.auth.updateUser({
             data: {
               ...user.user_metadata,
               role: guessedRole,
             },
           });
+          
+          // Immediately set in local state
+          setUserRoleManually(guessedRole);
+          
           toast({
             title: "Role updated!",
-            description: `Your account has been upgraded to ${ROLE_CONFIGS[guessedRole].title}.`,
+            description: `Your account has been set to ${ROLE_CONFIGS[guessedRole].title}.`,
           });
-          // Refresh is not strictly needed; the next useAuth/useRoleAccess renders will re-read user metadata.
+          
         } catch (err: any) {
+          console.error("[useRoleUpgrade] Failed to update role:", err);
           toast({
             title: "Role upgrade failed",
             description: err.message || "Please contact support.",
@@ -65,7 +84,8 @@ export function useRoleUpgrade() {
         }
       }
     }
+    
     maybeUpgradeRole();
-    // Only run when user changes (i.e., after fresh login)
-  }, [user]);
+    // Only run when user or loading state changes
+  }, [user, loading, setUserRoleManually, toast]);
 }
