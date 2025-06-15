@@ -34,10 +34,9 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    // Only redirect from auth page or home page - don't interfere with manual navigation
-    const shouldRedirect = 
-      location.pathname === '/auth' || 
-      location.pathname === '/';
+    // Only redirect from auth page - don't interfere with other navigation
+    // Remove the home page redirect to allow role switching
+    const shouldRedirect = location.pathname === '/auth';
 
     if (!shouldRedirect) {
       console.log('[useAuthRedirect] Not redirecting - user is on valid path:', location.pathname);
