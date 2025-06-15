@@ -22,9 +22,15 @@ export const useAuthRedirect = () => {
     console.log('[useAuthRedirect] Current path:', location.pathname);
     console.log('[useAuthRedirect] =================');
 
-    // Don't redirect while still loading or if no user
-    if (loading || !user || !userRole) {
-      console.log('[useAuthRedirect] Skipping redirect - loading or no user/role');
+    // Don't redirect while still loading
+    if (loading) {
+      console.log('[useAuthRedirect] Skipping redirect - still loading');
+      return;
+    }
+
+    // If no user or role, don't redirect (let them stay on current page or go to auth)
+    if (!user && !userRole) {
+      console.log('[useAuthRedirect] No user and no role - staying put');
       return;
     }
 
@@ -38,29 +44,39 @@ export const useAuthRedirect = () => {
       return;
     }
 
+    // Ensure we have a role before redirecting
+    if (!userRole) {
+      console.log('[useAuthRedirect] No role set yet, waiting...');
+      return;
+    }
+
     console.log('[useAuthRedirect] Redirecting user with role:', userRole, 'from:', location.pathname);
 
     // Redirect based on role
-    switch (userRole) {
-      case 'admin':
-        navigate('/admin-dashboard');
-        break;
-      case 'school_leader':
-      case 'school_staff':
-        navigate('/school-dashboard');
-        break;
-      case 'teacher':
-        navigate('/teacher-dashboard');
-        break;
-      case 'parent':
-        navigate('/parent-dashboard');
-        break;
-      case 'student':
-        navigate('/daily-program');
-        break;
-      default:
-        console.log('[useAuthRedirect] Unknown role, staying on current page');
-        break;
+    try {
+      switch (userRole) {
+        case 'admin':
+          navigate('/admin-dashboard', { replace: true });
+          break;
+        case 'school_leader':
+        case 'school_staff':
+          navigate('/school-dashboard', { replace: true });
+          break;
+        case 'teacher':
+          navigate('/teacher-dashboard', { replace: true });
+          break;
+        case 'parent':
+          navigate('/parent-dashboard', { replace: true });
+          break;
+        case 'student':
+          navigate('/daily-program', { replace: true });
+          break;
+        default:
+          console.log('[useAuthRedirect] Unknown role, staying on current page');
+          break;
+      }
+    } catch (error) {
+      console.error('[useAuthRedirect] Navigation error:', error);
     }
   }, [user, userRole, loading, navigate, location.pathname]);
 };

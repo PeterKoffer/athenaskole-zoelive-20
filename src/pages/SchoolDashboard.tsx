@@ -19,6 +19,8 @@ const SchoolDashboard = () => {
   const { userRole } = useRoleAccess();
   const { user, loading } = useAuth();
 
+  console.log('[SchoolDashboard] Rendering with role:', userRole, 'loading:', loading);
+
   const stats = {
     totalStudents: 485,
     totalTeachers: 28,
@@ -26,22 +28,28 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
+  // Show loading state while auth is still loading
   if (loading || userRole === null) {
+    console.log('[SchoolDashboard] Showing loading state');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="animate-pulse">
-          <div className="w-12 h-12 bg-purple-600 rounded-full mb-4 mx-auto"></div>
-          <h1 className="text-2xl font-bold mb-4">Loading School Dashboard...</h1>
-          <p className="text-gray-400">Preparing your educational management system...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-white text-lg font-semibold">Loading School Dashboard...</h2>
+          <p className="text-gray-400 mt-2">Preparing your educational management system...</p>
         </div>
       </div>
     );
   }
 
+  // Check access permissions - allow school_leader, admin, and school_staff
   const allowedRoles = ['admin', 'school_leader', 'school_staff'];
   const hasAccess = allowedRoles.includes(userRole);
   
+  console.log('[SchoolDashboard] Access check - userRole:', userRole, 'hasAccess:', hasAccess);
+
   if (!hasAccess) {
+    console.log('[SchoolDashboard] Access denied for role:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -53,6 +61,8 @@ const SchoolDashboard = () => {
       </div>
     );
   }
+
+  console.log('[SchoolDashboard] Rendering dashboard content');
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -74,7 +84,7 @@ const SchoolDashboard = () => {
         <SchoolStatsCards stats={stats} />
         <TeachingPerspectiveSettingsPanel />
 
-        {/* Enhanced Management Dropdown */}
+        {/* Management Dropdown */}
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

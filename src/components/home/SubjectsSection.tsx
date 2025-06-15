@@ -13,8 +13,7 @@ const SubjectsSection = () => {
       icon: "🔢",
       color: "from-blue-500 to-cyan-500",
       route: "/learn/mathematics",
-      skills: ["Algebra", "Geometry", "Statistics", "Calculus"],
-      engagement: "Interactive problem-solving with instant feedback"
+      skills: ["Algebra", "Geometry", "Statistics"],
     },
     {
       title: "English Language Arts",
@@ -22,8 +21,7 @@ const SubjectsSection = () => {
       icon: "📚",
       color: "from-purple-500 to-violet-500",
       route: "/learn/english",
-      skills: ["Creative Writing", "Literature Analysis", "Grammar", "Public Speaking"],
-      engagement: "Story-based learning with AI writing assistant"
+      skills: ["Creative Writing", "Literature", "Grammar"],
     },
     {
       title: "Science & Technology",
@@ -31,8 +29,7 @@ const SubjectsSection = () => {
       icon: "🔬",
       color: "from-green-500 to-emerald-500",
       route: "/learn/science",
-      skills: ["Physics", "Chemistry", "Biology", "Environmental Science"],
-      engagement: "Virtual labs and interactive simulations"
+      skills: ["Physics", "Chemistry", "Biology"],
     },  
     {
       title: "Computer Science",
@@ -40,8 +37,7 @@ const SubjectsSection = () => {
       icon: "💻",
       color: "from-indigo-500 to-purple-500",
       route: "/learn/computer-science",
-      skills: ["Programming", "Algorithms", "AI/ML", "Web Development"],
-      engagement: "Code-along projects and programming games"
+      skills: ["Programming", "Algorithms", "AI/ML"],
     },
     {
       title: "Creative Arts",
@@ -49,8 +45,7 @@ const SubjectsSection = () => {
       icon: "🎨",
       color: "from-pink-500 to-rose-500",
       route: "/learn/creative-arts",
-      skills: ["Digital Art", "Music Theory", "Design", "Multimedia"],
-      engagement: "Project-based creative challenges"
+      skills: ["Digital Art", "Music Theory", "Design"],
     },
     {
       title: "Music Discovery",
@@ -58,8 +53,7 @@ const SubjectsSection = () => {
       icon: "🎵",
       color: "from-orange-500 to-yellow-500",
       route: "/learn/music",
-      skills: ["Music Theory", "Composition", "Performance", "Audio Production"],
-      engagement: "Virtual instruments and composition tools"
+      skills: ["Music Theory", "Composition", "Performance"],
     }
   ];
 
@@ -87,33 +81,35 @@ const SubjectsSection = () => {
               className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 hover:scale-105 cursor-pointer group"
               onClick={() => handleSubjectClick(subject.route)}
             >
-              <CardHeader>
-                <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform`}>
+              <CardHeader className="pb-4">
+                <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${subject.color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
                   {subject.icon}
                 </div>
-                <CardTitle className="text-white text-xl mb-2">{subject.title}</CardTitle>
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {subject.skills.slice(0, 3).map((skill, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs border-gray-600 text-gray-300">
+                <CardTitle className="text-white text-2xl mb-3 font-bold">{subject.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-gray-300 leading-relaxed mb-6 text-base">{subject.description}</p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {subject.skills.map((skill, idx) => (
+                    <Badge 
+                      key={idx} 
+                      variant="outline" 
+                      className="text-sm border-gray-600 text-gray-300 hover:border-purple-400 hover:text-purple-300 transition-colors"
+                    >
                       {skill}
                     </Badge>
                   ))}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400 leading-relaxed mb-4">{subject.description}</p>
-                <div className="bg-gray-800 p-3 rounded-lg">
-                  <p className="text-sm text-purple-300 font-medium">✨ {subject.engagement}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
         
-        <div className="text-center mt-12">
-          <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-8">
+        <div className="text-center mt-16">
+          <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl p-8 border border-purple-500/20">
             <h3 className="text-2xl font-bold text-white mb-4">AI-Powered Personalization</h3>
-            <p className="text-gray-300 max-w-3xl mx-auto">
+            <p className="text-gray-300 max-w-3xl mx-auto text-lg">
               Our advanced AI system continuously adapts to your learning patterns, ensuring optimal challenge levels, 
               personalized content recommendations, and intelligent progress tracking across all subjects.
             </p>

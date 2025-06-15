@@ -36,6 +36,8 @@ export const useRoleAccess = () => {
     const sessionRole = getRoleFromSession();
     const profileRole = getRoleFromUser();
 
+    debugLog("Session role:", sessionRole, "Profile role:", profileRole, "User:", user?.email);
+
     if (user) {
       if (sessionRole) {
         debugLog("Using session role:", sessionRole);
@@ -77,8 +79,11 @@ export const useRoleAccess = () => {
     }
   };
 
-  const hasRole = (requiredRoles: UserRole[]): boolean =>
-    !!userRole && requiredRoles.includes(userRole);
+  const hasRole = (requiredRoles: UserRole[]): boolean => {
+    const result = !!userRole && requiredRoles.includes(userRole);
+    debugLog("hasRole check:", requiredRoles, "current role:", userRole, "result:", result);
+    return result;
+  };
 
   const isAdmin = () => userRole === 'admin';
   const isSchoolLeader = () => userRole === 'school_leader';
