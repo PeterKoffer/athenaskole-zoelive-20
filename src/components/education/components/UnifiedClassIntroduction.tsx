@@ -99,7 +99,26 @@ const UnifiedClassIntroduction = ({
           currentSection={currentSection}
         />
 
-        <div className="bg-gray-800/80 border-gray-700 rounded-lg p-6 backdrop-blur-sm">
+        {/* Blackboard effect for math subject */}
+        <div
+          className={
+            subject === "mathematics"
+              ? "board-math-intro bg-black/90 border-[3px] border-[#267346] shadow-2xl rounded-lg p-6 backdrop-blur-md mx-auto"
+              : "bg-gray-800/80 border-gray-700 rounded-lg p-6 backdrop-blur-sm"
+          }
+          style={
+            subject === "mathematics"
+              ? {
+                  maxWidth: 760,
+                  boxShadow: "0 6px 36px 6px rgba(20,22,24,0.45), 0 0 0 4px #0d2712 inset",
+                  borderRadius: 16,
+                  borderColor: "#267346",
+                  borderWidth: 3,
+                  backgroundColor: "rgba(21,26,33,0.95)",
+                }
+              : {}
+          }
+        >
           <IntroductionContent currentContent={currentContent} />
           <UnifiedClassIntroductionControls
             hasStarted={hasStarted}
@@ -120,9 +139,16 @@ const UnifiedClassIntroduction = ({
             isAdvancing={isAdvancing}
           />
         </div>
+        {/* 
+          If you need pixel-perfect "lock" to board:
+          - Change mx-auto to absolute positioning with top/left if your background never changes
+          - Or manually tweak marginTop (via style) to align
+          - But centering with mx-auto + p-6 looks good at all screen sizes
+        */}
       </div>
     </ClassroomEnvironment>
   );
 };
 
 export default UnifiedClassIntroduction;
+
