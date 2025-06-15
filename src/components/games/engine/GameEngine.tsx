@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -200,7 +199,7 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
             <Button
               variant="ghost"
               onClick={onBack}
-              className="text-white hover:text-lime-400"
+              className="text-white hover:text-blue-400"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -246,7 +245,7 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
             <Button 
               onClick={handleGameStart}
               size="lg"
-              className="bg-lime-500 hover:bg-lime-600 text-black font-bold px-8 py-4 text-xl"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-8 py-4 text-xl border-0 shadow-lg transform transition hover:scale-105"
             >
               🎮 START GAME
             </Button>
@@ -266,7 +265,7 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
               <Button
                 variant="ghost"
                 onClick={onBack}
-                className="text-white hover:text-lime-400"
+                className="text-white hover:text-blue-400"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Exit
