@@ -1,5 +1,5 @@
 
-import { Button } from '@/components/ui/button';
+import { useEffect } from 'react';
 import AskNelieButtons from '../shared/AskNelieButtons';
 import { LessonActivity } from '../types/LessonTypes';
 import Blackboard from '../shared/Blackboard';
@@ -15,6 +15,20 @@ const MathLessonContentRenderer = ({
   studentName,
   onComplete
 }: MathLessonContentRendererProps) => {
+  useEffect(() => {
+    const contentText = activity.content?.text || '';
+    const wordCount = contentText.split(/\s+/).filter(Boolean).length;
+    
+    // 3 seconds base time + 300ms per word (rough equivalent of 200 WPM)
+    const delay = 3000 + wordCount * 300;
+
+    const timer = setTimeout(() => {
+      onComplete();
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [activity, onComplete]);
+
   return (
     <Blackboard>
       <div className="flex justify-between items-start mb-4">
@@ -46,15 +60,6 @@ const MathLessonContentRenderer = ({
             </ul>
           </div>
         )}
-      </div>
-      
-      <div className="mt-6 text-center">
-        <Button
-          onClick={onComplete}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8"
-        >
-          Continue, {studentName}
-        </Button>
       </div>
     </Blackboard>
   );
