@@ -1,155 +1,195 @@
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, BarChart3, Gamepad2, MessageCircle, Calendar, BookOpen, GraduationCap, School, Users, Settings, User } from "lucide-react";
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { useNavigate } from "react-router-dom";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { 
+  BookOpen, 
+  Users, 
+  GraduationCap, 
+  Home, 
+  School, 
+  Calendar, 
+  Shield,
+  ChevronDown
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
 
 interface UnifiedNavigationDropdownProps {
-  user: any;
+  user?: any;
   onShowProgress?: () => void;
   onShowGames?: () => void;
   onShowAITutor?: () => void;
 }
 
-const UnifiedNavigationDropdown = ({ 
-  user, 
-  onShowProgress, 
-  onShowGames, 
-  onShowAITutor 
+const UnifiedNavigationDropdown = ({
+  user,
+  onShowProgress,
+  onShowGames,
+  onShowAITutor
 }: UnifiedNavigationDropdownProps) => {
   const navigate = useNavigate();
   const { userRole, canAccessSchoolDashboard } = useRoleAccess();
 
+  console.log('[UnifiedNavigationDropdown] Current role:', userRole, 'Can access school dashboard:', canAccessSchoolDashboard());
+
+  const handleNavigation = (path: string, action?: () => void) => {
+    console.log('[UnifiedNavigationDropdown] Navigating to:', path);
+    if (action) {
+      action();
+    } else {
+      navigate(path);
+    }
+  };
+
+  const dashboardItems = [
+    {
+      title: "Daily Program",
+      href: "/daily-program",
+      description: "Access your daily learning activities and progress",
+      icon: Calendar,
+      show: true
+    },
+    ...(canAccessSchoolDashboard() ? [{
+      title: "School Dashboard",
+      href: "/school-dashboard", 
+      description: "Manage school operations and view analytics",
+      icon: School,
+      show: true
+    }] : []),
+    ...(userRole === 'teacher' ? [{
+      title: "Teacher Dashboard",
+      href: "/teacher-dashboard",
+      description: "Manage your classes and student progress", 
+      icon: GraduationCap,
+      show: true
+    }] : []),
+    ...(userRole === 'parent' ? [{
+      title: "Parent Dashboard", 
+      href: "/parent-dashboard",
+      description: "Monitor your child's progress and communicate",
+      icon: Users,
+      show: true
+    }] : []),
+    ...(userRole === 'admin' ? [{
+      title: "Admin Dashboard",
+      href: "/admin-dashboard", 
+      description: "Full system management and administration",
+      icon: Shield,
+      show: true
+    }] : [])
+  ];
+
+  const learningItems = [
+    {
+      title: "Progress Dashboard",
+      description: "View your learning progress and achievements",
+      action: onShowProgress,
+      icon: BookOpen,
+      show: !!onShowProgress
+    },
+    {
+      title: "Learning Games", 
+      description: "Play educational games and challenges",
+      action: onShowGames,
+      icon: Users,
+      show: !!onShowGames
+    },
+    {
+      title: "AI Tutor",
+      description: "Get personalized help from your AI assistant", 
+      action: onShowAITutor,
+      icon: GraduationCap,
+      show: !!onShowAITutor
+    }
+  ];
+
   if (!user) return null;
 
-  const isStudent = userRole === 'student';
-  const isParent = userRole === 'parent';
-  const canAccessCalendar = userRole !== null; // All authenticated users can access calendar
-  const hasReadOnlyCalendar = isStudent || isParent;
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="text-white hover:text-lime-400 hover:bg-gray-800">
-          Navigation
-          <ChevronDown className="w-4 h-4 ml-2" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64 z-50">
-        
-        {/* Dashboard Access */}
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="hover:bg-gray-700">
-            <GraduationCap className="w-4 h-4 mr-2" />
-            Dashboards
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-            {userRole === 'admin' && (
-              <DropdownMenuItem onClick={() => navigate('/admin-dashboard')} className="hover:bg-gray-700">
-                <Settings className="w-4 h-4 mr-2" />
-                Admin Dashboard
-              </DropdownMenuItem>
-            )}
-            {canAccessSchoolDashboard() && (
-              <DropdownMenuItem onClick={() => navigate('/school-dashboard')} className="hover:bg-gray-700">
-                <School className="w-4 h-4 mr-2" />
-                School Dashboard
-              </DropdownMenuItem>
-            )}
-            {userRole === 'teacher' && (
-              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard')} className="hover:bg-gray-700">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Teacher Dashboard
-              </DropdownMenuItem>
-            )}
-            {userRole === 'parent' && (
-              <DropdownMenuItem onClick={() => navigate('/parent-dashboard')} className="hover:bg-gray-700">
-                <Users className="w-4 h-4 mr-2" />
-                Parent Dashboard
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-
-        <DropdownMenuSeparator className="bg-gray-700" />
-
-        {/* Calendar Access */}
-        {canAccessCalendar && (
-          <>
-            <DropdownMenuItem onClick={() => navigate('/calendar')} className="hover:bg-gray-700">
-              <Calendar className="w-4 h-4 mr-2" />
-              School Calendar {hasReadOnlyCalendar && "(View Only)"}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-gray-700" />
-          </>
-        )}
-
-        {/* Learning Tools */}
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="hover:bg-gray-700">
-            <BookOpen className="w-4 h-4 mr-2" />
-            Learning Tools
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-            <DropdownMenuItem onClick={() => navigate('/daily-program')} className="hover:bg-gray-700">
-              <BookOpen className="w-4 h-4 mr-2" />
-              Daily Program
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/adaptive-learning')} className="hover:bg-gray-700">
-              <GraduationCap className="w-4 h-4 mr-2" />
-              Adaptive Learning
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/ai-learning')} className="hover:bg-gray-700">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              AI Learning
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-
-        <DropdownMenuSeparator className="bg-gray-700" />
-
-        {/* Interactive Features */}
-        {onShowProgress && (
-          <DropdownMenuItem onClick={onShowProgress} className="hover:bg-gray-700">
-            <BarChart3 className="w-4 h-4 mr-2" />
-            Progress
-          </DropdownMenuItem>
-        )}
-
-        {onShowGames && (
-          <DropdownMenuItem onClick={onShowGames} className="hover:bg-gray-700">
-            <Gamepad2 className="w-4 h-4 mr-2" />
-            Games
-          </DropdownMenuItem>
-        )}
-
-        {onShowAITutor && (
-          <DropdownMenuItem onClick={onShowAITutor} className="hover:bg-gray-700">
-            <MessageCircle className="w-4 h-4 mr-2" />
-            AI Tutor
-          </DropdownMenuItem>
-        )}
-
-        <DropdownMenuSeparator className="bg-gray-700" />
-
-        {/* Profile */}
-        <DropdownMenuItem onClick={() => navigate('/profile')} className="hover:bg-gray-700">
-          <User className="w-4 h-4 mr-2" />
-          Profile
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger className="bg-transparent text-white hover:text-lime-400 hover:bg-gray-800">
+            <Home className="w-4 h-4 mr-2" />
+            Navigate
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <div className="grid gap-3 p-6 w-[600px] grid-cols-2">
+              <div className="space-y-3">
+                <h4 className="text-lg font-medium leading-none">Dashboards</h4>
+                {dashboardItems.filter(item => item.show).map((item) => (
+                  <ListItem
+                    key={item.title}
+                    title={item.title}
+                    href={item.href}
+                    onClick={() => handleNavigation(item.href)}
+                    icon={item.icon}
+                  >
+                    {item.description}
+                  </ListItem>
+                ))}
+              </div>
+              <div className="space-y-3">
+                <h4 className="text-lg font-medium leading-none">Learning</h4>
+                {learningItems.filter(item => item.show).map((item) => (
+                  <ListItem
+                    key={item.title}
+                    title={item.title}
+                    onClick={() => item.action && handleNavigation('', item.action)}
+                    icon={item.icon}
+                  >
+                    {item.description}
+                  </ListItem>
+                ))}
+              </div>
+            </div>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 };
+
+const ListItem = forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & {
+    title: string;
+    icon?: React.ElementType;
+    onClick?: () => void;
+  }
+>(({ className, title, children, icon: Icon, onClick, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <button
+          ref={ref as any}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground w-full text-left",
+            className
+          )}
+          onClick={onClick}
+          {...props}
+        >
+          <div className="flex items-center space-x-2">
+            {Icon && <Icon className="w-4 h-4" />}
+            <div className="text-sm font-medium leading-none">{title}</div>
+          </div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </button>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";
 
 export default UnifiedNavigationDropdown;

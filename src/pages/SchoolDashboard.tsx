@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -11,14 +12,38 @@ import AnalyticsDashboard from "@/components/school/AnalyticsDashboard";
 import StudentRegistration from "@/components/school/StudentRegistration";
 import CommunicationCenter from "@/components/communication/CommunicationCenter";
 import TeachingPerspectiveSettingsPanel from "@/components/school/TeachingPerspectiveSettings";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { useAuth } from "@/hooks/useAuth";
 
 const SchoolDashboard = () => {
+  const { userRole } = useRoleAccess();
+  const { user } = useAuth();
+
+  console.log('[SchoolDashboard] Component rendering, userRole:', userRole, 'user:', user?.email);
+
   const stats = {
     totalStudents: 485,
     totalTeachers: 28,
     averageProgress: 87.5,
     attendanceRate: 94.2
   };
+
+  // Check if user has access to school dashboard
+  const hasAccess = userRole && ['admin', 'school_leader', 'school_staff'].includes(userRole);
+  
+  console.log('[SchoolDashboard] Access check:', hasAccess);
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p className="text-gray-400">You don't have permission to access the school dashboard.</p>
+          <p className="text-gray-400 mt-2">Current role: {userRole || 'None'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
