@@ -5,9 +5,10 @@ import { getClassroomConfig } from '../shared/classroomConfigs';
 
 interface MathLearningIntroductionProps {
   onIntroductionComplete: () => void;
+  isAdvancing?: boolean;
 }
 
-const MathLearningIntroduction = ({ onIntroductionComplete }: MathLearningIntroductionProps) => {
+const MathLearningIntroduction = ({ onIntroductionComplete, isAdvancing }: MathLearningIntroductionProps) => {
   const classroomConfig = getClassroomConfig('mathematics');
 
   return (
@@ -17,6 +18,7 @@ const MathLearningIntroduction = ({ onIntroductionComplete }: MathLearningIntrod
           subject="mathematics"
           skillArea="general_math"
           onIntroductionComplete={onIntroductionComplete}
+          isAdvancing={isAdvancing}
         />
       </div>
     </ClassroomEnvironment>

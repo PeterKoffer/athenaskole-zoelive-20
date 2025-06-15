@@ -1,6 +1,4 @@
 
-// Refactored: all logic (and main orchestration) only, UI/composition is chunked to smaller subcomponents
-
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
@@ -8,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
-// New subcomponents
 import UnifiedClassIntroductionHeader from './UnifiedClassIntroductionHeader';
 import UnifiedClassIntroductionProgress from './UnifiedClassIntroductionProgress';
 import IntroductionContent from './introduction/IntroductionContent';
@@ -19,6 +16,7 @@ interface UnifiedClassIntroductionProps {
   skillArea: string;
   userLevel: string;
   onIntroductionComplete: () => void;
+  isAdvancing?: boolean;
 }
 
 const UnifiedClassIntroduction = ({
@@ -26,6 +24,7 @@ const UnifiedClassIntroduction = ({
   skillArea,
   userLevel,
   onIntroductionComplete,
+  isAdvancing,
 }: UnifiedClassIntroductionProps) => {
   const classroomConfig = getClassroomConfig(subject);
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
@@ -118,6 +117,7 @@ const UnifiedClassIntroduction = ({
             // Home and ProceedWithoutSpeech involve forcing speech to stop first!
             handleHome={handleHome}
             handleProceedWithoutSpeech={handleProceedWithoutSpeechWrapper}
+            isAdvancing={isAdvancing}
           />
         </div>
       </div>

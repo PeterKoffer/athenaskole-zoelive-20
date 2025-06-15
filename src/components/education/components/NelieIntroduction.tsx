@@ -5,12 +5,14 @@ interface NelieIntroductionProps {
   subject: string;
   skillArea: string;
   onIntroductionComplete: () => void;
+  isAdvancing?: boolean;
 }
 
 const NelieIntroduction = ({
   subject,
   skillArea,
-  onIntroductionComplete
+  onIntroductionComplete,
+  isAdvancing
 }: NelieIntroductionProps) => {
   console.log('🎭 NelieIntroduction using unified system:', { subject, skillArea });
 
@@ -20,6 +22,7 @@ const NelieIntroduction = ({
       skillArea={skillArea}
       userLevel="beginner"
       onIntroductionComplete={onIntroductionComplete}
+      isAdvancing={isAdvancing}
     />
   );
 };

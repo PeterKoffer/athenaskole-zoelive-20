@@ -12,6 +12,7 @@ const MathematicsLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [showLesson, setShowLesson] = useState(false);
+  const [isAdvancing, setIsAdvancing] = useState(false);
   const classroomConfig = getClassroomConfig("mathematics");
   const { stop } = useUnifiedSpeech();
 
@@ -41,16 +42,20 @@ const MathematicsLearning = () => {
 
   // Show the intro flow (like English class), then the actual lesson
   const handleIntroComplete = () => {
+    if (isAdvancing) return; // Prevent double trigger
+    setIsAdvancing(true);
     console.log('🟢 [MathematicsLearning] onIntroductionComplete: stopping speech then showing lesson');
     stop();
-    setShowLesson(true);
+    setTimeout(() => {
+      setShowLesson(true);
+    }, 200); // Allow UI to update and speech cleanup if any
   };
 
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
         {!showLesson ? (
-          <MathLearningIntroduction onIntroductionComplete={handleIntroComplete} />
+          <MathLearningIntroduction onIntroductionComplete={handleIntroComplete} isAdvancing={isAdvancing} />
         ) : (
           <EnhancedMathematicsLearning />
         )}

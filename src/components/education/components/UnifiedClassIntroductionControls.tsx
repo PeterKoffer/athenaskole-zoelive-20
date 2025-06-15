@@ -17,6 +17,7 @@ interface UnifiedClassIntroductionControlsProps {
   handleStartLesson: () => void;
   handleSkip: () => void;
   handleHome: () => void;
+  isAdvancing?: boolean;
 }
 
 const UnifiedClassIntroductionControls = ({
@@ -34,6 +35,7 @@ const UnifiedClassIntroductionControls = ({
   handleStartLesson,
   handleSkip,
   handleHome,
+  isAdvancing = false,
 }: UnifiedClassIntroductionControlsProps) => {
   return (
     <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -43,7 +45,7 @@ const UnifiedClassIntroductionControls = ({
           variant="outline"
           onClick={handleManualRead}
           className="border-purple-400 text-purple-200 bg-gray-800/50"
-          disabled={!isEnabled && hasUserInteracted}
+          disabled={!isEnabled && hasUserInteracted || isAdvancing}
         >
           <span className="flex items-center">
             <span className="mr-2">
@@ -57,6 +59,7 @@ const UnifiedClassIntroductionControls = ({
           variant="outline"
           className="border-gray-400 text-gray-200 bg-gray-800/50"
           onClick={handleHome}
+          disabled={isAdvancing}
         >
           <span className="flex items-center">
             <span className="mr-2">
@@ -71,6 +74,7 @@ const UnifiedClassIntroductionControls = ({
               type="button"
               onClick={handleManualStart}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+              disabled={isAdvancing}
             >
               <span className="flex items-center">
                 <span className="mr-2">
@@ -85,6 +89,7 @@ const UnifiedClassIntroductionControls = ({
                 onClick={handleProceedWithoutSpeech}
                 variant="outline"
                 className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
+                disabled={isAdvancing}
               >
                 Start Lesson Without Speech
               </Button>
@@ -99,6 +104,7 @@ const UnifiedClassIntroductionControls = ({
               type="button"
               onClick={onIntroductionComplete}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+              disabled={isAdvancing}
             >
               Start Class
             </Button>
@@ -109,6 +115,7 @@ const UnifiedClassIntroductionControls = ({
                   type="button"
                   onClick={handleStartLesson}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                  disabled={isAdvancing}
                 >
                   Start Lesson
                 </Button>
@@ -118,6 +125,7 @@ const UnifiedClassIntroductionControls = ({
                 variant="outline"
                 onClick={handleSkip}
                 className="border-gray-400 text-gray-200 bg-gray-800/50"
+                disabled={isAdvancing}
               >
                 Skip Introduction
               </Button>
