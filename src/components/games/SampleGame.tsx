@@ -6,6 +6,7 @@ import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { curriculumGames, getGameById } from './CurriculumGameConfig';
 import GameEngine from './engine/GameEngine';
 import { useToast } from '@/hooks/use-toast';
+import { loadAllGamesData } from './data/GameData';
 
 interface SampleGameProps {
   gameId: string;
@@ -25,42 +26,47 @@ const SampleGame = ({ gameId, onBack, onComplete }: SampleGameProps) => {
         setLoading(true);
         setError(null);
         
-        // Try to find the game in current data
+        console.log('🔍 Looking for game with ID:', gameId);
+        
+        // First, try to find the game in current data
         let foundGame = getGameById(gameId);
+        console.log('📋 Found in current data:', foundGame?.title || 'Not found');
         
         if (!foundGame) {
-          // Try to load from external data
-          const response = await fetch('/data/games/mathematics-k12-games.json');
-          if (response.ok) {
-            const games = await response.json();
-            foundGame = games.find((g: any) => g.id === gameId);
+          // Load all games from external sources
+          console.log('🌐 Loading all games from external sources...');
+          const allGames = await loadAllGamesData();
+          console.log('📊 Loaded games:', allGames.length, 'total games');
+          
+          // Search in loaded games
+          foundGame = allGames.find(g => g.id === gameId);
+          console.log('🎯 Found in external data:', foundGame?.title || 'Not found');
+          
+          // If still not found, try partial matching for debugging
+          if (!foundGame) {
+            const similarGames = allGames.filter(g => 
+              g.id.includes('geography') || 
+              g.title.toLowerCase().includes('geography') ||
+              g.subject.toLowerCase().includes('geography')
+            );
+            console.log('🗺️ Geography-related games found:', similarGames.map(g => ({ id: g.id, title: g.title })));
+            
+            // Use the first geography game if available
+            if (similarGames.length > 0) {
+              foundGame = similarGames[0];
+              console.log('✅ Using geography game:', foundGame.title);
+            }
           }
         }
         
         if (!foundGame) {
-          // Fallback: create a simple game
-          foundGame = {
-            id: gameId,
-            title: "Math Adventure",
-            description: "A fun math learning experience!",
-            emoji: "🎯",
-            subject: "Mathematics",
-            gradeLevel: [1, 2, 3],
-            difficulty: "beginner" as const,
-            interactionType: "multiple-choice" as const,
-            timeEstimate: "15-20 min",
-            skillAreas: ["basic_math", "problem_solving"],
-            learningObjectives: ["Practice basic math", "Develop problem-solving skills"],
-            status: "available" as const,
-            rewards: {
-              coins: 150,
-              badges: ["Math Explorer", "Problem Solver"]
-            }
-          };
+          console.error('❌ Game not found:', gameId);
+          setError(`Game not found: ${gameId}`);
+          return;
         }
         
+        console.log('🎮 Successfully loaded game:', foundGame.title, '- Subject:', foundGame.subject);
         setGame(foundGame);
-        console.log('🎮 Loaded game:', foundGame);
         
       } catch (err) {
         console.error('🚫 Error loading game:', err);

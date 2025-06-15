@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,6 +32,15 @@ const CurriculumGameSelector = ({
         setLoading(true);
         const games = await loadK12Games();
         console.log(`🎮 Loaded ${games.length} total games for display`);
+        
+        // Debug: specifically check for geography games
+        const geographyGames = games.filter(game => 
+          game.subject.toLowerCase().includes('geography') ||
+          game.title.toLowerCase().includes('geography') ||
+          game.id.includes('geography')
+        );
+        console.log('🗺️ Geography games in selector:', geographyGames.map(g => ({ id: g.id, title: g.title })));
+        
         setAllGames(games);
       } catch (error) {
         console.error('Failed to load games:', error);
@@ -43,6 +51,19 @@ const CurriculumGameSelector = ({
     
     loadGames();
   }, []);
+
+  // Enhanced game selection handler with debug info
+  const handleGameSelect = (gameId: string) => {
+    const selectedGame = allGames.find(game => game.id === gameId);
+    console.log('🎯 Game selected:', gameId);
+    console.log('🎮 Game details:', selectedGame ? {
+      id: selectedGame.id,
+      title: selectedGame.title,
+      subject: selectedGame.subject
+    } : 'NOT FOUND');
+    
+    onGameSelect(gameId);
+  };
 
   // Filter games based on selected criteria
   const filteredGames = allGames.filter(game => {
@@ -120,7 +141,7 @@ const CurriculumGameSelector = ({
                 <GameCard 
                   key={game.id} 
                   game={game} 
-                  onGameSelect={onGameSelect}
+                  onGameSelect={handleGameSelect}
                   getDifficultyColor={getDifficultyColor}
                   getSubjectColor={getSubjectColor}
                 />
@@ -143,7 +164,7 @@ const CurriculumGameSelector = ({
                   <GameCard 
                     key={game.id} 
                     game={game} 
-                    onGameSelect={onGameSelect}
+                    onGameSelect={handleGameSelect}
                     getDifficultyColor={getDifficultyColor}
                     getSubjectColor={getSubjectColor}
                   />
@@ -170,7 +191,7 @@ const CurriculumGameSelector = ({
                       <GameCard 
                         key={game.id} 
                         game={game} 
-                        onGameSelect={onGameSelect}
+                        onGameSelect={handleGameSelect}
                         getDifficultyColor={getDifficultyColor}
                         getSubjectColor={getSubjectColor}
                       />
