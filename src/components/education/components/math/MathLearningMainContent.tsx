@@ -66,6 +66,11 @@ const MathLearningMainContent = ({
     }
   };
 
+  const handleActivityCompleteWithAdvancement = (wasCorrect?: boolean) => {
+    console.log('🚀 Activity completed, triggering advancement:', wasCorrect);
+    onActivityComplete(wasCorrect);
+  };
+
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full space-y-0">
@@ -103,7 +108,7 @@ const MathLearningMainContent = ({
                     subject="mathematics"
                     skillArea="general_math"
                     difficultyLevel={2}
-                    onComplete={onActivityComplete}
+                    onComplete={handleActivityCompleteWithAdvancement}
                     questionNumber={currentActivityIndex + 1}
                     totalQuestions={totalRealActivities}
                   />
@@ -112,23 +117,23 @@ const MathLearningMainContent = ({
                     {currentActivity.title?.toLowerCase().includes('mental math strategies') ? (
                       <MentalMathStrategies
                         studentName={studentName}
-                        onComplete={() => onActivityComplete()}
+                        onComplete={() => handleActivityCompleteWithAdvancement()}
                       />
                     ) : (
                       <MathLessonContentRenderer
                         activity={currentActivity}
                         studentName={studentName}
-                        onComplete={() => onActivityComplete()}
+                        onComplete={() => handleActivityCompleteWithAdvancement()}
                       />
                     )}
                   </>
                 )}
                 
-                {/* Activity completion status indicator */}
+                {/* Activity completion status indicator with immediate advancement */}
                 {isCurrentActivityCompleted && (
                   <div className="text-center space-y-2">
                     <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                      ✓ Activity Completed
+                      ✓ Activity Completed - Advancing...
                     </div>
                     {canNavigateForward && (
                       <Button
@@ -138,7 +143,7 @@ const MathLearningMainContent = ({
                         tabIndex={0}
                         autoFocus
                       >
-                        Next Activity
+                        Continue to Next Activity
                       </Button>
                     )}
                   </div>
@@ -148,6 +153,12 @@ const MathLearningMainContent = ({
               <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">
                 <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
                 <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-4 bg-blue-600 hover:bg-blue-700"
+                >
+                  Refresh Lesson
+                </Button>
               </div>
             )}
           </div>
