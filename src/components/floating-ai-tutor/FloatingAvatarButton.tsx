@@ -1,4 +1,5 @@
 
+
 import CollapsedButton from "./CollapsedButton";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, RotateCcw } from "lucide-react";
@@ -50,18 +51,18 @@ const FloatingAvatarButton = ({
         isSpeaking={isSpeaking}
       />
       
-      {/* Small icon-only control buttons positioned very close to Nelie */}
-      <div className="flex gap-2 mt-2">
+      {/* Small icon-only control buttons positioned much closer to Nelie */}
+      <div className="flex gap-1 -mt-2">
         <Button
           variant="outline"
           size="sm"
           onClick={toggleEnabled}
-          className="w-8 h-8 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white rounded-full flex items-center justify-center"
+          className="w-7 h-7 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white rounded-full flex items-center justify-center"
         >
           {isEnabled ? (
-            <Volume2 className="w-4 h-4" />
+            <Volume2 className="w-3 h-3" />
           ) : (
-            <VolumeX className="w-4 h-4" />
+            <VolumeX className="w-3 h-3" />
           )}
         </Button>
         
@@ -70,9 +71,9 @@ const FloatingAvatarButton = ({
           size="sm"
           onClick={handleRepeat}
           disabled={!isEnabled}
-          className="w-8 h-8 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white disabled:opacity-50 rounded-full flex items-center justify-center"
+          className="w-7 h-7 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white disabled:opacity-50 rounded-full flex items-center justify-center"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-3 h-3" />
         </Button>
       </div>
     </div>
@@ -80,3 +81,4 @@ const FloatingAvatarButton = ({
 };
 
 export default FloatingAvatarButton;
+
