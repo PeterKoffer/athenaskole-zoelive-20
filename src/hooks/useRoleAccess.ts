@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
@@ -50,6 +49,14 @@ export const useRoleAccess = () => {
     }
   }, [user]);
 
+  // Expose a manual setter for the user role, used by UI role switchers
+  const setUserRoleManually = (role: UserRole) => {
+    setUserRole(role);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(SESSION_ROLE_KEY, role);
+    }
+  };
+
   const hasRole = (requiredRoles: UserRole[]): boolean => {
     if (!userRole) return false;
     return requiredRoles.includes(userRole);
@@ -81,6 +88,7 @@ export const useRoleAccess = () => {
 
   return {
     userRole,
+    setUserRoleManually,
     hasRole,
     isAdmin,
     isSchoolLeader,
