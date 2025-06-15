@@ -1,4 +1,3 @@
-
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
@@ -114,7 +113,7 @@ const UnifiedClassIntroduction = ({
                   borderRadius: 16,
                   borderColor: "#8B4513",
                   borderWidth: 3,
-                  backgroundColor: "rgba(21,26,33,0.95)",
+                  backgroundColor: "rgba(30, 32, 36, 0.92)",
                 }
               : {}
           }
