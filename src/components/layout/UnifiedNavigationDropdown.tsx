@@ -44,24 +44,15 @@ const UnifiedNavigationDropdown = ({
   console.log('[UnifiedNavigationDropdown] User:', user?.email);
   console.log('[UnifiedNavigationDropdown] =================');
 
-  const handleNavigation = (path: string, action?: () => void) => {
-    console.log('[UnifiedNavigationDropdown] =================');
-    console.log('[UnifiedNavigationDropdown] Navigation triggered');
-    console.log('[UnifiedNavigationDropdown] Path:', path);
-    console.log('[UnifiedNavigationDropdown] Has action:', !!action);
-    console.log('[UnifiedNavigationDropdown] Current userRole:', userRole);
-    console.log('[UnifiedNavigationDropdown] Current window.location:', window.location.pathname);
-    console.log('[UnifiedNavigationDropdown] =================');
-    
-    if (action) {
-      console.log('[UnifiedNavigationDropdown] Executing action instead of navigation');
-      action();
-    } else {
-      console.log('[UnifiedNavigationDropdown] About to navigate to:', path);
-      // Force immediate navigation without delay
-      navigate(path);
-      console.log('[UnifiedNavigationDropdown] Navigate function called for:', path);
-    }
+  // Simplified navigation handler
+  const navigateToPage = (path: string) => {
+    console.log('[UnifiedNavigationDropdown] Direct navigation to:', path);
+    navigate(path);
+  };
+
+  const executeAction = (action: () => void) => {
+    console.log('[UnifiedNavigationDropdown] Executing action');
+    action();
   };
 
   const dashboardItems = [
@@ -148,7 +139,7 @@ const UnifiedNavigationDropdown = ({
                     key={item.title}
                     title={item.title}
                     href={item.href}
-                    onClick={() => handleNavigation(item.href)}
+                    onClick={() => navigateToPage(item.href)}
                     icon={item.icon}
                   >
                     {item.description}
@@ -161,7 +152,7 @@ const UnifiedNavigationDropdown = ({
                   <ListItem
                     key={item.title}
                     title={item.title}
-                    onClick={() => item.action && handleNavigation('', item.action)}
+                    onClick={() => item.action && executeAction(item.action)}
                     icon={item.icon}
                   >
                     {item.description}

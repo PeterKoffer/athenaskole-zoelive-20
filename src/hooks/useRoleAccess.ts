@@ -86,11 +86,11 @@ export const useRoleAccess = () => {
       return;
     }
 
-    // 3. User is not authenticated - only then fall back to student for guest access
-    debugLog("Effect: No user authenticated, setting to student");
-    setUserRole("student");
+    // 3. User is not authenticated - set to school_leader for testing purposes
+    debugLog("Effect: No user authenticated, setting to school_leader for testing");
+    setUserRole("school_leader");
     if (typeof window !== "undefined") {
-      sessionStorage.setItem(SESSION_ROLE_KEY, "student");
+      sessionStorage.setItem(SESSION_ROLE_KEY, "school_leader");
     }
   }, [user, loading]);
 
