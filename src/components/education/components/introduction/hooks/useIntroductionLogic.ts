@@ -157,7 +157,11 @@ export const useIntroductionLogic = ({
 
   // Updated: do NOT call stop() here, we'll stop before advancing at parent level!
   const handleProceedWithoutSpeech = () => {
-    console.log('🔇 User choosing to proceed without speech (immediate) -- just calling onIntroductionComplete');
+    console.log('🔇 User choosing to proceed without speech (immediate) -- stopping speech and advancing');
+    stop();
+    if (!hasUserInteracted) {
+      enableUserInteraction();
+    }
     onIntroductionComplete();
   };
 

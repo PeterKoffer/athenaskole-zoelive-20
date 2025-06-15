@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
@@ -85,10 +84,7 @@ const UnifiedClassIntroduction = ({
   };
 
   // Handler for "Start Lesson Without Speech" - must stop speech, then proceed.
-  const handleProceedWithoutSpeechWrapper = () => {
-    stop();
-    handleProceedWithoutSpeech();
-  };
+  
 
   return (
     <ClassroomEnvironment config={classroomConfig}>
@@ -149,7 +145,7 @@ const UnifiedClassIntroduction = ({
               handleSkip={handleSkip}
               // Home and ProceedWithoutSpeech involve forcing speech to stop first!
               handleHome={handleHome}
-              handleProceedWithoutSpeech={handleProceedWithoutSpeechWrapper}
+              handleProceedWithoutSpeech={handleProceedWithoutSpeech}
               isAdvancing={isAdvancing}
             />
           </div>
