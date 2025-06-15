@@ -21,32 +21,222 @@ interface Question {
 }
 
 const generateQuestions = (gameData: CurriculumGame, level: number): Question[] => {
-  // Generate questions based on game data and level
-  const baseQuestions: Question[] = [
+  const subject = gameData.subject.toLowerCase();
+  const basePoints = 10 + level * 5;
+  
+  // Subject-specific question generation
+  if (subject.includes('french') || subject === 'french') {
+    return [
+      {
+        question: `Comment dit-on "Hello" en français?`,
+        options: ['Bonjour', 'Au revoir', 'Merci', 'Bonsoir'],
+        correctAnswer: 0,
+        explanation: '"Bonjour" means "Hello" in French and is used for daytime greetings.',
+        points: basePoints
+      },
+      {
+        question: `Quel est le mot français pour "coffee"?`,
+        options: ['Thé', 'Eau', 'Café', 'Lait'],
+        correctAnswer: 2,
+        explanation: '"Café" is the French word for coffee.',
+        points: basePoints
+      },
+      {
+        question: `Comment dit-on "Thank you" en français?`,
+        options: ['S\'il vous plaît', 'Merci', 'Excusez-moi', 'De rien'],
+        correctAnswer: 1,
+        explanation: '"Merci" means "Thank you" in French.',
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  if (subject.includes('spanish') || subject === 'spanish') {
+    return [
+      {
+        question: `¿Cómo se dice "Hello" en español?`,
+        options: ['Adiós', 'Hola', 'Gracias', 'Por favor'],
+        correctAnswer: 1,
+        explanation: '"Hola" means "Hello" in Spanish.',
+        points: basePoints
+      },
+      {
+        question: `¿Cuál es la palabra española para "water"?`,
+        options: ['Leche', 'Agua', 'Café', 'Jugo'],
+        correctAnswer: 1,
+        explanation: '"Agua" is the Spanish word for water.',
+        points: basePoints
+      },
+      {
+        question: `¿Cómo se dice "Good morning" en español?`,
+        options: ['Buenas noches', 'Buenas tardes', 'Buenos días', 'Hasta luego'],
+        correctAnswer: 2,
+        explanation: '"Buenos días" means "Good morning" in Spanish.',
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  if (subject.includes('geography')) {
+    return [
+      {
+        question: `What is the capital of France?`,
+        options: ['London', 'Berlin', 'Paris', 'Rome'],
+        correctAnswer: 2,
+        explanation: 'Paris is the capital and largest city of France.',
+        points: basePoints
+      },
+      {
+        question: `Which continent is Brazil located in?`,
+        options: ['North America', 'South America', 'Europe', 'Asia'],
+        correctAnswer: 1,
+        explanation: 'Brazil is the largest country in South America.',
+        points: basePoints
+      },
+      {
+        question: `What is the longest river in the world?`,
+        options: ['Amazon River', 'Nile River', 'Mississippi River', 'Yangtze River'],
+        correctAnswer: 1,
+        explanation: 'The Nile River in Africa is generally considered the longest river in the world.',
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  if (subject.includes('science')) {
+    return [
+      {
+        question: `What planet is known as the "Red Planet"?`,
+        options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
+        correctAnswer: 1,
+        explanation: 'Mars is called the Red Planet due to iron oxide (rust) on its surface.',
+        points: basePoints
+      },
+      {
+        question: `What gas do plants absorb from the atmosphere?`,
+        options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'],
+        correctAnswer: 2,
+        explanation: 'Plants absorb carbon dioxide during photosynthesis to make food.',
+        points: basePoints
+      },
+      {
+        question: `How many bones are in the adult human body?`,
+        options: ['106', '206', '306', '406'],
+        correctAnswer: 1,
+        explanation: 'The adult human body has 206 bones.',
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  if (subject.includes('history')) {
+    return [
+      {
+        question: `Who was the first President of the United States?`,
+        options: ['Thomas Jefferson', 'John Adams', 'George Washington', 'Benjamin Franklin'],
+        correctAnswer: 2,
+        explanation: 'George Washington was the first President of the United States (1789-1797).',
+        points: basePoints
+      },
+      {
+        question: `In what year did World War II end?`,
+        options: ['1944', '1945', '1946', '1947'],
+        correctAnswer: 1,
+        explanation: 'World War II ended in 1945 with the surrender of Japan in September.',
+        points: basePoints
+      },
+      {
+        question: `Which ancient wonder of the world was located in Egypt?`,
+        options: ['Hanging Gardens', 'Colossus of Rhodes', 'Great Pyramid of Giza', 'Lighthouse of Alexandria'],
+        correctAnswer: 2,
+        explanation: 'The Great Pyramid of Giza is the only ancient wonder still standing today.',
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  if (subject.includes('computer science') || subject === 'computer science') {
+    return [
+      {
+        question: `What does "HTML" stand for?`,
+        options: ['High Tech Modern Language', 'HyperText Markup Language', 'Home Tool Markup Language', 'Hyperlink and Text Markup Language'],
+        correctAnswer: 1,
+        explanation: 'HTML stands for HyperText Markup Language, used to create web pages.',
+        points: basePoints
+      },
+      {
+        question: `Which of these is a programming language?`,
+        options: ['HTML', 'CSS', 'Python', 'PDF'],
+        correctAnswer: 2,
+        explanation: 'Python is a popular programming language used for many applications.',
+        points: basePoints
+      },
+      {
+        question: `What does "AI" stand for in technology?`,
+        options: ['Automated Intelligence', 'Artificial Intelligence', 'Advanced Internet', 'Application Interface'],
+        correctAnswer: 1,
+        explanation: 'AI stands for Artificial Intelligence, the simulation of human intelligence in machines.',
+        points: basePoints + 5
+      }
+    ];
+  }
+
+  // Default to math questions only if the subject is actually Mathematics
+  if (subject.includes('math') || subject === 'mathematics') {
+    return [
+      {
+        question: `What is 5 + 3?`,
+        options: ['6', '7', '8', '9'],
+        correctAnswer: 2,
+        explanation: '5 + 3 = 8. Count up from 5: 6, 7, 8!',
+        points: basePoints
+      },
+      {
+        question: `Which shape has 3 sides?`,
+        options: ['Circle', 'Square', 'Triangle', 'Rectangle'],
+        correctAnswer: 2,
+        explanation: 'A triangle has exactly 3 sides and 3 corners.',
+        points: basePoints
+      },
+      {
+        question: `What comes next in the pattern: 2, 4, 6, ?`,
+        options: ['7', '8', '9', '10'],
+        correctAnswer: 1,
+        explanation: 'The pattern increases by 2 each time: 2, 4, 6, 8.',
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  // Fallback for unknown subjects - create generic educational questions
+  return [
     {
-      question: `What is 5 + 3?`,
-      options: ['6', '7', '8', '9'],
-      correctAnswer: 2,
-      explanation: '5 + 3 = 8. Count up from 5: 6, 7, 8!',
-      points: 10 + level * 5
+      question: `What subject are you learning about in "${gameData.title}"?`,
+      options: [gameData.subject, 'Mathematics', 'History', 'Art'],
+      correctAnswer: 0,
+      explanation: `This game focuses on ${gameData.subject} concepts and skills.`,
+      points: basePoints
     },
     {
-      question: `Which shape has 3 sides?`,
-      options: ['Circle', 'Square', 'Triangle', 'Rectangle'],
-      correctAnswer: 2,
-      explanation: 'A triangle has exactly 3 sides and 3 corners.',
-      points: 10 + level * 5
+      question: `Which skill area does this game help you practice?`,
+      options: gameData.skillAreas.slice(0, 3).concat(['None of the above']),
+      correctAnswer: 0,
+      explanation: `This game helps you practice ${gameData.skillAreas[0]} and related skills.`,
+      points: basePoints
     },
     {
-      question: `What comes next in the pattern: 2, 4, 6, ?`,
-      options: ['7', '8', '9', '10'],
-      correctAnswer: 1,
-      explanation: 'The pattern increases by 2 each time: 2, 4, 6, 8.',
-      points: 15 + level * 5
+      question: `What grade levels is this game designed for?`,
+      options: [
+        `Grades ${gameData.gradeLevel.join(', ')}`,
+        'All grades',
+        'Only advanced students',
+        'Pre-school only'
+      ],
+      correctAnswer: 0,
+      explanation: `This game is designed for students in grades ${gameData.gradeLevel.join(', ')}.`,
+      points: basePoints + 5
     }
   ];
-
-  return baseQuestions.slice(0, Math.min(3 + level, 5));
 };
 
 const MultipleChoiceGame = ({ level, onLevelComplete, gameData }: MultipleChoiceGameProps) => {
@@ -108,7 +298,7 @@ const MultipleChoiceGame = ({ level, onLevelComplete, gameData }: MultipleChoice
         <CardTitle className="flex items-center justify-between text-white">
           <span className="flex items-center">
             <Brain className="w-6 h-6 mr-2 text-blue-400" />
-            Question {currentQuestionIndex + 1} of {questions.length}
+            {gameData.title} - Question {currentQuestionIndex + 1} of {questions.length}
           </span>
           <Badge className="bg-blue-600 text-white">
             Level {level}
@@ -117,6 +307,7 @@ const MultipleChoiceGame = ({ level, onLevelComplete, gameData }: MultipleChoice
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-center">
+          <div className="text-4xl mb-4">{gameData.emoji}</div>
           <h2 className="text-2xl font-bold text-white mb-4">
             {currentQuestion.question}
           </h2>
