@@ -17,6 +17,9 @@ const LanguageSwitcher = () => {
       <Button variant="outline" size="sm" onClick={() => handleChange('es')}>
         Español
       </Button>
+      <Button variant="outline" size="sm" onClick={() => handleChange('da')}>
+        Dansk
+      </Button>
     </div>
   );
 };
