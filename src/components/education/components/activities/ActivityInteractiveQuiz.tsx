@@ -18,6 +18,14 @@ const ActivityInteractiveQuiz = ({
   const [timeLeft, setTimeLeft] = useState(30);
   const [score, setScore] = useState(0);
 
+  console.log('🎯 ActivityInteractiveQuiz rendering:', {
+    activityId: activity.id,
+    activityTitle: activity.title,
+    question: activity.content?.question,
+    options: activity.content?.options,
+    battleScenario: activity.content?.battleScenario
+  });
+
   useEffect(() => {
     if (timeLeft > 0 && !showResult) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -28,15 +36,18 @@ const ActivityInteractiveQuiz = ({
   }, [timeLeft, showResult]);
 
   const handleTimeUp = () => {
+    console.log('⏰ Time up! Auto-completing activity');
     setShowResult(true);
     setScore(0);
     setTimeout(() => {
+      console.log('🚀 Auto-advancing after time up');
       onActivityComplete(false);
     }, 3000);
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!showResult) {
+      console.log('📝 Answer selected:', answerIndex);
       setSelectedAnswer(answerIndex);
     }
   };
@@ -44,20 +55,24 @@ const ActivityInteractiveQuiz = ({
   const handleSubmit = () => {
     if (selectedAnswer === null) return;
     
+    console.log('✅ Submitting answer:', selectedAnswer, 'Correct:', activity.content?.correctAnswer);
     setShowResult(true);
     const isCorrect = selectedAnswer === activity.content?.correctAnswer;
     const earnedScore = isCorrect ? timeLeft * 10 : 0;
     setScore(earnedScore);
     
     setTimeout(() => {
+      console.log('🚀 Activity completed, advancing:', isCorrect);
       onActivityComplete(isCorrect);
     }, 3000);
   };
 
-  const question = activity.content?.question || activity.title;
-  const options = activity.content?.options || [];
+  const question = activity.content?.question || activity.title || 'Loading question...';
+  const options = activity.content?.options || ['Loading...', 'Loading...', 'Loading...', 'Loading...'];
   const battleScenario = activity.content?.battleScenario;
   const explanation = activity.content?.explanation;
+
+  console.log('🎮 Quiz state:', { selectedAnswer, showResult, timeLeft, score });
 
   return (
     <Blackboard>
@@ -75,7 +90,7 @@ const ActivityInteractiveQuiz = ({
               ⏰ {timeLeft}s
             </div>
             {score > 0 && (
-              <div className="bg-gold-500 text-black px-4 py-2 rounded-full font-bold">
+              <div className="bg-yellow-500 text-black px-4 py-2 rounded-full font-bold">
                 💰 {score} pts
               </div>
             )}
@@ -118,7 +133,7 @@ const ActivityInteractiveQuiz = ({
           </div>
         ) : (
           <div className="text-center space-y-4">
-            <div className={`text-6xl mb-4 ${selectedAnswer === activity.content?.correctAnswer ? '🎉' : '💀'}`}>
+            <div className="text-6xl mb-4">
               {selectedAnswer === activity.content?.correctAnswer ? '🎉' : '💀'}
             </div>
             <div className={`text-2xl font-bold ${
@@ -135,6 +150,9 @@ const ActivityInteractiveQuiz = ({
                 <p className="text-gray-300">{explanation}</p>
               </div>
             )}
+            <div className="text-gray-400 text-sm">
+              Advancing to next activity in {Math.max(0, 3 - Math.floor((Date.now() % 3000) / 1000))} seconds...
+            </div>
           </div>
         )}
 

@@ -1,19 +1,10 @@
-
 import { LessonActivity } from '../types/LessonTypes';
+import { mathBattleArenaActivity } from './MathBattleArenaActivity';
 
 // Diverse math activities with proper timing (total ~20 minutes = 1200 seconds)
 export const mathActivities: LessonActivity[] = [
-  {
-    id: 'math-intro-1',
-    title: 'Welcome to Math Adventures!',
-    type: 'introduction',
-    phase: 'introduction',
-    duration: 60, // 1 minute
-    phaseDescription: 'Welcome introduction to math concepts',
-    content: {
-      hook: 'Welcome to an amazing math adventure! Today we\'ll explore numbers, shapes, patterns, and solve exciting problems. Get ready to become a math detective!'
-    }
-  },
+  // Start with the exciting Math Battle Arena
+  mathBattleArenaActivity,
   
   // COUNTING & BASIC OPERATIONS (3 minutes)
   {
