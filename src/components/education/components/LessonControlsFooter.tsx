@@ -4,12 +4,7 @@ import { Button } from '@/components/ui/button';
 import { RotateCcw } from 'lucide-react';
 
 interface LessonControlsFooterProps {
-  autoReadEnabled: boolean;
-  isSpeaking: boolean;
-  isReady: boolean;
   adaptiveSpeed: number;
-  onMuteToggle: () => void;
-  onManualRead: () => void;
   onResetProgress: () => void;
 }
 
