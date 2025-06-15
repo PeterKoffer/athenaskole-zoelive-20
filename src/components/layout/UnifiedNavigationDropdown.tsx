@@ -159,24 +159,27 @@ const UnifiedNavigationDropdown = ({
 };
 
 const ListItem = forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & {
+  React.ElementRef<"button">,
+  {
     title: string;
     icon?: React.ElementType;
     onClick?: () => void;
+    children?: React.ReactNode;
+    className?: string;
+    href?: string;
   }
->(({ className, title, children, icon: Icon, onClick, ...props }, ref) => {
+>(({ className, title, children, icon: Icon, onClick, href, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <button
-          ref={ref as any}
+          ref={ref}
+          type="button"
           className={cn(
             "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground w-full text-left",
             className
           )}
           onClick={onClick}
-          {...props}
         >
           <div className="flex items-center space-x-2">
             {Icon && <Icon className="w-4 h-4" />}
