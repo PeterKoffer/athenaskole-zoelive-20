@@ -1,8 +1,10 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AppLoadingWrapper from "./components/layout/AppLoadingWrapper";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import DailyProgram from "./pages/DailyProgram";
@@ -35,34 +37,36 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/daily-program" element={<DailyProgram />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
-          <Route path="/ai-learning" element={<AILearning />} />
-          <Route path="/curriculum-system" element={<CurriculumSystem />} />
-          <Route path="/calendar" element={<JointCalendar />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/parent-dashboard" element={<ParentDashboard />} />
-          <Route path="/school-dashboard" element={<SchoolDashboard />} />
-          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+        <AppLoadingWrapper>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/daily-program" element={<DailyProgram />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
+            <Route path="/ai-learning" element={<AILearning />} />
+            <Route path="/curriculum-system" element={<CurriculumSystem />} />
+            <Route path="/calendar" element={<JointCalendar />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/parent-dashboard" element={<ParentDashboard />} />
+            <Route path="/school-dashboard" element={<SchoolDashboard />} />
+            <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+            
+            {/* Subject-specific learning routes */}
+            <Route path="/learn/english" element={<EnglishLearning />} />
+            <Route path="/learn/mathematics" element={<MathematicsLearning />} />
+            <Route path="/learn/creative_writing" element={<CreativeLearning />} />
+            <Route path="/learn/music" element={<MusicLearning />} />
+            <Route path="/learn/science" element={<ScienceLearning />} />
+            <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
+            <Route path="/learn/creative-arts" element={<CreativeLearning />} />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           
-          {/* Subject-specific learning routes */}
-          <Route path="/learn/english" element={<EnglishLearning />} />
-          <Route path="/learn/mathematics" element={<MathematicsLearning />} />
-          <Route path="/learn/creative_writing" element={<CreativeLearning />} />
-          <Route path="/learn/music" element={<MusicLearning />} />
-          <Route path="/learn/science" element={<ScienceLearning />} />
-          <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
-          <Route path="/learn/creative-arts" element={<CreativeLearning />} />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
-        {/* FloatingAITutor appears on all pages except auth */}
-        <FloatingAITutor />
+          {/* FloatingAITutor appears on all pages except auth */}
+          <FloatingAITutor />
+        </AppLoadingWrapper>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

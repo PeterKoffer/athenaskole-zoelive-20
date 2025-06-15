@@ -17,46 +17,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 
 const SchoolDashboard = () => {
-  const { userRole, canAccessSchoolDashboard } = useRoleAccess();
+  const { userRole } = useRoleAccess();
   const { user, loading } = useAuth();
-  const [isRoleLoaded, setIsRoleLoaded] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<any>({});
-
-  // Wait for role to be properly loaded
-  useEffect(() => {
-    console.log('[SchoolDashboard] useEffect triggered - loading:', loading, 'userRole:', userRole);
-    
-    const currentDebugInfo = {
-      loading,
-      userRole,
-      userEmail: user?.email,
-      userId: user?.id,
-      userMetadata: user?.user_metadata,
-      canAccess: canAccessSchoolDashboard(),
-      timestamp: new Date().toISOString()
-    };
-    
-    setDebugInfo(currentDebugInfo);
-    
-    if (!loading && userRole) {
-      console.log('[SchoolDashboard] Role loaded:', userRole);
-      setIsRoleLoaded(true);
-    } else {
-      console.log('[SchoolDashboard] Still waiting - loading:', loading, 'userRole:', userRole);
-      setIsRoleLoaded(false);
-    }
-  }, [loading, userRole, user, canAccessSchoolDashboard]);
 
   console.log('[SchoolDashboard] =================');
-  console.log('[SchoolDashboard] Component rendering');
   console.log('[SchoolDashboard] Auth loading:', loading);
-  console.log('[SchoolDashboard] User:', user?.email, user?.id);
+  console.log('[SchoolDashboard] User:', user?.email);
   console.log('[SchoolDashboard] User role:', userRole);
-  console.log('[SchoolDashboard] Role loaded:', isRoleLoaded);
-  console.log('[SchoolDashboard] Can access school dashboard:', canAccessSchoolDashboard());
-  console.log('[SchoolDashboard] User metadata:', user?.user_metadata);
-  console.log('[SchoolDashboard] Current URL:', window?.location?.pathname);
-  console.log('[SchoolDashboard] Debug info:', debugInfo);
   console.log('[SchoolDashboard] =================');
 
   const stats = {
@@ -66,33 +33,22 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
-  // Show loading state while auth is loading OR role is not yet loaded
-  if (loading || !isRoleLoaded) {
-    console.log('[SchoolDashboard] Showing loading state - auth loading:', loading, 'role loaded:', isRoleLoaded);
+  // Show loading state while auth is loading
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Loading School Dashboard...</h1>
           <p className="text-gray-400">Please wait while we load your dashboard.</p>
-          <div className="mt-4 text-sm text-gray-500">
-            <p>Auth Loading: {loading ? 'Yes' : 'No'}</p>
-            <p>Role: {userRole || 'None'}</p>
-            <p>Role Loaded: {isRoleLoaded ? 'Yes' : 'No'}</p>
-            <p>User: {user?.email || 'None'}</p>
-          </div>
         </div>
       </div>
     );
   }
 
-  // Check if user has access to school dashboard
-  const hasAccess = canAccessSchoolDashboard();
+  // Check if user has access (admin, school_leader, or school_staff)
+  const hasAccess = userRole === 'admin' || userRole === 'school_leader' || userRole === 'school_staff';
   
-  console.log('[SchoolDashboard] Final access check:', hasAccess);
-  console.log('[SchoolDashboard] User roles that should have access: admin, school_leader, school_staff');
-
   if (!hasAccess) {
-    console.log('[SchoolDashboard] Access denied, showing access denied screen');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -100,18 +56,10 @@ const SchoolDashboard = () => {
           <p className="text-gray-400">You don't have permission to access the school dashboard.</p>
           <p className="text-gray-400 mt-2">Current role: {userRole || 'None'}</p>
           <p className="text-gray-400 mt-2">Required roles: admin, school_leader, or school_staff</p>
-          <div className="mt-4 text-sm text-gray-500">
-            <p>Debug Info:</p>
-            <pre className="text-left bg-gray-800 p-2 rounded mt-2">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          </div>
         </div>
       </div>
     );
   }
-
-  console.log('[SchoolDashboard] Access granted, rendering full dashboard');
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -122,7 +70,6 @@ const SchoolDashboard = () => {
           <h2 className="font-bold">Dashboard Loaded Successfully!</h2>
           <p>Role: {userRole}</p>
           <p>User: {user?.email}</p>
-          <p>Access: {hasAccess ? 'Granted' : 'Denied'}</p>
         </div>
 
         <SchoolStatsCards stats={stats} />
