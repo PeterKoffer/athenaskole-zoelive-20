@@ -7,26 +7,47 @@ const SESSION_ROLE_KEY = "lovable-session-userRole";
 
 export const useRoleAccess = () => {
   const { user } = useAuth();
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+
+  // Initialize directly from sessionStorage if available, or null
+  const getInitialRole = () => {
+    if (typeof window !== "undefined") {
+      const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+      if (sessionRole) {
+        return sessionRole as UserRole;
+      }
+    }
+    return null;
+  };
+
+  const [userRole, setUserRole] = useState<UserRole | null>(getInitialRole);
 
   useEffect(() => {
     let detectedRole: UserRole | null = null;
-    // 1. Try direct from metadata
+    // Try direct from metadata if possible
     if (user?.user_metadata?.role) {
       detectedRole = user.user_metadata.role as UserRole;
-      // Persist it in sessionStorage for this browser session
-      sessionStorage.setItem(SESSION_ROLE_KEY, detectedRole);
+      // Persist to sessionStorage if different from what's already there
+      if (typeof window !== "undefined") {
+        const oldSessionRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+        if (oldSessionRole !== detectedRole) {
+          sessionStorage.setItem(SESSION_ROLE_KEY, detectedRole);
+        }
+      }
+      setUserRole(detectedRole);
     } else {
-      // 2. Fallback: try sessionStorage
-      const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY);
-      if (sessionRole) {
-        detectedRole = sessionRole as UserRole;
+      // Fallback: read from sessionStorage
+      if (typeof window !== "undefined") {
+        const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+        if (sessionRole) {
+          setUserRole(sessionRole as UserRole);
+        } else {
+          // Final fallback: default to student
+          setUserRole('student');
+        }
       } else {
-        // 3. Final fallback: default to student if everything else fails
-        detectedRole = 'student';
+        setUserRole('student');
       }
     }
-    setUserRole(detectedRole);
   }, [user]);
 
   const hasRole = (requiredRoles: UserRole[]): boolean => {
@@ -69,4 +90,3 @@ export const useRoleAccess = () => {
     canAccessSchoolDashboard
   };
 };
-
