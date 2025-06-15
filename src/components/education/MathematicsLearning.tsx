@@ -44,11 +44,10 @@ const MathematicsLearning = () => {
   const handleIntroComplete = () => {
     if (isAdvancing) return; // Prevent double trigger
     setIsAdvancing(true);
-    console.log('🟢 [MathematicsLearning] onIntroductionComplete: stopping speech then showing lesson');
+    setShowLesson(true);
+    // Stop speech after advancing – don't wait for it!
     stop();
-    setTimeout(() => {
-      setShowLesson(true);
-    }, 200); // Allow UI to update and speech cleanup if any
+    console.log('🟢 [MathematicsLearning] onIntroductionComplete: showing lesson immediately, THEN stopping speech');
   };
 
   return (
