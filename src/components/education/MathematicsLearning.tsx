@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import EnhancedMathematicsLearning from "./EnhancedMathematicsLearning";
-import MathLessonIntroCard from "./math/MathLessonIntroCard";
+// Removed: import MathLessonIntroCard from "./math/MathLessonIntroCard";
+import MathLearningIntroduction from "./components/math/MathLearningIntroduction";
 import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
 import { getClassroomConfig } from "./components/shared/classroomConfigs";
 
@@ -37,12 +38,12 @@ const MathematicsLearning = () => {
     return null;
   }
 
-  // Show intro card first, then actual lesson after start
+  // Show the intro flow (like English class), then the actual lesson
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
         {!showLesson ? (
-          <MathLessonIntroCard onStart={() => setShowLesson(true)} />
+          <MathLearningIntroduction onIntroductionComplete={() => setShowLesson(true)} />
         ) : (
           <EnhancedMathematicsLearning />
         )}
@@ -52,3 +53,4 @@ const MathematicsLearning = () => {
 };
 
 export default MathematicsLearning;
+
