@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Repeat, Home, Play } from 'lucide-react';
 
@@ -42,50 +41,43 @@ const UnifiedClassIntroductionControls = ({
   if (!hasStarted) {
     return (
       <div className="w-full flex justify-center mt-8">
-        <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-2xl justify-center">
+        <div className="flex flex-wrap md:flex-nowrap gap-2 w-full max-w-2xl justify-center">
           {/* Repeat (ask Nelie to repeat) */}
           <Button
             type="button"
             variant="outline"
             onClick={handleManualRead}
-            className="h-12 min-w-[130px] px-4 font-medium border-purple-400 text-purple-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-base transition-none"
+            className="h-10 px-3 font-medium border-purple-400 text-purple-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
             disabled={(!isEnabled && hasUserInteracted) || isAdvancing}
-            style={{
-              boxSizing: 'border-box'
-            }}
           >
-            <Repeat className="w-5 h-5 mr-2" />
-            <span className="whitespace-nowrap text-base">Repeat</span>
+            <Repeat className="w-4 h-4 mr-2" />
+            <span className="whitespace-nowrap">Repeat</span>
           </Button>
 
           {/* Home */}
           <Button
             type="button"
             variant="outline"
-            className="h-12 min-w-[120px] px-4 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-base transition-none"
+            className="h-10 px-3 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
             onClick={handleHome}
             disabled={isAdvancing}
-            style={{
-              boxSizing: 'border-box'
-            }}
           >
-            <Home className="w-5 h-5 mr-2" />
-            <span className="whitespace-nowrap text-base">Home</span>
+            <Home className="w-4 h-4 mr-2" />
+            <span className="whitespace-nowrap">Home</span>
           </Button>
 
           {/* Start Introduction with Nelie */}
           <Button
             type="button"
             onClick={handleManualStart}
-            className="h-12 min-w-[270px] px-6 font-bold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-base transition-none"
+            className="h-10 px-4 font-bold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-sm transition-none"
             disabled={isAdvancing}
             style={{
-              letterSpacing: "0.01em",
-              boxSizing: 'border-box'
+              letterSpacing: '0.01em',
             }}
           >
-            <Play className="w-5 h-5 mr-3" />
-            <span className="whitespace-nowrap text-base text-white font-bold">Start Introduction with Nelie</span>
+            <Play className="w-4 h-4 mr-2" />
+            <span className="whitespace-nowrap">Start Introduction with Nelie</span>
           </Button>
 
           {/* Start Lesson Without Speech */}
@@ -93,14 +85,13 @@ const UnifiedClassIntroductionControls = ({
             type="button"
             onClick={handleProceedWithoutSpeech}
             variant="outline"
-            className="h-12 min-w-[260px] px-6 font-bold border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-base transition-none"
+            className="h-10 px-4 font-bold border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
             disabled={!canProceedWithoutSpeech || isAdvancing}
             style={{
-              letterSpacing: "0.01em",
-              boxSizing: 'border-box'
+              letterSpacing: '0.01em',
             }}
           >
-            <span className="whitespace-nowrap text-base font-bold">Start Lesson Without Speech</span>
+            <span className="whitespace-nowrap">Start Lesson Without Speech</span>
           </Button>
         </div>
       </div>
