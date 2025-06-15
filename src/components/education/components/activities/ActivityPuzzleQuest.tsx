@@ -202,9 +202,10 @@ const ActivityPuzzleQuest = ({ activity, onActivityComplete }: ActivityPuzzleQue
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    );
-  };
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default ActivityPuzzleQuest;
