@@ -42,7 +42,17 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
   });
 
   const [gameStarted, setGameStarted] = useState(false);
+  const [lastToastTime, setLastToastTime] = useState(0);
   const maxLevels = 5;
+
+  // Prevent rapid toast notifications
+  const showToast = (title: string, description: string, duration: number = 3000) => {
+    const now = Date.now();
+    if (now - lastToastTime > 1000) { // Minimum 1 second between toasts
+      toast({ title, description, duration });
+      setLastToastTime(now);
+    }
+  };
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -63,7 +73,7 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
     }
 
     if (gameState.currentLevel >= maxLevels) {
-      // Game complete
+      // Game complete - single consolidated toast
       const finalAchievements = [...newAchievements, ...game.rewards.badges];
       setGameState(prev => ({ 
         ...prev, 
@@ -72,17 +82,18 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
         isComplete: true 
       }));
       
-      toast({
-        title: "Game Complete! 🎉",
-        description: `You earned ${newScore} points and ${finalAchievements.length} achievements!`,
-        duration: 5000
-      });
+      // Single toast for game completion
+      showToast(
+        "Game Complete! 🎉",
+        `You earned ${newScore} points and ${finalAchievements.length} achievements!`,
+        5000
+      );
       
       setTimeout(() => {
         onComplete(newScore, finalAchievements);
       }, 2000);
     } else {
-      // Next level
+      // Next level - brief toast only
       setGameState(prev => ({
         ...prev,
         currentLevel: prev.currentLevel + 1,
@@ -90,21 +101,21 @@ const GameEngine = ({ game, onComplete, onBack }: GameEngineProps) => {
         achievements: newAchievements
       }));
       
-      toast({
-        title: "Level Complete!",
-        description: `Moving to level ${gameState.currentLevel + 1}`,
-        duration: 2000
-      });
+      showToast(
+        "Level Complete!",
+        `Moving to level ${gameState.currentLevel + 1}`,
+        2000
+      );
     }
   };
 
   const handleGameStart = () => {
     setGameStarted(true);
-    toast({
-      title: "Game Started!",
-      description: `Good luck with ${game.title}!`,
-      duration: 2000
-    });
+    showToast(
+      "Game Started!",
+      `Good luck with ${game.title}!`,
+      2000
+    );
   };
 
   const renderGameInteraction = () => {
