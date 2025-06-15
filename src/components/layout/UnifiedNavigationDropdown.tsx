@@ -38,13 +38,25 @@ const UnifiedNavigationDropdown = ({
   const navigate = useNavigate();
   const { userRole, canAccessSchoolDashboard } = useRoleAccess();
 
-  console.log('[UnifiedNavigationDropdown] Current role:', userRole, 'Can access school dashboard:', canAccessSchoolDashboard());
+  console.log('[UnifiedNavigationDropdown] =================');
+  console.log('[UnifiedNavigationDropdown] Current role:', userRole);
+  console.log('[UnifiedNavigationDropdown] Can access school dashboard:', canAccessSchoolDashboard());
+  console.log('[UnifiedNavigationDropdown] User:', user?.email);
+  console.log('[UnifiedNavigationDropdown] =================');
 
   const handleNavigation = (path: string, action?: () => void) => {
-    console.log('[UnifiedNavigationDropdown] Navigating to:', path);
+    console.log('[UnifiedNavigationDropdown] =================');
+    console.log('[UnifiedNavigationDropdown] Navigation triggered');
+    console.log('[UnifiedNavigationDropdown] Path:', path);
+    console.log('[UnifiedNavigationDropdown] Has action:', !!action);
+    console.log('[UnifiedNavigationDropdown] Current userRole:', userRole);
+    console.log('[UnifiedNavigationDropdown] =================');
+    
     if (action) {
+      console.log('[UnifiedNavigationDropdown] Executing action instead of navigation');
       action();
     } else {
+      console.log('[UnifiedNavigationDropdown] Navigating to:', path);
       navigate(path);
     }
   };
@@ -110,6 +122,9 @@ const UnifiedNavigationDropdown = ({
       show: !!onShowAITutor
     }
   ];
+
+  console.log('[UnifiedNavigationDropdown] Dashboard items that will show:', dashboardItems.filter(item => item.show));
+  console.log('[UnifiedNavigationDropdown] Learning items that will show:', learningItems.filter(item => item.show));
 
   if (!user) return null;
 

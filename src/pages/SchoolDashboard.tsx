@@ -16,10 +16,17 @@ import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useAuth } from "@/hooks/useAuth";
 
 const SchoolDashboard = () => {
-  const { userRole } = useRoleAccess();
-  const { user } = useAuth();
+  const { userRole, canAccessSchoolDashboard } = useRoleAccess();
+  const { user, loading } = useAuth();
 
-  console.log('[SchoolDashboard] Component rendering, userRole:', userRole, 'user:', user?.email);
+  console.log('[SchoolDashboard] =================');
+  console.log('[SchoolDashboard] Component rendering');
+  console.log('[SchoolDashboard] Auth loading:', loading);
+  console.log('[SchoolDashboard] User:', user?.email, user?.id);
+  console.log('[SchoolDashboard] User role:', userRole);
+  console.log('[SchoolDashboard] Can access school dashboard:', canAccessSchoolDashboard());
+  console.log('[SchoolDashboard] User metadata:', user?.user_metadata);
+  console.log('[SchoolDashboard] =================');
 
   const stats = {
     totalStudents: 485,
@@ -28,22 +35,40 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
+  // Show loading state while auth is loading
+  if (loading) {
+    console.log('[SchoolDashboard] Showing loading state - auth is loading');
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+          <p className="text-gray-400">Please wait while we load your dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
   // Check if user has access to school dashboard
-  const hasAccess = userRole && ['admin', 'school_leader', 'school_staff'].includes(userRole);
+  const hasAccess = canAccessSchoolDashboard();
   
-  console.log('[SchoolDashboard] Access check:', hasAccess);
+  console.log('[SchoolDashboard] Final access check:', hasAccess);
+  console.log('[SchoolDashboard] User roles that should have access: admin, school_leader, school_staff');
 
   if (!hasAccess) {
+    console.log('[SchoolDashboard] Access denied, showing access denied screen');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
           <p className="text-gray-400">You don't have permission to access the school dashboard.</p>
           <p className="text-gray-400 mt-2">Current role: {userRole || 'None'}</p>
+          <p className="text-gray-400 mt-2">Required roles: admin, school_leader, or school_staff</p>
         </div>
       </div>
     );
   }
+
+  console.log('[SchoolDashboard] Access granted, rendering full dashboard');
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
