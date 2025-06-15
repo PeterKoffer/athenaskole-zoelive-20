@@ -17,6 +17,7 @@ interface SequenceItem {
   value: number;
   isCorrect: boolean;
   clicked: boolean;
+  clickOrder?: number; // Track the order in which items were clicked
 }
 
 const generateSequence = (level: number): SequenceItem[] => {
@@ -43,12 +44,16 @@ const ClickSequenceGame = ({ level, onLevelComplete, gameData }: ClickSequenceGa
   const [score, setScore] = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
   const [mistakes, setMistakes] = useState(0);
+  const [clickOrder, setClickOrder] = useState(0);
 
   const handleItemClick = (item: SequenceItem) => {
     if (item.clicked || gameComplete) return;
     
+    const newClickOrder = clickOrder + 1;
+    setClickOrder(newClickOrder);
+    
     const updatedSequence = sequence.map(seqItem =>
-      seqItem.id === item.id ? { ...seqItem, clicked: true } : seqItem
+      seqItem.id === item.id ? { ...seqItem, clicked: true, clickOrder: newClickOrder } : seqItem
     );
     
     setSequence(updatedSequence);
@@ -77,6 +82,16 @@ const ClickSequenceGame = ({ level, onLevelComplete, gameData }: ClickSequenceGa
       return 'bg-blue-600 hover:bg-blue-700 text-white';
     }
     
+    // If game is complete, show green for correctly sequenced items, red for wrong ones
+    if (gameComplete) {
+      if (item.isCorrect && item.clickOrder === item.value) {
+        return 'bg-green-600 text-white';
+      } else {
+        return 'bg-red-600 text-white';
+      }
+    }
+    
+    // During gameplay, show green for the most recently correct click, red for wrong clicks
     if (item.value === currentStep - 1 && item.isCorrect) {
       return 'bg-green-600 text-white';
     }
@@ -123,10 +138,10 @@ const ClickSequenceGame = ({ level, onLevelComplete, gameData }: ClickSequenceGa
               `}
             >
               {item.value}
-              {item.clicked && item.value === currentStep - 1 && item.isCorrect && (
+              {item.clicked && gameComplete && item.isCorrect && item.clickOrder === item.value && (
                 <CheckCircle className="w-5 h-5 ml-2" />
               )}
-              {item.clicked && (item.value !== currentStep - 1 || !item.isCorrect) && (
+              {item.clicked && (gameComplete ? (item.clickOrder !== item.value || !item.isCorrect) : (item.value !== currentStep - 1 || !item.isCorrect)) && (
                 <XCircle className="w-5 h-5 ml-2" />
               )}
             </Button>
