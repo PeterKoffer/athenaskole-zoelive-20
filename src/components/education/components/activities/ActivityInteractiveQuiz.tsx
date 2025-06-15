@@ -79,7 +79,7 @@ const ActivityInteractiveQuiz = ({
       <div className="space-y-6">
         {/* Epic Header with Timer */}
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white flex items-center">
+          <h2 className="text-3xl font-bold text-white flex items-center">
             {activity.title}
           </h2>
           <div className="flex items-center space-x-4">
@@ -99,8 +99,8 @@ const ActivityInteractiveQuiz = ({
 
         {/* Battle Context */}
         {battleScenario && (
-          <div className="bg-purple-900/50 border border-purple-400 rounded-lg p-4 text-center">
-            <p className="text-purple-200 font-medium text-lg">{battleScenario}</p>
+          <div className="bg-purple-900/50 border border-purple-400 rounded-lg p-6 text-center">
+            <p className="text-purple-200 font-medium text-xl">{battleScenario}</p>
           </div>
         )}
 
@@ -132,26 +132,26 @@ const ActivityInteractiveQuiz = ({
             ))}
           </div>
         ) : (
-          <div className="text-center space-y-4">
-            <div className="text-6xl mb-4">
+          <div className="text-center space-y-6">
+            <div className="text-8xl mb-4">
               {selectedAnswer === activity.content?.correctAnswer ? '🎉' : '💀'}
             </div>
-            <div className={`text-2xl font-bold ${
+            <div className={`text-3xl font-bold ${
               selectedAnswer === activity.content?.correctAnswer 
                 ? 'text-green-400' 
                 : 'text-red-400'
             }`}>
               {selectedAnswer === activity.content?.correctAnswer 
-                ? 'VICTORY!' 
-                : 'DEFEATED!'}
+                ? 'VICTORY! 🏆' 
+                : 'DEFEATED! ⚔️'}
             </div>
             {explanation && (
-              <div className="bg-gray-800 rounded-lg p-4 max-w-2xl mx-auto">
-                <p className="text-gray-300">{explanation}</p>
+              <div className="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
+                <p className="text-gray-300 text-lg">{explanation}</p>
               </div>
             )}
-            <div className="text-gray-400 text-sm">
-              Advancing to next activity in {Math.max(0, 3 - Math.floor((Date.now() % 3000) / 1000))} seconds...
+            <div className="text-gray-400 text-lg">
+              Next adventure begins in 3 seconds...
             </div>
           </div>
         )}
@@ -162,9 +162,9 @@ const ActivityInteractiveQuiz = ({
             <Button
               onClick={handleSubmit}
               disabled={selectedAnswer === null}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 text-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105 transition-all"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105 transition-all"
             >
-              ⚔️ ATTACK!
+              ⚔️ CAST SPELL!
             </Button>
           </div>
         )}

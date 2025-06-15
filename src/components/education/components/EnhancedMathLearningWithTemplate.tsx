@@ -1,21 +1,38 @@
 
-import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
+import { useStudentName } from './math/hooks/useStudentName';
+import MathLearningIntroduction from './math/MathLearningIntroduction';
 import OptimizedMathLearningContent from './math/OptimizedMathLearningContent';
 
 interface EnhancedMathLearningWithTemplateProps {
   onBackToProgram: () => void;
 }
 
-/**
- * Renders the lesson content directly instead of gating with the marketing template.
- * If you ever need the "WorldClassTeachingTemplate" for teachers/admins, re-enable via condition.
- */
 const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearningWithTemplateProps) => {
-  const { user } = useAuth();
+  const [showIntroduction, setShowIntroduction] = useState(true);
+  const studentName = useStudentName();
 
-  // Directly show optimized math lesson content for students
+  console.log('🎓 EnhancedMathLearningWithTemplate state:', { showIntroduction, studentName });
+
+  const handleIntroductionComplete = () => {
+    console.log('🎓 Introduction completed, starting main lesson');
+    setShowIntroduction(false);
+  };
+
+  // Show introduction first
+  if (showIntroduction) {
+    return (
+      <MathLearningIntroduction 
+        onIntroductionComplete={handleIntroductionComplete}
+      />
+    );
+  }
+
+  // Then show main math learning content
   return (
-    <OptimizedMathLearningContent onBackToProgram={onBackToProgram} />
+    <OptimizedMathLearningContent 
+      onBackToProgram={onBackToProgram} 
+    />
   );
 };
 
