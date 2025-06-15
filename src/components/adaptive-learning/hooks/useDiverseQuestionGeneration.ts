@@ -52,14 +52,14 @@ export const useDiverseQuestionGeneration = ({
   useEffect(() => {
     if (currentQuestion) {
       setSessionQuestions(prev => {
-        if (!prev.includes(currentQuestion.question)) {
-          return [...prev, currentQuestion.question];
+        if (!prev.includes(currentQuestion.content.question)) {
+          return [...prev, currentQuestion.content.question];
         }
         return prev;
       });
       
       // Extract topic from question for legacy compatibility
-      const questionTopic = currentQuestion.question.split(' ').slice(0, 5).join(' ');
+      const questionTopic = currentQuestion.content.question.split(' ').slice(0, 5).join(' ');
       setQuestionTopics(prev => new Set([...prev, questionTopic]));
     }
   }, [currentQuestion]);
@@ -80,9 +80,9 @@ export const useDiverseQuestionGeneration = ({
         options: uniqueQuestion.content.options,
         correct: uniqueQuestion.content.correctAnswer,
         explanation: uniqueQuestion.content.explanation,
-        learningObjectives: [], // Not available in UniqueQuestion
-        estimatedTime: undefined, // Not available in UniqueQuestion
-        conceptsCovered: [] // Not available in UniqueQuestion
+        learningObjectives: [],
+        estimatedTime: undefined,
+        conceptsCovered: []
       };
 
       console.log('✅ UNIQUE question generated successfully:', uniqueQuestion.content.question.substring(0, 50) + '...');

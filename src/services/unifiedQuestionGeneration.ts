@@ -1,4 +1,3 @@
-
 import { globalQuestionUniquenessService, UniqueQuestion } from './globalQuestionUniquenessService';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -306,18 +305,18 @@ class UnifiedQuestionGenerationService {
       const { error } = await supabase
         .from('user_question_history')
         .insert({
-          question_id: question.id,
           user_id: question.metadata.userId,
           subject: question.metadata.subject,
           skill_area: question.metadata.skillArea,
           question_text: question.content.question,
-          user_answer: userAnswer,
-          correct_answer: question.content.correctAnswer,
+          user_answer: typeof userAnswer === "number" ? question.content.options?.[userAnswer] || String(userAnswer) : null,
+          correct_answer: question.content.options?.[question.content.correctAnswer] || String(question.content.correctAnswer),
           is_correct: isCorrect,
-          response_time: responseTime,
+          response_time_seconds: responseTime,
           difficulty_level: question.metadata.difficultyLevel,
           session_id: question.metadata.sessionId,
-          context: additionalContext || {}
+          // mastery_indicators, concepts_covered, etc: left as defaults
+          // additionalContext attached only if it matches schema, here as a fallback
         });
 
       if (error) {

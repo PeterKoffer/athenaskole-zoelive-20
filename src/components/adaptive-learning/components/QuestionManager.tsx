@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuestionGeneration, Question } from "../hooks/useQuestionGeneration";
@@ -198,9 +197,19 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       const recapQuestions = await globalQuestionUniquenessService.getQuestionsForRecap(userId, subject, skillArea, 1);
       
       if (recapQuestions.length > 0) {
-        const recapQuestion = recapQuestions[0];
-        recapQuestion.isRecap = true;
-        
+        const baseRecapQuestion = recapQuestions[0];
+        // Construct a fully valid Question with all fields (provide defaults as needed)
+        const recapQuestion: Question = {
+          question: baseRecapQuestion.question,
+          options: baseRecapQuestion.options || ['A', 'B', 'C', 'D'],
+          correct: typeof baseRecapQuestion.correct === "number" ? baseRecapQuestion.correct : 0,
+          explanation: baseRecapQuestion.explanation || "",
+          learningObjectives: [],
+          estimatedTime: 0,
+          conceptsCovered: [],
+          isRecap: true
+        };
+
         setSessionQuestions(prev => [...prev, recapQuestion]);
         
         toast({
