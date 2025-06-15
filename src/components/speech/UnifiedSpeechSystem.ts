@@ -81,50 +81,54 @@ class UnifiedSpeechSystem {
   }
 
   stop(): void {
-    console.log('🔇 [UnifiedSpeechSystem] EMERGENCY STOP - Clearing all speech');
-    
-    // Clear the queue immediately
+    console.log('🔇 [UnifiedSpeechSystem] STOP - Clearing all speech');
+
+    // 1. Clear our internal queue to prevent further speech
     this.queue.clear();
-    
-    // Stop any current utterance
-    if (window.speechSynthesis) {
+
+    // 2. Stop browser Speech Synthesis
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
     }
-    
-    // Update state to reflect stopped status
-    this.stateManager.updateState({ 
-      isSpeaking: false, 
+
+    // 3. Stop ElevenLabs audio elements
+    try {
+      document.querySelectorAll('audio').forEach(audio => {
+        if (!audio.paused) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+    } catch (error) {
+      console.warn('🔇 [UnifiedSpeechSystem] Error stopping audio elements:', error);
+    }
+
+    // 4. Update state immediately to reflect stopped status
+    this.stateManager.updateState({
+      isSpeaking: false,
       currentUtterance: null,
       lastError: null
     });
 
-    // Clear any pending timeouts or intervals that might restart speech
+    // 5. Clear deduplication cache to allow re-speaking if needed
     speechDeduplication.clearAll();
-    
-    console.log('🔇 [UnifiedSpeechSystem] Speech fully stopped and cleaned up');
+
+    console.log('🔇 [UnifiedSpeechSystem] Speech fully stopped.');
   }
 
   forceStopAll(): void {
     console.log('🚨 [UnifiedSpeechSystem] FORCE STOP ALL SPEECH');
     this.stop();
-    
+
     // Additional cleanup for stubborn speech engines
     try {
-      // Cancel any ongoing speech synthesis
       if (window.speechSynthesis) {
+        // This sequence can sometimes help un-stick a browser's speech state
+        window.speechSynthesis.resume();
         window.speechSynthesis.cancel();
-        window.speechSynthesis.resume(); // Sometimes needed to clear stuck state
-        window.speechSynthesis.cancel(); // Cancel again
       }
-      
-      // Clear any audio elements that might be playing
-      const audioElements = document.querySelectorAll('audio');
-      audioElements.forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-      });
     } catch (error) {
-      console.warn('🔇 [UnifiedSpeechSystem] Error during force stop:', error);
+      console.warn('🔇 [UnifiedSpeechSystem] Error during force stop cleanup:', error);
     }
   }
 
