@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
 import GlobalCommunicationButton from "@/components/communication/GlobalCommunicationButton";
+import DashboardHomeButton from "@/components/layout/DashboardHomeButton";
 
 const TeacherNavbar = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const TeacherNavbar = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
+          {/* Dashboard button */}
+          <DashboardHomeButton className="ml-2" />
           <div className="flex items-center space-x-3">
             <BookOpen className="w-8 h-8 text-purple-500" />
             <div>

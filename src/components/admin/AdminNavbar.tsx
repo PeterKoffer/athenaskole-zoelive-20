@@ -1,8 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
+import DashboardHomeButton from "@/components/layout/DashboardHomeButton";
+
 const AdminNavbar = () => {
   const navigate = useNavigate();
   const {
@@ -15,6 +18,8 @@ const AdminNavbar = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
+          {/* Dashboard button */}
+          <DashboardHomeButton className="ml-2" />
           <div className="flex items-center space-x-3">
             <Shield className="w-8 h-8 text-red-500" />
             <div>
