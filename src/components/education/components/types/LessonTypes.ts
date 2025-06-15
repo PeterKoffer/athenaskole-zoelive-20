@@ -1,6 +1,7 @@
+
 export interface LessonActivity {
   id: string;
-  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
+  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'puzzle' | 'mini-game' | 'adventure-game' | 'puzzle-quest';
   phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
   title: string;
   duration: number; // in seconds
@@ -44,6 +45,18 @@ export interface LessonActivity {
     // Mini-game and puzzle specific properties
     gameDescription?: string;
     puzzleDescription?: string;
+    
+    // NEW INTERACTIVE ACTIVITY PROPERTIES
+    // Battle/Quiz specific properties
+    battleScenario?: string;
+    
+    // Simulation specific properties
+    simulationDescription?: string;
+    scenarios?: Array<{
+      customer?: string;
+      challenge?: string;
+      reward?: string;
+    }>;
     
     // ENGAGING ACTIVITY PROPERTIES
     // Adventure Game properties
