@@ -6,12 +6,12 @@ import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
 import { useNavigate } from 'react-router-dom';
-
 // Extracted subcomponents
 import IntroductionHeader from './introduction/IntroductionHeader';
 import IntroductionProgressIndicator from './introduction/IntroductionProgressIndicator';
 import IntroductionContent from './introduction/IntroductionContent';
 import IntroductionControls from './introduction/IntroductionControls';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech'; // 🟢 NEW: get the stop() method
 
 interface UnifiedClassIntroductionProps {
   subject: string;
@@ -30,6 +30,9 @@ const UnifiedClassIntroduction = ({
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
 
   const navigate = useNavigate();
+
+  // 🟢 NEW: Grab stop() so we can stop speech before nav
+  const { stop } = useUnifiedSpeech();
 
   const {
     hasStarted,
@@ -71,9 +74,16 @@ const UnifiedClassIntroduction = ({
     );
   }
 
-  // Handler for Home/Back navigation
+  // 🟢 Refactor: Always stop any speech before navigating home
   const handleHome = () => {
+    stop();
     navigate('/daily-program');
+  };
+
+  // 🟢 Refactor: Always stop speech before proceeding without speech
+  const handleProceedWithoutSpeech = () => {
+    stop();
+    onIntroductionComplete();
   };
 
   return (
@@ -188,4 +198,3 @@ const UnifiedClassIntroduction = ({
 };
 
 export default UnifiedClassIntroduction;
-
