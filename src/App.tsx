@@ -1,75 +1,81 @@
 
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AppLoadingWrapper from "./components/layout/AppLoadingWrapper";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import DailyProgram from "./pages/DailyProgram";
-import UserProfile from "./pages/UserProfile";
-import AdaptiveLearning from "./pages/AdaptiveLearning";
-import AdminDashboard from "./pages/AdminDashboard";
-import ParentDashboard from "./pages/ParentDashboard";
-import SchoolDashboard from "./pages/SchoolDashboard";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import AILearning from "./pages/AILearning";
-import CurriculumSystem from "./pages/CurriculumSystem";
-import NotFound from "./pages/NotFound";
-import FloatingAITutor from "./components/FloatingAITutor";
-import JointCalendar from "./components/calendar/JointCalendar";
+import { AuthProvider } from "@/hooks/useAuth";
+import { I18nextProvider } from 'react-i18next';
+import i18n from '@/i18n';
 
-// Education components for specific subjects
-import EnglishLearning from "./components/education/EnglishLearning";
-import MathematicsLearning from "./components/education/MathematicsLearning";
-import CreativeLearning from "./components/education/CreativeLearning";
-import ScienceLearning from "./components/education/ScienceLearning";
-import MusicLearning from "./components/education/MusicLearning";
-import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
-import './i18n'; // Add this import to initialize i18n
+// Lazy load components for better performance
+const Index = lazy(() => import("@/pages/Index"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const DailyProgram = lazy(() => import("@/pages/DailyProgram"));
+const SimpleSchoolDashboard = lazy(() => import("@/pages/SimpleSchoolDashboard"));
+const TeacherDashboard = lazy(() => import("@/pages/TeacherDashboard"));
+const ParentDashboard = lazy(() => import("@/pages/ParentDashboard"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const UserProfile = lazy(() => import("@/pages/UserProfile"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+// Import learning pages
+const MathematicsLearning = lazy(() => import("@/components/education/MathematicsLearning"));
+const EnglishLearning = lazy(() => import("@/components/education/EnglishLearning"));
+const ScienceLearning = lazy(() => import("@/components/education/ScienceLearning"));
+const ComputerScienceLearning = lazy(() => import("@/components/education/ComputerScienceLearning"));
+const CreativeLearning = lazy(() => import("@/components/education/CreativeLearning"));
+const MusicLearning = lazy(() => import("@/components/education/MusicLearning"));
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppLoadingWrapper>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/daily-program" element={<DailyProgram />} />
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
-            <Route path="/ai-learning" element={<AILearning />} />
-            <Route path="/curriculum-system" element={<CurriculumSystem />} />
-            <Route path="/calendar" element={<JointCalendar />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/parent-dashboard" element={<ParentDashboard />} />
-            <Route path="/school-dashboard" element={<SchoolDashboard />} />
-            <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-            
-            {/* Subject-specific learning routes */}
-            <Route path="/learn/english" element={<EnglishLearning />} />
-            <Route path="/learn/mathematics" element={<MathematicsLearning />} />
-            <Route path="/learn/creative_writing" element={<CreativeLearning />} />
-            <Route path="/learn/music" element={<MusicLearning />} />
-            <Route path="/learn/science" element={<ScienceLearning />} />
-            <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
-            <Route path="/learn/creative-arts" element={<CreativeLearning />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          
-          {/* FloatingAITutor appears on all pages except auth */}
-          <FloatingAITutor />
-        </AppLoadingWrapper>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <I18nextProvider i18n={i18n}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <div className="min-h-screen bg-gray-900">
+                <Suspense fallback={
+                  <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                      <h2 className="text-white text-lg font-semibold">Loading...</h2>
+                    </div>
+                  </div>
+                }>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/daily-program" element={<DailyProgram />} />
+                    <Route path="/school-dashboard" element={<SimpleSchoolDashboard />} />
+                    <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+                    <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                    <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                    <Route path="/profile" element={<UserProfile />} />
+                    
+                    {/* Learning routes */}
+                    <Route path="/learn/mathematics" element={<MathematicsLearning />} />
+                    <Route path="/learn/english" element={<EnglishLearning />} />
+                    <Route path="/learn/science" element={<ScienceLearning />} />
+                    <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
+                    <Route path="/learn/creative-arts" element={<CreativeLearning />} />
+                    <Route path="/learn/music" element={<MusicLearning />} />
+                    
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </div>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </I18nextProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

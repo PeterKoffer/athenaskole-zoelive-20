@@ -1,6 +1,5 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 const SubjectsSection = () => {
@@ -81,25 +80,28 @@ const SubjectsSection = () => {
               className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 hover:scale-105 cursor-pointer group"
               onClick={() => handleSubjectClick(subject.route)}
             >
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-6">
                 <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${subject.color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
                   {subject.icon}
                 </div>
                 <CardTitle className="text-white text-2xl mb-3 font-bold">{subject.title}</CardTitle>
+                <p className="text-gray-300 leading-relaxed text-base">{subject.description}</p>
               </CardHeader>
+              
               <CardContent className="pt-0">
-                <p className="text-gray-300 leading-relaxed mb-6 text-base">{subject.description}</p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {subject.skills.map((skill, idx) => (
-                    <Badge 
-                      key={idx} 
-                      variant="outline" 
-                      className="text-sm border-gray-600 text-gray-300 hover:border-purple-400 hover:text-purple-300 transition-colors"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
+                <div className="space-y-3">
+                  <h4 className="text-white font-medium text-sm">Key Areas:</h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {subject.skills.map((skill, idx) => (
+                      <div 
+                        key={idx} 
+                        className="text-gray-300 text-sm flex items-center"
+                      >
+                        <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${subject.color} mr-3 flex-shrink-0`}></div>
+                        {skill}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
