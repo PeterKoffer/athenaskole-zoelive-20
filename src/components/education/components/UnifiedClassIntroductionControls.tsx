@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Play, Home, Repeat } from 'lucide-react';
+import { Repeat, Home, Play } from 'lucide-react';
 
 interface UnifiedClassIntroductionControlsProps {
   hasStarted: boolean;
@@ -27,94 +27,61 @@ const UnifiedClassIntroductionControls = ({
   isComplete,
   hasUserInteracted,
   handleManualStart,
-  handleProceedWithoutSpeech,
-  toggleEnabled,
   handleManualRead,
+  toggleEnabled,
   onIntroductionComplete,
   handleStartLesson,
   handleSkip,
   handleHome,
   isAdvancing = false,
 }: UnifiedClassIntroductionControlsProps) => {
-  // Button stylings for consistent modern alignment.
-  // First row for sound/repeat, second for progression actions.
+  // Render only the required 4 buttons in a single row, responsive
 
   if (!hasStarted) {
     return (
-      <div className="w-full flex flex-col items-center gap-4 mt-8">
-        {/* --- First Row: Sound & Repeat --- */}
-        <div className="flex flex-row gap-4 justify-center w-full max-w-xl">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={toggleEnabled}
-            className={`min-w-[180px] py-3 font-medium border-green-400 
-              text-black bg-white hover:bg-gray-100 hover:text-black 
-              flex items-center justify-center shadow-sm`}
-          >
-            {isEnabled ? (
-              <>
-                <span className="mr-2"><span className="inline-block"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 5L6 9H2v6h4l5 4V5zm7.31 2.71a9 9 0 0 1 0 12.73M19 5l-14 14"/>
-                </svg></span></span>
-                Sound Off
-              </>
-            ) : (
-              <>
-                <span className="mr-2"><span className="inline-block"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19 13V11a4 4 0 0 0-4-4"/><path d="M19 19V5"/></svg></span></span>
-                Sound Off
-              </>
-            )}
-          </Button>
+      <div className="w-full flex justify-center mt-8">
+        <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-2xl justify-center">
+          {/* Repeat (ask Nelie to repeat) */}
           <Button
             type="button"
             variant="outline"
             onClick={handleManualRead}
-            className="min-w-[180px] py-3 font-medium border-green-400 text-black bg-white hover:bg-gray-100 hover:text-black flex items-center justify-center shadow-sm"
+            className="min-w-[100px] sm:min-w-[120px] px-3 py-2 font-medium border-purple-400 text-purple-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm"
             disabled={(!isEnabled && hasUserInteracted) || isAdvancing}
           >
-            <span className="mr-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="17 1 21 5 17 9"/><rect x="3" y="4" width="7" height="16" rx="2"/><path d="M14 4v16"/></svg></span>
-            Ask Nelie to Repeat
-          </Button>
-        </div>
-        {/* --- Second row: Progression controls --- */}
-        <div className="flex flex-row gap-4 justify-center w-full max-w-xl">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleManualRead}
-            className="min-w-[135px] py-3 font-medium border-purple-400 text-purple-200 bg-gray-800/50 flex items-center justify-center"
-            disabled={(!isEnabled && hasUserInteracted) || isAdvancing}
-          >
-            <span className="mr-2"><Play className="w-4 h-4" /></span>
+            <Repeat className="w-4 h-4 mr-1" />
             Repeat
           </Button>
+
+          {/* Home */}
           <Button
             type="button"
             variant="outline"
-            className="min-w-[110px] py-3 font-medium border-gray-400 text-gray-200 bg-gray-800/50 flex items-center justify-center"
+            className="min-w-[100px] sm:min-w-[120px] px-3 py-2 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm"
             onClick={handleHome}
             disabled={isAdvancing}
           >
-            <span className="mr-2"><Home className="w-4 h-4" /></span>
+            <Home className="w-4 h-4 mr-1" />
             Home
           </Button>
+
+          {/* Start Introduction with Nelie */}
           <Button
             type="button"
             onClick={handleManualStart}
-            className="min-w-[250px] py-3 font-semibold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
+            className="min-w-[140px] sm:min-w-[180px] px-3 py-2 font-semibold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-sm"
             disabled={isAdvancing}
           >
-            <span className="mr-2"><Play className="w-4 h-4" /></span>
+            <Play className="w-4 h-4 mr-1" />
             Start Introduction with Nelie
           </Button>
-        </div>
-        {/* --- Third (full-width under row): Start Without Speech --- */}
-        <div className="w-full flex justify-center mt-2">
+
+          {/* Start Lesson Without Speech */}
           <Button
             type="button"
             onClick={handleProceedWithoutSpeech}
             variant="outline"
-            className="w-[400px] max-w-full py-3 font-medium border-gray-400 text-gray-200 bg-gray-800/50 flex items-center justify-center"
+            className="min-w-[170px] px-3 py-2 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm"
             disabled={!canProceedWithoutSpeech || isAdvancing}
           >
             Start Lesson Without Speech
@@ -124,7 +91,7 @@ const UnifiedClassIntroductionControls = ({
     );
   }
 
-  // Advanced/started state (unchanged layout)
+  // Started state (keep as before, for after intro starts)
   return (
     <div className="mt-6 flex flex-col gap-2 w-full">
       {hasStarted && (
@@ -154,7 +121,7 @@ const UnifiedClassIntroductionControls = ({
                 type="button"
                 variant="outline"
                 onClick={handleSkip}
-                className="border-gray-400 text-gray-200 bg-gray-800/50"
+                className="border-gray-400 text-gray-200 bg-gray-800/60"
                 disabled={isAdvancing}
               >
                 Skip Introduction
