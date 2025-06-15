@@ -89,10 +89,11 @@ export const useOptimizedLessonManager = ({
           activities = activities.slice(1);
         }
 
-        // Map estimatedDuration to duration to match LessonActivity interface
+        // Map InteractiveActivity to LessonActivity interface
         const mappedActivities: LessonActivity[] = activities.map(activity => ({
           ...activity,
-          duration: activity.estimatedDuration || 120 // Default to 120 seconds if estimatedDuration is missing
+          duration: activity.duration || 120, // Use existing duration property or default
+          phase: 'content-delivery' as const // Add required phase property
         }));
 
         setAllActivities(mappedActivities);

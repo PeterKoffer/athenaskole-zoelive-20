@@ -129,7 +129,7 @@ export const createScienceInteractiveLesson = (topic: string, gradeLevel: number
           title: `${topic} Mystery Challenge`,
           description: `Solve scientific puzzles about ${topic}`,
           duration: 240,
-          difficulty: Math.min(gradeLevel, 4),
+          difficulty: Math.min(Math.max(gradeLevel, 1), 4) as 1 | 2 | 3 | 4,
           points: 20,
           instructions: `Use scientific thinking to solve ${topic} challenges!`,
           successCriteria: 'Solve the scientific mystery',
