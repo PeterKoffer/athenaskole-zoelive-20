@@ -24,6 +24,9 @@ interface MathLearningMainContentProps {
   onStopSpeaking: () => void;
   onActivityComplete: (wasCorrect?: boolean) => void;
   onNavigateToActivity?: (index: number) => void;
+  canNavigateBack?: boolean;
+  canNavigateForward?: boolean;
+  isCurrentActivityCompleted?: boolean;
 }
 
 const MathLearningMainContent = ({
@@ -41,26 +44,26 @@ const MathLearningMainContent = ({
   onReadRequest,
   onStopSpeaking,
   onActivityComplete,
-  onNavigateToActivity
+  onNavigateToActivity,
+  canNavigateBack = false,
+  canNavigateForward = false,
+  isCurrentActivityCompleted = false
 }: MathLearningMainContentProps) => {
   const classroomConfig = getClassroomConfig('mathematics');
 
   const handleNavigateBack = () => {
-    if (currentActivityIndex > 0 && onNavigateToActivity) {
+    if (canNavigateBack && onNavigateToActivity) {
       console.log('🔙 Navigating to previous activity:', currentActivityIndex - 1);
       onNavigateToActivity(currentActivityIndex - 1);
     }
   };
 
   const handleNavigateForward = () => {
-    if (currentActivityIndex < totalRealActivities - 1 && onNavigateToActivity) {
+    if (canNavigateForward && onNavigateToActivity) {
       console.log('🔜 Navigating to next activity:', currentActivityIndex + 1);
       onNavigateToActivity(currentActivityIndex + 1);
     }
   };
-
-  const canNavigateBack = currentActivityIndex > 0;
-  const canNavigateForward = currentActivityIndex < totalRealActivities - 1;
 
   return (
     <ClassroomEnvironment config={classroomConfig}>
@@ -118,6 +121,15 @@ const MathLearningMainContent = ({
                       />
                     )}
                   </>
+                )}
+                
+                {/* Activity completion status indicator */}
+                {isCurrentActivityCompleted && (
+                  <div className="text-center">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                      ✓ Activity Completed
+                    </div>
+                  </div>
                 )}
               </div>
             ) : (

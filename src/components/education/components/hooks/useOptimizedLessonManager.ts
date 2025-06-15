@@ -21,6 +21,7 @@ export const useOptimizedLessonManager = ({
 }: UseOptimizedLessonManagerProps) => {
   const [allActivities, setAllActivities] = useState<LessonActivity[]>([]);
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
+  const [completedActivities, setCompletedActivities] = useState<Set<number>>(new Set());
   const [score, setScore] = useState(0);
   const [correctStreak, setCorrectStreak] = useState(0);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -44,13 +45,34 @@ export const useOptimizedLessonManager = ({
     lessonStartTime: lessonStartTime.current
   });
 
-  // Handle manual navigation
+  // Handle manual navigation - only allow if target activity is completed or is the next sequential activity
   useEffect(() => {
     if (manualActivityIndex !== null && manualActivityIndex !== undefined) {
-      console.log('🧭 Manual navigation triggered:', manualActivityIndex);
-      setCurrentActivityIndex(manualActivityIndex);
+      console.log('🧭 Manual navigation attempted to:', manualActivityIndex);
+      
+      // Allow backward navigation to any completed activity
+      if (manualActivityIndex < currentActivityIndex && completedActivities.has(manualActivityIndex)) {
+        console.log('✅ Backward navigation allowed to completed activity:', manualActivityIndex);
+        setCurrentActivityIndex(manualActivityIndex);
+        return;
+      }
+      
+      // Allow forward navigation only to the next activity if current is completed
+      if (manualActivityIndex === currentActivityIndex + 1 && completedActivities.has(currentActivityIndex)) {
+        console.log('✅ Forward navigation allowed to next activity:', manualActivityIndex);
+        setCurrentActivityIndex(manualActivityIndex);
+        return;
+      }
+      
+      // Allow staying on current activity
+      if (manualActivityIndex === currentActivityIndex) {
+        console.log('✅ Staying on current activity:', manualActivityIndex);
+        return;
+      }
+      
+      console.log('❌ Navigation blocked - activity not accessible:', manualActivityIndex);
     }
-  }, [manualActivityIndex]);
+  }, [manualActivityIndex, currentActivityIndex, completedActivities]);
 
   // Initialize activities and reset to activity 0
   useEffect(() => {
@@ -62,6 +84,7 @@ export const useOptimizedLessonManager = ({
         console.log('✅ Generated activities:', activities.length);
         setAllActivities(activities);
         setCurrentActivityIndex(0); // Always start at activity 0 (Activity 1)
+        setCompletedActivities(new Set()); // Reset completion tracking
         setIsInitializing(false);
         startTimer();
       } catch (error) {
@@ -79,6 +102,14 @@ export const useOptimizedLessonManager = ({
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     console.log('📚 Activity completed:', currentActivityIndex, wasCorrect);
+    
+    // Mark current activity as completed
+    setCompletedActivities(prev => {
+      const newSet = new Set(prev);
+      newSet.add(currentActivityIndex);
+      console.log('✅ Marked activity as completed:', currentActivityIndex, 'Total completed:', newSet.size);
+      return newSet;
+    });
     
     if (wasCorrect !== undefined) {
       if (wasCorrect) {
@@ -111,6 +142,15 @@ export const useOptimizedLessonManager = ({
     }
   }, [currentActivity, teachingEngine]);
 
+  // Check if current activity is completed
+  const isCurrentActivityCompleted = completedActivities.has(currentActivityIndex);
+  
+  // Check if can navigate forward (next activity exists and current is completed)
+  const canNavigateForward = currentActivityIndex < totalRealActivities - 1 && isCurrentActivityCompleted;
+  
+  // Check if can navigate backward (previous activity exists)
+  const canNavigateBack = currentActivityIndex > 0;
+
   return {
     currentActivityIndex,
     setCurrentActivityIndex,
@@ -121,6 +161,10 @@ export const useOptimizedLessonManager = ({
     correctStreak,
     targetLessonLength,
     isInitializing,
+    completedActivities,
+    isCurrentActivityCompleted,
+    canNavigateForward,
+    canNavigateBack,
     handleActivityComplete,
     handleReadRequest,
     isSpeaking,

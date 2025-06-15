@@ -41,6 +41,9 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     correctStreak,
     targetLessonLength,
     isInitializing,
+    isCurrentActivityCompleted,
+    canNavigateForward,
+    canNavigateBack,
     handleActivityComplete,
     handleReadRequest,
     isSpeaking,
@@ -108,6 +111,9 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
       }}
       onActivityComplete={handleActivityComplete}
       onNavigateToActivity={handleNavigateToActivity}
+      canNavigateBack={canNavigateBack}
+      canNavigateForward={canNavigateForward}
+      isCurrentActivityCompleted={isCurrentActivityCompleted}
     />
   );
 };
