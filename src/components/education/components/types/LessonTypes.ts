@@ -34,7 +34,7 @@ export interface LessonActivity {
     }>;
     
     // Interactive game phase - EXTENDED
-    gameType?: 'fill-blanks' | 'drag-drop' | 'true-false' | 'matching' | 'problem-solving' | 'adventure-game' | 'puzzle-quest';
+    gameType?: 'fill-blanks' | 'drag-drop' | 'true-false' | 'matching' | 'problem-solving' | 'adventure-game' | 'puzzle-quest' | 'creative-builder' | 'exploration-sim';
     gameInstructions?: string;
     question?: string;
     options?: string[];
@@ -55,6 +55,8 @@ export interface LessonActivity {
     engagementHooks?: string[];
     interactionStyle?: string;
     celebrationLevel?: string;
+    winCondition?: string;
+    epicnessLevel?: string;
     
     // Puzzle Quest properties
     hintSystem?: boolean;
@@ -130,6 +132,7 @@ export interface LessonActivity {
       hint?: string;
       solution: string;
     }>;
+    scenario?: string;
     
     // Creative exploration phase
     explorationTask?: string;
