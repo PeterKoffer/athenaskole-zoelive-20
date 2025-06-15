@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import LessonControlsFooter from '../LessonControlsFooter';
@@ -23,12 +22,7 @@ const LessonControls = ({
   return (
     <>
       <LessonControlsFooter
-        autoReadEnabled={autoReadEnabled}
-        isSpeaking={isSpeaking}
-        isReady={isReady}
         adaptiveSpeed={1.0}
-        onMuteToggle={onMuteToggle}
-        onManualRead={onManualRead}
         onResetProgress={onRegenerate}
       />
 

@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
@@ -174,12 +173,7 @@ const ExtendedLessonManager = ({
 
       {/* Controls */}
       <LessonControlsFooter
-        autoReadEnabled={autoReadEnabled}
-        isSpeaking={isSpeaking}
-        isReady={isReady}
         adaptiveSpeed={1.0}
-        onMuteToggle={toggleMute}
-        onManualRead={handleReadQuestion}
         onResetProgress={() => window.location.reload()}
       />
     </div>
