@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Code, Zap, Brain, ArrowLeft } from 'lucide-react';
+import { Code, Zap, Brain, ArrowLeft, Gamepad2, Trophy, Clock } from 'lucide-react';
 import EnhancedLessonManager from '../components/EnhancedLessonManager';
 
 interface CSFeaturedGamesProps {
@@ -16,33 +16,42 @@ const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
   const featuredGames = [
     {
       id: 'coding-basics',
-      title: 'Coding Fundamentals',
-      description: 'Learn the building blocks of programming with interactive exercises',
+      title: 'Code Quest: Programming Fundamentals',
+      description: 'Embark on an epic coding adventure! Learn variables, loops, and functions through interactive story-driven challenges.',
       icon: Code,
       difficulty: 'Beginner',
       duration: '15-20 min',
       color: 'from-blue-500 to-cyan-500',
-      skillArea: 'programming-basics'
+      skillArea: 'programming-basics',
+      features: ['Interactive Code Editor', 'Visual Programming', 'Real-time Feedback'],
+      xpReward: 250,
+      achievements: ['Code Warrior', 'Logic Master']
     },
     {
       id: 'algorithm-adventure',
-      title: 'Algorithm Adventure',
-      description: 'Solve puzzles using computational thinking and logic',
+      title: 'Algorithm Arena: Problem Solving',
+      description: 'Battle through algorithmic challenges! Master sorting, searching, and optimization through gamified puzzle solving.',
       icon: Brain,
       difficulty: 'Intermediate',
       duration: '20-25 min',
       color: 'from-purple-500 to-pink-500',
-      skillArea: 'algorithms'
+      skillArea: 'algorithms',
+      features: ['Algorithm Visualization', 'Complexity Analysis', 'Strategy Games'],
+      xpReward: 350,
+      achievements: ['Algorithm Architect', 'Efficiency Expert']
     },
     {
       id: 'ai-exploration',
-      title: 'AI & Machine Learning Basics',
-      description: 'Discover how artificial intelligence works through hands-on activities',
+      title: 'AI Laboratory: Machine Learning Mastery',
+      description: 'Discover the future of technology! Build neural networks, train models, and create intelligent systems through hands-on experiments.',
       icon: Zap,
       difficulty: 'Advanced',
       duration: '25-30 min',
       color: 'from-orange-500 to-red-500',
-      skillArea: 'artificial-intelligence'
+      skillArea: 'artificial-intelligence',
+      features: ['Neural Network Builder', 'Data Visualization', 'Model Training'],
+      xpReward: 500,
+      achievements: ['AI Pioneer', 'Data Scientist']
     }
   ];
 
@@ -55,7 +64,6 @@ const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
     setSelectedGame(null);
   };
 
-  // Show lesson if game is selected
   if (selectedGame) {
     const game = featuredGames.find(g => g.id === selectedGame);
     return (
@@ -81,47 +89,90 @@ const CSFeaturedGames = ({ onGameSelect }: CSFeaturedGamesProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Featured Computer Science Games</h2>
-        <p className="text-gray-400">
-          Explore computational thinking through interactive coding challenges and AI adventures.
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-white mb-4">
+          🎮 Epic Computer Science Adventures
+        </h2>
+        <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+          Master programming and computational thinking through immersive, game-based learning experiences. 
+          Each adventure combines cutting-edge education with engaging gameplay.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
         {featuredGames.map((game) => {
           const IconComponent = game.icon;
           
           return (
-            <Card key={game.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-3">
-                  <div className={`p-2 rounded-lg bg-gradient-to-r ${game.color}`}>
-                    <IconComponent className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-white">{game.title}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 mb-4">{game.description}</p>
-                
+            <Card key={game.id} className="bg-gray-800 border-gray-700 hover:border-purple-500 transition-all duration-300 group hover:scale-105">
+              <CardHeader className="relative">
                 <div className="flex items-center justify-between mb-4">
-                  <Badge variant="outline" className="text-purple-400 border-purple-400">
-                    {game.difficulty}
-                  </Badge>
-                  <span className="text-gray-400 text-sm">{game.duration}</span>
+                  <div className={`p-3 rounded-lg bg-gradient-to-r ${game.color} group-hover:scale-110 transition-transform`}>
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant="outline" className="text-purple-400 border-purple-400">
+                      {game.difficulty}
+                    </Badge>
+                  </div>
+                </div>
+                <CardTitle className="text-white text-xl mb-2">{game.title}</CardTitle>
+                <p className="text-gray-300 text-sm leading-relaxed">{game.description}</p>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center text-gray-400">
+                    <Clock className="w-4 h-4 mr-2" />
+                    {game.duration}
+                  </div>
+                  <div className="flex items-center text-yellow-400">
+                    <Trophy className="w-4 h-4 mr-2" />
+                    {game.xpReward} XP
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-white font-medium text-sm">🚀 Game Features:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {game.features.map((feature, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-xs bg-gray-700 text-gray-300">
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-white font-medium text-sm">🏆 Unlock Achievements:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {game.achievements.map((achievement, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs border-yellow-500 text-yellow-400">
+                        {achievement}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
                 
                 <Button 
                   onClick={() => handleGameSelect(game.id)}
-                  className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white`}
+                  className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white font-semibold py-3`}
                 >
-                  Start Game
+                  <Gamepad2 className="w-4 h-4 mr-2" />
+                  Start Adventure
                 </Button>
               </CardContent>
             </Card>
           );
         })}
+      </div>
+
+      <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-6 text-center">
+        <h3 className="text-xl font-bold text-white mb-3">🎯 Adaptive Learning Technology</h3>
+        <p className="text-gray-300">
+          Our AI continuously adapts difficulty, provides personalized hints, and creates custom challenges 
+          based on your progress and interests. Every student gets a unique learning journey!
+        </p>
       </div>
     </div>
   );

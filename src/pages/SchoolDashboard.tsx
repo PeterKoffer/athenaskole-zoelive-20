@@ -19,12 +19,6 @@ const SchoolDashboard = () => {
   const { userRole } = useRoleAccess();
   const { user, loading } = useAuth();
 
-  console.log('[SchoolDashboard] =================');
-  console.log('[SchoolDashboard] Auth loading:', loading);
-  console.log('[SchoolDashboard] User:', user?.email);
-  console.log('[SchoolDashboard] User role:', userRole);
-  console.log('[SchoolDashboard] =================');
-
   const stats = {
     totalStudents: 485,
     totalTeachers: 28,
@@ -32,65 +26,61 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
-  // Show loading state while auth is loading OR userRole is null
   if (loading || userRole === null) {
-    console.log('[SchoolDashboard] Showing loading state - loading:', loading, 'userRole:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-center">
+        <div className="animate-pulse">
+          <div className="w-12 h-12 bg-purple-600 rounded-full mb-4 mx-auto"></div>
           <h1 className="text-2xl font-bold mb-4">Loading School Dashboard...</h1>
-          <p className="text-gray-400">Please wait while we load your dashboard.</p>
+          <p className="text-gray-400">Preparing your educational management system...</p>
         </div>
       </div>
     );
   }
 
-  // Simplified access check - allow admin, school_leader, and school_staff
   const allowedRoles = ['admin', 'school_leader', 'school_staff'];
   const hasAccess = allowedRoles.includes(userRole);
   
-  console.log('[SchoolDashboard] Access check - userRole:', userRole, 'hasAccess:', hasAccess, 'allowedRoles:', allowedRoles);
-  
   if (!hasAccess) {
-    console.log('[SchoolDashboard] Access denied for role:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-gray-400">You don't have permission to access the school dashboard.</p>
+          <div className="text-6xl mb-4">🏫</div>
+          <h1 className="text-2xl font-bold mb-4">School Dashboard Access Required</h1>
+          <p className="text-gray-400">You need administrator, school leader, or staff privileges to access this dashboard.</p>
           <p className="text-gray-400 mt-2">Current role: {userRole || 'None'}</p>
-          <p className="text-gray-400 mt-2">Required roles: admin, school_leader, or school_staff</p>
         </div>
       </div>
     );
   }
-
-  console.log('[SchoolDashboard] Rendering dashboard for role:', userRole);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <SchoolNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="bg-green-600 text-white p-4 rounded mb-4">
-          <h2 className="font-bold">School Dashboard Loaded Successfully!</h2>
-          <p>Role: {userRole}</p>
-          <p>User: {user?.email || 'No user'}</p>
-          <p>Access granted: {hasAccess ? 'Yes' : 'No'}</p>
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg">
+          <h1 className="text-3xl font-bold mb-2">Welcome to Your School Dashboard</h1>
+          <p className="text-purple-100">
+            Manage your educational institution with AI-powered insights and comprehensive tools.
+          </p>
+          <div className="mt-4 text-sm">
+            <span className="bg-white/20 px-3 py-1 rounded-full">
+              Logged in as: {userRole} • {user?.email || 'Guest User'}
+            </span>
+          </div>
         </div>
 
         <SchoolStatsCards stats={stats} />
-
-        {/* Render Teaching Perspective Settings Panel for admins and school leaders */}
         <TeachingPerspectiveSettingsPanel />
 
-        {/* Unified School Management Dropdown Menu */}
+        {/* Enhanced Management Dropdown */}
         <div className="flex gap-4 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-gray-600 text-slate-950 bg-slate-50">
+              <Button variant="outline" className="border-gray-600 text-white bg-gray-800 hover:bg-gray-700">
                 <Menu className="w-4 h-4 mr-2" />
-                School Management & Analytics
+                School Management Suite
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
@@ -190,12 +180,12 @@ const SchoolDashboard = () => {
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 bg-gray-800">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
-            <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Students</TabsTrigger>
-            <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Classes</TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-gray-700">Analytics</TabsTrigger>
-            <TabsTrigger value="registration" className="data-[state=active]:bg-gray-700">Registration</TabsTrigger>
-            <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Communication</TabsTrigger>
+            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">Overview</TabsTrigger>
+            <TabsTrigger value="students" className="data-[state=active]:bg-purple-600">Students</TabsTrigger>
+            <TabsTrigger value="classes" className="data-[state=active]:bg-purple-600">Classes</TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-purple-600">Analytics</TabsTrigger>
+            <TabsTrigger value="registration" className="data-[state=active]:bg-purple-600">Registration</TabsTrigger>
+            <TabsTrigger value="communication" className="data-[state=active]:bg-purple-600">Communication</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -207,11 +197,24 @@ const SchoolDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Users className="w-5 h-5 mr-2" />
-                  Student Management
+                  Advanced Student Management
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-400">Student management tools coming soon...</p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-4 rounded-lg">
+                    <h3 className="font-semibold text-white mb-2">Student Profiles</h3>
+                    <p className="text-gray-300 text-sm">Comprehensive student information and progress tracking</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-green-600/20 to-blue-600/20 p-4 rounded-lg">
+                    <h3 className="font-semibold text-white mb-2">Performance Analytics</h3>
+                    <p className="text-gray-300 text-sm">AI-powered insights into student learning patterns</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 p-4 rounded-lg">
+                    <h3 className="font-semibold text-white mb-2">Intervention Alerts</h3>
+                    <p className="text-gray-300 text-sm">Early warning system for students needing support</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

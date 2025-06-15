@@ -33,47 +33,147 @@ export const loadK12Games = async (): Promise<CurriculumGame[]> => {
       }
     }
 
-    // If we couldn't load any games, create some basic fallback games
+    // Enhanced fallback games with engaging content
     if (allGames.length === 0) {
-      const fallbackGames: CurriculumGame[] = [];
+      const enhancedGames: CurriculumGame[] = [];
       
-      // Create 10 games per grade (K-12)
+      // Create engaging games for each grade (K-12)
       for (let grade = 0; grade <= 12; grade++) {
-        const subjects = ['Mathematics', 'English', 'Science', 'History'];
+        const subjects = [
+          {
+            name: 'Mathematics',
+            games: [
+              {
+                title: `Math Quest Arena (Grade ${grade})`,
+                description: `Battle mathematical monsters using your calculation skills! Master Grade ${grade} math concepts through epic adventures.`,
+                emoji: '⚔️',
+                skillAreas: ['arithmetic', 'problem_solving', 'logical_thinking']
+              },
+              {
+                title: `Number Detective Stories (Grade ${grade})`,
+                description: `Solve mysterious cases using mathematical clues and deductive reasoning. Perfect for Grade ${grade} learners!`,
+                emoji: '🕵️',
+                skillAreas: ['pattern_recognition', 'logical_reasoning', 'number_sense']
+              },
+              {
+                title: `Space Math Mission (Grade ${grade})`,
+                description: `Navigate through space using math skills! Calculate trajectories, solve puzzles, and save the galaxy.`,
+                emoji: '🚀',
+                skillAreas: ['geometry', 'measurement', 'spatial_reasoning']
+              }
+            ]
+          },
+          {
+            name: 'English',
+            games: [
+              {
+                title: `Story Builder Adventures (Grade ${grade})`,
+                description: `Create epic tales while mastering grammar, vocabulary, and creative writing skills for Grade ${grade}.`,
+                emoji: '📖',
+                skillAreas: ['creative_writing', 'grammar', 'vocabulary']
+              },
+              {
+                title: `Word Wizard Challenge (Grade ${grade})`,
+                description: `Cast spelling spells and defeat vocabulary villains in this magical language adventure!`,
+                emoji: '🪄',
+                skillAreas: ['spelling', 'vocabulary', 'reading_comprehension']
+              },
+              {
+                title: `Poetry Power Quest (Grade ${grade})`,
+                description: `Unlock the power of poetry! Learn rhythm, rhyme, and literary devices through interactive storytelling.`,
+                emoji: '🎭',
+                skillAreas: ['poetry', 'literary_analysis', 'creative_expression']
+              }
+            ]
+          },
+          {
+            name: 'Science',
+            games: [
+              {
+                title: `Laboratory Legends (Grade ${grade})`,
+                description: `Conduct virtual experiments and discover scientific principles through hands-on investigation!`,
+                emoji: '🧪',
+                skillAreas: ['scientific_method', 'experimentation', 'observation']
+              },
+              {
+                title: `Ecosystem Explorer (Grade ${grade})`,
+                description: `Journey through different habitats and learn about biodiversity, food chains, and environmental science.`,
+                emoji: '🌿',
+                skillAreas: ['biology', 'ecology', 'environmental_science']
+              },
+              {
+                title: `Physics Playground (Grade ${grade})`,
+                description: `Master forces, motion, and energy through interactive simulations and real-world applications.`,
+                emoji: '⚡',
+                skillAreas: ['physics', 'mechanics', 'energy']
+              }
+            ]
+          },
+          {
+            name: 'Computer Science',
+            games: [
+              {
+                title: `Coding Kingdom (Grade ${grade})`,
+                description: `Rule a digital kingdom by programming solutions to help your citizens and protect your realm!`,
+                emoji: '👑',
+                skillAreas: ['programming', 'logic', 'problem_solving']
+              },
+              {
+                title: `Algorithm Academy (Grade ${grade})`,
+                description: `Train as an algorithm warrior! Master sorting, searching, and optimization through competitive challenges.`,
+                emoji: '🏛️',
+                skillAreas: ['algorithms', 'data_structures', 'computational_thinking']
+              },
+              {
+                title: `Robot Rescue Mission (Grade ${grade})`,
+                description: `Program robots to complete rescue missions! Learn sequences, loops, and conditionals through action.`,
+                emoji: '🤖',
+                skillAreas: ['robotics', 'programming_concepts', 'logical_sequences']
+              }
+            ]
+          }
+        ];
         
-        subjects.forEach((subject, subjectIndex) => {
-          for (let gameNum = 1; gameNum <= 3; gameNum++) {
-            fallbackGames.push({
-              id: `${subject.toLowerCase()}-grade${grade}-${gameNum}`,
-              title: `${subject} Adventure ${gameNum}`,
-              description: `Learn ${subject} concepts for Grade ${grade} in this engaging game!`,
-              emoji: ['🎯', '📚', '🔬', '📜'][subjectIndex],
-              subject,
+        subjects.forEach((subject) => {
+          subject.games.forEach((gameTemplate, gameIndex) => {
+            enhancedGames.push({
+              id: `${subject.name.toLowerCase()}-grade${grade}-${gameIndex + 1}`,
+              title: gameTemplate.title,
+              description: gameTemplate.description,
+              emoji: gameTemplate.emoji,
+              subject: subject.name,
               gradeLevel: [grade],
               difficulty: grade <= 3 ? 'beginner' : grade <= 8 ? 'intermediate' : 'advanced',
-              interactionType: ['multiple-choice', 'drag-drop', 'click-sequence'][gameNum % 3] as any,
-              timeEstimate: "15-25 min",
-              skillAreas: [`${subject.toLowerCase()}_basics`, "problem_solving"],
+              interactionType: ['multiple-choice', 'drag-drop', 'simulation', 'puzzle'][gameIndex % 4] as any,
+              timeEstimate: "15-30 min",
+              skillAreas: gameTemplate.skillAreas,
               learningObjectives: [
-                `Master Grade ${grade} ${subject} concepts`,
-                "Develop critical thinking skills",
-                "Apply knowledge to real scenarios"
+                `Master Grade ${grade} ${subject.name} concepts through engaging gameplay`,
+                "Develop critical thinking and problem-solving skills",
+                "Apply knowledge to real-world scenarios and challenges",
+                "Build confidence through progressive skill development"
               ],
               status: "available",
               rewards: {
-                coins: 100 + (grade * 10) + (gameNum * 20),
-                badges: [`${subject} Explorer`, `Grade ${grade} Champion`]
+                coins: 150 + (grade * 15) + (gameIndex * 25),
+                badges: [`${subject.name} Champion`, `Grade ${grade} Master`, 'Problem Solver']
+              },
+              adaptiveRules: {
+                successThreshold: 0.75,
+                failureThreshold: 0.4,
+                difficultyIncrease: 0.1,
+                difficultyDecrease: 0.15
               }
             });
-          }
+          });
         });
       }
       
-      allGames.push(...fallbackGames);
+      allGames.push(...enhancedGames);
     }
 
     cachedGames = allGames;
-    console.log(`📚 Loaded ${allGames.length} K-12 games`);
+    console.log(`🎮 Loaded ${allGames.length} enhanced K-12 educational games`);
     return allGames;
     
   } catch (error) {
