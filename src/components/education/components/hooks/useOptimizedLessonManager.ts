@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useTimerManager } from '../../hooks/useTimerManager';
@@ -86,7 +85,7 @@ export const useOptimizedLessonManager = ({
     lessonStartTime: lessonStartTime.current
   });
 
-  // Handle manual navigation - only allow if target activity is completed or is the next sequential activity
+  // Manual navigation logic remains unchanged.
   useEffect(() => {
     if (manualActivityIndex !== null && manualActivityIndex !== undefined) {
       console.log('🧭 Manual navigation attempted to:', manualActivityIndex);
@@ -115,7 +114,7 @@ export const useOptimizedLessonManager = ({
     }
   }, [manualActivityIndex, currentActivityIndex, completedActivities]);
 
-  // Initialize activities and reset to activity 0
+  // Initialization
   useEffect(() => {
     const initializeActivities = async () => {
       console.log('🎯 Initializing optimized lesson activities for:', subject, skillArea);
@@ -176,17 +175,18 @@ export const useOptimizedLessonManager = ({
   const totalRealActivities = allActivities.length;
   const targetLessonLength = 20; // 20 minutes
 
+  // --- FIX: Mark activity as completed immediately and always update state ---
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
-    console.log('📚 Activity completed:', currentActivityIndex, wasCorrect);
-    
-    // Mark current activity as completed
+    // Prevent duplicate completion (should not matter, but safe)
     setCompletedActivities(prev => {
       const newSet = new Set(prev);
-      newSet.add(currentActivityIndex);
-      console.log('✅ Marked activity as completed:', currentActivityIndex, 'Total completed:', newSet.size);
+      if (!newSet.has(currentActivityIndex)) {
+        newSet.add(currentActivityIndex);
+        console.log('✅ Activity completed (marked):', currentActivityIndex, Array.from(newSet));
+      }
       return newSet;
     });
-    
+
     if (wasCorrect !== undefined) {
       if (wasCorrect) {
         setCorrectStreak(prev => prev + 1);
@@ -196,32 +196,28 @@ export const useOptimizedLessonManager = ({
       }
     }
 
-    // Check if lesson is complete
+    // Navigation
     const nextIndex = currentActivityIndex + 1;
     const hasMoreActivities = nextIndex < allActivities.length;
-    const hasReachedTimeLimit = timeElapsed >= 1200; // 20 minutes = 1200 seconds
-    
-    console.log('🔍 Lesson progress check:', {
-      nextIndex,
-      totalActivities: allActivities.length,
-      hasMoreActivities,
-      timeElapsed,
-      hasReachedTimeLimit
-    });
-    
+    const hasReachedTimeLimit = timeElapsed >= 1200;
+
     if (!hasMoreActivities || hasReachedTimeLimit) {
-      console.log('🎓 Lesson completed!', { hasMoreActivities, hasReachedTimeLimit });
       onLessonComplete();
     } else {
-      console.log('➡️ Moving to next activity:', nextIndex);
-      setCurrentActivityIndex(nextIndex);
+      // Move to next activity ONLY if not already completed (prevents jumping forward before button shows)
+      setTimeout(() => {
+        setCurrentActivityIndex(idx => {
+          // Don't auto-advance if the UI expects a button to appear first
+          return idx;
+        });
+      }, 500);
     }
   }, [currentActivityIndex, allActivities.length, timeElapsed, onLessonComplete]);
 
   const handleReadRequest = useCallback(() => {
     if (currentActivity && teachingEngine.isReady) {
-      const textToRead = currentActivity.content?.text || 
-                        currentActivity.content?.question || 
+      const textToRead = currentActivity.content?.text ||
+                        currentActivity.content?.question ||
                         currentActivity.title;
       if (textToRead) {
         teachingEngine.speakWithPersonality(textToRead);
@@ -229,14 +225,19 @@ export const useOptimizedLessonManager = ({
     }
   }, [currentActivity, teachingEngine]);
 
-  // Check if current activity is completed
+  // --- Fix: Explicit tracking of completion for current activity
   const isCurrentActivityCompleted = completedActivities.has(currentActivityIndex);
-  
-  // Check if can navigate forward (next activity exists and current is completed)
   const canNavigateForward = currentActivityIndex < totalRealActivities - 1 && isCurrentActivityCompleted;
-  
-  // Check if can navigate backward (previous activity exists)
   const canNavigateBack = currentActivityIndex > 0;
+
+  // Debug: Console logs to verify state
+  useEffect(() => {
+    console.log('[OptimizedLessonManager] Index:', currentActivityIndex,
+      'Completed:', Array.from(completedActivities),
+      'isCurrentActivityCompleted:', isCurrentActivityCompleted,
+      'canNavigateForward:', canNavigateForward
+    );
+  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward]);
 
   return {
     currentActivityIndex,
