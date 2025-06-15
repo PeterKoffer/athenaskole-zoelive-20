@@ -14,7 +14,6 @@ import CommunicationCenter from "@/components/communication/CommunicationCenter"
 import TeachingPerspectiveSettingsPanel from "@/components/school/TeachingPerspectiveSettings";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect, useState } from "react";
 
 const SchoolDashboard = () => {
   const { userRole } = useRoleAccess();
@@ -33,8 +32,9 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
-  // Show loading state while auth is loading
-  if (loading) {
+  // Show loading state while auth is loading OR userRole is null
+  if (loading || userRole === null) {
+    console.log('[SchoolDashboard] Showing loading state - loading:', loading, 'userRole:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -45,10 +45,14 @@ const SchoolDashboard = () => {
     );
   }
 
-  // Check if user has access (admin, school_leader, or school_staff)
-  const hasAccess = userRole === 'admin' || userRole === 'school_leader' || userRole === 'school_staff';
+  // Simplified access check - allow admin, school_leader, and school_staff
+  const allowedRoles = ['admin', 'school_leader', 'school_staff'];
+  const hasAccess = allowedRoles.includes(userRole);
+  
+  console.log('[SchoolDashboard] Access check - userRole:', userRole, 'hasAccess:', hasAccess, 'allowedRoles:', allowedRoles);
   
   if (!hasAccess) {
+    console.log('[SchoolDashboard] Access denied for role:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -61,15 +65,18 @@ const SchoolDashboard = () => {
     );
   }
 
+  console.log('[SchoolDashboard] Rendering dashboard for role:', userRole);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <SchoolNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="bg-green-600 text-white p-4 rounded mb-4">
-          <h2 className="font-bold">Dashboard Loaded Successfully!</h2>
+          <h2 className="font-bold">School Dashboard Loaded Successfully!</h2>
           <p>Role: {userRole}</p>
-          <p>User: {user?.email}</p>
+          <p>User: {user?.email || 'No user'}</p>
+          <p>Access granted: {hasAccess ? 'Yes' : 'No'}</p>
         </div>
 
         <SchoolStatsCards stats={stats} />
