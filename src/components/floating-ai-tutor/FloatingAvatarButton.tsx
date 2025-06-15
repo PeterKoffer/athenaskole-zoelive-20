@@ -1,6 +1,9 @@
 
 import CollapsedButton from "./CollapsedButton";
 import EnableNelieButton from "./EnableNelieButton";
+import { Button } from "@/components/ui/button";
+import { Volume2, VolumeX, RotateCcw } from "lucide-react";
+import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 
 interface FloatingAvatarButtonProps {
   onToggleOpen: () => void;
@@ -29,8 +32,16 @@ const FloatingAvatarButton = ({
   hasUserInteracted,
   isOnHomepage
 }: FloatingAvatarButtonProps) => {
+  const { isEnabled, toggleEnabled, repeatSpeech } = useUnifiedSpeech();
+
+  const handleRepeat = () => {
+    // Repeat the last welcome message or a generic greeting
+    const repeatMessage = "Hello! I'm Nelie, your AI learning companion. How can I help you today?";
+    repeatSpeech(repeatMessage, 'floating-tutor-repeat');
+  };
+
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex flex-col items-center justify-center">
       <CollapsedButton 
         onExpand={onToggleOpen}
         onMouseDown={onMouseDown}
@@ -41,8 +52,36 @@ const FloatingAvatarButton = ({
         isSpeaking={isSpeaking}
       />
       
-      {/* Position the Enable Nelie button closer to the avatar */}
-      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+      {/* Small control buttons under Nelie */}
+      <div className="flex gap-1 mt-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleEnabled}
+          className="w-8 h-8 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 backdrop-blur-sm"
+          title={isEnabled ? "Mute Nelie" : "Unmute Nelie"}
+        >
+          {isEnabled ? (
+            <Volume2 className="w-3 h-3 text-green-300" />
+          ) : (
+            <VolumeX className="w-3 h-3 text-gray-400" />
+          )}
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRepeat}
+          disabled={!isEnabled}
+          className="w-8 h-8 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 backdrop-blur-sm disabled:opacity-50"
+          title="Ask Nelie to Repeat"
+        >
+          <RotateCcw className="w-3 h-3 text-blue-300" />
+        </Button>
+      </div>
+      
+      {/* Position the Enable Nelie button further down */}
+      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
         <EnableNelieButton
           showEnableButton={showEnableButton}
           hasUserInteracted={hasUserInteracted}
