@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
@@ -22,7 +23,10 @@ export const useIntroductionLogic = ({
   const [currentSection, setCurrentSection] = useState(0);
   const [userName, setUserName] = useState('Student');
   const [canProceedWithoutSpeech, setCanProceedWithoutSpeech] = useState(false);
-  
+
+  // NEW: Track intent to proceed after stopping speech
+  const [pendingProceedWithoutSpeech, setPendingProceedWithoutSpeech] = useState(false);
+
   const {
     isSpeaking,
     isEnabled,
@@ -154,14 +158,20 @@ export const useIntroductionLogic = ({
     onIntroductionComplete();
   };
 
+  // 🟢 MAIN FIX: Do not navigate immediately. Wait for speech to fully stop.
   const handleProceedWithoutSpeech = () => {
     console.log('🔇 User choosing to proceed without speech');
+    setPendingProceedWithoutSpeech(true);
     stop();
-    // Delay advancing until speech state is fully settled to avoid UI reset issues
-    setTimeout(() => {
-      onIntroductionComplete();
-    }, 120);
   };
+
+  // 🟢 Effect that triggers navigation once speech is fully stopped.
+  useEffect(() => {
+    if (pendingProceedWithoutSpeech && !isSpeaking) {
+      setPendingProceedWithoutSpeech(false);
+      onIntroductionComplete();
+    }
+  }, [pendingProceedWithoutSpeech, isSpeaking, onIntroductionComplete]);
 
   const isComplete = currentSection >= introduction.sections.length - 1 && !isSpeaking;
 
@@ -173,12 +183,12 @@ export const useIntroductionLogic = ({
     canProceedWithoutSpeech,
     currentContent,
     isComplete,
-    
+
     // Speech state
     isSpeaking,
     isEnabled,
     hasUserInteracted,
-    
+
     // Handlers
     handleManualStart,
     handleManualRead,
