@@ -1,8 +1,10 @@
 
 import { Button } from '@/components/ui/button';
 import { Brain } from 'lucide-react';
+import { useEffect } from 'react';
 import AskNelieButtons from '../shared/AskNelieButtons';
 import Blackboard from '../shared/Blackboard';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 interface MentalMathStrategiesProps {
   studentName: string;
@@ -10,6 +12,22 @@ interface MentalMathStrategiesProps {
 }
 
 const MentalMathStrategies = ({ studentName, onComplete }: MentalMathStrategiesProps) => {
+  const { speakAsNelie, autoReadEnabled } = useUnifiedSpeech();
+
+  // Welcome message to be spoken by Nelie
+  const welcomeMessage = `Hello there, ${studentName}! I'm Nelie, your AI learning companion, and I'm absolutely thrilled to be your teacher today! Welcome to our Mathematics class. I'm here to guide you through this amazing learning journey, step by step, making sure you understand everything clearly and have fun while learning!`;
+
+  // Speak welcome message when component loads
+  useEffect(() => {
+    if (autoReadEnabled) {
+      const timer = setTimeout(() => {
+        speakAsNelie(welcomeMessage, true, 'mental-math-welcome');
+      }, 1000); // Small delay to ensure component is fully loaded
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoReadEnabled, speakAsNelie, welcomeMessage]);
+
   return (
     <Blackboard>
       <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
@@ -18,6 +36,24 @@ const MentalMathStrategies = ({ studentName, onComplete }: MentalMathStrategiesP
       </h2>
       
       <div className="text-gray-300 space-y-6">
+        {/* Welcome Section */}
+        <div className="bg-gradient-to-r from-purple-900/60 to-blue-900/60 rounded-lg p-6 mb-6">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-xl font-semibold text-white">Welcome to Class</h3>
+            <AskNelieButtons 
+              content={welcomeMessage}
+              context="mental-math-welcome"
+              className="ml-4"
+            />
+          </div>
+          <p className="text-gray-200 leading-relaxed">
+            Hello there, {studentName}! I'm Nelie, your AI learning companion, and I'm absolutely thrilled to be 
+            your teacher today! Welcome to our Mathematics class. I'm here to guide you through this 
+            amazing learning journey, step by step, making sure you understand everything clearly and 
+            have fun while learning!
+          </p>
+        </div>
+
         <div className="bg-blue-900/30 rounded-lg p-4">
           <div className="flex justify-between items-start mb-3">
             <h3 className="font-semibold text-blue-200">Key Strategies for {studentName}:</h3>
