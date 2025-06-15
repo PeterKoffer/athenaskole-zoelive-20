@@ -6,7 +6,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 
 /**
  * Handles automatic redirection after authentication based on user role
- * Also handles navigation after role switching
+ * Only redirects from auth page - does not interfere with manual navigation or role switching
  */
 export const useAuthRedirect = () => {
   const { user, loading } = useAuth();
@@ -34,12 +34,10 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    // Only redirect from auth page - don't interfere with other navigation
-    // Remove the home page redirect to allow role switching
-    const shouldRedirect = location.pathname === '/auth';
-
-    if (!shouldRedirect) {
-      console.log('[useAuthRedirect] Not redirecting - user is on valid path:', location.pathname);
+    // ONLY redirect from the auth page - never interfere with other pages
+    // This prevents conflicts with role switching and manual navigation
+    if (location.pathname !== '/auth') {
+      console.log('[useAuthRedirect] Not on auth page - not redirecting from:', location.pathname);
       return;
     }
 
@@ -49,7 +47,7 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    console.log('[useAuthRedirect] Redirecting user with role:', userRole, 'from:', location.pathname);
+    console.log('[useAuthRedirect] Redirecting user with role:', userRole, 'from auth page');
 
     // Redirect based on role
     try {
@@ -71,7 +69,7 @@ export const useAuthRedirect = () => {
           navigate('/daily-program', { replace: true });
           break;
         default:
-          console.log('[useAuthRedirect] Unknown role, staying on current page');
+          console.log('[useAuthRedirect] Unknown role, staying on auth page');
           break;
       }
     } catch (error) {
