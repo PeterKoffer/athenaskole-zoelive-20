@@ -1,208 +1,111 @@
 
 import { useState, useEffect } from 'react';
-import GameEngine, { GameConfig } from './GameEngine';
-import DragDropGame from './interactions/DragDropGame';
-import NumberLineGame from './interactions/NumberLineGame';
-import FractionPizzaGame from './interactions/FractionPizzaGame';
 import { Card, CardContent } from '@/components/ui/card';
-import { getMathematicsGames } from './data/MathematicsGames';
-import { CurriculumGame } from './types/GameTypes';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { curriculumGames, getGameById } from './CurriculumGameConfig';
+import GameEngine from './engine/GameEngine';
+import { useToast } from '@/hooks/use-toast';
 
 interface SampleGameProps {
   gameId: string;
   onBack: () => void;
-  onComplete: (finalScore: number, achievements: string[]) => void;
+  onComplete: (score: number, achievements: string[]) => void;
 }
 
 const SampleGame = ({ gameId, onBack, onComplete }: SampleGameProps) => {
-  const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
-  const [gameData, setGameData] = useState<CurriculumGame | null>(null);
+  const [game, setGame] = useState(getGameById(gameId));
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const loadGameConfig = async () => {
+    const loadGame = async () => {
       try {
-        const games = await getMathematicsGames();
-        const foundGame = games.find(game => game.id === gameId);
+        setLoading(true);
+        setError(null);
         
-        if (foundGame) {
-          setGameData(foundGame);
-          
-          const config: GameConfig = {
-            id: foundGame.id,
-            title: foundGame.title,
-            subject: foundGame.subject,
-            interactionType: foundGame.interactionType,
-            difficulty: foundGame.gradeLevel[0] || 1,
-            gradeLevel: foundGame.gradeLevel,
-            objectives: foundGame.learningObjectives,
-            maxScore: 1000,
-            timeLimit: 1200, // 20 minutes
-            adaptiveRules: {
-              successThreshold: 0.8,
-              failureThreshold: 0.4,
-              difficultyIncrease: 1,
-              difficultyDecrease: 1
+        // Try to find the game in current data
+        let foundGame = getGameById(gameId);
+        
+        if (!foundGame) {
+          // Try to load from external data
+          const response = await fetch('/data/games/mathematics-k12-games.json');
+          if (response.ok) {
+            const games = await response.json();
+            foundGame = games.find((g: any) => g.id === gameId);
+          }
+        }
+        
+        if (!foundGame) {
+          // Fallback: create a simple game
+          foundGame = {
+            id: gameId,
+            title: "Math Adventure",
+            description: "A fun math learning experience!",
+            emoji: "🎯",
+            subject: "Mathematics",
+            gradeLevel: [1, 2, 3],
+            difficulty: "beginner" as const,
+            interactionType: "multiple-choice" as const,
+            timeEstimate: "15-20 min",
+            skillAreas: ["basic_math", "problem_solving"],
+            learningObjectives: ["Practice basic math", "Develop problem-solving skills"],
+            status: "available" as const,
+            rewards: {
+              coins: 150,
+              badges: ["Math Explorer", "Problem Solver"]
             }
           };
-          
-          setGameConfig(config);
         }
-      } catch (error) {
-        console.error('Failed to load game config:', error);
+        
+        setGame(foundGame);
+        console.log('🎮 Loaded game:', foundGame);
+        
+      } catch (err) {
+        console.error('🚫 Error loading game:', err);
+        setError(`Failed to load game: ${gameId}`);
+        toast({
+          title: "Game Loading Error",
+          description: "Failed to load the selected game. Please try another game.",
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    loadGameConfig();
-  }, [gameId]);
-
-  const renderGameContent = (gameState: any, gameActions: any) => {
-    if (!gameData) return null;
-
-    // Render different game types based on game ID
-    switch (gameId) {
-      case 'math-addition-castle':
-      case 'counting-kingdom':
-        return (
-          <DragDropGame
-            gameState={gameState}
-            gameActions={gameActions}
-            items={[
-              { id: 'num1', content: '5', type: 'draggable', correctTarget: 'sum1', value: 5 },
-              { id: 'num2', content: '3', type: 'draggable', correctTarget: 'sum2', value: 3 },
-              { id: 'num3', content: '7', type: 'draggable', correctTarget: 'sum3', value: 7 },
-              { id: 'sum1', content: '2 + 3 = ?', type: 'dropzone', value: 5 },
-              { id: 'sum2', content: '1 + 2 = ?', type: 'dropzone', value: 3 },
-              { id: 'sum3', content: '4 + 3 = ?', type: 'dropzone', value: 7 }
-            ]}
-            instruction="Drag the correct answers to solve these addition problems!"
-            onComplete={(success) => {
-              if (success) {
-                gameActions.addAchievement('Addition Master');
-                gameActions.completeGame();
-              }
-            }}
-          />
-        );
-
-      case 'geometry-shape-builder':
-        return (
-          <DragDropGame
-            gameState={gameState}
-            gameActions={gameActions}
-            items={[
-              { id: 'triangle', content: '△', type: 'draggable', category: 'triangle' },
-              { id: 'square', content: '□', type: 'draggable', category: 'square' },
-              { id: 'circle', content: '○', type: 'draggable', category: 'circle' },
-              { id: 'zone1', content: '3 sides', type: 'dropzone', category: 'triangle' },
-              { id: 'zone2', content: '4 equal sides', type: 'dropzone', category: 'square' },
-              { id: 'zone3', content: 'Round shape', type: 'dropzone', category: 'circle' }
-            ]}
-            instruction="Match each shape to its correct description!"
-            onComplete={(success) => {
-              if (success) {
-                gameActions.addAchievement('Geometry Expert');
-                gameActions.completeGame();
-              }
-            }}
-          />
-        );
-
-      case 'multiplication-mission':
-        return (
-          <NumberLineGame
-            gameState={gameState}
-            gameActions={gameActions}
-            minValue={10}
-            maxValue={50}
-            targetValue={24}
-            instruction="Find the result of 6 × 4 on the number line!"
-            onComplete={(success) => {
-              if (success) {
-                gameActions.addAchievement('Multiplication Hero');
-                gameActions.completeGame();
-              }
-            }}
-          />
-        );
-
-      case 'fraction-pizza-party':
-        return (
-          <FractionPizzaGame
-            gameState={gameState}
-            gameActions={gameActions}
-            targetFraction={{ numerator: 3, denominator: 8 }}
-            instruction="Select exactly 3/8 of the pizza by clicking on the slices!"
-            onComplete={(success) => {
-              if (success) {
-                gameActions.addAchievement('Fraction Master');
-                gameActions.completeGame();
-              }
-            }}
-          />
-        );
-
-      case 'decimal-treasure-hunt':
-        return (
-          <NumberLineGame
-            gameState={gameState}
-            gameActions={gameActions}
-            minValue={0}
-            maxValue={10}
-            targetValue={7.5}
-            instruction="Find the treasure at 7.5 on the number line!"
-            onComplete={(success) => {
-              if (success) {
-                gameActions.addAchievement('Decimal Detective');
-                gameActions.completeGame();
-              }
-            }}
-          />
-        );
-
-      default:
-        return (
-          <Card className="bg-gray-900 border-gray-800">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-xl font-bold text-white mb-4">{gameData.title}</h3>
-              <p className="text-gray-300 mb-6">{gameData.description}</p>
-              <div className="text-6xl mb-4">{gameData.emoji}</div>
-              <p className="text-gray-400">
-                This is a placeholder for the {gameData.interactionType} game type.
-                <br />
-                The game engine is ready - specific game mechanics will be implemented next!
-              </p>
-            </CardContent>
-          </Card>
-        );
-    }
-  };
+    loadGame();
+  }, [gameId, toast]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white">Loading game...</p>
-        </div>
-      </div>
+      <Card className="bg-gray-900 border-gray-700 max-w-4xl mx-auto">
+        <CardContent className="p-8 text-center">
+          <div className="animate-spin w-12 h-12 border-4 border-lime-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <h3 className="text-lg font-semibold text-white mb-2">Loading Game...</h3>
+          <p className="text-gray-400">Preparing your educational adventure!</p>
+        </CardContent>
+      </Card>
     );
   }
 
-  if (!gameConfig) {
+  if (error || !game) {
     return (
-      <Card className="bg-red-900 border-red-700 max-w-2xl mx-auto">
-        <CardContent className="p-6 text-center">
+      <Card className="bg-red-900 border-red-700 max-w-4xl mx-auto">
+        <CardContent className="p-8 text-center">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Game Not Found</h3>
-          <p className="text-red-300 mb-4">Could not load game configuration for: {gameId}</p>
-          <button 
+          <p className="text-red-300 mb-4">
+            {error || `Could not find game with ID: ${gameId}`}
+          </p>
+          <Button 
             onClick={onBack}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white"
           >
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Games
-          </button>
+          </Button>
         </CardContent>
       </Card>
     );
@@ -210,12 +113,10 @@ const SampleGame = ({ gameId, onBack, onComplete }: SampleGameProps) => {
 
   return (
     <GameEngine
-      gameConfig={gameConfig}
+      game={game}
       onComplete={onComplete}
       onBack={onBack}
-    >
-      {renderGameContent}
-    </GameEngine>
+    />
   );
 };
 
