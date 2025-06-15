@@ -1,4 +1,3 @@
-
 export interface Student {
   id: string;
   name: string;
@@ -53,6 +52,7 @@ export interface StudentProfile {
     subjects: string[];
     specialNeeds: string;
     notes: string;
+    currentStepId?: string; // optional: ID of the step (e.g., "1")
   };
   parentInfo: {
     parentName: string;
@@ -61,6 +61,7 @@ export interface StudentProfile {
     parentAddress: string;
     relationship: string;
   };
+  classId?: string; // optional field for class assignment
 }
 
 export interface RegistrationStep {
