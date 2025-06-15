@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Play, Home } from 'lucide-react';
+import { Play, Home } from 'lucide-react';
 import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
+
+// Extracted subcomponents
+import IntroductionHeader from './introduction/IntroductionHeader';
+import IntroductionProgressIndicator from './introduction/IntroductionProgressIndicator';
+import IntroductionContent from './introduction/IntroductionContent';
 import IntroductionControls from './introduction/IntroductionControls';
 
 interface UnifiedClassIntroductionProps {
@@ -19,7 +23,7 @@ const UnifiedClassIntroduction = ({
   subject,
   skillArea,
   userLevel,
-  onIntroductionComplete
+  onIntroductionComplete,
 }: UnifiedClassIntroductionProps) => {
   const classroomConfig = getClassroomConfig(subject);
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
@@ -39,11 +43,11 @@ const UnifiedClassIntroduction = ({
     handleSkip,
     handleStartLesson,
     handleProceedWithoutSpeech,
-    toggleEnabled
+    toggleEnabled,
   } = useIntroductionLogic({
     introduction,
     subject,
-    onIntroductionComplete
+    onIntroductionComplete,
   });
 
   if (!introduction || !currentContent) {
@@ -53,7 +57,9 @@ const UnifiedClassIntroduction = ({
           <div className="bg-gray-800/80 border-gray-700 rounded-lg p-8 text-center backdrop-blur-sm">
             <div className="animate-pulse">
               <div className="w-12 h-12 bg-blue-400 rounded-full mx-auto mb-4"></div>
-              <h3 className="text-white text-lg font-semibold mb-2">Preparing Your Introduction</h3>
+              <h3 className="text-white text-lg font-semibold mb-2">
+                Preparing Your Introduction
+              </h3>
               <p className="text-gray-400">Setting up your learning experience...</p>
             </div>
           </div>
@@ -62,62 +68,35 @@ const UnifiedClassIntroduction = ({
     );
   }
 
-  // NEW handler for Home/Back navigation, goes to daily program
+  // Handler for Home/Back navigation
   const handleHome = () => {
-    window.location.href = "/daily-program";
+    window.location.href = '/daily-program';
   };
 
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Introduction Header */}
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <RobotAvatar 
-              size="xl" 
-              isActive={true} 
-              isSpeaking={isSpeaking}
-            />
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
-            {introduction.title}
-          </h2>
-          <p className="text-purple-200">
-            Welcome to your {subject} class with Nelie, {userName}!
-          </p>
-        </div>
+        {/* Header */}
+        <IntroductionHeader
+          title={introduction.title}
+          userName={userName}
+          subject={subject}
+          isSpeaking={isSpeaking}
+        />
 
         {/* Progress Indicator */}
-        <div className="flex justify-center mb-6">
-          <div className="flex space-x-2">
-            {introduction.sections.map((_, index) => (
-              <div
-                key={index}
-                className={`w-3 h-3 rounded-full ${
-                  index <= currentSection 
-                    ? 'bg-purple-400' 
-                    : 'bg-purple-700'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+        <IntroductionProgressIndicator
+          sections={introduction.sections}
+          currentSection={currentSection}
+        />
 
         <div className="bg-gray-800/80 border-gray-700 rounded-lg p-6 backdrop-blur-sm">
           {/* Introduction Content */}
-          <div className="bg-purple-800/50 rounded-lg p-6 mb-6">
-            <h3 className="text-xl font-semibold text-white mb-3">
-              {currentContent.title}
-            </h3>
-            <p className="text-purple-100 leading-relaxed text-lg">
-              {currentContent.text}
-            </p>
-          </div>
-          {/* All controls in one bar underneath the content */}
+          <IntroductionContent currentContent={currentContent} />
+
+          {/* Controls */}
           <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            {/* Flex row of ALL buttons, as in reference design */}
             <div className="flex flex-1 flex-wrap gap-2">
-              {/* Repeat */}
               <Button
                 variant="outline"
                 onClick={handleManualRead}
@@ -127,7 +106,6 @@ const UnifiedClassIntroduction = ({
                 <Play className="w-4 h-4 mr-2" />
                 Repeat
               </Button>
-              {/* Home */}
               <Button
                 variant="outline"
                 className="border-gray-400 text-gray-200 bg-gray-800/50"
@@ -136,7 +114,6 @@ const UnifiedClassIntroduction = ({
                 <Home className="w-4 h-4 mr-2" />
                 Home
               </Button>
-              {/* Start Introduction with Nelie */}
               {!hasStarted && (
                 <Button
                   onClick={handleManualStart}
@@ -146,7 +123,6 @@ const UnifiedClassIntroduction = ({
                   Start Introduction with Nelie
                 </Button>
               )}
-              {/* Start Lesson Without Speech */}
               {!hasStarted && canProceedWithoutSpeech && (
                 <Button
                   onClick={handleProceedWithoutSpeech}
@@ -157,7 +133,6 @@ const UnifiedClassIntroduction = ({
                 </Button>
               )}
             </div>
-            {/* If started, show lesson controls (not relevant for welcome step) */}
             {hasStarted && (
               <div className="flex flex-wrap gap-2">
                 {isComplete ? (
