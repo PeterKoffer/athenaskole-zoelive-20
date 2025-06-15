@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Play, Home } from 'lucide-react';
 
@@ -16,7 +15,7 @@ interface IntroductionControlsProps {
   onIntroductionComplete: () => void;
   onStartLesson: () => void;
   onSkip: () => void;
-  onHome?: () => void; // NEW
+  onHome?: () => void;
 }
 
 const IntroductionControls = ({
@@ -33,12 +32,12 @@ const IntroductionControls = ({
   onIntroductionComplete,
   onStartLesson,
   onSkip,
-  onHome // NEW
+  onHome
 }: IntroductionControlsProps) => {
   if (!hasStarted) {
     return (
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Home (or Back) button now replaces "Unmute Nelie" */}
+        {/* Only Home, Start Introduction, and Start Lesson Without Speech buttons */}
         <Button
           variant="outline"
           className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
@@ -117,4 +116,3 @@ const IntroductionControls = ({
 };
 
 export default IntroductionControls;
-
