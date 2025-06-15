@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
 
 const SESSION_ROLE_KEY = "lovable-session-userRole";
+const MANUAL_ROLE_CHANGE_FLAG = "lovable-manual-role-change";
 
 export const useRoleAccess = () => {
   const { user, loading } = useAuth();
@@ -25,6 +26,20 @@ export const useRoleAccess = () => {
       if (val) return val;
     }
     return null;
+  };
+
+  const isManualRoleChange = (): boolean => {
+    if (typeof window !== "undefined") {
+      const flag = sessionStorage.getItem(MANUAL_ROLE_CHANGE_FLAG);
+      return flag === "true";
+    }
+    return false;
+  };
+
+  const clearManualRoleChangeFlag = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(MANUAL_ROLE_CHANGE_FLAG);
+    }
   };
 
   useEffect(() => {
@@ -72,11 +87,23 @@ export const useRoleAccess = () => {
   }, [user, loading]);
 
   const setUserRoleManually = (role: UserRole) => {
-    debugLog("MANUAL ROLE CHANGE:", role, "- This should NOT trigger redirects");
+    debugLog("MANUAL ROLE CHANGE:", role, "- Setting flag to prevent auto-redirects");
+    
+    // Set flag to prevent automatic redirects
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(MANUAL_ROLE_CHANGE_FLAG, "true");
+    }
+    
     setUserRole(role);
     if (typeof window !== "undefined") {
       sessionStorage.setItem(SESSION_ROLE_KEY, role);
     }
+
+    // Clear the flag after a short delay to allow navigation to complete
+    setTimeout(() => {
+      clearManualRoleChangeFlag();
+      debugLog("Manual role change flag cleared");
+    }, 2000);
   };
 
   const hasRole = (requiredRoles: UserRole[]): boolean => {
@@ -102,5 +129,7 @@ export const useRoleAccess = () => {
     isTeacher,
     canAccessAIInsights,
     canAccessSchoolDashboard,
+    isManualRoleChange,
+    clearManualRoleChangeFlag,
   };
 };

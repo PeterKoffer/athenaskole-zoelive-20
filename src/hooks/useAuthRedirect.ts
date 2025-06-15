@@ -10,7 +10,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
  */
 export const useAuthRedirect = () => {
   const { user, loading } = useAuth();
-  const { userRole } = useRoleAccess();
+  const { userRole, isManualRoleChange } = useRoleAccess();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,11 +20,18 @@ export const useAuthRedirect = () => {
     console.log('[useAuthRedirect] User:', user?.email);
     console.log('[useAuthRedirect] User role:', userRole);
     console.log('[useAuthRedirect] Current path:', location.pathname);
+    console.log('[useAuthRedirect] Is manual role change:', isManualRoleChange());
     console.log('[useAuthRedirect] =================');
 
     // Don't redirect while still loading
     if (loading) {
       console.log('[useAuthRedirect] Skipping redirect - still loading');
+      return;
+    }
+
+    // CRITICAL: Don't redirect during manual role changes
+    if (isManualRoleChange()) {
+      console.log('[useAuthRedirect] BLOCKING redirect - manual role change in progress');
       return;
     }
 
@@ -80,5 +87,5 @@ export const useAuthRedirect = () => {
     } catch (error) {
       console.error('[useAuthRedirect] Navigation error:', error);
     }
-  }, [user, userRole, loading, navigate, location.pathname]);
+  }, [user, userRole, loading, navigate, location.pathname, isManualRoleChange]);
 };
