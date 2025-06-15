@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Clock, Target } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import UnifiedLessonNavigation from '../shared/UnifiedLessonNavigation';
 
 interface MathLessonHeaderProps {
@@ -36,6 +37,20 @@ const MathLessonHeader = ({
   currentActivityType,
   currentActivityPhase
 }: MathLessonHeaderProps) => {
+  const [displayTime, setDisplayTime] = useState(timeElapsed);
+
+  // Update display time when timeElapsed prop changes
+  useEffect(() => {
+    setDisplayTime(timeElapsed);
+  }, [timeElapsed]);
+
+  // Format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   // Only show activity counter for interactive content
   const shouldShowActivityCounter = currentActivityType === 'interactive-game' || 
                                    currentActivityPhase === 'interactive-game';
@@ -55,7 +70,7 @@ const MathLessonHeader = ({
           <div className="flex items-center space-x-6 text-white">
             <div className="flex items-center space-x-2 bg-black/20 rounded-lg px-3 py-1 backdrop-blur-sm">
               <Clock className="w-4 h-4" />
-              <span>{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')} / {targetLessonLength}:00</span>
+              <span>{formatTime(displayTime)} / {targetLessonLength}:00</span>
             </div>
             
             <div className="flex items-center space-x-2 bg-black/20 rounded-lg px-3 py-1 backdrop-blur-sm">

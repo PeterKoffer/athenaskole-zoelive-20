@@ -1,12 +1,11 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useSimpleQuestionGeneration } from './hooks/useSimpleQuestionGeneration';
-import { LessonActivity } from './types/LessonTypes';
+import { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useReliableQuestionGeneration } from '../adaptive-learning/hooks/useReliableQuestionGeneration';
 import QuestionHeader from './question/QuestionHeader';
 import QuestionAnswerOptions from './question/QuestionAnswerOptions';
 import QuestionResult from './question/QuestionResult';
-import QuestionControls from './question/QuestionControls';
 import QuestionLoadingState from './question/QuestionLoadingState';
 import QuestionErrorState from './question/QuestionErrorState';
 
@@ -14,9 +13,9 @@ interface OptimizedQuestionActivityProps {
   subject: string;
   skillArea: string;
   difficultyLevel: number;
-  onComplete: (success: boolean) => void;
-  questionNumber: number;
-  totalQuestions: number;
+  onComplete: (wasCorrect?: boolean) => void;
+  questionNumber?: number;
+  totalQuestions?: number;
 }
 
 const OptimizedQuestionActivity = ({
@@ -24,88 +23,75 @@ const OptimizedQuestionActivity = ({
   skillArea,
   difficultyLevel,
   onComplete,
-  questionNumber,
-  totalQuestions
+  questionNumber = 1,
+  totalQuestions = 6
 }: OptimizedQuestionActivityProps) => {
-  const { user } = useAuth();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState<LessonActivity | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [hasAnswered, setHasAnswered] = useState(false);
+  
+  const startTime = useState(() => Date.now())[0];
 
-  const { generateUniqueQuestion } = useSimpleQuestionGeneration({
-    subject,
-    skillArea
-  });
-
-  // Timer for question
+  // Track time spent on question
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeSpent(prev => prev + 1);
+      setTimeSpent(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [startTime]);
 
-  // Generate question on mount
-  useEffect(() => {
-    if (!currentQuestion && !isLoading) {
-      generateQuestion();
-    }
-  }, [currentQuestion, isLoading]);
+  const {
+    currentQuestion,
+    isLoading,
+    error,
+    generateNewQuestion,
+    hasQuestions
+  } = useReliableQuestionGeneration({
+    subject,
+    skillArea,
+    difficultyLevel,
+    autoGenerate: true
+  });
 
-  const generateQuestion = async () => {
-    setIsLoading(true);
-    setError(null);
+  const handleAnswerSelect = useCallback((answerIndex: number) => {
+    if (hasAnswered) return;
     
-    try {
-      const newQuestion = generateUniqueQuestion();
-      setCurrentQuestion(newQuestion);
-    } catch (err) {
-      console.error('Error generating question:', err);
-      setError('Failed to generate question. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setSelectedAnswer(answerIndex);
+    const correct = answerIndex === currentQuestion?.correct;
+    setIsCorrect(correct);
+    setShowResult(true);
+    setHasAnswered(true);
+    
+    console.log('📝 Answer selected:', answerIndex, 'Correct:', correct);
+  }, [currentQuestion?.correct, hasAnswered]);
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (!showResult) {
-      setSelectedAnswer(answerIndex);
-    }
-  };
-
-  const handleSubmitAnswer = () => {
-    if (selectedAnswer !== null) {
-      setShowResult(true);
-    }
-  };
-
-  const handleNextQuestion = () => {
-    const isCorrect = selectedAnswer === currentQuestion?.content?.correctAnswer;
+  const handleContinue = useCallback(() => {
+    console.log('➡️ Continuing to next activity, was correct:', isCorrect);
     onComplete(isCorrect);
-  };
+  }, [isCorrect, onComplete]);
 
-  if (isLoading) {
+  const handleTryAgain = useCallback(() => {
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setHasAnswered(false);
+    generateNewQuestion();
+  }, [generateNewQuestion]);
+
+  if (isLoading || !hasQuestions) {
     return <QuestionLoadingState />;
   }
 
-  if (error) {
-    return <QuestionErrorState error={error} onRetry={generateQuestion} />;
-  }
-
-  if (!currentQuestion) {
+  if (error || !currentQuestion) {
     return (
       <QuestionErrorState 
-        error="Unable to load question content." 
-        onRetry={generateQuestion} 
+        error={error}
+        onRetry={generateNewQuestion}
       />
     );
   }
-
-  const isLastQuestion = questionNumber === totalQuestions;
 
   return (
     <div className="space-y-6">
@@ -113,31 +99,27 @@ const OptimizedQuestionActivity = ({
         questionNumber={questionNumber}
         totalQuestions={totalQuestions}
         timeSpent={timeSpent}
-        question={currentQuestion.content?.question || ''}
+        question={currentQuestion.question}
       />
 
-      <QuestionAnswerOptions
-        options={currentQuestion.content?.options || []}
-        selectedAnswer={selectedAnswer}
-        correctAnswer={currentQuestion.content?.correctAnswer || 0}
-        showResult={showResult}
-        onAnswerSelect={handleAnswerSelect}
-      />
-
-      <QuestionResult
-        selectedAnswer={selectedAnswer || 0}
-        correctAnswer={currentQuestion.content?.correctAnswer || 0}
-        explanation={currentQuestion.content?.explanation}
-        showResult={showResult}
-      />
-
-      <QuestionControls
-        selectedAnswer={selectedAnswer}
-        showResult={showResult}
-        isLastQuestion={isLastQuestion}
-        onSubmitAnswer={handleSubmitAnswer}
-        onNextQuestion={handleNextQuestion}
-      />
+      {!showResult ? (
+        <QuestionAnswerOptions
+          options={currentQuestion.options}
+          selectedAnswer={selectedAnswer}
+          onAnswerSelect={handleAnswerSelect}
+          disabled={hasAnswered}
+        />
+      ) : (
+        <QuestionResult
+          isCorrect={isCorrect}
+          correctAnswer={currentQuestion.correct}
+          options={currentQuestion.options}
+          explanation={currentQuestion.explanation}
+          onContinue={handleContinue}
+          onTryAgain={handleTryAgain}
+          timeSpent={timeSpent}
+        />
+      )}
     </div>
   );
 };
