@@ -52,19 +52,19 @@ const FloatingAvatarButton = ({
         isSpeaking={isSpeaking}
       />
       
-      {/* Small control buttons very close to Nelie */}
-      <div className="flex gap-1 -mt-1">
+      {/* Tiny control buttons positioned very close to the actual robot */}
+      <div className="flex gap-0.5 -mt-8">
         <Button
           variant="outline"
           size="sm"
           onClick={toggleEnabled}
-          className="w-8 h-8 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 backdrop-blur-sm"
+          className="w-6 h-6 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 backdrop-blur-sm border"
           title={isEnabled ? "Mute Nelie" : "Unmute Nelie"}
         >
           {isEnabled ? (
-            <Volume2 className="w-3 h-3 text-green-300" />
+            <Volume2 className="w-2.5 h-2.5 text-green-300" />
           ) : (
-            <VolumeX className="w-3 h-3 text-gray-400" />
+            <VolumeX className="w-2.5 h-2.5 text-gray-400" />
           )}
         </Button>
         
@@ -73,10 +73,10 @@ const FloatingAvatarButton = ({
           size="sm"
           onClick={handleRepeat}
           disabled={!isEnabled}
-          className="w-8 h-8 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 backdrop-blur-sm disabled:opacity-50"
+          className="w-6 h-6 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 backdrop-blur-sm disabled:opacity-50 border"
           title="Ask Nelie to Repeat"
         >
-          <RotateCcw className="w-3 h-3 text-blue-300" />
+          <RotateCcw className="w-2.5 h-2.5 text-blue-300" />
         </Button>
       </div>
       
