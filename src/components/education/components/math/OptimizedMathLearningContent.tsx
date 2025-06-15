@@ -4,7 +4,6 @@ import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
 import { useStudentName } from '../math/hooks/useStudentName';
 import { useSpeechCleanup } from '../math/hooks/useSpeechCleanup';
-import MathLearningIntroduction from './MathLearningIntroduction';
 import MathLearningLoading from './MathLearningLoading';
 import MathLearningMainContent from './MathLearningMainContent';
 
@@ -13,10 +12,9 @@ interface OptimizedMathLearningContentProps {
 }
 
 const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearningContentProps) => {
-  const [showIntroduction, setShowIntroduction] = useState(true);
   const [manualActivityIndex, setManualActivityIndex] = useState<number | null>(null);
   const studentName = useStudentName();
-  const { stop: stopSpeaking, forceStopAll } = useUnifiedSpeech();
+  const { forceStopAll } = useUnifiedSpeech();
 
   // Enhanced speech cleanup for all navigation scenarios
   useSpeechCleanup(() => {
@@ -66,23 +64,11 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     onBackToProgram();
   };
 
-  const handleIntroductionComplete = () => {
-    console.log('🎭 Math Introduction completed, starting optimized lesson');
-    setShowIntroduction(false);
-  };
-
   const handleNavigateToActivity = (index: number) => {
     console.log('🧭 Manual navigation to activity:', index);
     setManualActivityIndex(index);
     setCurrentActivityIndex(index);
   };
-
-  // Show introduction first
-  if (showIntroduction) {
-    return (
-      <MathLearningIntroduction onIntroductionComplete={handleIntroductionComplete} />
-    );
-  }
 
   // Show loading state during initialization
   if (isInitializing) {
