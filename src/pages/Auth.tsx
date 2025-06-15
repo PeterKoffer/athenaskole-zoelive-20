@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import RoleSelector from "@/components/auth/RoleSelector";
 import AuthForm from "@/components/auth/AuthForm";
 import { UserRole } from "@/types/auth";
+import { useRoleUpgrade } from "@/hooks/useRoleUpgrade";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -11,6 +12,9 @@ const Auth = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(
     (searchParams.get('role') as UserRole) || null
   );
+
+  // Run automatic "role upgrade after login" logic
+  useRoleUpgrade();
 
   if (!selectedRole) {
     return (
