@@ -89,7 +89,13 @@ export const useOptimizedLessonManager = ({
           activities = activities.slice(1);
         }
 
-        setAllActivities(activities);
+        // Map estimatedDuration to duration to match LessonActivity interface
+        const mappedActivities: LessonActivity[] = activities.map(activity => ({
+          ...activity,
+          duration: activity.estimatedDuration || 120 // Default to 120 seconds if estimatedDuration is missing
+        }));
+
+        setAllActivities(mappedActivities);
         setCurrentActivityIndex(0); // Always start at activity 0
         setCompletedActivities(new Set()); // Reset completion tracking
         setIsInitializing(false);
