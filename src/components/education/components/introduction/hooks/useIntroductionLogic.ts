@@ -155,10 +155,9 @@ export const useIntroductionLogic = ({
     onIntroductionComplete();
   };
 
-  // FINAL FIX: Instantly stop all speech and complete intro on first click
+  // Updated: do NOT call stop() here, we'll stop before advancing at parent level!
   const handleProceedWithoutSpeech = () => {
-    console.log('🔇 User choosing to proceed without speech (immediate)');
-    stop();
+    console.log('🔇 User choosing to proceed without speech (immediate) -- just calling onIntroductionComplete');
     onIntroductionComplete();
   };
 
