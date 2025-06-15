@@ -51,18 +51,18 @@ const FloatingAvatarButton = ({
         isSpeaking={isSpeaking}
       />
       
-      {/* Control buttons positioned directly under Nelie */}
-      <div className="flex gap-2 mt-2">
+      {/* Control buttons positioned directly under Nelie with minimal spacing */}
+      <div className="flex flex-col gap-1 mt-1">
         <Button
           variant="outline"
           size="sm"
           onClick={toggleEnabled}
-          className="text-xs px-2 py-1 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white"
+          className="text-xs px-2 py-1 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white rounded-full h-8 min-w-[60px] flex items-center justify-center"
         >
           {isEnabled ? (
-            <><Volume2 className="w-3 h-3 mr-1" />Mute Nelie</>
+            <><Volume2 className="w-3 h-3 mr-1" />Mute</>
           ) : (
-            <><VolumeX className="w-3 h-3 mr-1" />Unmute Nelie</>
+            <><VolumeX className="w-3 h-3 mr-1" />Unmute</>
           )}
         </Button>
         
@@ -71,15 +71,15 @@ const FloatingAvatarButton = ({
           size="sm"
           onClick={handleRepeat}
           disabled={!isEnabled}
-          className="text-xs px-2 py-1 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white disabled:opacity-50"
+          className="text-xs px-2 py-1 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white disabled:opacity-50 rounded-full h-8 min-w-[60px] flex items-center justify-center"
         >
           <RotateCcw className="w-3 h-3 mr-1" />
-          Ask Nelie to Repeat
+          Repeat
         </Button>
       </div>
       
       {/* Position the Enable Nelie button further down */}
-      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+      <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2">
         <EnableNelieButton
           showEnableButton={showEnableButton}
           hasUserInteracted={hasUserInteracted}
