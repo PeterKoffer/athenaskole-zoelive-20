@@ -3,17 +3,30 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
 
+const SESSION_ROLE_KEY = "lovable-session-userRole";
+
 export const useRoleAccess = () => {
   const { user } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
+    let detectedRole: UserRole | null = null;
+    // 1. Try direct from metadata
     if (user?.user_metadata?.role) {
-      setUserRole(user.user_metadata.role as UserRole);
+      detectedRole = user.user_metadata.role as UserRole;
+      // Persist it in sessionStorage for this browser session
+      sessionStorage.setItem(SESSION_ROLE_KEY, detectedRole);
     } else {
-      // Default role for users without explicit role metadata
-      setUserRole('student');
+      // 2. Fallback: try sessionStorage
+      const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+      if (sessionRole) {
+        detectedRole = sessionRole as UserRole;
+      } else {
+        // 3. Final fallback: default to student if everything else fails
+        detectedRole = 'student';
+      }
     }
+    setUserRole(detectedRole);
   }, [user]);
 
   const hasRole = (requiredRoles: UserRole[]): boolean => {
@@ -56,3 +69,4 @@ export const useRoleAccess = () => {
     canAccessSchoolDashboard
   };
 };
+
