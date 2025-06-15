@@ -13,6 +13,23 @@ interface UseOptimizedLessonManagerProps {
   manualActivityIndex?: number | null;
 }
 
+// Helper function to map InteractiveActivity types to LessonActivity types
+const mapActivityType = (interactiveType: string): LessonActivity['type'] => {
+  switch (interactiveType) {
+    case 'mini-game':
+    case 'simulation':
+      return 'interactive-game';
+    case 'quiz':
+    case 'puzzle':
+      return 'application';
+    case 'creative':
+    case 'exploration':
+      return 'creative-exploration';
+    default:
+      return 'content-delivery';
+  }
+};
+
 export const useOptimizedLessonManager = ({
   subject,
   skillArea,
@@ -92,6 +109,7 @@ export const useOptimizedLessonManager = ({
         // Map InteractiveActivity to LessonActivity interface
         const mappedActivities: LessonActivity[] = activities.map(activity => ({
           ...activity,
+          type: mapActivityType(activity.type), // Convert type properly
           duration: activity.duration || 120, // Use existing duration property or default
           phase: 'content-delivery' as const // Add required phase property
         }));
