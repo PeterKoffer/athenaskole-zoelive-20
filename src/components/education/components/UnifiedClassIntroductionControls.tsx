@@ -39,6 +39,7 @@ const UnifiedClassIntroductionControls = ({
     <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
       <div className="flex flex-1 flex-wrap gap-2">
         <Button
+          type="button"
           variant="outline"
           onClick={handleManualRead}
           className="border-purple-400 text-purple-200 bg-gray-800/50"
@@ -52,6 +53,7 @@ const UnifiedClassIntroductionControls = ({
           </span>
         </Button>
         <Button
+          type="button"
           variant="outline"
           className="border-gray-400 text-gray-200 bg-gray-800/50"
           onClick={handleHome}
@@ -66,6 +68,7 @@ const UnifiedClassIntroductionControls = ({
         {!hasStarted && (
           <>
             <Button
+              type="button"
               onClick={handleManualStart}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
             >
@@ -78,6 +81,7 @@ const UnifiedClassIntroductionControls = ({
             </Button>
             {canProceedWithoutSpeech && (
               <Button
+                type="button"
                 onClick={handleProceedWithoutSpeech}
                 variant="outline"
                 className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
@@ -92,6 +96,7 @@ const UnifiedClassIntroductionControls = ({
         <div className="flex flex-wrap gap-2">
           {isComplete ? (
             <Button
+              type="button"
               onClick={onIntroductionComplete}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6"
             >
@@ -101,6 +106,7 @@ const UnifiedClassIntroductionControls = ({
             <>
               {(isSpeaking || hasStarted) && (
                 <Button
+                  type="button"
                   onClick={handleStartLesson}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6"
                 >
@@ -108,6 +114,7 @@ const UnifiedClassIntroductionControls = ({
                 </Button>
               )}
               <Button
+                type="button"
                 variant="outline"
                 onClick={handleSkip}
                 className="border-gray-400 text-gray-200 bg-gray-800/50"
