@@ -264,9 +264,12 @@ const MultipleChoiceGame = ({ level, onLevelComplete, gameData }: MultipleChoice
 
   const handleNextQuestion = () => {
     if (isLastQuestion) {
-      // Level complete
-      const perfect = correctAnswers === questions.length;
-      onLevelComplete(score, perfect);
+      // Level complete - pass the current level's score and whether it was perfect
+      const levelScore = score + (selectedAnswer === currentQuestion.correctAnswer ? currentQuestion.points : 0);
+      const finalCorrectAnswers = correctAnswers + (selectedAnswer === currentQuestion.correctAnswer ? 1 : 0);
+      const perfect = finalCorrectAnswers === questions.length;
+      
+      onLevelComplete(levelScore, perfect);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
