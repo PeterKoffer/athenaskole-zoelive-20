@@ -9,6 +9,7 @@ import NavbarButton from "./NavbarButton";
 import UnifiedNavigationDropdown from "./UnifiedNavigationDropdown";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Brain } from "lucide-react";
+import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -32,7 +33,7 @@ const Navbar = ({
   onBack
 }: NavbarProps) => {
   const { user } = useAuth();
-  const { canAccessAIInsights } = useRoleAccess();
+  const { canAccessAIInsights, userRole } = useRoleAccess();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -78,6 +79,11 @@ const Navbar = ({
               </NavbarButton>
             )}
 
+            {/* Display the current user role (icon + label) */}
+            {userRole && (
+              <UserRoleDisplay role={userRole} className="ml-2" />
+            )}
+
             <NavbarUserMenu user={user} onGetStarted={onGetStarted} />
           </div>
 
@@ -107,9 +113,11 @@ const Navbar = ({
         onShowGames={onShowGames}
         onShowAITutor={onShowAITutor}
         onShowInsights={canAccessAIInsights() ? onShowInsights : undefined}
+        // No change to props required here: MobileMenu will use useRoleAccess internally for role display
       />
     </nav>
   );
 };
 
 export default Navbar;
+

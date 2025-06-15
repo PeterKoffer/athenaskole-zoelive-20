@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -78,6 +78,12 @@ const MobileMenu = ({
             <div className="px-3 py-2 text-sm text-gray-300 border-b border-gray-700 mb-2">
               Welcome, {user.user_metadata?.name || user.email}
             </div>
+            {/* User Role Display */}
+            {userRole && (
+              <div className="mb-3 flex justify-start">
+                <UserRoleDisplay role={userRole} />
+              </div>
+            )}
 
             {/* Calendar Access */}
             {canAccessCalendar && (
