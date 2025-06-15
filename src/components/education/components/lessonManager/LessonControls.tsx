@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+
 import LessonControlsFooter from '../LessonControlsFooter';
 
 interface LessonControlsProps {
@@ -19,26 +18,14 @@ const LessonControls = ({
   onManualRead,
   onRegenerate
 }: LessonControlsProps) => {
+  // Only render the footer (no controls above or banner with the removed buttons)
   return (
-    <>
-      <LessonControlsFooter
-        adaptiveSpeed={1.0}
-        onResetProgress={onRegenerate}
-      />
-
-      <div className="text-center">
-        <Button 
-          onClick={onRegenerate}
-          variant="ghost"
-          size="sm"
-          className="text-gray-400 hover:text-white"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Generate New Lesson
-        </Button>
-      </div>
-    </>
+    <LessonControlsFooter
+      adaptiveSpeed={1.0}
+      onResetProgress={onRegenerate}
+    />
   );
 };
 
 export default LessonControls;
+
