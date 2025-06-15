@@ -119,7 +119,17 @@ const UnifiedClassIntroduction = ({
               : {}
           }
         >
-          <IntroductionContent currentContent={currentContent} />
+          <IntroductionContent
+            currentStepText={currentContent.text}
+            currentStep={currentSection}
+            totalSteps={introduction.sections.length}
+            autoReadEnabled={isEnabled}
+            isSpeaking={isSpeaking}
+            isIntroductionComplete={isComplete}
+            onMuteToggle={toggleEnabled}
+            onManualRead={handleManualRead}
+            onStartLesson={handleStartLesson}
+          />
           <UnifiedClassIntroductionControls
             hasStarted={hasStarted}
             canProceedWithoutSpeech={canProceedWithoutSpeech}
@@ -151,4 +161,3 @@ const UnifiedClassIntroduction = ({
 };
 
 export default UnifiedClassIntroduction;
-
