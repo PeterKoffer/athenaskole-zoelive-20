@@ -1,6 +1,6 @@
-
 import { useState, useCallback } from 'react';
-import { LessonActivity } from '../types/LessonTypes';
+import { useAuth } from '@/hooks/useAuth';
+import { UniqueQuestion } from '@/services/globalQuestionUniquenessService';
 
 interface UseSimpleQuestionGenerationProps {
   subject: string;
@@ -11,116 +11,118 @@ export const useSimpleQuestionGeneration = ({
   subject,
   skillArea
 }: UseSimpleQuestionGenerationProps) => {
-  const [generatedQuestions, setGeneratedQuestions] = useState<Set<string>>(new Set());
-  const [questionCounter, setQuestionCounter] = useState(0);
+  const { user } = useAuth();
+  const [questionCount, setQuestionCount] = useState(0);
 
-  const generateUniqueQuestion = useCallback((): LessonActivity => {
-    const currentCount = questionCounter + 1;
-    setQuestionCounter(currentCount);
+  // Simple deterministic question generator to prevent duplicates
+  const generateUniqueQuestion = useCallback((): UniqueQuestion => {
+    const timestamp = Date.now();
+    const questionId = `local_${timestamp}_${questionCount}_${Math.random().toString(36).substring(2, 8)}`;
+    
+    console.log('🎲 Generating simple unique question:', { questionId, questionCount, subject, skillArea });
 
-    // Generate truly unique mathematical questions
-    const operations = ['+', '-', '*', '÷'];
-    const operation = operations[currentCount % operations.length];
+    // Generate unique mathematical scenarios based on question count and timestamp
+    const scenarios = [
+      'Magical Forest Adventure', 'Space Station Mission', 'Underwater Exploration',
+      'Dragon Kingdom Quest', 'Robot Factory Tour', 'Pirate Treasure Hunt',
+      'Wizard Academy Class', 'Arctic Research Expedition', 'Jungle Safari Discovery',
+      'Castle Building Project', 'Time Travel Journey', 'Superhero Training Day'
+    ];
+
+    const characters = [
+      'Luna', 'Phoenix', 'Storm', 'River', 'Sky', 'Ocean', 'Forest', 'Star',
+      'Sage', 'Quest', 'Nova', 'Echo', 'Blaze', 'Frost', 'Dawn', 'Ember'
+    ];
+
+    const scenarioIndex = questionCount % scenarios.length;
+    const characterIndex = (questionCount + 3) % characters.length;
     
-    // Create unique number combinations based on counter
-    let num1: number, num2: number, result: number, questionText: string, explanation: string;
+    const scenario = scenarios[scenarioIndex];
+    const character = characters[characterIndex];
     
-    switch (operation) {
-      case '+':
-        num1 = 15 + (currentCount * 3) % 50;
-        num2 = 8 + (currentCount * 2) % 30;
-        result = num1 + num2;
-        questionText = `Sarah collected ${num1} seashells on Monday and ${num2} seashells on Tuesday. How many seashells did she collect in total?`;
-        explanation = `Sarah collected ${num1} + ${num2} = ${result} seashells in total.`;
-        break;
-        
-      case '-':
-        num1 = 25 + (currentCount * 4) % 60;
-        num2 = 8 + (currentCount * 2) % 20;
-        if (num1 <= num2) num1 = num2 + 5; // Ensure positive result
-        result = num1 - num2;
-        questionText = `Tom had ${num1} marbles. He gave ${num2} marbles to his friend. How many marbles does Tom have left?`;
-        explanation = `Tom had ${num1} marbles and gave away ${num2}, so he has ${num1} - ${num2} = ${result} marbles left.`;
-        break;
-        
-      case '*':
-        num1 = 3 + (currentCount % 8);
-        num2 = 4 + (currentCount % 6);
-        result = num1 * num2;
-        questionText = `A bakery makes ${num1} rows of cupcakes with ${num2} cupcakes in each row. How many cupcakes are there in total?`;
-        explanation = `${num1} rows × ${num2} cupcakes per row = ${result} cupcakes total.`;
-        break;
-        
-      case '÷':
-        result = 4 + (currentCount % 8);
-        num2 = 3 + (currentCount % 5);
-        num1 = result * num2;
-        questionText = `A teacher needs to divide ${num1} students into groups of ${num2}. How many groups will there be?`;
-        explanation = `${num1} ÷ ${num2} = ${result} groups.`;
-        break;
-        
-      default:
-        num1 = 10 + currentCount;
-        num2 = 5 + currentCount;
-        result = num1 + num2;
-        questionText = `What is ${num1} + ${num2}?`;
-        explanation = `${num1} + ${num2} = ${result}`;
+    // Generate unique numbers based on question count to ensure different problems
+    const baseNum1 = 15 + (questionCount * 7) % 40;
+    const baseNum2 = 8 + (questionCount * 3) % 25;
+    
+    // Add some randomness while keeping it deterministic per session
+    const variation = Math.floor((timestamp / 1000) % 10);
+    const num1 = baseNum1 + variation;
+    const num2 = baseNum2 + (variation % 5);
+
+    const operations = [
+      { symbol: '+', word: 'collected and then found', result: num1 + num2 },
+      { symbol: '-', word: 'had and gave away', result: Math.max(num1, num2) - Math.min(num1, num2) }
+    ];
+
+    const operationIndex = questionCount % operations.length;
+    const operation = operations[operationIndex];
+    
+    let question: string;
+    let correctAnswer: number;
+
+    if (operation.symbol === '+') {
+      question = `In the ${scenario}, ${character} ${operation.word} ${num1} magical crystals and then found ${num2} more crystals. How many crystals does ${character} have in total?`;
+      correctAnswer = operation.result;
+    } else {
+      const larger = Math.max(num1, num2);
+      const smaller = Math.min(num1, num2);
+      question = `During the ${scenario}, ${character} started with ${larger} energy points and used ${smaller} points to cast a spell. How many energy points does ${character} have left?`;
+      correctAnswer = larger - smaller;
     }
 
-    // Generate wrong answers that are close but not correct
+    // Generate wrong answers that are clearly different
     const wrongAnswers = [
-      result + 1,
-      result - 1,
-      result + Math.floor(Math.random() * 5) + 2
-    ].filter(ans => ans !== result && ans > 0);
+      correctAnswer + 5 + (questionCount % 8),
+      correctAnswer - 3 - (questionCount % 6),
+      correctAnswer + 12 + (questionCount % 10)
+    ].filter(ans => ans !== correctAnswer && ans > 0);
 
-    // Ensure we have exactly 3 wrong answers
+    // Ensure we have exactly 4 unique options
     while (wrongAnswers.length < 3) {
-      const newWrong = result + Math.floor(Math.random() * 10) - 5;
-      if (newWrong !== result && newWrong > 0 && !wrongAnswers.includes(newWrong)) {
+      const newWrong = correctAnswer + Math.floor(Math.random() * 20) - 10;
+      if (newWrong > 0 && !wrongAnswers.includes(newWrong) && newWrong !== correctAnswer) {
         wrongAnswers.push(newWrong);
       }
     }
 
-    const allOptions = [result, ...wrongAnswers.slice(0, 3)];
-    
-    // Shuffle options
-    const shuffledOptions = allOptions
-      .map(value => ({ value, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value.toString());
+    const allOptions = [correctAnswer, ...wrongAnswers.slice(0, 3)]
+      .sort(() => 0.5 - Math.random()); // Shuffle options
 
-    const correctIndex = shuffledOptions.findIndex(option => parseInt(option) === result);
+    const finalCorrectIndex = allOptions.indexOf(correctAnswer);
 
-    const uniqueId = `math-${subject}-${currentCount}-${Date.now()}`;
-    
-    // Track this question
-    setGeneratedQuestions(prev => new Set([...prev, questionText]));
-
-    return {
-      id: uniqueId,
-      title: `${subject} Practice Question ${currentCount}`,
-      type: 'interactive-game',
-      phase: 'interactive-game' as const,
-      phaseDescription: 'Interactive question and answer activity',
-      duration: 60,
+    const uniqueQuestion: UniqueQuestion = {
+      id: questionId,
       content: {
-        question: questionText,
-        options: shuffledOptions,
-        correctAnswer: correctIndex,
-        explanation
+        question,
+        options: allOptions.map(String),
+        correctAnswer: finalCorrectIndex,
+        explanation: `${character} ${operation.symbol === '+' ? 'added the crystals together' : 'subtracted the points used'} to get ${correctAnswer}.`
+      },
+      metadata: {
+        subject,
+        skillArea,
+        difficultyLevel: 2,
+        timestamp,
+        userId: user?.id || 'anonymous',
+        sessionId: `session_${timestamp}`
       }
     };
-  }, [subject, skillArea, questionCounter]);
 
-  const resetQuestions = useCallback(() => {
-    setGeneratedQuestions(new Set());
-    setQuestionCounter(0);
-  }, []);
+    setQuestionCount(prev => prev + 1);
+    
+    console.log('✅ Generated unique question:', {
+      questionId,
+      questionNumber: questionCount + 1,
+      correctAnswer: correctAnswer,
+      scenario,
+      character
+    });
+
+    return uniqueQuestion;
+  }, [subject, skillArea, questionCount, user?.id]);
 
   return {
     generateUniqueQuestion,
-    resetQuestions,
-    questionCount: questionCounter
+    questionCount
   };
 };

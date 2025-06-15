@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import OptimizedMathLearningContent from "./components/math/OptimizedMathLearningContent";
+import EnhancedMathLearningWithTemplate from "./components/EnhancedMathLearningWithTemplate";
 
 const EnhancedMathematicsLearning = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const EnhancedMathematicsLearning = () => {
   };
 
   return (
-    <OptimizedMathLearningContent onBackToProgram={handleBackToProgram} />
+    <EnhancedMathLearningWithTemplate onBackToProgram={handleBackToProgram} />
   );
 };
 
