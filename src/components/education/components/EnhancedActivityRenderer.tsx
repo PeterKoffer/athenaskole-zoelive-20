@@ -6,6 +6,8 @@ import ActivityInteractiveGame from './activities/ActivityInteractiveGame';
 import ActivityFallback from './activities/ActivityFallback';
 import ActivityPuzzle from './activities/ActivityPuzzle';
 import ActivityMiniGame from './activities/ActivityMiniGame';
+import ActivityAdventureGame from './activities/ActivityAdventureGame';
+import ActivityPuzzleQuest from './activities/ActivityPuzzleQuest';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -46,8 +48,27 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  // Render specific game/puzzle types first
-  if (activity.content?.puzzleDescription) {
+  // NEW ENGAGING ACTIVITY TYPES - Check for these first!
+  if (activity.content?.gameType === 'adventure-game' || activity.title.includes('Adventure')) {
+    return (
+      <ActivityAdventureGame
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || activity.title.includes('Mystery')) {
+    return (
+      <ActivityPuzzleQuest
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Legacy specific game/puzzle types
+  if (activity.content?.puzzleDescription && !activity.title.includes('Quest')) {
     return (
       <ActivityPuzzle
         activity={activity}
@@ -56,7 +77,7 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  if (activity.content?.gameDescription) {
+  if (activity.content?.gameDescription && !activity.title.includes('Adventure')) {
     return (
       <ActivityMiniGame
         activity={activity}
