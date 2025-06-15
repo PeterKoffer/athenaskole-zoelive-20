@@ -83,17 +83,15 @@ const UnifiedClassIntroductionControls = ({
               Start Introduction with Nelie
             </span>
           </Button>
-          {canProceedWithoutSpeech && (
-            <Button
-              type="button"
-              onClick={handleProceedWithoutSpeech}
-              variant="outline"
-              className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
-              disabled={isAdvancing}
-            >
-              Start Lesson Without Speech
-            </Button>
-          )}
+          <Button
+            type="button"
+            onClick={handleProceedWithoutSpeech}
+            variant="outline"
+            className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
+            disabled={!canProceedWithoutSpeech || isAdvancing}
+          >
+            Start Lesson Without Speech
+          </Button>
         </div>
       )}
       {hasStarted && (
