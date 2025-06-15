@@ -1,4 +1,3 @@
-
 import OptimizedQuestionActivity from '../OptimizedQuestionActivity';
 import MathLessonHeader from './MathLessonHeader';
 import MathLessonControlPanel from './MathLessonControlPanel';
@@ -71,11 +70,6 @@ const MathLearningMainContent = ({
     onActivityComplete(wasCorrect);
   };
 
-  const handleForceNext = () => {
-    console.log('🔥 FORCE NEXT button clicked - advancing immediately');
-    handleActivityCompleteWithAdvancement(true);
-  };
-
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full space-y-0">
@@ -134,20 +128,19 @@ const MathLearningMainContent = ({
                   </>
                 )}
                 
-                {/* ALWAYS SHOW NEXT BUTTON - Emergency fix */}
+                {/* Beautiful, elegant progression indicator */}
                 <div className="text-center space-y-4 mt-8">
-                  <Button
-                    onClick={handleForceNext}
-                    className="bg-lime-500 hover:bg-lime-600 text-black px-8 py-4 text-xl font-bold transition shadow-lg"
-                    size="lg"
-                    tabIndex={0}
-                  >
-                    🚀 NEXT ACTIVITY
-                  </Button>
-                  
-                  <div className="text-sm text-gray-300">
-                    Activity {currentActivityIndex + 1} of {totalRealActivities}
+                  <div className="inline-flex items-center space-x-2 bg-blue-900/30 backdrop-blur-sm rounded-full px-6 py-3 border border-blue-400/30">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <span className="text-blue-100 font-medium">
+                      Adventure {currentActivityIndex + 1} of {totalRealActivities}
+                    </span>
                   </div>
+                  
+                  {/* Automatic progression message */}
+                  <p className="text-gray-300 text-sm">
+                    Complete the activity above to continue your mathematical journey!
+                  </p>
                 </div>
               </div>
             ) : (

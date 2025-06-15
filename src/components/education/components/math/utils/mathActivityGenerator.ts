@@ -2,173 +2,169 @@
 import { InteractiveActivity } from '../../../templates/InteractiveLessonTemplate';
 
 export const generateMathActivities = async (): Promise<InteractiveActivity[]> => {
-  console.log('🔢 Generating optimized interactive math activities');
+  console.log('🔢 Generating EXCITING interactive math activities');
   
-  // Return a well-rounded set of interactive activities
+  // Return truly interactive and engaging activities
   const activities: InteractiveActivity[] = [
     {
-      id: 'mental-math-strategies',
-      type: 'exploration',
-      title: 'Mental Math Strategies',
-      description: 'Discover powerful mental math techniques that make calculations faster and easier!',
-      duration: 180,
-      difficulty: 2,
-      points: 20,
-      instructions: 'Explore different mental math strategies like number bonds, compensation, and benchmark numbers.',
-      successCriteria: 'Learn at least 3 different mental math strategies',
-      content: {
-        explorationTask: 'Interactive exploration of mental math strategies with visual examples and practice opportunities',
-        strategies: [
-          {
-            name: 'Number Bonds',
-            description: 'Break numbers into friendly parts that are easier to work with',
-            example: '8 + 7 = 8 + 2 + 5 = 10 + 5 = 15'
-          },
-          {
-            name: 'Compensation',
-            description: 'Adjust one number to make calculation easier, then compensate',
-            example: '29 + 15 = 30 + 15 - 1 = 45 - 1 = 44'
-          },
-          {
-            name: 'Doubling and Halving',
-            description: 'Use known doubles to solve multiplication',
-            example: '6 × 8 = (6 × 4) × 2 = 24 × 2 = 48'
-          }
-        ]
-      }
-    },
-    
-    {
-      id: 'number-bonds-game',
-      type: 'mini-game',
-      title: 'Number Bonds Race',
-      description: 'Practice number bonds with this fast-paced matching game!',
-      duration: 120,
-      difficulty: 2,
-      points: 15,
-      instructions: 'Match number bonds as quickly as possible to score points!',
-      successCriteria: 'Complete 10 number bond matches correctly',
-      content: {
-        gameDescription: 'Drag and drop numbers to create bonds that add up to target numbers',
-        targetNumbers: [10, 20, 100],
-        timeLimit: 120
-      }
-    },
-    
-    {
-      id: 'math-problem-solving',
+      id: 'math-battle-arena',
       type: 'quiz',
-      title: 'Math Problem Solving Challenge',
-      description: 'Apply your mental math skills to solve real-world problems',
+      title: '⚔️ Math Battle Arena',
+      description: 'Face off against challenging math problems in this epic battle!',
       duration: 240,
       difficulty: 3,
-      points: 25,
-      instructions: 'Use mental math strategies to solve these word problems',
-      successCriteria: 'Answer at least 4 out of 5 questions correctly',
-      content: {
-        question: 'Sarah bought 3 books for $12 each. She paid with a $50 bill. How much change should she receive?',
-        options: ['$12', '$14', '$16', '$18'],
-        correctAnswer: 1,
-        explanation: '3 books × $12 = $36. Change = $50 - $36 = $14',
-        additionalQuestions: [
-          {
-            question: 'A pizza is cut into 8 slices. If 3 friends share it equally, how many slices does each person get?',
-            options: ['2 slices and 2/3 slice', '2.5 slices', '2 slices and 1/2 slice', '3 slices'],
-            correctAnswer: 0,
-            explanation: '8 ÷ 3 = 2 remainder 2, so each person gets 2 slices and 2/3 of a slice'
-          }
-        ]
-      }
-    },
-    
-    {
-      id: 'mental-math-puzzle',
-      type: 'puzzle',
-      title: 'Mental Math Puzzle Challenge',
-      description: 'Solve complex puzzles using your mental math strategies!',
-      duration: 300,
-      difficulty: 4,
       points: 30,
-      instructions: 'Use mental math strategies to solve these challenging puzzles',
-      successCriteria: 'Complete 3 different puzzle types',
+      instructions: 'Solve math problems to defeat your opponents in battle!',
+      successCriteria: 'Win 5 battles by solving problems correctly',
       content: {
-        puzzleDescription: 'Multi-step puzzles that require combining different mental math strategies',
-        puzzles: [
-          {
-            type: 'pattern',
-            description: 'Find the pattern in this sequence: 5, 8, 13, 20, 29, ?',
-            answer: 40,
-            hint: 'Look at the differences between consecutive numbers'
-          },
-          {
-            type: 'magic-square',
-            description: 'Complete this 3x3 magic square where each row, column, and diagonal adds to 15',
-            grid: [[2, null, 6], [null, 5, null], [4, null, 8]],
-            solution: [[2, 7, 6], [9, 5, 1], [4, 3, 8]]
-          }
-        ]
+        question: 'A dragon has 147 gold coins. It finds a treasure chest with 3 times as many coins. How many coins does the dragon have now?',
+        options: ['441 coins', '588 coins', '294 coins', '735 coins'],
+        correctAnswer: 1,
+        explanation: 'The treasure chest has 147 × 3 = 441 coins. Total: 147 + 441 = 588 coins!',
+        theme: 'fantasy-battle',
+        battleScenario: 'You face a fierce math dragon! Solve this to cast your spell!'
       }
     },
     
     {
-      id: 'estimation-game',
-      type: 'mini-game',
-      title: 'Quick Estimation Challenge',
-      description: 'Develop your number sense with estimation skills!',
-      duration: 180,
-      difficulty: 2,
-      points: 20,
-      instructions: 'Make quick estimates and see how close you can get!',
-      successCriteria: 'Get within 10% of the correct answer on 8 out of 10 problems',
-      content: {
-        gameDescription: 'Practice estimating quantities, measurements, and calculations',
-        estimationTypes: ['quantities', 'measurements', 'calculations', 'percentages']
-      }
-    },
-    
-    {
-      id: 'real-world-application',
+      id: 'pizza-fraction-factory',
       type: 'simulation',
-      title: 'Mental Math Shopping Spree',
-      description: 'Use mental math skills in a realistic shopping scenario!',
+      title: '🍕 Pizza Fraction Factory',
+      description: 'Run your own pizza shop and master fractions by serving customers!',
       duration: 300,
-      difficulty: 3,
-      points: 35,
-      instructions: 'Calculate totals, discounts, and change using mental math strategies',
-      successCriteria: 'Successfully complete 5 shopping transactions',
+      difficulty: 2,
+      points: 25,
+      instructions: 'Cut pizzas into the right fractions to satisfy hungry customers!',
+      successCriteria: 'Successfully serve 8 customers with correct pizza fractions',
       content: {
-        simulationDescription: 'Interactive shopping game where students calculate prices, apply discounts, and make change using mental math',
+        simulationDescription: 'Interactive pizza-cutting game where students drag and slice pizzas into fractions',
         scenarios: [
           {
-            items: ['Apple $1.25', 'Banana $0.75', 'Orange $1.50'],
-            discount: '10% off',
-            payment: '$5.00'
+            customer: 'A family of 4 wants to share 2 pizzas equally',
+            challenge: 'Cut each pizza into 4 equal slices (1/4 each)',
+            reward: '$12 earned!'
           },
           {
-            items: ['Notebook $3.50', 'Pen $1.25', 'Eraser $0.50'],
-            discount: '15% off',
-            payment: '$10.00'
+            customer: '6 friends want to share 3 pizzas',
+            challenge: 'Each person gets 1/2 pizza',
+            reward: '$18 earned!'
           }
-        ]
+        ],
+        gameType: 'drag-and-slice'
       }
     },
     
     {
-      id: 'strategy-creator',
-      type: 'creative',
-      title: 'Create Your Own Strategy',
-      description: 'Invent and demonstrate your own mental math strategy!',
+      id: 'treasure-hunt-coordinates',
+      type: 'puzzle',
+      title: '🗺️ Coordinate Treasure Hunt',
+      description: 'Navigate a mysterious island using coordinates to find hidden treasure!',
       duration: 360,
+      difficulty: 3,
+      points: 35,
+      instructions: 'Use coordinate pairs to navigate the treasure map and find the gold!',
+      successCriteria: 'Find all 5 treasure chests using coordinate clues',
+      content: {
+        puzzleDescription: 'Interactive coordinate plane where students click on points to find treasures',
+        treasureMap: {
+          chest1: { coordinates: [3, 4], clue: 'Where X marks 3 and Y reaches 4' },
+          chest2: { coordinates: [-2, 5], clue: '2 steps west, 5 steps north from center' },
+          chest3: { coordinates: [0, -3], clue: 'Straight down 3 from the origin' }
+        },
+        gameType: 'coordinate-clicking'
+      }
+    },
+    
+    {
+      id: 'rocket-equation-launch',
+      type: 'mini-game',
+      title: '🚀 Rocket Equation Launch',
+      description: 'Solve equations to provide enough fuel for your rocket to reach different planets!',
+      duration: 280,
       difficulty: 4,
       points: 40,
-      instructions: 'Create a new mental math strategy and teach it to others!',
-      successCriteria: 'Create an original strategy with clear explanation and examples',
+      instructions: 'Solve equations correctly to fuel your rocket and explore the galaxy!',
+      successCriteria: 'Successfully launch to 4 different planets',
       content: {
-        creativePrompt: 'Think of a unique way to solve math problems mentally. Create examples, name your strategy, and make a mini-lesson to teach others!'
+        gameDescription: 'Each correct equation adds fuel. Wrong answers lose fuel. Reach planets with enough fuel!',
+        destinations: [
+          { planet: 'Moon', fuelNeeded: 100, equation: '2x + 5 = 17', answer: 6 },
+          { planet: 'Mars', fuelNeeded: 250, equation: '3(x - 4) = 15', answer: 9 },
+          { planet: 'Jupiter', fuelNeeded: 400, equation: 'x² - 16 = 0', answer: 4 }
+        ],
+        gameType: 'fuel-management'
+      }
+    },
+    
+    {
+      id: 'geometry-castle-builder',
+      type: 'creative',
+      title: '🏰 Geometry Castle Builder',
+      description: 'Build an epic castle using geometric shapes and learn about area and perimeter!',
+      duration: 400,
+      difficulty: 3,
+      points: 45,
+      instructions: 'Drag geometric shapes to build your castle while calculating areas!',
+      successCriteria: 'Build a castle with total area of at least 500 square units',
+      content: {
+        creativePrompt: 'Design your dream castle using rectangles, triangles, and circles. Calculate the area of each section!',
+        availableShapes: [
+          { shape: 'rectangle', maxWidth: 20, maxHeight: 15 },
+          { shape: 'triangle', maxBase: 12, maxHeight: 10 },
+          { shape: 'circle', maxRadius: 8 }
+        ],
+        gameType: 'shape-building'
+      }
+    },
+    
+    {
+      id: 'time-travel-math-adventure',
+      type: 'exploration',
+      title: '⏰ Time Travel Math Adventure',
+      description: 'Travel through different time periods solving math problems to fix history!',
+      duration: 350,
+      difficulty: 4,
+      points: 50,
+      instructions: 'Solve math problems in different eras to restore the timeline!',
+      successCriteria: 'Fix 6 historical events by solving their math challenges',
+      content: {
+        explorationTask: 'Visit Ancient Egypt, Medieval Times, and the Future to solve era-specific math problems',
+        timePeriodsn: [
+          {
+            era: 'Ancient Egypt',
+            problem: 'Help build a pyramid: If each block is 2×2×2 feet, how many blocks for a 20×20×30 pyramid?',
+            historicalContext: 'The Great Pyramid construction requires precise calculations!'
+          },
+          {
+            era: 'Medieval Times',
+            problem: 'A knight needs to divide 144 gold coins among 12 villagers equally',
+            historicalContext: 'Fair distribution prevents peasant revolts!'
+          }
+        ],
+        gameType: 'time-travel-adventure'
+      }
+    },
+    
+    {
+      id: 'sports-statistics-champion',
+      type: 'quiz',
+      title: '⚽ Sports Statistics Champion',
+      description: 'Become a sports analyst by calculating averages, percentages, and predictions!',
+      duration: 320,
+      difficulty: 3,
+      points: 35,
+      instructions: 'Analyze real sports data to make predictions and calculate statistics!',
+      successCriteria: 'Correctly analyze 8 different sports scenarios',
+      content: {
+        question: 'A basketball player made 75% of their free throws in 20 attempts. How many did they make?',
+        options: ['12 shots', '15 shots', '18 shots', '20 shots'],
+        correctAnswer: 1,
+        explanation: '75% of 20 = 0.75 × 20 = 15 successful free throws!',
+        sportsContext: 'This player is having an excellent game!'
       }
     }
   ];
 
-  console.log('✅ Generated', activities.length, 'diverse interactive math activities');
+  console.log('✅ Generated', activities.length, 'EXCITING interactive math activities');
   return activities;
 };

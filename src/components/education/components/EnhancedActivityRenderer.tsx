@@ -8,6 +8,8 @@ import ActivityPuzzle from './activities/ActivityPuzzle';
 import ActivityMiniGame from './activities/ActivityMiniGame';
 import ActivityAdventureGame from './activities/ActivityAdventureGame';
 import ActivityPuzzleQuest from './activities/ActivityPuzzleQuest';
+import ActivityInteractiveQuiz from './activities/ActivityInteractiveQuiz';
+import ActivitySimulationGame from './activities/ActivitySimulationGame';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -29,26 +31,25 @@ const EnhancedActivityRenderer = ({
     contentKeys: activity.content ? Object.keys(activity.content) : []
   });
 
-  // Render based on activity type and phase
-  if (activity.phase === 'introduction') {
+  // NEW ENGAGING ACTIVITY TYPES - Check for these first!
+  if (activity.content?.battleScenario || activity.title.includes('Battle') || activity.title.includes('Arena')) {
     return (
-      <ActivityIntroduction
-        activity={activity}
-        onActivityComplete={() => onActivityComplete()}
-      />
-    );
-  }
-
-  if (activity.phase === 'content-delivery') {
-    return (
-      <ActivityContentDelivery
+      <ActivityInteractiveQuiz
         activity={activity}
         onActivityComplete={onActivityComplete}
       />
     );
   }
 
-  // NEW ENGAGING ACTIVITY TYPES - Check for these first!
+  if (activity.content?.simulationDescription || activity.title.includes('Factory') || activity.title.includes('Shop')) {
+    return (
+      <ActivitySimulationGame
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
   if (activity.content?.gameType === 'adventure-game' || activity.title.includes('Adventure')) {
     return (
       <ActivityAdventureGame
@@ -61,6 +62,45 @@ const EnhancedActivityRenderer = ({
   if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || activity.title.includes('Mystery')) {
     return (
       <ActivityPuzzleQuest
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Quiz-based activities (Math Battle Arena, Sports Statistics, etc.)
+  if (activity.type === 'quiz' || activity.content?.question) {
+    return (
+      <ActivityInteractiveQuiz
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Simulation-based activities (Pizza Factory, etc.)
+  if (activity.type === 'simulation' || activity.content?.scenarios) {
+    return (
+      <ActivitySimulationGame
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Render based on activity phase
+  if (activity.phase === 'introduction') {
+    return (
+      <ActivityIntroduction
+        activity={activity}
+        onActivityComplete={() => onActivityComplete()}
+      />
+    );
+  }
+
+  if (activity.phase === 'content-delivery') {
+    return (
+      <ActivityContentDelivery
         activity={activity}
         onActivityComplete={onActivityComplete}
       />
