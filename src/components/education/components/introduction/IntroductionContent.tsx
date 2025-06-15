@@ -22,27 +22,19 @@ const IntroductionContent = ({
 }: IntroductionContentProps) => {
   return (
     <>
-      {/* Soft blackboard-like message */}
-      <div
-        className="rounded-lg p-6 mb-6 border-[2.5px] border-[#267346] shadow-2xl"
-        style={{
-          background: "rgba(20, 22, 24, 0.80)",
-          boxShadow: "0 6px 36px 6px rgba(20,22,24,0.35), 0 0 0 4px #0d2712 inset",
-        }}
-      >
-        <h3 className="text-xl font-semibold text-white mb-3 text-center">Welcome to Class</h3>
-        <p className="text-gray-100 leading-relaxed text-lg text-center">{currentStepText}</p>
-        {/* Progress indicator */}
-        <div className="flex items-center space-x-2 mt-4 mb-1">
-          <div className="text-green-200 text-xs font-medium">
-            Step {currentStep + 1} of {totalSteps}
-          </div>
-          <div className="flex-1 bg-[#1b2621] rounded-full h-2">
-            <div 
-              className="bg-[#38e992] h-2 rounded-full transition-all duration-500"
-              style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-            />
-          </div>
+      {/* The blackboard-like message styling is now handled by the parent component */}
+      <h3 className="text-xl font-semibold text-white mb-3 text-center">Welcome to Class</h3>
+      <p className="text-gray-100 leading-relaxed text-lg text-center">{currentStepText}</p>
+      {/* Progress indicator */}
+      <div className="flex items-center space-x-2 mt-4 mb-1">
+        <div className="text-green-200 text-xs font-medium">
+          Step {currentStep + 1} of {totalSteps}
+        </div>
+        <div className="flex-1 bg-[#1b2621] rounded-full h-2">
+          <div 
+            className="bg-[#38e992] h-2 rounded-full transition-all duration-500"
+            style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+          />
         </div>
       </div>
 

@@ -103,16 +103,16 @@ const UnifiedClassIntroduction = ({
         <div
           className={
             subject === "mathematics"
-              ? "board-math-intro bg-black/90 border-[3px] border-[#267346] shadow-2xl rounded-lg p-6 backdrop-blur-md mx-auto"
+              ? "board-math-intro bg-black/90 border-[3px] border-[#8B4513] shadow-2xl rounded-lg p-6 backdrop-blur-md mx-auto"
               : "bg-gray-800/80 border-gray-700 rounded-lg p-6 backdrop-blur-sm"
           }
           style={
             subject === "mathematics"
               ? {
                   maxWidth: 760,
-                  boxShadow: "0 6px 36px 6px rgba(20,22,24,0.45), 0 0 0 4px #0d2712 inset",
+                  boxShadow: "0 6px 36px 6px rgba(20,22,24,0.45)",
                   borderRadius: 16,
-                  borderColor: "#267346",
+                  borderColor: "#8B4513",
                   borderWidth: 3,
                   backgroundColor: "rgba(21,26,33,0.95)",
                 }
