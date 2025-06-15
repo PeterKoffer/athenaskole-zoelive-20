@@ -57,7 +57,10 @@ const UnifiedNavigationDropdown = ({
       action();
     } else {
       console.log('[UnifiedNavigationDropdown] Navigating to:', path);
-      navigate(path);
+      // Small delay to ensure role is properly loaded before navigation
+      setTimeout(() => {
+        navigate(path);
+      }, 100);
     }
   };
 

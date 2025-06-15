@@ -15,20 +15,28 @@ export const useAuthRedirect = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Don't redirect while still loading or if no user
-    if (loading || !user || !userRole) return;
+    console.log('[useAuthRedirect] =================');
+    console.log('[useAuthRedirect] Auth loading:', loading);
+    console.log('[useAuthRedirect] User:', user?.email);
+    console.log('[useAuthRedirect] User role:', userRole);
+    console.log('[useAuthRedirect] Current path:', location.pathname);
+    console.log('[useAuthRedirect] =================');
 
-    // Only redirect from auth page, home page, or if we're on a dashboard that doesn't match the current role
+    // Don't redirect while still loading or if no user
+    if (loading || !user || !userRole) {
+      console.log('[useAuthRedirect] Skipping redirect - loading or no user/role');
+      return;
+    }
+
+    // Only redirect from auth page or home page - don't interfere with manual navigation
     const shouldRedirect = 
       location.pathname === '/auth' || 
-      location.pathname === '/' ||
-      (location.pathname === '/daily-program' && userRole !== 'student') ||
-      (location.pathname === '/school-dashboard' && !['admin', 'school_leader', 'school_staff'].includes(userRole)) ||
-      (location.pathname === '/teacher-dashboard' && userRole !== 'teacher') ||
-      (location.pathname === '/parent-dashboard' && userRole !== 'parent') ||
-      (location.pathname === '/admin-dashboard' && userRole !== 'admin');
+      location.pathname === '/';
 
-    if (!shouldRedirect) return;
+    if (!shouldRedirect) {
+      console.log('[useAuthRedirect] Not redirecting - user is on valid path:', location.pathname);
+      return;
+    }
 
     console.log('[useAuthRedirect] Redirecting user with role:', userRole, 'from:', location.pathname);
 
@@ -51,7 +59,7 @@ export const useAuthRedirect = () => {
         navigate('/daily-program');
         break;
       default:
-        // Stay on current page if role is unknown
+        console.log('[useAuthRedirect] Unknown role, staying on current page');
         break;
     }
   }, [user, userRole, loading, navigate, location.pathname]);

@@ -14,16 +14,27 @@ import CommunicationCenter from "@/components/communication/CommunicationCenter"
 import TeachingPerspectiveSettingsPanel from "@/components/school/TeachingPerspectiveSettings";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 const SchoolDashboard = () => {
   const { userRole, canAccessSchoolDashboard } = useRoleAccess();
   const { user, loading } = useAuth();
+  const [isRoleLoaded, setIsRoleLoaded] = useState(false);
+
+  // Wait for role to be properly loaded
+  useEffect(() => {
+    if (!loading && userRole) {
+      console.log('[SchoolDashboard] Role loaded:', userRole);
+      setIsRoleLoaded(true);
+    }
+  }, [loading, userRole]);
 
   console.log('[SchoolDashboard] =================');
   console.log('[SchoolDashboard] Component rendering');
   console.log('[SchoolDashboard] Auth loading:', loading);
   console.log('[SchoolDashboard] User:', user?.email, user?.id);
   console.log('[SchoolDashboard] User role:', userRole);
+  console.log('[SchoolDashboard] Role loaded:', isRoleLoaded);
   console.log('[SchoolDashboard] Can access school dashboard:', canAccessSchoolDashboard());
   console.log('[SchoolDashboard] User metadata:', user?.user_metadata);
   console.log('[SchoolDashboard] =================');
@@ -35,9 +46,9 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
-  // Show loading state while auth is loading
-  if (loading) {
-    console.log('[SchoolDashboard] Showing loading state - auth is loading');
+  // Show loading state while auth is loading OR role is not yet loaded
+  if (loading || !isRoleLoaded) {
+    console.log('[SchoolDashboard] Showing loading state - auth loading:', loading, 'role loaded:', isRoleLoaded);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
