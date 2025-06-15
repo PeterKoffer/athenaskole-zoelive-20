@@ -1,6 +1,5 @@
 
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, RotateCcw } from 'lucide-react';
 
 interface IntroductionContentProps {
   currentStepText: string;
@@ -18,11 +17,7 @@ const IntroductionContent = ({
   currentStepText,
   currentStep,
   totalSteps,
-  autoReadEnabled,
-  isSpeaking,
   isIntroductionComplete,
-  onMuteToggle,
-  onManualRead,
   onStartLesson
 }: IntroductionContentProps) => {
   return (
@@ -31,12 +26,12 @@ const IntroductionContent = ({
       <div
         className="rounded-lg p-6 mb-6 border-[2.5px] border-[#267346] shadow-2xl"
         style={{
-          background: "rgba(20, 22, 24, 0.80)", // softer, slightly see-through black
+          background: "rgba(20, 22, 24, 0.80)",
           boxShadow: "0 6px 36px 6px rgba(20,22,24,0.35), 0 0 0 4px #0d2712 inset",
         }}
       >
-        <h3 className="text-xl font-semibold text-white mb-3">Welcome to Class</h3>
-        <p className="text-gray-100 leading-relaxed text-lg">{currentStepText}</p>
+        <h3 className="text-xl font-semibold text-white mb-3 text-center">Welcome to Class</h3>
+        <p className="text-gray-100 leading-relaxed text-lg text-center">{currentStepText}</p>
         {/* Progress indicator */}
         <div className="flex items-center space-x-2 mt-4 mb-1">
           <div className="text-green-200 text-xs font-medium">
@@ -51,42 +46,9 @@ const IntroductionContent = ({
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex justify-center gap-4">
-        <Button
-          onClick={() => {
-            console.log('🔊 Sound toggle clicked in introduction');
-            onMuteToggle();
-          }}
-          variant="outline"
-          className="border-green-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
-        >
-          {autoReadEnabled ? (
-            <>
-              <Volume2 className="w-4 h-4 mr-2" />
-              Sound On
-            </>
-          ) : (
-            <>
-              <VolumeX className="w-4 h-4 mr-2" />
-              Sound Off
-            </>
-          )}
-        </Button>
-        
-        <Button
-          onClick={() => {
-            console.log('🔊 Ask Nelie to Repeat clicked in introduction');
-            onManualRead();
-          }}
-          variant="outline"
-          className="border-green-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
-          disabled={isSpeaking}
-        >
-          <RotateCcw className="w-4 h-4 mr-2" />
-          {isSpeaking ? 'Nelie is Speaking...' : 'Ask Nelie to Repeat'}
-        </Button>
-      </div>
+      {/* No extra controls; just spacing for visual breathing room */}
+      <div className="my-8"></div> 
+
       {isIntroductionComplete && (
         <div className="mt-6 text-center">
           <div className="text-green-200 text-sm mb-3">
@@ -105,4 +67,3 @@ const IntroductionContent = ({
 };
 
 export default IntroductionContent;
-
