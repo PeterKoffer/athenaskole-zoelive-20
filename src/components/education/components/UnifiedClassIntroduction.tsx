@@ -11,6 +11,7 @@ import UnifiedClassIntroductionHeader from './UnifiedClassIntroductionHeader';
 import UnifiedClassIntroductionProgress from './UnifiedClassIntroductionProgress';
 import IntroductionContent from './introduction/IntroductionContent';
 import UnifiedClassIntroductionControls from './UnifiedClassIntroductionControls';
+import Blackboard from './shared/Blackboard';
 
 interface UnifiedClassIntroductionProps {
   subject: string;
@@ -101,55 +102,37 @@ const UnifiedClassIntroduction = ({
         />
 
         {/* Standardized blackboard-style introduction sign */}
-        <div
-          className="board-intro relative bg-black/90 border-[3px] border-[#8B4513] shadow-2xl rounded-lg p-6 backdrop-blur-md mx-auto"
-          style={{
-            maxWidth: 760,
-            boxShadow: "0 6px 36px 6px rgba(20,22,24,0.45)",
-            borderRadius: 16,
-            borderColor: "#8B4513",
-            borderWidth: 3,
-            backgroundColor: "rgba(30, 32, 36, 0.92)",
-          }}
-        >
-          {/* Chalk Doodles */}
-          <div className="absolute top-5 left-5 text-white/20 text-4xl font-['cursive'] transform -rotate-12 select-none" aria-hidden="true">≈</div>
-          <div className="absolute bottom-4 right-24 text-white/20 text-2xl font-['cursive'] transform rotate-6 select-none" aria-hidden="true">✓</div>
-          <div className="absolute top-16 right-8 text-white/20 text-3xl font-['cursive'] transform rotate-12 select-none" aria-hidden="true">⨁</div>
-          <div className="absolute bottom-16 left-8 text-white/20 text-2xl font-['cursive'] transform -rotate-6 select-none" aria-hidden="true">⎎</div>
-          
-          <div className="relative z-10">
-            <IntroductionContent
-              currentStepText={currentContent.text}
-              currentStep={currentSection}
-              totalSteps={introduction.sections.length}
-              autoReadEnabled={isEnabled}
-              isSpeaking={isSpeaking}
-              isIntroductionComplete={isComplete}
-              onMuteToggle={toggleEnabled}
-              onManualRead={handleManualRead}
-              onStartLesson={handleStartLesson}
-            />
-            <UnifiedClassIntroductionControls
-              hasStarted={hasStarted}
-              canProceedWithoutSpeech={canProceedWithoutSpeech}
-              isEnabled={isEnabled}
-              isSpeaking={isSpeaking}
-              isComplete={isComplete}
-              hasUserInteracted={hasUserInteracted}
-              handleManualStart={handleManualStart}
-              handleManualRead={handleManualRead}
-              toggleEnabled={toggleEnabled}
-              onIntroductionComplete={onIntroductionComplete}
-              handleStartLesson={handleStartLesson}
-              handleSkip={handleSkip}
-              // Home and ProceedWithoutSpeech involve forcing speech to stop first!
-              handleHome={handleHome}
-              handleProceedWithoutSpeech={handleProceedWithoutSpeech}
-              isAdvancing={isAdvancing}
-            />
-          </div>
-        </div>
+        <Blackboard>
+          <IntroductionContent
+            currentStepText={currentContent.text}
+            currentStep={currentSection}
+            totalSteps={introduction.sections.length}
+            autoReadEnabled={isEnabled}
+            isSpeaking={isSpeaking}
+            isIntroductionComplete={isComplete}
+            onMuteToggle={toggleEnabled}
+            onManualRead={handleManualRead}
+            onStartLesson={handleStartLesson}
+          />
+          <UnifiedClassIntroductionControls
+            hasStarted={hasStarted}
+            canProceedWithoutSpeech={canProceedWithoutSpeech}
+            isEnabled={isEnabled}
+            isSpeaking={isSpeaking}
+            isComplete={isComplete}
+            hasUserInteracted={hasUserInteracted}
+            handleManualStart={handleManualStart}
+            handleManualRead={handleManualRead}
+            toggleEnabled={toggleEnabled}
+            onIntroductionComplete={onIntroductionComplete}
+            handleStartLesson={handleStartLesson}
+            handleSkip={handleSkip}
+            // Home and ProceedWithoutSpeech involve forcing speech to stop first!
+            handleHome={handleHome}
+            handleProceedWithoutSpeech={handleProceedWithoutSpeech}
+            isAdvancing={isAdvancing}
+          />
+        </Blackboard>
         {/* 
           If you need pixel-perfect "lock" to board:
           - Change mx-auto to absolute positioning with top/left if your background never changes
