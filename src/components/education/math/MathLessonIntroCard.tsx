@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Gauge, Award, BookOpen, Target, Timer, Brain, InfinityIcon } from "lucide-react";
 import { useRef } from "react";
 
+// Removed unnecessary/unintended image or preview artifacts
+
 const strengths = ["Problem Solving", "Critical Thinking"];
 const growthAreas = ["Speed", "Confidence"];
 
@@ -25,6 +27,7 @@ const MathLessonIntroCard = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <div className="rounded-2xl max-w-3xl w-full mx-auto shadow-lg bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 border border-slate-800 p-8 mt-8 relative">
+      {/* Only the mascot image on the left; no extra previews! */}
       <div className="absolute -left-20 -top-6 hidden md:block bg-transparent p-0 pointer-events-none select-none">
         <img
           ref={mascotRef}
