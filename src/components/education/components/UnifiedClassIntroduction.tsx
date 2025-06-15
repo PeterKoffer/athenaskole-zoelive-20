@@ -1,16 +1,18 @@
-import { Button } from '@/components/ui/button';
-import { Play, Home } from 'lucide-react';
-import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
+
+// Refactored: all logic (and main orchestration) only, UI/composition is chunked to smaller subcomponents
+
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
 import { useNavigate } from 'react-router-dom';
-// Extracted subcomponents
-import IntroductionHeader from './introduction/IntroductionHeader';
-import IntroductionProgressIndicator from './introduction/IntroductionProgressIndicator';
+import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+
+// New subcomponents
+import UnifiedClassIntroductionHeader from './UnifiedClassIntroductionHeader';
+import UnifiedClassIntroductionProgress from './UnifiedClassIntroductionProgress';
 import IntroductionContent from './introduction/IntroductionContent';
-import IntroductionControls from './introduction/IntroductionControls';
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech'; // 🟢 NEW: get the stop() method
+import UnifiedClassIntroductionControls from './UnifiedClassIntroductionControls';
 
 interface UnifiedClassIntroductionProps {
   subject: string;
@@ -27,10 +29,8 @@ const UnifiedClassIntroduction = ({
 }: UnifiedClassIntroductionProps) => {
   const classroomConfig = getClassroomConfig(subject);
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
-
   const navigate = useNavigate();
 
-  // 🟢 NEW: Grab stop() so we can stop speech before nav
   const { stop } = useUnifiedSpeech();
 
   const {
@@ -79,112 +79,46 @@ const UnifiedClassIntroduction = ({
     navigate('/daily-program');
   };
 
+  // Handler for "Start Lesson Without Speech" - must stop speech, then proceed.
+  const handleProceedWithoutSpeechWrapper = () => {
+    stop();
+    handleProceedWithoutSpeech();
+  };
+
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <IntroductionHeader
+        <UnifiedClassIntroductionHeader
           title={introduction.title}
           userName={userName}
           subject={subject}
           isSpeaking={isSpeaking}
         />
 
-        {/* Progress Indicator */}
-        <IntroductionProgressIndicator
+        <UnifiedClassIntroductionProgress
           sections={introduction.sections}
           currentSection={currentSection}
         />
 
         <div className="bg-gray-800/80 border-gray-700 rounded-lg p-6 backdrop-blur-sm">
-          {/* Introduction Content */}
           <IntroductionContent currentContent={currentContent} />
-
-          {/* Controls */}
-          <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            <div className="flex flex-1 flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={handleManualRead}
-                className="border-purple-400 text-purple-200 bg-gray-800/50"
-                disabled={!isEnabled && hasUserInteracted}
-              >
-                <span className="flex items-center">
-                  <span className="mr-2">
-                    <Play className="w-4 h-4" />
-                  </span>
-                  Repeat
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                className="border-gray-400 text-gray-200 bg-gray-800/50"
-                onClick={handleHome}
-              >
-                <span className="flex items-center">
-                  <span className="mr-2">
-                    <Home className="w-4 h-4" />
-                  </span>
-                  Home
-                </span>
-              </Button>
-              {!hasStarted && (
-                <>
-                  <Button
-                    onClick={handleManualStart}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
-                  >
-                    <span className="flex items-center">
-                      <span className="mr-2">
-                        <Play className="w-4 h-4" />
-                      </span>
-                      Start Introduction with Nelie
-                    </span>
-                  </Button>
-                  {canProceedWithoutSpeech && (
-                    <Button
-                      // ⬇️ Stop speech before proceeding without speech
-                      onClick={() => { stop(); handleProceedWithoutSpeech(); }}
-                      variant="outline"
-                      className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
-                    >
-                      Start Lesson Without Speech
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-            {hasStarted && (
-              <div className="flex flex-wrap gap-2">
-                {isComplete ? (
-                  <Button
-                    onClick={onIntroductionComplete}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6"
-                  >
-                    Start Class
-                  </Button>
-                ) : (
-                  <>
-                    {(isSpeaking || hasStarted) && (
-                      <Button
-                        onClick={handleStartLesson}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6"
-                      >
-                        Start Lesson
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      onClick={handleSkip}
-                      className="border-gray-400 text-gray-200 bg-gray-800/50"
-                    >
-                      Skip Introduction
-                    </Button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          <UnifiedClassIntroductionControls
+            hasStarted={hasStarted}
+            canProceedWithoutSpeech={canProceedWithoutSpeech}
+            isEnabled={isEnabled}
+            isSpeaking={isSpeaking}
+            isComplete={isComplete}
+            hasUserInteracted={hasUserInteracted}
+            handleManualStart={handleManualStart}
+            handleManualRead={handleManualRead}
+            toggleEnabled={toggleEnabled}
+            onIntroductionComplete={onIntroductionComplete}
+            handleStartLesson={handleStartLesson}
+            handleSkip={handleSkip}
+            // Home and ProceedWithoutSpeech involve forcing speech to stop first!
+            handleHome={handleHome}
+            handleProceedWithoutSpeech={handleProceedWithoutSpeechWrapper}
+          />
         </div>
       </div>
     </ClassroomEnvironment>
