@@ -21,16 +21,17 @@ const perspectiveOptions: { label: string, value: TeachingPerspectiveType }[] = 
 ];
 
 export default function TeachingPerspectiveSettingsPanel() {
+  // Call ALL hooks first, before any conditional logic
   const { userRole } = useRoleAccess();
-  // Only allow "admin" or "school_leader"
-  if (userRole !== "admin" && userRole !== "school_leader") {
-    return null;
-  }
-
   const { settings, saveSettings } = useTeachingPerspectiveSettings();
   const [form, setForm] = useState<TeachingPerspectiveSettings>(settings);
 
   useEffect(() => { setForm(settings); }, [settings]);
+
+  // Now do the conditional rendering AFTER all hooks are called
+  if (userRole !== "admin" && userRole !== "school_leader") {
+    return null;
+  }
 
   const handleChange = (field: keyof TeachingPerspectiveSettings, value: any) => {
     setForm(prev => ({
