@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
@@ -158,7 +157,10 @@ export const useIntroductionLogic = ({
   const handleProceedWithoutSpeech = () => {
     console.log('🔇 User choosing to proceed without speech');
     stop();
-    onIntroductionComplete();
+    // Delay advancing until speech state is fully settled to avoid UI reset issues
+    setTimeout(() => {
+      onIntroductionComplete();
+    }, 120);
   };
 
   const isComplete = currentSection >= introduction.sections.length - 1 && !isSpeaking;
