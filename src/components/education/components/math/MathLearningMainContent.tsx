@@ -67,8 +67,13 @@ const MathLearningMainContent = ({
   };
 
   const handleActivityCompleteWithAdvancement = (wasCorrect?: boolean) => {
-    console.log('🚀 Activity completed, triggering advancement:', wasCorrect);
+    console.log('🚀 Activity completed, triggering IMMEDIATE advancement:', wasCorrect);
     onActivityComplete(wasCorrect);
+  };
+
+  const handleForceNext = () => {
+    console.log('🔥 FORCE NEXT button clicked - advancing immediately');
+    handleActivityCompleteWithAdvancement(true);
   };
 
   return (
@@ -98,7 +103,7 @@ const MathLearningMainContent = ({
           onStopSpeaking={onStopSpeaking}
         />
 
-        {/* Current Activity Content - Full width content area with classroom-aware styling */}
+        {/* Current Activity Content */}
         <div className="w-full px-4 py-6">
           <div className="w-full max-w-4xl mx-auto">
             {currentActivity ? (
@@ -129,25 +134,21 @@ const MathLearningMainContent = ({
                   </>
                 )}
                 
-                {/* Activity completion status indicator with immediate advancement */}
-                {isCurrentActivityCompleted && (
-                  <div className="text-center space-y-2">
-                    <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                      ✓ Activity Completed - Advancing...
-                    </div>
-                    {canNavigateForward && (
-                      <Button
-                        onClick={handleNavigateForward}
-                        className="mt-4 bg-lime-500 hover:bg-lime-600 text-black px-8 py-3 text-lg font-bold transition"
-                        size="lg"
-                        tabIndex={0}
-                        autoFocus
-                      >
-                        Continue to Next Activity
-                      </Button>
-                    )}
+                {/* ALWAYS SHOW NEXT BUTTON - Emergency fix */}
+                <div className="text-center space-y-4 mt-8">
+                  <Button
+                    onClick={handleForceNext}
+                    className="bg-lime-500 hover:bg-lime-600 text-black px-8 py-4 text-xl font-bold transition shadow-lg"
+                    size="lg"
+                    tabIndex={0}
+                  >
+                    🚀 NEXT ACTIVITY
+                  </Button>
+                  
+                  <div className="text-sm text-gray-300">
+                    Activity {currentActivityIndex + 1} of {totalRealActivities}
                   </div>
-                )}
+                </div>
               </div>
             ) : (
               <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">

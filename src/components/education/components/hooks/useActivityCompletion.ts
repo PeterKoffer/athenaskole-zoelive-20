@@ -30,13 +30,11 @@ export const useActivityCompletion = ({
       timeElapsed
     });
 
-    // Mark current activity as completed
+    // Mark current activity as completed FIRST
     setCompletedActivities(prev => {
       const newSet = new Set(prev);
-      if (!newSet.has(currentActivityIndex)) {
-        newSet.add(currentActivityIndex);
-        console.log('✅ Activity marked as completed:', currentActivityIndex, Array.from(newSet));
-      }
+      newSet.add(currentActivityIndex);
+      console.log('✅ Activity marked as completed:', currentActivityIndex, Array.from(newSet));
       return newSet;
     });
 
@@ -67,12 +65,10 @@ export const useActivityCompletion = ({
       console.log('🎓 Lesson completed! (handleActivityComplete)');
       onLessonComplete();
     } else {
-      console.log('➡️ Advancing to next activity:', nextIndex);
-      // Force immediate advancement
-      setTimeout(() => {
-        setCurrentActivityIndex(nextIndex);
-        console.log('✅ Advanced to activity:', nextIndex);
-      }, 100);
+      console.log('➡️ IMMEDIATELY advancing to next activity:', nextIndex);
+      // Immediate advancement - no setTimeout!
+      setCurrentActivityIndex(nextIndex);
+      console.log('✅ Advanced to activity:', nextIndex);
     }
   }, [
     currentActivityIndex,
