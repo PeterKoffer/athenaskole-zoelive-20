@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 const AchievementsCard = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const achievements = [
     { name: t("days_in_a_row"), description: t("Used the app every day for a week"), date: "2024-01-15", emoji: "🔥" },
@@ -44,3 +44,4 @@ const AchievementsCard = () => {
 };
 
 export default AchievementsCard;
+
