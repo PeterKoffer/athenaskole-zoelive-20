@@ -6,7 +6,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { TeachingPerspectiveSettings, TeachingPerspectiveType } from "@/types/school";
 import { useTeachingPerspectiveSettings } from "./hooks/useTeachingPerspectiveSettings";
@@ -26,7 +26,10 @@ export default function TeachingPerspectiveSettingsPanel() {
   const { settings, saveSettings } = useTeachingPerspectiveSettings();
   const [form, setForm] = useState<TeachingPerspectiveSettings>(settings);
 
-  useEffect(() => { setForm(settings); }, [settings]);
+  useEffect(() => { 
+    setForm(settings); 
+    console.log("Settings loaded:", settings);
+  }, [settings]);
 
   // Now do the conditional rendering AFTER all hooks are called
   if (userRole !== "admin" && userRole !== "school_leader") {
@@ -34,6 +37,7 @@ export default function TeachingPerspectiveSettingsPanel() {
   }
 
   const handleChange = (field: keyof TeachingPerspectiveSettings, value: any) => {
+    console.log(`Updating ${field} to:`, value);
     setForm(prev => ({
       ...prev,
       [field]: value
@@ -41,6 +45,7 @@ export default function TeachingPerspectiveSettingsPanel() {
   };
 
   const handleSave = () => {
+    console.log("Saving form data:", form);
     saveSettings(form);
   };
 
@@ -54,11 +59,15 @@ export default function TeachingPerspectiveSettingsPanel() {
           <label className="block mb-1 text-gray-200">Teaching perspective</label>
           <Select value={form.perspective} onValueChange={v => handleChange('perspective', v as TeachingPerspectiveType)}>
             <SelectTrigger className="bg-gray-700 text-white border-gray-600 w-full">
-              {perspectiveOptions.find(o => o.value === form.perspective)?.label || 'Choose perspective'}
+              <SelectValue placeholder="Choose perspective">
+                {perspectiveOptions.find(o => o.value === form.perspective)?.label || 'Choose perspective'}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="z-50 bg-gray-800 border-gray-700">
               {perspectiveOptions.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                <SelectItem key={opt.value} value={opt.value} className="text-white hover:bg-gray-700">
+                  {opt.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -105,6 +114,11 @@ export default function TeachingPerspectiveSettingsPanel() {
         >
           Save Settings
         </Button>
+        {form.lastUpdated && (
+          <p className="text-xs text-gray-400 mt-2">
+            Last updated: {new Date(form.lastUpdated).toLocaleString()}
+          </p>
+        )}
       </CardContent>
     </Card>
   );
