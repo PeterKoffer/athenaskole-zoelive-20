@@ -1,21 +1,55 @@
 
-// @ts-nocheck
 import { Button } from '@/components/ui/button';
+import { Home } from 'lucide-react';
 
 interface MathLessonControlPanelProps {
+  onGoHome: () => void;
   isSpeaking: boolean;
-  onToggleMute: () => void;
   onReadRequest: () => void;
   onStopSpeaking: () => void;
 }
 
 const MathLessonControlPanel = ({
+  onGoHome,
   isSpeaking,
-  onToggleMute,
   onReadRequest,
   onStopSpeaking
 }: MathLessonControlPanelProps) => {
-  return null;
+  return (
+    <div className="w-full bg-gray-800/80 border-b border-gray-700 backdrop-blur-md">
+      <div className="w-full max-w-4xl mx-auto px-4 py-4">
+        <div className="flex justify-center space-x-4">
+          <Button
+            variant="outline"
+            onClick={onGoHome}
+            className="border-purple-400 text-purple-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={onReadRequest}
+            className="border-blue-400 text-blue-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
+          >
+            Ask Nelie to Repeat
+          </Button>
+          
+          {isSpeaking && (
+            <Button
+              variant="outline"
+              onClick={onStopSpeaking}
+              className="border-red-400 text-red-200 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/60"
+            >
+              Stop Nelie
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default MathLessonControlPanel;
+
