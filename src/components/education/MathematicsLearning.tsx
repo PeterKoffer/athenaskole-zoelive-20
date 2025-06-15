@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -40,12 +39,10 @@ const MathematicsLearning = () => {
     return null;
   }
 
-  // Show the intro flow (like English class), then the actual lesson
   const handleIntroComplete = () => {
     if (isAdvancing) return; // Prevent double trigger
     setIsAdvancing(true);
     setShowLesson(true);
-    // Stop speech after advancing – don't wait for it!
     stop();
     console.log('🟢 [MathematicsLearning] onIntroductionComplete: showing lesson immediately, THEN stopping speech');
   };
