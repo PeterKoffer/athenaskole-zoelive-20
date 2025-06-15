@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useTimerManager } from '../../hooks/useTimerManager';
@@ -29,25 +30,22 @@ const mapActivityType = (interactiveType: string): LessonActivity['type'] => {
   }
 };
 
-// Helper function to determine if an activity should count as a real activity
+// Improved helper function to determine if an activity should count as a real activity
 const isCountableActivity = (activity: LessonActivity): boolean => {
-  // Only count assignments, questions, and games as activities
-  const countableTypes = ['interactive-game', 'application'];
-  const countablePhases = ['interactive-game', 'application'];
+  // Accept interactive games, applications, and creative activities
+  const countableTypes = ['interactive-game', 'application', 'creative-exploration'];
+  const countablePhases = ['interactive-game', 'application', 'creative-exploration'];
   
-  // Check if it's a quiz, game, or assignment
+  // Include if it matches countable types or phases
   if (countableTypes.includes(activity.type) || countablePhases.includes(activity.phase)) {
     return true;
   }
   
-  // Check title patterns for obsolete content
+  // Only exclude very specific obsolete patterns, be less aggressive
   const obsoletePatterns = [
-    'compensation strategy',
-    'strategy quiz',
-    'explanation',
-    'introduction',
-    'welcome',
-    'overview'
+    'basic math concepts',
+    'welcome to',
+    'introduction to the lesson'
   ];
   
   const title = activity.title?.toLowerCase() || '';
@@ -126,7 +124,7 @@ export const useOptimizedLessonManager = ({
         let activities = await generateMathActivities();
         console.log('✅ Generated activities:', activities.length);
         
-        // Filter out obsolete activities and only keep countable ones
+        // Filter out obsolete activities but be less aggressive to ensure sufficient content
         const filteredActivities = activities.filter(activity => {
           const mapped = {
             ...activity,
@@ -138,6 +136,19 @@ export const useOptimizedLessonManager = ({
         });
         
         console.log('🎯 Filtered to countable activities:', filteredActivities.length, 'from', activities.length);
+
+        // Ensure we have at least 3 activities for a meaningful lesson
+        if (filteredActivities.length < 3) {
+          console.log('⚠️ Too few activities after filtering, including more content');
+          // Include more activities if we filtered too aggressively
+          const additionalActivities = activities.filter(activity => 
+            !filteredActivities.includes(activity) && 
+            !activity.title?.toLowerCase().includes('basic math concepts')
+          ).slice(0, 3 - filteredActivities.length);
+          
+          filteredActivities.push(...additionalActivities);
+          console.log('➕ Added additional activities, total now:', filteredActivities.length);
+        }
 
         // Map InteractiveActivity to LessonActivity interface
         const mappedActivities: LessonActivity[] = filteredActivities.map(activity => ({
@@ -187,8 +198,19 @@ export const useOptimizedLessonManager = ({
 
     // Check if lesson is complete
     const nextIndex = currentActivityIndex + 1;
-    if (nextIndex >= allActivities.length || timeElapsed >= 1200) { // 20 minutes = 1200 seconds
-      console.log('🎓 Lesson completed!');
+    const hasMoreActivities = nextIndex < allActivities.length;
+    const hasReachedTimeLimit = timeElapsed >= 1200; // 20 minutes = 1200 seconds
+    
+    console.log('🔍 Lesson progress check:', {
+      nextIndex,
+      totalActivities: allActivities.length,
+      hasMoreActivities,
+      timeElapsed,
+      hasReachedTimeLimit
+    });
+    
+    if (!hasMoreActivities || hasReachedTimeLimit) {
+      console.log('🎓 Lesson completed!', { hasMoreActivities, hasReachedTimeLimit });
       onLessonComplete();
     } else {
       console.log('➡️ Moving to next activity:', nextIndex);
