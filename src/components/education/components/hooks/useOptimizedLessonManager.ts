@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+
+import { useState, useRef, useEffect } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useTimerManager } from '../../hooks/useTimerManager';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
