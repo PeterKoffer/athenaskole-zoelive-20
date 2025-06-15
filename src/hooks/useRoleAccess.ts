@@ -10,17 +10,18 @@ const SESSION_ROLE_KEY = "lovable-session-userRole";
  * - Always prefers user.user_metadata.role if present (profile from Supabase)
  * - Otherwise, falls back to last persisted sessionStorage role
  * - *Never downgrades* to "student" during navigation if prior valid role exists.
- * - Only falls back to "student" if both user and saved session role are missing.
+ * - Only falls back to "student" if both user and saved session role are missing (i.e., signed out, or truly no assigned role).
  */
 export const useRoleAccess = () => {
   const { user } = useAuth();
 
-  // Console logging helper to track decision making
+  // Helper: logging, for debugging if needed
   const debugLog = (...args: any[]) => {
-    console.log("[useRoleAccess]", ...args);
+    // Uncomment to debug:
+    // console.log("[useRoleAccess]", ...args);
   };
 
-  // Get role from user profile
+  // Role from live user object
   const getRoleFromUser = (): UserRole | null => {
     const meta = user?.user_metadata;
     debugLog("getRoleFromUser:", meta?.role, meta);
@@ -28,37 +29,39 @@ export const useRoleAccess = () => {
     return null;
   };
 
-  // Get role from sessionStorage
+  // Role from sessionStorage
   const getRoleFromSession = (): UserRole | null => {
     if (typeof window !== "undefined") {
-      const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY) as UserRole | null;
-      debugLog("getRoleFromSession:", sessionRole);
-      if (sessionRole) return sessionRole;
+      const val = sessionStorage.getItem(SESSION_ROLE_KEY) as UserRole | null;
+      debugLog("getRoleFromSession:", val);
+      if (val) return val;
     }
     return null;
   };
 
-  // Setup role, but NEVER lose a privileged role when navigating.
+  // The role state (null at first; updated after user or session storage checked)
   const [userRole, setUserRole] = useState<UserRole | null>(() => {
-    const userMetaRole = getRoleFromUser();
-    if (userMetaRole) {
-      debugLog("Init: using userMetaRole", userMetaRole);
-      return userMetaRole;
+    // Try in priority order:
+    const fromUser = getRoleFromUser();
+    if (fromUser) {
+      debugLog("Init: using userMetaRole", fromUser);
+      return fromUser;
     }
-    const saved = getRoleFromSession();
-    if (saved) {
-      debugLog("Init: using sessionStorage role", saved);
-      return saved;
+    const fromSession = getRoleFromSession();
+    if (fromSession) {
+      debugLog("Init: using sessionStorage role", fromSession);
+      return fromSession;
     }
+    // Don't default to student yet; wait for useEffect!
     debugLog("Init: no role found, returning null");
     return null;
   });
 
   useEffect(() => {
-    // 1. Get the current role from Supabase user profile if available
+    // 1. Try the freshest user profile
     const profileRole = getRoleFromUser();
 
-    debugLog("useEffect: user:", user, "profileRole:", profileRole);
+    debugLog("useEffect ran: user", user, "profileRole", profileRole);
 
     if (profileRole) {
       debugLog("Effect: Setting userRole to profileRole", profileRole);
@@ -72,27 +75,30 @@ export const useRoleAccess = () => {
     // 2. Otherwise use the last session storage role
     const priorSessionRole = getRoleFromSession();
     if (priorSessionRole) {
-      // Don't auto downgrade to student if previously leader/admin
       if (userRole !== priorSessionRole) {
-        debugLog("Effect: Setting userRole to sessionStorage role", priorSessionRole);
+        debugLog("Effect: Restoring role from sessionStorage", priorSessionRole);
         setUserRole(priorSessionRole);
       }
-      // Keep highest role sticky
       return;
     }
 
-    // 3. If signed out or no profile, clear session, fall back ONLY NOW to student
-    if (typeof window !== "undefined") {
-      debugLog("No user or session role, clearing session and setting userRole to 'student'");
-      sessionStorage.removeItem(SESSION_ROLE_KEY);
+    // 3. If user *really* has no role and nothing in session => guest fallback: "student"
+    // Only set student if actually not authenticated OR everything else cleared.
+    if (!user) {
+      debugLog("Effect: No user/role/session, fallback to 'student'");
+      setUserRole("student");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(SESSION_ROLE_KEY, "student");
+      }
+    } else {
+      // We're signed in but no role from profile or session: don't force "student", just null!
+      debugLog("Effect: Authenticated but NO role detected, setting userRole to null");
+      setUserRole(null);
     }
-    setUserRole('student');
-  // Intentionally depend on "user" only - this ensures we sync up on auth change
-  // and avoid unnecessary resets
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Manual "role switcher"
+  // Set user role manually, and persist
   const setUserRoleManually = (role: UserRole) => {
     debugLog("setUserRoleManually:", role);
     setUserRole(role);
@@ -101,10 +107,13 @@ export const useRoleAccess = () => {
     }
   };
 
+  /**
+   * Checks if current role matches any in a list.
+   */
   const hasRole = (requiredRoles: UserRole[]): boolean =>
     !!userRole && requiredRoles.includes(userRole);
 
-  // Convenient role checks
+  // Shortcuts for convenience
   const isAdmin = () => userRole === 'admin';
   const isSchoolLeader = () => userRole === 'school_leader';
   const isSchoolStaff = () => userRole === 'school_staff';
@@ -123,6 +132,6 @@ export const useRoleAccess = () => {
     isSchoolStaff,
     isTeacher,
     canAccessAIInsights,
-    canAccessSchoolDashboard
+    canAccessSchoolDashboard,
   };
 };
