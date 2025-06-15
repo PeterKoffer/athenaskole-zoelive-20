@@ -72,7 +72,7 @@ export const useRoleAccess = () => {
   }, [user, loading]);
 
   const setUserRoleManually = (role: UserRole) => {
-    debugLog("Setting role manually:", role);
+    debugLog("MANUAL ROLE CHANGE:", role, "- This should NOT trigger redirects");
     setUserRole(role);
     if (typeof window !== "undefined") {
       sessionStorage.setItem(SESSION_ROLE_KEY, role);

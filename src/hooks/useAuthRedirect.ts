@@ -34,10 +34,10 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    // ONLY redirect from the auth page - never interfere with other pages
-    // This prevents conflicts with role switching and manual navigation
+    // CRITICAL: Only redirect from the auth page
+    // This hook should NEVER interfere with any other navigation
     if (location.pathname !== '/auth') {
-      console.log('[useAuthRedirect] Not on auth page - not redirecting from:', location.pathname);
+      console.log('[useAuthRedirect] SKIPPING - Not on auth page, current path:', location.pathname);
       return;
     }
 
@@ -47,25 +47,30 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    console.log('[useAuthRedirect] Redirecting user with role:', userRole, 'from auth page');
+    console.log('[useAuthRedirect] PROCEEDING with redirect - user with role:', userRole, 'from auth page');
 
     // Redirect based on role
     try {
       switch (userRole) {
         case 'admin':
+          console.log('[useAuthRedirect] Redirecting to admin dashboard');
           navigate('/admin-dashboard', { replace: true });
           break;
         case 'school_leader':
         case 'school_staff':
+          console.log('[useAuthRedirect] Redirecting to school dashboard');
           navigate('/school-dashboard', { replace: true });
           break;
         case 'teacher':
+          console.log('[useAuthRedirect] Redirecting to teacher dashboard');
           navigate('/teacher-dashboard', { replace: true });
           break;
         case 'parent':
+          console.log('[useAuthRedirect] Redirecting to parent dashboard');
           navigate('/parent-dashboard', { replace: true });
           break;
         case 'student':
+          console.log('[useAuthRedirect] Redirecting to daily program');
           navigate('/daily-program', { replace: true });
           break;
         default:
