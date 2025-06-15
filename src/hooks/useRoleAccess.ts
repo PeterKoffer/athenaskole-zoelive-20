@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
@@ -14,9 +15,15 @@ const SESSION_ROLE_KEY = "lovable-session-userRole";
 export const useRoleAccess = () => {
   const { user } = useAuth();
 
+  // Console logging helper to track decision making
+  const debugLog = (...args: any[]) => {
+    console.log("[useRoleAccess]", ...args);
+  };
+
   // Get role from user profile
   const getRoleFromUser = (): UserRole | null => {
     const meta = user?.user_metadata;
+    debugLog("getRoleFromUser:", meta?.role, meta);
     if (meta?.role) return meta.role as UserRole;
     return null;
   };
@@ -25,6 +32,7 @@ export const useRoleAccess = () => {
   const getRoleFromSession = (): UserRole | null => {
     if (typeof window !== "undefined") {
       const sessionRole = sessionStorage.getItem(SESSION_ROLE_KEY) as UserRole | null;
+      debugLog("getRoleFromSession:", sessionRole);
       if (sessionRole) return sessionRole;
     }
     return null;
@@ -33,16 +41,27 @@ export const useRoleAccess = () => {
   // Setup role, but NEVER lose a privileged role when navigating.
   const [userRole, setUserRole] = useState<UserRole | null>(() => {
     const userMetaRole = getRoleFromUser();
-    if (userMetaRole) return userMetaRole;
+    if (userMetaRole) {
+      debugLog("Init: using userMetaRole", userMetaRole);
+      return userMetaRole;
+    }
     const saved = getRoleFromSession();
-    return saved || null;
+    if (saved) {
+      debugLog("Init: using sessionStorage role", saved);
+      return saved;
+    }
+    debugLog("Init: no role found, returning null");
+    return null;
   });
 
   useEffect(() => {
     // 1. Get the current role from Supabase user profile if available
     const profileRole = getRoleFromUser();
 
+    debugLog("useEffect: user:", user, "profileRole:", profileRole);
+
     if (profileRole) {
+      debugLog("Effect: Setting userRole to profileRole", profileRole);
       setUserRole(profileRole);
       if (typeof window !== "undefined") {
         sessionStorage.setItem(SESSION_ROLE_KEY, profileRole);
@@ -55,6 +74,7 @@ export const useRoleAccess = () => {
     if (priorSessionRole) {
       // Don't auto downgrade to student if previously leader/admin
       if (userRole !== priorSessionRole) {
+        debugLog("Effect: Setting userRole to sessionStorage role", priorSessionRole);
         setUserRole(priorSessionRole);
       }
       // Keep highest role sticky
@@ -63,6 +83,7 @@ export const useRoleAccess = () => {
 
     // 3. If signed out or no profile, clear session, fall back ONLY NOW to student
     if (typeof window !== "undefined") {
+      debugLog("No user or session role, clearing session and setting userRole to 'student'");
       sessionStorage.removeItem(SESSION_ROLE_KEY);
     }
     setUserRole('student');
@@ -73,6 +94,7 @@ export const useRoleAccess = () => {
 
   // Manual "role switcher"
   const setUserRoleManually = (role: UserRole) => {
+    debugLog("setUserRoleManually:", role);
     setUserRole(role);
     if (typeof window !== "undefined") {
       sessionStorage.setItem(SESSION_ROLE_KEY, role);
@@ -89,6 +111,8 @@ export const useRoleAccess = () => {
   const isTeacher = () => userRole === 'teacher';
   const canAccessAIInsights = () => hasRole(['admin', 'school_leader']);
   const canAccessSchoolDashboard = () => hasRole(['admin', 'school_leader', 'school_staff']);
+
+  debugLog("Returned userRole:", userRole);
 
   return {
     userRole,
