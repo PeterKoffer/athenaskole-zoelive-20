@@ -1,6 +1,5 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 const SubjectsSection = () => {
@@ -11,7 +10,6 @@ const SubjectsSection = () => {
       title: "Mathematics",
       description: "Master numbers, algebra, and problem-solving with personalized guidance from Nelie.",
       icon: "🔢",
-      level: "Beginner to Advanced",
       color: "from-blue-500 to-cyan-500",
       route: "/learn/mathematics"
     },
@@ -19,7 +17,6 @@ const SubjectsSection = () => {
       title: "English",
       description: "Strengthen your language skills with guidance from Nelie.",
       icon: "🌍",
-      level: "Intermediate",
       color: "from-purple-500 to-violet-500",
       route: "/learn/english"
     },
@@ -27,7 +24,6 @@ const SubjectsSection = () => {
       title: "Music Discovery",
       description: "Explore rhythm, melody, and music theory with Nelie as your musical guide.",
       icon: "🎵",
-      level: "Beginner",
       color: "from-orange-500 to-yellow-500",
       route: "/learn/music"
     },
@@ -35,7 +31,6 @@ const SubjectsSection = () => {
       title: "Science & Technology",
       description: "Explore the wonders of science and technology with Nelie as your guide.",
       icon: "🔬",
-      level: "Progressive",
       color: "from-green-500 to-emerald-500",
       route: "/learn/science"
     },
@@ -43,7 +38,6 @@ const SubjectsSection = () => {
       title: "Computer Science",
       description: "Learn programming and computational thinking with Nelie guiding your journey.",
       icon: "💻",
-      level: "Beginner to Advanced",
       color: "from-indigo-500 to-purple-500",
       route: "/learn/computer-science"
     },
@@ -51,7 +45,6 @@ const SubjectsSection = () => {
       title: "Creative Arts",
       description: "Express your creativity through art, design, and storytelling with Nelie's inspiration.",
       icon: "🎨",
-      level: "Creative",
       color: "from-pink-500 to-rose-500",
       route: "/learn/creative-arts"
     }
@@ -85,9 +78,6 @@ const SubjectsSection = () => {
                   {subject.icon}
                 </div>
                 <CardTitle className="text-white text-xl">{subject.title}</CardTitle>
-                <Badge variant="outline" className="w-fit text-gray-300 border-gray-600">
-                  {subject.level}
-                </Badge>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 leading-relaxed">{subject.description}</p>

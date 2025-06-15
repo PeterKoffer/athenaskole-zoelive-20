@@ -50,17 +50,17 @@ const UnifiedNavigationDropdown = ({
     console.log('[UnifiedNavigationDropdown] Path:', path);
     console.log('[UnifiedNavigationDropdown] Has action:', !!action);
     console.log('[UnifiedNavigationDropdown] Current userRole:', userRole);
+    console.log('[UnifiedNavigationDropdown] Current window.location:', window.location.pathname);
     console.log('[UnifiedNavigationDropdown] =================');
     
     if (action) {
       console.log('[UnifiedNavigationDropdown] Executing action instead of navigation');
       action();
     } else {
-      console.log('[UnifiedNavigationDropdown] Navigating to:', path);
-      // Small delay to ensure role is properly loaded before navigation
-      setTimeout(() => {
-        navigate(path);
-      }, 100);
+      console.log('[UnifiedNavigationDropdown] About to navigate to:', path);
+      // Force immediate navigation without delay
+      navigate(path);
+      console.log('[UnifiedNavigationDropdown] Navigate function called for:', path);
     }
   };
 

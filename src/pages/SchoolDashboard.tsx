@@ -20,14 +20,32 @@ const SchoolDashboard = () => {
   const { userRole, canAccessSchoolDashboard } = useRoleAccess();
   const { user, loading } = useAuth();
   const [isRoleLoaded, setIsRoleLoaded] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>({});
 
   // Wait for role to be properly loaded
   useEffect(() => {
+    console.log('[SchoolDashboard] useEffect triggered - loading:', loading, 'userRole:', userRole);
+    
+    const currentDebugInfo = {
+      loading,
+      userRole,
+      userEmail: user?.email,
+      userId: user?.id,
+      userMetadata: user?.user_metadata,
+      canAccess: canAccessSchoolDashboard(),
+      timestamp: new Date().toISOString()
+    };
+    
+    setDebugInfo(currentDebugInfo);
+    
     if (!loading && userRole) {
       console.log('[SchoolDashboard] Role loaded:', userRole);
       setIsRoleLoaded(true);
+    } else {
+      console.log('[SchoolDashboard] Still waiting - loading:', loading, 'userRole:', userRole);
+      setIsRoleLoaded(false);
     }
-  }, [loading, userRole]);
+  }, [loading, userRole, user, canAccessSchoolDashboard]);
 
   console.log('[SchoolDashboard] =================');
   console.log('[SchoolDashboard] Component rendering');
@@ -37,6 +55,8 @@ const SchoolDashboard = () => {
   console.log('[SchoolDashboard] Role loaded:', isRoleLoaded);
   console.log('[SchoolDashboard] Can access school dashboard:', canAccessSchoolDashboard());
   console.log('[SchoolDashboard] User metadata:', user?.user_metadata);
+  console.log('[SchoolDashboard] Current URL:', window?.location?.pathname);
+  console.log('[SchoolDashboard] Debug info:', debugInfo);
   console.log('[SchoolDashboard] =================');
 
   const stats = {
@@ -52,8 +72,14 @@ const SchoolDashboard = () => {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+          <h1 className="text-2xl font-bold mb-4">Loading School Dashboard...</h1>
           <p className="text-gray-400">Please wait while we load your dashboard.</p>
+          <div className="mt-4 text-sm text-gray-500">
+            <p>Auth Loading: {loading ? 'Yes' : 'No'}</p>
+            <p>Role: {userRole || 'None'}</p>
+            <p>Role Loaded: {isRoleLoaded ? 'Yes' : 'No'}</p>
+            <p>User: {user?.email || 'None'}</p>
+          </div>
         </div>
       </div>
     );
@@ -74,6 +100,12 @@ const SchoolDashboard = () => {
           <p className="text-gray-400">You don't have permission to access the school dashboard.</p>
           <p className="text-gray-400 mt-2">Current role: {userRole || 'None'}</p>
           <p className="text-gray-400 mt-2">Required roles: admin, school_leader, or school_staff</p>
+          <div className="mt-4 text-sm text-gray-500">
+            <p>Debug Info:</p>
+            <pre className="text-left bg-gray-800 p-2 rounded mt-2">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </div>
         </div>
       </div>
     );
@@ -86,6 +118,13 @@ const SchoolDashboard = () => {
       <SchoolNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <div className="bg-green-600 text-white p-4 rounded mb-4">
+          <h2 className="font-bold">Dashboard Loaded Successfully!</h2>
+          <p>Role: {userRole}</p>
+          <p>User: {user?.email}</p>
+          <p>Access: {hasAccess ? 'Granted' : 'Denied'}</p>
+        </div>
+
         <SchoolStatsCards stats={stats} />
 
         {/* Render Teaching Perspective Settings Panel for admins and school leaders */}
