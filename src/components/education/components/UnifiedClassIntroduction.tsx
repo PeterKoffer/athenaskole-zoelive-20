@@ -5,6 +5,7 @@ import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic'
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
+import { useNavigate } from 'react-router-dom';
 
 // Extracted subcomponents
 import IntroductionHeader from './introduction/IntroductionHeader';
@@ -27,6 +28,8 @@ const UnifiedClassIntroduction = ({
 }: UnifiedClassIntroductionProps) => {
   const classroomConfig = getClassroomConfig(subject);
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
+
+  const navigate = useNavigate();
 
   const {
     hasStarted,
@@ -70,7 +73,7 @@ const UnifiedClassIntroduction = ({
 
   // Handler for Home/Back navigation
   const handleHome = () => {
-    window.location.href = '/daily-program';
+    navigate('/daily-program');
   };
 
   return (
@@ -171,3 +174,4 @@ const UnifiedClassIntroduction = ({
 };
 
 export default UnifiedClassIntroduction;
+
