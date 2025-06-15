@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useTimerManager } from '../../hooks/useTimerManager';
@@ -28,6 +27,33 @@ const mapActivityType = (interactiveType: string): LessonActivity['type'] => {
     default:
       return 'content-delivery';
   }
+};
+
+// Helper function to determine if an activity should count as a real activity
+const isCountableActivity = (activity: LessonActivity): boolean => {
+  // Only count assignments, questions, and games as activities
+  const countableTypes = ['interactive-game', 'application'];
+  const countablePhases = ['interactive-game', 'application'];
+  
+  // Check if it's a quiz, game, or assignment
+  if (countableTypes.includes(activity.type) || countablePhases.includes(activity.phase)) {
+    return true;
+  }
+  
+  // Check title patterns for obsolete content
+  const obsoletePatterns = [
+    'compensation strategy',
+    'strategy quiz',
+    'explanation',
+    'introduction',
+    'welcome',
+    'overview'
+  ];
+  
+  const title = activity.title?.toLowerCase() || '';
+  const isObsolete = obsoletePatterns.some(pattern => title.includes(pattern));
+  
+  return !isObsolete;
 };
 
 export const useOptimizedLessonManager = ({
@@ -100,14 +126,21 @@ export const useOptimizedLessonManager = ({
         let activities = await generateMathActivities();
         console.log('✅ Generated activities:', activities.length);
         
-        // If the first activity is the intro "Basic Math Concepts", remove it.
-        if (activities.length > 0 && activities[0].title?.toLowerCase() === 'basic math concepts') {
-          console.log('🚮 Removing introductory "Basic Math Concepts" activity.');
-          activities = activities.slice(1);
-        }
+        // Filter out obsolete activities and only keep countable ones
+        const filteredActivities = activities.filter(activity => {
+          const mapped = {
+            ...activity,
+            type: mapActivityType(activity.type),
+            duration: activity.duration || 120,
+            phase: 'content-delivery' as const
+          };
+          return isCountableActivity(mapped);
+        });
+        
+        console.log('🎯 Filtered to countable activities:', filteredActivities.length, 'from', activities.length);
 
         // Map InteractiveActivity to LessonActivity interface
-        const mappedActivities: LessonActivity[] = activities.map(activity => ({
+        const mappedActivities: LessonActivity[] = filteredActivities.map(activity => ({
           ...activity,
           type: mapActivityType(activity.type), // Convert type properly
           duration: activity.duration || 120, // Use existing duration property or default
