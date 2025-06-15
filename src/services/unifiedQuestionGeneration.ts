@@ -304,7 +304,7 @@ class UnifiedQuestionGenerationService {
   ): Promise<void> {
     try {
       const { error } = await supabase
-        .from('question_history')
+        .from('user_question_history')
         .insert({
           question_id: question.id,
           user_id: question.metadata.userId,

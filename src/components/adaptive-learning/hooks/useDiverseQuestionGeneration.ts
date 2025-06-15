@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -75,18 +74,18 @@ export const useDiverseQuestionGeneration = ({
       // Use the unified generation system
       const uniqueQuestion: UniqueQuestion = await generateUnified(questionContext || {});
       
-      // Convert UniqueQuestion back to legacy Question format for compatibility
+      // Convert UniqueQuestion to legacy Question format
       const legacyQuestion: Question = {
-        question: uniqueQuestion.question,
-        options: uniqueQuestion.options,
-        correct: uniqueQuestion.correct,
-        explanation: uniqueQuestion.explanation,
-        learningObjectives: uniqueQuestion.learningObjectives,
-        estimatedTime: uniqueQuestion.estimatedTime,
-        conceptsCovered: uniqueQuestion.conceptsCovered
+        question: uniqueQuestion.content.question,
+        options: uniqueQuestion.content.options,
+        correct: uniqueQuestion.content.correctAnswer,
+        explanation: uniqueQuestion.content.explanation,
+        learningObjectives: [], // Not available in UniqueQuestion
+        estimatedTime: undefined, // Not available in UniqueQuestion
+        conceptsCovered: [] // Not available in UniqueQuestion
       };
 
-      console.log('✅ UNIQUE question generated successfully:', uniqueQuestion.question.substring(0, 50) + '...');
+      console.log('✅ UNIQUE question generated successfully:', uniqueQuestion.content.question.substring(0, 50) + '...');
       console.log(`📊 Question ID: ${uniqueQuestion.id}`);
       
       return legacyQuestion;
@@ -114,7 +113,7 @@ export const useDiverseQuestionGeneration = ({
   ) => {
     try {
       // If we have a current unique question that matches, use the unified save
-      if (currentQuestion && currentQuestion.question === question.question) {
+      if (currentQuestion && currentQuestion.content.question === question.question) {
         await saveUnified(
           currentQuestion,
           userAnswer,
