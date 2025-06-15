@@ -33,8 +33,8 @@ export interface LessonActivity {
       };
     }>;
     
-    // Interactive game phase
-    gameType?: 'fill-blanks' | 'drag-drop' | 'true-false' | 'matching' | 'problem-solving';
+    // Interactive game phase - EXTENDED
+    gameType?: 'fill-blanks' | 'drag-drop' | 'true-false' | 'matching' | 'problem-solving' | 'adventure-game' | 'puzzle-quest';
     gameInstructions?: string;
     question?: string;
     options?: string[];
@@ -46,8 +46,83 @@ export interface LessonActivity {
     gameDescription?: string;
     puzzleDescription?: string;
     
-    // Application phase
+    // ENGAGING ACTIVITY PROPERTIES
+    // Adventure Game properties
     scenario?: string;
+    mechanics?: string;
+    rewards?: string[];
+    difficulty?: number;
+    engagementHooks?: string[];
+    interactionStyle?: string;
+    celebrationLevel?: string;
+    
+    // Puzzle Quest properties
+    hintSystem?: boolean;
+    progressTracking?: boolean;
+    multipleApproaches?: boolean;
+    celebrationAnimation?: boolean;
+    
+    // Creative properties
+    creativeType?: 'draw' | 'build' | 'story' | 'design' | 'compose';
+    buildingProject?: string;
+    tools?: string[];
+    collaborationFeatures?: boolean;
+    shareGallery?: boolean;
+    prideFactor?: string;
+    
+    // Discovery/Simulation properties
+    simulationType?: string;
+    realWorldConnections?: string[];
+    interactiveElements?: string[];
+    discoveryMode?: boolean;
+    experimentFreedom?: boolean;
+    
+    // Story and Theme properties
+    storyHook?: string;
+    storyContext?: string;
+    theme?: string;
+    characterGuide?: string;
+    characterIntroduction?: string;
+    missionBriefing?: string;
+    excitementBuilder?: string;
+    excitementLevel?: string;
+    
+    // Enhanced content delivery properties
+    concept?: string;
+    interactiveExplanation?: string;
+    quickChallenge?: {
+      type: 'drag-drop' | 'click-reveal' | 'mini-puzzle' | 'matching';
+      instruction: string;
+      options: string[];
+      correctAnswer: number | number[];
+      celebration: string;
+    };
+    engagementType?: string;
+    celebrationReady?: boolean;
+    
+    // Celebration and Achievement properties
+    celebration?: string;
+    achievementCelebration?: string;
+    heroStatus?: string;
+    badgesEarned?: string[];
+    nextQuestTeaser?: string;
+    nextAdventureTeaser?: string;
+    
+    // Creative expression properties
+    creativePrompt?: string;
+    prompt?: string;
+    shareOpportunity?: boolean;
+    inspirationBoost?: string;
+    
+    // Grand challenge properties
+    grandChallenge?: {
+      title: string;
+      description: string;
+      type: 'boss-battle' | 'final-project' | 'presentation' | 'epic-quest';
+      celebration: string;
+    };
+    
+    // Application phase
     task?: string;
     guidance?: string;
     problemSteps?: Array<{
@@ -57,7 +132,6 @@ export interface LessonActivity {
     }>;
     
     // Creative exploration phase
-    creativePrompt?: string;
     explorationTask?: string;
     whatIfScenario?: string;
     
@@ -71,6 +145,7 @@ export interface LessonActivity {
       explanation: string;
     };
     nextTopicSuggestion?: string;
+    achievementsList?: string[];
     
     // Legacy support
     message?: string;
@@ -86,4 +161,7 @@ export interface SubjectLessonPlan {
   phases: LessonActivity[];
   learningObjectives: string[];
   prerequisites: string[];
+  // ENGAGING LESSON PROPERTIES
+  engagementLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'MAXIMUM';
+  funFactor?: string;
 }
