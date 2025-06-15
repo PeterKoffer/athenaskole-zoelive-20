@@ -69,3 +69,14 @@ export interface RegistrationStep {
   title: string;
   icon: any;
 }
+
+// Teaching Perspective Setting for a school
+export type TeachingPerspectiveType = "none" | "mild-christian" | "strong-christian" | "secular" | "custom";
+
+export interface TeachingPerspectiveSettings {
+  perspective: TeachingPerspectiveType;
+  strength: number; // 1-5, how much the perspective influences teaching
+  wishes?: string;  // Wishes, requests, or topics to emphasize
+  avoid?: string;   // Topics or themes to avoid
+  lastUpdated?: string;
+}

@@ -1,0 +1,103 @@
+
+import { useEffect, useState } from "react";
+import { 
+  Card, CardContent, CardHeader, CardTitle 
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import Slider from "@/components/ui/slider";
+import { TeachingPerspectiveSettings, TeachingPerspectiveType } from "@/types/school";
+import { useTeachingPerspectiveSettings } from "./hooks/useTeachingPerspectiveSettings";
+
+const perspectiveOptions: { label: string, value: TeachingPerspectiveType }[] = [
+  { label: "None", value: "none" },
+  { label: "Mild Christian", value: "mild-christian" },
+  { label: "Strong Christian", value: "strong-christian" },
+  { label: "Secular", value: "secular" },
+  { label: "Custom", value: "custom" },
+];
+
+export default function TeachingPerspectiveSettingsPanel() {
+  const { settings, saveSettings } = useTeachingPerspectiveSettings();
+  const [form, setForm] = useState<TeachingPerspectiveSettings>(settings);
+
+  useEffect(() => { setForm(settings); }, [settings]);
+
+  const handleChange = (field: keyof TeachingPerspectiveSettings, value: any) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = () => {
+    saveSettings(form);
+  };
+
+  return (
+    <Card className="max-w-xl bg-gray-800 border-gray-700 mx-auto mb-8">
+      <CardHeader>
+        <CardTitle className="text-white">Teaching Perspective Settings</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-200">Teaching perspective</label>
+          <Select value={form.perspective} onValueChange={v => handleChange('perspective', v as TeachingPerspectiveType)}>
+            <SelectTrigger className="bg-gray-700 text-white border-gray-600 w-full">
+              {perspectiveOptions.find(o => o.value === form.perspective)?.label || 'Choose perspective'}
+            </SelectTrigger>
+            <SelectContent className="z-50 bg-gray-800 border-gray-700">
+              {perspectiveOptions.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-200">Strength</label>
+          <Slider
+            value={[form.strength]}
+            min={1}
+            max={5}
+            step={1}
+            onValueChange={v => handleChange('strength', v[0])}
+            className="mb-2"
+          />
+          <div className="text-xs text-gray-400">
+            {form.strength === 1 && "Very little influence"}
+            {form.strength === 2 && "Low influence"}
+            {form.strength === 3 && "Moderate influence"}
+            {form.strength === 4 && "Strong influence"}
+            {form.strength === 5 && "Extremely strong influence"}
+          </div>
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-200">Special wishes for teaching</label>
+          <Textarea 
+            value={form.wishes || ""} 
+            onChange={e => handleChange('wishes', e.target.value)} 
+            className="bg-gray-700 text-white border-gray-600"
+            placeholder="Describe any particular wishes, topics to emphasize, etc."
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-200">Topics or themes to avoid</label>
+          <Textarea 
+            value={form.avoid || ""} 
+            onChange={e => handleChange('avoid', e.target.value)} 
+            className="bg-gray-700 text-white border-gray-600"
+            placeholder="Are there things you'd like to avoid, e.g. sensitive topics?"
+          />
+        </div>
+        <Button 
+          onClick={handleSave}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          Save Settings
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}

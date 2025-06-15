@@ -1,4 +1,3 @@
-
 /**
  * Canonical, extensible lesson template engine for NELIE adaptive tutor.
  * This structure is designed to be robust, easy to extend, and reusable for all K-12 subjects.
@@ -23,6 +22,12 @@ export interface CanonicalLessonConfig {
   characterGuide?: string;
   activities: CanonicalLessonActivityConfig[];
   finale?: CanonicalFinaleConfig;
+  teachingPerspectiveSettings?: {
+    perspective: string;
+    strength: number;
+    wishes?: string;
+    avoid?: string;
+  };
 }
 
 // Each discrete activity/station/phase in the lesson
@@ -65,7 +70,9 @@ export function buildCanonicalLesson(config: CanonicalLessonConfig): SubjectLess
       characterGuide: config.characterGuide,
       missionObjectives: config.missionObjectives,
       // Optionally include student's name where relevant
-      ...(config.studentName ? { studentName: config.studentName } : {})
+      ...(config.studentName ? { studentName: config.studentName } : {}),
+      // Add school teaching perspective (if defined, otherwise skip)
+      ...(config.teachingPerspectiveSettings ? { teachingPerspective: config.teachingPerspectiveSettings } : {})
     }
   }));
 
@@ -84,6 +91,7 @@ export function buildCanonicalLesson(config: CanonicalLessonConfig): SubjectLess
         theme: config.theme,
         storyContext: config.storyContext,
         achievementsList: config.missionObjectives,
+        ...(config.teachingPerspectiveSettings ? { teachingPerspective: config.teachingPerspectiveSettings } : {})
       }
     });
   }
@@ -188,4 +196,3 @@ export function createCanonicalMathematicsLesson(options?: Partial<CanonicalLess
  * const mathLesson = createCanonicalMathematicsLesson({ studentName: "Katie" });
  * // mathLesson now fits SubjectLessonPlan and is ready for lesson manager!
  */
-
