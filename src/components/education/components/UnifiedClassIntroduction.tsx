@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Play, Home } from 'lucide-react';
@@ -118,15 +117,6 @@ const UnifiedClassIntroduction = ({
           <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             {/* Flex row of ALL buttons, as in reference design */}
             <div className="flex flex-1 flex-wrap gap-2">
-              {/* Unmute/Mute Nelie */}
-              <Button
-                variant="outline"
-                onClick={toggleEnabled}
-                className="border-purple-400 text-purple-200 bg-gray-800/50"
-              >
-                {isEnabled ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
-                {isEnabled ? 'Unmute Nelie' : 'Unmute Nelie'}
-              </Button>
               {/* Repeat */}
               <Button
                 variant="outline"
@@ -206,4 +196,3 @@ const UnifiedClassIntroduction = ({
 };
 
 export default UnifiedClassIntroduction;
-
