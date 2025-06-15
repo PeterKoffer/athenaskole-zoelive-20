@@ -42,6 +42,10 @@ export interface LessonActivity {
     correct?: number;
     explanation?: string;
     
+    // Mini-game and puzzle specific properties
+    gameDescription?: string;
+    puzzleDescription?: string;
+    
     // Application phase
     scenario?: string;
     task?: string;
