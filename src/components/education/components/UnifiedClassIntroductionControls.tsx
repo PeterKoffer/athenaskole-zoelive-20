@@ -9,13 +9,13 @@ interface UnifiedClassIntroductionControlsProps {
   isComplete: boolean;
   hasUserInteracted: boolean;
   handleManualStart: () => void;
-  handleProceedWithoutSpeech: () => void;
-  toggleEnabled: () => void;
   handleManualRead: () => void;
+  toggleEnabled: () => void;
   onIntroductionComplete: () => void;
   handleStartLesson: () => void;
   handleSkip: () => void;
   handleHome: () => void;
+  handleProceedWithoutSpeech: () => void;
   isAdvancing?: boolean;
 }
 
@@ -33,6 +33,7 @@ const UnifiedClassIntroductionControls = ({
   handleStartLesson,
   handleSkip,
   handleHome,
+  handleProceedWithoutSpeech,
   isAdvancing = false,
 }: UnifiedClassIntroductionControlsProps) => {
   // Render only the required 4 buttons in a single row, responsive
