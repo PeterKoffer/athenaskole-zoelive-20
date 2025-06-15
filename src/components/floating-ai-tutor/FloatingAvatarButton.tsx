@@ -1,6 +1,5 @@
 
 import CollapsedButton from "./CollapsedButton";
-import EnableNelieButton from "./EnableNelieButton";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, RotateCcw } from "lucide-react";
 import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
@@ -75,16 +74,6 @@ const FloatingAvatarButton = ({
         >
           <RotateCcw className="w-4 h-4" />
         </Button>
-      </div>
-      
-      {/* Position the Enable Nelie button further down */}
-      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
-        <EnableNelieButton
-          showEnableButton={showEnableButton}
-          hasUserInteracted={hasUserInteracted}
-          isOnHomepage={isOnHomepage}
-          onEnableNelie={onEnableNelie}
-        />
       </div>
     </div>
   );
