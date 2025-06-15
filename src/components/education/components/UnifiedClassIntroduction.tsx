@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Play, Home } from 'lucide-react';
 import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
@@ -74,16 +73,10 @@ const UnifiedClassIntroduction = ({
     );
   }
 
-  // 🟢 Refactor: Always stop any speech before navigating home
+  // Handler for Home/Back navigation
   const handleHome = () => {
     stop();
     navigate('/daily-program');
-  };
-
-  // 🟢 Refactor: Always stop speech before proceeding without speech
-  const handleProceedWithoutSpeech = () => {
-    stop();
-    onIntroductionComplete();
   };
 
   return (
@@ -150,7 +143,8 @@ const UnifiedClassIntroduction = ({
                   </Button>
                   {canProceedWithoutSpeech && (
                     <Button
-                      onClick={handleProceedWithoutSpeech}
+                      // ⬇️ Stop speech before proceeding without speech
+                      onClick={() => { stop(); handleProceedWithoutSpeech(); }}
                       variant="outline"
                       className="border-gray-400 text-gray-200 bg-gray-800/50 px-6 py-3"
                     >
