@@ -1,5 +1,5 @@
 
-interface IntroductionSection {
+interface Introduction Section {
   title: string;
   text: string;
   duration: number;
@@ -10,112 +10,114 @@ interface SubjectIntroduction {
   sections: IntroductionSection[];
 }
 
-const createWelcomeSection = (subject: string, userName: string = 'Student'): IntroductionSection => ({
-  title: "Welcome to Class",
-  text: `Welcome to your ${subject.toLowerCase()} lesson, ${userName}! Today we'll be exploring different concepts together.`,
-  duration: 8
+const createPersonalizedWelcome = (subject: string, userName: string = 'Student'): IntroductionSection => ({
+  title: "Your Personal Welcome",
+  text: `Hello there, amazing ${userName}! 🌟 I'm Nelie, your AI learning companion, and I'm absolutely thrilled to be your guide on this incredible ${subject.toLowerCase()} adventure! Today is going to be special because we're going to discover, play, learn, and have so much fun together. Are you ready to become a ${subject.toLowerCase()} superstar?`,
+  duration: 12
 });
+
+const createSubjectMagic = (subject: string, skillArea: string, userName: string): IntroductionSection => {
+  const subjectContent = {
+    mathematics: {
+      magic: `Mathematics is like having superpowers, ${userName}! 🔢✨ Numbers are everywhere around us - when you count your favorite toys, when you share snacks with friends, or even when you figure out how many minutes until recess! Math helps us solve puzzles, build amazing things, and understand the incredible patterns in our world. Today we're going to explore ${skillArea} through exciting games, fun challenges, and cool discoveries!`
+    },
+    english: {
+      magic: `English is pure magic, ${userName}! 📚✨ Words are like paintbrushes that let us create beautiful pictures in people's minds. Stories can take us to faraway kingdoms, poems can make our hearts sing, and learning new words gives us the power to express our most amazing ideas! In our ${skillArea} journey today, we'll read exciting stories, discover fascinating new words, and learn how to express ourselves like true word wizards!`
+    },
+    science: {
+      magic: `Science is the most amazing detective game ever, ${userName}! 🔬🌟 Everything around us has incredible secrets waiting to be discovered - from why flowers grow toward the sun, to how butterflies know where to fly, to what makes rainbows appear after storms! Today in ${skillArea}, we're going to be real scientists and make exciting discoveries together!`
+    },
+    music: {
+      magic: `Music is the language that speaks directly to our hearts, ${userName}! 🎵💫 It can make us dance, help us feel brave, or wrap us up in comfort like a warm hug. Every sound around us - from birds singing to rain pattering - is part of the beautiful symphony of life! In our ${skillArea} adventure today, we'll explore rhythm, melody, and harmony!`
+    },
+    "computer-science": {
+      magic: `Computer science is like being a wizard in the digital world, ${userName}! 💻✨ When we code, we're giving magical instructions to computers, creating games, apps, and websites that can help people and bring joy to the world. In our ${skillArea} journey, we'll think like programmers and solve problems step by step!`
+    },
+    "creative-arts": {
+      magic: `Art is your imagination coming to life, ${userName}! 🎨🌈 Every color, shape, and line you create is uniquely yours. Art lets us express feelings that are too big for words, create beauty that makes people smile, and share our special way of seeing the world! Today in ${skillArea}, we'll explore colors, shapes, and creative techniques!`
+    }
+  };
+
+  const content = subjectContent[subject.toLowerCase() as keyof typeof subjectContent] || subjectContent.mathematics;
+  
+  return {
+    title: "The Magic We'll Discover",
+    text: content.magic.replace(/\$\{userName\}/g, userName).replace(/\$\{skillArea\}/g, skillArea),
+    duration: 15
+  };
+};
+
+const createTodaysAdventure = (subject: string, skillArea: string, userName: string): IntroductionSection => {
+  const adventureContent = {
+    mathematics: `Today, ${userName}, we're going on an incredible math adventure! 🚀 We'll solve exciting puzzles, play number games, and discover cool patterns. I'll be right here to help you every step of the way, celebrating every success and helping you through any challenges. By the end of our time together, you'll feel like a confident math explorer ready for any mathematical adventure!`,
+    english: `Get ready for an amazing word adventure, ${userName}! 📖 We'll dive into the world of language through stories, games, and creative activities. We'll build your vocabulary like collecting treasure, practice reading like brave explorers, and maybe even create our own stories! Every great writer started with curiosity just like yours, and today you'll discover the magic of words!`,
+    science: `Today's science adventure is going to blow your mind, ${userName}! 🧪 We'll investigate mysteries, make predictions like real scientists, and discover answers to questions you might have wondered about. Science is all around us, and today you'll see the world through a scientist's curious eyes and maybe even make your own amazing discoveries!`,
+    music: `Our musical journey starts now, ${userName}! 🎼 We'll explore sounds, rhythms, and melodies that will make your heart happy. Whether you're hearing these concepts for the first time or building on what you know, we'll create beautiful musical moments together and discover the joy that music brings to our lives!`,
+    "computer-science": `Welcome to the amazing world of coding, ${userName}! 💾 In our adventure today, we'll learn to think like programmers, solve digital puzzles, and understand how the technology around us works. Every line of code we explore brings us closer to creating something incredible, and you'll discover that coding is both logical and creative!`,
+    "creative-arts": `Your artistic journey begins right now, ${userName}! 🖌️ We'll explore different techniques, experiment with colors and shapes, and create something uniquely beautiful. Remember, there's no wrong way to be creative - your artistic voice is perfect just as it is, and today we'll help it shine even brighter!`
+  };
+
+  const defaultContent = `Today's adventure is going to be amazing, ${userName}! We'll learn, play, and discover together, building your confidence and skills step by step. I'm here to make sure you feel supported and excited about everything we explore!`;
+
+  return {
+    title: "Today's Amazing Adventure",
+    text: adventureContent[subject.toLowerCase() as keyof typeof adventureContent] || defaultContent,
+    duration: 12
+  };
+};
 
 const subjectIntroductions: Record<string, (skillArea?: string, level?: string, userName?: string) => SubjectIntroduction> = {
   mathematics: (skillArea = "general math", level = "beginner", userName = "Student") => ({
-    title: `Mathematics with Nelie - Welcome ${userName}!`,
+    title: `🔢 Mathematics Magic with Nelie - Welcome ${userName}! ✨`,
     sections: [
-      createWelcomeSection("Mathematics", userName),
-      {
-        title: "What is Mathematics?",
-        text: `Mathematics is like a beautiful language that helps us understand patterns, solve problems, and make sense of the world around us, ${userName}! Whether you're ${level === 'beginner' ? 'just starting out' : 'building on what you already know'}, we'll explore ${skillArea} together. Math is everywhere - from counting your toys to understanding how tall buildings stay up!`,
-        duration: 10
-      },
-      {
-        title: "What We'll Learn Today",
-        text: `Today, ${userName}, we're going to focus on ${skillArea}. I'll break everything down into simple, easy-to-understand steps. We'll practice together, and I'll be here to help you every step of the way. Remember, every mathematician started exactly where you are now, so let's discover the magic of numbers together!`,
-        duration: 8
-      }
+      createPersonalizedWelcome("Mathematics", userName),
+      createSubjectMagic("mathematics", skillArea, userName),
+      createTodaysAdventure("mathematics", skillArea, userName)
     ]
   }),
 
   english: (skillArea = "language arts", level = "beginner", userName = "Student") => ({
-    title: `English Language Arts with Nelie - Welcome ${userName}!`,
+    title: `📚 English Adventures with Nelie - Welcome ${userName}! 🌟`,
     sections: [
-      createWelcomeSection("English", userName),
-      {
-        title: "The Magic of Language",
-        text: `English is an incredible language that opens doors to amazing stories, beautiful poetry, and clear communication, ${userName}! ${level === 'beginner' ? 'If this is your first time exploring English deeply' : 'Building on your English knowledge'}, we'll dive into ${skillArea} together. Language is like a superpower that lets us share our thoughts and dreams with others!`,
-        duration: 10
-      },
-      {
-        title: "Our Learning Adventure",
-        text: `In today's lesson, ${userName}, we'll explore ${skillArea}. We'll read together, discover new words, and learn how to express ourselves clearly and creatively. I'll guide you through each concept, making sure you feel confident and excited about using the English language!`,
-        duration: 8
-      }
+      createPersonalizedWelcome("English", userName),
+      createSubjectMagic("english", skillArea, userName),
+      createTodaysAdventure("english", skillArea, userName)
     ]
   }),
 
   science: (skillArea = "general science", level = "beginner", userName = "Student") => ({
-    title: `Science Exploration with Nelie - Welcome ${userName}!`,
+    title: `🔬 Science Discoveries with Nelie - Welcome ${userName}! 🌟`,
     sections: [
-      createWelcomeSection("Science", userName),
-      {
-        title: "The Wonder of Science",
-        text: `Science is all about curiosity and discovery, ${userName}! It's how we learn about everything from tiny atoms to massive galaxies, from how plants grow to how computers work. ${level === 'beginner' ? 'Even if you\'ve never studied science before' : 'Building on your scientific knowledge'}, we'll explore ${skillArea} together and uncover the amazing secrets of our universe!`,
-        duration: 10
-      },
-      {
-        title: "Today's Scientific Journey",
-        text: `Today, ${userName}, we're going to investigate ${skillArea}. We'll ask questions, make observations, and discover how things work. Science is like being a detective - we look for clues and solve mysteries about the natural world. Get ready for some amazing discoveries!`,
-        duration: 8
-      }
+      createPersonalizedWelcome("Science", userName),
+      createSubjectMagic("science", skillArea, userName),
+      createTodaysAdventure("science", skillArea, userName)
     ]
   }),
 
   music: (skillArea = "music basics", level = "beginner", userName = "Student") => ({
-    title: `Music Discovery with Nelie - Welcome ${userName}!`,
+    title: `🎵 Musical Magic with Nelie - Welcome ${userName}! ✨`,
     sections: [
-      createWelcomeSection("Music", userName),
-      {
-        title: "The Language of Music",
-        text: `Music is a universal language that speaks to our hearts and souls, ${userName}! It's made up of rhythm, melody, and harmony that can make us feel happy, peaceful, or excited. ${level === 'beginner' ? 'Whether you\'ve never played an instrument before' : 'Building on your musical foundation'}, we'll explore ${skillArea} together and discover the joy of creating beautiful sounds!`,
-        duration: 10
-      },
-      {
-        title: "Our Musical Journey",
-        text: `In today's lesson, ${userName}, we'll dive into ${skillArea}. We'll listen, learn, and maybe even create some music together! Music helps us express our feelings and connect with others. Let's make some beautiful music and have fun learning!`,
-        duration: 8
-      }
+      createPersonalizedWelcome("Music", userName),
+      createSubjectMagic("music", skillArea, userName),
+      createTodaysAdventure("music", skillArea, userName)
     ]
   }),
 
   "computer-science": (skillArea = "coding basics", level = "beginner", userName = "Student") => ({
-    title: `Computer Science with Nelie - Welcome ${userName}!`,
+    title: `💻 Coding Adventures with Nelie - Welcome ${userName}! 🚀`,
     sections: [
-      createWelcomeSection("Computer Science", userName),
-      {
-        title: "The Digital World",
-        text: `Computer science is like magic, but it's real, ${userName}! It's how we create apps, games, websites, and all the amazing technology around us. ${level === 'beginner' ? 'Even if you\'ve never coded before' : 'Building on your programming knowledge'}, we'll explore ${skillArea} together. Coding is like giving instructions to a computer in a special language it can understand!`,
-        duration: 10
-      },
-      {
-        title: "Today's Tech Adventure",
-        text: `Today, ${userName}, we're going to learn about ${skillArea}. We'll think like programmers, solve problems step by step, and maybe even create something cool together! Computer science teaches us logical thinking and creativity. Let's start building the future!`,
-        duration: 8
-      }
+      createPersonalizedWelcome("Computer Science", userName),
+      createSubjectMagic("computer-science", skillArea, userName),
+      createTodaysAdventure("computer-science", skillArea, userName)
     ]
   }),
 
   "creative-arts": (skillArea = "artistic expression", level = "beginner", userName = "Student") => ({
-    title: `Creative Arts with Nelie - Welcome ${userName}!`,
+    title: `🎨 Creative Magic with Nelie - Welcome ${userName}! 🌈`,
     sections: [
-      createWelcomeSection("Creative Arts", userName),
-      {
-        title: "The World of Creativity",
-        text: `Art is everywhere around us - in the colors of a sunset, the design of buildings, and the stories in movies, ${userName}! Creative arts let us express our imagination and share our unique view of the world. ${level === 'beginner' ? 'Whether you\'re picking up art supplies for the first time' : 'Building on your artistic skills'}, we'll explore ${skillArea} together and unleash your creativity!`,
-        duration: 10
-      },
-      {
-        title: "Our Creative Journey",
-        text: `In today's lesson, ${userName}, we'll dive into ${skillArea}. We'll experiment, create, and discover new ways to express ourselves through art. Remember, there's no wrong way to be creative - every artist has their own special style. Let's create something amazing together!`,
-        duration: 8
-      }
+      createPersonalizedWelcome("Creative Arts", userName),
+      createSubjectMagic("creative-arts", skillArea, userName),
+      createTodaysAdventure("creative-arts", skillArea, userName)
     ]
   })
 };
