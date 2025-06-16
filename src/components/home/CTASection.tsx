@@ -3,8 +3,20 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
-const CTASection = () => {
+interface CTASectionProps {
+  onGetStarted?: () => void;
+}
+
+const CTASection = ({ onGetStarted }: CTASectionProps) => {
   const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (onGetStarted) {
+      onGetStarted();
+    } else {
+      navigate("/education/mathematics");
+    }
+  };
 
   return (
     <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -31,7 +43,7 @@ const CTASection = () => {
         
         <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
           <Button
-            onClick={() => navigate("/education/mathematics")}
+            onClick={handleGetStarted}
             size="lg"
             className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
           >

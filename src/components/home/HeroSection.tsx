@@ -4,8 +4,20 @@ import { useNavigate } from "react-router-dom";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  onGetStarted?: () => void;
+}
+
+const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (onGetStarted) {
+      onGetStarted();
+    } else {
+      navigate("/education/mathematics");
+    }
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
@@ -45,7 +57,7 @@ const HeroSection = () => {
 
             <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
               <Button
-                onClick={() => navigate("/education/mathematics")}
+                onClick={handleGetStarted}
                 size="lg"
                 className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
               >
@@ -65,7 +77,7 @@ const HeroSection = () => {
 
           {/* Nelie Avatar */}
           <div className="flex justify-center lg:justify-end">
-            <NelieAvatarDisplay />
+            <NelieAvatarDisplay isSpeaking={false} onStopSpeech={() => {}} />
           </div>
         </div>
       </div>
