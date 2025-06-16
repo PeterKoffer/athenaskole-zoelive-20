@@ -29,13 +29,23 @@ export const loadK12Games = async (): Promise<CurriculumGame[]> => {
     allGamesCache = combinedGames;
     console.log('✅ Successfully loaded', allGamesCache.length, 'total games');
     
-    // Debug: Log geography games specifically
-    const geographyGames = allGamesCache.filter(game => 
-      game.subject.toLowerCase().includes('geography') ||
-      game.title.toLowerCase().includes('geography') ||
-      game.id.includes('geography')
-    );
-    console.log('🗺️ Geography games loaded:', geographyGames.map(g => ({ id: g.id, title: g.title, subject: g.subject })));
+    // Debug: Log various game categories
+    const categories = {
+      immersive: allGamesCache.filter(game => game.id.includes('vr') || game.id.includes('ar')),
+      coding: allGamesCache.filter(game => game.subject.toLowerCase().includes('computer')),
+      music: allGamesCache.filter(game => game.subject.toLowerCase().includes('music')),
+      interactive: allGamesCache.filter(game => game.id.includes('quiz') || game.id.includes('detective')),
+      geography: allGamesCache.filter(game => 
+        game.subject.toLowerCase().includes('geography') ||
+        game.title.toLowerCase().includes('geography') ||
+        game.id.includes('geography')
+      )
+    };
+    
+    console.log('🎮 Game categories loaded:');
+    Object.entries(categories).forEach(([category, games]) => {
+      console.log(`  ${category}: ${games.length} games`);
+    });
     
     return allGamesCache;
   } catch (error) {

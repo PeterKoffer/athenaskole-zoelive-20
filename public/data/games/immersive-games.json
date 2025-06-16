@@ -1,0 +1,86 @@
+
+[
+  {
+    "id": "ancient-rome-vr-journey",
+    "title": "Ancient Rome VR Journey",
+    "description": "Step into ancient Rome and experience daily life, architecture, and culture through immersive virtual reality!",
+    "emoji": "🏛️",
+    "subject": "History",
+    "gradeLevel": [5, 6, 7, 8, 9],
+    "difficulty": "intermediate",
+    "interactionType": "simulation",
+    "timeEstimate": "30-35 min",
+    "skillAreas": ["ancient_history", "cultural_studies", "architecture", "daily_life"],
+    "learningObjectives": [
+      "Explore Roman architecture and engineering",
+      "Understand daily life in ancient Rome",
+      "Learn about Roman government and society"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 350,
+      "badges": ["Time Traveler", "Roman Explorer", "History Detective"]
+    },
+    "xrFeatures": {
+      "vrMode": true,
+      "arOverlays": ["building_labels", "historical_context", "interactive_objects"],
+      "immersiveScenarios": ["Forum_Romanum_tour", "gladiator_arena", "roman_house"]
+    }
+  },
+  {
+    "id": "cell-biology-microscope-ar",
+    "title": "Cell Biology AR Lab",
+    "description": "Use augmented reality to explore inside living cells and understand cellular processes!",
+    "emoji": "🔬",
+    "subject": "Science",
+    "gradeLevel": [6, 7, 8, 9, 10],
+    "difficulty": "intermediate",
+    "interactionType": "simulation",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["cell_biology", "microscopy", "cellular_processes", "scientific_observation"],
+    "learningObjectives": [
+      "Identify cellular organelles and their functions",
+      "Observe cellular processes in real-time",
+      "Understand cell structure and organization"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 280,
+      "badges": ["Cell Explorer", "Microscopy Master", "Biology Detective"]
+    },
+    "xrFeatures": {
+      "arMode": true,
+      "virtualMicroscope": true,
+      "3dModels": ["plant_cell", "animal_cell", "organelles"],
+      "interactiveElements": ["zoom_controls", "label_toggle", "process_animation"]
+    }
+  },
+  {
+    "id": "space-exploration-galaxy-tour",
+    "title": "Galaxy Explorer VR",
+    "description": "Journey through our solar system and beyond to explore planets, stars, and cosmic phenomena!",
+    "emoji": "🚀",
+    "subject": "Science",
+    "gradeLevel": [4, 5, 6, 7, 8],
+    "difficulty": "beginner",
+    "interactionType": "simulation",
+    "timeEstimate": "35-40 min",
+    "skillAreas": ["astronomy", "space_science", "planetary_science", "cosmic_phenomena"],
+    "learningObjectives": [
+      "Explore planets and their characteristics",
+      "Learn about stars and galaxies",
+      "Understand scale and distances in space"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 400,
+      "badges": ["Space Explorer", "Astronaut", "Cosmic Navigator"]
+    },
+    "xrFeatures": {
+      "vrMode": true,
+      "scaleVisualization": true,
+      "planetaryTours": ["mars_surface", "jupiter_moons", "saturn_rings"],
+      "interactiveElements": ["spacecraft_controls", "telescope_view", "gravity_simulation"]
+    }
+  }
+]

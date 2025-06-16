@@ -1,0 +1,69 @@
+
+[
+  {
+    "id": "block-coding-adventures",
+    "title": "Block Coding Adventures",
+    "description": "Learn programming fundamentals using visual blocks to solve puzzles and create animations!",
+    "emoji": "🧩",
+    "subject": "Computer Science",
+    "gradeLevel": [2, 3, 4, 5, 6],
+    "difficulty": "beginner",
+    "interactionType": "drag-drop",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["visual_programming", "logical_thinking", "sequence_building", "debugging"],
+    "learningObjectives": [
+      "Understand programming sequences",
+      "Practice logical problem solving",
+      "Learn debugging skills"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 250,
+      "badges": ["Code Monkey", "Logic Master", "Bug Hunter"]
+    }
+  },
+  {
+    "id": "javascript-game-maker",
+    "title": "JavaScript Game Maker",
+    "description": "Create your own interactive games while learning JavaScript programming concepts!",
+    "emoji": "🎮",
+    "subject": "Computer Science",
+    "gradeLevel": [7, 8, 9, 10, 11, 12],
+    "difficulty": "intermediate",
+    "interactionType": "typing",
+    "timeEstimate": "40-45 min",
+    "skillAreas": ["javascript", "game_development", "programming_logic", "creative_coding"],
+    "learningObjectives": [
+      "Write JavaScript code",
+      "Understand game development concepts",
+      "Create interactive applications"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 350,
+      "badges": ["Game Developer", "JavaScript Pro", "Creative Coder"]
+    }
+  },
+  {
+    "id": "algorithm-racing-challenge",
+    "title": "Algorithm Racing Challenge",
+    "description": "Race against time by writing efficient algorithms to solve computational challenges!",
+    "emoji": "🏁",
+    "subject": "Computer Science",
+    "gradeLevel": [8, 9, 10, 11, 12],
+    "difficulty": "advanced",
+    "interactionType": "typing",
+    "timeEstimate": "35-40 min",
+    "skillAreas": ["algorithms", "optimization", "computational_thinking", "performance"],
+    "learningObjectives": [
+      "Design efficient algorithms",
+      "Analyze algorithm complexity",
+      "Optimize code performance"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 450,
+      "badges": ["Algorithm Master", "Speed Coder", "Optimization Expert"]
+    }
+  }
+]

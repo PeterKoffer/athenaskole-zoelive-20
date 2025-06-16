@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,31 @@ interface Question {
 const generateQuestions = (gameData: CurriculumGame, level: number): Question[] => {
   const subject = gameData.subject.toLowerCase();
   const basePoints = 10 + level * 5;
+  
+  // Enhanced XR and immersive question generation
+  if (gameData.id.includes('vr') || gameData.id.includes('ar') || subject.includes('immersive')) {
+    return generateXRQuestions(gameData, level, basePoints);
+  }
+  
+  // Coding and computer science questions
+  if (gameData.id.includes('coding') || gameData.id.includes('algorithm')) {
+    return generateCodingQuestions(gameData, level, basePoints);
+  }
+  
+  // Music and creative questions
+  if (subject.includes('music') || gameData.id.includes('melody') || gameData.id.includes('rhythm')) {
+    return generateMusicQuestions(gameData, level, basePoints);
+  }
+  
+  // Interactive quiz and detective games
+  if (gameData.id.includes('detective') || gameData.id.includes('error') || gameData.id.includes('quiz')) {
+    return generateDetectiveQuestions(gameData, level, basePoints);
+  }
+
+  // Multi-subject games
+  if (subject.includes('multi-subject')) {
+    return generateMultiSubjectQuestions(gameData, level, basePoints);
+  }
   
   // Subject-specific question generation
   if (subject.includes('french') || subject === 'french') {
@@ -237,6 +261,184 @@ const generateQuestions = (gameData: CurriculumGame, level: number): Question[] 
       points: basePoints + 5
     }
   ];
+};
+
+const generateXRQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  if (gameData.id.includes('ancient-rome')) {
+    return [
+      {
+        question: "🏛️ In our VR tour of the Roman Forum, what was the main purpose of the Basilica?",
+        options: ["Religious ceremonies", "Public meetings and law courts", "Gladiator fights", "Food markets"],
+        correctAnswer: 1,
+        explanation: "Basilicas in ancient Rome served as public buildings for meetings, law courts, and business transactions.",
+        points: basePoints
+      },
+      {
+        question: "🏺 Which architectural feature did Romans perfect that we explored in VR?",
+        options: ["Flying buttresses", "Pointed arches", "Concrete domes", "Wooden beams"],
+        correctAnswer: 2,
+        explanation: "Romans perfected concrete construction and dome architecture, as seen in the Pantheon.",
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  if (gameData.id.includes('cell-biology-ar')) {
+    return [
+      {
+        question: "🔬 Using AR microscopy, which organelle would you find only in plant cells?",
+        options: ["Mitochondria", "Nucleus", "Chloroplasts", "Ribosomes"],
+        correctAnswer: 2,
+        explanation: "Chloroplasts are unique to plant cells and conduct photosynthesis.",
+        points: basePoints
+      },
+      {
+        question: "🧬 In our AR cell exploration, what process occurs in the mitochondria?",
+        options: ["Protein synthesis", "DNA replication", "Cellular respiration", "Photosynthesis"],
+        correctAnswer: 2,
+        explanation: "Mitochondria are the powerhouses of the cell, producing energy through cellular respiration.",
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  return [
+    {
+      question: "🚀 What makes XR learning more effective than traditional methods?",
+      options: ["It's more expensive", "Immersive experiences enhance understanding", "It requires special equipment", "It's only for advanced students"],
+      correctAnswer: 1,
+      explanation: "XR creates immersive experiences that help students visualize and interact with complex concepts.",
+      points: basePoints
+    }
+  ];
+};
+
+const generateCodingQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  return [
+    {
+      question: "🧩 In block-based programming, what does a 'loop' block do?",
+      options: ["Stops the program", "Repeats code multiple times", "Deletes variables", "Changes colors"],
+      correctAnswer: 1,
+      explanation: "Loop blocks repeat a set of instructions multiple times, making code more efficient.",
+      points: basePoints
+    },
+    {
+      question: "🐛 When debugging code, what should you do first?",
+      options: ["Delete everything", "Read error messages carefully", "Ask for help immediately", "Start over"],
+      correctAnswer: 1,
+      explanation: "Reading error messages carefully helps identify exactly what went wrong and where.",
+      points: basePoints + 5
+    },
+    {
+      question: "⚡ What makes an algorithm 'efficient'?",
+      options: ["It uses many variables", "It solves problems quickly with minimal resources", "It has lots of comments", "It's written in JavaScript"],
+      correctAnswer: 1,
+      explanation: "Efficient algorithms solve problems quickly while using minimal computational resources.",
+      points: basePoints + 10
+    }
+  ];
+};
+
+const generateMusicQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  return [
+    {
+      question: "🎼 In music composition, what creates the 'melody'?",
+      options: ["The beat pattern", "The sequence of musical notes", "The volume level", "The instrument choice"],
+      correctAnswer: 1,
+      explanation: "A melody is created by a sequence of musical notes played in succession.",
+      points: basePoints
+    },
+    {
+      question: "🥁 What element of music determines how fast or slow a song feels?",
+      options: ["Harmony", "Melody", "Tempo", "Volume"],
+      correctAnswer: 2,
+      explanation: "Tempo determines the speed of music, measured in beats per minute (BPM).",
+      points: basePoints + 5
+    },
+    {
+      question: "🤖 How can AI help in music creation?",
+      options: ["By replacing human musicians", "By generating harmonies and suggesting chord progressions", "By making music louder", "By eliminating creativity"],
+      correctAnswer: 1,
+      explanation: "AI can assist musicians by generating harmonies, suggesting chord progressions, and inspiring new creative directions.",
+      points: basePoints + 10
+    }
+  ];
+};
+
+const generateDetectiveQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  if (gameData.subject.toLowerCase().includes('math')) {
+    return [
+      {
+        question: "🔍 Detective Challenge: Find the error in this solution: 5 + 3 × 2 = 16",
+        options: ["No error found", "Should multiply first: 5 + 6 = 11", "Should add first", "Wrong numbers used"],
+        correctAnswer: 1,
+        explanation: "Order of operations: multiplication before addition. 5 + (3 × 2) = 5 + 6 = 11, not 16.",
+        points: basePoints
+      },
+      {
+        question: "🕵️ What's wrong with this fraction work: 1/2 + 1/3 = 2/5?",
+        options: ["Nothing wrong", "Can't add fractions with different denominators directly", "Numbers are too small", "Should multiply instead"],
+        correctAnswer: 1,
+        explanation: "You need a common denominator: 1/2 + 1/3 = 3/6 + 2/6 = 5/6, not 2/5.",
+        points: basePoints + 5
+      }
+    ];
+  }
+  
+  return [
+    {
+      question: "👮 Grammar Police: Find the error in 'Me and John went to the store.'",
+      options: ["No error", "'John and I went to the store'", "Should be 'John and me'", "Store should be capitalized"],
+      correctAnswer: 1,
+      explanation: "Use 'I' as the subject of the sentence: 'John and I went to the store.'",
+      points: basePoints
+    },
+    {
+      question: "🔤 Hidden Word Hunt: Find the word hidden in 'CELEBRATION'",
+      options: ["RATE", "TREE", "CREATION", "BELL"],
+      correctAnswer: 2,
+      explanation: "CREATION can be found within CELEBRATION by rearranging some letters.",
+      points: basePoints + 5
+    }
+  ];
+};
+
+const generateMultiSubjectQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  const subjects = ['Math', 'Science', 'History', 'English'];
+  const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
+  
+  const questions = {
+    Math: {
+      question: "⚡ Speed Math: What's 15 × 4?",
+      options: ["50", "60", "65", "70"],
+      correctAnswer: 1,
+      explanation: "15 × 4 = 60. Quick tip: 15 × 4 = 15 × 2 × 2 = 30 × 2 = 60",
+      points: basePoints
+    },
+    Science: {
+      question: "⚡ Quick Science: What gas do we breathe in?",
+      options: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Helium"],
+      correctAnswer: 1,
+      explanation: "We breathe in oxygen and breathe out carbon dioxide.",
+      points: basePoints
+    },
+    History: {
+      question: "⚡ History Flash: Who was the first person on the moon?",
+      options: ["Buzz Aldrin", "Neil Armstrong", "John Glenn", "Yuri Gagarin"],
+      correctAnswer: 1,
+      explanation: "Neil Armstrong was the first person to walk on the moon in 1969.",
+      points: basePoints
+    },
+    English: {
+      question: "⚡ Word Power: What's a synonym for 'happy'?",
+      options: ["Sad", "Joyful", "Angry", "Tired"],
+      correctAnswer: 1,
+      explanation: "Joyful means the same as happy - they're synonyms!",
+      points: basePoints
+    }
+  };
+  
+  return [questions[randomSubject as keyof typeof questions]];
 };
 
 const MultipleChoiceGame = ({ level, onLevelComplete, gameData }: MultipleChoiceGameProps) => {

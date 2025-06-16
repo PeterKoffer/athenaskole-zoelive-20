@@ -37,20 +37,41 @@ export class StaticDataService {
    * Load all games data from multiple JSON files
    */
   async loadAllGamesData(): Promise<CurriculumGame[]> {
-    const subjects = [
-      'mathematics', 
-      'english', 
-      'computerscience', 
-      'science', 
-      'socialstudies', 
-      'language', 
-      'music'
+    const gameFiles = [
+      '/data/games/english-games.json',
+      '/data/games/science-games.json',
+      '/data/games/language-games.json',
+      '/data/games/computerscience-games.json',
+      '/data/games/socialstudies-games.json',
+      '/data/games/music-games.json',
+      '/data/games/immersive-games.json',
+      '/data/games/coding-games.json',
+      '/data/games/interactive-quiz-games.json',
+      '/data/games/music-creative-games.json',
+      '/data/games/ar-math-games.json'
     ];
 
-    const gamesPromises = subjects.map(subject => this.loadGamesData(subject));
-    const allGamesArrays = await Promise.all(gamesPromises);
+    console.log('📚 Loading games from', gameFiles.length, 'files...');
     
-    return allGamesArrays.flat();
+    const allGames: CurriculumGame[] = [];
+    
+    for (const file of gameFiles) {
+      try {
+        const response = await fetch(file);
+        if (response.ok) {
+          const games: CurriculumGame[] = await response.json();
+          allGames.push(...games);
+          console.log(`✅ Loaded ${games.length} games from ${file}`);
+        } else {
+          console.warn(`⚠️ Could not load ${file}: ${response.status}`);
+        }
+      } catch (error) {
+        console.warn(`⚠️ Failed to load ${file}:`, error);
+      }
+    }
+    
+    console.log(`🎮 Total games loaded: ${allGames.length}`);
+    return allGames;
   }
 
   /**

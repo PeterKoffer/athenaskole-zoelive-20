@@ -1,0 +1,58 @@
+
+[
+  {
+    "id": "ar-geometry-builder",
+    "title": "AR Geometry Builder",
+    "description": "Use augmented reality to build and manipulate 3D geometric shapes in your real environment!",
+    "emoji": "📐",
+    "subject": "Mathematics",
+    "gradeLevel": [5, 6, 7, 8, 9],
+    "difficulty": "intermediate",
+    "interactionType": "simulation",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["3d_geometry", "spatial_reasoning", "geometric_properties", "measurement"],
+    "learningObjectives": [
+      "Understand 3D geometric shapes",
+      "Calculate volume and surface area",
+      "Develop spatial visualization skills"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 300,
+      "badges": ["Geometry Architect", "3D Master", "Shape Explorer"]
+    },
+    "xrFeatures": {
+      "arMode": true,
+      "3dManipulation": true,
+      "realWorldPlacement": true,
+      "measurementTools": ["ruler", "protractor", "volume_calculator"]
+    }
+  },
+  {
+    "id": "fraction-pizza-ar-restaurant",
+    "title": "Fraction Pizza AR Restaurant",
+    "description": "Run a virtual pizza restaurant using AR to learn fractions through pizza cutting and serving!",
+    "emoji": "🍕",
+    "subject": "Mathematics",
+    "gradeLevel": [3, 4, 5, 6],
+    "difficulty": "beginner",
+    "interactionType": "simulation",
+    "timeEstimate": "20-25 min",
+    "skillAreas": ["fractions", "division", "practical_math", "problem_solving"],
+    "learningObjectives": [
+      "Understand fraction concepts",
+      "Practice fraction operations",
+      "Apply math to real-world scenarios"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 250,
+      "badges": ["Pizza Chef", "Fraction Master", "Restaurant Manager"]
+    },
+    "xrFeatures": {
+      "arMode": true,
+      "virtualObjects": ["pizzas", "cutting_tools", "serving_plates"],
+      "interactiveGestures": ["pinch_to_cut", "drag_to_serve", "tap_to_calculate"]
+    }
+  }
+]

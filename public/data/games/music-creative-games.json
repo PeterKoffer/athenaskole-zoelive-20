@@ -1,0 +1,69 @@
+
+[
+  {
+    "id": "melody-composer-studio",
+    "title": "Melody Composer Studio",
+    "description": "Create beautiful melodies and learn music theory through interactive composition tools!",
+    "emoji": "🎼",
+    "subject": "Music",
+    "gradeLevel": [3, 4, 5, 6, 7, 8],
+    "difficulty": "beginner",
+    "interactionType": "drawing",
+    "timeEstimate": "30-35 min",
+    "skillAreas": ["music_composition", "melody_creation", "music_theory", "rhythm_patterns"],
+    "learningObjectives": [
+      "Understand musical scales and notes",
+      "Create original melodies",
+      "Learn basic music theory concepts"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 280,
+      "badges": ["Melody Master", "Music Composer", "Creative Artist"]
+    }
+  },
+  {
+    "id": "rhythm-beat-machine",
+    "title": "Rhythm Beat Machine",
+    "description": "Build and mix rhythmic patterns while learning about beats, tempo, and musical timing!",
+    "emoji": "🥁",
+    "subject": "Music",
+    "gradeLevel": [2, 3, 4, 5, 6],
+    "difficulty": "beginner",
+    "interactionType": "click-sequence",
+    "timeEstimate": "20-25 min",
+    "skillAreas": ["rhythm_creation", "beat_patterns", "tempo_control", "musical_timing"],
+    "learningObjectives": [
+      "Understand rhythm and beat patterns",
+      "Learn about tempo and timing",
+      "Create original rhythmic compositions"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 200,
+      "badges": ["Rhythm Master", "Beat Creator", "Tempo Expert"]
+    }
+  },
+  {
+    "id": "ai-music-collaboration",
+    "title": "AI Music Collaboration Lab",
+    "description": "Work with AI to create amazing songs, learning about harmony, lyrics, and music production!",
+    "emoji": "🤖",
+    "subject": "Music",
+    "gradeLevel": [6, 7, 8, 9, 10],
+    "difficulty": "intermediate",
+    "interactionType": "typing",
+    "timeEstimate": "35-40 min",
+    "skillAreas": ["music_production", "lyric_writing", "harmony", "collaboration"],
+    "learningObjectives": [
+      "Collaborate with AI in music creation",
+      "Learn song structure and composition",
+      "Understand music production basics"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 350,
+      "badges": ["AI Collaborator", "Song Producer", "Music Innovator"]
+    }
+  }
+]
