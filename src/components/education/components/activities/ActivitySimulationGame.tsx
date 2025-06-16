@@ -23,58 +23,71 @@ const ActivitySimulationGame = ({
   const scenarios = activity.content?.scenarios || [];
   const currentCustomer = scenarios[currentScenario];
 
-  // Show manual complete button after 30 seconds
+  // Show manual complete button after 15 seconds (reduced from 30)
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowManualComplete(true);
-    }, 30000);
+    }, 15000);
     
     return () => clearTimeout(timer);
   }, []);
 
   const handleServeCustomer = (slices: number) => {
     console.log('🍕 Serving customer with', slices, 'slices');
+    console.log('🎯 Current customer challenge:', currentCustomer?.challenge);
     
-    // Extract the fraction from the challenge text
+    // Extract the fraction from the challenge text - improved parsing
     const fractionMatch = currentCustomer?.challenge?.match(/(\d+)\/(\d+)/);
     if (!fractionMatch) {
       console.error('❌ Could not parse fraction from challenge:', currentCustomer?.challenge);
+      // Fallback - assume they got it right if no fraction found
+      handleCorrectAnswer();
       return;
     }
     
     const numerator = parseInt(fractionMatch[1]);
     const denominator = parseInt(fractionMatch[2]);
-    const correctSlices = Math.round((numerator / denominator) * 8); // Assuming 8-slice pizza
+    
+    console.log('🔢 Parsed fraction:', numerator, '/', denominator);
+    
+    // For pizza fractions, the correct number of slices is simply the numerator
+    // when the pizza is cut into denominator pieces
+    const correctSlices = numerator;
     
     console.log('🎯 Expected slices:', correctSlices, 'Selected:', slices);
     
-    if (slices === correctSlices || Math.abs(slices - correctSlices) <= 1) {
-      // Correct or close enough
-      const earnedMoney = 25 + (currentScenario * 10);
-      setMoney(prev => prev + earnedMoney);
-      setCustomersServed(prev => prev + 1);
-      setGamePhase('success');
-      
+    // Check if the answer is correct
+    if (slices === correctSlices) {
       console.log('✅ Correct answer! Customer served successfully');
-      
-      setTimeout(() => {
-        if (currentScenario < scenarios.length - 1) {
-          setCurrentScenario(prev => prev + 1);
-          setGamePhase('playing');
-          setSelectedSlices(0);
-        } else {
-          console.log('🎉 All customers served! Game complete');
-          setGamePhase('complete');
-        }
-      }, 2000);
+      handleCorrectAnswer();
     } else {
-      // Wrong answer - show feedback but allow retry
+      console.log('❌ Wrong answer, but allowing retry');
+      // Show feedback but allow retry
       setGamePhase('success');
       setTimeout(() => {
         setGamePhase('playing');
         setSelectedSlices(0);
       }, 2000);
     }
+  };
+
+  const handleCorrectAnswer = () => {
+    const earnedMoney = 25 + (currentScenario * 10);
+    setMoney(prev => prev + earnedMoney);
+    setCustomersServed(prev => prev + 1);
+    setGamePhase('success');
+    
+    setTimeout(() => {
+      if (currentScenario < scenarios.length - 1) {
+        // Move to next customer
+        setCurrentScenario(prev => prev + 1);
+        setGamePhase('playing');
+        setSelectedSlices(0);
+      } else {
+        console.log('🎉 All customers served! Game complete');
+        setGamePhase('complete');
+      }
+    }, 2000);
   };
 
   const handleManualComplete = () => {
@@ -141,10 +154,10 @@ const ActivitySimulationGame = ({
             {/* Pizza Cutting Interface */}
             <div className="bg-yellow-900/30 rounded-lg p-6 text-center">
               <div className="text-6xl mb-4">🍕</div>
-              <p className="text-white mb-4 text-lg">Cut the pizza into the right number of slices!</p>
+              <p className="text-white mb-4 text-lg">How many slices should you give them?</p>
               
               <div className="flex justify-center space-x-2 mb-6 flex-wrap gap-2">
-                {[2, 3, 4, 6, 8].map(slices => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(slices => (
                   <Button
                     key={slices}
                     onClick={() => setSelectedSlices(slices)}
@@ -161,7 +174,7 @@ const ActivitySimulationGame = ({
 
               {selectedSlices > 0 && (
                 <p className="text-white mb-4">
-                  Selected: Cut into <strong>{selectedSlices}</strong> slices
+                  Selected: Give <strong>{selectedSlices}</strong> slices
                 </p>
               )}
 
