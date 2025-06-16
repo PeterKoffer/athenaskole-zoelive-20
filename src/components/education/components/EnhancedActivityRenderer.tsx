@@ -31,9 +31,22 @@ const EnhancedActivityRenderer = ({
     contentKeys: activity.content ? Object.keys(activity.content) : []
   });
 
-  // Force render interactive game for Math Battle Arena and similar activities
+  // PRIORITY 1: Check for Pizza Factory and similar simulation games FIRST
+  if (activity.title.includes('Pizza') || activity.title.includes('Factory') || 
+      activity.content?.simulationDescription || activity.content?.scenarios) {
+    console.log('🍕 Rendering Pizza Factory as simulation game');
+    return (
+      <ActivitySimulationGame
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // PRIORITY 2: Battle/Arena activities
   if (activity.title?.includes('Battle') || activity.title?.includes('Arena') || 
-      activity.title?.includes('Quiz') || activity.title?.includes('Challenge')) {
+      activity.title?.includes('Quiz') || activity.title?.includes('Challenge') ||
+      activity.content?.battleScenario) {
     console.log('🎮 Rendering as interactive quiz for battle/arena activity');
     return (
       <ActivityInteractiveQuiz
@@ -43,17 +56,8 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  // NEW ENGAGING ACTIVITY TYPES - Check for these first!
-  if (activity.content?.battleScenario || activity.title.includes('Battle') || activity.title.includes('Arena')) {
-    return (
-      <ActivityInteractiveQuiz
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
-
-  if (activity.content?.simulationDescription || activity.title.includes('Factory') || activity.title.includes('Shop')) {
+  // PRIORITY 3: Other simulation games
+  if (activity.title.includes('Shop') || activity.content?.gameType === 'simulation') {
     return (
       <ActivitySimulationGame
         activity={activity}
@@ -62,6 +66,7 @@ const EnhancedActivityRenderer = ({
     );
   }
 
+  // Adventure games
   if (activity.content?.gameType === 'adventure-game' || activity.title.includes('Adventure')) {
     return (
       <ActivityAdventureGame
@@ -71,6 +76,7 @@ const EnhancedActivityRenderer = ({
     );
   }
 
+  // Puzzle quests
   if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || activity.title.includes('Mystery')) {
     return (
       <ActivityPuzzleQuest
@@ -95,16 +101,6 @@ const EnhancedActivityRenderer = ({
   if (activity.type === 'quiz' || activity.content?.question) {
     return (
       <ActivityInteractiveQuiz
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
-
-  // Simulation-based activities (Pizza Factory, etc.)
-  if (activity.type === 'simulation' || activity.content?.scenarios) {
-    return (
-      <ActivitySimulationGame
         activity={activity}
         onActivityComplete={onActivityComplete}
       />
