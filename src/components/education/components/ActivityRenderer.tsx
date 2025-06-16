@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useState } from "react";
+import TextWithSpeaker from "./shared/TextWithSpeaker";
 
 interface ActivityRendererProps {
   activity: any;
@@ -49,9 +50,15 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
           <CardTitle className="text-white text-center">{activity.title}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 text-center">
-          <div className="text-purple-100 text-lg mb-6">
-            {activity.content.hook}
-          </div>
+          <TextWithSpeaker 
+            text={activity.content.hook}
+            context="introduction"
+            className="mb-6"
+          >
+            <div className="text-purple-100 text-lg">
+              {activity.content.hook}
+            </div>
+          </TextWithSpeaker>
           <Button 
             onClick={() => onComplete(true, 3)}
             className="bg-green-600 hover:bg-green-700 text-white"
@@ -70,25 +77,36 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
           <CardTitle className="text-white">{activity.title}</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="text-purple-100 text-lg mb-6">
-            {activity.content.question}
-          </div>
+          <TextWithSpeaker 
+            text={activity.content.question}
+            context="question"
+            className="mb-6"
+          >
+            <div className="text-purple-100 text-lg">
+              {activity.content.question}
+            </div>
+          </TextWithSpeaker>
           
           {!showResult && (
             <>
               <div className="space-y-3 mb-6">
                 {activity.content.options?.map((option: string, index: number) => (
-                  <button
+                  <TextWithSpeaker 
                     key={index}
-                    onClick={() => handleAnswerSelect(index)}
-                    className={`w-full p-3 text-left rounded-lg border transition-colors ${
-                      selectedAnswer === index
-                        ? 'bg-purple-600 border-purple-400 text-white'
-                        : 'bg-purple-800/50 border-purple-600 text-purple-200 hover:bg-purple-700/50'
-                    }`}
+                    text={option}
+                    context={`option-${index}`}
                   >
-                    {option}
-                  </button>
+                    <button
+                      onClick={() => handleAnswerSelect(index)}
+                      className={`w-full p-3 text-left rounded-lg border transition-colors ${
+                        selectedAnswer === index
+                          ? 'bg-purple-600 border-purple-400 text-white'
+                          : 'bg-purple-800/50 border-purple-600 text-purple-200 hover:bg-purple-700/50'
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  </TextWithSpeaker>
                 ))}
               </div>
               
@@ -115,9 +133,14 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
                   <span className="text-xl font-bold">Not quite right</span>
                 </div>
               )}
-              <div className="text-purple-200">
-                {activity.content.explanation}
-              </div>
+              <TextWithSpeaker 
+                text={activity.content.explanation}
+                context="explanation"
+              >
+                <div className="text-purple-200">
+                  {activity.content.explanation}
+                </div>
+              </TextWithSpeaker>
             </div>
           )}
         </CardContent>
@@ -131,9 +154,15 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
         <CardTitle className="text-white">{activity.title}</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="text-purple-100 mb-4">
-          {activity.content.text || activity.phaseDescription}
-        </div>
+        <TextWithSpeaker 
+          text={activity.content.text || activity.phaseDescription}
+          context="activity-content"
+          className="mb-4"
+        >
+          <div className="text-purple-100">
+            {activity.content.text || activity.phaseDescription}
+          </div>
+        </TextWithSpeaker>
         <Button 
           onClick={() => onComplete(true, 5)}
           className="bg-green-600 hover:bg-green-700 text-white"

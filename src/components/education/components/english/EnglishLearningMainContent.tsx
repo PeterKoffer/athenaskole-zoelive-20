@@ -145,7 +145,7 @@ const EnglishLearningMainContent = ({
           {/* Tips Sidebar (1/3 width on large screens) */}
           <div className="lg:col-span-1">
             <EnglishLearningTips 
-              skillArea="general_english"
+              skillArea="english"
               currentActivity={currentActivity?.type}
             />
           </div>
