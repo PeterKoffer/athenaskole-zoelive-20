@@ -16,8 +16,9 @@ const SpeakableCard = ({ children, speakText, context, className = '', ...props 
       context={context}
       position="corner"
       className={`group h-full ${className}`}
+      showOnHover={false}
     >
-      <Card {...props}>
+      <Card {...props} className="relative">
         {children}
       </Card>
     </TextWithSpeaker>

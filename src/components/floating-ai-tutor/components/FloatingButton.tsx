@@ -23,10 +23,11 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
         left: `${position.x}px`,
         top: `${position.y}px`,
         zIndex: 9999999,
-        cursor: isDragging ? 'grabbing' : 'grab'
+        cursor: isDragging ? 'grabbing' : 'grab',
+        userSelect: 'none'
       }}
       onMouseDown={onMouseDown}
-      onClick={onClick}
+      onClick={!isDragging ? onClick : undefined}
     >
       <RobotAvatar 
         size="3xl" 
