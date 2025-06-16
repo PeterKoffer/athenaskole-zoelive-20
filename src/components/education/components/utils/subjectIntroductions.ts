@@ -72,3 +72,18 @@ export const getSubjectIntroduction = (
       };
   }
 };
+
+export const getEstimatedIntroductionTime = (subject: string, skillArea?: string): number => {
+  // Return estimated time in seconds based on subject
+  switch (subject.toLowerCase()) {
+    case 'english':
+      return 45; // 45 seconds for English introduction
+    case 'mathematics':
+    case 'math':
+      return 30; // 30 seconds for Math introduction
+    case 'science':
+      return 40; // 40 seconds for Science introduction
+    default:
+      return 35; // Default 35 seconds
+  }
+};

@@ -6,19 +6,21 @@ interface UseClassIntroductionProps {
   subject: string;
   skillArea?: string;
   userLevel?: string;
+  studentName?: string;
   onComplete?: () => void;
 }
 
 export const useClassIntroduction = ({
   subject,
-  skillArea,
+  skillArea = 'general',
   userLevel = 'beginner',
+  studentName = 'Student',
   onComplete
 }: UseClassIntroductionProps) => {
   const [showIntroduction, setShowIntroduction] = useState(true);
   const [hasCompleted, setHasCompleted] = useState(false);
 
-  const introduction = getSubjectIntroduction(subject, skillArea, userLevel);
+  const introduction = getSubjectIntroduction(subject, skillArea, userLevel, studentName);
   const estimatedTime = getEstimatedIntroductionTime(subject, skillArea);
 
   const handleIntroductionComplete = useCallback(() => {
