@@ -10,7 +10,7 @@ export const useFloatingTutorState = () => {
   const [showEnableButton, setShowEnableButton] = useState(true);
   const location = useLocation();
 
-  // Only hide on auth pages, not on learning pages
+  // Only hide on auth pages - allow on all other pages including learning pages
   const shouldHide = location.pathname === '/auth' || location.pathname.startsWith('/auth/');
   const isOnHomepage = location.pathname === '/';
 
