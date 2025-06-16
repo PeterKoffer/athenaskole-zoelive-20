@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { LessonActivity } from '../types/LessonTypes';
 
@@ -178,9 +177,8 @@ export const useSimpleQuestionGeneration = ({
       metadata: {
         subject: subject,
         skillArea: skillArea,
-        operation: template.operation,
-        uniqueId: uniqueId,
-        questionNumber: questionCount + 1
+        templateId: uniqueId,
+        difficultyLevel: 1
       }
     };
 
