@@ -20,7 +20,12 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
     return (
       <Card className="bg-purple-900/30 border-purple-700">
         <CardContent className="p-6 text-center">
-          <div className="text-purple-200">Loading activity...</div>
+          <TextWithSpeaker 
+            text="Loading activity, please wait..."
+            context="loading"
+          >
+            <div className="text-purple-200">Loading activity...</div>
+          </TextWithSpeaker>
         </CardContent>
       </Card>
     );
@@ -47,7 +52,12 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
     return (
       <Card className="bg-gradient-to-br from-purple-900 to-blue-900 border-purple-400">
         <CardHeader>
-          <CardTitle className="text-white text-center">{activity.title}</CardTitle>
+          <TextWithSpeaker 
+            text={activity.title}
+            context="activity-title"
+          >
+            <CardTitle className="text-white text-center">{activity.title}</CardTitle>
+          </TextWithSpeaker>
         </CardHeader>
         <CardContent className="p-6 text-center">
           <TextWithSpeaker 
@@ -74,7 +84,12 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
     return (
       <Card className="bg-purple-900/30 border-purple-700">
         <CardHeader>
-          <CardTitle className="text-white">{activity.title}</CardTitle>
+          <TextWithSpeaker 
+            text={activity.title}
+            context="activity-title"
+          >
+            <CardTitle className="text-white">{activity.title}</CardTitle>
+          </TextWithSpeaker>
         </CardHeader>
         <CardContent className="p-6">
           <TextWithSpeaker 
@@ -151,7 +166,12 @@ const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRende
   return (
     <Card className="bg-purple-900/30 border-purple-700">
       <CardHeader>
-        <CardTitle className="text-white">{activity.title}</CardTitle>
+        <TextWithSpeaker 
+          text={activity.title}
+          context="activity-title"
+        >
+          <CardTitle className="text-white">{activity.title}</CardTitle>
+        </TextWithSpeaker>
       </CardHeader>
       <CardContent className="p-6">
         <TextWithSpeaker 

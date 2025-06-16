@@ -9,6 +9,7 @@ import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
 import { Button } from '@/components/ui/button';
+import TextWithSpeaker from '../shared/TextWithSpeaker';
 
 interface MathLearningMainContentProps {
   studentName: string;
@@ -115,21 +116,41 @@ const MathLearningMainContent = ({
                 <div className="text-center space-y-4 mt-8">
                   <div className="inline-flex items-center space-x-2 bg-blue-900/30 backdrop-blur-sm rounded-full px-6 py-3 border border-blue-400/30">
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                    <span className="text-blue-100 font-medium">
-                      Adventure {currentActivityIndex + 1} of {totalRealActivities}
-                    </span>
+                    <TextWithSpeaker 
+                      text={`Adventure ${currentActivityIndex + 1} of ${totalRealActivities}`}
+                      context="progress-indicator"
+                    >
+                      <span className="text-blue-100 font-medium">
+                        Adventure {currentActivityIndex + 1} of {totalRealActivities}
+                      </span>
+                    </TextWithSpeaker>
                   </div>
                   
                   {/* Automatic progression message */}
-                  <p className="text-gray-300 text-sm">
-                    Complete the activity above to continue your mathematical journey!
-                  </p>
+                  <TextWithSpeaker 
+                    text="Complete the activity above to continue your mathematical journey!"
+                    context="progression-message"
+                  >
+                    <p className="text-gray-300 text-sm">
+                      Complete the activity above to continue your mathematical journey!
+                    </p>
+                  </TextWithSpeaker>
                 </div>
               </div>
             ) : (
               <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">
-                <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
-                <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
+                <TextWithSpeaker 
+                  text="No Content Available"
+                  context="error-title"
+                >
+                  <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
+                </TextWithSpeaker>
+                <TextWithSpeaker 
+                  text={`Please try refreshing the lesson, ${studentName}.`}
+                  context="error-message"
+                >
+                  <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
+                </TextWithSpeaker>
                 <Button 
                   onClick={() => window.location.reload()} 
                   className="mt-4 bg-blue-600 hover:bg-blue-700"

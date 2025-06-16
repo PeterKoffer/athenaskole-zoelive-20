@@ -8,6 +8,7 @@ interface TextWithSpeakerProps {
   context?: string;
   className?: string;
   buttonClassName?: string;
+  showOnHover?: boolean;
 }
 
 const TextWithSpeaker = ({ 
@@ -15,7 +16,8 @@ const TextWithSpeaker = ({
   children, 
   context = 'text-content',
   className = '',
-  buttonClassName = ''
+  buttonClassName = '',
+  showOnHover = true
 }: TextWithSpeakerProps) => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
@@ -28,13 +30,15 @@ const TextWithSpeaker = ({
   };
 
   return (
-    <div className={`flex items-start justify-between group ${className}`}>
+    <div className={`flex items-start justify-between ${showOnHover ? 'group' : ''} ${className}`}>
       <div className="flex-1">
         {children}
       </div>
       <button
         onClick={handleSpeak}
-        className={`ml-2 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-white/10 transition-all ${buttonClassName}`}
+        className={`ml-2 p-1 rounded hover:bg-white/10 transition-all ${
+          showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-70 hover:opacity-100'
+        } ${buttonClassName}`}
         title="Ask Nelie to read this"
       >
         <Volume2 className="w-4 h-4 text-current" />
