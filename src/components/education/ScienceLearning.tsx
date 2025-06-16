@@ -7,16 +7,6 @@ import LessonPhaseRenderer from "./components/LessonPhaseRenderer";
 import { UnifiedLessonProvider, useUnifiedLesson } from "./contexts/UnifiedLessonContext";
 import { LessonActivity } from "./components/types/LessonTypes";
 
-interface LearningMode {
-  id: string;
-  name: string;
-  description: string;
-  icon: any;
-  difficulty: string;
-  estimatedTime: string;
-  benefits: string[];
-}
-
 // Sample activities for Science - these would normally come from a curriculum system
 const scienceActivities: LessonActivity[] = [
   {
@@ -63,6 +53,32 @@ const ScienceLearningContent = () => {
   const navigate = useNavigate();
   const [currentMode, setCurrentMode] = useState("adaptive");
 
+  console.log('🔬 ScienceLearningContent rendering:', {
+    user: !!user,
+    userId: user?.id,
+    loading,
+    currentMode
+  });
+
+  // This hook might be causing issues if the context is not properly set up
+  let lessonData;
+  try {
+    lessonData = useUnifiedLesson();
+    console.log('🔬 Unified lesson data:', lessonData);
+  } catch (error) {
+    console.error('🔬 Error getting unified lesson data:', error);
+    lessonData = {
+      phase: 'introduction',
+      timeSpent: 0,
+      currentSegment: 0,
+      totalSegments: scienceActivities.length,
+      handleLessonStart: () => {},
+      handleLessonComplete: () => navigate('/daily-program'),
+      handleLessonPause: () => {},
+      handleLessonResume: () => {}
+    };
+  }
+
   const {
     phase,
     timeSpent,
@@ -72,36 +88,30 @@ const ScienceLearningContent = () => {
     handleLessonComplete,
     handleLessonPause,
     handleLessonResume
-  } = useUnifiedLesson();
-
-  console.log('🔬 ScienceLearning component state:', {
-    user: !!user,
-    userId: user?.id,
-    loading,
-    currentMode,
-    subject: 'science',
-    skillArea: 'general_science',
-    lessonPhase: phase
-  });
+  } = lessonData;
 
   // Redirect to auth if not logged in
   useEffect(() => {
+    console.log('🔬 ScienceLearning useEffect:', { user: !!user, loading });
     if (!loading && !user) {
       console.log("🚪 User not authenticated in ScienceLearning, redirecting to auth");
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  const handleModeChange = (mode: LearningMode) => {
+  const handleModeChange = (mode: any) => {
+    console.log('🔬 Mode change:', mode);
     setCurrentMode(mode.id);
   };
 
   const handleBackToProgram = () => {
+    console.log('🔬 ScienceLearning - navigating back to daily program');
     navigate('/daily-program');
   };
 
   // Show loading state while authentication is being checked
   if (loading) {
+    console.log('🔬 ScienceLearning - showing loading state');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -114,9 +124,11 @@ const ScienceLearningContent = () => {
 
   // Don't render the component if user is not authenticated
   if (!user) {
+    console.log('🔬 ScienceLearning - no user, returning null');
     return null;
   }
 
+  console.log('🔬 ScienceLearning - rendering main content');
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <LearningHeader
@@ -131,7 +143,7 @@ const ScienceLearningContent = () => {
             timeSpent,
             currentSegment,
             totalSegments,
-            score: 0 // Will be managed by unified context
+            score: 0
           }}
           onLessonStart={handleLessonStart}
           onLessonComplete={handleLessonComplete}
@@ -148,7 +160,10 @@ const ScienceLearningContent = () => {
 const ScienceLearning = () => {
   const navigate = useNavigate();
   
+  console.log('🔬 ScienceLearning wrapper rendering');
+  
   const handleLessonComplete = () => {
+    console.log('🔬 Science lesson completed');
     navigate('/daily-program');
   };
 

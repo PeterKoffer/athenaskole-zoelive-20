@@ -4,59 +4,47 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import { RoleProvider } from "@/contexts/RoleContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
-import DailyProgram from "./pages/DailyProgram";
 import Auth from "./pages/Auth";
-import Profile from "./pages/Profile";
-import AILearning from "./pages/AILearning";
-import GameHub from "./pages/GameHub";
-import Admin from "./pages/Admin";
-import CommunicationCenter from "./pages/CommunicationCenter";
-import Analytics from "./pages/Analytics";
-import CalendarPage from "./pages/CalendarPage";
-import FloatingAITutor from "./components/FloatingAITutor";
-import EnhancedMathematicsLearning from "./components/education/EnhancedMathematicsLearning";
-import "./App.css";
+import DailyProgram from "./pages/DailyProgram";
+import MathematicsLearning from "./components/education/MathematicsLearning";
+import EnglishLearning from "./components/education/EnglishLearning";
+import ScienceLearning from "./components/education/ScienceLearning";
+import MusicLearning from "./components/education/MusicLearning";
+import CreativeArtsLearning from "./components/education/CreativeArtsLearning";
+import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
+import FloatingAITutor from "./components/floating-ai-tutor/FloatingAITutor";
 
 const queryClient = new QueryClient();
 
-function App() {
-  console.log('🚀 App component rendering...');
-  
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RoleProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <div className="min-h-screen bg-background">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/daily-program" element={<DailyProgram />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/auth/*" element={<Auth />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/ai-learning" element={<AILearning />} />
-                  <Route path="/games" element={<GameHub />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/communication" element={<CommunicationCenter />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/calendar" element={<CalendarPage />} />
-                  <Route path="/learn/mathematics" element={<EnhancedMathematicsLearning />} />
-                </Routes>
-                {/* Floating AI Tutor should appear on all pages except auth */}
-                <FloatingAITutor />
-              </div>
-            </BrowserRouter>
-          </TooltipProvider>
-        </RoleProvider>
-      </AuthProvider>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="relative">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/daily-program" element={<DailyProgram />} />
+                <Route path="/learn/mathematics" element={<MathematicsLearning />} />
+                <Route path="/learn/english" element={<EnglishLearning />} />
+                <Route path="/learn/science" element={<ScienceLearning />} />
+                <Route path="/learn/music" element={<MusicLearning />} />
+                <Route path="/learn/creative-arts" element={<CreativeArtsLearning />} />
+                <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
+              </Routes>
+              <FloatingAITutor />
+            </div>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;
