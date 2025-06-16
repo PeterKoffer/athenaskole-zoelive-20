@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 import { Volume2 } from "lucide-react";
 
 interface EnglishQuestionProps {
@@ -64,7 +64,7 @@ const EnglishQuestion = ({ activity, onAnswer, disabled }: EnglishQuestionProps)
             onClick={() => playAudio(activity.content)}
             className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
           >
-            <Volume2 className="w-4 h-4" />
+            <CustomSpeakerIcon className="w-4 h-4" size={16} />
           </Button>
         </div>
 

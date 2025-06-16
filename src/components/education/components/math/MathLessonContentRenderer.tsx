@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import AskNelieButtons from '../shared/AskNelieButtons';
 import { LessonActivity } from '../types/LessonTypes';

@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Brain } from 'lucide-react';
 import { useEffect } from 'react';
