@@ -36,12 +36,12 @@ const TextWithSpeaker = ({
       <div className={`relative ${className}`}>
         <button
           onClick={handleSpeak}
-          className={`absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-white/10 transition-all ${
+          className={`absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-blue-500/20 transition-all ${
             showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-70 hover:opacity-100'
           } ${buttonClassName}`}
           title="Ask Nelie to read this"
         >
-          <Volume2 className="w-4 h-4 text-white" />
+          <Volume2 className="w-4 h-4 text-blue-400" />
         </button>
         {children}
       </div>
@@ -55,7 +55,7 @@ const TextWithSpeaker = ({
       </div>
       <button
         onClick={handleSpeak}
-        className={`ml-2 p-1 rounded hover:bg-white/10 transition-all ${
+        className={`ml-2 p-1 rounded hover:bg-blue-500/20 transition-all ${
           showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-70 hover:opacity-100'
         } ${buttonClassName}`}
         title="Ask Nelie to read this"
