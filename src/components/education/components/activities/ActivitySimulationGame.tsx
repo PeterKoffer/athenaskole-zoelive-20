@@ -18,6 +18,7 @@ const ActivitySimulationGame = ({
   const [customersServed, setCustomersServed] = useState(0);
   const [gamePhase, setGamePhase] = useState<'playing' | 'success' | 'complete'>('playing');
   const [selectedSlices, setSelectedSlices] = useState<number>(0);
+  const [hasCompleted, setHasCompleted] = useState(false);
 
   const scenarios = activity.content?.scenarios || [];
   const currentCustomer = scenarios[currentScenario];
@@ -38,9 +39,7 @@ const ActivitySimulationGame = ({
           setSelectedSlices(0);
         } else {
           setGamePhase('complete');
-          setTimeout(() => {
-            onActivityComplete(true);
-          }, 3000);
+          setHasCompleted(true);
         }
       }, 2000);
     } else {
@@ -53,6 +52,16 @@ const ActivitySimulationGame = ({
     }
   };
 
+  // Auto-advance to next activity after completion
+  useEffect(() => {
+    if (hasCompleted && gamePhase === 'complete') {
+      console.log('🍕 Pizza Fraction Factory completed, advancing to next activity...');
+      setTimeout(() => {
+        onActivityComplete(true);
+      }, 3500); // Give user time to see completion message
+    }
+  }, [hasCompleted, gamePhase, onActivityComplete]);
+
   if (gamePhase === 'complete') {
     return (
       <Blackboard>
@@ -64,6 +73,9 @@ const ActivitySimulationGame = ({
             <p className="text-xl text-yellow-400">Money Earned: ${money}</p>
           </div>
           <p className="text-gray-300">You've mastered fractions through pizza!</p>
+          <div className="text-blue-300 text-sm mt-4">
+            Advancing to next activity...
+          </div>
         </div>
       </Blackboard>
     );
@@ -138,6 +150,11 @@ const ActivitySimulationGame = ({
             className="bg-gradient-to-r from-green-500 to-blue-500 h-full transition-all duration-500"
             style={{ width: `${((currentScenario + 1) / scenarios.length) * 100}%` }}
           />
+        </div>
+        
+        {/* Scenario progress indicator */}
+        <div className="text-center text-gray-300 text-sm">
+          Customer {currentScenario + 1} of {scenarios.length}
         </div>
       </div>
     </Blackboard>
