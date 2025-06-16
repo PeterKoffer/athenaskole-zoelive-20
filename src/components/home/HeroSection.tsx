@@ -26,32 +26,35 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 transform rotate-12 scale-150"></div>
       </div>
       
+      {/* Speaker icon positioned in top right corner of the hero section */}
+      <TextWithSpeaker 
+        text="Welcome to the Future of Learning. Meet Nelie, your AI-powered learning companion. Experience personalized education that adapts to your unique learning style, making every lesson engaging and effective." 
+        context="hero-main-content"
+        position="corner"
+        className="absolute top-8 right-8 z-20"
+        showOnHover={false}
+      >
+        <div></div>
+      </TextWithSpeaker>
+      
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
           <div className="text-left lg:text-left relative">
-            <TextWithSpeaker 
-              text="Welcome to the Future of Learning. Meet Nelie, your AI-powered learning companion. Experience personalized education that adapts to your unique learning style, making every lesson engaging and effective." 
-              context="hero-main-content"
-              position="corner"
-              className="group"
-              showOnHover={false}
-            >
-              <div>
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                  Welcome to the Future of{" "}
-                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Learning
-                  </span>
-                </h1>
+            <div>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                Welcome to the Future of{" "}
+                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Learning
+                </span>
+              </h1>
 
-                <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                  Meet <strong className="text-blue-400">Nelie</strong>, your AI-powered learning companion. 
-                  Experience personalized education that adapts to your unique learning style, 
-                  making every lesson engaging and effective.
-                </p>
-              </div>
-            </TextWithSpeaker>
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                Meet <strong className="text-blue-400">Nelie</strong>, your AI-powered learning companion. 
+                Experience personalized education that adapts to your unique learning style, 
+                making every lesson engaging and effective.
+              </p>
+            </div>
 
             <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
               <Button

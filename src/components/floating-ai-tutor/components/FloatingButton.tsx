@@ -30,7 +30,7 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
     >
       <Button
         onClick={onClick}
-        className="w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+        className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
         size="icon"
       >
         <MessageSquare className="w-6 h-6" />
