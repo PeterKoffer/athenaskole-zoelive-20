@@ -1,5 +1,5 @@
 
-import { Volume2 } from "lucide-react";
+import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 interface TextWithSpeakerProps {
@@ -36,12 +36,12 @@ const TextWithSpeaker = ({
       <div className={`relative ${className}`}>
         <button
           onClick={handleSpeak}
-          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-blue-600/90 hover:bg-blue-500 transition-all duration-200 shadow-lg backdrop-blur-sm ${
+          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-sky-500/90 hover:bg-sky-400 transition-all duration-200 shadow-lg backdrop-blur-sm ${
             showOnHover ? 'opacity-80 group-hover:opacity-100' : 'opacity-90 hover:opacity-100'
           } ${buttonClassName}`}
           title="Ask Nelie to read this"
         >
-          <Volume2 className="w-4 h-4 text-white" />
+          <CustomSpeakerIcon className="w-4 h-4 text-white" size={16} />
         </button>
         {children}
       </div>
@@ -55,12 +55,12 @@ const TextWithSpeaker = ({
       </div>
       <button
         onClick={handleSpeak}
-        className={`ml-2 p-2 rounded-full bg-blue-600/80 hover:bg-blue-500 transition-all duration-200 ${
+        className={`ml-2 p-2 rounded-full bg-sky-500/80 hover:bg-sky-400 transition-all duration-200 ${
           showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-80 hover:opacity-100'
         } ${buttonClassName}`}
         title="Ask Nelie to read this"
       >
-        <Volume2 className="w-4 h-4 text-white" />
+        <CustomSpeakerIcon className="w-4 h-4 text-white" size={16} />
       </button>
     </div>
   );
