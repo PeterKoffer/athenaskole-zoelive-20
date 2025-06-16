@@ -56,8 +56,8 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  // PRIORITY 3: Other simulation games
-  if (activity.title.includes('Shop') || activity.content?.gameType === 'simulation') {
+  // PRIORITY 3: Other simulation games (removed invalid gameType comparison)
+  if (activity.title.includes('Shop')) {
     return (
       <ActivitySimulationGame
         activity={activity}
