@@ -1,87 +1,70 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { LessonActivity } from '../types/LessonTypes';
-import { generateMathActivities } from '../math/utils/mathActivityGenerator';
-
-// Helper function to map InteractiveActivity types to LessonActivity types
-const mapActivityType = (interactiveType: string): LessonActivity['type'] => {
-  switch (interactiveType) {
-    case 'mini-game':
-    case 'simulation':
-      return 'interactive-game';
-    case 'quiz':
-    case 'puzzle':
-      return 'application';
-    case 'creative':
-    case 'exploration':
-      return 'creative-exploration';
-    default:
-      return 'content-delivery';
-  }
-};
-
-const isCountableActivity = (activity: LessonActivity): boolean => {
-  const countableTypes = ['interactive-game', 'application', 'creative-exploration'];
-  const countablePhases = ['interactive-game', 'application', 'creative-exploration'];
-  if (countableTypes.includes(activity.type) || countablePhases.includes(activity.phase)) {
-    return true;
-  }
-  const obsoletePatterns = [
-    'basic math concepts',
-    'welcome to',
-    'introduction to the lesson'
-  ];
-  const title = activity.title?.toLowerCase() || '';
-  const isObsolete = obsoletePatterns.some(pattern => title.includes(pattern));
-  return !isObsolete;
-};
+import { SubjectSpecificTemplates } from '../utils/subjectSpecificTemplates';
 
 export const useLessonActivitiesInitializer = (subject: string, skillArea: string, startTimer: () => void) => {
   const [allActivities, setAllActivities] = useState<LessonActivity[]>([]);
   const [isInitializing, setIsInitializing] = useState(true);
-  const lessonStartTime = useRef(Date.now());
-  
+  const lessonStartTime = useRef<number>(Date.now());
+
   useEffect(() => {
-    const initializeActivities = async () => {
-      console.log('🎯 Initializing optimized lesson activities for:', subject, skillArea);
+    const initializeLesson = async () => {
+      console.log(`🚀 Initializing ${subject} lesson with enhanced templates...`);
+      setIsInitializing(true);
+      
       try {
-        let activities = await generateMathActivities();
-        console.log('✅ Generated activities:', activities.length);
-        const filteredActivities = activities.filter(activity => {
-          const mapped = {
-            ...activity,
-            type: mapActivityType(activity.type),
-            duration: activity.duration || 120,
-            phase: 'content-delivery' as const,
-          };
-          return isCountableActivity(mapped);
-        });
-        console.log('🎯 Filtered to countable activities:', filteredActivities.length, 'from', activities.length);
-        if (filteredActivities.length < 3) {
-          console.log('⚠️ Too few activities after filtering, including more content');
-          const additionalActivities = activities.filter(activity => 
-            !filteredActivities.includes(activity) &&
-             !activity.title?.toLowerCase().includes('basic math concepts')
-          ).slice(0, 3 - filteredActivities.length);
-          filteredActivities.push(...additionalActivities);
-          console.log('➕ Added additional activities, total now:', filteredActivities.length);
-        }
-        const mappedActivities: LessonActivity[] = filteredActivities.map(activity => ({
-          ...activity,
-          type: mapActivityType(activity.type),
-          duration: activity.duration || 120,
-          phase: 'content-delivery' as const,
-        }));
-        setAllActivities(mappedActivities);
-        setIsInitializing(false);
+        // Reset lesson start time
+        lessonStartTime.current = Date.now();
+        
+        // Get subject-specific activities using the enhanced templates
+        const activities = SubjectSpecificTemplates.getTemplateForSubject(
+          subject,
+          skillArea || 'general',
+          6 // default grade level
+        );
+
+        console.log(`✅ Generated ${activities.length} activities for ${subject}:`, 
+          activities.map(a => `${a.title} (${a.type})`));
+
+        setAllActivities(activities);
+        
+        // Start the lesson timer
         startTimer();
+        
       } catch (error) {
-        console.error('❌ Failed to generate activities:', error);
+        console.error('❌ Error initializing lesson activities:', error);
+        
+        // Fallback to basic activities
+        const fallbackActivities: LessonActivity[] = [{
+          id: `${subject}-fallback-${Date.now()}`,
+          type: 'introduction',
+          phase: 'introduction',
+          title: `Welcome to ${subject}!`,
+          duration: 180,
+          phaseDescription: 'Getting started with your lesson',
+          content: {
+            hook: `Welcome to your ${subject} lesson! Let's begin this exciting learning journey together.`,
+            excitementBuilder: "Get ready for an amazing learning experience!",
+            characterIntroduction: "I'm Nelie, and I'm here to help you learn!"
+          }
+        }];
+        
+        setAllActivities(fallbackActivities);
+        startTimer();
+      } finally {
         setIsInitializing(false);
       }
     };
-    initializeActivities();
+
+    if (subject) {
+      initializeLesson();
+    }
   }, [subject, skillArea, startTimer]);
 
-  return { allActivities, isInitializing, lessonStartTime };
+  return {
+    allActivities,
+    isInitializing,
+    lessonStartTime
+  };
 };
