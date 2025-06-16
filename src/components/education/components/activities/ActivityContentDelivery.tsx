@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
+import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface ActivityContentDeliveryProps {
@@ -77,7 +77,7 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
             onClick={() => playAudio(segment?.explanation || activity.content.text || '')}
             className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
           >
-            <Volume2 className="w-4 h-4" />
+            <CustomSpeakerIcon className="w-4 h-4" size={16} />
           </Button>
         </CardTitle>
       </CardHeader>
