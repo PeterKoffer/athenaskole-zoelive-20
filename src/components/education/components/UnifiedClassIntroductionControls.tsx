@@ -42,16 +42,16 @@ const UnifiedClassIntroductionControls = ({
   if (!hasStarted) {
     return (
       <div className="w-full flex justify-center mt-8">
-        <div className="flex flex-wrap md:flex-nowrap gap-3 w-full max-w-4xl justify-center">
+        <div className="flex flex-wrap md:flex-nowrap gap-2 w-full max-w-3xl justify-center">
           {/* Repeat (ask Nelie to repeat) */}
           <Button
             type="button"
             variant="outline"
             onClick={handleManualRead}
-            className="h-12 px-4 py-3 font-medium border-purple-400 text-purple-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none min-w-[120px]"
+            className="h-10 px-3 font-medium border-purple-400 text-purple-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
             disabled={(!isEnabled && hasUserInteracted) || isAdvancing}
           >
-            <Repeat className="w-4 h-4 mr-3" />
+            <Repeat className="w-4 h-4 mr-2" />
             <span className="whitespace-nowrap">Repeat</span>
           </Button>
 
@@ -59,11 +59,11 @@ const UnifiedClassIntroductionControls = ({
           <Button
             type="button"
             variant="outline"
-            className="h-12 px-4 py-3 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none min-w-[100px]"
+            className="h-10 px-3 font-medium border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
             onClick={handleHome}
             disabled={isAdvancing}
           >
-            <Home className="w-4 h-4 mr-3" />
+            <Home className="w-4 h-4 mr-2" />
             <span className="whitespace-nowrap">Home</span>
           </Button>
 
@@ -71,13 +71,13 @@ const UnifiedClassIntroductionControls = ({
           <Button
             type="button"
             onClick={handleManualStart}
-            className="h-12 px-6 py-3 font-bold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-sm transition-none min-w-[240px]"
+            className="h-10 px-4 font-bold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-sm transition-none"
             disabled={isAdvancing}
             style={{
               letterSpacing: '0.01em',
             }}
           >
-            <Play className="w-4 h-4 mr-3" />
+            <Play className="w-4 h-4 mr-2" />
             <span className="whitespace-nowrap">Start Introduction with Nelie</span>
           </Button>
 
@@ -86,7 +86,7 @@ const UnifiedClassIntroductionControls = ({
             type="button"
             onClick={handleProceedWithoutSpeech}
             variant="outline"
-            className="h-12 px-6 py-3 font-bold border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none min-w-[220px]"
+            className="h-10 px-4 font-bold border-gray-400 text-gray-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
             disabled={!canProceedWithoutSpeech || isAdvancing}
             style={{
               letterSpacing: '0.01em',
