@@ -1,5 +1,4 @@
-
-interface Introduction Section {
+interface IntroductionSection {
   title: string;
   text: string;
   duration: number;
