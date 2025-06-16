@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardProps } from './card';
+import { Card } from './card';
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
-interface SpeakableCardProps extends CardProps {
+interface SpeakableCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   speakText: string;
   context: string;
