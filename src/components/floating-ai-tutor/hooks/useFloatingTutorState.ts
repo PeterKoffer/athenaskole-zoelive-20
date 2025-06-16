@@ -2,19 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-
-export interface FloatingTutorMessage {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
+import { Message } from '../types';
 
 export const useFloatingTutorState = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<FloatingTutorMessage[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [hasWelcomedOnHomepage, setHasWelcomedOnHomepage] = useState(() => {
     return sessionStorage.getItem('nelieHomepageWelcomed') === 'true';
   });
