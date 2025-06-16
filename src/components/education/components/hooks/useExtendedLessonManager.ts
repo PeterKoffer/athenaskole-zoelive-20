@@ -68,13 +68,15 @@ export const useExtendedLessonManager = ({
     setDynamicActivities,
     questionsGenerated,
     isGeneratingQuestion,
-    generateDynamicActivity
+    generateDynamicActivity,
+    forceFreshSession,
+    sessionId
   } = useDynamicActivityGeneration({
     subject,
     skillArea,
     timeElapsed,
     usedQuestionIds,
-    onQuestionUsed: () => {} // Handled by progress manager
+    onQuestionUsed: () => {}
   });
 
   const [hasGeneratedInitialQuestions, setHasGeneratedInitialQuestions] = useState(false);
@@ -83,7 +85,7 @@ export const useExtendedLessonManager = ({
   // Ensure we always have interactive questions mixed with content
   const allActivities = [
     ...baseLessonActivities.slice(0, 2), // First 2 base activities
-    ...dynamicActivities, // All dynamic questions
+    ...dynamicActivities, // All dynamic questions (FRESH each session)
     ...baseLessonActivities.slice(2) // Remaining base activities
   ];
 
@@ -125,23 +127,23 @@ export const useExtendedLessonManager = ({
     }, 100);
   }, [originalHandleActivityComplete, saveProgress]);
 
-  // Generate initial questions with subject specificity
+  // Generate FRESH questions for each new class session
   useEffect(() => {
     if (!hasGeneratedInitialQuestions && !isGeneratingQuestion && !isLoadingProgress) {
-      console.log('🎯 Starting initial subject-specific question generation...');
+      console.log(`🆕 Starting FRESH question generation for ${subject} (Session: ${sessionId})`);
       setHasGeneratedInitialQuestions(true);
       
-      const generateInitialQuestions = async () => {
-        console.log('🔄 Generating 8 subject-specific questions...');
+      const generateFreshQuestions = async () => {
+        console.log(`🔄 Generating 8 BRAND NEW ${subject} questions...`);
         
         for (let i = 0; i < 8; i++) {
           try {
-            console.log(`📝 Generating question ${i + 1}/8 for ${subject}...`);
+            console.log(`📝 Generating FRESH question ${i + 1}/8 for ${subject}...`);
             const newActivity = await generateSubjectQuestion();
             if (newActivity) {
               setDynamicActivities(prev => {
                 const updated = [...prev, newActivity];
-                console.log(`✅ Added ${subject} question ${i + 1}: ${newActivity.content.question.substring(0, 50)}...`);
+                console.log(`✅ Added FRESH ${subject} question ${i + 1}: ${newActivity.content.question.substring(0, 50)}...`);
                 return updated;
               });
             } else {
@@ -152,19 +154,27 @@ export const useExtendedLessonManager = ({
           }
           
           if (i < 7) {
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => setTimeout(resolve, 100)); // Shorter delay for faster generation
           }
         }
         
-        console.log(`✅ Initial ${subject} question generation completed`);
+        console.log(`✅ FRESH ${subject} question generation completed for session ${sessionId}`);
         setIsInitializing(false);
       };
       
-      generateInitialQuestions();
+      generateFreshQuestions();
     }
-  }, [hasGeneratedInitialQuestions, isGeneratingQuestion, isLoadingProgress, generateSubjectQuestion, setDynamicActivities, subject]);
+  }, [hasGeneratedInitialQuestions, isGeneratingQuestion, isLoadingProgress, generateSubjectQuestion, setDynamicActivities, subject, sessionId]);
 
-  console.log(`🧠 Extended ${subject} lesson: ${allActivities.length} activities, targeting ${targetLessonLength} minutes`);
+  // Add force refresh functionality
+  const refreshWithNewQuestions = useCallback(() => {
+    console.log('🔄 User requested FRESH questions - forcing new session');
+    forceFreshSession();
+    setHasGeneratedInitialQuestions(false);
+    setIsInitializing(true);
+  }, [forceFreshSession]);
+
+  console.log(`🧠 FRESH ${subject} lesson (Session: ${sessionId}): ${allActivities.length} activities, targeting ${targetLessonLength} minutes`);
 
   return {
     currentActivityIndex,
@@ -188,6 +198,8 @@ export const useExtendedLessonManager = ({
     toggleMute: teachingEngine.toggleMute,
     handleActivityComplete,
     handleReadRequest,
-    resetProgress
+    resetProgress,
+    refreshWithNewQuestions,
+    sessionId
   };
 };

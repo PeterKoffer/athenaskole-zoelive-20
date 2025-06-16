@@ -17,7 +17,11 @@ export const useSubjectSpecificQuestions = ({
 }: UseSubjectSpecificQuestionsProps) => {
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
   
-  const { generateUniqueQuestion, questionCount } = useSimpleQuestionGeneration({
+  const { 
+    generateUniqueQuestion, 
+    clearGeneratedQuestions, 
+    questionCount 
+  } = useSimpleQuestionGeneration({
     subject,
     skillArea
   });
@@ -29,7 +33,7 @@ export const useSubjectSpecificQuestions = ({
     }
 
     setIsGeneratingQuestion(true);
-    console.log('🎯 Generating truly unique question...', { 
+    console.log('🎯 Generating TRULY UNIQUE question...', { 
       subject, 
       skillArea, 
       questionNumber: questionCount + 1
@@ -44,8 +48,7 @@ export const useSubjectSpecificQuestions = ({
       console.log('✅ Generated unique question:', {
         id: uniqueQuestion.id,
         question: uniqueQuestion.content.question.substring(0, 50) + '...',
-        options: uniqueQuestion.content.options.length,
-        questionNumber: questionCount
+        questionNumber: questionCount + 1
       });
       
       return uniqueQuestion;
@@ -65,9 +68,15 @@ export const useSubjectSpecificQuestions = ({
     questionCount
   ]);
 
+  const clearSessionQuestions = useCallback(() => {
+    console.log('🧹 Clearing all session questions for fresh start');
+    clearGeneratedQuestions();
+  }, [clearGeneratedQuestions]);
+
   return {
     generateQuestion,
     isGeneratingQuestion,
-    sessionQuestionCount: questionCount
+    sessionQuestionCount: questionCount,
+    clearSessionQuestions
   };
 };
