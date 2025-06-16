@@ -1,12 +1,9 @@
 
-import OptimizedQuestionActivity from '../OptimizedQuestionActivity';
-import EnglishLessonHeader from './EnglishLessonHeader';
-import EnglishLessonControlPanel from './EnglishLessonControlPanel';
-import EnglishWritingStrategies from './EnglishWritingStrategies';
-import EnglishLessonContentRenderer from './EnglishLessonContentRenderer';
-import ClassroomEnvironment from '../shared/ClassroomEnvironment';
-import { getClassroomConfig } from '../shared/classroomConfigs';
-import { LessonActivity } from '../types/LessonTypes';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Clock, Star, RotateCcw, Home, Volume2, VolumeX } from "lucide-react";
+import ActivityRenderer from "../ActivityRenderer";
+import EnglishLearningTips from "./EnglishLearningTips";
 
 interface EnglishLearningMainContentProps {
   studentName: string;
@@ -16,13 +13,13 @@ interface EnglishLearningMainContentProps {
   currentActivityIndex: number;
   totalRealActivities: number;
   correctStreak: number;
-  currentActivity: LessonActivity | null;
+  currentActivity: any;
   isSpeaking: boolean;
   onBackToProgram: () => void;
   onToggleMute: () => void;
   onReadRequest: () => void;
   onStopSpeaking: () => void;
-  onActivityComplete: (wasCorrect?: boolean) => void;
+  onActivityComplete: (success: boolean, timeSpent: number) => void;
 }
 
 const EnglishLearningMainContent = ({
@@ -41,93 +38,120 @@ const EnglishLearningMainContent = ({
   onStopSpeaking,
   onActivityComplete
 }: EnglishLearningMainContentProps) => {
-  const classroomConfig = getClassroomConfig('english');
-
-  const handleNavigateBack = () => {
-    if (currentActivityIndex > 0) {
-      // Logic to go to previous activity would go here
-      console.log('Navigate to previous activity');
-    }
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const handleNavigateForward = () => {
-    if (currentActivityIndex < totalRealActivities - 1) {
-      // Logic to go to next activity would go here
-      console.log('Navigate to next activity');
-    }
-  };
-
-  const canNavigateBack = currentActivityIndex > 0;
-  const canNavigateForward = currentActivityIndex < totalRealActivities - 1;
 
   return (
-    <ClassroomEnvironment config={classroomConfig}>
-      <div className="w-full space-y-0">
-        <EnglishLessonHeader
-          studentName={studentName}
-          timeElapsed={timeElapsed}
-          targetLessonLength={targetLessonLength}
-          score={score}
-          currentActivityIndex={currentActivityIndex}
-          totalRealActivities={totalRealActivities}
-          correctStreak={correctStreak}
-          onBackToProgram={onBackToProgram}
-          onNavigateBack={handleNavigateBack}
-          onNavigateForward={handleNavigateForward}
-          canNavigateBack={canNavigateBack}
-          canNavigateForward={canNavigateForward}
-          currentActivityType={currentActivity?.type}
-          currentActivityPhase={currentActivity?.phase}
-        />
-
-        <EnglishLessonControlPanel
-          isSpeaking={isSpeaking}
-          onToggleMute={onToggleMute}
-          onReadRequest={onReadRequest}
-          onStopSpeaking={onStopSpeaking}
-        />
-
-        {/* Current Activity Content - Full width content area with classroom-aware styling */}
-        <div className="w-full px-4 py-6">
-          <div className="w-full max-w-4xl mx-auto">
-            {currentActivity ? (
-              <div className="space-y-6">
-                {currentActivity.type === 'interactive-game' ? (
-                  <OptimizedQuestionActivity
-                    subject="english"
-                    skillArea="general_english"
-                    difficultyLevel={2}
-                    onComplete={onActivityComplete}
-                    questionNumber={currentActivityIndex + 1}
-                    totalQuestions={totalRealActivities}
-                  />
-                ) : (
-                  <>
-                    {currentActivity.title?.toLowerCase().includes('writing strategies') ? (
-                      <EnglishWritingStrategies
-                        studentName={studentName}
-                        onComplete={() => onActivityComplete()}
-                      />
-                    ) : (
-                      <EnglishLessonContentRenderer
-                        activity={currentActivity}
-                        studentName={studentName}
-                        onComplete={() => onActivityComplete()}
-                      />
-                    )}
-                  </>
-                )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-purple-950 to-indigo-950">
+      {/* Header */}
+      <div className="bg-purple-900/50 backdrop-blur-sm border-b border-purple-700">
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="text-2xl">📚</div>
+              <div>
+                <h1 className="text-white text-xl font-bold">English with Nelie</h1>
+                <p className="text-purple-200 text-sm">Learning with {studentName}</p>
               </div>
-            ) : (
-              <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">
-                <h3 className="text-xl font-semibold text-white mb-2">No Content Available</h3>
-                <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-purple-200">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm">{formatTime(timeElapsed)} / {formatTime(targetLessonLength)}</span>
               </div>
-            )}
+              
+              <div className="flex items-center space-x-2 text-purple-200">
+                <Star className="w-4 h-4 text-yellow-400" />
+                <span className="text-sm">Score: {score}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </ClassroomEnvironment>
+
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Progress */}
+        <Card className="bg-purple-900/30 border-purple-700">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-purple-200 text-sm">
+                Activity {currentActivityIndex + 1} of {totalRealActivities}
+              </span>
+              {correctStreak > 0 && (
+                <span className="text-green-400 text-sm flex items-center">
+                  <span className="mr-1">🔥</span>
+                  {correctStreak} in a row!
+                </span>
+              )}
+            </div>
+            <div className="w-full bg-purple-900 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-purple-400 to-blue-400 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${((currentActivityIndex + 1) / totalRealActivities) * 100}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Controls */}
+        <div className="flex justify-center gap-3">
+          <Button
+            onClick={onToggleMute}
+            variant="outline"
+            size="sm"
+            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700"
+          >
+            {isSpeaking ? <VolumeX className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
+            {isSpeaking ? 'Mute Nelie' : 'Unmute Nelie'}
+          </Button>
+          
+          <Button
+            onClick={isSpeaking ? onStopSpeaking : onReadRequest}
+            variant="outline"
+            size="sm"
+            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700"
+            disabled={false}
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            {isSpeaking ? 'Stop Nelie' : 'Ask Nelie to Repeat'}
+          </Button>
+          
+          <Button
+            onClick={onBackToProgram}
+            variant="outline"
+            size="sm"
+            className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Activity (2/3 width on large screens) */}
+          <div className="lg:col-span-2">
+            <ActivityRenderer
+              activity={currentActivity}
+              onComplete={onActivityComplete}
+              timeRemaining={0}
+            />
+          </div>
+
+          {/* Tips Sidebar (1/3 width on large screens) */}
+          <div className="lg:col-span-1">
+            <EnglishLearningTips 
+              skillArea="general_english"
+              currentActivity={currentActivity?.type}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
