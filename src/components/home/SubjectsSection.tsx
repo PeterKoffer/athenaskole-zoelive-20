@@ -1,5 +1,6 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
+import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
@@ -84,49 +85,46 @@ const SubjectsSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {subjects.map((subject, index) => (
-            <TextWithSpeaker
+            <SpeakableCard
               key={index}
-              text={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
+              speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
               context={`subject-card-${index}`}
-              position="corner"
-              className="group"
+              className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-full"
             >
-              <Card className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-full">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    <span className="text-3xl mr-3">{subject.icon}</span>
-                    <h3 className="text-xl font-bold text-white">
-                      {subject.title}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-gray-300 mb-4">
-                    {subject.description}
-                  </p>
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">{subject.icon}</span>
+                  <h3 className="text-xl font-bold text-white">
+                    {subject.title}
+                  </h3>
+                </div>
+                
+                <p className="text-gray-300 mb-4">
+                  {subject.description}
+                </p>
 
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-400 mb-2">
-                      Key Areas:
-                    </h4>
-                    <ul className="space-y-1">
-                      {subject.keyAreas.map((area, areaIndex) => (
-                        <li key={areaIndex} className="flex items-center text-sm text-gray-300">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
-                          <span>{area}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-gray-400 mb-2">
+                    Key Areas:
+                  </h4>
+                  <ul className="space-y-1">
+                    {subject.keyAreas.map((area, areaIndex) => (
+                      <li key={areaIndex} className="flex items-center text-sm text-gray-300">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                        <span>{area}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-                  <Button
-                    onClick={() => navigate(subject.path)}
-                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity`}
-                  >
-                    Start Learning
-                  </Button>
-                </CardContent>
-              </Card>
-            </TextWithSpeaker>
+                <Button
+                  onClick={() => navigate(subject.path)}
+                  className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity`}
+                >
+                  Start Learning
+                </Button>
+              </CardContent>
+            </SpeakableCard>
           ))}
         </div>
       </div>

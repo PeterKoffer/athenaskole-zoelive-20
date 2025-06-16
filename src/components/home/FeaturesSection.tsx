@@ -1,5 +1,6 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
+import { SpeakableCard } from "@/components/ui/speakable-card";
 import { BarChart3, BookOpen, Gamepad2, Sparkles } from "lucide-react";
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
@@ -82,33 +83,30 @@ const FeaturesSection = () => {
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
-              <TextWithSpeaker
+              <SpeakableCard
                 key={index}
-                text={`${feature.title}. ${feature.description}. ${feature.details}`}
+                speakText={`${feature.title}. ${feature.description}. ${feature.details}`}
                 context={`feature-card-${index}`}
-                position="corner"
-                className="group h-full"
+                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 h-full"
               >
-                <Card className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 h-full">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {feature.title}
-                    </h3>
-                    
-                    <p className="text-gray-400 text-sm mb-3">
-                      {feature.description}
-                    </p>
-                    
-                    <p className="text-gray-300 text-xs leading-relaxed">
-                      {feature.details}
-                    </p>
-                  </CardContent>
-                </Card>
-              </TextWithSpeaker>
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-6 h-6 text-white" />
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  
+                  <p className="text-gray-400 text-sm mb-3">
+                    {feature.description}
+                  </p>
+                  
+                  <p className="text-gray-300 text-xs leading-relaxed">
+                    {feature.details}
+                  </p>
+                </CardContent>
+              </SpeakableCard>
             );
           })}
         </div>

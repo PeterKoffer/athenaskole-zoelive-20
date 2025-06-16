@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { MessageSquare } from 'lucide-react';
-import { Button } from '../../ui/button';
+import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 
 interface FloatingButtonProps {
   onClick: () => void;
@@ -27,14 +26,14 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
         cursor: isDragging ? 'grabbing' : 'grab'
       }}
       onMouseDown={onMouseDown}
+      onClick={onClick}
     >
-      <Button
-        onClick={onClick}
-        className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
-        size="icon"
-      >
-        <MessageSquare className="w-6 h-6" />
-      </Button>
+      <RobotAvatar 
+        size="3xl" 
+        isActive={true} 
+        isSpeaking={false}
+        className="pointer-events-none drop-shadow-2xl transition-transform duration-200 hover:scale-105"
+      />
     </div>
   );
 };
