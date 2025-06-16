@@ -28,6 +28,7 @@ const DailyProgram = () => {
     }
   }, [user, loading, navigate]);
   
+  // Force English locale for date formatting
   const todaysDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',

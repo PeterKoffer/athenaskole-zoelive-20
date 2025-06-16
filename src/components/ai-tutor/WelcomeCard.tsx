@@ -13,6 +13,7 @@ const WelcomeCard = ({ userName }: WelcomeCardProps) => {
   const { user } = useAuth();
   const [actualUserName, setActualUserName] = useState(userName);
 
+  // Force English locale for date formatting
   const todaysDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',

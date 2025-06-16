@@ -6,10 +6,11 @@ interface DateWidgetProps {
 const DateWidget = ({ className = "" }: DateWidgetProps) => {
   const now = new Date();
   
-  const dayName = now.toLocaleDateString(undefined, { weekday: 'long' });
+  // Force English locale for all date formatting
+  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
   const date = now.getDate();
-  const monthYear = now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-  const time = now.toLocaleTimeString(undefined, { 
+  const monthYear = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const time = now.toLocaleTimeString('en-US', { 
     hour: '2-digit', 
     minute: '2-digit',
     hour12: false 
