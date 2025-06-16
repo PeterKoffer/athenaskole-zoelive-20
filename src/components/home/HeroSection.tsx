@@ -1,39 +1,75 @@
 
 import { Button } from "@/components/ui/button";
-import DateWidget from "./DateWidget";
+import { useNavigate } from "react-router-dom";
+import NelieAvatarDisplay from "./NelieAvatarDisplay";
+import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
-interface HeroSectionProps {
-  onGetStarted: () => void;
-}
-
-const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
-  const handleGetStartedClick = () => {
-    console.log("HeroSection Get Started button clicked");
-    onGetStarted();
-  };
+const HeroSection = () => {
+  const navigate = useNavigate();
 
   return (
-    <div className="text-center py-20">
-      <h1 className="text-5xl font-bold text-white mb-4">
-        Welcome to NELIE
-      </h1>
-      <p className="text-xl text-gray-300 mb-4">
-        Your personal platform for learning and growth.
-      </p>
-      <p className="text-lg text-gray-400 mb-8">
-        Meet Nelie - your AI tutor who guides you through your daily learning program
-      </p>
-      <div className="flex flex-col items-center space-y-6">
-        <DateWidget className="max-w-xs" />
-        <Button
-          size="lg"
-          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white text-xl px-12 py-6 h-16 font-semibold"
-          onClick={handleGetStartedClick}
-        >
-          Click here to go to today's lessons
-        </Button>
+    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 transform rotate-12 scale-150"></div>
       </div>
-    </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Text Content */}
+          <div className="text-left lg:text-left">
+            <TextWithSpeaker 
+              text="Welcome to the Future of Learning" 
+              context="hero-title"
+              showOnHover={false}
+            >
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                Welcome to the Future of{" "}
+                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Learning
+                </span>
+              </h1>
+            </TextWithSpeaker>
+
+            <TextWithSpeaker 
+              text="Meet Nelie, your AI-powered learning companion. Experience personalized education that adapts to your unique learning style, making every lesson engaging and effective." 
+              context="hero-description"
+              className="mb-8"
+            >
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                Meet <strong className="text-blue-400">Nelie</strong>, your AI-powered learning companion. 
+                Experience personalized education that adapts to your unique learning style, 
+                making every lesson engaging and effective.
+              </p>
+            </TextWithSpeaker>
+
+            <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
+              <Button
+                onClick={() => navigate("/education/mathematics")}
+                size="lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Start Learning Now
+              </Button>
+              
+              <Button
+                onClick={() => navigate("/ai-tutor")}
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+              >
+                Chat with Nelie
+              </Button>
+            </div>
+          </div>
+
+          {/* Nelie Avatar */}
+          <div className="flex justify-center lg:justify-end">
+            <NelieAvatarDisplay />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 

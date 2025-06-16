@@ -1,6 +1,8 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
 const SubjectsSection = () => {
   const navigate = useNavigate();
@@ -9,113 +11,139 @@ const SubjectsSection = () => {
     {
       title: "Mathematics",
       description: "Master advanced mathematical concepts through AI-powered personalized learning paths with real-world problem solving.",
-      icon: "🔢",
-      color: "from-blue-500 to-cyan-500",
-      route: "/learn/mathematics",
-      skills: ["Algebra", "Geometry", "Statistics"],
+      keyAreas: ["Algebra", "Geometry", "Statistics"],
+      path: "/education/mathematics",
+      gradient: "from-blue-600 to-purple-600",
+      icon: "📐"
     },
     {
       title: "English Language Arts",
       description: "Develop exceptional reading, writing, and communication skills through immersive storytelling and creative expression.",
-      icon: "📚",
-      color: "from-purple-500 to-violet-500",
-      route: "/learn/english",
-      skills: ["Creative Writing", "Literature", "Grammar"],
+      keyAreas: ["Creative Writing", "Literature", "Grammar"],
+      path: "/education/english",
+      gradient: "from-green-600 to-teal-600",
+      icon: "📚"
     },
     {
       title: "Science & Technology",
       description: "Explore the wonders of science through virtual experiments, simulations, and hands-on discovery learning.",
-      icon: "🔬",
-      color: "from-green-500 to-emerald-500",
-      route: "/learn/science",
-      skills: ["Physics", "Chemistry", "Biology"],
-    },  
+      keyAreas: ["Physics", "Chemistry", "Biology"],
+      path: "/education/science",
+      gradient: "from-purple-600 to-pink-600",
+      icon: "🔬"
+    },
     {
       title: "Computer Science",
       description: "Learn programming, AI, and computational thinking through gamified coding challenges and real projects.",
-      icon: "💻",
-      color: "from-indigo-500 to-purple-500",
-      route: "/learn/computer-science",
-      skills: ["Programming", "Algorithms", "AI/ML"],
+      keyAreas: ["Programming", "Algorithms", "AI/ML"],
+      path: "/education/computer-science",
+      gradient: "from-indigo-600 to-blue-600",
+      icon: "💻"
     },
     {
       title: "Creative Arts",
       description: "Express your creativity through digital art, music composition, and multimedia storytelling projects.",
-      icon: "🎨",
-      color: "from-pink-500 to-rose-500",
-      route: "/learn/creative-arts",
-      skills: ["Digital Art", "Music Theory", "Design"],
+      keyAreas: ["Digital Art", "Music Theory", "Design"],
+      path: "/education/creative-arts",
+      gradient: "from-pink-600 to-red-600",
+      icon: "🎨"
     },
     {
       title: "Music Discovery",
       description: "Explore rhythm, melody, and composition through interactive music theory and digital instrument mastery.",
-      icon: "🎵",
-      color: "from-orange-500 to-yellow-500",
-      route: "/learn/music",
-      skills: ["Music Theory", "Composition", "Performance"],
+      keyAreas: ["Music Theory", "Composition", "Performance"],
+      path: "/education/music",
+      gradient: "from-orange-600 to-yellow-600",
+      icon: "🎵"
     }
   ];
 
-  const handleSubjectClick = (route: string) => {
-    navigate(route);
-  };
-
   return (
-    <section className="py-20 bg-gray-800">
+    <section className="py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            World-Class AI-Powered Education
-          </h2>
-          <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-            Experience personalized learning that adapts to your pace, interests, and learning style. 
-            Each subject features engaging content, interactive activities, and real-world applications.
-          </p>
+        <div className="text-center mb-12">
+          <TextWithSpeaker 
+            text="Choose Your Learning Adventure" 
+            context="subjects-section-title"
+            showOnHover={false}
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Choose Your Learning Adventure
+            </h2>
+          </TextWithSpeaker>
+          <TextWithSpeaker 
+            text="Dive into interactive lessons tailored to your learning style" 
+            context="subjects-section-subtitle"
+            showOnHover={false}
+          >
+            <p className="text-xl text-gray-300">
+              Dive into interactive lessons tailored to your learning style
+            </p>
+          </TextWithSpeaker>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {subjects.map((subject, index) => (
-            <Card 
-              key={index} 
-              className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-all duration-300 hover:scale-105 cursor-pointer group"
-              onClick={() => handleSubjectClick(subject.route)}
-            >
-              <CardHeader className="pb-6">
-                <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${subject.color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
-                  {subject.icon}
+            <Card key={index} className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">{subject.icon}</span>
+                  <TextWithSpeaker 
+                    text={subject.title} 
+                    context={`subject-title-${index}`}
+                    showOnHover={false}
+                  >
+                    <h3 className="text-xl font-bold text-white">
+                      {subject.title}
+                    </h3>
+                  </TextWithSpeaker>
                 </div>
-                <CardTitle className="text-white text-2xl mb-3 font-bold">{subject.title}</CardTitle>
-                <p className="text-gray-300 leading-relaxed text-base">{subject.description}</p>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <h4 className="text-white font-medium text-sm">Key Areas:</h4>
-                  <div className="grid grid-cols-1 gap-2">
-                    {subject.skills.map((skill, idx) => (
-                      <div 
-                        key={idx} 
-                        className="text-gray-300 text-sm flex items-center"
-                      >
-                        <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${subject.color} mr-3 flex-shrink-0`}></div>
-                        {skill}
-                      </div>
+                
+                <TextWithSpeaker 
+                  text={subject.description} 
+                  context={`subject-description-${index}`}
+                  className="mb-4"
+                >
+                  <p className="text-gray-300 mb-4">
+                    {subject.description}
+                  </p>
+                </TextWithSpeaker>
+
+                <div className="mb-6">
+                  <TextWithSpeaker 
+                    text="Key Areas:" 
+                    context={`subject-key-areas-label-${index}`}
+                    showOnHover={false}
+                  >
+                    <h4 className="text-sm font-semibold text-gray-400 mb-2">
+                      Key Areas:
+                    </h4>
+                  </TextWithSpeaker>
+                  <ul className="space-y-1">
+                    {subject.keyAreas.map((area, areaIndex) => (
+                      <li key={areaIndex} className="flex items-center text-sm text-gray-300">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                        <TextWithSpeaker 
+                          text={area} 
+                          context={`subject-key-area-${index}-${areaIndex}`}
+                          showOnHover={false}
+                        >
+                          <span>{area}</span>
+                        </TextWithSpeaker>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
+
+                <Button
+                  onClick={() => navigate(subject.path)}
+                  className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity`}
+                >
+                  Start Learning
+                </Button>
               </CardContent>
             </Card>
           ))}
-        </div>
-        
-        <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl p-8 border border-purple-500/20">
-            <h3 className="text-2xl font-bold text-white mb-4">AI-Powered Personalization</h3>
-            <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-              Our advanced AI system continuously adapts to your learning patterns, ensuring optimal challenge levels, 
-              personalized content recommendations, and intelligent progress tracking across all subjects.
-            </p>
-          </div>
         </div>
       </div>
     </section>

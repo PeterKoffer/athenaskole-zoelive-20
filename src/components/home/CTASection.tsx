@@ -1,34 +1,50 @@
 
 import { Button } from "@/components/ui/button";
-import DateWidget from "./DateWidget";
+import { useNavigate } from "react-router-dom";
+import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
-interface CTASectionProps {
-  onGetStarted: () => void;
-}
-
-const CTASection = ({ onGetStarted }: CTASectionProps) => {
-  const handleGetStartedClick = () => {
-    console.log("CTASection Get Started button clicked");
-    onGetStarted();
-  };
+const CTASection = () => {
+  const navigate = useNavigate();
 
   return (
-    <section className="py-16 relative z-10">
-      <div className="text-center">
-        <h2 className="text-3xl font-semibold text-white mb-4">
-          Ready to start your daily learning?
-        </h2>
-        <p className="text-gray-400 mb-8">
-          Your personalized program is waiting! Nelie has prepared today's lessons just for you.
-        </p>
-        <div className="flex flex-col items-center space-y-6">
-          <DateWidget className="max-w-xs" />
+    <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <TextWithSpeaker 
+          text="Ready to Transform Your Learning Experience?" 
+          context="cta-title"
+          showOnHover={false}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Transform Your Learning Experience?
+          </h2>
+        </TextWithSpeaker>
+        
+        <TextWithSpeaker 
+          text="Join thousands of students who have already discovered the power of AI-enhanced education with Nelie." 
+          context="cta-description"
+          className="mb-8"
+        >
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of students who have already discovered the power of AI-enhanced education with Nelie.
+          </p>
+        </TextWithSpeaker>
+        
+        <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
           <Button
+            onClick={() => navigate("/education/mathematics")}
             size="lg"
-            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white relative z-10 text-xl px-12 py-6 h-16 font-semibold"
-            onClick={handleGetStartedClick}
+            className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
           >
-            Click here to start today's schoolday
+            Start Your Journey
+          </Button>
+          
+          <Button
+            onClick={() => navigate("/progress")}
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+          >
+            View Progress Dashboard
           </Button>
         </div>
       </div>
