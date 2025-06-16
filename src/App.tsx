@@ -14,7 +14,7 @@ import ScienceLearning from "./components/education/ScienceLearning";
 import MusicLearning from "./components/education/MusicLearning";
 import CreativeArtsLearning from "./components/education/CreativeArtsLearning";
 import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
-import FloatingAITutor from "./components/floating-ai-tutor/FloatingAITutor";
+import FloatingAITutor from "./components/FloatingAITutor";
 
 const queryClient = new QueryClient();
 
