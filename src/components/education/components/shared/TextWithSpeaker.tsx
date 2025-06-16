@@ -9,6 +9,7 @@ interface TextWithSpeakerProps {
   className?: string;
   buttonClassName?: string;
   showOnHover?: boolean;
+  position?: 'inline' | 'corner';
 }
 
 const TextWithSpeaker = ({ 
@@ -17,7 +18,8 @@ const TextWithSpeaker = ({
   context = 'text-content',
   className = '',
   buttonClassName = '',
-  showOnHover = true
+  showOnHover = true,
+  position = 'inline'
 }: TextWithSpeakerProps) => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
@@ -28,6 +30,23 @@ const TextWithSpeaker = ({
       await speakAsNelie(text, true, context);
     }
   };
+
+  if (position === 'corner') {
+    return (
+      <div className={`relative ${className}`}>
+        <button
+          onClick={handleSpeak}
+          className={`absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-white/10 transition-all ${
+            showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-70 hover:opacity-100'
+          } ${buttonClassName}`}
+          title="Ask Nelie to read this"
+        >
+          <Volume2 className="w-4 h-4 text-white" />
+        </button>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-start justify-between ${showOnHover ? 'group' : ''} ${className}`}>
