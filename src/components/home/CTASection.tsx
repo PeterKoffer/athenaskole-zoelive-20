@@ -30,7 +30,7 @@ const CTASection = ({
         </TextWithSpeaker>
         
         <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-          <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105">
+          <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto bg-white hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 text-slate-950">
             Start Your Journey
           </Button>
           
