@@ -2,7 +2,6 @@
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { BarChart3, BookOpen, Gamepad2, Sparkles } from "lucide-react";
-import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
 const FeaturesSection = () => {
   const features = [
@@ -36,47 +35,23 @@ const FeaturesSection = () => {
     <section className="py-16 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <TextWithSpeaker 
-            text="AI-Powered Personalization" 
-            context="ai-personalization-title"
-            showOnHover={false}
-          >
-            <h2 className="text-3xl font-bold text-white mb-4">
-              AI-Powered Personalization
-            </h2>
-          </TextWithSpeaker>
-          <TextWithSpeaker 
-            text="Our advanced AI system continuously adapts to your learning patterns, ensuring optimal challenge levels, personalized content recommendations, and intelligent progress tracking across all subjects." 
-            context="ai-personalization-description"
-            className="mb-8"
-          >
-            <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-8">
-              Our advanced AI system continuously adapts to your learning patterns, ensuring optimal 
-              challenge levels, personalized content recommendations, and intelligent progress tracking 
-              across all subjects.
-            </p>
-          </TextWithSpeaker>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            AI-Powered Personalization
+          </h2>
+          <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-8">
+            Our advanced AI system continuously adapts to your learning patterns, ensuring optimal 
+            challenge levels, personalized content recommendations, and intelligent progress tracking 
+            across all subjects.
+          </p>
         </div>
 
         <div className="mb-16">
-          <TextWithSpeaker 
-            text="Features" 
-            context="features-title"
-            showOnHover={false}
-          >
-            <h3 className="text-2xl font-bold text-white text-center mb-4">
-              Features
-            </h3>
-          </TextWithSpeaker>
-          <TextWithSpeaker 
-            text="Experience the many ways Nelie can help you learn." 
-            context="features-subtitle"
-            showOnHover={false}
-          >
-            <p className="text-gray-400 text-center mb-8">
-              Experience the many ways Nelie can help you learn.
-            </p>
-          </TextWithSpeaker>
+          <h3 className="text-2xl font-bold text-white text-center mb-4">
+            Features
+          </h3>
+          <p className="text-gray-400 text-center mb-8">
+            Experience the many ways Nelie can help you learn.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
