@@ -1,8 +1,10 @@
+
 import OptimizedQuestionActivity from '../OptimizedQuestionActivity';
 import MathLessonHeader from './MathLessonHeader';
 import MathLessonControlPanel from './MathLessonControlPanel';
 import MentalMathStrategies from './MentalMathStrategies';
 import MathLessonContentRenderer from './MathLessonContentRenderer';
+import EnhancedActivityRenderer from '../EnhancedActivityRenderer';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
@@ -102,31 +104,12 @@ const MathLearningMainContent = ({
           <div className="w-full max-w-4xl mx-auto">
             {currentActivity ? (
               <div className="space-y-6">
-                {currentActivity.type === 'interactive-game' ? (
-                  <OptimizedQuestionActivity
-                    subject="mathematics"
-                    skillArea="general_math"
-                    difficultyLevel={2}
-                    onComplete={handleActivityCompleteWithAdvancement}
-                    questionNumber={currentActivityIndex + 1}
-                    totalQuestions={totalRealActivities}
-                  />
-                ) : (
-                  <>
-                    {currentActivity.title?.toLowerCase().includes('mental math strategies') ? (
-                      <MentalMathStrategies
-                        studentName={studentName}
-                        onComplete={() => handleActivityCompleteWithAdvancement()}
-                      />
-                    ) : (
-                      <MathLessonContentRenderer
-                        activity={currentActivity}
-                        studentName={studentName}
-                        onComplete={() => handleActivityCompleteWithAdvancement()}
-                      />
-                    )}
-                  </>
-                )}
+                {/* Use the enhanced activity renderer for better handling */}
+                <EnhancedActivityRenderer
+                  activity={currentActivity}
+                  onActivityComplete={handleActivityCompleteWithAdvancement}
+                  isNelieReady={true}
+                />
                 
                 {/* Beautiful, elegant progression indicator */}
                 <div className="text-center space-y-4 mt-8">

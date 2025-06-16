@@ -31,6 +31,18 @@ const EnhancedActivityRenderer = ({
     contentKeys: activity.content ? Object.keys(activity.content) : []
   });
 
+  // Force render interactive game for Math Battle Arena and similar activities
+  if (activity.title?.includes('Battle') || activity.title?.includes('Arena') || 
+      activity.title?.includes('Quiz') || activity.title?.includes('Challenge')) {
+    console.log('🎮 Rendering as interactive quiz for battle/arena activity');
+    return (
+      <ActivityInteractiveQuiz
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
   // NEW ENGAGING ACTIVITY TYPES - Check for these first!
   if (activity.content?.battleScenario || activity.title.includes('Battle') || activity.title.includes('Arena')) {
     return (
@@ -62,6 +74,17 @@ const EnhancedActivityRenderer = ({
   if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || activity.title.includes('Mystery')) {
     return (
       <ActivityPuzzleQuest
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Interactive game type - this should handle most math activities
+  if (activity.type === 'interactive-game' || activity.phase === 'interactive-game') {
+    console.log('🎮 Rendering as interactive game');
+    return (
+      <ActivityInteractiveGame
         activity={activity}
         onActivityComplete={onActivityComplete}
       />
@@ -126,20 +149,12 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  if (activity.phase === 'interactive-game' || activity.type === 'interactive-game') {
-    return (
-      <ActivityInteractiveGame
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
-
-  // Default fallback for any other activity type
+  // Default fallback - but make it more interactive
+  console.log('⚠️ Using fallback renderer for activity:', activity.title);
   return (
-    <ActivityFallback
+    <ActivityInteractiveGame
       activity={activity}
-      onActivityComplete={() => onActivityComplete()}
+      onActivityComplete={onActivityComplete}
     />
   );
 };
