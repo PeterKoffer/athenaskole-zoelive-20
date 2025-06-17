@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Play, Pause, Home } from 'lucide-react';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
@@ -164,17 +164,29 @@ const UniversalLearningMainContent = ({
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
-          {/* Header Section */}
+          {/* Header Section with Home button */}
           <div className="flex items-center justify-between">
-            <Button
-              onClick={onBackToProgram}
-              variant="outline"
-              size="sm"
-              className="border-gray-400 text-white hover:bg-gray-700 bg-black/50"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                onClick={() => window.location.href = '/'}
+                variant="outline"
+                size="sm"
+                className="border-gray-400 text-white hover:bg-gray-700 bg-black/50"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
+              
+              <Button
+                onClick={onBackToProgram}
+                variant="outline"
+                size="sm"
+                className="border-gray-400 text-white hover:bg-gray-700 bg-black/50"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </div>
             
             <div className="flex items-center space-x-2">
               <Button
@@ -236,21 +248,13 @@ const UniversalLearningMainContent = ({
                 </ul>
               </div>
 
-              {/* Ready Section */}
-              <div className="bg-purple-900/30 border border-purple-400/30 rounded-lg p-6 mb-6 text-center">
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-300 font-semibold">{subjectContent.readyMessage}</span>
-                </div>
-                <p className="text-purple-200">{subjectContent.lessonInfo}</p>
-              </div>
-
-              {/* Action Buttons */}
+              {/* Action Buttons - NO purple ready box here */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Button
                   onClick={handleStartIntroductionWithNelie}
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold px-6 py-3"
                 >
+                  <Play className="w-4 h-4 mr-2" />
                   Start Introduction with Nelie
                 </Button>
                 

@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
@@ -27,7 +28,7 @@ import TeacherCommunicationsPage from '@/pages/TeacherCommunicationsPage';
 import AnnouncementsPage from '@/pages/AnnouncementsPage';
 
 // Import learning components
-import EnhancedEnglishLearning from '@/components/education/EnhancedEnglishLearning';
+import EnhancedMathematicsLearning from '@/components/education/EnhancedMathematicsLearning';
 import LanguageLearning from '@/components/LanguageLearning';
 import UniversalLearning from '@/components/education/UniversalLearning';
 
@@ -64,8 +65,8 @@ function AppRoutes() {
         <Route path="/teacher-communications" element={<TeacherCommunicationsPage />} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
         
-        {/* Learning activity routes - all now use UniversalLearning with classroom images */}
-        <Route path="/learn/mathematics" element={<UniversalLearning subject="mathematics" skillArea="general_math" />} />
+        {/* Learning activity routes - mathematics uses the working component */}
+        <Route path="/learn/mathematics" element={<EnhancedMathematicsLearning />} />
         <Route path="/learn/english" element={<UniversalLearning subject="english" skillArea="general_english" />} />
         <Route path="/learn/music" element={<UniversalLearning subject="music" skillArea="general_music" />} />
         <Route path="/learn/science" element={<UniversalLearning subject="science" skillArea="general_science" />} />
