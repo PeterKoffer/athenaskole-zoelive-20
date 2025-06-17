@@ -6,19 +6,19 @@ import OptimizedMathLearningContent from "./components/math/OptimizedMathLearnin
 
 const EnhancedMathematicsLearning = () => {
   const navigate = useNavigate();
-  const { stop: stopSpeaking } = useUnifiedSpeech();
+  const { forceStopAll } = useUnifiedSpeech();
   
   // Stop speech when component unmounts (navigating away)
   useEffect(() => {
     return () => {
       console.log('🔇 Stopping Nelie speech due to navigation away from math lesson');
-      stopSpeaking();
+      forceStopAll();
     };
-  }, [stopSpeaking]);
+  }, [forceStopAll]);
   
   const handleBackToProgram = () => {
     console.log('🔇 Stopping Nelie speech before navigating back to program');
-    stopSpeaking();
+    forceStopAll();
     navigate('/daily-program');
   };
 
