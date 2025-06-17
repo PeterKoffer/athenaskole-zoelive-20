@@ -29,15 +29,19 @@ const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivit
   const IconComponent = activity.icon;
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
+  // Extract proper subject and skillArea from activity
+  const activitySubject = activity.subject || activity.id || 'general';
+  const activitySkillArea = activity.skillArea || 'mixed_topics';
+
   console.log('🎯 Activity card rendering:', {
     id: activity.id,
     title: activity.title,
-    subject: activity.subject,
-    skillArea: activity.skillArea
+    subject: activitySubject,
+    skillArea: activitySkillArea
   });
 
   const handleStartActivity = () => {
-    console.log(`🚀 Starting activity: ${activity.id} - ${activity.title}`);
+    console.log(`🚀 Starting activity: ${activity.id} - ${activity.title} (Subject: ${activitySubject}, Skill: ${activitySkillArea})`);
     onStartActivity(activity.id);
   };
 
