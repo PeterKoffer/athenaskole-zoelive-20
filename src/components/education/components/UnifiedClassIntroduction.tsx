@@ -1,17 +1,14 @@
-import { useMemo } from 'react';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Volume2, VolumeX, Play } from 'lucide-react';
+import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
+import { getSubjectIntroduction } from './utils/subjectIntroductions';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
-import { getSubjectIntroduction } from './utils/subjectIntroductions';
-import { useNavigate } from 'react-router-dom';
-import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import { useStudentName } from './math/hooks/useStudentName';
-
-import UnifiedClassIntroductionHeader from './UnifiedClassIntroductionHeader';
-import UnifiedClassIntroductionProgress from './UnifiedClassIntroductionProgress';
+import IntroductionHeader from './IntroductionHeader';
 import IntroductionContent from './introduction/IntroductionContent';
-import UnifiedClassIntroductionControls from './UnifiedClassIntroductionControls';
-import Blackboard from './shared/Blackboard';
 
 interface UnifiedClassIntroductionProps {
   subject: string;
@@ -26,22 +23,16 @@ const UnifiedClassIntroduction = ({
   skillArea,
   userLevel,
   onIntroductionComplete,
-  isAdvancing,
+  isAdvancing
 }: UnifiedClassIntroductionProps) => {
-  const studentName = useStudentName();
-  const classroomConfig = getClassroomConfig(subject);
-  const introduction = useMemo(
-    () => getSubjectIntroduction(subject, skillArea, userLevel, studentName),
-    [subject, skillArea, userLevel, studentName]
-  );
-  const navigate = useNavigate();
-
-  const { stop } = useUnifiedSpeech();
-
+  const [userName, setUserName] = useState('Student');
+  
+  // Get subject-specific introduction content
+  const introduction = getSubjectIntroduction(subject, skillArea, userLevel, userName);
+  
   const {
     hasStarted,
     currentSection,
-    userName,
     canProceedWithoutSpeech,
     currentContent,
     isComplete,
@@ -53,92 +44,83 @@ const UnifiedClassIntroduction = ({
     handleSkip,
     handleStartLesson,
     handleProceedWithoutSpeech,
-    toggleEnabled,
+    toggleEnabled
   } = useIntroductionLogic({
     introduction,
     subject,
-    onIntroductionComplete,
+    onIntroductionComplete
   });
 
-  if (!introduction || !currentContent) {
-    return (
-      <ClassroomEnvironment config={classroomConfig}>
-        <div className="w-full max-w-4xl mx-auto px-4 py-6">
-          <div className="bg-gray-800/80 border-gray-700 rounded-lg p-8 text-center backdrop-blur-sm">
-            <div className="animate-pulse">
-              <div className="w-12 h-12 bg-blue-400 rounded-full mx-auto mb-4"></div>
-              <h3 className="text-white text-lg font-semibold mb-2">
-                Preparing Your Introduction
-              </h3>
-              <p className="text-gray-400">Setting up your learning experience...</p>
-            </div>
-          </div>
-        </div>
-      </ClassroomEnvironment>
-    );
-  }
+  const classroomConfig = getClassroomConfig(subject);
 
-  // Handler for Home/Back navigation
-  const handleHome = () => {
-    stop();
-    navigate('/daily-program');
-  };
-
-  // Handler for "Start Lesson Without Speech" - must stop speech, then proceed.
-  
+  console.log('🎭 UnifiedClassIntroduction:', {
+    subject,
+    skillArea,
+    hasStarted,
+    currentSection,
+    isComplete,
+    isSpeaking,
+    canProceedWithoutSpeech
+  });
 
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
-        <UnifiedClassIntroductionHeader
-          userName={userName}
-          subject={subject}
-          isSpeaking={isSpeaking}
-        />
+        <Card className="bg-black/50 border-purple-400/50 backdrop-blur-sm">
+          <CardContent className="p-8">
+            <IntroductionHeader subject={subject} isSpeaking={isSpeaking} />
+            
+            <IntroductionContent
+              currentStepText={currentContent.text}
+              currentStep={currentSection}
+              totalSteps={introduction.sections.length}
+              autoReadEnabled={isEnabled}
+              isSpeaking={isSpeaking}
+              isIntroductionComplete={isComplete}
+              subject={subject}
+              onMuteToggle={toggleEnabled}
+              onManualRead={handleManualRead}
+              onStartLesson={handleStartLesson}
+            />
 
-        <UnifiedClassIntroductionProgress
-          sections={introduction.sections}
-          currentSection={currentSection}
-        />
+            {/* Start buttons */}
+            {!hasStarted && (
+              <div className="flex justify-center gap-4 mt-6">
+                <Button
+                  onClick={handleManualStart}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium px-6 py-2"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Start Introduction with Nelie
+                </Button>
+                
+                {canProceedWithoutSpeech && (
+                  <Button
+                    onClick={handleProceedWithoutSpeech}
+                    variant="outline"
+                    className="border-purple-400 bg-white text-black hover:bg-gray-100 hover:text-black font-medium"
+                  >
+                    Start Lesson Without Speech
+                  </Button>
+                )}
+              </div>
+            )}
 
-        {/* Standardized blackboard-style introduction sign */}
-        <Blackboard>
-          <IntroductionContent
-            currentStepText={currentContent.text}
-            currentStep={currentSection}
-            totalSteps={introduction.sections.length}
-            autoReadEnabled={isEnabled}
-            isSpeaking={isSpeaking}
-            isIntroductionComplete={isComplete}
-            onMuteToggle={toggleEnabled}
-            onManualRead={handleManualRead}
-            onStartLesson={handleStartLesson}
-          />
-          <UnifiedClassIntroductionControls
-            hasStarted={hasStarted}
-            canProceedWithoutSpeech={canProceedWithoutSpeech}
-            isEnabled={isEnabled}
-            isSpeaking={isSpeaking}
-            isComplete={isComplete}
-            hasUserInteracted={hasUserInteracted}
-            handleManualStart={handleManualStart}
-            handleManualRead={handleManualRead}
-            toggleEnabled={toggleEnabled}
-            onIntroductionComplete={onIntroductionComplete}
-            handleStartLesson={handleStartLesson}
-            handleSkip={handleSkip}
-            // Home and ProceedWithoutSpeech involve forcing speech to stop first!
-            handleHome={handleHome}
-            handleProceedWithoutSpeech={handleProceedWithoutSpeech}
-            isAdvancing={isAdvancing}
-          />
-        </Blackboard>
-        {/* 
-          If you need pixel-perfect "lock" to board:
-          - Change mx-auto to absolute positioning with top/left if your background never changes
-          - Or manually tweak marginTop (via style) to align
-          - But centering with mx-auto + p-6 looks good at all screen sizes
-        */}
+            {/* Skip button when introduction is running */}
+            {hasStarted && !isComplete && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  onClick={handleSkip}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-400 text-gray-300 hover:bg-gray-700"
+                >
+                  Skip Introduction
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </ClassroomEnvironment>
   );

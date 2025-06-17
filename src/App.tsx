@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
@@ -29,6 +28,7 @@ import AnnouncementsPage from '@/pages/AnnouncementsPage';
 // Import learning components
 import EnhancedEnglishLearning from '@/components/education/EnhancedEnglishLearning';
 import LanguageLearning from '@/components/LanguageLearning';
+import UniversalLearning from '@/components/education/UniversalLearning';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,6 +65,10 @@ function AppRoutes() {
         
         {/* Learning activity routes */}
         <Route path="/learn/english" element={<EnhancedEnglishLearning />} />
+        <Route path="/learn/music" element={<UniversalLearning subject="music" skillArea="general_music" />} />
+        <Route path="/learn/science" element={<UniversalLearning subject="science" skillArea="general_science" />} />
+        <Route path="/learn/computer-science" element={<UniversalLearning subject="computer-science" skillArea="general_programming" />} />
+        <Route path="/learn/creative-arts" element={<UniversalLearning subject="creative-arts" skillArea="general_arts" />} />
         <Route path="/learn/spanish" element={<LanguageLearning initialLanguage="spanish" />} />
         <Route path="/learn/french" element={<LanguageLearning initialLanguage="french" />} />
         <Route path="/learn/german" element={<LanguageLearning initialLanguage="german" />} />

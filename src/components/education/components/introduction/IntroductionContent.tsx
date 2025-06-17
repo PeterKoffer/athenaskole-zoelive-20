@@ -10,6 +10,7 @@ interface IntroductionContentProps {
   autoReadEnabled: boolean;
   isSpeaking: boolean;
   isIntroductionComplete: boolean;
+  subject: string;
   onMuteToggle: () => void;
   onManualRead: () => void;
   onStartLesson: () => void;
@@ -22,24 +23,81 @@ const IntroductionContent = ({
   autoReadEnabled,
   isSpeaking,
   isIntroductionComplete,
+  subject,
   onMuteToggle,
   onManualRead,
   onStartLesson
 }: IntroductionContentProps) => {
+  // Get subject-specific content
+  const getSubjectContent = (subjectName: string) => {
+    switch (subjectName.toLowerCase()) {
+      case 'english':
+        return {
+          emoji: '📚',
+          title: `${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)} with Nelie!`,
+          description: 'Ready for an amazing language and literature adventure?',
+          welcomeText: 'Welcome to the World of Words and Stories. Meet Nelie, your AI-powered learning companion. Experience personalized English learning that adapts to your unique style, making every lesson engaging and effective.',
+          tips: 'English Learning Tips: Take your time reading and understanding - there\'s no rush! Ask Nelie to repeat if you need to hear something again. Language is like exploring new worlds - have fun with it! Every new word you learn opens new possibilities.'
+        };
+      case 'music':
+        return {
+          emoji: '🎵',
+          title: `${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)} with Nelie!`,
+          description: 'Ready for an amazing musical adventure?',
+          welcomeText: 'Welcome to the Beautiful World of Music. Meet Nelie, your AI-powered learning companion. Experience personalized music education that adapts to your unique learning style, making every lesson harmonious and engaging.',
+          tips: 'Music Learning Tips: Listen carefully to different sounds and rhythms! Ask Nelie to play examples if you need to hear them again. Music is about feeling and expression - let your creativity flow! Every note you learn brings you closer to making beautiful music.'
+        };
+      case 'science':
+        return {
+          emoji: '🔬',
+          title: `${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)} with Nelie!`,
+          description: 'Ready for an amazing scientific discovery adventure?',
+          welcomeText: 'Welcome to the Fascinating World of Science. Meet Nelie, your AI-powered learning companion. Experience personalized science education that adapts to your curiosity, making every lesson an exciting exploration.',
+          tips: 'Science Learning Tips: Be curious and ask lots of questions! Ask Nelie to explain if something seems confusing. Science is about discovering how things work - experiment and explore! Every discovery you make helps you understand the world better.'
+        };
+      case 'computer-science':
+        return {
+          emoji: '💻',
+          title: `${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)} with Nelie!`,
+          description: 'Ready for an amazing coding and technology adventure?',
+          welcomeText: 'Welcome to the Exciting World of Technology. Meet Nelie, your AI-powered learning companion. Experience personalized computer science education that adapts to your learning style, making programming fun and accessible.',
+          tips: 'Programming Learning Tips: Think step by step through problems! Ask Nelie to explain code if you get stuck. Programming is like solving puzzles - be patient and creative! Every line of code you write brings your ideas to life.'
+        };
+      case 'creative-arts':
+        return {
+          emoji: '🎨',
+          title: `${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)} with Nelie!`,
+          description: 'Ready for an amazing artistic adventure?',
+          welcomeText: 'Welcome to the Colorful World of Creative Arts. Meet Nelie, your AI-powered learning companion. Experience personalized art education that nurtures your creativity, making every lesson an artistic journey.',
+          tips: 'Art Learning Tips: Express yourself freely and creatively! Ask Nelie for inspiration when you need ideas. Art is about personal expression - there are no wrong answers! Every creation you make is unique and valuable.'
+        };
+      default:
+        return {
+          emoji: '🔢',
+          title: 'Mathematics with Nelie!',
+          description: 'Ready for an amazing math adventure?',
+          welcomeText: 'Welcome to the Future of Learning. Meet Nelie, your AI-powered learning companion. Experience personalized education that adapts to your unique learning style, making every lesson engaging and effective.',
+          tips: 'Math Learning Tips: Take your time with each problem - there\'s no rush! Ask Nelie to repeat if you need to hear something again. Math is like solving puzzles - have fun with it! Every mistake is a chance to learn something new.'
+        };
+    }
+  };
+
+  const subjectContent = getSubjectContent(subject);
+
   return (
     <div className="space-y-6">
       {/* Welcome Message */}
       <TextWithSpeaker
-        text="Welcome to the Future of Learning. Meet Nelie, your AI-powered learning companion. Experience personalized education that adapts to your unique learning style, making every lesson engaging and effective."
-        context="math-welcome-message"
+        text={subjectContent.welcomeText}
+        context={`${subject}-welcome-message`}
         position="corner"
         showOnHover={false}
       >
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">🔢</div>
-          <h1 className="text-4xl font-bold text-white mb-4">Mathematics with Nelie!</h1>
+          <div className="text-6xl mb-4">{subjectContent.emoji}</div>
+          <h1 className="text-4xl font-bold text-white mb-4">{subjectContent.title}</h1>
           <div className="text-2xl text-purple-200 mb-6">
-            Ready for an amazing math adventure?
+            {subjectContent.description}
           </div>
         </div>
       </TextWithSpeaker>
@@ -71,23 +129,22 @@ const IntroductionContent = ({
         </div>
       </TextWithSpeaker>
 
-      {/* Math Tips Section */}
+      {/* Subject-specific Tips Section */}
       <TextWithSpeaker
-        text="Math Learning Tips: Take your time with each problem - there's no rush! Ask Nelie to repeat if you need to hear something again. Math is like solving puzzles - have fun with it! Every mistake is a chance to learn something new."
-        context="math-learning-tips"
+        text={subjectContent.tips}
+        context={`${subject}-learning-tips`}
         position="corner"
         showOnHover={false}
       >
         <div className="bg-yellow-900/30 border border-yellow-400/30 rounded-lg p-6">
           <h3 className="text-yellow-200 font-bold text-lg mb-4 flex items-center">
             <span className="text-2xl mr-2">💡</span>
-            Math Learning Tips
+            {subject.charAt(0).toUpperCase() + subject.slice(1)} Learning Tips
           </h3>
           <ul className="space-y-2 text-yellow-100">
-            <li>• Take your time with each problem - there's no rush!</li>
-            <li>• Ask Nelie to repeat if you need to hear something again</li>
-            <li>• Math is like solving puzzles - have fun with it!</li>
-            <li>• Every mistake is a chance to learn something new</li>
+            {subjectContent.tips.split('! ').filter(tip => tip.trim()).map((tip, index) => (
+              <li key={index}>• {tip.trim()}{tip.endsWith('!') ? '' : '!'}</li>
+            ))}
           </ul>
         </div>
       </TextWithSpeaker>
