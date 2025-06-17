@@ -3,7 +3,6 @@ import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
 
 const SubjectsSection = () => {
   const navigate = useNavigate();
@@ -63,24 +62,12 @@ const SubjectsSection = () => {
     <section className="py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <TextWithSpeaker 
-            text="Choose Your Learning Adventure" 
-            context="subjects-section-title"
-            showOnHover={false}
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Choose Your Learning Adventure
-            </h2>
-          </TextWithSpeaker>
-          <TextWithSpeaker 
-            text="Dive into interactive lessons tailored to your learning style" 
-            context="subjects-section-subtitle"
-            showOnHover={false}
-          >
-            <p className="text-xl text-gray-300">
-              Dive into interactive lessons tailored to your learning style
-            </p>
-          </TextWithSpeaker>
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Choose Your Learning Adventure
+          </h2>
+          <p className="text-xl text-gray-300">
+            Dive into interactive lessons tailored to your learning style
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
