@@ -91,28 +91,6 @@ const IntroductionContent = ({
           </ul>
         </div>
       </TextWithSpeaker>
-
-      {/* Auto-advance message when complete - NO GREEN BOX */}
-      {isIntroductionComplete && (
-        <TextWithSpeaker
-          text="Ready to start your math adventure! Click the button below to begin."
-          context="lesson-start-message"
-          position="corner"
-          showOnHover={false}
-        >
-          <div className="text-center bg-blue-900/30 border border-blue-400/30 rounded-lg p-6">
-            <div className="text-blue-200 text-lg mb-4 font-medium">
-              🎉 Ready to start your math adventure!
-            </div>
-            <Button
-              onClick={onStartLesson}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-6 py-2"
-            >
-              Start Math Lesson
-            </Button>
-          </div>
-        </TextWithSpeaker>
-      )}
     </div>
   );
 };
