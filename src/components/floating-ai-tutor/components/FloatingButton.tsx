@@ -15,6 +15,20 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
   position,
   isDragging
 }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) {
+      onClick();
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onMouseDown(e);
+  };
+
   return (
     <div
       className="floating-tutor-container"
@@ -26,8 +40,8 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none'
       }}
-      onMouseDown={onMouseDown}
-      onClick={!isDragging ? onClick : undefined}
+      onMouseDown={handleMouseDown}
+      onClick={handleClick}
     >
       <RobotAvatar 
         size="3xl" 

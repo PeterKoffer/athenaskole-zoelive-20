@@ -92,21 +92,24 @@ const IntroductionContent = ({
         </div>
       </TextWithSpeaker>
 
-      {/* Auto-advance message when complete */}
+      {/* Auto-advance message when complete - NO COUNTDOWN */}
       {isIntroductionComplete && (
         <TextWithSpeaker
-          text="Ready to start your math adventure! Starting lesson automatically in 3 seconds..."
+          text="Ready to start your math adventure! Click the button below to begin."
           context="lesson-start-message"
           position="corner"
           showOnHover={false}
         >
-          <div className="text-center bg-green-900/30 border border-green-400/30 rounded-lg p-4">
-            <div className="text-green-200 text-lg mb-3 font-medium">
+          <div className="text-center bg-green-900/30 border border-green-400/30 rounded-lg p-6">
+            <div className="text-green-200 text-lg mb-4 font-medium">
               🎉 Ready to start your math adventure!
             </div>
-            <div className="text-green-300 text-sm">
-              Starting lesson automatically in 3 seconds...
-            </div>
+            <Button
+              onClick={onStartLesson}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-6 py-2"
+            >
+              Start Math Lesson
+            </Button>
           </div>
         </TextWithSpeaker>
       )}
