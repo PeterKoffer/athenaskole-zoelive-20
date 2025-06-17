@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { LessonActivity } from '../types/LessonTypes';
@@ -26,10 +25,13 @@ const StableActivityInteractiveQuiz = ({
       return null;
     }
 
+    // Convert readonly array to regular array for processing, but keep content stable
+    const optionsArray = Array.from(activity.content.options);
+
     // Return a completely stable object that will never change reference
     return {
       question: activity.content.question,
-      options: activity.content.options,
+      options: optionsArray, // Now a regular array
       correctAnswer: activity.content.correctAnswer,
       explanation: activity.content.explanation,
       battleScenario: activity.content.battleScenario,

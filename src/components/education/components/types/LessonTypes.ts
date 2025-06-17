@@ -27,7 +27,7 @@ export interface LessonActivity {
       explanation: string;
       checkQuestion?: {
         question: string;
-        options: string[];
+        options: readonly string[]; // Changed to readonly
         correctAnswer: number;
         explanation: string;
       };
@@ -37,7 +37,7 @@ export interface LessonActivity {
     gameType?: 'fill-blanks' | 'drag-drop' | 'true-false' | 'matching' | 'problem-solving' | 'adventure-game' | 'puzzle-quest' | 'creative-builder' | 'exploration-sim';
     gameInstructions?: string;
     question?: string;
-    options?: string[];
+    options?: readonly string[]; // Changed to readonly
     correctAnswer?: number;
     correct?: number;
     explanation?: string;
@@ -107,7 +107,7 @@ export interface LessonActivity {
     quickChallenge?: {
       type: 'drag-drop' | 'click-reveal' | 'mini-puzzle' | 'matching';
       instruction: string;
-      options: string[];
+      options: readonly string[]; // Changed to readonly
       correctAnswer: number | number[];
       celebration: string;
     };
@@ -154,7 +154,7 @@ export interface LessonActivity {
     whatNext?: string;
     selfAssessment?: {
       question: string;
-      options: string[];
+      options: readonly string[]; // Changed to readonly
       correctAnswer: number;
       explanation: string;
     };
