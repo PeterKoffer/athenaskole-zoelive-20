@@ -8,8 +8,10 @@ export const useStableLessonActivitiesInitializer = (
   skillArea: string,
   startTimer: () => void
 ) => {
-  const [allActivities, setAllActivities] = useState<LessonActivity[]>([]);
+  // Use useRef to store activities so they NEVER change reference
+  const activitiesRef = useRef<LessonActivity[]>([]);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [initializationComplete, setInitializationComplete] = useState(false);
   const lessonStartTime = useRef(Date.now());
   
   const { generateStableQuestion, sessionId } = useStableQuestionGeneration({
@@ -18,6 +20,11 @@ export const useStableLessonActivitiesInitializer = (
   });
 
   useEffect(() => {
+    // Only initialize once
+    if (initializationComplete) {
+      return;
+    }
+
     const initializeStableActivities = async () => {
       console.log(`🚀 Initializing STABLE ${subject} lesson (Session: ${sessionId})`);
       setIsInitializing(true);
@@ -32,54 +39,56 @@ export const useStableLessonActivitiesInitializer = (
           try {
             const stableQuestion = generateStableQuestion();
             
-            const activity: LessonActivity = {
+            // Create completely frozen activity object that will never change
+            const activity: LessonActivity = Object.freeze({
               id: stableQuestion.id,
               title: `Question ${i + 1}`,
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
-              metadata: {
+              metadata: Object.freeze({
                 subject: subject,
                 skillArea: skillArea,
                 templateId: stableQuestion.templateId
-              },
-              content: {
+              }),
+              content: Object.freeze({
                 question: stableQuestion.question,
-                options: stableQuestion.options,
+                options: Object.freeze([...stableQuestion.options]),
                 correctAnswer: stableQuestion.correctAnswer,
                 explanation: stableQuestion.explanation
-              }
-            };
+              })
+            });
             
             stableActivities.push(activity);
             console.log(`✅ Retrieved stable question ${i + 1}: ${stableQuestion.question.substring(0, 30)}...`);
           } catch (error) {
             console.error(`❌ Error getting stable question ${i + 1}:`, error);
             
-            // Create a simple fallback question
-            const fallbackActivity: LessonActivity = {
+            // Create a simple fallback question - also frozen
+            const fallbackActivity: LessonActivity = Object.freeze({
               id: `fallback_${Date.now()}_${i}`,
               title: `Question ${i + 1}`,
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
-              metadata: {
+              metadata: Object.freeze({
                 subject: subject,
                 skillArea: skillArea
-              },
-              content: {
+              }),
+              content: Object.freeze({
                 question: `What is ${5 + i * 3} + ${7 + i * 2}?`,
-                options: [`${12 + i * 5}`, `${10 + i * 5}`, `${14 + i * 5}`, `${8 + i * 5}`],
+                options: Object.freeze([`${12 + i * 5}`, `${10 + i * 5}`, `${14 + i * 5}`, `${8 + i * 5}`]),
                 correctAnswer: 0,
                 explanation: `${5 + i * 3} + ${7 + i * 2} = ${12 + i * 5}`
-              }
-            };
+              })
+            });
             stableActivities.push(fallbackActivity);
           }
         }
         
-        console.log(`🎯 Generated ${stableActivities.length} stable activities for session ${sessionId}`);
-        setAllActivities(stableActivities);
+        // Freeze the entire activities array so it can never change
+        activitiesRef.current = Object.freeze(stableActivities);
+        console.log(`🎯 Generated ${stableActivities.length} FROZEN stable activities for session ${sessionId}`);
         
         // Start the timer
         startTimer();
@@ -87,37 +96,38 @@ export const useStableLessonActivitiesInitializer = (
       } catch (error) {
         console.error('❌ Critical error in stable initialization:', error);
         
-        // Ensure we have at least one activity
-        const emergencyActivity: LessonActivity = {
+        // Ensure we have at least one activity - also frozen
+        const emergencyActivity: LessonActivity = Object.freeze({
           id: `emergency_${Date.now()}`,
           title: 'Math Question',
           type: 'interactive-game' as const,
           phase: 'interactive-game' as const,
           duration: 180,
-          metadata: {
+          metadata: Object.freeze({
             subject: subject,
             skillArea: skillArea
-          },
-          content: {
+          }),
+          content: Object.freeze({
             question: 'What is 15 + 23?',
-            options: ['38', '35', '40', '33'],
+            options: Object.freeze(['38', '35', '40', '33']),
             correctAnswer: 0,
             explanation: '15 + 23 = 38'
-          }
-        };
-        setAllActivities([emergencyActivity]);
+          })
+        });
+        activitiesRef.current = Object.freeze([emergencyActivity]);
       } finally {
-        // ALWAYS set initializing to false - this should be instant now
-        console.log('🏁 Setting isInitializing to false (stable system)');
+        // Mark initialization as complete
+        setInitializationComplete(true);
+        console.log('🏁 Setting isInitializing to false (stable system with frozen objects)');
         setIsInitializing(false);
       }
     };
     
     initializeStableActivities();
-  }, [subject, skillArea, generateStableQuestion, sessionId, startTimer]);
+  }, [subject, skillArea, generateStableQuestion, sessionId, startTimer, initializationComplete]);
 
   return {
-    allActivities,
+    allActivities: activitiesRef.current, // Always return the same reference
     isInitializing,
     lessonStartTime
   };

@@ -18,28 +18,43 @@ const StableActivityInteractiveQuiz = ({
   const [timeLeft, setTimeLeft] = useState(30);
   const [score, setScore] = useState(0);
 
-  // Memoize all content to prevent re-computation and flickering
+  // Extract stable content once and never re-compute - this prevents ALL flickering
   const stableContent = useMemo(() => {
+    console.log('🔒 Creating STABLE content object for activity:', activity.id);
+    
     if (!activity.content?.question || !activity.content?.options) {
       return null;
     }
 
+    // Return a completely stable object that will never change reference
     return {
       question: activity.content.question,
       options: activity.content.options,
       correctAnswer: activity.content.correctAnswer,
       explanation: activity.content.explanation,
       battleScenario: activity.content.battleScenario,
-      title: activity.title
+      title: activity.title,
+      activityId: activity.id // Include ID for debugging
     };
-  }, [activity.id]); // Only depend on activity.id, not the whole activity object
+  }, [activity.id]); // Only depend on ID - content should never change for same ID
 
-  console.log('🎯 StableActivityInteractiveQuiz rendering:', {
+  console.log('🎯 StableActivityInteractiveQuiz render:', {
     activityId: activity.id,
     hasStableContent: !!stableContent,
+    contentKeys: stableContent ? Object.keys(stableContent) : [],
     showResult,
-    selectedAnswer
+    selectedAnswer,
+    renderTime: Date.now()
   });
+
+  // Reset state when activity changes (new question)
+  useEffect(() => {
+    console.log('🔄 Resetting quiz state for new activity:', activity.id);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setTimeLeft(30);
+    setScore(0);
+  }, [activity.id]);
 
   useEffect(() => {
     if (timeLeft > 0 && !showResult && stableContent) {
@@ -84,6 +99,7 @@ const StableActivityInteractiveQuiz = ({
 
   // Don't render until content is stable
   if (!stableContent) {
+    console.log('⏳ Waiting for stable content...');
     return (
       <Blackboard>
         <div className="text-center text-white p-8">
@@ -94,7 +110,13 @@ const StableActivityInteractiveQuiz = ({
     );
   }
 
-  console.log('🎮 Stable quiz state:', { selectedAnswer, showResult, timeLeft, score });
+  console.log('🎮 Rendering stable quiz with state:', { 
+    selectedAnswer, 
+    showResult, 
+    timeLeft, 
+    score,
+    question: stableContent.question.substring(0, 30) + '...'
+  });
 
   return (
     <Blackboard>
@@ -131,12 +153,12 @@ const StableActivityInteractiveQuiz = ({
           <p className="text-white text-xl leading-relaxed font-semibold">{stableContent.question}</p>
         </div>
 
-        {/* Stable Answer Options - No Flickering */}
+        {/* Completely Stable Answer Options - Zero Flickering */}
         {!showResult ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stableContent.options.map((option: string, index: number) => (
               <Button
-                key={`stable-option-${index}`} // Stable key
+                key={`${stableContent.activityId}-option-${index}`} // Ultra-stable key
                 onClick={() => handleAnswerSelect(index)}
                 className={`p-6 text-lg h-auto transition-all duration-200 ${
                   selectedAnswer === index
