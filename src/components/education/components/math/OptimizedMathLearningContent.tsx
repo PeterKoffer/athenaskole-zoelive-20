@@ -70,14 +70,14 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     setCurrentActivityIndex(index);
   };
 
-  // Show loading state during initialization - NO "Ready to start" box
-  if (isInitializing) {
+  // Show loading state ONLY during actual initialization
+  if (isInitializing || !currentActivity) {
     return (
       <MathLearningLoading studentName={studentName} />
     );
   }
 
-  // Directly show the main content - skip any "Ready to start" screens
+  // Directly show the main content - NO welcome screens or "Ready to start" boxes
   return (
     <MathLearningMainContent
       studentName={studentName}

@@ -59,9 +59,17 @@ export const useOptimizedLessonManager = ({
     setCurrentActivityIndex
   });
 
-  // --- Current Activity / Progress ---
-  const currentActivity = allActivities[currentActivityIndex] || null;
-  const totalRealActivities = allActivities.length;
+  // --- Filter out any welcome/introduction activities to skip "Ready to start" screens ---
+  const filteredActivities = allActivities.filter(activity => 
+    activity.type !== 'introduction' && 
+    activity.phase !== 'introduction' &&
+    !activity.title.toLowerCase().includes('welcome') &&
+    !activity.title.toLowerCase().includes('ready to start')
+  );
+
+  // --- Current Activity / Progress (use filtered activities) ---
+  const currentActivity = filteredActivities[currentActivityIndex] || null;
+  const totalRealActivities = filteredActivities.length;
   const targetLessonLength = 20; // 20 minutes
 
   // --- Fixed Activity completion logic ---
@@ -69,7 +77,7 @@ export const useOptimizedLessonManager = ({
     console.log('🎯 Activity completion triggered:', {
       currentActivityIndex,
       wasCorrect,
-      totalActivities: allActivities.length
+      totalActivities: filteredActivities.length
     });
 
     // Mark current activity as completed
@@ -87,7 +95,7 @@ export const useOptimizedLessonManager = ({
 
     // Small delay before advancing to next activity
     setTimeout(() => {
-      if (currentActivityIndex < allActivities.length - 1) {
+      if (currentActivityIndex < filteredActivities.length - 1) {
         console.log('➡️ Advancing to next activity:', currentActivityIndex + 1);
         setCurrentActivityIndex(prev => prev + 1);
       } else {
@@ -115,9 +123,10 @@ export const useOptimizedLessonManager = ({
     console.log('[OptimizedLessonManager] Index:', currentActivityIndex,
       'Completed:', Array.from(completedActivities),
       'isCurrentActivityCompleted:', isCurrentActivityCompleted,
-      'canNavigateForward:', canNavigateForward
+      'canNavigateForward:', canNavigateForward,
+      'Total filtered activities:', totalRealActivities
     );
-  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward]);
+  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward, totalRealActivities]);
 
   return {
     currentActivityIndex,
@@ -128,7 +137,7 @@ export const useOptimizedLessonManager = ({
     score,
     correctStreak,
     targetLessonLength,
-    isInitializing,
+    isInitializing: isInitializing || filteredActivities.length === 0,
     completedActivities,
     isCurrentActivityCompleted,
     canNavigateForward,
