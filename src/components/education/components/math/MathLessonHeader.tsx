@@ -48,9 +48,6 @@ const MathLessonHeader = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const shouldShowActivityCounter = currentActivityType === 'interactive-game' || 
-                                   currentActivityPhase === 'interactive-game';
-
   return (
     <div className="w-full flex justify-center py-4">
       <div className="bg-black/60 rounded-xl border border-purple-400/30 backdrop-blur-md p-4 max-w-2xl">
@@ -87,8 +84,8 @@ const MathLessonHeader = ({
           </div>
         </div>
 
-        {/* Main scoreboard display */}
-        <div className="flex items-center justify-center space-x-6 bg-black/40 rounded-lg px-4 py-3 border border-green-400/20">
+        {/* Main scoreboard display - REMOVED ACTIVITIES COUNTER */}
+        <div className="flex items-center justify-center space-x-8 bg-black/40 rounded-lg px-4 py-3 border border-green-400/20">
           {/* Time Display */}
           <div className="text-center">
             <div className="text-green-400 text-xs font-mono uppercase tracking-wider mb-1">TIME</div>
@@ -112,19 +109,6 @@ const MathLessonHeader = ({
               </div>
             )}
           </div>
-          
-          {/* Adventure Counter (changed from Activity) */}
-          {shouldShowActivityCounter && (
-            <>
-              <div className="w-px h-10 bg-green-400/30"></div>
-              <div className="text-center">
-                <div className="text-cyan-400 text-xs font-mono uppercase tracking-wider mb-1">ADVENTURE</div>
-                <div className="text-cyan-400 text-xl font-mono font-bold tracking-wider">
-                  {(currentActivityIndex + 1).toString().padStart(2, '0')}
-                </div>
-              </div>
-            </>
-          )}
         </div>
         
         {/* Student name and lesson title */}

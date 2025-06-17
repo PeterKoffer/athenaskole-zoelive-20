@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { useStableQuestionGeneration } from './useStableQuestionGeneration';
+import { useSimpleQuestionGeneration } from './useSimpleQuestionGeneration';
 import { LessonActivity } from '../types/LessonTypes';
 
 export const useStableLessonActivitiesInitializer = (
@@ -8,130 +8,119 @@ export const useStableLessonActivitiesInitializer = (
   skillArea: string,
   startTimer: () => void
 ) => {
-  // Use useRef to store activities so they NEVER change reference
-  const activitiesRef = useRef<LessonActivity[]>([]);
+  const [allActivities, setAllActivities] = useState<LessonActivity[]>([]);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [initializationComplete, setInitializationComplete] = useState(false);
   const lessonStartTime = useRef(Date.now());
   
-  const { generateStableQuestion, sessionId } = useStableQuestionGeneration({
+  const { generateUniqueQuestion, sessionId } = useSimpleQuestionGeneration({
     subject: subject.toLowerCase(),
     skillArea: skillArea || 'general_math'
   });
 
   useEffect(() => {
-    // Only initialize once
-    if (initializationComplete) {
-      return;
-    }
-
-    const initializeStableActivities = async () => {
-      console.log(`🚀 Initializing STABLE ${subject} lesson (Session: ${sessionId})`);
+    const initializeActivities = async () => {
+      console.log(`🚀 Initializing FRESH ${subject} lesson (Session: ${sessionId})`);
       setIsInitializing(true);
       
       try {
-        // Generate 6 stable pre-compiled questions instantly
-        const stableActivities: LessonActivity[] = [];
+        // Generate 6 completely unique questions for this lesson session
+        const uniqueActivities: LessonActivity[] = [];
         
         for (let i = 0; i < 6; i++) {
-          console.log(`📝 Getting stable question ${i + 1}/6...`);
+          console.log(`📝 Generating question ${i + 1}/6...`);
           
           try {
-            const stableQuestion = generateStableQuestion();
+            const uniqueQuestion = generateUniqueQuestion();
             
-            // Create completely frozen activity object that will never change
-            const activity: LessonActivity = Object.freeze({
-              id: stableQuestion.id,
+            const activity: LessonActivity = {
+              id: uniqueQuestion.id,
               title: `Question ${i + 1}`,
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
-              phaseDescription: `Stable interactive question ${i + 1}`,
-              metadata: Object.freeze({
+              phaseDescription: `Interactive question ${i + 1}`,
+              metadata: {
                 subject: subject,
                 skillArea: skillArea,
-                templateId: stableQuestion.templateId
-              }),
-              content: Object.freeze({
-                question: stableQuestion.question,
-                options: Object.freeze([...stableQuestion.options]),
-                correctAnswer: stableQuestion.correctAnswer,
-                explanation: stableQuestion.explanation
-              })
-            });
+                templateId: uniqueQuestion.metadata.templateId
+              },
+              content: {
+                question: uniqueQuestion.content.question,
+                options: [...uniqueQuestion.content.options], // Convert readonly to mutable
+                correctAnswer: uniqueQuestion.content.correctAnswer,
+                explanation: uniqueQuestion.content.explanation
+              }
+            };
             
-            stableActivities.push(activity);
-            console.log(`✅ Retrieved stable question ${i + 1}: ${stableQuestion.question.substring(0, 30)}...`);
+            uniqueActivities.push(activity);
+            console.log(`✅ Generated question ${i + 1}: ${uniqueQuestion.content.question.substring(0, 30)}...`);
           } catch (error) {
-            console.error(`❌ Error getting stable question ${i + 1}:`, error);
+            console.error(`❌ Error generating question ${i + 1}:`, error);
             
-            // Create a simple fallback question - also frozen
-            const fallbackActivity: LessonActivity = Object.freeze({
+            // Create a simple fallback question
+            const fallbackActivity: LessonActivity = {
               id: `fallback_${Date.now()}_${i}`,
               title: `Question ${i + 1}`,
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
-              phaseDescription: `Fallback stable question ${i + 1}`,
-              metadata: Object.freeze({
+              phaseDescription: `Fallback question ${i + 1}`,
+              metadata: {
                 subject: subject,
                 skillArea: skillArea
-              }),
-              content: Object.freeze({
+              },
+              content: {
                 question: `What is ${5 + i * 3} + ${7 + i * 2}?`,
-                options: Object.freeze([`${12 + i * 5}`, `${10 + i * 5}`, `${14 + i * 5}`, `${8 + i * 5}`]),
+                options: [`${12 + i * 5}`, `${10 + i * 5}`, `${14 + i * 5}`, `${8 + i * 5}`],
                 correctAnswer: 0,
                 explanation: `${5 + i * 3} + ${7 + i * 2} = ${12 + i * 5}`
-              })
-            });
-            stableActivities.push(fallbackActivity);
+              }
+            };
+            uniqueActivities.push(fallbackActivity);
           }
         }
         
-        // Convert the frozen array to mutable for the ref assignment
-        // The individual activities remain frozen, but the array itself can be assigned
-        activitiesRef.current = [...stableActivities];
-        console.log(`🎯 Generated ${stableActivities.length} FROZEN stable activities for session ${sessionId}`);
+        console.log(`🎯 Generated ${uniqueActivities.length} activities for session ${sessionId}`);
+        setAllActivities(uniqueActivities);
         
         // Start the timer
         startTimer();
         
       } catch (error) {
-        console.error('❌ Critical error in stable initialization:', error);
+        console.error('❌ Critical error in initialization:', error);
         
-        // Ensure we have at least one activity - also frozen
-        const emergencyActivity: LessonActivity = Object.freeze({
+        // Ensure we have at least one activity
+        const emergencyActivity: LessonActivity = {
           id: `emergency_${Date.now()}`,
           title: 'Math Question',
           type: 'interactive-game' as const,
           phase: 'interactive-game' as const,
           duration: 180,
-          phaseDescription: 'Emergency stable math question',
-          metadata: Object.freeze({
+          phaseDescription: 'Emergency math question',
+          metadata: {
             subject: subject,
             skillArea: skillArea
-          }),
-          content: Object.freeze({
+          },
+          content: {
             question: 'What is 15 + 23?',
-            options: Object.freeze(['38', '35', '40', '33']),
+            options: ['38', '35', '40', '33'],
             correctAnswer: 0,
             explanation: '15 + 23 = 38'
-          })
-        });
-        activitiesRef.current = [emergencyActivity];
+          }
+        };
+        setAllActivities([emergencyActivity]);
       } finally {
-        // Mark initialization as complete
-        setInitializationComplete(true);
-        console.log('🏁 Setting isInitializing to false (stable system with frozen objects)');
+        // ALWAYS set initializing to false
+        console.log('🏁 Setting isInitializing to false');
         setIsInitializing(false);
       }
     };
     
-    initializeStableActivities();
-  }, [subject, skillArea, generateStableQuestion, sessionId, startTimer, initializationComplete]);
+    initializeActivities();
+  }, [subject, skillArea, generateUniqueQuestion, sessionId, startTimer]);
 
   return {
-    allActivities: activitiesRef.current, // Always return the same reference
+    allActivities,
     isInitializing,
     lessonStartTime
   };

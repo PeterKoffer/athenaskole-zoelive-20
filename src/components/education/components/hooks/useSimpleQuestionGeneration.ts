@@ -165,6 +165,7 @@ export const useSimpleQuestionGeneration = ({
       type: 'interactive-game',
       phase: 'interactive-game',
       duration: 180,
+      phaseDescription: `Interactive ${selectedTemplate.skillArea} question`,
       metadata: {
         subject,
         skillArea: selectedTemplate.skillArea,
