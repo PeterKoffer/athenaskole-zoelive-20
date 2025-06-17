@@ -105,7 +105,7 @@ const ActivitySummary = ({ activity, timeRemaining, onContinue, onAnswerSubmit }
         ) : (
           <SelfAssessment
             question={activity.content.selfAssessment?.question}
-            options={activity.content.selfAssessment?.options}
+            options={activity.content.selfAssessment?.options ? Array.from(activity.content.selfAssessment.options) : undefined}
             correctAnswer={activity.content.selfAssessment?.correctAnswer}
             explanation={activity.content.selfAssessment?.explanation}
             onSubmit={onAnswerSubmit}

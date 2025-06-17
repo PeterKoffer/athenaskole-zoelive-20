@@ -86,8 +86,9 @@ export const useStableLessonActivitiesInitializer = (
           }
         }
         
-        // Freeze the entire activities array so it can never change
-        activitiesRef.current = Object.freeze(stableActivities);
+        // Convert the frozen array to mutable for the ref assignment
+        // The individual activities remain frozen, but the array itself can be assigned
+        activitiesRef.current = [...stableActivities];
         console.log(`🎯 Generated ${stableActivities.length} FROZEN stable activities for session ${sessionId}`);
         
         // Start the timer
@@ -114,7 +115,7 @@ export const useStableLessonActivitiesInitializer = (
             explanation: '15 + 23 = 38'
           })
         });
-        activitiesRef.current = Object.freeze([emergencyActivity]);
+        activitiesRef.current = [emergencyActivity];
       } finally {
         // Mark initialization as complete
         setInitializationComplete(true);
