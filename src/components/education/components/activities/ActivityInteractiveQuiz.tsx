@@ -17,6 +17,7 @@ const ActivityInteractiveQuiz = ({
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [score, setScore] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   console.log('🎯 ActivityInteractiveQuiz rendering:', {
     activityId: activity.id,
@@ -26,14 +27,21 @@ const ActivityInteractiveQuiz = ({
     battleScenario: activity.content?.battleScenario
   });
 
+  // Initialize component to prevent flickering
   useEffect(() => {
-    if (timeLeft > 0 && !showResult) {
+    if (activity.content?.question && activity.content?.options) {
+      setIsInitialized(true);
+    }
+  }, [activity.content?.question, activity.content?.options]);
+
+  useEffect(() => {
+    if (timeLeft > 0 && !showResult && isInitialized) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !showResult) {
+    } else if (timeLeft === 0 && !showResult && isInitialized) {
       handleTimeUp();
     }
-  }, [timeLeft, showResult]);
+  }, [timeLeft, showResult, isInitialized]);
 
   const handleTimeUp = () => {
     console.log('⏰ Time up! Auto-completing activity');
@@ -46,14 +54,14 @@ const ActivityInteractiveQuiz = ({
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (!showResult) {
+    if (!showResult && isInitialized) {
       console.log('📝 Answer selected:', answerIndex);
       setSelectedAnswer(answerIndex);
     }
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer === null) return;
+    if (selectedAnswer === null || !isInitialized) return;
     
     console.log('✅ Submitting answer:', selectedAnswer, 'Correct:', activity.content?.correctAnswer);
     setShowResult(true);
@@ -67,8 +75,20 @@ const ActivityInteractiveQuiz = ({
     }, 3000);
   };
 
-  const question = activity.content?.question || activity.title || 'Loading question...';
-  const options = activity.content?.options || ['Loading...', 'Loading...', 'Loading...', 'Loading...'];
+  // Don't render until fully initialized to prevent flickering
+  if (!isInitialized || !activity.content?.question || !activity.content?.options) {
+    return (
+      <Blackboard>
+        <div className="text-center text-white p-8">
+          <div className="text-2xl mb-4">⏳</div>
+          <p className="text-xl">Loading question...</p>
+        </div>
+      </Blackboard>
+    );
+  }
+
+  const question = activity.content.question;
+  const options = activity.content.options;
   const battleScenario = activity.content?.battleScenario;
   const explanation = activity.content?.explanation;
 
@@ -109,17 +129,17 @@ const ActivityInteractiveQuiz = ({
           <p className="text-white text-xl leading-relaxed font-semibold">{question}</p>
         </div>
 
-        {/* Fixed Answer Options - No Blinking */}
+        {/* Stable Answer Options - No Flickering */}
         {!showResult ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {options.map((option: string, index: number) => (
               <Button
-                key={index}
+                key={`option-${index}-${option}`}
                 onClick={() => handleAnswerSelect(index)}
-                className={`p-6 text-lg h-auto ${
+                className={`p-6 text-lg h-auto transition-all duration-200 ${
                   selectedAnswer === index
-                    ? 'bg-blue-600 hover:bg-blue-700 border-2 border-blue-400 text-white font-bold'
-                    : 'bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white'
+                    ? 'bg-blue-600 hover:bg-blue-700 border-2 border-blue-400 text-white font-bold transform scale-105'
+                    : 'bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white hover:scale-102'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -162,7 +182,7 @@ const ActivityInteractiveQuiz = ({
             <Button
               onClick={handleSubmit}
               disabled={selectedAnswer === null}
-              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-12 py-4 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-12 py-4 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               Submit Answer
             </Button>
