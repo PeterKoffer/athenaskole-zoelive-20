@@ -1,6 +1,5 @@
-
 import { Button } from '@/components/ui/button';
-import { Repeat, Home, Play } from 'lucide-react';
+import { Home, Play } from 'lucide-react';
 
 interface UnifiedClassIntroductionControlsProps {
   hasStarted: boolean;
@@ -37,24 +36,12 @@ const UnifiedClassIntroductionControls = ({
   handleProceedWithoutSpeech,
   isAdvancing = false,
 }: UnifiedClassIntroductionControlsProps) => {
-  // Render only the required 4 buttons in a single row, responsive
+  // Only 3 buttons now: Home, Start Introduction with Nelie, Start Lesson Without Speech
 
   if (!hasStarted) {
     return (
       <div className="w-full flex justify-center mt-8">
         <div className="flex flex-wrap md:flex-nowrap gap-2 w-full max-w-3xl justify-center">
-          {/* Repeat (ask Nelie to repeat) */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleManualRead}
-            className="h-10 px-3 font-medium border-purple-400 text-purple-200 bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-sm transition-none"
-            disabled={(!isEnabled && hasUserInteracted) || isAdvancing}
-          >
-            <Repeat className="w-4 h-4 mr-2" />
-            <span className="whitespace-nowrap">Repeat</span>
-          </Button>
-
           {/* Home */}
           <Button
             type="button"

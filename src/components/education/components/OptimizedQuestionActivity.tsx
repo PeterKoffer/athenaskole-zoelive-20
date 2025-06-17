@@ -9,6 +9,7 @@ import QuestionLoadingState from './question/QuestionLoadingState';
 import QuestionErrorState from './question/QuestionErrorState';
 import AnswerOptions from './AnswerOptions';
 import QuestionResult from './QuestionResult';
+import TextWithSpeaker from './shared/TextWithSpeaker';
 
 interface OptimizedQuestionActivityProps {
   subject: string;
@@ -35,6 +36,7 @@ const OptimizedQuestionActivity = ({
   const [hasAnswered, setHasAnswered] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
+  const [questionAttempts, setQuestionAttempts] = useState(0);
   
   const startTime = useState(() => Date.now())[0];
 
@@ -56,12 +58,21 @@ const OptimizedQuestionActivity = ({
     }
   });
 
-  // Generate initial question
+  // Generate initial question with better variation
   useEffect(() => {
     const initializeQuestion = async () => {
       if (!currentQuestion && !isGeneratingQuestion) {
         console.log('🎯 Generating initial question for OptimizedQuestionActivity');
-        const question = await generateQuestion();
+        
+        // Add randomization to prevent repetitive questions
+        const variationSeed = Date.now() + Math.random() * 1000;
+        const question = await generateQuestion({
+          seed: variationSeed,
+          previousQuestions: usedQuestionIds,
+          difficulty: difficultyLevel + (questionNumber * 0.1), // Slight difficulty progression
+          avoidSimilar: true
+        });
+        
         if (question) {
           setCurrentQuestion(question);
           console.log('✅ Initial question generated:', question.content.question.substring(0, 50) + '...');
@@ -70,7 +81,7 @@ const OptimizedQuestionActivity = ({
     };
 
     initializeQuestion();
-  }, [currentQuestion, generateQuestion, isGeneratingQuestion]);
+  }, [currentQuestion, generateQuestion, isGeneratingQuestion, questionNumber, difficultyLevel, usedQuestionIds]);
 
   const handleAnswerSelect = useCallback((answerIndex: number) => {
     if (hasAnswered || !currentQuestion) return;
@@ -93,13 +104,22 @@ const OptimizedQuestionActivity = ({
     setSelectedAnswer(null);
     setShowResult(false);
     setHasAnswered(false);
+    setQuestionAttempts(prev => prev + 1);
     
-    // Generate a new question
-    const newQuestion = await generateQuestion();
+    // Generate a more varied question to prevent repetition
+    const variationSeed = Date.now() + Math.random() * 1000 + questionAttempts * 100;
+    const newQuestion = await generateQuestion({
+      seed: variationSeed,
+      previousQuestions: usedQuestionIds,
+      difficulty: difficultyLevel + (questionAttempts * 0.2),
+      avoidSimilar: true,
+      forceNew: true
+    });
+    
     if (newQuestion) {
       setCurrentQuestion(newQuestion);
     }
-  }, [generateQuestion]);
+  }, [generateQuestion, usedQuestionIds, difficultyLevel, questionAttempts]);
 
   if (isGeneratingQuestion || !currentQuestion) {
     return <QuestionLoadingState />;
@@ -116,12 +136,19 @@ const OptimizedQuestionActivity = ({
 
   return (
     <div className="space-y-6">
-      <QuestionHeader
-        questionNumber={questionNumber}
-        totalQuestions={totalQuestions}
-        timeSpent={timeSpent}
-        question={currentQuestion.content.question}
-      />
+      <TextWithSpeaker
+        text={currentQuestion.content.question}
+        context="question-content"
+        position="corner"
+        showOnHover={false}
+      >
+        <QuestionHeader
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+          timeSpent={timeSpent}
+          question={currentQuestion.content.question}
+        />
+      </TextWithSpeaker>
 
       {!showResult ? (
         <Card className="bg-gray-800 border-gray-700">
@@ -151,12 +178,19 @@ const OptimizedQuestionActivity = ({
             </CardContent>
           </Card>
           
-          <QuestionResult
-            showResult={showResult}
-            isCorrect={isCorrect}
-            explanation={currentQuestion.content.explanation || "Good work!"}
-            isLastQuestion={questionNumber >= totalQuestions}
-          />
+          <TextWithSpeaker
+            text={currentQuestion.content.explanation || "Good work!"}
+            context="question-explanation"
+            position="corner"
+            showOnHover={false}
+          >
+            <QuestionResult
+              showResult={showResult}
+              isCorrect={isCorrect}
+              explanation={currentQuestion.content.explanation || "Good work!"}
+              isLastQuestion={questionNumber >= totalQuestions}
+            />
+          </TextWithSpeaker>
           
           <div className="flex gap-4 justify-center">
             <Button
@@ -168,7 +202,7 @@ const OptimizedQuestionActivity = ({
             </Button>
             <Button
               onClick={handleContinue}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               Continue
             </Button>

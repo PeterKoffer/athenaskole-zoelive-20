@@ -112,29 +112,21 @@ const MathLearningMainContent = ({
                   isNelieReady={true}
                 />
                 
-                {/* Beautiful, elegant progression indicator */}
+                {/* Improved adventure progress indicator with better readability */}
                 <div className="text-center space-y-4 mt-8">
-                  <div className="inline-flex items-center space-x-2 bg-blue-900/30 backdrop-blur-sm rounded-full px-6 py-3 border border-blue-400/30">
+                  <div className="inline-flex items-center space-x-2 bg-black/70 backdrop-blur-sm rounded-full px-6 py-4 border border-blue-400/50 shadow-lg">
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                    <TextWithSpeaker 
-                      text={`Adventure ${currentActivityIndex + 1} of ${totalRealActivities}`}
-                      context="progress-indicator"
-                    >
-                      <span className="text-blue-100 font-medium">
-                        Adventure {currentActivityIndex + 1} of {totalRealActivities}
-                      </span>
-                    </TextWithSpeaker>
+                    <span className="text-white font-semibold text-lg drop-shadow-lg">
+                      Adventure {currentActivityIndex + 1} of {totalRealActivities}
+                    </span>
                   </div>
                   
-                  {/* Automatic progression message */}
-                  <TextWithSpeaker 
-                    text="Complete the activity above to continue your mathematical journey!"
-                    context="progression-message"
-                  >
-                    <p className="text-gray-300 text-sm">
+                  {/* Improved progression message with better contrast */}
+                  <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 inline-block border border-gray-400/30">
+                    <p className="text-white font-medium drop-shadow-lg">
                       Complete the activity above to continue your mathematical journey!
                     </p>
-                  </TextWithSpeaker>
+                  </div>
                 </div>
               </div>
             ) : (
