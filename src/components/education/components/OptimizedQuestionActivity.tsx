@@ -85,12 +85,16 @@ const OptimizedQuestionActivity = ({
     setShowResult(true);
     setHasAnswered(true);
     
-    // Play dopamine-inducing sound effect for correct answers
-    if (correct) {
-      playCorrectAnswerSound();
-    } else {
-      playWrongAnswerSound();
-    }
+    // Play sound effects with proper timing
+    setTimeout(() => {
+      if (correct) {
+        console.log('🎵 Playing correct answer sound effect');
+        playCorrectAnswerSoun‹d();
+      } else {
+        console.log('🎵 Playing wrong answer sound effect');
+        playWrongAnswerSound();
+      }
+    }, 100); // Small delay to ensure UI updates first
     
     console.log('📝 Answer selected:', answerIndex, 'Correct:', correct);
   }, [currentQuestion, hasAnswered, playCorrectAnswerSound, playWrongAnswerSound]);

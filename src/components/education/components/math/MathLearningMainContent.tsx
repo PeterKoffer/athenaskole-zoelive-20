@@ -112,12 +112,12 @@ const MathLearningMainContent = ({
                   isNelieReady={true}
                 />
                 
-                {/* Improved adventure progress indicator - Adventure numbering starts from 1 */}
+                {/* Fixed adventure progress indicator - Show actual adventure number */}
                 <div className="text-center space-y-4 mt-8">
                   <div className="inline-flex items-center space-x-2 bg-black/70 backdrop-blur-sm rounded-full px-6 py-4 border border-blue-400/50 shadow-lg">
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                     <span className="text-white font-semibold text-lg drop-shadow-lg">
-                      Adventure {currentActivityIndex + 1} of {totalRealActivities}
+                      Adventure {Math.max(1, currentActivityIndex)} of {Math.max(1, totalRealActivities - 1)}
                     </span>
                   </div>
                   

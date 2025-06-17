@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { LessonActivity } from '../types/LessonTypes';
 import Blackboard from '../shared/Blackboard';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 interface ActivitySimulationGameProps {
   activity: LessonActivity;
@@ -19,6 +20,8 @@ const ActivitySimulationGame = ({
   const [gamePhase, setGamePhase] = useState<'playing' | 'success' | 'complete'>('playing');
   const [selectedSlices, setSelectedSlices] = useState<number>(0);
   const [showManualComplete, setShowManualComplete] = useState(false);
+  
+  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
 
   const scenarios = activity.content?.scenarios || [];
   const currentCustomer = scenarios[currentScenario];
@@ -32,26 +35,24 @@ const ActivitySimulationGame = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const handleServeCustomer = (slices: number) => {
-    console.log('🍕 Serving customer with', slices, 'slices');
-    console.log('🎯 Current customer challenge:', currentCustomer?.challenge);
-    
-    // Extract the fraction from the challenge text - improved parsing
+  // Extract fraction details from the challenge
+  const getFractionDetails = () => {
     const fractionMatch = currentCustomer?.challenge?.match(/(\d+)\/(\d+)/);
-    if (!fractionMatch) {
-      console.error('❌ Could not parse fraction from challenge:', currentCustomer?.challenge);
-      // Fallback - assume they got it right if no fraction found
-      handleCorrectAnswer();
-      return;
-    }
+    if (!fractionMatch) return { numerator: 2, denominator: 8 }; // fallback
     
     const numerator = parseInt(fractionMatch[1]);
     const denominator = parseInt(fractionMatch[2]);
+    return { numerator, denominator };
+  };
+
+  const { numerator, denominator } = getFractionDetails();
+
+  const handleServeCustomer = (slices: number) => {
+    console.log('🍕 Serving customer with', slices, 'slices');
+    console.log('🎯 Current customer challenge:', currentCustomer?.challenge);
+    console.log('🔢 Expected fraction:', numerator, '/', denominator);
     
-    console.log('🔢 Parsed fraction:', numerator, '/', denominator);
-    
-    // For pizza fractions, the correct number of slices is simply the numerator
-    // when the pizza is cut into denominator pieces
+    // For pizza fractions, the correct number of slices is the numerator
     const correctSlices = numerator;
     
     console.log('🎯 Expected slices:', correctSlices, 'Selected:', slices);
@@ -59,9 +60,11 @@ const ActivitySimulationGame = ({
     // Check if the answer is correct
     if (slices === correctSlices) {
       console.log('✅ Correct answer! Customer served successfully');
+      playCorrectAnswerSound(); // Play success sound
       handleCorrectAnswer();
     } else {
       console.log('❌ Wrong answer, but allowing retry');
+      playWrongAnswerSound(); // Play wrong answer sound
       // Show feedback but allow retry
       setGamePhase('success');
       setTimeout(() => {
@@ -156,8 +159,9 @@ const ActivitySimulationGame = ({
               <div className="text-6xl mb-4">🍕</div>
               <p className="text-white mb-4 text-lg">How many slices should you give them?</p>
               
+              {/* Generate answer buttons based on the denominator */}
               <div className="flex justify-center space-x-2 mb-6 flex-wrap gap-2">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(slices => (
+                {Array.from({ length: denominator }, (_, i) => i + 1).map(slices => (
                   <Button
                     key={slices}
                     onClick={() => setSelectedSlices(slices)}
@@ -174,7 +178,7 @@ const ActivitySimulationGame = ({
 
               {selectedSlices > 0 && (
                 <p className="text-white mb-4">
-                  Selected: Give <strong>{selectedSlices}</strong> slices
+                  Selected: Give <strong>{selectedSlices}</strong> slices out of {denominator}
                 </p>
               )}
 
