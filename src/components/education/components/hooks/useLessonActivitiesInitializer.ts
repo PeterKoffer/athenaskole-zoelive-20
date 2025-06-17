@@ -55,7 +55,7 @@ export const useLessonActivitiesInitializer = (
           
           // Small delay to prevent overwhelming the system
           if (i < 7) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 50));
           }
         }
         
@@ -74,6 +74,10 @@ export const useLessonActivitiesInitializer = (
           type: 'interactive-game',
           phase: 'interactive-game',
           duration: 180,
+          metadata: {
+            subject: subject,
+            skillArea: skillArea
+          },
           content: {
             question: 'What is 15 + 23?',
             options: ['38', '35', '40', '33'],
