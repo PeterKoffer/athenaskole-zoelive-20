@@ -36,8 +36,8 @@ export const useLessonActivitiesInitializer = (
             const activity: LessonActivity = {
               id: uniqueQuestion.id,
               title: `Math Challenge ${i + 1}`,
-              type: 'interactive-game',
-              phase: 'interactive-game',
+              type: 'interactive-game' as const,
+              phase: 'interactive-game' as const,
               duration: 180, // 3 minutes per question
               metadata: {
                 subject: subject,
@@ -56,12 +56,12 @@ export const useLessonActivitiesInitializer = (
             return activity;
           } catch (error) {
             console.error(`❌ Error generating question ${i + 1}:`, error);
-            // Return a fallback question
-            return {
+            // Return a fallback question with correct typing
+            const fallbackActivity: LessonActivity = {
               id: `fallback_${Date.now()}_${i}`,
               title: `Math Challenge ${i + 1}`,
-              type: 'interactive-game',
-              phase: 'interactive-game',
+              type: 'interactive-game' as const,
+              phase: 'interactive-game' as const,
               duration: 180,
               metadata: {
                 subject: subject,
@@ -74,6 +74,7 @@ export const useLessonActivitiesInitializer = (
                 explanation: `${10 + i * 5} + ${15 + i * 3} = ${25 + i * 8}`
               }
             };
+            return fallbackActivity;
           }
         });
         
@@ -91,8 +92,8 @@ export const useLessonActivitiesInitializer = (
         const fallbackActivity: LessonActivity = {
           id: `fallback_${Date.now()}`,
           title: 'Math Practice',
-          type: 'interactive-game',
-          phase: 'interactive-game',
+          type: 'interactive-game' as const,
+          phase: 'interactive-game' as const,
           duration: 180,
           metadata: {
             subject: subject,
