@@ -1,15 +1,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubjectSpecificQuestions } from './hooks/useSubjectSpecificQuestions';
-import QuestionHeader from './question/QuestionHeader';
 import QuestionLoadingState from './question/QuestionLoadingState';
 import QuestionErrorState from './question/QuestionErrorState';
-import AnswerOptions from './AnswerOptions';
-import QuestionResult from './QuestionResult';
-import TextWithSpeaker from './shared/TextWithSpeaker';
+import QuestionActivityHeader from './question/QuestionActivityHeader';
+import QuestionActivityContent from './question/QuestionActivityContent';
+import QuestionActivityResult from './question/QuestionActivityResult';
+import QuestionActivityControls from './question/QuestionActivityControls';
 
 interface OptimizedQuestionActivityProps {
   subject: string;
@@ -105,7 +103,7 @@ const OptimizedQuestionActivity = ({
     if (newQuestion) {
       setCurrentQuestion(newQuestion);
     }
-  }, [generateQuestion, usedQuestionIds, difficultyLevel, questionAttempts]);
+  }, [generateQuestion]);
 
   if (isGeneratingQuestion || !currentQuestion) {
     return <QuestionLoadingState />;
@@ -122,77 +120,44 @@ const OptimizedQuestionActivity = ({
 
   return (
     <div className="space-y-6">
-      <TextWithSpeaker
-        text={currentQuestion.content.question}
-        context="question-content"
-        position="corner"
-        showOnHover={false}
-      >
-        <QuestionHeader
-          questionNumber={questionNumber}
-          totalQuestions={totalQuestions}
-          timeSpent={timeSpent}
-          question={currentQuestion.content.question}
-        />
-      </TextWithSpeaker>
+      <QuestionActivityHeader
+        questionNumber={questionNumber}
+        totalQuestions={totalQuestions}
+        timeSpent={timeSpent}
+        question={currentQuestion.content.question}
+      />
 
       {!showResult ? (
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <AnswerOptions
-              options={currentQuestion.content.options}
-              selectedAnswer={selectedAnswer}
-              correctAnswer={currentQuestion.content.correctAnswer}
-              showResult={false}
-              onAnswerSelect={handleAnswerSelect}
-              disabled={hasAnswered}
-            />
-          </CardContent>
-        </Card>
+        <QuestionActivityContent
+          options={currentQuestion.content.options}
+          selectedAnswer={selectedAnswer}
+          correctAnswer={currentQuestion.content.correctAnswer}
+          showResult={false}
+          onAnswerSelect={handleAnswerSelect}
+          disabled={hasAnswered}
+        />
       ) : (
         <div className="space-y-4">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <AnswerOptions
-                options={currentQuestion.content.options}
-                selectedAnswer={selectedAnswer}
-                correctAnswer={currentQuestion.content.correctAnswer}
-                showResult={true}
-                onAnswerSelect={handleAnswerSelect}
-                disabled={true}
-              />
-            </CardContent>
-          </Card>
+          <QuestionActivityContent
+            options={currentQuestion.content.options}
+            selectedAnswer={selectedAnswer}
+            correctAnswer={currentQuestion.content.correctAnswer}
+            showResult={true}
+            onAnswerSelect={handleAnswerSelect}
+            disabled={true}
+          />
           
-          <TextWithSpeaker
-            text={currentQuestion.content.explanation || "Good work!"}
-            context="question-explanation"
-            position="corner"
-            showOnHover={false}
-          >
-            <QuestionResult
-              showResult={showResult}
-              isCorrect={isCorrect}
-              explanation={currentQuestion.content.explanation || "Good work!"}
-              isLastQuestion={questionNumber >= totalQuestions}
-            />
-          </TextWithSpeaker>
+          <QuestionActivityResult
+            showResult={showResult}
+            isCorrect={isCorrect}
+            explanation={currentQuestion.content.explanation || "Good work!"}
+            isLastQuestion={questionNumber >= totalQuestions}
+          />
           
-          <div className="flex gap-4 justify-center">
-            <Button
-              onClick={handleTryAgain}
-              variant="outline"
-              className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-            >
-              Try Another Question
-            </Button>
-            <Button
-              onClick={handleContinue}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              Continue
-            </Button>
-          </div>
+          <QuestionActivityControls
+            onTryAgain={handleTryAgain}
+            onContinue={handleContinue}
+          />
         </div>
       )}
     </div>
