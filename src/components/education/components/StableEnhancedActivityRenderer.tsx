@@ -78,10 +78,10 @@ const StableEnhancedActivityRenderer = ({
               <p>{activity.content.task}</p>
             </div>
           )}
-          {activity.content?.hint && (
+          {activity.content?.solution && (
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-yellow-400 mb-2">Hint:</h4>
-              <p className="text-sm text-gray-400">{activity.content.hint}</p>
+              <h4 className="text-lg font-semibold text-yellow-400 mb-2">Solution:</h4>
+              <p className="text-sm text-gray-400">{activity.content.solution}</p>
             </div>
           )}
           {activity.content?.text && !activity.content?.scenario && (

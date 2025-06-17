@@ -25,7 +25,7 @@ export interface StandardLessonConfig {
   }>;
   
   // Phase 3: Interactive Game (4-5 min)
-  gameType: 'problem-solving' | 'matching' | 'true-false' | 'sequence';
+  gameType: 'problem-solving' | 'matching' | 'true-false' | 'adventure-game';
   gameInstructions: string;
   gameQuestion: string;
   gameOptions: string[];
@@ -36,7 +36,6 @@ export interface StandardLessonConfig {
   applicationScenario: string;
   problemSteps: Array<{
     step: string;
-    hint: string;
     solution: string;
   }>;
   
@@ -87,7 +86,7 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
     }
   });
 
-  // Phase 2: Content Delivery Segments (5-7 minutes total)
+  // Phase 2: Content Delivery Segments (5-7 minutes total)  
   config.contentSegments.forEach((segment, index) => {
     phases.push({
       id: `${lessonId}-content-${index}`,
@@ -98,7 +97,9 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
       phaseDescription: `Learn about ${segment.concept}`,
       content: {
         text: segment.explanation,
+        concept: segment.concept,
         segments: [{
+          concept: segment.concept,
           explanation: segment.explanation,
           checkQuestion: segment.checkQuestion
         }]
@@ -151,9 +152,8 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
       content: {
         scenario: config.applicationScenario,
         task: step.step,
-        hint: step.hint,
         solution: step.solution,
-        text: `${step.step}\n\nHint: ${step.hint}`
+        text: `${step.step}\n\nSolution: ${step.solution}`
       }
     });
   });
@@ -215,5 +215,29 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
       createdAt: new Date().toISOString(),
       version: '1.0'
     }
+  };
+};
+
+// Add the missing validation function
+export const validateStandardLesson = (lesson: any): {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+} => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!lesson.phases || lesson.phases.length === 0) {
+    errors.push('Lesson must have phases');
+  }
+
+  if (lesson.totalDuration < 1000 || lesson.totalDuration > 1500) {
+    warnings.push(`Total duration ${lesson.totalDuration}s is outside recommended 16-25 minute range`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
   };
 };

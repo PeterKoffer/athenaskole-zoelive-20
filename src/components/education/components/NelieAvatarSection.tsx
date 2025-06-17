@@ -5,23 +5,25 @@ import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, RotateCcw } from 'lucide-react';
 
 interface NelieAvatarSectionProps {
-  subject: string;
-  currentQuestionIndex: number;
-  totalQuestions: number;
   isSpeaking: boolean;
   autoReadEnabled: boolean;
-  onMuteToggle: () => void;
-  onReadQuestion: () => void;
+  hasUserInteracted: boolean;
+  isReady: boolean;
+  onToggleMute: () => void;
+  onReadRequest: () => void;
+  engagementLevel: number;
+  adaptiveSpeed: number;
 }
 
 const NelieAvatarSection = ({
-  subject,
-  currentQuestionIndex,
-  totalQuestions,
   isSpeaking,
   autoReadEnabled,
-  onMuteToggle,
-  onReadQuestion
+  hasUserInteracted,
+  isReady,
+  onToggleMute,
+  onReadRequest,
+  engagementLevel,
+  adaptiveSpeed
 }: NelieAvatarSectionProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -34,40 +36,14 @@ const NelieAvatarSection = ({
     }
   }, [isSpeaking]);
 
-  const getSubjectColor = (subject: string) => {
-    switch (subject) {
-      case 'mathematics': return 'from-blue-500 to-cyan-500';
-      case 'english': return 'from-purple-500 to-violet-500';
-      case 'science': return 'from-green-500 to-emerald-500';
-      case 'music': return 'from-orange-500 to-yellow-500';
-      case 'computer-science': return 'from-indigo-500 to-purple-500';
-      case 'creative-arts': return 'from-pink-500 to-rose-500';
-      default: return 'from-gray-500 to-gray-600';
-    }
-  };
-
-  const getSubjectEmoji = (subject: string) => {
-    switch (subject) {
-      case 'mathematics': return '🔢';
-      case 'english': return '📚';
-      case 'science': return '🔬';
-      case 'music': return '🎵';
-      case 'computer-science': return '💻';
-      case 'creative-arts': return '🎨';
-      default: return '📖';
-    }
-  };
-
   return (
     <Card className="bg-gray-800 border-gray-700 overflow-hidden">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             {/* Nelie Avatar */}
-            <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${getSubjectColor(subject)} flex items-center justify-center ${isAnimating ? 'animate-pulse' : ''}`}>
-              <div className="text-2xl">
-                {getSubjectEmoji(subject)}
-              </div>
+            <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center ${isAnimating ? 'animate-pulse' : ''}`}>
+              <div className="text-2xl">🔢</div>
               {isSpeaking && (
                 <div className="absolute -inset-1 rounded-full border-2 border-lime-400 animate-ping"></div>
               )}
@@ -76,11 +52,14 @@ const NelieAvatarSection = ({
             {/* Nelie Info */}
             <div>
               <h3 className="text-white font-semibold">
-                Nelie - Your {subject.charAt(0).toUpperCase() + subject.slice(1)} Tutor
+                Nelie - Your Mathematics Tutor
               </h3>
               <p className="text-gray-400 text-sm">
-                Question {currentQuestionIndex + 1} of {totalQuestions}
+                {hasUserInteracted ? 'Ready to help!' : 'Say hello to get started!'}
               </p>
+              <div className="text-xs text-gray-500">
+                Engagement: {engagementLevel}% | Speed: {adaptiveSpeed}x
+              </div>
             </div>
           </div>
 
@@ -89,7 +68,7 @@ const NelieAvatarSection = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onMuteToggle}
+              onClick={onToggleMute}
               className={`${autoReadEnabled ? 'text-lime-400 hover:text-lime-300' : 'text-gray-400 hover:text-gray-300'}`}
             >
               {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -98,8 +77,9 @@ const NelieAvatarSection = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onReadQuestion}
+              onClick={onReadRequest}
               className="text-blue-400 hover:text-blue-300"
+              disabled={!isReady}
             >
               <RotateCcw className="w-4 h-4" />
             </Button>
