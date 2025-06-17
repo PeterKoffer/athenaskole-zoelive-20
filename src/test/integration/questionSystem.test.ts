@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Stable Question System Integration', () => {
   it('should initialize the stable question template system', async () => {
