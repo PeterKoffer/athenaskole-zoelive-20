@@ -59,8 +59,14 @@ export const useOptimizedLessonManager = ({
     setCurrentActivityIndex
   });
 
-  // Use all generated activities (they're already unique)
-  const filteredActivities = allActivities;
+  // ONLY use interactive-game activities - NO welcome screens, NO introduction activities
+  const filteredActivities = allActivities.filter(activity => 
+    activity.type === 'interactive-game' && 
+    activity.phase === 'interactive-game' &&
+    !activity.title.toLowerCase().includes('welcome') &&
+    !activity.title.toLowerCase().includes('introduction') &&
+    !activity.title.toLowerCase().includes('ready to start')
+  );
 
   // --- Current Activity / Progress ---
   const currentActivity = filteredActivities[currentActivityIndex] || null;
@@ -121,9 +127,12 @@ export const useOptimizedLessonManager = ({
       'isCurrentActivityCompleted:', isCurrentActivityCompleted,
       'canNavigateForward:', canNavigateForward,
       'Total activities:', totalRealActivities,
-      'Current activity ID:', currentActivity?.id
+      'Current activity ID:', currentActivity?.id,
+      'Is initializing:', isInitializing,
+      'All activities count:', allActivities.length,
+      'Filtered activities count:', filteredActivities.length
     );
-  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward, totalRealActivities, currentActivity]);
+  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward, totalRealActivities, currentActivity, isInitializing, allActivities.length, filteredActivities.length]);
 
   return {
     currentActivityIndex,

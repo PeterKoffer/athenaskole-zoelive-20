@@ -26,41 +26,61 @@ export const useLessonActivitiesInitializer = (
         // Generate 8 completely unique questions for this lesson session
         const uniqueActivities: LessonActivity[] = [];
         
-        for (let i = 0; i < 8; i++) {
+        // Generate all questions in parallel for faster loading
+        const questionPromises = Array.from({ length: 8 }, async (_, i) => {
           console.log(`📝 Generating unique question ${i + 1}/8...`);
           
-          const uniqueQuestion = generateUniqueQuestion();
-          
-          const activity: LessonActivity = {
-            id: uniqueQuestion.id,
-            title: `Math Challenge ${i + 1}`,
-            type: 'interactive-game',
-            phase: 'interactive-game',
-            duration: 180, // 3 minutes per question
-            metadata: {
-              subject: subject,
-              skillArea: skillArea,
-              templateId: uniqueQuestion.metadata.templateId
-            },
-            content: {
-              question: uniqueQuestion.content.question,
-              options: uniqueQuestion.content.options,
-              correctAnswer: uniqueQuestion.content.correctAnswer,
-              explanation: uniqueQuestion.content.explanation
-            }
-          };
-          
-          uniqueActivities.push(activity);
-          console.log(`✅ Generated unique question ${i + 1}: ${uniqueQuestion.content.question.substring(0, 50)}...`);
-          
-          // Small delay to prevent overwhelming the system
-          if (i < 7) {
-            await new Promise(resolve => setTimeout(resolve, 50));
+          try {
+            const uniqueQuestion = generateUniqueQuestion();
+            
+            const activity: LessonActivity = {
+              id: uniqueQuestion.id,
+              title: `Math Challenge ${i + 1}`,
+              type: 'interactive-game',
+              phase: 'interactive-game',
+              duration: 180, // 3 minutes per question
+              metadata: {
+                subject: subject,
+                skillArea: skillArea,
+                templateId: uniqueQuestion.metadata.templateId
+              },
+              content: {
+                question: uniqueQuestion.content.question,
+                options: uniqueQuestion.content.options,
+                correctAnswer: uniqueQuestion.content.correctAnswer,
+                explanation: uniqueQuestion.content.explanation
+              }
+            };
+            
+            console.log(`✅ Generated unique question ${i + 1}: ${uniqueQuestion.content.question.substring(0, 50)}...`);
+            return activity;
+          } catch (error) {
+            console.error(`❌ Error generating question ${i + 1}:`, error);
+            // Return a fallback question
+            return {
+              id: `fallback_${Date.now()}_${i}`,
+              title: `Math Challenge ${i + 1}`,
+              type: 'interactive-game',
+              phase: 'interactive-game',
+              duration: 180,
+              metadata: {
+                subject: subject,
+                skillArea: skillArea
+              },
+              content: {
+                question: `What is ${10 + i * 5} + ${15 + i * 3}?`,
+                options: [`${25 + i * 8}`, `${23 + i * 8}`, `${27 + i * 8}`, `${21 + i * 8}`],
+                correctAnswer: 0,
+                explanation: `${10 + i * 5} + ${15 + i * 3} = ${25 + i * 8}`
+              }
+            };
           }
-        }
+        });
         
-        console.log(`🎯 All ${uniqueActivities.length} unique questions generated for session ${sessionId}`);
-        setAllActivities(uniqueActivities);
+        const generatedActivities = await Promise.all(questionPromises);
+        
+        console.log(`🎯 All ${generatedActivities.length} unique questions generated for session ${sessionId}`);
+        setAllActivities(generatedActivities);
         
         // Start the timer now that activities are ready
         startTimer();
@@ -87,6 +107,7 @@ export const useLessonActivitiesInitializer = (
         };
         setAllActivities([fallbackActivity]);
       } finally {
+        console.log('🏁 Initialization complete, setting isInitializing to false');
         setIsInitializing(false);
       }
     };

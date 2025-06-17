@@ -145,7 +145,7 @@ const MathLearningMainContent = ({
                 </TextWithSpeaker>
                 <Button 
                   onClick={() => window.location.reload()} 
-                  className="mt-4 bg-blue-600 hover:bg-blue-700"
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                 >
                   Refresh Lesson
                 </Button>
