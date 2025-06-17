@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import MathLessonHeader from './MathLessonHeader';
-import ActivityQuestionAnswer from '../activities/ActivityQuestionAnswer';
+import ActivityQuestion from '../activities/ActivityQuestion';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface MathLearningMainContentProps {
@@ -112,11 +111,12 @@ const MathLearningMainContent = ({
           <Card className="bg-black/50 border-purple-400/50 backdrop-blur-sm">
             <CardContent className="p-8">
               {currentActivity.type === 'interactive-game' && currentActivity.content?.question ? (
-                <ActivityQuestionAnswer
+                <ActivityQuestion
                   activity={currentActivity}
-                  onAnswerSubmit={(result) => {
-                    console.log('🎯 Math answer submitted:', result);
-                    onActivityComplete(result);
+                  timeRemaining={Math.max(0, targetLessonLength * 60 - timeElapsed)}
+                  onActivityComplete={(wasCorrect) => {
+                    console.log('🎯 Math answer submitted:', wasCorrect);
+                    onActivityComplete(wasCorrect);
                   }}
                 />
               ) : (
