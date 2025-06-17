@@ -1,6 +1,7 @@
 
 import { LessonActivity } from './types/LessonTypes';
 import StableActivityInteractiveQuiz from './activities/StableActivityInteractiveQuiz';
+import ActivityContentDelivery from './activities/ActivityContentDelivery';
 
 interface StableEnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -20,7 +21,18 @@ const StableEnhancedActivityRenderer = ({
     isNelieReady
   });
 
-  // Use the stable interactive quiz component
+  // Handle content-delivery activities
+  if (activity.type === 'content-delivery' || activity.phase === 'content-delivery') {
+    console.log('📚 Rendering content-delivery activity');
+    return (
+      <ActivityContentDelivery
+        activity={activity}
+        onActivityComplete={onActivityComplete}
+      />
+    );
+  }
+
+  // Handle interactive quiz activities
   if (activity.type === 'interactive-game' || activity.phase === 'interactive-game') {
     return (
       <StableActivityInteractiveQuiz
@@ -30,20 +42,31 @@ const StableEnhancedActivityRenderer = ({
     );
   }
 
-  // Fallback for other activity types
+  // Handle introduction activities
+  if (activity.type === 'introduction' || activity.phase === 'introduction') {
+    return (
+      <div className="bg-gray-800 rounded-lg p-8 text-center text-white">
+        <h3 className="text-2xl font-semibold mb-4">{activity.title}</h3>
+        <div className="text-gray-300 mb-6 text-lg leading-relaxed">
+          {activity.content?.text || activity.phaseDescription || "Welcome to your learning adventure!"}
+        </div>
+        <button
+          onClick={() => onActivityComplete(true)}
+          className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded text-white font-bold text-lg"
+        >
+          Let's Begin!
+        </button>
+      </div>
+    );
+  }
+
+  // Fallback - convert any unsupported type to interactive quiz
+  console.log('⚠️ Converting unsupported activity type to interactive quiz:', activity.type);
   return (
-    <div className="bg-gray-800 rounded-lg p-8 text-center text-white">
-      <h3 className="text-xl font-semibold mb-4">{activity.title}</h3>
-      <p className="text-gray-300 mb-6">
-        Activity type "{activity.type}" with phase "{activity.phase}" is not yet supported in stable mode.
-      </p>
-      <button
-        onClick={() => onActivityComplete(true)}
-        className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded text-white font-bold"
-      >
-        Continue
-      </button>
-    </div>
+    <StableActivityInteractiveQuiz
+      activity={activity}
+      onActivityComplete={onActivityComplete}
+    />
   );
 };
 
