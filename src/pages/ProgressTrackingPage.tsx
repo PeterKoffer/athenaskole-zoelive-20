@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -98,7 +97,7 @@ const ProgressTrackingPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">156</div>
-              <p className="text-gray-400 text-sm">Students > 85%</p>
+              <p className="text-gray-400 text-sm">Students &gt; 85%</p>
             </CardContent>
           </Card>
 

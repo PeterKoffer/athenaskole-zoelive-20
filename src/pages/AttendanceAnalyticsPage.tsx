@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -106,7 +105,7 @@ const AttendanceAnalyticsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">8</div>
-              <p className="text-gray-400 text-sm">Students < 80%</p>
+              <p className="text-gray-400 text-sm">Students &lt; 80%</p>
             </CardContent>
           </Card>
         </div>
