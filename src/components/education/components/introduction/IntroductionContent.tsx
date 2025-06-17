@@ -92,7 +92,7 @@ const IntroductionContent = ({
         </div>
       </TextWithSpeaker>
 
-      {/* Auto-advance message when complete - NO COUNTDOWN */}
+      {/* Auto-advance message when complete - NO GREEN BOX */}
       {isIntroductionComplete && (
         <TextWithSpeaker
           text="Ready to start your math adventure! Click the button below to begin."
@@ -100,8 +100,8 @@ const IntroductionContent = ({
           position="corner"
           showOnHover={false}
         >
-          <div className="text-center bg-green-900/30 border border-green-400/30 rounded-lg p-6">
-            <div className="text-green-200 text-lg mb-4 font-medium">
+          <div className="text-center bg-blue-900/30 border border-blue-400/30 rounded-lg p-6">
+            <div className="text-blue-200 text-lg mb-4 font-medium">
               🎉 Ready to start your math adventure!
             </div>
             <Button
