@@ -59,25 +59,21 @@ export const useOptimizedLessonManager = ({
     setCurrentActivityIndex
   });
 
-  // --- Filter out any welcome/introduction activities to skip "Ready to start" screens ---
-  const filteredActivities = allActivities.filter(activity => 
-    activity.type !== 'introduction' && 
-    activity.phase !== 'introduction' &&
-    !activity.title.toLowerCase().includes('welcome') &&
-    !activity.title.toLowerCase().includes('ready to start')
-  );
+  // Use all generated activities (they're already unique)
+  const filteredActivities = allActivities;
 
-  // --- Current Activity / Progress (use filtered activities) ---
+  // --- Current Activity / Progress ---
   const currentActivity = filteredActivities[currentActivityIndex] || null;
   const totalRealActivities = filteredActivities.length;
   const targetLessonLength = 20; // 20 minutes
 
-  // --- Fixed Activity completion logic ---
+  // --- Activity completion logic ---
   const handleActivityComplete = (wasCorrect?: boolean) => {
     console.log('🎯 Activity completion triggered:', {
       currentActivityIndex,
       wasCorrect,
-      totalActivities: filteredActivities.length
+      totalActivities: filteredActivities.length,
+      activityId: currentActivity?.id
     });
 
     // Mark current activity as completed
@@ -96,10 +92,10 @@ export const useOptimizedLessonManager = ({
     // Small delay before advancing to next activity
     setTimeout(() => {
       if (currentActivityIndex < filteredActivities.length - 1) {
-        console.log('➡️ Advancing to next activity:', currentActivityIndex + 1);
+        console.log('➡️ Advancing to next unique activity:', currentActivityIndex + 1);
         setCurrentActivityIndex(prev => prev + 1);
       } else {
-        console.log('🏁 All activities completed - ending lesson');
+        console.log('🏁 All unique activities completed - ending lesson');
         setTimeout(() => {
           onLessonComplete();
         }, 2000);
@@ -124,9 +120,10 @@ export const useOptimizedLessonManager = ({
       'Completed:', Array.from(completedActivities),
       'isCurrentActivityCompleted:', isCurrentActivityCompleted,
       'canNavigateForward:', canNavigateForward,
-      'Total filtered activities:', totalRealActivities
+      'Total activities:', totalRealActivities,
+      'Current activity ID:', currentActivity?.id
     );
-  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward, totalRealActivities]);
+  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward, totalRealActivities, currentActivity]);
 
   return {
     currentActivityIndex,
