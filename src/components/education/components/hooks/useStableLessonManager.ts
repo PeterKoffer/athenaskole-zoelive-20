@@ -25,6 +25,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'content-delivery',
     phase: 'content-delivery',
     duration: 180,
+    phaseDescription: 'Welcome and introduction to the lesson',
     metadata: { subject, skillArea: 'introduction' },
     content: {
       segments: [{
@@ -41,6 +42,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'interactive-game',
     phase: 'interactive-game',
     duration: 240,
+    phaseDescription: 'Interactive addition practice',
     metadata: { subject, skillArea: 'addition' },
     content: {
       question: 'Emma has 15 stickers and finds 12 more. How many stickers does she have now?',
@@ -57,6 +59,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'interactive-game',
     phase: 'interactive-game',
     duration: 240,
+    phaseDescription: 'Interactive subtraction challenge',
     metadata: { subject, skillArea: 'subtraction' },
     content: {
       question: 'Jake has 45 marbles and gives 18 to his friend. How many marbles does Jake have left?',
@@ -73,6 +76,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'interactive-game',
     phase: 'interactive-game',
     duration: 240,
+    phaseDescription: 'Interactive multiplication practice',
     metadata: { subject, skillArea: 'multiplication' },
     content: {
       question: 'A classroom has 6 rows of desks with 5 desks in each row. How many desks are there in total?',
@@ -89,6 +93,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'interactive-game',
     phase: 'interactive-game',
     duration: 240,
+    phaseDescription: 'Interactive division discovery',
     metadata: { subject, skillArea: 'division' },
     content: {
       question: 'There are 48 cookies to be shared equally among 8 children. How many cookies will each child get?',
@@ -105,6 +110,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'interactive-game',
     phase: 'interactive-game',
     duration: 240,
+    phaseDescription: 'Interactive pattern recognition',
     metadata: { subject, skillArea: 'patterns' },
     content: {
       question: 'What comes next in this pattern: 5, 10, 15, 20, ?',
@@ -121,6 +127,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'interactive-game',
     phase: 'interactive-game',
     duration: 240,
+    phaseDescription: 'Interactive fraction practice',
     metadata: { subject, skillArea: 'fractions' },
     content: {
       question: 'Sarah ate 2/8 of a pizza. How much pizza is left?',
@@ -137,6 +144,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     type: 'content-delivery',
     phase: 'content-delivery',
     duration: 120,
+    phaseDescription: 'Lesson summary and celebration',
     metadata: { subject, skillArea: 'summary' },
     content: {
       segments: [{

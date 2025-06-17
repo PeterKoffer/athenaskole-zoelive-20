@@ -44,10 +44,10 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  // PRIORITY 2: Battle/Arena activities
+  // PRIORITY 2: Battle/Arena activities - check for quiz type instead of phase
   if (activity.title?.includes('Battle') || activity.title?.includes('Arena') || 
       activity.title?.includes('Quiz') || activity.title?.includes('Challenge') ||
-      activity.content?.battleScenario || activity.type === 'quiz' || activity.phase === 'quiz') {
+      activity.content?.battleScenario || activity.type === 'quiz') {
     console.log('🎮 Rendering as interactive quiz for battle/arena activity');
     return (
       <ActivityInteractiveQuiz
@@ -100,8 +100,8 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  // Quiz-based activities (Math Battle Arena, Sports Statistics, etc.)
-  if (activity.type === 'quiz' || activity.content?.question) {
+  // Activities with questions (but not necessarily quiz type)
+  if (activity.content?.question) {
     return (
       <ActivityInteractiveQuiz
         activity={activity}

@@ -38,6 +38,7 @@ export const useLessonActivitiesInitializer = (
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
+              phaseDescription: `Interactive question ${i + 1}`,
               metadata: {
                 subject: subject,
                 skillArea: skillArea,
@@ -63,6 +64,7 @@ export const useLessonActivitiesInitializer = (
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
+              phaseDescription: `Fallback question ${i + 1}`,
               metadata: {
                 subject: subject,
                 skillArea: skillArea
@@ -94,6 +96,7 @@ export const useLessonActivitiesInitializer = (
           type: 'interactive-game' as const,
           phase: 'interactive-game' as const,
           duration: 180,
+          phaseDescription: 'Emergency math question',
           metadata: {
             subject: subject,
             skillArea: skillArea

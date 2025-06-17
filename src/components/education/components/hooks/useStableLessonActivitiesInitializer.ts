@@ -46,6 +46,7 @@ export const useStableLessonActivitiesInitializer = (
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
+              phaseDescription: `Stable interactive question ${i + 1}`,
               metadata: Object.freeze({
                 subject: subject,
                 skillArea: skillArea,
@@ -71,6 +72,7 @@ export const useStableLessonActivitiesInitializer = (
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
+              phaseDescription: `Fallback stable question ${i + 1}`,
               metadata: Object.freeze({
                 subject: subject,
                 skillArea: skillArea
@@ -104,6 +106,7 @@ export const useStableLessonActivitiesInitializer = (
           type: 'interactive-game' as const,
           phase: 'interactive-game' as const,
           duration: 180,
+          phaseDescription: 'Emergency stable math question',
           metadata: Object.freeze({
             subject: subject,
             skillArea: skillArea
