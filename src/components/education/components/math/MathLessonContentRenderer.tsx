@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import AskNelieButtons from '../shared/AskNelieButtons';
 import { LessonActivity } from '../types/LessonTypes';
@@ -62,14 +61,8 @@ const MathLessonContentRenderer = ({
             showOnHover={false}
           >
             <div className="bg-blue-900/30 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-semibold text-blue-200">Examples for {studentName}:</h4>
-                <AskNelieButtons 
-                  content={`Here are some examples: ${activity.content.examples.join('. ')}`}
-                  context="examples"
-                />
-              </div>
-              <ul className="space-y-2">
+              <h4 className="font-semibold text-blue-200">Examples for {studentName}:</h4>
+              <ul className="space-y-2 mt-2">
                 {activity.content.examples.map((example: string, index: number) => (
                   <li key={index} className="text-blue-100">• {example}</li>
                 ))}

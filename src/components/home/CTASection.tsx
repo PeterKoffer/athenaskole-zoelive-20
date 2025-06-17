@@ -23,27 +23,31 @@ const CTASection = ({
   return (
     <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <TextWithSpeaker text="Ready to Transform Your Learning Experience?" context="cta-title" showOnHover={false}>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Transform Your Learning Experience?
-          </h2>
+        <TextWithSpeaker 
+          text="Ready to Transform Your Learning Experience? Join thousands of students who have already discovered the power of AI-enhanced education with Nelie." 
+          context="cta-section" 
+          position="corner"
+          showOnHover={false}
+        >
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Ready to Transform Your Learning Experience?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8">
+              Join thousands of students who have already discovered the power of AI-enhanced education with Nelie.
+            </p>
+            
+            <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+              <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto bg-white hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 text-slate-950">
+                Start Your Journey
+              </Button>
+              
+              <Button onClick={() => navigate("/daily-program")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white hover:bg-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 text-slate-950">
+                View Daily Program
+              </Button>
+            </div>
+          </div>
         </TextWithSpeaker>
-        
-        <TextWithSpeaker text="Join thousands of students who have already discovered the power of AI-enhanced education with Nelie." context="cta-description" className="mb-8">
-          <p className="text-xl text-blue-100 mb-8">
-            Join thousands of students who have already discovered the power of AI-enhanced education with Nelie.
-          </p>
-        </TextWithSpeaker>
-        
-        <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-          <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto bg-white hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 text-slate-950">
-            Start Your Journey
-          </Button>
-          
-          <Button onClick={() => navigate("/daily-program")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white hover:bg-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 text-slate-950">
-            View Daily Program
-          </Button>
-        </div>
       </div>
     </section>
   );
