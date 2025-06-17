@@ -23,12 +23,17 @@ interface ActivityCardProps {
 const ActivityCard = ({ activity, onStartActivity }: ActivityCardProps) => {
   const IconComponent = activity.icon;
 
+  const handleStartActivity = () => {
+    console.log(`🚀 Starting activity: ${activity.id} - ${activity.title}`);
+    onStartActivity(activity.id);
+  };
+
   return (
     <Card className="bg-gray-800 border-gray-700 hover:border-purple-400 transition-all duration-300 cursor-pointer transform hover:scale-105">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-lg bg-gradient-to-r ${activity.color}`}>
+            <div className="p-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600">
               <IconComponent className="w-6 h-6" />
             </div>
             <div>
@@ -51,8 +56,8 @@ const ActivityCard = ({ activity, onStartActivity }: ActivityCardProps) => {
           </div>
         </div>
         <Button 
-          onClick={() => onStartActivity(activity.id)} 
-          className={`w-full bg-gradient-to-r ${activity.color} hover:opacity-90 text-white border-none`}
+          onClick={handleStartActivity}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-none"
         >
           Start {activity.title}
         </Button>

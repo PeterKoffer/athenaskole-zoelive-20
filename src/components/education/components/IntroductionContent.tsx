@@ -92,7 +92,7 @@ const IntroductionContent = ({
           </div>
           <Button
             onClick={onStartLesson}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium"
           >
             Start Lesson Now
           </Button>

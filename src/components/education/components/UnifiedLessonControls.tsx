@@ -19,7 +19,7 @@ const UnifiedLessonControls = (props: LessonControlsProps) => {
           <Button
             onClick={onSubmitAnswer}
             disabled={selectedAnswer === null || disabled}
-            className="bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg max-w-xs sm:max-w-sm"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg max-w-xs sm:max-w-sm"
           >
             Submit Answer
           </Button>
@@ -27,7 +27,7 @@ const UnifiedLessonControls = (props: LessonControlsProps) => {
           <Button
             onClick={onNextQuestion}
             disabled={disabled}
-            className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg max-w-xs sm:max-w-sm"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg max-w-xs sm:max-w-sm"
           >
             {isLastQuestion ? 'Complete Lesson' : 'Next Question'}
           </Button>
@@ -44,7 +44,7 @@ const UnifiedLessonControls = (props: LessonControlsProps) => {
         <Button 
           onClick={onToggleSession} 
           disabled={disabled}
-          className={`${isSessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+          className={`${isSessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'}`}
         >
           {isSessionActive ? (
             <>

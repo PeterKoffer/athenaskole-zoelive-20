@@ -21,7 +21,7 @@ const SubjectsSection = () => {
       description: "Develop exceptional reading, writing, and communication skills through immersive storytelling and creative expression.",
       keyAreas: ["Creative Writing", "Literature", "Grammar"],
       path: "/learn/english",
-      gradient: "from-green-600 to-teal-600",
+      gradient: "from-blue-600 to-purple-600",
       icon: "📚"
     },
     {
@@ -29,7 +29,7 @@ const SubjectsSection = () => {
       description: "Explore the wonders of science through virtual experiments, simulations, and hands-on discovery learning.",
       keyAreas: ["Physics", "Chemistry", "Biology"],
       path: "/learn/science",
-      gradient: "from-purple-600 to-pink-600",
+      gradient: "from-blue-600 to-purple-600",
       icon: "🔬"
     },
     {
@@ -37,7 +37,7 @@ const SubjectsSection = () => {
       description: "Learn programming, AI, and computational thinking through gamified coding challenges and real projects.",
       keyAreas: ["Programming", "Algorithms", "AI/ML"],
       path: "/learn/computer-science",
-      gradient: "from-indigo-600 to-blue-600",
+      gradient: "from-blue-600 to-purple-600",
       icon: "💻"
     },
     {
@@ -45,7 +45,7 @@ const SubjectsSection = () => {
       description: "Express your creativity through digital art, music composition, and multimedia storytelling projects.",
       keyAreas: ["Digital Art", "Music Theory", "Design"],
       path: "/learn/creative-arts",
-      gradient: "from-pink-600 to-red-600",
+      gradient: "from-blue-600 to-purple-600",
       icon: "🎨"
     },
     {
@@ -53,10 +53,15 @@ const SubjectsSection = () => {
       description: "Explore rhythm, melody, and composition through interactive music theory and digital instrument mastery.",
       keyAreas: ["Music Theory", "Composition", "Performance"],
       path: "/learn/music",
-      gradient: "from-orange-600 to-yellow-600",
+      gradient: "from-blue-600 to-purple-600",
       icon: "🎵"
     }
   ];
+
+  const handleStartLearning = (path: string) => {
+    console.log(`🚀 Starting learning for path: ${path}`);
+    navigate(path);
+  };
 
   return (
     <section className="py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
@@ -105,7 +110,7 @@ const SubjectsSection = () => {
                 </div>
 
                 <Button
-                  onClick={() => navigate(subject.path)}
+                  onClick={() => handleStartLearning(subject.path)}
                   className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity`}
                 >
                   Start Learning
