@@ -19,26 +19,25 @@ export const useLessonActivitiesInitializer = (
 
   useEffect(() => {
     const initializeActivities = async () => {
-      console.log(`🚀 Initializing FRESH ${subject} lesson with unique questions (Session: ${sessionId})`);
+      console.log(`🚀 Initializing FRESH ${subject} lesson (Session: ${sessionId})`);
       setIsInitializing(true);
       
       try {
-        // Generate 8 completely unique questions for this lesson session
+        // Generate 6 completely unique questions for this lesson session
         const uniqueActivities: LessonActivity[] = [];
         
-        // Generate all questions in parallel for faster loading
-        const questionPromises = Array.from({ length: 8 }, async (_, i) => {
-          console.log(`📝 Generating unique question ${i + 1}/8...`);
+        for (let i = 0; i < 6; i++) {
+          console.log(`📝 Generating question ${i + 1}/6...`);
           
           try {
             const uniqueQuestion = generateUniqueQuestion();
             
             const activity: LessonActivity = {
               id: uniqueQuestion.id,
-              title: `Math Challenge ${i + 1}`,
+              title: `Question ${i + 1}`,
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
-              duration: 180, // 3 minutes per question
+              duration: 180,
               metadata: {
                 subject: subject,
                 skillArea: skillArea,
@@ -52,14 +51,15 @@ export const useLessonActivitiesInitializer = (
               }
             };
             
-            console.log(`✅ Generated unique question ${i + 1}: ${uniqueQuestion.content.question.substring(0, 50)}...`);
-            return activity;
+            uniqueActivities.push(activity);
+            console.log(`✅ Generated question ${i + 1}: ${uniqueQuestion.content.question.substring(0, 30)}...`);
           } catch (error) {
             console.error(`❌ Error generating question ${i + 1}:`, error);
-            // Return a fallback question with correct typing
+            
+            // Create a simple fallback question
             const fallbackActivity: LessonActivity = {
               id: `fallback_${Date.now()}_${i}`,
-              title: `Math Challenge ${i + 1}`,
+              title: `Question ${i + 1}`,
               type: 'interactive-game' as const,
               phase: 'interactive-game' as const,
               duration: 180,
@@ -68,30 +68,29 @@ export const useLessonActivitiesInitializer = (
                 skillArea: skillArea
               },
               content: {
-                question: `What is ${10 + i * 5} + ${15 + i * 3}?`,
-                options: [`${25 + i * 8}`, `${23 + i * 8}`, `${27 + i * 8}`, `${21 + i * 8}`],
+                question: `What is ${5 + i * 3} + ${7 + i * 2}?`,
+                options: [`${12 + i * 5}`, `${10 + i * 5}`, `${14 + i * 5}`, `${8 + i * 5}`],
                 correctAnswer: 0,
-                explanation: `${10 + i * 5} + ${15 + i * 3} = ${25 + i * 8}`
+                explanation: `${5 + i * 3} + ${7 + i * 2} = ${12 + i * 5}`
               }
             };
-            return fallbackActivity;
+            uniqueActivities.push(fallbackActivity);
           }
-        });
+        }
         
-        const generatedActivities = await Promise.all(questionPromises);
+        console.log(`🎯 Generated ${uniqueActivities.length} activities for session ${sessionId}`);
+        setAllActivities(uniqueActivities);
         
-        console.log(`🎯 All ${generatedActivities.length} unique questions generated for session ${sessionId}`);
-        setAllActivities(generatedActivities);
-        
-        // Start the timer now that activities are ready
+        // Start the timer
         startTimer();
         
       } catch (error) {
-        console.error('❌ Error generating unique activities:', error);
-        // Fallback to a simple question if generation fails
-        const fallbackActivity: LessonActivity = {
-          id: `fallback_${Date.now()}`,
-          title: 'Math Practice',
+        console.error('❌ Critical error in initialization:', error);
+        
+        // Ensure we have at least one activity
+        const emergencyActivity: LessonActivity = {
+          id: `emergency_${Date.now()}`,
+          title: 'Math Question',
           type: 'interactive-game' as const,
           phase: 'interactive-game' as const,
           duration: 180,
@@ -106,9 +105,10 @@ export const useLessonActivitiesInitializer = (
             explanation: '15 + 23 = 38'
           }
         };
-        setAllActivities([fallbackActivity]);
+        setAllActivities([emergencyActivity]);
       } finally {
-        console.log('🏁 Initialization complete, setting isInitializing to false');
+        // ALWAYS set initializing to false
+        console.log('🏁 Setting isInitializing to false');
         setIsInitializing(false);
       }
     };

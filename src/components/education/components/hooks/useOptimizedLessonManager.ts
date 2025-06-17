@@ -7,7 +7,6 @@ import { LessonActivity } from '../types/LessonTypes';
 
 import { useLessonActivitiesInitializer } from './useLessonActivitiesInitializer';
 import { useActivityNavigation } from './useActivityNavigation';
-import { useActivityCompletion } from './useActivityCompletion';
 import { useLessonScore } from './useLessonScore';
 import { useSpeechHandler } from './useSpeechHandler';
 
@@ -59,14 +58,8 @@ export const useOptimizedLessonManager = ({
     setCurrentActivityIndex
   });
 
-  // ONLY use interactive-game activities - NO welcome screens, NO introduction activities
-  const filteredActivities = allActivities.filter(activity => 
-    activity.type === 'interactive-game' && 
-    activity.phase === 'interactive-game' &&
-    !activity.title.toLowerCase().includes('welcome') &&
-    !activity.title.toLowerCase().includes('introduction') &&
-    !activity.title.toLowerCase().includes('ready to start')
-  );
+  // Use activities directly - no filtering (they're already clean from initializer)
+  const filteredActivities = allActivities;
 
   // --- Current Activity / Progress ---
   const currentActivity = filteredActivities[currentActivityIndex] || null;
@@ -98,10 +91,10 @@ export const useOptimizedLessonManager = ({
     // Small delay before advancing to next activity
     setTimeout(() => {
       if (currentActivityIndex < filteredActivities.length - 1) {
-        console.log('➡️ Advancing to next unique activity:', currentActivityIndex + 1);
+        console.log('➡️ Advancing to next activity:', currentActivityIndex + 1);
         setCurrentActivityIndex(prev => prev + 1);
       } else {
-        console.log('🏁 All unique activities completed - ending lesson');
+        console.log('🏁 All activities completed - ending lesson');
         setTimeout(() => {
           onLessonComplete();
         }, 2000);
@@ -122,17 +115,15 @@ export const useOptimizedLessonManager = ({
 
   // --- Debug ---
   useEffect(() => {
-    console.log('[OptimizedLessonManager] Index:', currentActivityIndex,
-      'Completed:', Array.from(completedActivities),
-      'isCurrentActivityCompleted:', isCurrentActivityCompleted,
-      'canNavigateForward:', canNavigateForward,
-      'Total activities:', totalRealActivities,
-      'Current activity ID:', currentActivity?.id,
-      'Is initializing:', isInitializing,
-      'All activities count:', allActivities.length,
-      'Filtered activities count:', filteredActivities.length
-    );
-  }, [currentActivityIndex, completedActivities, isCurrentActivityCompleted, canNavigateForward, totalRealActivities, currentActivity, isInitializing, allActivities.length, filteredActivities.length]);
+    console.log('[OptimizedLessonManager] Debug Info:', {
+      currentActivityIndex,
+      totalActivities: totalRealActivities,
+      isInitializing,
+      hasCurrentActivity: !!currentActivity,
+      currentActivityId: currentActivity?.id,
+      activitiesCount: allActivities.length
+    });
+  }, [currentActivityIndex, totalRealActivities, isInitializing, currentActivity, allActivities.length]);
 
   return {
     currentActivityIndex,
@@ -143,7 +134,7 @@ export const useOptimizedLessonManager = ({
     score,
     correctStreak,
     targetLessonLength,
-    isInitializing: isInitializing || filteredActivities.length === 0,
+    isInitializing,
     completedActivities,
     isCurrentActivityCompleted,
     canNavigateForward,

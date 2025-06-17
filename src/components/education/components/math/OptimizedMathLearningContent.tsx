@@ -70,23 +70,25 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     setCurrentActivityIndex(index);
   };
 
-  // Show loading state during initialization
+  // Show loading ONLY when actually initializing
   if (isInitializing) {
+    console.log('🔄 Showing loading screen - isInitializing:', isInitializing);
     return (
       <MathLearningLoading studentName={studentName} />
     );
   }
 
-  // If no current activity but not initializing, show error
+  // If initialization complete but no activity, show error
   if (!currentActivity) {
+    console.log('❌ No current activity available');
     return (
       <div className="w-full max-w-4xl mx-auto px-4 py-6">
         <div className="bg-red-900/50 border border-red-700 rounded-lg p-8 text-center backdrop-blur-sm">
-          <h3 className="text-xl font-semibold text-white mb-2">No Activities Available</h3>
-          <p className="text-red-300">Please try refreshing the lesson, {studentName}.</p>
+          <h3 className="text-xl font-semibold text-white mb-2">Unable to Load Activities</h3>
+          <p className="text-red-300 mb-4">There was an issue loading your math activities, {studentName}.</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
+            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded text-white font-bold"
           >
             Refresh Lesson
           </button>
@@ -95,7 +97,8 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     );
   }
 
-  // Show the main content directly - NO welcome screens
+  // Show the main content - NO green boxes, NO welcome screens
+  console.log('✅ Showing main content with activity:', currentActivity.id);
   return (
     <MathLearningMainContent
       studentName={studentName}
