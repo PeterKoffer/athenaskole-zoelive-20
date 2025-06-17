@@ -38,11 +38,11 @@ const CTASection = ({
             </p>
             
             <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-              <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto bg-white hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 text-slate-950">
+              <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105">
                 Start Your Journey
               </Button>
               
-              <Button onClick={() => navigate("/daily-program")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white hover:bg-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 text-slate-950">
+              <Button onClick={() => navigate("/daily-program")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white hover:bg-white hover:text-blue-600 font-semibold py-3 px-8 rounded-lg transition-all duration-300 text-white">
                 View Daily Program
               </Button>
             </div>

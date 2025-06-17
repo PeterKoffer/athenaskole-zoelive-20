@@ -71,7 +71,7 @@ const UnifiedClassIntroductionControls = ({
           <Button
             type="button"
             onClick={handleManualStart}
-            className="h-10 px-4 font-bold bg-green-600 hover:bg-green-700 text-white flex items-center justify-center text-sm transition-none"
+            className="h-10 px-4 font-bold bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white flex items-center justify-center text-sm transition-none"
             disabled={isAdvancing}
             style={{
               letterSpacing: '0.01em',
@@ -108,7 +108,7 @@ const UnifiedClassIntroductionControls = ({
             <Button
               type="button"
               onClick={onIntroductionComplete}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6"
               disabled={isAdvancing}
             >
               Start Class
@@ -119,7 +119,7 @@ const UnifiedClassIntroductionControls = ({
                 <Button
                   type="button"
                   onClick={handleStartLesson}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6"
                   disabled={isAdvancing}
                 >
                   Start Lesson
