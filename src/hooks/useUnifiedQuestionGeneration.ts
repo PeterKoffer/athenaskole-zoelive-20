@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { UniqueQuestion } from '@/services/globalQuestionUniquenessService';
@@ -140,7 +141,7 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     return {
       ...generationStats,
       successRate: generationStats.totalGenerated > 0 
-        ? Math.round((generationStats.totalGenerated / Math.max(generationStats.averageAttempts * generationStats.totalGenerated, 1)) * 100)
+        ? Math.round((generationStats.totalGenerated / Math.max(generationStats.totalGenerated, 1)) * 100)
         : 0,
       aiSuccessRate: generationStats.totalGenerated > 0
         ? Math.round((generationStats.aiGenerated / generationStats.totalGenerated) * 100)

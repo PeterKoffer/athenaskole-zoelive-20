@@ -141,8 +141,7 @@ class ScalableQuestionGenerationService {
         difficultyLevel: config.difficultyLevel,
         timestamp: Date.now(),
         userId: config.userId,
-        source: 'ai',
-        attempt
+        sessionId: `ai_generation_${attempt}`
       }
     };
 
@@ -181,7 +180,7 @@ class ScalableQuestionGenerationService {
         difficultyLevel: config.difficultyLevel,
         timestamp: Date.now(),
         userId: config.userId,
-        source: 'fallback'
+        sessionId: 'fallback_generation'
       }
     };
 
