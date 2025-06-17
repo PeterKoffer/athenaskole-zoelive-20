@@ -13,7 +13,7 @@ const RefactoredFloatingAITutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   
-  const { isDragging, position, dragRef, handleMouseDown } = useDragBehavior();
+  const { isDragging, position, dragRef, handleMouseDown, hasMoved } = useDragBehavior();
   const { messages, addUserMessage, addNelieMessage } = useFloatingTutorMessages();
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
@@ -62,6 +62,7 @@ const RefactoredFloatingAITutor = () => {
           onMouseDown={handleMouseDown}
           position={position}
           isDragging={isDragging}
+          hasMoved={hasMoved}
         />
       </div>
     );

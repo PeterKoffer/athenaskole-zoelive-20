@@ -7,18 +7,22 @@ interface FloatingButtonProps {
   onMouseDown: (e: React.MouseEvent) => void;
   position: { x: number; y: number };
   isDragging: boolean;
+  hasMoved?: boolean;
 }
 
 const FloatingButton: React.FC<FloatingButtonProps> = ({
   onClick,
   onMouseDown,
   position,
-  isDragging
+  isDragging,
+  hasMoved = false
 }) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isDragging) {
+    
+    // Only trigger click if we haven't moved (not dragging)
+    if (!isDragging && !hasMoved) {
       onClick();
     }
   };
