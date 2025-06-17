@@ -33,7 +33,8 @@ const EnhancedActivityRenderer = ({
 
   // PRIORITY 1: Check for Pizza Factory and similar simulation games FIRST
   if (activity.title.includes('Pizza') || activity.title.includes('Factory') || 
-      activity.content?.simulationDescription || activity.content?.scenarios) {
+      activity.content?.simulationDescription || activity.content?.scenarios ||
+      activity.type === 'simulation' || activity.phase === 'simulation') {
     console.log('🍕 Rendering Pizza Factory as simulation game');
     return (
       <ActivitySimulationGame
@@ -46,7 +47,7 @@ const EnhancedActivityRenderer = ({
   // PRIORITY 2: Battle/Arena activities
   if (activity.title?.includes('Battle') || activity.title?.includes('Arena') || 
       activity.title?.includes('Quiz') || activity.title?.includes('Challenge') ||
-      activity.content?.battleScenario) {
+      activity.content?.battleScenario || activity.type === 'quiz' || activity.phase === 'quiz') {
     console.log('🎮 Rendering as interactive quiz for battle/arena activity');
     return (
       <ActivityInteractiveQuiz
@@ -56,7 +57,7 @@ const EnhancedActivityRenderer = ({
     );
   }
 
-  // PRIORITY 3: Other simulation games (removed invalid gameType comparison)
+  // PRIORITY 3: Other simulation games
   if (activity.title.includes('Shop')) {
     return (
       <ActivitySimulationGame
@@ -67,7 +68,8 @@ const EnhancedActivityRenderer = ({
   }
 
   // Adventure games
-  if (activity.content?.gameType === 'adventure-game' || activity.title.includes('Adventure')) {
+  if (activity.content?.gameType === 'adventure-game' || activity.title.includes('Adventure') ||
+      activity.type === 'adventure-game' || activity.phase === 'adventure-game') {
     return (
       <ActivityAdventureGame
         activity={activity}
@@ -77,7 +79,8 @@ const EnhancedActivityRenderer = ({
   }
 
   // Puzzle quests
-  if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || activity.title.includes('Mystery')) {
+  if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || 
+      activity.title.includes('Mystery')) {
     return (
       <ActivityPuzzleQuest
         activity={activity}

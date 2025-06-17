@@ -6,6 +6,7 @@ import { Brain, Play } from 'lucide-react';
 import { useConsolidatedSpeech } from '@/hooks/useConsolidatedSpeech';
 import { useInteractiveLessonState, LessonState } from './hooks/useInteractiveLessonState';
 import { useInteractiveLessonQuestions } from './hooks/useInteractiveLessonQuestions';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonQuestionCard from './LessonQuestionCard';
 
@@ -47,10 +48,20 @@ const InteractiveLessonSession = ({
     toggleEnabled: handleMuteToggle
   } = useConsolidatedSpeech();
 
+  // Add sound effects hook
+  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
+
   const handleSubmitAnswerWithSpeech = () => {
     if (!currentQuestion) return;
     
     const isCorrect = handleSubmitAnswer(currentQuestion);
+    
+    // Play sound effect based on correctness
+    if (isCorrect) {
+      playCorrectAnswerSound();
+    } else {
+      playWrongAnswerSound();
+    }
     
     // Speak result with proper timing
     if (autoReadEnabled) {

@@ -1,11 +1,17 @@
 
 export interface LessonActivity {
   id: string;
-  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
-  phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
+  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'adventure-game';
+  phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'adventure-game';
   title: string;
   duration: number;
   phaseDescription: string;
+  metadata?: {
+    subject?: string;
+    skillArea?: string;
+    templateId?: string;
+    [key: string]: any;
+  };
   content: {
     // Content delivery fields
     text?: string;
@@ -26,7 +32,7 @@ export interface LessonActivity {
     question?: string;
     options?: string[];
     correctAnswer?: number;
-    gameType?: 'problem-solving' | 'matching' | 'true-false' | 'adventure-game';
+    gameType?: 'problem-solving' | 'matching' | 'true-false' | 'adventure-game' | 'puzzle-quest' | 'creative-builder' | 'exploration-sim';
 
     // Introduction fields
     hook?: string;
@@ -91,6 +97,13 @@ export interface LessonActivity {
       type: 'boss-battle' | 'final-project' | 'presentation' | 'epic-quest';
       celebration: string;
     };
+
+    // Simulation fields
+    simulationDescription?: string;
+    scenarios?: any[];
+
+    // Battle scenario fields
+    battleScenario?: any;
 
     // Legacy and additional fields
     story?: string;
