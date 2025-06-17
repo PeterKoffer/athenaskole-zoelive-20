@@ -31,12 +31,12 @@ const generateUnifiedLessonActivities = (subject: string, skillArea: string): Le
     }
   });
 
-  // 2-4. Interactive Questions (subject-specific)
+  // 2-4. Interactive Questions (subject-specific WITH PROPER QUESTION STRUCTURE)
   const questionTopics = getSubjectQuestions(subject);
   questionTopics.forEach((topic, index) => {
     activities.push({
       id: `${lessonId}_question_${index + 1}`,
-      title: topic.title,
+      title: `${topic.title}`,
       type: 'interactive-game',
       phase: 'interactive-game',
       duration: 240,
@@ -46,7 +46,10 @@ const generateUnifiedLessonActivities = (subject: string, skillArea: string): Le
         question: topic.question,
         options: topic.options,
         correctAnswer: topic.correctAnswer,
-        explanation: topic.explanation
+        explanation: topic.explanation,
+        // Add these required fields for proper question rendering
+        text: topic.question,
+        choices: topic.options
       }
     });
   });
@@ -103,10 +106,11 @@ const generateUnifiedLessonActivities = (subject: string, skillArea: string): Le
     }
   });
 
+  console.log(`🎯 Generated ${activities.length} activities for ${subject}:`, activities.map(a => a.title));
   return activities;
 };
 
-// Subject-specific question generators
+// Subject-specific question generators - FIXED TO ACTUALLY GENERATE PROPER QUESTIONS
 const getSubjectQuestions = (subject: string) => {
   const questionSets: Record<string, any[]> = {
     mathematics: [
@@ -225,7 +229,10 @@ export const useUnifiedLessonTemplate = ({
   onLessonComplete
 }: UseUnifiedLessonTemplateProps) => {
   const { user } = useAuth();
-  const [allActivities] = useState(() => generateUnifiedLessonActivities(subject, skillArea));
+  const [allActivities] = useState(() => {
+    console.log(`🚀 Generating unified lesson activities for ${subject}`);
+    return generateUnifiedLessonActivities(subject, skillArea);
+  });
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [correctStreak, setCorrectStreak] = useState(0);
@@ -236,6 +243,18 @@ export const useUnifiedLessonTemplate = ({
 
   const targetLessonLength = 1200; // 20 minutes
   const currentActivity = allActivities[currentActivityIndex] || null;
+
+  // Debug current activity
+  useEffect(() => {
+    console.log(`🎭 Current activity for ${subject}:`, {
+      index: currentActivityIndex,
+      activity: currentActivity,
+      hasQuestion: !!currentActivity?.content?.question,
+      hasOptions: !!currentActivity?.content?.options,
+      activityType: currentActivity?.type,
+      activityPhase: currentActivity?.phase
+    });
+  }, [currentActivity, currentActivityIndex, subject]);
 
   // Start timer when lesson begins
   useEffect(() => {
