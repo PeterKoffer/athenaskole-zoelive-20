@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubjectSpecificQuestions } from './hooks/useSubjectSpecificQuestions';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import QuestionLoadingState from './question/QuestionLoadingState';
 import QuestionErrorState from './question/QuestionErrorState';
 import QuestionActivityHeader from './question/QuestionActivityHeader';
@@ -27,6 +28,7 @@ const OptimizedQuestionActivity = ({
   totalQuestions = 6
 }: OptimizedQuestionActivityProps) => {
   const { user } = useAuth();
+  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -83,8 +85,15 @@ const OptimizedQuestionActivity = ({
     setShowResult(true);
     setHasAnswered(true);
     
+    // Play dopamine-inducing sound effect for correct answers
+    if (correct) {
+      playCorrectAnswerSound();
+    } else {
+      playWrongAnswerSound();
+    }
+    
     console.log('📝 Answer selected:', answerIndex, 'Correct:', correct);
-  }, [currentQuestion, hasAnswered]);
+  }, [currentQuestion, hasAnswered, playCorrectAnswerSound, playWrongAnswerSound]);
 
   const handleContinue = useCallback(() => {
     console.log('➡️ Continuing to next activity, was correct:', isCorrect);

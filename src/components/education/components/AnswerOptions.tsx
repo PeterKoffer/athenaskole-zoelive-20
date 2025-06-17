@@ -1,6 +1,8 @@
 
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle } from 'lucide-react';
+import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 interface AnswerOptionsProps {
   options: string[];
@@ -19,6 +21,13 @@ const AnswerOptions = ({
   onAnswerSelect,
   disabled = false
 }: AnswerOptionsProps) => {
+  const { speakAsNelie } = useUnifiedSpeech();
+
+  const handleSpeakOption = async (option: string, index: number) => {
+    const optionLetter = String.fromCharCode(65 + index);
+    await speakAsNelie(`Option ${optionLetter}: ${option}`, true, 'answer-option');
+  };
+
   const getOptionClassName = (index: number) => {
     if (selectedAnswer === index) {
       if (showResult) {
@@ -39,24 +48,34 @@ const AnswerOptions = ({
   return (
     <div className="space-y-2 sm:space-y-3 px-2 sm:px-0">
       {options.map((option: string, index: number) => (
-        <Button
-          key={index}
-          variant="outline"
-          className={`w-full text-left justify-start p-3 sm:p-4 h-auto transition-all duration-200 text-sm sm:text-base ${getOptionClassName(index)}`}
-          onClick={() => !disabled && !showResult && onAnswerSelect(index)}
-          disabled={showResult || disabled}
-        >
-          <span className="mr-2 sm:mr-3 font-semibold text-base sm:text-lg">
-            {String.fromCharCode(65 + index)}.
-          </span>
-          <span className="flex-1 break-words">{option}</span>
-          {showResult && index === correctAnswer && (
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-green-400 flex-shrink-0" />
-          )}
-          {showResult && selectedAnswer === index && index !== correctAnswer && (
-            <XCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-red-400 flex-shrink-0" />
-          )}
-        </Button>
+        <div key={index} className="relative">
+          <Button
+            variant="outline"
+            className={`w-full text-left justify-start p-3 sm:p-4 h-auto transition-all duration-200 text-sm sm:text-base ${getOptionClassName(index)}`}
+            onClick={() => !disabled && !showResult && onAnswerSelect(index)}
+            disabled={showResult || disabled}
+          >
+            <span className="mr-2 sm:mr-3 font-semibold text-base sm:text-lg">
+              {String.fromCharCode(65 + index)}.
+            </span>
+            <span className="flex-1 break-words pr-10">{option}</span>
+            {showResult && index === correctAnswer && (
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-green-400 flex-shrink-0" />
+            )}
+            {showResult && selectedAnswer === index && index !== correctAnswer && (
+              <XCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-red-400 flex-shrink-0" />
+            )}
+          </Button>
+          
+          {/* Speaker icon for each answer option */}
+          <button
+            onClick={() => handleSpeakOption(option, index)}
+            className="absolute top-2 right-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 opacity-90 hover:opacity-100"
+            title="Ask Nelie to read this option"
+          >
+            <CustomSpeakerIcon className="w-3 h-3" size={12} color="#0ea5e9" />
+          </button>
+        </div>
       ))}
     </div>
   );

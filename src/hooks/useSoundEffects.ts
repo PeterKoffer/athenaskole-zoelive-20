@@ -15,43 +15,55 @@ export const useSoundEffects = () => {
     try {
       const audioContext = initAudioContext();
       
-      // Create a pleasant, dopamine-inducing sound sequence
+      // Create a euphoric, dopamine-inducing sound sequence
       const oscillator1 = audioContext.createOscillator();
       const oscillator2 = audioContext.createOscillator();
+      const oscillator3 = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
       // Connect nodes
       oscillator1.connect(gainNode);
       oscillator2.connect(gainNode);
+      oscillator3.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
-      // Set up the first note (C5 - 523.25 Hz)
-      oscillator1.frequency.setValueAtTime(523.25, audioContext.currentTime);
-      oscillator1.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
-      oscillator1.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+      // Create a triumphant major chord progression (C-E-G to F-A-C to G-B-D)
+      // First chord: C Major
+      oscillator1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+      oscillator2.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+      oscillator3.frequency.setValueAtTime(783.99, audioContext.currentTime); // G5
       
-      // Set up the second note for harmony (E5 - 659.25 Hz)
-      oscillator2.frequency.setValueAtTime(659.25, audioContext.currentTime);
-      oscillator2.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.1); // G5
-      oscillator2.frequency.setValueAtTime(1046.5, audioContext.currentTime + 0.2); // C6
+      // Second chord: F Major (uplifting transition)
+      oscillator1.frequency.setValueAtTime(698.46, audioContext.currentTime + 0.15); // F5
+      oscillator2.frequency.setValueAtTime(880.00, audioContext.currentTime + 0.15); // A5
+      oscillator3.frequency.setValueAtTime(1046.5, audioContext.currentTime + 0.15); // C6
       
-      // Set oscillator types for pleasant sound
+      // Final chord: G Major (resolution with higher octave for excitement)
+      oscillator1.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.3); // G5
+      oscillator2.frequency.setValueAtTime(987.77, audioContext.currentTime + 0.3); // B5
+      oscillator3.frequency.setValueAtTime(1174.7, audioContext.currentTime + 0.3); // D6
+      
+      // Set oscillator types for rich, warm sound
       oscillator1.type = 'triangle';
       oscillator2.type = 'sine';
+      oscillator3.type = 'triangle';
       
-      // Create envelope for smooth attack and decay
+      // Create euphoric envelope - quick attack, sustained high, gentle decay
       gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
-      gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.15);
-      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4);
+      gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.05); // Quick attack
+      gainNode.gain.setValueAtTime(0.35, audioContext.currentTime + 0.2); // Sustain
+      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.35); // Keep energy
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6); // Gentle fade
       
       // Start and stop oscillators
       oscillator1.start(audioContext.currentTime);
       oscillator2.start(audioContext.currentTime);
-      oscillator1.stop(audioContext.currentTime + 0.4);
-      oscillator2.stop(audioContext.currentTime + 0.4);
+      oscillator3.start(audioContext.currentTime);
+      oscillator1.stop(audioContext.currentTime + 0.6);
+      oscillator2.stop(audioContext.currentTime + 0.6);
+      oscillator3.stop(audioContext.currentTime + 0.6);
       
-      console.log('🔊 Playing correct answer sound effect!');
+      console.log('🎉 Playing dopamine-inducing correct answer sound!');
     } catch (error) {
       console.error('❌ Error playing sound effect:', error);
     }
