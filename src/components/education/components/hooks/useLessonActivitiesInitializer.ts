@@ -47,11 +47,6 @@ export const useLessonActivitiesInitializer = (
               options: uniqueQuestion.content.options,
               correctAnswer: uniqueQuestion.content.correctAnswer,
               explanation: uniqueQuestion.content.explanation
-            },
-            adaptiveElements: {
-              difficultyAdjustment: true,
-              personalizedFeedback: true,
-              engagementTracking: true
             }
           };
           
@@ -84,11 +79,6 @@ export const useLessonActivitiesInitializer = (
             options: ['38', '35', '40', '33'],
             correctAnswer: 0,
             explanation: '15 + 23 = 38'
-          },
-          adaptiveElements: {
-            difficultyAdjustment: false,
-            personalizedFeedback: true,
-            engagementTracking: true
           }
         };
         setAllActivities([fallbackActivity]);
