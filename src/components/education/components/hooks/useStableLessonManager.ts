@@ -30,6 +30,7 @@ export const useStableLessonManager = ({
   // --- State ---
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [completedActivities, setCompletedActivities] = useState<Set<number>>(new Set());
+  const completionInProgress = useRef(false);
 
   const { score, setScore, correctStreak, setCorrectStreak } = useLessonScore();
 
@@ -68,6 +69,14 @@ export const useStableLessonManager = ({
 
   // --- Activity completion logic ---
   const handleActivityComplete = (wasCorrect?: boolean) => {
+    // Prevent multiple simultaneous completions
+    if (completionInProgress.current) {
+      console.log('🚫 Activity completion already in progress, ignoring');
+      return;
+    }
+
+    completionInProgress.current = true;
+
     console.log('🎯 Stable activity completion triggered:', {
       currentActivityIndex,
       wasCorrect,
@@ -88,15 +97,17 @@ export const useStableLessonManager = ({
       console.log('❌ Incorrect answer - streak reset');
     }
 
-    // Small delay before advancing to next activity
+    // Delay before advancing to prevent navigation issues
     setTimeout(() => {
       if (currentActivityIndex < filteredActivities.length - 1) {
         console.log('➡️ Advancing to next stable activity:', currentActivityIndex + 1);
         setCurrentActivityIndex(prev => prev + 1);
+        completionInProgress.current = false;
       } else {
         console.log('🏁 All stable activities completed - ending lesson');
         setTimeout(() => {
           onLessonComplete();
+          completionInProgress.current = false;
         }, 2000);
       }
     }, 1500);
@@ -121,7 +132,8 @@ export const useStableLessonManager = ({
       isInitializing,
       hasCurrentActivity: !!currentActivity,
       currentActivityId: currentActivity?.id,
-      activitiesCount: allActivities.length
+      activitiesCount: allActivities.length,
+      completionInProgress: completionInProgress.current
     });
   }, [currentActivityIndex, totalRealActivities, isInitializing, currentActivity, allActivities.length]);
 

@@ -12,6 +12,7 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [score, setScore] = useState(0);
+  const [hasCompleted, setHasCompleted] = useState(false);
 
   // Extract stable content once and never re-compute
   const stableContent = useMemo(() => {
@@ -41,22 +42,27 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
     setShowResult(false);
     setTimeLeft(30);
     setScore(0);
+    setHasCompleted(false);
   }, [activity.id]);
 
   // Timer logic
   useEffect(() => {
-    if (timeLeft > 0 && !showResult && stableContent) {
+    if (timeLeft > 0 && !showResult && stableContent && !hasCompleted) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !showResult && stableContent) {
+    } else if (timeLeft === 0 && !showResult && stableContent && !hasCompleted) {
       handleTimeUp();
     }
-  }, [timeLeft, showResult, stableContent]);
+  }, [timeLeft, showResult, stableContent, hasCompleted]);
 
   const handleTimeUp = () => {
+    if (hasCompleted) return;
+    
     console.log('⏰ Time up! Auto-completing activity');
     setShowResult(true);
     setScore(0);
+    setHasCompleted(true);
+    
     setTimeout(() => {
       console.log('🚀 Auto-advancing after time up');
       onActivityComplete(false);
@@ -64,21 +70,24 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (!showResult && stableContent) {
+    if (!showResult && stableContent && !hasCompleted) {
       console.log('📝 Answer selected:', answerIndex);
       setSelectedAnswer(answerIndex);
     }
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer === null || !stableContent) return;
+    if (selectedAnswer === null || !stableContent || hasCompleted) return;
     
     console.log('✅ Submitting answer:', selectedAnswer, 'Correct:', stableContent.correctAnswer);
     setShowResult(true);
+    setHasCompleted(true);
+    
     const isCorrect = selectedAnswer === stableContent.correctAnswer;
     const earnedScore = isCorrect ? timeLeft * 10 : 0;
     setScore(earnedScore);
     
+    // Ensure we only call completion once
     setTimeout(() => {
       console.log('🚀 Activity completed, advancing:', isCorrect);
       onActivityComplete(isCorrect);
