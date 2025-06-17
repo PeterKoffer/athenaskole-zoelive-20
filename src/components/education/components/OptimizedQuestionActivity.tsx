@@ -64,14 +64,7 @@ const OptimizedQuestionActivity = ({
       if (!currentQuestion && !isGeneratingQuestion) {
         console.log('🎯 Generating initial question for OptimizedQuestionActivity');
         
-        // Add randomization to prevent repetitive questions
-        const variationSeed = Date.now() + Math.random() * 1000;
-        const question = await generateQuestion({
-          seed: variationSeed,
-          previousQuestions: usedQuestionIds,
-          difficulty: difficultyLevel + (questionNumber * 0.1), // Slight difficulty progression
-          avoidSimilar: true
-        });
+        const question = await generateQuestion();
         
         if (question) {
           setCurrentQuestion(question);
@@ -106,15 +99,8 @@ const OptimizedQuestionActivity = ({
     setHasAnswered(false);
     setQuestionAttempts(prev => prev + 1);
     
-    // Generate a more varied question to prevent repetition
-    const variationSeed = Date.now() + Math.random() * 1000 + questionAttempts * 100;
-    const newQuestion = await generateQuestion({
-      seed: variationSeed,
-      previousQuestions: usedQuestionIds,
-      difficulty: difficultyLevel + (questionAttempts * 0.2),
-      avoidSimilar: true,
-      forceNew: true
-    });
+    // Generate a new question
+    const newQuestion = await generateQuestion();
     
     if (newQuestion) {
       setCurrentQuestion(newQuestion);
