@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, UserPlus, School, Menu, GraduationCap, Calendar } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SchoolNavbar from "@/components/school/SchoolNavbar";
 import SchoolStatsCards from "@/components/school/SchoolStatsCards";
 import SchoolOverviewTab from "@/components/school/SchoolOverviewTab";
@@ -19,6 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 const SchoolDashboard = () => {
   const { userRole } = useRoleAccess();
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [showTeachingSettings, setShowTeachingSettings] = useState(false);
 
   console.log('[SchoolDashboard] Rendering with role:', userRole, 'loading:', loading);
@@ -103,15 +105,24 @@ const SchoolDashboard = () => {
                   Student Management
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/school-dashboard')}
+                  >
                     <UserPlus className="w-4 h-4 mr-2" />
                     Register New Student
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/school-dashboard')}
+                  >
                     <Users className="w-4 h-4 mr-2" />
                     View All Students
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/student-records')}
+                  >
                     <ClipboardList className="w-4 h-4 mr-2" />
                     Student Records
                   </DropdownMenuItem>
@@ -127,19 +138,31 @@ const SchoolDashboard = () => {
                   Analytics & Reports
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/school-dashboard')}
+                  >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     Performance Statistics
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/academic-reports')}
+                  >
                     <GraduationCap className="w-4 h-4 mr-2" />
                     Academic Reports
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/attendance-analytics')}
+                  >
                     <Users className="w-4 h-4 mr-2" />
                     Attendance Analytics
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/progress-tracking')}
+                  >
                     <ClipboardList className="w-4 h-4 mr-2" />
                     Progress Tracking
                   </DropdownMenuItem>
@@ -149,7 +172,10 @@ const SchoolDashboard = () => {
               <DropdownMenuSeparator className="bg-gray-700" />
 
               {/* Class Management */}
-              <DropdownMenuItem className="hover:bg-gray-700">
+              <DropdownMenuItem 
+                className="hover:bg-gray-700"
+                onClick={() => navigate('/school-dashboard')}
+              >
                 <School className="w-4 h-4 mr-2" />
                 Manage Classes
               </DropdownMenuItem>
@@ -163,15 +189,24 @@ const SchoolDashboard = () => {
                   Communication
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/school-dashboard')}
+                  >
                     <MessageSquare className="w-4 h-4 mr-2" />
                     Message Parents
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/teacher-communications')}
+                  >
                     <Users className="w-4 h-4 mr-2" />
                     Teacher Communications
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => navigate('/announcements')}
+                  >
                     <Calendar className="w-4 h-4 mr-2" />
                     Announcements
                   </DropdownMenuItem>

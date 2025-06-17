@@ -18,6 +18,14 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import DailyProgram from '@/pages/DailyProgram';
 import CurriculumDashboard from '@/components/curriculum/CurriculumDashboard';
 
+// Import new school management pages
+import StudentRecordsPage from '@/pages/StudentRecordsPage';
+import AcademicReportsPage from '@/pages/AcademicReportsPage';
+import AttendanceAnalyticsPage from '@/pages/AttendanceAnalyticsPage';
+import ProgressTrackingPage from '@/pages/ProgressTrackingPage';
+import TeacherCommunicationsPage from '@/pages/TeacherCommunicationsPage';
+import AnnouncementsPage from '@/pages/AnnouncementsPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -42,6 +50,14 @@ function AppRoutes() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/daily-program" element={<DailyProgram />} />
         <Route path="/curriculum" element={<CurriculumDashboard />} />
+        
+        {/* School management pages */}
+        <Route path="/student-records" element={<StudentRecordsPage />} />
+        <Route path="/academic-reports" element={<AcademicReportsPage />} />
+        <Route path="/attendance-analytics" element={<AttendanceAnalyticsPage />} />
+        <Route path="/progress-tracking" element={<ProgressTrackingPage />} />
+        <Route path="/teacher-communications" element={<TeacherCommunicationsPage />} />
+        <Route path="/announcements" element={<AnnouncementsPage />} />
       </Routes>
       {user && <FloatingAITutor />}
     </>
