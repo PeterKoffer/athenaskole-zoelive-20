@@ -34,15 +34,19 @@ export const useLessonActivitiesInitializer = (
           const activity: LessonActivity = {
             id: uniqueQuestion.id,
             title: `Math Challenge ${i + 1}`,
-            type: 'interactive-question',
+            type: 'interactive-game',
             phase: 'interactive-game',
             duration: 180, // 3 minutes per question
+            metadata: {
+              subject: subject,
+              skillArea: skillArea,
+              templateId: uniqueQuestion.metadata.templateId
+            },
             content: {
               question: uniqueQuestion.content.question,
               options: uniqueQuestion.content.options,
               correctAnswer: uniqueQuestion.content.correctAnswer,
-              explanation: uniqueQuestion.content.explanation,
-              templateId: uniqueQuestion.metadata.templateId
+              explanation: uniqueQuestion.content.explanation
             },
             learningObjectives: ['Problem solving', 'Mathematical reasoning', 'Critical thinking'],
             adaptiveElements: {
@@ -73,7 +77,7 @@ export const useLessonActivitiesInitializer = (
         const fallbackActivity: LessonActivity = {
           id: `fallback_${Date.now()}`,
           title: 'Math Practice',
-          type: 'interactive-question',
+          type: 'interactive-game',
           phase: 'interactive-game',
           duration: 180,
           content: {
