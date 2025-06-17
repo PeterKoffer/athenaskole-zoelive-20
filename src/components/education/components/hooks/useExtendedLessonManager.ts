@@ -36,7 +36,21 @@ export const useExtendedLessonManager = ({
     timeElapsed
   } = useLessonState();
 
-  const { baseLessonActivities } = useLessonContentGeneration({ subject });
+  const {
+    generateIntroductionActivity,
+    generateContentDeliveryActivity,
+    generateInteractiveGameActivity,
+    generateApplicationActivity,
+    generateCreativeExplorationActivity,
+    generateSummaryActivity
+  } = useLessonContentGeneration(subject, skillArea);
+
+  // Create base lesson activities using the generator functions
+  const baseLessonActivities = [
+    generateIntroductionActivity(),
+    generateContentDeliveryActivity(),
+    generateSummaryActivity()
+  ];
 
   // Initialize progress manager
   const {
