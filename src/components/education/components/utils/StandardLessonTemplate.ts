@@ -1,4 +1,3 @@
-
 import { LessonActivity } from '../types/LessonTypes';
 
 export interface StandardLessonConfig {
@@ -36,7 +35,8 @@ export interface StandardLessonConfig {
   applicationScenario: string;
   problemSteps: Array<{
     step: string;
-    // Remove solution from content - let adaptive engine determine explanation depth
+    hint?: string;
+    solution?: string;
   }>;
   
   // Phase 5: Creative Exploration (percentage-based)
@@ -152,7 +152,9 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
       content: {
         scenario: config.applicationScenario,
         task: step.step,
-        text: step.step
+        text: step.step,
+        hint: step.hint,
+        solution: step.solution
       }
     });
   });

@@ -13,6 +13,12 @@ interface NelieAvatarSectionProps {
   onReadRequest: () => void;
   engagementLevel: number;
   adaptiveSpeed: number;
+  // Legacy props for backward compatibility
+  subject?: string;
+  currentQuestionIndex?: number;
+  totalQuestions?: number;
+  onMuteToggle?: () => void;
+  onReadQuestion?: () => void;
 }
 
 const NelieAvatarSection = ({
@@ -23,9 +29,16 @@ const NelieAvatarSection = ({
   onToggleMute,
   onReadRequest,
   engagementLevel,
-  adaptiveSpeed
+  adaptiveSpeed,
+  // Legacy props - use them if new props aren't provided
+  onMuteToggle,
+  onReadQuestion
 }: NelieAvatarSectionProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Use legacy handlers as fallbacks
+  const handleMuteToggle = onToggleMute || onMuteToggle;
+  const handleReadRequest = onReadRequest || onReadQuestion;
 
   useEffect(() => {
     if (isSpeaking) {
@@ -68,7 +81,7 @@ const NelieAvatarSection = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onToggleMute}
+              onClick={handleMuteToggle}
               className={`${autoReadEnabled ? 'text-lime-400 hover:text-lime-300' : 'text-gray-400 hover:text-gray-300'}`}
             >
               {autoReadEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -77,7 +90,7 @@ const NelieAvatarSection = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onReadRequest}
+              onClick={handleReadRequest}
               className="text-blue-400 hover:text-blue-300"
               disabled={!isReady}
             >
