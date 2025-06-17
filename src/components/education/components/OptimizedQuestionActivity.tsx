@@ -89,7 +89,7 @@ const OptimizedQuestionActivity = ({
     setTimeout(() => {
       if (correct) {
         console.log('🎵 Playing correct answer sound effect');
-        playCorrectAnswerSoun‹d();
+        playCorrectAnswerSound();
       } else {
         console.log('🎵 Playing wrong answer sound effect');
         playWrongAnswerSound();
