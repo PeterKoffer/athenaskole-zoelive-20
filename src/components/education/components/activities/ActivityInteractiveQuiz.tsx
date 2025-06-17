@@ -77,15 +77,15 @@ const ActivityInteractiveQuiz = ({
   return (
     <Blackboard>
       <div className="space-y-6">
-        {/* Epic Header with Timer */}
+        {/* Fixed Header with Better Contrast */}
         <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold text-white flex items-center">
+          <h2 className="text-3xl font-bold text-yellow-300 drop-shadow-lg">
             {activity.title}
           </h2>
           <div className="flex items-center space-x-4">
             <div className={`px-4 py-2 rounded-full font-bold ${
               timeLeft > 10 ? 'bg-green-500 text-white' : 
-              timeLeft > 5 ? 'bg-yellow-500 text-black' : 'bg-red-500 text-white animate-pulse'
+              timeLeft > 5 ? 'bg-yellow-500 text-black' : 'bg-red-500 text-white'
             }`}>
               ⏰ {timeLeft}s
             </div>
@@ -104,29 +104,29 @@ const ActivityInteractiveQuiz = ({
           </div>
         )}
 
-        {/* Question */}
-        <div className="bg-blue-900/30 rounded-lg p-6 border border-blue-400/30">
-          <p className="text-white text-xl leading-relaxed">{question}</p>
+        {/* Question with Better Contrast */}
+        <div className="bg-slate-800/90 rounded-lg p-6 border-2 border-blue-400/50">
+          <p className="text-white text-xl leading-relaxed font-semibold">{question}</p>
         </div>
 
-        {/* Interactive Options */}
+        {/* Fixed Answer Options - No Blinking */}
         {!showResult ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {options.map((option: string, index: number) => (
               <Button
                 key={index}
                 onClick={() => handleAnswerSelect(index)}
-                className={`p-6 text-lg h-auto transition-all duration-200 ${
+                className={`p-6 text-lg h-auto ${
                   selectedAnswer === index
-                    ? 'bg-blue-600 hover:bg-blue-700 border-2 border-blue-400 shadow-lg transform scale-105'
-                    : 'bg-gray-700 hover:bg-gray-600 border border-gray-500'
+                    ? 'bg-blue-600 hover:bg-blue-700 border-2 border-blue-400 text-white font-bold'
+                    : 'bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white'
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold">
                     {String.fromCharCode(65 + index)}
                   </div>
-                  <span className="text-white">{option}</span>
+                  <span className="text-white font-medium">{option}</span>
                 </div>
               </Button>
             ))}
@@ -162,9 +162,9 @@ const ActivityInteractiveQuiz = ({
             <Button
               onClick={handleSubmit}
               disabled={selectedAnswer === null}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105 transition-all"
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-12 py-4 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              ⚔️ CAST SPELL!
+              Submit Answer
             </Button>
           </div>
         )}
