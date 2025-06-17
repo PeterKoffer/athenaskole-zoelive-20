@@ -15,14 +15,6 @@ export class SpeechOrchestrator {
     updateState: (updates: Partial<SpeechState>) => void,
     onComplete: () => void
   ): Promise<void> {
-    /*
-    const now = Date.now();
-    if (text === this.lastSpokenText && now - this.lastSpokenTime < this.repeatPreventionTime) {
-      onComplete();
-      return;
-    }
-    */
-
     console.log("[SpeechOrchestrator] Processing speech request:", text.substring(0, 50));
     
     await new Promise<void>((resolve) => {
@@ -47,15 +39,14 @@ export class SpeechOrchestrator {
   addNeliePersonality(text: string): string {
     if (!text) return text;
     
-    if (
-      Math.random() < 0.2 &&
-      !text.includes('Hi') &&
-      !text.includes('Let')
-    ) {
+    // Removed "That's a great question!" and similar phrases
+    if (Math.random() < 0.15 && !text.includes('Hi') && !text.includes('Let')) {
       const phrases = [
         'Hi there!',
         'Let me help you with that!',
-        "That's a great question!",
+        'Excellent work!',
+        'Keep going!',
+        'You\'re doing great!'
       ];
       return `${phrases[Math.floor(Math.random() * phrases.length)]} ${text}`;
     }

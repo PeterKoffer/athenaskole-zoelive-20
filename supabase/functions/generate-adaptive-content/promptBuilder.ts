@@ -55,6 +55,12 @@ ${recentQuestions.map((q, i) => `${i + 1}. ${q.substring(0, 200)}...`).join('\n'
 9. Generate creative scenarios that haven't been used before
 10. Ensure educational value while maintaining uniqueness
 
+PERSONALITY RESTRICTIONS:
+- NEVER start responses with "That's a great question!"
+- NEVER use phrases like "Excellent question!" or "What a wonderful question!"
+- Keep responses natural and encouraging without repetitive praise phrases
+- Focus on the educational content rather than praise statements
+
 UNIQUENESS VERIFICATION:
 - Question must be 100% original and different from all previous questions
 - Use unique numerical values, character names, and story contexts
