@@ -99,7 +99,7 @@ const UnifiedLessonManager = ({
                   size="sm"
                   onClick={handleNavigateBack}
                   disabled={!canNavigateBack}
-                  className="border-gray-600 text-white bg-gray-700/50 hover:bg-gray-600/60 disabled:opacity-30 px-2 py-1"
+                  className="border-gray-600 text-gray-200 bg-gray-800/80 hover:bg-gray-700/60 disabled:opacity-30 px-2 py-1"
                 >
                   <ArrowLeft className="w-3 h-3" />
                 </Button>
@@ -109,7 +109,7 @@ const UnifiedLessonManager = ({
                   size="sm"
                   onClick={handleNavigateForward}
                   disabled={!canNavigateForward}
-                  className="border-gray-600 text-white bg-gray-700/50 hover:bg-gray-600/60 disabled:opacity-30 px-2 py-1"
+                  className="border-gray-600 text-gray-200 bg-gray-800/80 hover:bg-gray-700/60 disabled:opacity-30 px-2 py-1"
                 >
                   <ArrowRight className="w-3 h-3" />
                 </Button>
@@ -152,7 +152,7 @@ const UnifiedLessonManager = ({
           </div>
         </div>
 
-        {/* Speech Controls */}
+        {/* Speech Controls - Fixed styling for better contrast */}
         <div className="flex justify-center space-x-2">
           <Button
             onClick={isSpeaking ? () => {} : handleReadRequest}
@@ -167,7 +167,7 @@ const UnifiedLessonManager = ({
             onClick={toggleMute}
             variant="outline"
             size="sm"
-            className="border-gray-400 text-gray-300 hover:bg-gray-700 bg-black/50"
+            className="border-gray-600 text-gray-200 hover:bg-gray-700 bg-black/50"
           >
             <VolumeX className="w-4 h-4 mr-2" />
             Toggle Mute

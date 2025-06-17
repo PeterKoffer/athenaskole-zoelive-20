@@ -50,12 +50,14 @@ const StableEnhancedActivityRenderer = ({
         <div className="text-gray-300 mb-6 text-lg leading-relaxed">
           {activity.content?.text || activity.phaseDescription || "Welcome to your learning adventure!"}
         </div>
-        <button
-          onClick={() => onActivityComplete(true)}
-          className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded text-white font-bold text-lg"
-        >
-          Let's Begin!
-        </button>
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => onActivityComplete(true)}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+          >
+            Let's Begin!
+          </button>
+        </div>
       </div>
     );
   }
@@ -82,12 +84,14 @@ const StableEnhancedActivityRenderer = ({
             <p>{activity.content.text}</p>
           )}
         </div>
-        <button
-          onClick={() => onActivityComplete(true)}
-          className="bg-green-600 hover:bg-green-700 px-8 py-4 rounded text-white font-bold text-lg"
-        >
-          Continue
-        </button>
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => onActivityComplete(true)}
+            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+          >
+            Continue
+          </button>
+        </div>
       </div>
     );
   }
@@ -120,12 +124,14 @@ const StableEnhancedActivityRenderer = ({
             <p className="text-gray-200">{activity.content.text}</p>
           )}
         </div>
-        <button
-          onClick={() => onActivityComplete(true)}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded text-white font-bold text-lg"
-        >
-          I'm Ready to Continue!
-        </button>
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => onActivityComplete(true)}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+          >
+            I'm Ready to Continue!
+          </button>
+        </div>
       </div>
     );
   }
@@ -159,12 +165,14 @@ const StableEnhancedActivityRenderer = ({
             <p className="text-gray-200">{activity.content.text}</p>
           )}
         </div>
-        <button
-          onClick={() => onActivityComplete(true)}
-          className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded text-white font-bold text-lg"
-        >
-          Awesome, Let's Continue!
-        </button>
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => onActivityComplete(true)}
+            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+          >
+            Awesome, Let's Continue!
+          </button>
+        </div>
       </div>
     );
   }

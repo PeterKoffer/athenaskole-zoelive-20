@@ -14,35 +14,6 @@ interface QuestionTopic {
 // Subject-specific question generators
 const getSubjectQuestions = (subject: string): QuestionTopic[] => {
   const questionSets: Record<string, QuestionTopic[]> = {
-    mathematics: [
-      {
-        title: 'Addition Adventure',
-        skillArea: 'addition',
-        description: 'Master addition with fun scenarios',
-        question: 'Sarah has 24 stickers and her friend gives her 18 more. How many stickers does Sarah have now?',
-        options: ['42', '40', '44', '38'],
-        correctAnswer: 0,
-        explanation: 'Sarah started with 24 stickers and got 18 more. So 24 + 18 = 42 stickers total!'
-      },
-      {
-        title: 'Subtraction Detective',
-        skillArea: 'subtraction', 
-        description: 'Solve subtraction mysteries',
-        question: 'A library has 85 books. If 29 books are checked out, how many books remain?',
-        options: ['56', '54', '58', '52'],
-        correctAnswer: 0,
-        explanation: 'The library had 85 books and 29 were taken. So 85 - 29 = 56 books remain!'
-      },
-      {
-        title: 'Multiplication Magic',
-        skillArea: 'multiplication',
-        description: 'Discover the power of multiplication',
-        question: 'A garden has 7 rows of flowers with 8 flowers in each row. How many flowers are there?',
-        options: ['56', '54', '58', '52'],
-        correctAnswer: 0,
-        explanation: 'There are 7 rows with 8 flowers each. So 7 × 8 = 56 flowers total!'
-      }
-    ],
     science: [
       {
         title: 'Solar System Explorer',
@@ -70,6 +41,35 @@ const getSubjectQuestions = (subject: string): QuestionTopic[] => {
         options: ['Cumulus', 'Stratus', 'Cirrus', 'Nimbus'],
         correctAnswer: 3,
         explanation: 'Nimbus clouds are dark, thick clouds that bring rain and storms!'
+      }
+    ],
+    mathematics: [
+      {
+        title: 'Addition Adventure',
+        skillArea: 'addition',
+        description: 'Master addition with fun scenarios',
+        question: 'Sarah has 24 stickers and her friend gives her 18 more. How many stickers does Sarah have now?',
+        options: ['42', '40', '44', '38'],
+        correctAnswer: 0,
+        explanation: 'Sarah started with 24 stickers and got 18 more. So 24 + 18 = 42 stickers total!'
+      },
+      {
+        title: 'Subtraction Detective',
+        skillArea: 'subtraction', 
+        description: 'Solve subtraction mysteries',
+        question: 'A library has 85 books. If 29 books are checked out, how many books remain?',
+        options: ['56', '54', '58', '52'],
+        correctAnswer: 0,
+        explanation: 'The library had 85 books and 29 were taken. So 85 - 29 = 56 books remain!'
+      },
+      {
+        title: 'Multiplication Magic',
+        skillArea: 'multiplication',
+        description: 'Discover the power of multiplication',
+        question: 'A garden has 7 rows of flowers with 8 flowers in each row. How many flowers are there?',
+        options: ['56', '54', '58', '52'],
+        correctAnswer: 0,
+        explanation: 'There are 7 rows with 8 flowers each. So 7 × 8 = 56 flowers total!'
       }
     ],
     english: [
@@ -103,25 +103,32 @@ const getSubjectQuestions = (subject: string): QuestionTopic[] => {
     ]
   };
 
-  return questionSets[subject] || questionSets.mathematics;
+  const subjectQuestions = questionSets[subject];
+  if (!subjectQuestions) {
+    console.warn(`No questions found for subject: ${subject}, using mathematics as fallback`);
+    return questionSets.mathematics;
+  }
+  
+  console.log(`✅ Found ${subjectQuestions.length} questions for ${subject}`);
+  return subjectQuestions;
 };
 
 const getSubjectScenario = (subject: string): string => {
   const scenarios: Record<string, string> = {
-    mathematics: 'What if you were running a pizza shop and needed to calculate how many pizzas to make for different sized parties?',
     science: 'What if you were a scientist discovering a new planet? What would you want to learn about it first?',
+    mathematics: 'What if you were running a pizza shop and needed to calculate how many pizzas to make for different sized parties?',
     english: 'What if you were writing a story about a magical adventure? What characters and setting would you create?'
   };
-  return scenarios[subject] || scenarios.mathematics;
+  return scenarios[subject] || scenarios.science;
 };
 
 const getSubjectApplicationScenario = (subject: string): string => {
   const scenarios: Record<string, string> = {
-    mathematics: 'Your family is planning a picnic for 24 people. Each person will eat 2 sandwiches and drink 3 cups of juice. How much food and drink do you need to buy?',
     science: 'You notice your houseplant is wilting. Using what you know about plant needs, what steps would you take to help it grow healthy again?',
+    mathematics: 'Your family is planning a picnic for 24 people. Each person will eat 2 sandwiches and drink 3 cups of juice. How much food and drink do you need to buy?',
     english: 'You need to write a thank-you letter to your grandmother. How would you organize your thoughts and express your feelings clearly?'
   };
-  return scenarios[subject] || scenarios.mathematics;
+  return scenarios[subject] || scenarios.science;
 };
 
 export const useSubjectQuestionGenerator = () => {
