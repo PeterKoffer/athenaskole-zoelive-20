@@ -31,10 +31,13 @@ export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActi
       }
     });
 
-    // 2-4. Interactive Questions (subject-specific)
+    // 2-4. Interactive Questions (subject-specific) - PROPERLY MAPPED
     const questionTopics = getSubjectQuestions(subject);
+    console.log(`📚 Got ${questionTopics.length} ${subject} questions:`, questionTopics.map(q => q.title));
+    
     questionTopics.forEach((topic, index) => {
-      activities.push({
+      // Create properly structured activity from question topic
+      const questionActivity: LessonActivity = {
         id: `${lessonId}_question_${index + 1}`,
         title: topic.title,
         type: 'interactive-game',
@@ -43,14 +46,35 @@ export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActi
         phaseDescription: topic.description,
         metadata: { subject, skillArea: topic.skillArea },
         content: {
+          // Essential question data
           question: topic.question,
           options: topic.options,
+          choices: topic.options, // Alternative property name used by some renderers
           correctAnswer: topic.correctAnswer,
           explanation: topic.explanation,
+          
+          // Additional context
           text: topic.question,
-          choices: topic.options
+          title: topic.title,
+          
+          // Battle/Arena context for engaging presentation
+          battleScenario: `🎯 ${topic.title} Challenge: Test your ${topic.skillArea} knowledge!`,
+          
+          // Make sure we have all required properties
+          activityId: `${lessonId}_question_${index + 1}`,
+          questionText: topic.question
         }
+      };
+      
+      console.log(`✅ Created ${subject} question activity:`, {
+        title: questionActivity.title,
+        hasQuestion: !!questionActivity.content.question,
+        hasOptions: !!questionActivity.content.options,
+        optionsCount: questionActivity.content.options?.length || 0,
+        correctAnswer: questionActivity.content.correctAnswer
       });
+      
+      activities.push(questionActivity);
     });
 
     // 5. Educational Game/Assignment
@@ -105,7 +129,7 @@ export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActi
       }
     });
 
-    console.log(`✅ Generated ${activities.length} activities for ${subject}:`, activities.map(a => a.title));
+    console.log(`✅ Generated ${activities.length} activities for ${subject}:`, activities.map(a => ({ title: a.title, type: a.type, hasQuestion: !!a.content.question })));
     return activities;
   };
 

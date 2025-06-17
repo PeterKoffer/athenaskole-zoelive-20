@@ -18,7 +18,9 @@ const StableEnhancedActivityRenderer = ({
     activityId: activity.id,
     activityType: activity.type,
     activityPhase: activity.phase,
-    isNelieReady
+    isNelieReady,
+    hasQuestion: !!activity.content?.question,
+    hasOptions: !!activity.content?.options
   });
 
   // Handle content-delivery activities
@@ -42,7 +44,7 @@ const StableEnhancedActivityRenderer = ({
     );
   }
 
-  // Handle introduction activities
+  // Handle introduction activities with consistent button styling
   if (activity.type === 'introduction' || activity.phase === 'introduction') {
     return (
       <div className="bg-gray-800 rounded-lg p-8 text-center text-white">
@@ -53,7 +55,7 @@ const StableEnhancedActivityRenderer = ({
         <div className="flex justify-center mt-6">
           <button
             onClick={() => onActivityComplete(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105 min-w-[200px]"
           >
             Let's Begin!
           </button>
@@ -62,7 +64,7 @@ const StableEnhancedActivityRenderer = ({
     );
   }
 
-  // Handle application activities
+  // Handle application activities with consistent button styling
   if (activity.type === 'application' || activity.phase === 'application') {
     return (
       <div className="bg-gray-800 rounded-lg p-8 text-white">
@@ -87,7 +89,7 @@ const StableEnhancedActivityRenderer = ({
         <div className="flex justify-center mt-6">
           <button
             onClick={() => onActivityComplete(true)}
-            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105 min-w-[200px]"
           >
             Continue
           </button>
@@ -96,7 +98,7 @@ const StableEnhancedActivityRenderer = ({
     );
   }
 
-  // Handle creative exploration activities
+  // Handle creative exploration activities with consistent button styling
   if (activity.type === 'creative-exploration' || activity.phase === 'creative-exploration') {
     return (
       <div className="bg-gradient-to-br from-purple-800 to-indigo-800 rounded-lg p-8 text-white">
@@ -127,7 +129,7 @@ const StableEnhancedActivityRenderer = ({
         <div className="flex justify-center mt-6">
           <button
             onClick={() => onActivityComplete(true)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105 min-w-[200px]"
           >
             I'm Ready to Continue!
           </button>
@@ -136,7 +138,7 @@ const StableEnhancedActivityRenderer = ({
     );
   }
 
-  // Handle summary activities
+  // Handle summary activities with consistent button styling
   if (activity.type === 'summary' || activity.phase === 'summary') {
     return (
       <div className="bg-gradient-to-br from-green-800 to-teal-800 rounded-lg p-8 text-white">
@@ -168,7 +170,7 @@ const StableEnhancedActivityRenderer = ({
         <div className="flex justify-center mt-6">
           <button
             onClick={() => onActivityComplete(true)}
-            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105 min-w-[200px]"
           >
             Awesome, Let's Continue!
           </button>
