@@ -13,7 +13,7 @@ const SubjectsSection = () => {
       title: "Mathematics",
       description: "Master advanced mathematical concepts through AI-powered personalized learning paths with real-world problem solving.",
       keyAreas: ["Algebra", "Geometry", "Statistics"],
-      path: "/education/mathematics",
+      path: "/learn/mathematics",
       gradient: "from-blue-600 to-purple-600",
       icon: "📐"
     },
@@ -21,7 +21,7 @@ const SubjectsSection = () => {
       title: "English Language Arts",
       description: "Develop exceptional reading, writing, and communication skills through immersive storytelling and creative expression.",
       keyAreas: ["Creative Writing", "Literature", "Grammar"],
-      path: "/education/english",
+      path: "/learn/english",
       gradient: "from-green-600 to-teal-600",
       icon: "📚"
     },
@@ -29,7 +29,7 @@ const SubjectsSection = () => {
       title: "Science & Technology",
       description: "Explore the wonders of science through virtual experiments, simulations, and hands-on discovery learning.",
       keyAreas: ["Physics", "Chemistry", "Biology"],
-      path: "/education/science",
+      path: "/learn/science",
       gradient: "from-purple-600 to-pink-600",
       icon: "🔬"
     },
@@ -37,7 +37,7 @@ const SubjectsSection = () => {
       title: "Computer Science",
       description: "Learn programming, AI, and computational thinking through gamified coding challenges and real projects.",
       keyAreas: ["Programming", "Algorithms", "AI/ML"],
-      path: "/education/computer-science",
+      path: "/learn/computer-science",
       gradient: "from-indigo-600 to-blue-600",
       icon: "💻"
     },
@@ -45,7 +45,7 @@ const SubjectsSection = () => {
       title: "Creative Arts",
       description: "Express your creativity through digital art, music composition, and multimedia storytelling projects.",
       keyAreas: ["Digital Art", "Music Theory", "Design"],
-      path: "/education/creative-arts",
+      path: "/learn/creative-arts",
       gradient: "from-pink-600 to-red-600",
       icon: "🎨"
     },
@@ -53,7 +53,7 @@ const SubjectsSection = () => {
       title: "Music Discovery",
       description: "Explore rhythm, melody, and composition through interactive music theory and digital instrument mastery.",
       keyAreas: ["Music Theory", "Composition", "Performance"],
-      path: "/education/music",
+      path: "/learn/music",
       gradient: "from-orange-600 to-yellow-600",
       icon: "🎵"
     }

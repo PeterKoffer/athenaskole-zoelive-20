@@ -1,21 +1,27 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
+
 interface CTASectionProps {
   onGetStarted?: () => void;
 }
+
 const CTASection = ({
   onGetStarted
 }: CTASectionProps) => {
   const navigate = useNavigate();
+
   const handleGetStarted = () => {
     if (onGetStarted) {
       onGetStarted();
     } else {
-      navigate("/education/mathematics");
+      navigate("/learn/mathematics");
     }
   };
-  return <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
+
+  return (
+    <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <TextWithSpeaker text="Ready to Transform Your Learning Experience?" context="cta-title" showOnHover={false}>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -34,11 +40,13 @@ const CTASection = ({
             Start Your Journey
           </Button>
           
-          <Button onClick={() => navigate("/progress")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white hover:bg-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 text-slate-950">
-            View Progress Dashboard
+          <Button onClick={() => navigate("/daily-program")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white hover:bg-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 text-slate-950">
+            View Daily Program
           </Button>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default CTASection;

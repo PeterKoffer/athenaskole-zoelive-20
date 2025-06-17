@@ -15,7 +15,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
     if (onGetStarted) {
       onGetStarted();
     } else {
-      navigate("/education/mathematics");
+      navigate("/learn/mathematics");
     }
   };
 
@@ -60,12 +60,12 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 </Button>
                 
                 <Button
-                  onClick={() => navigate("/ai-tutor")}
+                  onClick={() => navigate("/daily-program")}
                   variant="outline"
                   size="lg"
                   className="w-full sm:w-auto border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
                 >
-                  Chat with Nelie
+                  View Daily Program
                 </Button>
               </div>
             </div>
