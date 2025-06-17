@@ -46,11 +46,10 @@ class UnifiedQuestionGenerationService {
         const aiQuestion = await this.generateWithAI(config, previousQuestions, sessionId);
         
         if (aiQuestion) {
-          const isUnique = await globalQuestionUniquenessService.isQuestionUnique(
-            aiQuestion.content.question,
+          const isUnique = globalQuestionUniquenessService.isQuestionUnique(
             config.userId,
             config.subject,
-            sessionId
+            aiQuestion.content.question
           );
 
           if (isUnique) {

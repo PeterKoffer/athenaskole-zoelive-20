@@ -84,6 +84,41 @@ class GlobalQuestionUniquenessService {
   }
 
   /**
+   * Check if user can generate recap questions
+   */
+  canGenerateRecap(userId: string, subject: string, skillArea: string): Promise<boolean> {
+    const userKey = `${userId}_${subject}`;
+    const userQuestions = this.questionHistory.get(userKey);
+    
+    // Need at least 3 questions answered to generate recap
+    return Promise.resolve(userQuestions ? userQuestions.size >= 3 : false);
+  }
+
+  /**
+   * Get questions for recap generation
+   */
+  getQuestionsForRecap(userId: string, subject: string, skillArea: string, limit: number = 5): Promise<any[]> {
+    const userKey = `${userId}_${subject}`;
+    const userQuestions = this.questionHistory.get(userKey);
+    
+    if (!userQuestions) {
+      return Promise.resolve([]);
+    }
+
+    // Get recent questions for recap
+    const recentQuestions = Array.from(userQuestions)
+      .slice(-limit)
+      .map(questionText => ({
+        question: questionText,
+        options: ['Option A', 'Option B', 'Option C', 'Option D'], // Default options
+        correct: 0, // Default correct answer
+        explanation: 'This is a recap question based on your previous learning.'
+      }));
+
+    return Promise.resolve(recentQuestions);
+  }
+
+  /**
    * Get session statistics
    */
   getSessionStats(sessionId: string) {
