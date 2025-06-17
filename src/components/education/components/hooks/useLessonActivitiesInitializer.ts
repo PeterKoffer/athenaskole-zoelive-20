@@ -48,7 +48,6 @@ export const useLessonActivitiesInitializer = (
               correctAnswer: uniqueQuestion.content.correctAnswer,
               explanation: uniqueQuestion.content.explanation
             },
-            learningObjectives: ['Problem solving', 'Mathematical reasoning', 'Critical thinking'],
             adaptiveElements: {
               difficultyAdjustment: true,
               personalizedFeedback: true,
@@ -86,7 +85,6 @@ export const useLessonActivitiesInitializer = (
             correctAnswer: 0,
             explanation: '15 + 23 = 38'
           },
-          learningObjectives: ['Basic addition'],
           adaptiveElements: {
             difficultyAdjustment: false,
             personalizedFeedback: true,
