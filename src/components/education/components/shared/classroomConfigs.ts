@@ -29,7 +29,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
     environmentDescription: 'Discovery Science Lab with Nelie'
   },
   
-  computerscience: {
+  'computer-science': {
     backgroundImage: '/lovable-uploads/bb51f857-f561-4049-8eac-9f9d6868d1ee.png', // Modern computer science classroom
     subjectColor: '#0f172a', // Dark slate for CS
     accentColor: '#3b82f6', // Blue accent
@@ -47,7 +47,7 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
     environmentDescription: 'Music Classroom with Nelie'
   },
 
-  creative: {
+  'creative-arts': {
     backgroundImage: '/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png', // Bright creative classroom with art supplies
     subjectColor: '#7c2d12', // Deep orange for creative arts
     accentColor: '#f97316', // Orange accent
@@ -87,6 +87,6 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
 };
 
 export const getClassroomConfig = (subject: string): ClassroomConfig => {
-  return CLASSROOM_CONFIGS[subject] || CLASSROOM_CONFIGS.mathematics;
+  const subjectKey = subject.toLowerCase().replace(/[^a-z-]/g, '');
+  return CLASSROOM_CONFIGS[subjectKey] || CLASSROOM_CONFIGS.mathematics;
 };
-
