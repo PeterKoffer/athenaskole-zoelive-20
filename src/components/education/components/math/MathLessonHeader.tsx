@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -112,17 +113,14 @@ const MathLessonHeader = ({
             )}
           </div>
           
-          {/* Activity Counter (if applicable) */}
+          {/* Adventure Counter (changed from Activity) */}
           {shouldShowActivityCounter && (
             <>
               <div className="w-px h-10 bg-green-400/30"></div>
               <div className="text-center">
-                <div className="text-cyan-400 text-xs font-mono uppercase tracking-wider mb-1">ACTIVITY</div>
+                <div className="text-cyan-400 text-xs font-mono uppercase tracking-wider mb-1">ADVENTURE</div>
                 <div className="text-cyan-400 text-xl font-mono font-bold tracking-wider">
                   {(currentActivityIndex + 1).toString().padStart(2, '0')}
-                </div>
-                <div className="text-cyan-400/60 text-xs font-mono">
-                  of {totalRealActivities.toString().padStart(2, '0')}
                 </div>
               </div>
             </>

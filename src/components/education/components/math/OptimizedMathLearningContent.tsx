@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
+import { useStableLessonManager } from '../hooks/useStableLessonManager';
 import { useStudentName } from '../math/hooks/useStudentName';
 import { useSpeechCleanup } from '../math/hooks/useSpeechCleanup';
 import MathLearningLoading from './MathLearningLoading';
@@ -30,6 +30,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     };
   }, [forceStopAll]);
 
+  // Use the new stable lesson manager instead of the original one
   const {
     currentActivityIndex,
     currentActivity,
@@ -47,7 +48,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     isSpeaking,
     toggleMute,
     setCurrentActivityIndex
-  } = useOptimizedLessonManager({
+  } = useStableLessonManager({
     subject: 'mathematics',
     skillArea: 'general_math',
     onLessonComplete: () => {
@@ -98,7 +99,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
   }
 
   // Show the main content - NO green boxes, NO welcome screens
-  console.log('✅ Showing main content with activity:', currentActivity.id);
+  console.log('✅ Showing main content with stable activity:', currentActivity.id);
   return (
     <MathLearningMainContent
       studentName={studentName}

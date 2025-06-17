@@ -1,10 +1,9 @@
-
 import OptimizedQuestionActivity from '../OptimizedQuestionActivity';
 import MathLessonHeader from './MathLessonHeader';
 import MathLessonControlPanel from './MathLessonControlPanel';
 import MentalMathStrategies from './MentalMathStrategies';
 import MathLessonContentRenderer from './MathLessonContentRenderer';
-import EnhancedActivityRenderer from '../EnhancedActivityRenderer';
+import StableEnhancedActivityRenderer from '../StableEnhancedActivityRenderer';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
@@ -105,8 +104,8 @@ const MathLearningMainContent = ({
           <div className="w-full max-w-4xl mx-auto">
             {currentActivity ? (
               <div className="space-y-6">
-                {/* Use the enhanced activity renderer for better handling */}
-                <EnhancedActivityRenderer
+                {/* Use the stable activity renderer for zero flickering */}
+                <StableEnhancedActivityRenderer
                   activity={currentActivity}
                   onActivityComplete={handleActivityCompleteWithAdvancement}
                   isNelieReady={true}
