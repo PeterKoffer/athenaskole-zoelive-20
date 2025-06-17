@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
-import { Volume2 } from "lucide-react";
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 interface EnglishQuestionProps {
   activity: {
@@ -21,13 +22,21 @@ const EnglishQuestion = ({ activity, onAnswer, disabled }: EnglishQuestionProps)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime] = useState(Date.now());
+  const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
-  const playAudio = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.8;
-      speechSynthesis.speak(utterance);
+  const handleSpeakContent = async () => {
+    if (isSpeaking) {
+      stop();
+    } else {
+      await speakAsNelie(activity.content, true, 'english-content');
+    }
+  };
+
+  const handleSpeakQuestion = async () => {
+    if (isSpeaking) {
+      stop();
+    } else {
+      await speakAsNelie(activity.question, true, 'english-question');
     }
   };
 
@@ -53,23 +62,38 @@ const EnglishQuestion = ({ activity, onAnswer, disabled }: EnglishQuestionProps)
 
   return (
     <Card className="bg-gray-800 border-gray-700">
-      <CardContent className="p-6">
+      <CardContent className="relative p-6">
+        <button
+          onClick={handleSpeakQuestion}
+          className="absolute top-4 right-4 z-20 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 opacity-90 hover:opacity-100"
+          title="Ask Nelie to read this"
+        >
+          <CustomSpeakerIcon className="w-4 h-4" size={16} color="#0ea5e9" />
+        </button>
+
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold text-white">
+          <h3 className="text-xl font-semibold text-white pr-12">
             {activity.title}
           </h3>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => playAudio(activity.content)}
+            onClick={handleSpeakContent}
             className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
           >
             <CustomSpeakerIcon className="w-4 h-4" size={16} />
           </Button>
         </div>
 
-        <div className="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-6">
-          <p className="text-gray-200 text-lg leading-relaxed">
+        <div className="relative bg-gray-700 border border-gray-600 rounded-lg p-4 mb-6">
+          <button
+            onClick={handleSpeakContent}
+            className="absolute top-2 right-2 z-20 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 opacity-90 hover:opacity-100"
+            title="Ask Nelie to read this"
+          >
+            <CustomSpeakerIcon className="w-3 h-3" size={12} color="#0ea5e9" />
+          </button>
+          <p className="text-gray-200 text-lg leading-relaxed pr-8">
             {activity.content}
           </p>
         </div>
