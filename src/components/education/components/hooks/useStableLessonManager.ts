@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLessonTimer } from '../../hooks/useLessonTimer';
@@ -143,7 +142,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     content: {
       segments: [{
         type: 'celebration',
-        explanation: 'Fantastic work! You've completed an amazing variety of math challenges today. You practiced addition, subtraction, multiplication, division, patterns, and fractions!',
+        explanation: "Fantastic work! You've completed an amazing variety of math challenges today. You practiced addition, subtraction, multiplication, division, patterns, and fractions!",
         examples: []
       }]
     }
