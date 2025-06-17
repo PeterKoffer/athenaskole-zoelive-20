@@ -51,66 +51,112 @@ const UniversalLearningMainContent = ({
     switch (subjectName.toLowerCase()) {
       case 'mathematics':
         return {
-          emoji: '🔢',
-          title: 'Mathematics Magic with Nelie!',
-          description: 'Ready to explore the amazing world of numbers?',
-          welcomeMessage: `Welcome to the most exciting math adventure ever, ${studentName}! Today we're exploring ${skillArea} through amazing games, fun challenges, and cool discoveries that will make you feel like a math wizard!`,
-          tipMessage: 'Math is everywhere around us - let\'s discover the patterns and solve amazing puzzles together!'
+          title: 'Mathematics with Nelie!',
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your math learning companion! Today we're going to explore the amazing world of numbers, patterns, and problem-solving together.`,
+          tips: [
+            'Take your time with each problem - there\'s no rush!',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Math is like solving puzzles - have fun with it!',
+            'Every mistake is a chance to learn something new!'
+          ],
+          readyMessage: 'Ready to start your math adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
       case 'english':
         return {
-          emoji: '📚',
-          title: 'English Adventures with Nelie!',
-          description: 'Ready to explore the world of words and stories?',
-          welcomeMessage: `Hello ${studentName}! Welcome to an amazing English adventure where we'll discover the magic of words, stories, and language together!`,
-          tipMessage: 'Every word you learn opens new doors to amazing stories and ideas!'
+          title: 'English with Nelie!',
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your English learning companion! Today we're going to explore the wonderful world of words, stories, and language together.`,
+          tips: [
+            'Read carefully and take your time with each question',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Every new word you learn opens new possibilities!',
+            'Practice makes your reading and writing stronger!'
+          ],
+          readyMessage: 'Ready to start your English adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
       case 'science':
         return {
-          emoji: '🔬',
-          title: 'Science Discoveries with Nelie!',
-          description: 'Ready to explore the wonders of our world?',
-          welcomeMessage: `Hi ${studentName}! Get ready for an incredible science adventure where we'll discover amazing facts about our world and how everything works!`,
-          tipMessage: 'Science is all around us - let\'s explore and discover the secrets of nature together!'
+          title: 'Science with Nelie!',
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your science learning companion! Today we're going to explore the incredible world of discovery and investigation together.`,
+          tips: [
+            'Think like a scientist - ask questions and explore!',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Science is all around us - look for patterns everywhere!',
+            'Every experiment teaches us something new!'
+          ],
+          readyMessage: 'Ready to start your science adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
       case 'music':
         return {
-          emoji: '🎵',
-          title: 'Musical Magic with Nelie!',
-          description: 'Ready to explore the beautiful world of music?',
-          welcomeMessage: `Welcome ${studentName}! Let's dive into the wonderful world of music where we'll explore rhythm, melody, and harmony together!`,
-          tipMessage: 'Music speaks to our hearts - let\'s create beautiful sounds and discover musical magic!'
+          title: 'Music with Nelie!',
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your music learning companion! Today we're going to explore the beautiful world of rhythm, melody, and harmony together.`,
+          tips: [
+            'Listen carefully to the rhythms and melodies around you',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Music is a universal language - express yourself!',
+            'Every note you learn adds to your musical journey!'
+          ],
+          readyMessage: 'Ready to start your music adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
       case 'computer-science':
         return {
-          emoji: '💻',
-          title: 'Coding Adventures with Nelie!',
-          description: 'Ready to explore the digital world?',
-          welcomeMessage: `Hello ${studentName}! Welcome to the exciting world of coding where we'll learn to think like programmers and create amazing things!`,
-          tipMessage: 'Coding is like solving puzzles - let\'s build something incredible together!'
+          title: 'Computer Science with Nelie!',
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your coding learning companion! Today we're going to explore the exciting world of programming and technology together.`,
+          tips: [
+            'Think step-by-step like a computer programmer',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Coding is like building with digital blocks!',
+            'Every line of code you learn is a new superpower!'
+          ],
+          readyMessage: 'Ready to start your coding adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
       case 'creative-arts':
         return {
-          emoji: '🎨',
-          title: 'Creative Magic with Nelie!',
-          description: 'Ready to unleash your artistic creativity?',
-          welcomeMessage: `Hi ${studentName}! Welcome to the colorful world of creative arts where your imagination will come to life!`,
-          tipMessage: 'Art is about expressing yourself - let your creativity flow and create something beautiful!'
+          title: 'Creative Arts with Nelie!',
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your art learning companion! Today we're going to explore the colorful world of creativity and artistic expression together.`,
+          tips: [
+            'Let your imagination flow freely and creatively',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Art is about expressing your unique vision!',
+            'Every creation you make is beautifully unique!'
+          ],
+          readyMessage: 'Ready to start your art adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
       default:
         return {
-          emoji: '⭐',
-          title: 'Learning Adventure with Nelie!',
-          description: 'Ready for an amazing educational journey?',
-          welcomeMessage: `Welcome ${studentName}! Let's embark on an incredible learning adventure together!`,
-          tipMessage: 'Every lesson is a new adventure - let\'s learn and have fun!'
+          title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} with Nelie!`,
+          subtitle: 'Ready for an amazing adventure?',
+          welcomeMessage: `Hello ${studentName}! I'm Nelie, your learning companion! Today we're going to explore the exciting world of ${subject} together.`,
+          tips: [
+            'Take your time and think through each challenge',
+            'Ask Nelie to repeat if you need to hear something again',
+            'Learning is an adventure - enjoy the journey!',
+            'Every step forward makes you stronger and smarter!'
+          ],
+          readyMessage: 'Ready to start your learning adventure!',
+          lessonInfo: 'Starting lesson automatically in 5 seconds...'
         };
     }
   };
 
   const subjectContent = getSubjectWelcomeContent(subject);
 
-  const handleStartLearning = () => {
+  const handleStartIntroductionWithNelie = () => {
+    setShowWelcomeTemplate(false);
+  };
+
+  const handleStartLessonWithoutSpeech = () => {
     setShowWelcomeTemplate(false);
   };
 
@@ -118,57 +164,102 @@ const UniversalLearningMainContent = ({
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
-          <Card className="bg-black/50 border-purple-400/50 backdrop-blur-sm">
+          {/* Header Section */}
+          <div className="flex items-center justify-between">
+            <Button
+              onClick={onBackToProgram}
+              variant="outline"
+              size="sm"
+              className="border-gray-400 text-white hover:bg-gray-700 bg-black/50"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-gray-400 text-white hover:bg-gray-700 bg-black/50"
+              >
+                Sound Off
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-gray-400 text-white hover:bg-gray-700 bg-black/50"
+              >
+                Ask Nelie to Repeat
+              </Button>
+            </div>
+          </div>
+
+          {/* Main Welcome Card */}
+          <Card className="bg-black/70 border-purple-400/50 backdrop-blur-sm">
             <CardContent className="p-8">
-              {/* Subject Welcome Header */}
               <div className="text-center mb-8">
-                <div className="text-6xl mb-4 animate-bounce">{subjectContent.emoji}</div>
-                <h1 className="text-4xl font-bold text-white mb-4">{subjectContent.title}</h1>
+                <h1 className="text-4xl font-bold text-white mb-2">
+                  Welcome to {subjectContent.title}
+                </h1>
                 <div className="text-2xl text-purple-200 mb-6">
-                  {subjectContent.description}
+                  {subjectContent.subtitle}
                 </div>
               </div>
 
               {/* Welcome Message */}
-              <div className="bg-blue-900/40 rounded-lg p-8 border border-blue-400/30 mb-6">
-                <div className="text-blue-100 text-xl leading-relaxed text-center mb-4">
+              <div className="bg-blue-900/40 rounded-lg p-6 border border-blue-400/30 mb-6">
+                <div className="text-blue-100 text-lg leading-relaxed text-center">
                   {subjectContent.welcomeMessage}
-                </div>
-                <div className="text-yellow-200 text-lg text-center">
-                  💡 {subjectContent.tipMessage}
                 </div>
               </div>
 
               {/* Progress Info */}
-              <div className="bg-purple-900/30 border border-purple-400/30 rounded-lg p-6 mb-6">
-                <div className="text-center text-white">
-                  <h3 className="text-lg font-semibold mb-2">Your Learning Session</h3>
-                  <p className="text-purple-200">
-                    🎯 Target: {Math.round(targetLessonLength / 60)} minutes of engaging learning
-                  </p>
-                  <p className="text-purple-200">
-                    📚 Activities: {totalRealActivities} interactive challenges prepared just for you!
-                  </p>
+              <div className="text-center text-white mb-6">
+                <p className="text-lg">Step 1 of 1</p>
+                <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                  <div className="bg-purple-400 h-2 rounded-full w-full"></div>
                 </div>
+              </div>
+
+              {/* Tips Section */}
+              <div className="bg-green-900/30 border border-green-400/30 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-green-300 mb-4 flex items-center">
+                  💡 {subject.charAt(0).toUpperCase() + subject.slice(1)} Learning Tips
+                </h3>
+                <ul className="space-y-2">
+                  {subjectContent.tips.map((tip, index) => (
+                    <li key={index} className="text-green-200 flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Ready Section */}
+              <div className="bg-purple-900/30 border border-purple-400/30 rounded-lg p-6 mb-6 text-center">
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-300 font-semibold">{subjectContent.readyMessage}</span>
+                </div>
+                <p className="text-purple-200">{subjectContent.lessonInfo}</p>
               </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Button
-                  onClick={handleStartLearning}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold px-8 py-3 text-lg"
+                  onClick={handleStartIntroductionWithNelie}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold px-6 py-3"
                 >
-                  <Play className="w-5 h-5 mr-2" />
-                  Start Learning Adventure!
+                  Start Introduction with Nelie
                 </Button>
                 
                 <Button
-                  onClick={onBackToProgram}
+                  onClick={handleStartLessonWithoutSpeech}
                   variant="outline"
-                  className="border-gray-400 text-white hover:bg-gray-700"
+                  className="border-gray-400 text-white hover:bg-gray-700 bg-black/30"
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Program
+                  Start Lesson Without Speech
                 </Button>
               </div>
             </CardContent>
