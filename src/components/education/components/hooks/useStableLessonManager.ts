@@ -28,7 +28,6 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     metadata: { subject, skillArea: 'introduction' },
     content: {
       segments: [{
-        type: 'introduction',
         explanation: `Welcome! Today we're going on an exciting ${subject} journey. Let's explore amazing concepts together and have fun learning!`,
         examples: []
       }]
@@ -141,7 +140,6 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     metadata: { subject, skillArea: 'summary' },
     content: {
       segments: [{
-        type: 'celebration',
         explanation: "Fantastic work! You've completed an amazing variety of math challenges today. You practiced addition, subtraction, multiplication, division, patterns, and fractions!",
         examples: []
       }]

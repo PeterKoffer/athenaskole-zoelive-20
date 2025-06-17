@@ -132,6 +132,7 @@ export const useSimpleQuestionGeneration = ({
   skillArea
 }: UseSimpleQuestionGenerationProps) => {
   const [sessionId] = useState(`session_${Date.now()}`);
+  const [questionCount, setQuestionCount] = useState(0);
   const usedQuestionIds = useRef<Set<string>>(new Set());
 
   const generateUniqueQuestion = (): LessonActivity => {
@@ -150,6 +151,7 @@ export const useSimpleQuestionGeneration = ({
     // Select random question
     const selectedTemplate = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
     usedQuestionIds.current.add(selectedTemplate.id);
+    setQuestionCount(prev => prev + 1);
 
     console.log('📝 Generated unique question:', {
       id: selectedTemplate.id,
@@ -177,8 +179,16 @@ export const useSimpleQuestionGeneration = ({
     };
   };
 
+  const clearGeneratedQuestions = () => {
+    usedQuestionIds.current.clear();
+    setQuestionCount(0);
+    console.log('🧹 Cleared all generated questions');
+  };
+
   return {
     generateUniqueQuestion,
+    clearGeneratedQuestions,
+    questionCount,
     sessionId
   };
 };
