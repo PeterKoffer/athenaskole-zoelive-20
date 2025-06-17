@@ -89,11 +89,11 @@ export const useRoleAccess = () => {
       return;
     }
 
-    // For unauthenticated users, set school_leader for testing
-    debugLog("Setting school_leader for unauthenticated user");
-    setUserRole("school_leader");
+    // For unauthenticated users, clear any role
+    debugLog("No authenticated user - clearing role");
+    setUserRole(null);
     if (typeof window !== "undefined") {
-      sessionStorage.setItem(SESSION_ROLE_KEY, "school_leader");
+      sessionStorage.removeItem(SESSION_ROLE_KEY);
     }
   }, [user, loading, isManuallyChangingRole]);
 

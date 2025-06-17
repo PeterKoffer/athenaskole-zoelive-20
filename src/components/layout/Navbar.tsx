@@ -79,8 +79,8 @@ const Navbar = ({
               </NavbarButton>
             )}
 
-            {/* Display the current user role (icon + label) */}
-            {userRole && (
+            {/* Display the current user role (icon + label) - only if user is authenticated */}
+            {user && userRole && (
               <UserRoleDisplay role={userRole} className="ml-2" />
             )}
 
@@ -113,11 +113,9 @@ const Navbar = ({
         onShowGames={onShowGames}
         onShowAITutor={onShowAITutor}
         onShowInsights={canAccessAIInsights() ? onShowInsights : undefined}
-        // No change to props required here: MobileMenu will use useRoleAccess internally for role display
       />
     </nav>
   );
 };
 
 export default Navbar;
-
