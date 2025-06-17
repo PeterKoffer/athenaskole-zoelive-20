@@ -18,8 +18,8 @@ const TextWithSpeaker = ({
   context = 'text-content',
   className = '',
   buttonClassName = '',
-  showOnHover = true,
-  position = 'inline'
+  showOnHover = false,
+  position = 'corner'
 }: TextWithSpeakerProps) => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
@@ -36,12 +36,12 @@ const TextWithSpeaker = ({
       <div className={`relative ${className}`}>
         <button
           onClick={handleSpeak}
-          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-sky-500/90 hover:bg-sky-400 transition-all duration-200 shadow-lg backdrop-blur-sm ${
+          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 ${
             showOnHover ? 'opacity-80 group-hover:opacity-100' : 'opacity-90 hover:opacity-100'
           } ${buttonClassName}`}
           title="Ask Nelie to read this"
         >
-          <CustomSpeakerIcon className="w-4 h-4 text-white" size={16} />
+          <CustomSpeakerIcon className="w-5 h-5" size={20} color="#0ea5e9" />
         </button>
         {children}
       </div>
@@ -55,12 +55,12 @@ const TextWithSpeaker = ({
       </div>
       <button
         onClick={handleSpeak}
-        className={`ml-2 p-2 rounded-full bg-sky-500/80 hover:bg-sky-400 transition-all duration-200 ${
+        className={`ml-2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 border border-sky-400/30 ${
           showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-80 hover:opacity-100'
         } ${buttonClassName}`}
         title="Ask Nelie to read this"
       >
-        <CustomSpeakerIcon className="w-4 h-4 text-white" size={16} />
+        <CustomSpeakerIcon className="w-5 h-5" size={20} color="#0ea5e9" />
       </button>
     </div>
   );

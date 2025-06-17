@@ -4,9 +4,10 @@ import React from 'react';
 interface CustomSpeakerIconProps {
   className?: string;
   size?: number;
+  color?: string;
 }
 
-const CustomSpeakerIcon = ({ className = '', size = 16 }: CustomSpeakerIconProps) => {
+const CustomSpeakerIcon = ({ className = '', size = 16, color = '#0ea5e9' }: CustomSpeakerIconProps) => {
   return (
     <svg 
       width={size} 
@@ -20,19 +21,19 @@ const CustomSpeakerIcon = ({ className = '', size = 16 }: CustomSpeakerIconProps
         {/* Speaker cone */}
         <path 
           d="M25 35 L25 65 L45 65 L65 80 L65 20 L45 35 Z" 
-          fill="currentColor"
+          fill={color}
         />
         {/* Sound waves */}
         <path 
           d="M72 35 Q80 42 80 50 Q80 58 72 65" 
-          stroke="currentColor" 
+          stroke={color} 
           strokeWidth="3" 
           fill="none"
           strokeLinecap="round"
         />
         <path 
           d="M76 28 Q88 38 88 50 Q88 62 76 72" 
-          stroke="currentColor" 
+          stroke={color} 
           strokeWidth="3" 
           fill="none"
           strokeLinecap="round"
