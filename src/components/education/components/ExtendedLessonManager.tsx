@@ -155,13 +155,20 @@ const ExtendedLessonManager = ({
 
       {/* Nelie Avatar */}
       <NelieAvatarSection 
-        subject={subject} 
-        currentQuestionIndex={currentActivityIndex} 
-        totalQuestions={lessonActivities.length} 
-        isSpeaking={isSpeaking} 
-        autoReadEnabled={autoReadEnabled} 
-        onMuteToggle={toggleMute} 
-        onReadQuestion={handleReadQuestion} 
+        isSpeaking={isSpeaking}
+        autoReadEnabled={autoReadEnabled}
+        hasUserInteracted={isReady}
+        isReady={isReady}
+        onToggleMute={toggleMute}
+        onReadRequest={handleReadQuestion}
+        engagementLevel={75}
+        adaptiveSpeed={1.0}
+        // Legacy props for backward compatibility
+        subject={subject}
+        currentQuestionIndex={currentActivityIndex}
+        totalQuestions={lessonActivities.length}
+        onMuteToggle={toggleMute}
+        onReadQuestion={handleReadQuestion}
       />
 
       {/* Activity Content */}

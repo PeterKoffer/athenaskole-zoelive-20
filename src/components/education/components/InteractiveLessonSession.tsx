@@ -135,11 +135,18 @@ const InteractiveLessonSession = ({
   return (
     <div className="space-y-6">
       <NelieAvatarSection
+        isSpeaking={isSpeaking}
+        autoReadEnabled={autoReadEnabled}
+        hasUserInteracted={true}
+        isReady={true}
+        onToggleMute={handleMuteToggle}
+        onReadRequest={readQuestion}
+        engagementLevel={75}
+        adaptiveSpeed={1.0}
+        // Legacy props for backward compatibility
         subject={subject}
         currentQuestionIndex={currentQuestionIndex}
         totalQuestions={questions.length}
-        isSpeaking={isSpeaking}
-        autoReadEnabled={autoReadEnabled}
         onMuteToggle={handleMuteToggle}
         onReadQuestion={readQuestion}
       />
