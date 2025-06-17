@@ -1,9 +1,11 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle } from 'lucide-react';
 import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 import { LessonActivity } from '../types/LessonTypes';
+import TextWithSpeaker from '../shared/TextWithSpeaker';
 
 interface ActivityContentDeliveryProps {
   activity: LessonActivity;
@@ -82,20 +84,36 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="bg-gray-700 border border-gray-600 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-3">
-            {segment?.concept || 'Learning Content'}
-          </h3>
-          <p className="text-gray-200 text-lg leading-relaxed">
-            {segment?.explanation || activity.content.text || 'Content coming soon...'}
-          </p>
-        </div>
+        <TextWithSpeaker
+          text={segment?.explanation || activity.content.text || 'Content coming soon...'}
+          context="activity-content-explanation"
+          position="corner"
+          showOnHover={false}
+        >
+          <div className="bg-gray-700 border border-gray-600 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-white mb-3">
+              {segment?.concept || 'Learning Content'}
+            </h3>
+            <p className="text-gray-200 text-lg leading-relaxed">
+              {segment?.explanation || activity.content.text || 'Content coming soon...'}
+            </p>
+          </div>
+        </TextWithSpeaker>
         
         {segment?.checkQuestion && (
           <div className="space-y-4">
-            <h4 className="text-lg font-medium text-white">
-              {segment.checkQuestion.question}
-            </h4>
+            <TextWithSpeaker
+              text={segment.checkQuestion.question}
+              context="activity-question"
+              position="corner"
+              showOnHover={false}
+            >
+              <div className="bg-blue-900/20 rounded-lg p-4">
+                <h4 className="text-lg font-medium text-white">
+                  {segment.checkQuestion.question}
+                </h4>
+              </div>
+            </TextWithSpeaker>
             
             <div className="space-y-3">
               {segment.checkQuestion.options.map((option, index) => (
@@ -119,25 +137,32 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
             </div>
 
             {showResult && (
-              <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  {selectedAnswer === segment.checkQuestion.correctAnswer ? (
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <XCircle className="w-5 h-5 text-red-400" />
-                  )}
-                  <p className={`font-semibold ${
-                    selectedAnswer === segment.checkQuestion.correctAnswer 
-                      ? 'text-green-400' 
-                      : 'text-red-400'
-                  }`}>
-                    {selectedAnswer === segment.checkQuestion.correctAnswer ? 'Excellent!' : 'Try again next time!'}
+              <TextWithSpeaker
+                text={segment.checkQuestion.explanation}
+                context="activity-explanation"
+                position="corner"
+                showOnHover={false}
+              >
+                <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    {selectedAnswer === segment.checkQuestion.correctAnswer ? (
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-400" />
+                    )}
+                    <p className={`font-semibold ${
+                      selectedAnswer === segment.checkQuestion.correctAnswer 
+                        ? 'text-green-400' 
+                        : 'text-red-400'
+                    }`}>
+                      {selectedAnswer === segment.checkQuestion.correctAnswer ? 'Excellent!' : 'Try again next time!'}
+                    </p>
+                  </div>
+                  <p className="text-gray-300">
+                    {segment.checkQuestion.explanation}
                   </p>
                 </div>
-                <p className="text-gray-300">
-                  {segment.checkQuestion.explanation}
-                </p>
-              </div>
+              </TextWithSpeaker>
             )}
 
             <div className="flex justify-end">
