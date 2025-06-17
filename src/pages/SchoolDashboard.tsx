@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, UserPlus, School, Menu, GraduationCap, Calendar } from "lucide-react";
+import { useState } from "react";
 import SchoolNavbar from "@/components/school/SchoolNavbar";
 import SchoolStatsCards from "@/components/school/SchoolStatsCards";
 import SchoolOverviewTab from "@/components/school/SchoolOverviewTab";
@@ -18,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 const SchoolDashboard = () => {
   const { userRole } = useRoleAccess();
   const { user, loading } = useAuth();
+  const [showTeachingSettings, setShowTeachingSettings] = useState(false);
 
   console.log('[SchoolDashboard] Rendering with role:', userRole, 'loading:', loading);
 
@@ -69,7 +71,7 @@ const SchoolDashboard = () => {
       <SchoolNavbar />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg">
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg mb-6">
           <h1 className="text-3xl font-bold mb-2">Welcome to Your School Dashboard</h1>
           <p className="text-purple-100">
             Manage your educational institution with AI-powered insights and comprehensive tools.
@@ -82,7 +84,6 @@ const SchoolDashboard = () => {
         </div>
 
         <SchoolStatsCards stats={stats} />
-        <TeachingPerspectiveSettingsPanel />
 
         {/* Management Dropdown */}
         <div className="flex gap-4 mb-6">
@@ -179,14 +180,48 @@ const SchoolDashboard = () => {
 
               <DropdownMenuSeparator className="bg-gray-700" />
 
-              {/* System Settings */}
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <Settings className="w-4 h-4 mr-2" />
-                System Settings
-              </DropdownMenuItem>
+              {/* System Settings with Teaching Perspective */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="hover:bg-gray-700">
+                  <Settings className="w-4 h-4 mr-2" />
+                  System Settings
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+                  <DropdownMenuItem 
+                    className="hover:bg-gray-700"
+                    onClick={() => setShowTeachingSettings(true)}
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Teaching Perspective Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700">
+                    <Settings className="w-4 h-4 mr-2" />
+                    General Settings
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        {/* Teaching Perspective Settings Modal/Panel */}
+        {showTeachingSettings && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-white">Teaching Perspective Settings</h2>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setShowTeachingSettings(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ×
+                </Button>
+              </div>
+              <TeachingPerspectiveSettingsPanel />
+            </div>
+          </div>
+        )}
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 bg-gray-800">
