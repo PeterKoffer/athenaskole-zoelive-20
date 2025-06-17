@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { UniqueQuestion } from '@/services/globalQuestionUniquenessService';
+import { UniqueQuestion, globalQuestionUniquenessService } from '@/services/globalQuestionUniquenessService';
 import { gradeAlignedQuestionGeneration, TeachingPerspective } from '@/services/gradeAlignedQuestionGeneration';
 import { teachingPerspectiveService } from '@/services/teachingPerspectiveService';
 
@@ -148,6 +148,26 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     }
   }, [props, effectiveGradeLevel, teachingPerspective, toast]);
 
+  const saveQuestionHistory = useCallback(async (
+    question: UniqueQuestion,
+    userAnswer: number,
+    isCorrect: boolean,
+    responseTime: number,
+    additionalContext?: any
+  ) => {
+    try {
+      await globalQuestionUniquenessService.trackQuestionUsage(question);
+      console.log(`📝 Saved question history for Grade ${effectiveGradeLevel}:`, {
+        questionId: question.id,
+        isCorrect,
+        responseTime,
+        context: additionalContext
+      });
+    } catch (error) {
+      console.error('❌ Failed to save question history:', error);
+    }
+  }, [effectiveGradeLevel]);
+
   const updateTeachingPerspective = useCallback((newPerspective: TeachingPerspective) => {
     teachingPerspectiveService.saveTeachingPerspective(props.userId, newPerspective);
   }, [props.userId]);
@@ -170,6 +190,7 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     // Core functionality
     generateUniqueQuestion,
     updateTeachingPerspective,
+    saveQuestionHistory,
     
     // State
     isGenerating,
