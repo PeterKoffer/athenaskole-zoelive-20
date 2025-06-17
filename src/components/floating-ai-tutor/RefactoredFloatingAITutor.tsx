@@ -4,18 +4,25 @@ import { Card, CardContent } from '../ui/card';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useDragBehavior } from './hooks/useDragBehavior';
 import { useFloatingTutorMessages } from './hooks/useFloatingTutorMessages';
+import { useFloatingTutorState } from './hooks/useFloatingTutorState';
 import FloatingButton from './components/FloatingButton';
 import ChatHeader from './components/ChatHeader';
 import ChatMessages from './components/ChatMessages';
 import ChatInputArea from './components/ChatInputArea';
 
 const RefactoredFloatingAITutor = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   
   const { isDragging, position, dragRef, handleMouseDown, hasMoved } = useDragBehavior();
   const { messages, addUserMessage, addNelieMessage } = useFloatingTutorMessages();
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
+  const { isOpen, setIsOpen, shouldHide } = useFloatingTutorState();
+
+  // Hide the floating tutor if it should be hidden (to prevent duplicates)
+  if (shouldHide) {
+    console.log('🚫 Hiding floating tutor to prevent duplicates');
+    return null;
+  }
 
   const handleSendMessage = async (inputText: string) => {
     addUserMessage(inputText);
