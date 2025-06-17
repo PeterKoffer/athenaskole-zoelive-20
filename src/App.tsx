@@ -26,6 +26,10 @@ import ProgressTrackingPage from '@/pages/ProgressTrackingPage';
 import TeacherCommunicationsPage from '@/pages/TeacherCommunicationsPage';
 import AnnouncementsPage from '@/pages/AnnouncementsPage';
 
+// Import learning components
+import EnhancedEnglishLearning from '@/components/education/EnhancedEnglishLearning';
+import LanguageLearning from '@/components/LanguageLearning';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -58,6 +62,14 @@ function AppRoutes() {
         <Route path="/progress-tracking" element={<ProgressTrackingPage />} />
         <Route path="/teacher-communications" element={<TeacherCommunicationsPage />} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
+        
+        {/* Learning activity routes */}
+        <Route path="/learn/english" element={<EnhancedEnglishLearning />} />
+        <Route path="/learn/spanish" element={<LanguageLearning initialLanguage="spanish" />} />
+        <Route path="/learn/french" element={<LanguageLearning initialLanguage="french" />} />
+        <Route path="/learn/german" element={<LanguageLearning initialLanguage="german" />} />
+        <Route path="/learn/italian" element={<LanguageLearning initialLanguage="italian" />} />
+        <Route path="/learn/mandarin" element={<LanguageLearning initialLanguage="mandarin" />} />
       </Routes>
       {user && <FloatingAITutor />}
     </>
