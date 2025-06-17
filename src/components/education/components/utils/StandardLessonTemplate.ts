@@ -7,12 +7,12 @@ export interface StandardLessonConfig {
   learningObjectives: string[];
   prerequisites: string[];
   
-  // Phase 1: Introduction (2-3 min)
+  // Phase 1: Introduction (percentage-based)
   hook: string;
   realWorldExample: string;
   thoughtQuestion: string;
   
-  // Phase 2: Content Delivery (5-7 min, split into segments)
+  // Phase 2: Content Delivery (percentage-based, split into segments)
   contentSegments: Array<{
     concept: string;
     explanation: string;
@@ -24,7 +24,7 @@ export interface StandardLessonConfig {
     };
   }>;
   
-  // Phase 3: Interactive Game (4-5 min)
+  // Phase 3: Interactive Game (percentage-based)
   gameType: 'problem-solving' | 'matching' | 'true-false' | 'adventure-game';
   gameInstructions: string;
   gameQuestion: string;
@@ -32,19 +32,19 @@ export interface StandardLessonConfig {
   gameCorrectAnswer: number;
   gameExplanation: string;
   
-  // Phase 4: Application (3-4 min)
+  // Phase 4: Application (percentage-based)
   applicationScenario: string;
   problemSteps: Array<{
     step: string;
-    solution: string;
+    // Remove solution from content - let adaptive engine determine explanation depth
   }>;
   
-  // Phase 5: Creative Exploration (2-3 min)
+  // Phase 5: Creative Exploration (percentage-based)
   creativePrompt: string;
   whatIfScenario: string;
   explorationTask: string;
   
-  // Phase 6: Summary (1-2 min)
+  // Phase 6: Summary (percentage-based)
   keyTakeaways: string[];
   selfAssessment: {
     question: string;
@@ -70,13 +70,13 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
   const lessonId = `lesson-${Date.now()}`;
   const phases: LessonActivity[] = [];
 
-  // Phase 1: Engaging Introduction (2-3 minutes)
+  // Phase 1: Engaging Introduction (adaptive percentage)
   phases.push({
     id: `${lessonId}-introduction`,
     title: `Welcome to ${config.subject}`,
     type: 'introduction',
     phase: 'introduction',
-    duration: 150, // 2.5 minutes
+    duration: 150, // This will be overridden by adaptive engine
     phaseDescription: 'Get excited about learning!',
     content: {
       hook: config.hook,
@@ -86,14 +86,14 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
     }
   });
 
-  // Phase 2: Content Delivery Segments (5-7 minutes total)  
+  // Phase 2: Content Delivery Segments (adaptive percentage)  
   config.contentSegments.forEach((segment, index) => {
     phases.push({
       id: `${lessonId}-content-${index}`,
       title: segment.concept,
       type: 'content-delivery',
       phase: 'content-delivery',
-      duration: Math.floor(400 / config.contentSegments.length), // Distribute 400 seconds
+      duration: Math.floor(400 / config.contentSegments.length), // Adaptive override
       phaseDescription: `Learn about ${segment.concept}`,
       content: {
         text: segment.explanation,
@@ -112,7 +112,7 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
       title: `Check: ${segment.concept}`,
       type: 'interactive-game',
       phase: 'interactive-game',
-      duration: 60, // 1 minute per check
+      duration: 60, // Adaptive override
       phaseDescription: 'Quick understanding check',
       content: {
         question: segment.checkQuestion.question,
@@ -123,13 +123,13 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
     });
   });
 
-  // Phase 3: Interactive Learning Game (4-5 minutes)
+  // Phase 3: Interactive Learning Game (adaptive percentage)
   phases.push({
     id: `${lessonId}-game`,
     title: 'Interactive Challenge',
     type: 'interactive-game',
     phase: 'interactive-game',
-    duration: 270, // 4.5 minutes
+    duration: 270, // Adaptive override
     phaseDescription: config.gameInstructions,
     content: {
       question: config.gameQuestion,
@@ -140,31 +140,30 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
     }
   });
 
-  // Phase 4: Application & Problem-Solving (3-4 minutes)
+  // Phase 4: Application & Problem-Solving (adaptive percentage)
   config.problemSteps.forEach((step, index) => {
     phases.push({
       id: `${lessonId}-application-${index}`,
       title: `Apply: Step ${index + 1}`,
       type: 'application',
       phase: 'application',
-      duration: Math.floor(210 / config.problemSteps.length), // Distribute 3.5 minutes
+      duration: Math.floor(210 / config.problemSteps.length), // Adaptive override
       phaseDescription: step.step,
       content: {
         scenario: config.applicationScenario,
         task: step.step,
-        solution: step.solution,
-        text: `${step.step}\n\nSolution: ${step.solution}`
+        text: step.step
       }
     });
   });
 
-  // Phase 5: Creative Exploration (2-3 minutes)
+  // Phase 5: Creative Exploration (adaptive percentage)
   phases.push({
     id: `${lessonId}-creative`,
     title: 'Creative Exploration',
     type: 'creative-exploration',
     phase: 'creative-exploration',
-    duration: 150, // 2.5 minutes
+    duration: 150, // Adaptive override
     phaseDescription: 'Think creatively and explore!',
     content: {
       creativePrompt: config.creativePrompt,
@@ -174,13 +173,13 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
     }
   });
 
-  // Phase 6: Summary & Assessment (1-2 minutes)
+  // Phase 6: Summary & Assessment (adaptive percentage)
   phases.push({
     id: `${lessonId}-summary`,
     title: 'Lesson Summary',
     type: 'summary',
     phase: 'summary',
-    duration: 90, // 1.5 minutes
+    duration: 90, // Adaptive override
     phaseDescription: 'Review what we learned',
     content: {
       keyTakeaways: config.keyTakeaways,
@@ -194,7 +193,7 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
     title: 'Self-Assessment',
     type: 'interactive-game',
     phase: 'interactive-game',
-    duration: 90, // 1.5 minutes
+    duration: 90, // Adaptive override
     phaseDescription: 'Check your understanding',
     content: {
       question: config.selfAssessment.question,
@@ -218,7 +217,6 @@ export const createStandardLesson = (config: StandardLessonConfig): StandardLess
   };
 };
 
-// Add the missing validation function
 export const validateStandardLesson = (lesson: any): {
   isValid: boolean;
   errors: string[];

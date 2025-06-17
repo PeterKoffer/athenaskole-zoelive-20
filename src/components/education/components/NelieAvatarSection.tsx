@@ -52,13 +52,13 @@ const NelieAvatarSection = ({
             {/* Nelie Info */}
             <div>
               <h3 className="text-white font-semibold">
-                Nelie - Your Mathematics Tutor
+                Nelie - Your Adaptive Tutor
               </h3>
               <p className="text-gray-400 text-sm">
-                {hasUserInteracted ? 'Ready to help!' : 'Say hello to get started!'}
+                {hasUserInteracted ? 'Adapting to your pace!' : 'Say hello to get started!'}
               </p>
               <div className="text-xs text-gray-500">
-                Engagement: {engagementLevel}% | Speed: {adaptiveSpeed}x
+                Engagement: {engagementLevel}% | Adaptive Speed: {adaptiveSpeed.toFixed(1)}x
               </div>
             </div>
           </div>

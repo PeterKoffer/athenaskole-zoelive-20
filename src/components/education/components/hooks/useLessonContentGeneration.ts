@@ -19,7 +19,7 @@ export const useLessonContentGeneration = ({
 
   useEffect(() => {
     const generateStandardizedLesson = async () => {
-      console.log(`🌟 Generating STANDARDIZED 20-minute ${subject} lesson...`);
+      console.log(`🌟 Generating ADAPTIVE ${subject} lesson...`);
       setIsGenerating(true);
 
       try {
@@ -41,12 +41,12 @@ export const useLessonContentGeneration = ({
               'Understanding of numbers 1-20'
             ],
             
-            // Phase 1: Introduction (2-3 min)
+            // Phase 1: Introduction (adaptive percentage)
             hook: "Imagine you're planning the perfect pizza party for your friends! You need to figure out how much pizza to order, how to split the cost fairly, and even how to cut the pizzas into equal slices.",
             realWorldExample: "Every time you go shopping, check your phone battery percentage, or split a bill with friends, you're using the mathematical concepts we'll explore today!",
             thoughtQuestion: "Have you ever wondered why understanding numbers and patterns can actually make your daily life easier and more fun?",
             
-            // Phase 2: Content Delivery (5-7 min, split into segments)
+            // Phase 2: Content Delivery (adaptive percentage)
             contentSegments: [
               {
                 concept: "Addition as Combining Groups",
@@ -80,7 +80,7 @@ export const useLessonContentGeneration = ({
               }
             ],
             
-            // Phase 3: Interactive Game (4-5 min)
+            // Phase 3: Interactive Game (adaptive percentage)
             gameType: 'problem-solving',
             gameInstructions: "You're a Number Detective! Help solve these mathematical mysteries by finding the missing numbers and patterns.",
             gameQuestion: "Detective Challenge: A magical number machine takes any number, adds 7, then subtracts 3. If you put the number 15 into this machine, what number comes out?",
@@ -88,32 +88,26 @@ export const useLessonContentGeneration = ({
             gameCorrectAnswer: 1,
             gameExplanation: "Amazing detective work! 15 + 7 = 22, then 22 - 3 = 19. The machine output 19! You cracked the mathematical mystery!",
             
-            // Phase 4: Application (3-4 min)
+            // Phase 4: Application (adaptive percentage)
             applicationScenario: "You're organizing a class party! There are 24 students in your class, and you want to arrange them into equal groups for activities.",
             problemSteps: [
               {
-                step: "If you make groups of 4 students each, how many groups will you have?",
-                hint: "Think about how many times 4 goes into 24",
-                solution: "24 ÷ 4 = 6 groups of 4 students each"
+                step: "If you make groups of 4 students each, how many groups will you have?"
               },
               {
-                step: "Each group needs 3 balloons for their activity. How many balloons do you need total?",
-                hint: "Multiply the number of groups by balloons per group",
-                solution: "6 groups × 3 balloons = 18 balloons total"
+                step: "Each group needs 3 balloons for their activity. How many balloons do you need total?"
               },
               {
-                step: "Balloons come in packs of 5. How many packs do you need to buy?",
-                hint: "You need 18 balloons, and each pack has 5",
-                solution: "18 ÷ 5 = 3.6, so you need 4 packs (always round up for purchases!)"
+                step: "Balloons come in packs of 5. How many packs do you need to buy?"
               }
             ],
             
-            // Phase 5: Creative Exploration (2-3 min)
+            // Phase 5: Creative Exploration (adaptive percentage)
             creativePrompt: "Imagine you could design a new number system for aliens on another planet! How would you explain addition to them?",
             whatIfScenario: "What if we could only use the numbers 1, 2, and 3? How would you represent the number 'seven' using just these three numbers?",
             explorationTask: "Think of three places in your daily life where you use math without even realizing it. How could understanding patterns make these activities more fun or efficient?",
             
-            // Phase 6: Summary (1-2 min)
+            // Phase 6: Summary (adaptive percentage)
             keyTakeaways: [
               "Addition combines groups to find totals",
               "Subtraction finds differences or what's left",
@@ -135,7 +129,7 @@ export const useLessonContentGeneration = ({
             nextTopicSuggestion: "Next, we'll explore multiplication as repeated addition and discover the amazing patterns in times tables!"
           };
         } else {
-          // Default template for other subjects
+          // Default adaptive template for other subjects
           lessonConfig = {
             subject,
             skillArea,
@@ -165,9 +159,7 @@ export const useLessonContentGeneration = ({
             applicationScenario: `Real-world application of ${subject}`,
             problemSteps: [
               {
-                step: `Apply ${subject} knowledge`,
-                hint: "Think step by step",
-                solution: `Solution using ${subject} principles`
+                step: `Apply ${subject} knowledge`
               }
             ],
             creativePrompt: `Think creatively about ${subject}`,
@@ -186,13 +178,12 @@ export const useLessonContentGeneration = ({
 
         const standardLesson = createStandardLesson(lessonConfig);
         
-        console.log(`✅ Generated ${standardLesson.phases.length} standardized activities for ${subject}:`, 
-          standardLesson.phases.map(a => `${a.title} (${a.duration}s)`));
-        console.log(`📊 Total lesson duration: ${Math.floor(standardLesson.totalDuration / 60)} minutes`);
+        console.log(`✅ Generated ${standardLesson.phases.length} adaptive activities for ${subject}`);
+        console.log(`📊 Base lesson structure: ${Math.floor(standardLesson.totalDuration / 60)} minutes (will adapt per student)`);
 
         setBaseLessonActivities(standardLesson.phases);
       } catch (error) {
-        console.error('❌ Error generating standardized lesson:', error);
+        console.error('❌ Error generating adaptive lesson:', error);
         
         // Fallback to ensure we have activities
         const fallbackActivities: LessonActivity[] = [
@@ -217,7 +208,7 @@ export const useLessonContentGeneration = ({
   }, [subject, skillArea, gradeLevel]);
 
   const regenerateLesson = () => {
-    console.log(`🔄 Regenerating standardized ${subject} lesson...`);
+    console.log(`🔄 Regenerating adaptive ${subject} lesson...`);
     setBaseLessonActivities([]);
     setIsGenerating(true);
     
