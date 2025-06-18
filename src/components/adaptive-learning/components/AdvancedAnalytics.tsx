@@ -8,12 +8,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Target, Clock, Award, Brain, BarChart3 } from 'lucide-react';
+import { SessionData, ConceptMasteryData, UserPerformanceData, WeeklyProgressData } from '../types/analytics';
 
 interface AnalyticsData {
-  sessions: any[];
-  conceptMastery: any[];
-  performance: any[];
-  weeklyProgress: any[];
+  sessions: SessionData[];
+  conceptMastery: ConceptMasteryData[];
+  performance: UserPerformanceData[];
+  weeklyProgress: WeeklyProgressData[];
 }
 
 interface AdvancedAnalyticsProps {
@@ -79,7 +80,7 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     }
   };
 
-  const processWeeklyProgress = (sessions: any[]) => {
+  const processWeeklyProgress = (sessions: SessionData[]): WeeklyProgressData[] => {
     const weeklyMap = new Map();
     
     sessions.forEach(session => {
