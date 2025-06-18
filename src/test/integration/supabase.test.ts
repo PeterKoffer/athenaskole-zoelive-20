@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../../types/supabase';
 

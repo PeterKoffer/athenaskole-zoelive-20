@@ -11,8 +11,8 @@ import {
   generateCompleteEducationalSession,
   generateMathematicsLesson,
   generateEnglishLesson 
-} from '../utils/EnhancedSubjectLessonFactory';
-import { generateEnhancedLesson, validateEnhancedLesson } from '../utils/EnhancedLessonGenerator';
+} from './utils/EnhancedSubjectLessonFactory';
+import { generateEnhancedLesson, validateEnhancedLesson } from './utils/EnhancedLessonGenerator';
 
 /**
  * Enhanced NELIE Lesson Manager Component
