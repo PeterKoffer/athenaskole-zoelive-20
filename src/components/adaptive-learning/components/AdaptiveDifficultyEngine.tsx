@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { SessionData, UserPerformanceData, PerformanceMetrics } from '../types/analytics';
+import { SessionData, UserPerformanceData } from '../types/analytics';
 
 interface DifficultyMetrics {
   currentLevel: number;
