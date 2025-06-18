@@ -6,7 +6,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 
 /**
  * Handles automatic redirection after authentication based on user role
- * Only redirects from auth page - does not interfere with manual navigation or role switching
+ * BLOCKS redirects during active learning sessions to prevent interruption
  */
 export const useAuthRedirect = () => {
   const { user, loading } = useAuth();
@@ -15,27 +15,28 @@ export const useAuthRedirect = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log('[useAuthRedirect] =================');
-    console.log('[useAuthRedirect] Auth loading:', loading);
-    console.log('[useAuthRedirect] User:', user?.email);
-    console.log('[useAuthRedirect] User role:', userRole);
-    console.log('[useAuthRedirect] Current path:', location.pathname);
-    console.log('[useAuthRedirect] Is manual role change:', isManualRoleChange());
-    console.log('[useAuthRedirect] =================');
-
     // Don't redirect while still loading
     if (loading) {
       console.log('[useAuthRedirect] Skipping redirect - still loading');
       return;
     }
 
-    // CRITICAL: Completely block all redirects during manual role changes
+    // CRITICAL: Block ALL redirects during manual role changes
     if (isManualRoleChange()) {
-      console.log('[useAuthRedirect] 🚫 BLOCKING ALL REDIRECTS - manual role change in progress');
+      console.log('[useAuthRedirect] 🚫 BLOCKING redirects - manual role change in progress');
       return;
     }
 
-    // If we're on the auth page and the user is trying to switch roles, don't redirect
+    // CRITICAL: Block redirects during active learning sessions
+    const learningPaths = ['/learn', '/daily-program', '/mathematics', '/english', '/science'];
+    const isInLearningSession = learningPaths.some(path => location.pathname.includes(path));
+    
+    if (isInLearningSession) {
+      console.log('[useAuthRedirect] 🚫 BLOCKING redirects - active learning session detected:', location.pathname);
+      return;
+    }
+
+    // If we're on the auth page, allow role selection
     if (location.pathname === '/auth') {
       console.log('[useAuthRedirect] On auth page - allowing role selection');
       return;
@@ -53,9 +54,17 @@ export const useAuthRedirect = () => {
 
       // Add a delay to ensure manual role change flags are processed
       setTimeout(() => {
-        // Double-check the manual role change flag before redirecting
+        // Double-check the manual role change flag and learning session before redirecting
         if (isManualRoleChange()) {
           console.log('[useAuthRedirect] 🚫 LAST MINUTE BLOCK - manual role change detected');
+          return;
+        }
+
+        const currentPath = window.location.pathname;
+        const stillInLearning = learningPaths.some(path => currentPath.includes(path));
+        
+        if (stillInLearning) {
+          console.log('[useAuthRedirect] 🚫 LAST MINUTE BLOCK - learning session detected');
           return;
         }
 

@@ -1,5 +1,6 @@
 import { LessonActivity } from '../types/LessonTypes';
 import { StandardLessonConfig, createStandardLesson } from './StandardLessonTemplate';
+import EnhancedContentUniquenessSystem from './EnhancedContentUniquenessSystem';
 
 /**
  * Enhanced lesson generator that creates 20-25 minute lessons with unique content
@@ -112,98 +113,6 @@ export const K12_CURRICULUM_STANDARDS = {
 };
 
 /**
- * Content uniqueness system to ensure fresh content for each session
- */
-export class ContentUniquenessSystem {
-  private static sessionHistory: Map<string, ContentUniquenessTracker> = new Map();
-
-  static generateUniqueContent(config: EnhancedLessonConfig): {
-    themes: string[];
-    scenarios: string[];
-    activities: string[];
-  } {
-    const sessionId = config.sessionId || `session-${Date.now()}`;
-    const history = this.sessionHistory.get(sessionId) || {
-      sessionId,
-      usedThemes: [],
-      usedScenarios: [],
-      usedActivities: [],
-      lastGenerated: ''
-    };
-
-    // Generate fresh content pools
-    const availableThemes = this.generateFreshThemes(config.subject, history.usedThemes);
-    const availableScenarios = this.generateFreshScenarios(config.subject, history.usedScenarios);
-    const availableActivities = this.generateFreshActivities(config.subject, history.usedActivities);
-
-    // Update history
-    history.usedThemes.push(...availableThemes.slice(0, 3));
-    history.usedScenarios.push(...availableScenarios.slice(0, 5));
-    history.usedActivities.push(...availableActivities.slice(0, 10));
-    history.lastGenerated = new Date().toISOString();
-
-    // Keep history manageable (last 50 items)
-    history.usedThemes = history.usedThemes.slice(-50);
-    history.usedScenarios = history.usedScenarios.slice(-50);
-    history.usedActivities = history.usedActivities.slice(-50);
-
-    this.sessionHistory.set(sessionId, history);
-
-    return {
-      themes: availableThemes,
-      scenarios: availableScenarios,
-      activities: availableActivities
-    };
-  }
-
-  private static generateFreshThemes(subject: string, usedThemes: string[]): string[] {
-    const allThemes = {
-      mathematics: ['Detective Mystery', 'Space Adventure', 'Treasure Hunt', 'Time Travel', 'Animal Kingdom', 'Ocean Explorer', 'Super Hero Mission', 'Fantasy Quest', 'Sports Challenge', 'Cooking Adventure'],
-      english: ['Story Adventure', 'Word Detective', 'Language Explorer', 'Book Quest', 'Writing Journey', 'Poetry Garden', 'Drama Stage', 'News Reporter', 'Author Workshop', 'Literary Journey'],
-      science: ['Science Lab', 'Nature Explorer', 'Space Mission', 'Underwater World', 'Weather Station', 'Body Systems', 'Chemistry Magic', 'Physics Playground', 'Environmental Hero', 'Invention Station'],
-      music: ['Musical Journey', 'Rhythm Quest', 'Melody Maker', 'Sound Explorer', 'Concert Hall', 'Instrument Adventure', 'Composer Studio', 'Music History', 'World Music Tour', 'Band Practice'],
-      computerScience: ['Code Quest', 'Algorithm Adventure', 'Robot Mission', 'Digital World', 'Programming Playground', 'Logic Puzzle', 'Tech Inventor', 'Cyber Explorer', 'App Creator', 'Game Developer'],
-      creativeArts: ['Art Studio', 'Creative Workshop', 'Design Challenge', 'Color Quest', 'Artistic Journey', 'Craft Adventure', 'Gallery Tour', 'Artist Studio', 'Creative Expression', 'Art History']
-    };
-
-    const subjectThemes = allThemes[subject as keyof typeof allThemes] || allThemes.mathematics;
-    return subjectThemes.filter(theme => !usedThemes.includes(theme));
-  }
-
-  private static generateFreshScenarios(subject: string, usedScenarios: string[]): string[] {
-    // Generate subject-specific scenarios that haven't been used
-    const scenarioPool = this.getScenarioPool(subject);
-    return scenarioPool.filter(scenario => !usedScenarios.includes(scenario));
-  }
-
-  private static generateFreshActivities(subject: string, usedActivities: string[]): string[] {
-    // Generate subject-specific activities that haven't been used
-    const activityPool = this.getActivityPool(subject);
-    return activityPool.filter(activity => !usedActivities.includes(activity));
-  }
-
-  private static getScenarioPool(subject: string): string[] {
-    // This would be expanded with hundreds of scenarios per subject
-    return [
-      `${subject}_scenario_1`,
-      `${subject}_scenario_2`,
-      `${subject}_scenario_3`,
-      // ... many more scenarios
-    ];
-  }
-
-  private static getActivityPool(subject: string): string[] {
-    // This would be expanded with hundreds of activities per subject
-    return [
-      `${subject}_activity_1`,
-      `${subject}_activity_2`,
-      `${subject}_activity_3`,
-      // ... many more activities
-    ];
-  }
-}
-
-/**
  * Generate enhanced lesson with 20-25 minute duration, unique content, and learning style adaptation
  */
 export function generateEnhancedLesson(config: EnhancedLessonConfig): {
@@ -220,8 +129,22 @@ export function generateEnhancedLesson(config: EnhancedLessonConfig): {
     version: string;
   };
 } {
-  // Generate unique content for this session
-  const uniqueContent = ContentUniquenessSystem.generateUniqueContent(config);
+  // Generate unique content using the enhanced system
+  const uniqueContent = EnhancedContentUniquenessSystem.generateUniqueContent({
+    subject: config.subject,
+    sessionId: config.sessionId
+  });
+  
+  console.log('🎨 Using enhanced unique content system:', {
+    subject: config.subject,
+    sessionId: config.sessionId?.substring(0, 12) + '...',
+    contentGenerated: {
+      themes: uniqueContent.themes.length,
+      scenarios: uniqueContent.scenarios.length,
+      activities: uniqueContent.activities.length,
+      contexts: uniqueContent.contexts.length
+    }
+  });
   
   // Determine target duration based on learning style
   const learningStyle = config.learningStyle || 'mixed';
@@ -244,6 +167,12 @@ export function generateEnhancedLesson(config: EnhancedLessonConfig): {
     // Calculate adaptive duration
     const phaseDuration = Math.floor((phaseConfig.basePercentage / 100) * targetDuration);
     
+    // Get unique content for this phase
+    const themeIndex = index % uniqueContent.themes.length;
+    const scenarioIndex = index % uniqueContent.scenarios.length;
+    const activityIndex = index % uniqueContent.activities.length;
+    const contextIndex = index % uniqueContent.contexts.length;
+    
     return {
       ...phase,
       duration: phaseDuration,
@@ -251,7 +180,10 @@ export function generateEnhancedLesson(config: EnhancedLessonConfig): {
         ...phase.content,
         // Add learning style specific adaptations
         learningStyleAdaptation: LEARNING_STYLE_ADAPTATIONS[learningStyle],
-        uniqueTheme: uniqueContent.themes[index % uniqueContent.themes.length],
+        uniqueTheme: uniqueContent.themes[themeIndex],
+        uniqueScenario: uniqueContent.scenarios[scenarioIndex],
+        uniqueActivity: uniqueContent.activities[activityIndex],
+        uniqueContext: uniqueContent.contexts[contextIndex],
         gradeLevel: config.gradeLevel,
         curriculum: K12_CURRICULUM_STANDARDS[config.gradeLevel as keyof typeof K12_CURRICULUM_STANDARDS]?.[config.subject as keyof typeof K12_CURRICULUM_STANDARDS[0]]
       }
@@ -259,6 +191,19 @@ export function generateEnhancedLesson(config: EnhancedLessonConfig): {
   });
 
   const finalDuration = enhancedPhases.reduce((sum, phase) => sum + phase.duration, 0);
+
+  console.log('✅ Enhanced lesson generated:', {
+    subject: config.subject,
+    gradeLevel: config.gradeLevel,
+    learningStyle,
+    duration: `${Math.floor(finalDuration/60)}m ${finalDuration%60}s`,
+    phases: enhancedPhases.length,
+    uniqueContentUsed: {
+      themes: uniqueContent.themes.slice(0, 3),
+      firstScenario: uniqueContent.scenarios[0]?.substring(0, 50) + '...',
+      firstActivity: uniqueContent.activities[0]?.substring(0, 50) + '...'
+    }
+  });
 
   return {
     phases: enhancedPhases,
@@ -271,7 +216,7 @@ export function generateEnhancedLesson(config: EnhancedLessonConfig): {
       sessionId: config.sessionId || `session-${Date.now()}`,
       targetDuration: `${Math.floor(finalDuration/60)} minutes ${finalDuration%60} seconds`,
       createdAt: new Date().toISOString(),
-      version: '2.0-enhanced'
+      version: '2.1-enhanced-unique'
     }
   };
 }
