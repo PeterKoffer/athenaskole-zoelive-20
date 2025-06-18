@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Calendar as CalendarIcon, Table, Filter, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addDays, subDays } from "date-fns";
 import { mockClasses, mockLessonCoverage, getLessonCoverageStats } from "@/data/mockLessonCoverage";
-import { LessonCoverageFilters } from "@/types/lessonCoverage";
+import { LessonCoverageFilters, LessonCoverage } from "@/types/lessonCoverage";
+import LessonDetailsModal from "@/components/admin/LessonDetailsModal";
 
 const LessonCoverageDisplay = () => {
   const [viewType, setViewType] = useState<'calendar' | 'table'>('table');
+  const [selectedLesson, setSelectedLesson] = useState<LessonCoverage | null>(null);
   const [filters, setFilters] = useState<LessonCoverageFilters>({
     classId: 'all',
     status: 'all',
@@ -83,6 +85,11 @@ const LessonCoverageDisplay = () => {
 
   return (
     <div className="space-y-6">
+      <LessonDetailsModal 
+        coverage={selectedLesson} 
+        onClose={() => setSelectedLesson(null)} 
+      />
+      
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white">Lesson Coverage Dashboard</h2>
@@ -256,19 +263,30 @@ const LessonCoverageDisplay = () => {
                       </td>
                       {uniqueDates.map(date => {
                         const coverage = coverageByClassAndDate[classItem.id]?.[date];
+                        const dayOfWeek = parseISO(date).getDay();
+                        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                        
                         return (
                           <td key={date} className="p-2 text-center">
-                            {coverage ? (
+                            {isWeekend ? (
+                              <div className="w-6 h-6 rounded-full bg-gray-700 mx-auto flex items-center justify-center">
+                                <span className="text-xs text-gray-500">-</span>
+                              </div>
+                            ) : coverage ? (
                               <div className="flex flex-col items-center">
-                                <div className={`w-6 h-6 rounded-full ${getStatusColor(coverage.status)} flex items-center justify-center`}>
+                                <button
+                                  className={`w-6 h-6 rounded-full ${getStatusColor(coverage.status)} flex items-center justify-center hover:scale-110 transition-transform cursor-pointer`}
+                                  onClick={() => setSelectedLesson(coverage)}
+                                  title="Click for details"
+                                >
                                   {getStatusIcon(coverage.status)}
-                                </div>
+                                </button>
                                 <Badge variant="outline" className="mt-1 text-xs">
                                   {coverage.status}
                                 </Badge>
                               </div>
                             ) : (
-                              <div className="w-6 h-6 rounded-full bg-gray-600 mx-auto"></div>
+                              <div className="w-6 h-6 rounded-full bg-gray-600 mx-auto" title="No lesson scheduled"></div>
                             )}
                           </td>
                         );
@@ -279,45 +297,110 @@ const LessonCoverageDisplay = () => {
               </table>
             </div>
           ) : (
-            <div className="space-y-4">
-              <p className="text-gray-400">Calendar view implementation coming soon...</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-6">
+              {/* Calendar View Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {mockClasses
                   .filter(classItem => !filters.classId || filters.classId === 'all' || classItem.id === filters.classId)
                   .map(classItem => (
                   <Card key={classItem.id} className="bg-gray-700 border-gray-600">
                     <CardHeader>
-                      <CardTitle className="text-white text-lg">{classItem.name}</CardTitle>
+                      <CardTitle className="text-white text-lg flex items-center justify-between">
+                        <span>{classItem.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {classItem.subject}
+                        </Badge>
+                      </CardTitle>
+                      <p className="text-sm text-gray-400">{classItem.teacher} • {classItem.students} students</p>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-2">
-                        {uniqueDates.slice(0, 7).map(date => {
-                          const coverage = coverageByClassAndDate[classItem.id]?.[date];
-                          return (
-                            <div key={date} className="flex items-center justify-between">
-                              <span className="text-gray-400 text-sm">
-                                {format(parseISO(date), 'MMM dd')}
-                              </span>
-                              {coverage ? (
-                                <Badge 
-                                  variant="outline" 
-                                  className={`${getStatusColor(coverage.status)} text-white border-0`}
-                                >
-                                  {coverage.status}
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-gray-600 text-white border-0">
-                                  No data
-                                </Badge>
-                              )}
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium text-white">Recent Lesson Coverage</h4>
+                        <div className="grid grid-cols-7 gap-1 mb-2">
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                            <div key={index} className="text-center text-xs text-gray-400 p-1">
+                              {day}
                             </div>
-                          );
-                        })}
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {Array.from({ length: 14 }, (_, index) => {
+                            const date = format(addDays(subDays(new Date(), 13), index), 'yyyy-MM-dd');
+                            const coverage = coverageByClassAndDate[classItem.id]?.[date];
+                            const dayOfWeek = parseISO(date).getDay();
+                            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                            
+                            return (
+                              <div
+                                key={date}
+                                className={`
+                                  h-8 w-8 rounded border flex items-center justify-center text-xs cursor-pointer hover:scale-110 transition-transform
+                                  ${isWeekend ? 'bg-gray-800 border-gray-600' : 'bg-gray-600 border-gray-500'}
+                                  ${coverage ? getStatusColor(coverage.status) : ''}
+                                `}
+                                title={`${format(parseISO(date), 'MMM dd')} - ${coverage ? coverage.status : isWeekend ? 'Weekend' : 'No lesson scheduled'}`}
+                                onClick={() => coverage && setSelectedLesson(coverage)}
+                              >
+                                {coverage ? (
+                                  <div className="w-full h-full rounded flex items-center justify-center">
+                                    {coverage.status === 'present' && <CheckCircle className="w-3 h-3 text-white" />}
+                                    {coverage.status === 'missing' && <AlertTriangle className="w-3 h-3 text-white" />}
+                                    {coverage.status === 'incomplete' && <AlertTriangle className="w-3 h-3 text-white" />}
+                                  </div>
+                                ) : (
+                                  <span className={`${isWeekend ? 'text-gray-500' : 'text-gray-400'}`}>
+                                    {parseISO(date).getDate()}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Summary for this class */}
+                        <div className="mt-4 pt-3 border-t border-gray-600">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-green-400">
+                              Present: {filteredCoverage.filter(c => c.classId === classItem.id && c.status === 'present').length}
+                            </span>
+                            <span className="text-red-400">
+                              Missing: {filteredCoverage.filter(c => c.classId === classItem.id && c.status === 'missing').length}
+                            </span>
+                            <span className="text-yellow-400">
+                              Incomplete: {filteredCoverage.filter(c => c.classId === classItem.id && c.status === 'incomplete').length}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
+              
+              {/* Legend */}
+              <Card className="bg-gray-700 border-gray-600">
+                <CardContent className="p-4">
+                  <h4 className="text-white font-medium mb-3">Legend</h4>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-green-500"></div>
+                      <span className="text-sm text-gray-300">Lesson Present</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-yellow-500"></div>
+                      <span className="text-sm text-gray-300">Lesson Incomplete</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-red-500"></div>
+                      <span className="text-sm text-gray-300">Lesson Missing</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-gray-600 border border-gray-500"></div>
+                      <span className="text-sm text-gray-300">Weekend/No Data</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </CardContent>

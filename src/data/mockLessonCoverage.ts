@@ -54,20 +54,45 @@ const generateMockData = () => {
   for (let i = 0; i <= 14; i++) {
     const currentDate = addDays(startDate, i);
     const dateStr = format(currentDate, 'yyyy-MM-dd');
+    const dayOfWeek = currentDate.getDay();
     
-    // Skip weekends (simplified - only generate for weekdays)
-    if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+    // Skip weekends for lesson generation but still include them for calendar display
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
       continue;
     }
     
     mockClasses.forEach(classItem => {
+      // Different classes have different schedules
+      const shouldHaveLesson = (() => {
+        if (classItem.subject === 'Mathematics') {
+          // Math: Monday, Wednesday, Friday
+          return dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5;
+        } else if (classItem.subject === 'English') {
+          // English: Tuesday, Thursday
+          return dayOfWeek === 2 || dayOfWeek === 4;
+        } else if (classItem.subject === 'Science') {
+          // Science: Monday, Thursday
+          return dayOfWeek === 1 || dayOfWeek === 4;
+        } else if (classItem.subject === 'History') {
+          // History: Tuesday, Friday
+          return dayOfWeek === 2 || dayOfWeek === 5;
+        } else {
+          // Art: Wednesday
+          return dayOfWeek === 3;
+        }
+      })();
+      
+      if (!shouldHaveLesson) {
+        return; // Skip this class on this day
+      }
+      
       // Randomly assign lesson status with realistic distribution
       const rand = Math.random();
       let status: 'present' | 'missing' | 'incomplete';
       
-      if (rand < 0.75) {
+      if (rand < 0.8) {
         status = 'present';
-      } else if (rand < 0.9) {
+      } else if (rand < 0.95) {
         status = 'incomplete';
       } else {
         status = 'missing';
