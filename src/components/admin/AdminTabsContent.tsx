@@ -6,6 +6,7 @@ import { Users, UserPlus, Shield, BarChart3, School, Brain } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 import AdminOverviewTab from "@/components/admin/AdminOverviewTab";
 import SystemManagement from "@/components/admin/SystemManagement";
+import LessonCoverageDisplay from "@/components/admin/LessonCoverageDisplay";
 
 interface AdminTabsContentProps {
   onShowAIInsights: () => void;
@@ -99,6 +100,10 @@ const AdminTabsContent = ({ onShowAIInsights }: AdminTabsContentProps) => {
             </div>
           </CardContent>
         </Card>
+      </TabsContent>
+
+      <TabsContent value="lesson-coverage" className="space-y-6">
+        <LessonCoverageDisplay />
       </TabsContent>
 
       <TabsContent value="system" className="space-y-6">
