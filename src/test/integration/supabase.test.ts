@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../../types/supabase';
 
@@ -24,8 +24,7 @@ const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
 describe('Supabase Integration', () => {
   beforeAll(() => {
-    // Increase timeout for Supabase tests
-    vi.setTimeout(testTimeout);
+    // Setup code if needed
   });
 
   it('should connect to Supabase', async () => {
@@ -33,7 +32,7 @@ describe('Supabase Integration', () => {
 
     expect(error).toBeNull();
     expect(Array.isArray(data)).toBe(true);
-  });
+  }, testTimeout);
 
   it('should perform basic database operations', async () => {
     // Use an actual table from the schema instead of 'test_table'
@@ -44,5 +43,5 @@ describe('Supabase Integration', () => {
 
     expect(error).toBeNull();
     expect(Array.isArray(data)).toBe(true);
-  });
+  }, testTimeout);
 });
