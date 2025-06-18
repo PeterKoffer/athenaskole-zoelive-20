@@ -1,9 +1,9 @@
 // Quick test script to validate the enhanced lesson system functionality
 import { 
   generateEnhancedLesson, 
-  validateEnhancedLesson,
-  ContentUniquenessSystem 
+  validateEnhancedLesson
 } from './components/utils/EnhancedLessonGenerator';
+import EnhancedContentUniquenessSystem from './components/utils/EnhancedContentUniquenessSystem';
 import { 
   generateCompleteEducationalSession,
   generateMathematicsLesson,

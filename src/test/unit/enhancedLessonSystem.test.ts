@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { 
   generateEnhancedLesson, 
-  validateEnhancedLesson, 
-  ContentUniquenessSystem,
+  validateEnhancedLesson,
   ENHANCED_LESSON_PHASES,
   LEARNING_STYLE_ADAPTATIONS,
   K12_CURRICULUM_STANDARDS
-} from '../components/utils/EnhancedLessonGenerator';
+} from '../../components/education/components/utils/EnhancedLessonGenerator';
+import EnhancedContentUniquenessSystem from '../../components/education/components/utils/EnhancedContentUniquenessSystem';
 import { 
   generateCompleteEducationalSession,
   generateMathematicsLesson,
   generateEnglishLesson 
-} from '../components/utils/EnhancedSubjectLessonFactory';
+} from '../../components/education/components/utils/EnhancedSubjectLessonFactory';
 
 describe('Enhanced NELIE Lesson System', () => {
   describe('Enhanced Lesson Duration', () => {
@@ -52,7 +52,7 @@ describe('Enhanced NELIE Lesson System', () => {
   describe('Content Uniqueness System', () => {
     beforeEach(() => {
       // Clear session history before each test
-      ContentUniquenessSystem['sessionHistory'].clear();
+      EnhancedContentUniquenessSystem['sessionHistory'].clear();
     });
 
     it('should generate unique content for different sessions', () => {
@@ -83,7 +83,7 @@ describe('Enhanced NELIE Lesson System', () => {
       generateEnhancedLesson(config2);
       
       // Verify session history is being tracked
-      const history = ContentUniquenessSystem['sessionHistory'].get(sessionId);
+      const history = EnhancedContentUniquenessSystem['sessionHistory'].get(sessionId);
       expect(history).toBeDefined();
       expect(history?.usedThemes.length).toBeGreaterThan(0);
     });
