@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { calculateRecommendedSessionTime, shouldAdjustDifficulty } from '@/utils/adaptiveLearningUtils';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProgress } from '@/services/progressPersistence';
 import { SessionData, UserPerformanceData } from '../types/AnalyticsTypes';
-import { Json } from '@/types/supabase';
 
 interface AdaptiveDifficultyEngineProps {
   subject: string;
@@ -125,12 +125,12 @@ const AdaptiveDifficultyEngine: React.FC<AdaptiveDifficultyEngineProps> = ({
       {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
-            difficultyLevel: currentDifficulty,
+            difficulty: currentDifficulty,
             onQuestionAnswered: handleQuestionAnswered,
             recommendedSessionTime: recommendedTime,
             sessionData: sessionData,
             userPerformance: performanceData
-          });
+          } as any);
         }
         return child;
       })}

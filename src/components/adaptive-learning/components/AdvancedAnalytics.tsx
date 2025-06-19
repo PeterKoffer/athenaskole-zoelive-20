@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,8 +8,19 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Target, Clock, Award, Brain, BarChart3 } from 'lucide-react';
-import { SessionData, ConceptMasteryData, UserPerformanceData, WeeklyProgressData } from '../types/analytics';
 import { SessionData, UserPerformanceData } from '../types/AnalyticsTypes';
+
+interface ConceptMasteryData {
+  concept_name: string;
+  mastery_level: number;
+}
+
+interface WeeklyProgressData {
+  week: string;
+  sessions: number;
+  avgScore: number;
+  totalTime: number;
+}
 
 interface AnalyticsData {
   sessions: SessionData[];
@@ -101,7 +113,7 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     }));
   };
 
-  const processWeeklyProgress = (sessions: SessionData[]): WeeklyProgressData[] => {
+  const processWeeklyProgress = (sessions: any[]): WeeklyProgressData[] => {
     const weeklyMap = new Map<string, WeeklyProgressData>();
     
     sessions.forEach(session => {
@@ -195,6 +207,65 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
       </Card>
     );
   }
+
+  const getMasteryDistribution = (): Array<{ name: string; value: number; color: string }> => {
+    const distribution = { mastered: 0, learning: 0, struggling: 0 };
+    
+    data.conceptMastery.forEach(concept => {
+      const masteryLevel = concept.mastery_level || 0;
+      if (masteryLevel >= 0.8) distribution.mastered++;
+      else if (masteryLevel >= 0.5) distribution.learning++;
+      else distribution.struggling++;
+    });
+    
+    return [
+      { name: 'Mastered', value: distribution.mastered, color: '#22c55e' },
+      { name: 'Learning', value: distribution.learning, color: '#eab308' },
+      { name: 'Struggling', value: distribution.struggling, color: '#ef4444' }
+    ];
+  };
+
+  const getAverageScore = (): number => {
+    if (data.sessions.length === 0) return 0;
+    return Math.round(data.sessions.reduce((acc, s) => acc + (s.score || 0), 0) / data.sessions.length);
+  };
+
+  const getTotalStudyTime = (): number => {
+    return Math.round(data.sessions.reduce((acc, s) => acc + (s.time_spent || 0), 0) / 60); // Convert to minutes
+  };
+
+  const getStreakData = (): { current: number; longest: number } => {
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let tempStreak = 0;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Sort sessions by date
+    const sortedSessions = [...data.sessions].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    
+    for (let i = 0; i < sortedSessions.length; i++) {
+      const sessionDate = new Date(sortedSessions[i].created_at);
+      sessionDate.setHours(0, 0, 0, 0);
+      
+      const daysDiff = Math.floor((today.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (daysDiff === i) {
+        tempStreak++;
+        if (i === 0) currentStreak = tempStreak;
+      } else {
+        longestStreak = Math.max(longestStreak, tempStreak);
+        tempStreak = 0;
+      }
+    }
+    
+    longestStreak = Math.max(longestStreak, tempStreak);
+    
+    return { current: currentStreak, longest: longestStreak };
+  };
 
   const masteryDistribution = getMasteryDistribution();
   const streakData = getStreakData();
