@@ -7,14 +7,18 @@ import { LessonActivity } from './types/LessonTypes';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
-  onComplete: (score: number) => void;
-  score: number;
+  onComplete?: (score: number) => void;
+  onActivityComplete?: (wasCorrect?: boolean) => void;
+  score?: number;
+  isNelieReady?: boolean;
 }
 
 const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   activity,
   onComplete,
-  score
+  onActivityComplete,
+  score = 0,
+  isNelieReady = true
 }) => {
   const [selectedAnswer, setSelectedAnswer] = React.useState<number | null>(null);
   const [showResult, setShowResult] = React.useState(false);
@@ -29,12 +33,22 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
     const points = isCorrect ? 10 : 0;
     
     setTimeout(() => {
-      onComplete(points);
+      if (onComplete) {
+        onComplete(points);
+      }
+      if (onActivityComplete) {
+        onActivityComplete(isCorrect);
+      }
     }, 2000);
   };
 
   const handleContinue = () => {
-    onComplete(0);
+    if (onComplete) {
+      onComplete(0);
+    }
+    if (onActivityComplete) {
+      onActivityComplete(true);
+    }
   };
 
   const renderContent = () => {
@@ -43,7 +57,22 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <p className="text-gray-300 text-lg leading-relaxed">
-              {activity.content.text}
+              {activity.content.hook || activity.content.text}
+            </p>
+            <Button 
+              onClick={handleContinue}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Continue Learning
+            </Button>
+          </div>
+        );
+
+      case 'content-delivery':
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg leading-relaxed">
+              {activity.content.segments?.[0]?.explanation || activity.content.text}
             </p>
             <Button 
               onClick={handleContinue}

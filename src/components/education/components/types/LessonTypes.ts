@@ -2,7 +2,7 @@
 export interface LessonActivity {
   id: string;
   title: string;
-  type: 'introduction' | 'interactive-game' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'quiz';
+  type: 'introduction' | 'interactive-game' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'quiz' | 'content-delivery';
   phase: string;
   duration: number;
   phaseDescription: string;
@@ -36,6 +36,19 @@ export interface LessonActivity {
     segments?: Array<{
       title: string;
       explanation: string;
+    }>;
+    // Additional properties used throughout the codebase
+    hook?: string;
+    uniqueTheme?: string;
+    uniqueScenario?: string;
+    uniqueActivity?: string;
+    uniqueContext?: string;
+    mechanics?: string[];
+    rewards?: string[];
+    problemSteps?: Array<{
+      step: string;
+      hint?: string;
+      solution?: string;
     }>;
   };
 }
