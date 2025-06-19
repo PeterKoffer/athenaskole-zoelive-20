@@ -6,7 +6,7 @@ export interface ClassroomConfig {
   accentColor: string;
   loadingIcon?: string;
   loadingMessage?: string;
-  backgroundImage?: string;
+  backgroundImage: string; // Made required to match ClassroomEnvironment
   subjectColor?: string;
   overlayOpacity?: number;
   environmentDescription?: string;
@@ -26,6 +26,16 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     languageArts: {
       subjectName: "Language Arts",
+      primaryColor: "#FF9800", // Orange
+      secondaryColor: "#FFB74D", // Light Orange
+      accentColor: "#F57C00", // Dark Orange
+      backgroundImage: "/images/language-classroom.jpg",
+      subjectColor: "#FF9800",
+      overlayOpacity: 0.7,
+      environmentDescription: "A cozy library setting with books and writing materials"
+    },
+    english: {
+      subjectName: "English",
       primaryColor: "#FF9800", // Orange
       secondaryColor: "#FFB74D", // Light Orange
       accentColor: "#F57C00", // Dark Orange
@@ -101,6 +111,18 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       subjectColor: "#FFC107",
       overlayOpacity: 0.7,
       environmentDescription: "A classical classroom with historical artifacts and timelines"
+    },
+    mentalWellness: {
+      subjectName: "Mental Wellness",
+      primaryColor: "#4CAF50", // Green
+      secondaryColor: "#81C784", // Light Green
+      accentColor: "#388E3C", // Dark Green
+      loadingIcon: '🧘',
+      loadingMessage: 'Loading Mental Wellness...',
+      backgroundImage: "/images/wellness-classroom.jpg",
+      subjectColor: "#4CAF50",
+      overlayOpacity: 0.7,
+      environmentDescription: "A peaceful mindfulness and wellness space"
     },
     default: {
       subjectName: "Learning",

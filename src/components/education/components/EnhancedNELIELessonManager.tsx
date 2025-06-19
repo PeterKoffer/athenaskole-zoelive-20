@@ -1,382 +1,274 @@
-import React, { useState, useEffect } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft, BookOpen, Play, Pause, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Clock, BookOpen, Users, Award, RefreshCw, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { generateEnhancedLesson, EnhancedLessonConfig } from './utils/EnhancedLessonGenerator';
 
-import { 
-  generateCompleteEducationalSession,
-  generateMathematicsLesson,
-  generateEnglishLesson 
-} from './utils/EnhancedSubjectLessonFactory';
-import { generateEnhancedLesson, validateEnhancedLesson } from './utils/EnhancedLessonGenerator';
-
-/**
- * Enhanced NELIE Lesson Manager Component
- * 
- * Provides 20-25 minutes of unique, high-quality content for each class session
- * with adaptive learning and curriculum alignment for all 6 subjects.
- */
-
-interface LessonSession {
-  mathematics: any;
-  english: any;
-  science: any;
-  music: any;
-  computerScience: any;
-  creativeArts: any;
-  sessionMetadata: any;
+interface EnhancedNELIELessonManagerProps {
+  subject: string;
+  skillArea: string;
+  onBack: () => void;
 }
 
-interface ComponentProps {
-  studentGrade?: number;
-  preferredLearningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
-  onLessonStart?: (subject: string, lesson: any) => void;
-  onSessionComplete?: (session: LessonSession) => void;
-}
+const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELIELessonManagerProps) => {
+  const { user } = useAuth();
+  const [lesson, setLesson] = useState<EnhancedLessonConfig | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
+  const [isActive, setIsActive] = useState(false);
 
-export const EnhancedNELIELessonManager: React.FC<ComponentProps> = ({
-  studentGrade = 1,
-  preferredLearningStyle = 'mixed',
-  onLessonStart,
-  onSessionComplete
-}) => {
-  const [currentSession, setCurrentSession] = useState<LessonSession | null>(null);
-  const [currentSubject, setCurrentSubject] = useState<string | null>(null);
-  const [currentLesson, setCurrentLesson] = useState<any>(null);
-  const [sessionProgress, setSessionProgress] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [grade, setGrade] = useState(studentGrade);
-  const [learningStyle, setLearningStyle] = useState(preferredLearningStyle);
-  const [validationResults, setValidationResults] = useState<any>(null);
+  useEffect(() => {
+    initializeLesson();
+  }, [subject, skillArea]);
 
-  const subjects = [
-    { key: 'mathematics', name: 'Mathematics', icon: '🔢', color: 'bg-blue-500' },
-    { key: 'english', name: 'English', icon: '📖', color: 'bg-green-500' },
-    { key: 'science', name: 'Science', icon: '🔬', color: 'bg-purple-500' },
-    { key: 'music', name: 'Music', icon: '🎵', color: 'bg-pink-500' },
-    { key: 'computerScience', name: 'Computer Science', icon: '💻', color: 'bg-orange-500' },
-    { key: 'creativeArts', name: 'Creative Arts', icon: '🎨', color: 'bg-red-500' }
-  ];
-
-  // Generate a complete educational session
-  const generateNewSession = async () => {
-    setIsGenerating(true);
+  const initializeLesson = async () => {
+    setIsLoading(true);
     try {
-      const sessionId = `nelie-session-${Date.now()}`;
-      const session = generateCompleteEducationalSession(grade, learningStyle, sessionId);
+      // Check if there's an existing session
+      const existingSession = sessionStorage.getItem(`lesson_${subject}_${skillArea}`);
       
-      // Validate all lessons in the session
-      const validations = subjects.map(subject => {
-        const lesson = session[subject.key as keyof LessonSession];
-        return {
-          subject: subject.key,
-          validation: validateEnhancedLesson(lesson)
-        };
-      });
-
-      setCurrentSession(session);
-      setValidationResults(validations);
-      setSessionProgress(0);
-      setCurrentSubject(null);
-      setCurrentLesson(null);
-
-      console.log('✅ Generated complete NELIE session:', {
-        sessionId,
-        totalSubjects: 6,
-        gradeLevel: grade,
-        learningStyle,
-        validations: validations.map(v => ({ 
-          subject: v.subject, 
-          valid: v.validation.isValid,
-          score: v.validation.qualityScore 
-        }))
-      });
-
-    } catch (error) {
-      console.error('❌ Error generating session:', error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // Start a specific subject lesson
-  const startLesson = (subjectKey: string) => {
-    if (!currentSession) return;
-
-    const lesson = currentSession[subjectKey as keyof LessonSession];
-    setCurrentSubject(subjectKey);
-    setCurrentLesson(lesson);
-
-    if (onLessonStart) {
-      onLessonStart(subjectKey, lesson);
-    }
-
-    console.log(`🎯 Starting ${subjectKey} lesson:`, {
-      duration: `${Math.floor(lesson.totalDuration / 60)}m ${lesson.totalDuration % 60}s`,
-      phases: lesson.phases.length,
-      sessionId: lesson.metadata.sessionId
-    });
-  };
-
-  // Complete current lesson and move to next
-  const completeLesson = () => {
-    if (!currentSubject) return;
-
-    const completedIndex = subjects.findIndex(s => s.key === currentSubject);
-    const nextIndex = completedIndex + 1;
-
-    setSessionProgress(((completedIndex + 1) / subjects.length) * 100);
-
-    if (nextIndex < subjects.length) {
-      // Auto-start next lesson
-      const nextSubject = subjects[nextIndex].key;
-      startLesson(nextSubject);
-    } else {
-      // Session complete
-      setCurrentSubject(null);
-      setCurrentLesson(null);
-      if (onSessionComplete && currentSession) {
-        onSessionComplete(currentSession);
+      if (existingSession) {
+        const sessionData = JSON.parse(existingSession);
+        console.log('Restoring existing session:', sessionData);
+        setLesson(sessionData);
+      } else {
+        // Generate new lesson
+        const newLesson = await generateEnhancedLesson(subject, skillArea);
+        console.log('Generated new lesson:', newLesson);
+        setLesson(newLesson);
+        
+        // Save to session storage
+        sessionStorage.setItem(`lesson_${subject}_${skillArea}`, JSON.stringify(newLesson));
       }
-      console.log('🎉 Complete NELIE session finished!');
+    } catch (error) {
+      console.error('Error initializing lesson:', error);
+      // Fallback lesson
+      const fallbackLesson: EnhancedLessonConfig = {
+        id: `fallback_${Date.now()}`,
+        title: `${subject} - ${skillArea}`,
+        overview: `Interactive ${subject} lesson focusing on ${skillArea}`,
+        gradeLevel: 3,
+        learningStyle: 'mixed',
+        subject,
+        skillArea,
+        difficulty: 1,
+        estimatedDuration: 20,
+        objectives: [`Learn ${skillArea} concepts`],
+        prerequisites: [],
+        assessmentCriteria: ['Understanding of concepts'],
+        materials: ['Interactive content'],
+        extensions: ['Practice exercises'],
+        phases: []
+      };
+      setLesson(fallbackLesson);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Generate initial session on component mount
-  useEffect(() => {
-    generateNewSession();
-  }, []);
+  const handleStartLesson = () => {
+    setIsActive(true);
+  };
 
-  // Regenerate when grade or learning style changes
-  useEffect(() => {
-    if (currentSession) {
-      generateNewSession();
+  const handlePauseLesson = () => {
+    setIsActive(false);
+  };
+
+  const handleNextPhase = () => {
+    if (lesson?.phases && currentPhaseIndex < lesson.phases.length - 1) {
+      setCurrentPhaseIndex(prev => prev + 1);
+    } else {
+      handleCompleteLesson();
     }
-  }, [grade, learningStyle]);
-
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
   };
 
-  const getOverallQualityScore = () => {
-    if (!validationResults) return 0;
-    const totalScore = validationResults.reduce((sum: number, result: any) => 
-      sum + result.validation.qualityScore, 0);
-    return Math.round(totalScore / validationResults.length);
+  const handleCompleteLesson = () => {
+    setIsActive(false);
+    // Save completion to session storage
+    if (lesson) {
+      const completionData = {
+        ...lesson,
+        completed: true,
+        completedAt: new Date().toISOString()
+      };
+      sessionStorage.setItem(`lesson_${subject}_${skillArea}_completed`, JSON.stringify(completionData));
+    }
   };
 
-  return (
-    <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
-      {/* Session Controls */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6" />
-            Enhanced NELIE Lesson System
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Grade Level</label>
-              <Select value={grade.toString()} onValueChange={(value) => setGrade(parseInt(value))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select grade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Kindergarten</SelectItem>
-                  <SelectItem value="1">Grade 1</SelectItem>
-                  <SelectItem value="2">Grade 2</SelectItem>
-                  <SelectItem value="3">Grade 3</SelectItem>
-                  <SelectItem value="4">Grade 4</SelectItem>
-                  <SelectItem value="5">Grade 5</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">Learning Style</label>
-              <Select value={learningStyle} onValueChange={(value: any) => setLearningStyle(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select learning style" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="visual">Visual Learner</SelectItem>
-                  <SelectItem value="auditory">Auditory Learner</SelectItem>
-                  <SelectItem value="kinesthetic">Kinesthetic Learner</SelectItem>
-                  <SelectItem value="mixed">Mixed Learning</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-end">
-              <Button 
-                onClick={generateNewSession} 
-                disabled={isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                )}
-                Generate New Session
-              </Button>
-            </div>
-          </div>
-
-          {/* Session Quality Metrics */}
-          {validationResults && (
-            <Alert>
-              <Award className="h-4 w-4" />
-              <AlertDescription>
-                Session Quality Score: <strong>{getOverallQualityScore()}/100</strong>
-                {' • '}Total Duration: <strong>2.5-3 hours</strong>
-                {' • '}All 6 subjects validated and ready!
-              </AlertDescription>
-            </Alert>
-          )}
+  if (isLoading) {
+    return (
+      <Card className="max-w-4xl mx-auto bg-gray-900 border-gray-800">
+        <CardContent className="p-8 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-lime-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-white">Preparing your enhanced lesson...</p>
         </CardContent>
       </Card>
+    );
+  }
 
-      {/* Session Progress */}
-      {currentSession && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Session Progress
-              </span>
-              <Badge variant="outline">
-                {Math.round(sessionProgress)}% Complete
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Progress value={sessionProgress} className="mb-4" />
+  if (!lesson) {
+    return (
+      <Card className="max-w-4xl mx-auto bg-red-900 border-red-700">
+        <CardContent className="p-8 text-center text-white">
+          <h3 className="text-lg font-semibold mb-2">Lesson Error</h3>
+          <p className="text-red-300 mb-4">Unable to load lesson content.</p>
+          <Button onClick={onBack} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Go Back
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
+      <Card className="bg-gray-900 border-gray-800">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="text-gray-400 hover:text-white"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
             
-            {/* Current Lesson Display */}
-            {currentLesson && (
-              <div className="bg-muted p-4 rounded-lg mb-4">
-                <h3 className="font-semibold mb-2">
-                  Current Lesson: {subjects.find(s => s.key === currentSubject)?.name}
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Duration:</span>
-                    <div className="font-medium">{formatDuration(currentLesson.totalDuration)}</div>
+            <div className="flex items-center space-x-3">
+              <Badge variant="outline" className="bg-blue-600 text-white">
+                Grade {lesson.gradeLevel}
+              </Badge>
+              <Badge variant="outline" className="bg-purple-600 text-white">
+                {lesson.learningStyle}
+              </Badge>
+            </div>
+          </div>
+          
+          <div>
+            <CardTitle className="text-white text-2xl mb-2">
+              {lesson.title}
+            </CardTitle>
+            <p className="text-gray-400">{lesson.overview}</p>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Lesson Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-white">
+                <BookOpen className="w-5 h-5 text-lime-400" />
+                <span>Lesson Content</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!isActive ? (
+                <div className="text-center py-8">
+                  <Play className="w-16 h-16 text-lime-400 mx-auto mb-4" />
+                  <h3 className="text-white text-lg font-semibold mb-2">
+                    Ready to Start Learning?
+                  </h3>
+                  <p className="text-gray-400 mb-6">
+                    This lesson will take approximately {lesson.estimatedDuration} minutes
+                  </p>
+                  <Button
+                    onClick={handleStartLesson}
+                    className="bg-lime-500 hover:bg-lime-600 text-black font-semibold"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Lesson
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-white font-semibold">
+                      Interactive Learning Session
+                    </h4>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePauseLesson}
+                    >
+                      <Pause className="w-4 h-4 mr-2" />
+                      Pause
+                    </Button>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Phases:</span>
-                    <div className="font-medium">{currentLesson.phases.length}</div>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Style:</span>
-                    <div className="font-medium capitalize">{currentLesson.metadata.learningStyle}</div>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Grade:</span>
-                    <div className="font-medium">
-                      {currentLesson.metadata.gradeLevel === 0 ? 'K' : `Grade ${currentLesson.metadata.gradeLevel}`}
-                    </div>
+                  
+                  <div className="bg-gray-800 rounded-lg p-6">
+                    <p className="text-white mb-4">
+                      Welcome to your {subject} lesson on {skillArea}!
+                    </p>
+                    <p className="text-gray-300 mb-6">
+                      In this interactive session, we'll explore key concepts and practice together.
+                    </p>
+                    
+                    <Button
+                      onClick={handleNextPhase}
+                      className="bg-lime-500 hover:bg-lime-600 text-black"
+                    >
+                      Continue Learning
+                    </Button>
                   </div>
                 </div>
-                
-                <Button onClick={completeLesson} className="mt-4" size="sm">
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Complete Lesson
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Subject Grid */}
-      {currentSession && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {subjects.map((subject, index) => {
-            const lesson = currentSession[subject.key as keyof LessonSession];
-            const validation = validationResults?.find((v: any) => v.subject === subject.key)?.validation;
-            const isActive = currentSubject === subject.key;
-            const isCompleted = sessionProgress > (index / subjects.length) * 100;
-
-            return (
-              <Card 
-                key={subject.key} 
-                className={`transition-all duration-300 ${
-                  isActive ? 'ring-2 ring-primary shadow-lg' : ''
-                } ${isCompleted ? 'bg-green-50' : ''}`}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <span className="text-2xl">{subject.icon}</span>
-                      <span className="text-sm">{subject.name}</span>
-                    </span>
-                    {isCompleted && <CheckCircle className="h-5 w-5 text-green-600" />}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Duration:</span>
-                      <div className="font-medium">{formatDuration(lesson.totalDuration)}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Quality:</span>
-                      <div className="font-medium">{validation?.qualityScore || 0}/100</div>
-                    </div>
-                  </div>
-
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">Topic:</span>
-                    <div className="font-medium">{lesson.metadata.skillArea}</div>
-                  </div>
-
-                  {validation && validation.isValid ? (
-                    <Badge variant="outline" className="text-green-600 border-green-600">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Validated
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-red-600 border-red-600">
-                      Needs Review
-                    </Badge>
-                  )}
-
-                  <Button 
-                    onClick={() => startLesson(subject.key)}
-                    disabled={isActive || isGenerating}
-                    variant={isActive ? "default" : "outline"}
-                    size="sm"
-                    className="w-full"
-                  >
-                    {isActive ? 'In Progress' : isCompleted ? 'Restart Lesson' : 'Start Lesson'}
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+              )}
+            </CardContent>
+          </Card>
         </div>
-      )}
 
-      {/* Loading State */}
-      {isGenerating && (
-        <Card>
-          <CardContent className="flex items-center justify-center py-8">
-            <RefreshCw className="h-8 w-8 animate-spin mr-4" />
-            <span>Generating unique, high-quality lesson content...</span>
-          </CardContent>
-        </Card>
-      )}
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Learning Objectives */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Learning Objectives</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {lesson.objectives?.map((objective, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <CheckCircle className="w-4 h-4 text-lime-400 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-300 text-sm">{objective}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Progress */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Duration</span>
+                  <span className="text-white">{lesson.estimatedDuration} min</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Difficulty</span>
+                  <Badge variant="outline">{lesson.difficulty}/5</Badge>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Status</span>
+                  <span className="text-lime-400">
+                    {isActive ? 'In Progress' : 'Ready'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

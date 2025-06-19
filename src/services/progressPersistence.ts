@@ -23,6 +23,18 @@ export interface UserProgress {
   updated_at: string;
 }
 
+interface SessionData {
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  difficulty_level: number;
+  start_time: string;
+  end_time?: string;
+  time_spent: number;
+  score: number;
+  completed: boolean;
+}
+
 export const useUserProgress = (userId: string, subject: string, skillArea: string) => {
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,4 +70,45 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
     isLoading,
     fetchUserProgress
   };
+};
+
+export const progressPersistence = {
+  async saveSession(sessionData: SessionData): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .insert([sessionData])
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error('Error saving session:', error);
+        return null;
+      }
+
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error saving session:', error);
+      return null;
+    }
+  },
+
+  async updateSession(sessionId: string, updates: Partial<SessionData>): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('learning_sessions')
+        .update(updates)
+        .eq('id', sessionId);
+
+      if (error) {
+        console.error('Error updating session:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating session:', error);
+      return false;
+    }
+  }
 };

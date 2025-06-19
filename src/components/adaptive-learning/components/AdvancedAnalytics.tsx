@@ -208,65 +208,6 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     );
   }
 
-  const getMasteryDistribution = (): Array<{ name: string; value: number; color: string }> => {
-    const distribution = { mastered: 0, learning: 0, struggling: 0 };
-    
-    data.conceptMastery.forEach(concept => {
-      const masteryLevel = concept.mastery_level || 0;
-      if (masteryLevel >= 0.8) distribution.mastered++;
-      else if (masteryLevel >= 0.5) distribution.learning++;
-      else distribution.struggling++;
-    });
-    
-    return [
-      { name: 'Mastered', value: distribution.mastered, color: '#22c55e' },
-      { name: 'Learning', value: distribution.learning, color: '#eab308' },
-      { name: 'Struggling', value: distribution.struggling, color: '#ef4444' }
-    ];
-  };
-
-  const getAverageScore = (): number => {
-    if (data.sessions.length === 0) return 0;
-    return Math.round(data.sessions.reduce((acc, s) => acc + (s.score || 0), 0) / data.sessions.length);
-  };
-
-  const getTotalStudyTime = (): number => {
-    return Math.round(data.sessions.reduce((acc, s) => acc + (s.time_spent || 0), 0) / 60); // Convert to minutes
-  };
-
-  const getStreakData = (): { current: number; longest: number } => {
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let tempStreak = 0;
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Sort sessions by date
-    const sortedSessions = [...data.sessions].sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-    
-    for (let i = 0; i < sortedSessions.length; i++) {
-      const sessionDate = new Date(sortedSessions[i].created_at);
-      sessionDate.setHours(0, 0, 0, 0);
-      
-      const daysDiff = Math.floor((today.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysDiff === i) {
-        tempStreak++;
-        if (i === 0) currentStreak = tempStreak;
-      } else {
-        longestStreak = Math.max(longestStreak, tempStreak);
-        tempStreak = 0;
-      }
-    }
-    
-    longestStreak = Math.max(longestStreak, tempStreak);
-    
-    return { current: currentStreak, longest: longestStreak };
-  };
-
   const masteryDistribution = getMasteryDistribution();
   const streakData = getStreakData();
 
