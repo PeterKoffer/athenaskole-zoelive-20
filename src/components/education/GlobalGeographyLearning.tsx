@@ -12,10 +12,12 @@ const GlobalGeographyLearning = () => {
   const classroomConfig = getClassroomConfig('globalGeography') || getClassroomConfig('default');
 
   useEffect(() => {
+    console.log(`[${classroomConfig?.subjectName || 'GlobalGeographyLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
+      console.warn(`[${classroomConfig?.subjectName || 'GlobalGeographyLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, classroomConfig?.subjectName]);
 
   if (loading) {
     return (

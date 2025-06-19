@@ -12,10 +12,12 @@ const BodyLabLearning = () => {
   const classroomConfig = getClassroomConfig('bodyLab') || getClassroomConfig('default');
 
   useEffect(() => {
+    console.log(`[${classroomConfig?.subjectName || 'BodyLabLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
+      console.warn(`[${classroomConfig?.subjectName || 'BodyLabLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, classroomConfig?.subjectName]);
 
   if (loading) {
     return (

@@ -12,10 +12,12 @@ const WorldHistoryReligionsLearning = () => {
   const classroomConfig = getClassroomConfig('worldHistoryReligions') || getClassroomConfig('default');
 
   useEffect(() => {
+    console.log(`[${classroomConfig?.subjectName || 'WorldHistoryReligionsLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
+      console.warn(`[${classroomConfig?.subjectName || 'WorldHistoryReligionsLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, classroomConfig?.subjectName]);
 
   if (loading) {
     return (

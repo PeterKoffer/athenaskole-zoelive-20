@@ -12,10 +12,12 @@ const LifeEssentialsLearning = () => {
   const classroomConfig = getClassroomConfig('lifeEssentials') || getClassroomConfig('default');
 
   useEffect(() => {
+    console.log(`[${classroomConfig?.subjectName || 'LifeEssentialsLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
+      console.warn(`[${classroomConfig?.subjectName || 'LifeEssentialsLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, classroomConfig?.subjectName]);
 
   if (loading) {
     return (

@@ -17,10 +17,11 @@ export const useUnifiedLessonTemplate = ({
   onLessonComplete
 }: UseUnifiedLessonTemplateProps) => {
   const { user } = useAuth();
-  const { generateUnifiedLessonActivities } = useLessonActivityGenerator({ subject, skillArea });
+  const [sessionId] = useState(() => `session-${subject}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`);
+  const { generateUnifiedLessonActivities } = useLessonActivityGenerator({ subject, skillArea, sessionId });
   
   const [allActivities] = useState(() => {
-    console.log(`🚀 Initializing unified lesson for ${subject}`);
+    console.log(`🚀 Initializing unified lesson for ${subject} with session ID: ${sessionId}`);
     return generateUnifiedLessonActivities();
   });
   
@@ -50,11 +51,26 @@ export const useUnifiedLessonTemplate = ({
   // Start timer when lesson begins
   useEffect(() => {
     startTimer();
+    const cleanupStopTimer = stopTimer; // Store for cleanup
+    const cleanupForceStopAll = forceStopAll; // Store for cleanup
     return () => {
-      stopTimer();
-      forceStopAll();
+      cleanupStopTimer();
+      cleanupForceStopAll();
+      console.log('🧹 Cleaned up timers and speech in useUnifiedLessonTemplate');
     };
   }, [startTimer, stopTimer, forceStopAll]);
+
+  const [completionTimeoutId, setCompletionTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [advancementTimeoutId, setAdvancementTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeouts on unmount or when dependencies change significantly (e.g., subject)
+  useEffect(() => {
+    return () => {
+      if (completionTimeoutId) clearTimeout(completionTimeoutId);
+      if (advancementTimeoutId) clearTimeout(advancementTimeoutId);
+      console.log('🧹 Cleared pending activity completion/advancement timeouts.');
+    };
+  }, [completionTimeoutId, advancementTimeoutId]); // Re-run cleanup if IDs change (though they shouldn't externally)
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     console.log('🎯 Unified lesson activity completed:', {
@@ -80,17 +96,21 @@ export const useUnifiedLessonTemplate = ({
     // Check if lesson is complete
     if (currentActivityIndex >= allActivities.length - 1) {
       console.log('🎓 Unified lesson completed for', subject);
-      setTimeout(() => {
+      if (completionTimeoutId) clearTimeout(completionTimeoutId); // Clear previous if any
+      const newTimeoutId = setTimeout(() => {
         onLessonComplete();
       }, 2000);
+      setCompletionTimeoutId(newTimeoutId);
       return;
     }
 
     // Advance to next activity
-    setTimeout(() => {
+    if (advancementTimeoutId) clearTimeout(advancementTimeoutId); // Clear previous if any
+    const newTimeoutId = setTimeout(() => {
       setCurrentActivityIndex(prev => prev + 1);
     }, 2000);
-  }, [currentActivityIndex, allActivities.length, currentActivity, subject, onLessonComplete]);
+    setAdvancementTimeoutId(newTimeoutId);
+  }, [currentActivityIndex, allActivities.length, currentActivity, subject, onLessonComplete, completionTimeoutId, advancementTimeoutId]);
 
   const handleReadRequest = useCallback(() => {
     if (currentActivity) {
