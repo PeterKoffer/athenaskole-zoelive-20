@@ -2,7 +2,7 @@
 export interface LessonActivity {
   id: string;
   title: string;
-  type: 'introduction' | 'interactive-game' | 'creative-exploration' | 'application' | 'summary';
+  type: 'introduction' | 'interactive-game' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'quiz';
   phase: string;
   duration: number;
   phaseDescription: string;
@@ -25,9 +25,17 @@ export interface LessonActivity {
     whatIfScenario?: string;
     explorationTask?: string;
     scenario?: string;
+    scenarios?: string[];
     task?: string;
     guidance?: string;
     keyTakeaways?: string[];
     nextTopicSuggestion?: string;
+    gameType?: string;
+    quickChallenge?: string;
+    simulationDescription?: string;
+    segments?: Array<{
+      title: string;
+      explanation: string;
+    }>;
   };
 }

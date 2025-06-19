@@ -6,19 +6,19 @@ export interface ClassroomConfig {
   accentColor: string;
   loadingIcon?: string;
   loadingMessage?: string;
-  backgroundImage: string; // Made required to match ClassroomEnvironment
-  subjectColor: string; // Made required to match ClassroomEnvironment usage
-  overlayOpacity: number; // Made required to match ClassroomEnvironment
-  environmentDescription?: string;
+  backgroundImage: string;
+  subjectColor: string;
+  overlayOpacity: number;
+  environmentDescription: string; // Made required
 }
 
 export const getClassroomConfig = (subject: string): ClassroomConfig => {
   const configs: Record<string, ClassroomConfig> = {
     mathematics: {
       subjectName: "Mathematics",
-      primaryColor: "#4CAF50", // Green
-      secondaryColor: "#81C784", // Light Green
-      accentColor: "#388E3C", // Dark Green
+      primaryColor: "#4CAF50",
+      secondaryColor: "#81C784",
+      accentColor: "#388E3C",
       backgroundImage: "/images/math-classroom.jpg",
       subjectColor: "#4CAF50",
       overlayOpacity: 0.7,
@@ -26,9 +26,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     languageArts: {
       subjectName: "Language Arts",
-      primaryColor: "#FF9800", // Orange
-      secondaryColor: "#FFB74D", // Light Orange
-      accentColor: "#F57C00", // Dark Orange
+      primaryColor: "#FF9800",
+      secondaryColor: "#FFB74D",
+      accentColor: "#F57C00",
       backgroundImage: "/images/language-classroom.jpg",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
@@ -36,9 +36,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     english: {
       subjectName: "English",
-      primaryColor: "#FF9800", // Orange
-      secondaryColor: "#FFB74D", // Light Orange
-      accentColor: "#F57C00", // Dark Orange
+      primaryColor: "#FF9800",
+      secondaryColor: "#FFB74D",
+      accentColor: "#F57C00",
       backgroundImage: "/images/language-classroom.jpg",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
@@ -46,9 +46,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     science: {
       subjectName: "Science",
-      primaryColor: "#2196F3", // Blue
-      secondaryColor: "#64B5F6", // Light Blue
-      accentColor: "#1976D2", // Dark Blue
+      primaryColor: "#2196F3",
+      secondaryColor: "#64B5F6",
+      accentColor: "#1976D2",
       backgroundImage: "/images/science-classroom.jpg",
       subjectColor: "#2196F3",
       overlayOpacity: 0.7,
@@ -56,9 +56,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     socialStudies: {
       subjectName: "Social Studies",
-      primaryColor: "#9C27B0", // Purple
-      secondaryColor: "#BA68C8", // Light Purple
-      accentColor: "#7B1FA2", // Dark Purple
+      primaryColor: "#9C27B0",
+      secondaryColor: "#BA68C8",
+      accentColor: "#7B1FA2",
       backgroundImage: "/images/social-studies-classroom.jpg",
       subjectColor: "#9C27B0",
       overlayOpacity: 0.7,
@@ -66,9 +66,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     bodyLab: {
       subjectName: "BodyLab",
-      primaryColor: "#E91E63", // Pink
-      secondaryColor: "#F06292", // Light Pink
-      accentColor: "#C2185B", // Dark Pink
+      primaryColor: "#E91E63",
+      secondaryColor: "#F06292",
+      accentColor: "#C2185B",
       loadingIcon: '💪',
       loadingMessage: 'Warming up BodyLab...',
       backgroundImage: "/images/bodylab-classroom.jpg",
@@ -78,9 +78,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     globalGeography: {
       subjectName: "Global Geography",
-      primaryColor: "#607D8B", // Grey
-      secondaryColor: "#90A4AE", // Light Grey
-      accentColor: "#455A64", // Dark Grey
+      primaryColor: "#607D8B",
+      secondaryColor: "#90A4AE",
+      accentColor: "#455A64",
       loadingIcon: '🌍',
       loadingMessage: 'Loading geographical data...',
       backgroundImage: "/images/geography-classroom.jpg",
@@ -90,9 +90,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     lifeEssentials: {
       subjectName: "Life Essentials",
-      primaryColor: "#795548", // Brown
-      secondaryColor: "#A1887F", // Light Brown
-      accentColor: "#5D4037", // Dark Brown
+      primaryColor: "#795548",
+      secondaryColor: "#A1887F",
+      accentColor: "#5D4037",
       loadingIcon: '🛠️',
       loadingMessage: 'Loading Life Essentials...',
       backgroundImage: "/images/life-essentials-classroom.jpg",
@@ -102,9 +102,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     worldHistoryReligions: {
       subjectName: "World History & Religions",
-      primaryColor: "#FFC107", // Amber
-      secondaryColor: "#FFD54F", // Light Amber
-      accentColor: "#FF8F00", // Dark Amber
+      primaryColor: "#FFC107",
+      secondaryColor: "#FFD54F",
+      accentColor: "#FF8F00",
       loadingIcon: '📜',
       loadingMessage: 'Loading historical records...',
       backgroundImage: "/images/history-classroom.jpg",
@@ -114,9 +114,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     mentalWellness: {
       subjectName: "Mental Wellness",
-      primaryColor: "#4CAF50", // Green
-      secondaryColor: "#81C784", // Light Green
-      accentColor: "#388E3C", // Dark Green
+      primaryColor: "#4CAF50",
+      secondaryColor: "#81C784",
+      accentColor: "#388E3C",
       loadingIcon: '🧘',
       loadingMessage: 'Loading Mental Wellness...',
       backgroundImage: "/images/wellness-classroom.jpg",
@@ -126,9 +126,9 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
     },
     default: {
       subjectName: "Learning",
-      primaryColor: "#673AB7", // Deep Purple
-      secondaryColor: "#9575CD", // Light Deep Purple
-      accentColor: "#512DA8", // Dark Deep Purple
+      primaryColor: "#673AB7",
+      secondaryColor: "#9575CD",
+      accentColor: "#512DA8",
       loadingIcon: '📚',
       loadingMessage: 'Loading...',
       backgroundImage: "/images/default-classroom.jpg",
