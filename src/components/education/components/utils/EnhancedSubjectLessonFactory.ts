@@ -1,5 +1,4 @@
-
-import { EnhancedLessonConfig, generateEnhancedLesson, K12_CURRICULUM_STANDARDS } from './EnhancedLessonGenerator';
+import { EnhancedLessonConfig, K12_CURRICULUM_STANDARDS } from './EnhancedLessonGenerator';
 
 /**
  * Factory for generating enhanced lessons for all 6 subjects
@@ -288,12 +287,12 @@ export function generateCompleteEducationalSession(
   const sessionID = sessionId || `complete-session-${Date.now()}`;
   
   return {
-    mathematics: generateEnhancedLesson(generateMathematicsLesson(gradeLevel, learningStyle, `${sessionID}-math`)),
-    english: generateEnhancedLesson(generateEnglishLesson(gradeLevel, learningStyle, `${sessionID}-english`)),
-    science: generateEnhancedLesson(generateScienceLesson(gradeLevel, learningStyle, `${sessionID}-science`)),
-    music: generateEnhancedLesson(generateMusicLesson(gradeLevel, learningStyle, `${sessionID}-music`)),
-    computerScience: generateEnhancedLesson(generateComputerScienceLesson(gradeLevel, learningStyle, `${sessionID}-cs`)),
-    creativeArts: generateEnhancedLesson(generateCreativeArtsLesson(gradeLevel, learningStyle, `${sessionID}-arts`)),
+    mathematics: generateMathematicsLesson(gradeLevel, learningStyle, `${sessionID}-math`),
+    english: generateEnglishLesson(gradeLevel, learningStyle, `${sessionID}-english`),
+    science: generateScienceLesson(gradeLevel, learningStyle, `${sessionID}-science`),
+    music: generateMusicLesson(gradeLevel, learningStyle, `${sessionID}-music`),
+    computerScience: generateComputerScienceLesson(gradeLevel, learningStyle, `${sessionID}-cs`),
+    creativeArts: generateCreativeArtsLesson(gradeLevel, learningStyle, `${sessionID}-arts`),
     sessionMetadata: {
       sessionId: sessionID,
       gradeLevel,

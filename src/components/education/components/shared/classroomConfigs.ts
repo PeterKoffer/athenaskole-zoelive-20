@@ -7,7 +7,7 @@ export interface ClassroomConfig {
   loadingIcon?: string;
   loadingMessage?: string;
   backgroundImage: string; // Made required to match ClassroomEnvironment
-  subjectColor?: string;
+  subjectColor: string; // Made required to match ClassroomEnvironment usage
   overlayOpacity?: number;
   environmentDescription?: string;
 }
