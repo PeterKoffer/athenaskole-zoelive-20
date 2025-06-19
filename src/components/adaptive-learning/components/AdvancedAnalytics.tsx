@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Target, Clock, Award, Brain, BarChart3 } from 'lucide-react';
 import { SessionData, ConceptMasteryData, UserPerformanceData, WeeklyProgressData } from '../types/analytics';
+import { SessionData, UserPerformanceData } from '../types/AnalyticsTypes';
 
 interface AnalyticsData {
   sessions: SessionData[];
@@ -68,9 +68,9 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
       const weeklyData = processWeeklyProgress(sessionsResult.data || []);
 
       setData({
-        sessions: sessionsResult.data || [],
+        sessions: castSessionData(sessionsResult.data || []),
         conceptMastery: masteryResult.data || [],
-        performance: performanceResult.data || [],
+        performance: castUserPerformanceData(performanceResult.data || []),
         weeklyProgress: weeklyData
       });
     } catch (error) {
@@ -78,6 +78,27 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const castSessionData = (data: any[]): SessionData[] => {
+    return data.map(item => ({
+      ...item,
+      user_feedback: typeof item.user_feedback === 'string' 
+        ? JSON.parse(item.user_feedback) 
+        : (item.user_feedback as Record<string, unknown>) || {}
+    }));
+  };
+
+  const castUserPerformanceData = (data: any[]): UserPerformanceData[] => {
+    return data.map(item => ({
+      ...item,
+      strengths: typeof item.strengths === 'string' 
+        ? JSON.parse(item.strengths) 
+        : (item.strengths as Record<string, unknown>) || {},
+      weaknesses: typeof item.weaknesses === 'string' 
+        ? JSON.parse(item.weaknesses) 
+        : (item.weaknesses as Record<string, unknown>) || {}
+    }));
   };
 
   const processWeeklyProgress = (sessions: SessionData[]): WeeklyProgressData[] => {
