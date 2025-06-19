@@ -1,149 +1,33 @@
 
 export interface LessonActivity {
   id: string;
-  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'adventure-game';
-  phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'adventure-game';
   title: string;
+  type: 'introduction' | 'interactive-game' | 'creative-exploration' | 'application' | 'summary';
+  phase: string;
   duration: number;
   phaseDescription: string;
-  metadata?: {
-    subject?: string;
-    skillArea?: string;
-    templateId?: string;
-    [key: string]: any;
+  metadata: {
+    subject: string;
+    skillArea: string;
   };
   content: {
-    // Content delivery fields
     text?: string;
-    concept?: string;
-    explanation?: string;
-    segments?: Array<{
-      concept: string;
-      explanation: string;
-      checkQuestion?: {
-        question: string;
-        options: readonly string[];
-        correctAnswer: number;
-        explanation: string;
-      };
-    }>;
-
-    // Interactive game fields
     question?: string;
     options?: string[];
+    choices?: string[];
     correctAnswer?: number;
-    gameType?: 'problem-solving' | 'matching' | 'true-false' | 'adventure-game' | 'puzzle-quest' | 'creative-builder' | 'exploration-sim';
-
-    // Introduction fields
-    hook?: string;
-    realWorldExample?: string;
-    thoughtQuestion?: string;
-    storyContext?: string;
-    theme?: string;
-    characterGuide?: string;
-    missionBriefing?: string;
-    excitementLevel?: string;
-
-    // Application fields
-    scenario?: string;
-    task?: string;
-    hint?: string;
-    solution?: string;
-    problemSteps?: Array<{
-      step: string;
-      hint?: string;
-      solution?: string;
-    }>;
-
-    // Creative exploration fields
+    explanation?: string;
+    title?: string;
+    battleScenario?: string;
+    activityId?: string;
+    questionText?: string;
     creativePrompt?: string;
     whatIfScenario?: string;
     explorationTask?: string;
-    creativeType?: string;
-    tools?: string[];
-    shareOpportunity?: boolean;
-    inspirationBoost?: string;
-
-    // Summary fields
+    scenario?: string;
+    task?: string;
+    guidance?: string;
     keyTakeaways?: string[];
     nextTopicSuggestion?: string;
-    achievementsList?: string[];
-    celebration?: string;
-    nextAdventureTeaser?: string;
-    heroStatus?: string;
-
-    // Game-specific fields
-    mechanics?: string;
-    winCondition?: string;
-    rewards?: string[];
-    epicnessLevel?: string;
-
-    // Interactive elements
-    quickChallenge?: {
-      type: 'drag-drop' | 'click-reveal' | 'mini-puzzle' | 'matching';
-      instruction: string;
-      options: string[];
-      correctAnswer: number | number[];
-      celebration: string;
-    };
-    interactiveExplanation?: string;
-    engagementType?: string;
-    celebrationReady?: boolean;
-
-    // Grand challenge fields
-    grandChallenge?: {
-      title: string;
-      description: string;
-      type: 'boss-battle' | 'final-project' | 'presentation' | 'epic-quest';
-      celebration: string;
-    };
-
-    // Simulation fields
-    simulationDescription?: string;
-    scenarios?: any[];
-
-    // Battle scenario fields
-    battleScenario?: any;
-
-    // Legacy and additional fields
-    story?: string;
-    image?: string;
-    video?: string;
-    audio?: string;
-    interactiveElements?: any[];
-    assessmentCriteria?: string[];
-    
-    [key: string]: any; // Allow additional properties for flexibility
   };
-}
-
-export interface SubjectLessonPlan {
-  subject: string;
-  skillArea: string;
-  totalDuration: number;
-  phases: LessonActivity[];
-  learningObjectives: string[];
-  prerequisites: string[];
-  engagementLevel?: string;
-  funFactor?: string;
-}
-
-export interface QuestionContent {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-  difficulty?: number;
-  concept?: string;
-  timeLimit?: number;
-}
-
-export interface ComprehensionQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-  difficulty: number;
-  topic: string;
 }
