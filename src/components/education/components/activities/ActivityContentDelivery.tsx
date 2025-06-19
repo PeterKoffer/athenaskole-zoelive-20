@@ -25,6 +25,9 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
   });
 
   const segment = activity.content.segments?.[0];
+  const displayTitle = activity.content.uniqueTheme || activity.title;
+  const mainExplanation = activity.content.uniqueScenario || segment?.explanation || activity.content.text || 'Content coming soon...';
+  const conceptTitle = activity.content.uniqueScenario ? 'Scenario Focus' : (segment?.concept || 'Learning Content');
 
   const playAudio = (text: string) => {
     if ('speechSynthesis' in window) {
@@ -72,11 +75,13 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center justify-between">
-          <span>{activity.title}</span>
+          <span>{displayTitle}</span>
+          {activity.content.uniqueTheme && activity.title && activity.title !== displayTitle &&
+            <span className="text-xs text-purple-300 ml-2">(Original Title: {activity.title})</span>}
           <Button
             variant="outline"
             size="sm"
-            onClick={() => playAudio(segment?.explanation || activity.content.text || '')}
+            onClick={() => playAudio(mainExplanation)}
             className="border-gray-600 text-white bg-gray-700 hover:bg-gray-600"
           >
             <CustomSpeakerIcon className="w-4 h-4" size={16} />
@@ -85,17 +90,17 @@ const ActivityContentDelivery = ({ activity, onActivityComplete }: ActivityConte
       </CardHeader>
       <CardContent className="space-y-6">
         <TextWithSpeaker
-          text={segment?.explanation || activity.content.text || 'Content coming soon...'}
+          text={mainExplanation}
           context="activity-content-explanation"
           position="corner"
           showOnHover={false}
         >
           <div className="bg-gray-700 border border-gray-600 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-3">
-              {segment?.concept || 'Learning Content'}
+              {conceptTitle}
             </h3>
             <p className="text-gray-200 text-lg leading-relaxed">
-              {segment?.explanation || activity.content.text || 'Content coming soon...'}
+              {mainExplanation}
             </p>
           </div>
         </TextWithSpeaker>
