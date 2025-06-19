@@ -81,12 +81,13 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
     setScore(0); // Or some other logic for time up
     setHasCompleted(true);
     
-    if (logicTimeoutId) clearTimeout(logicTimeoutId); // Clear previous
-    const newTimeoutId = setTimeout(() => {
-      console.log('🚀 Auto-advancing after time up');
-      onActivityComplete(false);
-    }, 3000);
-    setLogicTimeoutId(newTimeoutId);
+    // if (logicTimeoutId) clearTimeout(logicTimeoutId); // Keep timeout logic
+    // const newTimeoutId = setTimeout(() => {
+    //   console.log('🚀 Auto-advancing after time up');
+    //   onActivityComplete(false);
+    // }, 3000);
+    // setLogicTimeoutId(newTimeoutId);
+    onActivityComplete(false); // Call synchronously for debugging
   };
 
   // Call handleTimeUp if timeLeft reaches 0 and not handled yet
@@ -116,12 +117,13 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
     setScore(earnedScore);
     
     // Ensure we only call completion once
-    if (logicTimeoutId) clearTimeout(logicTimeoutId); // Clear previous
-    const newTimeoutId = setTimeout(() => {
-      console.log('🚀 Activity completed, advancing:', isCorrect);
-      onActivityComplete(isCorrect);
-    }, 3000);
-    setLogicTimeoutId(newTimeoutId);
+    // if (logicTimeoutId) clearTimeout(logicTimeoutId); // Keep timeout logic
+    // const newTimeoutId = setTimeout(() => {
+    //   console.log('🚀 Activity completed, advancing:', isCorrect);
+    //   onActivityComplete(isCorrect);
+    // }, 3000);
+    // setLogicTimeoutId(newTimeoutId);
+    onActivityComplete(isCorrect); // Call synchronously for debugging
   };
 
   return {

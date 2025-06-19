@@ -96,20 +96,22 @@ export const useUnifiedLessonTemplate = ({
     // Check if lesson is complete
     if (currentActivityIndex >= allActivities.length - 1) {
       console.log('🎓 Unified lesson completed for', subject);
-      if (completionTimeoutId) clearTimeout(completionTimeoutId); // Clear previous if any
-      const newTimeoutId = setTimeout(() => {
-        onLessonComplete();
-      }, 2000);
-      setCompletionTimeoutId(newTimeoutId);
+      // if (completionTimeoutId) clearTimeout(completionTimeoutId); // Keep timeout logic if you want to reinstate later
+      // const newTimeoutId = setTimeout(() => {
+      //   onLessonComplete();
+      // }, 2000);
+      // setCompletionTimeoutId(newTimeoutId);
+      onLessonComplete(); // Call synchronously for debugging
       return;
     }
 
     // Advance to next activity
-    if (advancementTimeoutId) clearTimeout(advancementTimeoutId); // Clear previous if any
-    const newTimeoutId = setTimeout(() => {
-      setCurrentActivityIndex(prev => prev + 1);
-    }, 2000);
-    setAdvancementTimeoutId(newTimeoutId);
+    // if (advancementTimeoutId) clearTimeout(advancementTimeoutId); // Clear previous if any
+    // const newTimeoutId = setTimeout(() => {
+    //   setCurrentActivityIndex(prev => prev + 1);
+    // }, 2000);
+    // setAdvancementTimeoutId(newTimeoutId);
+    setCurrentActivityIndex(prev => prev + 1); // Call synchronously for debugging
   }, [currentActivityIndex, allActivities.length, currentActivity, subject, onLessonComplete, completionTimeoutId, advancementTimeoutId]);
 
   const handleReadRequest = useCallback(() => {
