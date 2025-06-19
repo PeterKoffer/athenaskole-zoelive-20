@@ -100,7 +100,6 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
     overlayOpacity: 0,
     subjectName: 'Mental Wellness',
     environmentDescription: 'Calm Space for Mental Wellness with Nelie'
-jules_wip_15189971815575095135
   },
 
   worldHistoryReligions: {
@@ -157,7 +156,6 @@ jules_wip_15189971815575095135
     loadingIcon: "🛠️",
     environmentDescription: "A modern co-working space or a well-organized home office.",
     overlayOpacity: 0.5,
-    main
   }
 };
 

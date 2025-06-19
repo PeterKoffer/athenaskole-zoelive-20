@@ -12,18 +12,12 @@ const MentalWellnessLearning = () => {
   const classroomConfig = getClassroomConfig('mentalWellness') || getClassroomConfig('default'); // Fallback to a default if needed
 
   useEffect(() => {
-jules_wip_15189971815575095135
     console.log(`[${classroomConfig?.subjectName || 'MentalWellnessLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
       console.warn(`[${classroomConfig?.subjectName || 'MentalWellnessLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth'); // Navigate to login/auth page if not authenticated
     }
   }, [user, loading, navigate, classroomConfig?.subjectName]);
-    if (!loading && !user) {
-      navigate('/auth'); // Navigate to login/auth page if not authenticated
-    }
-  }, [user, loading, navigate]);
-main
 
   if (loading) {
     return (
