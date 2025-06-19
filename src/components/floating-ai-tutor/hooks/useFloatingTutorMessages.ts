@@ -1,39 +1,38 @@
 
 import { useState } from 'react';
-
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
+import { Message } from '../types';
 
 export const useFloatingTutorMessages = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      text: "Hi! I'm Nelie, your AI learning companion. How can I help you today?",
-      isUser: false,
+      role: 'assistant',
+      content: "Hi! I'm Nelie, your AI learning companion. How can I help you today?",
       timestamp: new Date()
     }
   ]);
 
-  const addMessage = (text: string, isUser: boolean) => {
+  const addUserMessage = (content: string) => {
     const newMessage: Message = {
-      id: Date.now().toString(),
-      text,
-      isUser,
+      role: 'user',
+      content,
       timestamp: new Date()
     };
     setMessages(prev => [...prev, newMessage]);
   };
 
-  const addUserMessage = (text: string) => addMessage(text, true);
-  const addNelieMessage = (text: string) => addMessage(text, false);
+  const addNelieMessage = (content: string) => {
+    const newMessage: Message = {
+      role: 'assistant', 
+      content,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, newMessage]);
+  };
 
   return {
     messages,
     addUserMessage,
-    addNelieMessage
+    addNelieMessage,
+    setMessages
   };
 };
