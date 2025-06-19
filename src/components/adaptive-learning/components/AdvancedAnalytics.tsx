@@ -8,13 +8,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Target, Clock, Award, Brain, BarChart3 } from 'lucide-react';
-import { SessionData, ConceptMasteryData, UserPerformanceData, WeeklyProgressData } from '../types/analytics';
 
 interface AnalyticsData {
-  sessions: SessionData[];
-  conceptMastery: ConceptMasteryData[];
-  performance: UserPerformanceData[];
-  weeklyProgress: WeeklyProgressData[];
+  sessions: any[];
+  conceptMastery: any[];
+  performance: any[];
+  weeklyProgress: any[];
 }
 
 interface AdvancedAnalyticsProps {
@@ -80,8 +79,8 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     }
   };
 
-  const processWeeklyProgress = (sessions: SessionData[]): WeeklyProgressData[] => {
-    const weeklyMap = new Map<string, WeeklyProgressData>();
+  const processWeeklyProgress = (sessions: any[]) => {
+    const weeklyMap = new Map();
     
     sessions.forEach(session => {
       const date = new Date(session.created_at);
@@ -93,23 +92,20 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
       }
       
       const week = weeklyMap.get(weekKey);
-      if (week) {
-        week.sessions += 1;
-        week.avgScore = ((week.avgScore * (week.sessions - 1)) + (session.score || 0)) / week.sessions;
-        week.totalTime += session.time_spent || 0;
-      }
+      week.sessions += 1;
+      week.avgScore = ((week.avgScore * (week.sessions - 1)) + (session.score || 0)) / week.sessions;
+      week.totalTime += session.time_spent || 0;
     });
     
     return Array.from(weeklyMap.values()).slice(-8); // Last 8 weeks
   };
 
-  const getMasteryDistribution = (): Array<{ name: string; value: number; color: string }> => {
+  const getMasteryDistribution = () => {
     const distribution = { mastered: 0, learning: 0, struggling: 0 };
     
     data.conceptMastery.forEach(concept => {
-      const masteryLevel = concept.mastery_level || 0;
-      if (masteryLevel >= 0.8) distribution.mastered++;
-      else if (masteryLevel >= 0.5) distribution.learning++;
+      if (concept.mastery_level >= 0.8) distribution.mastered++;
+      else if (concept.mastery_level >= 0.5) distribution.learning++;
       else distribution.struggling++;
     });
     
@@ -120,16 +116,16 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     ];
   };
 
-  const getAverageScore = (): number => {
+  const getAverageScore = () => {
     if (data.sessions.length === 0) return 0;
     return Math.round(data.sessions.reduce((acc, s) => acc + (s.score || 0), 0) / data.sessions.length);
   };
 
-  const getTotalStudyTime = (): number => {
+  const getTotalStudyTime = () => {
     return Math.round(data.sessions.reduce((acc, s) => acc + (s.time_spent || 0), 0) / 60); // Convert to minutes
   };
 
-  const getStreakData = (): { current: number; longest: number } => {
+  const getStreakData = () => {
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
@@ -301,20 +297,17 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
                 <CardTitle className="text-white">Concept Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {data.conceptMastery.slice(0, 5).map((concept, index) => {
-                  const masteryLevel = concept.mastery_level || 0;
-                  return (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-white text-sm">{concept.concept_name}</span>
-                        <Badge variant={masteryLevel >= 0.8 ? 'default' : 'secondary'}>
-                          {Math.round(masteryLevel * 100)}%
-                        </Badge>
-                      </div>
-                      <Progress value={masteryLevel * 100} className="h-2" />
+                {data.conceptMastery.slice(0, 5).map((concept, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white text-sm">{concept.concept_name}</span>
+                      <Badge variant={concept.mastery_level >= 0.8 ? 'default' : 'secondary'}>
+                        {Math.round(concept.mastery_level * 100)}%
+                      </Badge>
                     </div>
-                  );
-                })}
+                    <Progress value={concept.mastery_level * 100} className="h-2" />
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>

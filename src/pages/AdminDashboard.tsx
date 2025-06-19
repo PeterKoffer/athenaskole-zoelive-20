@@ -44,11 +44,10 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-800">
             <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-gray-700">Users</TabsTrigger>
             <TabsTrigger value="schools" className="data-[state=active]:bg-gray-700">Schools</TabsTrigger>
-            <TabsTrigger value="lesson-coverage" className="data-[state=active]:bg-gray-700">Lesson Coverage</TabsTrigger>
             <TabsTrigger value="system" className="data-[state=active]:bg-gray-700">System</TabsTrigger>
             <TabsTrigger value="ai-insights" className="data-[state=active]:bg-purple-700 data-[state=active]:text-white">AI Insights</TabsTrigger>
           </TabsList>
