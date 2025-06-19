@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { SessionData, UserPerformanceData } from '../types/analytics';
 
 interface DifficultyMetrics {
   currentLevel: number;
@@ -17,7 +16,7 @@ interface PerformanceData {
   responseTime: number;
   consecutiveCorrect: number;
   consecutiveIncorrect: number;
-  recentSessions: SessionData[];
+  recentSessions: any[];
 }
 
 export const useAdaptiveDifficulty = (subject: string, skillArea: string) => {
@@ -80,7 +79,7 @@ export const useAdaptiveDifficulty = (subject: string, skillArea: string) => {
     }
   };
 
-  const calculatePerformanceMetrics = (sessions: SessionData[]): PerformanceData => {
+  const calculatePerformanceMetrics = (sessions: any[]): PerformanceData => {
     if (sessions.length === 0) {
       return {
         accuracy: 0,
@@ -124,7 +123,7 @@ export const useAdaptiveDifficulty = (subject: string, skillArea: string) => {
     };
   };
 
-  const calculateAdaptiveDifficulty = (performance: PerformanceData, userPerformance: UserPerformanceData | null): DifficultyMetrics => {
+  const calculateAdaptiveDifficulty = (performance: PerformanceData, userPerformance: any): DifficultyMetrics => {
     let recommendedLevel = difficultyMetrics.currentLevel;
     let confidenceScore = 0.5;
     let adaptationReason = 'Maintaining current level';
