@@ -71,6 +71,18 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws', route: '/learn/science' },
         { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment', route: '/learn/science' }
       ]
+    },
+    {
+      id: 'mentalHealth',
+      name: 'Mental Wellness',
+      icon: Brain,
+      skillAreas: [
+        { id: 'understandingEmotions', name: 'Understanding Emotions', description: 'Learn to identify and understand your feelings and the feelings of others.', route: '/learn/mental-wellness' },
+        { id: 'copingStrategies', name: 'Coping Strategies', description: 'Discover healthy ways to manage stress, anxiety, and difficult emotions.', route: '/learn/mental-wellness' },
+        { id: 'mindfulnessBasics', name: 'Mindfulness Basics', description: 'Practice techniques to stay present and calm your mind.', route: '/learn/mental-wellness' },
+        { id: 'buildingResilience', name: 'Building Resilience', description: 'Develop skills to bounce back from challenges and adversity.', route: '/learn/mental-wellness' },
+        { id: 'empathyAndSupport', name: 'Empathy & Support', description: 'Learn how to support others and build strong, healthy relationships.', route: '/learn/mental-wellness' }
+      ]
     }
   ];
 

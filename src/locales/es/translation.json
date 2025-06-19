@@ -9,5 +9,26 @@
   "Curious Learner": "Aprendiz curioso",
   "Tried all subjects": "Probó todas las materias",
   "Achieved_on": "Logrado el {{date}}",
-  "days_in_a_row": "7 días seguidos"
+  "days_in_a_row": "7 días seguidos",
+  "subjects": {
+    "mentalWellness": {
+      "title": "[es] Mental Wellness",
+      "description": "[es] Learn about understanding your feelings, developing healthy coping strategies, and supporting others. Nurture your mind for a balanced life.",
+      "keyArea1": "[es] Understanding Emotions",
+      "keyArea2": "[es] Stress Management",
+      "keyArea3": "[es] Mindfulness Practices",
+      "keyArea4": "[es] Building Resilience",
+      "keyArea5": "[es] Healthy Relationships",
+      "skillAreaUnderstandingEmotionsName": "[es] Understanding Emotions",
+      "skillAreaUnderstandingEmotionsDescription": "[es] Learn to identify and understand your feelings and the feelings of others.",
+      "skillAreaCopingStrategiesName": "[es] Coping Strategies",
+      "skillAreaCopingStrategiesDescription": "[es] Discover healthy ways to manage stress, anxiety, and difficult emotions.",
+      "skillAreaMindfulnessBasicsName": "[es] Mindfulness Basics",
+      "skillAreaMindfulnessBasicsDescription": "[es] Practice techniques to stay present and calm your mind.",
+      "skillAreaBuildingResilienceName": "[es] Building Resilience",
+      "skillAreaBuildingResilienceDescription": "[es] Develop skills to bounce back from challenges and adversity.",
+      "skillAreaEmpathyAndSupportName": "[es] Empathy & Support",
+      "skillAreaEmpathyAndSupportDescription": "[es] Learn how to support others and build strong, healthy relationships."
+    }
+  }
 }

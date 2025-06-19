@@ -83,6 +83,23 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
     overlayOpacity: 0, // No overlay
     subjectName: 'Advanced Music',
     environmentDescription: 'Advanced Music Performance Classroom with Nelie'
+  },
+
+  mentalWellness: {
+    configName: "mentalWellness",
+    backgroundImage: '/public/placeholder.svg', // Using placeholder for now
+    backgroundColor: "bg-teal-700",
+    // characterImageUrl: '', // Omitting for now
+    primaryColor: "teal-400",
+    secondaryColor: "cyan-300",
+    greetingMessage: "Welcome to your Mental Wellness space. Let's explore and learn together.",
+    loadingMessage: "Preparing a calm space for your Mental Wellness journey...",
+    loadingIcon: "🧠",
+    subjectColor: '#0f766e', // Teal-700
+    accentColor: '#06b6d4', // Cyan-500
+    overlayOpacity: 0,
+    subjectName: 'Mental Wellness',
+    environmentDescription: 'Calm Space for Mental Wellness with Nelie'
   }
 };
 

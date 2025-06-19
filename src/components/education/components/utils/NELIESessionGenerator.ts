@@ -9,6 +9,7 @@ import {
   generateCreativeArtsLesson,
   generateCompleteEducationalSession
 } from './EnhancedSubjectLessonFactory';
+import { generateMentalWellnessLesson } from './EnhancedMentalWellnessLessonFactory';
 
 /**
  * Integration bridge between existing lesson system and enhanced NELIE system
@@ -19,7 +20,7 @@ export interface NELIESessionConfig {
   studentId?: string;
   gradeLevel: number; // 0-12 (K-12)
   preferredLearningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
-  subjects?: ('mathematics' | 'english' | 'science' | 'music' | 'computerScience' | 'creativeArts')[];
+  subjects?: ('mathematics' | 'english' | 'science' | 'music' | 'computerScience' | 'creativeArts' | 'mentalHealth')[];
   sessionDuration?: 'standard' | 'extended'; // standard = 20min, extended = 20-25min
   enableUniqueness?: boolean;
   previousSessionIds?: string[];
@@ -49,7 +50,7 @@ export interface NELIESessionResult {
 export class NELIESessionGenerator {
   private static defaultConfig: Partial<NELIESessionConfig> = {
     preferredLearningStyle: 'mixed',
-    subjects: ['mathematics', 'english', 'science', 'music', 'computerScience', 'creativeArts'],
+    subjects: ['mathematics', 'english', 'science', 'music', 'computerScience', 'creativeArts', 'mentalHealth'],
     sessionDuration: 'extended',
     enableUniqueness: true
   };
@@ -158,6 +159,10 @@ export class NELIESessionGenerator {
       case 'creative-arts':
       case 'arts':
         config = generateCreativeArtsLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      case 'mentalhealth':
+      case 'mentalwellness':
+        config = generateMentalWellnessLesson(gradeLevel, learningStyle as any, sessionId);
         break;
       default:
         throw new Error(`Unknown subject: ${subject}`);
@@ -274,6 +279,12 @@ export const NELIEHelpers = {
    */
   generateReadingLesson: (grade: number, style?: string) => 
     NELIESessionGenerator.generateSubjectLesson('english', grade, style as any),
+
+  /**
+   * Generate a mental wellness lesson for a specific grade
+   */
+  generateMentalWellnessLesson: (grade: number, style?: string, sessionId?: string) =>
+    NELIESessionGenerator.generateSubjectLesson('mentalhealth', grade, style as any, sessionId),
 
   /**
    * Generate a complete day's worth of lessons
