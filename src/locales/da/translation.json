@@ -29,6 +29,7 @@
       "skillAreaBuildingResilienceDescription": "[da] Develop skills to bounce back from challenges and adversity.",
       "skillAreaEmpathyAndSupportName": "[da] Empathy & Support",
       "skillAreaEmpathyAndSupportDescription": "[da] Learn how to support others and build strong, healthy relationships."
+jules_wip_15189971815575095135
     },
     "languageLab": {
       "title": "[da] Language Lab",
@@ -110,5 +111,7 @@
     "loadingLesson": "[da] Loading lesson...",
     "noLessonLoaded": "[da] No lesson loaded. Please select a lesson.",
     "unsupportedSectionType": "[da] Unsupported section type: {{sectionType}}"
+    }
+main
   }
 }

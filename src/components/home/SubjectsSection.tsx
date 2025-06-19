@@ -63,6 +63,7 @@ const SubjectsSection = () => {
       path: "/learn/mental-wellness",
       gradient: "from-teal-500 to-cyan-500",
       icon: "🧠"
+jules_wip_15189971815575095135
     },
     {
       title: "Language Lab",
@@ -103,6 +104,7 @@ const SubjectsSection = () => {
       path: "/learn/life-essentials",
       gradient: "from-slate-600 to-gray-600",
       icon: "🛠️"
+main
     }
   ];
 
