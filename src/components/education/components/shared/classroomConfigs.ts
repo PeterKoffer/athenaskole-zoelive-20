@@ -100,62 +100,6 @@ export const CLASSROOM_CONFIGS: Record<string, ClassroomConfig> = {
     overlayOpacity: 0,
     subjectName: 'Mental Wellness',
     environmentDescription: 'Calm Space for Mental Wellness with Nelie'
-  },
-
-  worldHistoryReligions: {
-    configName: "worldHistoryReligions",
-    subjectName: "World History & Religions",
-    backgroundImage: '/public/placeholder.svg', // Placeholder: ancient scroll/map texture
-    subjectColor: '#b45309', // amber-700
-    accentColor: '#ef4444', // red-500
-    // characterImageUrl: '/public/placeholder.svg', // Placeholder: historian/scholar avatar (omitting if not standard)
-    greetingMessage: "Welcome to World History & Religions! Let's uncover the stories of our past.",
-    loadingMessage: "Excavating historical records and sacred texts...",
-    loadingIcon: "📜",
-    environmentDescription: "An ancient library or archaeological site.",
-    overlayOpacity: 0.6,
-  },
-
-  globalGeography: {
-    configName: "globalGeography",
-    subjectName: "Global Geography",
-    backgroundImage: '/public/placeholder.svg', // Placeholder: world map/satellite image
-    subjectColor: '#0369a1', // sky-700
-    accentColor: '#22c55e', // green-500
-    // characterImageUrl: '/public/placeholder.svg', // Placeholder: explorer/geographer avatar (omitting if not standard)
-    greetingMessage: "Welcome to Global Geography! Ready to explore our amazing planet?",
-    loadingMessage: "Charting a course across continents and oceans...",
-    loadingIcon: "🌍",
-    environmentDescription: "A vibrant world map or a view from a mountain top.",
-    overlayOpacity: 0.5,
-  },
-
-  bodyLab: {
-    configName: "bodyLab",
-    subjectName: "BodyLab: Healthy Living",
-    backgroundImage: '/public/placeholder.svg', // Placeholder: bright, energetic fitness/nature scene
-    subjectColor: '#059669', // emerald-600
-    accentColor: '#facc15', // yellow-400
-    // characterImageUrl: '/public/placeholder.svg', // Placeholder: fitness coach/nutritionist avatar (omitting if not standard)
-    greetingMessage: "Welcome to BodyLab! Let's energize your life.",
-    loadingMessage: "Warming up for a session on health and fitness...",
-    loadingIcon: "💪",
-    environmentDescription: "A bright and modern fitness studio or a lush park.",
-    overlayOpacity: 0.4,
-  },
-
-  lifeEssentials: {
-    configName: "lifeEssentials",
-    subjectName: "Life Essentials",
-    backgroundImage: '/public/placeholder.svg', // Placeholder: organized desk/cityscape
-    subjectColor: '#334155', // slate-700
-    accentColor: '#a855f7', // purple-500
-    // characterImageUrl: '/public/placeholder.svg', // Placeholder: mentor/advisor avatar (omitting if not standard)
-    greetingMessage: "Welcome to Life Essentials! Let's prepare for your future.",
-    loadingMessage: "Organizing tools and tips for navigating adulthood...",
-    loadingIcon: "🛠️",
-    environmentDescription: "A modern co-working space or a well-organized home office.",
-    overlayOpacity: 0.5,
   }
 };
 

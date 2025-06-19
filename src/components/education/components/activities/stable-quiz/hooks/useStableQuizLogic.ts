@@ -47,56 +47,27 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
 
   // Timer logic
   useEffect(() => {
-    let timer: NodeJS.Timeout | undefined;
     if (timeLeft > 0 && !showResult && stableContent && !hasCompleted) {
-      timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
     } else if (timeLeft === 0 && !showResult && stableContent && !hasCompleted) {
-      // handleTimeUp is called, which itself calls onActivityComplete after a timeout
-      // No direct call to handleTimeUp here to avoid it being a dependency that might change.
-      // The condition itself will trigger handleTimeUp if not already called by other means.
+      handleTimeUp();
     }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [timeLeft, showResult, stableContent, hasCompleted]); // Removed handleTimeUp from deps
-
-  // Add at the top of the hook
-  const [logicTimeoutId, setLogicTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
-  // Cleanup timeout on unmount or when activity.id changes
-  useEffect(() => {
-    return () => {
-      if (logicTimeoutId) {
-        clearTimeout(logicTimeoutId);
-        console.log('🧹 Cleared pending logic timeout in useStableQuizLogic for activity:', activity.id);
-      }
-    };
-  }, [logicTimeoutId, activity.id]);
+  }, [timeLeft, showResult, stableContent, hasCompleted]);
 
   const handleTimeUp = () => {
     if (hasCompleted) return;
     
     console.log('⏰ Time up! Auto-completing activity');
     setShowResult(true);
-    setScore(0); // Or some other logic for time up
+    setScore(0);
     setHasCompleted(true);
     
-    // if (logicTimeoutId) clearTimeout(logicTimeoutId); // Keep timeout logic
-    // const newTimeoutId = setTimeout(() => {
-    //   console.log('🚀 Auto-advancing after time up');
-    //   onActivityComplete(false);
-    // }, 3000);
-    // setLogicTimeoutId(newTimeoutId);
-    onActivityComplete(false); // Call synchronously for debugging
+    setTimeout(() => {
+      console.log('🚀 Auto-advancing after time up');
+      onActivityComplete(false);
+    }, 3000);
   };
-
-  // Call handleTimeUp if timeLeft reaches 0 and not handled yet
-  useEffect(() => {
-    if (timeLeft === 0 && !showResult && stableContent && !hasCompleted) {
-      handleTimeUp();
-    }
-  }, [timeLeft, showResult, stableContent, hasCompleted, handleTimeUp]);
-
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!showResult && stableContent && !hasCompleted) {
@@ -117,13 +88,10 @@ export const useStableQuizLogic = ({ activity, onActivityComplete }: UseStableQu
     setScore(earnedScore);
     
     // Ensure we only call completion once
-    // if (logicTimeoutId) clearTimeout(logicTimeoutId); // Keep timeout logic
-    // const newTimeoutId = setTimeout(() => {
-    //   console.log('🚀 Activity completed, advancing:', isCorrect);
-    //   onActivityComplete(isCorrect);
-    // }, 3000);
-    // setLogicTimeoutId(newTimeoutId);
-    onActivityComplete(isCorrect); // Call synchronously for debugging
+    setTimeout(() => {
+      console.log('🚀 Activity completed, advancing:', isCorrect);
+      onActivityComplete(isCorrect);
+    }, 3000);
   };
 
   return {

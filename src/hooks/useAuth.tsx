@@ -27,11 +27,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('🔄 Auth state changed. Event:', event, 'User ID:', session?.user?.id || 'no user', 'Current User State:', user?.id);
-        // If user becomes null and was previously set, it's a sign-out or session expiry
-        if (!session?.user && user) {
-           console.warn('🚨 User state changed to null, potential sign out or session expiry. Event:', event);
-        }
+        console.log('🔄 Auth state changed:', event, session?.user?.id || 'no user');
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);

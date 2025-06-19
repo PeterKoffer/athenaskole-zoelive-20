@@ -108,55 +108,6 @@ export const K12_CURRICULUM_STANDARDS = {
     music: ['Rhythm patterns', 'High/low sounds', 'Musical notation basics', 'Singing'],
     computerScience: ['Simple algorithms', 'Basic coding concepts', 'Digital citizenship', 'Technology tools'],
     creativeArts: ['Art techniques', 'Creative projects', 'Color mixing', 'Art appreciation']
-  },
-  2: { // Grade 2
-    mathematics: ['Addition/Subtraction up to 100', 'Place Value (Hundreds)', 'Basic Fractions Intro', 'Telling Time (Quarter Hour)'],
-    english: ['Reading Simple Chapters', 'Writing Short Stories (Descriptive)', 'Compound Words', 'Verb Tenses (Present/Past/Future)'],
-    science: ['States of Matter (Solid/Liquid/Gas)', 'Animal Life Cycles (Advanced)', 'Simple Machines Intro (Lever/Wheel)', 'Earth & Sun Interactions'],
-    music: ['Melody basics', 'Instrument families', 'Dynamic variations (loud/soft)'],
-    computerScience: ['Block-based programming intro', 'Debugging simple programs', 'Online safety basics'],
-    creativeArts: ['Primary/Secondary colors', 'Basic sculpting (clay)', 'Storytelling through drawing'],
-    mentalWellness: ['Identifying Feelings (Happy/Sad/Angry/Scared)', 'Sharing with Others', 'Asking for Help Nicely'],
-    globalGeography: ['My Local Community Map', 'Neighborhood Features', 'Cardinal Directions (N,S,E,W)'],
-    bodyLab: ['Fun Ways to Move (Running/Jumping/Dancing)', 'Importance of Sleep', 'Healthy Food Groups Intro']
-  },
-  5: { // Grade 5
-    mathematics: ['Decimal Operations', 'Fraction Operations (Add/Subtract/Multiply)', 'Volume & Area of 3D Shapes', 'Order of Operations'],
-    english: ['Analyzing Character Development', 'Writing Persuasive Essays', 'Figurative Language (Metaphor/Simile)', 'Complex Sentences'],
-    science: ['Ecosystems & Food Webs', 'Water Cycle & Weather Systems', 'Properties of Light & Sound', 'Human Body Systems Overview'],
-    music: ['Reading sheet music (basic notes)', 'Composing simple melodies', 'Music genres overview'],
-    computerScience: ['Variables and loops', 'Basic game design concepts', 'Understanding algorithms'],
-    creativeArts: ['Perspective drawing', 'Advanced color theory (analogous/complementary)', 'Creating comic strips'],
-    mentalWellness: ['Managing Stress (Simple Techniques)', 'Understanding Empathy', 'Positive Self-Talk Basics'],
-    worldHistoryReligions: ['Ancient Egypt (Daily Life, Pyramids)', 'Introduction to Greek Mythology', 'Early American History Snippets'],
-    globalGeography: ['Continents and Oceans Detailed', 'Map Reading Skills (Latitude/Longitude)', 'World Climates Overview'],
-    bodyLab: ["What's in My Food? (Nutrients Basics)", 'Importance of Regular Exercise', 'Understanding Hygiene'],
-  },
-  8: { // Grade 8
-    mathematics: ['Pre-Algebra Concepts (Linear Equations)', 'Pythagorean Theorem', 'Probability & Statistics Basics', 'Geometric Transformations'],
-    english: ['Analyzing Theme & Author\'s Purpose', 'Writing Research Reports', 'Advanced Grammar (Clauses, Punctuation)', 'Shakespeare Intro'],
-    science: ['Newton\'s Laws of Motion', 'Periodic Table Introduction', 'Cellular Biology Basics', 'Plate Tectonics'],
-    music: ['Chord progressions', 'Music history periods overview', 'Songwriting basics'],
-    computerScience: ['Text-based programming (Python/JS intro)', 'Data representation (binary basics)', 'Cybersecurity awareness'],
-    creativeArts: ['Digital art software intro', 'Exploring different art movements', 'Portfolio development basics'],
-    mentalWellness: ['Healthy Relationships (Friends, Family)', 'Coping with Peer Pressure', 'Digital Well-being & Social Media'],
-    worldHistoryReligions: ['The Roman Empire (Rise & Fall)', 'Medieval Societies (Europe/Asia)', 'Introduction to Major World Religions (Origins, Core Tenets)'],
-    globalGeography: ['Climate Zones & Biomes In-depth', 'Globalization & Interdependence', 'Cultural Geography Basics'],
-    bodyLab: ['Fitness Planning & Goal Setting', 'Understanding Mental Health Stigma', 'Effects of Substance Abuse (Intro)'],
-    lifeEssentials: ['Introduction to Budgeting (Needs vs Wants)', 'Basic Banking Concepts', 'Time Management Skills']
-  },
-  10: { // Grade 10
-    mathematics: ['Algebra II (Quadratics, Polynomials)', 'Trigonometry Basics', 'Advanced Statistics (Data Analysis)', 'Logarithms'],
-    english: ['Critical Literary Analysis (Symbolism, Tone)', 'Writing Argumentative/Analytical Essays', 'Rhetorical Devices', 'World Literature Survey'],
-    science: ['Genetics & Heredity', 'Chemical Reactions & Stoichiometry', 'Electromagnetism Basics', 'Environmental Science Issues'],
-    music: ['Advanced music theory', 'Arranging music', 'Music production software intro'],
-    computerScience: ['Object-Oriented Programming concepts', 'Web development basics (HTML/CSS/JS)', 'Database fundamentals'],
-    creativeArts: ['Advanced digital art techniques', 'Independent art projects', 'Art criticism and analysis'],
-    mentalWellness: ['Mindfulness Techniques for Stress Reduction', 'Understanding Anxiety & Depression (Signs, Seeking Help)', 'Conflict Resolution Skills'],
-    worldHistoryReligions: ['Impact of World Wars', 'Cold War Era', 'Comparative Study of World Religions (Ethics, Philosophies)'],
-    globalGeography: ['Globalization Patterns & Impacts', 'Geopolitics & International Relations', 'Sustainable Development Goals'],
-    bodyLab: ['Advanced Nutrition (Micronutrients, Diet Planning)', 'Mental Well-being Strategies (CBT basics)', 'Long-term Fitness Programming'],
-    lifeEssentials: ['Understanding Credit & Debt', 'Basic Investments (Stocks, Bonds Intro)', 'Renting vs Buying Housing (Pros/Cons)', 'Job Application & Interview Skills']
   }
   // ... Additional grades would be added here for complete K-12 coverage
 };
