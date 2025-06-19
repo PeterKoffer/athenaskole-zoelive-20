@@ -29,6 +29,89 @@
       "skillAreaBuildingResilienceDescription": "Develop skills to bounce back from challenges and adversity.",
       "skillAreaEmpathyAndSupportName": "Empathy & Support",
       "skillAreaEmpathyAndSupportDescription": "Learn how to support others and build strong, healthy relationships."
+jules_wip_15189971815575095135
+    },
+    "languageLab": {
+      "title": "Language Lab",
+      "description": "Embark on a journey to learn new languages! Interactive lessons, vocabulary building, and grammar practice for languages around the world.",
+      "keyArea1": "Vocabulary Practice",
+      "keyArea2": "Grammar Drills",
+      "keyArea3": "Pronunciation Basics",
+      "keyArea4": "Cultural Insights",
+      "skillAreaExploreName": "Explore Languages",
+      "skillAreaExploreDescription": "Choose a new language to learn or continue your progress."
+    },
+    "worldHistoryReligions": {
+      "title": "World History & Global Religions",
+      "description": "Uncover the past to understand the present. This class takes you on a journey through world history, exploring pivotal events, influential figures, and the rise and fall of civilizations. We'll also delve into the rich tapestry of global religions, examining their origins, core beliefs, cultural impacts, and role in shaping societies across time.",
+      "keyArea1": "Ancient Civilizations",
+      "keyArea2": "Major Empires",
+      "keyArea3": "World Wars",
+      "keyArea4": "Religious Studies",
+      "keyArea5": "Cultural Heritage",
+      "skillAreaAncientHistoryName": "Ancient History",
+      "skillAreaAncientHistoryDescription": "Explore early civilizations and their legacies.",
+      "skillAreaGlobalReligionsName": "Global Religions",
+      "skillAreaGlobalReligionsDescription": "Understand diverse beliefs and practices."
+    },
+    "globalGeography": {
+      "title": "Global Geography",
+      "description": "Embark on an exploration of our planet. Global Geography goes beyond maps, teaching you about Earth's diverse landscapes, climates, and natural resources. Discover how human societies interact with their environment, the dynamics of population, urbanization, and the fascinating interplay between physical features and cultural development.",
+      "keyArea1": "Physical Landscapes",
+      "keyArea2": "Climate Systems",
+      "keyArea3": "Human-Environment Interaction",
+      "keyArea4": "Population Dynamics",
+      "keyArea5": "Urban Studies",
+      "skillAreaPhysicalGeographyName": "Physical Geography",
+      "skillAreaPhysicalGeographyDescription": "Study Earth's natural features and processes.",
+      "skillAreaHumanGeographyName": "Human Geography",
+      "skillAreaHumanGeographyDescription": "Examine human populations and their impact."
+    },
+    "bodyLab": {
+      "title": "BodyLab: Healthy & Active Living",
+      "description": "Ignite your potential and energize your life! BodyLab is your interactive guide to healthy and active living. Through engaging lessons, we'll explore the benefits of nutrition, physical fitness, and mental well-being. Get ready for activities and insights that will inspire you to make informed choices for a vibrant, balanced life.",
+      "keyArea1": "Nutrition Science",
+      "keyArea2": "Fitness Principles",
+      "keyArea3": "Mental Wellness",
+      "keyArea4": "Holistic Health",
+      "keyArea5": "Active Lifestyles",
+      "skillAreaNutritionFundamentalsName": "Nutrition Fundamentals",
+      "skillAreaNutritionFundamentalsDescription": "Learn about healthy eating and diets.",
+      "skillAreaFitnessForLifeName": "Fitness for Life",
+      "skillAreaFitnessForLifeDescription": "Discover exercises and active habits."
+    },
+    "lifeEssentials": {
+      "title": "Life Essentials: Navigating Adulthood",
+      "description": "Prepare for your future with confidence. Life Essentials: Navigating Adulthood is your comprehensive guide to the practical realities of independent living. This class covers vital topics such as personal finance (budgeting, banking, investments, loans), managing a household, understanding taxes and insurance, making informed decisions about mortgages and cars, and navigating the world of work and careers. Gain the knowledge and foresight you need to plan ahead and thrive.",
+      "keyArea1": "Personal Finance",
+      "keyArea2": "Household Management",
+      "keyArea3": "Career Development",
+      "keyArea4": "Civic Responsibilities",
+      "keyArea5": "Future Planning",
+      "skillAreaPersonalFinanceName": "Personal Finance",
+      "skillAreaPersonalFinanceDescription": "Manage budgets, savings, and investments.",
+      "skillAreaAdultingSkillsName": "Practical Adulting",
+      "skillAreaAdultingSkillsDescription": "Navigate household tasks and responsibilities."
     }
+  },
+  "languageLabView": {
+    "mainTitle": "Language Learning - Duolingo Style",
+    "selectLanguageTitle": "Select a Language",
+    "lessonsInTitle": "Lessons in {{languageName}}",
+    "backToDailyProgramButton": "Back to Daily Program",
+    "checkAnswerButton": "Check Answer",
+    "nextQuestionButton": "Next Question",
+    "nextSectionButton": "Next Section",
+    "finishLessonButton": "Finish Lesson",
+    "heartsLabel": "Hearts",
+    "streakLabel": "Day Streak",
+    "xpLabel": "XP",
+    "loadingLanguages": "Loading languages...",
+    "loadingCurriculum": "Loading curriculum for {{languageName}}...",
+    "loadingLesson": "Loading lesson...",
+    "noLessonLoaded": "No lesson loaded. Please select a lesson.",
+    "unsupportedSectionType": "Unsupported section type: {{sectionType}}"
+    }
+main
   }
 }

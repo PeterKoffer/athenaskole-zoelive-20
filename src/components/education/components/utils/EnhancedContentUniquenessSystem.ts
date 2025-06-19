@@ -180,6 +180,41 @@ export class EnhancedContentUniquenessSystem {
     ]
   };
 
+  private static mentalWellnessContent: ContentPool = {
+    themes: ["Mindful Moments", "Emotion Explorer", "Friendship Corner", "Resilience Builders", "Calm Oasis"],
+    scenarios: ["Feeling overwhelmed before a test", "A friend seems sad", "Disagreeing with a sibling", "Trying something new and failing", "Setting a small goal for yourself"],
+    activities: ["Guided deep breathing exercises", "Journaling about three good things", "Role-playing asking for help", "Listing personal strengths", "Practicing positive self-talk affirmations"],
+    contexts: ["during a quiet time at home", "when feeling stressed at school", "while playing with friends", "when learning a new skill", "after a disagreement"]
+  };
+
+  private static worldHistoryReligionsContent: ContentPool = {
+    themes: ["Ancient Wonders", "Echoes of Empires", "Sacred Texts & Traditions", "Crossroads of Culture", "Moments that Shaped Millennia"],
+    scenarios: ["Discovering a lost city in the jungle", "Translating an ancient scroll", "Debating the causes of a major war", "Comparing two different religious festivals", "Interviewing a historical figure (imagined)"],
+    activities: ["Creating a timeline of an empire", "Designing a museum exhibit for an artifact", "Writing a diary entry as someone from the past", "Comparing maps of ancient and modern worlds", "Researching a specific religious symbol or ritual"],
+    contexts: ["in a grand library of Alexandria", "at an archaeological dig site", "during a medieval fair", "inside a majestic temple or cathedral", "at a United Nations historical summit"]
+  };
+
+  private static globalGeographyContent: ContentPool = {
+    themes: ["Planet Earth Explorers", "Mapping Our World", "Cultures & Climates", "Human Impact Zones", "Journey to the Core"],
+    scenarios: ["Planning a sustainable city in a challenging environment", "Tracking a migrating animal species across continents", "Investigating the causes of desertification in a region", "Comparing population pyramids of two different countries", "Designing a travel itinerary for an around-the-world trip"],
+    activities: ["Building a model of a volcano or mountain range", "Creating a climate graph for a specific city", "Using GIS data (simulated) to solve a problem", "Debating solutions to overpopulation or resource scarcity", "Designing a flag and anthem for a new micro-nation"],
+    contexts: ["aboard a research vessel in the Arctic", "deep within the Amazon rainforest", "on top of Mount Everest", "in a bustling megacity like Tokyo", "navigating with a compass in a vast desert"]
+  };
+
+  private static bodyLabContent: ContentPool = {
+    themes: ["Fuel Your Body", "Move & Groove", "Mind-Body Connection", "Healthy Habits Handbook", "Wellness Warriors"],
+    scenarios: ["Designing a balanced meal plan for an athlete", "Creating a fun workout routine for different age groups", "Investigating the effects of sleep deprivation", "Developing a campaign to reduce screen time", "Understanding how stress affects the body"],
+    activities: ["Tracking daily water intake and its benefits", "Learning basic yoga poses for flexibility", "Comparing nutritional labels on food products", "Designing an obstacle course for fitness", "Practicing mindfulness meditation for 5 minutes"],
+    contexts: ["in a modern gym or fitness studio", "at a farmer's market choosing fresh produce", "during a school sports day", "while preparing a healthy family dinner", "in a calm nature spot for meditation"]
+  };
+
+  private static lifeEssentialsContent: ContentPool = {
+    themes: ["Future Ready Finances", "Adulting 101", "Career Compass", "Smart Consumer Skills", "Blueprint for Independence"],
+    scenarios: ["Creating a budget for your first apartment", "Comparing different types of bank accounts or credit cards", "Researching career paths based on interests and skills", "Understanding a sample rental agreement or job contract", "Planning for a major purchase like a car or further education"],
+    activities: ["Role-playing a job interview", "Calculating compound interest on savings", "Developing a 5-year financial goal plan", "Creating a weekly household chore schedule", "Comparing prices for a common household item across different stores"],
+    contexts: ["at a mock job fair", "while planning a personal budget at a desk", "in a simulated bank or financial advisor's office", "when looking for your first apartment online", "discussing future plans with a mentor"]
+  };
+
   /**
    * Generate truly unique content for a session
    */
@@ -206,8 +241,25 @@ export class EnhancedContentUniquenessSystem {
       case 'science':
         contentPool = this.scienceContent;
         break;
+      case 'mentalwellness':
+        contentPool = this.mentalWellnessContent;
+        break;
+      case 'worldhistoryreligions':
+        contentPool = this.worldHistoryReligionsContent;
+        break;
+      case 'globalgeography':
+        contentPool = this.globalGeographyContent;
+        break;
+      case 'bodylab':
+        contentPool = this.bodyLabContent;
+        break;
+      case 'lifeessentials':
+        contentPool = this.lifeEssentialsContent;
+        break;
       default:
-        contentPool = this.mathematicsContent; // fallback
+        // Consider a more generic fallback or error if subject pool is missing
+        console.warn(`No specific content pool for ${subject}, defaulting to Mathematics.`);
+        contentPool = this.mathematicsContent;
     }
 
     // Get or create session history

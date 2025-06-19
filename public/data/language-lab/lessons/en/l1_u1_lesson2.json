@@ -1,0 +1,28 @@
+{
+  "lessonId": "en_l1_u1_lesson2",
+  "languageCode": "en",
+  "title": "Common Objects",
+  "learningObjectives": ["Learn names of common objects."],
+  "sections": [
+    {
+      "type": "vocabulary",
+      "title": "New Words",
+      "items": [
+        { "term": "Book", "translation": "Book", "audio": "placeholder/audio/en/book.mp3" },
+        { "term": "Table", "translation": "Table", "audio": "placeholder/audio/en/table.mp3" }
+      ]
+    },
+    {
+      "type": "exercises",
+      "questions": [
+        {
+          "questionId": "en_l1_u1_l2_q1",
+          "type": "multipleChoice",
+          "prompt": "What is a 'book'?",
+          "options": ["Something you read", "Something you eat"],
+          "correctOptionIndex": 0
+        }
+      ]
+    }
+  ]
+}

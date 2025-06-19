@@ -13,10 +13,12 @@ const MathematicsLearning = () => {
 
   // Redirect to auth if not logged in
   useEffect(() => {
+    console.log(`[${classroomConfig?.subjectName || 'MathematicsLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
+      console.warn(`[${classroomConfig?.subjectName || 'MathematicsLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, classroomConfig?.subjectName]);
 
   if (loading) {
     return (
