@@ -39,6 +39,58 @@
       "keyArea4": "[es] Cultural Insights",
       "skillAreaExploreName": "[es] Explore Languages",
       "skillAreaExploreDescription": "[es] Choose a new language to learn or continue your progress."
+    },
+    "worldHistoryReligions": {
+      "title": "[es] World History & Global Religions",
+      "description": "[es] Uncover the past to understand the present. This class takes you on a journey through world history, exploring pivotal events, influential figures, and the rise and fall of civilizations. We'll also delve into the rich tapestry of global religions, examining their origins, core beliefs, cultural impacts, and role in shaping societies across time.",
+      "keyArea1": "[es] Ancient Civilizations",
+      "keyArea2": "[es] Major Empires",
+      "keyArea3": "[es] World Wars",
+      "keyArea4": "[es] Religious Studies",
+      "keyArea5": "[es] Cultural Heritage",
+      "skillAreaAncientHistoryName": "[es] Ancient History",
+      "skillAreaAncientHistoryDescription": "[es] Explore early civilizations and their legacies.",
+      "skillAreaGlobalReligionsName": "[es] Global Religions",
+      "skillAreaGlobalReligionsDescription": "[es] Understand diverse beliefs and practices."
+    },
+    "globalGeography": {
+      "title": "[es] Global Geography",
+      "description": "[es] Embark on an exploration of our planet. Global Geography goes beyond maps, teaching you about Earth's diverse landscapes, climates, and natural resources. Discover how human societies interact with their environment, the dynamics of population, urbanization, and the fascinating interplay between physical features and cultural development.",
+      "keyArea1": "[es] Physical Landscapes",
+      "keyArea2": "[es] Climate Systems",
+      "keyArea3": "[es] Human-Environment Interaction",
+      "keyArea4": "[es] Population Dynamics",
+      "keyArea5": "[es] Urban Studies",
+      "skillAreaPhysicalGeographyName": "[es] Physical Geography",
+      "skillAreaPhysicalGeographyDescription": "[es] Study Earth's natural features and processes.",
+      "skillAreaHumanGeographyName": "[es] Human Geography",
+      "skillAreaHumanGeographyDescription": "[es] Examine human populations and their impact."
+    },
+    "bodyLab": {
+      "title": "[es] BodyLab: Healthy & Active Living",
+      "description": "[es] Ignite your potential and energize your life! BodyLab is your interactive guide to healthy and active living. Through engaging lessons, we'll explore the benefits of nutrition, physical fitness, and mental well-being. Get ready for activities and insights that will inspire you to make informed choices for a vibrant, balanced life.",
+      "keyArea1": "[es] Nutrition Science",
+      "keyArea2": "[es] Fitness Principles",
+      "keyArea3": "[es] Mental Wellness",
+      "keyArea4": "[es] Holistic Health",
+      "keyArea5": "[es] Active Lifestyles",
+      "skillAreaNutritionFundamentalsName": "[es] Nutrition Fundamentals",
+      "skillAreaNutritionFundamentalsDescription": "[es] Learn about healthy eating and diets.",
+      "skillAreaFitnessForLifeName": "[es] Fitness for Life",
+      "skillAreaFitnessForLifeDescription": "[es] Discover exercises and active habits."
+    },
+    "lifeEssentials": {
+      "title": "[es] Life Essentials: Navigating Adulthood",
+      "description": "[es] Prepare for your future with confidence. Life Essentials: Navigating Adulthood is your comprehensive guide to the practical realities of independent living. This class covers vital topics such as personal finance (budgeting, banking, investments, loans), managing a household, understanding taxes and insurance, making informed decisions about mortgages and cars, and navigating the world of work and careers. Gain the knowledge and foresight you need to plan ahead and thrive.",
+      "keyArea1": "[es] Personal Finance",
+      "keyArea2": "[es] Household Management",
+      "keyArea3": "[es] Career Development",
+      "keyArea4": "[es] Civic Responsibilities",
+      "keyArea5": "[es] Future Planning",
+      "skillAreaPersonalFinanceName": "[es] Personal Finance",
+      "skillAreaPersonalFinanceDescription": "[es] Manage budgets, savings, and investments.",
+      "skillAreaAdultingSkillsName": "[es] Practical Adulting",
+      "skillAreaAdultingSkillsDescription": "[es] Navigate household tasks and responsibilities."
     }
   },
   "languageLabView": {

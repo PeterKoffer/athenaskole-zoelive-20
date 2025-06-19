@@ -71,6 +71,38 @@ const SubjectsSection = () => {
       path: "/learn/language-lab",
       gradient: "from-lime-500 to-green-500",
       icon: "🌐"
+    },
+    {
+      title: "World History & Global Religions",
+      description: "Uncover the past to understand the present. This class takes you on a journey through world history, exploring pivotal events, influential figures, and the rise and fall of civilizations. We'll also delve into the rich tapestry of global religions, examining their origins, core beliefs, cultural impacts, and role in shaping societies across time.",
+      keyAreas: ["Ancient Civilizations", "Major Empires", "World Wars", "Religious Studies", "Cultural Heritage"],
+      path: "/learn/world-history-religions",
+      gradient: "from-amber-600 to-orange-600",
+      icon: "📜"
+    },
+    {
+      title: "Global Geography",
+      description: "Embark on an exploration of our planet. Global Geography goes beyond maps, teaching you about Earth's diverse landscapes, climates, and natural resources. Discover how human societies interact with their environment, the dynamics of population, urbanization, and the fascinating interplay between physical features and cultural development.",
+      keyAreas: ["Physical Landscapes", "Climate Systems", "Human-Environment Interaction", "Population Dynamics", "Urban Studies"],
+      path: "/learn/global-geography",
+      gradient: "from-sky-600 to-cyan-600",
+      icon: "🌍"
+    },
+    {
+      title: "BodyLab: Healthy & Active Living",
+      description: "Ignite your potential and energize your life! BodyLab is your interactive guide to healthy and active living. Through engaging lessons, we'll explore the benefits of nutrition, physical fitness, and mental well-being. Get ready for activities and insights that will inspire you to make informed choices for a vibrant, balanced life.",
+      keyAreas: ["Nutrition Science", "Fitness Principles", "Mental Wellness", "Holistic Health", "Active Lifestyles"],
+      path: "/learn/body-lab",
+      gradient: "from-emerald-500 to-lime-500",
+      icon: "💪"
+    },
+    {
+      title: "Life Essentials: Navigating Adulthood",
+      description: "Prepare for your future with confidence. Life Essentials: Navigating Adulthood is your comprehensive guide to the practical realities of independent living. This class covers vital topics such as personal finance (budgeting, banking, investments, loans), managing a household, understanding taxes and insurance, making informed decisions about mortgages and cars, and navigating the world of work and careers. Gain the knowledge and foresight you need to plan ahead and thrive.",
+      keyAreas: ["Personal Finance", "Household Management", "Career Development", "Civic Responsibilities", "Future Planning"],
+      path: "/learn/life-essentials",
+      gradient: "from-slate-600 to-gray-600",
+      icon: "🛠️"
     }
   ];
 
