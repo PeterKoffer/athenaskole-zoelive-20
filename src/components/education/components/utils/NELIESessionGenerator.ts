@@ -10,10 +10,12 @@ import {
   generateCompleteEducationalSession
 } from './EnhancedSubjectLessonFactory';
 import { generateMentalWellnessLesson } from './EnhancedMentalWellnessLessonFactory';
+jules_wip_15189971815575095135
 import { generateWorldHistoryReligionsLesson } from './EnhancedWorldHistoryReligionsLessonFactory';
 import { generateGlobalGeographyLesson } from './EnhancedGlobalGeographyLessonFactory';
 import { generateBodyLabLesson } from './EnhancedBodyLabLessonFactory';
 import { generateLifeEssentialsLesson } from './EnhancedLifeEssentialsLessonFactory';
+main
 
 /**
  * Integration bridge between existing lesson system and enhanced NELIE system
@@ -24,7 +26,11 @@ export interface NELIESessionConfig {
   studentId?: string;
   gradeLevel: number; // 0-12 (K-12)
   preferredLearningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
+jules_wip_15189971815575095135
   subjects?: ('mathematics' | 'english' | 'science' | 'music' | 'computerScience' | 'creativeArts' | 'mentalHealth' | 'worldHistoryReligions' | 'globalGeography' | 'bodyLab' | 'lifeEssentials')[];
+
+  subjects?: ('mathematics' | 'english' | 'science' | 'music' | 'computerScience' | 'creativeArts' | 'mentalHealth')[];
+  main
   sessionDuration?: 'standard' | 'extended'; // standard = 20min, extended = 20-25min
   enableUniqueness?: boolean;
   previousSessionIds?: string[];
@@ -54,12 +60,15 @@ export interface NELIESessionResult {
 export class NELIESessionGenerator {
   private static defaultConfig: Partial<NELIESessionConfig> = {
     preferredLearningStyle: 'mixed',
+jules_wip_15189971815575095135
     subjects: [
       'mathematics', 'english', 'science', 'music',
       'computerScience', 'creativeArts', 'mentalHealth',
       // 'languageLab', // Assuming languageLab might be added here if it's a default subject
       'worldHistoryReligions', 'globalGeography', 'bodyLab', 'lifeEssentials'
     ],
+    subjects: ['mathematics', 'english', 'science', 'music', 'computerScience', 'creativeArts', 'mentalHealth'], 
+    main
     sessionDuration: 'extended',
     enableUniqueness: true
   };
@@ -173,6 +182,7 @@ export class NELIESessionGenerator {
       case 'mentalwellness':
         config = generateMentalWellnessLesson(gradeLevel, learningStyle as any, sessionId);
         break;
+jules_wip_15189971815575095135
       case 'worldhistoryreligions':
         config = generateWorldHistoryReligionsLesson(gradeLevel, learningStyle as any, sessionId);
         break;
@@ -185,6 +195,7 @@ export class NELIESessionGenerator {
       case 'lifeessentials':
         config = generateLifeEssentialsLesson(gradeLevel, learningStyle as any, sessionId);
         break;
+main
       default:
         throw new Error(`Unknown subject: ${subject}`);
     }
@@ -306,6 +317,7 @@ export const NELIEHelpers = {
    */
   generateMentalWellnessLesson: (grade: number, style?: string, sessionId?: string) =>
     NELIESessionGenerator.generateSubjectLesson('mentalhealth', grade, style as any, sessionId),
+jules_wip_15189971815575095135
   generateWorldHistoryReligionsLesson: (grade: number, style?: string, sessionId?: string) =>
     NELIESessionGenerator.generateSubjectLesson('worldhistoryreligions', grade, style as any, sessionId),
   generateGlobalGeographyLesson: (grade: number, style?: string, sessionId?: string) =>
@@ -314,6 +326,7 @@ export const NELIEHelpers = {
     NELIESessionGenerator.generateSubjectLesson('bodylab', grade, style as any, sessionId),
   generateLifeEssentialsLesson: (grade: number, style?: string, sessionId?: string) =>
     NELIESessionGenerator.generateSubjectLesson('lifeessentials', grade, style as any, sessionId),
+main
 
   /**
    * Generate a complete day's worth of lessons

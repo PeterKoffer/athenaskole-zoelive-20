@@ -32,10 +32,12 @@ import EnhancedMathematicsLearning from '@/components/education/EnhancedMathemat
 import LanguageLearning from '@/components/LanguageLearning';
 import UniversalLearning from '@/components/education/UniversalLearning';
 import MentalWellnessLearning from '@/components/education/MentalWellnessLearning';
+jules_wip_15189971815575095135
 import WorldHistoryReligionsLearning from '@/components/education/WorldHistoryReligionsLearning';
 import GlobalGeographyLearning from '@/components/education/GlobalGeographyLearning';
 import BodyLabLearning from '@/components/education/BodyLabLearning';
 import LifeEssentialsLearning from '@/components/education/LifeEssentialsLearning';
+main
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,11 +80,13 @@ function AppRoutes() {
         <Route path="/learn/computer-science" element={<UniversalLearning subject="computer-science" skillArea="general_programming" />} />
         <Route path="/learn/creative-arts" element={<UniversalLearning subject="creative-arts" skillArea="general_arts" />} />
         <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
+jules_wip_15189971815575095135
         <Route path="/learn/language-lab" element={<LanguageLearning />} />
         <Route path="/learn/world-history-religions" element={<WorldHistoryReligionsLearning />} />
         <Route path="/learn/global-geography" element={<GlobalGeographyLearning />} />
         <Route path="/learn/body-lab" element={<BodyLabLearning />} />
         <Route path="/learn/life-essentials" element={<LifeEssentialsLearning />} />
+main
         <Route path="/learn/spanish" element={<LanguageLearning initialLanguage="spanish" />} />
         <Route path="/learn/french" element={<LanguageLearning initialLanguage="french" />} />
         <Route path="/learn/german" element={<LanguageLearning initialLanguage="german" />} />

@@ -83,6 +83,7 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: 'buildingResilience', name: 'Building Resilience', description: 'Develop skills to bounce back from challenges and adversity.', route: '/learn/mental-wellness' },
         { id: 'empathyAndSupport', name: 'Empathy & Support', description: 'Learn how to support others and build strong, healthy relationships.', route: '/learn/mental-wellness' }
       ]
+jules_wip_15189971815575095135
     },
     {
       id: 'languageLab',
@@ -127,6 +128,7 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: "personalFinance", name: "Personal Finance", description: "Manage budgets, savings, and investments.", route: "/learn/life-essentials" },
         { id: "adultingSkills", name: "Practical Adulting", description: "Navigate household tasks and responsibilities.", route: "/learn/life-essentials" }
       ]
+main
     }
   ];
 
