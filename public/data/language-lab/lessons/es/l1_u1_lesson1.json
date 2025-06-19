@@ -1,0 +1,34 @@
+{
+  "lessonId": "es_l1_u1_lesson1",
+  "languageCode": "es",
+  "title": "Hola y Números",
+  "learningObjectives": [
+    "Aprender saludos básicos.",
+    "Aprender números 1-5."
+  ],
+  "sections": [
+    {
+      "type": "vocabulary",
+      "title": "Nuevas Palabras",
+      "items": [
+        { "term": "Hola", "translation": "Hello", "audio": "placeholder/audio/es/hola.mp3", "exampleSentence": "Hola, me llamo Alex." },
+        { "term": "Uno", "translation": "One", "audio": "placeholder/audio/es/uno.mp3", "exampleSentence": "Tengo una manzana." },
+        { "term": "Dos", "translation": "Two", "audio": "placeholder/audio/es/dos.mp3", "exampleSentence": "Ella tiene dos gatos." }
+      ]
+    },
+    {
+      "type": "exercises",
+      "questions": [
+        {
+          "questionId": "es_l1_u1_l1_q1",
+          "type": "multipleChoice",
+          "prompt": "¿Qué significa 'Hola'?",
+          "options": ["Hello", "Goodbye", "Sí", "No"],
+          "correctOptionIndex": 0,
+          "feedbackCorrect": "¡Correcto!",
+          "feedbackIncorrect": "Intenta de nuevo. 'Hola' significa 'Hello'."
+        }
+      ]
+    }
+  ]
+}

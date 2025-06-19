@@ -9,5 +9,54 @@
   "Curious Learner": "Curious Learner",
   "Tried all subjects": "Tried all subjects",
   "Achieved_on": "Achieved {{date}}",
-  "days_in_a_row": "7 days in a row"
+  "days_in_a_row": "7 days in a row",
+  "subjects": {
+    "mentalWellness": {
+      "title": "Mental Wellness",
+      "description": "Learn about understanding your feelings, developing healthy coping strategies, and supporting others. Nurture your mind for a balanced life.",
+      "keyArea1": "Understanding Emotions",
+      "keyArea2": "Stress Management",
+      "keyArea3": "Mindfulness Practices",
+      "keyArea4": "Building Resilience",
+      "keyArea5": "Healthy Relationships",
+      "skillAreaUnderstandingEmotionsName": "Understanding Emotions",
+      "skillAreaUnderstandingEmotionsDescription": "Learn to identify and understand your feelings and the feelings of others.",
+      "skillAreaCopingStrategiesName": "Coping Strategies",
+      "skillAreaCopingStrategiesDescription": "Discover healthy ways to manage stress, anxiety, and difficult emotions.",
+      "skillAreaMindfulnessBasicsName": "Mindfulness Basics",
+      "skillAreaMindfulnessBasicsDescription": "Practice techniques to stay present and calm your mind.",
+      "skillAreaBuildingResilienceName": "Building Resilience",
+      "skillAreaBuildingResilienceDescription": "Develop skills to bounce back from challenges and adversity.",
+      "skillAreaEmpathyAndSupportName": "Empathy & Support",
+      "skillAreaEmpathyAndSupportDescription": "Learn how to support others and build strong, healthy relationships."
+    },
+    "languageLab": {
+      "title": "Language Lab",
+      "description": "Embark on a journey to learn new languages! Interactive lessons, vocabulary building, and grammar practice for languages around the world.",
+      "keyArea1": "Vocabulary Practice",
+      "keyArea2": "Grammar Drills",
+      "keyArea3": "Pronunciation Basics",
+      "keyArea4": "Cultural Insights",
+      "skillAreaExploreName": "Explore Languages",
+      "skillAreaExploreDescription": "Choose a new language to learn or continue your progress."
+    }
+  },
+  "languageLabView": {
+    "mainTitle": "Language Learning - Duolingo Style",
+    "selectLanguageTitle": "Select a Language",
+    "lessonsInTitle": "Lessons in {{languageName}}",
+    "backToDailyProgramButton": "Back to Daily Program",
+    "checkAnswerButton": "Check Answer",
+    "nextQuestionButton": "Next Question",
+    "nextSectionButton": "Next Section",
+    "finishLessonButton": "Finish Lesson",
+    "heartsLabel": "Hearts",
+    "streakLabel": "Day Streak",
+    "xpLabel": "XP",
+    "loadingLanguages": "Loading languages...",
+    "loadingCurriculum": "Loading curriculum for {{languageName}}...",
+    "loadingLesson": "Loading lesson...",
+    "noLessonLoaded": "No lesson loaded. Please select a lesson.",
+    "unsupportedSectionType": "Unsupported section type: {{sectionType}}"
+  }
 }

@@ -55,6 +55,22 @@ const SubjectsSection = () => {
       path: "/learn/music",
       gradient: "from-blue-600 to-purple-600",
       icon: "🎵"
+    },
+    {
+      title: "Mental Wellness",
+      description: "Learn about understanding your feelings, developing healthy coping strategies, and supporting others. Nurture your mind for a balanced life.",
+      keyAreas: ["Understanding Emotions", "Stress Management", "Mindfulness Practices", "Building Resilience", "Healthy Relationships"],
+      path: "/learn/mental-wellness",
+      gradient: "from-teal-500 to-cyan-500",
+      icon: "🧠"
+    },
+    {
+      title: "Language Lab",
+      description: "Embark on a journey to learn new languages! Interactive lessons, vocabulary building, and grammar practice for languages around the world.",
+      keyAreas: ["Vocabulary Practice", "Grammar Drills", "Pronunciation Basics", "Cultural Insights"],
+      path: "/learn/language-lab",
+      gradient: "from-lime-500 to-green-500",
+      icon: "🌐"
     }
   ];
 

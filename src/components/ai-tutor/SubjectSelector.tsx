@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Calculator, BookOpen, Globe, Music, Code } from 'lucide-react';
+import { Brain, Calculator, BookOpen, Globe, Music, Code, Languages } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export interface SubjectSelectorProps {
@@ -70,6 +70,26 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: 'chemistry', name: 'Chemistry', description: 'Matter, atoms, and chemical reactions', route: '/learn/science' },
         { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws', route: '/learn/science' },
         { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment', route: '/learn/science' }
+      ]
+    },
+    {
+      id: 'mentalHealth',
+      name: 'Mental Wellness',
+      icon: Brain,
+      skillAreas: [
+        { id: 'understandingEmotions', name: 'Understanding Emotions', description: 'Learn to identify and understand your feelings and the feelings of others.', route: '/learn/mental-wellness' },
+        { id: 'copingStrategies', name: 'Coping Strategies', description: 'Discover healthy ways to manage stress, anxiety, and difficult emotions.', route: '/learn/mental-wellness' },
+        { id: 'mindfulnessBasics', name: 'Mindfulness Basics', description: 'Practice techniques to stay present and calm your mind.', route: '/learn/mental-wellness' },
+        { id: 'buildingResilience', name: 'Building Resilience', description: 'Develop skills to bounce back from challenges and adversity.', route: '/learn/mental-wellness' },
+        { id: 'empathyAndSupport', name: 'Empathy & Support', description: 'Learn how to support others and build strong, healthy relationships.', route: '/learn/mental-wellness' }
+      ]
+    },
+    {
+      id: 'languageLab',
+      name: 'Language Lab',
+      icon: Languages,
+      skillAreas: [
+        { id: 'exploreLanguages', name: 'Explore Languages', description: 'Choose a new language to learn or continue your progress.', route: '/learn/language-lab' }
       ]
     }
   ];

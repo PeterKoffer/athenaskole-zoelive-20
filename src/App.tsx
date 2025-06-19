@@ -31,6 +31,7 @@ import AnnouncementsPage from '@/pages/AnnouncementsPage';
 import EnhancedMathematicsLearning from '@/components/education/EnhancedMathematicsLearning';
 import LanguageLearning from '@/components/LanguageLearning';
 import UniversalLearning from '@/components/education/UniversalLearning';
+import MentalWellnessLearning from '@/components/education/MentalWellnessLearning';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,6 +73,8 @@ function AppRoutes() {
         <Route path="/learn/science" element={<UniversalLearning subject="science" skillArea="general_science" />} />
         <Route path="/learn/computer-science" element={<UniversalLearning subject="computer-science" skillArea="general_programming" />} />
         <Route path="/learn/creative-arts" element={<UniversalLearning subject="creative-arts" skillArea="general_arts" />} />
+        <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
+        <Route path="/learn/language-lab" element={<LanguageLearning />} />
         <Route path="/learn/spanish" element={<LanguageLearning initialLanguage="spanish" />} />
         <Route path="/learn/french" element={<LanguageLearning initialLanguage="french" />} />
         <Route path="/learn/german" element={<LanguageLearning initialLanguage="german" />} />

@@ -9,5 +9,54 @@
   "Curious Learner": "Nysgerrig lærende",
   "Tried all subjects": "Prøvede alle fag",
   "Achieved_on": "Opnået den {{date}}",
-  "days_in_a_row": "7 dage i træk"
+  "days_in_a_row": "7 dage i træk",
+  "subjects": {
+    "mentalWellness": {
+      "title": "[da] Mental Wellness",
+      "description": "[da] Learn about understanding your feelings, developing healthy coping strategies, and supporting others. Nurture your mind for a balanced life.",
+      "keyArea1": "[da] Understanding Emotions",
+      "keyArea2": "[da] Stress Management",
+      "keyArea3": "[da] Mindfulness Practices",
+      "keyArea4": "[da] Building Resilience",
+      "keyArea5": "[da] Healthy Relationships",
+      "skillAreaUnderstandingEmotionsName": "[da] Understanding Emotions",
+      "skillAreaUnderstandingEmotionsDescription": "[da] Learn to identify and understand your feelings and the feelings of others.",
+      "skillAreaCopingStrategiesName": "[da] Coping Strategies",
+      "skillAreaCopingStrategiesDescription": "[da] Discover healthy ways to manage stress, anxiety, and difficult emotions.",
+      "skillAreaMindfulnessBasicsName": "[da] Mindfulness Basics",
+      "skillAreaMindfulnessBasicsDescription": "[da] Practice techniques to stay present and calm your mind.",
+      "skillAreaBuildingResilienceName": "[da] Building Resilience",
+      "skillAreaBuildingResilienceDescription": "[da] Develop skills to bounce back from challenges and adversity.",
+      "skillAreaEmpathyAndSupportName": "[da] Empathy & Support",
+      "skillAreaEmpathyAndSupportDescription": "[da] Learn how to support others and build strong, healthy relationships."
+    },
+    "languageLab": {
+      "title": "[da] Language Lab",
+      "description": "[da] Embark on a journey to learn new languages! Interactive lessons, vocabulary building, and grammar practice for languages around the world.",
+      "keyArea1": "[da] Vocabulary Practice",
+      "keyArea2": "[da] Grammar Drills",
+      "keyArea3": "[da] Pronunciation Basics",
+      "keyArea4": "[da] Cultural Insights",
+      "skillAreaExploreName": "[da] Explore Languages",
+      "skillAreaExploreDescription": "[da] Choose a new language to learn or continue your progress."
+    }
+  },
+  "languageLabView": {
+    "mainTitle": "[da] Language Learning - Duolingo Style",
+    "selectLanguageTitle": "[da] Select a Language",
+    "lessonsInTitle": "[da] Lessons in {{languageName}}",
+    "backToDailyProgramButton": "[da] Back to Daily Program",
+    "checkAnswerButton": "[da] Check Answer",
+    "nextQuestionButton": "[da] Next Question",
+    "nextSectionButton": "[da] Next Section",
+    "finishLessonButton": "[da] Finish Lesson",
+    "heartsLabel": "[da] Hearts",
+    "streakLabel": "[da] Day Streak",
+    "xpLabel": "[da] XP",
+    "loadingLanguages": "[da] Loading languages...",
+    "loadingCurriculum": "[da] Loading curriculum for {{languageName}}...",
+    "loadingLesson": "[da] Loading lesson...",
+    "noLessonLoaded": "[da] No lesson loaded. Please select a lesson.",
+    "unsupportedSectionType": "[da] Unsupported section type: {{sectionType}}"
+  }
 }
