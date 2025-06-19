@@ -35,7 +35,43 @@ export interface EnhancedLessonConfig {
   keyTakeaways?: string[];
   selfAssessment?: any;
   nextTopicSuggestion?: string;
+  estimatedTotalDuration?: number;
+  assessmentMethods?: string[];
+  keywords?: string[];
 }
+
+export const ENHANCED_LESSON_PHASES = {
+  introduction: {
+    baseSeconds: 180, // 2-3 minutes
+    name: 'Introduction',
+    description: 'Engaging hook and real-world connections'
+  },
+  contentDelivery: {
+    baseSeconds: 390, // 5-7 minutes
+    name: 'Content Delivery',
+    description: 'Core concepts with comprehension checks'
+  },
+  interactiveGame: {
+    baseSeconds: 270, // 4-5 minutes
+    name: 'Interactive Game',
+    description: 'Fun activities to reinforce learning'
+  },
+  application: {
+    baseSeconds: 210, // 3-4 minutes
+    name: 'Application',
+    description: 'Real-world problem solving'
+  },
+  creativeExploration: {
+    baseSeconds: 150, // 2-3 minutes
+    name: 'Creative Exploration',
+    description: 'Open-ended thinking and creativity'
+  },
+  summary: {
+    baseSeconds: 90, // 1-2 minutes
+    name: 'Summary',
+    description: 'Key takeaways and next steps'
+  }
+};
 
 export const K12_CURRICULUM_STANDARDS = {
   0: {
