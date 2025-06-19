@@ -1,6 +1,18 @@
 
 import { LessonActivity } from '../types/LessonTypes';
 
+// Helper Function for Seeded PRNG (Pseudo-Random Number Generator)
+const seededRandom = (seedStr: string): (() => number) => {
+  let seed = 0;
+  for (let i = 0; i < seedStr.length; i++) {
+    seed = (seed * 31 + seedStr.charCodeAt(i)) & 0xFFFFFFFF; // A simple hashing function
+  }
+  return () => {
+    seed = (seed * 1664525 + 1013904223) & 0xFFFFFFFF;
+    return (seed >>> 0) / 0xFFFFFFFF; // Convert to float between 0 and 1
+  };
+};
+
 interface QuestionTopic {
   title: string;
   skillArea: string;
@@ -217,28 +229,29 @@ const questionSets: Record<string, QuestionTopic[]> = {
 
 // Subject-specific question generators
 const getSubjectQuestions = (subject: string, sessionId: string): QuestionTopic[] => {
-  const allQuestions = questionSets[subject] || questionSets.mathematics; // Fallback for safety
-  if (!allQuestions || allQuestions.length === 0) {
-    console.warn(`[useSubjectQuestionGenerator] No questions found for subject ${subject} or fallback.`);
+  const allQuestionsOriginal = questionSets[subject] || questionSets.mathematics;
+  if (!allQuestionsOriginal || allQuestionsOriginal.length === 0) {
+    console.warn(`[useSubjectQuestionGenerator] No questions for subject ${subject}, returning empty.`);
     return [];
   }
 
-  const numToSelect = Math.min(allQuestions.length, 3); // Select up to 3 questions
-  if (allQuestions.length <= numToSelect) return allQuestions; // Not enough to need selection
+  // Create a mutable copy for shuffling
+  const allQuestions = [...allQuestionsOriginal];
 
-  // Simple "hash" from sessionId for an offset - very basic
-  let offset = 0;
-  if (sessionId) {
-    for (let i = 0; i < sessionId.length; i++) {
-      offset = (offset + sessionId.charCodeAt(i)) % allQuestions.length;
-    }
+  const numToSelect = Math.min(allQuestions.length, 3); // Select up to 3 questions
+
+  if (allQuestions.length === 0) return []; // Should be caught by previous check, but good safeguard
+
+  // Shuffle even if returning a subset or all, so order changes per session if pool is small or numToSelect is high
+  const random = seededRandom(sessionId);
+  for (let i = allQuestions.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]]; // Swap
   }
   
-  const selectedQuestions: QuestionTopic[] = [];
-  for (let i = 0; i < numToSelect; i++) {
-    selectedQuestions.push(allQuestions[(offset + i) % allQuestions.length]);
-  }
-  console.log(`[useSubjectQuestionGenerator] For session ${sessionId}, selected ${selectedQuestions.length} questions for ${subject} with offset ${offset}`);
+  const selectedQuestions = allQuestions.slice(0, numToSelect);
+
+  console.log(`[useSubjectQuestionGenerator] For session ${sessionId}, selected ${selectedQuestions.length} questions for ${subject} using seeded shuffle (Pool size: ${allQuestionsOriginal.length}, Selected: ${selectedQuestions.length}).`);
   return selectedQuestions;
 };
 
