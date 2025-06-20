@@ -93,6 +93,7 @@ export const validateLessonStructure = (
 export const validateEnhancedLessonAsync = async (
   subject: string,
   skillArea: string,
+  gradeLevel: number = 6,
   config?: LessonValidationConfig
 ): Promise<LessonValidationResult> => {
   try {

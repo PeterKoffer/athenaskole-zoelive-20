@@ -1,3 +1,4 @@
+
 import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
 
 /**
@@ -199,10 +200,17 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
   return {
     subject: config.subject,
     skillArea: config.skillArea,
+    gradeLevel: config.gradeLevel,
     totalDuration: 1200, // 20 minutes
     phases: activities,
+    activities: activities, // Required property
+    estimatedDuration: 1200, // Required property
+    objectives: config.missionObjectives, // Required property
     learningObjectives: config.missionObjectives,
-    prerequisites: [],
+    difficulty: config.gradeLevel <= 3 ? 1 : config.gradeLevel <= 6 ? 2 : config.gradeLevel <= 9 ? 3 : 4, // Required property
+    prerequisites: [], // Required property
+    assessmentCriteria: ['Understanding of concepts', 'Application of knowledge'], // Required property
+    extensions: ['Practice exercises'], // Required property
     engagementLevel: 'MAXIMUM',
     funFactor: '🚀🎮🎨🏆'
   };
@@ -295,6 +303,7 @@ export function validateEngagingLesson(lesson: SubjectLessonPlan): {
 export interface StandardLessonConfig {
   subject: string;
   skillArea: string;
+  gradeLevel: number;
   learningObjectives: string[];
   prerequisites: string[];
   
@@ -473,10 +482,17 @@ export function createStandardLesson(config: StandardLessonConfig): SubjectLesso
   return {
     subject: config.subject,
     skillArea: config.skillArea,
+    gradeLevel: config.gradeLevel,
     totalDuration: activities.reduce((sum, activity) => sum + activity.duration, 0),
     phases: activities,
+    activities: activities, // Required property
+    estimatedDuration: activities.reduce((sum, activity) => sum + activity.duration, 0), // Required property
+    objectives: config.learningObjectives, // Required property
     learningObjectives: config.learningObjectives,
-    prerequisites: config.prerequisites
+    difficulty: config.gradeLevel <= 3 ? 1 : config.gradeLevel <= 6 ? 2 : config.gradeLevel <= 9 ? 3 : 4, // Required property
+    prerequisites: config.prerequisites,
+    assessmentCriteria: ['Understanding of concepts', 'Application of knowledge'], // Required property
+    extensions: ['Practice exercises'] // Required property
   };
 }
 

@@ -33,7 +33,28 @@ export const ENHANCED_LESSON_PHASES = {
   summary: { baseSeconds: 90 }
 };
 
-export function generateEnhancedLesson(subject: string, skillArea: string): Promise<EnhancedLessonConfig> {
+// Add missing exports for testing
+export const LEARNING_STYLE_ADAPTATIONS = {
+  visual: { preferredMediaTypes: ['images', 'charts', 'diagrams'], extraDuration: 60 },
+  auditory: { preferredMediaTypes: ['audio', 'speech', 'music'], extraDuration: 30 },
+  kinesthetic: { preferredMediaTypes: ['interactive', 'hands-on', 'movement'], extraDuration: 90 },
+  mixed: { preferredMediaTypes: ['all'], extraDuration: 45 }
+};
+
+export const K12_CURRICULUM_STANDARDS = {
+  mathematics: {
+    elementary: ['counting', 'addition', 'subtraction', 'basic-geometry'],
+    middle: ['algebra-basics', 'fractions', 'decimals', 'geometry'],
+    high: ['algebra', 'geometry', 'trigonometry', 'calculus']
+  },
+  science: {
+    elementary: ['earth-science', 'life-science', 'physical-science'],
+    middle: ['biology', 'chemistry', 'physics'],
+    high: ['advanced-biology', 'advanced-chemistry', 'advanced-physics']
+  }
+};
+
+export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
     const baseDuration = ENHANCED_LESSON_PHASES.introduction.baseSeconds;
     
@@ -41,7 +62,7 @@ export function generateEnhancedLesson(subject: string, skillArea: string): Prom
     const lessonConfig: EnhancedLessonConfig = {
       subject,
       skillArea,
-      gradeLevel: 6,
+      gradeLevel,
       learningStyle: 'mixed',
       sessionId: `session_${subject}_${Date.now()}`,
       title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} - ${skillArea}`,
@@ -80,10 +101,12 @@ export function validateEnhancedLesson(lesson: SubjectLessonPlan): {
   qualityScore: number;
   isValid: boolean;
   errors: string[];
+  warnings: string[];
 } {
   return {
     qualityScore: 85,
     isValid: true,
-    errors: []
+    errors: [],
+    warnings: []
   };
 }

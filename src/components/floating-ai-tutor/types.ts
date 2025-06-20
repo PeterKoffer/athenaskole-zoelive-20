@@ -1,14 +1,11 @@
 
-export interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  showOptions?: boolean;
+export interface Position {
+  x: number;
+  y: number;
 }
 
-export interface FloatingTutorState {
-  isOpen: boolean;
-  messages: Message[];
+export interface DragState {
   isDragging: boolean;
-  position: { x: number; y: number };
+  startPosition: Position;
+  currentPosition: Position;
 }
