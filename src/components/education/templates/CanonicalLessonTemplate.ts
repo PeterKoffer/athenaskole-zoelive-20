@@ -33,13 +33,11 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
       phaseDescription: 'Engaging introduction to capture interest',
       metadata: {
         subject,
-        skillArea,
-        gradeLevel
+        skillArea
       },
       content: {
         hook: `Ready to explore the amazing world of ${subject}?`,
-        objectives: learningObjectives,
-        preview: `Today we'll master ${skillArea} concepts!`
+        text: `Today we'll master ${skillArea} concepts!`
       }
     },
 
@@ -53,15 +51,13 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
       phaseDescription: 'Core concept explanation and demonstration',
       metadata: {
         subject,
-        skillArea,
-        gradeLevel
+        skillArea
       },
       content: {
         segments: [{
           title: `${skillArea} Fundamentals`,
           concept: skillArea,
           explanation: `Let's explore the key concepts of ${skillArea} step by step.`,
-          examples: [`Example 1 for ${skillArea}`, `Example 2 for ${skillArea}`],
           checkQuestion: {
             question: `What is the main concept of ${skillArea}?`,
             options: ['Concept A', 'Concept B', 'Concept C', 'All of the above'],
@@ -82,8 +78,7 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
       phaseDescription: 'Interactive practice and reinforcement',
       metadata: {
         subject,
-        skillArea,
-        gradeLevel
+        skillArea
       },
       content: {
         question: `Ready to test your ${skillArea} skills?`,
@@ -103,13 +98,12 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
       phaseDescription: 'Real-world application of learned concepts',
       metadata: {
         subject,
-        skillArea,
-        gradeLevel
+        skillArea
       },
       content: {
         scenario: `Imagine you need to use ${skillArea} in a real situation...`,
         task: `Apply what you've learned about ${skillArea} to solve this problem.`,
-        guidance: 'Take your time and think through each step.'
+        text: 'Take your time and think through each step.'
       }
     }
   ];
@@ -124,8 +118,7 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
     phaseDescription: 'Lesson wrap-up and achievement celebration',
     metadata: {
       subject,
-      skillArea,
-      gradeLevel
+      skillArea
     },
     content: {
       keyTakeaways: [
@@ -133,17 +126,14 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
         `You can apply ${skillArea} in real situations`,
         `You're ready for more advanced topics!`
       ],
-      achievements: learningObjectives.map(obj => `✓ ${obj}`),
-      nextSteps: `Continue exploring ${subject} with more advanced ${skillArea} topics!`,
-      celebrationMessage: `Amazing work! You've successfully completed your ${subject} lesson!`,
-      achievementsList: learningObjectives
+      achievementsList: learningObjectives.map(obj => `✓ ${obj}`),
+      text: `Amazing work! You've successfully completed your ${subject} lesson!`
     }
   };
 
   activities.push(summaryActivity);
 
   return {
-    title: `${subject}: ${skillArea} Mastery`,
     subject,
     skillArea,
     gradeLevel,

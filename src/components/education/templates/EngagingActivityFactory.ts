@@ -43,21 +43,14 @@ const createGameActivity = (
     phaseDescription: `Interactive ${skillArea} game experience`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      activityType: 'game'
+      skillArea
     },
     content: {
       question: `Ready to play the ${skillArea} adventure game?`,
       options: ['Start Adventure!', 'Learn Rules First', 'Choose Difficulty', 'Practice Mode'],
       correctAnswer: 0,
       explanation: 'Great choice! Let\'s begin your adventure!',
-      gameElements: {
-        theme: `${skillArea} Adventure`,
-        points: 0,
-        level: 1,
-        challenges: [`Master ${skillArea} basics`, `Apply ${skillArea} skills`, `Solve complex problems`]
-      }
+      text: `${skillArea} Adventure - Master basics, apply skills, solve complex problems`
     }
   };
 };
@@ -78,24 +71,14 @@ const createChallengeActivity = (
     phaseDescription: `Challenging ${skillArea} problem-solving activity`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      activityType: 'challenge'
+      skillArea
     },
     content: {
       question: `Are you ready for the ultimate ${skillArea} challenge?`,
       options: ['Bring it on!', 'I need hints', 'Start easy', 'Show examples'],
       correctAnswer: 0,
       explanation: 'Excellent! Your confidence will help you succeed!',
-      challengeElements: {
-        difficulty: gradeLevel <= 3 ? 'Easy' : gradeLevel <= 6 ? 'Medium' : 'Hard',
-        timeLimit: duration,
-        hints: [
-          `Think about ${skillArea} fundamentals`,
-          `Break the problem into smaller parts`,
-          `Remember what you learned earlier`
-        ]
-      }
+      text: `Challenge difficulty: ${gradeLevel <= 3 ? 'Easy' : gradeLevel <= 6 ? 'Medium' : 'Hard'}`
     }
   };
 };
@@ -116,19 +99,12 @@ const createExplorationActivity = (
     phaseDescription: `Creative exploration of ${skillArea} concepts`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      activityType: 'exploration'
+      skillArea
     },
     content: {
       creativePrompt: `Let's explore the fascinating world of ${skillArea}! What discoveries can you make?`,
-      explorationTask: `Investigate how ${skillArea} works in different situations`,
-      whatIfScenario: `What if ${skillArea} worked differently? How would that change things?`,
-      explorationElements: {
-        discoveryPoints: ['Observation', 'Experimentation', 'Analysis', 'Conclusion'],
-        tools: ['Virtual tools', 'Interactive models', 'Guided questions'],
-        outcomes: [`Understand ${skillArea} better`, `See real-world applications`, `Make connections`]
-      }
+      text: `Investigate how ${skillArea} works in different situations`,
+      whatIfScenario: `What if ${skillArea} worked differently? How would that change things?`
     }
   };
 };
@@ -149,19 +125,12 @@ const createSimulationActivity = (
     phaseDescription: `Realistic simulation of ${skillArea} applications`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      activityType: 'simulation'
+      skillArea
     },
     content: {
       scenario: `You're in a realistic situation where you need to use ${skillArea}`,
       task: `Apply your ${skillArea} knowledge to solve real-world problems`,
-      simulationElements: {
-        environment: `Realistic ${skillArea} setting`,
-        tools: ['Professional tools', 'Real data', 'Authentic challenges'],
-        objectives: [`Complete the simulation`, `Apply knowledge correctly`, `Learn from experience`],
-        feedback: 'Real-time feedback on your decisions'
-      }
+      text: `Realistic ${skillArea} setting with professional tools and real data`
     }
   };
 };
@@ -188,18 +157,13 @@ export const createEngagingQuiz = (
     phaseDescription: `Interactive quiz on ${skillArea} concepts`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      questionCount: questions.length
+      skillArea
     },
     content: {
-      questions,
-      quizSettings: {
-        showProgress: true,
-        allowRetry: true,
-        showExplanations: true,
-        randomizeQuestions: false
-      }
+      question: questions[0]?.question || `Test your ${skillArea} knowledge`,
+      options: questions[0]?.options || ['Option A', 'Option B', 'Option C', 'Option D'],
+      correctAnswer: questions[0]?.correctAnswer || 0,
+      explanation: questions[0]?.explanation || 'Great job!'
     }
   };
 };
@@ -222,18 +186,12 @@ export const createStoryBasedActivity = (
     phaseDescription: `Story-based learning adventure for ${skillArea}`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      activityType: 'story'
+      skillArea
     },
     content: {
-      story,
-      storyElements: {
-        setting: `A world where ${skillArea} is essential`,
-        characters: ['You (the hero)', 'Wise guide', 'Helpful friends'],
-        plot: `Use ${skillArea} to overcome challenges and succeed`,
-        challenges
-      }
+      text: story,
+      scenario: `A world where ${skillArea} is essential`,
+      question: `Use ${skillArea} to overcome challenges and succeed`
     }
   };
 };
