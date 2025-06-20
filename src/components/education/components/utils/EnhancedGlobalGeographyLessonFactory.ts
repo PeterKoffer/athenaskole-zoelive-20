@@ -1,38 +1,52 @@
 
-import { EnhancedLessonConfig, ENHANCED_LESSON_PHASES } from './EnhancedLessonGenerator';
+import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
 
 export const generateGlobalGeographyLesson = (
   gradeLevel: number,
-  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed',
-  sessionId: string = ''
-): EnhancedLessonConfig => {
+  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic',
+  sessionId: string
+): { lesson: EnhancedLessonConfig } => {
   const phases: LessonActivity[] = [
     {
-      id: 'geography-intro',
+      id: `${sessionId}_intro`,
       type: 'introduction',
       phase: 'introduction',
-      title: 'Welcome to Global Geography',
-      duration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
-      phaseDescription: 'Introduction to global geography',
-      metadata: { subject: 'globalGeography', skillArea: 'general' },
-      content: { text: 'Welcome to an exciting global geography lesson!' }
+      title: 'Welcome to Geography',
+      duration: 300,
+      phaseDescription: 'Introduction to world geography',
+      metadata: {
+        subject: 'globalGeography',
+        skillArea: 'geography',
+        gradeLevel
+      },
+      content: {
+        text: 'Welcome to your geography lesson!'
+      }
     }
   ];
 
-  return {
+  const lesson: EnhancedLessonConfig = {
     subject: 'globalGeography',
-    skillArea: 'general',
+    skillArea: 'geography',
     gradeLevel,
     learningStyle,
     sessionId,
-    title: `Global Geography Lesson (Grade ${gradeLevel})`,
-    overview: 'Engaging global geography lesson',
+    title: 'Global Geography Explorer',
+    overview: 'Interactive geography lesson',
     phases,
-    estimatedTotalDuration: phases.reduce((sum, phase) => sum + phase.duration, 0),
-    learningObjectives: ['Understand basic global geography concepts'],
-    materials: ['Device with internet access'],
+    estimatedTotalDuration: 1200,
+    learningObjectives: ['Learn about world geography'],
+    materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
-    keywords: ['Global Geography', 'Learning']
+    keywords: ['geography', 'world'],
+    estimatedDuration: 1200,
+    objectives: ['Learn about world geography'],
+    difficulty: 2,
+    prerequisites: [],
+    assessmentCriteria: ['Understanding of concepts'],
+    extensions: ['Practice exercises']
   };
+
+  return { lesson };
 };

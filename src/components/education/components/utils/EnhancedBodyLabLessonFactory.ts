@@ -1,38 +1,52 @@
 
-import { EnhancedLessonConfig, ENHANCED_LESSON_PHASES } from './EnhancedLessonGenerator';
+import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
 
 export const generateBodyLabLesson = (
   gradeLevel: number,
-  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed',
-  sessionId: string = ''
-): EnhancedLessonConfig => {
+  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic',
+  sessionId: string
+): { lesson: EnhancedLessonConfig } => {
   const phases: LessonActivity[] = [
     {
-      id: 'body-lab-intro',
+      id: `${sessionId}_intro`,
       type: 'introduction',
       phase: 'introduction',
-      title: 'Welcome to Body Lab',
-      duration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
-      phaseDescription: 'Introduction to body lab concepts',
-      metadata: { subject: 'bodyLab', skillArea: 'general' },
-      content: { text: 'Welcome to an exciting body lab lesson!' }
+      title: 'Welcome to BodyLab',
+      duration: 300,
+      phaseDescription: 'Introduction to healthy living',
+      metadata: {
+        subject: 'bodyLab',
+        skillArea: 'health',
+        gradeLevel
+      },
+      content: {
+        text: 'Welcome to your healthy living lesson!'
+      }
     }
   ];
 
-  return {
+  const lesson: EnhancedLessonConfig = {
     subject: 'bodyLab',
-    skillArea: 'general',
+    skillArea: 'health',
     gradeLevel,
     learningStyle,
     sessionId,
-    title: `Body Lab Lesson (Grade ${gradeLevel})`,
-    overview: 'Engaging body lab lesson',
+    title: 'BodyLab: Healthy Living',
+    overview: 'Interactive health and wellness lesson',
     phases,
-    estimatedTotalDuration: phases.reduce((sum, phase) => sum + phase.duration, 0),
-    learningObjectives: ['Understand basic body lab concepts'],
-    materials: ['Device with internet access'],
+    estimatedTotalDuration: 1200,
+    learningObjectives: ['Learn about healthy living'],
+    materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
-    keywords: ['Body Lab', 'Learning']
+    keywords: ['health', 'wellness'],
+    estimatedDuration: 1200,
+    objectives: ['Learn about healthy living'],
+    difficulty: 2,
+    prerequisites: [],
+    assessmentCriteria: ['Understanding of concepts'],
+    extensions: ['Practice exercises']
   };
+
+  return { lesson };
 };

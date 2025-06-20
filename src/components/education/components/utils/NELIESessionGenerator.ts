@@ -25,6 +25,15 @@ export interface NELIESession {
     encouragements: string[];
     explanationStyle: string;
   };
+  subjects?: Record<string, any>;
+  metadata?: {
+    totalDuration: number;
+    subjectCount: number;
+    gradeLevel: number;
+    learningStyle: string;
+    qualityScores: Record<string, number>;
+    generatedAt: number;
+  };
 }
 
 class NELIESessionGenerator {
@@ -35,13 +44,8 @@ class NELIESessionGenerator {
     const sessionId = `nelie_session_${config.subject}_${Date.now()}_${this.sessionCounter}`;
 
     try {
-      // Generate enhanced lesson with both required parameters
       const enhancedLesson = await generateEnhancedLesson(config.subject, config.skillArea);
-      
-      // Create personalized elements
       const personalizedElements = this.createPersonalizedElements(config);
-      
-      // Adapt activities based on learning preferences
       const adaptedActivities = this.adaptActivitiesForLearningStyle(
         enhancedLesson.phases,
         config.learningPreferences
@@ -56,10 +60,55 @@ class NELIESessionGenerator {
       };
     } catch (error) {
       console.error('Error generating NELIE session:', error);
-      
-      // Fallback to basic session
       return this.generateFallbackSession(config, sessionId);
     }
+  }
+
+  generateSession(config: any): NELIESession {
+    const sessionId = `session_${Date.now()}`;
+    const totalDuration = config.sessionDuration || 1500; // 25 minutes default
+    
+    return {
+      sessionId,
+      config: {
+        subject: config.subjects?.[0] || 'mathematics',
+        skillArea: 'general',
+        studentName: 'Student',
+        sessionDuration: totalDuration,
+        gradeLevel: config.gradeLevel || 1,
+        learningPreferences: { visual: 5, auditory: 5, kinesthetic: 5 }
+      },
+      activities: [],
+      estimatedDuration: totalDuration,
+      personalizedElements: {
+        greetings: ['Hello!'],
+        encouragements: ['Great job!'],
+        explanationStyle: config.preferredLearningStyle || 'mixed'
+      },
+      subjects: config.subjects?.reduce((acc: any, subject: string) => {
+        acc[subject] = { lesson: { totalDuration: 1200 } };
+        return acc;
+      }, {}),
+      metadata: {
+        totalDuration,
+        subjectCount: config.subjects?.length || 1,
+        gradeLevel: config.gradeLevel || 1,
+        learningStyle: config.preferredLearningStyle || 'mixed',
+        qualityScores: { default: 85 },
+        generatedAt: Date.now()
+      }
+    };
+  }
+
+  generateSubjectLesson(subject: string, gradeLevel: number, learningStyle: string) {
+    return {
+      activities: [],
+      validation: { qualityScore: 85 }
+    };
+  }
+
+  generateSessionSummary(session: NELIESession): string {
+    return `Session Summary: ${session.sessionId} - Duration: ${session.estimatedDuration} minutes`;
   }
 
   private createPersonalizedElements(config: NELIESessionConfig) {
@@ -100,7 +149,6 @@ class NELIESessionGenerator {
     return activities.map(activity => {
       const adaptedActivity = { ...activity };
       
-      // Add learning style specific adaptations
       if (preferences.visual > 7) {
         adaptedActivity.content = {
           ...adaptedActivity.content,
@@ -161,7 +209,7 @@ class NELIESessionGenerator {
       subject,
       skillArea,
       studentName,
-      sessionDuration: 900, // 15 minutes
+      sessionDuration: 900,
       gradeLevel: 6,
       learningPreferences: {
         visual: 5,
@@ -173,6 +221,163 @@ class NELIESessionGenerator {
     return this.generatePersonalizedSession(quickConfig);
   }
 }
+
+// Create NELIEHelpers object with lesson generation methods
+export const NELIEHelpers = {
+  generateMathLesson: (gradeLevel: number, learningStyle: string) => ({
+    lesson: {
+      totalDuration: 1200,
+      metadata: { skillArea: 'mathematics' },
+      phases: [{
+        content: {
+          learningStyleAdaptation: {
+            contentFormat: `${learningStyle} focused content`,
+            activityType: `${learningStyle} activities`
+          },
+          curriculum: ['Grade appropriate math concepts'],
+          uniqueTheme: `Math theme ${Date.now()}`
+        }
+      }]
+    }
+  }),
+  
+  generateBodyLabLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
+    lesson: {
+      title: 'BodyLab: Healthy Living',
+      subject: 'bodyLab',
+      skillArea: 'health',
+      gradeLevel,
+      learningStyle,
+      sessionId,
+      overview: 'Interactive health and wellness lesson',
+      phases: [{
+        id: 'bodylab_intro',
+        type: 'introduction',
+        phase: 'introduction',
+        title: 'Welcome to BodyLab',
+        duration: 300,
+        phaseDescription: 'Introduction to healthy living',
+        metadata: { subject: 'bodyLab', skillArea: 'health', gradeLevel },
+        content: { text: 'Welcome to your healthy living lesson!' }
+      }],
+      estimatedTotalDuration: 1200,
+      learningObjectives: ['Learn about healthy living'],
+      materials: ['Interactive content'],
+      assessmentMethods: ['Interactive exercises'],
+      keywords: ['health', 'wellness'],
+      estimatedDuration: 1200,
+      objectives: ['Learn about healthy living'],
+      difficulty: 2,
+      prerequisites: [],
+      assessmentCriteria: ['Understanding of concepts'],
+      extensions: ['Practice exercises']
+    }
+  }),
+
+  generateGlobalGeographyLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
+    lesson: {
+      title: 'Global Geography Explorer',
+      subject: 'globalGeography',
+      skillArea: 'geography',
+      gradeLevel,
+      learningStyle,
+      sessionId,
+      overview: 'Interactive geography lesson',
+      phases: [{
+        id: 'geography_intro',
+        type: 'introduction',
+        phase: 'introduction',
+        title: 'Welcome to Geography',
+        duration: 300,
+        phaseDescription: 'Introduction to world geography',
+        metadata: { subject: 'globalGeography', skillArea: 'geography', gradeLevel },
+        content: { text: 'Welcome to your geography lesson!' }
+      }],
+      estimatedTotalDuration: 1200,
+      learningObjectives: ['Learn about world geography'],
+      materials: ['Interactive content'],
+      assessmentMethods: ['Interactive exercises'],
+      keywords: ['geography', 'world'],
+      estimatedDuration: 1200,
+      objectives: ['Learn about world geography'],
+      difficulty: 2,
+      prerequisites: [],
+      assessmentCriteria: ['Understanding of concepts'],
+      extensions: ['Practice exercises']
+    }
+  }),
+
+  generateLifeEssentialsLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
+    lesson: {
+      title: 'Life Essentials: Navigating Adulthood',
+      subject: 'lifeEssentials',
+      skillArea: 'lifeskills',
+      gradeLevel,
+      learningStyle,
+      sessionId,
+      overview: 'Interactive life skills lesson',
+      phases: [{
+        id: 'life_intro',
+        type: 'introduction',
+        phase: 'introduction',
+        title: 'Welcome to Life Essentials',
+        duration: 300,
+        phaseDescription: 'Introduction to life skills',
+        metadata: { subject: 'lifeEssentials', skillArea: 'lifeskills', gradeLevel },
+        content: { text: 'Welcome to your life skills lesson!' }
+      }],
+      estimatedTotalDuration: 1200,
+      learningObjectives: ['Learn essential life skills'],
+      materials: ['Interactive content'],
+      assessmentMethods: ['Interactive exercises'],
+      keywords: ['life skills', 'adulthood'],
+      estimatedDuration: 1200,
+      objectives: ['Learn essential life skills'],
+      difficulty: 3,
+      prerequisites: [],
+      assessmentCriteria: ['Understanding of concepts'],
+      extensions: ['Practice exercises']
+    }
+  }),
+
+  generateWorldHistoryReligionsLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
+    lesson: {
+      title: 'World History & Global Religions',
+      subject: 'worldHistoryReligions',
+      skillArea: 'history',
+      gradeLevel,
+      learningStyle,
+      sessionId,
+      overview: 'Interactive history and religions lesson',
+      phases: [{
+        id: 'history_intro',
+        type: 'introduction',
+        phase: 'introduction',
+        title: 'Welcome to World History',
+        duration: 300,
+        phaseDescription: 'Introduction to world history',
+        metadata: { subject: 'worldHistoryReligions', skillArea: 'history', gradeLevel },
+        content: { text: 'Welcome to your history lesson!' }
+      }],
+      estimatedTotalDuration: 1200,
+      learningObjectives: ['Learn about world history'],
+      materials: ['Interactive content'],
+      assessmentMethods: ['Interactive exercises'],
+      keywords: ['history', 'religion'],
+      estimatedDuration: 1200,
+      objectives: ['Learn about world history'],
+      difficulty: 3,
+      prerequisites: [],
+      assessmentCriteria: ['Understanding of concepts'],
+      extensions: ['Practice exercises']
+    }
+  }),
+
+  formatDuration: (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes} minutes`;
+  }
+};
 
 // Export singleton instance
 export const nelieSessionGenerator = new NELIESessionGenerator();

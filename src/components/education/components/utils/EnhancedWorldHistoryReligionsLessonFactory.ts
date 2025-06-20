@@ -1,38 +1,52 @@
 
-import { EnhancedLessonConfig, ENHANCED_LESSON_PHASES } from './EnhancedLessonGenerator';
+import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
 
 export const generateWorldHistoryReligionsLesson = (
   gradeLevel: number,
-  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed',
-  sessionId: string = ''
-): EnhancedLessonConfig => {
+  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic',
+  sessionId: string
+): { lesson: EnhancedLessonConfig } => {
   const phases: LessonActivity[] = [
     {
-      id: 'world-history-intro',
+      id: `${sessionId}_intro`,
       type: 'introduction',
       phase: 'introduction',
-      title: 'Welcome to World History & Religions',
-      duration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
-      phaseDescription: 'Introduction to world history and religions',
-      metadata: { subject: 'worldHistoryReligions', skillArea: 'general' },
-      content: { text: 'Welcome to an exciting world history and religions lesson!' }
+      title: 'Welcome to World History',
+      duration: 300,
+      phaseDescription: 'Introduction to world history',
+      metadata: {
+        subject: 'worldHistoryReligions',
+        skillArea: 'history',
+        gradeLevel
+      },
+      content: {
+        text: 'Welcome to your history lesson!'
+      }
     }
   ];
 
-  return {
+  const lesson: EnhancedLessonConfig = {
     subject: 'worldHistoryReligions',
-    skillArea: 'general',
+    skillArea: 'history',
     gradeLevel,
     learningStyle,
     sessionId,
-    title: `World History & Religions Lesson (Grade ${gradeLevel})`,
-    overview: 'Engaging world history and religions lesson',
+    title: 'World History & Global Religions',
+    overview: 'Interactive history and religions lesson',
     phases,
-    estimatedTotalDuration: phases.reduce((sum, phase) => sum + phase.duration, 0),
-    learningObjectives: ['Understand basic world history and religious concepts'],
-    materials: ['Device with internet access'],
+    estimatedTotalDuration: 1200,
+    learningObjectives: ['Learn about world history'],
+    materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
-    keywords: ['World History', 'Religions', 'Learning']
+    keywords: ['history', 'religion'],
+    estimatedDuration: 1200,
+    objectives: ['Learn about world history'],
+    difficulty: 3,
+    prerequisites: [],
+    assessmentCriteria: ['Understanding of concepts'],
+    extensions: ['Practice exercises']
   };
+
+  return { lesson };
 };

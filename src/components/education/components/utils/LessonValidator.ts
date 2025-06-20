@@ -33,47 +33,39 @@ export const validateLessonStructure = (
   const suggestions: string[] = [];
   let qualityScore = 100;
 
-  // Validate basic structure
-  if (!lesson.title) {
-    errors.push('Lesson must have a title');
+  // Validate basic structure - using correct property names
+  if (!lesson.subject) {
+    errors.push('Lesson must have a subject');
     qualityScore -= 10;
   }
 
-  if (!lesson.activities || lesson.activities.length === 0) {
-    errors.push('Lesson must have activities');
-    qualityScore -= 20;
+  if (!lesson.skillArea) {
+    errors.push('Lesson must have a skill area');
+    qualityScore -= 10;
   }
 
   // Validate duration if requested
-  if (checkDuration && lesson.activities) {
-    const totalDuration = lesson.activities.reduce((sum, activity) => sum + activity.duration, 0);
-    if (totalDuration < 600) { // Less than 10 minutes
+  if (checkDuration && lesson.estimatedDuration) {
+    if (lesson.estimatedDuration < 600) { // Less than 10 minutes
       warnings.push('Lesson might be too short for effective learning');
       qualityScore -= 5;
     }
-    if (totalDuration > 2400) { // More than 40 minutes
+    if (lesson.estimatedDuration > 2400) { // More than 40 minutes
       warnings.push('Lesson might be too long, consider breaking it up');
       qualityScore -= 5;
     }
   }
 
   // Validate content quality if requested
-  if (checkContent && lesson.activities) {
-    const hasIntroduction = lesson.activities.some(a => a.phase === 'introduction');
-    const hasSummary = lesson.activities.some(a => a.phase === 'summary');
-    const hasInteractive = lesson.activities.some(a => a.phase === 'interactive-game');
+  if (checkContent && lesson.objectives) {
+    if (lesson.objectives.length === 0) {
+      suggestions.push('Consider adding learning objectives');
+      qualityScore -= 5;
+    }
 
-    if (!hasIntroduction) {
-      suggestions.push('Consider adding an introduction activity');
+    if (lesson.difficulty && (lesson.difficulty < 1 || lesson.difficulty > 5)) {
+      warnings.push('Difficulty should be between 1 and 5');
       qualityScore -= 5;
-    }
-    if (!hasSummary) {
-      suggestions.push('Consider adding a summary activity');
-      qualityScore -= 5;
-    }
-    if (!hasInteractive) {
-      suggestions.push('Consider adding interactive elements');
-      qualityScore -= 10;
     }
   }
 
@@ -96,13 +88,11 @@ export const validateEnhancedLessonAsync = async (
     
     // Convert to SubjectLessonPlan format for validation
     const lessonPlan: SubjectLessonPlan = {
-      title: enhancedLesson.title,
       subject: enhancedLesson.subject,
       skillArea: enhancedLesson.skillArea,
       gradeLevel: enhancedLesson.gradeLevel,
       estimatedDuration: enhancedLesson.estimatedDuration,
       objectives: enhancedLesson.objectives,
-      activities: enhancedLesson.phases,
       difficulty: enhancedLesson.difficulty,
       prerequisites: enhancedLesson.prerequisites,
       assessmentCriteria: enhancedLesson.assessmentCriteria,

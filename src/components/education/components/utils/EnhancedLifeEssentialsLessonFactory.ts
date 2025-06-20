@@ -1,38 +1,52 @@
 
-import { EnhancedLessonConfig, ENHANCED_LESSON_PHASES } from './EnhancedLessonGenerator';
+import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
 
 export const generateLifeEssentialsLesson = (
   gradeLevel: number,
-  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed',
-  sessionId: string = ''
-): EnhancedLessonConfig => {
+  learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic',
+  sessionId: string
+): { lesson: EnhancedLessonConfig } => {
   const phases: LessonActivity[] = [
     {
-      id: 'life-essentials-intro',
+      id: `${sessionId}_intro`,
       type: 'introduction',
       phase: 'introduction',
       title: 'Welcome to Life Essentials',
-      duration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
-      phaseDescription: 'Introduction to life essentials concepts',
-      metadata: { subject: 'lifeEssentials', skillArea: 'general' },
-      content: { text: 'Welcome to an exciting life essentials lesson!' }
+      duration: 300,
+      phaseDescription: 'Introduction to life skills',
+      metadata: {
+        subject: 'lifeEssentials',
+        skillArea: 'lifeskills',
+        gradeLevel
+      },
+      content: {
+        text: 'Welcome to your life skills lesson!'
+      }
     }
   ];
 
-  return {
+  const lesson: EnhancedLessonConfig = {
     subject: 'lifeEssentials',
-    skillArea: 'general',
+    skillArea: 'lifeskills',
     gradeLevel,
     learningStyle,
     sessionId,
-    title: `Life Essentials Lesson (Grade ${gradeLevel})`,
-    overview: 'Engaging life essentials lesson',
+    title: 'Life Essentials: Navigating Adulthood',
+    overview: 'Interactive life skills lesson',
     phases,
-    estimatedTotalDuration: phases.reduce((sum, phase) => sum + phase.duration, 0),
-    learningObjectives: ['Understand basic life essentials concepts'],
-    materials: ['Device with internet access'],
+    estimatedTotalDuration: 1200,
+    learningObjectives: ['Learn essential life skills'],
+    materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
-    keywords: ['Life Essentials', 'Learning']
+    keywords: ['life skills', 'adulthood'],
+    estimatedDuration: 1200,
+    objectives: ['Learn essential life skills'],
+    difficulty: 3,
+    prerequisites: [],
+    assessmentCriteria: ['Understanding of concepts'],
+    extensions: ['Practice exercises']
   };
+
+  return { lesson };
 };
