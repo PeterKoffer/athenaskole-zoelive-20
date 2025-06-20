@@ -9,7 +9,7 @@ import LoadingStates from './LoadingStates';
 import SessionHeader from './SessionHeader';
 import QuestionDisplay from './QuestionDisplay';
 import ImprovedSessionManager from './ImprovedSessionManager';
-import GameEngine from '@/components/games/engine/GameEngine'; // Import GameEngine
+import GameEngine from '@/components/games/engine/GameEngine';
 
 interface ImprovedLearningSessionProps {
   subject: string;
@@ -78,7 +78,7 @@ const ImprovedLearningSession = ({
     >
       {(sessionData) => {
         const {
-          currentActivity, // Changed from currentQuestion
+          currentActivity,
           selectedAnswer,
           showResult,
           questionNumber,
@@ -87,10 +87,8 @@ const ImprovedLearningSession = ({
           isGenerating,
           gradeLevel,
           loadNextQuestion,
-          handleAnswerSelect
-        } = sessionData;
-
-          handleGameComplete, // New handler from sessionData
+          handleAnswerSelect,
+          handleGameComplete
         } = sessionData;
 
         // Generate first activity after explanation phase
@@ -132,8 +130,8 @@ const ImprovedLearningSession = ({
             <GameEngine
               game={currentActivity.gameData}
               onComplete={(score) => {
-                console.log("GameEngine onComplete score:", score); // For debugging
-                handleGameComplete(score); // Use the new handler
+                console.log("GameEngine onComplete score:", score);
+                handleGameComplete(score);
               }}
               onBack={onBack}
             />
@@ -170,7 +168,7 @@ const ImprovedLearningSession = ({
                   questionNumber={questionNumber}
                   totalQuestions={totalQuestions}
                   onAnswerSelect={handleAnswerSelect}
-                  subject={subject} // Pass subject to QuestionDisplay
+                  subject={subject}
                 />
               </CardContent>
             </Card>
