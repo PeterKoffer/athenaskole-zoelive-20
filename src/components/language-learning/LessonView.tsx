@@ -1,17 +1,17 @@
-
 import { useState, useEffect, useMemo } from "react";
-import ProgressHeader from "./ProgressHeader"; // Assuming this will be adapted or is generic enough
-import QuestionCard from "./QuestionCard";   // Assuming this will be adapted or is generic enough
-import ResultCard from "./ResultCard";     // Assuming this will be adapted or is generic enough
+import { Card } from "@/components/ui/card";
+import ProgressHeader from "./ProgressHeader";
+import QuestionCard from "./QuestionCard";   
+import ResultCard from "./ResultCard";     
 import { LanguageLabLesson, ExerciseQuestion, VocabularyItem, LessonSection } from "./types";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Button } from "@/components/ui/button"; // For "Next Section" etc.
+import { Button } from "@/components/ui/button";
 import { Volume2, BookOpenText } from "lucide-react";
 
 interface LessonViewProps {
   currentLesson: LanguageLabLesson | null;
   isLoadingLesson: boolean;
-  currentLanguageCode: string; // e.g., "en", "es"
+  currentLanguageCode: string;
   hearts: number;
   xp: number;
   onBack: () => void;
@@ -33,11 +33,10 @@ const LessonView = ({
 }: LessonViewProps) => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | number | undefined>(undefined); // Can be string or number
+  const [selectedAnswer, setSelectedAnswer] = useState<string | number | undefined>(undefined);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  // Memoize questions from the current exercise section
   const exerciseQuestions = useMemo(() => {
     if (!currentLesson || !currentLesson.sections) return [];
     const exerciseSection = currentLesson.sections.find(sec => sec.type === 'exercises');
@@ -48,11 +47,6 @@ const LessonView = ({
   const currentQuestionData = currentSection?.type === 'exercises' ? exerciseQuestions[currentQuestionIndex] : undefined;
 
   useEffect(() => {
-    // Reset states when lesson changes
-    // TODO: Enhance audio playback:
-    // - Implement robust playback for pre-recorded audio files specified in lesson data (item.audio, question.audioPrompt).
-    // - Fallback to TTS only if dedicated audio is missing.
-    // - Consider an audio player component with controls.
     setCurrentSectionIndex(0);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(undefined);
@@ -63,19 +57,16 @@ const LessonView = ({
   const playAudio = (text: string, langCode: string = currentLanguageCode) => {
     if ('speechSynthesis' in window && text) {
       const utterance = new SpeechSynthesisUtterance(text);
-      // Basic language mapping, can be expanded
       const langMap: { [key: string]: string } = {
         en: 'en-US', es: 'es-ES', fr: 'fr-FR', de: 'de-DE',
         it: 'it-IT', zh: 'zh-CN', da: 'da-DK', pt: 'pt-PT'
       };
       utterance.lang = langMap[langCode] || 'en-US';
       utterance.rate = 0.9;
-      speechSynthesis.cancel(); // Cancel any ongoing speech
+      speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
-    } else if (text) { // Fallback for audio file path (conceptual)
+    } else if (text) {
       console.log(`Playing audio file: ${text}`);
-      // const audio = new Audio(text); // This would require files to be served correctly
-      // audio.play().catch(e => console.error("Error playing audio file:", e));
     }
   };
 
@@ -90,18 +81,15 @@ const LessonView = ({
     if (currentQuestionData.type === "multipleChoice" && typeof currentQuestionData.correctOptionIndex === 'number') {
       correct = selectedAnswer === currentQuestionData.correctOptionIndex;
     } else if (currentQuestionData.type === "translate" && currentQuestionData.targetLanguageText) {
-      // For translation, direct string comparison (case-insensitive, trim whitespace)
       correct = typeof selectedAnswer === 'string' &&
                 selectedAnswer.trim().toLowerCase() === currentQuestionData.targetLanguageText.trim().toLowerCase();
     }
-    // Add more logic for other question types (fillInBlank, etc.)
 
     setIsCorrect(correct);
     setShowResult(true);
 
     if (correct) {
-      onXpGained(10); // Example XP
-      // Play audio feedback if available (e.g., correct term or example sentence)
+      onXpGained(10);
       const audioToPlay = currentQuestionData.audioPrompt || currentQuestionData.feedbackCorrect;
       if (audioToPlay) {
          setTimeout(() => playAudio(audioToPlay), 300);
@@ -118,10 +106,10 @@ const LessonView = ({
 
     if (currentSection?.type === 'exercises' && currentQuestionIndex < exerciseQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-    } else { // Move to next section or complete lesson
+    } else {
       if (currentLesson && currentSectionIndex < currentLesson.sections.length - 1) {
         setCurrentSectionIndex(prev => prev + 1);
-        setCurrentQuestionIndex(0); // Reset question index for new section
+        setCurrentQuestionIndex(0);
       } else {
         onLessonComplete();
       }
@@ -163,29 +151,27 @@ const LessonView = ({
         if (!currentQuestionData) {
           return <p className="text-gray-400">End of exercises in this section or no exercises.</p>;
         }
-        // QuestionCard expects onAnswerSelect to pass index for multiple choice.
-        // We need to adapt if QuestionCard is rigid or make QuestionCard more flexible.
-        // For now, assuming QuestionCard can handle the new `ExerciseQuestion` structure.
         return (
           <QuestionCard
-            questionData={currentQuestionData}
-            onAnswer={handleAnswerSelect} // QuestionCard needs to call this with string or number
-            // selectedAnswer={selectedAnswer} // QuestionCard might manage its own internal selection state
-            currentLanguage={currentLanguageCode} // Pass code for TTS
+            question={{
+              question: currentQuestionData.prompt,
+              options: currentQuestionData.options || [],
+              correct: currentQuestionData.correctOptionIndex || 0,
+              audio: currentQuestionData.audioPrompt
+            }}
+            selectedAnswer={selectedAnswer?.toString() || ''}
+            showResult={showResult}
+            isCorrect={isCorrect}
+            selectedLanguage={currentLanguageCode}
+            onAnswerSelect={(index) => handleAnswerSelect(index)}
+            onCheckAnswer={checkAnswer}
           />
-          // TODO: When enhancing QuestionCard or exercise interactions:
-          // - Implement rendering and interaction logic for new question types (speaking, listening, sentence construction).
-          // - For speaking exercises, integrate with speech recognition services.
-          // - Provide more nuanced feedback for incorrect answers (e.g., identifying common error types).
         );
       case 'grammar':
-        // TODO: Implement rendering for structured grammar explanations and examples.
         return <p className="text-gray-400">Grammar section rendering (TODO)</p>;
       case 'dialogue':
-        // TODO: Implement rendering for interactive dialogues.
         return <p className="text-gray-400">Dialogue section rendering (TODO)</p>;
       case 'cultureNote':
-        // TODO: Implement rendering for cultural notes.
         return <p className="text-gray-400">Cultural note rendering (TODO)</p>;
       default:
         return <p className="text-gray-400">Unsupported section type: {section.type}</p>;
@@ -196,13 +182,17 @@ const LessonView = ({
     <div className="p-4 md:p-6 max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-2xl space-y-6">
       <ProgressHeader
         hearts={hearts}
-        streak={0} // Streak is managed by LanguageLearning parent, not passed here directly for lesson view
         xp={xp}
-        // Pass lesson title and progress if needed by ProgressHeader
-        // currentLessonTitle={currentLesson.title}
-        // currentProgress={(currentSectionIndex + 1) / (currentLesson.sections.length)}
+        currentLesson={{
+          title: currentLesson.title,
+          questions: exerciseQuestions.map(q => ({
+            question: q.prompt,
+            options: q.options || [],
+            correct: q.correctOptionIndex || 0
+          }))
+        }}
+        currentQuestion={currentQuestionIndex}
         onBack={onBack}
-        languageName={currentLesson.languageName || currentLanguageCode.toUpperCase()}
       />
 
       <div className="p-5 bg-gray-700/50 rounded-lg border border-gray-600">
@@ -217,7 +207,7 @@ const LessonView = ({
         <ResultCard
           isCorrect={isCorrect}
           correctAnswer={currentQuestionData.type === 'multipleChoice' ? currentQuestionData.options?.[currentQuestionData.correctOptionIndex!] : currentQuestionData.targetLanguageText}
-          userAnswer={selectedAnswer?.toString()} // Convert number to string if needed
+          userAnswer={selectedAnswer?.toString()}
           feedback={isCorrect ? currentQuestionData.feedbackCorrect : currentQuestionData.feedbackIncorrect}
           onNext={handleNext}
         />
@@ -233,7 +223,6 @@ const LessonView = ({
         </Button>
       )}
 
-      {/* Button to proceed to next section if current section is not exercises or exercises are done */}
       {!showResult && (currentSection?.type !== 'exercises' || !currentQuestionData) && (
          <Button
           onClick={handleNext}

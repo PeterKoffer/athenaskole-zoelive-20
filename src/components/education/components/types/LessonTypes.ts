@@ -1,5 +1,4 @@
 
-
 export interface LessonActivity {
   id: string;
   title: string;
@@ -10,7 +9,11 @@ export interface LessonActivity {
   metadata: {
     subject: string;
     skillArea: string;
-    templateId?: string; // Optional template identifier
+    templateId?: string;
+    difficultyLevel?: number;
+    isExtension?: boolean;
+    gradeLevel?: number;
+    concept?: string;
   };
   content: {
     text?: string;
@@ -18,7 +21,7 @@ export interface LessonActivity {
     options?: string[];
     choices?: string[];
     correctAnswer?: number;
-    correct?: number; // Alternative property name used by some components
+    correct?: number;
     explanation?: string;
     title?: string;
     battleScenario?: string;
@@ -51,7 +54,6 @@ export interface LessonActivity {
         explanation: string;
       };
     }>;
-    // Additional properties used throughout the codebase
     hook?: string;
     uniqueTheme?: string;
     uniqueScenario?: string;
@@ -64,7 +66,6 @@ export interface LessonActivity {
       hint?: string;
       solution?: string;
     }>;
-    // Properties for various activity types
     examples?: string[];
     story?: string;
     gameDescription?: string;
@@ -76,22 +77,18 @@ export interface LessonActivity {
       correctAnswer: number;
       explanation: string;
     };
-    // Additional missing properties
-    message?: string; // Used in ActivityWelcome
-    difficulty?: number; // Used in PuzzleQuestBriefing
-    storyHook?: string; // Used in EngagingLessonGenerator
-    achievementCelebration?: string; // Used in EngagingLessonGenerator
-    celebration?: string; // Used in EngagingLessonGenerator
-    // New properties for factory files
+    message?: string;
+    difficulty?: number;
+    storyHook?: string;
+    achievementCelebration?: string;
+    celebration?: string;
     thoughtQuestion?: string;
     concept?: string;
     activityInstructions?: string;
     tools?: string[];
-    // Additional properties found in StandardLessonTemplate
     realWorldExample?: string;
     hint?: string;
     storyContext?: string;
-    // Properties from StandardLessonTemplate that were causing errors
     theme?: string;
     characterGuide?: string;
     missionBriefing?: string;
@@ -108,7 +105,6 @@ export interface LessonActivity {
     achievementsList?: string[];
     nextAdventureTeaser?: string;
     heroStatus?: string;
-    // Properties from subjectSpecificTemplates
     excitementBuilder?: string;
     celebrationLevel?: string;
     characterIntroduction?: string;
@@ -118,11 +114,17 @@ export interface LessonActivity {
 export interface SubjectLessonPlan {
   subject: string;
   skillArea: string;
+  gradeLevel: number;
   totalDuration: number;
   phases: LessonActivity[];
+  activities: LessonActivity[];
+  estimatedDuration: number;
+  objectives: string[];
   learningObjectives: string[];
   prerequisites: string[];
+  difficulty: number;
+  assessmentCriteria: string[];
+  extensions: string[];
   engagementLevel?: string;
   funFactor?: string;
 }
-

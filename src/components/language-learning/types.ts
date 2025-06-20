@@ -45,29 +45,26 @@ export interface LanguageLabLesson {
   title: string;
   learningObjectives: string[];
   sections: LessonSection[];
+  languageName?: string;
 }
 
 // Defines a section within a lesson (e.g., vocabulary, grammar, exercises)
 export interface LessonSection {
-  type: "vocabulary" | "grammar" | "exercises" | "dialogue" | "cultureNote"; // Added more types
+  type: "vocabulary" | "grammar" | "exercises" | "dialogue" | "cultureNote";
   title: string;
-  // Depending on the type, different content fields will be populated
-  items?: VocabularyItem[];      // For 'vocabulary' type
-  explanation?: string;          // For 'grammar' or 'cultureNote'
-  rules?: GrammarRule[];         // For 'grammar'
-  questions?: ExerciseQuestion[];// For 'exercises'
-  lines?: DialogueLine[];        // For 'dialogue'
+  items?: VocabularyItem[];
+  explanation?: string;
+  rules?: GrammarRule[];
+  questions?: ExerciseQuestion[];
+  lines?: DialogueLine[];
 }
-
-// TODO: Consider a 'cultureNote' section type within LessonSection for cultural insights.
-// interface CultureNoteSection extends LessonSectionBase { type: 'cultureNote'; content: { title: string; text: string; imageUrl?: string; }[]; }
 
 // Defines a vocabulary item
 export interface VocabularyItem {
   term: string;
   translation: string;
-  audio?: string; // Path to audio file
-  image?: string; // Path to image file
+  audio?: string;
+  image?: string;
   exampleSentence?: string;
 }
 
@@ -80,7 +77,7 @@ export interface GrammarRule {
 
 // Defines a line in a dialogue
 export interface DialogueLine {
-  speaker: string; // e.g., "Character A", "Narrator"
+  speaker: string;
   line: string;
   translation?: string;
   audio?: string;
@@ -91,33 +88,30 @@ export interface ExerciseQuestion {
   questionId: string;
   type: "multipleChoice" | "fillInBlank" | "translate" | "matchingPairs" | "listeningComprehension" | "speakingPractice";
   prompt: string;
-  textToTranslate?: string;       // For 'translate' type (source text)
-  targetLanguageText?: string;  // For 'translate' type (expected answer if not open input)
-  options?: string[];             // For 'multipleChoice'
-  correctOptionIndex?: number;    // For 'multipleChoice'
-  correctAnswers?: string[];      // For 'fillInBlank' if multiple blanks or variations
-  pairs?: { term: string; definition: string }[]; // For 'matchingPairs'
-  audioPrompt?: string;           // For 'listeningComprehension' or adding audio to any question
+  textToTranslate?: string;
+  targetLanguageText?: string;
+  options?: string[];
+  correctOptionIndex?: number;
+  correctAnswers?: string[];
+  pairs?: { term: string; definition: string }[];
+  audioPrompt?: string;
   feedbackCorrect?: string;
   feedbackIncorrect?: string;
   hint?: string;
 }
 
-// TODO: Future ExerciseQuestion types:
-// type: 'speaking' (requires speech-to-text integration)
-// type: 'listeningComprehension' (requires dedicated audio and comprehension questions)
-// type: 'sentenceConstruction' (drag-and-drop or reordering words)
-// type: 'dialogueCompletion' (fill in blanks in a conversation)
+// Legacy types for compatibility
+export interface Lesson {
+  title: string;
+  questions: Question[];
+}
 
-// TODO: Consider adding more structured grammar rule type, e.g.:
-// interface GrammarRuleStructured { title: string; explanation: string; examples: { correct: string; incorrect?: string; note?: string }[]; }
-
-// TODO: For Spaced Repetition System (SRS):
-// Consider adding SRS metadata to VocabularyItem and possibly Lesson/Unit:
-// lastReviewed?: string; // ISO date
-// nextReviewDate?: string; // ISO date
-// easeFactor?: number;
-// intervalDays?: number;
+export interface Question {
+  question: string;
+  options: string[];
+  correct: number;
+  audio?: string;
+}
 
 // Props for the main LanguageLearning component
 export interface LanguageLearningProps {
@@ -127,23 +121,32 @@ export interface LanguageLearningProps {
 // Props for the ProgressHeader (example, might need adjustment)
 export interface ProgressHeaderProps {
   hearts: number;
-  streak: number;
   xp: number;
+  currentLesson: Lesson;
+  currentQuestion: number;
+  onBack: () => void;
   languageName?: string; // Added to show current language
   onLanguageSelect: () => void; // Function to go back to language selection
 }
 
 // Props for QuestionCard (example, might need adjustment based on new ExerciseQuestion)
 export interface QuestionCardProps {
-  questionData: ExerciseQuestion; // Updated to use new ExerciseQuestion type
-  onAnswer: (isCorrect: boolean, userAnswer?: string | number) => void;
-  currentLanguage: string; // To help with TTS if needed
+  question: Question;
+  selectedAnswer: string;
+  showResult: boolean;
+  isCorrect: boolean;
+  selectedLanguage: string;
+  onAnswerSelect: (answerIndex: number) => void;
+  onCheckAnswer: () => void;
+  questionData?: ExerciseQuestion;
+  onAnswer?: (isCorrect: boolean, userAnswer?: string | number) => void;
+  currentLanguage?: string;
 }
 
 // Props for ResultCard (example)
 export interface ResultCardProps {
   isCorrect: boolean;
-  correctAnswer: string | undefined; // Correct answer might be a string or undefined if not applicable
+  correctAnswer?: string; // Correct answer might be a string or undefined if not applicable
   userAnswer?: string | number;
   feedback?: string;
   onNext: () => void;

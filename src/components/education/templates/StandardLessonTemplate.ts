@@ -1,4 +1,3 @@
-
 import { LessonActivity, SubjectLessonPlan } from '../components/types/LessonTypes';
 
 /**
@@ -11,19 +10,11 @@ export interface EngagingLessonConfig {
   skillArea: string;
   gradeLevel: number;
   studentName?: string;
-  
-  // Story/Theme wrapper (makes everything more engaging)
   theme: 'adventure' | 'mystery' | 'space' | 'underwater' | 'fantasy' | 'detective' | 'time-travel';
-  storyContext: string; // "You're a detective solving math mysteries!"
-  
-  // Learning objectives (but disguised as mission objectives)
+  storyContext: string;
   missionObjectives: string[];
-  
-  // Engagement hooks
   openingHook: string;
-  characterGuide?: string; // "Detective Numbers will help you!"
-  
-  // Interactive content segments
+  characterGuide?: string;
   discoverySegments: Array<{
     title: string;
     concept: string;
@@ -36,26 +27,20 @@ export interface EngagingLessonConfig {
       celebration: string;
     };
   }>;
-  
-  // Main game activities (the fun stuff!)
   gameActivities: Array<{
     type: 'adventure-game' | 'puzzle-quest' | 'creative-builder' | 'exploration-sim';
     title: string;
     scenario: string;
-    mechanics: string; // How the game works
+    mechanics: string;
     winCondition: string;
     rewards: string[];
   }>;
-  
-  // Creative expression opportunities
   creativeElements: Array<{
     type: 'draw' | 'build' | 'story' | 'design' | 'compose';
     prompt: string;
     tools: string[];
     shareOpportunity: boolean;
   }>;
-  
-  // Epic finale
   grandChallenge: {
     title: string;
     description: string;
@@ -69,7 +54,6 @@ export interface EngagingLessonConfig {
  */
 export function createEngagingLesson(config: EngagingLessonConfig): SubjectLessonPlan {
   const activities: LessonActivity[] = [
-    // 1. EPIC OPENING (3 min) - Hook them immediately!
     {
       id: `${config.subject}-epic-opening`,
       type: 'introduction',
@@ -88,13 +72,12 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
       }
     },
 
-    // 2. DISCOVERY ADVENTURES (8 min total) - Interactive learning segments
     ...config.discoverySegments.map((segment, index) => ({
       id: `${config.subject}-discovery-${index + 1}`,
       type: 'content-delivery' as const,
       phase: 'content-delivery' as const,
       title: `🔍 ${segment.title}`,
-      duration: Math.floor(480 / config.discoverySegments.length), // 8 min total
+      duration: Math.floor(480 / config.discoverySegments.length),
       phaseDescription: 'Interactive discovery with instant challenges',
       metadata: {
         subject: config.subject,
@@ -115,7 +98,6 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
       }
     })),
 
-    // 3. MAIN GAME EVENT (5 min) - The big fun activity!
     {
       id: `${config.subject}-main-game`,
       type: 'interactive-game',
@@ -136,7 +118,6 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
       }
     },
 
-    // 4. CREATIVE EXPRESSION (3 min) - Let them create!
     {
       id: `${config.subject}-creative-time`,
       type: 'creative-exploration',
@@ -154,7 +135,6 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
       }
     },
 
-    // 5. GRAND FINALE (1 min) - Epic celebration!
     {
       id: `${config.subject}-grand-finale`,
       type: 'summary',
@@ -178,9 +158,12 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
     subject: config.subject,
     skillArea: config.skillArea,
     gradeLevel: config.gradeLevel,
-    estimatedDuration: 1200, // 20 minutes
-    objectives: config.missionObjectives,
+    totalDuration: 1200,
+    phases: activities,
     activities,
+    estimatedDuration: 1200,
+    objectives: config.missionObjectives,
+    learningObjectives: config.missionObjectives,
     difficulty: config.gradeLevel <= 3 ? 1 : config.gradeLevel <= 6 ? 2 : config.gradeLevel <= 9 ? 3 : 4,
     prerequisites: [],
     assessmentCriteria: ['Understanding of concepts', 'Application of knowledge'],
@@ -199,7 +182,6 @@ export const ENGAGING_THEMES = {
     openingHook: "A mathematical mystery needs solving! Are you ready, Detective?",
     celebrationStyle: "Case closed! Mystery solved!"
   },
-  
   spaceExplorer: {
     theme: 'space' as const,
     storyContext: "Galactic Space Academy - Explore the universe through learning!",
@@ -207,7 +189,6 @@ export const ENGAGING_THEMES = {
     openingHook: "Mission Control to Space Cadet! Ready for an interstellar adventure?",
     celebrationStyle: "Mission accomplished, Space Hero!"
   },
-  
   timeAdventurer: {
     theme: 'time-travel' as const,
     storyContext: "Time Academy - Journey through history while learning!",
@@ -215,7 +196,6 @@ export const ENGAGING_THEMES = {
     openingHook: "The Time Machine is ready! Which era shall we explore today?",
     celebrationStyle: "Time mission complete! History hero status achieved!"
   },
-  
   mysticalQuest: {
     theme: 'fantasy' as const,
     storyContext: "Enchanted Learning Realm - Magic happens when you learn!",
@@ -237,30 +217,26 @@ export function validateEngagingLesson(lesson: SubjectLessonPlan): {
   let score = 0;
   const improvements: string[] = [];
   
-  // Check for story/theme integration
-  if (lesson.activities.some(p => p.content.title || p.content.hook)) {
+  if (lesson.phases.some(p => p.content.title || p.content.hook)) {
     score += 25;
   } else {
     improvements.push('Add engaging story theme');
   }
   
-  // Check for interactive elements
-  const interactiveCount = lesson.activities.filter(p => 
+  const interactiveCount = lesson.phases.filter(p => 
     p.type === 'interactive-game' || p.content.question
   ).length;
   
   if (interactiveCount >= 3) score += 25;
   else improvements.push('Add more interactive elements');
   
-  // Check for creative opportunities  
-  if (lesson.activities.some(p => p.phase === 'creative-exploration')) {
+  if (lesson.phases.some(p => p.phase === 'creative-exploration')) {
     score += 25;
   } else {
     improvements.push('Include creative expression activities');
   }
   
-  // Check for celebration/rewards
-  if (lesson.activities.some(p => p.content.achievementsList || p.content.keyTakeaways)) {
+  if (lesson.phases.some(p => p.content.achievementsList || p.content.keyTakeaways)) {
     score += 25;
   } else {
     improvements.push('Add celebrations and rewards');

@@ -1,4 +1,3 @@
-
 import { LessonActivity, SubjectLessonPlan } from '../components/types/LessonTypes';
 
 export interface CanonicalLessonConfig {
@@ -137,9 +136,12 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
     subject,
     skillArea,
     gradeLevel,
+    totalDuration: sessionDuration,
+    phases: activities,
+    activities,
     estimatedDuration: sessionDuration,
     objectives: learningObjectives,
-    activities,
+    learningObjectives,
     difficulty: gradeLevel <= 3 ? 1 : gradeLevel <= 6 ? 2 : gradeLevel <= 9 ? 3 : 4,
     prerequisites: [`Basic ${subject} knowledge`],
     assessmentCriteria: ['Understanding of concepts', 'Application of knowledge'],

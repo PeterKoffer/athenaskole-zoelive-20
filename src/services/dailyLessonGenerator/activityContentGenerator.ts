@@ -1,11 +1,7 @@
-
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import { StudentProgressData } from './types';
 
 export class ActivityContentGenerator {
-  /**
-   * Generate content for the activity based on type and focus
-   */
   static async generateActivityContent(
     subject: string,
     focusArea: string,
@@ -22,9 +18,6 @@ export class ActivityContentGenerator {
     }
   }
 
-  /**
-   * Create a curriculum-aligned activity
-   */
   static async createCurriculumActivity(
     lessonId: string,
     index: number,
@@ -51,8 +44,14 @@ export class ActivityContentGenerator {
       title: `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Challenge`,
       type: this.mapActivityTypeToPhase(activityType),
       phase: this.mapActivityTypeToPhase(activityType),
-      duration: 180, // 3 minutes per activity
+      duration: 180,
       phaseDescription: `Learn about ${focusArea.replace(/_/g, ' ')}`,
+      metadata: {
+        subject,
+        skillArea,
+        gradeLevel,
+        difficultyLevel: difficulty
+      },
       content
     };
   }
@@ -92,6 +91,7 @@ export class ActivityContentGenerator {
     return {
       text: `Today we're exploring ${focusArea.replace(/_/g, ' ')} concepts designed for your current learning level. Let's discover something new together!`,
       segments: [{
+        title: focusArea.replace(/_/g, ' '),
         explanation: `Understanding ${focusArea.replace(/_/g, ' ')} is an important skill that builds your knowledge step by step.`,
         examples: [`Example for ${focusArea}`, `Another way to think about ${focusArea}`]
       }]
