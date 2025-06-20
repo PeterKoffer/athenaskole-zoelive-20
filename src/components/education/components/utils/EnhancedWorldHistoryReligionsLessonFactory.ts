@@ -17,8 +17,7 @@ export const generateWorldHistoryReligionsLesson = (
       phaseDescription: 'Introduction to world history',
       metadata: {
         subject: 'worldHistoryReligions',
-        skillArea: 'history',
-        gradeLevel
+        skillArea: 'history'
       },
       content: {
         text: 'Welcome to your history lesson!'

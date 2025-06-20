@@ -17,8 +17,7 @@ export const generateGlobalGeographyLesson = (
       phaseDescription: 'Introduction to world geography',
       metadata: {
         subject: 'globalGeography',
-        skillArea: 'geography',
-        gradeLevel
+        skillArea: 'geography'
       },
       content: {
         text: 'Welcome to your geography lesson!'

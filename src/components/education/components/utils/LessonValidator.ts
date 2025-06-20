@@ -1,5 +1,5 @@
 
-import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
+import { LessonActivity } from '../types/LessonTypes';
 import { generateEnhancedLesson } from './EnhancedLessonGenerator';
 
 export interface LessonValidationResult {
@@ -15,6 +15,18 @@ export interface LessonValidationConfig {
   checkProgression?: boolean;
   checkContent?: boolean;
   minQualityScore?: number;
+}
+
+export interface SubjectLessonPlan {
+  subject: string;
+  skillArea: string;
+  gradeLevel: number;
+  estimatedDuration?: number;
+  objectives?: string[];
+  difficulty?: number;
+  prerequisites?: string[];
+  assessmentCriteria?: string[];
+  extensions?: string[];
 }
 
 export const validateLessonStructure = (
@@ -33,7 +45,7 @@ export const validateLessonStructure = (
   const suggestions: string[] = [];
   let qualityScore = 100;
 
-  // Validate basic structure - using correct property names
+  // Validate basic structure
   if (!lesson.subject) {
     errors.push('Lesson must have a subject');
     qualityScore -= 10;

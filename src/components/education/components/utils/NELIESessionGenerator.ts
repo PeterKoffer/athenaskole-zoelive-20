@@ -64,9 +64,10 @@ class NELIESessionGenerator {
     }
   }
 
-  generateSession(config: any): NELIESession {
+  // Add missing static methods
+  static generateSession(config: any): NELIESession {
     const sessionId = `session_${Date.now()}`;
-    const totalDuration = config.sessionDuration || 1500; // 25 minutes default
+    const totalDuration = config.sessionDuration || 1500;
     
     return {
       sessionId,
@@ -100,14 +101,14 @@ class NELIESessionGenerator {
     };
   }
 
-  generateSubjectLesson(subject: string, gradeLevel: number, learningStyle: string) {
+  static generateSubjectLesson(subject: string, gradeLevel: number, learningStyle: string) {
     return {
       activities: [],
       validation: { qualityScore: 85 }
     };
   }
 
-  generateSessionSummary(session: NELIESession): string {
+  static generateSessionSummary(session: NELIESession): string {
     return `Session Summary: ${session.sessionId} - Duration: ${session.estimatedDuration} minutes`;
   }
 
@@ -152,24 +153,21 @@ class NELIESessionGenerator {
       if (preferences.visual > 7) {
         adaptedActivity.content = {
           ...adaptedActivity.content,
-          visualAids: true,
-          useImages: true
+          text: adaptedActivity.content.text || ''
         };
       }
       
       if (preferences.auditory > 7) {
         adaptedActivity.content = {
           ...adaptedActivity.content,
-          audioEmphasis: true,
-          verbalExplanations: true
+          text: adaptedActivity.content.text || ''
         };
       }
       
       if (preferences.kinesthetic > 7) {
         adaptedActivity.content = {
           ...adaptedActivity.content,
-          interactiveElements: true,
-          handsonActivities: true
+          text: adaptedActivity.content.text || ''
         };
       }
       
@@ -187,8 +185,7 @@ class NELIESessionGenerator {
       phaseDescription: `Basic introduction to ${config.subject}`,
       metadata: {
         subject: config.subject,
-        skillArea: config.skillArea,
-        gradeLevel: config.gradeLevel
+        skillArea: config.skillArea
       },
       content: {
         text: `Welcome to your ${config.subject} lesson, ${config.studentName}!`
@@ -257,7 +254,7 @@ export const NELIEHelpers = {
         title: 'Welcome to BodyLab',
         duration: 300,
         phaseDescription: 'Introduction to healthy living',
-        metadata: { subject: 'bodyLab', skillArea: 'health', gradeLevel },
+        metadata: { subject: 'bodyLab', skillArea: 'health' },
         content: { text: 'Welcome to your healthy living lesson!' }
       }],
       estimatedTotalDuration: 1200,
@@ -290,7 +287,7 @@ export const NELIEHelpers = {
         title: 'Welcome to Geography',
         duration: 300,
         phaseDescription: 'Introduction to world geography',
-        metadata: { subject: 'globalGeography', skillArea: 'geography', gradeLevel },
+        metadata: { subject: 'globalGeography', skillArea: 'geography' },
         content: { text: 'Welcome to your geography lesson!' }
       }],
       estimatedTotalDuration: 1200,
@@ -323,7 +320,7 @@ export const NELIEHelpers = {
         title: 'Welcome to Life Essentials',
         duration: 300,
         phaseDescription: 'Introduction to life skills',
-        metadata: { subject: 'lifeEssentials', skillArea: 'lifeskills', gradeLevel },
+        metadata: { subject: 'lifeEssentials', skillArea: 'lifeskills' },
         content: { text: 'Welcome to your life skills lesson!' }
       }],
       estimatedTotalDuration: 1200,
@@ -356,7 +353,7 @@ export const NELIEHelpers = {
         title: 'Welcome to World History',
         duration: 300,
         phaseDescription: 'Introduction to world history',
-        metadata: { subject: 'worldHistoryReligions', skillArea: 'history', gradeLevel },
+        metadata: { subject: 'worldHistoryReligions', skillArea: 'history' },
         content: { text: 'Welcome to your history lesson!' }
       }],
       estimatedTotalDuration: 1200,

@@ -19,8 +19,7 @@ const createBaseLesson = (
       phaseDescription: `Introduction to ${subject}`,
       metadata: {
         subject,
-        skillArea,
-        gradeLevel
+        skillArea
       },
       content: {
         text: `Welcome to your ${subject} lesson!`

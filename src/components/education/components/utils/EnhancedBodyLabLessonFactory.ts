@@ -17,8 +17,7 @@ export const generateBodyLabLesson = (
       phaseDescription: 'Introduction to healthy living',
       metadata: {
         subject: 'bodyLab',
-        skillArea: 'health',
-        gradeLevel
+        skillArea: 'health'
       },
       content: {
         text: 'Welcome to your healthy living lesson!'

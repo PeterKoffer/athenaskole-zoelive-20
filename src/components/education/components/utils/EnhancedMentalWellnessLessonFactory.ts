@@ -17,8 +17,7 @@ export const generateMentalWellnessLesson = (
       phaseDescription: 'Introduction to mental wellness',
       metadata: {
         subject: 'mentalWellness',
-        skillArea: 'wellness',
-        gradeLevel
+        skillArea: 'wellness'
       },
       content: {
         text: 'Welcome to your mental wellness lesson!'

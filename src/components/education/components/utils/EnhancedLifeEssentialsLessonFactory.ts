@@ -17,8 +17,7 @@ export const generateLifeEssentialsLesson = (
       phaseDescription: 'Introduction to life skills',
       metadata: {
         subject: 'lifeEssentials',
-        skillArea: 'lifeskills',
-        gradeLevel
+        skillArea: 'lifeskills'
       },
       content: {
         text: 'Welcome to your life skills lesson!'

@@ -29,9 +29,7 @@ export const generateWelcomeActivity = (config: WelcomeActivityConfig): LessonAc
     phaseDescription: `Welcoming introduction to ${subject} learning`,
     metadata: {
       subject,
-      skillArea,
-      gradeLevel,
-      studentName
+      skillArea
     },
     content: {
       hook: randomWelcome

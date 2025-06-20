@@ -1,5 +1,6 @@
 
 export { generateWelcomeActivity as createWelcomeActivity } from './utils/welcomeActivityGenerator';
+export { LessonActivity } from './types/LessonTypes';
 
 export const createEnhancedLessonContent = (subject: string, skillArea: string) => {
   return {
