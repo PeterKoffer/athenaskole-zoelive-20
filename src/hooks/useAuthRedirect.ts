@@ -42,12 +42,6 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    // For users without authentication who are trying to access learning content, don't redirect away
-    if (!user && isInLearningSession) {
-      console.log('[useAuthRedirect] No user but in learning session - keeping in session');
-      return;
-    }
-
     // If no user or role, don't redirect (let them stay on current page or go to auth)
     if (!user && !userRole) {
       console.log('[useAuthRedirect] No user and no role - staying put');
