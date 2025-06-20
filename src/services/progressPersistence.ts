@@ -35,6 +35,14 @@ interface SessionData {
   completed: boolean;
 }
 
+// Helper function to safely convert Json to Record<string, unknown>
+const safeJsonToRecord = (json: any): Record<string, unknown> => {
+  if (typeof json === 'object' && json !== null && !Array.isArray(json)) {
+    return json as Record<string, unknown>;
+  }
+  return {};
+};
+
 export const useUserProgress = (userId: string, subject: string, skillArea: string) => {
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,9 +72,9 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
           user_id: data.user_id,
           subject: data.subject,
           skill_area: data.skill_area,
-          current_activity_index: (data as any).current_activity_index || 0,
-          score: (data as any).score || 0,
-          time_elapsed: (data as any).time_elapsed || 0,
+          current_activity_index: 0, // Default value since not in DB
+          score: 0, // Default value since not in DB
+          time_elapsed: 0, // Default value since not in DB
           accuracy_rate: data.accuracy_rate,
           attempts_count: data.attempts_count,
           completion_time_avg: data.completion_time_avg,
@@ -74,8 +82,8 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
           engagement_score: data.engagement_score,
           last_assessment: data.last_assessment,
           learning_style: data.learning_style,
-          strengths: typeof data.strengths === 'object' && data.strengths !== null ? data.strengths as Record<string, unknown> : {},
-          weaknesses: typeof data.weaknesses === 'object' && data.weaknesses !== null ? data.weaknesses as Record<string, unknown> : {},
+          strengths: safeJsonToRecord(data.strengths),
+          weaknesses: safeJsonToRecord(data.weaknesses),
           created_at: data.created_at,
           updated_at: data.updated_at
         };
@@ -159,9 +167,9 @@ export const progressPersistence = {
         user_id: data.user_id,
         subject: data.subject,
         skill_area: data.skill_area,
-        current_activity_index: (data as any).current_activity_index || 0,
-        score: (data as any).score || 0,
-        time_elapsed: (data as any).time_elapsed || 0,
+        current_activity_index: 0, // Default value since not in DB
+        score: 0, // Default value since not in DB
+        time_elapsed: 0, // Default value since not in DB
         accuracy_rate: data.accuracy_rate,
         attempts_count: data.attempts_count,
         completion_time_avg: data.completion_time_avg,
@@ -169,8 +177,8 @@ export const progressPersistence = {
         engagement_score: data.engagement_score,
         last_assessment: data.last_assessment,
         learning_style: data.learning_style,
-        strengths: typeof data.strengths === 'object' && data.strengths !== null ? data.strengths as Record<string, unknown> : {},
-        weaknesses: typeof data.weaknesses === 'object' && data.weaknesses !== null ? data.weaknesses as Record<string, unknown> : {},
+        strengths: safeJsonToRecord(data.strengths),
+        weaknesses: safeJsonToRecord(data.weaknesses),
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -182,9 +190,22 @@ export const progressPersistence = {
 
   async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
     try {
-      // Convert UserProgress to database format
-      const dbData: any = { ...progressData };
-      delete dbData.id; // Remove id from upsert data
+      // Convert UserProgress to database format, excluding fields not in DB schema
+      const dbData = {
+        user_id: progressData.user_id!,
+        subject: progressData.subject!,
+        skill_area: progressData.skill_area!,
+        accuracy_rate: progressData.accuracy_rate || 0,
+        attempts_count: progressData.attempts_count || 0,
+        completion_time_avg: progressData.completion_time_avg || 0,
+        current_level: progressData.current_level || 1,
+        engagement_score: progressData.engagement_score || 0,
+        last_assessment: progressData.last_assessment || new Date().toISOString(),
+        learning_style: progressData.learning_style || 'visual',
+        strengths: progressData.strengths || {},
+        weaknesses: progressData.weaknesses || {},
+        updated_at: new Date().toISOString()
+      };
       
       const { error } = await supabase
         .from('user_performance')
