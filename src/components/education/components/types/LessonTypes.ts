@@ -16,6 +16,7 @@ export interface LessonActivity {
     options?: string[];
     choices?: string[];
     correctAnswer?: number;
+    correct?: number; // Alternative property name used by some components
     explanation?: string;
     title?: string;
     battleScenario?: string;
@@ -25,7 +26,11 @@ export interface LessonActivity {
     whatIfScenario?: string;
     explorationTask?: string;
     scenario?: string;
-    scenarios?: string[];
+    scenarios?: Array<{
+      customer: string;
+      challenge: string;
+      reward: string;
+    }>;
     task?: string;
     guidance?: string;
     keyTakeaways?: string[];
@@ -36,6 +41,13 @@ export interface LessonActivity {
     segments?: Array<{
       title: string;
       explanation: string;
+      concept?: string;
+      checkQuestion?: {
+        question: string;
+        options: string[];
+        correctAnswer: number;
+        explanation: string;
+      };
     }>;
     // Additional properties used throughout the codebase
     hook?: string;
@@ -50,5 +62,17 @@ export interface LessonActivity {
       hint?: string;
       solution?: string;
     }>;
+    // Properties for various activity types
+    examples?: string[];
+    story?: string;
+    gameDescription?: string;
+    puzzleDescription?: string;
+    whatNext?: string;
+    selfAssessment?: {
+      question: string;
+      options: string[];
+      correctAnswer: number;
+      explanation: string;
+    };
   };
 }
