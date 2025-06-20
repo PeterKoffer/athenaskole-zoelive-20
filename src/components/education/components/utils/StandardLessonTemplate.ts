@@ -1,3 +1,4 @@
+
 import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
 
 /**
@@ -135,7 +136,7 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
         skillArea: config.skillArea
       },
       content: {
-        question: `Ready for the ${config.gameActivities[0]?.title || 'Epic Challenge'?}`,
+        question: `Ready for the ${config.gameActivities[0]?.title || 'Epic Challenge'}?`,
         options: ['Let\'s do it!', 'I\'m ready!', 'Bring it on!', 'Game time!'],
         correctAnswer: 0,
         explanation: config.gameActivities[0]?.rewards?.[0] || 'Amazing job!',
