@@ -202,8 +202,8 @@ export const progressPersistence = {
         engagement_score: progressData.engagement_score || 0,
         last_assessment: progressData.last_assessment || new Date().toISOString(),
         learning_style: progressData.learning_style || 'visual',
-        strengths: progressData.strengths || {},
-        weaknesses: progressData.weaknesses || {},
+        strengths: (progressData.strengths || {}) as any,
+        weaknesses: (progressData.weaknesses || {}) as any,
         updated_at: new Date().toISOString()
       };
       
