@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback } from 'react';
 import { LessonActivity } from '../types/LessonTypes';
 

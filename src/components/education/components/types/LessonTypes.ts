@@ -1,4 +1,5 @@
 
+
 export interface LessonActivity {
   id: string;
   title: string;
@@ -9,6 +10,7 @@ export interface LessonActivity {
   metadata: {
     subject: string;
     skillArea: string;
+    templateId?: string; // Optional template identifier
   };
   content: {
     text?: string;
@@ -74,5 +76,9 @@ export interface LessonActivity {
       correctAnswer: number;
       explanation: string;
     };
+    // Additional missing properties
+    message?: string; // Used in ActivityWelcome
+    difficulty?: number; // Used in PuzzleQuestBriefing
   };
 }
+
