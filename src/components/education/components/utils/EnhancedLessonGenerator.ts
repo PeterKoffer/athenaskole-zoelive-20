@@ -35,6 +35,8 @@ export const ENHANCED_LESSON_PHASES = {
 
 export function generateEnhancedLesson(subject: string, skillArea: string): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
+    const baseDuration = ENHANCED_LESSON_PHASES.introduction.baseSeconds;
+    
     // Generate a basic lesson structure
     const lessonConfig: EnhancedLessonConfig = {
       subject,
@@ -50,19 +52,19 @@ export function generateEnhancedLesson(subject: string, skillArea: string): Prom
           type: 'introduction',
           phase: 'introduction',
           title: `Welcome to ${subject.charAt(0).toUpperCase() + subject.slice(1)}`,
-          duration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
+          duration: baseDuration,
           phaseDescription: 'Introduction to the lesson',
           metadata: { subject, skillArea },
           content: { text: `Welcome to an exciting ${subject} lesson!` }
         }
       ],
-      estimatedTotalDuration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
+      estimatedTotalDuration: baseDuration,
       learningObjectives: [`Learn ${skillArea} concepts`],
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: [subject, skillArea],
-      // Aliases
-      estimatedDuration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
+      // Required additional properties
+      estimatedDuration: baseDuration,
       objectives: [`Learn ${skillArea} concepts`],
       difficulty: 3,
       prerequisites: [],

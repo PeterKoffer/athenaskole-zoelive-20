@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { 
@@ -45,26 +44,26 @@ export const useLessonManager = ({
     
     switch (subject.toLowerCase()) {
       case 'mathematics':
-        activities = createMathematicsLesson();
+        activities = createMathematicsLesson(skillArea);
         break;
       case 'english':
         activities = englishLessons;
         break;
       case 'science':
-        activities = createScienceLesson();
+        activities = createScienceLesson(skillArea);
         break;
       case 'music':
-        activities = createMusicLesson();
+        activities = createMusicLesson(skillArea);
         break;
       case 'computer-science':
-        activities = createComputerScienceLesson();
+        activities = createComputerScienceLesson(skillArea);
         break;
       case 'creative-arts':
-        activities = createCreativeArtsLesson();
+        activities = createCreativeArtsLesson(skillArea);
         break;
       default:
         console.log('⚠️ Unknown subject, using mathematics lesson');
-        activities = createMathematicsLesson();
+        activities = createMathematicsLesson(skillArea);
     }
 
     // Enhance all activities with the teaching engine

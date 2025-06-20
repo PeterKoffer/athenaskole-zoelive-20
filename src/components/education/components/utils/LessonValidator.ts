@@ -1,203 +1,157 @@
-import { validateStandardLesson, StandardLessonConfig } from './StandardLessonTemplate';
-import { SubjectLessonPlan } from '../types/LessonTypes';
-import { englishLessons } from '../lessons/EnglishLessons';
-import { createMathematicsLesson } from '../lessons/MathematicsLessons';
-import { createScienceLesson } from '../lessons/ScienceLessons';
-import { createMusicLesson } from '../lessons/MusicLessons';
-import { createComputerScienceLesson } from '../lessons/ComputerScienceLessons';
-import { createCreativeArtsLesson } from '../lessons/CreativeArtsLessons';
 
-/**
- * Validates all subject lessons against the standard 20-minute structure
- */
-export function validateAllLessons(): {
-  overall: boolean;
-  results: Record<string, {
-    isValid: boolean;
-    errors: string[];
-    warnings: string[];
-    totalDuration: number;
-    phaseBreakdown: Record<string, number>;
-  }>;
-} {
-  const lessonCreators = {
-    english: () => englishLessons,
-    mathematics: createMathematicsLesson,
-    science: createScienceLesson,
-    music: createMusicLesson,
-    'computer-science': createComputerScienceLesson,
-    'creative-arts': createCreativeArtsLesson
-  };
+import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
+import { generateEnhancedLesson } from './EnhancedLessonGenerator';
 
-  const results: Record<string, any> = {};
-  let overallValid = true;
+export interface LessonValidationResult {
+  isValid: boolean;
+  qualityScore: number;
+  errors: string[];
+  warnings: string[];
+  suggestions: string[];
+}
 
-  for (const [subject, createLesson] of Object.entries(lessonCreators)) {
-    try {
-      const activities = createLesson();
-      
-      // Convert activities to SubjectLessonPlan format for validation
-      const totalDuration = activities.reduce((sum, activity) => sum + activity.duration, 0);
-      
-      const lessonPlan: SubjectLessonPlan = {
-        subject,
-        skillArea: 'Standard Lesson',
-        totalDuration,
-        phases: activities,
-        learningObjectives: [],
-        prerequisites: []
-      };
+export interface LessonValidationConfig {
+  checkDuration?: boolean;
+  checkProgression?: boolean;
+  checkContent?: boolean;
+  minQualityScore?: number;
+}
 
-      const validation = validateStandardLesson(lessonPlan);
-      
-      // Calculate phase breakdown
-      const phaseBreakdown = activities.reduce((acc, activity) => {
-        acc[activity.phase] = (acc[activity.phase] || 0) + activity.duration;
-        return acc;
-      }, {} as Record<string, number>);
+export const validateLessonStructure = (
+  lesson: SubjectLessonPlan,
+  config: LessonValidationConfig = {}
+): LessonValidationResult => {
+  const {
+    checkDuration = true,
+    checkProgression = true,
+    checkContent = true,
+    minQualityScore = 70
+  } = config;
 
-      results[subject] = {
-        ...validation,
-        totalDuration,
-        phaseBreakdown
-      };
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const suggestions: string[] = [];
+  let qualityScore = 100;
 
-      if (!validation.isValid) {
-        overallValid = false;
-      }
-    } catch (error) {
-      results[subject] = {
-        isValid: false,
-        errors: [`Failed to create lesson: ${error}`],
-        warnings: [],
-        totalDuration: 0,
-        phaseBreakdown: {}
-      };
-      overallValid = false;
+  // Validate basic structure
+  if (!lesson.title) {
+    errors.push('Lesson must have a title');
+    qualityScore -= 10;
+  }
+
+  if (!lesson.activities || lesson.activities.length === 0) {
+    errors.push('Lesson must have activities');
+    qualityScore -= 20;
+  }
+
+  // Validate duration if requested
+  if (checkDuration && lesson.activities) {
+    const totalDuration = lesson.activities.reduce((sum, activity) => sum + activity.duration, 0);
+    if (totalDuration < 600) { // Less than 10 minutes
+      warnings.push('Lesson might be too short for effective learning');
+      qualityScore -= 5;
+    }
+    if (totalDuration > 2400) { // More than 40 minutes
+      warnings.push('Lesson might be too long, consider breaking it up');
+      qualityScore -= 5;
+    }
+  }
+
+  // Validate content quality if requested
+  if (checkContent && lesson.activities) {
+    const hasIntroduction = lesson.activities.some(a => a.phase === 'introduction');
+    const hasSummary = lesson.activities.some(a => a.phase === 'summary');
+    const hasInteractive = lesson.activities.some(a => a.phase === 'interactive-game');
+
+    if (!hasIntroduction) {
+      suggestions.push('Consider adding an introduction activity');
+      qualityScore -= 5;
+    }
+    if (!hasSummary) {
+      suggestions.push('Consider adding a summary activity');
+      qualityScore -= 5;
+    }
+    if (!hasInteractive) {
+      suggestions.push('Consider adding interactive elements');
+      qualityScore -= 10;
     }
   }
 
   return {
-    overall: overallValid,
-    results
+    isValid: errors.length === 0 && qualityScore >= minQualityScore,
+    qualityScore,
+    errors,
+    warnings,
+    suggestions
   };
-}
+};
 
-/**
- * Generates a detailed report of lesson structure validation
- */
-export function generateLessonValidationReport(): string {
-  const validation = validateAllLessons();
-  
-  let report = "=== STANDARDIZED LESSON VALIDATION REPORT ===\n\n";
-  report += `Overall Status: ${validation.overall ? "✅ ALL LESSONS VALID" : "❌ SOME LESSONS NEED FIXES"}\n\n`;
-
-  for (const [subject, result] of Object.entries(validation.results)) {
-    report += `--- ${subject.toUpperCase()} LESSON ---\n`;
-    report += `Status: ${result.isValid ? "✅ Valid" : "❌ Invalid"}\n`;
-    report += `Total Duration: ${result.totalDuration}s (${(result.totalDuration / 60).toFixed(1)} minutes)\n`;
+export const validateEnhancedLessonAsync = async (
+  subject: string,
+  skillArea: string,
+  config?: LessonValidationConfig
+): Promise<LessonValidationResult> => {
+  try {
+    const enhancedLesson = await generateEnhancedLesson(subject, skillArea);
     
-    if (result.phaseBreakdown) {
-      report += "Phase Breakdown:\n";
-      for (const [phase, duration] of Object.entries(result.phaseBreakdown)) {
-        report += `  - ${phase}: ${duration}s (${(duration / 60).toFixed(1)} min)\n`;
-      }
-    }
-    
-    if (result.errors.length > 0) {
-      report += "❌ ERRORS:\n";
-      result.errors.forEach(error => report += `  - ${error}\n`);
-    }
-    
-    if (result.warnings.length > 0) {
-      report += "⚠️ WARNINGS:\n";
-      result.warnings.forEach(warning => report += `  - ${warning}\n`);
-    }
-    
-    report += "\n";
-  }
-
-  report += "=== TARGET STRUCTURE (20 minutes) ===\n";
-  report += "1. Introduction: 2-3 min (120-180s)\n";
-  report += "2. Content Delivery: 5-7 min (300-420s)\n";
-  report += "3. Interactive Game: 4-5 min (240-300s)\n";
-  report += "4. Application: 3-4 min (180-240s)\n";
-  report += "5. Creative Exploration: 2-3 min (120-180s)\n";
-  report += "6. Summary: 1-2 min (60-120s)\n";
-  report += "TOTAL: 20 minutes (1200s) exactly\n";
-
-  return report;
-}
-
-/**
- * Quick test function to verify a specific lesson meets standards
- */
-export function testLessonStandard(subject: string): boolean {
-  const validation = validateAllLessons();
-  return validation.results[subject]?.isValid || false;
-}
-
-/**
- * Gets timing statistics for all lessons
- */
-export function getLessonTimingStats(): {
-  subjects: Record<string, {
-    total: number;
-    phases: Record<string, number>;
-    meetsStandard: boolean;
-  }>;
-  averages: {
-    introduction: number;
-    contentDelivery: number;
-    interactiveGame: number;
-    application: number;
-    creativeExploration: number;
-    summary: number;
-  };
-} {
-  const validation = validateAllLessons();
-  const subjects: Record<string, any> = {};
-  const phaseStats: Record<string, number[]> = {
-    introduction: [],
-    'content-delivery': [],
-    'interactive-game': [],
-    application: [],
-    'creative-exploration': [],
-    summary: []
-  };
-
-  for (const [subject, result] of Object.entries(validation.results)) {
-    subjects[subject] = {
-      total: result.totalDuration,
-      phases: result.phaseBreakdown,
-      meetsStandard: result.isValid
+    // Convert to SubjectLessonPlan format for validation
+    const lessonPlan: SubjectLessonPlan = {
+      title: enhancedLesson.title,
+      subject: enhancedLesson.subject,
+      skillArea: enhancedLesson.skillArea,
+      gradeLevel: enhancedLesson.gradeLevel,
+      estimatedDuration: enhancedLesson.estimatedDuration,
+      objectives: enhancedLesson.objectives,
+      activities: enhancedLesson.phases,
+      difficulty: enhancedLesson.difficulty,
+      prerequisites: enhancedLesson.prerequisites,
+      assessmentCriteria: enhancedLesson.assessmentCriteria,
+      extensions: enhancedLesson.extensions
     };
 
-    // Collect stats for averages
-    for (const [phase, duration] of Object.entries(result.phaseBreakdown)) {
-      if (phaseStats[phase]) {
-        phaseStats[phase].push(duration);
-      }
-    }
+    return validateLessonStructure(lessonPlan, config);
+  } catch (error) {
+    return {
+      isValid: false,
+      qualityScore: 0,
+      errors: [`Failed to generate lesson: ${error}`],
+      warnings: [],
+      suggestions: []
+    };
+  }
+};
+
+export const validateActivitySequence = (activities: LessonActivity[]): LessonValidationResult => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const suggestions: string[] = [];
+  let qualityScore = 100;
+
+  if (activities.length === 0) {
+    errors.push('No activities provided');
+    return { isValid: false, qualityScore: 0, errors, warnings, suggestions };
   }
 
-  // Calculate averages
-  const averages = Object.entries(phaseStats).reduce((acc, [phase, durations]) => {
-    acc[phase as keyof typeof acc] = durations.length > 0 
-      ? durations.reduce((sum, d) => sum + d, 0) / durations.length 
-      : 0;
-    return acc;
-  }, {} as any);
+  // Check for proper sequencing
+  const phases = activities.map(a => a.phase);
+  const firstPhase = phases[0];
+  const lastPhase = phases[phases.length - 1];
+
+  if (firstPhase !== 'introduction') {
+    suggestions.push('Consider starting with an introduction phase');
+    qualityScore -= 5;
+  }
+
+  if (lastPhase !== 'summary') {
+    suggestions.push('Consider ending with a summary phase');
+    qualityScore -= 5;
+  }
 
   return {
-    subjects,
-    averages: {
-      introduction: averages.introduction || 0,
-      contentDelivery: averages['content-delivery'] || 0,
-      interactiveGame: averages['interactive-game'] || 0,
-      application: averages.application || 0,
-      creativeExploration: averages['creative-exploration'] || 0,
-      summary: averages.summary || 0
-    }
+    isValid: errors.length === 0,
+    qualityScore,
+    errors,
+    warnings,
+    suggestions
   };
-}
+};
