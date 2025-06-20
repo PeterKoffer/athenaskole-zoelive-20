@@ -1,5 +1,4 @@
 
-
 export interface LessonActivity {
   id: string;
   title: string;
@@ -91,6 +90,26 @@ export interface LessonActivity {
     realWorldExample?: string;
     hint?: string;
     storyContext?: string;
+    // Properties from StandardLessonTemplate that were causing errors
+    theme?: string;
+    characterGuide?: string;
+    missionBriefing?: string;
+    excitementLevel?: string;
+    engagementType?: string;
+    celebrationReady?: boolean;
+    interactiveExplanation?: string;
+    epicnessLevel?: string;
+    winCondition?: string;
+    inspirationBoost?: string;
+    creativeType?: string;
+    shareOpportunity?: boolean;
+    grandChallenge?: any;
+    achievementsList?: string[];
+    nextAdventureTeaser?: string;
+    heroStatus?: string;
+    // Properties from subjectSpecificTemplates
+    excitementBuilder?: string;
+    celebrationLevel?: string;
   };
 }
 
@@ -104,4 +123,3 @@ export interface SubjectLessonPlan {
   engagementLevel?: string;
   funFactor?: string;
 }
-

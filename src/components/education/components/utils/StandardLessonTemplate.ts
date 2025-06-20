@@ -135,7 +135,7 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
         skillArea: config.skillArea
       },
       content: {
-        question: `Ready for the ${config.gameActivities[0]?.title || 'Epic Challenge'}?`,
+        question: `Ready for the ${config.gameActivities[0]?.title || 'Epic Challenge'?}`,
         options: ['Let\'s do it!', 'I\'m ready!', 'Bring it on!', 'Game time!'],
         correctAnswer: 0,
         explanation: config.gameActivities[0]?.rewards?.[0] || 'Amazing job!',
@@ -293,30 +293,233 @@ export function validateEngagingLesson(lesson: SubjectLessonPlan): {
 }
 
 export interface StandardLessonConfig {
+  subject: string;
+  skillArea: string;
+  learningObjectives: string[];
+  prerequisites: string[];
+  
+  // Phase 1: Introduction
+  hook: string;
+  realWorldExample: string;
+  thoughtQuestion: string;
+  
+  // Phase 2: Content Delivery
+  contentSegments: Array<{
+    concept: string;
+    explanation: string;
+    checkQuestion: {
+      question: string;
+      options: string[];
+      correctAnswer: number;
+      explanation: string;
+    };
+  }>;
+  
+  // Phase 3: Interactive Game
+  gameType: string;
+  gameInstructions: string;
+  gameQuestion: string;
+  gameOptions: string[];
+  gameCorrectAnswer: number;
+  gameExplanation: string;
+  
+  // Phase 4: Application
+  applicationScenario: string;
+  problemSteps: Array<{
+    step: string;
+    hint?: string;
+    solution?: string;
+  }>;
+  
+  // Phase 5: Creative Exploration
+  creativePrompt: string;
+  whatIfScenario: string;
+  explorationTask: string;
+  
+  // Phase 6: Summary
+  keyTakeaways: string[];
+  selfAssessment: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+  };
+  nextTopicSuggestion: string;
+}
+
+export function createStandardLesson(config: StandardLessonConfig): SubjectLessonPlan {
+  const activities: LessonActivity[] = [
+    // Phase 1: Introduction (2-3 min)
+    {
+      id: `${config.subject}-introduction`,
+      type: 'introduction',
+      phase: 'introduction',
+      title: `Welcome to ${config.subject}`,
+      duration: 180,
+      phaseDescription: 'Engaging introduction with real-world connections',
+      metadata: {
+        subject: config.subject,
+        skillArea: config.skillArea
+      },
+      content: {
+        hook: config.hook,
+        realWorldExample: config.realWorldExample,
+        thoughtQuestion: config.thoughtQuestion
+      }
+    },
+
+    // Phase 2: Content Delivery (5-7 min)
+    {
+      id: `${config.subject}-content-delivery`,
+      type: 'content-delivery',
+      phase: 'content-delivery',
+      title: 'Core Learning',
+      duration: 390,
+      phaseDescription: 'Main content with comprehension checks',
+      metadata: {
+        subject: config.subject,
+        skillArea: config.skillArea
+      },
+      content: {
+        segments: config.contentSegments
+      }
+    },
+
+    // Phase 3: Interactive Game (4-5 min)
+    {
+      id: `${config.subject}-interactive-game`,
+      type: 'interactive-game',
+      phase: 'interactive-game',
+      title: 'Learning Game',
+      duration: 270,
+      phaseDescription: 'Interactive activity to reinforce learning',
+      metadata: {
+        subject: config.subject,
+        skillArea: config.skillArea
+      },
+      content: {
+        gameType: config.gameType,
+        activityInstructions: config.gameInstructions,
+        question: config.gameQuestion,
+        options: config.gameOptions,
+        correctAnswer: config.gameCorrectAnswer,
+        explanation: config.gameExplanation
+      }
+    },
+
+    // Phase 4: Application (3-4 min)
+    {
+      id: `${config.subject}-application`,
+      type: 'application',
+      phase: 'application',
+      title: 'Real-World Application',
+      duration: 210,
+      phaseDescription: 'Apply learning to real-world scenarios',
+      metadata: {
+        subject: config.subject,
+        skillArea: config.skillArea
+      },
+      content: {
+        scenario: config.applicationScenario,
+        problemSteps: config.problemSteps
+      }
+    },
+
+    // Phase 5: Creative Exploration (2-3 min)
+    {
+      id: `${config.subject}-creative-exploration`,
+      type: 'creative-exploration',
+      phase: 'creative-exploration',
+      title: 'Creative Thinking',
+      duration: 150,
+      phaseDescription: 'Open-ended creative activities',
+      metadata: {
+        subject: config.subject,
+        skillArea: config.skillArea
+      },
+      content: {
+        creativePrompt: config.creativePrompt,
+        whatIfScenario: config.whatIfScenario,
+        explorationTask: config.explorationTask
+      }
+    },
+
+    // Phase 6: Summary (1-2 min)
+    {
+      id: `${config.subject}-summary`,
+      type: 'summary',
+      phase: 'summary',
+      title: 'Lesson Summary',
+      duration: 90,
+      phaseDescription: 'Key takeaways and assessment',
+      metadata: {
+        subject: config.subject,
+        skillArea: config.skillArea
+      },
+      content: {
+        keyTakeaways: config.keyTakeaways,
+        selfAssessment: config.selfAssessment,
+        nextTopicSuggestion: config.nextTopicSuggestion
+      }
+    }
+  ];
+
+  return {
+    subject: config.subject,
+    skillArea: config.skillArea,
+    totalDuration: activities.reduce((sum, activity) => sum + activity.duration, 0),
+    phases: activities,
+    learningObjectives: config.learningObjectives,
+    prerequisites: config.prerequisites
+  };
+}
+
+export function validateStandardLesson(lesson: SubjectLessonPlan): {
   isValid: boolean;
   errors: string[];
   warnings: string[];
-}
-
-export function validateStandardLesson(lesson: SubjectLessonPlan): StandardLessonConfig {
+} {
   const errors: string[] = [];
   const warnings: string[] = [];
-  
-  // Check total duration (should be ~20 minutes = 1200 seconds)
-  if (lesson.totalDuration < 1000 || lesson.totalDuration > 1400) {
-    errors.push(`Total duration ${lesson.totalDuration}s is outside target range (1000-1400s)`);
-  }
-  
-  // Check required phases
-  const requiredPhases = ['introduction', 'content-delivery', 'interactive-game', 'application', 'creative-exploration', 'summary'];
-  const lessonPhases = lesson.phases.map(p => p.phase);
-  
-  for (const required of requiredPhases) {
-    if (!lessonPhases.includes(required)) {
-      errors.push(`Missing required phase: ${required}`);
+
+  // Check total duration (should be 20 minutes = 1200 seconds)
+  if (lesson.totalDuration !== 1200) {
+    if (lesson.totalDuration < 1140 || lesson.totalDuration > 1260) {
+      errors.push(`Total duration ${lesson.totalDuration}s is outside acceptable range (1140-1260s for 19-21 minutes)`);
+    } else {
+      warnings.push(`Total duration ${lesson.totalDuration}s is close but not exactly 20 minutes (1200s)`);
     }
   }
+
+  // Check required phases
+  const requiredPhases = ['introduction', 'content-delivery', 'interactive-game', 'application', 'creative-exploration', 'summary'];
+  const actualPhases = lesson.phases.map(p => p.phase);
   
+  for (const requiredPhase of requiredPhases) {
+    if (!actualPhases.includes(requiredPhase)) {
+      errors.push(`Missing required phase: ${requiredPhase}`);
+    }
+  }
+
+  // Check phase durations
+  const phaseDurationLimits = {
+    'introduction': { min: 120, max: 180 },
+    'content-delivery': { min: 300, max: 420 },
+    'interactive-game': { min: 240, max: 300 },
+    'application': { min: 180, max: 240 },
+    'creative-exploration': { min: 120, max: 180 },
+    'summary': { min: 60, max: 120 }
+  };
+
+  for (const activity of lesson.phases) {
+    const limits = phaseDurationLimits[activity.phase as keyof typeof phaseDurationLimits];
+    if (limits) {
+      if (activity.duration < limits.min || activity.duration > limits.max) {
+        warnings.push(`Phase '${activity.phase}' duration ${activity.duration}s is outside recommended range (${limits.min}-${limits.max}s)`);
+      }
+    }
+  }
+
   return {
     isValid: errors.length === 0,
     errors,
