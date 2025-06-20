@@ -58,15 +58,15 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
       }
 
       if (data) {
-        // Map database fields to UserProgress interface
+        // Map database fields to UserProgress interface with proper type handling
         const mappedProgress: UserProgress = {
           id: data.id,
           user_id: data.user_id,
           subject: data.subject,
           skill_area: data.skill_area,
-          current_activity_index: data.current_activity_index || 0,
-          score: data.score || 0,
-          time_elapsed: data.time_elapsed || 0,
+          current_activity_index: (data as any).current_activity_index || 0,
+          score: (data as any).score || 0,
+          time_elapsed: (data as any).time_elapsed || 0,
           accuracy_rate: data.accuracy_rate,
           attempts_count: data.attempts_count,
           completion_time_avg: data.completion_time_avg,
@@ -74,8 +74,8 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
           engagement_score: data.engagement_score,
           last_assessment: data.last_assessment,
           learning_style: data.learning_style,
-          strengths: data.strengths || {},
-          weaknesses: data.weaknesses || {},
+          strengths: typeof data.strengths === 'object' && data.strengths !== null ? data.strengths as Record<string, unknown> : {},
+          weaknesses: typeof data.weaknesses === 'object' && data.weaknesses !== null ? data.weaknesses as Record<string, unknown> : {},
           created_at: data.created_at,
           updated_at: data.updated_at
         };
@@ -153,15 +153,15 @@ export const progressPersistence = {
         return null;
       }
 
-      // Map database fields to UserProgress interface
+      // Map database fields to UserProgress interface with proper type handling
       return {
         id: data.id,
         user_id: data.user_id,
         subject: data.subject,
         skill_area: data.skill_area,
-        current_activity_index: data.current_activity_index || 0,
-        score: data.score || 0,
-        time_elapsed: data.time_elapsed || 0,
+        current_activity_index: (data as any).current_activity_index || 0,
+        score: (data as any).score || 0,
+        time_elapsed: (data as any).time_elapsed || 0,
         accuracy_rate: data.accuracy_rate,
         attempts_count: data.attempts_count,
         completion_time_avg: data.completion_time_avg,
@@ -169,8 +169,8 @@ export const progressPersistence = {
         engagement_score: data.engagement_score,
         last_assessment: data.last_assessment,
         learning_style: data.learning_style,
-        strengths: data.strengths || {},
-        weaknesses: data.weaknesses || {},
+        strengths: typeof data.strengths === 'object' && data.strengths !== null ? data.strengths as Record<string, unknown> : {},
+        weaknesses: typeof data.weaknesses === 'object' && data.weaknesses !== null ? data.weaknesses as Record<string, unknown> : {},
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -182,9 +182,13 @@ export const progressPersistence = {
 
   async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
     try {
+      // Convert UserProgress to database format
+      const dbData: any = { ...progressData };
+      delete dbData.id; // Remove id from upsert data
+      
       const { error } = await supabase
         .from('user_performance')
-        .upsert([progressData], { 
+        .upsert(dbData, { 
           onConflict: 'user_id,subject,skill_area',
           ignoreDuplicates: false 
         });
