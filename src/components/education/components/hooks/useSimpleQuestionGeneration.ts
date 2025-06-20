@@ -178,7 +178,7 @@ export const useSimpleQuestionGeneration = ({
         explanation: selectedTemplate.explanation
       }
     };
-  };
+  }, [subject, skillArea]);
 
   const clearGeneratedQuestions = () => {
     usedQuestionIds.current.clear();
@@ -192,4 +192,4 @@ export const useSimpleQuestionGeneration = ({
     questionCount,
     sessionId
   };
-}, [subject, skillArea]);
+};
