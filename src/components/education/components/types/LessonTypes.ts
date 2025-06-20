@@ -1,4 +1,5 @@
 
+
 export interface LessonActivity {
   id: string;
   title: string;
@@ -110,6 +111,7 @@ export interface LessonActivity {
     // Properties from subjectSpecificTemplates
     excitementBuilder?: string;
     celebrationLevel?: string;
+    characterIntroduction?: string;
   };
 }
 
@@ -123,3 +125,4 @@ export interface SubjectLessonPlan {
   engagementLevel?: string;
   funFactor?: string;
 }
+

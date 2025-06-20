@@ -95,15 +95,15 @@ export class NELIESessionGenerator {
       
       if (lesson && typeof lesson === 'object' && 'phases' in lesson) {
         // Validate lesson quality
-        const validation = this.validateLesson(lesson);
+        const validation = this.validateLesson(generateEnhancedLesson(lesson));
         
         subjects[subjectKey] = {
-          lesson,
+          lesson: generateEnhancedLesson(lesson),
           validation,
           activities: lesson.phases as LessonActivity[]
         };
 
-        totalDuration += (lesson.totalDuration as number) || 0;
+        totalDuration += (lesson.estimatedTotalDuration as number) || 0;
         qualityScores[subjectKey] = validation.qualityScore || 0;
       }
     });
@@ -194,7 +194,7 @@ export class NELIESessionGenerator {
     return {
       lesson,
       validation,
-      activities: lesson.phases
+      activities: config.phases
     };
   }
 

@@ -1,4 +1,3 @@
-
 import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
 
 /**
@@ -106,7 +105,7 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
       content: {
         concept: segment.concept,
         interactiveExplanation: segment.interactiveExplanation,
-        quickChallenge: segment.quickChallenge,
+        quickChallenge: segment.quickChallenge.instruction,
         engagementType: 'discovery-adventure',
         celebrationReady: true,
         segments: [{
@@ -142,7 +141,7 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
         explanation: config.gameActivities[0]?.rewards?.[0] || 'Amazing job!',
         gameType: config.gameActivities[0]?.type || 'adventure-game',
         scenario: config.gameActivities[0]?.scenario,
-        mechanics: config.gameActivities[0]?.mechanics,
+        mechanics: [config.gameActivities[0]?.mechanics || 'Fun gameplay'],
         winCondition: config.gameActivities[0]?.winCondition,
         rewards: config.gameActivities[0]?.rewards,
         epicnessLevel: 'LEGENDARY'
@@ -306,6 +305,7 @@ export interface StandardLessonConfig {
   
   // Phase 2: Content Delivery
   contentSegments: Array<{
+    title: string;
     concept: string;
     explanation: string;
     checkQuestion: {
@@ -382,7 +382,12 @@ export function createStandardLesson(config: StandardLessonConfig): SubjectLesso
         skillArea: config.skillArea
       },
       content: {
-        segments: config.contentSegments
+        segments: config.contentSegments.map(segment => ({
+          title: segment.title,
+          concept: segment.concept,
+          explanation: segment.explanation,
+          checkQuestion: segment.checkQuestion
+        }))
       }
     },
 
