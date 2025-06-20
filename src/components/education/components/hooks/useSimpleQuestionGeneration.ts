@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface QuestionTemplate {
@@ -135,7 +135,7 @@ export const useSimpleQuestionGeneration = ({
   const [questionCount, setQuestionCount] = useState(0);
   const usedQuestionIds = useRef<Set<string>>(new Set());
 
-  const generateUniqueQuestion = (): LessonActivity => {
+  const generateUniqueQuestion = useCallback((): LessonActivity => {
     // Filter out already used questions
     const availableQuestions = MATH_QUESTION_TEMPLATES.filter(
       template => !usedQuestionIds.current.has(template.id)
@@ -192,4 +192,4 @@ export const useSimpleQuestionGeneration = ({
     questionCount,
     sessionId
   };
-};
+}, [subject, skillArea]);
