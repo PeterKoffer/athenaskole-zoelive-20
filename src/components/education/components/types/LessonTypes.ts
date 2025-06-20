@@ -1,6 +1,4 @@
 
-
-
 export interface LessonActivity {
   id: string;
   title: string;
@@ -83,7 +81,10 @@ export interface LessonActivity {
     storyHook?: string; // Used in EngagingLessonGenerator
     achievementCelebration?: string; // Used in EngagingLessonGenerator
     celebration?: string; // Used in EngagingLessonGenerator
+    // New properties for factory files
+    thoughtQuestion?: string;
+    concept?: string;
+    activityInstructions?: string;
+    tools?: string[];
   };
 }
-
-
