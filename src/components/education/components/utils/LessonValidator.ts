@@ -1,6 +1,6 @@
 import { validateStandardLesson, StandardLessonConfig } from './StandardLessonTemplate';
 import { SubjectLessonPlan } from '../types/LessonTypes';
-import { createEnglishLesson } from '../lessons/EnglishLessons';
+import { englishLessons } from '../lessons/EnglishLessons';
 import { createMathematicsLesson } from '../lessons/MathematicsLessons';
 import { createScienceLesson } from '../lessons/ScienceLessons';
 import { createMusicLesson } from '../lessons/MusicLessons';
@@ -21,7 +21,7 @@ export function validateAllLessons(): {
   }>;
 } {
   const lessonCreators = {
-    english: createEnglishLesson,
+    english: () => englishLessons,
     mathematics: createMathematicsLesson,
     science: createScienceLesson,
     music: createMusicLesson,

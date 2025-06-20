@@ -1,4 +1,5 @@
 
+
 export interface LessonActivity {
   id: string;
   title: string;
@@ -86,5 +87,21 @@ export interface LessonActivity {
     concept?: string;
     activityInstructions?: string;
     tools?: string[];
+    // Additional properties found in StandardLessonTemplate
+    realWorldExample?: string;
+    hint?: string;
+    storyContext?: string;
   };
 }
+
+export interface SubjectLessonPlan {
+  subject: string;
+  skillArea: string;
+  totalDuration: number;
+  phases: LessonActivity[];
+  learningObjectives: string[];
+  prerequisites: string[];
+  engagementLevel?: string;
+  funFactor?: string;
+}
+

@@ -4,7 +4,7 @@ import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { 
   createMathematicsLesson
 } from '../lessons/MathematicsLessons';
-import { createEnglishLesson } from '../lessons/EnglishLessons';
+import { englishLessons } from '../lessons/EnglishLessons';
 import { createScienceLesson } from '../lessons/ScienceLessons';
 import { createMusicLesson } from '../lessons/MusicLessons';
 import { createComputerScienceLesson } from '../lessons/ComputerScienceLessons';
@@ -48,7 +48,7 @@ export const useLessonManager = ({
         activities = createMathematicsLesson();
         break;
       case 'english':
-        activities = createEnglishLesson();
+        activities = englishLessons;
         break;
       case 'science':
         activities = createScienceLesson();
