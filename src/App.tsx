@@ -10,6 +10,7 @@ import GlobalImagePreloader from '@/components/education/components/shared/Globa
 
 // Import pages
 import Index from '@/pages/Index';
+import Auth from '@/pages/Auth'; // Added Auth import
 import SchoolDashboard from '@/pages/SchoolDashboard';
 import SimpleSchoolDashboard from '@/pages/SimpleSchoolDashboard';
 import TeacherDashboard from '@/pages/TeacherDashboard';
@@ -56,6 +57,7 @@ function AppRoutes() {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/school-dashboard" element={<SchoolDashboard />} />
         <Route path="/simple-school-dashboard" element={<SimpleSchoolDashboard />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
