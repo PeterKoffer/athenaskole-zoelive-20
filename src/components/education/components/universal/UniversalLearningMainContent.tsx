@@ -322,7 +322,7 @@ const UniversalLearningMainContent = ({
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-white mb-4">{currentActivity.title}</h3>
                 <div className="text-lg text-purple-200 mb-6">
-                  {currentActivity.content?.text || `Welcome to ${subject} learning with Nelie!`}
+                  {currentActivity.content?.question || `Welcome to ${subject} learning with Nelie!`}
                 </div>
                 
                 {/* Sample Interactive Content */}

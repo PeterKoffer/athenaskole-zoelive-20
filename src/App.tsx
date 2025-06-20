@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -28,9 +28,9 @@ import TeacherCommunicationsPage from '@/pages/TeacherCommunicationsPage';
 import AnnouncementsPage from '@/pages/AnnouncementsPage';
 
 // Import learning components
-import EnhancedMathematicsLearning from '@/components/education/EnhancedMathematicsLearning';
+import AILearningModule from '@/components/adaptive-learning/AILearningModule'; // Added AILearningModule
 import LanguageLearning from '@/components/LanguageLearning';
-import UniversalLearning from '@/components/education/UniversalLearning';
+// UniversalLearning and EnhancedMathematicsLearning might be removed if no longer used directly
 import MentalWellnessLearning from '@/components/education/MentalWellnessLearning';
 import WorldHistoryReligionsLearning from '@/components/education/WorldHistoryReligionsLearning';
 import GlobalGeographyLearning from '@/components/education/GlobalGeographyLearning';
@@ -48,6 +48,9 @@ const queryClient = new QueryClient({
 
 function AppRoutes() {
   const { user } = useAuth();
+  const navigate = useNavigate(); // Added useNavigate hook
+
+  const handleLessonBack = () => navigate('/student-dashboard'); // Define back handler
 
   return (
     <>
@@ -70,13 +73,15 @@ function AppRoutes() {
         <Route path="/teacher-communications" element={<TeacherCommunicationsPage />} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
         
-        {/* Learning activity routes - mathematics uses the working component */}
-        <Route path="/learn/mathematics" element={<EnhancedMathematicsLearning />} />
-        <Route path="/learn/english" element={<UniversalLearning subject="english" skillArea="general_english" />} />
-        <Route path="/learn/music" element={<UniversalLearning subject="music" skillArea="general_music" />} />
-        <Route path="/learn/science" element={<UniversalLearning subject="science" skillArea="general_science" />} />
-        <Route path="/learn/computer-science" element={<UniversalLearning subject="computer-science" skillArea="general_programming" />} />
-        <Route path="/learn/creative-arts" element={<UniversalLearning subject="creative-arts" skillArea="general_arts" />} />
+        {/* Learning activity routes - Rerouted to AILearningModule */}
+        <Route path="/learn/mathematics" element={<AILearningModule subject="mathematics" skillArea="general_mathematics" difficultyLevel={2} onBack={handleLessonBack} />} />
+        <Route path="/learn/english" element={<AILearningModule subject="english" skillArea="general_english" difficultyLevel={2} onBack={handleLessonBack} />} />
+        <Route path="/learn/music" element={<AILearningModule subject="music" skillArea="general_music" difficultyLevel={2} onBack={handleLessonBack} />} />
+        <Route path="/learn/science" element={<AILearningModule subject="science" skillArea="general_science" difficultyLevel={2} onBack={handleLessonBack} />} />
+        <Route path="/learn/computer-science" element={<AILearningModule subject="computer-science" skillArea="general_programming" difficultyLevel={2} onBack={handleLessonBack} />} />
+        <Route path="/learn/creative-arts" element={<AILearningModule subject="creative-arts" skillArea="general_arts" difficultyLevel={2} onBack={handleLessonBack} />} />
+
+        {/* Other learning routes - kept as is for now */}
         <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
         <Route path="/learn/language-lab" element={<LanguageLearning />} />
         <Route path="/learn/world-history-religions" element={<WorldHistoryReligionsLearning />} />
