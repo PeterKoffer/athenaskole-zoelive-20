@@ -1,4 +1,3 @@
-
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
@@ -108,6 +107,7 @@ const SubjectsSection = () => {
 
   const handleStartLearning = (path: string) => {
     console.log(`🚀 Starting learning for path: ${path}`);
+    // Direct navigation without any auth checks
     navigate(path);
   };
 

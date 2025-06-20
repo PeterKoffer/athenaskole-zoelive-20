@@ -6,7 +6,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 
 /**
  * Handles automatic redirection after authentication based on user role
- * BLOCKS redirects during active learning sessions to prevent interruption
+ * ALLOWS unauthenticated users to access learning content as guests
  */
 export const useAuthRedirect = () => {
   const { user, loading } = useAuth();
@@ -27,12 +27,12 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    // CRITICAL: Block redirects during active learning sessions
+    // CRITICAL: ALWAYS allow learning content for guests and authenticated users
     const learningPaths = ['/learn', '/daily-program', '/mathematics', '/english', '/science'];
     const isInLearningSession = learningPaths.some(path => location.pathname.includes(path));
     
     if (isInLearningSession) {
-      console.log('[useAuthRedirect] 🚫 BLOCKING redirects - active learning session detected:', location.pathname);
+      console.log('[useAuthRedirect] ✅ ALLOWING learning session access:', location.pathname);
       return;
     }
 
@@ -42,19 +42,7 @@ export const useAuthRedirect = () => {
       return;
     }
 
-    // For users without authentication who are trying to access learning content, don't redirect away
-    if (!user && isInLearningSession) {
-      console.log('[useAuthRedirect] No user but in learning session - keeping in session');
-      return;
-    }
-
-    // If no user or role, don't redirect (let them stay on current page or go to auth)
-    if (!user && !userRole) {
-      console.log('[useAuthRedirect] No user and no role - staying put');
-      return;
-    }
-
-    // Only auto-redirect authenticated users with roles from the home page
+    // Only auto-redirect authenticated users with roles from specific pages
     if (location.pathname === '/' && user && userRole) {
       console.log('[useAuthRedirect] ✅ Auto-redirecting authenticated user from home page');
 
