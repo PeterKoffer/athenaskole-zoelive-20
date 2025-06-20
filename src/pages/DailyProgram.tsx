@@ -20,12 +20,22 @@ const DailyProgram = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Redirect to auth if not logged in - but only after loading is complete
+  // Don't redirect immediately - allow some time for auth to settle
   useEffect(() => {
+    let redirectTimer: NodeJS.Timeout;
+    
     if (!loading && !user) {
-      console.log("User not authenticated, redirecting to auth");
-      navigate('/auth');
+      console.log("User not authenticated, will redirect to auth in 2 seconds");
+      redirectTimer = setTimeout(() => {
+        navigate('/auth');
+      }, 2000);
     }
+
+    return () => {
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
+    };
   }, [user, loading, navigate]);
   
   // Force English locale for date formatting
@@ -37,14 +47,8 @@ const DailyProgram = () => {
   });
 
   const handleStartActivity = (activityId: string) => {
-    console.log("Starting activity:", activityId, "User:", user);
+    console.log("Starting activity:", activityId, "User:", user?.id);
     
-    if (!user) {
-      console.log("No user found, redirecting to auth");
-      navigate('/auth');
-      return;
-    }
-
     setSelectedActivity(activityId);
     console.log("Navigating to:", `/learn/${activityId}`);
     
@@ -64,9 +68,35 @@ const DailyProgram = () => {
     );
   }
 
-  // Don't render the component if user is not authenticated
+  // Show temporary message if user is not authenticated but allow access
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="text-4xl mb-4">🎓</div>
+            <h1 className="text-3xl font-bold mb-4">Welcome to Daily Program</h1>
+            <p className="text-gray-300 mb-6">
+              You can explore the learning activities below. For a personalized experience, please sign in.
+            </p>
+            <Button 
+              onClick={() => navigate('/auth')} 
+              className="bg-blue-600 hover:bg-blue-700 mb-8"
+            >
+              Sign In for Full Access
+            </Button>
+          </div>
+          
+          <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
+          
+          <div className="mt-8 text-center">
+            <Button variant="outline" onClick={() => navigate('/')} className="border-gray-600 text-slate-950 bg-sky-50">
+              Back to home page
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

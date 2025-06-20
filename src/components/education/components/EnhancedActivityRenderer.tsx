@@ -1,160 +1,239 @@
 
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Play, Brain, Target } from 'lucide-react';
 import { LessonActivity } from './types/LessonTypes';
-import ActivityIntroduction from './activities/ActivityIntroduction';
-import ActivityContentDelivery from './activities/ActivityContentDelivery';
-import ActivityInteractiveGame from './activities/ActivityInteractiveGame';
-import ActivityFallback from './activities/ActivityFallback';
-import ActivityPuzzle from './activities/ActivityPuzzle';
-import ActivityMiniGame from './activities/ActivityMiniGame';
-import ActivityAdventureGame from './activities/ActivityAdventureGame';
-import ActivityPuzzleQuest from './activities/ActivityPuzzleQuest';
-import ActivityInteractiveQuiz from './activities/ActivityInteractiveQuiz';
-import ActivitySimulationGame from './activities/ActivitySimulationGame';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
-  onActivityComplete: (wasCorrect?: boolean) => void;
-  isNelieReady: boolean;
+  onComplete?: (score: number) => void;
+  onActivityComplete?: (wasCorrect?: boolean) => void;
+  score?: number;
+  isNelieReady?: boolean;
 }
 
-const EnhancedActivityRenderer = ({
+const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   activity,
+  onComplete,
   onActivityComplete,
-  isNelieReady
-}: EnhancedActivityRendererProps) => {
-  console.log('🎭 EnhancedActivityRenderer rendering:', {
-    activityId: activity.id,
-    activityType: activity.type,
-    activityPhase: activity.phase,
-    activityTitle: activity.title,
-    hasContent: !!activity.content,
-    contentKeys: activity.content ? Object.keys(activity.content) : []
-  });
+  score = 0,
+  isNelieReady = true
+}) => {
+  const [selectedAnswer, setSelectedAnswer] = React.useState<number | null>(null);
+  const [showResult, setShowResult] = React.useState(false);
 
-  // PRIORITY 1: Check for Pizza Factory and similar simulation games FIRST
-  if (activity.title.includes('Pizza') || activity.title.includes('Factory') || 
-      activity.content?.simulationDescription || activity.content?.scenarios ||
-      activity.type === 'simulation' || activity.phase === 'simulation') {
-    console.log('🍕 Rendering Pizza Factory as simulation game');
-    return (
-      <ActivitySimulationGame
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (showResult) return;
+    
+    setSelectedAnswer(answerIndex);
+    setShowResult(true);
+    
+    const isCorrect = answerIndex === activity.content.correctAnswer;
+    const points = isCorrect ? 10 : 0;
+    
+    setTimeout(() => {
+      if (onComplete) {
+        onComplete(points);
+      }
+      if (onActivityComplete) {
+        onActivityComplete(isCorrect);
+      }
+    }, 2000);
+  };
 
-  // PRIORITY 2: Battle/Arena activities - check for quiz type instead of phase
-  if (activity.title?.includes('Battle') || activity.title?.includes('Arena') || 
-      activity.title?.includes('Quiz') || activity.title?.includes('Challenge') ||
-      activity.content?.battleScenario || activity.type === 'quiz') {
-    console.log('🎮 Rendering as interactive quiz for battle/arena activity');
-    return (
-      <ActivityInteractiveQuiz
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+  const handleContinue = () => {
+    if (onComplete) {
+      onComplete(0);
+    }
+    if (onActivityComplete) {
+      onActivityComplete(true);
+    }
+  };
 
-  // PRIORITY 3: Other simulation games
-  if (activity.title.includes('Shop')) {
-    return (
-      <ActivitySimulationGame
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+  const renderContent = () => {
+    switch (activity.type) {
+      case 'introduction':
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg leading-relaxed">
+              {activity.content.hook || activity.content.text}
+            </p>
+            <Button 
+              onClick={handleContinue}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Continue Learning
+            </Button>
+          </div>
+        );
 
-  // Adventure games
-  if (activity.content?.gameType === 'adventure-game' || activity.title.includes('Adventure') ||
-      activity.type === 'adventure-game' || activity.phase === 'adventure-game') {
-    return (
-      <ActivityAdventureGame
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+      case 'content-delivery':
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg leading-relaxed">
+              {activity.content.segments?.[0]?.explanation || activity.content.text}
+            </p>
+            <Button 
+              onClick={handleContinue}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Continue Learning
+            </Button>
+          </div>
+        );
 
-  // Puzzle quests
-  if (activity.content?.gameType === 'puzzle-quest' || activity.title.includes('Puzzle Quest') || 
-      activity.title.includes('Mystery')) {
-    return (
-      <ActivityPuzzleQuest
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+      case 'interactive-game':
+      case 'quiz':
+        return (
+          <div className="space-y-6">
+            <h3 className="text-xl font-semibold text-white mb-4">
+              {activity.content.question}
+            </h3>
+            
+            <div className="grid gap-3">
+              {activity.content.options?.map((option, index) => (
+                <Button
+                  key={index}
+                  onClick={() => handleAnswerSelect(index)}
+                  disabled={showResult}
+                  variant={selectedAnswer === index ? "default" : "outline"}
+                  className={`p-4 text-left justify-start h-auto ${
+                    showResult && index === activity.content.correctAnswer
+                      ? 'bg-green-600 border-green-500'
+                      : showResult && selectedAnswer === index && index !== activity.content.correctAnswer
+                      ? 'bg-red-600 border-red-500'
+                      : ''
+                  }`}
+                >
+                  <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
+                  {option}
+                </Button>
+              ))}
+            </div>
 
-  // Interactive game type - this should handle most math activities
-  if (activity.type === 'interactive-game' || activity.phase === 'interactive-game') {
-    console.log('🎮 Rendering as interactive game');
-    return (
-      <ActivityInteractiveGame
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+            {showResult && (
+              <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+                <p className="text-gray-300">
+                  {activity.content.explanation}
+                </p>
+              </div>
+            )}
+          </div>
+        );
 
-  // Activities with questions (but not necessarily quiz type)
-  if (activity.content?.question) {
-    return (
-      <ActivityInteractiveQuiz
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+      case 'creative-exploration':
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg">
+              {activity.content.creativePrompt || activity.content.text}
+            </p>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <p className="text-gray-400 italic">
+                Think about this scenario and be creative with your response!
+              </p>
+            </div>
+            <Button 
+              onClick={handleContinue}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              Continue Exploring
+            </Button>
+          </div>
+        );
 
-  // Render based on activity phase
-  if (activity.phase === 'introduction') {
-    return (
-      <ActivityIntroduction
-        activity={activity}
-        onActivityComplete={() => onActivityComplete()}
-      />
-    );
-  }
+      case 'application':
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg">
+              {activity.content.scenario || activity.content.text}
+            </p>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <p className="text-gray-400">
+                Apply what you've learned to solve this real-world scenario.
+              </p>
+            </div>
+            <Button 
+              onClick={handleContinue}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Target className="w-4 h-4 mr-2" />
+              Complete Application
+            </Button>
+          </div>
+        );
 
-  if (activity.phase === 'content-delivery') {
-    return (
-      <ActivityContentDelivery
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+      case 'summary':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              {activity.content.keyTakeaways?.map((takeaway, index) => (
+                <div key={index} className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-gray-300">{takeaway}</p>
+                </div>
+              ))}
+            </div>
+            <Button 
+              onClick={handleContinue}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Complete Lesson
+            </Button>
+          </div>
+        );
 
-  // Legacy specific game/puzzle types
-  if (activity.content?.puzzleDescription && !activity.title.includes('Quest')) {
-    return (
-      <ActivityPuzzle
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+      case 'simulation':
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg">
+              {activity.content.simulationDescription || activity.content.text}
+            </p>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <p className="text-gray-400 italic">
+                Interactive simulation experience
+              </p>
+            </div>
+            <Button 
+              onClick={handleContinue}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Complete Simulation
+            </Button>
+          </div>
+        );
 
-  if (activity.content?.gameDescription && !activity.title.includes('Adventure')) {
-    return (
-      <ActivityMiniGame
-        activity={activity}
-        onActivityComplete={onActivityComplete}
-      />
-    );
-  }
+      default:
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-300 text-lg">
+              {activity.content.text || 'Content not available'}
+            </p>
+            <Button 
+              onClick={handleContinue}
+              className="bg-gray-600 hover:bg-gray-700 text-white"
+            >
+              Continue
+            </Button>
+          </div>
+        );
+    }
+  };
 
-  // Default fallback - but make it more interactive
-  console.log('⚠️ Using fallback renderer for activity:', activity.title);
   return (
-    <ActivityInteractiveGame
-      activity={activity}
-      onActivityComplete={onActivityComplete}
-    />
+    <Card className="bg-gray-900 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center space-x-2">
+          <span>{activity.title}</span>
+          <span className="text-sm text-gray-400">({activity.duration} min)</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {renderContent()}
+      </CardContent>
+    </Card>
   );
 };
 
