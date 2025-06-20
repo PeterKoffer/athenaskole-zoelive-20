@@ -1,5 +1,6 @@
 
 
+
 export interface LessonActivity {
   id: string;
   title: string;
@@ -79,6 +80,10 @@ export interface LessonActivity {
     // Additional missing properties
     message?: string; // Used in ActivityWelcome
     difficulty?: number; // Used in PuzzleQuestBriefing
+    storyHook?: string; // Used in EngagingLessonGenerator
+    achievementCelebration?: string; // Used in EngagingLessonGenerator
+    celebration?: string; // Used in EngagingLessonGenerator
   };
 }
+
 
