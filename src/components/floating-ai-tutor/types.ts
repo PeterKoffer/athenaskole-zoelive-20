@@ -9,3 +9,10 @@ export interface DragState {
   startPosition: Position;
   currentPosition: Position;
 }
+
+export interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  showOptions?: boolean;
+}

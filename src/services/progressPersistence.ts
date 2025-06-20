@@ -57,7 +57,30 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
         return;
       }
 
-      setUserProgress(data);
+      if (data) {
+        // Map database fields to UserProgress interface
+        const mappedProgress: UserProgress = {
+          id: data.id,
+          user_id: data.user_id,
+          subject: data.subject,
+          skill_area: data.skill_area,
+          current_activity_index: data.current_activity_index || 0,
+          score: data.score || 0,
+          time_elapsed: data.time_elapsed || 0,
+          accuracy_rate: data.accuracy_rate,
+          attempts_count: data.attempts_count,
+          completion_time_avg: data.completion_time_avg,
+          current_level: data.current_level,
+          engagement_score: data.engagement_score,
+          last_assessment: data.last_assessment,
+          learning_style: data.learning_style,
+          strengths: data.strengths || {},
+          weaknesses: data.weaknesses || {},
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        };
+        setUserProgress(mappedProgress);
+      }
     } catch (error) {
       console.error('Error fetching user progress:', error);
     } finally {
@@ -108,6 +131,72 @@ export const progressPersistence = {
       return true;
     } catch (error) {
       console.error('Error updating session:', error);
+      return false;
+    }
+  },
+
+  async getUserProgress(userId: string, subject: string): Promise<UserProgress | null> {
+    try {
+      const { data, error } = await supabase
+        .from('user_performance')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user progress:', error);
+        return null;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      // Map database fields to UserProgress interface
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        subject: data.subject,
+        skill_area: data.skill_area,
+        current_activity_index: data.current_activity_index || 0,
+        score: data.score || 0,
+        time_elapsed: data.time_elapsed || 0,
+        accuracy_rate: data.accuracy_rate,
+        attempts_count: data.attempts_count,
+        completion_time_avg: data.completion_time_avg,
+        current_level: data.current_level,
+        engagement_score: data.engagement_score,
+        last_assessment: data.last_assessment,
+        learning_style: data.learning_style,
+        strengths: data.strengths || {},
+        weaknesses: data.weaknesses || {},
+        created_at: data.created_at,
+        updated_at: data.updated_at
+      };
+    } catch (error) {
+      console.error('Error fetching user progress:', error);
+      return null;
+    }
+  },
+
+  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('user_performance')
+        .upsert([progressData], { 
+          onConflict: 'user_id,subject,skill_area',
+          ignoreDuplicates: false 
+        });
+
+      if (error) {
+        console.error('Error updating user progress:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating user progress:', error);
       return false;
     }
   }
