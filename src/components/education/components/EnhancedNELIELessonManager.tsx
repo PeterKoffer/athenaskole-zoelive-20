@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,7 @@ const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELI
       console.error('Error initializing lesson:', error);
       // Fallback lesson
       const fallbackLesson: EnhancedLessonConfig = {
-        id: `fallback_${Date.now()}`,
+        sessionId: `fallback_${Date.now()}`,
         title: `${subject} - ${skillArea}`,
         overview: `Interactive ${subject} lesson focusing on ${skillArea}`,
         gradeLevel: 3,
@@ -54,12 +55,16 @@ const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELI
         subject,
         skillArea,
         difficulty: 1,
+        estimatedTotalDuration: 20,
         estimatedDuration: 20,
         objectives: [`Learn ${skillArea} concepts`],
+        learningObjectives: [`Learn ${skillArea} concepts`],
         prerequisites: [],
         assessmentCriteria: ['Understanding of concepts'],
+        assessmentMethods: ['Interactive exercises'],
         materials: ['Interactive content'],
         extensions: ['Practice exercises'],
+        keywords: [subject, skillArea],
         phases: []
       };
       setLesson(fallbackLesson);
@@ -176,7 +181,7 @@ const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELI
                     Ready to Start Learning?
                   </h3>
                   <p className="text-gray-400 mb-6">
-                    This lesson will take approximately {lesson.estimatedDuration} minutes
+                    This lesson will take approximately {lesson.estimatedTotalDuration} minutes
                   </p>
                   <Button
                     onClick={handleStartLesson}
@@ -232,7 +237,7 @@ const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELI
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {lesson.objectives?.map((objective, index) => (
+                {lesson.learningObjectives?.map((objective, index) => (
                   <li key={index} className="flex items-start space-x-2">
                     <CheckCircle className="w-4 h-4 text-lime-400 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300 text-sm">{objective}</span>
@@ -251,7 +256,7 @@ const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELI
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Duration</span>
-                  <span className="text-white">{lesson.estimatedDuration} min</span>
+                  <span className="text-white">{lesson.estimatedTotalDuration} min</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Difficulty</span>

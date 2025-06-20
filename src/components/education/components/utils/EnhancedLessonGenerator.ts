@@ -15,6 +15,13 @@ export interface EnhancedLessonConfig {
   materials: string[];
   assessmentMethods: string[];
   keywords: string[];
+  // Additional properties that were being used
+  estimatedDuration: number; // Alias for estimatedTotalDuration
+  objectives: string[]; // Alias for learningObjectives
+  difficulty: number;
+  prerequisites: string[];
+  assessmentCriteria: string[];
+  extensions: string[];
 }
 
 export const ENHANCED_LESSON_PHASES = {
@@ -26,15 +33,45 @@ export const ENHANCED_LESSON_PHASES = {
   summary: { baseSeconds: 90 }
 };
 
-export function generateEnhancedLesson(config: EnhancedLessonConfig): SubjectLessonPlan {
-  return {
-    subject: config.subject,
-    skillArea: config.skillArea,
-    totalDuration: config.estimatedTotalDuration,
-    phases: config.phases,
-    learningObjectives: config.learningObjectives,
-    prerequisites: []
-  };
+export function generateEnhancedLesson(subject: string, skillArea: string): Promise<EnhancedLessonConfig> {
+  return new Promise((resolve) => {
+    // Generate a basic lesson structure
+    const lessonConfig: EnhancedLessonConfig = {
+      subject,
+      skillArea,
+      gradeLevel: 6,
+      learningStyle: 'mixed',
+      sessionId: `session_${subject}_${Date.now()}`,
+      title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} - ${skillArea}`,
+      overview: `Interactive ${subject} lesson focusing on ${skillArea}`,
+      phases: [
+        {
+          id: `${subject}-intro`,
+          type: 'introduction',
+          phase: 'introduction',
+          title: `Welcome to ${subject.charAt(0).toUpperCase() + subject.slice(1)}`,
+          duration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
+          phaseDescription: 'Introduction to the lesson',
+          metadata: { subject, skillArea },
+          content: { text: `Welcome to an exciting ${subject} lesson!` }
+        }
+      ],
+      estimatedTotalDuration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
+      learningObjectives: [`Learn ${skillArea} concepts`],
+      materials: ['Interactive content'],
+      assessmentMethods: ['Interactive exercises'],
+      keywords: [subject, skillArea],
+      // Aliases
+      estimatedDuration: ENHANCED_LESSON_PHASES.introduction.baseSeconds,
+      objectives: [`Learn ${skillArea} concepts`],
+      difficulty: 3,
+      prerequisites: [],
+      assessmentCriteria: ['Understanding of concepts'],
+      extensions: ['Practice exercises']
+    };
+
+    resolve(lessonConfig);
+  });
 }
 
 export function validateEnhancedLesson(lesson: SubjectLessonPlan): {
