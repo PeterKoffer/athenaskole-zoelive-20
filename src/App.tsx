@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,7 +10,6 @@ import GlobalImagePreloader from '@/components/education/components/shared/Globa
 
 // Import pages
 import Index from '@/pages/Index';
-import Auth from '@/pages/Auth';
 import SchoolDashboard from '@/pages/SchoolDashboard';
 import SimpleSchoolDashboard from '@/pages/SimpleSchoolDashboard';
 import TeacherDashboard from '@/pages/TeacherDashboard';
@@ -28,13 +28,9 @@ import TeacherCommunicationsPage from '@/pages/TeacherCommunicationsPage';
 import AnnouncementsPage from '@/pages/AnnouncementsPage';
 
 // Import learning components
-import AILearningModule from '@/components/adaptive-learning/AILearningModule';
+import EnhancedMathematicsLearning from '@/components/education/EnhancedMathematicsLearning';
 import LanguageLearning from '@/components/LanguageLearning';
-import MentalWellnessLearning from '@/components/education/MentalWellnessLearning';
-import WorldHistoryReligionsLearning from '@/components/education/WorldHistoryReligionsLearning';
-import GlobalGeographyLearning from '@/components/education/GlobalGeographyLearning';
-import BodyLabLearning from '@/components/education/BodyLabLearning';
-import LifeEssentialsLearning from '@/components/education/LifeEssentialsLearning';
+import UniversalLearning from '@/components/education/UniversalLearning';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,15 +43,11 @@ const queryClient = new QueryClient({
 
 function AppRoutes() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLessonBack = () => navigate('/student-dashboard');
 
   return (
     <>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
         <Route path="/school-dashboard" element={<SchoolDashboard />} />
         <Route path="/simple-school-dashboard" element={<SimpleSchoolDashboard />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
@@ -73,21 +65,13 @@ function AppRoutes() {
         <Route path="/teacher-communications" element={<TeacherCommunicationsPage />} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
         
-        {/* Learning activity routes */}
-        <Route path="/learn/mathematics" element={<AILearningModule subject="mathematics" skillArea="general_mathematics" difficultyLevel={2} onBack={handleLessonBack} />} />
-        <Route path="/learn/english" element={<AILearningModule subject="english" skillArea="general_english" difficultyLevel={2} onBack={handleLessonBack} />} />
-        <Route path="/learn/music" element={<AILearningModule subject="music" skillArea="general_music" difficultyLevel={2} onBack={handleLessonBack} />} />
-        <Route path="/learn/science" element={<AILearningModule subject="science" skillArea="general_science" difficultyLevel={2} onBack={handleLessonBack} />} />
-        <Route path="/learn/computer-science" element={<AILearningModule subject="computer-science" skillArea="general_programming" difficultyLevel={2} onBack={handleLessonBack} />} />
-        <Route path="/learn/creative-arts" element={<AILearningModule subject="creative-arts" skillArea="general_arts" difficultyLevel={2} onBack={handleLessonBack} />} />
-
-        {/* Other learning routes */}
-        <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
-        <Route path="/learn/language-lab" element={<LanguageLearning />} />
-        <Route path="/learn/world-history-religions" element={<WorldHistoryReligionsLearning />} />
-        <Route path="/learn/global-geography" element={<GlobalGeographyLearning />} />
-        <Route path="/learn/body-lab" element={<BodyLabLearning />} />
-        <Route path="/learn/life-essentials" element={<LifeEssentialsLearning />} />
+        {/* Learning activity routes - mathematics uses the working component */}
+        <Route path="/learn/mathematics" element={<EnhancedMathematicsLearning />} />
+        <Route path="/learn/english" element={<UniversalLearning subject="english" skillArea="general_english" />} />
+        <Route path="/learn/music" element={<UniversalLearning subject="music" skillArea="general_music" />} />
+        <Route path="/learn/science" element={<UniversalLearning subject="science" skillArea="general_science" />} />
+        <Route path="/learn/computer-science" element={<UniversalLearning subject="computer-science" skillArea="general_programming" />} />
+        <Route path="/learn/creative-arts" element={<UniversalLearning subject="creative-arts" skillArea="general_arts" />} />
         <Route path="/learn/spanish" element={<LanguageLearning initialLanguage="spanish" />} />
         <Route path="/learn/french" element={<LanguageLearning initialLanguage="french" />} />
         <Route path="/learn/german" element={<LanguageLearning initialLanguage="german" />} />

@@ -1,18 +1,16 @@
 
+export interface Message {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
 export interface Position {
   x: number;
   y: number;
 }
 
-export interface DragState {
-  isDragging: boolean;
-  startPosition: Position;
-  currentPosition: Position;
-}
-
-export interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  showOptions?: boolean;
+export interface DragOffset {
+  x: number;
+  y: number;
 }

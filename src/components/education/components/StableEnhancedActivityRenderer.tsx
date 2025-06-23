@@ -14,12 +14,6 @@ const StableEnhancedActivityRenderer = ({
   onActivityComplete,
   isNelieReady = true
 }: StableEnhancedActivityRendererProps) => {
-  // Fallback if activity or activity.content is null (should ideally not happen if useUnifiedLessonTemplate guards it)
-  if (!activity || !activity.content) {
-     console.error("Error: Activity or activity content is null in StableEnhancedActivityRenderer:", activity);
-     return <div className="text-red-500 p-4">Error: Unable to render activity due to missing data.</div>;
-  }
-
   console.log('🎯 StableEnhancedActivityRenderer rendering:', {
     activityId: activity.id,
     activityType: activity.type,
@@ -42,10 +36,6 @@ const StableEnhancedActivityRenderer = ({
 
   // Handle interactive quiz activities
   if (activity.type === 'interactive-game' || activity.phase === 'interactive-game') {
-    if (!activity.content || !activity.content.question || !activity.content.options) {
-      console.error("Error: Missing essential content for interactive quiz activity:", activity);
-      return <div className="text-red-500 p-4">Error: Activity content is missing for this quiz.</div>;
-    }
     return (
       <StableActivityInteractiveQuiz
         activity={activity}
@@ -56,13 +46,11 @@ const StableEnhancedActivityRenderer = ({
 
   // Handle introduction activities with consistent button styling
   if (activity.type === 'introduction' || activity.phase === 'introduction') {
-    const mainTitle = activity.title || 'Introduction';
-    const mainText = activity.content?.text || activity.phaseDescription || "Welcome!";
     return (
       <div className="bg-gray-800 rounded-lg p-8 text-center text-white">
-        <h3 className="text-2xl font-semibold mb-4">{mainTitle}</h3>
+        <h3 className="text-2xl font-semibold mb-4">{activity.title}</h3>
         <div className="text-gray-300 mb-6 text-lg leading-relaxed">
-          {mainText}
+          {activity.content?.text || activity.phaseDescription || "Welcome to your learning adventure!"}
         </div>
         <div className="flex justify-center mt-6">
           <button
@@ -78,15 +66,14 @@ const StableEnhancedActivityRenderer = ({
 
   // Handle application activities with consistent button styling
   if (activity.type === 'application' || activity.phase === 'application') {
-    const scenarioText = activity.content?.scenario;
     return (
       <div className="bg-gray-800 rounded-lg p-8 text-white">
         <h3 className="text-2xl font-semibold mb-4">{activity.title}</h3>
         <div className="text-gray-300 mb-6 text-lg leading-relaxed">
-          {scenarioText && (
+          {activity.content?.scenario && (
             <div className="mb-4">
               <h4 className="text-xl font-semibold text-lime-400 mb-2">Scenario:</h4>
-              <p>{scenarioText}</p>
+              <p>{activity.content.scenario}</p>
             </div>
           )}
           {activity.content?.task && (
@@ -95,7 +82,7 @@ const StableEnhancedActivityRenderer = ({
               <p>{activity.content.task}</p>
             </div>
           )}
-          {activity.content?.text && !scenarioText && ( // Show generic text if no specific scenario
+          {activity.content?.text && !activity.content?.scenario && (
             <p>{activity.content.text}</p>
           )}
         </div>
@@ -113,9 +100,6 @@ const StableEnhancedActivityRenderer = ({
 
   // Handle creative exploration activities with consistent button styling
   if (activity.type === 'creative-exploration' || activity.phase === 'creative-exploration') {
-    const baseCreativePrompt = activity.content?.creativePrompt || "Think creatively!";
-    const whatIfScenarioText = activity.content?.whatIfScenario;
-
     return (
       <div className="bg-gradient-to-br from-purple-800 to-indigo-800 rounded-lg p-8 text-white">
         <h3 className="text-2xl font-semibold mb-4">{activity.title}</h3>
@@ -123,13 +107,13 @@ const StableEnhancedActivityRenderer = ({
           {activity.content?.creativePrompt && (
             <div className="mb-4">
               <h4 className="text-xl font-semibold text-purple-300 mb-2">Creative Challenge:</h4>
-              <p className="text-gray-200">{baseCreativePrompt}</p>
+              <p className="text-gray-200">{activity.content.creativePrompt}</p>
             </div>
           )}
-          {whatIfScenarioText && (
+          {activity.content?.whatIfScenario && (
             <div className="mb-4">
               <h4 className="text-xl font-semibold text-pink-300 mb-2">What If...?</h4>
-              <p className="text-gray-200">{whatIfScenarioText}</p>
+              <p className="text-gray-200">{activity.content.whatIfScenario}</p>
             </div>
           )}
           {activity.content?.explorationTask && (
@@ -138,7 +122,7 @@ const StableEnhancedActivityRenderer = ({
               <p className="text-gray-200">{activity.content.explorationTask}</p>
             </div>
           )}
-          {activity.content?.text && !activity.content?.creativePrompt && !whatIfScenarioText && (
+          {activity.content?.text && !activity.content?.creativePrompt && (
             <p className="text-gray-200">{activity.content.text}</p>
           )}
         </div>

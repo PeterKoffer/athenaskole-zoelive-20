@@ -1,11 +1,14 @@
 
-export { generateWelcomeActivity as createWelcomeActivity } from './utils/welcomeActivityGenerator';
+// Re-export types
 export type { LessonActivity } from './types/LessonTypes';
 
-export const createEnhancedLessonContent = (subject: string, skillArea: string) => {
-  return {
-    subject,
-    skillArea,
-    content: `Enhanced lesson content for ${subject} - ${skillArea}`
-  };
-};
+// Re-export lesson creators
+export { createMathematicsLesson } from './lessons/MathematicsLessons';
+export { createEnglishLesson } from './lessons/EnglishLessons';
+export { createScienceLesson } from './lessons/ScienceLessons';
+export { createMusicLesson } from './lessons/MusicLessons';
+export { createComputerScienceLesson } from './lessons/ComputerScienceLessons';
+export { createCreativeArtsLesson } from './lessons/CreativeArtsLessons';
+
+// Re-export utility
+export { createWelcomeActivity } from './utils/welcomeActivityGenerator';

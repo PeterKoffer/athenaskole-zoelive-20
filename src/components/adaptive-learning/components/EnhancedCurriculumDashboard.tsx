@@ -8,7 +8,7 @@ import CurriculumLearningPath from './CurriculumLearningPath';
 import EnhancedLearningSession from './EnhancedLearningSession';
 import AdvancedAnalytics from './AdvancedAnalytics';
 import SmartRecommendations from './SmartRecommendations';
-import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
+import { useAdaptiveDifficulty } from './AdaptiveDifficultyEngine';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, BarChart3, Brain, Target, ArrowLeft } from 'lucide-react';
 

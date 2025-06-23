@@ -37,7 +37,7 @@ const ExtendedLessonManager = ({
 
   // Generate lesson activities
   const [lessonActivities] = useState<LessonActivity[]>(() => {
-    return createMathematicsLesson(skillArea);
+    return createMathematicsLesson();
   });
 
   const currentActivity = lessonActivities[currentActivityIndex];

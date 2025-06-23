@@ -464,28 +464,9 @@ const UniversalLearningMainContent = ({
         {/* Current Activity Content Card */}
         {currentActivity && (
           <Card className="bg-black/50 border-purple-400/50 backdrop-blur-sm">
-        nelie-foundational-principles
             <CardContent className="p-6 sm:p-8"> {/* Adjusted padding for responsiveness */}
               <h3 className="text-2xl font-bold text-white mb-4 text-center">{currentActivity.title}</h3>
               {renderActivityContent()} {/* Dynamic content rendering here */}
-            <CardContent className="p-8">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-white mb-4">{currentActivity.title}</h3>
-                <div className="text-lg text-purple-200 mb-6">
-                  {currentActivity.content?.question || `Welcome to ${subject} learning with Nelie!`}
-                </div>
-                
-                {/* Sample Interactive Content */}
-                <div className="space-y-4">
-                  <Button
-                    onClick={() => onActivityComplete({ success: true, score: 100 })}
-                    className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-6 py-3"
-                  >
-                    Complete Activity
-                  </Button>
-                </div>
-              </div>
-        main
             </CardContent>
           </Card>
         )}

@@ -91,7 +91,9 @@ export class DynamicLessonExtender {
       metadata: {
         subject: questionData.subject,
         skillArea: questionData.skillArea,
-        templateId: questionData.templateId
+        difficultyLevel: questionData.difficultyLevel,
+        templateId: questionData.templateId,
+        isExtension: true
       }
     };
   }
@@ -107,7 +109,6 @@ export class DynamicLessonExtender {
       content: {
         text: contentData.explanation,
         segments: [{
-          title: contentData.concept,
           concept: contentData.concept,
           explanation: contentData.explanation,
           checkQuestion: {
@@ -119,8 +120,9 @@ export class DynamicLessonExtender {
         }]
       },
       metadata: {
-        subject: 'dynamic',
-        skillArea: 'extension'
+        isExtension: true,
+        gradeLevel: contentData.gradeLevel,
+        concept: contentData.concept
       }
     };
   }
@@ -139,8 +141,8 @@ export class DynamicLessonExtender {
         guidance: applicationData.guidance
       },
       metadata: {
-        subject: 'dynamic',
-        skillArea: 'application'
+        isExtension: true,
+        gradeLevel: applicationData.gradeLevel
       }
     };
   }

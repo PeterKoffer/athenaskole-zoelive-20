@@ -40,7 +40,7 @@ const ActivityApplication = ({
             {activity.content.scenario}
           </p>
 
-          {activity.content.problemSteps && activity.content.problemSteps.length > 0 && (
+          {activity.content.problemSteps && (
             <div className="space-y-4">
               {activity.content.problemSteps.map((step, index) => (
                 <div key={index} className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">

@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Calculator, BookOpen, Globe, Music, Code, Languages, ScrollText, Map, HeartPulse, ClipboardCheck } from 'lucide-react';
+import { Brain, Calculator, BookOpen, Globe, Music, Code } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export interface SubjectSelectorProps {
@@ -70,62 +70,6 @@ const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubj
         { id: 'chemistry', name: 'Chemistry', description: 'Matter, atoms, and chemical reactions', route: '/learn/science' },
         { id: 'physics', name: 'Physics', description: 'Energy, motion, and physical laws', route: '/learn/science' },
         { id: 'earth-science', name: 'Earth Science', description: 'Our planet and the environment', route: '/learn/science' }
-      ]
-    },
-    {
-      id: 'mentalHealth',
-      name: 'Mental Wellness',
-      icon: Brain,
-      skillAreas: [
-        { id: 'understandingEmotions', name: 'Understanding Emotions', description: 'Learn to identify and understand your feelings and the feelings of others.', route: '/learn/mental-wellness' },
-        { id: 'copingStrategies', name: 'Coping Strategies', description: 'Discover healthy ways to manage stress, anxiety, and difficult emotions.', route: '/learn/mental-wellness' },
-        { id: 'mindfulnessBasics', name: 'Mindfulness Basics', description: 'Practice techniques to stay present and calm your mind.', route: '/learn/mental-wellness' },
-        { id: 'buildingResilience', name: 'Building Resilience', description: 'Develop skills to bounce back from challenges and adversity.', route: '/learn/mental-wellness' },
-        { id: 'empathyAndSupport', name: 'Empathy & Support', description: 'Learn how to support others and build strong, healthy relationships.', route: '/learn/mental-wellness' }
-      ]
-    },
-    {
-      id: 'languageLab',
-      name: 'Language Lab',
-      icon: Languages,
-      skillAreas: [
-        { id: 'exploreLanguages', name: 'Explore Languages', description: 'Choose a new language to learn or continue your progress.', route: '/learn/language-lab' }
-      ]
-    },
-    {
-      id: "worldHistoryReligions",
-      name: "World History & Religions",
-      icon: ScrollText,
-      skillAreas: [
-        { id: "ancientHistory", name: "Ancient History", description: "Explore early civilizations and their legacies.", route: "/learn/world-history-religions" },
-        { id: "globalReligions", name: "Global Religions", description: "Understand diverse beliefs and practices.", route: "/learn/world-history-religions" }
-      ]
-    },
-    {
-      id: "globalGeography",
-      name: "Global Geography",
-      icon: Map,
-      skillAreas: [
-        { id: "physicalGeography", name: "Physical Geography", description: "Study Earth's natural features and processes.", route: "/learn/global-geography" },
-        { id: "humanGeography", name: "Human Geography", description: "Examine human populations and their impact.", route: "/learn/global-geography" }
-      ]
-    },
-    {
-      id: "bodyLab",
-      name: "BodyLab: Healthy Living",
-      icon: HeartPulse,
-      skillAreas: [
-        { id: "nutritionFundamentals", name: "Nutrition Fundamentals", description: "Learn about healthy eating and diets.", route: "/learn/body-lab" },
-        { id: "fitnessForLife", name: "Fitness for Life", description: "Discover exercises and active habits.", route: "/learn/body-lab" }
-      ]
-    },
-    {
-      id: "lifeEssentials",
-      name: "Life Essentials",
-      icon: ClipboardCheck,
-      skillAreas: [
-        { id: "personalFinance", name: "Personal Finance", description: "Manage budgets, savings, and investments.", route: "/learn/life-essentials" },
-        { id: "adultingSkills", name: "Practical Adulting", description: "Navigate household tasks and responsibilities.", route: "/learn/life-essentials" }
       ]
     }
   ];

@@ -1,9 +1,10 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { 
   createMathematicsLesson
 } from '../lessons/MathematicsLessons';
-import { englishLessons } from '../lessons/EnglishLessons';
+import { createEnglishLesson } from '../lessons/EnglishLessons';
 import { createScienceLesson } from '../lessons/ScienceLessons';
 import { createMusicLesson } from '../lessons/MusicLessons';
 import { createComputerScienceLesson } from '../lessons/ComputerScienceLessons';
@@ -44,26 +45,26 @@ export const useLessonManager = ({
     
     switch (subject.toLowerCase()) {
       case 'mathematics':
-        activities = createMathematicsLesson(skillArea);
+        activities = createMathematicsLesson();
         break;
       case 'english':
-        activities = englishLessons;
+        activities = createEnglishLesson();
         break;
       case 'science':
-        activities = createScienceLesson(skillArea);
+        activities = createScienceLesson();
         break;
       case 'music':
-        activities = createMusicLesson(skillArea);
+        activities = createMusicLesson();
         break;
       case 'computer-science':
-        activities = createComputerScienceLesson(skillArea);
+        activities = createComputerScienceLesson();
         break;
       case 'creative-arts':
-        activities = createCreativeArtsLesson(skillArea);
+        activities = createCreativeArtsLesson();
         break;
       default:
         console.log('⚠️ Unknown subject, using mathematics lesson');
-        activities = createMathematicsLesson(skillArea);
+        activities = createMathematicsLesson();
     }
 
     // Enhance all activities with the teaching engine

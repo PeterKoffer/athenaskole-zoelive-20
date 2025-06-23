@@ -1,21 +1,13 @@
 
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useState } from "react";
 import ProgressHeader from "./ProgressHeader";
-import QuestionCard from "./QuestionCard";   
+import QuestionCard from "./QuestionCard";
 import ResultCard from "./ResultCard";
-import LessonHeader from "./LessonHeader";
-import SectionRenderer from "./SectionRenderer";
-import LessonControls from "./LessonControls";
-import { LanguageLabLesson } from "./types";
-import { useLessonState } from "./hooks/useLessonState";
-import { useLessonNavigation } from "./hooks/useLessonNavigation";
-import { useAudioPlayer } from "./hooks/useAudioPlayer";
-import { useAnswerHandler } from "./hooks/useAnswerHandler";
+import { Lesson } from "./types";
 
 interface LessonViewProps {
-  currentLesson: LanguageLabLesson | null;
-  isLoadingLesson: boolean;
-  currentLanguageCode: string;
+  currentLesson: Lesson;
+  selectedLanguage: string;
   hearts: number;
   xp: number;
   onBack: () => void;
@@ -26,8 +18,7 @@ interface LessonViewProps {
 
 const LessonView = ({
   currentLesson,
-  isLoadingLesson,
-  currentLanguageCode,
+  selectedLanguage,
   hearts,
   xp,
   onBack,
@@ -35,127 +26,83 @@ const LessonView = ({
   onHeartLost,
   onXpGained
 }: LessonViewProps) => {
-  const {
-    currentSectionIndex,
-    setCurrentSectionIndex,
-    currentQuestionIndex,
-    setCurrentQuestionIndex,
-    selectedAnswer,
-    setSelectedAnswer,
-    showResult,
-    setShowResult,
-    isCorrect,
-    setIsCorrect,
-    exerciseQuestions,
-    currentSection,
-    currentQuestionData,
-    resetState
-  } = useLessonState(currentLesson);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [showResult, setShowResult] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
-  const { handleNext } = useLessonNavigation({
-    currentLesson,
-    currentSectionIndex,
-    currentQuestionIndex,
-    exerciseQuestions,
-    setCurrentSectionIndex,
-    setCurrentQuestionIndex,
-    resetState,
-    onLessonComplete
-  });
+  const currentQuestionData = currentLesson.questions[currentQuestion];
 
-  const { playAudio } = useAudioPlayer(currentLanguageCode);
-
-  const { checkAnswer } = useAnswerHandler({
-    currentQuestionData,
-    selectedAnswer,
-    setIsCorrect,
-    setShowResult,
-    onXpGained,
-    onHeartLost,
-    playAudio
-  });
-
-  const handleAnswerSelect = (answer: string | number) => {
-    setSelectedAnswer(answer);
+  const playAudio = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = selectedLanguage === 'spanish' ? 'es-ES' :
+                      selectedLanguage === 'french' ? 'fr-FR' :
+                      selectedLanguage === 'german' ? 'de-DE' :
+                      selectedLanguage === 'italian' ? 'it-IT' : 'en-US';
+      utterance.rate = 0.8;
+      speechSynthesis.speak(utterance);
+    }
   };
 
-  if (isLoadingLesson) {
-    return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><LoadingSpinner size="lg" /></div>;
-  }
+  const handleAnswerSelect = (answerIndex: number) => {
+    setSelectedAnswer(answerIndex.toString());
+  };
 
-  if (!currentLesson) {
-    return <div className="text-center p-8 text-gray-400">No lesson loaded. Please select a lesson.</div>;
-  }
+  const checkAnswer = () => {
+    const correct = parseInt(selectedAnswer) === currentQuestionData.correct;
+    setIsCorrect(correct);
+    setShowResult(true);
+
+    if (correct) {
+      onXpGained(10);
+      if (currentQuestionData.audio) {
+        setTimeout(() => playAudio(currentQuestionData.audio!), 500);
+      }
+    } else {
+      onHeartLost();
+    }
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestion < currentLesson.questions.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+    } else {
+      onLessonComplete();
+    }
+
+    setSelectedAnswer("");
+    setShowResult(false);
+    setIsCorrect(false);
+  };
 
   return (
-    <div className="p-4 md:p-6 max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-2xl space-y-6">
+    <div className="space-y-6">
       <ProgressHeader
         hearts={hearts}
         xp={xp}
-        currentLesson={{
-          title: currentLesson.title,
-          questions: exerciseQuestions.map(q => ({
-            question: q.prompt,
-            options: q.options || [],
-            correct: q.correctOptionIndex || 0
-          }))
-        }}
-        currentQuestion={currentQuestionIndex}
+        currentLesson={currentLesson}
+        currentQuestion={currentQuestion}
         onBack={onBack}
       />
 
-      {currentSection && (
-        <LessonHeader
-          title={currentSection.title || currentLesson.title}
-          currentSectionIndex={currentSectionIndex}
-          totalSections={currentLesson.sections.length}
-        />
-      )}
-
-      {currentSection && currentSection.type !== 'exercises' && (
-        <SectionRenderer
-          section={currentSection}
-          currentLanguageCode={currentLanguageCode}
-          playAudio={playAudio}
-        />
-      )}
-
-      {currentSection?.type === 'exercises' && currentQuestionData && (
+      {!showResult ? (
         <QuestionCard
-          question={{
-            question: currentQuestionData.prompt,
-            options: currentQuestionData.options || [],
-            correct: currentQuestionData.correctOptionIndex || 0,
-            audio: currentQuestionData.audioPrompt
-          }}
-          selectedAnswer={selectedAnswer?.toString() || ''}
+          question={currentQuestionData}
+          selectedAnswer={selectedAnswer}
           showResult={showResult}
           isCorrect={isCorrect}
-          selectedLanguage={currentLanguageCode}
-          onAnswerSelect={(index) => handleAnswerSelect(index)}
+          selectedLanguage={selectedLanguage}
+          onAnswerSelect={handleAnswerSelect}
           onCheckAnswer={checkAnswer}
         />
-      )}
-
-      {showResult && currentSection?.type === 'exercises' && currentQuestionData && (
+      ) : (
         <ResultCard
           isCorrect={isCorrect}
-          correctAnswer={currentQuestionData.type === 'multipleChoice' ? currentQuestionData.options?.[currentQuestionData.correctOptionIndex!] : currentQuestionData.targetLanguageText}
-          userAnswer={selectedAnswer?.toString()}
-          feedback={isCorrect ? currentQuestionData.feedbackCorrect : currentQuestionData.feedbackIncorrect}
-          onNext={handleNext}
+          isLastQuestion={currentQuestion === currentLesson.questions.length - 1}
+          onNext={nextQuestion}
         />
       )}
-
-      <LessonControls
-        showResult={showResult}
-        isExerciseSection={currentSection?.type === 'exercises'}
-        hasCurrentQuestion={!!currentQuestionData}
-        selectedAnswer={selectedAnswer}
-        onCheckAnswer={checkAnswer}
-        onNext={handleNext}
-        isLastSection={currentLesson && currentSectionIndex >= currentLesson.sections.length - 1}
-      />
     </div>
   );
 };

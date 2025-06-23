@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLessonTimer } from '../../hooks/useLessonTimer';
@@ -30,7 +29,6 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     metadata: { subject, skillArea: 'introduction' },
     content: {
       segments: [{
-        title: `${subject} Introduction`,
         concept: `${subject} Introduction`,
         explanation: `Welcome! Today we're going on an exciting ${subject} journey. Let's explore amazing concepts together and have fun learning!`
       }]
@@ -150,7 +148,6 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
     metadata: { subject, skillArea: 'summary' },
     content: {
       segments: [{
-        title: 'Lesson Summary',
         concept: 'Lesson Summary',
         explanation: "Fantastic work! You've completed an amazing variety of math challenges today. You practiced addition, subtraction, multiplication, division, patterns, and fractions!"
       }]

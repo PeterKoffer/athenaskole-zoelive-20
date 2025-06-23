@@ -28,10 +28,6 @@ const StableActivityInteractiveQuiz = ({
     handleSubmit
   } = useStableQuizLogic({ activity, onActivityComplete });
 
-  // Prioritize unique content elements for display
-  const quizTitle = activity.content.uniqueTheme || stableContent?.title || activity.title || "Quiz Challenge";
-  const scenarioForBattle = activity.content.uniqueActivity || activity.content.uniqueScenario || stableContent?.battleScenario || "Test your knowledge!";
-
   console.log('🎯 StableActivityInteractiveQuiz render:', {
     activityId: activity.id,
     hasStableContent: !!stableContent,
@@ -65,12 +61,12 @@ const StableActivityInteractiveQuiz = ({
     <Blackboard>
       <div className="space-y-6">
         <StableQuizHeader
-          title={quizTitle}
+          title={stableContent.title}
           timeLeft={timeLeft}
           score={score}
         />
 
-        <StableQuizBattleContext battleScenario={scenarioForBattle} />
+        <StableQuizBattleContext battleScenario={stableContent.battleScenario} />
 
         <StableQuizQuestion question={stableContent.question} />
 

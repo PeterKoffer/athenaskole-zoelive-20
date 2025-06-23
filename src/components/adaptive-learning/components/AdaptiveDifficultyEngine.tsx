@@ -1,141 +1,240 @@
 
-import React, { useState, useEffect } from 'react';
-import { calculateRecommendedSessionTime, shouldAdjustDifficulty } from '@/utils/adaptiveLearningUtils';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserProgress } from '@/services/progressPersistence';
-import { SessionData, UserPerformanceData } from '../types/AnalyticsTypes';
+import { supabase } from '@/integrations/supabase/client';
 
-interface AdaptiveDifficultyEngineProps {
-  subject: string;
-  skillArea: string;
-  initialDifficulty: number;
-  children: React.ReactNode;
-  onDifficultyChange: (newDifficulty: number, reason: string) => void;
+interface DifficultyMetrics {
+  currentLevel: number;
+  recommendedLevel: number;
+  confidenceScore: number;
+  adaptationReason: string;
+  lastUpdated: string;
 }
 
-const AdaptiveDifficultyEngine: React.FC<AdaptiveDifficultyEngineProps> = ({
-  subject,
-  skillArea,
-  initialDifficulty,
-  children,
-  onDifficultyChange,
-}) => {
+interface PerformanceData {
+  accuracy: number;
+  responseTime: number;
+  consecutiveCorrect: number;
+  consecutiveIncorrect: number;
+  recentSessions: any[];
+}
+
+export const useAdaptiveDifficulty = (subject: string, skillArea: string) => {
   const { user } = useAuth();
-  const userId = user?.id || 'anonymous';
-  const [currentDifficulty, setCurrentDifficulty] = useState(initialDifficulty);
-  const { userProgress, fetchUserProgress } = useUserProgress(userId, subject, skillArea);
+  const [difficultyMetrics, setDifficultyMetrics] = useState<DifficultyMetrics>({
+    currentLevel: 2,
+    recommendedLevel: 2,
+    confidenceScore: 0.5,
+    adaptationReason: 'Initial assessment',
+    lastUpdated: new Date().toISOString()
+  });
+
+  const [performanceData, setPerformanceData] = useState<PerformanceData>({
+    accuracy: 0,
+    responseTime: 0,
+    consecutiveCorrect: 0,
+    consecutiveIncorrect: 0,
+    recentSessions: []
+  });
 
   useEffect(() => {
-    fetchUserProgress();
-  }, [userId, subject, skillArea, fetchUserProgress]);
-
-  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
-  const [consecutiveIncorrect, setConsecutiveIncorrect] = useState(0);
-  const [totalAttempts, setTotalAttempts] = useState(0);
-
-  const handleQuestionAnswered = (isCorrect: boolean) => {
-    setTotalAttempts(prev => prev + 1);
-
-    if (isCorrect) {
-      setConsecutiveCorrect(prev => prev + 1);
-      setConsecutiveIncorrect(0);
-    } else {
-      setConsecutiveIncorrect(prev => prev + 1);
-      setConsecutiveCorrect(0);
+    if (user) {
+      loadPerformanceData();
     }
-  };
-
-  useEffect(() => {
-    if (!userProgress) return;
-
-    const { accuracy_rate } = userProgress;
-
-    const adjustment = shouldAdjustDifficulty(
-      accuracy_rate,
-      consecutiveCorrect,
-      consecutiveIncorrect,
-      totalAttempts
-    );
-
-    if (adjustment.shouldAdjust && adjustment.newLevel) {
-      const newDifficulty = Math.max(1, Math.min(5, currentDifficulty + adjustment.newLevel));
-      setCurrentDifficulty(newDifficulty);
-      onDifficultyChange(newDifficulty, adjustment.reason || 'Difficulty adjusted');
-    }
-  }, [consecutiveCorrect, consecutiveIncorrect, totalAttempts, currentDifficulty, onDifficultyChange, userProgress]);
-
-  const [sessionHistory, setSessionHistory] = useState<any[] | null>(null);
-  const [userPerformance, setUserPerformance] = useState<any | null>(null);
-
-  useEffect(() => {
-    const fetchAnalyticsData = async () => {
-      if (!user) return;
-
-      try {
-        const response = await fetch(`/api/get-user-sessions?userId=${user.id}&subject=${subject}&skillArea=${skillArea}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const sessionData = await response.json();
-        setSessionHistory(sessionData);
-
-        const performanceResponse = await fetch(`/api/get-user-performance?userId=${user.id}&subject=${subject}&skillArea=${skillArea}`);
-        if (!performanceResponse.ok) {
-          throw new Error(`HTTP error! status: ${performanceResponse.status}`);
-        }
-        const performanceData = await performanceResponse.json();
-        setUserPerformance(performanceData);
-
-      } catch (error) {
-        console.error("Could not fetch analytics data:", error);
-      }
-    };
-
-    fetchAnalyticsData();
   }, [user, subject, skillArea]);
 
-  const castSessionData = (data: any[]): SessionData[] => {
-    return data.map(item => ({
-      ...item,
-      user_feedback: typeof item.user_feedback === 'string'
-        ? JSON.parse(item.user_feedback)
-        : (item.user_feedback as Record<string, unknown>) || {}
-    }));
+  const loadPerformanceData = async () => {
+    if (!user) return;
+
+    try {
+      // Get recent learning sessions
+      const { data: sessions } = await supabase
+        .from('learning_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Get user performance data
+      const { data: performance } = await supabase
+        .from('user_performance')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .single();
+
+      if (sessions) {
+        const recentPerformance = calculatePerformanceMetrics(sessions);
+        setPerformanceData(recentPerformance);
+
+        // Calculate adaptive difficulty
+        const newDifficulty = calculateAdaptiveDifficulty(recentPerformance, performance);
+        setDifficultyMetrics(newDifficulty);
+      }
+    } catch (error) {
+      console.error('Error loading performance data:', error);
+    }
   };
 
-  const castUserPerformanceData = (data: any): UserPerformanceData => {
+  const calculatePerformanceMetrics = (sessions: any[]): PerformanceData => {
+    if (sessions.length === 0) {
+      return {
+        accuracy: 0,
+        responseTime: 0,
+        consecutiveCorrect: 0,
+        consecutiveIncorrect: 0,
+        recentSessions: []
+      };
+    }
+
+    // Calculate accuracy
+    const totalScore = sessions.reduce((acc, session) => acc + (session.score || 0), 0);
+    const accuracy = totalScore / sessions.length;
+
+    // Calculate average response time
+    const totalTime = sessions.reduce((acc, session) => acc + (session.time_spent || 0), 0);
+    const avgResponseTime = totalTime / sessions.length;
+
+    // Calculate consecutive streaks
+    let consecutiveCorrect = 0;
+    let consecutiveIncorrect = 0;
+
+    for (const session of sessions) {
+      if ((session.score || 0) >= 70) {
+        consecutiveCorrect++;
+        consecutiveIncorrect = 0;
+      } else {
+        consecutiveIncorrect++;
+        consecutiveCorrect = 0;
+      }
+
+      if (consecutiveCorrect >= 3 || consecutiveIncorrect >= 3) break;
+    }
+
     return {
-      ...data,
-      strengths: typeof data.strengths === 'string'
-        ? JSON.parse(data.strengths)
-        : (data.strengths as Record<string, unknown>) || {},
-      weaknesses: typeof data.weaknesses === 'string'
-        ? JSON.parse(data.weaknesses)
-        : (data.weaknesses as Record<string, unknown>) || {}
+      accuracy,
+      responseTime: avgResponseTime,
+      consecutiveCorrect,
+      consecutiveIncorrect,
+      recentSessions: sessions
     };
   };
 
-  const sessionData = castSessionData(sessionHistory || []);
-  const performanceData = castUserPerformanceData(userPerformance);
+  const calculateAdaptiveDifficulty = (performance: PerformanceData, userPerformance: any): DifficultyMetrics => {
+    let recommendedLevel = difficultyMetrics.currentLevel;
+    let confidenceScore = 0.5;
+    let adaptationReason = 'Maintaining current level';
 
-  const recommendedTime = calculateRecommendedSessionTime(userProgress);
+    // Difficulty adjustment rules
+    if (performance.accuracy >= 85 && performance.consecutiveCorrect >= 3) {
+      // Increase difficulty if performing very well
+      recommendedLevel = Math.min(10, difficultyMetrics.currentLevel + 1);
+      confidenceScore = 0.8;
+      adaptationReason = 'High accuracy and consecutive correct answers';
+    } else if (performance.accuracy <= 50 || performance.consecutiveIncorrect >= 3) {
+      // Decrease difficulty if struggling
+      recommendedLevel = Math.max(1, difficultyMetrics.currentLevel - 1);
+      confidenceScore = 0.7;
+      adaptationReason = 'Low accuracy or consecutive incorrect answers';
+    } else if (performance.accuracy >= 70 && performance.accuracy < 85) {
+      // Optimal difficulty range
+      confidenceScore = 0.9;
+      adaptationReason = 'Optimal difficulty - good challenge level';
+    } else if (performance.responseTime > 300) { // More than 5 minutes per question
+      // If taking too long, might be too difficult
+      recommendedLevel = Math.max(1, difficultyMetrics.currentLevel - 1);
+      confidenceScore = 0.6;
+      adaptationReason = 'Extended response time indicates difficulty';
+    }
 
-  return (
-    <>
-      {React.Children.map(children, child => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
-            difficulty: currentDifficulty,
-            onQuestionAnswered: handleQuestionAnswered,
-            recommendedSessionTime: recommendedTime,
-            sessionData: sessionData,
-            userPerformance: performanceData
-          } as any);
+    // Consider historical performance
+    if (userPerformance) {
+      const historicalAccuracy = userPerformance.accuracy_rate;
+      if (historicalAccuracy > performance.accuracy + 20) {
+        // Current performance significantly below historical - reduce difficulty
+        recommendedLevel = Math.max(1, recommendedLevel - 1);
+        adaptationReason += ' (Below historical performance)';
+      }
+    }
+
+    return {
+      currentLevel: difficultyMetrics.currentLevel,
+      recommendedLevel,
+      confidenceScore,
+      adaptationReason,
+      lastUpdated: new Date().toISOString()
+    };
+  };
+
+  const applyDifficultyAdjustment = async () => {
+    if (!user) return false;
+
+    try {
+      // Update current level to recommended level
+      setDifficultyMetrics(prev => ({
+        ...prev,
+        currentLevel: prev.recommendedLevel,
+        lastUpdated: new Date().toISOString()
+      }));
+
+      // Log the difficulty adjustment
+      await supabase.from('ai_interactions').insert({
+        user_id: user.id,
+        ai_service: 'adaptive_difficulty',
+        interaction_type: 'difficulty_adjustment',
+        subject,
+        skill_area: skillArea,
+        difficulty_level: difficultyMetrics.recommendedLevel,
+        success: true,
+        response_data: {
+          previousLevel: difficultyMetrics.currentLevel,
+          newLevel: difficultyMetrics.recommendedLevel,
+          reason: difficultyMetrics.adaptationReason,
+          confidence: difficultyMetrics.confidenceScore
         }
-        return child;
-      })}
-    </>
-  );
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error applying difficulty adjustment:', error);
+      return false;
+    }
+  };
+
+  const getDifficultyRecommendation = () => {
+    const levelDiff = difficultyMetrics.recommendedLevel - difficultyMetrics.currentLevel;
+
+    if (levelDiff > 0) {
+      return {
+        type: 'increase',
+        message: `Ready for level ${difficultyMetrics.recommendedLevel}? Your performance suggests you can handle more challenging content.`,
+        confidence: difficultyMetrics.confidenceScore
+      };
+    } else if (levelDiff < 0) {
+      return {
+        type: 'decrease',
+        message: `Consider level ${difficultyMetrics.recommendedLevel}. This adjustment may help you learn more effectively.`,
+        confidence: difficultyMetrics.confidenceScore
+      };
+    } else {
+      return {
+        type: 'maintain',
+        message: `Level ${difficultyMetrics.currentLevel} is optimal for your current skill level.`,
+        confidence: difficultyMetrics.confidenceScore
+      };
+    }
+  };
+
+  return {
+    difficultyMetrics,
+    performanceData,
+    applyDifficultyAdjustment,
+    getDifficultyRecommendation,
+    refreshMetrics: loadPerformanceData
+  };
 };
 
-export default AdaptiveDifficultyEngine;
+export default useAdaptiveDifficulty;

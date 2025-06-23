@@ -1,391 +1,307 @@
-
 import { LessonActivity } from '../types/LessonTypes';
 import { generateEnhancedLesson, EnhancedLessonConfig } from './EnhancedLessonGenerator';
+import {
+  generateMathematicsLesson,
+  generateEnglishLesson,
+  generateScienceLesson,
+  generateMusicLesson,
+  generateComputerScienceLesson,
+  generateCreativeArtsLesson,
+  generateCompleteEducationalSession
+} from './EnhancedSubjectLessonFactory';
+
+/**
+ * Integration bridge between existing lesson system and enhanced NELIE system
+ * Provides backward compatibility while adding enhanced features
+ */
 
 export interface NELIESessionConfig {
-  subject: string;
-  skillArea: string;
-  studentName: string;
-  sessionDuration: number;
-  gradeLevel: number;
-  learningPreferences: {
-    visual: number;
-    auditory: number;
-    kinesthetic: number;
-  };
+  studentId?: string;
+  gradeLevel: number; // 0-12 (K-12)
+  preferredLearningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
+  subjects?: ('mathematics' | 'english' | 'science' | 'music' | 'computerScience' | 'creativeArts')[];
+  sessionDuration?: 'standard' | 'extended'; // standard = 20min, extended = 20-25min
+  enableUniqueness?: boolean;
+  previousSessionIds?: string[];
 }
 
-export interface NELIESession {
+export interface NELIESessionResult {
   sessionId: string;
-  config: NELIESessionConfig;
-  activities: LessonActivity[];
-  estimatedDuration: number;
-  personalizedElements: {
-    greetings: string[];
-    encouragements: string[];
-    explanationStyle: string;
-  };
-  subjects?: Record<string, any>;
-  metadata?: {
-    totalDuration: number;
+  metadata: {
+    totalDuration: number; // Total across all subjects
     subjectCount: number;
     gradeLevel: number;
     learningStyle: string;
+    generatedAt: string;
     qualityScores: Record<string, number>;
-    generatedAt: number;
   };
+  subjects: Record<string, {
+    lesson: any;
+    validation: any;
+    activities: LessonActivity[];
+  }>;
 }
 
-class NELIESessionGenerator {
-  private sessionCounter = 0;
+/**
+ * Enhanced NELIE Session Generator
+ * Main interface for generating complete educational sessions
+ */
+export class NELIESessionGenerator {
+  private static defaultConfig: Partial<NELIESessionConfig> = {
+    preferredLearningStyle: 'mixed',
+    subjects: ['mathematics', 'english', 'science', 'music', 'computerScience', 'creativeArts'],
+    sessionDuration: 'extended',
+    enableUniqueness: true
+  };
 
-  async generatePersonalizedSession(config: NELIESessionConfig): Promise<NELIESession> {
-    this.sessionCounter++;
-    const sessionId = `nelie_session_${config.subject}_${Date.now()}_${this.sessionCounter}`;
-
-    try {
-      const enhancedLesson = await generateEnhancedLesson(config.subject, config.skillArea);
-      const personalizedElements = this.createPersonalizedElements(config);
-      const adaptedActivities = this.adaptActivitiesForLearningStyle(
-        enhancedLesson.phases,
-        config.learningPreferences
-      );
-
-      return {
-        sessionId,
-        config,
-        activities: adaptedActivities,
-        estimatedDuration: enhancedLesson.estimatedTotalDuration,
-        personalizedElements
-      };
-    } catch (error) {
-      console.error('Error generating NELIE session:', error);
-      return this.generateFallbackSession(config, sessionId);
-    }
-  }
-
-  // Add missing static methods
-  static generateSession(config: any): NELIESession {
-    const sessionId = `session_${Date.now()}`;
-    const totalDuration = config.sessionDuration || 1500;
+  /**
+   * Generate a complete NELIE educational session
+   */
+  static generateSession(config: NELIESessionConfig): NELIESessionResult {
+    const finalConfig = { ...this.defaultConfig, ...config };
+    const sessionId = `nelie-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
-    return {
+    console.log('🎓 Generating Enhanced NELIE Session:', {
       sessionId,
-      config: {
-        subject: config.subjects?.[0] || 'mathematics',
-        skillArea: 'general',
-        studentName: 'Student',
-        sessionDuration: totalDuration,
-        gradeLevel: config.gradeLevel || 1,
-        learningPreferences: { visual: 5, auditory: 5, kinesthetic: 5 }
-      },
-      activities: [],
-      estimatedDuration: totalDuration,
-      personalizedElements: {
-        greetings: ['Hello!'],
-        encouragements: ['Great job!'],
-        explanationStyle: config.preferredLearningStyle || 'mixed'
-      },
-      subjects: config.subjects?.reduce((acc: any, subject: string) => {
-        acc[subject] = { lesson: { totalDuration: 1200 } };
-        return acc;
-      }, {}),
+      gradeLevel: finalConfig.gradeLevel,
+      learningStyle: finalConfig.preferredLearningStyle,
+      subjects: finalConfig.subjects?.length,
+      uniqueness: finalConfig.enableUniqueness
+    });
+
+    // Generate complete session using enhanced system
+    const completeSession = generateCompleteEducationalSession(
+      finalConfig.gradeLevel!,
+      finalConfig.preferredLearningStyle,
+      sessionId
+    );
+
+    // Process each subject
+    const subjects: Record<string, any> = {};
+    let totalDuration = 0;
+    const qualityScores: Record<string, number> = {};
+
+    finalConfig.subjects?.forEach(subjectKey => {
+      const lesson = completeSession[subjectKey as keyof typeof completeSession];
+
+      if (lesson && typeof lesson === 'object' && 'phases' in lesson) {
+        // Validate lesson quality
+        const validation = this.validateLesson(lesson);
+
+        subjects[subjectKey] = {
+          lesson,
+          validation,
+          activities: lesson.phases as LessonActivity[]
+        };
+
+        totalDuration += (lesson.totalDuration as number) || 0;
+        qualityScores[subjectKey] = validation.qualityScore || 0;
+      }
+    });
+
+    const result: NELIESessionResult = {
+      sessionId,
       metadata: {
         totalDuration,
-        subjectCount: config.subjects?.length || 1,
-        gradeLevel: config.gradeLevel || 1,
-        learningStyle: config.preferredLearningStyle || 'mixed',
-        qualityScores: { default: 85 },
-        generatedAt: Date.now()
-      }
-    };
-  }
-
-  static generateSubjectLesson(subject: string, gradeLevel: number, learningStyle: string) {
-    return {
-      activities: [],
-      validation: { qualityScore: 85 }
-    };
-  }
-
-  static generateSessionSummary(session: NELIESession): string {
-    return `Session Summary: ${session.sessionId} - Duration: ${session.estimatedDuration} minutes`;
-  }
-
-  private createPersonalizedElements(config: NELIESessionConfig) {
-    const { studentName, subject } = config;
-    
-    return {
-      greetings: [
-        `Hi ${studentName}! Ready for an amazing ${subject} adventure?`,
-        `Hello ${studentName}! Let's explore ${subject} together today!`,
-        `Welcome back ${studentName}! I'm excited to learn ${subject} with you!`
-      ],
-      encouragements: [
-        `You're doing great, ${studentName}!`,
-        `Excellent work, ${studentName}! Keep it up!`,
-        `I'm so proud of your progress, ${studentName}!`,
-        `Amazing job, ${studentName}! You're getting so much better!`
-      ],
-      explanationStyle: this.determineExplanationStyle(config.learningPreferences)
-    };
-  }
-
-  private determineExplanationStyle(preferences: NELIESessionConfig['learningPreferences']): string {
-    const maxPreference = Math.max(preferences.visual, preferences.auditory, preferences.kinesthetic);
-    
-    if (preferences.visual === maxPreference) {
-      return 'visual-focused';
-    } else if (preferences.auditory === maxPreference) {
-      return 'auditory-focused';
-    } else {
-      return 'kinesthetic-focused';
-    }
-  }
-
-  private adaptActivitiesForLearningStyle(
-    activities: LessonActivity[],
-    preferences: NELIESessionConfig['learningPreferences']
-  ): LessonActivity[] {
-    return activities.map(activity => {
-      const adaptedActivity = { ...activity };
-      
-      if (preferences.visual > 7) {
-        adaptedActivity.content = {
-          ...adaptedActivity.content,
-          text: adaptedActivity.content.text || ''
-        };
-      }
-      
-      if (preferences.auditory > 7) {
-        adaptedActivity.content = {
-          ...adaptedActivity.content,
-          text: adaptedActivity.content.text || ''
-        };
-      }
-      
-      if (preferences.kinesthetic > 7) {
-        adaptedActivity.content = {
-          ...adaptedActivity.content,
-          text: adaptedActivity.content.text || ''
-        };
-      }
-      
-      return adaptedActivity;
-    });
-  }
-
-  private generateFallbackSession(config: NELIESessionConfig, sessionId: string): NELIESession {
-    const basicActivity: LessonActivity = {
-      id: `${sessionId}_basic`,
-      type: 'introduction',
-      phase: 'introduction',
-      title: `Welcome to ${config.subject}`,
-      duration: 300,
-      phaseDescription: `Basic introduction to ${config.subject}`,
-      metadata: {
-        subject: config.subject,
-        skillArea: config.skillArea
+        subjectCount: Object.keys(subjects).length,
+        gradeLevel: finalConfig.gradeLevel!,
+        learningStyle: finalConfig.preferredLearningStyle || 'mixed',
+        generatedAt: new Date().toISOString(),
+        qualityScores
       },
-      content: {
-        text: `Welcome to your ${config.subject} lesson, ${config.studentName}!`
-      }
+      subjects
     };
 
+    console.log('✅ NELIE Session Generated:', {
+      sessionId: result.sessionId,
+      totalDuration: `${Math.floor(totalDuration / 60)} minutes`,
+      avgQuality: Math.round(Object.values(qualityScores).reduce((a, b) => a + b, 0) / Object.values(qualityScores).length),
+      subjects: Object.keys(subjects)
+    });
+
+    return result;
+  }
+
+  /**
+   * Generate a single subject lesson
+   */
+  static generateSubjectLesson(
+    subject: string,
+    gradeLevel: number,
+    learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'mixed',
+    sessionId?: string
+  ): { lesson: any; validation: any; activities: LessonActivity[] } {
+
+    let config: EnhancedLessonConfig;
+
+    switch (subject.toLowerCase()) {
+      case 'mathematics':
+      case 'math':
+        config = generateMathematicsLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      case 'english':
+      case 'language':
+        config = generateEnglishLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      case 'science':
+        config = generateScienceLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      case 'music':
+        config = generateMusicLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      case 'computerscience':
+      case 'computer-science':
+      case 'cs':
+        config = generateComputerScienceLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      case 'creativeart':
+      case 'creative-arts':
+      case 'arts':
+        config = generateCreativeArtsLesson(gradeLevel, learningStyle, sessionId);
+        break;
+      default:
+        throw new Error(`Unknown subject: ${subject}`);
+    }
+
+    const lesson = generateEnhancedLesson(config);
+    const validation = this.validateLesson(lesson);
+
     return {
-      sessionId,
-      config,
-      activities: [basicActivity],
-      estimatedDuration: 300,
-      personalizedElements: this.createPersonalizedElements(config)
+      lesson,
+      validation,
+      activities: lesson.phases
     };
   }
 
-  generateQuickSession(subject: string, skillArea: string, studentName: string = 'Student'): Promise<NELIESession> {
-    const quickConfig: NELIESessionConfig = {
-      subject,
-      skillArea,
-      studentName,
-      sessionDuration: 900,
-      gradeLevel: 6,
-      learningPreferences: {
-        visual: 5,
-        auditory: 5,
-        kinesthetic: 5
-      }
+  /**
+   * Validate lesson meets NELIE requirements
+   */
+  private static validateLesson(lesson: any): any {
+    // Import and use validation from enhanced system
+    const { validateEnhancedLesson } = require('./EnhancedLessonGenerator');
+    return validateEnhancedLesson(lesson);
+  }
+
+  /**
+   * Get recommended lesson duration based on grade level and learning style
+   */
+  static getRecommendedDuration(gradeLevel: number, learningStyle: string): number {
+    const baseDuration = 1350; // 22.5 minutes
+    const styleMultipliers = {
+      visual: 1.1,
+      auditory: 1.0,
+      kinesthetic: 1.2,
+      mixed: 1.15
     };
 
-    return this.generatePersonalizedSession(quickConfig);
+    const gradeMultiplier = Math.min(1.0 + (gradeLevel * 0.05), 1.3); // Older students get slightly longer
+    const styleMultiplier = styleMultipliers[learningStyle as keyof typeof styleMultipliers] || 1.0;
+
+    return Math.floor(baseDuration * gradeMultiplier * styleMultiplier);
+  }
+
+  /**
+   * Check if student needs content refresh
+   */
+  static needsContentRefresh(
+    studentId: string,
+    subject: string,
+    previousSessions: string[]
+  ): boolean {
+    // Simple heuristic: refresh if more than 3 sessions with same subject
+    const subjectSessions = previousSessions.filter(sessionId =>
+      sessionId.includes(subject.toLowerCase())
+    );
+    
+    return subjectSessions.length >= 3;
+  }
+
+  /**
+   * Generate session summary for reporting
+   */
+  static generateSessionSummary(sessionResult: NELIESessionResult): string {
+    const { metadata, subjects } = sessionResult;
+    const avgQuality = Math.round(
+      Object.values(metadata.qualityScores).reduce((a, b) => a + b, 0) /
+      Object.values(metadata.qualityScores).length
+    );
+
+    const totalMinutes = Math.floor(metadata.totalDuration / 60);
+    const totalSeconds = metadata.totalDuration % 60;
+
+    return `
+NELIE Session Summary
+=====================
+Session ID: ${sessionResult.sessionId}
+Grade Level: ${metadata.gradeLevel === 0 ? 'Kindergarten' : `Grade ${metadata.gradeLevel}`}
+Learning Style: ${metadata.learningStyle}
+Generated: ${new Date(metadata.generatedAt).toLocaleString()}
+
+Content Overview:
+- Subjects: ${metadata.subjectCount}
+- Total Duration: ${totalMinutes}m ${totalSeconds}s
+- Average Quality: ${avgQuality}/100
+
+Subject Breakdown:
+${Object.entries(subjects).map(([subject, data]) =>
+  `- ${subject}: ${Math.floor((data.lesson.totalDuration || 0) / 60)}m (Quality: ${metadata.qualityScores[subject]}/100)`
+).join('\n')}
+
+Key Features:
+✅ 20-25 minute lessons for optimal attention span
+✅ Unique content for each session (no repetition)
+✅ Learning style adaptations for better engagement
+✅ K-12 curriculum aligned content
+✅ Interactive games and activities
+✅ Real-world application scenarios
+✅ Creative exploration opportunities
+    `.trim();
   }
 }
 
-// Create NELIEHelpers object with lesson generation methods
+/**
+ * Quick helper functions for common use cases
+ */
 export const NELIEHelpers = {
-  generateMathLesson: (gradeLevel: number, learningStyle: string) => ({
-    lesson: {
-      totalDuration: 1200,
-      metadata: { skillArea: 'mathematics' },
-      phases: [{
-        content: {
-          learningStyleAdaptation: {
-            contentFormat: `${learningStyle} focused content`,
-            activityType: `${learningStyle} activities`
-          },
-          curriculum: ['Grade appropriate math concepts'],
-          uniqueTheme: `Math theme ${Date.now()}`
-        }
-      }]
-    }
-  }),
-  
-  generateBodyLabLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
-    lesson: {
-      title: 'BodyLab: Healthy Living',
-      subject: 'bodyLab',
-      skillArea: 'health',
-      gradeLevel,
-      learningStyle,
-      sessionId,
-      overview: 'Interactive health and wellness lesson',
-      phases: [{
-        id: 'bodylab_intro',
-        type: 'introduction',
-        phase: 'introduction',
-        title: 'Welcome to BodyLab',
-        duration: 300,
-        phaseDescription: 'Introduction to healthy living',
-        metadata: { subject: 'bodyLab', skillArea: 'health' },
-        content: { text: 'Welcome to your healthy living lesson!' }
-      }],
-      estimatedTotalDuration: 1200,
-      learningObjectives: ['Learn about healthy living'],
-      materials: ['Interactive content'],
-      assessmentMethods: ['Interactive exercises'],
-      keywords: ['health', 'wellness'],
-      estimatedDuration: 1200,
-      objectives: ['Learn about healthy living'],
-      difficulty: 2,
-      prerequisites: [],
-      assessmentCriteria: ['Understanding of concepts'],
-      extensions: ['Practice exercises']
-    }
-  }),
+  /**
+   * Generate a math lesson for a specific grade
+   */
+  generateMathLesson: (grade: number, style?: string) =>
+    NELIESessionGenerator.generateSubjectLesson('mathematics', grade, style as any),
 
-  generateGlobalGeographyLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
-    lesson: {
-      title: 'Global Geography Explorer',
-      subject: 'globalGeography',
-      skillArea: 'geography',
-      gradeLevel,
-      learningStyle,
-      sessionId,
-      overview: 'Interactive geography lesson',
-      phases: [{
-        id: 'geography_intro',
-        type: 'introduction',
-        phase: 'introduction',
-        title: 'Welcome to Geography',
-        duration: 300,
-        phaseDescription: 'Introduction to world geography',
-        metadata: { subject: 'globalGeography', skillArea: 'geography' },
-        content: { text: 'Welcome to your geography lesson!' }
-      }],
-      estimatedTotalDuration: 1200,
-      learningObjectives: ['Learn about world geography'],
-      materials: ['Interactive content'],
-      assessmentMethods: ['Interactive exercises'],
-      keywords: ['geography', 'world'],
-      estimatedDuration: 1200,
-      objectives: ['Learn about world geography'],
-      difficulty: 2,
-      prerequisites: [],
-      assessmentCriteria: ['Understanding of concepts'],
-      extensions: ['Practice exercises']
-    }
-  }),
+  /**
+   * Generate a reading lesson for a specific grade
+   */
+  generateReadingLesson: (grade: number, style?: string) =>
+    NELIESessionGenerator.generateSubjectLesson('english', grade, style as any),
 
-  generateLifeEssentialsLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
-    lesson: {
-      title: 'Life Essentials: Navigating Adulthood',
-      subject: 'lifeEssentials',
-      skillArea: 'lifeskills',
-      gradeLevel,
-      learningStyle,
-      sessionId,
-      overview: 'Interactive life skills lesson',
-      phases: [{
-        id: 'life_intro',
-        type: 'introduction',
-        phase: 'introduction',
-        title: 'Welcome to Life Essentials',
-        duration: 300,
-        phaseDescription: 'Introduction to life skills',
-        metadata: { subject: 'lifeEssentials', skillArea: 'lifeskills' },
-        content: { text: 'Welcome to your life skills lesson!' }
-      }],
-      estimatedTotalDuration: 1200,
-      learningObjectives: ['Learn essential life skills'],
-      materials: ['Interactive content'],
-      assessmentMethods: ['Interactive exercises'],
-      keywords: ['life skills', 'adulthood'],
-      estimatedDuration: 1200,
-      objectives: ['Learn essential life skills'],
-      difficulty: 3,
-      prerequisites: [],
-      assessmentCriteria: ['Understanding of concepts'],
-      extensions: ['Practice exercises']
-    }
-  }),
+  /**
+   * Generate a complete day's worth of lessons
+   */
+  generateDailyLessons: (grade: number, style?: string) =>
+    NELIESessionGenerator.generateSession({
+      gradeLevel: grade,
+      preferredLearningStyle: style as any
+    }),
 
-  generateWorldHistoryReligionsLesson: (gradeLevel: number, learningStyle: string, sessionId: string) => ({
-    lesson: {
-      title: 'World History & Global Religions',
-      subject: 'worldHistoryReligions',
-      skillArea: 'history',
-      gradeLevel,
-      learningStyle,
-      sessionId,
-      overview: 'Interactive history and religions lesson',
-      phases: [{
-        id: 'history_intro',
-        type: 'introduction',
-        phase: 'introduction',
-        title: 'Welcome to World History',
-        duration: 300,
-        phaseDescription: 'Introduction to world history',
-        metadata: { subject: 'worldHistoryReligions', skillArea: 'history' },
-        content: { text: 'Welcome to your history lesson!' }
-      }],
-      estimatedTotalDuration: 1200,
-      learningObjectives: ['Learn about world history'],
-      materials: ['Interactive content'],
-      assessmentMethods: ['Interactive exercises'],
-      keywords: ['history', 'religion'],
-      estimatedDuration: 1200,
-      objectives: ['Learn about world history'],
-      difficulty: 3,
-      prerequisites: [],
-      assessmentCriteria: ['Understanding of concepts'],
-      extensions: ['Practice exercises']
-    }
-  }),
+  /**
+   * Quick quality check for any lesson
+   */
+  checkLessonQuality: (lesson: any) =>
+    NELIESessionGenerator['validateLesson'](lesson),
 
-  formatDuration: (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    return `${minutes} minutes`;
+  /**
+   * Format duration for display
+   */
+  formatDuration: (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
   }
 };
 
-// Export singleton instance
-export const nelieSessionGenerator = new NELIESessionGenerator();
+// Export types for external use
+// (Types are already exported with their declarations above)
 
-// Export for backwards compatibility
-export const generateNELIESession = (
-  subject: string,
-  skillArea: string,
-  studentName: string = 'Student'
-): Promise<NELIESession> => {
-  return nelieSessionGenerator.generateQuickSession(subject, skillArea, studentName);
-};
-
+// Default export
 export default NELIESessionGenerator;
