@@ -230,7 +230,7 @@ const EnhancedDailyProgram = ({
     setIsPaused(false);
     
     toast({
-      title: "20-Minute Lesson Started! 🎯",
+      title: "20-Min Lesson Started! 🎯",
       description: currentActivity?.title || "Let's begin learning!",
     });
   };
