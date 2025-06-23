@@ -1,154 +1,194 @@
+import { supabase } from '@/integrations/supabase/client';
 
-// User Learning Profile Service - simplified implementation
-
-export interface UserLearningProfile {
-  userId: string;
-  subject: string;
-  skillArea: string;
-  currentLevel: number;
-  strengths: string[];
-  weaknesses: string[];
-  learningStyle: string;
-  accuracy: number;
-  overallAccuracy?: number;
-  learning_gaps?: string[];
-  attention_span_minutes?: number;
-  current_difficulty_level?: number;
-  overall_accuracy?: number;
-  consistency_score?: number;
-  total_sessions?: number;
-  total_time_spent?: number;
-  last_session_date?: string;
-  last_topic_covered?: string;
-  preferred_pace?: string;
-  learning_style?: string;
-  updated_at?: string;
-}
-
-export interface UserPreferences {
+export interface UserActivitySession {
+  id?: string;
   user_id: string;
-  speech_enabled?: boolean;
-  speech_rate?: number;
-  speech_pitch?: number;
-  preferred_voice?: string;
-  auto_read_questions?: boolean;
-  auto_read_explanations?: boolean;
-  updated_at?: string;
+  session_type: 'chat' | 'game' | 'lesson' | 'music_creation' | 'ai_tutor';
+  subject?: string;
+  start_time: string;
+  end_time?: string;
+  duration_minutes?: number;
+  completion_status: 'in_progress' | 'completed' | 'abandoned';
+  engagement_score?: number;
+  metadata?: Record<string, unknown>;
 }
 
-export class UserLearningProfileService {
-  static async getLearningProfile(userId: string, subject: string, skillArea: string = 'general'): Promise<UserLearningProfile> {
-    console.log('Getting learning profile for user:', userId, 'subject:', subject, 'skillArea:', skillArea);
-    
-    // Mock implementation
-    return {
-      userId,
-      subject,
-      skillArea,
-      currentLevel: 3,
-      strengths: ['problem_solving', 'logic'],
-      weaknesses: ['attention_to_detail'],
-      learningStyle: 'visual',
-      accuracy: 75,
-      overallAccuracy: 75,
-      learning_gaps: ['basic_concepts'],
-      attention_span_minutes: 20,
-      current_difficulty_level: 3,
-      overall_accuracy: 75,
-      consistency_score: 70,
-      total_sessions: 5,
-      total_time_spent: 120,
-      last_session_date: new Date().toISOString(),
-      last_topic_covered: skillArea,
-      preferred_pace: 'medium',
-      learning_style: 'visual'
-    };
+export class UserActivityService {
+  async startSession(session: Omit<UserActivitySession, 'id'>): Promise<string | null> {
+    try {
+      // Map to learning_sessions table since user_activity_sessions doesn't exist
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .insert({
+          user_id: session.user_id,
+          subject: session.subject || 'general',
+          skill_area: session.session_type,
+          difficulty_level: 1,
+          start_time: session.start_time,
+          completed: session.completion_status === 'completed',
+          user_feedback: session.metadata || {}
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error('Error starting session:', error);
+        return null;
+      }
+
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error starting session:', error);
+      return null;
+    }
   }
 
-  static async updateLearningProfile(
-    userId: string, 
-    subject: string, 
-    updates: Partial<UserLearningProfile>
-  ): Promise<void> {
-    console.log('Updating learning profile for user:', userId, 'updates:', updates);
-    // Implementation will be added when needed
+  async endSession(sessionId: string, engagementScore?: number): Promise<boolean> {
+    try {
+      const endTime = new Date().toISOString();
+      
+      // First get the start time to calculate duration
+      const { data: sessionData, error: fetchError } = await supabase
+        .from('learning_sessions')
+        .select('start_time')
+        .eq('id', sessionId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching session:', fetchError);
+        return false;
+      }
+
+      // Calculate duration in minutes
+      const startTime = new Date(sessionData.start_time);
+      const durationMinutes = Math.round((new Date(endTime).getTime() - startTime.getTime()) / (1000 * 60));
+
+      // Update the session
+      const { error } = await supabase
+        .from('learning_sessions')
+        .update({
+          end_time: endTime,
+          time_spent: durationMinutes,
+          completed: true,
+          score: engagementScore || 0
+        })
+        .eq('id', sessionId);
+
+      if (error) {
+        console.error('Error ending session:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error ending session:', error);
+      return false;
+    }
   }
 
-  static async getUserPreferences(userId: string): Promise<UserPreferences | null> {
-    console.log('Getting user preferences for:', userId);
-    
-    // Mock implementation
-    return {
-      user_id: userId,
-      speech_enabled: true,
-      speech_rate: 0.8,
-      speech_pitch: 1.2,
-      preferred_voice: 'female',
-      auto_read_questions: true,
-      auto_read_explanations: true,
-      updated_at: new Date().toISOString()
-    };
+  async abandonSession(sessionId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('learning_sessions')
+        .update({
+          completed: false,
+          end_time: new Date().toISOString()
+        })
+        .eq('id', sessionId);
+
+      if (error) {
+        console.error('Error abandoning session:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error abandoning session:', error);
+      return false;
+    }
   }
 
-  static async createOrUpdateProfile(profileData: any): Promise<boolean> {
-    console.log('Creating or updating profile:', profileData);
-    // Mock implementation
-    return true;
+  async getUserSessions(userId: string, limit: number = 50): Promise<UserActivitySession[]> {
+    try {
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('start_time', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('Error fetching user sessions:', error);
+        return [];
+      }
+
+      // Transform learning_sessions data to UserActivitySession format
+      return (data || []).map(session => ({
+        id: session.id,
+        user_id: session.user_id,
+        session_type: session.skill_area as 'chat' | 'game' | 'lesson' | 'music_creation' | 'ai_tutor',
+        subject: session.subject,
+        start_time: session.start_time,
+        end_time: session.end_time || undefined,
+        duration_minutes: session.time_spent,
+        completion_status: session.completed ? 'completed' : 'abandoned',
+        engagement_score: session.score || undefined,
+        metadata: session.user_feedback
+      }));
+    } catch (error) {
+      console.error('Error fetching user sessions:', error);
+      return [];
+    }
   }
 
-  static async updateUserPreferences(preferences: Partial<UserPreferences>): Promise<boolean> {
-    console.log('Updating user preferences:', preferences);
-    // Mock implementation
-    return true;
-  }
+  async getSessionAnalytics(userId: string, days: number = 30): Promise<Record<string, unknown> | null> {
+    try {
+      const fromDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .select('skill_area, time_spent, score, completed')
+        .eq('user_id', userId)
+        .gte('start_time', fromDate);
 
-  static async recordQuestionHistory(historyEntry: any): Promise<boolean> {
-    console.log('Recording question history:', historyEntry);
-    // Mock implementation
-    return true;
-  }
+      if (error) {
+        console.error('Error fetching session analytics:', error);
+        return null;
+      }
 
-  static async analyzeAndUpdateProfile(
-    userId: string,
-    subject: string,
-    skillArea: string,
-    questionData: any,
-    responseData: any
-  ): Promise<void> {
-    console.log('Analyzing and updating profile:', { userId, subject, skillArea, questionData, responseData });
-    // Mock implementation
-  }
+      if (!data || data.length === 0) {
+        return {
+          totalSessions: 0,
+          completedSessions: 0,
+          totalTimeSpent: 0,
+          averageEngagement: 0,
+          completionRate: 0,
+          sessionTypeBreakdown: {}
+        };
+      }
 
-  // Instance methods that delegate to static methods for backward compatibility
-  async getLearningProfile(userId: string, subject: string, skillArea: string = 'general'): Promise<UserLearningProfile> {
-    return UserLearningProfileService.getLearningProfile(userId, subject, skillArea);
-  }
+      const completedSessions = data.filter(s => s.completed);
+      
+      const analytics = {
+        totalSessions: data.length,
+        completedSessions: completedSessions.length,
+        totalTimeSpent: completedSessions.reduce((sum, s) => sum + (s.time_spent || 0), 0),
+        averageEngagement: completedSessions.length > 0 
+          ? completedSessions.reduce((sum, s) => sum + (s.score || 0), 0) / completedSessions.length 
+          : 0,
+        completionRate: data.length ? (completedSessions.length / data.length) * 100 : 0,
+        sessionTypeBreakdown: data.reduce((acc, s) => {
+          acc[s.skill_area] = (acc[s.skill_area] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      };
 
-  async getUserPreferences(userId: string): Promise<UserPreferences | null> {
-    return UserLearningProfileService.getUserPreferences(userId);
-  }
-
-  async createOrUpdateProfile(profileData: any): Promise<boolean> {
-    return UserLearningProfileService.createOrUpdateProfile(profileData);
-  }
-
-  async updateUserPreferences(preferences: Partial<UserPreferences>): Promise<boolean> {
-    return UserLearningProfileService.updateUserPreferences(preferences);
-  }
-
-  async recordQuestionHistory(historyEntry: any): Promise<boolean> {
-    return UserLearningProfileService.recordQuestionHistory(historyEntry);
-  }
-
-  async analyzeAndUpdateProfile(
-    userId: string,
-    subject: string,
-    skillArea: string,
-    questionData: any,
-    responseData: any
-  ): Promise<void> {
-    return UserLearningProfileService.analyzeAndUpdateProfile(userId, subject, skillArea, questionData, responseData);
+      return analytics;
+    } catch (error) {
+      console.error('Error calculating session analytics:', error);
+      return null;
+    }
   }
 }
 
-export const userLearningProfileService = new UserLearningProfileService();
+export const userActivityService = new UserActivityService();
