@@ -2,40 +2,70 @@
 import { UserProgress } from '@/services/progressPersistence';
 
 export const calculateRecommendedSessionTime = (userProgress: UserProgress | null): number => {
-  if (!userProgress) return 20; // Default 20 minutes
+  if (!userProgress) return 20; // Default 20 minutes for new users
+
+  const { accuracy_rate, attempts_count } = userProgress;
   
-  // Use accuracy_rate instead of accuracy
-  const accuracy = userProgress.accuracy_rate || userProgress.accuracy || 0;
-  const attempts = userProgress.attempts_count || userProgress.attempts || 0;
-  
-  if (accuracy > 80) {
-    return 25; // Longer sessions for high performers
-  } else if (accuracy < 50) {
-    return 15; // Shorter sessions for struggling learners
+  // Base time on past performance
+  let recommendedTime = 20;
+
+  // Adjust based on accuracy
+  if (accuracy_rate > 80) {
+    recommendedTime += 5; // Longer sessions for high performers
+  } else if (accuracy_rate < 60) {
+    recommendedTime -= 5; // Shorter sessions for struggling learners
   }
-  
-  return 20; // Default
+
+  // Adjust based on experience
+  if (attempts_count > 10) {
+    recommendedTime += 5; // Experienced learners can handle longer sessions
+  }
+
+  return Math.max(10, Math.min(40, recommendedTime)); // Between 10-40 minutes
 };
 
-export const shouldAdjustDifficulty = (userProgress: UserProgress | null, currentStreak: number): boolean => {
-  if (!userProgress) return false;
-  
-  const accuracy = userProgress.accuracy_rate || userProgress.accuracy || 0;
-  
-  // Adjust difficulty if accuracy is very high or very low
-  return accuracy > 90 || accuracy < 40;
-};
+export const shouldAdjustDifficulty = (
+  accuracy: number,
+  consecutiveCorrect: number,
+  consecutiveIncorrect: number,
+  totalAttempts: number
+): { shouldAdjust: boolean; newLevel?: number; reason?: string } => {
+  // Don't adjust until we have enough data
+  if (totalAttempts < 3) return { shouldAdjust: false };
 
-export const calculateDifficultyAdjustment = (userProgress: UserProgress | null, isCorrect: boolean): number => {
-  if (!userProgress) return 0;
-  
-  const accuracy = userProgress.accuracy_rate || userProgress.accuracy || 0;
-  
-  if (isCorrect && accuracy > 85) {
-    return 0.1; // Increase difficulty
-  } else if (!isCorrect && accuracy < 50) {
-    return -0.1; // Decrease difficulty
+  // Increase difficulty conditions
+  if (accuracy >= 85 && consecutiveCorrect >= 3) {
+    return {
+      shouldAdjust: true,
+      newLevel: 1, // relative increase
+      reason: `High accuracy (${accuracy.toFixed(1)}%) - increasing difficulty`
+    };
   }
-  
-  return 0; // No change
+
+  if (accuracy >= 90 && consecutiveCorrect >= 2) {
+    return {
+      shouldAdjust: true,
+      newLevel: 1,
+      reason: `Excellent performance (${accuracy.toFixed(1)}%) - increasing difficulty`
+    };
+  }
+
+  // Decrease difficulty conditions
+  if (accuracy <= 50 && consecutiveIncorrect >= 2) {
+    return {
+      shouldAdjust: true,
+      newLevel: -1, // relative decrease
+      reason: `Low accuracy (${accuracy.toFixed(1)}%) - decreasing difficulty`
+    };
+  }
+
+  if (accuracy <= 30) {
+    return {
+      shouldAdjust: true,
+      newLevel: -1,
+      reason: `Very low accuracy (${accuracy.toFixed(1)}%) - decreasing difficulty`
+    };
+  }
+
+  return { shouldAdjust: false };
 };

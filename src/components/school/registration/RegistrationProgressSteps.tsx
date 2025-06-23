@@ -1,12 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save, User, Phone, GraduationCap, Home, CheckCircle, LucideIcon } from "lucide-react";
-
-interface RegistrationStep {
-  id: number;
-  title: string;
-  icon: LucideIcon;
-}
+import { Save, User, Phone, GraduationCap, Home, CheckCircle } from "lucide-react";
+import { RegistrationStep } from "@/types/school";
 
 interface RegistrationProgressStepsProps {
   currentStep: number;

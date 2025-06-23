@@ -1,3 +1,4 @@
+
 import { StableQuestionTemplate, PrecompiledQuestion } from './types';
 
 export class QuestionGenerator {
@@ -21,7 +22,7 @@ export class QuestionGenerator {
     return shuffled;
   }
 
-  private evaluateFormula(formula: string, variables: Record<string, unknown>): number {
+  private evaluateFormula(formula: string, variables: Record<string, any>): number {
     let expression = formula;
     for (const [key, value] of Object.entries(variables)) {
       expression = expression.replace(new RegExp(key, 'g'), String(value));
@@ -54,7 +55,7 @@ export class QuestionGenerator {
   generateFromTemplate(template: StableQuestionTemplate, seed: number): PrecompiledQuestion {
     let question = template.template;
     let explanation = template.explanationTemplate;
-    const variables: Record<string, unknown> = {};
+    const variables: Record<string, any> = {};
 
     const random = this.seededRandom(seed);
 

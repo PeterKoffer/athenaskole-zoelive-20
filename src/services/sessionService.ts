@@ -13,8 +13,8 @@ export interface LearningSession {
   score: number;
   completed: boolean;
   content_id?: string;
-  user_feedback?: Record<string, unknown>;
-  ai_adjustments?: Record<string, unknown>;
+  user_feedback?: any;
+  ai_adjustments?: any;
 }
 
 class SessionService {
@@ -32,7 +32,7 @@ class SessionService {
           score: sessionData.score || 0,
           completed: sessionData.completed || false,
           content_id: sessionData.content_id,
-          user_feedback: (sessionData.user_feedback || {}) as any, // Cast for Json compatibility
+          user_feedback: sessionData.user_feedback || {},
         })
         .select('id')
         .single();
@@ -58,7 +58,7 @@ class SessionService {
           time_spent: updates.time_spent,
           score: updates.score,
           completed: updates.completed,
-          user_feedback: (updates.user_feedback || {}) as any, // Cast for Json compatibility
+          user_feedback: updates.user_feedback,
         })
         .eq('id', sessionId);
 
@@ -88,24 +88,7 @@ class SessionService {
         return [];
       }
 
-      // Transform the data to match the expected interface
-      return (data || []).map(item => ({
-        id: item.id,
-        user_id: item.user_id,
-        subject: item.subject,
-        skill_area: item.skill_area,
-        difficulty_level: item.difficulty_level,
-        start_time: item.start_time,
-        end_time: item.end_time || undefined,
-        time_spent: item.time_spent,
-        score: item.score,
-        completed: item.completed,
-        content_id: item.content_id || undefined,
-        user_feedback: (typeof item.user_feedback === 'object' && item.user_feedback !== null) 
-          ? item.user_feedback as Record<string, unknown> 
-          : {},
-        ai_adjustments: {}
-      }));
+      return data || [];
     } catch (error) {
       console.error('Error in getRecentSessions:', error);
       return [];

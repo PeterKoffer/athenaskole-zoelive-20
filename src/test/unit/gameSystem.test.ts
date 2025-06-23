@@ -1,48 +1,53 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { describe, it, expect } from 'vitest';
+// Test the existing game system verification
+describe('Game System Verification', () => {
+  let gameSystemVerification: any;
 
-describe('Game System Unit Tests', () => {
-  it('should handle game assignments', () => {
-    const mockGameAssignment = {
-      id: 'test-assignment',
-      gameId: 'test-game',
-      userId: 'test-user',
-      assignedAt: new Date().toISOString(),
-      dueDate: new Date().toISOString(),
-      completed: false
-    };
+  beforeEach(async () => {
+    // Mock the dependencies that the verification module needs
+    vi.mock('@/services/gameAssignmentService', () => ({
+      gameAssignmentService: {
+        createAssignment: vi.fn(),
+        getTeacherAssignments: vi.fn(),
+        startGameSession: vi.fn(),
+        endGameSession: vi.fn(),
+        getGameAnalytics: vi.fn(),
+      },
+    }));
 
-    expect(mockGameAssignment.id).toBe('test-assignment');
-    expect(mockGameAssignment.gameId).toBe('test-game');
-    expect(mockGameAssignment.userId).toBe('test-user');
-    expect(mockGameAssignment.completed).toBe(false);
+    vi.mock('@/hooks/useGameTracking', () => ({
+      useGameTracking: vi.fn(() => ({
+        isTracking: false,
+        startGameTracking: vi.fn(),
+        endGameTracking: vi.fn(),
+        recordAction: vi.fn(),
+        recordHintUsed: vi.fn(),
+        updateLearningOutcome: vi.fn(),
+      })),
+    }));
+
+    // Import the module after mocking dependencies
+    gameSystemVerification = await import('@/test/gameSystemVerification');
   });
 
-  it('should track game sessions', () => {
-    const mockGameSession = {
-      id: 'test-session',
-      gameId: 'test-game',
-      userId: 'test-user',
-      startTime: new Date().toISOString(),
-      endTime: new Date().toISOString(),
-      score: 85,
-      completed: true
-    };
-
-    expect(mockGameSession.id).toBe('test-session');
-    expect(mockGameSession.score).toBe(85);
-    expect(mockGameSession.completed).toBe(true);
+  it('should have correct test game assignment structure', () => {
+    expect(gameSystemVerification.default.testGameAssignment).toBeDefined();
+    expect(gameSystemVerification.default.testGameAssignment).toHaveProperty('teacher_id');
+    expect(gameSystemVerification.default.testGameAssignment).toHaveProperty('game_id');
+    expect(gameSystemVerification.default.testGameAssignment).toHaveProperty('subject');
+    expect(gameSystemVerification.default.testGameAssignment).toHaveProperty('skill_area');
   });
 
-  it('should provide game tracking functionality', () => {
-    const mockTrackingHook = {
-      currentGame: null,
-      isPlaying: false,
-      score: 0,
-      timeElapsed: 0
-    };
+  it('should have correct test game session structure', () => {
+    expect(gameSystemVerification.default.testGameSession).toBeDefined();
+    expect(gameSystemVerification.default.testGameSession).toHaveProperty('user_id');
+    expect(gameSystemVerification.default.testGameSession).toHaveProperty('game_id');
+    expect(gameSystemVerification.default.testGameSession).toHaveProperty('score');
+  });
 
-    expect(mockTrackingHook.isPlaying).toBe(false);
-    expect(mockTrackingHook.score).toBe(0);
+  it('should export TestGameTrackingHook component', () => {
+    expect(gameSystemVerification.default.TestGameTrackingHook).toBeDefined();
+    expect(typeof gameSystemVerification.default.TestGameTrackingHook).toBe('function');
   });
 });

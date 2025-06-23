@@ -8,7 +8,7 @@ export interface LessonProgress {
   skill_area: string;
   current_activity_index: number;
   total_activities: number;
-  lesson_data: Record<string, unknown>;
+  lesson_data: any;
   score: number;
   time_elapsed: number;
   is_completed: boolean;
@@ -19,17 +19,7 @@ export class LessonProgressService {
     try {
       const { data, error } = await supabase
         .from('lesson_progress')
-        .upsert({
-          user_id: progress.user_id,
-          subject: progress.subject,
-          skill_area: progress.skill_area,
-          current_activity_index: progress.current_activity_index,
-          total_activities: progress.total_activities,
-          lesson_data: progress.lesson_data as any, // Cast to any for Json compatibility
-          score: progress.score,
-          time_elapsed: progress.time_elapsed,
-          is_completed: progress.is_completed
-        }, {
+        .upsert(progress, {
           onConflict: 'user_id,subject,skill_area'
         })
         .select('id')
@@ -63,20 +53,7 @@ export class LessonProgressService {
         return null;
       }
 
-      if (!data) return null;
-
-      return {
-        id: data.id,
-        user_id: data.user_id,
-        subject: data.subject,
-        skill_area: data.skill_area,
-        current_activity_index: data.current_activity_index,
-        total_activities: data.total_activities,
-        lesson_data: (data.lesson_data as Record<string, unknown>) || {},
-        score: data.score,
-        time_elapsed: data.time_elapsed,
-        is_completed: data.is_completed
-      };
+      return data;
     } catch (error) {
       console.error('Error in getLessonProgress:', error);
       return null;

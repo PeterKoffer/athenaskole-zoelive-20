@@ -38,45 +38,48 @@ export class StableQuestionTemplateSystem {
     sessionId: string,
     difficultyLevel: number = 1
   ): PrecompiledQuestion | null {
-    const templateId = this.findTemplateId(subject, skillArea, difficultyLevel);
-    if (!templateId) {
-      console.warn(`No template found for ${subject}-${skillArea}-${difficultyLevel}`);
-      return null;
-    }
-
-    const questions = this.precompiledQuestions.get(templateId);
-    if (!questions || questions.length === 0) {
-      console.warn(`No questions available for template: ${templateId}`);
-      return null;
-    }
-
+    console.log(`🎯 Getting stable question for ${subject}/${skillArea} (Session: ${sessionId})`);
+    
     if (!this.sessionQuestions.has(sessionId)) {
       this.sessionQuestions.set(sessionId, new Set());
     }
     const usedQuestions = this.sessionQuestions.get(sessionId)!;
 
-    const availableQuestions = questions.filter(q => !usedQuestions.has(q.id));
-    if (availableQuestions.length === 0) {
-      console.warn(`All questions used for session ${sessionId}, template ${templateId}`);
-      return questions[Math.floor(Math.random() * questions.length)];
+    const availableTemplates = this.templates.filter(template => 
+      template.subject === subject &&
+      (skillArea === 'general_math' || template.skillArea === skillArea) &&
+      template.difficultyLevel <= difficultyLevel
+    );
+
+    if (availableTemplates.length === 0) {
+      console.warn('⚠️ No matching templates found');
+      return null;
     }
 
-    const selectedQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
-    usedQuestions.add(selectedQuestion.id);
+    for (const template of availableTemplates) {
+      const precompiledQuestions = this.precompiledQuestions.get(template.id) || [];
+      const availableQuestions = precompiledQuestions.filter(q => !usedQuestions.has(q.id));
+      
+      if (availableQuestions.length > 0) {
+        const selectedQuestion = availableQuestions[0];
+        usedQuestions.add(selectedQuestion.id);
+        
+        console.log(`✅ Retrieved stable question: ${selectedQuestion.question.substring(0, 50)}...`);
+        return selectedQuestion;
+      }
+    }
 
-    return selectedQuestion;
+    console.log('🔄 All questions used, resetting session');
+    usedQuestions.clear();
+    return this.getStableQuestion(subject, skillArea, sessionId, difficultyLevel);
   }
 
-  private findTemplateId(subject: string, skillArea: string, difficultyLevel: number): string | null {
-    const template = this.templates.find(t => 
-      t.subject === subject && 
-      t.skillArea === skillArea && 
-      t.difficultyLevel === difficultyLevel
-    );
-    return template?.id || null;
+  clearSession(sessionId: string): void {
+    this.sessionQuestions.delete(sessionId);
+    console.log(`🧹 Cleared stable question session: ${sessionId}`);
   }
 
-  private getTotalPrecompiledCount(): number {
+  getTotalPrecompiledCount(): number {
     let total = 0;
     for (const questions of this.precompiledQuestions.values()) {
       total += questions.length;
@@ -84,24 +87,15 @@ export class StableQuestionTemplateSystem {
     return total;
   }
 
-  clearSessionQuestions(sessionId: string): void {
-    this.sessionQuestions.delete(sessionId);
-  }
-
-  clearSession(sessionId: string): void {
-    this.clearSessionQuestions(sessionId);
-  }
-
-  getSessionStats(sessionId: string): { used: number; available: number } {
-    const usedQuestions = this.sessionQuestions.get(sessionId);
-    const usedCount = usedQuestions ? usedQuestions.size : 0;
-    const totalCount = this.getTotalPrecompiledCount();
-    return { used: usedCount, available: totalCount - usedCount };
-  }
-
-  getStats(sessionId: string): { used: number; available: number } {
-    return this.getSessionStats(sessionId);
+  getStats(): Record<string, any> {
+    return {
+      totalTemplates: this.templates.length,
+      totalPrecompiledQuestions: this.getTotalPrecompiledCount(),
+      activeSessions: this.sessionQuestions.size,
+      questionsPerTemplate: this.batchSize
+    };
   }
 }
 
 export const stableQuestionTemplateSystem = new StableQuestionTemplateSystem();
+export type { StableQuestionTemplate, PrecompiledQuestion };

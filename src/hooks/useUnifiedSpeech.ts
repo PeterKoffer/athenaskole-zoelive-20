@@ -1,115 +1,77 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { unifiedSpeech } from '@/components/speech/UnifiedSpeechSystem';
 
 export const useUnifiedSpeech = () => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
-
-  const speakAsNelie = async (text: string, priority: boolean = false, context?: string): Promise<void> => {
-    if (!isEnabled || !hasUserInteracted) return;
-    
-    setIsSpeaking(true);
-    try {
-      // Mock implementation using browser's speech synthesis
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      utterance.volume = 0.8;
-      
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      
-      speechSynthesis.speak(utterance);
-    } catch (error) {
-      console.error('Error in speech synthesis:', error);
-      setIsSpeaking(false);
-    }
-  };
-
-  // Alias for backward compatibility
-  const speak = speakAsNelie;
-
-  const stop = () => {
-    if (speechSynthesis.speaking) {
-      speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
-  };
-
-  const forceStopAll = () => {
-    stop();
-    // Additional cleanup for stubborn speech engines
-    try {
-      if (speechSynthesis) {
-        speechSynthesis.resume();
-        speechSynthesis.cancel();
-      }
-    } catch (error) {
-      console.warn('Error during force stop cleanup:', error);
-    }
-  };
-
-  const enableSpeech = () => {
-    setIsEnabled(true);
-    setHasUserInteracted(true);
-  };
-
-  const enableUserInteraction = () => {
-    setHasUserInteracted(true);
-  };
-
-  const disableSpeech = () => setIsEnabled(false);
-
-  const toggleEnabled = () => {
-    if (!isEnabled) {
-      enableSpeech();
-    } else {
-      disableSpeech();
-      stop();
-    }
-  };
-
-  const repeatSpeech = async (text: string, context?: string) => {
-    await speakAsNelie(text, true, context);
-  };
+  const [speechState, setSpeechState] = useState(unifiedSpeech.getState());
 
   useEffect(() => {
-    // Check if speech synthesis is available
-    if ('speechSynthesis' in window) {
-      setIsEnabled(true);
-    }
+    const unsubscribe = unifiedSpeech.subscribe(setSpeechState);
+    return unsubscribe;
+  }, []);
 
-    // Enable user interaction on first user gesture
-    const handleUserInteraction = () => {
-      setHasUserInteracted(true);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-    };
+  const speak = useCallback(async (text: string, priority: boolean = false, context?: string) => {
+    await unifiedSpeech.speak(text, priority, context);
+  }, []);
 
-    document.addEventListener('click', handleUserInteraction);
-    document.addEventListener('touchstart', handleUserInteraction);
+  const speakAsNelie = useCallback(async (text: string, priority: boolean = false, context?: string) => {
+    await unifiedSpeech.speakAsNelie(text, priority, context);
+  }, []);
 
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-    };
+  const repeatSpeech = useCallback(async (text: string, context?: string) => {
+    await unifiedSpeech.repeatLastSpeech(text, context);
+  }, []);
+
+  const stop = useCallback(() => {
+    unifiedSpeech.stop();
+  }, []);
+
+  const forceStopAll = useCallback(() => {
+    unifiedSpeech.forceStopAll();
+  }, []);
+
+  const toggleEnabled = useCallback(() => {
+    unifiedSpeech.toggleEnabled();
+  }, []);
+
+  const enableUserInteraction = useCallback(() => {
+    unifiedSpeech.enableUserInteraction();
+  }, []);
+
+  const test = useCallback(async () => {
+    await unifiedSpeech.test();
+  }, []);
+
+  const clearSpokenContent = useCallback(() => {
+    unifiedSpeech.clearSpokenContent();
   }, []);
 
   return {
-    isEnabled,
-    isSpeaking,
-    hasUserInteracted,
-    isReady: hasUserInteracted,
-    autoReadEnabled: isEnabled, // Alias for backward compatibility
+    // State
+    isSpeaking: speechState.isSpeaking,
+    isEnabled: speechState.isEnabled,
+    hasUserInteracted: speechState.hasUserInteracted,
+    isReady: speechState.isReady,
+    lastError: speechState.lastError,
+    isLoading: speechState.isLoading,
+    isCheckingElevenLabs: speechState.isCheckingElevenLabs,
+
+    // Actions
+    speak,
     speakAsNelie,
-    speak, // Alias for backward compatibility
-    enableSpeech,
-    enableUserInteraction,
-    disableSpeech,
+    repeatSpeech,
     stop,
     forceStopAll,
     toggleEnabled,
-    repeatSpeech
+    enableUserInteraction,
+    test,
+    clearSpokenContent,
+
+    // Legacy compatibility
+    autoReadEnabled: speechState.isEnabled,
+    handleMuteToggle: toggleEnabled,
+    speakText: speak,
+    stopSpeaking: stop,
+    testSpeech: test
   };
 };

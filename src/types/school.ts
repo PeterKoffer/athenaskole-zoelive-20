@@ -67,7 +67,7 @@ export interface StudentProfile {
 export interface RegistrationStep {
   id: number;
   title: string;
-  icon: unknown;
+  icon: any;
 }
 
 // Teaching Perspective Setting for a school

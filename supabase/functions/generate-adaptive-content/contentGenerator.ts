@@ -2,7 +2,7 @@ import { GeneratedContent } from './types.ts';
 import { createGradeAlignedPrompt, PromptConfig } from './promptBuilder.ts';
 import { callDeepSeek } from './apiClient.ts';
 
-export async function generateContentWithDeepSeek(requestData: Record<string, unknown>): Promise<GeneratedContent | null> {
+export async function generateContentWithDeepSeek(requestData: any): Promise<GeneratedContent | null> {
   console.log('🤖 generateContentWithDeepSeek called with grade-level alignment:', requestData);
   
   const deepSeekApiKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');

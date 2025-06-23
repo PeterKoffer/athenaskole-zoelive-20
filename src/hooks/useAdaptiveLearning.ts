@@ -34,9 +34,9 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
     setState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      const userProgress = await progressPersistence.getUserProgress(user.id, subject, activityType);
+      const userProgress = await progressPersistence.getUserProgress(user.id, subject);
       const recommendedTime = calculateRecommendedSessionTime(userProgress);
-      const initialDifficulty = userProgress?.currentLevel || 1;
+      const initialDifficulty = userProgress?.current_level || 1;
 
       await startSession(initialDifficulty);
 
@@ -52,7 +52,7 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
       console.error('Error initializing adaptive learning session:', error);
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [user, subject, activityType, startSession]);
+  }, [user, subject, startSession]);
 
   // Record an answer
   const recordAnswer = useCallback(async (isCorrect: boolean, responseTime: number) => {
@@ -96,20 +96,17 @@ export const useAdaptiveLearning = (subject: string, activityType: string) => {
 
     // Update user progress
     const progressUpdate = {
-      accuracy: metrics.accuracy,
-      currentLevel: state.difficulty,
-      attempts: metrics.totalAttempts,
-      averageTime: metrics.averageTime,
-      engagement: 0.8,
-      learningStyle: 'mixed',
-      strengths: {},
-      weaknesses: {}
+      user_id: user.id,
+      subject,
+      current_level: state.difficulty,
+      accuracy_rate: metrics.accuracy,
+      last_assessment: new Date().toISOString()
     };
 
-    await progressPersistence.updateUserProgress(user.id, subject, activityType, progressUpdate);
+    await progressPersistence.updateUserProgress(progressUpdate);
     resetMetrics();
 
-  }, [user, subject, activityType, state.difficulty, metrics, endSession, resetMetrics]);
+  }, [user, subject, state.difficulty, metrics, endSession, resetMetrics]);
 
   useEffect(() => {
     if (user) {

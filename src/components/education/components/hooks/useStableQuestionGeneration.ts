@@ -58,8 +58,8 @@ export const useStableQuestionGeneration = ({
   }, [sessionId]);
 
   const getStableStats = useCallback(() => {
-    return stableQuestionTemplateSystem.getStats(sessionId); // Pass sessionId as parameter
-  }, [sessionId]);
+    return stableQuestionTemplateSystem.getStats();
+  }, []);
 
   return {
     generateStableQuestion,

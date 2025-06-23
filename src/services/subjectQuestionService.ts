@@ -10,20 +10,10 @@ export interface SubjectQuestionTemplate {
   correct_answer: number;
   explanation_template: string;
   difficulty_level: number;
-  content?: {
-    question: string;
-    options: string[];
-    correct: number;
-    explanation: string;
-  };
 }
 
 export class SubjectQuestionService {
-  static async getQuestionsForSubject(
-    subject: string,
-    skillArea?: string,
-    count: number = 10
-  ): Promise<SubjectQuestionTemplate[]> {
+  static async getQuestionsForSubject(subject: string, skillArea?: string, count: number = 10): Promise<SubjectQuestionTemplate[]> {
     try {
       let query = supabase
         .from('subject_question_templates')
@@ -46,9 +36,9 @@ export class SubjectQuestionService {
         subject: item.subject,
         skill_area: item.skill_area,
         question_template: item.question_template,
-        options_template: Array.isArray(item.options_template)
-          ? item.options_template
-          : typeof item.options_template === 'string'
+        options_template: Array.isArray(item.options_template) 
+          ? item.options_template 
+          : typeof item.options_template === 'string' 
             ? JSON.parse(item.options_template)
             : [],
         correct_answer: item.correct_answer,
@@ -61,11 +51,7 @@ export class SubjectQuestionService {
     }
   }
 
-  static async getRandomQuestionForSubject(
-    subject: string,
-    skillArea?: string,
-    excludeIds: string[] = []
-  ): Promise<SubjectQuestionTemplate | null> {
+  static async getRandomQuestionForSubject(subject: string, skillArea?: string, excludeIds: string[] = []): Promise<SubjectQuestionTemplate | null> {
     try {
       let query = supabase
         .from('subject_question_templates')
@@ -91,17 +77,18 @@ export class SubjectQuestionService {
         return null;
       }
 
+      // Return a random question from the results
       const randomIndex = Math.floor(Math.random() * data.length);
       const item = data[randomIndex];
-
+      
       return {
         id: item.id,
         subject: item.subject,
         skill_area: item.skill_area,
         question_template: item.question_template,
-        options_template: Array.isArray(item.options_template)
-          ? item.options_template
-          : typeof item.options_template === 'string'
+        options_template: Array.isArray(item.options_template) 
+          ? item.options_template 
+          : typeof item.options_template === 'string' 
             ? JSON.parse(item.options_template)
             : [],
         correct_answer: item.correct_answer,
@@ -114,53 +101,25 @@ export class SubjectQuestionService {
     }
   }
 
-  static async createDynamicQuestion(
-    subject: string,
-    skillArea: string,
-    difficultyLevel: number,
-    usedQuestions: string[] = []
-  ): Promise<SubjectQuestionTemplate | null> {
-    try {
-      console.log('🎯 Creating dynamic question for:', { subject, skillArea, difficultyLevel });
-      
-      // Try to get existing template first
-      const template = await this.getRandomQuestionForSubject(subject, skillArea, usedQuestions);
-      
-      if (template) {
-        // Add content property to match expected interface
-        template.content = {
-          question: template.question_template,
-          options: template.options_template,
-          correct: template.correct_answer,
-          explanation: template.explanation_template
-        };
-        return template;
+  static createDynamicQuestion(template: SubjectQuestionTemplate): any {
+    return {
+      id: `dynamic-${template.id}-${Date.now()}`,
+      title: `${template.subject} Question`,
+      type: 'activity',
+      phase: 'interactive-game' as const,
+      duration: 3,
+      content: {
+        question: template.question_template,
+        options: template.options_template,
+        correctAnswer: template.correct_answer,
+        explanation: template.explanation_template
+      },
+      metadata: {
+        subject: template.subject,
+        skillArea: template.skill_area,
+        difficultyLevel: template.difficulty_level,
+        templateId: template.id
       }
-
-      // If no template found, create a basic fallback question
-      const fallbackQuestion: SubjectQuestionTemplate = {
-        id: `dynamic_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
-        subject,
-        skill_area: skillArea,
-        question_template: `What is an important concept in ${skillArea}?`,
-        options_template: ['Option A', 'Option B', 'Option C', 'Option D'],
-        correct_answer: 0,
-        explanation_template: `This is a practice question for ${skillArea}.`,
-        difficulty_level: difficultyLevel,
-        content: {
-          question: `What is an important concept in ${skillArea}?`,
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correct: 0,
-          explanation: `This is a practice question for ${skillArea}.`
-        }
-      };
-
-      console.log('✅ Created fallback dynamic question');
-      return fallbackQuestion;
-      
-    } catch (error) {
-      console.error('Error creating dynamic question:', error);
-      return null;
-    }
+    };
   }
 }

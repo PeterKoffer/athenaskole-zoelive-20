@@ -1,52 +1,67 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { AdaptiveContentRecord, GeneratedContent } from '@/services/progressPersistence';
+import { aiContentGenerator } from './content/aiContentGenerator';
+import { contentRepository } from './content/contentRepository';
+import { fallbackContentService } from './content/fallbackContentService';
+import { GenerateContentRequest, GeneratedContent } from './types/contentTypes';
 
-export class OpenAIContentService {
-  async generateContent(prompt: string, subject: string, skillArea: string): Promise<GeneratedContent | null> {
-    try {
-      // Mock implementation
-      const content: GeneratedContent = {
-        id: `content_${Date.now()}`,
-        content: {
-          text: `Generated content for ${subject} - ${skillArea}`,
-          type: 'educational_content'
-        },
-        metadata: {
-          subject,
-          skillArea,
-          prompt: prompt.substring(0, 50) + '...'
-        },
-        created_at: new Date().toISOString()
-      };
-      
-      return content;
-    } catch (error) {
-      console.error('Error generating content:', error);
-      return null;
-    }
+export class DeepSeekContentService {
+  async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
+    return aiContentGenerator.generateAdaptiveContent(request);
   }
 
-  async saveAdaptiveContent(userId: string, content: GeneratedContent, subject: string, skillArea: string): Promise<boolean> {
+  async getOrGenerateContent(
+    subject: string, 
+    skillArea: string, 
+    difficultyLevel: number, 
+    userId: string
+  ): Promise<any> {
     try {
-      const record: AdaptiveContentRecord = {
-        id: `adaptive_${Date.now()}`,
-        user_id: userId,
-        subject,
-        skill_area: skillArea,
-        content_type: 'generated',
-        generated_content: content.content,
-        difficulty_level: 1,
-        created_at: new Date().toISOString()
-      };
+      // First, try to get existing content
+      const existingContent = await contentRepository.getExistingContent(subject, skillArea, difficultyLevel);
 
-      console.log('Saving adaptive content:', record);
-      return true;
+      // If we have existing content, use it
+      if (existingContent) {
+        console.log('♻️ Using existing adaptive content');
+        return existingContent;
+      }
+
+      // If no existing content, generate new content with DeepSeek
+      console.log('🆕 No existing content found, generating new content with DeepSeek AI');
+      
+      try {
+        const generatedContent = await this.generateAdaptiveContent({
+          subject,
+          skillArea,
+          difficultyLevel,
+          userId
+        });
+
+        // Try to save the generated content to database
+        return await contentRepository.saveGeneratedContent(subject, skillArea, difficultyLevel, generatedContent);
+
+      } catch (aiError) {
+        console.error('❌ DeepSeek AI generation failed, using fallback content:', aiError);
+        
+        // Create fallback content when AI generation fails
+        const fallbackContent = fallbackContentService.createFallbackContent(subject, skillArea, difficultyLevel);
+        
+        // Try to save fallback content
+        return await contentRepository.saveFallbackContent(fallbackContent);
+      }
+
     } catch (error) {
-      console.error('Error saving adaptive content:', error);
-      return false;
+      console.error('❌ Error in getOrGenerateContent:', error);
+      
+      // Final fallback - return basic content structure
+      return fallbackContentService.createFallbackContent(subject, skillArea, difficultyLevel);
     }
   }
 }
 
-export const openaiContentService = new OpenAIContentService();
+export const deepSeekContentService = new DeepSeekContentService();
+
+// Export aliases for backward compatibility
+export const openaiContentService = deepSeekContentService;
+
+// Re-export types for backward compatibility
+export type { GenerateContentRequest, GeneratedContent } from './types/contentTypes';
