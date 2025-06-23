@@ -113,19 +113,13 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
         <div className="absolute top-6 left-6 w-8 h-8 bg-white/10 rounded-full blur-sm"></div>
         <div className="absolute top-8 left-8 w-4 h-4 bg-white/5 rounded-full blur-xs"></div>
 
-        {/* Fixed Speaker Icon with better alignment */}
+        {/* Speaker Icon - same size as dropdown and horizontally aligned */}
         <button
           onClick={handleSpeakerClick}
-          className="absolute top-4 right-4 transform transition-all duration-300 group-hover:scale-125 group-hover:rotate-12"
+          className="absolute top-4 right-16 p-2 bg-gradient-to-br from-blue-300/80 via-purple-400/80 to-pink-400/80 rounded-xl transition-all duration-200 backdrop-blur-sm hover:scale-125 hover:rotate-12"
           title="Ask Nelie to explain this subject"
         >
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-300/80 via-purple-400/80 to-pink-400/80 rounded-xl flex items-center justify-center transform rotate-3 group-hover:rotate-6 transition-transform duration-300
-            shadow-[0_8px_20px_rgba(0,0,0,0.25),0_3px_10px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1)]
-            hover:shadow-[0_12px_30px_rgba(147,51,234,0.3),0_6px_18px_rgba(59,130,246,0.2)]
-            before:content-[''] before:absolute before:top-1.5 before:left-1.5 before:w-4 before:h-4 before:bg-white/40 before:rounded-full before:blur-sm
-            after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-gradient-to-br after:from-cyan-400/10 after:to-purple-600/10 after:animate-pulse">
-            <Volume2 size={16} className="text-white drop-shadow-lg relative z-10" />
-          </div>
+          <Volume2 size={16} className="text-white drop-shadow-lg" />
         </button>
 
         {/* Dropdown Menu with dark background */}
@@ -133,7 +127,7 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
           <DropdownMenuTrigger asChild>
             <button
               onClick={handleDropdownClick}
-              className="absolute top-4 right-16 p-2 bg-purple-500/60 hover:bg-purple-600/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
+              className="absolute top-4 right-4 p-2 bg-purple-500/60 hover:bg-purple-600/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
               title="More information"
             >
               <ChevronDown size={16} className="text-white" />
