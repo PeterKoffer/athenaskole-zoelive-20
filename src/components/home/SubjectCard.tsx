@@ -32,10 +32,10 @@ const SubjectCard = ({ subject, index, onStartLearning }: SubjectCardProps) => {
         context={`subject-card-${index}`}
         className="border-2 border-gray-600 hover:border-gray-500 transition-all duration-300 backdrop-blur-sm w-full flex bg-gray-800/70"
       >
-        <CardContent className="p-6 flex flex-col h-full w-full relative">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex flex-col">
-              <span className="text-4xl mb-3 filter drop-shadow-lg" style={{
+        <CardContent className="p-6 flex flex-col h-full w-full">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center flex-1">
+              <span className="text-4xl mr-4 filter drop-shadow-lg" style={{
                 textShadow: '0 4px 8px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)'
               }}>
                 {subject.icon}
@@ -47,7 +47,7 @@ const SubjectCard = ({ subject, index, onStartLearning }: SubjectCardProps) => {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="text-gray-400 hover:text-white transition-colors p-1">
+                <button className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-700/50">
                   <ChevronDown className="w-5 h-5" />
                 </button>
               </DropdownMenuTrigger>
