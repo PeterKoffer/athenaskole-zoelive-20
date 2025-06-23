@@ -1,7 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { generateContentWithDeepSeek } from './contentGenerator.ts';
+import { generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,25 +26,22 @@ serve(async (req) => {
       hasPreviousQuestions: Array.isArray(requestData.previousQuestions) && requestData.previousQuestions.length > 0
     });
 
-    // Check for API key availability
-    const deepSeekKey = Deno.env.get('DEEPSEEK_API_KEY');
-    const openaiKey = Deno.env.get('OpenaiAPI');
-    const openaiKeyAlt = Deno.env.get('OPENAI_API_KEY');
+    // Check for API key availability - prioritize OpenAI
+    const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
+    const deepSeekKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('DeepSeek_API');
     
     console.log('🔑 API Key status:', {
+      hasOpenaiKey: !!openaiKey,
       hasDeepSeekKey: !!deepSeekKey,
-      hasOpenaiAPI: !!openaiKey,
-      hasOpenaiKeyAlt: !!openaiKeyAlt,
-      deepSeekKeyLength: deepSeekKey?.length || 0,
       openaiKeyLength: openaiKey?.length || 0,
-      openaiKeyAltLength: openaiKeyAlt?.length || 0
+      deepSeekKeyLength: deepSeekKey?.length || 0
     });
 
-    if (!deepSeekKey && !openaiKey && !openaiKeyAlt) {
+    if (!openaiKey && !deepSeekKey) {
       console.error('❌ No API keys found in environment');
       return new Response(JSON.stringify({
         success: false,
-        error: 'No API keys configured. Please add DEEPSEEK_API_KEY, OpenaiAPI, or OPENAI_API_KEY to your Supabase Edge Function Secrets.',
+        error: 'No API keys configured. Please add OpenaiAPI or DEEPSEEK_API_KEY to your Supabase Edge Function Secrets.',
         debug: {
           availableEnvVars: Object.keys(Deno.env.toObject()).filter(key => key.includes('API') || key.includes('KEY'))
         }
@@ -54,9 +51,37 @@ serve(async (req) => {
       });
     }
 
-    // Generate content using DeepSeek API
-    console.log('🤖 Attempting AI content generation...');
-    const generatedContent = await generateContentWithDeepSeek(requestData);
+    // Try OpenAI first, then fallback to DeepSeek
+    let generatedContent = null;
+    let apiUsed = 'none';
+
+    if (openaiKey) {
+      try {
+        console.log('🤖 Attempting OpenAI content generation...');
+        generatedContent = await generateContentWithOpenAI(requestData);
+        apiUsed = 'openai';
+      } catch (error) {
+        console.error('❌ OpenAI generation failed:', error);
+        
+        // Fallback to DeepSeek if available
+        if (deepSeekKey) {
+          console.log('🔄 Falling back to DeepSeek...');
+          try {
+            generatedContent = await generateContentWithDeepSeek(requestData);
+            apiUsed = 'deepseek-fallback';
+          } catch (deepSeekError) {
+            console.error('❌ DeepSeek fallback also failed:', deepSeekError);
+            throw error; // Throw original OpenAI error
+          }
+        } else {
+          throw error;
+        }
+      }
+    } else if (deepSeekKey) {
+      console.log('🤖 Attempting DeepSeek content generation...');
+      generatedContent = await generateContentWithDeepSeek(requestData);
+      apiUsed = 'deepseek';
+    }
     
     if (!generatedContent) {
       console.error('❌ AI generation returned null/undefined');
@@ -68,7 +93,8 @@ serve(async (req) => {
             subject: requestData.subject,
             skillArea: requestData.skillArea,
             difficultyLevel: requestData.difficultyLevel
-          }
+          },
+          apiUsed
         }
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -80,7 +106,8 @@ serve(async (req) => {
       hasQuestion: !!generatedContent.question,
       optionsCount: generatedContent.options?.length || 0,
       hasExplanation: !!generatedContent.explanation,
-      correctIndex: generatedContent.correct
+      correctIndex: generatedContent.correct,
+      apiUsed
     });
 
     return new Response(JSON.stringify({
@@ -88,7 +115,7 @@ serve(async (req) => {
       generatedContent: generatedContent,
       debug: {
         timestamp: new Date().toISOString(),
-        apiUsed: 'deepseek',
+        apiUsed,
         generationTime: 'success'
       }
     }), {

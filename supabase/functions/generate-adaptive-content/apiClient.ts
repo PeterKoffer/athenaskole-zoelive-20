@@ -1,3 +1,4 @@
+
 import { OpenAIResponse, GeneratedContent } from './types.ts';
 
 export interface APICallResult {
@@ -5,6 +6,98 @@ export interface APICallResult {
   data?: GeneratedContent;
   error?: string;
   debug?: any;
+}
+
+export async function callOpenAI(apiKey: string, prompt: string): Promise<APICallResult> {
+  console.log('🤖 Making request to OpenAI API...');
+  console.log('🌐 Using endpoint: https://api.openai.com/v1/chat/completions');
+  console.log('🎯 Using model: gpt-4o-mini');
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an AI education assistant that creates grade-level appropriate questions aligned with educational standards. Always generate questions that match the requested grade level, subject, and educational standards. Use age-appropriate language and examples. Return only valid JSON with no formatting. CRITICAL: Make sure the "correct" field points to the INDEX of the actual correct answer in the options array.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 500,
+      }),
+    });
+
+    console.log('📡 OpenAI Response Details:');
+    console.log('  - Status:', response.status);
+    console.log('  - Status Text:', response.statusText);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ OpenAI API error response:', errorText);
+      
+      let errorMessage = `OpenAI API error: ${response.status} - ${response.statusText}`;
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.error?.message) {
+          errorMessage = `OpenAI API error: ${errorJson.error.message}`;
+        }
+      } catch (e) {
+        console.log('Could not parse error as JSON');
+      }
+      
+      return {
+        success: false,
+        error: errorMessage,
+        debug: {
+          status: response.status,
+          statusText: response.statusText,
+          errorResponse: errorText
+        }
+      };
+    }
+
+    const openAIData: OpenAIResponse = await response.json();
+    console.log('✅ OpenAI response received successfully');
+
+    if (!openAIData.choices?.[0]?.message?.content) {
+      console.error('❌ Invalid OpenAI response structure:', openAIData);
+      return {
+        success: false,
+        error: 'Invalid response structure from OpenAI',
+        debug: {
+          response: openAIData,
+          hasChoices: !!openAIData.choices,
+          choicesLength: openAIData.choices?.length || 0,
+          firstChoice: openAIData.choices?.[0] || null
+        }
+      };
+    }
+
+    return parseOpenAIResponse(openAIData);
+
+  } catch (error) {
+    console.error('💥 Unexpected error in OpenAI call:', error);
+    return {
+      success: false,
+      error: `OpenAI request failed: ${error.message}`,
+      debug: {
+        errorName: error.name,
+        errorMessage: error.message,
+        errorStack: error.stack
+      }
+    };
+  }
 }
 
 export async function callDeepSeek(apiKey: string, prompt: string): Promise<APICallResult> {
@@ -83,7 +176,7 @@ export async function callDeepSeek(apiKey: string, prompt: string): Promise<APIC
       };
     }
 
-    return parseDeepSeekResponse(deepSeekData);
+    return parseOpenAIResponse(deepSeekData);
 
   } catch (error) {
     console.error('💥 Unexpected error in DeepSeek call:', error);
@@ -99,9 +192,9 @@ export async function callDeepSeek(apiKey: string, prompt: string): Promise<APIC
   }
 }
 
-function parseDeepSeekResponse(deepSeekData: OpenAIResponse): APICallResult {
-  const contentText = deepSeekData.choices[0].message.content.trim();
-  console.log('📄 Raw DeepSeek content (first 200 chars):', contentText.substring(0, 200));
+function parseOpenAIResponse(responseData: OpenAIResponse): APICallResult {
+  const contentText = responseData.choices[0].message.content.trim();
+  console.log('📄 Raw AI content (first 200 chars):', contentText.substring(0, 200));
 
   // Clean any potential markdown formatting
   const cleanContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -132,6 +225,3 @@ function parseDeepSeekResponse(deepSeekData: OpenAIResponse): APICallResult {
 
   return { success: true, data: generatedContent };
 }
-
-// Keep the old function for backward compatibility
-export const callOpenAI = callDeepSeek;
