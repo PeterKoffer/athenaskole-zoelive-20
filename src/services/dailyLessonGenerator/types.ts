@@ -8,9 +8,20 @@ export interface DailyLessonConfig {
 }
 
 export interface StudentProgressData {
+  userId: string;
+  subject: string;
+  skillArea: string;
   currentLevel: number;
   strengths: string[];
   weaknesses: string[];
-  masteredConcepts: string[];
-  overallAccuracy: number;
+  recentPerformance: number[];
+  preferredLearningStyle: string;
+}
+
+export interface CurriculumFocusArea {
+  name: string;
+  description: string;
+  concepts: string[];
+  skills: string[];
+  examples: string[];
 }
