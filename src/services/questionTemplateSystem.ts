@@ -24,7 +24,6 @@ interface GeneratedQuestion {
 
 class QuestionTemplateSystem {
   private mathTemplates: QuestionTemplate[] = [
-    // ... (no changes to the templates array)
     {
       id: 'math_addition_word_1',
       subject: 'mathematics',
@@ -99,7 +98,7 @@ class QuestionTemplateSystem {
     const usedTemplates = this.sessionQuestions.get(sessionId)!;
 
     // Find available templates
-    const availableTemplates = this.mathTemplates.filter(template => 
+    const availableTemplates = this.mathTemplates.filter(template =>
       template.subject === subject &&
       (skillArea === 'general_math' || template.skillArea === skillArea) &&
       template.difficultyLevel <= difficultyLevel &&
@@ -110,14 +109,14 @@ class QuestionTemplateSystem {
     if (availableTemplates.length === 0) {
       console.log('🔄 No unused templates, resetting session templates');
       usedTemplates.clear();
-      availableTemplates.push(...this.mathTemplates.filter(template => 
+      availableTemplates.push(...this.mathTemplates.filter(template =>
         template.subject === subject &&
         (skillArea === 'general_math' || template.skillArea === skillArea)
       ));
     }
 
     // Select template with least usage
-    const template = availableTemplates.sort((a, b) => 
+    const template = availableTemplates.sort((a, b) =>
       (this.templateUsage.get(a.id) || 0) - (this.templateUsage.get(b.id) || 0)
     )[0];
 
@@ -139,7 +138,7 @@ class QuestionTemplateSystem {
 
     // Replace all variables
     for (const [key, values] of Object.entries(template.variables)) {
-      const value = Array.isArray(values) 
+      const value = Array.isArray(values)
         ? values[Math.floor(Math.random() * values.length)]
         : values;
       variables[key] = value;
