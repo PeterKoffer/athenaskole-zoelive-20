@@ -26,6 +26,7 @@ interface UserLearningProfile {
   weaknesses: string[];
   learning_style?: string;
   total_sessions?: number;
+  accuracy_rate?: number; // Added to match the property being used in session updates
 }
 
 export const useLearningProfile = (subject?: string, skillArea?: string) => {
@@ -62,7 +63,8 @@ export const useLearningProfile = (subject?: string, skillArea?: string) => {
         task_completion_rate: 0.85,
         weaknesses: ['time-management'],
         learning_style: 'visual',
-        total_sessions: 10
+        total_sessions: 10,
+        accuracy_rate: 0.75
       };
       setProfile(mockProfile);
     } catch (error) {
