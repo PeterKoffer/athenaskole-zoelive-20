@@ -2,76 +2,37 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserLearningProfile {
-  id?: string;
   user_id: string;
-  subject: string;
-  skill_area: string;
+  attention_span_minutes: number;
+  average_response_time: number;
+  consistency_score: number;
   current_difficulty_level: number;
-  overall_accuracy: number;
+  difficulty_adjustments: Record<string, unknown>;
+  engagement_patterns: Record<string, unknown>;
+  frustration_indicators: Record<string, unknown>;
+  last_updated: string;
+  learning_pace: string;
+  learning_preferences: Record<string, unknown>;
+  motivation_triggers: Record<string, unknown>;
+  optimal_session_length: number;
+  performance_trends: Record<string, unknown>;
+  problem_solving_approach: string;
+  retention_rate: number;
+  social_learning_preference: string;
   strengths: string[];
+  subject_preferences: Record<string, unknown>;
+  task_completion_rate: number;
   weaknesses: string[];
-  learning_style: string;
-  total_sessions: number;
-  total_time_spent: number;
-  last_session_date: string | null;
-  last_topic_covered: string;
-  consistency_score?: number;
-  attention_span_minutes?: number;
-  preferred_pace?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
-export interface UserPreferences {
-  id?: string;
-  user_id: string;
-  auto_read_enabled: boolean;
-  voice_speed: number;
-  difficulty_preference: string;
-  learning_style: string;
-  speech_enabled?: boolean;
-  speech_rate?: number;
-  speech_pitch?: number;
-  preferred_voice?: string;
-  auto_read_questions?: boolean;
-  auto_read_explanations?: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface QuestionHistoryEntry {
-  user_id: string;
-  subject: string;
-  skill_area: string;
-  question_text: string;
-  question_type: string;
-  difficulty_level: number;
-  concepts_covered: string[];
-  user_answer: string;
-  correct_answer: string;
-  is_correct: boolean;
-  response_time_seconds: number;
-  session_id?: string;
-  question_number: number;
-  total_questions_in_session: number;
-  struggle_indicators: Record<string, unknown>;
-  mastery_indicators: Record<string, unknown>;
-}
-
-class UserLearningProfileService {
-  async getLearningProfile(userId: string, subject: string, skillArea?: string): Promise<UserLearningProfile | null> {
+export class UserLearningProfileService {
+  async getProfile(userId: string): Promise<UserLearningProfile | null> {
     try {
-      let query = supabase
-        .from('user_performance')
+      const { data, error } = await supabase
+        .from('user_learning_profiles')
         .select('*')
         .eq('user_id', userId)
-        .eq('subject', subject);
-
-      if (skillArea) {
-        query = query.eq('skill_area', skillArea);
-      }
-
-      const { data, error } = await query.maybeSingle();
+        .single();
 
       if (error) {
         console.error('Error fetching learning profile:', error);
@@ -80,124 +41,70 @@ class UserLearningProfileService {
 
       if (!data) return null;
 
-      return {
-        id: data.id,
+      // Convert database data to UserLearningProfile format with proper type casting
+      const profile: UserLearningProfile = {
         user_id: data.user_id,
-        subject: data.subject,
-        skill_area: data.skill_area,
-        current_difficulty_level: data.current_level || 1,
-        overall_accuracy: data.accuracy_rate || 0,
-        strengths: Array.isArray(data.strengths) ? data.strengths : [],
-        weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses : [],
-        learning_style: data.learning_style || 'mixed',
-        total_sessions: data.attempts_count || 0,
-        total_time_spent: data.completion_time_avg || 0,
-        last_session_date: data.last_assessment,
-        last_topic_covered: data.skill_area,
-        consistency_score: data.engagement_score || 0,
-        attention_span_minutes: 20,
-        preferred_pace: 'medium',
-        created_at: data.created_at,
-        updated_at: data.updated_at
+        attention_span_minutes: data.attention_span_minutes || 20,
+        average_response_time: data.average_response_time || 3.0,
+        consistency_score: data.consistency_score || 0.5,
+        current_difficulty_level: data.current_difficulty_level || 1,
+        difficulty_adjustments: (typeof data.difficulty_adjustments === 'object' && data.difficulty_adjustments !== null) 
+          ? data.difficulty_adjustments as Record<string, unknown> 
+          : {},
+        engagement_patterns: (typeof data.engagement_patterns === 'object' && data.engagement_patterns !== null) 
+          ? data.engagement_patterns as Record<string, unknown> 
+          : {},
+        frustration_indicators: (typeof data.frustration_indicators === 'object' && data.frustration_indicators !== null) 
+          ? data.frustration_indicators as Record<string, unknown> 
+          : {},
+        last_updated: data.last_updated || new Date().toISOString(),
+        learning_pace: data.learning_pace || 'moderate',
+        learning_preferences: (typeof data.learning_preferences === 'object' && data.learning_preferences !== null) 
+          ? data.learning_preferences as Record<string, unknown> 
+          : {},
+        motivation_triggers: (typeof data.motivation_triggers === 'object' && data.motivation_triggers !== null) 
+          ? data.motivation_triggers as Record<string, unknown> 
+          : {},
+        optimal_session_length: data.optimal_session_length || 20,
+        performance_trends: (typeof data.performance_trends === 'object' && data.performance_trends !== null) 
+          ? data.performance_trends as Record<string, unknown> 
+          : {},
+        problem_solving_approach: data.problem_solving_approach || 'systematic',
+        retention_rate: data.retention_rate || 0.5,
+        social_learning_preference: data.social_learning_preference || 'individual',
+        strengths: Array.isArray(data.strengths) ? data.strengths.filter((s): s is string => typeof s === 'string') : [],
+        subject_preferences: (typeof data.subject_preferences === 'object' && data.subject_preferences !== null) 
+          ? data.subject_preferences as Record<string, unknown> 
+          : {},
+        task_completion_rate: data.task_completion_rate || 0.5,
+        weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses.filter((w): w is string => typeof w === 'string') : []
       };
+
+      return profile;
     } catch (error) {
-      console.error('Error in getLearningProfile:', error);
+      console.error('Error in getProfile:', error);
       return null;
     }
   }
 
-  async createOrUpdateProfile(profileData: Partial<UserLearningProfile>): Promise<boolean> {
+  async updateProfile(userId: string, updates: Partial<UserLearningProfile>): Promise<boolean> {
     try {
-      const dbData = {
-        user_id: profileData.user_id!,
-        subject: profileData.subject!,
-        skill_area: profileData.skill_area || 'general',
-        current_level: profileData.current_difficulty_level || 1,
-        accuracy_rate: profileData.overall_accuracy || 0,
-        strengths: profileData.strengths || [],
-        weaknesses: profileData.weaknesses || [],
-        learning_style: profileData.learning_style || 'mixed',
-        attempts_count: profileData.total_sessions || 0,
-        completion_time_avg: profileData.total_time_spent || 0,
-        last_assessment: profileData.last_session_date,
-        updated_at: new Date().toISOString()
-      };
-
       const { error } = await supabase
-        .from('user_performance')
-        .upsert([dbData], { 
-          onConflict: 'user_id,subject,skill_area',
-          ignoreDuplicates: false 
+        .from('user_learning_profiles')
+        .upsert({
+          user_id: userId,
+          ...updates,
+          last_updated: new Date().toISOString()
         });
 
       if (error) {
-        console.error('Error updating profile:', error);
+        console.error('Error updating learning profile:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in createOrUpdateProfile:', error);
-      return false;
-    }
-  }
-
-  async getUserPreferences(userId: string): Promise<UserPreferences | null> {
-    try {
-      // Since we don't have a preferences table, return default preferences
-      return {
-        user_id: userId,
-        auto_read_enabled: true,
-        voice_speed: 1.0,
-        difficulty_preference: 'adaptive',
-        learning_style: 'mixed',
-        speech_enabled: true,
-        speech_rate: 1.0,
-        speech_pitch: 1.0,
-        preferred_voice: 'default',
-        auto_read_questions: true,
-        auto_read_explanations: true
-      };
-    } catch (error) {
-      console.error('Error in getUserPreferences:', error);
-      return null;
-    }
-  }
-
-  async updateUserPreferences(userId: string, preferences: Partial<UserPreferences>): Promise<boolean> {
-    try {
-      console.log('📝 Updating user preferences:', preferences);
-      // Mock implementation since we don't have a preferences table
-      return true;
-    } catch (error) {
-      console.error('Error updating user preferences:', error);
-      return false;
-    }
-  }
-
-  async recordQuestionHistory(historyEntry: QuestionHistoryEntry): Promise<boolean> {
-    try {
-      // For now, just log the history entry since we don't have a question_history table
-      console.log('📝 Question history recorded:', historyEntry);
-      return true;
-    } catch (error) {
-      console.error('Error recording question history:', error);
-      return false;
-    }
-  }
-
-  async analyzeAndUpdateProfile(
-    userId: string, 
-    subject: string, 
-    skillArea: string, 
-    questionData: any, 
-    response: any
-  ): Promise<boolean> {
-    try {
-      console.log('📊 Analyzing and updating profile for user:', userId);
-      return true;
-    } catch (error) {
-      console.error('Error analyzing profile:', error);
+      console.error('Error in updateProfile:', error);
       return false;
     }
   }

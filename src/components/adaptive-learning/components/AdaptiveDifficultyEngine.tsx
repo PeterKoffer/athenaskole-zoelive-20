@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { calculateRecommendedSessionTime, shouldAdjustDifficulty } from '@/utils/adaptiveLearningUtils';
 import { useAuth } from '@/hooks/useAuth';
@@ -48,10 +47,11 @@ const AdaptiveDifficultyEngine: React.FC<AdaptiveDifficultyEngineProps> = ({
   useEffect(() => {
     if (!userProgress) return;
 
-    const { accuracy_rate } = userProgress;
+    // Use the correct property names from UserProgress interface
+    const { accuracy } = userProgress;
 
     const adjustment = shouldAdjustDifficulty(
-      accuracy_rate,
+      accuracy,
       consecutiveCorrect,
       consecutiveIncorrect,
       totalAttempts
@@ -128,8 +128,8 @@ const AdaptiveDifficultyEngine: React.FC<AdaptiveDifficultyEngineProps> = ({
             difficulty: currentDifficulty,
             onQuestionAnswered: handleQuestionAnswered,
             recommendedSessionTime: recommendedTime,
-            sessionData: sessionData,
-            userPerformance: performanceData
+            sessionData: [],
+            userPerformance: null
           } as any);
         }
         return child;

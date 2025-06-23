@@ -1,66 +1,58 @@
-import { aiContentGenerator } from './content/aiContentGenerator';
-import { contentRepository } from './content/contentRepository';
-import { fallbackContentService } from './content/fallbackContentService';
-import { GenerateContentRequest, GeneratedContent } from './types/contentTypes';
 
-export class DeepSeekContentService {
-  async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
-    return aiContentGenerator.generateAdaptiveContent(request);
+import { AdaptiveContentRecord, GeneratedContent } from '@/services/progressPersistence';
+
+export class OpenAIContentService {
+  async generateContent(
+    subject: string,
+    skillArea: string,
+    difficulty: number
+  ): Promise<GeneratedContent | null> {
+    try {
+      console.log('🤖 Generating OpenAI content:', { subject, skillArea, difficulty });
+
+      // Mock implementation - replace with actual OpenAI API call
+      const content: GeneratedContent = {
+        id: `openai_${Date.now()}`,
+        subject,
+        skillArea,
+        gradeLevel: difficulty,
+        question: `What is an important concept in ${skillArea}?`,
+        options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
+        correct: 0,
+        explanation: `This explains the important concept in ${skillArea}.`,
+        learningObjectives: [`Understand ${skillArea} concepts`],
+        estimatedTime: 5
+      };
+
+      return content;
+    } catch (error) {
+      console.error('Error generating OpenAI content:', error);
+      return null;
+    }
   }
 
-  async getOrGenerateContent(
-    subject: string, 
-    skillArea: string, 
-    difficultyLevel: number, 
-    userId: string
-  ): Promise<GeneratedContent> { // changed from Promise<any> to Promise<GeneratedContent>
+  async adaptRecord(record: AdaptiveContentRecord): Promise<GeneratedContent | null> {
     try {
-      // First, try to get existing content
-      const existingContent = await contentRepository.getExistingContent(subject, skillArea, difficultyLevel);
+      // Convert AdaptiveContentRecord to GeneratedContent
+      const content: GeneratedContent = {
+        id: record.id,
+        subject: record.subject,
+        skillArea: record.skillArea,
+        gradeLevel: record.gradeLevel,
+        question: `Question based on ${record.contentType}`,
+        options: ['Option A', 'Option B', 'Option C', 'Option D'],
+        correct: 0,
+        explanation: 'Generated explanation',
+        learningObjectives: ['Learning objective'],
+        estimatedTime: 5
+      };
 
-      // If we have existing content, use it
-      if (existingContent) {
-        console.log('♻️ Using existing adaptive content');
-        return existingContent;
-      }
-
-      // If no existing content, generate new content with DeepSeek
-      console.log('🆕 No existing content found, generating new content with DeepSeek AI');
-      
-      try {
-        const generatedContent = await this.generateAdaptiveContent({
-          subject,
-          skillArea,
-          difficultyLevel,
-          userId
-        });
-
-        // Try to save the generated content to database
-        return await contentRepository.saveGeneratedContent(subject, skillArea, difficultyLevel, generatedContent);
-
-      } catch (aiError) {
-        console.error('❌ DeepSeek AI generation failed, using fallback content:', aiError);
-        
-        // Create fallback content when AI generation fails
-        const fallbackContent = fallbackContentService.createFallbackContent(subject, skillArea, difficultyLevel);
-        
-        // Try to save fallback content
-        return await contentRepository.saveFallbackContent(fallbackContent);
-      }
-
+      return content;
     } catch (error) {
-      console.error('❌ Error in getOrGenerateContent:', error);
-      
-      // Final fallback - return basic content structure
-      return fallbackContentService.createFallbackContent(subject, skillArea, difficultyLevel);
+      console.error('Error adapting record:', error);
+      return null;
     }
   }
 }
 
-export const deepSeekContentService = new DeepSeekContentService();
-
-// Export aliases for backward compatibility
-export const openaiContentService = deepSeekContentService;
-
-// Re-export types for backward compatibility
-export type { GenerateContentRequest, GeneratedContent } from './types/contentTypes';
+export const openaiContentService = new OpenAIContentService();

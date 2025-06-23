@@ -4,20 +4,21 @@ import { UserProgress } from '@/services/progressPersistence';
 export const calculateRecommendedSessionTime = (userProgress: UserProgress | null): number => {
   if (!userProgress) return 20; // Default 20 minutes for new users
 
-  const { accuracy_rate, attempts_count } = userProgress;
+  // Use correct property names from UserProgress interface
+  const { accuracy, attempts } = userProgress;
   
   // Base time on past performance
   let recommendedTime = 20;
 
   // Adjust based on accuracy
-  if (accuracy_rate > 80) {
+  if (accuracy > 80) {
     recommendedTime += 5; // Longer sessions for high performers
-  } else if (accuracy_rate < 60) {
+  } else if (accuracy < 60) {
     recommendedTime -= 5; // Shorter sessions for struggling learners
   }
 
   // Adjust based on experience
-  if (attempts_count > 10) {
+  if (attempts > 10) {
     recommendedTime += 5; // Experienced learners can handle longer sessions
   }
 
