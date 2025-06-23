@@ -54,6 +54,36 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       overlayOpacity: 0.7,
       environmentDescription: "A modern laboratory with scientific equipment and experiments"
     },
+    computer_science: {
+      subjectName: "Computer Science",
+      primaryColor: "#9C27B0",
+      secondaryColor: "#BA68C8",
+      accentColor: "#7B1FA2",
+      backgroundImage: "/images/computer-science-classroom.jpg",
+      subjectColor: "#9C27B0",
+      overlayOpacity: 0.7,
+      environmentDescription: "A modern tech lab with computers and coding displays"
+    },
+    music: {
+      subjectName: "Music",
+      primaryColor: "#E91E63",
+      secondaryColor: "#F06292",
+      accentColor: "#C2185B",
+      backgroundImage: "/images/music-classroom.jpg",
+      subjectColor: "#E91E63",
+      overlayOpacity: 0.7,
+      environmentDescription: "A musical studio with instruments and sound equipment"
+    },
+    creative_arts: {
+      subjectName: "Creative Arts",
+      primaryColor: "#9C27B0",
+      secondaryColor: "#BA68C8",
+      accentColor: "#7B1FA2",
+      backgroundImage: "/images/art-classroom.jpg",
+      subjectColor: "#9C27B0",
+      overlayOpacity: 0.7,
+      environmentDescription: "An art studio with canvases, paints, and creative supplies"
+    },
     socialStudies: {
       subjectName: "Social Studies",
       primaryColor: "#9C27B0",
