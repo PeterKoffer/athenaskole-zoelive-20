@@ -88,7 +88,24 @@ class SessionService {
         return [];
       }
 
-      return data || [];
+      // Transform the data to match the expected interface
+      return (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        subject: item.subject,
+        skill_area: item.skill_area,
+        difficulty_level: item.difficulty_level,
+        start_time: item.start_time,
+        end_time: item.end_time || undefined,
+        time_spent: item.time_spent,
+        score: item.score,
+        completed: item.completed,
+        content_id: item.content_id || undefined,
+        user_feedback: (typeof item.user_feedback === 'object' && item.user_feedback !== null) 
+          ? item.user_feedback as Record<string, unknown> 
+          : {},
+        ai_adjustments: {}
+      }));
     } catch (error) {
       console.error('Error in getRecentSessions:', error);
       return [];

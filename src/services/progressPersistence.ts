@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProgress {
@@ -37,23 +38,41 @@ export interface GeneratedContent {
   estimatedTime: number;
 }
 
+export interface LearningSession {
+  id?: string;
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  difficulty_level: number;
+  start_time: string;
+  end_time?: string;
+  time_spent: number;
+  score: number;
+  completed: boolean;
+  content_id?: string;
+  user_feedback?: Record<string, unknown>;
+  ai_adjustments?: Record<string, unknown>;
+}
+
 export class ProgressPersistence {
+  // Use learning_sessions table instead of non-existent content_consumption table
   async logContentConsumption(userId: string, content: AdaptiveContentRecord): Promise<void> {
     try {
-      console.log('📝 Logging content consumption:', { userId, content });
+      console.log('📝 Logging content consumption as learning session:', { userId, content });
       
       const { data, error } = await supabase
-        .from('content_consumption')
+        .from('learning_sessions')
         .insert([
           {
             user_id: userId,
-            content_id: content.id,
             subject: content.subject,
             skill_area: content.skillArea,
-            grade_level: content.gradeLevel,
-            content_type: content.contentType,
-            content_url: content.contentUrl,
-            metadata: content.metadata
+            difficulty_level: content.gradeLevel,
+            start_time: new Date().toISOString(),
+            time_spent: 0,
+            score: 0,
+            completed: false,
+            content_id: content.id
           }
         ]);
 
@@ -69,22 +88,25 @@ export class ProgressPersistence {
     }
   }
 
+  // Use user_question_history table instead of non-existent question_engagement table
   async logQuestionEngagement(userId: string, question: GeneratedContent, isCorrect: boolean, responseTime: number): Promise<void> {
     try {
       console.log('❓ Logging question engagement:', { userId, question, isCorrect, responseTime });
       
       const { data, error } = await supabase
-        .from('question_engagement')
+        .from('user_question_history')
         .insert([
           {
             user_id: userId,
-            question_id: question.id,
             subject: question.subject,
             skill_area: question.skillArea,
-            grade_level: question.gradeLevel,
+            question_text: question.question,
+            difficulty_level: question.gradeLevel,
+            user_answer: '',
+            correct_answer: question.options[question.correct],
             is_correct: isCorrect,
-            response_time: responseTime,
-            learning_objectives: question.learningObjectives
+            response_time_seconds: Math.round(responseTime / 1000),
+            concepts_covered: [question.skillArea]
           }
         ]);
 
@@ -115,8 +137,8 @@ export class ProgressPersistence {
         engagement_score: progressData.engagement || 0,
         last_assessment: new Date().toISOString(),
         learning_style: progressData.learningStyle || 'mixed',
-        strengths: progressData.strengths || [] as any, // Cast to any for Json compatibility
-        weaknesses: progressData.weaknesses || [] as any, // Cast to any for Json compatibility
+        strengths: (progressData.strengths || {}) as any,
+        weaknesses: (progressData.weaknesses || {}) as any,
         updated_at: new Date().toISOString()
       };
 
@@ -171,8 +193,8 @@ export class ProgressPersistence {
         currentLevel: data.current_level || 1,
         engagement: data.engagement_score || 0,
         learningStyle: data.learning_style || 'mixed',
-        strengths: data.strengths || {},
-        weaknesses: data.weaknesses || {}
+        strengths: (typeof data.strengths === 'object' && data.strengths !== null) ? data.strengths as Record<string, unknown> : {},
+        weaknesses: (typeof data.weaknesses === 'object' && data.weaknesses !== null) ? data.weaknesses as Record<string, unknown> : {}
       };
 
       console.log('✅ User progress retrieved successfully');
@@ -182,6 +204,67 @@ export class ProgressPersistence {
       return null;
     }
   }
+
+  // Add missing saveSession method
+  async saveSession(sessionData: Partial<LearningSession>): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .insert({
+          user_id: sessionData.user_id!,
+          subject: sessionData.subject!,
+          skill_area: sessionData.skill_area!,
+          difficulty_level: sessionData.difficulty_level || 1,
+          start_time: sessionData.start_time || new Date().toISOString(),
+          time_spent: sessionData.time_spent || 0,
+          score: sessionData.score || 0,
+          completed: sessionData.completed || false,
+          content_id: sessionData.content_id,
+          user_feedback: (sessionData.user_feedback || {}) as any,
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error('Error saving session:', error);
+        return null;
+      }
+
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error in saveSession:', error);
+      return null;
+    }
+  }
+
+  // Add missing updateSession method
+  async updateSession(sessionId: string, updates: Partial<LearningSession>): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('learning_sessions')
+        .update({
+          end_time: updates.end_time,
+          time_spent: updates.time_spent,
+          score: updates.score,
+          completed: updates.completed,
+          user_feedback: (updates.user_feedback || {}) as any,
+        })
+        .eq('id', sessionId);
+
+      if (error) {
+        console.error('Error updating session:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in updateSession:', error);
+      return false;
+    }
+  }
 }
 
 export const progressPersistence = new ProgressPersistence();
+
+// Export the hook
+export { useUserProgress } from '@/hooks/useUserProgress';

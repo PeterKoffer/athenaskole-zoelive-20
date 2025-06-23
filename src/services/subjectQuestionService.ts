@@ -163,17 +163,4 @@ export class SubjectQuestionService {
       return null;
     }
   }
-
-  static createDynamicQuestion(template: SubjectQuestionTemplate): SubjectQuestionTemplate {
-    // Overloaded method for backward compatibility
-    return {
-      ...template,
-      content: {
-        question: template.question_template,
-        options: template.options_template,
-        correct: template.correct_answer,
-        explanation: template.explanation_template
-      }
-    };
-  }
 }
