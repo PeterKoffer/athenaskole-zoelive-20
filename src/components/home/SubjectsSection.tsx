@@ -1,13 +1,18 @@
+
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const SubjectsSection = () => {
   const navigate = useNavigate();
-  const [expandedCards, setExpandedCards] = useState<number[]>([]);
 
   const subjects = [
     {
@@ -114,14 +119,6 @@ const SubjectsSection = () => {
     navigate(path);
   };
 
-  const toggleCardExpansion = (index: number) => {
-    setExpandedCards(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
-  };
-
   return (
     <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,71 +132,70 @@ const SubjectsSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {subjects.map((subject, index) => {
-            const isExpanded = expandedCards.includes(index);
-            return (
-              <div key={index} className="flex">
-                <SpeakableCard
-                  speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
-                  context={`subject-card-${index}`}
-                  className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm w-full flex"
-                >
-                  <CardContent className="p-6 flex flex-col h-full w-full">
-                    <div className="flex items-center mb-4">
+          {subjects.map((subject, index) => (
+            <div key={index} className="flex">
+              <SpeakableCard
+                speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
+                context={`subject-card-${index}`}
+                className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm w-full flex"
+              >
+                <CardContent className="p-6 flex flex-col h-full w-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
                       <span className="text-3xl mr-3">{subject.icon}</span>
                       <h3 className="text-xl font-bold text-white">
                         {subject.title}
                       </h3>
                     </div>
                     
-                    <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                      {subject.description}
-                    </p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-gray-400 hover:text-white transition-colors p-1">
+                          <ChevronDown className="w-5 h-5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent 
+                        className="w-80 bg-gray-800 border-gray-700 text-white p-4 z-50"
+                        align="end"
+                        side="bottom"
+                      >
+                        <div className="space-y-4">
+                          <div>
+                            <p className="text-gray-300 text-sm leading-relaxed">
+                              {subject.description}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-400 mb-2">
+                              Key Areas:
+                            </h4>
+                            <ul className="space-y-1">
+                              {subject.keyAreas.map((area, areaIndex) => (
+                                <li key={areaIndex} className="flex items-center text-sm text-gray-300">
+                                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3 flex-shrink-0"></div>
+                                  <span>{area}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
 
-                    <div className="flex-1 mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-semibold text-gray-400">
-                          Key Areas:
-                        </h4>
-                        {subject.keyAreas.length > 3 && (
-                          <button
-                            onClick={() => toggleCardExpansion(index)}
-                            className="text-gray-400 hover:text-white transition-colors"
-                          >
-                            {isExpanded ? (
-                              <ChevronUp className="w-4 h-4" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4" />
-                            )}
-                          </button>
-                        )}
-                      </div>
-                      <ul className="space-y-2">
-                        {(isExpanded ? subject.keyAreas : subject.keyAreas.slice(0, 3)).map((area, areaIndex) => (
-                          <li key={areaIndex} className="flex items-center text-sm text-gray-300">
-                            <div className="w-2 h-2 bg-blue-400 rounded-full mr-3 flex-shrink-0"></div>
-                            <span>{area}</span>
-                          </li>
-                        ))}
-                        {!isExpanded && subject.keyAreas.length > 3 && (
-                          <li className="text-sm text-gray-400 ml-5">
-                            +{subject.keyAreas.length - 3} more areas
-                          </li>
-                        )}
-                      </ul>
-                    </div>
+                  <div className="flex-1"></div>
 
-                    <Button
-                      onClick={() => handleStartLearning(subject.path)}
-                      className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-3 font-semibold mt-auto`}
-                    >
-                      Start Learning
-                    </Button>
-                  </CardContent>
-                </SpeakableCard>
-              </div>
-            );
-          })}
+                  <Button
+                    onClick={() => handleStartLearning(subject.path)}
+                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-3 font-semibold mt-4`}
+                  >
+                    Start Learning
+                  </Button>
+                </CardContent>
+              </SpeakableCard>
+            </div>
+          ))}
         </div>
       </div>
     </section>
