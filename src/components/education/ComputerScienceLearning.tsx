@@ -66,12 +66,12 @@ const ComputerScienceLearning = () => {
                 </Button>
                 
                 <Button
-                  onClick={() => navigate('/daily-program')}
+                  onClick={() => navigate('/')}
                   variant="outline"
                   className="border-gray-600 text-gray-200 hover:bg-gray-700 px-8 py-3 text-lg"
                 >
                   <ArrowLeft className="w-5 h-5 mr-2" />
-                  Back to Program
+                  Back to Home
                 </Button>
               </div>
             </CardContent>
@@ -101,7 +101,7 @@ const ComputerScienceLearning = () => {
           subject="computer_science" 
           skillArea="programming_basics" 
           difficultyLevel={1}
-          onBack={() => navigate('/daily-program')}
+          onBack={() => navigate('/')}
         />
       </div>
     </div>
