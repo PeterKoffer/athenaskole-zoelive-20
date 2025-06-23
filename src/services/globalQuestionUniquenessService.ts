@@ -15,9 +15,17 @@ export interface UniqueQuestion {
     timestamp: number;
     userId: string;
     sessionId: string;
-    teachingPerspective?: any;
+    teachingPerspective?: unknown; // Changed from 'any' to 'unknown'
     gradeStandards?: string[];
   };
+}
+
+// Add this interface to type the recap questions
+interface RecapQuestion {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
 }
 
 class GlobalQuestionUniquenessService {
@@ -97,7 +105,12 @@ class GlobalQuestionUniquenessService {
   /**
    * Get questions for recap generation
    */
-  getQuestionsForRecap(userId: string, subject: string, skillArea: string, limit: number = 5): Promise<any[]> {
+  getQuestionsForRecap(
+    userId: string,
+    subject: string,
+    skillArea: string,
+    limit: number = 5
+  ): Promise<RecapQuestion[]> { // Changed return type from 'any[]' to 'RecapQuestion[]'
     const userKey = `${userId}_${subject}`;
     const userQuestions = this.questionHistory.get(userKey);
     
@@ -106,7 +119,7 @@ class GlobalQuestionUniquenessService {
     }
 
     // Get recent questions for recap
-    const recentQuestions = Array.from(userQuestions)
+    const recentQuestions: RecapQuestion[] = Array.from(userQuestions)
       .slice(-limit)
       .map(questionText => ({
         question: questionText,
