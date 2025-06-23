@@ -1,11 +1,13 @@
-
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
 const SubjectsSection = () => {
   const navigate = useNavigate();
+  const [expandedCards, setExpandedCards] = useState<number[]>([]);
 
   const subjects = [
     {
@@ -112,6 +114,14 @@ const SubjectsSection = () => {
     navigate(path);
   };
 
+  const toggleCardExpansion = (index: number) => {
+    setExpandedCards(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
+  };
+
   return (
     <section className="py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,54 +134,71 @@ const SubjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {subjects.map((subject, index) => (
-            <SpeakableCard
-              key={index}
-              speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
-              context={`subject-card-${index}`}
-              className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-[460px] flex flex-col"
-            >
-              <CardContent className="p-6 flex flex-col h-full">
-                <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">{subject.icon}</span>
-                  <h3 className="text-xl font-bold text-white">
-                    {subject.title}
-                  </h3>
-                </div>
-                
-                <p className="text-gray-300 mb-4 flex-grow">
-                  {subject.description}
-                </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {subjects.map((subject, index) => {
+            const isExpanded = expandedCards.includes(index);
+            return (
+              <SpeakableCard
+                key={index}
+                speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
+                context={`subject-card-${index}`}
+                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-[380px] flex flex-col"
+              >
+                <CardContent className="p-4 flex flex-col h-full">
+                  <div className="flex items-center mb-3">
+                    <span className="text-2xl mr-2">{subject.icon}</span>
+                    <h3 className="text-lg font-bold text-white">
+                      {subject.title}
+                    </h3>
+                  </div>
+                  
+                  <p className="text-gray-300 mb-3 flex-grow text-sm line-clamp-3">
+                    {subject.description}
+                  </p>
 
-                <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-gray-400 mb-2">
-                    Key Areas:
-                  </h4>
-                  <ul className="space-y-1">
-                    {subject.keyAreas.slice(0, 3).map((area, areaIndex) => (
-                      <li key={areaIndex} className="flex items-center text-sm text-gray-300">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
-                        <span>{area}</span>
-                      </li>
-                    ))}
-                    {subject.keyAreas.length > 3 && (
-                      <li className="text-sm text-gray-400">
-                        +{subject.keyAreas.length - 3} more areas
-                      </li>
-                    )}
-                  </ul>
-                </div>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-semibold text-gray-400">
+                        Key Areas:
+                      </h4>
+                      {subject.keyAreas.length > 3 && (
+                        <button
+                          onClick={() => toggleCardExpansion(index)}
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    <ul className="space-y-1">
+                      {(isExpanded ? subject.keyAreas : subject.keyAreas.slice(0, 3)).map((area, areaIndex) => (
+                        <li key={areaIndex} className="flex items-center text-xs text-gray-300">
+                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0"></div>
+                          <span>{area}</span>
+                        </li>
+                      ))}
+                      {!isExpanded && subject.keyAreas.length > 3 && (
+                        <li className="text-xs text-gray-400">
+                          +{subject.keyAreas.length - 3} more areas
+                        </li>
+                      )}
+                    </ul>
+                  </div>
 
-                <Button
-                  onClick={() => handleStartLearning(subject.path)}
-                  className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity mt-auto`}
-                >
-                  Start Learning
-                </Button>
-              </CardContent>
-            </SpeakableCard>
-          ))}
+                  <Button
+                    onClick={() => handleStartLearning(subject.path)}
+                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity mt-auto text-sm py-2`}
+                  >
+                    Start Learning
+                  </Button>
+                </CardContent>
+              </SpeakableCard>
+            );
+          })}
         </div>
       </div>
     </section>
