@@ -23,7 +23,15 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
   const { user } = useAuth();
   const classroomConfig = getClassroomConfig(subject);
 
+  console.log('🎓 UnifiedLessonManager state:', {
+    subject,
+    skillArea,
+    showWelcome,
+    studentName: user?.user_metadata?.first_name || studentName
+  });
+
   const handleStartLesson = () => {
+    console.log('🚀 Starting lesson - transitioning from welcome to main content');
     setShowWelcome(false);
   };
 
@@ -32,6 +40,8 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
       onStartLesson: handleStartLesson,
       studentName: user?.user_metadata?.first_name || studentName
     };
+
+    console.log('📝 Rendering welcome for subject:', subject.toLowerCase());
 
     switch (subject.toLowerCase()) {
       case 'mathematics':
@@ -50,11 +60,14 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
       case 'creative-arts':
         return <CreativeArtsWelcome {...welcomeProps} />;
       default:
+        console.log('⚠️ Unknown subject, defaulting to MathematicsWelcome');
         return <MathematicsWelcome {...welcomeProps} />;
     }
   };
 
+  // Show welcome screen
   if (showWelcome) {
+    console.log('👋 Displaying welcome screen for', subject);
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="min-h-screen flex items-center justify-center">
@@ -64,15 +77,19 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
     );
   }
 
+  // Show main lesson content
+  console.log('📚 Displaying main lesson content for', subject);
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <AILearningModule 
-        subject={subject} 
-        skillArea={skillArea} 
-        difficultyLevel={1}
-        onBack={onBackToProgram}
-      />
-    </div>
+    <ClassroomEnvironment config={classroomConfig}>
+      <div className="min-h-screen py-10 px-2 flex items-center justify-center">
+        <AILearningModule 
+          subject={subject} 
+          skillArea={skillArea} 
+          difficultyLevel={1}
+          onBack={onBackToProgram}
+        />
+      </div>
+    </ClassroomEnvironment>
   );
 };
 
