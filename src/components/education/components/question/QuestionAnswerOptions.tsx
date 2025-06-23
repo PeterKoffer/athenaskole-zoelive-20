@@ -17,10 +17,19 @@ const QuestionAnswerOptions = ({
   showResult,
   onAnswerSelect
 }: QuestionAnswerOptionsProps) => {
+  console.log('🔍 QuestionAnswerOptions Debug:', {
+    selectedAnswer,
+    correctAnswer,
+    showResult,
+    options: options.map((opt, idx) => ({ idx, opt }))
+  });
+
   const getButtonClassName = (index: number) => {
     if (selectedAnswer === index) {
       if (showResult) {
-        return selectedAnswer === correctAnswer
+        const isCorrect = selectedAnswer === correctAnswer;
+        console.log(`🎯 Answer ${index} selected. Correct answer: ${correctAnswer}. Is correct: ${isCorrect}`);
+        return isCorrect
           ? 'bg-green-600 border-green-500 text-white'
           : 'bg-red-600 border-red-500 text-white';
       }
@@ -40,8 +49,11 @@ const QuestionAnswerOptions = ({
         <Button
           key={index}
           variant="outline"
-          className={`w-full text-left justify-start p-4 h-auto ${getButtonClassName(index)}`}
-          onClick={() => onAnswerSelect(index)}
+          className={`w-full text-left justify-start p-4 h-auto relative z-10 ${getButtonClassName(index)}`}
+          onClick={() => {
+            console.log(`🖱️ Button ${index} clicked`);
+            onAnswerSelect(index);
+          }}
           disabled={showResult}
         >
           <span className="mr-3 font-semibold">

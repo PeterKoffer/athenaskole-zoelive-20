@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useDiverseQuestionGeneration } from '../hooks/useDiverseQuestionGeneration';
 import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
-import { userProgressService, UserProgress } from '@/services/userProgressService'; // Import userProgressService
+import { userProgressService, UserProgress } from '@/services/userProgressService';
 
 interface ImprovedSessionManagerProps {
   subject: string;
@@ -25,7 +24,7 @@ const ImprovedSessionManager = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const { gradeConfig } = useGradeLevelContent(subject);
-  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects(); // Instantiate sound effects hook
+  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
 
   // --- State for the session's activity list ---
   const [activityList, setActivityList] = useState<any[]>([]);
@@ -198,30 +197,49 @@ const ImprovedSessionManager = ({
   const handleAnswerSelect = async (answerIndex: number) => {
     if (showResult || selectedAnswer !== null || !currentActivity || currentActivity.type !== 'interactive-question') return;
     
+    console.log('🎯 Answer Selection Debug:', {
+      answerIndex,
+      correctAnswer: currentActivity.correct,
+      question: currentActivity.question,
+      options: currentActivity.options
+    });
+    
     setSessionQuestionsAttempted(prev => prev + 1); // Track attempt for persistence
     setSelectedAnswer(answerIndex);
     const isCorrect = answerIndex === currentActivity.correct;
     const responseTime = Date.now() - activityStartTime.getTime();
     setShowResult(true);
     
+    console.log('🔍 Answer Validation:', {
+      selectedIndex: answerIndex,
+      correctIndex: currentActivity.correct,
+      isCorrect,
+      selectedOption: currentActivity.options[answerIndex],
+      correctOption: currentActivity.options[currentActivity.correct]
+    });
+    
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1); // For UI display
       setSessionCorrectAnswers(prev => prev + 1); // For persistence
       playCorrectAnswerSound();
+      toast({
+        title: "Correct! 🎉",
+        description: "Well done!",
+        duration: 2000,
+      });
     } else {
       playWrongAnswerSound();
+      toast({
+        title: "Incorrect",
+        description: currentActivity.explanation || `The correct answer was: ${currentActivity.options[currentActivity.correct]}`,
+        duration: 3000,
+        variant: "destructive"
+      });
     }
 
     await saveQuestionHistory(currentActivity, answerIndex, isCorrect, responseTime, {
       gradeLevel: gradeConfig?.userGrade,
       standardCode: gradeContentConfig?.standard?.code
-    });
-
-    toast({
-      title: isCorrect ? "Correct! 🎉" : "Incorrect",
-      description: isCorrect ? "Well done!" : currentActivity.explanation,
-      duration: 2000,
-      variant: isCorrect ? "default" : "destructive"
     });
 
     setTimeout(loadNextActivity, 3000);

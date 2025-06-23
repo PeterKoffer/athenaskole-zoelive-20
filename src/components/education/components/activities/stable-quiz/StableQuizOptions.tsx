@@ -19,8 +19,11 @@ export const StableQuizOptions = ({
       {options.map((option: string, index: number) => (
         <Button
           key={`${activityId}-option-${index}`}
-          onClick={() => onAnswerSelect(index)}
-          className={`p-6 text-lg h-auto transition-all duration-200 ${
+          onClick={() => {
+            console.log(`🖱️ StableQuiz Button ${index} clicked`);
+            onAnswerSelect(index);
+          }}
+          className={`p-6 text-lg h-auto transition-all duration-200 relative z-10 ${
             selectedAnswer === index
               ? 'bg-blue-600 hover:bg-blue-700 border-2 border-blue-400 text-white font-bold transform scale-105'
               : 'bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white hover:scale-102'
