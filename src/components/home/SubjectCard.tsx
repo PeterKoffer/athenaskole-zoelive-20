@@ -1,16 +1,51 @@
 
 import React from 'react';
+import { Calculator, BookOpen, Laptop, Zap, Palette, Music, Brain, Globe, Dumbbell, Target, Languages, Scroll } from 'lucide-react';
 import { LucideIcon, Speaker } from 'lucide-react';
+import { Subject } from './SubjectsData';
 
 interface SubjectCardProps {
-  title: string;
-  icon: LucideIcon;
-  gradient: string;
-  bgColor: string;
-  iconColor: string;
+  subject: Subject;
+  index: number;
+  onStartLearning: (path: string) => void;
 }
 
-const SubjectCard: React.FC<SubjectCardProps> = ({ title, icon: Icon, gradient, bgColor, iconColor }) => {
+// Map subject titles to icons
+const iconMap: Record<string, LucideIcon> = {
+  'Mathematics': Calculator,
+  'English Language Arts': BookOpen,
+  'Science & Technology': Laptop,
+  'Computer Science': Zap,
+  'Creative Arts': Palette,
+  'Music Discovery': Music,
+  'Mental Wellness': Brain,
+  'Language Lab': Languages,
+  'History & Religion': Scroll,
+  'Global Geography': Globe,
+  'BodyLab': Dumbbell,
+  'Life Essentials': Target
+};
+
+// Map subject titles to icon colors
+const iconColorMap: Record<string, string> = {
+  'Mathematics': 'bg-gradient-to-br from-orange-400 to-red-500',
+  'English Language Arts': 'bg-gradient-to-br from-blue-400 to-indigo-500',
+  'Science & Technology': 'bg-gradient-to-br from-green-400 to-emerald-500',
+  'Computer Science': 'bg-gradient-to-br from-yellow-400 to-amber-500',
+  'Creative Arts': 'bg-gradient-to-br from-pink-400 to-purple-500',
+  'Music Discovery': 'bg-gradient-to-br from-purple-400 to-violet-500',
+  'Mental Wellness': 'bg-gradient-to-br from-green-400 to-emerald-500',
+  'Language Lab': 'bg-gradient-to-br from-blue-400 to-cyan-500',
+  'History & Religion': 'bg-gradient-to-br from-orange-400 to-red-500',
+  'Global Geography': 'bg-gradient-to-br from-blue-400 to-green-500',
+  'BodyLab': 'bg-gradient-to-br from-red-400 to-orange-500',
+  'Life Essentials': 'bg-gradient-to-br from-red-400 to-pink-500'
+};
+
+const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearning }) => {
+  const Icon = iconMap[subject.title] || Calculator;
+  const iconColor = iconColorMap[subject.title] || 'bg-gradient-to-br from-blue-400 to-purple-500';
+
   return (
     <div className={`bg-white rounded-3xl p-8 relative overflow-hidden group cursor-pointer transform transition-all duration-500 hover:scale-110 hover:-translate-y-6 border-4 border-white/30
       shadow-[0_15px_50px_rgba(0,0,0,0.2),0_8px_25px_rgba(0,0,0,0.15),0_25px_80px_rgba(0,0,0,0.1)] 
@@ -18,7 +53,7 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ title, icon: Icon, gradient, 
       before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:to-transparent before:rounded-3xl before:pointer-events-none`}>
       
       {/* Cosmic background with stars */}
-      <div className={`absolute inset-0 ${gradient} opacity-25 group-hover:opacity-35 transition-opacity duration-500`}></div>
+      <div className={`absolute inset-0 ${subject.gradient} opacity-25 group-hover:opacity-35 transition-opacity duration-500`}></div>
       
       {/* Floating cosmic particles */}
       <div className="absolute top-4 left-4 w-2 h-2 bg-yellow-300/60 rounded-full animate-pulse"></div>
@@ -71,12 +106,14 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ title, icon: Icon, gradient, 
         <h3 className="text-gray-800 text-xl font-bold text-center mb-8 group-hover:text-gray-700 transition-colors font-sans tracking-wide 
           drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] group-hover:drop-shadow-[0_4px_8px_rgba(0,0,0,0.15)]
           group-hover:text-shadow-[0_0_10px_rgba(147,51,234,0.3)]">
-          {title}
+          {subject.title}
         </h3>
       </div>
       
       {/* Maximum 3D Start Learning Button with cosmic universe theme - NO ROCKET */}
-      <button className={`w-full py-5 px-6 ${gradient} text-white font-bold rounded-2xl transform transition-all duration-400 relative overflow-hidden group-hover:scale-105 border-4 border-white/30 text-lg
+      <button 
+        onClick={() => onStartLearning(subject.path)}
+        className={`w-full py-5 px-6 ${subject.gradient} text-white font-bold rounded-2xl transform transition-all duration-400 relative overflow-hidden group-hover:scale-105 border-4 border-white/30 text-lg
         shadow-[0_12px_30px_rgba(0,0,0,0.25),0_6px_15px_rgba(0,0,0,0.15),inset_0_3px_0_rgba(255,255,255,0.4),inset_0_-2px_0_rgba(0,0,0,0.1)]
         hover:shadow-[0_20px_50px_rgba(147,51,234,0.35),0_10px_25px_rgba(59,130,246,0.2)]
         active:shadow-[0_6px_20px_rgba(0,0,0,0.25),0_3px_10px_rgba(0,0,0,0.15)]
