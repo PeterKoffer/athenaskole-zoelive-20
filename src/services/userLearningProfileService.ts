@@ -15,6 +15,9 @@ export interface UserLearningProfile {
   total_time_spent: number;
   last_session_date: string | null;
   last_topic_covered: string;
+  consistency_score?: number;
+  attention_span_minutes?: number;
+  preferred_pace?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -26,6 +29,12 @@ export interface UserPreferences {
   voice_speed: number;
   difficulty_preference: string;
   learning_style: string;
+  speech_enabled?: boolean;
+  speech_rate?: number;
+  speech_pitch?: number;
+  preferred_voice?: string;
+  auto_read_questions?: boolean;
+  auto_read_explanations?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -85,6 +94,9 @@ class UserLearningProfileService {
         total_time_spent: data.completion_time_avg || 0,
         last_session_date: data.last_assessment,
         last_topic_covered: data.skill_area,
+        consistency_score: data.engagement_score || 0,
+        attention_span_minutes: 20,
+        preferred_pace: 'medium',
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -138,11 +150,28 @@ class UserLearningProfileService {
         auto_read_enabled: true,
         voice_speed: 1.0,
         difficulty_preference: 'adaptive',
-        learning_style: 'mixed'
+        learning_style: 'mixed',
+        speech_enabled: true,
+        speech_rate: 1.0,
+        speech_pitch: 1.0,
+        preferred_voice: 'default',
+        auto_read_questions: true,
+        auto_read_explanations: true
       };
     } catch (error) {
       console.error('Error in getUserPreferences:', error);
       return null;
+    }
+  }
+
+  async updateUserPreferences(userId: string, preferences: Partial<UserPreferences>): Promise<boolean> {
+    try {
+      console.log('📝 Updating user preferences:', preferences);
+      // Mock implementation since we don't have a preferences table
+      return true;
+    } catch (error) {
+      console.error('Error updating user preferences:', error);
+      return false;
     }
   }
 

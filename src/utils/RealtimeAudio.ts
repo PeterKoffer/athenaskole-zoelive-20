@@ -101,9 +101,26 @@ export interface RealtimeChatConfig {
 
 export class RealtimeChat {
   private config: RealtimeChatConfig;
+  private onMessage?: (event: any) => void;
+  private onDisconnect?: () => void;
 
-  constructor(config: RealtimeChatConfig = {}) {
-    this.config = config;
+  constructor(onMessage?: (event: any) => void, onDisconnect?: () => void) {
+    this.config = {};
+    this.onMessage = onMessage;
+    this.onDisconnect = onDisconnect;
+  }
+
+  async init(): Promise<void> {
+    console.log('🔌 Initializing RealtimeChat connection');
+    // Mock initialization
+    return Promise.resolve();
+  }
+
+  disconnect(): void {
+    console.log('🔌 Disconnecting RealtimeChat');
+    if (this.onDisconnect) {
+      this.onDisconnect();
+    }
   }
 
   async sendMessage(message: string): Promise<string> {

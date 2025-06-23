@@ -1,224 +1,187 @@
-
-import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProgress {
-  id: string;
-  user_id: string;
+  userId: string;
   subject: string;
-  skill_area: string;
-  current_activity_index: number;
-  score: number;
-  time_elapsed: number;
-  accuracy_rate: number;
-  attempts_count: number;
-  completion_time_avg: number;
-  current_level: number;
-  engagement_score: number;
-  last_assessment: string;
-  learning_style: string;
+  skillArea: string;
+  accuracy: number;
+  attempts: number;
+  averageTime: number;
+  currentLevel: number;
+  engagement: number;
+  learningStyle: string;
   strengths: Record<string, unknown>;
   weaknesses: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
 }
 
-interface SessionData {
-  user_id: string;
+export interface AdaptiveContentRecord {
+  id: string;
   subject: string;
-  skill_area: string;
-  difficulty_level: number;
-  start_time: string;
-  end_time?: string;
-  time_spent: number;
-  score: number;
-  completed: boolean;
+  skillArea: string;
+  gradeLevel: number;
+  contentType: string;
+  contentUrl: string;
+  metadata: Record<string, unknown>;
 }
 
-// Helper function to safely convert Json to Record<string, unknown>
-const safeJsonToRecord = (json: unknown): Record<string, unknown> => {
-  if (typeof json === 'object' && json !== null && !Array.isArray(json)) {
-    return json as Record<string, unknown>;
+export interface GeneratedContent {
+  id: string;
+  subject: string;
+  skillArea: string;
+  gradeLevel: number;
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  learningObjectives: string[];
+  estimatedTime: number;
+}
+
+export class ProgressPersistence {
+  async logContentConsumption(userId: string, content: AdaptiveContentRecord): Promise<void> {
+    try {
+      console.log('📝 Logging content consumption:', { userId, content });
+      
+      const { data, error } = await supabase
+        .from('content_consumption')
+        .insert([
+          {
+            user_id: userId,
+            content_id: content.id,
+            subject: content.subject,
+            skill_area: content.skillArea,
+            grade_level: content.gradeLevel,
+            content_type: content.contentType,
+            content_url: content.contentUrl,
+            metadata: content.metadata
+          }
+        ]);
+
+      if (error) {
+        console.error('Error logging content consumption:', error);
+        throw error;
+      }
+
+      console.log('✅ Content consumption logged successfully');
+    } catch (error) {
+      console.error('Error in logContentConsumption:', error);
+      throw error;
+    }
   }
-  return {};
-};
 
-export const useUserProgress = (userId: string, subject: string, skillArea: string) => {
-  const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchUserProgress = useCallback(async () => {
-    if (!userId) return;
-    
-    setIsLoading(true);
+  async logQuestionEngagement(userId: string, question: GeneratedContent, isCorrect: boolean, responseTime: number): Promise<void> {
     try {
+      console.log('❓ Logging question engagement:', { userId, question, isCorrect, responseTime });
+      
       const { data, error } = await supabase
-        .from('user_performance')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching user progress:', error);
-        return;
-      }
-
-      if (data) {
-        const mappedProgress: UserProgress = {
-          id: data.id,
-          user_id: data.user_id,
-          subject: data.subject,
-          skill_area: data.skill_area,
-          current_activity_index: 0,
-          score: 0,
-          time_elapsed: 0,
-          accuracy_rate: data.accuracy_rate,
-          attempts_count: data.attempts_count,
-          completion_time_avg: data.completion_time_avg,
-          current_level: data.current_level,
-          engagement_score: data.engagement_score,
-          last_assessment: data.last_assessment,
-          learning_style: data.learning_style,
-          strengths: safeJsonToRecord(data.strengths),
-          weaknesses: safeJsonToRecord(data.weaknesses),
-          created_at: data.created_at,
-          updated_at: data.updated_at
-        };
-        setUserProgress(mappedProgress);
-      }
-    } catch (error) {
-      console.error('Error fetching user progress:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, subject, skillArea]);
-
-  return {
-    userProgress,
-    isLoading,
-    fetchUserProgress
-  };
-};
-
-export const progressPersistence = {
-  async saveSession(sessionData: SessionData): Promise<string | null> {
-    try {
-      const { data, error } = await supabase
-        .from('learning_sessions')
-        .insert([sessionData])
-        .select('id')
-        .single();
+        .from('question_engagement')
+        .insert([
+          {
+            user_id: userId,
+            question_id: question.id,
+            subject: question.subject,
+            skill_area: question.skillArea,
+            grade_level: question.gradeLevel,
+            is_correct: isCorrect,
+            response_time: responseTime,
+            learning_objectives: question.learningObjectives
+          }
+        ]);
 
       if (error) {
-        console.error('Error saving session:', error);
-        return null;
+        console.error('Error logging question engagement:', error);
+        throw error;
       }
 
-      return data?.id || null;
+      console.log('✅ Question engagement logged successfully');
     } catch (error) {
-      console.error('Error saving session:', error);
-      return null;
+      console.error('Error in logQuestionEngagement:', error);
+      throw error;
     }
-  },
+  }
 
-  async updateSession(sessionId: string, updates: Partial<SessionData>): Promise<boolean> {
+  async updateUserProgress(userId: string, subject: string, skillArea: string, progressData: any): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('learning_sessions')
-        .update(updates)
-        .eq('id', sessionId);
-
-      if (error) {
-        console.error('Error updating session:', error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error updating session:', error);
-      return false;
-    }
-  },
-
-  async getUserProgress(userId: string, subject: string, skillArea: string): Promise<UserProgress | null> {
-    try {
-      const { data, error } = await supabase
-        .from('user_performance')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching user progress:', error);
-        return null;
-      }
-
-      if (!data) return null;
-
-      return {
-        id: data.id,
-        user_id: data.user_id,
-        subject: data.subject,
-        skill_area: data.skill_area,
-        current_activity_index: 0,
-        score: 0,
-        time_elapsed: 0,
-        accuracy_rate: data.accuracy_rate,
-        attempts_count: data.attempts_count,
-        completion_time_avg: data.completion_time_avg,
-        current_level: data.current_level,
-        engagement_score: data.engagement_score,
-        last_assessment: data.last_assessment,
-        learning_style: data.learning_style,
-        strengths: safeJsonToRecord(data.strengths),
-        weaknesses: safeJsonToRecord(data.weaknesses),
-        created_at: data.created_at,
-        updated_at: data.updated_at
-      };
-    } catch (error) {
-      console.error('Error fetching user progress:', error);
-      return null;
-    }
-  },
-
-  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
-    try {
-      const dbData = {
-        user_id: progressData.user_id!,
-        subject: progressData.subject!,
-        skill_area: progressData.skill_area!,
-        accuracy_rate: progressData.accuracy_rate,
-        attempts_count: progressData.attempts_count,
-        completion_time_avg: progressData.completion_time_avg,
-        current_level: progressData.current_level,
-        engagement_score: progressData.engagement_score,
-        last_assessment: progressData.last_assessment,
-        learning_style: progressData.learning_style,
-        strengths: progressData.strengths,
-        weaknesses: progressData.weaknesses,
+      console.log('💾 Updating user progress:', { userId, subject, skillArea, progressData });
+      
+      const updateData = {
+        user_id: userId,
+        subject,
+        skill_area: skillArea,
+        accuracy_rate: progressData.accuracy || 0,
+        attempts_count: progressData.attempts || 0,
+        completion_time_avg: progressData.averageTime || 0,
+        current_level: progressData.currentLevel || 1,
+        engagement_score: progressData.engagement || 0,
+        last_assessment: new Date().toISOString(),
+        learning_style: progressData.learningStyle || 'mixed',
+        strengths: progressData.strengths || [] as any, // Cast to any for Json compatibility
+        weaknesses: progressData.weaknesses || [] as any, // Cast to any for Json compatibility
         updated_at: new Date().toISOString()
       };
 
       const { error } = await supabase
         .from('user_performance')
-        .upsert([dbData], { 
+        .upsert([updateData], { 
           onConflict: 'user_id,subject,skill_area',
           ignoreDuplicates: false 
         });
 
       if (error) {
-        console.error('Error updating progress:', error);
-        return false;
+        console.error('Error updating user progress:', error);
+        throw error;
       }
 
-      return true;
+      console.log('✅ Progress updated successfully');
     } catch (error) {
-      console.error('Error updating progress:', error);
-      return false;
+      console.error('Error in updateUserProgress:', error);
+      throw error;
     }
   }
-};
+
+  async getUserProgress(userId: string, subject: string, skillArea: string): Promise<UserProgress | null> {
+    try {
+      console.log('👤 Getting user progress:', { userId, subject, skillArea });
+      
+      const { data, error } = await supabase
+        .from('user_performance')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .single();
+
+      if (error) {
+        console.error('Error getting user progress:', error);
+        return null;
+      }
+
+      if (!data) {
+        console.warn('No progress data found for user');
+        return null;
+      }
+
+      const userProgress: UserProgress = {
+        userId: data.user_id,
+        subject: data.subject,
+        skillArea: data.skill_area,
+        accuracy: data.accuracy_rate || 0,
+        attempts: data.attempts_count || 0,
+        averageTime: data.completion_time_avg || 0,
+        currentLevel: data.current_level || 1,
+        engagement: data.engagement_score || 0,
+        learningStyle: data.learning_style || 'mixed',
+        strengths: data.strengths || {},
+        weaknesses: data.weaknesses || {}
+      };
+
+      console.log('✅ User progress retrieved successfully');
+      return userProgress;
+    } catch (error) {
+      console.error('Error in getUserProgress:', error);
+      return null;
+    }
+  }
+}
+
+export const progressPersistence = new ProgressPersistence();

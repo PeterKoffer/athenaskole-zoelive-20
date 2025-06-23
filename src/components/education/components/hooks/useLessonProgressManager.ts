@@ -41,7 +41,7 @@ export const useLessonProgressManager = ({
       
       if (progress) {
         console.log('📚 Found existing progress:', progress);
-        const usedIds = progress.lesson_data?.usedQuestionIds || [];
+        const usedIds = (progress.lesson_data?.usedQuestionIds as string[]) || [];
         setUsedQuestionIds(usedIds);
         
         if (onProgressLoaded) {
@@ -104,13 +104,22 @@ export const useLessonProgressManager = ({
       return null;
     }
 
-    const dynamicQuestion = SubjectQuestionService.createDynamicQuestion(questionTemplate);
+    const dynamicQuestion = await SubjectQuestionService.createDynamicQuestion(
+      subject,
+      skillArea,
+      1,
+      usedQuestionIds
+    );
     
-    // Track this question as used
-    setUsedQuestionIds(prev => [...prev, questionTemplate.id]);
+    if (dynamicQuestion) {
+      // Track this question as used
+      setUsedQuestionIds(prev => [...prev, questionTemplate.id]);
+      
+      console.log('✅ Generated subject question:', dynamicQuestion.content?.question);
+      return dynamicQuestion;
+    }
     
-    console.log('✅ Generated subject question:', dynamicQuestion.content.question);
-    return dynamicQuestion;
+    return null;
   }, [subject, skillArea, usedQuestionIds]);
 
   // Reset progress (start new lesson)

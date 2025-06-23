@@ -32,7 +32,7 @@ class SessionService {
           score: sessionData.score || 0,
           completed: sessionData.completed || false,
           content_id: sessionData.content_id,
-          user_feedback: sessionData.user_feedback || {},
+          user_feedback: (sessionData.user_feedback || {}) as any, // Cast for Json compatibility
         })
         .select('id')
         .single();
@@ -58,7 +58,7 @@ class SessionService {
           time_spent: updates.time_spent,
           score: updates.score,
           completed: updates.completed,
-          user_feedback: updates.user_feedback || {},
+          user_feedback: (updates.user_feedback || {}) as any, // Cast for Json compatibility
         })
         .eq('id', sessionId);
 

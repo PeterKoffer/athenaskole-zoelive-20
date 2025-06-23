@@ -28,6 +28,16 @@ export class ScalableQuestionGeneration {
       activeUsers: Math.floor(Math.random() * 1000)
     };
   }
+
+  getSystemStats(): { cachedQuestions: number; activeUsers: number; cacheHitRate: number; systemLoad: number } {
+    // Mock system stats for monitoring
+    return {
+      cachedQuestions: Math.floor(Math.random() * 1000),
+      activeUsers: Math.floor(Math.random() * 500),
+      cacheHitRate: Math.random(),
+      systemLoad: Math.random()
+    };
+  }
 }
 
 export const scalableQuestionGeneration = new ScalableQuestionGeneration();

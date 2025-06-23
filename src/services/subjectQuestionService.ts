@@ -10,6 +10,12 @@ export interface SubjectQuestionTemplate {
   correct_answer: number;
   explanation_template: string;
   difficulty_level: number;
+  content?: {
+    question: string;
+    options: string[];
+    correct: number;
+    explanation: string;
+  };
 }
 
 export class SubjectQuestionService {
@@ -121,6 +127,13 @@ export class SubjectQuestionService {
       const template = await this.getRandomQuestionForSubject(subject, skillArea, usedQuestions);
       
       if (template) {
+        // Add content property to match expected interface
+        template.content = {
+          question: template.question_template,
+          options: template.options_template,
+          correct: template.correct_answer,
+          explanation: template.explanation_template
+        };
         return template;
       }
 
@@ -133,7 +146,13 @@ export class SubjectQuestionService {
         options_template: ['Option A', 'Option B', 'Option C', 'Option D'],
         correct_answer: 0,
         explanation_template: `This is a practice question for ${skillArea}.`,
-        difficulty_level: difficultyLevel
+        difficulty_level: difficultyLevel,
+        content: {
+          question: `What is an important concept in ${skillArea}?`,
+          options: ['Option A', 'Option B', 'Option C', 'Option D'],
+          correct: 0,
+          explanation: `This is a practice question for ${skillArea}.`
+        }
       };
 
       console.log('✅ Created fallback dynamic question');
@@ -143,5 +162,18 @@ export class SubjectQuestionService {
       console.error('Error creating dynamic question:', error);
       return null;
     }
+  }
+
+  static createDynamicQuestion(template: SubjectQuestionTemplate): SubjectQuestionTemplate {
+    // Overloaded method for backward compatibility
+    return {
+      ...template,
+      content: {
+        question: template.question_template,
+        options: template.options_template,
+        correct: template.correct_answer,
+        explanation: template.explanation_template
+      }
+    };
   }
 }

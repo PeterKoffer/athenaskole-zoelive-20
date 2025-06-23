@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface LessonProgress {
@@ -24,7 +25,7 @@ export class LessonProgressService {
           skill_area: progress.skill_area,
           current_activity_index: progress.current_activity_index,
           total_activities: progress.total_activities,
-          lesson_data: progress.lesson_data,
+          lesson_data: progress.lesson_data as any, // Cast to any for Json compatibility
           score: progress.score,
           time_elapsed: progress.time_elapsed,
           is_completed: progress.is_completed
@@ -62,7 +63,20 @@ export class LessonProgressService {
         return null;
       }
 
-      return data;
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        subject: data.subject,
+        skill_area: data.skill_area,
+        current_activity_index: data.current_activity_index,
+        total_activities: data.total_activities,
+        lesson_data: (data.lesson_data as Record<string, unknown>) || {},
+        score: data.score,
+        time_elapsed: data.time_elapsed,
+        is_completed: data.is_completed
+      };
     } catch (error) {
       console.error('Error in getLessonProgress:', error);
       return null;
