@@ -2,14 +2,24 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import EnhancedMathematicsLearning from "./EnhancedMathematicsLearning";
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import UnifiedLessonManager from "./components/UnifiedLessonManager";
 import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
 import { getClassroomConfig } from "./components/shared/classroomConfigs";
 
 const MathematicsLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { forceStopAll } = useUnifiedSpeech();
   const classroomConfig = getClassroomConfig("mathematics");
+
+  console.log('🧮 MathematicsLearning component state:', {
+    user: !!user,
+    userId: user?.id,
+    loading,
+    subject: 'mathematics',
+    skillArea: 'general_mathematics'
+  });
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -19,6 +29,20 @@ const MathematicsLearning = () => {
       navigate('/auth');
     }
   }, [user, loading, navigate, classroomConfig?.subjectName]);
+
+  // Stop speech when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log('🔇 Stopping Nelie speech due to navigation away from mathematics lesson');
+      forceStopAll();
+    };
+  }, [forceStopAll]);
+
+  const handleBackToProgram = () => {
+    console.log('🔇 Stopping Nelie speech before navigating back to program');
+    forceStopAll();
+    navigate('/daily-program');
+  };
 
   if (loading) {
     return (
@@ -40,7 +64,12 @@ const MathematicsLearning = () => {
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
-        <EnhancedMathematicsLearning />
+        <UnifiedLessonManager
+          subject="mathematics"
+          skillArea="general_mathematics"
+          studentName={user.user_metadata?.first_name || 'Student'}
+          onBackToProgram={handleBackToProgram}
+        />
       </div>
     </ClassroomEnvironment>
   );
