@@ -1,4 +1,3 @@
-
 interface QuestionTemplate {
   id: string;
   subject: string;
@@ -25,6 +24,7 @@ interface GeneratedQuestion {
 
 class QuestionTemplateSystem {
   private mathTemplates: QuestionTemplate[] = [
+    // ... (no changes to the templates array)
     {
       id: 'math_addition_word_1',
       subject: 'mathematics',
@@ -91,7 +91,7 @@ class QuestionTemplateSystem {
     difficultyLevel: number = 1
   ): GeneratedQuestion {
     console.log(`🎯 Generating UNIQUE template question for ${subject}/${skillArea} (Session: ${sessionId})`);
-    
+
     // Get session's used templates
     if (!this.sessionQuestions.has(sessionId)) {
       this.sessionQuestions.set(sessionId, new Set());
@@ -123,7 +123,7 @@ class QuestionTemplateSystem {
 
     // Generate question from template
     const questionData = this.generateFromTemplate(template, sessionId);
-    
+
     // Track usage
     usedTemplates.add(template.id);
     this.templateUsage.set(template.id, (this.templateUsage.get(template.id) || 0) + 1);
@@ -135,7 +135,7 @@ class QuestionTemplateSystem {
   private generateFromTemplate(template: QuestionTemplate, sessionId: string): GeneratedQuestion {
     let question = template.template;
     let explanation = template.explanationTemplate;
-    const variables: Record<string, any> = {};
+    const variables: Record<string, unknown> = {};
 
     // Replace all variables
     for (const [key, values] of Object.entries(template.variables)) {
@@ -143,7 +143,7 @@ class QuestionTemplateSystem {
         ? values[Math.floor(Math.random() * values.length)]
         : values;
       variables[key] = value;
-      
+
       const regex = new RegExp(`{${key}}`, 'g');
       question = question.replace(regex, String(value));
       explanation = explanation.replace(regex, String(value));
@@ -156,7 +156,7 @@ class QuestionTemplateSystem {
     // Generate wrong answers
     const wrongAnswers = this.generateWrongAnswers(correctAnswer, template.type);
     const allOptions = [correctAnswer, ...wrongAnswers].map(String);
-    
+
     // Shuffle options
     const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
     const correctIndex = shuffledOptions.indexOf(String(correctAnswer));
@@ -173,14 +173,15 @@ class QuestionTemplateSystem {
     };
   }
 
-  private evaluateFormula(formula: string, variables: Record<string, any>): number {
+  private evaluateFormula(formula: string, variables: Record<string, unknown>): number {
     let expression = formula;
     for (const [key, value] of Object.entries(variables)) {
       expression = expression.replace(new RegExp(key, 'g'), String(value));
     }
-    
+
     // Safe evaluation for basic arithmetic
     try {
+      // eslint-disable-next-line no-new-func
       return Function(`"use strict"; return (${expression})`)();
     } catch {
       return 0;
@@ -189,18 +190,19 @@ class QuestionTemplateSystem {
 
   private generateWrongAnswers(correct: number, type: string): number[] {
     const wrong: number[] = [];
-    
     switch (type) {
-      case 'word_problem':
+      case 'word_problem': {
         // Generate plausible wrong answers
         wrong.push(correct + Math.floor(Math.random() * 10) + 1);
         wrong.push(Math.max(1, correct - Math.floor(Math.random() * 10) - 1));
         wrong.push(Math.floor(correct * 1.5));
         break;
-      default:
+      }
+      default: {
         wrong.push(correct + 5, correct - 3, correct * 2);
+      }
     }
-    
+
     return wrong.filter(w => w !== correct && w > 0).slice(0, 3);
   }
 
@@ -209,7 +211,7 @@ class QuestionTemplateSystem {
     console.log(`🧹 Cleared template session: ${sessionId}`);
   }
 
-  getStats(): Record<string, any> {
+  getStats(): Record<string, unknown> {
     return {
       totalTemplates: this.mathTemplates.length,
       activeSessions: this.sessionQuestions.size,
