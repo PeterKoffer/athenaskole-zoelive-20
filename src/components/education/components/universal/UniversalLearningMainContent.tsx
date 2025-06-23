@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea'; // Added for input fields
 import { ArrowLeft, Volume2, VolumeX, Play, Pause, Home } from 'lucide-react';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
-import { LessonActivity } from '../types/LessonTypes';
+import { LessonActivity, IntroductionContent, ContentDeliveryContent, InteractiveGameContent, ApplicationContent, CreativeExplorationContent, SummaryContent } from '../types/LessonTypes';
 
 interface UniversalLearningMainContentProps {
   subject: string;
@@ -46,8 +46,12 @@ const UniversalLearningMainContent = ({
 }: UniversalLearningMainContentProps) => {
   const [showWelcomeTemplate, setShowWelcomeTemplate] = useState(true);
   const classroomConfig = getClassroomConfig(subject);
+  // State for simple text inputs, can be expanded if needed
+  const [responseText, setResponseText] = useState('');
+
 
   const getSubjectWelcomeContent = (subjectName: string) => {
+    // ... (welcome content logic remains the same as provided)
     switch (subjectName.toLowerCase()) {
       case 'mathematics':
         return {
@@ -160,7 +164,150 @@ const UniversalLearningMainContent = ({
     setShowWelcomeTemplate(false);
   };
 
+  useEffect(() => {
+    // Reset response text when activity changes
+    setResponseText('');
+  }, [currentActivity]);
+
+
+  const renderActivityContent = () => {
+    if (!currentActivity || !currentActivity.content) {
+      return (
+        <div className="text-center text-white">
+          <p>Loading activity...</p>
+          <Button onClick={() => onActivityComplete({})} className="mt-4">Continue</Button>
+        </div>
+      );
+    }
+
+    // Type casting for convenience, ensure content matches type in generator
+    const { content, type } = currentActivity;
+
+    switch (type) {
+      case 'introduction':
+        const introContent = content as IntroductionContent;
+        return (
+          <div className="text-white space-y-4 text-center">
+            {introContent.hook && <p className="text-lg">{introContent.hook}</p>}
+            {introContent.realWorldExample && <p>{introContent.realWorldExample}</p>}
+            {introContent.storyContext && <p className="italic">{introContent.storyContext}</p>}
+            {introContent.introductionText && <p>{introContent.introductionText}</p>}
+            {introContent.learningObjectives && (
+              <div>
+                <h4 className="font-semibold mt-2">Today we will:</h4>
+                <ul className="list-disc list-inside">
+                  {introContent.learningObjectives.map((obj, i) => <li key={i}>{obj}</li>)}
+                </ul>
+              </div>
+            )}
+            <Button onClick={() => onActivityComplete({})} className="mt-6 bg-green-500 hover:bg-green-600">Let's Start!</Button>
+          </div>
+        );
+
+      case 'content-delivery':
+        const deliveryContent = content as ContentDeliveryContent;
+        return (
+          <div className="text-white space-y-4">
+            {deliveryContent.introductionText && <p className="text-lg font-semibold">{deliveryContent.introductionText}</p>}
+            {deliveryContent.mainExplanation && <p>{deliveryContent.mainExplanation}</p>}
+            {deliveryContent.examples?.map((ex, i) => <p key={i} className="pl-4 italic">Example: {ex}</p>)}
+            {deliveryContent.segments?.map((seg, i) => (
+              <div key={i} className="p-3 bg-black/20 rounded-md">
+                <h4 className="font-semibold">{seg.title}</h4>
+                <p>{seg.explanation}</p>
+                {seg.examples?.map((exSeg, j) => <p key={j} className="pl-2 italic text-sm">E.g.: {exSeg}</p>)}
+                {seg.checkQuestion && <p className="mt-2 text-purple-300">Quick Check: {seg.checkQuestion}</p>}
+              </div>
+            ))}
+            <Button onClick={() => onActivityComplete({})} className="mt-6 bg-blue-500 hover:bg-blue-600 w-full">Got it!</Button>
+          </div>
+        );
+
+      case 'interactive-game':
+        const gameContent = content as InteractiveGameContent;
+        return (
+          <div className="text-white text-center space-y-4">
+            <p className="text-xl font-semibold">{gameContent.question}</p>
+            {gameContent.gameType === "drag-and-drop" && <p className="text-sm">(Imagine a drag and drop interface here)</p>}
+            {gameContent.options ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {gameContent.options.map((option, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => onActivityComplete({ success: true, answer: index })} // Simplified completion
+                    variant="outline"
+                    className="text-lg p-4 border-purple-400 hover:bg-purple-600"
+                  >
+                    {option}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <Button onClick={() => onActivityComplete({})} className="mt-6 bg-yellow-500 hover:bg-yellow-600">Play Game</Button>
+            )}
+             {gameContent.explanation && <p className="text-sm mt-4 p-2 bg-black/30 rounded">{gameContent.explanation}</p>}
+          </div>
+        );
+
+      case 'application':
+        const appContent = content as ApplicationContent;
+        return (
+          <div className="text-white space-y-4">
+            {appContent.scenario && <p className="font-semibold">{appContent.scenario}</p>}
+            {appContent.task && <p>{appContent.task}</p>}
+            <Textarea
+              placeholder="Type your response here..."
+              className="bg-black/30 border-purple-400 text-white"
+              value={responseText}
+              onChange={(e) => setResponseText(e.target.value)}
+            />
+            {appContent.hints?.map((hint, i) => <p key={i} className="text-sm text-gray-400 italic">Hint: {hint}</p>)}
+            <Button onClick={() => onActivityComplete({ response: responseText })} className="mt-6 bg-orange-500 hover:bg-orange-600 w-full">Submit Response</Button>
+          </div>
+        );
+
+      case 'creative-exploration':
+        const creativeContent = content as CreativeExplorationContent;
+        return (
+          <div className="text-white space-y-4">
+            {creativeContent.creativePrompt && <p className="font-semibold text-lg">{creativeContent.creativePrompt}</p>}
+            {creativeContent.whatIfScenario && <p className="italic">{creativeContent.whatIfScenario}</p>}
+            {creativeContent.guidelines?.map((guide, i) => <p key={i} className="text-sm text-gray-300">Tip: {guide}</p>)}
+            <Textarea
+              placeholder="Let your imagination flow! Type your ideas here..."
+              className="bg-black/30 border-purple-400 text-white min-h-[150px]"
+              value={responseText}
+              onChange={(e) => setResponseText(e.target.value)}
+            />
+            <Button onClick={() => onActivityComplete({ idea: responseText })} className="mt-6 bg-pink-500 hover:bg-pink-600 w-full">Save My Idea</Button>
+          </div>
+        );
+
+      case 'summary':
+        const summaryContent = content as SummaryContent;
+        return (
+          <div className="text-white space-y-4 text-center">
+            <h4 className="text-xl font-semibold">Lesson Recap!</h4>
+            {summaryContent.keyTakeaways?.map((takeaway, i) => <p key={i} className="p-2 bg-black/20 rounded">{takeaway}</p>)}
+            {summaryContent.nextStepsPreview && <p className="mt-4 text-purple-300">{summaryContent.nextStepsPreview}</p>}
+            {summaryContent.finalEncouragement && <p className="mt-4 text-lg font-bold text-green-400">{summaryContent.finalEncouragement}</p>}
+            <Button onClick={() => onActivityComplete({})} className="mt-6 bg-teal-500 hover:bg-teal-600">Finish Lesson</Button>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="text-center text-white">
+            <p>Activity content not available for type: {type}.</p>
+            <Button onClick={() => onActivityComplete({})} className="mt-4">Continue</Button>
+          </div>
+        );
+    }
+  };
+
+
   if (showWelcomeTemplate) {
+    // ... (welcome template JSX remains the same)
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -273,7 +420,6 @@ const UniversalLearningMainContent = ({
     );
   }
 
-  // Show actual lesson content when welcome template is dismissed
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -315,26 +461,12 @@ const UniversalLearningMainContent = ({
           </div>
         </div>
 
-        {/* Current Activity Content */}
+        {/* Current Activity Content Card */}
         {currentActivity && (
           <Card className="bg-black/50 border-purple-400/50 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-white mb-4">{currentActivity.title}</h3>
-                <div className="text-lg text-purple-200 mb-6">
-                  {currentActivity.content?.text || `Welcome to ${subject} learning with Nelie!`}
-                </div>
-                
-                {/* Sample Interactive Content */}
-                <div className="space-y-4">
-                  <Button
-                    onClick={() => onActivityComplete({ success: true, score: 100 })}
-                    className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-6 py-3"
-                  >
-                    Complete Activity
-                  </Button>
-                </div>
-              </div>
+            <CardContent className="p-6 sm:p-8"> {/* Adjusted padding for responsiveness */}
+              <h3 className="text-2xl font-bold text-white mb-4 text-center">{currentActivity.title}</h3>
+              {renderActivityContent()} {/* Dynamic content rendering here */}
             </CardContent>
           </Card>
         )}

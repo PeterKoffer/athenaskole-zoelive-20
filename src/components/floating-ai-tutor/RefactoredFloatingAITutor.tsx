@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
@@ -9,9 +8,11 @@ import FloatingButton from './components/FloatingButton';
 import ChatHeader from './components/ChatHeader';
 import ChatMessages from './components/ChatMessages';
 import ChatInputArea from './components/ChatInputArea';
+import { supabase } from '@/integrations/supabase/client'; // Added Supabase client
 
 const RefactoredFloatingAITutor = () => {
   const [isListening, setIsListening] = useState(false);
+  const [isNelieReplying, setIsNelieReplying] = useState(false); // Added loading state
   
   const { isDragging, position, dragRef, handleMouseDown, hasMoved } = useDragBehavior();
   const { messages, addUserMessage, addNelieMessage } = useFloatingTutorMessages();
@@ -25,24 +26,50 @@ const RefactoredFloatingAITutor = () => {
   }
 
   const handleSendMessage = async (inputText: string) => {
-    addUserMessage(inputText);
+    if (inputText.trim() === '') return;
 
-    // Simulate Nelie's response
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! Let me help you understand that concept better.",
-        "I can see you're working hard on your learning journey. Keep it up!",
-        "Let's break this down into smaller, easier steps.",
-        "Would you like me to explain this in a different way?",
-        "That's exactly the kind of thinking that leads to mastery!"
-      ];
-      
-      const response = responses[Math.floor(Math.random() * responses.length)];
-      addNelieMessage(response);
-      
-      // Speak Nelie's response
-      speakAsNelie(response, true, 'floating-tutor-response');
-    }, 1000);
+    addUserMessage(inputText);
+    setIsNelieReplying(true);
+
+    const personaInstructions = "Respond as NELIE, an infinitely patient, endlessly creative, and encouraging AI tutor. Your goal is to ignite a passion for learning. Be supportive, curious, and celebrate effort. Frame mistakes as learning opportunities. Encourage 'why' and 'how' questions.";
+
+    // Mock lesson context for now, as per instructions
+    const mockLessonContext = {
+      subject: "General Knowledge", // Placeholder
+      activityTitle: "Chat with NELIE" // Placeholder
+    };
+
+    const payload = {
+      userInput: inputText,
+      chatHistory: messages.slice(-10), // Send last 10 messages for context
+      personaInstructions: personaInstructions,
+      lessonContext: mockLessonContext
+    };
+
+    try {
+      const { data, error } = await supabase.functions.invoke('nelie-chat-handler', {
+        body: payload // No need to stringify if Supabase client handles it, otherwise JSON.stringify(payload)
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        addNelieMessage("I'm having a little trouble connecting right now. Please try again in a moment.");
+        speakAsNelie("I'm having a little trouble connecting right now. Please try again in a moment.", true, 'floating-tutor-error');
+      } else if (data && data.reply) {
+        addNelieMessage(data.reply);
+        speakAsNelie(data.reply, true, 'floating-tutor-response');
+      } else {
+        console.warn('Unexpected response structure from Supabase function:', data);
+        addNelieMessage("I received a response, but I'm not sure how to read it. Let's try that again.");
+        speakAsNelie("I received a response, but I'm not sure how to read it. Let's try that again.", true, 'floating-tutor-communication-error');
+      }
+    } catch (e: any) {
+      console.error('Error invoking Supabase function:', e);
+      addNelieMessage("Oops! Something went wrong on my end. Could you try asking that again?");
+      speakAsNelie("Oops! Something went wrong on my end. Could you try asking that again?", true, 'floating-tutor-error');
+    } finally {
+      setIsNelieReplying(false);
+    }
   };
 
   const handleVoiceToggle = () => {
@@ -100,7 +127,7 @@ const RefactoredFloatingAITutor = () => {
         
         <CardContent className="p-0 h-full flex flex-col">
           <ChatMessages messages={messages} />
-          <ChatInputArea onSendMessage={handleSendMessage} />
+          <ChatInputArea onSendMessage={handleSendMessage} isReplying={isNelieReplying} /> {/* Pass isReplying */}
         </CardContent>
       </Card>
     </div>
