@@ -60,21 +60,20 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
         .eq('skill_area', skillArea)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (error && error.code !== 'PGRST116') {
         console.error('Error fetching user progress:', error);
         return;
       }
 
       if (data) {
-        // Map database fields to UserProgress interface with proper type handling
         const mappedProgress: UserProgress = {
           id: data.id,
           user_id: data.user_id,
           subject: data.subject,
           skill_area: data.skill_area,
-          current_activity_index: 0, // Default value since not in DB
-          score: 0, // Default value since not in DB
-          time_elapsed: 0, // Default value since not in DB
+          current_activity_index: 0,
+          score: 0,
+          time_elapsed: 0,
           accuracy_rate: data.accuracy_rate,
           attempts_count: data.attempts_count,
           completion_time_avg: data.completion_time_avg,
@@ -124,11 +123,89 @@ export const progressPersistence = {
     }
   },
 
-  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
+  async updateSession(sessionId: string, updates: Partial<SessionData>): Promise<boolean> {
     try {
       const { error } = await supabase
+        .from('learning_sessions')
+        .update(updates)
+        .eq('id', sessionId);
+
+      if (error) {
+        console.error('Error updating session:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating session:', error);
+      return false;
+    }
+  },
+
+  async getUserProgress(userId: string, subject: string, skillArea: string): Promise<UserProgress | null> {
+    try {
+      const { data, error } = await supabase
         .from('user_performance')
-        .upsert([progressData], { 
+        .select('*')
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user progress:', error);
+        return null;
+      }
+
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        subject: data.subject,
+        skill_area: data.skill_area,
+        current_activity_index: 0,
+        score: 0,
+        time_elapsed: 0,
+        accuracy_rate: data.accuracy_rate,
+        attempts_count: data.attempts_count,
+        completion_time_avg: data.completion_time_avg,
+        current_level: data.current_level,
+        engagement_score: data.engagement_score,
+        last_assessment: data.last_assessment,
+        learning_style: data.learning_style,
+        strengths: safeJsonToRecord(data.strengths),
+        weaknesses: safeJsonToRecord(data.weaknesses),
+        created_at: data.created_at,
+        updated_at: data.updated_at
+      };
+    } catch (error) {
+      console.error('Error fetching user progress:', error);
+      return null;
+    }
+  },
+
+  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
+    try {
+      const dbData = {
+        user_id: progressData.user_id!,
+        subject: progressData.subject!,
+        skill_area: progressData.skill_area!,
+        accuracy_rate: progressData.accuracy_rate,
+        attempts_count: progressData.attempts_count,
+        completion_time_avg: progressData.completion_time_avg,
+        current_level: progressData.current_level,
+        engagement_score: progressData.engagement_score,
+        last_assessment: progressData.last_assessment,
+        learning_style: progressData.learning_style,
+        strengths: progressData.strengths,
+        weaknesses: progressData.weaknesses,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('user_performance')
+        .upsert([dbData], { 
           onConflict: 'user_id,subject,skill_area',
           ignoreDuplicates: false 
         });

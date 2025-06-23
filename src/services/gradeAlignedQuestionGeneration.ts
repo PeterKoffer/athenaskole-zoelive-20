@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { commonStandardsAPI } from './commonStandardsAPI';
 import { UniqueQuestion } from './globalQuestionUniquenessService';
@@ -58,12 +57,12 @@ export class GradeAlignedQuestionGeneration {
         gradeLevel: config.gradeLevel,
         
         // Grade alignment data
-        gradeStandards: gradeStandards.slice(0, 3), // Top 3 relevant standards
+        gradeStandards: gradeStandards.slice(0, 3),
         skillAreas: gradeSkillAreas,
-        prerequisites: prerequisites.slice(0, 2), // Top 2 prerequisites
+        prerequisites: prerequisites.slice(0, 2),
         
-        // Teaching perspective integration
-        teachingPerspective: config.teachingPerspective,
+        // Teaching perspective integration as JSON string
+        teachingPerspective: JSON.stringify(config.teachingPerspective),
         teachingPrompt,
         
         // Uniqueness data
@@ -100,7 +99,6 @@ export class GradeAlignedQuestionGeneration {
     
     if (!isGradeAppropriate) {
       console.warn('⚠️ Generated content may not be grade appropriate, adjusting...');
-      // Could retry with stricter parameters if needed
     }
     
     return {

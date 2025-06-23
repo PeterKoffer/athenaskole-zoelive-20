@@ -50,20 +50,17 @@ export class StableQuestionTemplateSystem {
       return null;
     }
 
-    // Get or create session question set
     if (!this.sessionQuestions.has(sessionId)) {
       this.sessionQuestions.set(sessionId, new Set());
     }
     const usedQuestions = this.sessionQuestions.get(sessionId)!;
 
-    // Find unused question
     const availableQuestions = questions.filter(q => !usedQuestions.has(q.id));
     if (availableQuestions.length === 0) {
       console.warn(`All questions used for session ${sessionId}, template ${templateId}`);
       return questions[Math.floor(Math.random() * questions.length)];
     }
 
-    // Select random unused question
     const selectedQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
     usedQuestions.add(selectedQuestion.id);
 
@@ -91,11 +88,19 @@ export class StableQuestionTemplateSystem {
     this.sessionQuestions.delete(sessionId);
   }
 
+  clearSession(sessionId: string): void {
+    this.clearSessionQuestions(sessionId);
+  }
+
   getSessionStats(sessionId: string): { used: number; available: number } {
     const usedQuestions = this.sessionQuestions.get(sessionId);
     const usedCount = usedQuestions ? usedQuestions.size : 0;
     const totalCount = this.getTotalPrecompiledCount();
     return { used: usedCount, available: totalCount - usedCount };
+  }
+
+  getStats(sessionId: string): { used: number; available: number } {
+    return this.getSessionStats(sessionId);
   }
 }
 

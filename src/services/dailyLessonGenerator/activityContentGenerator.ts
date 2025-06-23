@@ -19,13 +19,13 @@ export class ActivityContentGenerator {
       type: activityType as any,
       phase: activityType as any,
       title: `${focusArea.name} Activity`,
-      duration: 180, // 3 minutes
+      duration: 180,
       phaseDescription: focusArea.description,
       metadata: {
         subject,
         skillArea,
         gradeLevel,
-        focusArea: focusArea.name
+        concept: focusArea.name
       },
       content: {
         text: `Let's explore ${focusArea.name} for Grade ${gradeLevel}!`,

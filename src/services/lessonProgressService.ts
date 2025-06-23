@@ -7,7 +7,7 @@ export interface LessonProgress {
   skill_area: string;
   current_activity_index: number;
   total_activities: number;
-  lesson_data: unknown; // changed from 'any' to 'unknown'
+  lesson_data: Record<string, unknown>;
   score: number;
   time_elapsed: number;
   is_completed: boolean;
@@ -18,7 +18,17 @@ export class LessonProgressService {
     try {
       const { data, error } = await supabase
         .from('lesson_progress')
-        .upsert(progress, {
+        .upsert({
+          user_id: progress.user_id,
+          subject: progress.subject,
+          skill_area: progress.skill_area,
+          current_activity_index: progress.current_activity_index,
+          total_activities: progress.total_activities,
+          lesson_data: progress.lesson_data,
+          score: progress.score,
+          time_elapsed: progress.time_elapsed,
+          is_completed: progress.is_completed
+        }, {
           onConflict: 'user_id,subject,skill_area'
         })
         .select('id')

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface LearningSession {
@@ -12,8 +13,8 @@ export interface LearningSession {
   score: number;
   completed: boolean;
   content_id?: string;
-  user_feedback?: unknown;    // was any
-  ai_adjustments?: unknown;   // was any
+  user_feedback?: Record<string, unknown>;
+  ai_adjustments?: Record<string, unknown>;
 }
 
 class SessionService {
@@ -57,7 +58,7 @@ class SessionService {
           time_spent: updates.time_spent,
           score: updates.score,
           completed: updates.completed,
-          user_feedback: updates.user_feedback,
+          user_feedback: updates.user_feedback || {},
         })
         .eq('id', sessionId);
 

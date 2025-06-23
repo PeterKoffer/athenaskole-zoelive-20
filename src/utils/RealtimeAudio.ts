@@ -53,7 +53,7 @@ export interface StudentProfile {
     subjects: string[];
     specialNeeds: string;
     notes: string;
-    currentStepId?: string; // optional: ID of the step (e.g., "1")
+    currentStepId?: string;
   };
   parentInfo: {
     parentName: string;
@@ -62,7 +62,7 @@ export interface StudentProfile {
     parentAddress: string;
     relationship: string;
   };
-  classId?: string; // optional field for class assignment
+  classId?: string;
 }
 
 export interface RegistrationStep {
@@ -71,7 +71,6 @@ export interface RegistrationStep {
   icon: unknown;
 }
 
-// Teaching Perspective Setting for a school
 export type TeachingPerspectiveType = "none" | "mild-christian" | "strong-christian" | "secular" | "custom";
 
 export interface TeachingPerspective {
@@ -94,6 +93,35 @@ export interface RealtimeAudioService {
   isPlaying(): boolean;
 }
 
+export interface RealtimeChatConfig {
+  apiKey?: string;
+  model?: string;
+  temperature?: number;
+}
+
+export class RealtimeChat {
+  private config: RealtimeChatConfig;
+
+  constructor(config: RealtimeChatConfig = {}) {
+    this.config = config;
+  }
+
+  async sendMessage(message: string): Promise<string> {
+    console.log('💬 RealtimeChat sending message:', message);
+    // Mock response for now
+    return "This is a mock response from RealtimeChat";
+  }
+
+  async streamResponse(message: string, onChunk: (chunk: string) => void): Promise<void> {
+    console.log('🌊 RealtimeChat streaming response for:', message);
+    // Mock streaming response
+    const mockResponse = "This is a mock streaming response";
+    for (let i = 0; i < mockResponse.length; i++) {
+      setTimeout(() => onChunk(mockResponse[i]), i * 50);
+    }
+  }
+}
+
 export class RealtimeAudioManager implements RealtimeAudioService {
   private isInitialized = false;
   private currentAudio: HTMLAudioElement | null = null;
@@ -107,7 +135,6 @@ export class RealtimeAudioManager implements RealtimeAudioService {
     if (this.isInitialized) return;
     
     try {
-      // Initialize audio context if needed
       this.isInitialized = true;
       console.log('✅ Realtime Audio Manager initialized');
     } catch (error) {
@@ -120,10 +147,7 @@ export class RealtimeAudioManager implements RealtimeAudioService {
     if (!this.config.enabled || !text.trim()) return;
     
     try {
-      // Stop any currently playing audio
       this.stopAudio();
-      
-      // Create new audio instance (placeholder for actual implementation)
       console.log(`🔊 Playing audio for: ${text.substring(0, 50)}...`);
       
     } catch (error) {

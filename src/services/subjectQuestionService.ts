@@ -85,7 +85,6 @@ export class SubjectQuestionService {
         return null;
       }
 
-      // Return a random question from the results
       const randomIndex = Math.floor(Math.random() * data.length);
       const item = data[randomIndex];
 
@@ -105,6 +104,43 @@ export class SubjectQuestionService {
       };
     } catch (error) {
       console.error('Error in getRandomQuestionForSubject:', error);
+      return null;
+    }
+  }
+
+  static async createDynamicQuestion(
+    subject: string,
+    skillArea: string,
+    difficultyLevel: number,
+    usedQuestions: string[] = []
+  ): Promise<SubjectQuestionTemplate | null> {
+    try {
+      console.log('🎯 Creating dynamic question for:', { subject, skillArea, difficultyLevel });
+      
+      // Try to get existing template first
+      const template = await this.getRandomQuestionForSubject(subject, skillArea, usedQuestions);
+      
+      if (template) {
+        return template;
+      }
+
+      // If no template found, create a basic fallback question
+      const fallbackQuestion: SubjectQuestionTemplate = {
+        id: `dynamic_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+        subject,
+        skill_area: skillArea,
+        question_template: `What is an important concept in ${skillArea}?`,
+        options_template: ['Option A', 'Option B', 'Option C', 'Option D'],
+        correct_answer: 0,
+        explanation_template: `This is a practice question for ${skillArea}.`,
+        difficulty_level: difficultyLevel
+      };
+
+      console.log('✅ Created fallback dynamic question');
+      return fallbackQuestion;
+      
+    } catch (error) {
+      console.error('Error creating dynamic question:', error);
       return null;
     }
   }
