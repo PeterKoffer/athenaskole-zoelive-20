@@ -10,6 +10,7 @@ import {
 import { Camera, Users, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 
 interface AvatarUploadProps {
   avatarUrl: string;
@@ -22,8 +23,13 @@ interface AvatarUploadProps {
 const AvatarUpload = ({ avatarUrl, name, uploading, onUpload, avatarColor }: AvatarUploadProps) => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { setUserRoleManually } = useRoleAccess();
 
   const handleRoleSelector = () => {
+    console.log('[AvatarUpload] Switching to role selector');
+    // Set a manual role change to prevent auto-redirects
+    setUserRoleManually('student'); // Temporary role to trigger the flow
+    // Navigate to auth page for role selection
     navigate('/auth');
   };
 

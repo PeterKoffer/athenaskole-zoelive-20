@@ -7,10 +7,12 @@ import { UserRole } from "@/types/auth";
 import { useRoleUpgrade } from "@/hooks/useRoleUpgrade";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { useAuth } from "@/hooks/useAuth";
 
 const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const { userRole, setUserRoleManually } = useRoleAccess();
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(
     (searchParams.get('role') as UserRole) || null
@@ -38,6 +40,33 @@ const Auth = () => {
     setSelectedRole(role);
     // Set the role manually to trigger the role change process
     setUserRoleManually(role);
+    
+    // If user is already authenticated, just redirect to appropriate dashboard
+    if (user) {
+      console.log('[Auth] User is authenticated, redirecting to dashboard');
+      // Redirect based on the new role
+      switch (role) {
+        case 'admin':
+          navigate('/admin-dashboard');
+          break;
+        case 'school_leader':
+        case 'school_staff':
+          navigate('/school-dashboard');
+          break;
+        case 'teacher':
+          navigate('/teacher-dashboard');
+          break;
+        case 'parent':
+          navigate('/parent-dashboard');
+          break;
+        case 'student':
+          navigate('/daily-program');
+          break;
+        default:
+          navigate('/');
+          break;
+      }
+    }
   };
 
   const handleRoleDeselect = () => {
@@ -45,6 +74,23 @@ const Auth = () => {
     setSelectedRole(null);
   };
 
+  // If user is authenticated and just switching roles, show role selector
+  if (user && !selectedRole) {
+    return (
+      <RoleSelector
+        onRoleSelect={handleRoleSelect}
+        onBack={() => navigate('/profile')}
+        currentUserRole={userRole}
+      />
+    );
+  }
+
+  // If user is authenticated and has selected a role, redirect them
+  if (user && selectedRole) {
+    return null; // Will redirect via useEffect above
+  }
+
+  // If no role selected, show role selector
   if (!selectedRole) {
     return (
       <RoleSelector
@@ -55,6 +101,7 @@ const Auth = () => {
     );
   }
 
+  // Show auth form for unauthenticated users
   return (
     <AuthForm
       selectedRole={selectedRole}
