@@ -1,4 +1,3 @@
-
 import { LessonActivity } from '../types/LessonTypes';
 import StableActivityInteractiveQuiz from './StableActivityInteractiveQuiz';
 import ActivityContentDelivery from './ActivityContentDelivery';

@@ -1,5 +1,4 @@
 
-import { useState, useCallback } from 'react';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface UseVariedLessonGeneratorProps {
@@ -8,160 +7,150 @@ interface UseVariedLessonGeneratorProps {
   sessionId: string;
 }
 
-export const useVariedLessonGenerator = ({ subject, skillArea, sessionId }: UseVariedLessonGeneratorProps) => {
+export const useVariedLessonGenerator = ({ 
+  subject, 
+  skillArea, 
+  sessionId 
+}: UseVariedLessonGeneratorProps) => {
 
-  const generateVariedLessonActivities = useCallback((): LessonActivity[] => {
+  const generateVariedLessonActivities = (): LessonActivity[] => {
+    console.log(`🎨 Generating VARIED ${subject} lesson with games, simulations, and creative activities`);
+
     const activities: LessonActivity[] = [];
-    const lessonId = `varied-${subject}-${sessionId.substring(0,8)}-${Date.now()}`;
-    const subjectTitle = subject.charAt(0).toUpperCase() + subject.slice(1);
 
-    console.log(`🎯 Generating VARIED activities for ${subject} (session: ${sessionId})`);
-
-    // 1. Welcome Introduction
+    // 1. Introduction Activity
     activities.push({
-      id: `${lessonId}_welcome`,
-      title: `Welcome to ${subjectTitle} Adventure!`,
+      id: `intro-${sessionId}`,
       type: 'introduction',
       phase: 'introduction',
-      duration: 120,
-      phaseDescription: `Welcome to your exciting ${subjectTitle} learning journey`,
-      metadata: { subject, skillArea: 'welcome' },
+      title: `Welcome to ${subject.charAt(0).toUpperCase() + subject.slice(1)}!`,
       content: {
-        text: `Hello! Get ready for an amazing ${subjectTitle} adventure filled with games, challenges, and discoveries! We'll explore concepts through fun activities, interactive games, and creative challenges. Let's make learning exciting!`
-      }
+        text: `Get ready for an amazing journey through ${subject}! Today we'll explore exciting concepts through games, simulations, and creative challenges.`,
+        hook: `Let's dive into the wonderful world of ${subject}!`
+      },
+      duration: 2
     });
 
-    // 2. Educational Game
+    // 2. Educational Game Activity
     activities.push({
-      id: `${lessonId}_game_1`,
-      title: `${subjectTitle} Challenge Arena`,
+      id: `game-${sessionId}-1`,
       type: 'educational-game',
-      phase: 'interactive-game',
-      duration: 300,
-      phaseDescription: `Interactive ${subjectTitle} game challenge`,
-      metadata: { subject, skillArea: 'educational-game' },
+      title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} Adventure Game`,
       content: {
-        gameType: 'challenge-arena',
-        description: `Test your ${subjectTitle} skills in this exciting challenge arena!`,
+        gameType: 'adventure',
+        description: `Embark on an exciting ${subject} adventure where you'll solve puzzles and overcome challenges!`,
         challenges: [
-          `Solve the ${subjectTitle} puzzle to unlock the first key!`,
-          `Use your knowledge to overcome the second challenge!`,
-          `Master the final challenge and claim victory!`
+          'Solve the mystery puzzle',
+          'Complete the challenge quest',
+          'Master the final boss level'
         ]
-      }
+      },
+      duration: 6
     });
 
-    // 3. Interactive Question
+    // 3. Interactive Quiz
     activities.push({
-      id: `${lessonId}_question_1`,
-      title: `${subjectTitle} Knowledge Test`,
+      id: `quiz-${sessionId}-1`,
       type: 'interactive-game',
       phase: 'interactive-game',
-      duration: 180,
-      phaseDescription: `Test your ${subjectTitle} understanding`,
-      metadata: { subject, skillArea: 'knowledge-test' },
+      title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} Challenge`,
       content: {
-        question: `Ready to test your ${subjectTitle} knowledge? Let's see what you've learned!`,
-        options: ['I\'m ready!', 'Give me a hint', 'Let\'s practice first', 'Show me examples'],
-        correctAnswer: 0,
-        explanation: 'Great attitude! Your enthusiasm will help you succeed!'
-      }
+        question: `What's the most important concept in ${subject}?`,
+        options: ['Understanding patterns', 'Solving problems', 'Creative thinking', 'All of the above'],
+        correctAnswer: 3,
+        explanation: `All of these are important aspects of ${subject}!`
+      },
+      duration: 4
     });
 
-    // 4. Creative Exploration
+    // 4. Interactive Simulation
     activities.push({
-      id: `${lessonId}_creative`,
-      title: `Creative ${subjectTitle} Workshop`,
+      id: `simulation-${sessionId}-1`,
+      type: 'simulation',
+      title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} Laboratory`,
+      content: {
+        simulationType: 'laboratory',
+        scenario: `Welcome to the ${subject} laboratory! Here you can experiment and discover new concepts through interactive simulations.`
+      },
+      duration: 7
+    });
+
+    // 5. Creative Exploration
+    activities.push({
+      id: `creative-${sessionId}-1`,
       type: 'creative-exploration',
       phase: 'creative-exploration',
-      duration: 360,
-      phaseDescription: `Explore ${subjectTitle} creatively`,
-      metadata: { subject, skillArea: 'creative-exploration' },
+      title: `Creative ${subject.charAt(0).toUpperCase() + subject.slice(1)} Exploration`,
       content: {
-        creativePrompt: `Let's think outside the box! How can we use ${subjectTitle} in creative and unexpected ways?`,
-        whatIfScenario: `What if ${subjectTitle} worked differently in a magical world? How would that change everything?`,
-        explorationTask: `Imagine you're a ${subjectTitle} detective solving mysteries. What tools would you use?`
-      }
+        creativePrompt: `Let's think creatively about ${subject}! What unique connections can you make?`,
+        whatIfScenario: `What if we approached ${subject} in a completely different way?`,
+        explorationTask: `Explore the creative possibilities within ${subject}`
+      },
+      duration: 5
     });
 
-    // 5. Interactive Simulation
+    // 6. Content Delivery
     activities.push({
-      id: `${lessonId}_simulation`,
-      title: `${subjectTitle} Laboratory`,
-      type: 'simulation',
-      phase: 'application',
-      duration: 240,
-      phaseDescription: `Interactive ${subjectTitle} simulation`,
-      metadata: { subject, skillArea: 'simulation' },
+      id: `content-${sessionId}-1`,
+      type: 'content-delivery',
+      phase: 'content-delivery',
+      title: `Understanding ${subject.charAt(0).toUpperCase() + subject.slice(1)}`,
       content: {
-        scenario: `Welcome to the ${subjectTitle} laboratory! Here you can experiment and discover how things work.`,
-        simulationType: 'interactive-lab',
-        task: `Run experiments and observe the results to deepen your understanding.`
-      }
+        text: `Let's explore the key concepts that make ${subject} so fascinating and important in our daily lives.`
+      },
+      duration: 4
     });
 
-    // 6. Another Educational Game
+    // 7. Another Educational Game
     activities.push({
-      id: `${lessonId}_game_2`,
-      title: `${subjectTitle} Adventure Quest`,
+      id: `game-${sessionId}-2`,
       type: 'educational-game',
-      phase: 'interactive-game',
-      duration: 300,
-      phaseDescription: `Adventure quest with ${subjectTitle} challenges`,
-      metadata: { subject, skillArea: 'adventure-quest' },
+      title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} Puzzle Master`,
       content: {
-        gameType: 'adventure-quest',
-        description: `Embark on an epic ${subjectTitle} adventure quest!`,
+        gameType: 'puzzle',
+        description: `Test your ${subject} skills with challenging puzzles and brain teasers!`,
         challenges: [
-          `Navigate through the ${subjectTitle} forest using your skills!`,
-          `Solve the ancient ${subjectTitle} riddle to unlock the treasure!`,
-          `Use teamwork and ${subjectTitle} knowledge to complete your quest!`
+          'Solve the pattern puzzle',
+          'Complete the logic challenge',
+          'Master the final puzzle'
         ]
-      }
+      },
+      duration: 6
     });
 
-    // 7. Real-World Application
+    // 8. Application Activity
     activities.push({
-      id: `${lessonId}_application`,
-      title: `Real-World ${subjectTitle}`,
+      id: `application-${sessionId}-1`,
       type: 'application',
       phase: 'application',
-      duration: 240,
-      phaseDescription: `Apply ${subjectTitle} to real situations`,
-      metadata: { subject, skillArea: 'real-world' },
+      title: `Real-World ${subject.charAt(0).toUpperCase() + subject.slice(1)}`,
       content: {
-        scenario: `Let's see how ${subjectTitle} is used in the real world! You'll discover amazing connections between what you're learning and everyday life.`,
-        task: `Explore how professionals use ${subjectTitle} in their careers and daily activities.`,
-        guidance: `Think about how this knowledge can help you in your own life and future goals!`
-      }
+        scenario: `Imagine you're using ${subject} to solve a real-world problem.`,
+        task: `Apply what you've learned to create a solution.`
+      },
+      duration: 5
     });
 
-    // 8. Celebration Summary
+    // 9. Summary Activity
     activities.push({
-      id: `${lessonId}_celebration`,
-      title: `🎉 Amazing ${subjectTitle} Achievements!`,
+      id: `summary-${sessionId}`,
       type: 'summary',
       phase: 'summary',
-      duration: 180,
-      phaseDescription: 'Celebrate your learning journey',
-      metadata: { subject, skillArea: 'celebration' },
+      title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} Mastery Celebration!`,
       content: {
         keyTakeaways: [
-          `🎮 You conquered exciting ${subjectTitle} games and challenges!`,
-          `🎨 You explored creative ways to use ${subjectTitle} concepts!`,
-          `🔬 You experimented with ${subjectTitle} in the virtual laboratory!`,
-          `🌟 You discovered how ${subjectTitle} connects to the real world!`,
-          `🏆 You've become a true ${subjectTitle} explorer and problem-solver!`
+          `You've mastered key ${subject} concepts`,
+          `You've completed engaging games and simulations`,
+          `You've explored creative applications`,
+          `You're ready for more advanced challenges`
         ],
-        nextTopicSuggestion: `Next time, we'll dive into even more exciting ${subjectTitle} adventures with new games, challenges, and discoveries!`
-      }
+        nextTopicSuggestion: `Continue your ${subject} journey with advanced topics!`
+      },
+      duration: 3
     });
 
-    console.log(`✅ Generated ${activities.length} VARIED activities for ${subject}:`, 
-      activities.map(a => ({ title: a.title, type: a.type, hasGame: a.type === 'educational-game' })));
-    
     return activities;
-  }, [subject, skillArea, sessionId]);
+  };
 
   return {
     generateVariedLessonActivities
