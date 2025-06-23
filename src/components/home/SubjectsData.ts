@@ -15,7 +15,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Algebra", "Geometry", "Statistics"],
     path: "/learn/mathematics",
     gradient: "from-blue-500 to-blue-600",
-    icon: "📐"
+    icon: "🧮"
   },
   {
     title: "English Language Arts",
@@ -23,7 +23,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Creative Writing", "Literature", "Grammar"],
     path: "/learn/english",
     gradient: "from-purple-500 to-purple-600",
-    icon: "📚"
+    icon: "📖"
   },
   {
     title: "Science & Technology",
@@ -31,7 +31,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Physics", "Chemistry", "Biology"],
     path: "/learn/science",
     gradient: "from-indigo-500 to-indigo-600",
-    icon: "🔬"
+    icon: "🧪"
   },
   {
     title: "Computer Science",
@@ -39,7 +39,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Programming", "Algorithms", "AI/ML"],
     path: "/learn/computer-science",
     gradient: "from-slate-500 to-slate-600",
-    icon: "💻"
+    icon: "⚡"
   },
   {
     title: "Creative Arts",
@@ -47,7 +47,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Digital Art", "Music Theory", "Design"],
     path: "/learn/creative-arts",
     gradient: "from-pink-500 to-pink-600",
-    icon: "🎨"
+    icon: "🎭"
   },
   {
     title: "Music Discovery",
@@ -55,7 +55,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Music Theory", "Composition", "Performance"],
     path: "/learn/music",
     gradient: "from-violet-500 to-violet-600",
-    icon: "🎵"
+    icon: "🎼"
   },
   {
     title: "Mental Wellness",
@@ -63,7 +63,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Understanding Emotions", "Stress Management", "Mindfulness Practices", "Building Resilience", "Healthy Relationships"],
     path: "/learn/mental-wellness",
     gradient: "from-teal-500 to-teal-600",
-    icon: "🧠"
+    icon: "🧘"
   },
   {
     title: "Language Lab",
@@ -71,7 +71,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Vocabulary Practice", "Grammar Drills", "Pronunciation Basics", "Cultural Insights"],
     path: "/learn/language-lab",
     gradient: "from-green-500 to-green-600",
-    icon: "🌐"
+    icon: "🗺️"
   },
   {
     title: "World History & Global Religions",
@@ -79,7 +79,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Ancient Civilizations", "Major Empires", "World Wars", "Religious Studies", "Cultural Heritage"],
     path: "/learn/world-history-religions",
     gradient: "from-amber-500 to-amber-600",
-    icon: "📜"
+    icon: "🏺"
   },
   {
     title: "Global Geography",
@@ -87,7 +87,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Physical Landscapes", "Climate Systems", "Human-Environment Interaction", "Population Dynamics", "Urban Studies"],
     path: "/learn/global-geography",
     gradient: "from-cyan-500 to-cyan-600",
-    icon: "🌍"
+    icon: "🌏"
   },
   {
     title: "BodyLab: Healthy & Active Living",
@@ -95,7 +95,7 @@ export const subjects: Subject[] = [
     keyAreas: ["Nutrition Science", "Fitness Principles", "Mental Wellness", "Holistic Health", "Active Lifestyles"],
     path: "/learn/body-lab",
     gradient: "from-emerald-500 to-emerald-600",
-    icon: "💪"
+    icon: "🏃"
   },
   {
     title: "Life Essentials: Navigating Adulthood",
@@ -103,6 +103,6 @@ export const subjects: Subject[] = [
     keyAreas: ["Personal Finance", "Household Management", "Career Development", "Civic Responsibilities", "Future Planning"],
     path: "/learn/life-essentials",
     gradient: "from-gray-500 to-gray-600",
-    icon: "🛠️"
+    icon: "🎯"
   }
 ];

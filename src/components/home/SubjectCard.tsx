@@ -35,7 +35,11 @@ const SubjectCard = ({ subject, index, onStartLearning }: SubjectCardProps) => {
         <CardContent className="p-6 flex flex-col h-full w-full">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <span className="text-3xl mr-3">{subject.icon}</span>
+              <span className="text-4xl mr-4 filter drop-shadow-lg" style={{
+                textShadow: '0 4px 8px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)'
+              }}>
+                {subject.icon}
+              </span>
               <h3 className="text-xl font-bold text-white">
                 {subject.title}
               </h3>
@@ -77,7 +81,7 @@ const SubjectCard = ({ subject, index, onStartLearning }: SubjectCardProps) => {
             </DropdownMenu>
           </div>
 
-          <div className="flex-1"></div>
+          <div className="flex-grow"></div>
 
           <Button
             onClick={() => onStartLearning(subject.path)}
