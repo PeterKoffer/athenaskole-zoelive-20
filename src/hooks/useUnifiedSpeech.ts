@@ -27,6 +27,9 @@ export const useUnifiedSpeech = () => {
     }
   };
 
+  // Alias for backward compatibility
+  const speak = speakAsNelie;
+
   const stop = () => {
     if (speechSynthesis.speaking) {
       speechSynthesis.cancel();
@@ -52,6 +55,10 @@ export const useUnifiedSpeech = () => {
     setHasUserInteracted(true);
   };
 
+  const enableUserInteraction = () => {
+    setHasUserInteracted(true);
+  };
+
   const disableSpeech = () => setIsEnabled(false);
 
   const toggleEnabled = () => {
@@ -61,6 +68,10 @@ export const useUnifiedSpeech = () => {
       disableSpeech();
       stop();
     }
+  };
+
+  const repeatSpeech = async (text: string, context?: string) => {
+    await speakAsNelie(text, true, context);
   };
 
   useEffect(() => {
@@ -90,11 +101,15 @@ export const useUnifiedSpeech = () => {
     isSpeaking,
     hasUserInteracted,
     isReady: hasUserInteracted,
+    autoReadEnabled: isEnabled, // Alias for backward compatibility
     speakAsNelie,
+    speak, // Alias for backward compatibility
     enableSpeech,
+    enableUserInteraction,
     disableSpeech,
     stop,
     forceStopAll,
-    toggleEnabled
+    toggleEnabled,
+    repeatSpeech
   };
 };

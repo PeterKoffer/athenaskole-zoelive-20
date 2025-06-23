@@ -7,6 +7,11 @@ export interface UserProgress {
   accuracy_rate: number;
   current_level: number;
   last_assessment: string;
+  // Add missing properties for backward compatibility
+  accuracy?: number;
+  attempts?: number;
+  currentLevel?: number;
+  overall_accuracy?: number;
 }
 
 export interface SessionData {
@@ -21,6 +26,24 @@ export interface SessionData {
   completed: boolean;
 }
 
+export interface AdaptiveContentRecord {
+  id: string;
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  content_type: string;
+  generated_content: any;
+  difficulty_level: number;
+  created_at: string;
+}
+
+export interface GeneratedContent {
+  id: string;
+  content: any;
+  metadata: any;
+  created_at: string;
+}
+
 export class ProgressPersistence {
   async getUserProgress(userId: string, subject: string, skillArea: string): Promise<UserProgress | null> {
     try {
@@ -32,7 +55,12 @@ export class ProgressPersistence {
         attempts_count: 10,
         accuracy_rate: 75,
         current_level: 2,
-        last_assessment: new Date().toISOString()
+        last_assessment: new Date().toISOString(),
+        // Backward compatibility aliases
+        accuracy: 75,
+        attempts: 10,
+        currentLevel: 2,
+        overall_accuracy: 75
       };
     } catch (error) {
       console.error('Error fetching user progress:', error);

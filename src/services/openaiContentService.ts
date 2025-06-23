@@ -1,56 +1,50 @@
 
+import { supabase } from '@/integrations/supabase/client';
 import { AdaptiveContentRecord, GeneratedContent } from '@/services/progressPersistence';
 
 export class OpenAIContentService {
-  async generateContent(
-    subject: string,
-    skillArea: string,
-    difficulty: number
-  ): Promise<GeneratedContent | null> {
+  async generateContent(prompt: string, subject: string, skillArea: string): Promise<GeneratedContent | null> {
     try {
-      console.log('🤖 Generating OpenAI content:', { subject, skillArea, difficulty });
-
-      // Mock implementation - replace with actual OpenAI API call
+      // Mock implementation
       const content: GeneratedContent = {
-        id: `openai_${Date.now()}`,
-        subject,
-        skillArea,
-        gradeLevel: difficulty,
-        question: `What is an important concept in ${skillArea}?`,
-        options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
-        correct: 0,
-        explanation: `This explains the important concept in ${skillArea}.`,
-        learningObjectives: [`Understand ${skillArea} concepts`],
-        estimatedTime: 5
+        id: `content_${Date.now()}`,
+        content: {
+          text: `Generated content for ${subject} - ${skillArea}`,
+          type: 'educational_content'
+        },
+        metadata: {
+          subject,
+          skillArea,
+          prompt: prompt.substring(0, 50) + '...'
+        },
+        created_at: new Date().toISOString()
       };
-
+      
       return content;
     } catch (error) {
-      console.error('Error generating OpenAI content:', error);
+      console.error('Error generating content:', error);
       return null;
     }
   }
 
-  async adaptRecord(record: AdaptiveContentRecord): Promise<GeneratedContent | null> {
+  async saveAdaptiveContent(userId: string, content: GeneratedContent, subject: string, skillArea: string): Promise<boolean> {
     try {
-      // Convert AdaptiveContentRecord to GeneratedContent
-      const content: GeneratedContent = {
-        id: record.id,
-        subject: record.subject,
-        skillArea: record.skillArea,
-        gradeLevel: record.gradeLevel,
-        question: `Question based on ${record.contentType}`,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        correct: 0,
-        explanation: 'Generated explanation',
-        learningObjectives: ['Learning objective'],
-        estimatedTime: 5
+      const record: AdaptiveContentRecord = {
+        id: `adaptive_${Date.now()}`,
+        user_id: userId,
+        subject,
+        skill_area: skillArea,
+        content_type: 'generated',
+        generated_content: content.content,
+        difficulty_level: 1,
+        created_at: new Date().toISOString()
       };
 
-      return content;
+      console.log('Saving adaptive content:', record);
+      return true;
     } catch (error) {
-      console.error('Error adapting record:', error);
-      return null;
+      console.error('Error saving adaptive content:', error);
+      return false;
     }
   }
 }
