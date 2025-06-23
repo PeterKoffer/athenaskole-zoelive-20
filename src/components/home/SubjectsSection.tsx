@@ -3,7 +3,7 @@ import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, Speaker } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -133,19 +133,14 @@ const SubjectsSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subjects.map((subject, index) => (
-            <div key={index} className="flex h-48">
+            <div key={index} className="flex h-56">
               <SpeakableCard
                 speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
                 context={`subject-card-${index}`}
                 className="border-2 border-gray-600 hover:border-gray-500 transition-all duration-300 backdrop-blur-sm w-full flex bg-gray-800/70"
               >
                 <CardContent className="p-6 flex flex-col h-full w-full relative">
-                  {/* Speaker Icon in top right */}
-                  <div className="absolute top-4 right-4">
-                    <Speaker className="w-5 h-5 text-blue-400" />
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4 pr-8">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <span className="text-3xl mr-3">{subject.icon}</span>
                       <h3 className="text-xl font-bold text-white">
