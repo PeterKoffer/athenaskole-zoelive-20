@@ -1,3 +1,4 @@
+
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
@@ -134,7 +135,7 @@ const SubjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {subjects.map((subject, index) => {
             const isExpanded = expandedCards.includes(index);
             return (
@@ -142,7 +143,7 @@ const SubjectsSection = () => {
                 key={index}
                 speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
                 context={`subject-card-${index}`}
-                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-[380px] flex flex-col"
+                className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm h-[380px]"
               >
                 <CardContent className="p-4 flex flex-col h-full">
                   <div className="flex items-center mb-3">
@@ -156,7 +157,7 @@ const SubjectsSection = () => {
                     {subject.description}
                   </p>
 
-                  <div className="mb-4">
+                  <div className="mb-4 flex-grow">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="text-xs font-semibold text-gray-400">
                         Key Areas:
@@ -191,7 +192,7 @@ const SubjectsSection = () => {
 
                   <Button
                     onClick={() => handleStartLearning(subject.path)}
-                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity mt-auto text-sm py-2`}
+                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-2 mt-auto`}
                   >
                     Start Learning
                   </Button>
