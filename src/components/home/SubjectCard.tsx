@@ -49,20 +49,20 @@ const backgroundMap: Record<string, string> = {
   'Life Essentials': 'bg-gradient-to-br from-purple-300 via-pink-400 to-red-400'
 };
 
-// Card background gradients to match iOS style
+// Darker card background gradients
 const cardBackgroundMap: Record<string, string> = {
-  'Mathematics': 'bg-gradient-to-br from-blue-100/80 via-purple-50/60 to-pink-100/80',
-  'English Language Arts': 'bg-gradient-to-br from-purple-100/80 via-pink-50/60 to-blue-100/80',
-  'Science & Technology': 'bg-gradient-to-br from-green-100/80 via-cyan-50/60 to-teal-100/80',
-  'Computer Science': 'bg-gradient-to-br from-yellow-100/80 via-orange-50/60 to-amber-100/80',
-  'Creative Arts': 'bg-gradient-to-br from-pink-100/80 via-purple-50/60 to-violet-100/80',
-  'Music Discovery': 'bg-gradient-to-br from-purple-100/80 via-indigo-50/60 to-blue-100/80',
-  'Mental Wellness': 'bg-gradient-to-br from-green-100/80 via-teal-50/60 to-cyan-100/80',
-  'Language Lab': 'bg-gradient-to-br from-blue-100/80 via-cyan-50/60 to-teal-100/80',
-  'History & Religion': 'bg-gradient-to-br from-orange-100/80 via-red-50/60 to-pink-100/80',
-  'Global Geography': 'bg-gradient-to-br from-cyan-100/80 via-blue-50/60 to-indigo-100/80',
-  'BodyLab': 'bg-gradient-to-br from-red-100/80 via-pink-50/60 to-purple-100/80',
-  'Life Essentials': 'bg-gradient-to-br from-purple-100/80 via-pink-50/60 to-red-100/80'
+  'Mathematics': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'English Language Arts': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Science & Technology': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Computer Science': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Creative Arts': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Music Discovery': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Mental Wellness': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Language Lab': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'History & Religion': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Global Geography': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'BodyLab': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900',
+  'Life Essentials': 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900'
 };
 
 const buttonGradientMap: Record<string, string> = {
@@ -86,7 +86,7 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
   
   const Icon = iconMap[subject.title] || Calculator;
   const iconGradient = backgroundMap[subject.title] || 'bg-gradient-to-br from-blue-400 to-purple-400';
-  const cardBackground = cardBackgroundMap[subject.title] || 'bg-gradient-to-br from-blue-100/80 to-purple-100/80';
+  const cardBackground = cardBackgroundMap[subject.title] || 'bg-gradient-to-br from-slate-700 to-slate-900';
   const buttonGradient = buttonGradientMap[subject.title] || 'bg-gradient-to-r from-blue-400 to-blue-500';
 
   const handleClick = () => {
@@ -111,12 +111,12 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
       style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Main Card */}
-      <div className={`relative ${cardBackground} rounded-3xl p-6 shadow-xl border border-white/30 backdrop-blur-sm overflow-hidden`}>
+      <div className={`relative ${cardBackground} rounded-3xl p-6 shadow-xl overflow-hidden`}>
 
         {/* Speaker Icon */}
         <button
           onClick={handleSpeakerClick}
-          className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all duration-200 backdrop-blur-sm border border-white/20"
+          className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all duration-200 backdrop-blur-sm"
           title="Ask Nelie to explain this subject"
         >
           <Volume2 size={16} className="text-white" />
@@ -127,13 +127,13 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
           <DropdownMenuTrigger asChild>
             <button
               onClick={handleDropdownClick}
-              className="absolute top-4 right-16 p-2 bg-purple-500/80 hover:bg-purple-600/80 rounded-xl transition-all duration-200 backdrop-blur-sm border border-white/20"
+              className="absolute top-4 right-16 p-2 bg-purple-500/80 hover:bg-purple-600/80 rounded-xl transition-all duration-200 backdrop-blur-sm"
               title="More information"
             >
               <ChevronDown size={16} className="text-white" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-80 bg-white/95 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
+          <DropdownMenuContent className="w-80 bg-white/95 backdrop-blur-md shadow-xl rounded-2xl z-50">
             <DropdownMenuItem className="p-4 cursor-default">
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-800">{subject.title}</h4>
@@ -163,7 +163,7 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
         </div>
         
         {/* Title */}
-        <h3 className="text-gray-800 text-xl font-bold text-center mb-6 leading-tight">
+        <h3 className="text-white text-xl font-bold text-center mb-6 leading-tight">
           {subject.title}
         </h3>
         
@@ -175,12 +175,12 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
           Start Learning!
         </button>
 
-        {/* Glassmorphism overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/5 rounded-3xl pointer-events-none"></div>
+        {/* Subtle glassmorphism overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 rounded-3xl pointer-events-none"></div>
       </div>
 
       {/* Subtle shadow layer */}
-      <div className="absolute inset-0 bg-black/5 rounded-3xl transform translate-y-2 -z-10 blur-sm"></div>
+      <div className="absolute inset-0 bg-black/10 rounded-3xl transform translate-y-2 -z-10 blur-sm"></div>
     </div>
   );
 };
