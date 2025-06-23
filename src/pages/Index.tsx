@@ -28,11 +28,19 @@ const Index = () => {
     // This will be handled by the navigation in HomeMainContent
   };
 
+  // Mock user progress data
+  const userProgress = {
+    matematik: 75,
+    dansk: 60,
+    engelsk: 85,
+    naturteknik: 45
+  };
+
   // Show AI Insights Dashboard
   if (showInsightsDashboard) {
     return (
       <div className="min-h-screen bg-gray-900">
-        <AIInsightsDashboard onBack={handleBackToHome} />
+        <AIInsightsDashboard onClose={handleBackToHome} />
       </div>
     );
   }
@@ -41,7 +49,7 @@ const Index = () => {
   if (state.showProgress) {
     return (
       <div className="min-h-screen bg-gray-900">
-        <ProgressDashboard onBack={handleBackToHome} />
+        <ProgressDashboard userProgress={userProgress} />
       </div>
     );
   }
@@ -50,7 +58,7 @@ const Index = () => {
   if (state.showGames) {
     return (
       <div className="min-h-screen bg-gray-900">
-        <GameHub onBack={handleBackToHome} />
+        <GameHub />
       </div>
     );
   }
@@ -59,7 +67,7 @@ const Index = () => {
   if (state.showAITutor) {
     return (
       <div className="min-h-screen bg-gray-900">
-        <EnhancedAITutor onBack={handleBackToHome} />
+        <EnhancedAITutor user={user} onBack={handleBackToHome} />
       </div>
     );
   }
