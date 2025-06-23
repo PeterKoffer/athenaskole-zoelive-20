@@ -1,3 +1,4 @@
+
 export interface Student {
   id: string;
   name: string;
@@ -73,5 +74,81 @@ export interface RegistrationStep {
 // Teaching Perspective Setting for a school
 export type TeachingPerspectiveType = "none" | "mild-christian" | "strong-christian" | "secular" | "custom";
 
-export interface
-
+export interface TeachingPerspective {
+  type: TeachingPerspectiveType;
+  customValues?: string[];
+  emphasis?: string;
+}
+
+export interface AudioConfig {
+  enabled: boolean;
+  volume: number;
+  autoPlay: boolean;
+}
+
+export interface RealtimeAudioService {
+  initialize(): Promise<void>;
+  playAudio(text: string): Promise<void>;
+  stopAudio(): void;
+  setVolume(volume: number): void;
+  isPlaying(): boolean;
+}
+
+export class RealtimeAudioManager implements RealtimeAudioService {
+  private isInitialized = false;
+  private currentAudio: HTMLAudioElement | null = null;
+  private config: AudioConfig = {
+    enabled: true,
+    volume: 0.8,
+    autoPlay: false
+  };
+
+  async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+    
+    try {
+      // Initialize audio context if needed
+      this.isInitialized = true;
+      console.log('✅ Realtime Audio Manager initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize audio manager:', error);
+      throw error;
+    }
+  }
+
+  async playAudio(text: string): Promise<void> {
+    if (!this.config.enabled || !text.trim()) return;
+    
+    try {
+      // Stop any currently playing audio
+      this.stopAudio();
+      
+      // Create new audio instance (placeholder for actual implementation)
+      console.log(`🔊 Playing audio for: ${text.substring(0, 50)}...`);
+      
+    } catch (error) {
+      console.error('❌ Failed to play audio:', error);
+    }
+  }
+
+  stopAudio(): void {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
+  }
+
+  setVolume(volume: number): void {
+    this.config.volume = Math.max(0, Math.min(1, volume));
+    if (this.currentAudio) {
+      this.currentAudio.volume = this.config.volume;
+    }
+  }
+
+  isPlaying(): boolean {
+    return this.currentAudio ? !this.currentAudio.paused : false;
+  }
+}
+
+export const realtimeAudioManager = new RealtimeAudioManager();

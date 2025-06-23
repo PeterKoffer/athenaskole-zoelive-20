@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -105,5 +106,42 @@ export const useUserProgress = (userId: string, subject: string, skillArea: stri
 export const progressPersistence = {
   async saveSession(sessionData: SessionData): Promise<string | null> {
     try {
-      const { data
-
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .insert([sessionData])
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error('Error saving session:', error);
+        return null;
+      }
+
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error saving session:', error);
+      return null;
+    }
+  },
+
+  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('user_performance')
+        .upsert([progressData], { 
+          onConflict: 'user_id,subject,skill_area',
+          ignoreDuplicates: false 
+        });
+
+      if (error) {
+        console.error('Error updating progress:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      return false;
+    }
+  }
+};

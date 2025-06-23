@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface SubjectQuestionTemplate {
@@ -85,6 +86,26 @@ export class SubjectQuestionService {
       }
 
       // Return a random question from the results
-      const randomIndex = Math.floor(Math.random
-
-      
+      const randomIndex = Math.floor(Math.random() * data.length);
+      const item = data[randomIndex];
+
+      return {
+        id: item.id,
+        subject: item.subject,
+        skill_area: item.skill_area,
+        question_template: item.question_template,
+        options_template: Array.isArray(item.options_template)
+          ? item.options_template
+          : typeof item.options_template === 'string'
+            ? JSON.parse(item.options_template)
+            : [],
+        correct_answer: item.correct_answer,
+        explanation_template: item.explanation_template,
+        difficulty_level: item.difficulty_level
+      };
+    } catch (error) {
+      console.error('Error in getRandomQuestionForSubject:', error);
+      return null;
+    }
+  }
+}

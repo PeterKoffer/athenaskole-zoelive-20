@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { getStandardsByGrade, findStandardByCode } from '@/data/curriculumStandards';
 import { userLearningProfileService } from './userLearningProfileService';
@@ -166,5 +167,67 @@ class PersonalizedLearningPathGenerator {
         strengths.push({
           concept: concept.conceptName,
           masteryLevel: concept.masteryLevel,
-          canAdvance: concept.masteryLevel >= 0*
-
+          canAdvance: concept.masteryLevel >= 0.9,
+          nextConcepts: []
+        });
+      }
+    });
+
+    return strengths;
+  }
+
+  /**
+   * Generate learning path steps
+   */
+  private async generatePathSteps(
+    standards: any[],
+    gaps: LearningGap[],
+    strengths: StrengthArea[],
+    profile: unknown,
+    targetSkills?: string[]
+  ): Promise<LearningPathStep[]> {
+    const steps: LearningPathStep[] = [];
+
+    // Generate steps based on learning gaps (priority items)
+    gaps.forEach((gap, index) => {
+      steps.push({
+        id: `gap-${index}`,
+        title: `Master ${gap.concept}`,
+        description: `Address learning gap in ${gap.concept}`,
+        standardId: '',
+        difficultyLevel: gap.severity === 'high' ? 2 : gap.severity === 'medium' ? 3 : 4,
+        estimatedMinutes: 30,
+        prerequisites: gap.prerequisites,
+        skills: [gap.concept],
+        isCompleted: false,
+        order: index
+      });
+    });
+
+    return steps;
+  }
+
+  /**
+   * Generate personalized adjustments
+   */
+  private generatePersonalizedAdjustments(
+    profile: unknown, 
+    gaps: LearningGap[], 
+    strengths: StrengthArea[]
+  ): PersonalizedAdjustment[] {
+    const adjustments: PersonalizedAdjustment[] = [];
+
+    // Add adjustment based on learning style
+    if ((profile as {learningStyle?: string}).learningStyle) {
+      adjustments.push({
+        type: 'learning_style',
+        value: (profile as {learningStyle: string}).learningStyle,
+        description: `Content adapted for ${(profile as {learningStyle: string}).learningStyle} learning style`
+      });
+    }
+
+    return adjustments;
+  }
+}
+
+export const personalizedLearningPathGenerator = new PersonalizedLearningPathGenerator();
