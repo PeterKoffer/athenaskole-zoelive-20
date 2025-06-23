@@ -7,7 +7,7 @@ export interface LessonProgress {
   skill_area: string;
   current_activity_index: number;
   total_activities: number;
-  lesson_data: unknown; // Changed from 'any' to 'unknown'
+  lesson_data: unknown; // changed from 'any' to 'unknown'
   score: number;
   time_elapsed: number;
   is_completed: boolean;
