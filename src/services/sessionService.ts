@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface LearningSession {
@@ -13,8 +12,8 @@ export interface LearningSession {
   score: number;
   completed: boolean;
   content_id?: string;
-  user_feedback?: any;
-  ai_adjustments?: any;
+  user_feedback?: unknown;    // was any
+  ai_adjustments?: unknown;   // was any
 }
 
 class SessionService {
