@@ -27,7 +27,8 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
     subject,
     skillArea,
     showWelcome,
-    studentName: user?.user_metadata?.first_name || studentName
+    studentName: user?.user_metadata?.first_name || studentName,
+    timestamp: new Date().toISOString()
   });
 
   const handleStartLesson = () => {
@@ -65,9 +66,9 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
     }
   };
 
-  // Show welcome screen
+  // Always show welcome screen first - this is the main issue
   if (showWelcome) {
-    console.log('👋 Displaying welcome screen for', subject);
+    console.log('👋 Displaying welcome screen for', subject, 'at', new Date().toISOString());
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="min-h-screen flex items-center justify-center">
@@ -78,7 +79,7 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
   }
 
   // Show main lesson content using ImprovedLearningSession
-  console.log('📚 Displaying main lesson content for', subject);
+  console.log('📚 Displaying main lesson content for', subject, 'at', new Date().toISOString());
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">

@@ -1,15 +1,11 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Brain, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
-import GradeContentSetup from './GradeContentSetup';
-import TopicExplanation from './TopicExplanation';
-import LoadingStates from './LoadingStates';
-import SessionHeader from './SessionHeader';
-import QuestionDisplay from './QuestionDisplay';
-import ImprovedSessionManager from './ImprovedSessionManager';
-import GameEngine from '@/components/games/engine/GameEngine';
+import { useQuestionGeneration, Question } from '../hooks/useQuestionGeneration';
+import { FallbackQuestionGenerator } from './FallbackQuestionGenerator';
 
 interface ImprovedLearningSessionProps {
   subject: string;
@@ -18,166 +14,215 @@ interface ImprovedLearningSessionProps {
   onBack: () => void;
 }
 
-const ImprovedLearningSession = ({ 
-  subject, 
-  skillArea, 
-  difficultyLevel, 
-  onBack 
+const ImprovedLearningSession = ({
+  subject,
+  skillArea,
+  difficultyLevel,
+  onBack
 }: ImprovedLearningSessionProps) => {
   const { user } = useAuth();
-  const { gradeConfig } = useGradeLevelContent(subject);
-  
-  const [gradeContentConfig, setGradeContentConfig] = useState<any>(null);
-  const [showExplanation, setShowExplanation] = useState(true);
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [score, setScore] = useState(0);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [useFallback, setUseFallback] = useState(false);
 
-  const handleContentGenerated = (contentConfig: any) => {
-    setGradeContentConfig(contentConfig);
-    console.log('📚 Using grade-appropriate content configuration:', contentConfig);
+  const { generateQuestion, isGenerating, error } = useQuestionGeneration({
+    subject,
+    skillArea,
+    difficultyLevel,
+    userId: user?.id || 'anonymous'
+  });
+
+  console.log('📚 ImprovedLearningSession initialized:', {
+    subject,
+    skillArea,
+    difficultyLevel,
+    hasUser: !!user,
+    useFallback,
+    timestamp: new Date().toISOString()
+  });
+
+  // Generate first question on mount
+  useEffect(() => {
+    if (user?.id) {
+      console.log('🚀 Attempting to generate first question...');
+      handleGenerateQuestion();
+    }
+  }, [user?.id]);
+
+  const handleGenerateQuestion = async () => {
+    try {
+      console.log('📝 Generating question via API...');
+      const question = await generateQuestion([]);
+      if (question) {
+        setCurrentQuestion(question);
+        setUseFallback(false);
+        console.log('✅ API question generated successfully');
+      } else {
+        throw new Error('No question generated from API');
+      }
+    } catch (error) {
+      console.warn('⚠️ API generation failed, using fallback:', error);
+      const fallbackQuestion = FallbackQuestionGenerator.generateFallbackQuestion(
+        subject,
+        skillArea,
+        difficultyLevel
+      );
+      setCurrentQuestion(fallbackQuestion);
+      setUseFallback(true);
+    }
   };
 
-  const handleStartQuestions = () => {
-    console.log('📖 Moving from explanation to questions phase');
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (showExplanation) return;
+    setSelectedAnswer(answerIndex);
+  };
+
+  const handleSubmitAnswer = () => {
+    if (selectedAnswer === null || !currentQuestion) return;
+    
+    const isCorrect = selectedAnswer === currentQuestion.correct;
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+    setShowExplanation(true);
+  };
+
+  const handleNextQuestion = () => {
+    setSelectedAnswer(null);
     setShowExplanation(false);
+    setQuestionCount(questionCount + 1);
+    handleGenerateQuestion();
   };
 
   if (!user) {
-    return <LoadingStates type="login-required" />;
-  }
-
-  // Show grade-level content configuration first
-  if (!gradeContentConfig) {
     return (
-      <GradeContentSetup
-        subject={subject}
-        skillArea={skillArea}
-        onBack={onBack}
-        onContentGenerated={handleContentGenerated}
-      />
+      <Card className="bg-red-900 border-red-700 max-w-md mx-auto">
+        <CardContent className="p-6 text-center">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-white text-lg font-semibold mb-2">Login Required</h3>
+          <p className="text-red-300 mb-4">Please log in to start your lesson.</p>
+          <Button onClick={onBack} className="bg-red-600 hover:bg-red-700">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Go Back
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
-  // Show topic explanation before questions
-  if (showExplanation) {
+  if (isGenerating || !currentQuestion) {
     return (
-      <TopicExplanation
-        subject={subject}
-        skillArea={skillArea}
-        gradeLevel={gradeConfig?.userGrade}
-        standardInfo={gradeContentConfig.standard}
-        onStartQuestions={handleStartQuestions}
-      />
+      <Card className="bg-gray-900 border-gray-800 max-w-md mx-auto">
+        <CardContent className="p-6 text-center">
+          <Brain className="w-12 h-12 text-blue-400 animate-pulse mx-auto mb-4" />
+          <h3 className="text-white text-lg font-semibold mb-2">
+            {isGenerating ? 'Generating Question...' : 'Loading...'}
+          </h3>
+          <p className="text-gray-300 mb-4">
+            Preparing your {subject} question
+          </p>
+          <Button onClick={onBack} variant="outline" className="border-gray-600">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Program
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <ImprovedSessionManager
-      subject={subject}
-      skillArea={skillArea}
-      difficultyLevel={difficultyLevel}
-      gradeContentConfig={gradeContentConfig}
-    >
-      {(sessionData) => {
-        const {
-          currentActivity,
-          selectedAnswer,
-          showResult,
-          questionNumber,
-          totalQuestions,
-          correctAnswers,
-          isGenerating,
-          gradeLevel,
-          loadNextQuestion,
-          handleAnswerSelect,
-          handleGameComplete
-        } = sessionData;
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Button onClick={onBack} variant="outline" className="border-gray-600">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Program
+        </Button>
+        <div className="text-white">
+          Question {questionCount + 1} | Score: {score}/{questionCount + 1}
+        </div>
+      </div>
 
-        // Generate first activity after explanation phase
-        useEffect(() => {
-          if (user?.id && gradeContentConfig && !currentActivity && !isGenerating) {
-            console.log('🎬 Starting grade-appropriate session for Grade', gradeLevel);
-            loadNextQuestion();
-          }
-        }, [user?.id, gradeContentConfig, currentActivity, isGenerating, gradeLevel, loadNextQuestion]);
+      {/* Fallback Warning */}
+      {useFallback && (
+        <Card className="bg-yellow-900 border-yellow-700">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="w-5 h-5 text-yellow-400" />
+              <p className="text-yellow-200 text-sm">
+                Using practice questions (API unavailable)
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        const handleRefresh = () => {
-          if (!isGenerating) {
-            loadNextQuestion();
-          }
-        };
+      {/* Question Card */}
+      <Card className="bg-gray-900 border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-white text-xl">
+            {currentQuestion.question}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Answer Options */}
+          <div className="space-y-2">
+            {currentQuestion.options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleAnswerSelect(index)}
+                disabled={showExplanation}
+                className={`w-full p-3 text-left rounded-lg border-2 transition-colors ${
+                  selectedAnswer === index
+                    ? showExplanation
+                      ? index === currentQuestion.correct
+                        ? 'bg-green-900 border-green-600 text-green-100'
+                        : 'bg-red-900 border-red-600 text-red-100'
+                      : 'bg-blue-900 border-blue-600 text-blue-100'
+                    : showExplanation && index === currentQuestion.correct
+                    ? 'bg-green-900 border-green-600 text-green-100'
+                    : 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
 
-        if (isGenerating && !currentActivity) {
-          return (
-            <LoadingStates 
-              type="generating" 
-              gradeLevel={gradeLevel}
-              standardCode={gradeContentConfig.standard?.code}
-            />
-          );
-        }
+          {/* Explanation */}
+          {showExplanation && (
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-white font-semibold mb-2">Explanation:</h4>
+              <p className="text-gray-300">{currentQuestion.explanation}</p>
+            </div>
+          )}
 
-        if (!currentActivity) {
-          return (
-            <LoadingStates 
-              type="no-question"
-              onRefresh={handleRefresh}
-            />
-          );
-        }
-
-        // Conditional rendering based on activity type
-        if (currentActivity.type === 'interactive-game' && currentActivity.gameData) {
-          return (
-            <GameEngine
-              game={currentActivity.gameData}
-              onComplete={(score) => {
-                console.log("GameEngine onComplete score:", score);
-                handleGameComplete(score);
-              }}
-              onBack={onBack}
-            />
-          );
-        } else if (currentActivity.type === 'interactive-question') {
-          return (
-            <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
-              <CardHeader>
-                <SessionHeader
-                  onBack={onBack}
-                  gradeLevel={gradeLevel}
-                  subject={subject}
-                  questionNumber={questionNumber}
-                  totalQuestions={totalQuestions}
-                  standardCode={gradeContentConfig.standard?.code}
-                  correctAnswers={correctAnswers}
-                  showResult={showResult}
-                  isGenerating={isGenerating}
-                  onRefresh={handleRefresh}
-                />
-              </CardHeader>
-              <CardContent className="p-6">
-                <QuestionDisplay
-                  question={currentActivity.question}
-                  options={currentActivity.options}
-                  selectedAnswer={selectedAnswer}
-                  correctAnswer={currentActivity.correct}
-                  showResult={showResult}
-                  explanation={currentActivity.explanation}
-                  standardInfo={gradeContentConfig.standard ? {
-                    code: gradeContentConfig.standard.code,
-                    title: gradeContentConfig.standard.title
-                  } : undefined}
-                  questionNumber={questionNumber}
-                  totalQuestions={totalQuestions}
-                  onAnswerSelect={handleAnswerSelect}
-                  subject={subject}
-                />
-              </CardContent>
-            </Card>
-          );
-        }
-        // Fallback or loading for unknown activity type
-        return <LoadingStates type="generating" gradeLevel={gradeLevel} />;
-      }}
-    </ImprovedSessionManager>
+          {/* Action Buttons */}
+          <div className="flex justify-center space-x-4">
+            {!showExplanation ? (
+              <Button
+                onClick={handleSubmitAnswer}
+                disabled={selectedAnswer === null}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Submit Answer
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNextQuestion}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Next Question
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
