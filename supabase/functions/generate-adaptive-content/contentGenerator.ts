@@ -100,6 +100,3 @@ export async function generateContentWithDeepSeek(requestData: any): Promise<Gen
   console.log('✅ DeepSeek generation successful');
   return result.data || null;
 }
-
-// Keep the old function for backward compatibility
-export const generateContentWithOpenAI = generateContentWithOpenAI;
