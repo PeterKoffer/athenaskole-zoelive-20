@@ -8,6 +8,7 @@ interface QuestionAnswerOptionsProps {
   correctAnswer: number;
   showResult: boolean;
   onAnswerSelect: (index: number) => void;
+  disabled?: boolean;
 }
 
 const QuestionAnswerOptions = ({
@@ -15,51 +16,57 @@ const QuestionAnswerOptions = ({
   selectedAnswer,
   correctAnswer,
   showResult,
-  onAnswerSelect
+  onAnswerSelect,
+  disabled = false
 }: QuestionAnswerOptionsProps) => {
   console.log('🔍 QuestionAnswerOptions Debug:', {
     selectedAnswer,
     correctAnswer,
     showResult,
+    disabled,
     options: options.map((opt, idx) => ({ idx, opt }))
   });
 
   const getButtonClassName = (index: number) => {
+    const baseClasses = "w-full text-left justify-start p-4 h-auto relative z-20 transition-all duration-200";
+    
     if (selectedAnswer === index) {
       if (showResult) {
         const isCorrect = selectedAnswer === correctAnswer;
         console.log(`🎯 Answer ${index} selected. Correct answer: ${correctAnswer}. Is correct: ${isCorrect}`);
         return isCorrect
-          ? 'bg-green-600 border-green-500 text-white'
-          : 'bg-red-600 border-red-500 text-white';
+          ? `${baseClasses} bg-green-600 border-green-500 text-white`
+          : `${baseClasses} bg-red-600 border-red-500 text-white`;
       }
-      return 'bg-blue-600 border-blue-500 text-white';
+      return `${baseClasses} bg-blue-600 border-blue-500 text-white`;
     }
     
     if (showResult && index === correctAnswer) {
-      return 'bg-green-600 border-green-500 text-white';
+      return `${baseClasses} bg-green-600 border-green-500 text-white`;
     }
     
-    return 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600';
+    return `${baseClasses} bg-gray-700 border-gray-600 text-white hover:bg-gray-600`;
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 relative z-10">
       {options.map((option, index) => (
         <Button
           key={index}
           variant="outline"
-          className={`w-full text-left justify-start p-4 h-auto relative z-10 ${getButtonClassName(index)}`}
+          className={getButtonClassName(index)}
           onClick={() => {
-            console.log(`🖱️ Button ${index} clicked`);
-            onAnswerSelect(index);
+            if (!disabled && !showResult) {
+              console.log(`🖱️ Button ${index} clicked for option: ${option}`);
+              onAnswerSelect(index);
+            }
           }}
-          disabled={showResult}
+          disabled={showResult || disabled}
         >
           <span className="mr-3 font-semibold">
             {String.fromCharCode(65 + index)}.
           </span>
-          {option}
+          <span className="flex-1">{option}</span>
           {showResult && index === correctAnswer && (
             <CheckCircle className="w-5 h-5 ml-auto text-green-400" />
           )}
