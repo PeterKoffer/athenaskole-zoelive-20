@@ -143,9 +143,9 @@ const SubjectsSection = () => {
                 key={index}
                 speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
                 context={`subject-card-${index}`}
-                className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm h-[380px]"
+                className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm h-[380px] flex flex-col"
               >
-                <CardContent className="p-4 flex flex-col h-full">
+                <CardContent className="p-4 h-full flex flex-col">
                   <div className="flex items-center mb-3">
                     <span className="text-2xl mr-2">{subject.icon}</span>
                     <h3 className="text-lg font-bold text-white">
@@ -153,11 +153,11 @@ const SubjectsSection = () => {
                     </h3>
                   </div>
                   
-                  <p className="text-gray-300 mb-3 flex-grow text-sm line-clamp-3">
+                  <p className="text-gray-300 mb-3 text-sm line-clamp-3">
                     {subject.description}
                   </p>
 
-                  <div className="mb-4 flex-grow">
+                  <div className="flex-1 mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="text-xs font-semibold text-gray-400">
                         Key Areas:
@@ -192,7 +192,7 @@ const SubjectsSection = () => {
 
                   <Button
                     onClick={() => handleStartLearning(subject.path)}
-                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-2 mt-auto`}
+                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-2`}
                   >
                     Start Learning
                   </Button>
