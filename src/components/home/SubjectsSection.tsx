@@ -1,4 +1,3 @@
-
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
@@ -124,7 +123,7 @@ const SubjectsSection = () => {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-white mb-4">
@@ -135,69 +134,70 @@ const SubjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subjects.map((subject, index) => {
             const isExpanded = expandedCards.includes(index);
             return (
-              <SpeakableCard
-                key={index}
-                speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
-                context={`subject-card-${index}`}
-                className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm h-[380px] flex flex-col"
-              >
-                <CardContent className="p-4 h-full flex flex-col">
-                  <div className="flex items-center mb-3">
-                    <span className="text-2xl mr-2">{subject.icon}</span>
-                    <h3 className="text-lg font-bold text-white">
-                      {subject.title}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-gray-300 mb-3 text-sm line-clamp-3">
-                    {subject.description}
-                  </p>
-
-                  <div className="flex-1 mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-xs font-semibold text-gray-400">
-                        Key Areas:
-                      </h4>
-                      {subject.keyAreas.length > 3 && (
-                        <button
-                          onClick={() => toggleCardExpansion(index)}
-                          className="text-gray-400 hover:text-white transition-colors"
-                        >
-                          {isExpanded ? (
-                            <ChevronUp className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </button>
-                      )}
+              <div key={index} className="flex">
+                <SpeakableCard
+                  speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
+                  context={`subject-card-${index}`}
+                  className="border-gray-700 hover:border-gray-600 transition-all duration-300 backdrop-blur-sm w-full flex"
+                >
+                  <CardContent className="p-6 flex flex-col h-full w-full">
+                    <div className="flex items-center mb-4">
+                      <span className="text-3xl mr-3">{subject.icon}</span>
+                      <h3 className="text-xl font-bold text-white">
+                        {subject.title}
+                      </h3>
                     </div>
-                    <ul className="space-y-1">
-                      {(isExpanded ? subject.keyAreas : subject.keyAreas.slice(0, 3)).map((area, areaIndex) => (
-                        <li key={areaIndex} className="flex items-center text-xs text-gray-300">
-                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0"></div>
-                          <span>{area}</span>
-                        </li>
-                      ))}
-                      {!isExpanded && subject.keyAreas.length > 3 && (
-                        <li className="text-xs text-gray-400">
-                          +{subject.keyAreas.length - 3} more areas
-                        </li>
-                      )}
-                    </ul>
-                  </div>
+                    
+                    <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                      {subject.description}
+                    </p>
 
-                  <Button
-                    onClick={() => handleStartLearning(subject.path)}
-                    className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-2`}
-                  >
-                    Start Learning
-                  </Button>
-                </CardContent>
-              </SpeakableCard>
+                    <div className="flex-1 mb-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-gray-400">
+                          Key Areas:
+                        </h4>
+                        {subject.keyAreas.length > 3 && (
+                          <button
+                            onClick={() => toggleCardExpansion(index)}
+                            className="text-gray-400 hover:text-white transition-colors"
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                      <ul className="space-y-2">
+                        {(isExpanded ? subject.keyAreas : subject.keyAreas.slice(0, 3)).map((area, areaIndex) => (
+                          <li key={areaIndex} className="flex items-center text-sm text-gray-300">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full mr-3 flex-shrink-0"></div>
+                            <span>{area}</span>
+                          </li>
+                        ))}
+                        {!isExpanded && subject.keyAreas.length > 3 && (
+                          <li className="text-sm text-gray-400 ml-5">
+                            +{subject.keyAreas.length - 3} more areas
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+
+                    <Button
+                      onClick={() => handleStartLearning(subject.path)}
+                      className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity text-sm py-3 font-semibold mt-auto`}
+                    >
+                      Start Learning
+                    </Button>
+                  </CardContent>
+                </SpeakableCard>
+              </div>
             );
           })}
         </div>
