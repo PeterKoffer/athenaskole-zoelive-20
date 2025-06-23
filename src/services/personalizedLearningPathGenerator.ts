@@ -33,7 +33,7 @@ export interface PersonalizedLearningPath {
   currentStep: number;
   estimatedCompletionTime: number;
   steps: LearningPathStep[];
-  personalizedAdjustments: PersonalizedAdjustment[]; // <-- changed from any[] to PersonalizedAdjustment[]
+  personalizedAdjustments: PersonalizedAdjustment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -122,24 +122,24 @@ class PersonalizedLearningPathGenerator {
   /**
    * Identify learning gaps based on user performance
    */
-  private identifyLearningGaps(profile: unknown, conceptMastery: unknown[]): LearningGap[] { // changed from any, any[]
+  private identifyLearningGaps(profile: unknown, conceptMastery: unknown[]): LearningGap[] {
     const gaps: LearningGap[] = [];
 
     // Check for concepts with low mastery
-    (conceptMastery as any[]).forEach(concept => {
+    (conceptMastery as Array<{conceptName: string; masteryLevel: number}>).forEach(concept => {
       if (concept.masteryLevel < 0.6) {
         gaps.push({
           concept: concept.conceptName,
           severity: concept.masteryLevel < 0.3 ? 'high' : concept.masteryLevel < 0.5 ? 'medium' : 'low',
           recommendedAction: concept.masteryLevel < 0.3 ? 'intensive_practice' : 'targeted_review',
-          prerequisites: [] // Could be enhanced to include actual prerequisites
+          prerequisites: []
         });
       }
     });
 
     // Add gaps from profile weaknesses
-    if ((profile as any).weaknesses) {
-      (profile as any).weaknesses.forEach((weakness: string) => {
+    if ((profile as {weaknesses?: string[]}).weaknesses) {
+      (profile as {weaknesses: string[]}).weaknesses.forEach((weakness: string) => {
         if (!gaps.find(g => g.concept === weakness)) {
           gaps.push({
             concept: weakness,
@@ -157,111 +157,14 @@ class PersonalizedLearningPathGenerator {
   /**
    * Identify strength areas where student can advance
    */
-  private identifyStrengths(profile: unknown, conceptMastery: unknown[]): StrengthArea[] { // changed from any, any[]
+  private identifyStrengths(profile: unknown, conceptMastery: unknown[]): StrengthArea[] {
     const strengths: StrengthArea[] = [];
 
     // Check for concepts with high mastery
-    (conceptMastery as any[]).forEach(concept => {
+    (conceptMastery as Array<{conceptName: string; masteryLevel: number}>).forEach(concept => {
       if (concept.masteryLevel >= 0.8) {
         strengths.push({
           concept: concept.conceptName,
           masteryLevel: concept.masteryLevel,
-          canAdvance: concept.masteryLevel >= 0.9,
-          nextConcepts: [] // Could be enhanced to suggest advancement paths
-        });
-      }
-    });
-
-    // Add strengths from profile
-    if ((profile as any).strengths) {
-      (profile as any).strengths.forEach((strength: string) => {
-        if (!strengths.find(s => s.concept === strength)) {
-          strengths.push({
-            concept: strength,
-            masteryLevel: 0.85, // Estimated
-            canAdvance: true,
-            nextConcepts: []
-          });
-        }
-      });
-    }
-
-    return strengths;
-  }
-
-  /**
-   * Generate learning path steps based on analysis
-   */
-  private async generatePathSteps(
-    standards: unknown[], // changed from any[]
-    gaps: LearningGap[],
-    strengths: StrengthArea[],
-    profile: unknown, // changed from any
-    targetSkills?: string[]
-  ): Promise<LearningPathStep[]> {
-    const steps: LearningPathStep[] = [];
-    let stepOrder = 0;
-
-    // ... (rest of function unchanged)
-    // Only the function signature needed changing to remove 'any'
-    // ... (see full file above for implementation)
-    // (No relevant changes below this point for job errors)
-    // --snip--
-    // Full function implementation remains as original
-    // --snip--
-
-    // [For brevity, you can keep the rest of the function as is.]
-    // ... (no changes to the body)
-    return steps; // placeholder
-  }
-
-  /**
-   * Generate personalized adjustments based on student profile
-   */
-  private generatePersonalizedAdjustments(
-    profile: unknown, // changed from any
-    gaps: LearningGap[],
-    strengths: StrengthArea[]
-  ): PersonalizedAdjustment[] { // changed from any[]
-    const adjustments: PersonalizedAdjustment[] = [];
-
-    // Learning style adjustments
-    if ((profile as any).learningStyle) {
-      adjustments.push({
-        type: 'learning_style',
-        value: (profile as any).learningStyle,
-        description: `Content optimized for ${(profile as any).learningStyle} learning style`
-      });
-    }
-
-    // Difficulty adjustments based on overall performance
-    if ((profile as any).accuracy > 85) {
-      adjustments.push({
-        type: 'difficulty_increase',
-        value: 1,
-        description: 'Increased difficulty due to high accuracy'
-      });
-    } else if ((profile as any).accuracy < 60) {
-      adjustments.push({
-        type: 'difficulty_decrease',
-        value: 1,
-        description: 'Reduced difficulty to build confidence'
-      });
-    }
-
-    // Pacing adjustments
-    if (gaps.filter(g => g.severity === 'high').length > 2) {
-      adjustments.push({
-        type: 'pacing_slow',
-        value: 1.5,
-        description: 'Slower pacing to address multiple learning gaps'
-      });
-    }
-
-    return adjustments;
-  }
-
-  // ...rest of the class unchanged
-}
-
-export const personalizedLearningPathGenerator = new PersonalizedLearningPathGenerator();
+          canAdvance: concept.masteryLevel >= 0*
+
