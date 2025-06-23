@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -174,12 +173,12 @@ const AdaptiveEducationSession: React.FC<AdaptiveEducationSessionProps> = ({
   const handleSessionComplete = async () => {
     setSessionComplete(true);
     
-    // Update learning profile
+    // Update learning profile with accuracy_rate instead of overall_accuracy
     await updateProfile({
       current_difficulty_level: currentDifficulty,
-      overall_accuracy: performanceMetrics.accuracy,
+      accuracy_rate: performanceMetrics.accuracy, // Changed from overall_accuracy to accuracy_rate
       total_sessions: (profile?.total_sessions || 0) + 1,
-      last_session_date: new Date().toISOString(),
+      last_updated: new Date().toISOString(),
       consistency_score: Math.min(100, (performanceMetrics.accuracy + (100 - performanceMetrics.averageTime * 2))),
       attention_span_minutes: Math.round((Date.now() - sessionStartTime) / 60000)
     });
