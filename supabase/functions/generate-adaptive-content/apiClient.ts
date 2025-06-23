@@ -4,7 +4,7 @@ export interface APICallResult {
   success: boolean;
   data?: GeneratedContent;
   error?: string;
-  debug?: any;
+  debug?: Record<string, unknown>;
 }
 
 export async function callDeepSeek(apiKey: string, prompt: string): Promise<APICallResult> {
@@ -24,7 +24,7 @@ export async function callDeepSeek(apiKey: string, prompt: string): Promise<APIC
         messages: [
           {
             role: 'system',
-            content: 'You are an AI education assistant that creates grade-level appropriate questions aligned with educational standards. Always generate questions that match the requested grade level, subject, and educational standards. Use age-appropriate language and examples. Return only valid JSON with no formatting. CRITICAL: Make sure the "correct" field points to the INDEX of the actual correct answer in the options array.'
+            content: 'You are an AI education assistant that creates grade-level appropriate questions aligned with educational standards. Always generate questions that match the requested grade level and subject, and provide the correct answer index.'
           },
           {
             role: 'user',
