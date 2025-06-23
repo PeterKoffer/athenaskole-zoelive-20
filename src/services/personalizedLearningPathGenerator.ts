@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { getStandardsByGrade, findStandardByCode } from '@/data/curriculumStandards';
 import { userLearningProfileService } from './userLearningProfileService';
@@ -28,7 +27,7 @@ export interface PersonalizedLearningPath {
   currentStep: number;
   estimatedCompletionTime: number;
   steps: LearningPathStep[];
-  personalizedAdjustments: any[];
+  personalizedAdjustments: unknown[]; // Changed from any[] to unknown[]
   createdAt: string;
   updatedAt: string;
 }
@@ -117,11 +116,11 @@ class PersonalizedLearningPathGenerator {
   /**
    * Identify learning gaps based on user performance
    */
-  private identifyLearningGaps(profile: any, conceptMastery: any[]): LearningGap[] {
+  private identifyLearningGaps(profile: unknown, conceptMastery: unknown[]): LearningGap[] {
     const gaps: LearningGap[] = [];
 
     // Check for concepts with low mastery
-    conceptMastery.forEach(concept => {
+    (conceptMastery as any[]).forEach(concept => {
       if (concept.masteryLevel < 0.6) {
         gaps.push({
           concept: concept.conceptName,
@@ -133,8 +132,8 @@ class PersonalizedLearningPathGenerator {
     });
 
     // Add gaps from profile weaknesses
-    if (profile.weaknesses) {
-      profile.weaknesses.forEach((weakness: string) => {
+    if ((profile as any).weaknesses) {
+      (profile as any).weaknesses.forEach((weakness: string) => {
         if (!gaps.find(g => g.concept === weakness)) {
           gaps.push({
             concept: weakness,
@@ -152,11 +151,11 @@ class PersonalizedLearningPathGenerator {
   /**
    * Identify strength areas where student can advance
    */
-  private identifyStrengths(profile: any, conceptMastery: any[]): StrengthArea[] {
+  private identifyStrengths(profile: unknown, conceptMastery: unknown[]): StrengthArea[] {
     const strengths: StrengthArea[] = [];
 
     // Check for concepts with high mastery
-    conceptMastery.forEach(concept => {
+    (conceptMastery as any[]).forEach(concept => {
       if (concept.masteryLevel >= 0.8) {
         strengths.push({
           concept: concept.conceptName,
@@ -168,8 +167,8 @@ class PersonalizedLearningPathGenerator {
     });
 
     // Add strengths from profile
-    if (profile.strengths) {
-      profile.strengths.forEach((strength: string) => {
+    if ((profile as any).strengths) {
+      (profile as any).strengths.forEach((strength: string) => {
         if (!strengths.find(s => s.concept === strength)) {
           strengths.push({
             concept: strength,
@@ -188,10 +187,10 @@ class PersonalizedLearningPathGenerator {
    * Generate learning path steps based on analysis
    */
   private async generatePathSteps(
-    standards: any[],
+    standards: unknown[],
     gaps: LearningGap[],
     strengths: StrengthArea[],
-    profile: any,
+    profile: unknown,
     targetSkills?: string[]
   ): Promise<LearningPathStep[]> {
     const steps: LearningPathStep[] = [];
@@ -200,7 +199,7 @@ class PersonalizedLearningPathGenerator {
     // First, address critical gaps (high severity)
     const criticalGaps = gaps.filter(g => g.severity === 'high');
     for (const gap of criticalGaps) {
-      const standard = standards.find(s => 
+      const standard = (standards as any[]).find(s => 
         s.title.toLowerCase().includes(gap.concept.toLowerCase()) ||
         s.description.toLowerCase().includes(gap.concept.toLowerCase())
       );
@@ -224,7 +223,7 @@ class PersonalizedLearningPathGenerator {
     // Then, address medium priority gaps
     const mediumGaps = gaps.filter(g => g.severity === 'medium');
     for (const gap of mediumGaps) {
-      const standard = standards.find(s => 
+      const standard = (standards as any[]).find(s => 
         s.title.toLowerCase().includes(gap.concept.toLowerCase()) ||
         s.description.toLowerCase().includes(gap.concept.toLowerCase())
       );
@@ -246,7 +245,7 @@ class PersonalizedLearningPathGenerator {
     }
 
     // Add grade-level standards that aren't gaps
-    const remainingStandards = standards.filter(standard => 
+    const remainingStandards = (standards as any[]).filter(standard => 
       !gaps.some(gap => 
         standard.title.toLowerCase().includes(gap.concept.toLowerCase()) ||
         standard.description.toLowerCase().includes(gap.concept.toLowerCase())
@@ -271,7 +270,7 @@ class PersonalizedLearningPathGenerator {
     // Finally, add advancement opportunities for strengths
     const advancementOpportunities = strengths.filter(s => s.canAdvance);
     for (const strength of advancementOpportunities.slice(0, 3)) { // Limit advancement steps
-      const relatedStandard = standards.find(s => 
+      const relatedStandard = (standards as any[]).find(s => 
         s.title.toLowerCase().includes(strength.concept.toLowerCase()) ||
         s.description.toLowerCase().includes(strength.concept.toLowerCase())
       );
@@ -299,29 +298,29 @@ class PersonalizedLearningPathGenerator {
    * Generate personalized adjustments based on student profile
    */
   private generatePersonalizedAdjustments(
-    profile: any,
+    profile: unknown,
     gaps: LearningGap[],
     strengths: StrengthArea[]
-  ): any[] {
-    const adjustments: any[] = [];
+  ): unknown[] {
+    const adjustments: unknown[] = [];
 
     // Learning style adjustments
-    if (profile.learningStyle) {
+    if ((profile as any).learningStyle) {
       adjustments.push({
         type: 'learning_style',
-        value: profile.learningStyle,
-        description: `Content optimized for ${profile.learningStyle} learning style`
+        value: (profile as any).learningStyle,
+        description: `Content optimized for ${(profile as any).learningStyle} learning style`
       });
     }
 
     // Difficulty adjustments based on overall performance
-    if (profile.accuracy > 85) {
+    if ((profile as any).accuracy > 85) {
       adjustments.push({
         type: 'difficulty_increase',
         value: 1,
         description: 'Increased difficulty due to high accuracy'
       });
-    } else if (profile.accuracy < 60) {
+    } else if ((profile as any).accuracy < 60) {
       adjustments.push({
         type: 'difficulty_decrease',
         value: 1,
@@ -342,41 +341,5 @@ class PersonalizedLearningPathGenerator {
   }
 
   /**
-   * Update learning path progress
-   */
-  async updatePathProgress(
-    pathId: string,
-    stepId: string,
-    completed: boolean,
-    score?: number
-  ): Promise<void> {
-    console.log(`Updating path progress: ${pathId}, step: ${stepId}, completed: ${completed}`);
-    
-    try {
-      // This would typically update the database
-      // For now, just log the update
-      console.log('Path progress updated successfully');
-    } catch (error) {
-      console.error('Error updating path progress:', error);
-      throw new Error('Failed to update learning path progress');
-    }
-  }
-
-  /**
-   * Get learning path for a user
-   */
-  async getLearningPath(userId: string, subject: string): Promise<PersonalizedLearningPath | null> {
-    console.log(`Getting learning path for user: ${userId}, subject: ${subject}`);
-    
-    try {
-      // This would typically query the database
-      // For now, return null to trigger path generation
-      return null;
-    } catch (error) {
-      console.error('Error getting learning path:', error);
-      return null;
-    }
-  }
-}
-
-export const personalizedLearningPathGenerator = new PersonalizedLearningPathGenerator();
+   * Update*
+
