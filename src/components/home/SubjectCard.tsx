@@ -112,13 +112,6 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
     >
       {/* Main Card */}
       <div className={`relative ${cardBackground} rounded-3xl p-6 shadow-xl border border-white/30 backdrop-blur-sm overflow-hidden`}>
-        
-        {/* Decorative dots */}
-        <div className="absolute top-4 left-4 flex space-x-1">
-          <div className="w-2 h-2 bg-white/40 rounded-full"></div>
-          <div className="w-2 h-2 bg-white/30 rounded-full"></div>
-          <div className="w-2 h-2 bg-white/20 rounded-full"></div>
-        </div>
 
         {/* Speaker Icon */}
         <button
