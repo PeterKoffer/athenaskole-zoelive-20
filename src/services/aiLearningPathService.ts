@@ -1,33 +1,12 @@
 
-
 export class AILearningPathService {
-  static async getAdaptiveRecommendations(userId: string, subject: string): Promise<string[]> {
-    console.log('Getting adaptive recommendations for user:', userId, 'subject:', subject);
-    
+  async getAdaptiveRecommendations(userId: string, subject: string): Promise<string[]> {
     // Mock implementation
     return [
       'Focus on foundational concepts',
-      'Practice problem-solving strategies',
-      'Explore advanced topics when ready'
+      'Practice more complex problems',
+      'Review previous material'
     ];
-  }
-
-  static async generatePersonalizedPath(config: {
-    userId: string;
-    subject: string;
-    weakAreas: string[];
-    preferredPace: string;
-    learningStyle: string;
-  }): Promise<string | null> {
-    console.log('Generating personalized path:', config);
-    
-    // Mock implementation
-    return `personalized-path-${config.userId}-${Date.now()}`;
-  }
-
-  // Instance methods that delegate to static methods for backward compatibility
-  async getAdaptiveRecommendations(userId: string, subject: string): Promise<string[]> {
-    return AILearningPathService.getAdaptiveRecommendations(userId, subject);
   }
 
   async generatePersonalizedPath(config: {
@@ -37,9 +16,10 @@ export class AILearningPathService {
     preferredPace: string;
     learningStyle: string;
   }): Promise<string | null> {
-    return AILearningPathService.generatePersonalizedPath(config);
+    // Mock implementation
+    console.log('Generating personalized path:', config);
+    return `path_${Date.now()}`;
   }
 }
 
 export const aiLearningPathService = new AILearningPathService();
-

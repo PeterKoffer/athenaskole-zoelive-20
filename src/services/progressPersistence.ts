@@ -9,6 +9,18 @@ export interface UserProgress {
   last_assessment: string;
 }
 
+export interface SessionData {
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  difficulty_level: number;
+  start_time: string;
+  end_time?: string;
+  time_spent: number;
+  score: number;
+  completed: boolean;
+}
+
 export class ProgressPersistence {
   async getUserProgress(userId: string, subject: string, skillArea: string): Promise<UserProgress | null> {
     try {
@@ -35,6 +47,29 @@ export class ProgressPersistence {
       return true;
     } catch (error) {
       console.error('Error updating user progress:', error);
+      return false;
+    }
+  }
+
+  async saveSession(sessionData: SessionData): Promise<string | null> {
+    try {
+      // Mock implementation - in real app would save to database
+      const sessionId = `session_${Date.now()}`;
+      console.log('Saving session:', { sessionId, sessionData });
+      return sessionId;
+    } catch (error) {
+      console.error('Error saving session:', error);
+      return null;
+    }
+  }
+
+  async updateSession(sessionId: string, updates: Partial<SessionData>): Promise<boolean> {
+    try {
+      // Mock implementation - in real app would update database
+      console.log('Updating session:', { sessionId, updates });
+      return true;
+    } catch (error) {
+      console.error('Error updating session:', error);
       return false;
     }
   }

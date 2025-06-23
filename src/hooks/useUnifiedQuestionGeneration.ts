@@ -9,6 +9,7 @@ interface QuestionGenerationConfig {
   gradeLevel?: number;
   standardsAlignment?: any;
   enablePersistence?: boolean;
+  maxAttempts?: number;
 }
 
 interface QuestionContent {
@@ -24,12 +25,25 @@ interface UniqueQuestion {
   metadata: any;
 }
 
+interface GenerationStats {
+  totalGenerated: number;
+  successRate: number;
+  averageTime: number;
+}
+
 export const useUnifiedQuestionGeneration = (config: QuestionGenerationConfig) => {
   const [currentQuestion, setCurrentQuestion] = useState<UniqueQuestion | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStats, setGenerationStats] = useState<GenerationStats>({
+    totalGenerated: 0,
+    successRate: 100,
+    averageTime: 1500
+  });
 
   const generateUniqueQuestion = async (options?: any): Promise<UniqueQuestion | null> => {
     setIsGenerating(true);
+    const startTime = Date.now();
+    
     try {
       // Mock implementation
       const question: UniqueQuestion = {
@@ -49,9 +63,22 @@ export const useUnifiedQuestionGeneration = (config: QuestionGenerationConfig) =
       };
       
       setCurrentQuestion(question);
+      
+      // Update stats
+      const generationTime = Date.now() - startTime;
+      setGenerationStats(prev => ({
+        totalGenerated: prev.totalGenerated + 1,
+        successRate: 100, // Mock high success rate
+        averageTime: (prev.averageTime + generationTime) / 2
+      }));
+      
       return question;
     } catch (error) {
       console.error('Error generating question:', error);
+      setGenerationStats(prev => ({
+        ...prev,
+        successRate: prev.successRate * 0.95 // Slightly lower success rate on error
+      }));
       return null;
     } finally {
       setIsGenerating(false);
@@ -84,6 +111,7 @@ export const useUnifiedQuestionGeneration = (config: QuestionGenerationConfig) =
   return {
     currentQuestion,
     isGenerating,
+    generationStats,
     generateUniqueQuestion,
     saveQuestionHistory
   };

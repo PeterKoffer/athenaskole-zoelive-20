@@ -1,141 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { calculateRecommendedSessionTime, shouldAdjustDifficulty } from '@/utils/adaptiveLearningUtils';
+
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserProgress } from '@/services/progressPersistence';
-import { SessionData, UserPerformanceData } from '../types/AnalyticsTypes';
+import { UserProgress, progressPersistence } from '@/services/progressPersistence';
 
 interface AdaptiveDifficultyEngineProps {
   subject: string;
   skillArea: string;
   initialDifficulty: number;
-  children: React.ReactNode;
-  onDifficultyChange: (newDifficulty: number, reason: string) => void;
+  onDifficultyChange: (newDifficulty: number) => void;
 }
 
-const AdaptiveDifficultyEngine: React.FC<AdaptiveDifficultyEngineProps> = ({
+export const AdaptiveDifficultyEngine = ({
   subject,
   skillArea,
   initialDifficulty,
-  children,
-  onDifficultyChange,
-}) => {
+  onDifficultyChange
+}: AdaptiveDifficultyEngineProps) => {
   const { user } = useAuth();
-  const userId = user?.id || 'anonymous';
   const [currentDifficulty, setCurrentDifficulty] = useState(initialDifficulty);
-  const { userProgress, fetchUserProgress } = useUserProgress(userId, subject, skillArea);
+  const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
 
   useEffect(() => {
-    fetchUserProgress();
-  }, [userId, subject, skillArea, fetchUserProgress]);
-
-  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
-  const [consecutiveIncorrect, setConsecutiveIncorrect] = useState(0);
-  const [totalAttempts, setTotalAttempts] = useState(0);
-
-  const handleQuestionAnswered = (isCorrect: boolean) => {
-    setTotalAttempts(prev => prev + 1);
-
-    if (isCorrect) {
-      setConsecutiveCorrect(prev => prev + 1);
-      setConsecutiveIncorrect(0);
-    } else {
-      setConsecutiveIncorrect(prev => prev + 1);
-      setConsecutiveCorrect(0);
-    }
-  };
-
-  useEffect(() => {
-    if (!userProgress) return;
-
-    // Use the correct property names from UserProgress interface
-    const { accuracy } = userProgress;
-
-    const adjustment = shouldAdjustDifficulty(
-      accuracy,
-      consecutiveCorrect,
-      consecutiveIncorrect,
-      totalAttempts
-    );
-
-    if (adjustment.shouldAdjust && adjustment.newLevel) {
-      const newDifficulty = Math.max(1, Math.min(5, currentDifficulty + adjustment.newLevel));
-      setCurrentDifficulty(newDifficulty);
-      onDifficultyChange(newDifficulty, adjustment.reason || 'Difficulty adjusted');
-    }
-  }, [consecutiveCorrect, consecutiveIncorrect, totalAttempts, currentDifficulty, onDifficultyChange, userProgress]);
-
-  const [sessionHistory, setSessionHistory] = useState<any[] | null>(null);
-  const [userPerformance, setUserPerformance] = useState<any | null>(null);
-
-  useEffect(() => {
-    const fetchAnalyticsData = async () => {
-      if (!user) return;
-
-      try {
-        const response = await fetch(`/api/get-user-sessions?userId=${user.id}&subject=${subject}&skillArea=${skillArea}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const sessionData = await response.json();
-        setSessionHistory(sessionData);
-
-        const performanceResponse = await fetch(`/api/get-user-performance?userId=${user.id}&subject=${subject}&skillArea=${skillArea}`);
-        if (!performanceResponse.ok) {
-          throw new Error(`HTTP error! status: ${performanceResponse.status}`);
-        }
-        const performanceData = await performanceResponse.json();
-        setUserPerformance(performanceData);
-
-      } catch (error) {
-        console.error("Could not fetch analytics data:", error);
+    const loadUserProgress = async () => {
+      if (!user?.id) return;
+      
+      const progress = await progressPersistence.getUserProgress(user.id, subject, skillArea);
+      setUserProgress(progress);
+      
+      if (progress) {
+        setCurrentDifficulty(progress.current_level);
+        onDifficultyChange(progress.current_level);
       }
     };
 
-    fetchAnalyticsData();
-  }, [user, subject, skillArea]);
+    loadUserProgress();
+  }, [user?.id, subject, skillArea, onDifficultyChange]);
 
-  const castSessionData = (data: any[]): SessionData[] => {
-    return data.map(item => ({
-      ...item,
-      user_feedback: typeof item.user_feedback === 'string'
-        ? JSON.parse(item.user_feedback)
-        : (item.user_feedback as Record<string, unknown>) || {}
-    }));
+  const adjustDifficulty = async (isCorrect: boolean, responseTime: number) => {
+    if (!user?.id || !userProgress) return;
+
+    let adjustment = 0;
+    
+    // Simple difficulty adjustment logic
+    if (isCorrect && responseTime < 10000) { // Quick correct answer
+      adjustment = 0.1;
+    } else if (isCorrect) { // Slow correct answer
+      adjustment = 0.05;
+    } else { // Incorrect answer
+      adjustment = -0.1;
+    }
+
+    const newDifficulty = Math.max(1, Math.min(5, currentDifficulty + adjustment));
+    
+    if (newDifficulty !== currentDifficulty) {
+      setCurrentDifficulty(newDifficulty);
+      onDifficultyChange(newDifficulty);
+      
+      // Update user progress
+      await progressPersistence.updateUserProgress(user.id, subject, skillArea, {
+        current_level: newDifficulty,
+        last_assessment: new Date().toISOString()
+      });
+    }
   };
 
-  const castUserPerformanceData = (data: any): UserPerformanceData => {
-    return {
-      ...data,
-      strengths: typeof data.strengths === 'string'
-        ? JSON.parse(data.strengths)
-        : (data.strengths as Record<string, unknown>) || {},
-      weaknesses: typeof data.weaknesses === 'string'
-        ? JSON.parse(data.weaknesses)
-        : (data.weaknesses as Record<string, unknown>) || {}
-    };
-  };
-
-  const sessionData = castSessionData(sessionHistory || []);
-  const performanceData = castUserPerformanceData(userPerformance);
-
-  const recommendedTime = calculateRecommendedSessionTime(userProgress);
-
-  return (
-    <>
-      {React.Children.map(children, child => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
-            difficulty: currentDifficulty,
-            onQuestionAnswered: handleQuestionAnswered,
-            recommendedSessionTime: recommendedTime,
-            sessionData: [],
-            userPerformance: null
-          } as any);
-        }
-        return child;
-      })}
-    </>
-  );
+  return null; // This is a logic-only component
 };
-
-export default AdaptiveDifficultyEngine;

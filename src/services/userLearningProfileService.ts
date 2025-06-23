@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserLearningProfile {
@@ -23,6 +22,7 @@ export interface UserLearningProfile {
   subject_preferences: Record<string, unknown>;
   task_completion_rate: number;
   weaknesses: string[];
+  accuracy_rate?: number; // Changed from overall_accuracy to accuracy_rate
 }
 
 export class UserLearningProfileService {
@@ -67,7 +67,8 @@ export class UserLearningProfileService {
         strengths: Array.isArray(data.strengths) ? data.strengths.filter((s): s is string => typeof s === 'string') : [],
         subject_preferences: {},
         task_completion_rate: data.consistency_score || 0.5, // Use consistency as completion rate
-        weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses.filter((w): w is string => typeof w === 'string') : []
+        weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses.filter((w): w is string => typeof w === 'string') : [],
+        accuracy_rate: data.consistency_score || 0.5
       };
 
       return profile;

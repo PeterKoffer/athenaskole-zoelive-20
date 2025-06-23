@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 export const useUnifiedSpeech = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  const speakAsNelie = async (text: string, queue: boolean = true): Promise<void> => {
-    if (!isEnabled) return;
+  const speakAsNelie = async (text: string, priority: boolean = false, context?: string): Promise<void> => {
+    if (!isEnabled || !hasUserInteracted) return;
     
     setIsSpeaking(true);
     try {
@@ -26,21 +27,74 @@ export const useUnifiedSpeech = () => {
     }
   };
 
-  const enableSpeech = () => setIsEnabled(true);
+  const stop = () => {
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+  };
+
+  const forceStopAll = () => {
+    stop();
+    // Additional cleanup for stubborn speech engines
+    try {
+      if (speechSynthesis) {
+        speechSynthesis.resume();
+        speechSynthesis.cancel();
+      }
+    } catch (error) {
+      console.warn('Error during force stop cleanup:', error);
+    }
+  };
+
+  const enableSpeech = () => {
+    setIsEnabled(true);
+    setHasUserInteracted(true);
+  };
+
   const disableSpeech = () => setIsEnabled(false);
+
+  const toggleEnabled = () => {
+    if (!isEnabled) {
+      enableSpeech();
+    } else {
+      disableSpeech();
+      stop();
+    }
+  };
 
   useEffect(() => {
     // Check if speech synthesis is available
     if ('speechSynthesis' in window) {
       setIsEnabled(true);
     }
+
+    // Enable user interaction on first user gesture
+    const handleUserInteraction = () => {
+      setHasUserInteracted(true);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
   }, []);
 
   return {
     isEnabled,
     isSpeaking,
+    hasUserInteracted,
+    isReady: hasUserInteracted,
     speakAsNelie,
     enableSpeech,
-    disableSpeech
+    disableSpeech,
+    stop,
+    forceStopAll,
+    toggleEnabled
   };
 };
