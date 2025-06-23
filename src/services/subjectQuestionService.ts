@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface SubjectQuestionTemplate {
@@ -13,7 +12,11 @@ export interface SubjectQuestionTemplate {
 }
 
 export class SubjectQuestionService {
-  static async getQuestionsForSubject(subject: string, skillArea?: string, count: number = 10): Promise<SubjectQuestionTemplate[]> {
+  static async getQuestionsForSubject(
+    subject: string,
+    skillArea?: string,
+    count: number = 10
+  ): Promise<SubjectQuestionTemplate[]> {
     try {
       let query = supabase
         .from('subject_question_templates')
@@ -36,9 +39,9 @@ export class SubjectQuestionService {
         subject: item.subject,
         skill_area: item.skill_area,
         question_template: item.question_template,
-        options_template: Array.isArray(item.options_template) 
-          ? item.options_template 
-          : typeof item.options_template === 'string' 
+        options_template: Array.isArray(item.options_template)
+          ? item.options_template
+          : typeof item.options_template === 'string'
             ? JSON.parse(item.options_template)
             : [],
         correct_answer: item.correct_answer,
@@ -51,7 +54,11 @@ export class SubjectQuestionService {
     }
   }
 
-  static async getRandomQuestionForSubject(subject: string, skillArea?: string, excludeIds: string[] = []): Promise<SubjectQuestionTemplate | null> {
+  static async getRandomQuestionForSubject(
+    subject: string,
+    skillArea?: string,
+    excludeIds: string[] = []
+  ): Promise<SubjectQuestionTemplate | null> {
     try {
       let query = supabase
         .from('subject_question_templates')
@@ -80,15 +87,15 @@ export class SubjectQuestionService {
       // Return a random question from the results
       const randomIndex = Math.floor(Math.random() * data.length);
       const item = data[randomIndex];
-      
+
       return {
         id: item.id,
         subject: item.subject,
         skill_area: item.skill_area,
         question_template: item.question_template,
-        options_template: Array.isArray(item.options_template) 
-          ? item.options_template 
-          : typeof item.options_template === 'string' 
+        options_template: Array.isArray(item.options_template)
+          ? item.options_template
+          : typeof item.options_template === 'string'
             ? JSON.parse(item.options_template)
             : [],
         correct_answer: item.correct_answer,
@@ -101,7 +108,9 @@ export class SubjectQuestionService {
     }
   }
 
-  static createDynamicQuestion(template: SubjectQuestionTemplate): any {
+  static createDynamicQuestion(
+    template: SubjectQuestionTemplate
+  ): Record<string, unknown> {
     return {
       id: `dynamic-${template.id}-${Date.now()}`,
       title: `${template.subject} Question`,
