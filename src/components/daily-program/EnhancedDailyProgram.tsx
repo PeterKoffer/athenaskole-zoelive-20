@@ -5,356 +5,398 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Clock, BookOpen, Gamepad2, Target, Brain, Calendar } from 'lucide-react';
+import { Clock, BookOpen, Gamepad2, Target, Brain, Calendar, Play, Pause, RotateCcw } from 'lucide-react';
 import { DailyLessonOrchestrator, DailyLessonPlan, DailyActivity } from '@/services/dailyLessonOrchestrator';
+import { AdaptiveDifficultyEngine, StudentPerformanceMetrics } from '@/services/adaptiveDifficultyEngine';
 import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import EducationalGameEngine from '@/components/activities/EducationalGameEngine';
+import EnhancedNelieInterface from '@/components/nelie/EnhancedNelieInterface';
 
-const EnhancedDailyProgram = () => {
+interface EnhancedDailyProgramProps {
+  studentId?: string;
+  gradeLevel?: number;
+}
+
+const EnhancedDailyProgram = ({ 
+  studentId = 'demo-student', 
+  gradeLevel = 5 
+}: EnhancedDailyProgramProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [dailyPlan, setDailyPlan] = useState<DailyLessonPlan | null>(null);
-  const [currentActivity, setCurrentActivity] = useState<D
+  const [currentActivity, setCurrentActivity] = useState<DailyActivity | null>(null);
+  const [activityIndex, setActivityIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [sessionProgress, setSessionProgress] = useState(0);
+  const [studentMetrics, setStudentMetrics] = useState<StudentPerformanceMetrics>({
+    accuracy_rate: 75,
+    response_time_avg: 30,
+    consistency_score: 70,
+    engagement_level: 85,
+    recent_session_scores: [70, 75, 80, 85],
+    mistake_patterns: [],
+    strength_areas: ['basic_arithmetic', 'problem_solving'],
+    challenge_areas: ['fractions', 'word_problems']
+  });
 
-I'll continue with the remaining components to complete your extraordinary AI school system:
-
-<lov-write file_path="src/components/nelie/EnhancedNelieInterface.tsx">
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, MessageCircle, Volume2, VolumeX, Minimize2, Maximize2 } from 'lucide-react';
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface NelieMessage {
-  id: string;
-  type: 'nelie' | 'student';
-  content: string;
-  timestamp: Date;
-  context?: string;
-  helpful?: boolean;
-}
-
-interface EnhancedNelieInterfaceProps {
-  currentSubject?: string;
-  currentActivity?: string;
-  studentNeedsHelp?: boolean;
-  onHelpProvided?: (helpType: string) => void;
-}
-
-const EnhancedNelieInterface = ({ 
-  currentSubject = 'mathematics',
-  currentActivity = 'learning',
-  studentNeedsHelp = false,
-  onHelpProvided = () => {}
-}: EnhancedNelieInterfaceProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState<NelieMessage[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [nelieState, setNelieState] = useState<'listening' | 'thinking' | 'speaking' | 'idle'>('idle');
-  
-  const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
-
-  // Initialize Nelie with welcoming message
   useEffect(() => {
-    const welcomeMessage: NelieMessage = {
-      id: 'welcome',
-      type: 'nelie',
-      content: `Hi there! I'm Nelie, your AI learning companion! I'm here to help you with ${currentSubject} and make learning fun and engaging. Feel free to ask me anything!`,
-      timestamp: new Date(),
-      context: 'greeting'
-    };
-    setMessages([welcomeMessage]);
+    initializeDailyProgram();
+  }, [studentId, gradeLevel]);
+
+  const initializeDailyProgram = async () => {
+    try {
+      setIsLoading(true);
+      console.log('🚀 Initializing Enhanced Daily Program for Grade', gradeLevel);
+      
+      // Generate comprehensive daily lesson plan
+      const lessonPlan = await DailyLessonOrchestrator.generateDailyLesson(
+        studentId, 
+        gradeLevel, 
+        'mathematics'
+      );
+      
+      setDailyPlan(lessonPlan);
+      setCurrentActivity(lessonPlan.activity_sequence[0]);
+      
+      toast({
+        title: "Daily Program Ready! 📚",
+        description: `Generated ${lessonPlan.activity_sequence.length} personalized activities for today`,
+      });
+      
+      console.log('✅ Daily program initialized:', lessonPlan);
+    } catch (error) {
+      console.error('❌ Error initializing daily program:', error);
+      toast({
+        title: "Setup Error",
+        description: "Failed to generate daily program. Using fallback activities.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startActivity = () => {
+    setIsPlaying(true);
+    setIsPaused(false);
     
-    // Speak welcome message
+    toast({
+      title: "Activity Started! 🎯",
+      description: currentActivity?.title || "Let's begin learning!",
+    });
+  };
+
+  const pauseActivity = () => {
+    setIsPaused(true);
+    setIsPlaying(false);
+    
+    toast({
+      title: "Activity Paused ⏸️",
+      description: "Take your time. Resume when ready!",
+    });
+  };
+
+  const nextActivity = () => {
+    if (!dailyPlan) return;
+    
+    const nextIndex = Math.min(activityIndex + 1, dailyPlan.activity_sequence.length - 1);
+    setActivityIndex(nextIndex);
+    setCurrentActivity(dailyPlan.activity_sequence[nextIndex]);
+    setSessionProgress(((nextIndex + 1) / dailyPlan.activity_sequence.length) * 100);
+    
+    // Analyze performance and adjust difficulty
+    const adjustment = AdaptiveDifficultyEngine.analyzeDifficultyAdjustment(
+      currentActivity?.difficulty_level || 2,
+      studentMetrics,
+      {
+        subject: 'mathematics',
+        skill_area: 'general',
+        total_questions: 5,
+        time_spent_minutes: 15
+      }
+    );
+    
+    if (adjustment.new_difficulty_level !== currentActivity?.difficulty_level) {
+      toast({
+        title: "Difficulty Adjusted! ⚡",
+        description: adjustment.adjustment_reason,
+      });
+    }
+  };
+
+  const resetProgram = () => {
+    setActivityIndex(0);
+    setCurrentActivity(dailyPlan?.activity_sequence[0] || null);
+    setSessionProgress(0);
+    setIsPlaying(false);
+    setIsPaused(false);
+    
+    toast({
+      title: "Program Reset 🔄",
+      description: "Starting fresh with today's activities!",
+    });
+  };
+
+  const handleActivityComplete = (score: number, achievements: string[]) => {
+    // Update student metrics based on performance
+    const newMetrics = {
+      ...studentMetrics,
+      recent_session_scores: [...studentMetrics.recent_session_scores.slice(-3), score],
+      accuracy_rate: (studentMetrics.accuracy_rate + score) / 2,
+      engagement_level: Math.min(100, studentMetrics.engagement_level + (achievements.length * 5))
+    };
+    
+    setStudentMetrics(newMetrics);
+    
+    toast({
+      title: "Great Work! 🎉",
+      description: `You scored ${score} points and earned ${achievements.length} achievements!`,
+    });
+    
+    // Auto-advance to next activity after celebration
     setTimeout(() => {
-      speakAsNelie(welcomeMessage.content, false, 'nelie-welcome');
-    }, 1000);
-  }, [currentSubject, speakAsNelie]);
-
-  // Respond to student needing help
-  useEffect(() => {
-    if (studentNeedsHelp && !isExpanded) {
-      setIsExpanded(true);
-      offerContextualHelp();
-    }
-  }, [studentNeedsHelp, isExpanded]);
-
-  const offerContextualHelp = () => {
-    const helpMessages = {
-      mathematics: {
-        practice: "I notice you might need some help with this math problem! Remember, breaking it down step by step often makes it easier. Would you like me to walk through it with you?",
-        game: "Having fun with this math game? If you get stuck, try thinking about what patterns you see. I'm here if you need a hint!",
-        assessment: "You're doing great! Take your time and trust what you've learned. Remember, I believe in you!"
-      },
-      general: "I'm here to help! Don't hesitate to ask me anything about what you're learning. We're in this together!"
-    };
-
-    const helpContent = helpMessages[currentSubject as keyof typeof helpMessages]?.[currentActivity as keyof typeof helpMessages.mathematics] || helpMessages.general;
-    
-    const helpMessage: NelieMessage = {
-      id: `help-${Date.now()}`,
-      type: 'nelie',
-      content: helpContent,
-      timestamp: new Date(),
-      context: 'contextual_help'
-    };
-
-    setMessages(prev => [...prev, helpMessage]);
-    speakAsNelie(helpContent, true, 'nelie-help-offer');
-    onHelpProvided('contextual_offer');
+      nextActivity();
+    }, 3000);
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
-
-    const studentMessage: NelieMessage = {
-      id: `student-${Date.now()}`,
-      type: 'student', 
-      content: inputMessage,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, studentMessage]);
-    setInputMessage('');
-    setIsTyping(true);
-    setNelieState('thinking');
-
-    // Simulate Nelie thinking and responding
-    setTimeout(async () => {
-      const nelieResponse = await generateNelieResponse(inputMessage, currentSubject, currentActivity);
-      
-      const nelieMessage: NelieMessage = {
-        id: `nelie-${Date.now()}`,
-        type: 'nelie',
-        content: nelieResponse,
-        timestamp: new Date(),
-        context: 'conversation'
-      };
-
-      setMessages(prev => [...prev, nelieMessage]);
-      setIsTyping(false);
-      setNelieState('speaking');
-      
-      // Speak Nelie's response
-      await speakAsNelie(nelieResponse, true, 'nelie-response');
-      setNelieState('idle');
-      
-      onHelpProvided('direct_assistance');
-    }, 1500);
+  const handleRequestHelp = () => {
+    toast({
+      title: "Nelie is here to help! 💫",
+      description: "Ask me anything about your current activity!",
+    });
   };
 
-  const generateNelieResponse = async (question: string, subject: string, activity: string): Promise<string> => {
-    // Enhanced response generation based on context
-    const questionLower = question.toLowerCase();
-    
-    // Math-specific help responses
-    if (subject === 'mathematics') {
-      if (questionLower.includes('stuck') || questionLower.includes('don\'t understand')) {
-        return "I understand it can feel challenging! Let's break this down together. What specific part is confusing you? Remember, every mathematician gets stuck sometimes - it's part of learning!";
-      }
-      
-      if (questionLower.includes('how') && (questionLower.includes('solve') || questionLower.includes('calculate'))) {
-        return "Great question! The best approach is to start with what you know. Can you identify the key information in the problem? Then we can work step by step toward the solution!";
-      }
-      
-      if (questionLower.includes('why') || questionLower.includes('explain')) {
-        return "I love that you're asking 'why' - that shows real mathematical thinking! Understanding the 'why' helps us remember and apply concepts better. Let me help you see the connection...";
-      }
-    }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center text-white"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="text-6xl mb-4"
+          >
+            🎓
+          </motion.div>
+          <h2 className="text-2xl font-bold mb-2">Preparing Your Daily Program</h2>
+          <p className="text-blue-200">Generating personalized learning activities...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
-    // General encouraging responses
-    const encouragingResponses = [
-      "That's a thoughtful question! Your curiosity is exactly what makes learning exciting. Let me help you explore this...",
-      "I'm so glad you asked! Questions like yours help us dive deeper into understanding. Here's what I think...",
-      "What a great way to think about this! Your question shows you're really engaging with the material. Let me share some insights...",
-      "I can tell you're thinking carefully about this. That's exactly the kind of thinking that leads to real understanding!"
-    ];
-
-    return encouragingResponses[Math.floor(Math.random() * encouragingResponses.length)];
-  };
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const handleVolumeToggle = () => {
-    if (isSpeaking) {
-      stop();
-    }
-  };
+  if (!dailyPlan || !currentActivity) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white p-8 text-center">
+          <CardContent>
+            <h2 className="text-2xl font-bold mb-4">Unable to Load Daily Program</h2>
+            <p className="mb-6">There was an issue generating your personalized learning plan.</p>
+            <Button onClick={initializeDailyProgram} className="bg-blue-600 hover:bg-blue-700">
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <AnimatePresence>
-        {isExpanded ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="w-96 h-[500px]"
-          >
-            <Card className="h-full bg-gradient-to-br from-purple-900 to-blue-900 border-purple-500 shadow-2xl">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="relative">
-                      <Sparkles className="w-6 h-6 text-yellow-400" />
-                      <motion.div
-                        animate={{ 
-                          scale: nelieState === 'speaking' ? [1, 1.2, 1] : 1,
-                          rotate: nelieState === 'thinking' ? 360 : 0
-                        }}
-                        transition={{ 
-                          duration: nelieState === 'speaking' ? 0.5 : 2,
-                          repeat: nelieState === 'thinking' ? Infinity : 0
-                        }}
-                        className="absolute inset-0"
-                      >
-                        <Sparkles className="w-6 h-6 text-yellow-400" />
-                      </motion.div>
-                    </div>
-                    <div>
-                      <h3 className="text-white font-bold">Nelie</h3>
-                      <p className="text-purple-200 text-xs">Your AI Learning Companion</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleVolumeToggle}
-                      className="text-white hover:bg-purple-700"
-                    >
-                      {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={toggleExpanded}
-                      className="text-white hover:bg-purple-700"
-                    >
-                      <Minimize2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+      {/* Program Header */}
+      <div className="p-6 bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Enhanced Daily Learning Program
+              </h1>
+              <p className="text-blue-200">
+                Grade {gradeLevel} • {dailyPlan.total_duration_minutes} minutes • {dailyPlan.activity_sequence.length} activities
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge variant="secondary" className="bg-green-600 text-white">
+                <Target className="w-4 h-4 mr-1" />
+                {dailyPlan.curriculum_coverage.standards_addressed.length} Standards
+              </Badge>
+              <Badge variant="secondary" className="bg-purple-600 text-white">
+                <Brain className="w-4 h-4 mr-1" />
+                Adaptive Learning
+              </Badge>
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white font-medium">Session Progress</span>
+              <span className="text-blue-200">{Math.round(sessionProgress)}%</span>
+            </div>
+            <Progress value={sessionProgress} className="h-3 bg-white/10" />
+          </div>
+          
+          {/* Activity Controls */}
+          <div className="flex items-center space-x-4">
+            {!isPlaying && !isPaused ? (
+              <Button onClick={startActivity} className="bg-green-600 hover:bg-green-700 text-white">
+                <Play className="w-4 h-4 mr-2" />
+                Start Activity
+              </Button>
+            ) : isPaused ? (
+              <Button onClick={startActivity} className="bg-green-600 hover:bg-green-700 text-white">
+                <Play className="w-4 h-4 mr-2" />
+                Resume
+              </Button>
+            ) : (
+              <Button onClick={pauseActivity} className="bg-orange-600 hover:bg-orange-700 text-white">
+                <Pause className="w-4 h-4 mr-2" />
+                Pause
+              </Button>
+            )}
+            
+            <Button onClick={nextActivity} variant="outline" className="border-white/20 text-white hover:bg-white/10">
+              Next Activity
+            </Button>
+            
+            <Button onClick={resetProgram} variant="outline" className="border-white/20 text-white hover:bg-white/10">
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Reset
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Current Activity Display */}
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activityIndex}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.3 }}
+              >
+                {currentActivity.activity_data.content_type === 'educational_game' ? (
+                  <EducationalGameEngine
+                    subject="mathematics"
+                    skillArea={dailyPlan.learning_units[0]?.skill_areas[0] || 'addition'}
+                    theme="space_adventure"
+                    onGameComplete={handleActivityComplete}
+                    onRequestHelp={handleRequestHelp}
+                  />
+                ) : (
+                  <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center space-x-2">
+                        <BookOpen className="w-6 h-6" />
+                        <span>{currentActivity.title}</span>
+                        <Badge className="bg-blue-600 text-white">
+                          {currentActivity.type.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-white">
+                      <div className="mb-6">
+                        <p className="text-blue-200 mb-4">
+                          {currentActivity.nelie_guidance.introduction_prompt}
+                        </p>
+                        <div className="flex items-center space-x-4 text-sm">
+                          <div className="flex items-center space-x-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{currentActivity.duration_minutes} minutes</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Target className="w-4 h-4" />
+                            <span>Level {currentActivity.difficulty_level}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Activity Content Placeholder */}
+                      <div className="bg-white/5 rounded-lg p-6 text-center">
+                        <h3 className="text-xl font-bold mb-4">Activity Content</h3>
+                        <p className="text-blue-200 mb-6">
+                          This would contain the actual {currentActivity.activity_data.content_type} content
+                        </p>
+                        <Button 
+                          onClick={handleActivityComplete.bind(null, 85, ['participation'])}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Complete Activity
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Activity Timeline Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 sticky top-6">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <Calendar className="w-5 h-5" />
+                  <span>Today's Journey</span>
+                </CardTitle>
               </CardHeader>
-              
-              <CardContent className="h-full flex flex-col p-4">
-                {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto space-y-3 mb-4">
-                  {messages.map((message) => (
+              <CardContent>
+                <div className="space-y-3">
+                  {dailyPlan.activity_sequence.map((activity, index) => (
                     <motion.div
-                      key={message.id}
+                      key={activity.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.type === 'student' ? 'justify-end' : 'justify-start'}`}
+                      transition={{ delay: index * 0.1 }}
+                      className={`p-3 rounded-lg border ${
+                        index === activityIndex
+                          ? 'bg-blue-600/20 border-blue-400 text-white'
+                          : index < activityIndex
+                          ? 'bg-green-600/20 border-green-400 text-green-200'
+                          : 'bg-white/5 border-white/10 text-white/70'
+                      }`}
                     >
-                      <div className={`max-w-[80%] p-3 rounded-lg ${
-                        message.type === 'student' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-purple-700 text-purple-100'
-                      }`}>
-                        <p className="text-sm">{message.content}</p>
-                        <p className="text-xs opacity-70 mt-1">
-                          {message.timestamp.toLocaleTimeString()}
-                        </p>
+                      <div className="flex items-center space-x-2 mb-1">
+                        {activity.type === 'game' && <Gamepad2 className="w-4 h-4" />}
+                        {activity.type === 'instruction' && <BookOpen className="w-4 h-4" />}
+                        {activity.type === 'practice' && <Target className="w-4 h-4" />}
+                        <span className="text-sm font-medium">{activity.title}</span>
+                      </div>
+                      <div className="text-xs opacity-75">
+                        {activity.duration_minutes} min • Level {activity.difficulty_level}
                       </div>
                     </motion.div>
                   ))}
-                  
-                  {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex justify-start"
-                    >
-                      <div className="bg-purple-700 text-purple-100 p-3 rounded-lg">
-                        <div className="flex space-x-1">
-                          <motion.div
-                            animate={{ opacity: [0.4, 1, 0.4] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-2 h-2 bg-purple-300 rounded-full"
-                          />
-                          <motion.div
-                            animate={{ opacity: [0.4, 1, 0.4] }}
-                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                            className="w-2 h-2 bg-purple-300 rounded-full"
-                          />
-                          <motion.div
-                            animate={{ opacity: [0.4, 1, 0.4] }}
-                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                            className="w-2 h-2 bg-purple-300 rounded-full"
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
 
-                {/* Input Area */}
-                <div className="flex space-x-2">
-                  <Textarea
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Ask Nelie anything..."
-                    className="flex-1 min-h-[40px] max-h-[80px] bg-white/10 border-purple-400 text-white placeholder-purple-200"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                      }
-                    }}
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={!inputMessage.trim() || isTyping}
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Card 
-              className="cursor-pointer bg-gradient-to-br from-purple-600 to-blue-600 border-purple-400 shadow-lg hover:shadow-xl transition-all duration-300"
-              onClick={toggleExpanded}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <motion.div
-                    animate={{ 
-                      rotate: 360,
-                      scale: [1, 1.1, 1]
-                    }}
-                    transition={{ 
-                      rotate: { duration: 3, repeat: Infinity, ease: "linear" },
-                      scale: { duration: 2, repeat: Infinity }
-                    }}
-                  >
-                    <Sparkles className="w-6 h-6 text-yellow-400" />
-                  </motion.div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">Nelie</p>
-                    <p className="text-purple-200 text-xs">Tap for help!</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Enhanced Nelie Interface */}
+      <EnhancedNelieInterface
+        currentSubject="mathematics"
+        currentActivity={currentActivity.type}
+        studentNeedsHelp={false}
+        onHelpProvided={(helpType) => {
+          console.log('Nelie provided help:', helpType);
+        }}
+      />
     </div>
   );
 };
 
-export default EnhancedNelieInterface;
+export default EnhancedDailyProgram;
