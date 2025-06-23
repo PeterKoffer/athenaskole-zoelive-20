@@ -67,14 +67,14 @@ const SubjectCard = ({ subject, index, onStartLearning }: SubjectCardProps) => {
                     <h4 className="text-sm font-semibold text-gray-400 mb-2">
                       Key Areas:
                     </h4>
-                    <ul className="space-y-1">
+                    <div className="space-y-1">
                       {subject.keyAreas.map((area, areaIndex) => (
-                        <li key={areaIndex} className="flex items-center text-sm text-gray-300">
+                        <div key={areaIndex} className="flex items-center text-sm text-gray-300">
                           <div className="w-2 h-2 bg-blue-400 rounded-full mr-3 flex-shrink-0"></div>
                           <span>{area}</span>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </div>
               </DropdownMenuContent>
