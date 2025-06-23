@@ -79,6 +79,20 @@ export const useLearningProfile = () => {
     }
   };
 
+  const getRecommendedDifficulty = () => {
+    if (!profile) return 1;
+    return profile.current_difficulty_level;
+  };
+
+  const getPersonalizedSettings = () => {
+    if (!profile) return {};
+    return {
+      optimalSessionLength: profile.optimal_session_length,
+      learningPace: profile.learning_pace,
+      preferences: profile.learning_preferences
+    };
+  };
+
   useEffect(() => {
     fetchProfile();
   }, [user?.id]);
@@ -87,6 +101,8 @@ export const useLearningProfile = () => {
     profile,
     isLoading,
     fetchProfile,
-    updateProfile
+    updateProfile,
+    getRecommendedDifficulty,
+    getPersonalizedSettings
   };
 };

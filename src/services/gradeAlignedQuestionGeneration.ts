@@ -1,5 +1,5 @@
 
-import { TeachingPerspective } from '@/types/school';
+import { TeachingPerspectiveType } from '@/types/school';
 
 interface GradeAlignedQuestion {
   id: string;
@@ -10,6 +10,12 @@ interface GradeAlignedQuestion {
   gradeLevel: number;
   subject: string;
   skillArea: string;
+}
+
+export interface TeachingPerspective {
+  type: TeachingPerspectiveType;
+  style: string;
+  preferences: Record<string, unknown>;
 }
 
 export class GradeAlignedQuestionGeneration {
@@ -24,7 +30,7 @@ export class GradeAlignedQuestionGeneration {
         subject,
         skillArea,
         gradeLevel,
-        perspective: perspective?.toString() || 'none'
+        perspective: perspective?.type || 'none'
       });
 
       // Mock implementation - replace with actual generation logic
@@ -40,6 +46,42 @@ export class GradeAlignedQuestionGeneration {
       };
 
       return question;
+    } catch (error) {
+      console.error('Error generating grade-aligned question:', error);
+      return null;
+    }
+  }
+
+  async generateGradeAlignedQuestion(config: any): Promise<any> {
+    try {
+      const question = await this.generateQuestion(
+        config.subject,
+        config.skillArea,
+        config.gradeLevel,
+        config.teachingPerspective
+      );
+
+      if (!question) return null;
+
+      // Convert to UniqueQuestion format
+      return {
+        id: question.id,
+        content: {
+          question: question.question,
+          options: question.options,
+          correctAnswer: question.correct,
+          explanation: question.explanation
+        },
+        metadata: {
+          subject: question.subject,
+          skillArea: question.skillArea,
+          difficultyLevel: config.difficultyLevel,
+          gradeLevel: question.gradeLevel,
+          timestamp: Date.now(),
+          userId: config.userId,
+          sessionId: 'grade_aligned_generation'
+        }
+      };
     } catch (error) {
       console.error('Error generating grade-aligned question:', error);
       return null;

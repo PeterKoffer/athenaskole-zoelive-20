@@ -51,24 +51,16 @@ export class UserLearningProfileService {
         difficulty_adjustments: (typeof data.difficulty_adjustments === 'object' && data.difficulty_adjustments !== null) 
           ? data.difficulty_adjustments as Record<string, unknown> 
           : {},
-        engagement_patterns: (typeof data.engagement_patterns === 'object' && data.engagement_patterns !== null) 
-          ? data.engagement_patterns as Record<string, unknown> 
-          : {},
-        frustration_indicators: (typeof data.frustration_indicators === 'object' && data.frustration_indicators !== null) 
-          ? data.frustration_indicators as Record<string, unknown> 
-          : {},
-        last_updated: data.last_updated || new Date().toISOString(),
+        engagement_patterns: {},
+        frustration_indicators: {},
+        last_updated: data.created_at || new Date().toISOString(),
         learning_pace: data.learning_pace || 'moderate',
         learning_preferences: (typeof data.learning_preferences === 'object' && data.learning_preferences !== null) 
           ? data.learning_preferences as Record<string, unknown> 
           : {},
-        motivation_triggers: (typeof data.motivation_triggers === 'object' && data.motivation_triggers !== null) 
-          ? data.motivation_triggers as Record<string, unknown> 
-          : {},
+        motivation_triggers: {},
         optimal_session_length: data.optimal_session_length || 20,
-        performance_trends: (typeof data.performance_trends === 'object' && data.performance_trends !== null) 
-          ? data.performance_trends as Record<string, unknown> 
-          : {},
+        performance_trends: {},
         problem_solving_approach: data.problem_solving_approach || 'systematic',
         retention_rate: data.retention_rate || 0.5,
         social_learning_preference: data.social_learning_preference || 'individual',
@@ -107,6 +99,85 @@ export class UserLearningProfileService {
       console.error('Error in updateProfile:', error);
       return false;
     }
+  }
+
+  async getUserPreferences(userId: string): Promise<any> {
+    try {
+      const profile = await this.getProfile(userId);
+      return profile?.learning_preferences || {};
+    } catch (error) {
+      console.error('Error getting user preferences:', error);
+      return {};
+    }
+  }
+
+  async recordQuestionHistory(historyEntry: any): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('learning_sessions')
+        .insert({
+          user_id: historyEntry.user_id,
+          subject: historyEntry.subject,
+          skill_area: historyEntry.skill_area,
+          difficulty_level: historyEntry.difficulty_level,
+          start_time: new Date().toISOString(),
+          time_spent: historyEntry.response_time_seconds || 0,
+          score: historyEntry.is_correct ? 100 : 0,
+          completed: true,
+          user_feedback: {
+            question_text: historyEntry.question_text,
+            user_answer: historyEntry.user_answer,
+            correct_answer: historyEntry.correct_answer,
+            is_correct: historyEntry.is_correct,
+            struggle_indicators: historyEntry.struggle_indicators,
+            mastery_indicators: historyEntry.mastery_indicators
+          }
+        });
+
+      if (error) {
+        console.error('Error recording question history:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in recordQuestionHistory:', error);
+      return false;
+    }
+  }
+
+  async analyzeAndUpdateProfile(userId: string, subject: string, skillArea: string, questionData: any, responseData: any): Promise<void> {
+    try {
+      const profile = await this.getProfile(userId);
+      if (!profile) return;
+
+      // Simple analysis - adjust difficulty based on performance
+      const isCorrect = responseData.is_correct;
+      let difficultyAdjustment = 0;
+
+      if (isCorrect) {
+        difficultyAdjustment = 0.1;
+      } else {
+        difficultyAdjustment = -0.1;
+      }
+
+      const newDifficulty = Math.max(1, Math.min(5, profile.current_difficulty_level + difficultyAdjustment));
+
+      await this.updateProfile(userId, {
+        current_difficulty_level: newDifficulty,
+        last_updated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error analyzing and updating profile:', error);
+    }
+  }
+
+  async getLearningProfile(userId: string, subject: string, skillArea: string): Promise<any> {
+    return this.getProfile(userId);
+  }
+
+  async createOrUpdateProfile(profileData: any): Promise<boolean> {
+    return this.updateProfile(profileData.user_id, profileData);
   }
 }
 
