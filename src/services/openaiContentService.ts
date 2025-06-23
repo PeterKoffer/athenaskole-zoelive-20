@@ -13,7 +13,7 @@ export class DeepSeekContentService {
     skillArea: string, 
     difficultyLevel: number, 
     userId: string
-  ): Promise<GeneratedContent> { // Changed from Promise<any> to Promise<GeneratedContent>
+  ): Promise<GeneratedContent> { // changed from Promise<any> to Promise<GeneratedContent>
     try {
       // First, try to get existing content
       const existingContent = await contentRepository.getExistingContent(subject, skillArea, difficultyLevel);
