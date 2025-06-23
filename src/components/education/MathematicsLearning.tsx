@@ -61,17 +61,15 @@ const MathematicsLearning = () => {
     return null;
   }
 
+  console.log('🎯 MathematicsLearning rendering UnifiedLessonManager with welcome screen');
+
   return (
-    <ClassroomEnvironment config={classroomConfig}>
-      <div className="min-h-screen py-10 px-2 flex items-center justify-center">
-        <UnifiedLessonManager
-          subject="mathematics"
-          skillArea="general_mathematics"
-          studentName={user.user_metadata?.first_name || 'Student'}
-          onBackToProgram={handleBackToProgram}
-        />
-      </div>
-    </ClassroomEnvironment>
+    <UnifiedLessonManager
+      subject="mathematics"
+      skillArea="general_mathematics"
+      studentName={user.user_metadata?.first_name || 'Student'}
+      onBackToProgram={handleBackToProgram}
+    />
   );
 };
 
