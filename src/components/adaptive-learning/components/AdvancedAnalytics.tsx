@@ -8,12 +8,25 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Target, Clock, Award, Brain, BarChart3 } from 'lucide-react';
+import { SessionData, UserPerformanceData } from '../types/AnalyticsTypes';
+
+interface ConceptMasteryData {
+  concept_name: string;
+  mastery_level: number;
+}
+
+interface WeeklyProgressData {
+  week: string;
+  sessions: number;
+  avgScore: number;
+  totalTime: number;
+}
 
 interface AnalyticsData {
-  sessions: any[];
-  conceptMastery: any[];
-  performance: any[];
-  weeklyProgress: any[];
+  sessions: SessionData[];
+  conceptMastery: ConceptMasteryData[];
+  performance: UserPerformanceData[];
+  weeklyProgress: WeeklyProgressData[];
 }
 
 interface AdvancedAnalyticsProps {
@@ -67,9 +80,9 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
       const weeklyData = processWeeklyProgress(sessionsResult.data || []);
 
       setData({
-        sessions: sessionsResult.data || [],
+        sessions: castSessionData(sessionsResult.data || []),
         conceptMastery: masteryResult.data || [],
-        performance: performanceResult.data || [],
+        performance: castUserPerformanceData(performanceResult.data || []),
         weeklyProgress: weeklyData
       });
     } catch (error) {
@@ -79,8 +92,29 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     }
   };
 
-  const processWeeklyProgress = (sessions: any[]) => {
-    const weeklyMap = new Map();
+  const castSessionData = (data: any[]): SessionData[] => {
+    return data.map(item => ({
+      ...item,
+      user_feedback: typeof item.user_feedback === 'string' 
+        ? JSON.parse(item.user_feedback) 
+        : (item.user_feedback as Record<string, unknown>) || {}
+    }));
+  };
+
+  const castUserPerformanceData = (data: any[]): UserPerformanceData[] => {
+    return data.map(item => ({
+      ...item,
+      strengths: typeof item.strengths === 'string' 
+        ? JSON.parse(item.strengths) 
+        : (item.strengths as Record<string, unknown>) || {},
+      weaknesses: typeof item.weaknesses === 'string' 
+        ? JSON.parse(item.weaknesses) 
+        : (item.weaknesses as Record<string, unknown>) || {}
+    }));
+  };
+
+  const processWeeklyProgress = (sessions: any[]): WeeklyProgressData[] => {
+    const weeklyMap = new Map<string, WeeklyProgressData>();
     
     sessions.forEach(session => {
       const date = new Date(session.created_at);
@@ -92,20 +126,23 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
       }
       
       const week = weeklyMap.get(weekKey);
-      week.sessions += 1;
-      week.avgScore = ((week.avgScore * (week.sessions - 1)) + (session.score || 0)) / week.sessions;
-      week.totalTime += session.time_spent || 0;
+      if (week) {
+        week.sessions += 1;
+        week.avgScore = ((week.avgScore * (week.sessions - 1)) + (session.score || 0)) / week.sessions;
+        week.totalTime += session.time_spent || 0;
+      }
     });
     
     return Array.from(weeklyMap.values()).slice(-8); // Last 8 weeks
   };
 
-  const getMasteryDistribution = () => {
+  const getMasteryDistribution = (): Array<{ name: string; value: number; color: string }> => {
     const distribution = { mastered: 0, learning: 0, struggling: 0 };
     
     data.conceptMastery.forEach(concept => {
-      if (concept.mastery_level >= 0.8) distribution.mastered++;
-      else if (concept.mastery_level >= 0.5) distribution.learning++;
+      const masteryLevel = concept.mastery_level || 0;
+      if (masteryLevel >= 0.8) distribution.mastered++;
+      else if (masteryLevel >= 0.5) distribution.learning++;
       else distribution.struggling++;
     });
     
@@ -116,16 +153,16 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
     ];
   };
 
-  const getAverageScore = () => {
+  const getAverageScore = (): number => {
     if (data.sessions.length === 0) return 0;
     return Math.round(data.sessions.reduce((acc, s) => acc + (s.score || 0), 0) / data.sessions.length);
   };
 
-  const getTotalStudyTime = () => {
+  const getTotalStudyTime = (): number => {
     return Math.round(data.sessions.reduce((acc, s) => acc + (s.time_spent || 0), 0) / 60); // Convert to minutes
   };
 
-  const getStreakData = () => {
+  const getStreakData = (): { current: number; longest: number } => {
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
@@ -297,17 +334,20 @@ const AdvancedAnalytics = ({ subject }: AdvancedAnalyticsProps) => {
                 <CardTitle className="text-white">Concept Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {data.conceptMastery.slice(0, 5).map((concept, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-white text-sm">{concept.concept_name}</span>
-                      <Badge variant={concept.mastery_level >= 0.8 ? 'default' : 'secondary'}>
-                        {Math.round(concept.mastery_level * 100)}%
-                      </Badge>
+                {data.conceptMastery.slice(0, 5).map((concept, index) => {
+                  const masteryLevel = concept.mastery_level || 0;
+                  return (
+                    <div key={index} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-white text-sm">{concept.concept_name}</span>
+                        <Badge variant={masteryLevel >= 0.8 ? 'default' : 'secondary'}>
+                          {Math.round(masteryLevel * 100)}%
+                        </Badge>
+                      </div>
+                      <Progress value={masteryLevel * 100} className="h-2" />
                     </div>
-                    <Progress value={concept.mastery_level * 100} className="h-2" />
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           </div>

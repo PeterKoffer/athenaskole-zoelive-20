@@ -2,36 +2,40 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, Trophy, ArrowLeft } from "lucide-react";
-import { Language, LanguageLessons } from "./types";
+import { Heart, Star, Trophy, ArrowLeft, BookOpen, Layers, FileText } from "lucide-react"; // Added icons
+import { LanguageLabLanguage, LanguageLabCurriculum, CurriculumLevel, CurriculumUnit, CurriculumLessonLink } from "./types";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface LanguageSelectionViewProps {
-  languages: Language[];
-  selectedLanguage: string;
-  lessons: LanguageLessons;
+  languages: LanguageLabLanguage[];
+  selectedLanguageCode?: string;
+  curriculum: LanguageLabCurriculum | null;
+  isLoadingCurriculum: boolean;
   hearts: number;
   streak: number;
   xp: number;
   onLanguageSelect: (languageCode: string) => void;
-  onLessonSelect: (lessonIndex: number) => void;
+  onLessonSelect: (lessonPath: string) => void;
   onBack: () => void;
+  currentLanguageName?: string; // Added to display current language name
 }
 
-const LanguageSelectionView = ({ 
-  languages, 
-  selectedLanguage, 
-  lessons, 
-  hearts, 
-  streak, 
-  xp, 
-  onLanguageSelect, 
+const LanguageSelectionView = ({
+  languages,
+  selectedLanguageCode,
+  curriculum,
+  isLoadingCurriculum,
+  hearts,
+  streak,
+  xp,
+  onLanguageSelect,
   onLessonSelect,
-  onBack
+  onBack,
+  currentLanguageName
 }: LanguageSelectionViewProps) => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Back Button */}
+      <div className="max-w-5xl mx-auto space-y-6">
         <Button
           variant="outline"
           onClick={onBack}
@@ -41,75 +45,107 @@ const LanguageSelectionView = ({
           Back to Daily Program
         </Button>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-gray-800 border-gray-700 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-white">
-              <span className="flex items-center space-x-2">
-                <span className="text-2xl">🌍</span>
-                <span>Language Learning - Duolingo Style</span>
+              <span className="flex items-center space-x-3">
+                <BookOpen className="w-8 h-8 text-purple-400" />
+                <span className="text-2xl font-bold">Language Lab</span>
               </span>
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-1" title="Hearts">
                   <Heart className="w-5 h-5 text-red-500" />
                   <span className="text-white">{hearts}</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-1" title="Day Streak">
                   <Trophy className="w-5 h-5 text-yellow-500" />
-                  <span className="text-white">{streak} day streak</span>
+                  <span className="text-white">{streak}</span>
                 </div>
-                <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
+                <Badge variant="outline" className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white border-purple-500 px-3 py-1 text-sm">
                   {xp} XP
                 </Badge>
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <p className="text-gray-300 mb-4">Select a language to start your learning journey:</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {languages.map((lang) => (
                 <Button
                   key={lang.code}
                   variant="outline"
-                  className={`h-20 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white flex flex-col space-y-2 ${
-                    selectedLanguage === lang.code ? 'ring-2 ring-purple-400' : ''
+                  className={`h-24 ${lang.color} hover:opacity-90 text-white flex flex-col items-center justify-center space-y-1 p-2 rounded-lg shadow-md transition-all duration-200 ${
+                    selectedLanguageCode === lang.code ? 'ring-4 ring-offset-2 ring-offset-gray-900 ring-lime-400' : 'border-gray-700 hover:border-gray-500'
                   }`}
                   onClick={() => onLanguageSelect(lang.code)}
                 >
-                  <span className="text-2xl">{lang.flag}</span>
-                  <span className="text-sm">{lang.name}</span>
+                  <span className="text-3xl">{lang.flag}</span>
+                  <span className="text-xs font-medium text-center">{lang.name}</span>
                 </Button>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {selectedLanguage && lessons[selectedLanguage] && (
-          <Card className="bg-gray-800 border-gray-700">
+        {selectedLanguageCode && isLoadingCurriculum && (
+          <div className="flex justify-center items-center p-10">
+            <LoadingSpinner />
+            <p className="ml-3 text-lg">Loading {currentLanguageName} curriculum...</p>
+          </div>
+        )}
+
+        {selectedLanguageCode && !isLoadingCurriculum && curriculum && (
+          <Card className="bg-gray-800 border-gray-700 shadow-xl mt-6">
             <CardHeader>
-              <CardTitle className="text-white">
-                Lessons in {languages.find(l => l.code === selectedLanguage)?.name}
+              <CardTitle className="text-2xl font-semibold text-lime-400">
+                Curriculum: {curriculum.languageName}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {lessons[selectedLanguage].map((lesson, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="w-full h-16 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white justify-between"
-                    onClick={() => onLessonSelect(index)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-cyan-400 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold">{index + 1}</span>
+            <CardContent className="space-y-6">
+              {curriculum.levels && curriculum.levels.length > 0 ? (
+                curriculum.levels.map((level: CurriculumLevel) => (
+                  <div key={level.levelId} className="p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+                    <h3 className="text-xl font-semibold text-purple-300 mb-1 flex items-center">
+                      <Layers className="w-5 h-5 mr-2" /> {level.title}
+                    </h3>
+                    <p className="text-sm text-gray-400 mb-3 ml-7">{level.description}</p>
+                    {level.units.map((unit: CurriculumUnit) => (
+                      <div key={unit.unitId} className="ml-7 mb-4 last:mb-0">
+                        <h4 className="text-lg font-medium text-cyan-300 mb-2 flex items-center">
+                           <BookOpen className="w-4 h-4 mr-2 opacity-80" /> {unit.title}
+                        </h4>
+                        <div className="space-y-2">
+                          {unit.lessons.map((lessonLink: CurriculumLessonLink) => (
+                            <Button
+                              key={lessonLink.lessonId}
+                              variant="ghost"
+                              className="w-full h-auto py-3 bg-gray-700 border border-gray-600 hover:bg-gray-600/70 text-white justify-start text-left rounded-md transition-colors duration-150"
+                              onClick={() => onLessonSelect(lessonLink.lessonPath)}
+                            >
+                              <FileText className="w-5 h-5 mr-3 text-lime-400 flex-shrink-0" />
+                              <div className="flex flex-col">
+                                <span className="font-medium">{lessonLink.title}</span>
+                                <span className="text-xs text-gray-400">ID: {lessonLink.lessonId}</span>
+                              </div>
+                              {/* Placeholder for progress indicator if available later */}
+                              {/* <Star className="w-5 h-5 text-yellow-500 ml-auto" /> */}
+                            </Button>
+                          ))}
+                        </div>
                       </div>
-                      <span>{lesson.title}</span>
-                    </div>
-                    <Star className="w-5 h-5 text-yellow-500" />
-                  </Button>
-                ))}
-              </div>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400">No levels available for this language yet.</p>
+              )}
             </CardContent>
           </Card>
+        )}
+         {!selectedLanguageCode && !isLoadingCurriculum && (
+          <div className="text-center text-gray-500 py-10">
+            <p>Please select a language to view its curriculum.</p>
+          </div>
         )}
       </div>
     </div>

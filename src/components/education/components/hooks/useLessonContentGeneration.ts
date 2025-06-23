@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { LessonActivity } from '../types/LessonTypes';
 
@@ -20,6 +21,10 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
       phase: 'introduction',
       duration: 180,
       phaseDescription: `Introduction to ${subject} lesson`,
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
         text: introContent
       }
@@ -36,11 +41,15 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
       phase: 'content-delivery',
       duration: 300,
       phaseDescription: `Content delivery for ${skillArea}`,
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
         text: content
       }
     };
-  }, [skillArea]);
+  }, [skillArea, subject]);
 
   const generateInteractiveGameActivity = useCallback((): LessonActivity => {
     const question = `What is a key concept in ${skillArea}?`;
@@ -55,6 +64,10 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
       phase: 'interactive-game',
       duration: 240,
       phaseDescription: `Interactive game for ${skillArea}`,
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
         question,
         options,
@@ -62,7 +75,7 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
         explanation
       }
     };
-  }, [skillArea]);
+  }, [skillArea, subject]);
 
   const generateApplicationActivity = useCallback((): LessonActivity => {
     const scenario = `Imagine you are using ${skillArea} in a real-world situation...`;
@@ -75,12 +88,16 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
       phase: 'application',
       duration: 300,
       phaseDescription: `Application of ${skillArea} concepts`,
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
         scenario,
         task
       }
     };
-  }, [skillArea]);
+  }, [skillArea, subject]);
 
   const generateCreativeExplorationActivity = useCallback((): LessonActivity => {
     const creativePrompt = `Create a project that demonstrates your understanding of ${skillArea}.`;
@@ -92,11 +109,15 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
       phase: 'creative-exploration',
       duration: 360,
       phaseDescription: `Creative exploration activity for ${skillArea}`,
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
         creativePrompt
       }
     };
-  }, [skillArea]);
+  }, [skillArea, subject]);
 
   const generateSummaryActivity = useCallback((): LessonActivity => {
     const keyTakeaways = [
@@ -112,6 +133,10 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
       phase: 'summary',
       duration: 180,
       phaseDescription: `Summary of key concepts in ${skillArea}`,
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
         keyTakeaways
       }
@@ -129,3 +154,4 @@ export const useLessonContentGeneration = (subject: string, skillArea: string) =
     generateSummaryActivity
   };
 };
+

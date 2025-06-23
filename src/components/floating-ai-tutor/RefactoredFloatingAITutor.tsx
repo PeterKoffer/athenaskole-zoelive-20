@@ -1,9 +1,14 @@
+        nelie-foundational-principles
 import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
+        main
 import { Card, CardContent } from '../ui/card';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useDragBehavior } from './hooks/useDragBehavior';
 import { useFloatingTutorMessages } from './hooks/useFloatingTutorMessages';
 import { useFloatingTutorState } from './hooks/useFloatingTutorState';
+import { useAuth } from '@/hooks/useAuth';
 import FloatingButton from './components/FloatingButton';
 import ChatHeader from './components/ChatHeader';
 import ChatMessages from './components/ChatMessages';
@@ -11,6 +16,7 @@ import ChatInputArea from './components/ChatInputArea';
 import { supabase } from '@/integrations/supabase/client'; // Added Supabase client
 
 const RefactoredFloatingAITutor = () => {
+  const { user } = useAuth();
   const [isListening, setIsListening] = useState(false);
   const [isNelieReplying, setIsNelieReplying] = useState(false); // Added loading state
   
@@ -19,7 +25,13 @@ const RefactoredFloatingAITutor = () => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
   const { isOpen, setIsOpen, shouldHide } = useFloatingTutorState();
 
-  // Hide the floating tutor if it should be hidden (to prevent duplicates)
+  // Don't show if user is not logged in
+  if (!user) {
+    console.log('🚫 Hiding floating tutor - no user logged in');
+    return null;
+  }
+
+  // Hide the floating tutor if it should be hidden
   if (shouldHide) {
     console.log('🚫 Hiding floating tutor to prevent duplicates');
     return null;
@@ -73,13 +85,7 @@ const RefactoredFloatingAITutor = () => {
   };
 
   const handleVoiceToggle = () => {
-    if (isListening) {
-      setIsListening(false);
-      // Stop voice recognition
-    } else {
-      setIsListening(true);
-      // Start voice recognition
-    }
+    setIsListening(!isListening);
   };
 
   const handleSpeechToggle = () => {

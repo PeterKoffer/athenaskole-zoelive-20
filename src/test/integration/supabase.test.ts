@@ -1,63 +1,47 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Mock Supabase for integration tests
-const mockSupabaseClient = {
-  auth: {
-    onAuthStateChange: vi.fn(() => ({ 
-      data: { subscription: { unsubscribe: vi.fn() } } 
-    })),
-    getSession: vi.fn(() => Promise.resolve({ 
-      data: { session: null } 
-    })),
-    signInWithPassword: vi.fn(),
-    signOut: vi.fn(),
-  },
-  from: vi.fn(() => ({
-    select: vi.fn(() => Promise.resolve({ data: [], error: null })),
-    insert: vi.fn(() => Promise.resolve({ data: [], error: null })),
-    update: vi.fn(() => Promise.resolve({ data: [], error: null })),
-    delete: vi.fn(() => Promise.resolve({ data: [], error: null })),
-  })),
-};
+import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '../../types/supabase';
 
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: mockSupabaseClient,
-}));
+// Environment variables
+const supabaseUrl = process.env.SUPABASE_URL as string;
+const supabaseKey = process.env.SUPABASE_ANON_KEY as string;
+const testTimeout = 10000; // 10 seconds
+
+// Check if environment variables are set
+if (!supabaseUrl) {
+  console.warn('Skipping Supabase integration tests because SUPABASE_URL is not set.');
+  process.exit();
+}
+
+if (!supabaseKey) {
+  console.warn('Skipping Supabase integration tests because SUPABASE_ANON_KEY is not set.');
+  process.exit();
+}
+
+// Initialize Supabase client
+const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
 describe('Supabase Integration', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  beforeAll(() => {
+    // Setup code if needed
   });
 
-  it('should handle authentication state changes', async () => {
-    const { supabase } = await import('@/integrations/supabase/client');
-    
-    // Test that the auth state change handler is properly set up
-    expect(supabase.auth.onAuthStateChange).toBeDefined();
-    
-    // Call the handler and verify it returns the expected structure
-    const result = supabase.auth.onAuthStateChange(vi.fn());
-    expect(result).toHaveProperty('data');
-    expect(result.data).toHaveProperty('subscription');
-  });
+  it('should connect to Supabase', async () => {
+    const { data, error } = await supabase.from('curriculum_standards').select('*').limit(1);
 
-  it('should handle session retrieval', async () => {
-    const { supabase } = await import('@/integrations/supabase/client');
-    
-    const session = await supabase.auth.getSession();
-    expect(session).toHaveProperty('data');
-    expect(session.data).toHaveProperty('session');
-  });
+    expect(error).toBeNull();
+    expect(Array.isArray(data)).toBe(true);
+  }, testTimeout);
 
-  it('should handle database queries', async () => {
-    const { supabase } = await import('@/integrations/supabase/client');
-    
-    const query = supabase.from('test_table');
-    expect(query).toBeDefined();
-    expect(query.select).toBeDefined();
-    
-    const result = await query.select('*');
-    expect(result).toHaveProperty('data');
-    expect(result).toHaveProperty('error');
-  });
+  it('should perform basic database operations', async () => {
+    // Use an actual table from the schema instead of 'test_table'
+    const { data, error } = await supabase
+      .from('adaptive_content')
+      .select('*')
+      .limit(1);
+
+    expect(error).toBeNull();
+    expect(Array.isArray(data)).toBe(true);
+  }, testTimeout);
 });

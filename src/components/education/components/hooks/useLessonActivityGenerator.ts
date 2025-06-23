@@ -5,17 +5,18 @@ import { useSubjectQuestionGenerator } from './useSubjectQuestionGenerator';
 interface UseLessonActivityGeneratorProps {
   subject: string;
   skillArea: string;
+  sessionId: string;
 }
 
-export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActivityGeneratorProps) => {
+export const useLessonActivityGenerator = ({ subject, skillArea, sessionId }: UseLessonActivityGeneratorProps) => {
   const { getSubjectQuestions, getSubjectScenario, getSubjectApplicationScenario } = useSubjectQuestionGenerator();
 
   const generateUnifiedLessonActivities = (): LessonActivity[] => {
     const activities: LessonActivity[] = [];
-    const lessonId = `unified-${subject}-${Date.now()}`;
+    const lessonId = `unified-${subject}-${sessionId.substring(0,8)}-${Date.now()}`; // Include sessionId in lessonId
     const subjectTitle = subject.charAt(0).toUpperCase() + subject.slice(1);
 
-    console.log(`🎯 Generating activities for ${subject} with skill area: ${skillArea}`);
+    console.log(`🎯 Generating activities for ${subject} (session: ${sessionId}) with skill area: ${skillArea}`);
 
     // 1. Welcome Introduction
     activities.push({
@@ -32,8 +33,8 @@ export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActi
     });
 
     // 2-4. Interactive Questions (subject-specific) - PROPERLY MAPPED
-    const questionTopics = getSubjectQuestions(subject);
-    console.log(`📚 Got ${questionTopics.length} ${subject} questions:`, questionTopics.map(q => q.title));
+    const questionTopics = getSubjectQuestions(subject, sessionId); // Pass sessionId
+    console.log(`📚 Got ${questionTopics.length} ${subject} questions for session ${sessionId}:`, questionTopics.map(q => q.title));
     
     questionTopics.forEach((topic, index) => {
       // Create properly structured activity from question topic
@@ -88,7 +89,7 @@ export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActi
       metadata: { subject, skillArea: 'game' },
       content: {
         creativePrompt: `Let's play a fun ${subjectTitle} game! I'll give you different scenarios where you can use your ${subjectTitle} skills creatively.`,
-        whatIfScenario: getSubjectScenario(subject),
+        whatIfScenario: getSubjectScenario(subject, sessionId), // Pass sessionId
         explorationTask: `Think about how ${subjectTitle} helps us solve real-world problems!`
       }
     });
@@ -103,7 +104,7 @@ export const useLessonActivityGenerator = ({ subject, skillArea }: UseLessonActi
       phaseDescription: `Apply ${subjectTitle} to real situations`,
       metadata: { subject, skillArea: 'application' },
       content: {
-        scenario: getSubjectApplicationScenario(subject),
+        scenario: getSubjectApplicationScenario(subject, sessionId), // Pass sessionId
         task: `Use your ${subjectTitle} knowledge to solve this real-world challenge!`,
         guidance: `Take your time and think through each step. Remember what we've learned today!`
       }

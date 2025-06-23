@@ -1,3 +1,4 @@
+        nelie-foundational-principles
 import {
     LessonActivity,
     LessonActivityContent,
@@ -9,6 +10,8 @@ import {
     SummaryContent,
     ActivityType // Added to use for type safety
 } from '@/components/education/components/types/LessonTypes';
+import { LessonActivity } from '@/components/education/components/types/LessonTypes';
+        main
 import { StudentProgressData } from './types';
 
 // --- Conceptual AI Service ---
@@ -208,12 +211,26 @@ export class ActivityContentGenerator {
 
     return {
       id: activityId,
+        nelie-foundational-principles
       title: generatedContentResponse.title || `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Activity`,
       type: activityType,
       phase: activityType, // Assuming type and phase are the same for all current types
       duration: 180,
       phaseDescription: `Engage with ${focusArea.replace(/_/g, ' ')}`,
       content: generatedContentResponse.content,
+      title: `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Challenge`,
+      type: this.mapActivityTypeToPhase(activityType),
+      phase: this.mapActivityTypeToPhase(activityType),
+      duration: 180,
+      phaseDescription: `Learn about ${focusArea.replace(/_/g, ' ')}`,
+      metadata: {
+        subject,
+        skillArea,
+        gradeLevel,
+        difficultyLevel: difficulty
+      },
+      content
+        main
     };
   }
 
@@ -349,6 +366,7 @@ export class ActivityContentGenerator {
       mainExplanation: `Let's dive into ${focusArea.replace(/_/g, ' ')}! Think of it like [insert simple analogy here, e.g., 'building with LEGOs' for sentence structure]. It's all about understanding the pieces and how they fit together.`,
       examples: [`For example, a common part of ${focusArea} is...`, `Another way to see ${focusArea} in action is...`],
       segments: [{
+        nelie-foundational-principles
         title: "First Big Idea",
         explanation: `One super important idea in ${focusArea.replace(/_/g, ' ')} is [concept 1]. It's like the foundation of a house!`,
         examples: [`Here's how [concept 1] works...`]
@@ -356,6 +374,10 @@ export class ActivityContentGenerator {
         title: "Another Cool Idea",
         explanation: `Next up is [concept 2] in ${focusArea.replace(/_/g, ' ')}. This builds on what we just learned and makes it even more interesting!`,
         examples: [`Let's look at [concept 2] with an example...`]
+        title: focusArea.replace(/_/g, ' '),
+        explanation: `Understanding ${focusArea.replace(/_/g, ' ')} is an important skill that builds your knowledge step by step.`,
+        examples: [`Example for ${focusArea}`, `Another way to think about ${focusArea}`]
+        main
       }]
     };
   }

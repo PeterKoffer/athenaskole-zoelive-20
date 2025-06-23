@@ -12,11 +12,18 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
+    console.log('🚀 Hero: Get Started clicked');
     if (onGetStarted) {
       onGetStarted();
     } else {
+      // Navigate directly to mathematics learning
       navigate("/learn/mathematics");
     }
+  };
+
+  const handleViewDailyProgram = () => {
+    console.log('🚀 Hero: View Daily Program clicked');
+    navigate("/daily-program");
   };
 
   return (
@@ -60,7 +67,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 </Button>
                 
                 <Button
-                  onClick={() => navigate("/daily-program")}
+                  onClick={handleViewDailyProgram}
                   variant="outline"
                   size="lg"
                   className="w-full sm:w-auto border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"

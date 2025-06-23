@@ -8,24 +8,22 @@ export const useFloatingTutorState = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [hasWelcomedOnHomepage, setHasWelcomedOnHomepage] = useState(() => {
-    return sessionStorage.getItem('nelieHomepageWelcomed') === 'true';
-  });
-  const [showEnableButton, setShowEnableButton] = useState(false);
-
-  // Determine if we're on the homepage
-  const isOnHomepage = location.pathname === '/';
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: 'assistant',
+      content: "Hi! I'm Nelie, your AI learning companion. How can I help you today?",
+      timestamp: new Date()
+    }
+  ]);
   
-  // Hide floating tutor on homepage when user is not logged in
-  // This prevents duplicate Nelie avatars (HomepageWelcome already shows Nelie for logged-in users)
-  const shouldHide = isOnHomepage && !user;
+  // Simplified visibility logic - show for all authenticated users
+  const shouldHide = false; // Always show the floating tutor when user is logged in
 
   console.log('🎯 FloatingTutorState:', {
-    isOnHomepage,
+    pathname: location.pathname,
     hasUser: !!user,
     shouldHide,
-    pathname: location.pathname
+    isOpen
   });
 
   return {
@@ -33,11 +31,11 @@ export const useFloatingTutorState = () => {
     setIsOpen,
     messages,
     setMessages,
-    hasWelcomedOnHomepage,
-    setHasWelcomedOnHomepage,
-    showEnableButton,
-    setShowEnableButton,
     shouldHide,
-    isOnHomepage
+    hasWelcomedOnHomepage: true,
+    setHasWelcomedOnHomepage: () => {},
+    showEnableButton: false,
+    setShowEnableButton: () => {},
+    isOnHomepage: location.pathname === '/'
   };
 };

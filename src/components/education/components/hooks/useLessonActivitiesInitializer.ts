@@ -1,4 +1,5 @@
 
+
 import { useState, useRef, useEffect } from 'react';
 import { useSimpleQuestionGeneration } from './useSimpleQuestionGeneration';
 import { LessonActivity } from '../types/LessonTypes';
@@ -46,7 +47,7 @@ export const useLessonActivitiesInitializer = (
               },
               content: {
                 question: uniqueQuestion.content.question,
-                options: uniqueQuestion.content.options,
+                options: [...uniqueQuestion.content.options], // Convert readonly to mutable
                 correctAnswer: uniqueQuestion.content.correctAnswer,
                 explanation: uniqueQuestion.content.explanation
               }
@@ -125,3 +126,4 @@ export const useLessonActivitiesInitializer = (
     lessonStartTime
   };
 };
+

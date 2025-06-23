@@ -4,11 +4,21 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface ResultCardProps {
   isCorrect: boolean;
-  isLastQuestion: boolean;
+  correctAnswer?: string;
+  userAnswer?: string;
+  feedback?: string;
   onNext: () => void;
+  isLastQuestion?: boolean;
 }
 
-const ResultCard = ({ isCorrect, isLastQuestion, onNext }: ResultCardProps) => {
+const ResultCard = ({ 
+  isCorrect, 
+  correctAnswer, 
+  userAnswer, 
+  feedback, 
+  onNext, 
+  isLastQuestion = false 
+}: ResultCardProps) => {
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-8">
@@ -22,6 +32,12 @@ const ResultCard = ({ isCorrect, isLastQuestion, onNext }: ResultCardProps) => {
             <p className={`font-semibold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
               {isCorrect ? 'Correct! Well done!' : 'Incorrect. Try again next time!'}
             </p>
+            {feedback && (
+              <p className="text-white text-sm mt-2">{feedback}</p>
+            )}
+            {!isCorrect && correctAnswer && (
+              <p className="text-yellow-400 text-sm mt-2">Correct answer: {correctAnswer}</p>
+            )}
             {isCorrect && <p className="text-white text-sm mt-2">+10 XP</p>}
           </div>
           <Button

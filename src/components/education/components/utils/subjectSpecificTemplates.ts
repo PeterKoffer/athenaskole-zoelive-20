@@ -1,4 +1,5 @@
 
+
 import { LessonActivity } from '../types/LessonTypes';
 import { UniversalContentGenerator } from './universalContentGenerator';
 
@@ -16,10 +17,14 @@ export class SubjectSpecificTemplates {
         title: '🔢 Welcome to Math Magic! ✨',
         duration: 120,
         phaseDescription: 'Your mathematical adventure begins!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
           hook: `Welcome to the most exciting math adventure ever! Today we're exploring ${skillArea} through amazing games, fun challenges, and cool discoveries that will make you feel like a math wizard!`,
           excitementBuilder: "Get ready for number magic, problem-solving adventures, and mathematical fun!",
-          characterIntroduction: "I'm Nelie, and I'm here to make math the most amazing subject you've ever experienced!"
+          text: "I'm Nelie, and I'm here to make math the most amazing subject you've ever experienced!"
         }
       },
       
@@ -31,9 +36,14 @@ export class SubjectSpecificTemplates {
         title: `🔍 Discovering ${skillArea}`,
         duration: 180,
         phaseDescription: 'Learning through exploration and fun!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
           text: `Let's discover the amazing world of ${skillArea}! Math is everywhere around us!`,
           segments: [{
+            title: `Understanding ${skillArea}`,
             concept: skillArea,
             explanation: `${skillArea} helps us solve real-world problems and understand patterns in our world. It's like having a superpower for logical thinking!`,
             checkQuestion: {
@@ -54,6 +64,10 @@ export class SubjectSpecificTemplates {
         title: '🎮 Math Challenge Arena!',
         duration: 200,
         phaseDescription: 'Interactive problem-solving fun!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
           gameType: 'problem-solving',
           question: `🏆 Math Champion Challenge: Lisa has 47 stickers and gives 18 to her friends. How many stickers does Lisa have left?`,
@@ -68,10 +82,14 @@ export class SubjectSpecificTemplates {
       {
         id: `${lessonId}-pizza-factory`,
         type: 'simulation',
-        phase: 'interactive-game',
+        phase: 'simulation',
         title: '🍕 Amazing Pizza Fraction Factory! 🏭',
         duration: 300,
         phaseDescription: 'Learn fractions through delicious pizza adventures!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
           simulationDescription: "Welcome to the most amazing pizza factory in the world! You're the master pizza chef, and customers are ordering different fractions of pizzas!",
           scenarios: [
@@ -104,6 +122,10 @@ export class SubjectSpecificTemplates {
         title: '🎨 Math Art Studio!',
         duration: 240,
         phaseDescription: 'Create amazing mathematical art!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
           creativeType: 'build',
           creativePrompt: `Use your ${skillArea} knowledge to create beautiful mathematical patterns, shapes, or designs!`,
@@ -116,18 +138,24 @@ export class SubjectSpecificTemplates {
       // 6. Math Adventure Quest
       {
         id: `${lessonId}-adventure`,
-        type: 'adventure-game',
+        type: 'interactive-game',
         phase: 'interactive-game',
         title: '🗡️ Kingdom of Numbers Quest!',
         duration: 280,
         phaseDescription: 'Epic mathematical adventure!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
-          gameType: 'adventure-game',
+          gameType: 'interactive-game',
           scenario: "🏰 The Mathematical Crown has been stolen from the Kingdom of Numbers! Only a brave math hero can solve the puzzles and retrieve it!",
-          mechanics: `Use your ${skillArea} skills to overcome mathematical challenges and complete your heroic quest!`,
+          mechanics: [`Use your ${skillArea} skills to overcome mathematical challenges and complete your heroic quest!`],
           rewards: ['Math Hero Badge', 'Number Crown', 'Problem-Solver Medal'],
-          engagementHooks: ["Epic mathematical storyline!", "Challenging puzzles to solve!", "Amazing rewards await!"],
-          celebrationAnimation: true
+          question: "Are you ready for the Kingdom of Numbers Quest?",
+          options: ["Yes, let's go!", "I'm ready!", "Bring on the challenge!", "Math adventure time!"],
+          correctAnswer: 0,
+          explanation: "Fantastic! Your mathematical adventure begins!"
         }
       },
       
@@ -139,6 +167,10 @@ export class SubjectSpecificTemplates {
         title: '🎉 Math Champion Celebration! 🏆',
         duration: 180,
         phaseDescription: 'Celebrating your mathematical mastery!',
+        metadata: {
+          subject: 'mathematics',
+          skillArea: skillArea
+        },
         content: {
           keyTakeaways: [
             `You've mastered important ${skillArea} concepts!`,
@@ -161,32 +193,22 @@ export class SubjectSpecificTemplates {
   }
 
   static getEnglishTemplate(skillArea: string, gradeLevel: number): LessonActivity[] {
-    const lessonId = `english-enhanced-${Date.now()}`;
-    
     return UniversalContentGenerator.generateEngagingLesson('english', skillArea, gradeLevel);
   }
 
   static getScienceTemplate(skillArea: string, gradeLevel: number): LessonActivity[] {
-    const lessonId = `science-enhanced-${Date.now()}`;
-    
     return UniversalContentGenerator.generateEngagingLesson('science', skillArea, gradeLevel);
   }
 
   static getMusicTemplate(skillArea: string, gradeLevel: number): LessonActivity[] {
-    const lessonId = `music-enhanced-${Date.now()}`;
-    
     return UniversalContentGenerator.generateEngagingLesson('music', skillArea, gradeLevel);
   }
 
   static getComputerScienceTemplate(skillArea: string, gradeLevel: number): LessonActivity[] {
-    const lessonId = `cs-enhanced-${Date.now()}`;
-    
     return UniversalContentGenerator.generateEngagingLesson('computer-science', skillArea, gradeLevel);
   }
 
   static getCreativeArtsTemplate(skillArea: string, gradeLevel: number): LessonActivity[] {
-    const lessonId = `arts-enhanced-${Date.now()}`;
-    
     return UniversalContentGenerator.generateEngagingLesson('creative-arts', skillArea, gradeLevel);
   }
 
@@ -215,3 +237,4 @@ export class SubjectSpecificTemplates {
     }
   }
 }
+

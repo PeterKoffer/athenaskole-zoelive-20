@@ -1,198 +1,168 @@
-/**
- * Canonical, extensible lesson template engine for NELIE adaptive tutor.
- * This structure is designed to be robust, easy to extend, and reusable for all K-12 subjects.
- */
-
-// First: import only types needed
 import { LessonActivity, SubjectLessonPlan } from '../components/types/LessonTypes';
 
-/**
- * CanonicalLessonConfig:
- * Core configuration shape for any adaptive, themed, story-driven lesson plan.
- */
 export interface CanonicalLessonConfig {
   subject: string;
   skillArea: string;
   gradeLevel: number;
-  studentName?: string;
-  theme: string; // "detective", "space", etc
-  storyContext: string;
-  openingHook: string;
-  missionObjectives: string[];
-  characterGuide?: string;
-  activities: CanonicalLessonActivityConfig[];
-  finale?: CanonicalFinaleConfig;
-  teachingPerspectiveSettings?: {
-    perspective: string;
-    strength: number;
-    wishes?: string;
-    avoid?: string;
+  sessionDuration: number;
+  learningObjectives: string[];
+}
+
+export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): SubjectLessonPlan => {
+  const { subject, skillArea, gradeLevel, sessionDuration, learningObjectives } = config;
+  const sessionId = `canonical_${subject}_${Date.now()}`;
+
+  // Calculate phase durations based on total session duration
+  const phases = {
+    introduction: Math.floor(sessionDuration * 0.15), // 15%
+    contentDelivery: Math.floor(sessionDuration * 0.35), // 35%
+    interactiveGame: Math.floor(sessionDuration * 0.25), // 25%
+    application: Math.floor(sessionDuration * 0.15), // 15%
+    summary: Math.floor(sessionDuration * 0.10) // 10%
   };
-}
 
-// Each discrete activity/station/phase in the lesson
-export interface CanonicalLessonActivityConfig {
-  id?: string; // if absent, will be auto-numbered
-  type: LessonActivity["type"];
-  phase: LessonActivity["phase"];
-  title: string;
-  duration: number; // seconds
-  phaseDescription?: string;
-  content: any; // flexible—matches LessonActivity's 'content'
-  // Optionally add more for extension!
-}
-
-// Finale config (optional epic ending / boss)
-export interface CanonicalFinaleConfig {
-  title: string;
-  description: string;
-  type: 'boss-battle' | 'presentation' | 'final-project' | 'epic-quest';
-  celebration: string;
-}
-
-/**
- * Converts CanonicalLessonConfig to SubjectLessonPlan (NELIE wide type)
- * - Handles id/phase/type assignment & extension hooks.
- */
-export function buildCanonicalLesson(config: CanonicalLessonConfig): SubjectLessonPlan {
-  // Automate id's if missing, add theme/storyContext to all
-  const phases: LessonActivity[] = config.activities.map((act, idx) => ({
-    id: act.id ?? `${config.subject}-step-${idx + 1}`,
-    type: act.type,
-    phase: act.phase,
-    title: act.title,
-    duration: act.duration,
-    phaseDescription: act.phaseDescription,
-    content: {
-      ...act.content,
-      theme: config.theme,
-      storyContext: config.storyContext,
-      characterGuide: config.characterGuide,
-      missionObjectives: config.missionObjectives,
-      // Optionally include student's name where relevant
-      ...(config.studentName ? { studentName: config.studentName } : {}),
-      // Add school teaching perspective (if defined, otherwise skip)
-      ...(config.teachingPerspectiveSettings ? { teachingPerspective: config.teachingPerspectiveSettings } : {})
-    }
-  }));
-
-  // Add grand finale if present
-  if (config.finale) {
-    phases.push({
-      id: `${config.subject}-finale`,
-      type: 'summary',
-      phase: 'summary',
-      title: `🏆 ${config.finale.title}`,
-      duration: 60,
-      phaseDescription: 'Epic celebration and next adventure!',
+  const activities: LessonActivity[] = [
+    // Introduction Phase
+    {
+      id: `${sessionId}_intro`,
+      type: 'introduction',
+      phase: 'introduction',
+      title: `Welcome to ${subject}`,
+      duration: phases.introduction,
+      phaseDescription: 'Engaging introduction to capture interest',
+      metadata: {
+        subject,
+        skillArea
+      },
       content: {
-        grandChallenge: config.finale,
-        celebration: config.finale.celebration,
-        theme: config.theme,
-        storyContext: config.storyContext,
-        achievementsList: config.missionObjectives,
-        ...(config.teachingPerspectiveSettings ? { teachingPerspective: config.teachingPerspectiveSettings } : {})
+        hook: `Ready to explore the amazing world of ${subject}?`,
+        text: `Today we'll master ${skillArea} concepts!`
       }
-    });
-  }
+    },
+
+    // Content Delivery Phase
+    {
+      id: `${sessionId}_content`,
+      type: 'content-delivery',
+      phase: 'content-delivery',
+      title: `Understanding ${skillArea}`,
+      duration: phases.contentDelivery,
+      phaseDescription: 'Core concept explanation and demonstration',
+      metadata: {
+        subject,
+        skillArea
+      },
+      content: {
+        segments: [{
+          title: `${skillArea} Fundamentals`,
+          concept: skillArea,
+          explanation: `Let's explore the key concepts of ${skillArea} step by step.`,
+          checkQuestion: {
+            question: `What is the main concept of ${skillArea}?`,
+            options: ['Concept A', 'Concept B', 'Concept C', 'All of the above'],
+            correctAnswer: 3,
+            explanation: 'Great! Understanding all aspects helps master the topic.'
+          }
+        }]
+      }
+    },
+
+    // Interactive Game Phase
+    {
+      id: `${sessionId}_game`,
+      type: 'interactive-game',
+      phase: 'interactive-game',
+      title: `${skillArea} Challenge`,
+      duration: phases.interactiveGame,
+      phaseDescription: 'Interactive practice and reinforcement',
+      metadata: {
+        subject,
+        skillArea
+      },
+      content: {
+        question: `Ready to test your ${skillArea} skills?`,
+        options: ['Yes, let\'s do this!', 'I need more practice', 'Explain again please', 'I\'m ready!'],
+        correctAnswer: 0,
+        explanation: 'Excellent! Let\'s put your knowledge to the test!'
+      }
+    },
+
+    // Application Phase
+    {
+      id: `${sessionId}_application`,
+      type: 'application',
+      phase: 'application',
+      title: `Apply Your ${skillArea} Knowledge`,
+      duration: phases.application,
+      phaseDescription: 'Real-world application of learned concepts',
+      metadata: {
+        subject,
+        skillArea
+      },
+      content: {
+        scenario: `Imagine you need to use ${skillArea} in a real situation...`,
+        task: `Apply what you've learned about ${skillArea} to solve this problem.`,
+        text: 'Take your time and think through each step.'
+      }
+    }
+  ];
+
+  // Add summary activity
+  const summaryActivity: LessonActivity = {
+    id: `${sessionId}_summary`,
+    type: 'summary',
+    phase: 'summary',
+    title: 'Lesson Complete!',
+    duration: phases.summary,
+    phaseDescription: 'Lesson wrap-up and achievement celebration',
+    metadata: {
+      subject,
+      skillArea
+    },
+    content: {
+      keyTakeaways: [
+        `You mastered ${skillArea} concepts`,
+        `You can apply ${skillArea} in real situations`,
+        `You're ready for more advanced topics!`
+      ],
+      achievementsList: learningObjectives.map(obj => `✓ ${obj}`),
+      text: `Amazing work! You've successfully completed your ${subject} lesson!`
+    }
+  };
+
+  activities.push(summaryActivity);
 
   return {
-    subject: config.subject,
-    skillArea: config.skillArea,
-    totalDuration: phases.reduce((sum, p) => sum + (p.duration || 0), 0),
-    phases,
-    learningObjectives: config.missionObjectives,
-    prerequisites: [],
-    engagementLevel: 'HIGH',
-    funFactor: '🎉'
+    subject,
+    skillArea,
+    gradeLevel,
+    totalDuration: sessionDuration,
+    phases: activities,
+    activities,
+    estimatedDuration: sessionDuration,
+    objectives: learningObjectives,
+    learningObjectives,
+    difficulty: gradeLevel <= 3 ? 1 : gradeLevel <= 6 ? 2 : gradeLevel <= 9 ? 3 : 4,
+    prerequisites: [`Basic ${subject} knowledge`],
+    assessmentCriteria: ['Understanding of concepts', 'Application of knowledge'],
+    extensions: [`Advanced ${skillArea} practice`, `Related ${subject} topics`]
   };
-}
+};
 
-/**
- * Sample function to generate a Mathematics lesson using the canonical structure
- * Easy to extend! (Add more phases/activities, or build a "template per subject".)
- */
-export function createCanonicalMathematicsLesson(options?: Partial<CanonicalLessonConfig>): SubjectLessonPlan {
-  const config: CanonicalLessonConfig = {
-    subject: 'mathematics',
-    skillArea: 'general_math',
-    gradeLevel: 2,
-    studentName: options?.studentName ?? 'Math Explorer',
-    theme: "mystery",
-    storyContext: "Math Adventure Forest",
-    openingHook: "A puzzle awaits you in the magic forest—can you solve it before sunset?",
-    missionObjectives: [
-      "Solve math challenges",
-      "Discover number patterns",
-      "Become a Math Explorer"
-    ],
-    characterGuide: "Professor Patterns",
-    activities: [
-      {
-        type: 'introduction',
-        phase: 'introduction',
-        title: "Welcome to the Math Forest!",
-        duration: 120,
-        phaseDescription: "Meet your guide and get your supplies.",
-        content: {
-          hook: "Welcome, young explorer!",
-          realWorldExample: "In our forest, every puzzle is a chance to earn a golden acorn.",
-          thoughtQuestion: "What's the biggest number you can count to?"
-        }
-      },
-      {
-        type: 'content-delivery',
-        phase: 'content-delivery',
-        title: "The Counting Stream",
-        duration: 120,
-        phaseDescription: "Counting animals and treasures.",
-        content: {
-          segments: [{
-            concept: "Counting",
-            explanation: "Let's count all the ducks in the stream. How many do you see?",
-            checkQuestion: {
-              question: "How many ducks are there? 🦆🦆🦆🦆",
-              options: ['2', '3', '4', '5'],
-              correctAnswer: 2,
-              explanation: "There are 4 ducks in the stream!"
-            }
-          }]
-        }
-      },
-      {
-        type: 'interactive-game',
-        phase: 'interactive-game',
-        title: "Puzzle Bridge",
-        duration: 150,
-        phaseDescription: "Solve a puzzle to cross the bridge.",
-        content: {
-          question: "What comes next in this pattern? 2, 4, 6, __",
-          options: ['7', '8', '9', '10'],
-          correctAnswer: 1,
-          explanation: "We add 2 each time: 2,4,6,8!",
-          gameType: 'problem-solving'
-        }
-      }
-    ],
-    finale: {
-      title: "You Escaped the Math Forest!",
-      description: "Celebrate your adventure and prepare for the next quest.",
-      type: 'presentation', // was "celebration", which is not a valid type; changed to "presentation"
-      celebration: "You are a true Math Explorer! 🎉"
-    }
-  };
-  // Allow overrides for customization/extensibility
-  return buildCanonicalLesson({ ...config, ...options });
-}
-
-/**
- * To extend for other subjects:
- * - Make per-subject config generators (like createCanonicalScienceLesson)
- * - Or create a UI to assemble a CanonicalLessonConfig dynamically
- */
-
-/**
- * USAGE:
- * const mathLesson = createCanonicalMathematicsLesson({ studentName: "Katie" });
- * // mathLesson now fits SubjectLessonPlan and is ready for lesson manager!
- */
+export const generateQuickCanonicalLesson = (
+  subject: string,
+  skillArea: string,
+  gradeLevel: number = 6
+): SubjectLessonPlan => {
+  return createCanonicalLessonTemplate({
+    subject,
+    skillArea,
+    gradeLevel,
+    sessionDuration: 1200, // 20 minutes
+    learningObjectives: [
+      `Understand ${skillArea} fundamentals`,
+      `Apply ${skillArea} concepts`,
+      `Solve ${skillArea} problems confidently`
+    ]
+  });
+};

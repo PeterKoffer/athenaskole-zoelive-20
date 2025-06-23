@@ -1,128 +1,228 @@
-import { sessionService, LearningSession as SessionLearningSession } from './sessionService';
-import { userProgressService, UserProgress as ServiceUserProgress } from './userProgressService';
 
-// Use the UserProgress from userProgressService and add the missing id field
-export interface UserProgress extends ServiceUserProgress {
+import { useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface UserProgress {
   id: string;
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  current_activity_index: number;
+  score: number;
+  time_elapsed: number;
+  accuracy_rate: number;
+  attempts_count: number;
+  completion_time_avg: number;
+  current_level: number;
+  engagement_score: number;
+  last_assessment: string;
+  learning_style: string;
+  strengths: Record<string, unknown>;
+  weaknesses: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
 }
 
-// Use the LearningSession from sessionService to ensure consistency
-export interface LearningSession extends SessionLearningSession {
-  id: string; // Ensure id is required, not optional
+interface SessionData {
+  user_id: string;
+  subject: string;
+  skill_area: string;
+  difficulty_level: number;
+  start_time: string;
+  end_time?: string;
+  time_spent: number;
+  score: number;
+  completed: boolean;
 }
 
-class ProgressPersistenceService {
-  async saveSession(sessionData: Partial<LearningSession>): Promise<string | null> {
-    return sessionService.saveSession(sessionData);
+// Helper function to safely convert Json to Record<string, unknown>
+const safeJsonToRecord = (json: any): Record<string, unknown> => {
+  if (typeof json === 'object' && json !== null && !Array.isArray(json)) {
+    return json as Record<string, unknown>;
   }
+  return {};
+};
 
-  async updateSession(sessionId: string, updates: Partial<LearningSession>): Promise<boolean> {
-    return sessionService.updateSession(sessionId, updates);
-  }
+export const useUserProgress = (userId: string, subject: string, skillArea: string) => {
+  const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  async getUserProgress(userId: string, subject: string): Promise<UserProgress | null> {
-    const progress = await userProgressService.getUserProgress(userId, subject);
-    if (!progress) return null;
+  const fetchUserProgress = useCallback(async () => {
+    if (!userId) return;
     
-    // Add the missing id field
-    return {
-      ...progress,
-      id: `${userId}-${subject}-${progress.skill_area}`
-    };
-  }
-
-  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
-    // Remove the id field before passing to userProgressService
-    const { id, ...serviceProgressData } = progressData;
-    return userProgressService.updateUserProgress(serviceProgressData);
-  }
-
-  async getRecentSessions(userId: string, limit: number = 10): Promise<LearningSession[]> {
-    const sessions = await sessionService.getRecentSessions(userId, limit);
-    // Transform sessions to ensure they have required id field
-    return sessions.map(session => ({
-      ...session,
-      id: session.id || `temp-${Date.now()}-${Math.random()}` // Ensure id is always present
-    })) as LearningSession[];
-  }
-
-  async getPerformanceAnalytics(userId: string, subject: string, days: number = 30): Promise<any> {
+    setIsLoading(true);
     try {
-      const sessions = await this.getRecentSessions(userId, 100);
-      const filteredSessions = sessions.filter(session => 
-        session.subject === subject &&
-        new Date(session.start_time) >= new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-      );
+      const { data, error } = await supabase
+        .from('user_performance')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .eq('skill_area', skillArea)
+        .single();
 
-      const analytics = {
-        totalSessions: filteredSessions.length,
-        totalTimeSpent: filteredSessions.reduce((sum, session) => sum + (session.time_spent || 0), 0),
-        averageScore: filteredSessions.length > 0 
-          ? filteredSessions.reduce((sum, session) => sum + (session.score || 0), 0) / filteredSessions.length 
-          : 0,
-        difficultyProgression: filteredSessions.map(session => ({
-          date: session.start_time,
-          level: session.difficulty_level
-        })),
-        dailyProgress: this.groupSessionsByDay(filteredSessions)
-      };
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error fetching user progress:', error);
+        return;
+      }
 
-      return analytics;
+      if (data) {
+        // Map database fields to UserProgress interface with proper type handling
+        const mappedProgress: UserProgress = {
+          id: data.id,
+          user_id: data.user_id,
+          subject: data.subject,
+          skill_area: data.skill_area,
+          current_activity_index: 0, // Default value since not in DB
+          score: 0, // Default value since not in DB
+          time_elapsed: 0, // Default value since not in DB
+          accuracy_rate: data.accuracy_rate,
+          attempts_count: data.attempts_count,
+          completion_time_avg: data.completion_time_avg,
+          current_level: data.current_level,
+          engagement_score: data.engagement_score,
+          last_assessment: data.last_assessment,
+          learning_style: data.learning_style,
+          strengths: safeJsonToRecord(data.strengths),
+          weaknesses: safeJsonToRecord(data.weaknesses),
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        };
+        setUserProgress(mappedProgress);
+      }
     } catch (error) {
-      console.error('Error calculating analytics:', error);
+      console.error('Error fetching user progress:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId, subject, skillArea]);
+
+  return {
+    userProgress,
+    isLoading,
+    fetchUserProgress
+  };
+};
+
+export const progressPersistence = {
+  async saveSession(sessionData: SessionData): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('learning_sessions')
+        .insert([sessionData])
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error('Error saving session:', error);
+        return null;
+      }
+
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error saving session:', error);
       return null;
     }
-  }
+  },
 
-  private groupSessionsByDay(sessions: LearningSession[]): any[] {
-    const grouped = sessions.reduce((acc, session) => {
-      const date = session.start_time.split('T')[0];
-      if (!acc[date]) {
-        acc[date] = {
-          date,
-          sessions: 0,
-          totalTime: 0,
-          totalScore: 0,
-          sessionCount: 0
-        };
+  async updateSession(sessionId: string, updates: Partial<SessionData>): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('learning_sessions')
+        .update(updates)
+        .eq('id', sessionId);
+
+      if (error) {
+        console.error('Error updating session:', error);
+        return false;
       }
-      acc[date].sessions++;
-      acc[date].totalTime += session.time_spent || 0;
-      acc[date].totalScore += session.score || 0;
-      acc[date].sessionCount++;
-      return acc;
-    }, {} as any);
 
-    return Object.values(grouped).map((day: any) => ({
-      ...day,
-      averageScore: day.sessionCount > 0 ? day.totalScore / day.sessionCount : 0
-    }));
-  }
-
-  calculateLearningStreak(sessions: LearningSession[]): number {
-    if (sessions.length === 0) return 0;
-
-    const today = new Date();
-    const sortedSessions = sessions.sort((a, b) => 
-      new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
-    );
-
-    let streak = 0;
-    let currentDate = today;
-
-    for (const session of sortedSessions) {
-      const sessionDate = new Date(session.start_time);
-      const daysDiff = Math.floor((currentDate.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24));
-
-      if (daysDiff === streak) {
-        streak++;
-      } else if (daysDiff > streak + 1) {
-        break;
-      }
+      return true;
+    } catch (error) {
+      console.error('Error updating session:', error);
+      return false;
     }
+  },
 
-    return streak;
+  async getUserProgress(userId: string, subject: string): Promise<UserProgress | null> {
+    try {
+      const { data, error } = await supabase
+        .from('user_performance')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('subject', subject)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user progress:', error);
+        return null;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      // Map database fields to UserProgress interface with proper type handling
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        subject: data.subject,
+        skill_area: data.skill_area,
+        current_activity_index: 0, // Default value since not in DB
+        score: 0, // Default value since not in DB
+        time_elapsed: 0, // Default value since not in DB
+        accuracy_rate: data.accuracy_rate,
+        attempts_count: data.attempts_count,
+        completion_time_avg: data.completion_time_avg,
+        current_level: data.current_level,
+        engagement_score: data.engagement_score,
+        last_assessment: data.last_assessment,
+        learning_style: data.learning_style,
+        strengths: safeJsonToRecord(data.strengths),
+        weaknesses: safeJsonToRecord(data.weaknesses),
+        created_at: data.created_at,
+        updated_at: data.updated_at
+      };
+    } catch (error) {
+      console.error('Error fetching user progress:', error);
+      return null;
+    }
+  },
+
+  async updateUserProgress(progressData: Partial<UserProgress>): Promise<boolean> {
+    try {
+      // Convert UserProgress to database format, excluding fields not in DB schema
+      const dbData = {
+        user_id: progressData.user_id!,
+        subject: progressData.subject!,
+        skill_area: progressData.skill_area!,
+        accuracy_rate: progressData.accuracy_rate || 0,
+        attempts_count: progressData.attempts_count || 0,
+        completion_time_avg: progressData.completion_time_avg || 0,
+        current_level: progressData.current_level || 1,
+        engagement_score: progressData.engagement_score || 0,
+        last_assessment: progressData.last_assessment || new Date().toISOString(),
+        learning_style: progressData.learning_style || 'visual',
+        strengths: (progressData.strengths || {}) as any,
+        weaknesses: (progressData.weaknesses || {}) as any,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { error } = await supabase
+        .from('user_performance')
+        .upsert(dbData, { 
+          onConflict: 'user_id,subject,skill_area',
+          ignoreDuplicates: false 
+        });
+
+      if (error) {
+        console.error('Error updating user progress:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating user progress:', error);
+      return false;
+    }
   }
-}
-
-export const progressPersistence = new ProgressPersistenceService();
+};

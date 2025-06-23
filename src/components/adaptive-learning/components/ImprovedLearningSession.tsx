@@ -9,6 +9,7 @@ import LoadingStates from './LoadingStates';
 import SessionHeader from './SessionHeader';
 import QuestionDisplay from './QuestionDisplay';
 import ImprovedSessionManager from './ImprovedSessionManager';
+import GameEngine from '@/components/games/engine/GameEngine';
 
 interface ImprovedLearningSessionProps {
   subject: string;
@@ -77,7 +78,7 @@ const ImprovedLearningSession = ({
     >
       {(sessionData) => {
         const {
-          currentQuestion,
+          currentActivity,
           selectedAnswer,
           showResult,
           questionNumber,
@@ -86,16 +87,17 @@ const ImprovedLearningSession = ({
           isGenerating,
           gradeLevel,
           loadNextQuestion,
-          handleAnswerSelect
+          handleAnswerSelect,
+          handleGameComplete
         } = sessionData;
 
-        // Generate first question after explanation phase
+        // Generate first activity after explanation phase
         useEffect(() => {
-          if (user?.id && gradeContentConfig && !currentQuestion && !isGenerating) {
+          if (user?.id && gradeContentConfig && !currentActivity && !isGenerating) {
             console.log('🎬 Starting grade-appropriate session for Grade', gradeLevel);
             loadNextQuestion();
           }
-        }, [user?.id, gradeContentConfig, currentQuestion, isGenerating, gradeLevel, loadNextQuestion]);
+        }, [user?.id, gradeContentConfig, currentActivity, isGenerating, gradeLevel, loadNextQuestion]);
 
         const handleRefresh = () => {
           if (!isGenerating) {
@@ -103,7 +105,7 @@ const ImprovedLearningSession = ({
           }
         };
 
-        if (isGenerating && !currentQuestion) {
+        if (isGenerating && !currentActivity) {
           return (
             <LoadingStates 
               type="generating" 
@@ -113,7 +115,7 @@ const ImprovedLearningSession = ({
           );
         }
 
-        if (!currentQuestion) {
+        if (!currentActivity) {
           return (
             <LoadingStates 
               type="no-question"
@@ -122,42 +124,58 @@ const ImprovedLearningSession = ({
           );
         }
 
-        return (
-          <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
-            <CardHeader>
-              <SessionHeader
-                onBack={onBack}
-                gradeLevel={gradeLevel}
-                subject={subject}
-                questionNumber={questionNumber}
-                totalQuestions={totalQuestions}
-                standardCode={gradeContentConfig.standard?.code}
-                correctAnswers={correctAnswers}
-                showResult={showResult}
-                isGenerating={isGenerating}
-                onRefresh={handleRefresh}
-              />
-            </CardHeader>
-
-            <CardContent className="p-6">
-              <QuestionDisplay
-                question={currentQuestion.question}
-                options={currentQuestion.options}
-                selectedAnswer={selectedAnswer}
-                correctAnswer={currentQuestion.correct}
-                showResult={showResult}
-                explanation={currentQuestion.explanation}
-                standardInfo={gradeContentConfig.standard ? {
-                  code: gradeContentConfig.standard.code,
-                  title: gradeContentConfig.standard.title
-                } : undefined}
-                questionNumber={questionNumber}
-                totalQuestions={totalQuestions}
-                onAnswerSelect={handleAnswerSelect}
-              />
-            </CardContent>
-          </Card>
-        );
+        // Conditional rendering based on activity type
+        if (currentActivity.type === 'interactive-game' && currentActivity.gameData) {
+          return (
+            <GameEngine
+              game={currentActivity.gameData}
+              onComplete={(score) => {
+                console.log("GameEngine onComplete score:", score);
+                handleGameComplete(score);
+              }}
+              onBack={onBack}
+            />
+          );
+        } else if (currentActivity.type === 'interactive-question') {
+          return (
+            <Card className="bg-gray-900 border-gray-800 max-w-4xl mx-auto">
+              <CardHeader>
+                <SessionHeader
+                  onBack={onBack}
+                  gradeLevel={gradeLevel}
+                  subject={subject}
+                  questionNumber={questionNumber}
+                  totalQuestions={totalQuestions}
+                  standardCode={gradeContentConfig.standard?.code}
+                  correctAnswers={correctAnswers}
+                  showResult={showResult}
+                  isGenerating={isGenerating}
+                  onRefresh={handleRefresh}
+                />
+              </CardHeader>
+              <CardContent className="p-6">
+                <QuestionDisplay
+                  question={currentActivity.question}
+                  options={currentActivity.options}
+                  selectedAnswer={selectedAnswer}
+                  correctAnswer={currentActivity.correct}
+                  showResult={showResult}
+                  explanation={currentActivity.explanation}
+                  standardInfo={gradeContentConfig.standard ? {
+                    code: gradeContentConfig.standard.code,
+                    title: gradeContentConfig.standard.title
+                  } : undefined}
+                  questionNumber={questionNumber}
+                  totalQuestions={totalQuestions}
+                  onAnswerSelect={handleAnswerSelect}
+                  subject={subject}
+                />
+              </CardContent>
+            </Card>
+          );
+        }
+        // Fallback or loading for unknown activity type
+        return <LoadingStates type="generating" gradeLevel={gradeLevel} />;
       }}
     </ImprovedSessionManager>
   );

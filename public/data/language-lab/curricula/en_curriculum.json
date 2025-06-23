@@ -1,0 +1,30 @@
+{
+  "languageCode": "en",
+  "languageName": "English",
+  "levels": [
+    {
+      "levelId": "en_level1",
+      "title": "Beginner English (A1)",
+      "description": "Learn the basics of English.",
+      "k12Grades": [1, 2, 3, 4],
+      "units": [
+        {
+          "unitId": "en_l1_unit1",
+          "title": "Greetings & Basics",
+          "lessons": [
+            {
+              "lessonId": "en_l1_u1_lesson1",
+              "title": "Hello and Numbers",
+              "lessonPath": "language-lab/lessons/en/l1_u1_lesson1.json"
+            },
+            {
+              "lessonId": "en_l1_u1_lesson2",
+              "title": "Common Objects",
+              "lessonPath": "language-lab/lessons/en/l1_u1_lesson2.json"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

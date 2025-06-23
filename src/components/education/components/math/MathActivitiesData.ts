@@ -1,3 +1,4 @@
+
 import { LessonActivity } from '../types/LessonTypes';
 import { mathBattleArenaActivity } from './MathBattleArenaActivity';
 
@@ -14,6 +15,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Count objects and learn basic numbers',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'counting'
+    },
     content: {
       question: 'Count the animals: 🐶🐶🐶🐱🐱 How many pets are there in total?',
       options: ['5 pets', '4 pets', '6 pets', '3 pets'],
@@ -28,6 +33,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Basic addition with real-world context',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'addition'
+    },
     content: {
       question: 'At the pizza party, there are 4 cheese pizzas and 3 pepperoni pizzas. How many pizzas in total?',
       options: ['6 pizzas', '7 pizzas', '8 pizzas', '5 pizzas'],
@@ -44,8 +53,13 @@ export const mathActivities: LessonActivity[] = [
     phase: 'content-delivery',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Learning about basic geometric shapes',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'geometry'
+    },
     content: {
       segments: [{
+        title: 'Basic Shapes',
         concept: 'Basic Shapes',
         explanation: 'Shapes are everywhere! A circle is round like a ball, a square has 4 equal sides like a window, and a triangle has 3 sides like a slice of pizza. Can you find shapes around your room?',
         checkQuestion: {
@@ -64,6 +78,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Identify shapes in everyday objects',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'geometry'
+    },
     content: {
       question: 'A clock face is what shape?',
       options: ['Triangle', 'Square', 'Circle', 'Rectangle'],
@@ -80,6 +98,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Finding patterns in number sequences',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'patterns'
+    },
     content: {
       question: 'What comes next in this pattern? 2, 4, 6, 8, ?',
       options: ['9', '10', '11', '12'],
@@ -94,6 +116,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Recognizing visual patterns',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'patterns'
+    },
     content: {
       question: 'Complete the pattern: Red, Blue, Red, Blue, Red, ?',
       options: ['Red', 'Blue', 'Green', 'Yellow'],
@@ -110,8 +136,13 @@ export const mathActivities: LessonActivity[] = [
     phase: 'content-delivery',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Understanding measurement concepts',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'measurement'
+    },
     content: {
       segments: [{
+        title: 'Big and Small, Long and Short',
         concept: 'Big and Small, Long and Short',
         explanation: 'We can measure how long, how tall, and how heavy things are! A pencil is shorter than a ruler. An elephant is heavier than a mouse. We use words like bigger, smaller, longer, and shorter to compare!',
         checkQuestion: {
@@ -130,6 +161,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Learning to tell time',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'time'
+    },
     content: {
       question: 'How many minutes are in one hour?',
       options: ['30 minutes', '45 minutes', '60 minutes', '90 minutes'],
@@ -146,6 +181,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Learning about money and counting coins',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'money'
+    },
     content: {
       question: 'If you have 2 quarters (25¢ each), how much money do you have?',
       options: ['25¢', '40¢', '50¢', '75¢'],
@@ -160,6 +199,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Real-world problem solving with money',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'money'
+    },
     content: {
       question: 'You want to buy a toy for $3 and a book for $2. How much do you need in total?',
       options: ['$4', '$5', '$6', '$7'],
@@ -176,6 +219,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Learning subtraction through stories',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'subtraction'
+    },
     content: {
       question: 'Mom baked 10 cookies. The family ate 3 cookies. How many cookies are left?',
       options: ['6 cookies', '7 cookies', '8 cookies', '9 cookies'],
@@ -190,6 +237,10 @@ export const mathActivities: LessonActivity[] = [
     phase: 'interactive-game',
     duration: 90, // 1.5 minutes
     phaseDescription: 'Multi-step problem solving',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'problem_solving'
+    },
     content: {
       question: 'There are 12 birds in a tree. 4 birds fly away, then 2 more birds come. How many birds are in the tree now?',
       options: ['8 birds', '9 birds', '10 birds', '11 birds'],
@@ -206,8 +257,13 @@ export const mathActivities: LessonActivity[] = [
     phase: 'content-delivery',
     duration: 120, // 2 minutes
     phaseDescription: 'Introduction to multiplication concepts',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'multiplication'
+    },
     content: {
       segments: [{
+        title: 'Making Groups',
         concept: 'Making Groups',
         explanation: 'Multiplication is like making equal groups! If you have 3 bags with 2 apples each, that\'s 3 × 2 = 6 apples total. It\'s faster than counting 2 + 2 + 2!',
         checkQuestion: {
@@ -228,8 +284,13 @@ export const mathActivities: LessonActivity[] = [
     phase: 'content-delivery',
     duration: 60, // 1 minute
     phaseDescription: 'Celebrating math learning achievements',
+    metadata: {
+      subject: 'mathematics',
+      skillArea: 'summary'
+    },
     content: {
       segments: [{
+        title: 'You\'re a Math Star!',
         concept: 'You\'re a Math Star!',
         explanation: 'Congratulations! You\'ve learned about counting, shapes, patterns, time, money, and problem-solving. Math is everywhere around us, and you\'re becoming a real math detective! Keep practicing and exploring numbers!',
         checkQuestion: {
