@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,30 +6,39 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Brain, ArrowLeft, LogIn } from 'lucide-react';
 import ImprovedLearningSession from './components/ImprovedLearningSession';
+import MathematicsWelcome from '@/components/education/components/welcome/MathematicsWelcome';
+import ClassroomEnvironment from '@/components/education/components/shared/ClassroomEnvironment';
+import { getClassroomConfig } from '@/components/education/components/shared/classroomConfigs';
+
 interface AILearningModuleProps {
   subject: string;
   skillArea: string;
   difficultyLevel: number;
   onBack: () => void;
 }
+
 const AILearningModule = ({
   subject,
   skillArea,
   difficultyLevel,
   onBack
 }: AILearningModuleProps) => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [showWelcome, setShowWelcome] = useState(subject === 'mathematics');
+  const classroomConfig = getClassroomConfig(subject);
+
   console.log('🎯 AILearningModule rendering with improved session:', {
     subject,
     skillArea,
     difficultyLevel,
-    hasUser: !!user
+    hasUser: !!user,
+    showWelcome
   });
+
   if (!user) {
-    return <Card className="bg-red-900 border-red-700">
+    return (
+      <Card className="bg-red-900 border-red-700">
         <CardContent className="p-8 text-center text-white">
           <Brain className="w-16 h-16 text-red-400 mx-auto mb-6" />
           <h3 className="text-2xl font-semibold mb-4">Login Required</h3>
@@ -46,10 +56,39 @@ const AILearningModule = ({
             </Button>
           </div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   }
-  return <div className="space-y-6">
-      <ImprovedLearningSession subject={subject} skillArea={skillArea} difficultyLevel={difficultyLevel} onBack={onBack} />
-    </div>;
+
+  const handleStartLesson = () => {
+    console.log('🚀 Starting lesson from welcome screen');
+    setShowWelcome(false);
+  };
+
+  // Show mathematics welcome screen
+  if (showWelcome && subject === 'mathematics') {
+    return (
+      <ClassroomEnvironment config={classroomConfig}>
+        <div className="min-h-screen flex items-center justify-center">
+          <MathematicsWelcome
+            onStartLesson={handleStartLesson}
+            studentName={user?.user_metadata?.first_name || 'Student'}
+          />
+        </div>
+      </ClassroomEnvironment>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <ImprovedLearningSession
+        subject={subject}
+        skillArea={skillArea}
+        difficultyLevel={difficultyLevel}
+        onBack={onBack}
+      />
+    </div>
+  );
 };
+
 export default AILearningModule;
