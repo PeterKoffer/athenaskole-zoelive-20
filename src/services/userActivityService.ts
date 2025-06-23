@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserActivitySession {
@@ -11,7 +10,7 @@ export interface UserActivitySession {
   duration_minutes?: number;
   completion_status: 'in_progress' | 'completed' | 'abandoned';
   engagement_score?: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export class UserActivityService {
@@ -142,7 +141,7 @@ export class UserActivityService {
     }
   }
 
-  async getSessionAnalytics(userId: string, days: number = 30): Promise<any> {
+  async getSessionAnalytics(userId: string, days: number = 30): Promise<Record<string, unknown> | null> {
     try {
       const fromDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
       
