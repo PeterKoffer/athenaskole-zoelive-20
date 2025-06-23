@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Test the existing game system verification
 describe('Game System Verification', () => {
-  let gameSystemVerification: any;
+  let gameSystemVerification: Record<string, unknown>;
 
   beforeEach(async () => {
     // Mock the dependencies that the verification module needs
