@@ -1,3 +1,4 @@
+
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { Button } from "@/components/ui/button";
@@ -129,9 +130,9 @@ const SubjectsSection = () => {
               key={index}
               speakText={`${subject.title}. ${subject.description}. Key Areas: ${subject.keyAreas.join(', ')}`}
               context={`subject-card-${index}`}
-              className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-full"
+              className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 backdrop-blur-sm h-[460px] flex flex-col"
             >
-              <CardContent className="p-6">
+              <CardContent className="p-6 flex flex-col h-full">
                 <div className="flex items-center mb-4">
                   <span className="text-3xl mr-3">{subject.icon}</span>
                   <h3 className="text-xl font-bold text-white">
@@ -139,7 +140,7 @@ const SubjectsSection = () => {
                   </h3>
                 </div>
                 
-                <p className="text-gray-300 mb-4">
+                <p className="text-gray-300 mb-4 flex-grow">
                   {subject.description}
                 </p>
 
@@ -148,18 +149,23 @@ const SubjectsSection = () => {
                     Key Areas:
                   </h4>
                   <ul className="space-y-1">
-                    {subject.keyAreas.map((area, areaIndex) => (
+                    {subject.keyAreas.slice(0, 3).map((area, areaIndex) => (
                       <li key={areaIndex} className="flex items-center text-sm text-gray-300">
                         <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
                         <span>{area}</span>
                       </li>
                     ))}
+                    {subject.keyAreas.length > 3 && (
+                      <li className="text-sm text-gray-400">
+                        +{subject.keyAreas.length - 3} more areas
+                      </li>
+                    )}
                   </ul>
                 </div>
 
                 <Button
                   onClick={() => handleStartLearning(subject.path)}
-                  className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity`}
+                  className={`w-full bg-gradient-to-r ${subject.gradient} hover:opacity-90 transition-opacity mt-auto`}
                 >
                   Start Learning
                 </Button>
