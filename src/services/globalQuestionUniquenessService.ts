@@ -1,4 +1,3 @@
-
 export interface UniqueQuestion {
   id: string;
   content: {
@@ -15,17 +14,9 @@ export interface UniqueQuestion {
     timestamp: number;
     userId: string;
     sessionId: string;
-    teachingPerspective?: unknown; // Changed from 'any' to 'unknown'
+    teachingPerspective?: string; // <-- changed from any to string
     gradeStandards?: string[];
   };
-}
-
-// Add this interface to type the recap questions
-interface RecapQuestion {
-  question: string;
-  options: string[];
-  correct: number;
-  explanation: string;
 }
 
 class GlobalQuestionUniquenessService {
@@ -47,23 +38,21 @@ class GlobalQuestionUniquenessService {
    */
   async trackQuestionUsage(question: UniqueQuestion): Promise<void> {
     const userKey = `${question.metadata.userId}_${question.metadata.subject}`;
-    
     if (!this.questionHistory.has(userKey)) {
       this.questionHistory.set(userKey, new Set());
     }
-    
     const userQuestions = this.questionHistory.get(userKey)!;
     userQuestions.add(question.content.question);
-    
+
     // Store full question data
     this.questionDatabase.set(question.id, question);
-    
+
     // Track by session
     if (!this.sessionTracker.has(question.metadata.sessionId)) {
       this.sessionTracker.set(question.metadata.sessionId, []);
     }
     this.sessionTracker.get(question.metadata.sessionId)!.push(question.id);
-    
+
     console.log(`📊 Tracked question usage: ${userQuestions.size} total questions for user`);
   }
 
@@ -73,9 +62,9 @@ class GlobalQuestionUniquenessService {
   getUserQuestionHistory(userId: string, subject: string, limit: number = 50): string[] {
     const userKey = `${userId}_${subject}`;
     const questions = this.questionHistory.get(userKey);
-    
+
     if (!questions) return [];
-    
+
     return Array.from(questions).slice(-limit);
   }
 
@@ -85,9 +74,9 @@ class GlobalQuestionUniquenessService {
   isQuestionUnique(userId: string, subject: string, questionText: string): boolean {
     const userKey = `${userId}_${subject}`;
     const userQuestions = this.questionHistory.get(userKey);
-    
+
     if (!userQuestions) return true;
-    
+
     return !userQuestions.has(questionText);
   }
 
@@ -97,7 +86,7 @@ class GlobalQuestionUniquenessService {
   canGenerateRecap(userId: string, subject: string, skillArea: string): Promise<boolean> {
     const userKey = `${userId}_${subject}`;
     const userQuestions = this.questionHistory.get(userKey);
-    
+
     // Need at least 3 questions answered to generate recap
     return Promise.resolve(userQuestions ? userQuestions.size >= 3 : false);
   }
@@ -110,16 +99,16 @@ class GlobalQuestionUniquenessService {
     subject: string,
     skillArea: string,
     limit: number = 5
-  ): Promise<RecapQuestion[]> { // Changed return type from 'any[]' to 'RecapQuestion[]'
+  ): Promise<{question: string; options: string[]; correct: number; explanation: string}[]> { // <-- changed from any[] to specific type
     const userKey = `${userId}_${subject}`;
     const userQuestions = this.questionHistory.get(userKey);
-    
+
     if (!userQuestions) {
       return Promise.resolve([]);
     }
 
     // Get recent questions for recap
-    const recentQuestions: RecapQuestion[] = Array.from(userQuestions)
+    const recentQuestions = Array.from(userQuestions)
       .slice(-limit)
       .map(questionText => ({
         question: questionText,
@@ -147,13 +136,13 @@ class GlobalQuestionUniquenessService {
    */
   cleanup(olderThanHours: number = 24): void {
     const cutoffTime = Date.now() - (olderThanHours * 60 * 60 * 1000);
-    
+
     for (const [questionId, question] of this.questionDatabase.entries()) {
       if (question.metadata.timestamp < cutoffTime) {
         this.questionDatabase.delete(questionId);
       }
     }
-    
+
     console.log(`🧹 Cleaned up old question data older than ${olderThanHours} hours`);
   }
 }
