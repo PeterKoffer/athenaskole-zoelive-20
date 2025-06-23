@@ -1,4 +1,3 @@
-
 import { aiContentGenerator } from './content/aiContentGenerator';
 import { contentRepository } from './content/contentRepository';
 import { fallbackContentService } from './content/fallbackContentService';
@@ -14,7 +13,7 @@ export class DeepSeekContentService {
     skillArea: string, 
     difficultyLevel: number, 
     userId: string
-  ): Promise<any> {
+  ): Promise<GeneratedContent> { // Changed from Promise<any> to Promise<GeneratedContent>
     try {
       // First, try to get existing content
       const existingContent = await contentRepository.getExistingContent(subject, skillArea, difficultyLevel);
