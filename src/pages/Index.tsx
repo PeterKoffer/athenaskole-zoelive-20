@@ -14,6 +14,7 @@ import Footer from "@/components/layout/Footer";
 import HomeMainContent from "@/components/home/HomeMainContent";
 import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
 import InsightsNotification from "@/components/ai-insights/InsightsNotification";
+import SubjectsSection from "@/components/home/SubjectsSection";
 
 const userProgress = {
   matematik: 75,
@@ -78,7 +79,10 @@ const Index = () => {
     }
 
     return (
-      <HomeMainContent user={user} onGetStarted={handleGetStarted} />
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500">
+        <HomeMainContent user={user} onGetStarted={handleGetStarted} />
+        <SubjectsSection />
+      </div>
     );
   };
 
