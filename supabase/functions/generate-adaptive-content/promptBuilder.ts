@@ -6,7 +6,7 @@ export interface PromptConfig {
   diversityPrompt?: string;
   sessionId?: string;
   gradeLevel?: number;
-  standardsAlignment?: any;
+  standardsAlignment?: Record<string, unknown>;
   uniquenessInstructions?: string;
   forceUnique?: boolean;
 }
@@ -206,122 +206,5 @@ function normalizeSubjectName(subject: string): string {
     'discovery': 'science'
   };
 
-  const normalized = subjectMap[subject.toLowerCase()] || subject.toLowerCase();
-  console.log('🔍 Subject mapping:', subject, '->', normalized);
-  return normalized;
-}
-
-function createEnglishPrompt(gradeLevel?: number): string {
-  const grade = gradeLevel || 5;
-  const uniqueTimestamp = Date.now();
-  
-  return `Generate a COMPLETELY UNIQUE Grade ${grade} English question suitable for ${getAgeGroup(grade)} students.
-
-GRADE ${grade} SPECIFIC REQUIREMENTS:
-- Vocabulary: ${getVocabularyLevel(grade)}
-- Cognitive Level: ${getCognitiveDevelopmentLevel(grade)}
-- Age-appropriate content and scenarios
-
-CRITICAL UNIQUENESS REQUIREMENTS:
-- Use 100% original sentences and scenarios never used before
-- Create fresh vocabulary and grammar exercises with unique content
-- Vary reading comprehension approaches and contexts significantly
-- Use creative characters, settings, and situations that are completely new
-- Ensure no similarity to any previous English questions
-- Generate unique story elements and educational content
-
-TIMESTAMP: ${uniqueTimestamp}
-
-Return ONLY a valid JSON object with this exact structure:
-{
-  "question": "Read this COMPLETELY NEW sentence for Grade ${grade}: 'The curious young scientist discovered a hidden rainbow beneath the frozen waterfall.' What did the scientist find?",
-  "options": ["rainbow", "waterfall", "scientist", "ice"],
-  "correct": 0,
-  "explanation": "The sentence clearly states 'The curious young scientist discovered a hidden rainbow beneath the frozen waterfall', so the correct answer is 'rainbow'.",
-  "learningObjectives": ["Reading comprehension", "Detail identification", "Story understanding"],
-  "estimatedTime": 30
-}
-
-Make sure the content is appropriate for Grade ${grade} students and follows their developmental level.`;
-}
-
-function createMathematicsPrompt(skillArea: string, difficultyLevel: number, gradeLevel?: number): string {
-  const grade = gradeLevel || 5;
-  const uniqueTimestamp = Date.now();
-  
-  return `Generate a COMPLETELY UNIQUE Grade ${grade} mathematics question about ${skillArea}.
-
-GRADE ${grade} MATHEMATICS REQUIREMENTS:
-- Age Group: ${getAgeGroup(grade)}
-- Cognitive Level: ${getCognitiveDevelopmentLevel(grade)}
-- Difficulty appropriate for Grade ${grade} students
-- Numbers and operations suitable for grade level
-
-CRITICAL UNIQUENESS REQUIREMENTS:
-- Use 100% ORIGINAL numbers, scenarios, and contexts never used before
-- Create completely fresh word problems with unique characters and settings
-- Vary mathematical operations and problem types significantly  
-- Use creative real-world applications appropriate for Grade ${grade}
-- Ensure engaging and age-appropriate content that's never been generated
-- Generate unique numerical combinations and story contexts
-
-TIMESTAMP: ${uniqueTimestamp}
-
-Return ONLY a valid JSON object with this exact structure:
-{
-  "question": "At the mystical garden, Grade ${grade} student Aria planted 37 magical flower seeds. After the first moon, 19 seeds sprouted. After the second moon, 12 more seeds sprouted. How many seeds have sprouted in total?",
-  "options": ["29", "31", "33", "35"],
-  "correct": 1,
-  "explanation": "Aria had 19 seeds sprout after the first moon and 12 more after the second moon. So 19 + 12 = 31 seeds sprouted in total.",
-  "learningObjectives": ["Multi-step addition", "Sequential problem solving", "Word problem comprehension"],
-  "estimatedTime": 30
-}
-
-Ensure the mathematical content and language are appropriate for Grade ${grade} developmental level.`;
-}
-
-function createCreativeWritingPrompt(gradeLevel?: number): string {
-  const grade = gradeLevel || 5;
-  const uniqueTimestamp = Date.now();
-  
-  return `Generate a COMPLETELY UNIQUE Grade ${grade} creative writing exercise.
-
-GRADE ${grade} CREATIVE WRITING REQUIREMENTS:
-- Age-appropriate themes and content for ${getAgeGroup(grade)}
-- Vocabulary level: ${getVocabularyLevel(grade)}
-- Imagination level suitable for Grade ${grade} students
-
-CRITICAL UNIQUENESS REQUIREMENTS:
-- Use 100% original story starters and scenarios never used before
-- Create completely fresh creative prompts with unique characters and settings
-- Vary creative writing approaches and imagination exercises significantly
-- Use engaging and inspiring content that sparks creativity with new concepts
-- Generate unique creative scenarios that haven't been explored before
-
-TIMESTAMP: ${uniqueTimestamp}
-
-Return ONLY a valid JSON object appropriate for Grade ${grade} students.`;
-}
-
-function createSciencePrompt(gradeLevel?: number): string {
-  const grade = gradeLevel || 5;
-  const uniqueTimestamp = Date.now();
-  
-  return `Generate a COMPLETELY UNIQUE Grade ${grade} science discovery question.
-
-GRADE ${grade} SCIENCE REQUIREMENTS:
-- Scientific concepts appropriate for ${getAgeGroup(grade)}
-- Cognitive level: ${getCognitiveDevelopmentLevel(grade)}
-- Age-appropriate scientific vocabulary and explanations
-
-CRITICAL UNIQUENESS REQUIREMENTS:
-- Use 100% original scientific scenarios and examples never used before
-- Create completely fresh experiments and discovery opportunities
-- Vary scientific concepts and exploration approaches significantly
-- Use engaging real-world applications appropriate for Grade ${grade}
-- Generate unique scientific scenarios that haven't been explored before
-
-TIMESTAMP: ${uniqueTimestamp}
-
-Return ONLY a valid JSON object appropriate for Grade ${grade} students.`;
-}
+  const normalized = subjectMap[subject.toLowerCase()] ||`
+
