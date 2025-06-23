@@ -87,6 +87,10 @@
     perspective: 1000px;
   }
   
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
   .transform-gpu {
     transform: translate3d(0, 0, 0);
   }
@@ -101,5 +105,9 @@
   
   .backface-hidden {
     backface-visibility: hidden;
+  }
+  
+  .translate-z-\[-10px\] {
+    transform: translateZ(-10px);
   }
 }
