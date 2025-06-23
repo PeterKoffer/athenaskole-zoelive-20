@@ -22,7 +22,7 @@ export interface QuestionGenerationResult {
 
 class UnifiedQuestionGenerationService {
   private readonly maxRetries = 5;
-  private readonly fallbackQuestions = new Map<string, any[]>();
+  private readonly fallbackQuestions = new Map<string, unknown[]>();
 
   async generateUniqueQuestion(config: QuestionGenerationConfig): Promise<QuestionGenerationResult> {
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
