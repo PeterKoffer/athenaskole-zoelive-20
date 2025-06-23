@@ -24,9 +24,11 @@ interface UserLearningProfile {
   subject_preferences: Record<string, unknown>;
   task_completion_rate: number;
   weaknesses: string[];
+  learning_style?: string;
+  total_sessions?: number;
 }
 
-export const useLearningProfile = () => {
+export const useLearningProfile = (subject?: string, skillArea?: string) => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserLearningProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +60,9 @@ export const useLearningProfile = () => {
         strengths: ['problem-solving', 'pattern-recognition'],
         subject_preferences: {},
         task_completion_rate: 0.85,
-        weaknesses: ['time-management']
+        weaknesses: ['time-management'],
+        learning_style: 'visual',
+        total_sessions: 10
       };
       setProfile(mockProfile);
     } catch (error) {
@@ -85,11 +89,12 @@ export const useLearningProfile = () => {
   };
 
   const getPersonalizedSettings = () => {
-    if (!profile) return {};
+    if (!profile) return { optimalSessionLength: 20, learningPace: 'moderate', preferences: {} };
     return {
       optimalSessionLength: profile.optimal_session_length,
       learningPace: profile.learning_pace,
-      preferences: profile.learning_preferences
+      preferences: profile.learning_preferences,
+      attentionSpan: profile.attention_span_minutes
     };
   };
 

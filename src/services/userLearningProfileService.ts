@@ -54,21 +54,19 @@ export class UserLearningProfileService {
         engagement_patterns: {},
         frustration_indicators: {},
         last_updated: data.created_at || new Date().toISOString(),
-        learning_pace: data.learning_pace || 'moderate',
-        learning_preferences: (typeof data.learning_preferences === 'object' && data.learning_preferences !== null) 
-          ? data.learning_preferences as Record<string, unknown> 
+        learning_pace: 'moderate', // Default since not in DB
+        learning_preferences: (typeof data.difficulty_adjustments === 'object' && data.difficulty_adjustments !== null) 
+          ? data.difficulty_adjustments as Record<string, unknown> 
           : {},
         motivation_triggers: {},
-        optimal_session_length: data.optimal_session_length || 20,
+        optimal_session_length: data.attention_span_minutes || 20, // Use attention_span as session length
         performance_trends: {},
-        problem_solving_approach: data.problem_solving_approach || 'systematic',
-        retention_rate: data.retention_rate || 0.5,
-        social_learning_preference: data.social_learning_preference || 'individual',
+        problem_solving_approach: 'systematic', // Default since not in DB
+        retention_rate: data.consistency_score || 0.5, // Use consistency as retention
+        social_learning_preference: 'individual', // Default since not in DB
         strengths: Array.isArray(data.strengths) ? data.strengths.filter((s): s is string => typeof s === 'string') : [],
-        subject_preferences: (typeof data.subject_preferences === 'object' && data.subject_preferences !== null) 
-          ? data.subject_preferences as Record<string, unknown> 
-          : {},
-        task_completion_rate: data.task_completion_rate || 0.5,
+        subject_preferences: {},
+        task_completion_rate: data.consistency_score || 0.5, // Use consistency as completion rate
         weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses.filter((w): w is string => typeof w === 'string') : []
       };
 
@@ -81,13 +79,23 @@ export class UserLearningProfileService {
 
   async updateProfile(userId: string, updates: Partial<UserLearningProfile>): Promise<boolean> {
     try {
+      // Map our interface to database fields
+      const dbUpdates: any = {
+        user_id: userId,
+      };
+
+      // Only map fields that exist in the database
+      if (updates.attention_span_minutes !== undefined) dbUpdates.attention_span_minutes = updates.attention_span_minutes;
+      if (updates.average_response_time !== undefined) dbUpdates.average_response_time = updates.average_response_time;
+      if (updates.consistency_score !== undefined) dbUpdates.consistency_score = updates.consistency_score;
+      if (updates.current_difficulty_level !== undefined) dbUpdates.current_difficulty_level = updates.current_difficulty_level;
+      if (updates.difficulty_adjustments !== undefined) dbUpdates.difficulty_adjustments = updates.difficulty_adjustments;
+      if (updates.strengths !== undefined) dbUpdates.strengths = updates.strengths;
+      if (updates.weaknesses !== undefined) dbUpdates.weaknesses = updates.weaknesses;
+
       const { error } = await supabase
         .from('user_learning_profiles')
-        .upsert({
-          user_id: userId,
-          ...updates,
-          last_updated: new Date().toISOString()
-        });
+        .upsert(dbUpdates);
 
       if (error) {
         console.error('Error updating learning profile:', error);

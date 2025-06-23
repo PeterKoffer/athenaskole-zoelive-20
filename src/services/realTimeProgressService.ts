@@ -1,32 +1,24 @@
 
-import { supabase } from '@/integrations/supabase/client';
-
-class RealTimeProgressService {
+export class RealTimeProgressService {
   async updateProgress(
     userId: string,
     subject: string,
-    skillArea: string,
+    sessionType: string,
     isCorrect: boolean,
-    completionTime: number
+    durationSeconds: number
   ): Promise<boolean> {
     try {
-      // Use the existing database function to update user performance
-      const { error } = await supabase.rpc('update_user_performance', {
-        p_user_id: userId,
-        p_subject: subject,
-        p_skill_area: skillArea,
-        p_is_correct: isCorrect,
-        p_completion_time: Math.round(completionTime)
+      // Mock implementation - in a real app, this would update real-time progress
+      console.log('Updating real-time progress:', {
+        userId,
+        subject,
+        sessionType,
+        isCorrect,
+        durationSeconds
       });
-
-      if (error) {
-        console.error('Error updating progress:', error);
-        return false;
-      }
-
       return true;
     } catch (error) {
-      console.error('Error in updateProgress:', error);
+      console.error('Error updating real-time progress:', error);
       return false;
     }
   }

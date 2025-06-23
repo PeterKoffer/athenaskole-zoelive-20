@@ -26,6 +26,23 @@ export class ConceptMasteryService {
     // Mock implementation
     console.log('Updating concept mastery:', { userId, concept, subject, isCorrect });
   }
+
+  async getWeakConcepts(userId: string, subject: string): Promise<ConceptMastery[]> {
+    // Mock implementation - return concepts with low mastery
+    const allConcepts = await this.getConceptMastery(userId, subject);
+    return allConcepts.filter(concept => concept.masteryLevel < 0.5);
+  }
+
+  async getConceptsNeedingReview(userId: string, subject: string): Promise<ConceptMastery[]> {
+    // Mock implementation - return concepts that haven't been practiced recently
+    const allConcepts = await this.getConceptMastery(userId, subject);
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    
+    return allConcepts.filter(concept => 
+      new Date(concept.lastPracticed) < threeDaysAgo
+    );
+  }
 }
 
 export const conceptMasteryService = new ConceptMasteryService();
