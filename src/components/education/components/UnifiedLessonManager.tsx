@@ -83,7 +83,12 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
-        <UnifiedSessionProvider>
+        <UnifiedSessionProvider
+          subject={subject}
+          skillArea={skillArea}
+          difficultyLevel={2}
+          totalQuestions={8}
+        >
           <SessionContent
             subject={subject}
             skillArea={skillArea}
