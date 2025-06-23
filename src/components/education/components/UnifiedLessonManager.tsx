@@ -9,8 +9,7 @@ import ScienceWelcome from './welcome/ScienceWelcome';
 import ComputerScienceWelcome from './welcome/ComputerScienceWelcome';
 import MusicWelcome from './welcome/MusicWelcome';
 import CreativeArtsWelcome from './welcome/CreativeArtsWelcome';
-import SessionContent from '@/components/adaptive-learning/components/SessionContent';
-import { UnifiedSessionProvider } from '@/components/adaptive-learning/contexts/UnifiedSessionContext';
+import ImprovedLearningSession from '@/components/adaptive-learning/components/ImprovedLearningSession';
 
 interface UnifiedLessonManagerProps {
   subject: string;
@@ -78,26 +77,17 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
     );
   }
 
-  // Show main lesson content - use SessionContent directly to skip explanation phase
+  // Show main lesson content using ImprovedLearningSession
   console.log('📚 Displaying main lesson content for', subject);
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
-        <UnifiedSessionProvider
+        <ImprovedLearningSession
           subject={subject}
           skillArea={skillArea}
           difficultyLevel={2}
-          totalQuestions={8}
-        >
-          <SessionContent
-            subject={subject}
-            skillArea={skillArea}
-            difficultyLevel={2}
-            totalQuestions={8}
-            onBack={onBackToProgram}
-            sessionData={{} as any} // This will be provided by the context
-          />
-        </UnifiedSessionProvider>
+          onBack={onBackToProgram}
+        />
       </div>
     </ClassroomEnvironment>
   );
