@@ -1,5 +1,6 @@
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateContentWithDeepSeek } from './contentGenerator.ts';
 
 const corsHeaders = {
@@ -8,61 +9,106 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log('🚀 Edge function called with method:', req.method);
+  console.log('🚀 Generate-adaptive-content function called at:', new Date().toISOString());
   
-  // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    // Validate request method
-    if (req.method !== 'POST') {
-      console.error('❌ Invalid method:', req.method);
-      return new Response(
-        JSON.stringify({ success: false, error: 'Method not allowed. Use POST.' }),
-        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const requestData = await req.json();
+    console.log('📋 Request data received:', {
+      subject: requestData.subject,
+      skillArea: requestData.skillArea,
+      difficultyLevel: requestData.difficultyLevel,
+      userId: requestData.userId?.substring(0, 8) + '...',
+      hasGradeLevel: !!requestData.gradeLevel,
+      hasPreviousQuestions: Array.isArray(requestData.previousQuestions) && requestData.previousQuestions.length > 0
+    });
+
+    // Check for API key availability
+    const deepSeekKey = Deno.env.get('DEEPSEEK_API_KEY');
+    const openaiKey = Deno.env.get('OpenaiAPI');
+    const openaiKeyAlt = Deno.env.get('OPENAI_API_KEY');
+    
+    console.log('🔑 API Key status:', {
+      hasDeepSeekKey: !!deepSeekKey,
+      hasOpenaiAPI: !!openaiKey,
+      hasOpenaiKeyAlt: !!openaiKeyAlt,
+      deepSeekKeyLength: deepSeekKey?.length || 0,
+      openaiKeyLength: openaiKey?.length || 0,
+      openaiKeyAltLength: openaiKeyAlt?.length || 0
+    });
+
+    if (!deepSeekKey && !openaiKey && !openaiKeyAlt) {
+      console.error('❌ No API keys found in environment');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'No API keys configured. Please add DEEPSEEK_API_KEY, OpenaiAPI, or OPENAI_API_KEY to your Supabase Edge Function Secrets.',
+        debug: {
+          availableEnvVars: Object.keys(Deno.env.toObject()).filter(key => key.includes('API') || key.includes('KEY'))
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
+      });
     }
 
-    // Parse request body
-    const body = await req.json();
-    console.log('📋 Request body received:', body);
-
-    if (!body.subject || !body.skillArea || !body.userId) {
-      console.error('❌ Missing required fields');
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Missing required fields: subject, skillArea, userId',
-          debug: { received: Object.keys(body) }
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Generate content using DeepSeek
-    const generatedContent = await generateContentWithDeepSeek(body);
-
+    // Generate content using DeepSeek API
+    console.log('🤖 Attempting AI content generation...');
+    const generatedContent = await generateContentWithDeepSeek(requestData);
+    
     if (!generatedContent) {
-      throw new Error('Failed to generate content');
+      console.error('❌ AI generation returned null/undefined');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'AI content generation failed - no content returned',
+        debug: {
+          requestData: {
+            subject: requestData.subject,
+            skillArea: requestData.skillArea,
+            difficultyLevel: requestData.difficultyLevel
+          }
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
+      });
     }
 
-    console.log('🎯 Content generation successful with DeepSeek');
-    return new Response(
-      JSON.stringify({ success: true, generatedContent }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.log('✅ Content generated successfully:', {
+      hasQuestion: !!generatedContent.question,
+      optionsCount: generatedContent.options?.length || 0,
+      hasExplanation: !!generatedContent.explanation,
+      correctIndex: generatedContent.correct
+    });
+
+    return new Response(JSON.stringify({
+      success: true,
+      generatedContent: generatedContent,
+      debug: {
+        timestamp: new Date().toISOString(),
+        apiUsed: 'deepseek',
+        generationTime: 'success'
+      }
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
     console.error('💥 Unexpected error:', error);
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: 'Internal server error',
-        debug: { errorMessage: error.message, errorStack: error.stack }
-      }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message || 'Unknown error occurred',
+      debug: {
+        errorName: error.name,
+        errorStack: error.stack,
+        timestamp: new Date().toISOString()
+      }
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500
+    });
   }
 });

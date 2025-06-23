@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Brain, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuestionGeneration, Question } from '../hooks/useQuestionGeneration';
-import { FallbackQuestionGenerator } from './FallbackQuestionGenerator';
 
 interface ImprovedLearningSessionProps {
   subject: string;
@@ -26,7 +25,7 @@ const ImprovedLearningSession = ({
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [questionCount, setQuestionCount] = useState(0);
-  const [useFallback, setUseFallback] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const { generateQuestion, isGenerating, error } = useQuestionGeneration({
     subject,
@@ -40,7 +39,6 @@ const ImprovedLearningSession = ({
     skillArea,
     difficultyLevel,
     hasUser: !!user,
-    useFallback,
     timestamp: new Date().toISOString()
   });
 
@@ -54,24 +52,20 @@ const ImprovedLearningSession = ({
 
   const handleGenerateQuestion = async () => {
     try {
+      setApiError(null);
       console.log('📝 Generating question via API...');
       const question = await generateQuestion([]);
+      
       if (question) {
         setCurrentQuestion(question);
-        setUseFallback(false);
         console.log('✅ API question generated successfully');
       } else {
         throw new Error('No question generated from API');
       }
     } catch (error) {
-      console.warn('⚠️ API generation failed, using fallback:', error);
-      const fallbackQuestion = FallbackQuestionGenerator.generateFallbackQuestion(
-        subject,
-        skillArea,
-        difficultyLevel
-      );
-      setCurrentQuestion(fallbackQuestion);
-      setUseFallback(true);
+      console.error('❌ API generation failed:', error);
+      setApiError(error.message || 'Failed to generate question');
+      setCurrentQuestion(null);
     }
   };
 
@@ -113,16 +107,39 @@ const ImprovedLearningSession = ({
     );
   }
 
+  // Show API error state
+  if (apiError) {
+    return (
+      <Card className="bg-red-900 border-red-700 max-w-md mx-auto">
+        <CardContent className="p-6 text-center">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-white text-lg font-semibold mb-2">API Error</h3>
+          <p className="text-red-300 mb-4">{apiError}</p>
+          <div className="space-y-2">
+            <Button onClick={handleGenerateQuestion} className="w-full bg-blue-600 hover:bg-blue-700">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry Question Generation
+            </Button>
+            <Button onClick={onBack} variant="outline" className="w-full border-gray-600">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Program
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (isGenerating || !currentQuestion) {
     return (
       <Card className="bg-gray-900 border-gray-800 max-w-md mx-auto">
         <CardContent className="p-6 text-center">
           <Brain className="w-12 h-12 text-blue-400 animate-pulse mx-auto mb-4" />
           <h3 className="text-white text-lg font-semibold mb-2">
-            {isGenerating ? 'Generating Question...' : 'Loading...'}
+            {isGenerating ? 'Generating AI Question...' : 'Loading...'}
           </h3>
           <p className="text-gray-300 mb-4">
-            Preparing your {subject} question
+            Creating your personalized {subject} question with AI
           </p>
           <Button onClick={onBack} variant="outline" className="border-gray-600">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -145,20 +162,6 @@ const ImprovedLearningSession = ({
           Question {questionCount + 1} | Score: {score}/{questionCount + 1}
         </div>
       </div>
-
-      {/* Fallback Warning */}
-      {useFallback && (
-        <Card className="bg-yellow-900 border-yellow-700">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="w-5 h-5 text-yellow-400" />
-              <p className="text-yellow-200 text-sm">
-                Using practice questions (API unavailable)
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Question Card */}
       <Card className="bg-gray-900 border-gray-800">

@@ -1,16 +1,33 @@
+
 import { GeneratedContent } from './types.ts';
 import { createGradeAlignedPrompt, PromptConfig } from './promptBuilder.ts';
 import { callDeepSeek } from './apiClient.ts';
 
 export async function generateContentWithDeepSeek(requestData: any): Promise<GeneratedContent | null> {
-  console.log('🤖 generateContentWithDeepSeek called with grade-level alignment:', requestData);
+  console.log('🤖 generateContentWithDeepSeek called with:', {
+    subject: requestData.subject,
+    skillArea: requestData.skillArea,
+    difficultyLevel: requestData.difficultyLevel,
+    gradeLevel: requestData.gradeLevel,
+    hasStandardsAlignment: !!requestData.standardsAlignment
+  });
   
-  const deepSeekApiKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
+  // Try different API key environment variables in order of preference
+  const deepSeekApiKey = Deno.env.get('DEEPSEEK_API_KEY') || 
+                        Deno.env.get('OpenaiAPI') || 
+                        Deno.env.get('OPENAI_API_KEY');
   
   if (!deepSeekApiKey) {
-    console.error('❌ No DeepSeek API key found');
-    throw new Error('DeepSeek API key not configured');
+    console.error('❌ No API key found in any environment variable');
+    throw new Error('API key not configured - please add DEEPSEEK_API_KEY to your Supabase Edge Function Secrets');
   }
+
+  console.log('🔑 Using API key:', {
+    keySource: Deno.env.get('DEEPSEEK_API_KEY') ? 'DEEPSEEK_API_KEY' : 
+               Deno.env.get('OpenaiAPI') ? 'OpenaiAPI' : 'OPENAI_API_KEY',
+    keyLength: deepSeekApiKey.length,
+    keyPreview: deepSeekApiKey.substring(0, 8) + '...' + deepSeekApiKey.substring(deepSeekApiKey.length - 4)
+  });
 
   const promptConfig: PromptConfig = {
     subject: requestData.subject,
@@ -24,15 +41,16 @@ export async function generateContentWithDeepSeek(requestData: any): Promise<Gen
   };
 
   const prompt = createGradeAlignedPrompt(promptConfig);
-  console.log('📝 Using grade-aligned prompt for Grade', requestData.gradeLevel);
+  console.log('📝 Generated prompt for Grade', requestData.gradeLevel || 'default');
 
   const result = await callDeepSeek(deepSeekApiKey, prompt);
   
   if (!result.success) {
     console.error('❌ DeepSeek call failed:', result.error);
-    throw new Error(result.error || 'DeepSeek call failed');
+    throw new Error(`DeepSeek API error: ${result.error}`);
   }
 
+  console.log('✅ DeepSeek generation successful');
   return result.data || null;
 }
 
