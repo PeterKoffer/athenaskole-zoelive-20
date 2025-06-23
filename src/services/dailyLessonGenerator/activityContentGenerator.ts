@@ -7,15 +7,18 @@ import {
     IntroductionContent,
     CreativeExplorationContent,
     SummaryContent,
-    ActivityType // Added to use for type safety
+    ActivityType
 } from '@/components/education/components/types/LessonTypes';
 import { StudentProgressData } from './types';
+import { supabase } from '@/integrations/supabase/client'; // Ensure Supabase client is imported
 
-// --- Conceptual AI Service ---
+// --- Type Definitions (contract with Supabase function) ---
+// These interfaces define the expected structure for requests to and responses from the Supabase Edge Function.
+// It's crucial that these align with the types defined within the Edge Function itself.
 interface DynamicContentRequest {
   subject: string;
   focusArea: string;
-  activityType: ActivityType; // Updated to use imported ActivityType
+  activityType: ActivityType;
   difficulty: number;
   gradeLevel: number;
   promptDetails?: Record<string, any>;
@@ -25,73 +28,7 @@ interface DynamicContentResponse {
   title?: string;
   content: LessonActivityContent;
 }
-
-const aiContentService = {
-  generateDynamicActivityContent: async (request: DynamicContentRequest): Promise<DynamicContentResponse | null> => {
-    console.log(`[AI Service Request] Generating content for ${request.subject} - ${request.focusArea} (${request.activityType}) with persona: ${request.promptDetails?.persona}`);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Simulate AI processing
-
-    // Example AI responses for new types (and existing ones for completeness)
-    if (request.activityType === 'introduction' && request.subject.toLowerCase() === 'mathematics') {
-        return {
-            title: `Let's Explore ${request.focusArea}!`,
-            content: {
-                hook: `AI: Ever wondered how ${request.focusArea} shapes our world? It's like a secret code!`,
-                realWorldExample: `AI: Think about when you share cookies (division) or build with blocks (geometry)! That's ${request.focusArea} in action.`,
-                learningObjectives: [`Understand basic ${request.focusArea}`, `Apply ${request.focusArea} to simple problems`],
-            } as IntroductionContent,
-        };
-    }
-    if (request.activityType === 'creative-exploration' && request.subject.toLowerCase() === 'art') {
-        return {
-            title: `Unleash Your Inner ${request.focusArea} Artist!`,
-            content: {
-                creativePrompt: `AI: Imagine you are a tiny explorer in a giant's garden. Using what we learned about ${request.focusArea}, draw or write a story about three amazing things you discover!`,
-                guidelines: ["Use bright colors!", "Think about different textures.", "Let your imagination soar!"],
-                submissionType: "image-drawing"
-            } as CreativeExplorationContent,
-        };
-    }
-    if (request.activityType === 'summary' && request.subject.toLowerCase() === 'science') {
-        return {
-            title: `Wrapping Up ${request.focusArea}`,
-            content: {
-                keyTakeaways: [`AI: ${request.focusArea} is all about understanding X.`, `AI: We learned how Y affects Z in ${request.focusArea}.`, `AI: Remember the importance of Q.`],
-                nextStepsPreview: `AI: Next, we'll see how ${request.focusArea} connects to even bigger ideas!`,
-                finalEncouragement: `AI: You did a great job exploring ${request.focusArea} today! Keep that curious mind buzzing!`,
-            } as SummaryContent,
-        };
-    }
-    if (request.activityType === 'interactive-game' && request.subject.toLowerCase() === 'science') {
-        return {
-            title: `The Amazing World of ${request.focusArea}`,
-            content: {
-                question: `AI Generated: What is the powerhouse of the cell in ${request.focusArea}?`,
-                options: ["Mitochondria", "Nucleus", "Ribosome", "Chloroplast"],
-                correctAnswerIndex: 0,
-                explanation: "AI Explanation: Mitochondria are known as the powerhouses of the cell.",
-                gameType: "multiple-choice-quiz",
-            } as InteractiveGameContent,
-        };
-    }
-    if (request.activityType === 'content-delivery' && request.subject.toLowerCase() === 'history') {
-        return {
-            title: `A Journey Through ${request.focusArea}`,
-            content: {
-                introductionText: `AI Generated: Welcome to an exciting exploration of ${request.focusArea}!`,
-                mainExplanation: `AI Generated: ${request.focusArea} is a fascinating topic. Let's dive deep into its various aspects, understanding its significance and impact using vivid analogies.`,
-                examples: [`AI Example: The Great Wall related to ${request.focusArea}`, `AI Example: The Pyramids and their connection to ${request.focusArea}`],
-                segments: [
-                    { title: "Key Event 1", explanation: `AI: Detailed explanation of key event 1 in ${request.focusArea}`, examples: ["Example A"] },
-                    { title: "Key Figure", explanation: `AI: Detailed explanation of a key figure in ${request.focusArea}`, examples: ["Example B"] },
-                ],
-            } as ContentDeliveryContent,
-        };
-    }
-    return null; // Default to null for other cases to test fallbacks
-  },
-};
-// --- End Conceptual AI Service ---
+// --- End Type Definitions ---
 
 const NELIE_PERSONA_PROMPT_DETAILS = {
   persona: "NELIE",
@@ -104,7 +41,7 @@ export class ActivityContentGenerator {
   static async generateActivityContent(
     subject: string,
     focusArea: string,
-    activityType: ActivityType, // Updated to use imported ActivityType
+    activityType: ActivityType,
     difficulty: number,
     gradeLevel: number
   ): Promise<DynamicContentResponse> {
@@ -114,6 +51,7 @@ export class ActivityContentGenerator {
       activityType,
       difficulty,
       gradeLevel,
+      // NELIE_PERSONA_PROMPT_DETAILS are now added within each specific create method's promptDetails
     };
 
     let aiResponse: DynamicContentResponse | null = null;
@@ -139,11 +77,10 @@ export class ActivityContentGenerator {
           break;
         default:
           console.warn(`Unknown activity type: ${activityType}. Using generic fallback.`);
-          // Fallback for unknown type, though type system should prevent this.
           aiResponse = null;
       }
     } catch (error) {
-      console.error(`Error calling AI content service for ${activityType}:`, error);
+      console.error(`Error calling Supabase function for ${activityType}:`, error);
       aiResponse = null;
     }
 
@@ -151,7 +88,7 @@ export class ActivityContentGenerator {
       return aiResponse;
     }
 
-    console.warn(`AI service failed or returned null for ${activityType}. Using fallback content.`);
+    console.warn(`Supabase function call failed or returned null/invalid data for ${activityType}. Using fallback content.`);
     let fallbackContent: LessonActivityContent;
     let fallbackTitle = `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Session`;
 
@@ -177,7 +114,7 @@ export class ActivityContentGenerator {
           fallbackContent = this.createFallbackSummaryContent(subject, focusArea, gradeLevel);
           fallbackTitle = `Reviewing ${focusArea.replace(/_/g, ' ')}`;
           break;
-        default: // Should not be reached if activityType is validated, but as a safeguard:
+        default:
           fallbackContent = { genericPlaceholder: `No content available for unknown type: ${activityType}` };
           break;
     }
@@ -193,7 +130,7 @@ export class ActivityContentGenerator {
     focusArea: string,
     gradeLevel: number,
     studentProgress: StudentProgressData,
-    activityType: ActivityType // Updated to use imported ActivityType
+    activityType: ActivityType
   ): Promise<LessonActivity> {
     const activityId = `${lessonId}-activity-${index}`;
     const difficulty = this.calculateDifficulty(studentProgress, gradeLevel);
@@ -210,14 +147,40 @@ export class ActivityContentGenerator {
       id: activityId,
       title: generatedContentResponse.title || `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Activity`,
       type: activityType,
-      phase: activityType, // Assuming type and phase are the same for all current types
+      phase: activityType,
       duration: 180,
       phaseDescription: `Engage with ${focusArea.replace(/_/g, ' ')}`,
       content: generatedContentResponse.content,
     };
   }
 
-  // --- Specific Content Creation Methods (using AI Service) ---
+  // --- Specific Content Creation Methods (Now using Supabase) ---
+  private static async invokeNelieContentFunction(request: DynamicContentRequest): Promise<DynamicContentResponse | null> {
+    console.log(`Invoking Supabase function 'generate-nelie-activity-content' for type: ${request.activityType}`);
+    const { data, error } = await supabase.functions.invoke(
+      'generate-nelie-activity-content',
+      { body: request }
+    );
+
+    if (error) {
+      console.error(`Supabase function call failed for ${request.activityType}:`, error);
+      return null;
+    }
+    // It's good practice to validate the structure of 'data' here
+    // For example, check if data.content exists and has expected fields for the activityType
+    if (data && data.content) {
+      // Basic validation: ensure 'content' is an object. More specific checks could be added.
+      if (typeof data.content !== 'object' || data.content === null) {
+        console.warn(`Unexpected content structure (not an object or null) from Supabase function for ${request.activityType}:`, data);
+        return null;
+      }
+      return data as DynamicContentResponse;
+    } else {
+      console.warn(`Unexpected response structure (no data or data.content missing) from Supabase function for ${request.activityType}:`, data);
+      return null;
+    }
+  }
+
   private static async createIntroductionContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
     const promptDetails = {
       ...NELIE_PERSONA_PROMPT_DETAILS,
@@ -225,10 +188,7 @@ export class ActivityContentGenerator {
       elements: ['hook', 'realWorldExample', 'learningObjectives'],
     };
     const request: DynamicContentRequest = { ...baseRequest, activityType: 'introduction', promptDetails };
-    const aiResponse = await aiContentService.generateDynamicActivityContent(request);
-    if (aiResponse?.content && 'hook' in aiResponse.content) return aiResponse;
-    console.warn("AI response for introduction was not structured as expected.");
-    return null;
+    return this.invokeNelieContentFunction(request);
   }
 
   private static async createContentDeliveryContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
@@ -237,13 +197,10 @@ export class ActivityContentGenerator {
       requestType: 'engaging-explanation-with-imagery',
       numSegments: Math.max(2, Math.floor(difficulty / 2)),
       includeExamples: true,
-      imageryEmphasis: "vivid mental images and analogies", // Specific instruction
+      imageryEmphasis: "vivid mental images and analogies",
     };
     const request: DynamicContentRequest = { ...baseRequest, activityType: 'content-delivery', promptDetails };
-    const aiResponse = await aiContentService.generateDynamicActivityContent(request);
-    if (aiResponse?.content && 'mainExplanation' in aiResponse.content) return aiResponse;
-    console.warn("AI response for content delivery was not structured as expected.");
-    return null;
+    return this.invokeNelieContentFunction(request);
   }
 
   private static async createInteractiveGameContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
@@ -254,17 +211,17 @@ export class ActivityContentGenerator {
       topicComplexity: difficulty,
     };
     const request: DynamicContentRequest = { ...baseRequest, activityType: 'interactive-game', promptDetails };
-    const aiResponse = await aiContentService.generateDynamicActivityContent(request);
-    if (aiResponse?.content && 'question' in aiResponse.content) return aiResponse;
-    console.warn("AI response for game content was not structured as expected.");
-     // Fallback to specialized math game if AI fails for math
-    if (subject.toLowerCase() === 'mathematics') {
-      return {
-        content: this.createFallbackInteractiveGameContent(subject, focusArea, difficulty, gradeLevel, true),
-        title: `${focusArea} Math Challenge (Fallback)`,
-      };
+    const aiResponse = await this.invokeNelieContentFunction(request);
+
+    // Specific fallback for math if AI fails, otherwise generic fallback will be caught by generateActivityContent
+    if (!aiResponse && subject.toLowerCase() === 'mathematics') {
+        console.warn("Supabase call failed for Math game, using specific Math fallback.");
+        return {
+            content: this.createFallbackInteractiveGameContent(subject, focusArea, difficulty, gradeLevel, true),
+            title: `${focusArea} Math Challenge (Fallback)`,
+        };
     }
-    return null;
+    return aiResponse;
   }
 
   private static async createApplicationContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
@@ -274,23 +231,17 @@ export class ActivityContentGenerator {
       numHints: Math.max(1, 3 - Math.floor(difficulty / 3)),
     };
     const request: DynamicContentRequest = { ...baseRequest, activityType: 'application', promptDetails };
-    const aiResponse = await aiContentService.generateDynamicActivityContent(request);
-    if (aiResponse?.content && 'scenario' in aiResponse.content) return aiResponse;
-    console.warn("AI response for application content was not structured as expected.");
-    return null;
+    return this.invokeNelieContentFunction(request);
   }
 
   private static async createCreativeExplorationContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
     const promptDetails = {
       ...NELIE_PERSONA_PROMPT_DETAILS,
       requestType: 'open-ended-creative-prompt',
-      freedomLevel: difficulty, // Higher difficulty might mean more open prompts
+      freedomLevel: difficulty,
     };
     const request: DynamicContentRequest = { ...baseRequest, activityType: 'creative-exploration', promptDetails };
-    const aiResponse = await aiContentService.generateDynamicActivityContent(request);
-    if (aiResponse?.content && 'creativePrompt' in aiResponse.content) return aiResponse;
-    console.warn("AI response for creative exploration was not structured as expected.");
-    return null;
+    return this.invokeNelieContentFunction(request);
   }
 
   private static async createSummaryContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
@@ -300,13 +251,10 @@ export class ActivityContentGenerator {
       elements: ['keyTakeaways', 'nextStepsPreview', 'finalEncouragement'],
     };
     const request: DynamicContentRequest = { ...baseRequest, activityType: 'summary', promptDetails };
-    const aiResponse = await aiContentService.generateDynamicActivityContent(request);
-    if (aiResponse?.content && 'keyTakeaways' in aiResponse.content) return aiResponse;
-    console.warn("AI response for summary was not structured as expected.");
-    return null;
+    return this.invokeNelieContentFunction(request);
   }
 
-  // --- Fallback Content Creation Methods ---
+  // --- Fallback Content Creation Methods (Remain Unchanged) ---
   private static createFallbackIntroductionContent(subject: string, focusArea: string, gradeLevel: number): IntroductionContent {
     return {
       hook: `Get ready to explore the amazing world of ${focusArea.replace(/_/g, ' ')}! It's more exciting than you think!`,
@@ -324,13 +272,13 @@ export class ActivityContentGenerator {
       const num2 = Math.floor(Math.random() * 10) + (difficulty * 2);
       const question = `Emma has ${num1} stickers and her friend gives her ${num2} more. How many stickers does Emma have now?`;
       const correctAnswer = num1 + num2;
+      const options = [correctAnswer.toString(), (correctAnswer + 5).toString(), (Math.max(0, correctAnswer - 3)).toString(), (correctAnswer + 10).toString()].sort(() => Math.random() - 0.5);
+      const correctIndex = options.findIndex(opt => opt === correctAnswer.toString());
       return {
         gameType: "multiple-choice-quiz",
         question,
-        options: [correctAnswer.toString(), (correctAnswer + 5).toString(), (Math.max(0, correctAnswer - 3)).toString(), (correctAnswer + 10).toString()].sort(() => Math.random() - 0.5),
-        correctAnswerIndex: -1, // This would need to be dynamically set if options are shuffled. For fixed, it's easier.
-                                // Let's assume the correct answer is always the first one for simplicity in fallback, then shuffle.
-                                // For a real fallback, you'd find the index after shuffling.
+        options,
+        correctAnswerIndex: correctIndex,
         explanation: `Emma started with ${num1} and got ${num2} more, so ${num1} + ${num2} = ${correctAnswer}. Keep up the great work!`,
       };
     }
