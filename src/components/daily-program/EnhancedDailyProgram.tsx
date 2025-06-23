@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Clock, BookOpen, Gamepad2, Target, Brain, Calendar, Play, Pause, RotateCcw } from 'lucide-react';
+import { Clock, BookOpen, Gamepad2, Target, Brain, Calendar, Play, Pause, RotateCcw, Plus } from 'lucide-react';
 import { DailyLessonOrchestrator, DailyLessonPlan, DailyActivity } from '@/services/dailyLessonOrchestrator';
 import { AdaptiveDifficultyEngine, StudentPerformanceMetrics } from '@/services/adaptiveDifficultyEngine';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +30,11 @@ const EnhancedDailyProgram = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [sessionProgress, setSessionProgress] = useState(0);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [isGeneratingMore, setIsGeneratingMore] = useState(false);
+  const TARGET_LESSON_TIME = 20 * 60; // 20 minutes in seconds
+  
   const [studentMetrics, setStudentMetrics] = useState<StudentPerformanceMetrics>({
     accuracy_rate: 75,
     response_time_avg: 30,
@@ -42,6 +46,23 @@ const EnhancedDailyProgram = ({
     challenge_areas: ['fractions', 'word_problems']
   });
 
+  // Timer effect to track lesson progress
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isPlaying && sessionStartTime) {
+      interval = setInterval(() => {
+        const now = new Date();
+        const elapsed = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+        setElapsedTime(elapsed);
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, sessionStartTime]);
+
   useEffect(() => {
     initializeDailyProgram();
   }, [studentId, gradeLevel]);
@@ -49,24 +70,27 @@ const EnhancedDailyProgram = ({
   const initializeDailyProgram = async () => {
     try {
       setIsLoading(true);
-      console.log('🚀 Initializing Enhanced Daily Program for Grade', gradeLevel);
+      console.log('🚀 Initializing 20-minute Daily Program for Grade', gradeLevel);
       
-      // Generate comprehensive daily lesson plan
+      // Generate initial lesson plan targeting 20 minutes
       const lessonPlan = await DailyLessonOrchestrator.generateDailyLesson(
         studentId, 
         gradeLevel, 
         'mathematics'
       );
       
-      setDailyPlan(lessonPlan);
-      setCurrentActivity(lessonPlan.activity_sequence[0]);
+      // Adjust activities to fit 20-minute target
+      const adjustedPlan = adjustLessonForTargetTime(lessonPlan, TARGET_LESSON_TIME);
+      
+      setDailyPlan(adjustedPlan);
+      setCurrentActivity(adjustedPlan.activity_sequence[0]);
       
       toast({
-        title: "Daily Program Ready! 📚",
-        description: `Generated ${lessonPlan.activity_sequence.length} personalized activities for today`,
+        title: "20-Minute Daily Program Ready! 📚",
+        description: `Generated ${adjustedPlan.activity_sequence.length} activities targeting 20 minutes`,
       });
       
-      console.log('✅ Daily program initialized:', lessonPlan);
+      console.log('✅ 20-minute daily program initialized:', adjustedPlan);
     } catch (error) {
       console.error('❌ Error initializing daily program:', error);
       toast({
@@ -79,12 +103,134 @@ const EnhancedDailyProgram = ({
     }
   };
 
+  const adjustLessonForTargetTime = (plan: DailyLessonPlan, targetSeconds: number): DailyLessonPlan => {
+    const targetMinutes = Math.floor(targetSeconds / 60);
+    const currentTotalMinutes = plan.activity_sequence.reduce((sum, activity) => sum + activity.duration_minutes, 0);
+    
+    if (currentTotalMinutes < targetMinutes) {
+      // Need to add more activities
+      console.log(`📈 Lesson too short (${currentTotalMinutes}min), targeting ${targetMinutes}min`);
+    } else if (currentTotalMinutes > targetMinutes) {
+      // Need to trim activities
+      console.log(`📉 Lesson too long (${currentTotalMinutes}min), targeting ${targetMinutes}min`);
+      const adjustedActivities = trimActivitiesToTime(plan.activity_sequence, targetMinutes);
+      plan.activity_sequence = adjustedActivities;
+    }
+    
+    plan.total_duration_minutes = targetMinutes;
+    return plan;
+  };
+
+  const trimActivitiesToTime = (activities: DailyActivity[], targetMinutes: number): DailyActivity[] => {
+    let totalTime = 0;
+    const trimmedActivities: DailyActivity[] = [];
+    
+    for (const activity of activities) {
+      if (totalTime + activity.duration_minutes <= targetMinutes) {
+        trimmedActivities.push(activity);
+        totalTime += activity.duration_minutes;
+      } else {
+        // Adjust the last activity to fit exactly
+        const remainingTime = targetMinutes - totalTime;
+        if (remainingTime > 2) { // Only include if at least 2 minutes remain
+          const adjustedActivity = { ...activity, duration_minutes: remainingTime };
+          trimmedActivities.push(adjustedActivity);
+        }
+        break;
+      }
+    }
+    
+    return trimmedActivities;
+  };
+
+  const generateAdditionalContent = async () => {
+    if (!dailyPlan || isGeneratingMore) return;
+    
+    setIsGeneratingMore(true);
+    
+    try {
+      console.log('🔄 Student progressing faster - generating additional content');
+      
+      // Generate 2-3 more activities
+      const additionalActivities = await generateMoreActivities(dailyPlan, 3);
+      
+      const updatedPlan = {
+        ...dailyPlan,
+        activity_sequence: [...dailyPlan.activity_sequence, ...additionalActivities],
+        total_duration_minutes: dailyPlan.total_duration_minutes + additionalActivities.reduce((sum, a) => sum + a.duration_minutes, 0)
+      };
+      
+      setDailyPlan(updatedPlan);
+      
+      toast({
+        title: "More Content Generated! 🚀",
+        description: `Added ${additionalActivities.length} more activities for continued learning`,
+      });
+      
+    } catch (error) {
+      console.error('❌ Error generating additional content:', error);
+      toast({
+        title: "Generation Error",
+        description: "Failed to generate additional content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingMore(false);
+    }
+  };
+
+  const generateMoreActivities = async (basePlan: DailyLessonPlan, count: number): Promise<DailyActivity[]> => {
+    const newActivities: DailyActivity[] = [];
+    
+    for (let i = 0; i < count; i++) {
+      const activityType = i % 2 === 0 ? 'practice' : 'game';
+      const difficulty = Math.min(5, studentMetrics.accuracy_rate > 80 ? 3 : 2);
+      
+      const newActivity: DailyActivity = {
+        id: `additional-${Date.now()}-${i}`,
+        type: activityType,
+        title: `${activityType === 'practice' ? 'Extra Practice' : 'Bonus Game'}: ${basePlan.learning_units[0]?.title}`,
+        duration_minutes: 5,
+        curriculum_unit_id: basePlan.learning_units[0]?.id || 'general',
+        difficulty_level: difficulty,
+        activity_data: {
+          content_type: activityType === 'practice' ? 'ai_question' : 'educational_game',
+          parameters: {
+            question_count: activityType === 'practice' ? 3 : undefined,
+            game_type: activityType === 'game' ? 'challenge_mode' : undefined,
+            adaptive_difficulty: true
+          }
+        },
+        nelie_guidance: {
+          introduction_prompt: `Great progress! Let's keep the momentum going with this ${activityType}!`,
+          help_prompts: [
+            "You're doing amazing!",
+            "Let's tackle this together!",
+            "Remember what we learned earlier!"
+          ],
+          encouragement_messages: [
+            "Fantastic work!",
+            "You're really mastering this!",
+            "Keep up the excellent progress!"
+          ]
+        }
+      };
+      
+      newActivities.push(newActivity);
+    }
+    
+    return newActivities;
+  };
+
   const startActivity = () => {
+    if (!sessionStartTime) {
+      setSessionStartTime(new Date());
+    }
     setIsPlaying(true);
     setIsPaused(false);
     
     toast({
-      title: "Activity Started! 🎯",
+      title: "20-Minute Lesson Started! 🎯",
       description: currentActivity?.title || "Let's begin learning!",
     });
   };
@@ -94,7 +240,7 @@ const EnhancedDailyProgram = ({
     setIsPlaying(false);
     
     toast({
-      title: "Activity Paused ⏸️",
+      title: "Lesson Paused ⏸️",
       description: "Take your time. Resume when ready!",
     });
   };
@@ -107,23 +253,12 @@ const EnhancedDailyProgram = ({
     setCurrentActivity(dailyPlan.activity_sequence[nextIndex]);
     setSessionProgress(((nextIndex + 1) / dailyPlan.activity_sequence.length) * 100);
     
-    // Analyze performance and adjust difficulty
-    const adjustment = AdaptiveDifficultyEngine.analyzeDifficultyAdjustment(
-      currentActivity?.difficulty_level || 2,
-      studentMetrics,
-      {
-        subject: 'mathematics',
-        skill_area: 'general',
-        total_questions: 5,
-        time_spent_minutes: 15
-      }
-    );
+    // Check if we need to generate more content for fast learners
+    const remainingTime = TARGET_LESSON_TIME - elapsedTime;
+    const remainingActivities = dailyPlan.activity_sequence.length - nextIndex - 1;
     
-    if (adjustment.new_difficulty_level !== currentActivity?.difficulty_level) {
-      toast({
-        title: "Difficulty Adjusted! ⚡",
-        description: adjustment.adjustment_reason,
-      });
+    if (remainingTime > 300 && remainingActivities <= 2) { // More than 5 minutes left with few activities
+      generateAdditionalContent();
     }
   };
 
@@ -133,15 +268,16 @@ const EnhancedDailyProgram = ({
     setSessionProgress(0);
     setIsPlaying(false);
     setIsPaused(false);
+    setSessionStartTime(null);
+    setElapsedTime(0);
     
     toast({
       title: "Program Reset 🔄",
-      description: "Starting fresh with today's activities!",
+      description: "Starting fresh with today's 20-minute lesson!",
     });
   };
 
   const handleActivityComplete = (score: number, achievements: string[]) => {
-    // Update student metrics based on performance
     const newMetrics = {
       ...studentMetrics,
       recent_session_scores: [...studentMetrics.recent_session_scores.slice(-3), score],
@@ -156,7 +292,6 @@ const EnhancedDailyProgram = ({
       description: `You scored ${score} points and earned ${achievements.length} achievements!`,
     });
     
-    // Auto-advance to next activity after celebration
     setTimeout(() => {
       nextActivity();
     }, 3000);
@@ -168,6 +303,15 @@ const EnhancedDailyProgram = ({
       description: "Ask me anything about your current activity!",
     });
   };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const timeProgress = Math.min((elapsedTime / TARGET_LESSON_TIME) * 100, 100);
+  const remainingTime = Math.max(0, TARGET_LESSON_TIME - elapsedTime);
 
   if (isLoading) {
     return (
@@ -184,7 +328,7 @@ const EnhancedDailyProgram = ({
           >
             🎓
           </motion.div>
-          <h2 className="text-2xl font-bold mb-2">Preparing Your Daily Program</h2>
+          <h2 className="text-2xl font-bold mb-2">Preparing Your 20-Minute Lesson</h2>
           <p className="text-blue-200">Generating personalized learning activities...</p>
         </motion.div>
       </div>
@@ -216,16 +360,16 @@ const EnhancedDailyProgram = ({
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">
-                Enhanced Daily Learning Program
+                20-Minute Daily Learning Program
               </h1>
               <p className="text-blue-200">
-                Grade {gradeLevel} • {dailyPlan.total_duration_minutes} minutes • {dailyPlan.activity_sequence.length} activities
+                Grade {gradeLevel} • Target: 20 minutes • {dailyPlan.activity_sequence.length} activities
               </p>
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="secondary" className="bg-green-600 text-white">
-                <Target className="w-4 h-4 mr-1" />
-                {dailyPlan.curriculum_coverage.standards_addressed.length} Standards
+                <Clock className="w-4 h-4 mr-1" />
+                {formatTime(remainingTime)} left
               </Badge>
               <Badge variant="secondary" className="bg-purple-600 text-white">
                 <Brain className="w-4 h-4 mr-1" />
@@ -234,13 +378,22 @@ const EnhancedDailyProgram = ({
             </div>
           </div>
           
-          {/* Progress Bar */}
+          {/* Time Progress Bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-white font-medium">Session Progress</span>
+              <span className="text-white font-medium">Lesson Time Progress</span>
+              <span className="text-blue-200">{formatTime(elapsedTime)} / 20:00</span>
+            </div>
+            <Progress value={timeProgress} className="h-3 bg-white/10" />
+          </div>
+          
+          {/* Activity Progress Bar */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white font-medium">Activity Progress</span>
               <span className="text-blue-200">{Math.round(sessionProgress)}%</span>
             </div>
-            <Progress value={sessionProgress} className="h-3 bg-white/10" />
+            <Progress value={sessionProgress} className="h-2 bg-white/10" />
           </div>
           
           {/* Activity Controls */}
@@ -248,7 +401,7 @@ const EnhancedDailyProgram = ({
             {!isPlaying && !isPaused ? (
               <Button onClick={startActivity} className="bg-green-600 hover:bg-green-700 text-white">
                 <Play className="w-4 h-4 mr-2" />
-                Start Activity
+                Start 20-Min Lesson
               </Button>
             ) : isPaused ? (
               <Button onClick={startActivity} className="bg-green-600 hover:bg-green-700 text-white">
@@ -264,6 +417,16 @@ const EnhancedDailyProgram = ({
             
             <Button onClick={nextActivity} variant="outline" className="border-white/20 text-white hover:bg-white/10">
               Next Activity
+            </Button>
+            
+            <Button 
+              onClick={generateAdditionalContent} 
+              variant="outline" 
+              className="border-white/20 text-white hover:bg-white/10"
+              disabled={isGeneratingMore}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {isGeneratingMore ? 'Generating...' : 'More Content'}
             </Button>
             
             <Button onClick={resetProgram} variant="outline" className="border-white/20 text-white hover:bg-white/10">
@@ -323,7 +486,6 @@ const EnhancedDailyProgram = ({
                         </div>
                       </div>
                       
-                      {/* Activity Content Placeholder */}
                       <div className="bg-white/5 rounded-lg p-6 text-center">
                         <h3 className="text-xl font-bold mb-4">Activity Content</h3>
                         <p className="text-blue-200 mb-6">
@@ -349,7 +511,7 @@ const EnhancedDailyProgram = ({
               <CardHeader>
                 <CardTitle className="text-white flex items-center space-x-2">
                   <Calendar className="w-5 h-5" />
-                  <span>Today's Journey</span>
+                  <span>20-Min Journey</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -386,7 +548,6 @@ const EnhancedDailyProgram = ({
         </div>
       </div>
 
-      {/* Enhanced Nelie Interface */}
       <EnhancedNelieInterface
         currentSubject="mathematics"
         currentActivity={currentActivity.type}

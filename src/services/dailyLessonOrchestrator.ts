@@ -1,5 +1,4 @@
-
-// Daily Lesson Orchestrator - Creates 3-hour comprehensive learning experiences
+// Daily Lesson Orchestrator - Creates 20-minute targeted learning experiences
 import { CurriculumManager, LearningUnit } from './curriculumManager';
 import { UserLearningProfileService } from './userLearningProfileService';
 
@@ -37,13 +36,12 @@ export interface DailyActivity {
 }
 
 export class DailyLessonOrchestrator {
-  private static readonly TARGET_DAILY_MINUTES = 180; // 3 hours
+  private static readonly TARGET_DAILY_MINUTES = 20; // 20-minute targeted lessons
   private static readonly ACTIVITY_TYPES_DISTRIBUTION = {
-    instruction: 0.25,     // 25% - Learning new concepts
-    practice: 0.35,       // 35% - Practicing skills
+    instruction: 0.30,     // 30% - Learning new concepts
+    practice: 0.40,       // 40% - Practicing skills  
     games: 0.25,          // 25% - Educational games
-    assessment: 0.10,     // 10% - Progress checking
-    breaks: 0.05          // 5% - Mental breaks
+    assessment: 0.05      // 5% - Quick progress checks
   };
 
   static async generateDailyLesson(
@@ -51,7 +49,7 @@ export class DailyLessonOrchestrator {
     gradeLevel: number, 
     subject: string = 'mathematics'
   ): Promise<DailyLessonPlan> {
-    console.log(`🎯 Generating comprehensive daily lesson for Grade ${gradeLevel} ${subject}`);
+    console.log(`🎯 Generating 20-minute lesson for Grade ${gradeLevel} ${subject}`);
     
     // Get student learning profile
     const studentProfile = await UserLearningProfileService.getLearningProfile(
@@ -63,11 +61,11 @@ export class DailyLessonOrchestrator {
     // Get curriculum units for grade level
     const availableUnits = CurriculumManager.getCurriculumForGrade(subject, gradeLevel);
     
-    // Select appropriate units based on student readiness and previous progress
+    // Select appropriate units based on student readiness
     const selectedUnits = this.selectLearningUnits(availableUnits, studentProfile);
     
-    // Create activity sequence for 3-hour learning experience
-    const activitySequence = await this.createActivitySequence(selectedUnits, studentProfile);
+    // Create activity sequence for 20-minute learning experience
+    const activitySequence = await this.createTwentyMinuteSequence(selectedUnits, studentProfile);
     
     const lessonPlan: DailyLessonPlan = {
       date: new Date().toISOString().split('T')[0],
@@ -84,98 +82,117 @@ export class DailyLessonOrchestrator {
       }
     };
 
-    console.log(`✅ Generated daily lesson with ${activitySequence.length} activities covering ${lessonPlan.curriculum_coverage.standards_addressed.length} standards`);
+    console.log(`✅ Generated 20-minute lesson with ${activitySequence.length} activities`);
     return lessonPlan;
   }
 
   private static selectLearningUnits(availableUnits: LearningUnit[], studentProfile: any): LearningUnit[] {
-    // Select 2-3 learning units that fit the student's current level
+    // For 20-minute lessons, focus on 1-2 learning units max
     const readinessScores = availableUnits.map(unit => ({
       unit,
       readiness: CurriculumManager.estimateStudentReadiness(studentProfile, unit)
     }));
 
-    // Sort by readiness and select appropriate units
     const suitableUnits = readinessScores
-      .filter(item => item.readiness >= 60) // Student must be at least 60% ready
+      .filter(item => item.readiness >= 60)
       .sort((a, b) => b.readiness - a.readiness)
-      .slice(0, 3)
+      .slice(0, 2) // Max 2 units for focused 20-minute lesson
       .map(item => item.unit);
 
-    return suitableUnits.length > 0 ? suitableUnits : [availableUnits[0]]; // Fallback to first unit
+    return suitableUnits.length > 0 ? suitableUnits : [availableUnits[0]];
   }
 
-  private static async createActivitySequence(units: LearningUnit[], studentProfile: any): Promise<DailyActivity[]> {
+  private static async createTwentyMinuteSequence(units: LearningUnit[], studentProfile: any): Promise<DailyActivity[]> {
     const activities: DailyActivity[] = [];
-    const totalMinutes = this.TARGET_DAILY_MINUTES;
-    let remainingMinutes = totalMinutes;
+    const targetMinutes = this.TARGET_DAILY_MINUTES;
+    let currentMinutes = 0;
 
-    // Start with warm-up activity (10 minutes)
-    activities.push(this.createWarmUpActivity(studentProfile));
-    remainingMinutes -= 10;
+    // Start with a quick warm-up (2 minutes)
+    activities.push(this.createQuickWarmUp(studentProfile));
+    currentMinutes += 2;
 
-    // Distribute remaining time across units
-    const minutesPerUnit = Math.floor(remainingMinutes / units.length);
-    
-    for (let i = 0; i < units.length; i++) {
-      const unit = units[i];
-      const unitActivities = await this.createUnitActivities(unit, minutesPerUnit, studentProfile);
-      activities.push(...unitActivities);
+    // Main content delivery (6-8 minutes)
+    const mainInstruction = this.createMainInstruction(units[0], studentProfile);
+    activities.push(mainInstruction);
+    currentMinutes += mainInstruction.duration_minutes;
 
-      // Add break between units (except last)
-      if (i < units.length - 1) {
-        activities.push(this.createBreakActivity(5));
-      }
-    }
+    // Interactive practice (5-7 minutes)
+    const practiceActivity = this.createPracticeActivity(units[0], studentProfile);
+    activities.push(practiceActivity);
+    currentMinutes += practiceActivity.duration_minutes;
 
-    // End with review activity
-    activities.push(this.createReviewActivity(studentProfile));
+    // Educational game (4-6 minutes)
+    const gameActivity = this.createGameActivity(units[0], studentProfile);
+    activities.push(gameActivity);
+    currentMinutes += gameActivity.duration_minutes;
 
+    // Final assessment/review (2-3 minutes)
+    const finalActivity = this.createQuickAssessment(units[0], studentProfile);
+    activities.push(finalActivity);
+    currentMinutes += finalActivity.duration_minutes;
+
+    // Adjust timing to exactly hit 20 minutes
+    this.adjustTimingTo20Minutes(activities, targetMinutes);
+
+    console.log(`📋 Created 20-minute sequence: ${activities.length} activities, ${currentMinutes} minutes`);
     return activities;
   }
 
-  private static createWarmUpActivity(studentProfile: any): DailyActivity {
+  private static adjustTimingTo20Minutes(activities: DailyActivity[], targetMinutes: number): void {
+    const currentTotal = activities.reduce((sum, activity) => sum + activity.duration_minutes, 0);
+    
+    if (currentTotal !== targetMinutes) {
+      const difference = targetMinutes - currentTotal;
+      // Distribute the difference across practice and game activities
+      const adjustableActivities = activities.filter(a => a.type === 'practice' || a.type === 'game');
+      
+      if (adjustableActivities.length > 0) {
+        const adjustmentPerActivity = Math.floor(difference / adjustableActivities.length);
+        adjustableActivities.forEach(activity => {
+          activity.duration_minutes = Math.max(2, activity.duration_minutes + adjustmentPerActivity);
+        });
+      }
+    }
+  }
+
+  private static createQuickWarmUp(studentProfile: any): DailyActivity {
     return {
       id: `warmup-${Date.now()}`,
       type: 'warm_up',
-      title: 'Daily Math Warm-Up',
-      duration_minutes: 10,
+      title: 'Quick Math Warm-Up',
+      duration_minutes: 2,
       curriculum_unit_id: 'review',
       difficulty_level: Math.max(1, studentProfile.current_difficulty_level - 1),
       activity_data: {
         content_type: 'ai_question',
         parameters: {
-          question_count: 3,
+          question_count: 2,
           review_previous_concepts: true,
-          adaptive_difficulty: true
+          time_limit: 120 // 2 minutes
         }
       },
       nelie_guidance: {
-        introduction_prompt: "Good morning! Let's start with a quick warm-up to get your math brain ready for today's adventure!",
+        introduction_prompt: "Let's start with a quick warm-up to activate your math brain!",
         help_prompts: [
-          "Remember what we learned yesterday?",
-          "Take your time, there's no rush!",
-          "You're doing great, keep going!"
+          "Take a moment to think...",
+          "Remember what we learned before!",
+          "You've got this!"
         ],
         encouragement_messages: [
-          "Perfect start to the day!",
-          "Your brain is warmed up and ready!",
-          "Great job getting ready to learn!"
+          "Great start!",
+          "Your brain is ready to learn!",
+          "Perfect warm-up!"
         ]
       }
     };
   }
 
-  private static async createUnitActivities(unit: LearningUnit, timeAllocation: number, studentProfile: any): Promise<DailyActivity[]> {
-    const activities: DailyActivity[] = [];
-    
-    // Instruction phase (25% of unit time)
-    const instructionTime = Math.floor(timeAllocation * 0.25);
-    activities.push({
+  private static createMainInstruction(unit: LearningUnit, studentProfile: any): DailyActivity {
+    return {
       id: `instruction-${unit.id}-${Date.now()}`,
       type: 'instruction',
-      title: `Learning: ${unit.title}`,
-      duration_minutes: instructionTime,
+      title: `Learn: ${unit.title}`,
+      duration_minutes: 7,
       curriculum_unit_id: unit.id,
       difficulty_level: studentProfile.current_difficulty_level || 2,
       activity_data: {
@@ -184,185 +201,121 @@ export class DailyLessonOrchestrator {
           curriculum_standards: unit.curriculum_standards,
           learning_objectives: unit.curriculum_standards.flatMap(s => s.learning_objectives),
           visual_aids: true,
-          interactive_examples: true
+          interactive_examples: true,
+          time_limit: 420 // 7 minutes
         }
       },
       nelie_guidance: {
-        introduction_prompt: `Today we're exploring ${unit.title}! I'll be here to help you understand every step.`,
+        introduction_prompt: `Today we're exploring ${unit.title}! I'll guide you through each step.`,
         help_prompts: [
           "Would you like me to explain this differently?",
-          "Let's break this down into smaller pieces!",
-          "Remember, questions help you learn better!"
+          "Let's break this into smaller steps!",
+          "Ask me anything you're curious about!"
         ],
         encouragement_messages: [
-          "You're getting the hang of this!",
-          "Great questions lead to great understanding!",
-          "I can see you're really thinking about this!"
-        ]
-      }
-    });
-
-    // Practice phase (35% of unit time)
-    const practiceTime = Math.floor(timeAllocation * 0.35);
-    activities.push({
-      id: `practice-${unit.id}-${Date.now()}`,
-      type: 'practice',
-      title: `Practice: ${unit.title}`,
-      duration_minutes: practiceTime,
-      curriculum_unit_id: unit.id,
-      difficulty_level: studentProfile.current_difficulty_level || 2,
-      activity_data: {
-        content_type: 'ai_question',
-        parameters: {
-          question_count: Math.floor(practiceTime / 3), // ~3 minutes per question
-          curriculum_aligned: true,
-          adaptive_difficulty: true,
-          skill_areas: unit.skill_areas
-        }
-      },
-      nelie_guidance: {
-        introduction_prompt: "Time to practice what we just learned! I believe in you!",
-        help_prompts: [
-          "What strategy might work here?",
-          "Let's think step by step...",
-          "What do you remember from our lesson?"
-        ],
-        encouragement_messages: [
-          "Excellent work! You're mastering this!",
-          "I love how you're thinking through this!",
-          "You're building strong math skills!"
-        ]
-      }
-    });
-
-    // Game phase (25% of unit time)
-    const gameTime = Math.floor(timeAllocation * 0.25);
-    activities.push({
-      id: `game-${unit.id}-${Date.now()}`,
-      type: 'game',
-      title: `Math Game: ${unit.title}`,
-      duration_minutes: gameTime,
-      curriculum_unit_id: unit.id,
-      difficulty_level: studentProfile.current_difficulty_level || 2,
-      activity_data: {
-        content_type: 'educational_game',
-        parameters: {
-          game_type: 'adaptive_challenge',
-          skill_focus: unit.skill_areas[0],
-          fun_theme: this.selectGameTheme(studentProfile),
-          collaborative_elements: true
-        }
-      },
-      nelie_guidance: {
-        introduction_prompt: "Learning through play is the best! Let's have some fun while practicing math!",
-        help_prompts: [
-          "Games help your brain learn in new ways!",
-          "Don't worry about mistakes - they help you learn!",
-          "What pattern do you notice?"
-        ],
-        encouragement_messages: [
-          "You're having fun AND learning!",
-          "Games make math exciting!",
-          "Your playful learning is inspiring!"
-        ]
-      }
-    });
-
-    // Assessment phase (10% of unit time)
-    const assessmentTime = Math.floor(timeAllocation * 0.10);
-    activities.push({
-      id: `assessment-${unit.id}-${Date.now()}`,
-      type: 'assessment',
-      title: `Check Understanding: ${unit.title}`,
-      duration_minutes: assessmentTime,
-      curriculum_unit_id: unit.id,
-      difficulty_level: studentProfile.current_difficulty_level || 2,
-      activity_data: {
-        content_type: 'ai_question',
-        parameters: {
-          question_count: 2,
-          mastery_check: true,
-          curriculum_standards: unit.curriculum_standards.map(s => s.id),
-          adaptive_feedback: true
-        }
-      },
-      nelie_guidance: {
-        introduction_prompt: "Let's see how well you understand what we've learned today!",
-        help_prompts: [
-          "Take your time to think...",
-          "What strategies have worked for you?",
-          "Remember, this helps me understand how to help you better!"
-        ],
-        encouragement_messages: [
-          "You've shown great understanding!",
-          "I'm proud of your learning today!",
-          "You're ready for tomorrow's adventures!"
-        ]
-      }
-    });
-
-    return activities;
-  }
-
-  private static createBreakActivity(minutes: number): DailyActivity {
-    return {
-      id: `break-${Date.now()}`,
-      type: 'break',
-      title: 'Learning Break',
-      duration_minutes: minutes,
-      curriculum_unit_id: 'break',
-      difficulty_level: 0,
-      activity_data: {
-        content_type: 'interactive_lesson',
-        parameters: {
-          break_type: 'mindful_moment',
-          activities: ['deep_breathing', 'positive_visualization', 'gentle_movement']
-        }
-      },
-      nelie_guidance: {
-        introduction_prompt: "Time for a quick brain break! Let's recharge for more learning!",
-        help_prompts: [
-          "Take some deep breaths with me!",
-          "Stretch those learning muscles!",
-          "A little rest helps your brain grow stronger!"
-        ],
-        encouragement_messages: [
-          "Perfect! You're taking care of your learning brain!",
-          "Rest is an important part of learning!",
-          "You're ready for the next adventure!"
+          "You're understanding this really well!",
+          "Great questions help you learn!",
+          "I can see you're thinking deeply about this!"
         ]
       }
     };
   }
 
-  private static createReviewActivity(studentProfile: any): DailyActivity {
+  private static createPracticeActivity(unit: LearningUnit, studentProfile: any): DailyActivity {
     return {
-      id: `review-${Date.now()}`,
-      type: 'review',
-      title: 'Daily Learning Review',
-      duration_minutes: 15,
-      curriculum_unit_id: 'review',
+      id: `practice-${unit.id}-${Date.now()}`,
+      type: 'practice',
+      title: `Practice: ${unit.title}`,
+      duration_minutes: 6,
+      curriculum_unit_id: unit.id,
       difficulty_level: studentProfile.current_difficulty_level || 2,
       activity_data: {
-        content_type: 'interactive_lesson',
+        content_type: 'ai_question',
         parameters: {
-          review_type: 'reflection_and_consolidation',
-          summarize_key_concepts: true,
-          celebrate_progress: true,
-          preview_tomorrow: true
+          question_count: 4,
+          curriculum_aligned: true,
+          adaptive_difficulty: true,
+          skill_areas: unit.skill_areas,
+          time_limit: 360 // 6 minutes
         }
       },
       nelie_guidance: {
-        introduction_prompt: "What an amazing learning day! Let's review all the incredible things you've discovered!",
+        introduction_prompt: "Time to practice what we just learned! You're ready for this!",
         help_prompts: [
-          "What was your favorite part of today?",
-          "What new skill are you most proud of?",
-          "What would you like to explore more tomorrow?"
+          "What strategy might work here?",
+          "Think about what we just learned...",
+          "Take your time to work through this!"
         ],
         encouragement_messages: [
-          "You've accomplished so much today!",
-          "Your learning journey is inspiring!",
-          "I can't wait to see what you'll discover tomorrow!"
+          "Excellent thinking!",
+          "You're applying the concepts perfectly!",
+          "Your practice is paying off!"
+        ]
+      }
+    };
+  }
+
+  private static createGameActivity(unit: LearningUnit, studentProfile: any): DailyActivity {
+    return {
+      id: `game-${unit.id}-${Date.now()}`,
+      type: 'game',
+      title: `Math Game: ${unit.title}`,
+      duration_minutes: 4,
+      curriculum_unit_id: unit.id,
+      difficulty_level: studentProfile.current_difficulty_level || 2,
+      activity_data: {
+        content_type: 'educational_game',
+        parameters: {
+          game_type: 'quick_challenge',
+          skill_focus: unit.skill_areas[0],
+          fun_theme: this.selectGameTheme(studentProfile),
+          time_limit: 240 // 4 minutes
+        }
+      },
+      nelie_guidance: {
+        introduction_prompt: "Let's make learning fun with this quick game challenge!",
+        help_prompts: [
+          "Games help your brain learn in exciting ways!",
+          "Don't worry about mistakes - they help you grow!",
+          "What patterns do you notice?"
+        ],
+        encouragement_messages: [
+          "You're learning and having fun!",
+          "Games make math exciting!",
+          "Your playful learning is amazing!"
+        ]
+      }
+    };
+  }
+
+  private static createQuickAssessment(unit: LearningUnit, studentProfile: any): DailyActivity {
+    return {
+      id: `assessment-${unit.id}-${Date.now()}`,
+      type: 'assessment',
+      title: `Quick Check: ${unit.title}`,
+      duration_minutes: 1,
+      curriculum_unit_id: unit.id,
+      difficulty_level: studentProfile.current_difficulty_level || 2,
+      activity_data: {
+        content_type: 'ai_question',
+        parameters: {
+          question_count: 1,
+          mastery_check: true,
+          curriculum_standards: unit.curriculum_standards.map(s => s.id),
+          time_limit: 60 // 1 minute
+        }
+      },
+      nelie_guidance: {
+        introduction_prompt: "Let's do a quick check of what you've learned!",
+        help_prompts: [
+          "Think about what we practiced...",
+          "You know this!",
+          "Take a moment to consider..."
+        ],
+        encouragement_messages: [
+          "You've learned so much in 20 minutes!",
+          "Your understanding is growing!",
+          "Ready for tomorrow's adventure!"
         ]
       }
     };
@@ -381,7 +334,7 @@ export class DailyLessonOrchestrator {
     }
     
     if (studentProfile.attention_span_minutes < 20) {
-      notes.push('Includes frequent breaks and variety to maintain engagement');
+      notes.push('Optimized for 20-minute focused learning sessions');
     }
     
     if (studentProfile.overall_accuracy < 70) {
@@ -389,6 +342,7 @@ export class DailyLessonOrchestrator {
     }
     
     notes.push(`Adjusted for ${studentProfile.preferred_pace} learning pace`);
+    notes.push('Designed for exactly 20 minutes of engaged learning');
     
     return notes;
   }
@@ -398,5 +352,54 @@ export class DailyLessonOrchestrator {
     const masteredConcepts = studentProfile.mastered_concepts || [];
     
     return allConcepts.filter(concept => !masteredConcepts.includes(concept));
+  }
+
+  static async generateAdditionalActivities(
+    basePlan: DailyLessonPlan, 
+    count: number = 3
+  ): Promise<DailyActivity[]> {
+    console.log(`🚀 Generating ${count} additional activities for fast learners`);
+    
+    const additionalActivities: DailyActivity[] = [];
+    const baseUnit = basePlan.learning_units[0];
+    
+    for (let i = 0; i < count; i++) {
+      const activityType = i % 2 === 0 ? 'practice' : 'game';
+      
+      const activity: DailyActivity = {
+        id: `additional-${Date.now()}-${i}`,
+        type: activityType,
+        title: `Bonus ${activityType === 'practice' ? 'Practice' : 'Game'}: ${baseUnit?.title}`,
+        duration_minutes: 5,
+        curriculum_unit_id: baseUnit?.id || 'general',
+        difficulty_level: 3, // Slightly higher for fast learners
+        activity_data: {
+          content_type: activityType === 'practice' ? 'ai_question' : 'educational_game',
+          parameters: {
+            question_count: activityType === 'practice' ? 3 : undefined,
+            game_type: activityType === 'game' ? 'challenge_mode' : undefined,
+            adaptive_difficulty: true,
+            time_limit: 300 // 5 minutes
+          }
+        },
+        nelie_guidance: {
+          introduction_prompt: `Excellent progress! Here's an extra ${activityType} to keep you challenged!`,
+          help_prompts: [
+            "You're ready for this challenge!",
+            "Use what you've learned so far!",
+            "Take your time to think it through!"
+          ],
+          encouragement_messages: [
+            "Amazing progress!",
+            "You're mastering this quickly!",
+            "Your learning speed is impressive!"
+          ]
+        }
+      };
+      
+      additionalActivities.push(activity);
+    }
+    
+    return additionalActivities;
   }
 }
