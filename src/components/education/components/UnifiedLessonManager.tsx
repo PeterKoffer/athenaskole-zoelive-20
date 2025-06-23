@@ -77,7 +77,7 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
     );
   }
 
-  // Show main lesson content
+  // Show main lesson content - directly use AILearningModule to skip the duplicate explanation
   console.log('📚 Displaying main lesson content for', subject);
   return (
     <ClassroomEnvironment config={classroomConfig}>
