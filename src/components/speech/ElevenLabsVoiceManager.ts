@@ -20,7 +20,7 @@ export class ElevenLabsVoiceManager {
     try {
       console.log("🔍 [ElevenLabsVoiceManager] Calling edge function to check availability...");
       
-      // Get the API key - use the new one provided by user
+      // Get the API key
       const apiKey = await this.getApiKey();
       if (!apiKey) {
         console.error("❌ [ElevenLabsVoiceManager] No API key available");
@@ -37,6 +37,8 @@ export class ElevenLabsVoiceManager {
         return false;
       }
 
+      console.log("🔑 [ElevenLabsVoiceManager] Using API key:", apiKey.substring(0, 10) + "...");
+
       // Add timeout and better error handling
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -45,7 +47,8 @@ export class ElevenLabsVoiceManager {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-elevenlabs-key": apiKey
+          "x-elevenlabs-key": apiKey,
+          "authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({ type: "check-availability" }),
         signal: controller.signal
@@ -53,7 +56,11 @@ export class ElevenLabsVoiceManager {
 
       clearTimeout(timeoutId);
 
-      console.log("📡 [ElevenLabsVoiceManager] Edge function response status:", response.status);
+      console.log("📡 [ElevenLabsVoiceManager] Edge function response:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -133,17 +140,18 @@ export class ElevenLabsVoiceManager {
   }
 
   private async getApiKey(): Promise<string | null> {
-    // First try the new API key provided by user
-    const newApiKey = 'sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51';
-    if (newApiKey) {
-      console.log("🔑 [ElevenLabsVoiceManager] Using provided API key");
-      // Store it in localStorage for future use
+    // Use the hardcoded API key as primary
+    const hardcodedKey = 'sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51';
+    
+    if (hardcodedKey) {
+      console.log("🔑 [ElevenLabsVoiceManager] Using hardcoded API key");
+      // Store it in localStorage for consistency
       try {
-        localStorage.setItem('elevenlabs_api_key', newApiKey);
+        localStorage.setItem('elevenlabs_api_key', hardcodedKey);
       } catch (e) {
         console.warn("⚠️ Could not save API key to localStorage");
       }
-      return newApiKey;
+      return hardcodedKey;
     }
 
     // Fallback to localStorage

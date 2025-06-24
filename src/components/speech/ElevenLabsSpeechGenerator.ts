@@ -31,15 +31,24 @@ export class ElevenLabsSpeechGenerator {
       };
       
       console.log("📤 [ElevenLabsSpeechGenerator] Request payload:", JSON.stringify(requestPayload, null, 2));
+      console.log("🔑 [ElevenLabsSpeechGenerator] Using API key:", apiKey.substring(0, 10) + "...");
       
       console.log("‼️‼️ [ElevenLabsSpeechGenerator] ABOUT TO FETCH from edge function... ‼️‼️");
       const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-elevenlabs-key": apiKey
+          "x-elevenlabs-key": apiKey,
+          "authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify(requestPayload),
+      });
+
+      console.log("📡 [ElevenLabsSpeechGenerator] Response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
       });
 
       // Try to dump as much as possible if not ok
@@ -52,10 +61,13 @@ export class ElevenLabsSpeechGenerator {
       }
 
       console.log(
-        "📥 [ElevenLabsSpeechGenerator] Response status:", response.status,
-        "Has audioContent:", !!rawJson.audioContent,
-        "audioContent length:", rawJson.audioContent?.length,
-        "Error:", rawJson.error
+        "📥 [ElevenLabsSpeechGenerator] Response data:", {
+          status: response.status,
+          hasAudioContent: !!rawJson.audioContent,
+          audioContentLength: rawJson.audioContent?.length,
+          error: rawJson.error,
+          fullResponse: rawJson
+        }
       );
 
       if (!response.ok || !rawJson.audioContent) {
@@ -79,17 +91,32 @@ export class ElevenLabsSpeechGenerator {
   }
 
   private async getApiKey(): Promise<string | null> {
-    // Try to get the API key from localStorage
+    // Use the hardcoded API key as primary
+    const hardcodedKey = 'sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51';
+    
+    if (hardcodedKey) {
+      console.log("🔑 [ElevenLabsSpeechGenerator] Using hardcoded API key");
+      // Store it in localStorage for consistency
+      try {
+        localStorage.setItem('elevenlabs_api_key', hardcodedKey);
+      } catch (e) {
+        console.warn("⚠️ Could not save API key to localStorage");
+      }
+      return hardcodedKey;
+    }
+
+    // Fallback to localStorage
     try {
       const storedKey = localStorage.getItem('elevenlabs_api_key');
       if (storedKey) {
+        console.log("🔑 [ElevenLabsSpeechGenerator] Using stored API key");
         return storedKey;
       }
     } catch (e) {
       // localStorage might not be available
     }
 
-    // Use the hardcoded API key as fallback
-    return 'sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51';
+    console.log("🔑 [ElevenLabsSpeechGenerator] No API key found");
+    return null;
   }
 }
