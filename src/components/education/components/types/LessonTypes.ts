@@ -20,6 +20,29 @@ export type ActivityPhase =
   | 'quiz'
   | 'content-delivery';
 
+export interface ContentSegment {
+  explanation?: string;
+  checkQuestion?: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+  };
+}
+
+export interface SelfAssessment {
+  question?: string;
+  options?: string[];
+  correctAnswer?: number;
+  explanation?: string;
+}
+
+export interface ProblemStep {
+  step: string;
+  hint?: string;
+  solution?: string;
+}
+
 export interface LessonActivityContent {
   text?: string;
   question?: string;
@@ -46,9 +69,14 @@ export interface LessonActivityContent {
   gameType?: string;
   description?: string;
   challenges?: string[];
+  gameDescription?: string;
+  mechanics?: string[];
+  rewards?: string[];
   
   // Simulation-specific properties
   simulationType?: string;
+  simulationDescription?: string;
+  scenarios?: string[];
   
   // Battle-specific properties
   enemyName?: string;
@@ -60,6 +88,28 @@ export interface LessonActivityContent {
   characterName?: string;
   characterRole?: string;
   characterIntroduction?: string;
+  
+  // Content delivery properties
+  segments?: ContentSegment[];
+  uniqueTheme?: string;
+  uniqueScenario?: string;
+  uniqueActivity?: string;
+  
+  // Educational properties
+  examples?: string[];
+  story?: string;
+  
+  // Puzzle properties
+  puzzleDescription?: string;
+  difficulty?: string;
+  
+  // Summary properties
+  whatNext?: string;
+  selfAssessment?: SelfAssessment;
+  
+  // Application properties
+  problemSteps?: ProblemStep[];
+  guidance?: string;
 }
 
 export interface LessonActivity {
@@ -70,4 +120,9 @@ export interface LessonActivity {
   content: LessonActivityContent;
   duration: number;
   phaseDescription?: string;
+  metadata?: {
+    subject?: string;
+    skillArea?: string;
+    templateId?: string;
+  };
 }
