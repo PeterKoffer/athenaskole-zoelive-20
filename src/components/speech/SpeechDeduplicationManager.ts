@@ -1,46 +1,115 @@
-export class SpeechDeduplicationManager {
-  private spokenContent = new Set<string>();
-  private sessionStartTime = Date.now();
-  
-  // Generate a unique key for content based on text and context
-  private generateContentKey(text: string, context?: string): string {
-    const cleanText = text.trim().toLowerCase().substring(0, 100);
-    return context ? `${context}:${cleanText}` : cleanText;
+
+// Speech Deduplication Manager for Nelie
+// Prevents the same content from being spoken multiple times in quick succession
+
+interface SpokenContent {
+  text: string;
+  context?: string;
+  timestamp: number;
+  hash: string;
+}
+
+class SpeechDeduplicationManager {
+  private spokenContent: Map<string, SpokenContent> = new Map();
+  private readonly DEDUPLICATION_WINDOW = 30000; // 30 seconds
+  private readonly MAX_ENTRIES = 100;
+
+  private generateHash(text: string, context?: string): string {
+    const content = `${text.toLowerCase().trim()}:${context || 'default'}`;
+    return btoa(content).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
   }
-  
-  // Check if content has already been spoken
+
   hasBeenSpoken(text: string, context?: string): boolean {
-    const key = this.generateContentKey(text, context);
-    return this.spokenContent.has(key);
+    if (!text?.trim()) return true;
+
+    const hash = this.generateHash(text, context);
+    const entry = this.spokenContent.get(hash);
+    
+    if (!entry) return false;
+
+    const now = Date.now();
+    const timeSinceSpoken = now - entry.timestamp;
+    
+    // If spoken recently, consider it a duplicate
+    if (timeSinceSpoken < this.DEDUPLICATION_WINDOW) {
+      console.log(`🔇 Content recently spoken (${Math.round(timeSinceSpoken/1000)}s ago):`, text.substring(0, 50));
+      return true;
+    }
+
+    // Clean up old entry
+    this.spokenContent.delete(hash);
+    return false;
   }
-  
-  // Mark content as spoken
+
   markAsSpoken(text: string, context?: string): void {
-    const key = this.generateContentKey(text, context);
-    this.spokenContent.add(key);
-    console.log('🔇 Marked as spoken:', key);
+    if (!text?.trim()) return;
+
+    const hash = this.generateHash(text, context);
+    const now = Date.now();
+    
+    // Clean up old entries before adding new one
+    this.cleanupOldEntries(now);
+    
+    // Add new entry
+    this.spokenContent.set(hash, {
+      text: text.substring(0, 100), // Store truncated version for debugging
+      context,
+      timestamp: now,
+      hash
+    });
+
+    console.log('🔇 Marked as spoken:', `${context || 'default'}:${text.substring(0, 50)}`);
+
+    // Enforce max entries limit
+    if (this.spokenContent.size > this.MAX_ENTRIES) {
+      const oldestKey = Array.from(this.spokenContent.keys())[0];
+      this.spokenContent.delete(oldestKey);
+    }
   }
-  
-  // Allow content to be spoken again (for repeat buttons)
+
   allowRepeat(text: string, context?: string): void {
-    const key = this.generateContentKey(text, context);
-    this.spokenContent.delete(key);
-    console.log('🔊 Allowing repeat for:', key);
+    if (!text?.trim()) return;
+
+    const hash = this.generateHash(text, context);
+    this.spokenContent.delete(hash);
+    console.log('🔄 Allowing repeat for:', text.substring(0, 50));
   }
-  
-  // Clear all spoken content (for new sessions)
+
   clearAll(): void {
     this.spokenContent.clear();
-    this.sessionStartTime = Date.now();
     console.log('🆕 Speech deduplication cleared');
   }
-  
-  // Clear content older than specified time (in minutes)
-  clearOld(minutesOld: number = 30): void {
-    // For now, we'll keep it simple and not implement time-based clearing
-    // since we're using a Set that doesn't store timestamps
+
+  clearContext(context: string): void {
+    const toDelete = Array.from(this.spokenContent.entries())
+      .filter(([_, entry]) => entry.context === context)
+      .map(([key, _]) => key);
+    
+    toDelete.forEach(key => this.spokenContent.delete(key));
+    console.log(`🗑️ Cleared deduplication for context: ${context}`);
+  }
+
+  private cleanupOldEntries(now: number): void {
+    const cutoff = now - this.DEDUPLICATION_WINDOW;
+    const toDelete = Array.from(this.spokenContent.entries())
+      .filter(([_, entry]) => entry.timestamp < cutoff)
+      .map(([key, _]) => key);
+    
+    toDelete.forEach(key => this.spokenContent.delete(key));
+  }
+
+  // Debug method
+  getStatus(): { totalEntries: number; contexts: string[]; recentEntries: string[] } {
+    const entries = Array.from(this.spokenContent.values());
+    return {
+      totalEntries: entries.length,
+      contexts: [...new Set(entries.map(e => e.context || 'default'))],
+      recentEntries: entries
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 5)
+        .map(e => `${e.context}:${e.text.substring(0, 30)}`)
+    };
   }
 }
 
-// Global instance for the entire app
 export const speechDeduplication = new SpeechDeduplicationManager();

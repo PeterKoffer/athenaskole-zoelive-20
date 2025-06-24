@@ -1,9 +1,10 @@
 
-import { SpeechSystemQueue } from './SpeechSystemQueue';
-import { SpeechOrchestrator } from './SpeechOrchestrator';
 import { SpeechConfig } from './SpeechConfig';
 import { SpeechState } from './SpeechState';
+import { SpeechOrchestrator } from './SpeechOrchestrator';
+import { SpeechSystemQueue } from './SpeechSystemQueue';
 import { speakWithEngines } from './SpeechEngines';
+import { ElevenLabsEngine } from './engine/ElevenLabsEngine';
 
 export class SpeechQueueProcessor {
   constructor(
@@ -13,45 +14,39 @@ export class SpeechQueueProcessor {
 
   async processQueue(
     config: SpeechConfig,
-    state: SpeechState,
+    currentState: SpeechState,
     updateState: (updates: Partial<SpeechState>) => void
   ): Promise<void> {
-    if (state.isSpeaking || this.queue.isEmpty()) {
+    if (currentState.isSpeaking || this.queue.isEmpty()) {
       return;
     }
 
     const nextItem = this.queue.getNext();
-    if (!nextItem) {
-      return;
-    }
+    if (!nextItem) return;
 
-    console.log('🎤 [SpeechQueueProcessor] Processing:', nextItem.substring(0, 50));
-    
-    updateState({ isSpeaking: true, currentUtterance: null });
+    console.log('🎤 [SpeechQueueProcessor] Processing:', nextItem.text.substring(0, 50) + '...');
+
+    // Always try ElevenLabs first if enabled in config
+    const shouldTryElevenLabs = config.preferElevenLabs && config.useElevenLabs;
+    console.log('🔍 [SpeechQueueProcessor] Should try ElevenLabs:', shouldTryElevenLabs);
 
     try {
       await speakWithEngines(
-        nextItem,
-        config.preferElevenLabs && state.usingElevenLabs, // Use ElevenLabs if available and preferred
+        nextItem.text,
+        config.useElevenLabs,
         config,
         updateState,
         () => {
           console.log('🏁 [SpeechQueueProcessor] Speech completed');
-          updateState({ isSpeaking: false, currentUtterance: null });
-          // Process next item in queue
-          setTimeout(() => {
-            this.processQueue(config, { ...state, isSpeaking: false }, updateState);
-          }, 100);
+          updateState({ isSpeaking: false });
         },
-        state.usingElevenLabs || false, // shouldTryElevenLabs
-        state.isCheckingElevenLabs
+        shouldTryElevenLabs
       );
     } catch (error) {
       console.error('❌ [SpeechQueueProcessor] Error processing speech:', error);
       updateState({ 
         isSpeaking: false, 
-        currentUtterance: null,
-        lastError: error instanceof Error ? error.message : 'Speech processing failed'
+        lastError: error instanceof Error ? error.message : 'Speech processing failed' 
       });
     }
   }

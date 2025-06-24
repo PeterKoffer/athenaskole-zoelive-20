@@ -1,3 +1,4 @@
+
 import { EDGE_BASE, FENA_VOICE_ID } from "./ElevenLabsConfig";
 import { VoicesResponse } from "./ElevenLabsTypes";
 
@@ -8,7 +9,8 @@ export class ElevenLabsVoiceManager {
 
   public async checkAvailability(): Promise<boolean> {
     const now = Date.now();
-    if (now - this.lastCheck < 5000 && this.cachedAvailability !== null) {
+    // Reduce cache time to 3 seconds so it refreshes more quickly after API key is added
+    if (now - this.lastCheck < 3000 && this.cachedAvailability !== null) {
       console.log(`‼️ [ElevenLabsVoiceManager] Using CACHED availability: ${this.cachedAvailability}`);
       return this.cachedAvailability;
     }
@@ -16,6 +18,8 @@ export class ElevenLabsVoiceManager {
     this.lastCheck = now;
 
     try {
+      console.log("🔍 [ElevenLabsVoiceManager] Calling edge function to check availability...");
+      
       const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {
@@ -23,6 +27,8 @@ export class ElevenLabsVoiceManager {
         },
         body: JSON.stringify({ type: "check-availability" })
       });
+
+      console.log("📡 [ElevenLabsVoiceManager] Edge function response status:", response.status);
 
       const text = await response.text();
       let result: VoicesResponse | null = null;
@@ -69,7 +75,7 @@ export class ElevenLabsVoiceManager {
       } else {
         console.error("❌ [ElevenLabsVoiceManager] LIVE check FAILED (Unknown Response). Caching availability: false.", result);
         this.cachedAvailability = false;
-        this.lastError = "Unknown response";
+        this.lastError = "Unknown response from ElevenLabs";
         return false;
       }
     } catch (error) {
@@ -87,7 +93,9 @@ export class ElevenLabsVoiceManager {
   }
 
   public async refreshAvailability(): Promise<void> {
+    console.log("🔄 [ElevenLabsVoiceManager] Forcing refresh of availability cache...");
     this.cachedAvailability = null;
+    this.lastCheck = 0; // Force immediate refresh
     await this.checkAvailability();
   }
 }

@@ -1075,13 +1075,15 @@ export type Database = {
     }
     Functions: {
       analyze_and_update_learning_profile: {
-        Args: {
-          p_user_id: string
-          p_subject: string
-          p_skill_area: string
-          p_question_data: Json
-          p_user_response: Json
-        }
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              p_user_id: string
+              p_subject: string
+              p_skill_area: string
+              p_question_data: Json
+              p_user_response: Json
+            }
         Returns: undefined
       }
       generate_learning_path: {

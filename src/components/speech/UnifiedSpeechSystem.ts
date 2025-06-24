@@ -5,12 +5,14 @@ import { SpeechSystemQueue } from './SpeechSystemQueue';
 import { SpeechQueueProcessor } from './SpeechQueueProcessor';
 import { getDefaultSpeechConfig } from './SpeechConfig';
 import { speechDeduplication } from './SpeechDeduplicationManager';
+import { ElevenLabsEngine } from './engine/ElevenLabsEngine';
 
 class UnifiedSpeechSystem {
   private orchestrator = new SpeechOrchestrator();
   private queue = new SpeechSystemQueue();
   private processor = new SpeechQueueProcessor(this.queue, this.orchestrator);
   private config = getDefaultSpeechConfig();
+  private elevenLabsInitialized = false;
 
   constructor() {
     this.initializeSpeechSystem();
@@ -18,8 +20,49 @@ class UnifiedSpeechSystem {
 
   private async initializeSpeechSystem() {
     console.log('🔧 [UnifiedSpeechSystem] Initializing...');
+    
+    // Initialize speech state manager first
     await speechStateManager.initialize();
+    
+    // Check ElevenLabs availability immediately on startup
+    await this.checkElevenLabsAvailability();
+    
     console.log('🔧 [UnifiedSpeechSystem] initializeSpeechSystem done', speechStateManager.getState());
+  }
+
+  private async checkElevenLabsAvailability() {
+    console.log('🔍 [UnifiedSpeechSystem] Checking ElevenLabs availability...');
+    
+    try {
+      speechStateManager.updateState({ isCheckingElevenLabs: true });
+      
+      const isAvailable = await ElevenLabsEngine.isAvailable();
+      console.log('🔍 [UnifiedSpeechSystem] ElevenLabs availability result:', isAvailable);
+      
+      if (isAvailable) {
+        console.log('✅ [UnifiedSpeechSystem] ElevenLabs is available! Using Fena voice.');
+        speechStateManager.updateState({ 
+          usingElevenLabs: true,
+          isCheckingElevenLabs: false,
+          lastError: null
+        });
+        this.elevenLabsInitialized = true;
+      } else {
+        console.warn('⚠️ [UnifiedSpeechSystem] ElevenLabs not available, will use browser fallback');
+        speechStateManager.updateState({ 
+          usingElevenLabs: false,
+          isCheckingElevenLabs: false,
+          lastError: 'ElevenLabs not available - using browser voice'
+        });
+      }
+    } catch (error) {
+      console.error('❌ [UnifiedSpeechSystem] Error checking ElevenLabs:', error);
+      speechStateManager.updateState({ 
+        usingElevenLabs: false,
+        isCheckingElevenLabs: false,
+        lastError: 'Failed to check ElevenLabs availability'
+      });
+    }
   }
 
   async speak(text: string, priority: boolean = false, context?: string): Promise<void> {
@@ -159,6 +202,13 @@ class UnifiedSpeechSystem {
     await this.speak(testText, true, 'test');
   }
 
+  // Refresh ElevenLabs availability (useful after API key is added)
+  async refreshElevenLabsAvailability(): Promise<void> {
+    console.log('🔄 [UnifiedSpeechSystem] Refreshing ElevenLabs availability...');
+    await ElevenLabsEngine.refreshAvailability();
+    await this.checkElevenLabsAvailability();
+  }
+
   getState() {
     return speechStateManager.getState();
   }
@@ -174,3 +224,9 @@ class UnifiedSpeechSystem {
 }
 
 export const unifiedSpeech = new UnifiedSpeechSystem();
+
+// Automatically refresh ElevenLabs availability when the system loads
+// This helps in case the API key was added after the system initialized
+setTimeout(() => {
+  unifiedSpeech.refreshElevenLabsAvailability();
+}, 2000);
