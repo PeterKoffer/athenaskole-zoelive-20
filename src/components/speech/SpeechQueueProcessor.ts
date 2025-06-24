@@ -24,7 +24,7 @@ export class SpeechQueueProcessor {
     const nextItem = this.queue.getNext();
     if (!nextItem) return;
 
-    console.log('🎤 [SpeechQueueProcessor] Processing:', nextItem.text.substring(0, 50) + '...');
+    console.log('🎤 [SpeechQueueProcessor] Processing:', nextItem.substring(0, 50) + '...');
 
     // Always try ElevenLabs first if enabled in config
     const shouldTryElevenLabs = config.preferElevenLabs && config.useElevenLabs;
@@ -32,7 +32,7 @@ export class SpeechQueueProcessor {
 
     try {
       await speakWithEngines(
-        nextItem.text,
+        nextItem,
         config.useElevenLabs,
         config,
         updateState,
