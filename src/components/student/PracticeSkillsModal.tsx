@@ -40,6 +40,9 @@ const PracticeSkillsModal = ({ isOpen, onClose }: PracticeSkillsModalProps) => {
           <DialogTitle className="text-white text-2xl text-center mb-4">
             Choose Your Practice Subject
           </DialogTitle>
+          <p className="text-gray-300 text-center">
+            Each subject includes a personalized welcome and immersive classroom experience!
+          </p>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -62,7 +65,7 @@ const PracticeSkillsModal = ({ isOpen, onClose }: PracticeSkillsModalProps) => {
                     className="w-full mt-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white text-xs"
                     size="sm"
                   >
-                    Start Practice
+                    Start Learning Journey
                   </Button>
                 </CardContent>
               </Card>

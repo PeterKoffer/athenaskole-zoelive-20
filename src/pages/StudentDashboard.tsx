@@ -1,15 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Trophy, Clock, Star } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { supabase } from '@/integrations/supabase/client';
 import PracticeSkillsModal from "@/components/student/PracticeSkillsModal";
 
 const StudentDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [showPracticeModal, setShowPracticeModal] = useState(false);
+  const [studentName, setStudentName] = useState('Student');
+
+  // Fetch student's name from profile
+  useEffect(() => {
+    const fetchStudentName = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profile?.name) {
+          const firstName = profile.name.split(' ')[0];
+          setStudentName(firstName);
+        } else if (user.user_metadata?.first_name) {
+          setStudentName(user.user_metadata.first_name);
+        } else if (user.user_metadata?.name) {
+          const firstName = user.user_metadata.name.split(' ')[0];
+          setStudentName(firstName);
+        }
+      } catch (error) {
+        console.log('Could not fetch student name from profile, using fallback');
+        if (user.user_metadata?.first_name) {
+          setStudentName(user.user_metadata.first_name);
+        } else if (user.user_metadata?.name) {
+          const firstName = user.user_metadata.name.split(' ')[0];
+          setStudentName(firstName);
+        }
+      }
+    };
+
+    fetchStudentName();
+  }, [user]);
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -56,7 +93,7 @@ const StudentDashboard = () => {
               NELIE
             </span>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Welcome back, Student!</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {studentName}!</h1>
           <p className="text-blue-100">Ready to continue your learning journey?</p>
         </div>
 
