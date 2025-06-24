@@ -1,4 +1,5 @@
 
+
 export type ActivityType = 
   | 'introduction'
   | 'interactive-game'
@@ -21,6 +22,8 @@ export type ActivityPhase =
   | 'content-delivery';
 
 export interface ContentSegment {
+  title?: string;
+  concept?: string;
   explanation?: string;
   checkQuestion?: {
     question: string;
@@ -41,6 +44,12 @@ export interface ProblemStep {
   step: string;
   hint?: string;
   solution?: string;
+}
+
+export interface ScenarioItem {
+  customer?: string;
+  challenge?: string;
+  reward?: string;
 }
 
 export interface LessonActivityContent {
@@ -65,6 +74,14 @@ export interface LessonActivityContent {
   whatIfScenario?: string;
   explorationTask?: string;
   
+  // Story and narrative properties
+  storyHook?: string;
+  storyContext?: string;
+  celebration?: string;
+  achievementCelebration?: string;
+  excitementBuilder?: string;
+  celebrationLevel?: string;
+  
   // Game-specific properties
   gameType?: string;
   description?: string;
@@ -72,11 +89,13 @@ export interface LessonActivityContent {
   gameDescription?: string;
   mechanics?: string[];
   rewards?: string[];
+  winCondition?: string;
+  epicnessLevel?: string;
   
   // Simulation-specific properties
   simulationType?: string;
   simulationDescription?: string;
-  scenarios?: string[];
+  scenarios?: (string | ScenarioItem)[];
   
   // Battle-specific properties
   enemyName?: string;
@@ -94,10 +113,12 @@ export interface LessonActivityContent {
   uniqueTheme?: string;
   uniqueScenario?: string;
   uniqueActivity?: string;
+  concept?: string;
   
   // Educational properties
   examples?: string[];
   story?: string;
+  realWorldExample?: string;
   
   // Puzzle properties
   puzzleDescription?: string;
@@ -106,10 +127,16 @@ export interface LessonActivityContent {
   // Summary properties
   whatNext?: string;
   selfAssessment?: SelfAssessment;
+  achievementsList?: string[];
   
   // Application properties
   problemSteps?: ProblemStep[];
   guidance?: string;
+  grandChallenge?: string;
+  activityInstructions?: string;
+  
+  // Creative properties
+  creativeType?: string;
 }
 
 export interface LessonActivity {
@@ -126,3 +153,15 @@ export interface LessonActivity {
     templateId?: string;
   };
 }
+
+export interface SubjectLessonPlan {
+  id: string;
+  title: string;
+  subject: string;
+  skillArea: string;
+  gradeLevel: number;
+  activities: LessonActivity[];
+  estimatedDuration: number;
+  learningObjectives: string[];
+}
+
