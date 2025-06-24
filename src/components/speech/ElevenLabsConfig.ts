@@ -7,6 +7,9 @@ export const EDGE_BASE =
 export const FENA_VOICE_ID = "BlgEcC0TfWpBak7FmvHW";
 export const DEFAULT_MODEL_ID = "eleven_turbo_v2_5";
 
+// Use the provided API key directly
+export const ELEVENLABS_API_KEY = "sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51";
+
 export const DEFAULT_VOICE_SETTINGS = {
   stability: 0.5,
   similarity_boost: 0.5,
@@ -14,5 +17,4 @@ export const DEFAULT_VOICE_SETTINGS = {
   use_speaker_boost: true,
 };
 
-// Force Fena voice everywhere - no other voices allowed
-console.log('🎭 ElevenLabs Config: ONLY Fena voice (BlgEcC0TfWpBak7FmvHW) should be used');
+console.log('🎭 ElevenLabs Config: Using hardcoded API key for Fena voice');

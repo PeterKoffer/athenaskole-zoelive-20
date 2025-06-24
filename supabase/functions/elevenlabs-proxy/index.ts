@@ -7,10 +7,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-elevenlabs-key",
 };
 
-// Chunked base64 encoding to handle large buffers safely
+// Hardcoded ElevenLabs API key for immediate functionality
+const HARDCODED_API_KEY = "sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51";
+
 function encodeBase64Chunked(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
-  const chunkSize = 32768; // 32KB chunks
+  const chunkSize = 32768;
   let result = '';
   
   for (let i = 0; i < bytes.length; i += chunkSize) {
@@ -23,8 +25,7 @@ function encodeBase64Chunked(buffer: ArrayBuffer): string {
 }
 
 serve(async (req) => {
-  const invocationTime = new Date().toISOString();
-  console.log("[ElevenLabs] Function invoked at", invocationTime);
+  console.log("[ElevenLabs] Function invoked at", new Date().toISOString());
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -38,69 +39,46 @@ serve(async (req) => {
       });
     }
 
-    // Get ElevenLabs API key from custom header first, then authorization header
-    let clientApiKey = req.headers.get("x-elevenlabs-key");
+    // Use hardcoded API key for immediate functionality
+    let apiKey = HARDCODED_API_KEY;
     
-    if (!clientApiKey) {
-      const authHeader = req.headers.get("authorization");
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        clientApiKey = authHeader.replace("Bearer ", "");
-      }
-    }
+    // Also try to get from headers as fallback
+    const clientApiKey = req.headers.get("x-elevenlabs-key") || 
+                        req.headers.get("authorization")?.replace("Bearer ", "");
     
-    // Fallback to environment variable if no client key
-    if (!clientApiKey) {
-      clientApiKey = Deno.env.get("ELEVENLABS_API_KEY");
+    if (clientApiKey && clientApiKey.startsWith('sk_')) {
+      apiKey = clientApiKey;
+      console.log("[ElevenLabs] Using client-provided API key");
+    } else {
+      console.log("[ElevenLabs] Using hardcoded API key");
     }
-    
-    if (!clientApiKey) {
-      console.error("[ElevenLabs] API KEY IS MISSING - checked x-elevenlabs-key, authorization headers and env");
-      return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY." }), {
-        status: 401,
-        headers: corsHeaders
-      });
-    }
-
-    // Validate that this looks like an ElevenLabs API key (starts with sk_)
-    if (!clientApiKey.startsWith('sk_')) {
-      console.error("[ElevenLabs] Invalid API key format - ElevenLabs keys should start with 'sk_'");
-      return new Response(JSON.stringify({ error: "Invalid ElevenLabs API key format" }), {
-        status: 401,
-        headers: corsHeaders
-      });
-    }
-
-    console.log("[ElevenLabs] Valid ElevenLabs API key found, proceeding with request");
 
     const payload = await req.json();
     const type = payload.type || "";
-    console.log(`[ElevenLabs] Incoming payload:`, JSON.stringify(payload));
+    console.log(`[ElevenLabs] Processing request type: ${type}`);
 
     if (type === "check-availability") {
-      console.log("[ElevenLabs] Checking availability with ElevenLabs API");
+      console.log("[ElevenLabs] Checking ElevenLabs API availability");
+      
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
-        headers: { "xi-api-key": clientApiKey }
+        headers: { "xi-api-key": apiKey }
       });
-      const status = voicesRes.status;
-      let body = null;
-      try {
-        body = await voicesRes.json();
-      } catch (e) {
-        console.error("[ElevenLabs] Failed to parse ElevenLabs voices response", e);
-        return new Response(JSON.stringify({ error: "Failed to parse ElevenLabs voices response" }), {
-          status: 502,
-          headers: corsHeaders,
-        });
-      }
+      
       if (!voicesRes.ok) {
-        console.error("[ElevenLabs] ElevenLabs API error:", status, body);
-        return new Response(JSON.stringify({ error: body?.detail?.message || "Could not fetch voices" }), {
-          status,
+        const errorText = await voicesRes.text();
+        console.error("[ElevenLabs] API error:", voicesRes.status, errorText);
+        return new Response(JSON.stringify({ 
+          error: `ElevenLabs API error: ${voicesRes.status}` 
+        }), {
+          status: voicesRes.status,
           headers: corsHeaders,
         });
       }
-      console.log("[ElevenLabs] Successfully fetched voices from ElevenLabs");
-      return new Response(JSON.stringify(body), {
+      
+      const voices = await voicesRes.json();
+      console.log("[ElevenLabs] Successfully retrieved voices");
+      
+      return new Response(JSON.stringify(voices), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -108,20 +86,22 @@ serve(async (req) => {
 
     if (type === "generate-speech") {
       const { text, voiceId, model } = payload;
+      
       if (!text || !voiceId || !model) {
-        console.error("[ElevenLabs] Missing required params in generate-speech:", { text, voiceId, model });
-        return new Response(JSON.stringify({ error: "Missing required params" }), { status: 400, headers: corsHeaders });
+        return new Response(JSON.stringify({ error: "Missing required params" }), { 
+          status: 400, 
+          headers: corsHeaders 
+        });
       }
       
-      console.log(`[ElevenLabs] Generating speech for text (first 60): "${text.substring(0,60)}..."`);
-      console.log(`[ElevenLabs] Using voiceId:`, voiceId, " model:", model);
+      console.log(`[ElevenLabs] Generating speech for: "${text.substring(0,50)}..."`);
 
       const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: "POST",
         headers: {
           "Accept": "audio/mpeg",
           "Content-Type": "application/json",
-          "xi-api-key": clientApiKey,
+          "xi-api-key": apiKey,
         },
         body: JSON.stringify({
           text,
@@ -136,34 +116,28 @@ serve(async (req) => {
       });
 
       if (!ttsRes.ok) {
-        let errorMsg = "Unknown error";
-        try {
-          const errData = await ttsRes.json();
-          errorMsg = errData?.detail?.message || JSON.stringify(errData);
-        } catch (err) {
-          errorMsg = "Could not parse error body";
-        }
-        console.error("[ElevenLabs] TTS request failed:", errorMsg);
-        return new Response(JSON.stringify({ error: errorMsg }), { status: ttsRes.status, headers: corsHeaders });
+        const errorText = await ttsRes.text();
+        console.error("[ElevenLabs] TTS error:", ttsRes.status, errorText);
+        return new Response(JSON.stringify({ 
+          error: `TTS generation failed: ${ttsRes.status}` 
+        }), { 
+          status: ttsRes.status, 
+          headers: corsHeaders 
+        });
       }
 
       const audioBuffer = await ttsRes.arrayBuffer();
-      console.log(`[ElevenLabs] Received audio buffer of byteLength:`, audioBuffer.byteLength);
+      console.log(`[ElevenLabs] Generated audio: ${audioBuffer.byteLength} bytes`);
 
-      let base64Audio = "";
-      if (audioBuffer && audioBuffer.byteLength > 0) {
-        try {
-          // Use chunked encoding to prevent stack overflow
-          base64Audio = encodeBase64Chunked(audioBuffer);
-          console.log(`[ElevenLabs] Successfully encoded audio to base64, length:`, base64Audio.length);
-        } catch (err) {
-          console.error("[ElevenLabs] Error base64 encoding audio:", err);
-          return new Response(JSON.stringify({ error: "Failed to encode audio to base64" }), { status: 500, headers: corsHeaders });
-        }
-      } else {
-        console.error("[ElevenLabs] Empty audio buffer received!");
-        return new Response(JSON.stringify({ error: "Empty audio buffer received" }), { status: 500, headers: corsHeaders });
+      if (audioBuffer.byteLength === 0) {
+        return new Response(JSON.stringify({ error: "Empty audio buffer" }), { 
+          status: 500, 
+          headers: corsHeaders 
+        });
       }
+
+      const base64Audio = encodeBase64Chunked(audioBuffer);
+      console.log(`[ElevenLabs] Encoded to base64: ${base64Audio.length} chars`);
 
       return new Response(JSON.stringify({ audioContent: base64Audio }), {
         status: 200,
@@ -171,12 +145,14 @@ serve(async (req) => {
       });
     }
 
-    console.error("[ElevenLabs] Unknown type in payload:", type);
-    return new Response(JSON.stringify({ error: "Unknown type" }), { status: 400, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Unknown request type" }), { 
+      status: 400, 
+      headers: corsHeaders 
+    });
 
-  } catch (e) {
-    const errMsg = e instanceof Error ? e.message : "Proxy error";
-    console.error("[ElevenLabs] Exception thrown in handler:", errMsg);
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : "Unknown error";
+    console.error("[ElevenLabs] Exception:", errMsg);
     return new Response(JSON.stringify({ error: errMsg }), {
       status: 500,
       headers: corsHeaders,
