@@ -9,6 +9,7 @@ interface TextWithSpeakerProps {
   position?: 'corner' | 'inline';
   showOnHover?: boolean;
   children: React.ReactNode;
+  className?: string;
 }
 
 const TextWithSpeaker = ({ 
@@ -16,7 +17,8 @@ const TextWithSpeaker = ({
   context, 
   position = 'corner', 
   showOnHover = true,
-  children 
+  children,
+  className = ''
 }: TextWithSpeakerProps) => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
@@ -30,7 +32,7 @@ const TextWithSpeaker = ({
 
   if (position === 'corner') {
     return (
-      <div className="relative">
+      <div className={`relative ${className}`}>
         <button
           onClick={handleSpeak}
           className={`absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 ${
@@ -46,7 +48,7 @@ const TextWithSpeaker = ({
   }
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className={`flex items-center space-x-2 ${className}`}>
       {children}
       <button
         onClick={handleSpeak}
