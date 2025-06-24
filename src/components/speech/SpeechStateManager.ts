@@ -101,6 +101,12 @@ class SpeechStateManager {
       }
     };
   }
+
+  async initialize() {
+    // This method can be used for any async initialization if needed
+    console.log('🔧 [SpeechStateManager] Initialize called');
+  }
 }
 
 export const speechStateManager = new SpeechStateManager();
+export { SpeechStateManager };

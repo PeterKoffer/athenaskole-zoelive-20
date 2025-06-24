@@ -1,5 +1,5 @@
 
-import { SpeechStateManager } from './SpeechStateManager';
+import { speechStateManager } from './SpeechStateManager';
 import { SpeechOrchestrator } from './SpeechOrchestrator';
 import { SpeechSystemQueue } from './SpeechSystemQueue';
 import { SpeechQueueProcessor } from './SpeechQueueProcessor';
@@ -7,7 +7,6 @@ import { getDefaultSpeechConfig } from './SpeechConfig';
 import { speechDeduplication } from './SpeechDeduplicationManager';
 
 class UnifiedSpeechSystem {
-  private stateManager = new SpeechStateManager();
   private orchestrator = new SpeechOrchestrator();
   private queue = new SpeechSystemQueue();
   private processor = new SpeechQueueProcessor(this.queue, this.orchestrator);
@@ -19,8 +18,8 @@ class UnifiedSpeechSystem {
 
   private async initializeSpeechSystem() {
     console.log('🔧 [UnifiedSpeechSystem] Initializing...');
-    await this.stateManager.initialize();
-    console.log('🔧 [UnifiedSpeechSystem] initializeSpeechSystem done', this.stateManager.getState());
+    await speechStateManager.initialize();
+    console.log('🔧 [UnifiedSpeechSystem] initializeSpeechSystem done', speechStateManager.getState());
   }
 
   async speak(text: string, priority: boolean = false, context?: string): Promise<void> {
@@ -40,8 +39,8 @@ class UnifiedSpeechSystem {
     this.queue.addItem(text, priority);
     await this.processor.processQueue(
       this.config,
-      this.stateManager.getState(),
-      (updates) => this.stateManager.updateState(updates)
+      speechStateManager.getState(),
+      (updates) => speechStateManager.updateState(updates)
     );
   }
 
@@ -64,8 +63,8 @@ class UnifiedSpeechSystem {
     this.queue.addItem(nelieText, priority);
     await this.processor.processQueue(
       this.config,
-      this.stateManager.getState(),
-      (updates) => this.stateManager.updateState(updates)
+      speechStateManager.getState(),
+      (updates) => speechStateManager.updateState(updates)
     );
   }
 
@@ -104,7 +103,7 @@ class UnifiedSpeechSystem {
     }
 
     // 4. Update state immediately to reflect stopped status
-    this.stateManager.updateState({
+    speechStateManager.updateState({
       isSpeaking: false,
       currentUtterance: null,
       lastError: null
@@ -133,7 +132,7 @@ class UnifiedSpeechSystem {
   }
 
   toggleEnabled(): void {
-    const currentState = this.stateManager.getState();
+    const currentState = speechStateManager.getState();
     const newEnabledState = !currentState.isEnabled;
     
     console.log('[UnifiedSpeechSystem] Toggling enabled:', newEnabledState);
@@ -142,12 +141,12 @@ class UnifiedSpeechSystem {
       this.forceStopAll();
     }
     
-    this.stateManager.updateState({ isEnabled: newEnabledState });
+    speechStateManager.updateState({ isEnabled: newEnabledState });
   }
 
   enableUserInteraction(): void {
     console.log('[UnifiedSpeechSystem] Enabling user interaction');
-    this.stateManager.updateState({ 
+    speechStateManager.updateState({ 
       hasUserInteracted: true,
       isEnabled: true 
     });
@@ -161,11 +160,11 @@ class UnifiedSpeechSystem {
   }
 
   getState() {
-    return this.stateManager.getState();
+    return speechStateManager.getState();
   }
 
   subscribe(callback: (state: any) => void) {
-    return this.stateManager.subscribe(callback);
+    return speechStateManager.subscribe(callback);
   }
 
   // Clear spoken content for new sessions
