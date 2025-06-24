@@ -25,7 +25,15 @@ export class ElevenLabsVoiceManager {
       if (!apiKey) {
         console.error("❌ [ElevenLabsVoiceManager] No API key available");
         this.cachedAvailability = false;
-        this.lastError = "ElevenLabs API key not configured";
+        this.lastError = "Please add your ElevenLabs API key (starts with 'sk_' for ElevenLabs)";
+        return false;
+      }
+
+      // Validate API key format
+      if (!apiKey.startsWith('sk_') || apiKey.length < 20) {
+        console.error("❌ [ElevenLabsVoiceManager] Invalid API key format");
+        this.cachedAvailability = false;
+        this.lastError = "Invalid ElevenLabs API key format. Please check your API key.";
         return false;
       }
 
@@ -50,6 +58,13 @@ export class ElevenLabsVoiceManager {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ [ElevenLabsVoiceManager] HTTP error:", response.status, errorText);
+        
+        if (response.status === 401) {
+          this.cachedAvailability = false;
+          this.lastError = "Invalid ElevenLabs API key. Please check your API key.";
+          return false;
+        }
+        
         this.cachedAvailability = false;
         this.lastError = `HTTP ${response.status}: ${errorText}`;
         return false;
