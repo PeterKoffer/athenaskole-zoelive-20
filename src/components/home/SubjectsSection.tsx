@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { subjects } from "./SubjectsData";
-import SubjectCard from "./SubjectCard";
+import SubjectCard from "./subject-card/SubjectCard";
 
 const SubjectsSection = () => {
   const navigate = useNavigate();
