@@ -1,13 +1,15 @@
-
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Trophy, Clock, Star } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import PracticeSkillsModal from "@/components/student/PracticeSkillsModal";
 
 const StudentDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [showPracticeModal, setShowPracticeModal] = useState(false);
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -19,8 +21,7 @@ const StudentDashboard = () => {
         navigate('/daily-program');
         break;
       case 'practice':
-        // Navigate to a specific learning subject - let's default to mathematics
-        navigate('/learn/mathematics');
+        setShowPracticeModal(true);
         break;
       case 'help':
         // This could show the floating AI tutor or navigate to a help section
@@ -47,6 +48,14 @@ const StudentDashboard = () => {
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg mb-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-xl">👩‍🏫</span>
+            </div>
+            <span className="font-bold text-2xl bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+              NELIE
+            </span>
+          </div>
           <h1 className="text-3xl font-bold mb-2">Welcome back, Student!</h1>
           <p className="text-blue-100">Ready to continue your learning journey?</p>
         </div>
@@ -168,6 +177,11 @@ const StudentDashboard = () => {
           </Card>
         </div>
       </div>
+
+      <PracticeSkillsModal 
+        isOpen={showPracticeModal} 
+        onClose={() => setShowPracticeModal(false)} 
+      />
     </div>
   );
 };
