@@ -73,7 +73,7 @@ const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivit
     if (isSpeaking) {
       stop();
     } else {
-      const speakText = `${activity.title}. ${activity.description}. Duration: ${activity.duration}. Level: ${activity.level}.`;
+      const speakText = `${activity.title}. ${activity.description}.`;
       await speakAsNelie(speakText, true, 'ai-enhanced-activity-card');
     }
   };
@@ -127,23 +127,12 @@ const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivit
           </h3>
           
           {/* Description */}
-          <p className="text-gray-300 text-xs text-center mb-2 leading-relaxed">
+          <p className="text-gray-300 text-xs text-center mb-4 leading-relaxed">
             {activity.description}
           </p>
-          
-          {/* Badges */}
-          <div className="flex items-center justify-center space-x-2 mb-3">
-            <Badge variant="outline" className="bg-gray-700/50 text-gray-300 border-gray-600 backdrop-blur-sm text-xs px-1.5 py-0.5">
-              <Clock className="w-2 h-2 mr-1" />
-              {activity.duration}
-            </Badge>
-            <Badge variant="outline" className="bg-blue-600/50 text-white border-blue-600 backdrop-blur-sm text-xs px-1.5 py-0.5">
-              {activity.level}
-            </Badge>
-          </div>
         </div>
         
-        {/* Start Learning Button - smaller */}
+        {/* Start Learning Button - moved up since badges are removed */}
         <button 
           onClick={handleStartActivity}
           className={`w-full py-2.5 px-4 ${buttonGradient} text-white font-semibold rounded-xl transform transition-all duration-400 relative overflow-hidden group-hover:scale-105 border border-white/20 text-sm
