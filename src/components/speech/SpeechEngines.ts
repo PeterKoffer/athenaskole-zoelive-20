@@ -1,67 +1,83 @@
 
-import { SpeechConfig } from "./SpeechConfig";
-import { ElevenLabsEngine } from "./engine/ElevenLabsEngine";
-import { browserSpeakFallback } from "./engine/BrowserEngine";
+import { SpeechConfig } from './SpeechConfig';
+import { SpeechState } from './SpeechState';
+import { ElevenLabsEngine } from './engine/ElevenLabsEngine';
 
 export async function speakWithEngines(
   text: string,
   useElevenLabs: boolean,
   config: SpeechConfig,
-  updateState: (partial: any) => void,
-  onDone: () => void,
-  shouldTryElevenLabs: boolean,
-  isCheckingElevenLabs?: boolean
-) {
-  console.log("‼️‼️ [SpeechEngines] ENTERING speakWithEngines ‼️‼️", {
+  updateState: (updates: Partial<SpeechState>) => void,
+  onComplete: () => void,
+  preferElevenLabs: boolean = true
+): Promise<void> {
+  console.log('🎤 [SpeechEngines] Starting speech with engines:', {
     text: text.substring(0, 50),
     useElevenLabs,
-    shouldTryElevenLabs,
+    preferElevenLabs
   });
 
-  // Remove toast notifications to avoid confusing students
-  window.addEventListener("nelie-tts-engine", (evt) => {
-    const detail = (evt as CustomEvent).detail || {};
-    console.info("[SpeechEngines] Speech engine event:", detail);
-  }, { once: true });
+  updateState({ isSpeaking: true, currentUtterance: text });
 
-  if (shouldTryElevenLabs && useElevenLabs) {
-    console.log("‼️ [SpeechEngines] Condition MET. Trying ElevenLabs.");
-
-    const success = await ElevenLabsEngine.speak(text);
-    console.log("‼️ [SpeechEngines] ElevenLabs success status:", success);
-
-    if (success) {
-      console.log("✅ [SpeechEngines] ElevenLabs speech finished successfully.");
-      updateState({ isSpeaking: false, lastError: null });
-      onDone();
-      return;
-    } else {
-      const errorMsg = "ElevenLabs engine failed. Falling back to browser voice.";
-      console.log("‼️ [SpeechEngines] ElevenLabs FAILED. Preparing to fall back.");
-      updateState({
-        usingElevenLabs: false,
-        lastError: errorMsg,
-      });
-      window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "elevenlabs-failed" } }));
-      console.warn(`❗ [SpeechEngines] ${errorMsg}`);
-    }
-  } else {
-    if (!shouldTryElevenLabs) {
-      console.warn("‼️ [SpeechEngines] Skipping ElevenLabs: shouldTryElevenLabs is false");
-    } else if (!useElevenLabs) {
-      console.warn("‼️ [SpeechEngines] Skipping ElevenLabs: useElevenLabs is false (user/config does not prefer)");
+  // Always try ElevenLabs first if enabled and preferred
+  if (useElevenLabs && preferElevenLabs) {
+    console.log('🎤 [SpeechEngines] Attempting ElevenLabs...');
+    
+    try {
+      const isAvailable = await ElevenLabsEngine.isAvailable();
+      console.log('🎤 [SpeechEngines] ElevenLabs availability:', isAvailable);
+      
+      if (isAvailable) {
+        console.log('✅ [SpeechEngines] Using ElevenLabs engine');
+        updateState({ usingElevenLabs: true });
+        
+        await ElevenLabsEngine.speak(text, config, updateState, onComplete);
+        return; // Success - don't fall back to browser
+      } else {
+        console.warn('⚠️ [SpeechEngines] ElevenLabs not available, falling back to browser');
+      }
+    } catch (error) {
+      console.error('❌ [SpeechEngines] ElevenLabs failed:', error);
     }
   }
 
-  // Use browser fallback without showing technical messages to students
-  console.warn("*** [SpeechEngines] USING BROWSER VOICE FALLBACK NOW! ***");
-  window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "direct-fallback" } }));
+  // Fallback to browser speech synthesis
+  console.log('🔄 [SpeechEngines] Using browser speech synthesis fallback');
+  updateState({ usingElevenLabs: false });
+  
+  try {
+    if (!window.speechSynthesis) {
+      throw new Error('Speech synthesis not supported');
+    }
 
-  console.log("‼️ [SpeechEngines] Executing browser fallback.");
-  browserSpeakFallback({
-    text,
-    config,
-    updateState,
-    onDone,
-  });
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = config.rate;
+    utterance.pitch = config.pitch;
+    utterance.volume = config.volume;
+    
+    if (config.voice) {
+      utterance.voice = config.voice;
+    }
+
+    utterance.onend = () => {
+      console.log('🏁 [SpeechEngines] Browser speech completed');
+      onComplete();
+    };
+
+    utterance.onerror = (error) => {
+      console.error('❌ [SpeechEngines] Browser speech error:', error);
+      updateState({ 
+        isSpeaking: false, 
+        lastError: 'Browser speech failed' 
+      });
+    };
+
+    window.speechSynthesis.speak(utterance);
+  } catch (error) {
+    console.error('❌ [SpeechEngines] Browser speech synthesis failed:', error);
+    updateState({ 
+      isSpeaking: false, 
+      lastError: error instanceof Error ? error.message : 'Speech failed' 
+    });
+  }
 }
