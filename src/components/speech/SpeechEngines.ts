@@ -31,7 +31,8 @@ export async function speakWithEngines(
         console.log('✅ [SpeechEngines] Using ElevenLabs engine');
         updateState({ usingElevenLabs: true });
         
-        await ElevenLabsEngine.speak(text, config, updateState, onComplete);
+        await ElevenLabsEngine.speak(text);
+        onComplete();
         return; // Success - don't fall back to browser
       } else {
         console.warn('⚠️ [SpeechEngines] ElevenLabs not available, falling back to browser');

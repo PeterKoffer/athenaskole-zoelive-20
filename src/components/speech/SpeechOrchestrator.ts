@@ -20,7 +20,7 @@ export class SpeechOrchestrator {
     await new Promise<void>((resolve) => {
       speakWithEngines(
         text,
-        state.usingElevenLabs,
+        config.useElevenLabs,
         config,
         updateState,
         () => {
@@ -28,8 +28,7 @@ export class SpeechOrchestrator {
           this.lastSpokenTime = Date.now();
           resolve();
         },
-        config.preferElevenLabs,
-        state.isCheckingElevenLabs
+        config.preferElevenLabs
       );
     });
 
