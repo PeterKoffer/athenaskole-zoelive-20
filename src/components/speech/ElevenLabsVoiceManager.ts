@@ -20,10 +20,20 @@ export class ElevenLabsVoiceManager {
     try {
       console.log("🔍 [ElevenLabsVoiceManager] Calling edge function to check availability...");
       
+      // Get the API key from environment or prompt user
+      const apiKey = await this.getApiKey();
+      if (!apiKey) {
+        console.error("❌ [ElevenLabsVoiceManager] No API key available");
+        this.cachedAvailability = false;
+        this.lastError = "ElevenLabs API key not configured";
+        return false;
+      }
+
       const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({ type: "check-availability" })
       });
@@ -86,6 +96,37 @@ export class ElevenLabsVoiceManager {
       );
       return false;
     }
+  }
+
+  private async getApiKey(): Promise<string | null> {
+    // Try to get the API key from various sources
+    // First check if it's stored in localStorage (for development)
+    try {
+      const storedKey = localStorage.getItem('elevenlabs_api_key');
+      if (storedKey) {
+        console.log("🔑 [ElevenLabsVoiceManager] Found API key in localStorage");
+        return storedKey;
+      }
+    } catch (e) {
+      // localStorage might not be available
+    }
+
+    // Prompt user for API key if not found
+    const apiKey = prompt(
+      "ElevenLabs API key required for premium voice. Please enter your ElevenLabs API key:"
+    );
+    
+    if (apiKey) {
+      try {
+        localStorage.setItem('elevenlabs_api_key', apiKey);
+        console.log("🔑 [ElevenLabsVoiceManager] API key saved to localStorage");
+      } catch (e) {
+        console.warn("⚠️ [ElevenLabsVoiceManager] Could not save API key to localStorage");
+      }
+      return apiKey;
+    }
+
+    return null;
   }
 
   public getLastError(): string | null {

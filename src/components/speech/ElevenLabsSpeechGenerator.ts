@@ -12,6 +12,16 @@ export class ElevenLabsSpeechGenerator {
         "\n🎛️ Model:", config.model,
         "\n🎀 Expected: Female character voice (Fena)"
       );
+
+      // Get the API key
+      const apiKey = await this.getApiKey();
+      if (!apiKey) {
+        console.error("❌ [ElevenLabsSpeechGenerator] No API key available");
+        return {
+          audioContent: "",
+          error: "ElevenLabs API key not configured"
+        };
+      }
       
       const requestPayload = {
         type: "generate-speech",
@@ -27,6 +37,7 @@ export class ElevenLabsSpeechGenerator {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify(requestPayload),
       });
@@ -65,5 +76,33 @@ export class ElevenLabsSpeechGenerator {
           : "Speech generation failed",
       };
     }
+  }
+
+  private async getApiKey(): Promise<string | null> {
+    // Try to get the API key from localStorage
+    try {
+      const storedKey = localStorage.getItem('elevenlabs_api_key');
+      if (storedKey) {
+        return storedKey;
+      }
+    } catch (e) {
+      // localStorage might not be available
+    }
+
+    // Prompt user for API key if not found
+    const apiKey = prompt(
+      "ElevenLabs API key required for premium voice. Please enter your ElevenLabs API key:"
+    );
+    
+    if (apiKey) {
+      try {
+        localStorage.setItem('elevenlabs_api_key', apiKey);
+      } catch (e) {
+        console.warn("⚠️ Could not save API key to localStorage");
+      }
+      return apiKey;
+    }
+
+    return null;
   }
 }
