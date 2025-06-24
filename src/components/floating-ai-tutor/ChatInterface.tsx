@@ -75,7 +75,7 @@ const ChatInterface = ({
 
   return (
     <Card className="w-96 h-[500px] bg-gray-900 border-gray-700 shadow-2xl flex flex-col overflow-hidden">
-      {/* Simplified Header */}
+      {/* Header with dragging functionality */}
       <div 
         className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 cursor-grab active:cursor-grabbing select-none"
         style={{
@@ -108,8 +108,8 @@ const ChatInterface = ({
         </div>
       </div>
 
-      {/* Chat Messages */}
-      <CardContent className="flex-1 p-0 flex flex-col">
+      {/* Chat Messages Area */}
+      <div className="flex-1 flex flex-col min-h-0">
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
             {messages.map((message, index) => (
@@ -135,30 +135,37 @@ const ChatInterface = ({
           <div ref={messagesEndRef} />
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="border-t border-gray-700 p-4">
-          <form onSubmit={handleSubmit} className="flex space-x-2">
-            <Input
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Ask Nelie anything..."
-              className="flex-1 bg-gray-800 border-gray-600 text-white"
-            />
-            <Button type="submit" size="sm" disabled={!inputMessage.trim()}>
-              <Send className="w-4 h-4" />
-            </Button>
+        {/* Input Area - Now properly contained within the chat box */}
+        <div className="border-t border-gray-700 p-4 bg-gray-900">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="flex space-x-2">
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Ask Nelie anything..."
+                className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+              />
+              <Button 
+                type="submit" 
+                size="sm" 
+                disabled={!inputMessage.trim()}
+                className="bg-blue-600 hover:bg-blue-700 px-3"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Voice Controls */}
+            <div className="flex justify-center">
+              <VoiceControls
+                isSpeaking={isSpeaking}
+                onStopSpeaking={onStopSpeaking}
+                onVoiceInput={handleVoiceInput}
+              />
+            </div>
           </form>
-          
-          {/* Voice Controls */}
-          <div className="flex justify-center space-x-2 mt-2">
-            <VoiceControls
-              isSpeaking={isSpeaking}
-              onStopSpeaking={onStopSpeaking}
-              onVoiceInput={handleVoiceInput}
-            />
-          </div>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };
