@@ -41,7 +41,12 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   };
 
   const handleProfile = () => {
-    navigate('/profile');
+    if (user) {
+      navigate('/profile');
+    } else {
+      // If not logged in, redirect to auth page
+      navigate('/auth');
+    }
   };
 
   const handleCurriculumSystem = () => {
@@ -104,7 +109,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                       <Button 
                         variant="outline"
                         size="lg"
-                        className="w-full sm:w-auto bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold border-none py-3 px-6 rounded-lg transition-all duration-300"
+                        className="w-full sm:w-auto border-2 border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-gray-900 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
                       >
                         More Options
                         <ChevronDown className="w-4 h-4 ml-2" />
@@ -123,7 +128,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                         className="text-white hover:bg-gray-700 focus:bg-gray-700"
                       >
                         <User className="mr-2 h-4 w-4" />
-                        Profile
+                        {user ? 'Profile' : 'Profile (Login Required)'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-gray-700" />
                       <DropdownMenuItem 
