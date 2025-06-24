@@ -29,16 +29,31 @@ export class ElevenLabsVoiceManager {
         return false;
       }
 
+      // Add timeout and better error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch(EDGE_BASE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-elevenlabs-key": apiKey
         },
-        body: JSON.stringify({ type: "check-availability" })
+        body: JSON.stringify({ type: "check-availability" }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+
       console.log("📡 [ElevenLabsVoiceManager] Edge function response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ [ElevenLabsVoiceManager] HTTP error:", response.status, errorText);
+        this.cachedAvailability = false;
+        this.lastError = `HTTP ${response.status}: ${errorText}`;
+        return false;
+      }
 
       const text = await response.text();
       let result: VoicesResponse | null = null;
@@ -60,7 +75,6 @@ export class ElevenLabsVoiceManager {
       );
 
       if (
-        response.ok &&
         result &&
         Array.isArray(result.voices) &&
         result.voices.length > 0
@@ -90,10 +104,15 @@ export class ElevenLabsVoiceManager {
       }
     } catch (error) {
       this.cachedAvailability = false;
-      this.lastError = error instanceof Error ? error.message : "Unknown error";
-      console.error(
-        "❌ [ElevenLabsVoiceManager] CRITICAL LIVE check FAILED (Catch Block). Caching availability: false. Error:", error
-      );
+      
+      if (error.name === 'AbortError') {
+        this.lastError = "Request timeout - ElevenLabs service may be unavailable";
+        console.error("❌ [ElevenLabsVoiceManager] Request timed out");
+      } else {
+        this.lastError = error instanceof Error ? error.message : "Unknown error";
+        console.error("❌ [ElevenLabsVoiceManager] CRITICAL LIVE check FAILED (Catch Block). Caching availability: false. Error:", error);
+      }
+      
       return false;
     }
   }
@@ -110,21 +129,7 @@ export class ElevenLabsVoiceManager {
       // localStorage might not be available
     }
 
-    // Prompt user for API key if not found
-    const apiKey = prompt(
-      "ElevenLabs API key required for premium voice. Please enter your ElevenLabs API key:"
-    );
-    
-    if (apiKey) {
-      try {
-        localStorage.setItem('elevenlabs_api_key', apiKey);
-        console.log("🔑 [ElevenLabsVoiceManager] API key saved to localStorage");
-      } catch (e) {
-        console.warn("⚠️ [ElevenLabsVoiceManager] Could not save API key to localStorage");
-      }
-      return apiKey;
-    }
-
+    console.log("🔑 [ElevenLabsVoiceManager] No API key found in localStorage");
     return null;
   }
 

@@ -3,17 +3,22 @@ import React from 'react';
 import { SubjectCardTooltipProps } from './types';
 
 const SubjectCardTooltip: React.FC<SubjectCardTooltipProps> = ({ subject, isVisible }) => {
-  console.log('🔍 SubjectCardTooltip render:', { subject, isVisible });
+  console.log('🔍 SubjectCardTooltip render:', { 
+    title: subject.title, 
+    isVisible, 
+    hasDescription: !!subject.description,
+    hasKeyAreas: !!subject.keyAreas 
+  });
   
   if (!isVisible) return null;
 
   return (
-    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-80 bg-gray-900/95 backdrop-blur-md shadow-xl rounded-2xl p-4 z-50 border border-gray-700 animate-fade-in">
+    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-80 bg-gray-900/95 backdrop-blur-md shadow-xl rounded-2xl p-4 z-[9999] border border-gray-700 animate-fade-in pointer-events-none">
       <h4 className="font-semibold text-white mb-2 text-center text-base">
         {subject.title || 'Subject Title'}
       </h4>
       <p className="text-sm text-gray-300 leading-relaxed mb-3">
-        {subject.description || 'No description available.'}
+        {subject.description || 'Explore this exciting subject with interactive lessons and engaging activities.'}
       </p>
       {subject.keyAreas && subject.keyAreas.length > 0 && (
         <div>
