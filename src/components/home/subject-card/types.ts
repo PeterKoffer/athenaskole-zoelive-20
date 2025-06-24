@@ -6,6 +6,7 @@ export interface Subject {
   description: string;
   path: string;
   keyAreas?: string[];
+  icon?: string;
 }
 
 export interface SubjectCardProps {
