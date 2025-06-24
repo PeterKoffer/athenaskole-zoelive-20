@@ -3,9 +3,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Trophy, Clock, Star } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const StudentDashboard = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'daily-program':
+        navigate('/daily-program');
+        break;
+      case 'assignments':
+        // For now, navigate to daily program as assignments aren't implemented yet
+        navigate('/daily-program');
+        break;
+      case 'practice':
+        // Navigate to a specific learning subject - let's default to mathematics
+        navigate('/learn/mathematics');
+        break;
+      case 'help':
+        // This could show the floating AI tutor or navigate to a help section
+        // For now, let's navigate to the daily program where Nelie is available
+        navigate('/daily-program');
+        break;
+      default:
+        console.log('Unknown action:', action);
+    }
+  };
 
   if (loading) {
     return (
@@ -115,16 +140,28 @@ const StudentDashboard = () => {
               <CardTitle className="text-white">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                onClick={() => handleQuickAction('daily-program')}
+              >
                 Start Daily Program
               </Button>
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button 
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                onClick={() => handleQuickAction('assignments')}
+              >
                 View Assignments
               </Button>
-              <Button className="w-full bg-green-600 hover:bg-green-700">
+              <Button 
+                className="w-full bg-green-600 hover:bg-green-700"
+                onClick={() => handleQuickAction('practice')}
+              >
                 Practice Skills
               </Button>
-              <Button className="w-full bg-orange-600 hover:bg-orange-700">
+              <Button 
+                className="w-full bg-orange-600 hover:bg-orange-700"
+                onClick={() => handleQuickAction('help')}
+              >
                 Ask Nelie for Help
               </Button>
             </CardContent>
