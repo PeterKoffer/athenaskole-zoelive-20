@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calculator, Play, Volume2, VolumeX } from 'lucide-react';
+import { Calculator, Play, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import TextWithSpeaker from '../shared/TextWithSpeaker';
 
@@ -12,44 +13,16 @@ interface MathematicsWelcomeProps {
 }
 
 const MathematicsWelcome = ({ onStartLesson, studentName = 'Student' }: MathematicsWelcomeProps) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTextComplete, setIsTextComplete] = useState(false);
+  const navigate = useNavigate();
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
   const welcomeMessage = `Welcome to the exciting world of Mathematics, ${studentName}! Today we're going to explore numbers, patterns, and problem-solving in the most engaging way possible. Get ready to become a math detective as we discover how mathematics helps us understand the world around us!`;
 
   console.log('🧮 MathematicsWelcome rendering for:', studentName);
 
-  useEffect(() => {
-    console.log('📝 Starting text animation for mathematics welcome');
-    const words = welcomeMessage.split(' ');
-    let currentIndex = 0;
-    
-    const showNextWords = () => {
-      if (currentIndex < words.length) {
-        const wordsToShow = words.slice(0, currentIndex + 3).join(' ');
-        setDisplayedText(wordsToShow);
-        currentIndex += 3;
-        setTimeout(showNextWords, 500);
-      } else {
-        console.log('✅ Text animation completed');
-        setIsTextComplete(true);
-      }
-    };
-    
-    // Start animation after 1 second
-    const timer = setTimeout(showNextWords, 1000);
-    return () => clearTimeout(timer);
-  }, [welcomeMessage]);
-
-  const handleSpeakWelcome = async () => {
-    if (isSpeaking) {
-      console.log('🔇 Stopping speech');
-      stop();
-    } else {
-      console.log('🔊 Starting speech for welcome message');
-      await speakAsNelie(welcomeMessage, true, 'math-welcome');
-    }
+  const handleBackToHome = () => {
+    console.log('🏠 Navigating back to home');
+    navigate('/');
   };
 
   const handleStartLesson = () => {
@@ -77,16 +50,7 @@ const MathematicsWelcome = ({ onStartLesson, studentName = 'Student' }: Mathemat
             
             <div className="text-xl text-purple-100 mb-8 leading-relaxed min-h-[10rem] flex items-center justify-center">
               <div className="max-w-3xl">
-                {displayedText && (
-                  <p className="animate-fade-in">{displayedText}</p>
-                )}
-                {!isTextComplete && displayedText && (
-                  <div className="flex items-center justify-center mt-4">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse mx-1" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                  </div>
-                )}
+                <p className="animate-fade-in">{welcomeMessage}</p>
               </div>
             </div>
 
@@ -102,21 +66,12 @@ const MathematicsWelcome = ({ onStartLesson, studentName = 'Student' }: Mathemat
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
-                onClick={handleSpeakWelcome}
+                onClick={handleBackToHome}
                 variant="outline"
                 className="border-purple-400 text-purple-200 bg-purple-800/50 hover:bg-purple-700 transition-colors"
               >
-                {isSpeaking ? (
-                  <>
-                    <VolumeX className="w-5 h-5 mr-2" />
-                    Stop Nelie
-                  </>
-                ) : (
-                  <>
-                    <Volume2 className="w-5 h-5 mr-2" />
-                    Ask Nelie to Read
-                  </>
-                )}
+                <Home className="w-5 h-5 mr-2" />
+                Back to Home
               </Button>
               
               <Button
