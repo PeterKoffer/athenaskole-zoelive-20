@@ -20,7 +20,7 @@ export class ElevenLabsVoiceManager {
     try {
       console.log("🔍 [ElevenLabsVoiceManager] Calling edge function to check availability...");
       
-      // Get the API key from localStorage
+      // Get the API key - use the new one provided by user
       const apiKey = await this.getApiKey();
       if (!apiKey) {
         console.error("❌ [ElevenLabsVoiceManager] No API key available");
@@ -133,7 +133,20 @@ export class ElevenLabsVoiceManager {
   }
 
   private async getApiKey(): Promise<string | null> {
-    // Try to get the API key from localStorage
+    // First try the new API key provided by user
+    const newApiKey = 'sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51';
+    if (newApiKey) {
+      console.log("🔑 [ElevenLabsVoiceManager] Using provided API key");
+      // Store it in localStorage for future use
+      try {
+        localStorage.setItem('elevenlabs_api_key', newApiKey);
+      } catch (e) {
+        console.warn("⚠️ Could not save API key to localStorage");
+      }
+      return newApiKey;
+    }
+
+    // Fallback to localStorage
     try {
       const storedKey = localStorage.getItem('elevenlabs_api_key');
       if (storedKey) {
@@ -144,7 +157,7 @@ export class ElevenLabsVoiceManager {
       // localStorage might not be available
     }
 
-    console.log("🔑 [ElevenLabsVoiceManager] No API key found in localStorage");
+    console.log("🔑 [ElevenLabsVoiceManager] No API key found");
     return null;
   }
 
