@@ -1,69 +1,99 @@
 
-import { SpeechState, getDefaultSpeechState } from './SpeechState';
-import { elevenLabsSpeechEngine } from './ElevenLabsSpeechEngine';
+import { SpeechState } from './SpeechState';
 
-export class SpeechStateManager {
-  private state: SpeechState = getDefaultSpeechState();
+class SpeechStateManager {
+  private state: SpeechState = {
+    isSpeaking: false,
+    currentUtterance: null,
+    isEnabled: false,
+    hasUserInteracted: false,
+    isReady: false,
+    isLoading: false,
+    lastError: null,
+    voicesLoaded: false,
+    usingElevenLabs: false,
+    isCheckingElevenLabs: false
+  };
+
   private listeners: ((state: SpeechState) => void)[] = [];
 
-  async initialize(): Promise<void> {
-    console.log('🔧 [SpeechStateManager] Initializing...');
+  constructor() {
+    this.initializeSpeechSystem();
+  }
+
+  private initializeSpeechSystem() {
+    console.log('🔧 [SpeechStateManager] Initializing speech system...');
     
-    // Check ElevenLabs availability first
-    this.updateState({ isCheckingElevenLabs: true });
-    
-    try {
-      const elevenLabsAvailable = await elevenLabsSpeechEngine.isAvailable();
-      console.log('🎭 [SpeechStateManager] ElevenLabs available:', elevenLabsAvailable);
-      
-      if (elevenLabsAvailable) {
-        console.log('🎤 [SpeechStateManager] Using ElevenLabs with Fena voice');
-        this.updateState({
-          isReady: true,
-          isLoading: false,
-          voicesLoaded: true,
-          usingElevenLabs: true,
-          isCheckingElevenLabs: false
+    if (typeof speechSynthesis !== 'undefined') {
+      // Force load voices
+      const loadVoices = () => {
+        const voices = speechSynthesis.getVoices();
+        console.log(`🎵 [SpeechStateManager] Loaded ${voices.length} voices`);
+        
+        // Log available female voices for debugging
+        const femaleVoices = voices.filter(v => 
+          v.lang.startsWith('en') && 
+          (v.name.toLowerCase().includes('female') || 
+           v.name.toLowerCase().includes('karen') ||
+           v.name.toLowerCase().includes('samantha') ||
+           v.name.toLowerCase().includes('zira'))
+        );
+        
+        if (femaleVoices.length > 0) {
+          console.log('👩 [SpeechStateManager] Available female voices:', femaleVoices.map(v => v.name));
+        } else {
+          console.warn('⚠️ [SpeechStateManager] No clearly female voices detected');
+        }
+        
+        this.updateState({ 
+          voicesLoaded: true, 
+          isReady: true 
         });
+      };
+
+      // Load voices immediately if available
+      if (speechSynthesis.getVoices().length > 0) {
+        loadVoices();
       } else {
-        console.warn('⚠️ [SpeechStateManager] ElevenLabs not available, falling back to browser');
-        this.updateState({
-          isReady: true,
-          isLoading: false,
-          voicesLoaded: true,
-          usingElevenLabs: false,
-          isCheckingElevenLabs: false
-        });
+        // Wait for voices to load
+        speechSynthesis.addEventListener('voiceschanged', loadVoices);
+        
+        // Fallback timeout
+        setTimeout(() => {
+          if (!this.state.voicesLoaded) {
+            console.log('🔄 [SpeechStateManager] Forcing voice load after timeout');
+            loadVoices();
+          }
+        }, 1000);
       }
-    } catch (error) {
-      console.error('❌ [SpeechStateManager] Error during initialization:', error);
-      this.updateState({
-        isReady: true,
-        isLoading: false,
-        voicesLoaded: true,
-        usingElevenLabs: false,
-        isCheckingElevenLabs: false,
-        lastError: 'Failed to initialize ElevenLabs'
-      });
+    } else {
+      console.warn('⚠️ [SpeechStateManager] Speech synthesis not supported');
+      this.updateState({ isReady: true });
     }
-    
-    console.log('🔧 [SpeechStateManager] Initialization complete');
   }
 
   getState(): SpeechState {
     return { ...this.state };
   }
 
-  updateState(updates: Partial<SpeechState>): void {
+  updateState(updates: Partial<SpeechState>) {
+    const prevState = { ...this.state };
     this.state = { ...this.state, ...updates };
-    console.log("🔄 [SpeechStateManager] State updated", this.state);
-    this.notifyListeners();
+    
+    console.log('🔄 [SpeechStateManager] State updated', this.state);
+    
+    this.listeners.forEach(listener => {
+      try {
+        listener(this.state);
+      } catch (error) {
+        console.error('❌ [SpeechStateManager] Error in listener:', error);
+      }
+    });
   }
 
   subscribe(listener: (state: SpeechState) => void): () => void {
     this.listeners.push(listener);
-    listener(this.state);
-
+    
     return () => {
       const index = this.listeners.indexOf(listener);
       if (index > -1) {
@@ -71,8 +101,6 @@ export class SpeechStateManager {
       }
     };
   }
-
-  private notifyListeners(): void {
-    this.listeners.forEach((listener) => listener(this.state));
-  }
 }
+
+export const speechStateManager = new SpeechStateManager();
