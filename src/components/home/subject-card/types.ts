@@ -25,6 +25,7 @@ export interface SubjectCardIconProps {
 export interface SubjectCardTooltipProps {
   subject: Subject;
   isVisible: boolean;
+  children: React.ReactNode;
 }
 
 export interface SubjectCardButtonProps {

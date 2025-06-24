@@ -28,33 +28,32 @@ const SubjectCardIcon: React.FC<SubjectCardIconProps> = ({
   };
 
   return (
-    <div className="relative">
-      {/* Icon Container */}
-      <div 
-        className="relative mb-6"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div className={`w-20 h-20 ${iconGradient} rounded-3xl flex items-center justify-center mb-4 mx-auto transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 shadow-lg`}>
-          {IconComponent ? (
-            <IconComponent size={32} className="text-white drop-shadow-lg" />
-          ) : (
-            <span className="text-2xl">{subject.icon || '📚'}</span>
-          )}
+    <SubjectCardTooltip 
+      subject={subject} 
+      isVisible={tooltipVisible}
+    >
+      <div className="relative">
+        {/* Icon Container */}
+        <div 
+          className="relative mb-6"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className={`w-20 h-20 ${iconGradient} rounded-3xl flex items-center justify-center mb-4 mx-auto transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 shadow-lg`}>
+            {IconComponent ? (
+              <IconComponent size={32} className="text-white drop-shadow-lg" />
+            ) : (
+              <span className="text-2xl">{subject.icon || '📚'}</span>
+            )}
+          </div>
+          
+          {/* Subject Title */}
+          <h3 className="text-lg font-bold text-white text-center mb-2 drop-shadow-lg">
+            {subject.title}
+          </h3>
         </div>
-        
-        {/* Subject Title */}
-        <h3 className="text-lg font-bold text-white text-center mb-2 drop-shadow-lg">
-          {subject.title}
-        </h3>
       </div>
-
-      {/* Tooltip */}
-      <SubjectCardTooltip 
-        subject={subject} 
-        isVisible={tooltipVisible}
-      />
-    </div>
+    </SubjectCardTooltip>
   );
 };
 

@@ -37,7 +37,7 @@ export class ElevenLabsSpeechGenerator {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "authorization": `Bearer ${apiKey}`
+          "x-elevenlabs-key": apiKey
         },
         body: JSON.stringify(requestPayload),
       });
@@ -89,20 +89,7 @@ export class ElevenLabsSpeechGenerator {
       // localStorage might not be available
     }
 
-    // Prompt user for API key if not found
-    const apiKey = prompt(
-      "ElevenLabs API key required for premium voice. Please enter your ElevenLabs API key:"
-    );
-    
-    if (apiKey) {
-      try {
-        localStorage.setItem('elevenlabs_api_key', apiKey);
-      } catch (e) {
-        console.warn("⚠️ Could not save API key to localStorage");
-      }
-      return apiKey;
-    }
-
-    return null;
+    // Use the hardcoded API key as fallback
+    return 'sk_37e2751a30d9fcb1c276898281def78f92a285a2223b1b51';
   }
 }
