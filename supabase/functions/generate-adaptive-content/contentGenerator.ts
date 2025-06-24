@@ -1,8 +1,19 @@
-import { GeneratedContent } from './types.ts';
-import { createGradeAlignedPrompt, PromptConfig } from './promptBuilder.ts';
-import { callOpenAI } from './apiClient.ts';
 
-export async function generateContentWithOpenAI(requestData: any): Promise<GeneratedContent | null> {
+import { createGradeAlignedPrompt } from './promptBuilder.ts';
+
+export async function generateContentWithOpenAI(requestData: any) {
+  const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
+  
+  if (!openaiKey) {
+    throw new Error('OpenAI API key not found');
+  }
+
+  console.log('🔑 Using OpenAI API key:', {
+    keySource: Deno.env.get('OpenaiAPI') ? 'OpenaiAPI' : 'OPENAI_API_KEY',
+    keyLength: openaiKey.length,
+    keyPreview: openaiKey.substring(0, 7) + '...' + openaiKey.slice(-4)
+  });
+
   console.log('🤖 generateContentWithOpenAI called with:', {
     subject: requestData.subject,
     skillArea: requestData.skillArea,
@@ -10,48 +21,75 @@ export async function generateContentWithOpenAI(requestData: any): Promise<Gener
     gradeLevel: requestData.gradeLevel,
     hasStandardsAlignment: !!requestData.standardsAlignment
   });
-  
-  // Use the OpenAI API key that was just provided
-  const openaiApiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
-  
-  if (!openaiApiKey) {
-    console.error('❌ No OpenAI API key found in environment variables');
-    throw new Error('OpenAI API key not configured - please add OpenaiAPI to your Supabase Edge Function Secrets');
+
+  try {
+    const prompt = createGradeAlignedPrompt(requestData);
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert educational content creator. Generate age-appropriate, engaging questions for K-12 students. Always respond with valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 800
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.choices[0].message.content;
+
+    console.log('📝 Raw OpenAI response:', generatedText.substring(0, 200) + '...');
+
+    // Parse JSON response
+    const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedContent = JSON.parse(cleanedResponse);
+
+    // Validate required fields
+    if (!parsedContent.question || !parsedContent.options || !Array.isArray(parsedContent.options)) {
+      throw new Error('Invalid response format from OpenAI');
+    }
+
+    console.log('✅ OpenAI content generated successfully');
+    return parsedContent;
+
+  } catch (error) {
+    console.error('❌ OpenAI generation failed:', error);
+    throw error;
   }
-
-  console.log('🔑 Using OpenAI API key:', {
-    keySource: Deno.env.get('OpenaiAPI') ? 'OpenaiAPI' : 'OPENAI_API_KEY',
-    keyLength: openaiApiKey.length,
-    keyPreview: openaiApiKey.substring(0, 8) + '...' + openaiApiKey.substring(openaiApiKey.length - 4)
-  });
-
-  const promptConfig: PromptConfig = {
-    subject: requestData.subject,
-    skillArea: requestData.skillArea,
-    difficultyLevel: requestData.difficultyLevel,
-    previousQuestions: requestData.previousQuestions || [],
-    diversityPrompt: requestData.diversityPrompt,
-    sessionId: requestData.sessionId,
-    gradeLevel: requestData.gradeLevel,
-    standardsAlignment: requestData.standardsAlignment
-  };
-
-  const prompt = createGradeAlignedPrompt(promptConfig);
-  console.log('📝 Generated prompt for Grade', requestData.gradeLevel || 'default');
-
-  const result = await callOpenAI(openaiApiKey, prompt);
-  
-  if (!result.success) {
-    console.error('❌ OpenAI call failed:', result.error);
-    throw new Error(`OpenAI API error: ${result.error}`);
-  }
-
-  console.log('✅ OpenAI generation successful');
-  return result.data || null;
 }
 
-// Keep the DeepSeek function as backup
-export async function generateContentWithDeepSeek(requestData: any): Promise<GeneratedContent | null> {
+export async function generateContentWithDeepSeek(requestData: any) {
+  const deepSeekKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('DeepSeek_API');
+  
+  if (!deepSeekKey) {
+    throw new Error('DeepSeek API key not found');
+  }
+
+  console.log('🔑 Using DeepSeek API key:', {
+    keySource: Deno.env.get('DEEPSEEK_API_KEY') ? 'DEEPSEEK_API_KEY' : 'DeepSeek_API',
+    keyLength: deepSeekKey.length,
+    keyPreview: deepSeekKey.substring(0, 7) + '...' + deepSeekKey.slice(-4)
+  });
+
   console.log('🤖 generateContentWithDeepSeek called with:', {
     subject: requestData.subject,
     skillArea: requestData.skillArea,
@@ -59,44 +97,58 @@ export async function generateContentWithDeepSeek(requestData: any): Promise<Gen
     gradeLevel: requestData.gradeLevel,
     hasStandardsAlignment: !!requestData.standardsAlignment
   });
-  
-  // Try different API key environment variables in order of preference
-  const deepSeekApiKey = Deno.env.get('DEEPSEEK_API_KEY') || 
-                        Deno.env.get('DeepSeek_API');
-  
-  if (!deepSeekApiKey) {
-    console.error('❌ No DeepSeek API key found in environment variables');
-    throw new Error('DeepSeek API key not configured - please add DEEPSEEK_API_KEY to your Supabase Edge Function Secrets');
+
+  try {
+    const prompt = createGradeAlignedPrompt(requestData);
+
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${deepSeekKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert educational content creator. Generate age-appropriate, engaging questions for K-12 students. Always respond with valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 800
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ DeepSeek API error:', response.status, errorText);
+      throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.choices[0].message.content;
+
+    console.log('📝 Raw DeepSeek response:', generatedText.substring(0, 200) + '...');
+
+    // Parse JSON response
+    const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedContent = JSON.parse(cleanedResponse);
+
+    // Validate required fields
+    if (!parsedContent.question || !parsedContent.options || !Array.isArray(parsedContent.options)) {
+      throw new Error('Invalid response format from DeepSeek');
+    }
+
+    console.log('✅ DeepSeek content generated successfully');
+    return parsedContent;
+
+  } catch (error) {
+    console.error('❌ DeepSeek generation failed:', error);
+    throw error;
   }
-
-  console.log('🔑 Using DeepSeek API key:', {
-    keySource: Deno.env.get('DEEPSEEK_API_KEY') ? 'DEEPSEEK_API_KEY' : 'DeepSeek_API',
-    keyLength: deepSeekApiKey.length,
-    keyPreview: deepSeekApiKey.substring(0, 8) + '...' + deepSeekApiKey.substring(deepSeekApiKey.length - 4)
-  });
-
-  const promptConfig: PromptConfig = {
-    subject: requestData.subject,
-    skillArea: requestData.skillArea,
-    difficultyLevel: requestData.difficultyLevel,
-    previousQuestions: requestData.previousQuestions || [],
-    diversityPrompt: requestData.diversityPrompt,
-    sessionId: requestData.sessionId,
-    gradeLevel: requestData.gradeLevel,
-    standardsAlignment: requestData.standardsAlignment
-  };
-
-  const prompt = createGradeAlignedPrompt(promptConfig);
-  console.log('📝 Generated prompt for Grade', requestData.gradeLevel || 'default');
-
-  const { callDeepSeek } = await import('./apiClient.ts');
-  const result = await callDeepSeek(deepSeekApiKey, prompt);
-  
-  if (!result.success) {
-    console.error('❌ DeepSeek call failed:', result.error);
-    throw new Error(`DeepSeek API error: ${result.error}`);
-  }
-
-  console.log('✅ DeepSeek generation successful');
-  return result.data || null;
 }
