@@ -38,10 +38,20 @@ serve(async (req) => {
       });
     }
 
-    // Get ElevenLabs API key from custom header, authorization header, or environment variable
-    const clientApiKey = req.headers.get("x-elevenlabs-key") || 
-                        req.headers.get("authorization")?.replace("Bearer ", "") ||
-                        Deno.env.get("ELEVENLABS_API_KEY");
+    // Get ElevenLabs API key from custom header first, then authorization header
+    let clientApiKey = req.headers.get("x-elevenlabs-key");
+    
+    if (!clientApiKey) {
+      const authHeader = req.headers.get("authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        clientApiKey = authHeader.replace("Bearer ", "");
+      }
+    }
+    
+    // Fallback to environment variable if no client key
+    if (!clientApiKey) {
+      clientApiKey = Deno.env.get("ELEVENLABS_API_KEY");
+    }
     
     if (!clientApiKey) {
       console.error("[ElevenLabs] API KEY IS MISSING - checked x-elevenlabs-key, authorization headers and env");
@@ -51,13 +61,23 @@ serve(async (req) => {
       });
     }
 
-    console.log("[ElevenLabs] API key found, proceeding with request");
+    // Validate that this looks like an ElevenLabs API key (starts with sk_)
+    if (!clientApiKey.startsWith('sk_')) {
+      console.error("[ElevenLabs] Invalid API key format - ElevenLabs keys should start with 'sk_'");
+      return new Response(JSON.stringify({ error: "Invalid ElevenLabs API key format" }), {
+        status: 401,
+        headers: corsHeaders
+      });
+    }
+
+    console.log("[ElevenLabs] Valid ElevenLabs API key found, proceeding with request");
 
     const payload = await req.json();
     const type = payload.type || "";
     console.log(`[ElevenLabs] Incoming payload:`, JSON.stringify(payload));
 
     if (type === "check-availability") {
+      console.log("[ElevenLabs] Checking availability with ElevenLabs API");
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
         headers: { "xi-api-key": clientApiKey }
       });
@@ -73,11 +93,13 @@ serve(async (req) => {
         });
       }
       if (!voicesRes.ok) {
+        console.error("[ElevenLabs] ElevenLabs API error:", status, body);
         return new Response(JSON.stringify({ error: body?.detail?.message || "Could not fetch voices" }), {
           status,
           headers: corsHeaders,
         });
       }
+      console.log("[ElevenLabs] Successfully fetched voices from ElevenLabs");
       return new Response(JSON.stringify(body), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
