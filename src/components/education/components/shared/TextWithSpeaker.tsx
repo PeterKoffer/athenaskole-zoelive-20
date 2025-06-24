@@ -1,25 +1,22 @@
 
-import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
+import React from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 
 interface TextWithSpeakerProps {
   text: string;
-  children: React.ReactNode;
-  context?: string;
-  className?: string;
-  buttonClassName?: string;
+  context: string;
+  position?: 'corner' | 'inline';
   showOnHover?: boolean;
-  position?: 'inline' | 'corner';
+  children: React.ReactNode;
 }
 
 const TextWithSpeaker = ({ 
   text, 
-  children, 
-  context = 'text-content',
-  className = '',
-  buttonClassName = '',
-  showOnHover = false,
-  position = 'corner'
+  context, 
+  position = 'corner', 
+  showOnHover = true,
+  children 
 }: TextWithSpeakerProps) => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
@@ -33,12 +30,12 @@ const TextWithSpeaker = ({
 
   if (position === 'corner') {
     return (
-      <div className={`relative ${className}`}>
+      <div className="relative">
         <button
           onClick={handleSpeak}
-          className={`absolute top-2 right-2 z-20 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 ${
-            showOnHover ? 'opacity-80 group-hover:opacity-100' : 'opacity-90 hover:opacity-100'
-          } ${buttonClassName}`}
+          className={`absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30 ${
+            showOnHover ? 'opacity-0 hover:opacity-100 group-hover:opacity-100' : 'opacity-90 hover:opacity-100'
+          }`}
           title="Ask Nelie to read this"
         >
           <CustomSpeakerIcon className="w-4 h-4" size={16} color="#0ea5e9" />
@@ -49,15 +46,11 @@ const TextWithSpeaker = ({
   }
 
   return (
-    <div className={`flex items-start justify-between ${showOnHover ? 'group' : ''} ${className}`}>
-      <div className="flex-1">
-        {children}
-      </div>
+    <div className="flex items-center space-x-2">
+      {children}
       <button
         onClick={handleSpeak}
-        className={`ml-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 border border-sky-400/30 ${
-          showOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-80 hover:opacity-100'
-        } ${buttonClassName}`}
+        className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 shadow-lg backdrop-blur-sm border border-sky-400/30"
         title="Ask Nelie to read this"
       >
         <CustomSpeakerIcon className="w-4 h-4" size={16} color="#0ea5e9" />

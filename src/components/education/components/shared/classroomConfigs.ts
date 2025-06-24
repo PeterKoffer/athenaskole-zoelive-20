@@ -19,7 +19,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#4CAF50",
       secondaryColor: "#81C784",
       accentColor: "#388E3C",
-      backgroundImage: "/images/math-classroom.jpg",
+      backgroundImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1600&h=900&fit=crop",
       subjectColor: "#4CAF50",
       overlayOpacity: 0.7,
       environmentDescription: "A bright mathematics classroom with equations and geometric shapes"
@@ -29,7 +29,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF9800",
       secondaryColor: "#FFB74D",
       accentColor: "#F57C00",
-      backgroundImage: "/images/language-classroom.jpg",
+      backgroundImage: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1600&h=900&fit=crop",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
       environmentDescription: "A cozy library setting with books and writing materials"
@@ -39,7 +39,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF9800",
       secondaryColor: "#FFB74D",
       accentColor: "#F57C00",
-      backgroundImage: "/images/language-classroom.jpg",
+      backgroundImage: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1600&h=900&fit=crop",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
       environmentDescription: "A cozy library setting with books and writing materials"
@@ -49,7 +49,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#2196F3",
       secondaryColor: "#64B5F6",
       accentColor: "#1976D2",
-      backgroundImage: "/images/science-classroom.jpg",
+      backgroundImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&h=900&fit=crop",
       subjectColor: "#2196F3",
       overlayOpacity: 0.7,
       environmentDescription: "A modern laboratory with scientific equipment and experiments"
@@ -59,7 +59,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#9C27B0",
       secondaryColor: "#BA68C8",
       accentColor: "#7B1FA2",
-      backgroundImage: "/images/computer-science-classroom.jpg",
+      backgroundImage: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=1600&h=900&fit=crop",
       subjectColor: "#9C27B0",
       overlayOpacity: 0.7,
       environmentDescription: "A modern tech lab with computers and coding displays"
@@ -69,102 +69,30 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#E91E63",
       secondaryColor: "#F06292",
       accentColor: "#C2185B",
-      backgroundImage: "/images/music-classroom.jpg",
+      backgroundImage: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&h=900&fit=crop",
       subjectColor: "#E91E63",
       overlayOpacity: 0.7,
-      environmentDescription: "A musical studio with instruments and sound equipment"
+      environmentDescription: "A vibrant music room with instruments and musical notes"
     },
     creative_arts: {
       subjectName: "Creative Arts",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/images/art-classroom.jpg",
-      subjectColor: "#9C27B0",
+      primaryColor: "#FF5722",
+      secondaryColor: "#FF8A65",
+      accentColor: "#D84315",
+      backgroundImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=900&fit=crop",
+      subjectColor: "#FF5722",
       overlayOpacity: 0.7,
-      environmentDescription: "An art studio with canvases, paints, and creative supplies"
-    },
-    socialStudies: {
-      subjectName: "Social Studies",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/images/social-studies-classroom.jpg",
-      subjectColor: "#9C27B0",
-      overlayOpacity: 0.7,
-      environmentDescription: "A classroom with maps, globes, and historical artifacts"
-    },
-    bodyLab: {
-      subjectName: "BodyLab",
-      primaryColor: "#E91E63",
-      secondaryColor: "#F06292",
-      accentColor: "#C2185B",
-      loadingIcon: '💪',
-      loadingMessage: 'Warming up BodyLab...',
-      backgroundImage: "/images/bodylab-classroom.jpg",
-      subjectColor: "#E91E63",
-      overlayOpacity: 0.7,
-      environmentDescription: "An active fitness space with exercise equipment"
-    },
-    globalGeography: {
-      subjectName: "Global Geography",
-      primaryColor: "#607D8B",
-      secondaryColor: "#90A4AE",
-      accentColor: "#455A64",
-      loadingIcon: '🌍',
-      loadingMessage: 'Loading geographical data...',
-      backgroundImage: "/images/geography-classroom.jpg",
-      subjectColor: "#607D8B",
-      overlayOpacity: 0.7,
-      environmentDescription: "A classroom with world maps and geographical displays"
-    },
-    lifeEssentials: {
-      subjectName: "Life Essentials",
-      primaryColor: "#795548",
-      secondaryColor: "#A1887F",
-      accentColor: "#5D4037",
-      loadingIcon: '🛠️',
-      loadingMessage: 'Loading Life Essentials...',
-      backgroundImage: "/images/life-essentials-classroom.jpg",
-      subjectColor: "#795548",
-      overlayOpacity: 0.7,
-      environmentDescription: "A practical learning space with life skills materials"
-    },
-    worldHistoryReligions: {
-      subjectName: "World History & Religions",
-      primaryColor: "#FFC107",
-      secondaryColor: "#FFD54F",
-      accentColor: "#FF8F00",
-      loadingIcon: '📜',
-      loadingMessage: 'Loading historical records...',
-      backgroundImage: "/images/history-classroom.jpg",
-      subjectColor: "#FFC107",
-      overlayOpacity: 0.7,
-      environmentDescription: "A classical classroom with historical artifacts and timelines"
-    },
-    mentalWellness: {
-      subjectName: "Mental Wellness",
-      primaryColor: "#4CAF50",
-      secondaryColor: "#81C784",
-      accentColor: "#388E3C",
-      loadingIcon: '🧘',
-      loadingMessage: 'Loading Mental Wellness...',
-      backgroundImage: "/images/wellness-classroom.jpg",
-      subjectColor: "#4CAF50",
-      overlayOpacity: 0.7,
-      environmentDescription: "A peaceful mindfulness and wellness space"
+      environmentDescription: "A colorful art studio with paints, brushes, and creative works"
     },
     default: {
       subjectName: "Learning",
-      primaryColor: "#673AB7",
-      secondaryColor: "#9575CD",
-      accentColor: "#512DA8",
-      loadingIcon: '📚',
-      loadingMessage: 'Loading...',
-      backgroundImage: "/images/default-classroom.jpg",
-      subjectColor: "#673AB7",
+      primaryColor: "#607D8B",
+      secondaryColor: "#90A4AE",
+      accentColor: "#455A64",
+      backgroundImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1600&h=900&fit=crop",
+      subjectColor: "#607D8B",
       overlayOpacity: 0.7,
-      environmentDescription: "A versatile learning environment"
+      environmentDescription: "A modern learning environment with educational tools"
     }
   };
 
