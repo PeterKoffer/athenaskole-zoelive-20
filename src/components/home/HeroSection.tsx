@@ -3,6 +3,15 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
 import TextWithSpeaker from '../education/components/shared/TextWithSpeaker';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { User, BookOpen, GraduationCap, ChevronDown, UserPlus } from "lucide-react";
+import { useAuth } from '@/hooks/useAuth';
 
 interface HeroSectionProps {
   onGetStarted?: () => void;
@@ -10,6 +19,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleGetStarted = () => {
     console.log('🚀 Hero: Get Started clicked');
@@ -24,6 +34,18 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   const handleViewDailyProgram = () => {
     console.log('🚀 Hero: View Daily Program clicked');
     navigate("/daily-program");
+  };
+
+  const handleLogin = () => {
+    navigate('/auth');
+  };
+
+  const handleProfile = () => {
+    navigate('/profile');
+  };
+
+  const handleCurriculumSystem = () => {
+    navigate('/curriculum-system');
   };
 
   return (
@@ -57,7 +79,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 making every lesson engaging and effective.
               </p>
 
-              <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
+              <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:items-center">
                 <Button
                   onClick={handleGetStarted}
                   size="lg"
@@ -74,6 +96,46 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 >
                   View Daily Program
                 </Button>
+
+                {/* Dropdown Menu positioned right after the main buttons */}
+                {!user && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="outline"
+                        size="lg"
+                        className="w-full sm:w-auto bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold border-none py-3 px-6 rounded-lg transition-all duration-300"
+                      >
+                        More Options
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 bg-gray-800 border-gray-700" align="center">
+                      <DropdownMenuItem 
+                        onClick={handleLogin}
+                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                      >
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Login / Sign Up
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={handleProfile}
+                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-gray-700" />
+                      <DropdownMenuItem 
+                        onClick={handleCurriculumSystem}
+                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                      >
+                        <GraduationCap className="mr-2 h-4 w-4" />
+                        Curriculum System
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
           </TextWithSpeaker>
