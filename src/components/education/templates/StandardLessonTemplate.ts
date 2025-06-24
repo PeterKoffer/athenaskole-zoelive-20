@@ -53,6 +53,8 @@ export interface EngagingLessonConfig {
  * Creates an ENGAGING lesson that students actually want to participate in
  */
 export function createEngagingLesson(config: EngagingLessonConfig): SubjectLessonPlan {
+  const lessonId = `engaging-template-${config.subject}-${Date.now()}`;
+  
   const activities: LessonActivity[] = [
     {
       id: `${config.subject}-epic-opening`,
@@ -155,6 +157,8 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
   ];
 
   return {
+    id: lessonId,
+    title: `${config.subject.charAt(0).toUpperCase() + config.subject.slice(1)} Adventure`,
     subject: config.subject,
     skillArea: config.skillArea,
     gradeLevel: config.gradeLevel,

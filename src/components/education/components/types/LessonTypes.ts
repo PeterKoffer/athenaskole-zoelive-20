@@ -1,5 +1,4 @@
 
-
 export type ActivityType = 
   | 'introduction'
   | 'interactive-game'
@@ -50,6 +49,13 @@ export interface ScenarioItem {
   customer?: string;
   challenge?: string;
   reward?: string;
+}
+
+export interface GrandChallenge {
+  title: string;
+  description: string;
+  type: 'boss-battle' | 'final-project' | 'presentation' | 'epic-quest';
+  celebration: string;
 }
 
 export interface LessonActivityContent {
@@ -107,6 +113,7 @@ export interface LessonActivityContent {
   characterName?: string;
   characterRole?: string;
   characterIntroduction?: string;
+  characterGuide?: string;
   
   // Content delivery properties
   segments?: ContentSegment[];
@@ -132,7 +139,7 @@ export interface LessonActivityContent {
   // Application properties
   problemSteps?: ProblemStep[];
   guidance?: string;
-  grandChallenge?: string;
+  grandChallenge?: GrandChallenge;
   activityInstructions?: string;
   
   // Creative properties
@@ -146,6 +153,13 @@ export interface LessonActivityContent {
   heroStatus?: string;
   thoughtQuestion?: string;
   excitementLevel?: string;
+  
+  // Template-specific properties
+  interactiveExplanation?: string;
+  quickChallenge?: string;
+  engagementType?: string;
+  celebrationReady?: boolean;
+  missionBriefing?: string;
 }
 
 export interface LessonActivity {
@@ -181,4 +195,6 @@ export interface SubjectLessonPlan {
   prerequisites?: string[];
   assessmentCriteria?: string[];
   extensions?: string[];
+  engagementLevel?: string;
+  funFactor?: string;
 }

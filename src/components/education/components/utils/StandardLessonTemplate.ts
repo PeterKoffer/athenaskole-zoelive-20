@@ -1,5 +1,4 @@
-
-import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
+import { LessonActivity, SubjectLessonPlan, GrandChallenge } from '../types/LessonTypes';
 
 /**
  * ENGAGING 20-MINUTE LESSON STRUCTURE
@@ -68,6 +67,8 @@ export interface EngagingLessonConfig {
  * Creates an ENGAGING lesson that students actually want to participate in
  */
 export function createEngagingLesson(config: EngagingLessonConfig): SubjectLessonPlan {
+  const lessonId = `engaging-${config.subject}-${Date.now()}`;
+  
   const activities: LessonActivity[] = [
     // 1. EPIC OPENING (3 min) - Hook them immediately!
     {
@@ -198,6 +199,8 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
   ];
 
   return {
+    id: lessonId,
+    title: `${config.subject.charAt(0).toUpperCase() + config.subject.slice(1)} Adventure`,
     subject: config.subject,
     skillArea: config.skillArea,
     gradeLevel: config.gradeLevel,
@@ -260,29 +263,29 @@ export function validateEngagingLesson(lesson: SubjectLessonPlan): {
   const improvements: string[] = [];
   
   // Check for story/theme integration
-  if (lesson.phases.some(p => p.content.theme || p.content.storyContext)) {
+  if (lesson.phases?.some(p => p.content.theme || p.content.storyContext)) {
     score += 25;
   } else {
     improvements.push('Add engaging story theme');
   }
   
   // Check for interactive elements
-  const interactiveCount = lesson.phases.filter(p => 
+  const interactiveCount = lesson.phases?.filter(p => 
     p.type === 'interactive-game' || p.content.quickChallenge
-  ).length;
+  ).length || 0;
   
   if (interactiveCount >= 3) score += 25;
   else improvements.push('Add more interactive elements');
   
   // Check for creative opportunities  
-  if (lesson.phases.some(p => p.phase === 'creative-exploration')) {
+  if (lesson.phases?.some(p => p.phase === 'creative-exploration')) {
     score += 25;
   } else {
     improvements.push('Include creative expression activities');
   }
   
   // Check for celebration/rewards
-  if (lesson.phases.some(p => p.content.celebration || p.content.rewards)) {
+  if (lesson.phases?.some(p => p.content.celebration || p.content.rewards)) {
     score += 25;
   } else {
     improvements.push('Add celebrations and rewards');
@@ -358,6 +361,8 @@ export interface StandardLessonConfig {
 }
 
 export function createStandardLesson(config: StandardLessonConfig): SubjectLessonPlan {
+  const lessonId = `standard-${config.subject}-${Date.now()}`;
+  
   const activities: LessonActivity[] = [
     // Phase 1: Introduction (2-3 min)
     {
@@ -480,6 +485,8 @@ export function createStandardLesson(config: StandardLessonConfig): SubjectLesso
   ];
 
   return {
+    id: lessonId,
+    title: `${config.subject.charAt(0).toUpperCase() + config.subject.slice(1)} Lesson`,
     subject: config.subject,
     skillArea: config.skillArea,
     gradeLevel: config.gradeLevel,
@@ -505,7 +512,7 @@ export function validateStandardLesson(lesson: SubjectLessonPlan): {
   const warnings: string[] = [];
 
   // Check total duration (should be 20 minutes = 1200 seconds)
-  if (lesson.totalDuration !== 1200) {
+  if (lesson.totalDuration && lesson.totalDuration !== 1200) {
     if (lesson.totalDuration < 1140 || lesson.totalDuration > 1260) {
       errors.push(`Total duration ${lesson.totalDuration}s is outside acceptable range (1140-1260s for 19-21 minutes)`);
     } else {
@@ -515,10 +522,10 @@ export function validateStandardLesson(lesson: SubjectLessonPlan): {
 
   // Check required phases
   const requiredPhases = ['introduction', 'content-delivery', 'interactive-game', 'application', 'creative-exploration', 'summary'];
-  const actualPhases = lesson.phases.map(p => p.phase);
+  const actualPhases = lesson.phases?.map(p => p.phase).filter(Boolean) || [];
   
   for (const requiredPhase of requiredPhases) {
-    if (!actualPhases.includes(requiredPhase)) {
+    if (!actualPhases.includes(requiredPhase as any)) {
       errors.push(`Missing required phase: ${requiredPhase}`);
     }
   }
@@ -533,7 +540,7 @@ export function validateStandardLesson(lesson: SubjectLessonPlan): {
     'summary': { min: 60, max: 120 }
   };
 
-  for (const activity of lesson.phases) {
+  for (const activity of lesson.phases || []) {
     const limits = phaseDurationLimits[activity.phase as keyof typeof phaseDurationLimits];
     if (limits) {
       if (activity.duration < limits.min || activity.duration > limits.max) {

@@ -133,6 +133,8 @@ export const createCanonicalLessonTemplate = (config: CanonicalLessonConfig): Su
   activities.push(summaryActivity);
 
   return {
+    id: sessionId,
+    title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} - ${skillArea}`,
     subject,
     skillArea,
     gradeLevel,
