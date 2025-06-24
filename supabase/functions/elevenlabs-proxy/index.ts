@@ -38,17 +38,20 @@ serve(async (req) => {
       });
     }
 
-    // Get ElevenLabs API key from custom header or use environment variable as fallback
-    const clientApiKey = req.headers.get("x-elevenlabs-key");
-    const ELEVENLABS_API_KEY = clientApiKey || Deno.env.get("ELEVENLABS_API_KEY");
+    // Get ElevenLabs API key from custom header, authorization header, or environment variable
+    const clientApiKey = req.headers.get("x-elevenlabs-key") || 
+                        req.headers.get("authorization")?.replace("Bearer ", "") ||
+                        Deno.env.get("ELEVENLABS_API_KEY");
     
-    if (!ELEVENLABS_API_KEY) {
-      console.error("[ElevenLabs] API KEY IS MISSING.");
+    if (!clientApiKey) {
+      console.error("[ElevenLabs] API KEY IS MISSING - checked x-elevenlabs-key, authorization headers and env");
       return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY." }), {
-        status: 500,
+        status: 401,
         headers: corsHeaders
       });
     }
+
+    console.log("[ElevenLabs] API key found, proceeding with request");
 
     const payload = await req.json();
     const type = payload.type || "";
@@ -56,7 +59,7 @@ serve(async (req) => {
 
     if (type === "check-availability") {
       const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
-        headers: { "xi-api-key": ELEVENLABS_API_KEY }
+        headers: { "xi-api-key": clientApiKey }
       });
       const status = voicesRes.status;
       let body = null;
@@ -96,7 +99,7 @@ serve(async (req) => {
         headers: {
           "Accept": "audio/mpeg",
           "Content-Type": "application/json",
-          "xi-api-key": ELEVENLABS_API_KEY,
+          "xi-api-key": clientApiKey,
         },
         body: JSON.stringify({
           text,

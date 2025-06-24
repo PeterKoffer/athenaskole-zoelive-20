@@ -37,7 +37,7 @@ export class ElevenLabsVoiceManager {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-elevenlabs-key": apiKey
+          "authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({ type: "check-availability" }),
         signal: controller.signal

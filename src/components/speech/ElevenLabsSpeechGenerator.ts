@@ -37,7 +37,7 @@ export class ElevenLabsSpeechGenerator {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-elevenlabs-key": apiKey
+          "authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify(requestPayload),
       });
