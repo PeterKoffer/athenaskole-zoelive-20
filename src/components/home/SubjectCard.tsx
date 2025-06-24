@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calculator, BookOpen, Laptop, Zap, Palette, Music, Brain, Globe, Dumbbell, Target, Languages, Scroll, Volume2 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
@@ -60,7 +59,7 @@ const buttonGradientMap: Record<string, string> = {
 };
 
 const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearning }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isIconHovered, setIsIconHovered] = useState(false);
   const { speakAsNelie } = useUnifiedSpeech();
   
   const Icon = iconMap[subject.title] || Calculator;
@@ -82,8 +81,6 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
     <div 
       className="relative group cursor-pointer transform transition-all duration-500 hover:scale-110 hover:-translate-y-6"
       style={{ animationDelay: `${index * 100}ms` }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Main Dark Card with Enhanced 3D Effects */}
       <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-3xl p-6 relative overflow-hidden
@@ -112,30 +109,34 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
           <Volume2 size={14} className="text-white drop-shadow-lg" />
         </button>
 
-        {/* Hover Information Tooltip */}
-        {isHovered && (
-          <div className="absolute top-12 right-3 w-72 bg-gray-900/95 backdrop-blur-md shadow-xl rounded-2xl p-4 z-20 border border-gray-700 animate-fade-in">
-            <h4 className="font-semibold text-white mb-2">{subject.title}</h4>
-            <p className="text-sm text-gray-300 leading-relaxed mb-3">{subject.description}</p>
-            {subject.keyAreas && (
-              <div>
-                <p className="text-xs font-medium text-gray-400 mb-2">Key Areas:</p>
-                <div className="flex flex-wrap gap-1">
-                  {subject.keyAreas.slice(0, 3).map((area, idx) => (
-                    <span key={idx} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
-                      {area}
-                    </span>
-                  ))}
-                </div>
+        {/* Icon Container with Hover Tooltip */}
+        <div className="relative z-10 mb-6">
+          <div 
+            className="w-16 h-16 mx-auto mb-4 transform-gpu perspective-1000 relative"
+            onMouseEnter={() => setIsIconHovered(true)}
+            onMouseLeave={() => setIsIconHovered(false)}
+          >
+            {/* Hover Information Tooltip - positioned relative to icon */}
+            {isIconHovered && (
+              <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-80 bg-gray-900/95 backdrop-blur-md shadow-xl rounded-2xl p-4 z-30 border border-gray-700 animate-fade-in">
+                <h4 className="font-semibold text-white mb-2 text-center">{subject.title}</h4>
+                <p className="text-sm text-gray-300 leading-relaxed mb-3">{subject.description}</p>
+                {subject.keyAreas && (
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 mb-2">Key Areas:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {subject.keyAreas.slice(0, 3).map((area, idx) => (
+                        <span key={idx} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        {/* Icon Container - made smaller */}
-        <div className="relative z-10 mb-6">
-          <div className="w-16 h-16 mx-auto mb-4 transform-gpu perspective-1000 relative">
-            {/* Cosmic orbital ring - smaller */}
+            {/* Cosmic orbital rings */}
             <div className="absolute inset-0 border border-gradient-to-r from-cyan-300/15 to-purple-400/15 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
             <div className="absolute inset-1 border border-gradient-to-r from-pink-300/10 to-blue-400/10 rounded-full animate-spin" style={{animationDuration: '12s', animationDirection: 'reverse'}}></div>
             
@@ -177,7 +178,6 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
             after:content-['✨'] after:absolute after:top-1/2 after:right-4 after:-translate-y-1/2 after:opacity-0 after:group-hover:opacity-100 after:transition-opacity after:duration-300`}
         >
           <span className="relative z-10 drop-shadow-lg">Start Learning!</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/10 via-purple-500/10 to-pink-400/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left rounded-2xl"></div>
           
           {/* Button shine effects */}
           <div className="absolute top-2 left-4 w-10 h-2 bg-white/30 rounded-full blur-sm"></div>
