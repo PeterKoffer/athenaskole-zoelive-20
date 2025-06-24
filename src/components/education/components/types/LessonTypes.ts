@@ -137,6 +137,15 @@ export interface LessonActivityContent {
   
   // Creative properties
   creativeType?: string;
+  tools?: string[];
+  shareOpportunity?: boolean;
+  inspirationBoost?: string;
+  
+  // Additional properties found in the codebase
+  theme?: string;
+  heroStatus?: string;
+  thoughtQuestion?: string;
+  excitementLevel?: string;
 }
 
 export interface LessonActivity {
@@ -151,6 +160,8 @@ export interface LessonActivity {
     subject?: string;
     skillArea?: string;
     templateId?: string;
+    gradeLevel?: number;
+    difficultyLevel?: number;
   };
 }
 
@@ -163,5 +174,11 @@ export interface SubjectLessonPlan {
   activities: LessonActivity[];
   estimatedDuration: number;
   learningObjectives: string[];
+  totalDuration?: number;
+  phases?: LessonActivity[];
+  objectives?: string[];
+  difficulty?: number;
+  prerequisites?: string[];
+  assessmentCriteria?: string[];
+  extensions?: string[];
 }
-

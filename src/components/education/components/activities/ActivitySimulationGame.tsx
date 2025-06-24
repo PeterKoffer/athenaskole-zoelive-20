@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { LessonActivity } from '../types/LessonTypes';
+import { LessonActivity, ScenarioItem } from '../types/LessonTypes';
 import Blackboard from '../shared/Blackboard';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 
@@ -24,7 +24,18 @@ const ActivitySimulationGame = ({
   const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
 
   const scenarios = activity.content?.scenarios || [];
-  const currentCustomer = scenarios[currentScenario];
+  const rawCurrentCustomer = scenarios[currentScenario];
+  
+  // Type guard to check if the scenario is a ScenarioItem
+  const isScenarioItem = (scenario: string | ScenarioItem): scenario is ScenarioItem => {
+    return typeof scenario === 'object' && scenario !== null;
+  };
+  
+  const currentCustomer = isScenarioItem(rawCurrentCustomer) ? rawCurrentCustomer : {
+    customer: 'Customer',
+    challenge: typeof rawCurrentCustomer === 'string' ? rawCurrentCustomer : 'Pizza challenge',
+    reward: 'Great job!'
+  };
 
   // Show manual complete button after 15 seconds (reduced from 30)
   useEffect(() => {
@@ -37,7 +48,8 @@ const ActivitySimulationGame = ({
 
   // Extract fraction details from the challenge
   const getFractionDetails = () => {
-    const fractionMatch = currentCustomer?.challenge?.match(/(\d+)\/(\d+)/);
+    const challenge = currentCustomer?.challenge || '';
+    const fractionMatch = challenge.match(/(\d+)\/(\d+)/);
     if (!fractionMatch) return { numerator: 2, denominator: 8 }; // fallback
     
     const numerator = parseInt(fractionMatch[1]);
