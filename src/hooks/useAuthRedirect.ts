@@ -46,54 +46,37 @@ export const useAuthRedirect = () => {
     if (location.pathname === '/' && user && userRole) {
       console.log('[useAuthRedirect] ✅ Auto-redirecting authenticated user from home page');
 
-      // Add a delay to ensure manual role change flags are processed
-      setTimeout(() => {
-        // Double-check the manual role change flag and learning session before redirecting
-        if (isManualRoleChange()) {
-          console.log('[useAuthRedirect] 🚫 LAST MINUTE BLOCK - manual role change detected');
-          return;
+      // Redirect based on role immediately (no delay needed)
+      try {
+        switch (userRole) {
+          case 'admin':
+            console.log('[useAuthRedirect] Redirecting to admin dashboard');
+            navigate('/admin-dashboard', { replace: true });
+            break;
+          case 'school_leader':
+          case 'school_staff':
+            console.log('[useAuthRedirect] Redirecting to school dashboard');
+            navigate('/school-dashboard', { replace: true });
+            break;
+          case 'teacher':
+            console.log('[useAuthRedirect] Redirecting to teacher dashboard');
+            navigate('/teacher-dashboard', { replace: true });
+            break;
+          case 'parent':
+            console.log('[useAuthRedirect] Redirecting to parent dashboard');
+            navigate('/parent-dashboard', { replace: true });
+            break;
+          case 'student':
+            console.log('[useAuthRedirect] Redirecting to daily program');
+            navigate('/daily-program', { replace: true });
+            break;
+          default:
+            console.log('[useAuthRedirect] Unknown role, staying on current page');
+            break;
         }
-
-        const currentPath = window.location.pathname;
-        const stillInLearning = learningPaths.some(path => currentPath.includes(path));
-        
-        if (stillInLearning) {
-          console.log('[useAuthRedirect] 🚫 LAST MINUTE BLOCK - learning session detected');
-          return;
-        }
-
-        // Redirect based on role
-        try {
-          switch (userRole) {
-            case 'admin':
-              console.log('[useAuthRedirect] Redirecting to admin dashboard');
-              navigate('/admin-dashboard', { replace: true });
-              break;
-            case 'school_leader':
-            case 'school_staff':
-              console.log('[useAuthRedirect] Redirecting to school dashboard');
-              navigate('/school-dashboard', { replace: true });
-              break;
-            case 'teacher':
-              console.log('[useAuthRedirect] Redirecting to teacher dashboard');
-              navigate('/teacher-dashboard', { replace: true });
-              break;
-            case 'parent':
-              console.log('[useAuthRedirect] Redirecting to parent dashboard');
-              navigate('/parent-dashboard', { replace: true });
-              break;
-            case 'student':
-              console.log('[useAuthRedirect] Redirecting to daily program');
-              navigate('/daily-program', { replace: true });
-              break;
-            default:
-              console.log('[useAuthRedirect] Unknown role, staying on current page');
-              break;
-          }
-        } catch (error) {
-          console.error('[useAuthRedirect] Navigation error:', error);
-        }
-      }, 100);
+      } catch (error) {
+        console.error('[useAuthRedirect] Navigation error:', error);
+      }
     }
   }, [user, userRole, loading, navigate, location.pathname, isManualRoleChange]);
 };

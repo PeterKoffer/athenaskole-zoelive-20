@@ -23,7 +23,7 @@ const SchoolDashboard = () => {
   const navigate = useNavigate();
   const [showTeachingSettings, setShowTeachingSettings] = useState(false);
 
-  console.log('[SchoolDashboard] Rendering with role:', userRole, 'loading:', loading);
+  console.log('[SchoolDashboard] Rendering with role:', userRole, 'loading:', loading, 'user:', user?.email);
 
   const stats = {
     totalStudents: 485,
@@ -32,9 +32,9 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
-  // Show loading state while auth is still loading
-  if (loading || userRole === null) {
-    console.log('[SchoolDashboard] Showing loading state');
+  // Show loading state while auth is still loading OR if we have a user but no role yet
+  if (loading || (user && userRole === null)) {
+    console.log('[SchoolDashboard] Showing loading state - loading:', loading, 'userRole:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -48,7 +48,7 @@ const SchoolDashboard = () => {
 
   // Check access permissions - allow school_leader, admin, and school_staff
   const allowedRoles = ['admin', 'school_leader', 'school_staff'];
-  const hasAccess = allowedRoles.includes(userRole);
+  const hasAccess = userRole && allowedRoles.includes(userRole);
   
   console.log('[SchoolDashboard] Access check - userRole:', userRole, 'hasAccess:', hasAccess);
 

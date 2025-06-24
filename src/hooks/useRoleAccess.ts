@@ -53,38 +53,42 @@ export const useRoleAccess = () => {
       return;
     }
 
-    // Don't auto-set role if we're in the middle of a manual change
-    if (isManualRoleChange()) {
-      debugLog("Manual role change in progress, skipping auto role assignment");
-      return;
-    }
-
     const sessionRole = getRoleFromSession();
     const profileRole = getRoleFromUser();
 
     debugLog("Session role:", sessionRole, "Profile role:", profileRole, "User:", user?.email);
 
     if (user) {
-      if (sessionRole) {
-        debugLog("Using session role:", sessionRole);
-        setUserRole(sessionRole);
-        return;
-      }
-      
-      if (profileRole) {
-        debugLog("Using profile role:", profileRole);
+      // If we have a profile role and no session role, use the profile role
+      if (profileRole && !sessionRole) {
+        debugLog("Using profile role from metadata:", profileRole);
         setUserRole(profileRole);
         if (typeof window !== "undefined") {
           sessionStorage.setItem(SESSION_ROLE_KEY, profileRole);
         }
         return;
       }
+
+      // If we have a session role, use it (but not during manual changes)
+      if (sessionRole && !isManualRoleChange()) {
+        debugLog("Using session role:", sessionRole);
+        setUserRole(sessionRole);
+        return;
+      }
+
+      // Don't auto-set role if we're in the middle of a manual change
+      if (isManualRoleChange()) {
+        debugLog("Manual role change in progress, keeping current role");
+        return;
+      }
       
       // Default for authenticated users without role
-      debugLog("Setting default role for authenticated user");
-      setUserRole("student");
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem(SESSION_ROLE_KEY, "student");
+      if (!sessionRole && !profileRole) {
+        debugLog("Setting default role for authenticated user");
+        setUserRole("student");
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(SESSION_ROLE_KEY, "student");
+        }
       }
       return;
     }
@@ -112,11 +116,11 @@ export const useRoleAccess = () => {
       sessionStorage.setItem(SESSION_ROLE_KEY, role);
     }
 
-    // Clear the flags after a longer delay to ensure navigation completes
+    // Clear the flags after a shorter delay for better UX
     setTimeout(() => {
       clearManualRoleChangeFlag();
       debugLog("✅ Manual role change complete - auto-redirects re-enabled");
-    }, 3000); // Increased from 2000 to 3000ms
+    }, 1000); // Reduced from 3000 to 1000ms
   };
 
   const hasRole = (requiredRoles: UserRole[]): boolean => {
