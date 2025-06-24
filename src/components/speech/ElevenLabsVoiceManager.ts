@@ -18,7 +18,7 @@ export class ElevenLabsVoiceManager {
     this.lastCheck = now;
 
     try {
-      console.log("🔑 [ElevenLabsVoiceManager] Using hardcoded API key");
+      console.log("🔑 [ElevenLabsVoiceManager] Making request without authorization header");
 
       const response = await fetch(EDGE_BASE, {
         method: "POST",

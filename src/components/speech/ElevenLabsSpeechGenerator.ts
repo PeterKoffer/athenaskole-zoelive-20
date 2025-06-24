@@ -20,7 +20,7 @@ export class ElevenLabsSpeechGenerator {
       };
       
       console.log("📤 [ElevenLabsSpeechGenerator] Request payload:", JSON.stringify(requestPayload, null, 2));
-      console.log("🔑 [ElevenLabsSpeechGenerator] Using hardcoded API key");
+      console.log("🔑 [ElevenLabsSpeechGenerator] Making request without authorization header");
       
       const response = await fetch(EDGE_BASE, {
         method: "POST",
