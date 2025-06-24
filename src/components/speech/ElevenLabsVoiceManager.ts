@@ -20,7 +20,7 @@ export class ElevenLabsVoiceManager {
     try {
       console.log("🔍 [ElevenLabsVoiceManager] Calling edge function to check availability...");
       
-      // Get the API key from environment or prompt user
+      // Get the API key from localStorage
       const apiKey = await this.getApiKey();
       if (!apiKey) {
         console.error("❌ [ElevenLabsVoiceManager] No API key available");
@@ -33,7 +33,7 @@ export class ElevenLabsVoiceManager {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
+          "x-elevenlabs-key": apiKey
         },
         body: JSON.stringify({ type: "check-availability" })
       });
@@ -99,8 +99,7 @@ export class ElevenLabsVoiceManager {
   }
 
   private async getApiKey(): Promise<string | null> {
-    // Try to get the API key from various sources
-    // First check if it's stored in localStorage (for development)
+    // Try to get the API key from localStorage
     try {
       const storedKey = localStorage.getItem('elevenlabs_api_key');
       if (storedKey) {

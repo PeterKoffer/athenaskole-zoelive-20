@@ -2,10 +2,9 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-elevenlabs-key",
 };
 
 // Chunked base64 encoding to handle large buffers safely
@@ -38,9 +37,14 @@ serve(async (req) => {
         headers: corsHeaders,
       });
     }
+
+    // Get ElevenLabs API key from custom header or use environment variable as fallback
+    const clientApiKey = req.headers.get("x-elevenlabs-key");
+    const ELEVENLABS_API_KEY = clientApiKey || Deno.env.get("ELEVENLABS_API_KEY");
+    
     if (!ELEVENLABS_API_KEY) {
       console.error("[ElevenLabs] API KEY IS MISSING.");
-      return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY in server environment." }), {
+      return new Response(JSON.stringify({ error: "Missing ElevenLabs API KEY." }), {
         status: 500,
         headers: corsHeaders
       });
