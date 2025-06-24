@@ -9,25 +9,33 @@ const FeaturesSection = () => {
       icon: BarChart3,
       title: "Personal Dashboard",
       description: "Get an overview of your progress.",
-      details: "Track your learning journey with detailed analytics and personalized insights."
+      details: "Track your learning journey with detailed analytics and personalized insights.",
+      gradient: "bg-gradient-to-br from-orange-300/70 to-red-400/70",
+      buttonGradient: "bg-gradient-to-br from-orange-300/80 to-red-500/80"
     },
     {
       icon: BookOpen,
       title: "Interactive Lessons",
       description: "Engaging content that makes learning fun.",
-      details: "Experience immersive lessons designed to adapt to your learning style."
+      details: "Experience immersive lessons designed to adapt to your learning style.",
+      gradient: "bg-gradient-to-br from-blue-300/70 to-indigo-400/70",
+      buttonGradient: "bg-gradient-to-br from-blue-300/80 to-indigo-500/80"
     },
     {
       icon: Gamepad2,
       title: "Gamified Learning",
       description: "Earn points and badges while you learn.",
-      details: "Stay motivated with rewards, achievements, and friendly competition."
+      details: "Stay motivated with rewards, achievements, and friendly competition.",
+      gradient: "bg-gradient-to-br from-green-300/70 to-emerald-400/70",
+      buttonGradient: "bg-gradient-to-br from-green-300/80 to-emerald-500/80"
     },
     {
       icon: Sparkles,
       title: "AI-Powered Tutor",
       description: "Get personalized help from our AI assistant.",
-      details: "Receive instant feedback and guidance tailored to your needs."
+      details: "Receive instant feedback and guidance tailored to your needs.",
+      gradient: "bg-gradient-to-br from-purple-300/70 to-violet-400/70",
+      buttonGradient: "bg-gradient-to-br from-purple-300/80 to-violet-500/80"
     }
   ];
 
@@ -45,43 +53,83 @@ const FeaturesSection = () => {
           </p>
         </div>
 
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-white text-center mb-4">
-            Features
-          </h3>
-          <p className="text-gray-400 text-center mb-8">
-            Experience the many ways Nelie can help you learn.
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
-              <SpeakableCard
+              <div 
                 key={index}
-                speakText={`${feature.title}. ${feature.description}. ${feature.details}`}
-                context={`feature-card-${index}`}
-                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 h-full"
+                className="relative group cursor-pointer transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="w-6 h-6 text-white" />
+                {/* Main Dark Card with Enhanced 3D Effects */}
+                <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-3xl p-6 relative overflow-hidden h-full
+                  shadow-[0_15px_50px_rgba(0,0,0,0.4),0_8px_25px_rgba(0,0,0,0.3)] 
+                  hover:shadow-[0_30px_100px_rgba(0,0,0,0.5),0_20px_50px_rgba(0,0,0,0.4)]
+                  before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:rounded-3xl before:pointer-events-none">
+                  
+                  {/* Subtle cosmic background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-blue-500/3 to-pink-500/5 opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+                  
+                  {/* Floating cosmic particles */}
+                  <div className="absolute top-4 left-4 w-1 h-1 bg-yellow-300/30 rounded-full animate-pulse"></div>
+                  <div className="absolute top-12 right-8 w-0.5 h-0.5 bg-blue-300/40 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute bottom-16 left-8 w-1 h-1 bg-purple-300/35 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+
+                  {/* Icon Container */}
+                  <div className="relative z-10 mb-6">
+                    <div className="w-16 h-16 mx-auto mb-4 transform-gpu perspective-1000 relative">
+                      <div className={`w-full h-full ${feature.gradient} rounded-2xl flex items-center justify-center transform transition-all duration-700 group-hover:scale-110 border-2 border-white/30 relative
+                        shadow-[0_15px_30px_rgba(0,0,0,0.25),inset_0_2px_0_rgba(255,255,255,0.3)]
+                        before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:rounded-2xl`}>
+                        
+                        <IconComponent size={28} className="text-white drop-shadow-xl relative z-10" />
+                        
+                        {/* Shine effects */}
+                        <div className="absolute top-2 left-2 w-4 h-4 bg-white/40 rounded-full blur-sm"></div>
+                        <div className="absolute top-3 left-3 w-2 h-2 bg-white/20 rounded-full blur-xs"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Title */}
+                    <h3 className="text-white text-lg font-bold text-center mb-3 group-hover:text-gray-100 transition-colors font-sans tracking-wide 
+                      drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
+                      {feature.title}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-gray-400 text-sm text-center mb-3">
+                      {feature.description}
+                    </p>
+                    
+                    {/* Details */}
+                    <p className="text-gray-300 text-xs leading-relaxed text-center mb-6">
+                      {feature.details}
+                    </p>
                   </div>
                   
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {feature.title}
-                  </h3>
-                  
-                  <p className="text-gray-400 text-sm mb-3">
-                    {feature.description}
-                  </p>
-                  
-                  <p className="text-gray-300 text-xs leading-relaxed">
-                    {feature.details}
-                  </p>
-                </CardContent>
-              </SpeakableCard>
+                  {/* Learn More Button */}
+                  <button 
+                    className={`w-full py-3 px-4 ${feature.buttonGradient} text-white font-semibold rounded-xl transform transition-all duration-300 relative overflow-hidden group-hover:scale-105 border-2 border-white/20 text-sm
+                      shadow-[0_8px_20px_rgba(0,0,0,0.25),inset_0_2px_0_rgba(255,255,255,0.2)]
+                      hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
+                      before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:rounded-xl before:pointer-events-none`}
+                  >
+                    <span className="relative z-10 drop-shadow-lg">Learn More</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left rounded-xl"></div>
+                    
+                    {/* Button shine effects */}
+                    <div className="absolute top-2 left-4 w-8 h-2 bg-white/30 rounded-full blur-sm"></div>
+                    <div className="absolute top-2.5 left-5 w-4 h-1 bg-white/15 rounded-full blur-xs"></div>
+                  </button>
+
+                  {/* Glassmorphism overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/3 via-transparent to-black/5 rounded-3xl pointer-events-none"></div>
+                </div>
+
+                {/* Shadow layer */}
+                <div className="absolute inset-0 bg-black/20 rounded-3xl transform translate-y-1 -z-10 blur-sm"></div>
+              </div>
             );
           })}
         </div>
