@@ -9,7 +9,7 @@ export class ElevenLabsVoiceManager {
 
   public async checkAvailability(): Promise<boolean> {
     const now = Date.now();
-    if (now - this.lastCheck < 3000 && this.cachedAvailability !== null) {
+    if (now - this.lastCheck < 5000 && this.cachedAvailability !== null) {
       console.log(`✅ [ElevenLabsVoiceManager] Using CACHED availability: ${this.cachedAvailability}`);
       return this.cachedAvailability;
     }
@@ -24,8 +24,6 @@ export class ElevenLabsVoiceManager {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-elevenlabs-key": ELEVENLABS_API_KEY,
-          "authorization": `Bearer ${ELEVENLABS_API_KEY}`
         },
         body: JSON.stringify({ type: "check-availability" }),
       });
@@ -45,6 +43,14 @@ export class ElevenLabsVoiceManager {
 
       const result: VoicesResponse = await response.json();
       
+      // Check if response contains an error (even with 200 status)
+      if (result.error) {
+        console.error("❌ [ElevenLabsVoiceManager] API error:", result.error);
+        this.cachedAvailability = false;
+        this.lastError = result.error;
+        return false;
+      }
+      
       if (result && Array.isArray(result.voices) && result.voices.length > 0) {
         this.cachedAvailability = true;
         this.lastError = null;
@@ -61,7 +67,7 @@ export class ElevenLabsVoiceManager {
       } else {
         console.error("❌ [ElevenLabsVoiceManager] Invalid response:", result);
         this.cachedAvailability = false;
-        this.lastError = result?.error || "Invalid response from ElevenLabs";
+        this.lastError = "Invalid response from ElevenLabs";
         return false;
       }
     } catch (error) {

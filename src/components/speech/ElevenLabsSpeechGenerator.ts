@@ -26,8 +26,6 @@ export class ElevenLabsSpeechGenerator {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-elevenlabs-key": ELEVENLABS_API_KEY,
-          "authorization": `Bearer ${ELEVENLABS_API_KEY}`
         },
         body: JSON.stringify(requestPayload),
       });
@@ -54,6 +52,12 @@ export class ElevenLabsSpeechGenerator {
           error: rawJson.error
         }
       );
+
+      // Check for errors in response (even with 200 status)
+      if (rawJson.error) {
+        console.error("❌ [ElevenLabsSpeechGenerator] Speech generation failed:", rawJson.error);
+        throw new Error(rawJson.error);
+      }
 
       if (!response.ok || !rawJson.audioContent) {
         console.error("❌ [ElevenLabsSpeechGenerator] Speech generation failed:", rawJson.error || "No audio content");
