@@ -4,11 +4,11 @@ import { useAuth } from '@/hooks/useAuth';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import MathematicsWelcome from './welcome/MathematicsWelcome';
-import EnglishWelcome from './welcome/EnglishWelcome';
-import ScienceWelcome from './welcome/ScienceWelcome';
-import ComputerScienceWelcome from './welcome/ComputerScienceWelcome';
-import MusicWelcome from './welcome/MusicWelcome';
-import CreativeArtsWelcome from './welcome/CreativeArtsWelcome';
+import { EnglishWelcome } from './welcome/EnglishWelcome';
+import { ScienceWelcome } from './welcome/ScienceWelcome';
+import { ComputerScienceWelcome } from './welcome/ComputerScienceWelcome';
+import { MusicWelcome } from './welcome/MusicWelcome';
+import { CreativeArtsWelcome } from './welcome/CreativeArtsWelcome';
 import ImprovedLearningSession from '@/components/adaptive-learning/components/ImprovedLearningSession';
 
 interface UnifiedLessonManagerProps {
