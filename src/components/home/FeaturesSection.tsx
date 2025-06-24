@@ -2,8 +2,11 @@
 import { CardContent } from "@/components/ui/card";
 import { SpeakableCard } from "@/components/ui/speakable-card";
 import { BarChart3, BookOpen, Gamepad2, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const FeaturesSection = () => {
+  const navigate = useNavigate();
+
   const features = [
     {
       icon: BarChart3,
@@ -11,7 +14,8 @@ const FeaturesSection = () => {
       description: "Get an overview of your progress.",
       details: "Track your learning journey with detailed analytics and personalized insights.",
       gradient: "bg-gradient-to-br from-orange-300/70 to-red-400/70",
-      buttonGradient: "bg-gradient-to-br from-orange-300/80 to-red-500/80"
+      buttonGradient: "bg-gradient-to-br from-orange-300/80 to-red-500/80",
+      navigationPath: "/progress"
     },
     {
       icon: BookOpen,
@@ -19,7 +23,8 @@ const FeaturesSection = () => {
       description: "Engaging content that makes learning fun.",
       details: "Experience immersive lessons designed to adapt to your learning style.",
       gradient: "bg-gradient-to-br from-blue-300/70 to-indigo-400/70",
-      buttonGradient: "bg-gradient-to-br from-blue-300/80 to-indigo-500/80"
+      buttonGradient: "bg-gradient-to-br from-blue-300/80 to-indigo-500/80",
+      navigationPath: "/learn/mathematics"
     },
     {
       icon: Gamepad2,
@@ -27,7 +32,8 @@ const FeaturesSection = () => {
       description: "Earn points and badges while you learn.",
       details: "Stay motivated with rewards, achievements, and friendly competition.",
       gradient: "bg-gradient-to-br from-green-300/70 to-emerald-400/70",
-      buttonGradient: "bg-gradient-to-br from-green-300/80 to-emerald-500/80"
+      buttonGradient: "bg-gradient-to-br from-green-300/80 to-emerald-500/80",
+      navigationPath: "/game-hub"
     },
     {
       icon: Sparkles,
@@ -35,9 +41,14 @@ const FeaturesSection = () => {
       description: "Get personalized help from our AI assistant.",
       details: "Receive instant feedback and guidance tailored to your needs.",
       gradient: "bg-gradient-to-br from-purple-300/70 to-violet-400/70",
-      buttonGradient: "bg-gradient-to-br from-purple-300/80 to-violet-500/80"
+      buttonGradient: "bg-gradient-to-br from-purple-300/80 to-violet-500/80",
+      navigationPath: "/ai-learning"
     }
   ];
+
+  const handleLearnMore = (path: string) => {
+    navigate(path);
+  };
 
   return (
     <section className="py-16 bg-gray-900">
@@ -110,6 +121,7 @@ const FeaturesSection = () => {
                   
                   {/* Learn More Button */}
                   <button 
+                    onClick={() => handleLearnMore(feature.navigationPath)}
                     className={`w-full py-3 px-4 ${feature.buttonGradient} text-white font-semibold rounded-xl transform transition-all duration-300 relative overflow-hidden group-hover:scale-105 border-2 border-white/20 text-sm
                       shadow-[0_8px_20px_rgba(0,0,0,0.25),inset_0_2px_0_rgba(255,255,255,0.2)]
                       hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
