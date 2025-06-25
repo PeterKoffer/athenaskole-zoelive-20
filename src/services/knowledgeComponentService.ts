@@ -30,7 +30,20 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
   }
 
   private async ensureInitialized(): Promise<void> {
-    return this.initializationPromise;
+    if (!this.isInitialized) {
+      // This is a simple busy-wait, in a real app use a more robust initialization pattern
+      // or ensure loadKcs is called and awaited in the constructor properly if it were truly async.
+      // For current mock data setup, this is mostly a formality.
+      let attempts = 0;
+      while(!this.isInitialized && attempts < 10) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+      }
+      if (!this.isInitialized) {
+        console.error("KnowledgeComponentService: Failed to initialize after multiple attempts.");
+        // Potentially throw an error or handle appropriately
+      }
+    }
   }
 
   async getKcById(id: string): Promise<KnowledgeComponent | undefined> {
