@@ -64,17 +64,17 @@ const FeaturesSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
               <div 
                 key={index}
-                className="relative group cursor-pointer transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+                className="relative group cursor-pointer transform transition-all duration-500 hover:scale-105 hover:-translate-y-2 h-full"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Main Dark Card with Enhanced 3D Effects */}
-                <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-3xl p-6 relative overflow-hidden h-full
+                <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-3xl p-6 relative overflow-hidden h-full flex flex-col
                   shadow-[0_15px_50px_rgba(0,0,0,0.4),0_8px_25px_rgba(0,0,0,0.3)] 
                   hover:shadow-[0_30px_100px_rgba(0,0,0,0.5),0_20px_50px_rgba(0,0,0,0.4)]
                   before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:rounded-3xl before:pointer-events-none">
@@ -104,36 +104,38 @@ const FeaturesSection = () => {
                     
                     {/* Title */}
                     <h3 className="text-white text-lg font-bold text-center mb-3 group-hover:text-gray-100 transition-colors font-sans tracking-wide 
-                      drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
+                      drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] min-h-[1.75rem]">
                       {feature.title}
                     </h3>
                     
                     {/* Description */}
-                    <p className="text-gray-400 text-sm text-center mb-3">
+                    <p className="text-gray-400 text-sm text-center mb-3 min-h-[2.5rem] flex items-center justify-center">
                       {feature.description}
                     </p>
                     
                     {/* Details */}
-                    <p className="text-gray-300 text-xs leading-relaxed text-center mb-6">
+                    <p className="text-gray-300 text-xs leading-relaxed text-center mb-6 min-h-[3rem] flex items-center justify-center">
                       {feature.details}
                     </p>
                   </div>
                   
-                  {/* Learn More Button */}
-                  <button 
-                    onClick={() => handleLearnMore(feature.navigationPath)}
-                    className={`w-full py-3 px-4 ${feature.buttonGradient} text-white font-semibold rounded-xl transform transition-all duration-300 relative overflow-hidden group-hover:scale-105 border-2 border-white/20 text-sm
-                      shadow-[0_8px_20px_rgba(0,0,0,0.25),inset_0_2px_0_rgba(255,255,255,0.2)]
-                      hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
-                      before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:rounded-xl before:pointer-events-none`}
-                  >
-                    <span className="relative z-10 drop-shadow-lg">Learn More</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left rounded-xl"></div>
-                    
-                    {/* Button shine effects */}
-                    <div className="absolute top-2 left-4 w-8 h-2 bg-white/30 rounded-full blur-sm"></div>
-                    <div className="absolute top-2.5 left-5 w-4 h-1 bg-white/15 rounded-full blur-xs"></div>
-                  </button>
+                  {/* Learn More Button - pushed to bottom */}
+                  <div className="mt-auto">
+                    <button 
+                      onClick={() => handleLearnMore(feature.navigationPath)}
+                      className={`w-full py-3 px-4 ${feature.buttonGradient} text-white font-semibold rounded-xl transform transition-all duration-300 relative overflow-hidden group-hover:scale-105 border-2 border-white/20 text-sm
+                        shadow-[0_8px_20px_rgba(0,0,0,0.25),inset_0_2px_0_rgba(255,255,255,0.2)]
+                        hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
+                        before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:rounded-xl before:pointer-events-none`}
+                    >
+                      <span className="relative z-10 drop-shadow-lg">Learn More</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left rounded-xl"></div>
+                      
+                      {/* Button shine effects */}
+                      <div className="absolute top-2 left-4 w-8 h-2 bg-white/30 rounded-full blur-sm"></div>
+                      <div className="absolute top-2.5 left-5 w-4 h-1 bg-white/15 rounded-full blur-xs"></div>
+                    </button>
+                  </div>
 
                   {/* Glassmorphism overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/3 via-transparent to-black/5 rounded-3xl pointer-events-none"></div>
