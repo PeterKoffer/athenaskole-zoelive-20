@@ -6,7 +6,7 @@ import AnswerOption from './AnswerOption';
 import { Question } from '../hooks/useQuestionGeneration'; // Assuming Question type is defined here
 import stealthAssessmentService from '@/services/stealthAssessmentService';
 // InteractionEventType is not directly used here but good for context if expanding logging
-// import { InteractionEventType } from '@/types/stealthAssessment';
+// import { InteractionEventType } from '@/types/stealthAssessment'; 
 import { useEffect, useState } from 'react';
 
 export interface QuestionCardQuestion extends Question { // Renamed to avoid conflict if Question is also a component
@@ -22,7 +22,7 @@ interface QuestionCardProps {
   onOptionClick: (index: number) => void;
   onAnswerSubmit: (selectedIndex: number, isCorrect: boolean) => void;
   // userId and sessionId are now handled by stealthAssessmentService internally
-  currentAttemptNumber: number;
+  currentAttemptNumber: number; 
 }
 
 const QuestionCard = ({
@@ -42,7 +42,7 @@ const QuestionCard = ({
     // This assumes question.id can serve as a contentAtomId for this context
     // and that knowledgeComponentIds are available on the question object.
     // stealthAssessmentService.logContentView({
-    //   contentAtomId: question.id,
+    //   contentAtomId: question.id, 
     //   knowledgeComponentIds: question.knowledgeComponentIds || ['unknown_kc_question_view'],
     //   contentType: 'QUESTION_INTERACTIVE_VIEW',
     // }, `QuestionCard-View-${question.id}`);
@@ -88,7 +88,7 @@ const QuestionCard = ({
             onClick={() => {
               if (!hasAnswered) {
                 // Update UI for temporary selection first
-                onOptionClick(index);
+                onOptionClick(index); 
                 // Then, directly call submission logic.
                 // In a more complex app, onOptionClick might just set tempSelected,
                 // and a separate "Submit" button would call handleActualSubmission.
@@ -97,7 +97,7 @@ const QuestionCard = ({
               } else {
                 // If already answered, allow clicking to review (onOptionClick might highlight it)
                 // but don't re-trigger submission.
-                onOptionClick(index);
+                onOptionClick(index); 
               }
             }}
           />
