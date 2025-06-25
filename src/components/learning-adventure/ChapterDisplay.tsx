@@ -2,70 +2,83 @@ import React, { useState } from 'react';
 import type { Chapter, EmbeddedActivityRequest } from '@/types/learningAdventureTypes';
 import type { LessonActivity, ActivityType } from '@/components/education/components/types/LessonTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button'; // Added
+import { Button } from '@/components/ui/button';
 import AdventureImageDisplay from './AdventureImageDisplay';
-import UniversalLearningContent from '@/components/education/components/universal/UniversalLearningContent'; // Added
+import UniversalLearningContent from '@/components/education/components/universal/UniversalLearningContent';
+import { ActivityContentGenerator } from '@/services/dailyLessonGenerator/activityContentGenerator'; // Added
+import type { StudentProgressData } from '@/services/dailyLessonGenerator/types'; // Added
+import { Loader2 } from 'lucide-react'; // For spinner icon
 
 interface ChapterDisplayProps {
   chapter: Chapter;
-  adventureId: string; // To form unique IDs for generated activities
-  // For mock LessonActivity generation & passing to UniversalLearningContent
-  // In a real app, studentProgress might come from context or props
+  adventureId: string;
   mockStudentName?: string;
-  mockSkillArea?: string; // If not directly in EmbeddedActivityRequest, use chapter's theme
+  mockSkillArea?: string;
   mockGradeLevel?: number;
 }
 
 const ChapterDisplay: React.FC<ChapterDisplayProps> = ({
   chapter,
   adventureId,
-  mockStudentName = "Explorer",
-  mockSkillArea = "Adventure Skills",
-  mockGradeLevel = 3,
+  mockStudentName = "Explorer", // Will be used by UniversalLearningContent via mock activity.subject/skillArea if needed
+  mockSkillArea = "Adventure Skills", // Used as fallback for activity.skillArea
+  mockGradeLevel = 3, // Used for generating activity
 }) => {
   const [activeEmbeddedActivityIndex, setActiveEmbeddedActivityIndex] = useState<number | null>(null);
   const [currentLessonActivities, setCurrentLessonActivities] = useState<LessonActivity[] | null>(null);
   const [showLessonActivityView, setShowLessonActivityView] = useState<boolean>(false);
   const [activityCompletionMessage, setActivityCompletionMessage] = useState<string | null>(null);
+  const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(false); // Added state
 
   const isActivityRequest = (activity: LessonActivity | EmbeddedActivityRequest): activity is EmbeddedActivityRequest => {
     return (activity as EmbeddedActivityRequest).activityType !== undefined && (activity as EmbeddedActivityRequest).subject !== undefined;
   };
 
-  const handleStartActivity = (activity: LessonActivity | EmbeddedActivityRequest, index: number) => {
-    setActivityCompletionMessage(null); // Clear previous completion message
+  const handleStartActivity = async (activity: LessonActivity | EmbeddedActivityRequest, index: number) => {
+    setActivityCompletionMessage(null);
     setActiveEmbeddedActivityIndex(index);
-    let activityToRun: LessonActivity;
 
     if (isActivityRequest(activity)) {
-      console.log(`ChapterDisplay: Would generate activity for request:`, activity);
-      // Create a mock LessonActivity based on the EmbeddedActivityRequest
-      // This is a simplified mock. A real implementation would call ActivityContentGenerator.
-      activityToRun = {
-        id: `${adventureId}-${chapter.chapterId}-activity-${index}`,
-        type: activity.activityType,
-        title: `${activity.skillArea}: ${activity.focusArea || 'Challenge'}`,
-        phase: activity.activityType, // Assuming phase matches type for this context
-        duration: 180, // Default duration
-        phaseDescription: `Complete this activity about ${activity.focusArea || activity.skillArea}.`,
-        content: {
-          // Mock content based on type - this should be more robust or come from a generator
-          // For now, a generic placeholder that UniversalLearningMainContent might try to render
-          text: `This is a ${activity.activityType} activity for ${activity.subject} on ${activity.skillArea}. Focus: ${activity.focusArea || 'general'}. Difficulty: ${activity.difficulty || 'default'}.`,
-          // Add minimal fields expected by UniversalLearningMainContent for this type if known
-          ...(activity.activityType === 'interactive-game' && { question: `Mock question for ${activity.focusArea}?`, options: ["A", "B", "C"], correctAnswerIndex: 0, gameType: "multiple-choice-quiz" }),
-          ...(activity.activityType === 'content-delivery' && { mainExplanation: `Mock explanation for ${activity.focusArea}.` }),
-          ...(activity.activityType === 'application' && { scenario: `Mock scenario for ${activity.focusArea}.`, task: "Solve the mock task." }),
-        },
-        subject: activity.subject, // Pass subject and skillArea for UniversalLearningContent
-        skillArea: activity.skillArea,
+      setIsLoadingActivity(true);
+      console.log(`ChapterDisplay: Generating activity for request:`, activity);
+
+      const mockStudentProgress: StudentProgressData = {
+        userId: 'mockAdventureUserId', // Using a distinct mock user ID for adventure context
+        subject: activity.subject,
+        overallAccuracy: 75,
+        lessonsCompleted: 5,
+        focusAreaPerformance: {},
+        lastAccessed: new Date().toISOString(),
       };
+
+      try {
+        const generatedActivity = await ActivityContentGenerator.createCurriculumActivity(
+          `${adventureId}_${chapter.chapterId}`, // lessonId (unique for this chapter context)
+          index,                               // activity index within the chapter
+          activity.subject,
+          activity.skillArea,
+          activity.focusArea || activity.skillArea, // focusArea (fallback to skillArea)
+          mockGradeLevel, // gradeLevel
+          mockStudentProgress,
+          activity.activityType
+          // `activity.difficulty` from EmbeddedActivityRequest is not directly passed;
+          // createCurriculumActivity calculates difficulty based on studentProgress and gradeLevel.
+          // If direct difficulty override is needed, createCurriculumActivity signature would need adjustment.
+          // For now, we can assume the generator's calculation is sufficient or difficulty from request is used internally if passed.
+        );
+        setCurrentLessonActivities([generatedActivity]);
+        setShowLessonActivityView(true);
+      } catch (err) {
+        console.error("Error generating curriculum activity:", err);
+        setActivityCompletionMessage(`Error preparing activity: \${(err as Error).message}`);
+      } finally {
+        setIsLoadingActivity(false);
+      }
     } else {
       // It's already a full LessonActivity object
-      activityToRun = activity;
+      setCurrentLessonActivities([activity]);
+      setShowLessonActivityView(true);
     }
-    setCurrentLessonActivities([activityToRun]);
-    setShowLessonActivityView(true);
   };
 
   const handleEmbeddedLessonComplete = () => {
