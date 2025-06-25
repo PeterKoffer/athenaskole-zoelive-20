@@ -5,7 +5,7 @@ interface WelcomeContentProps {
 
 const WelcomeContent = ({ userName }: WelcomeContentProps) => {
   return (
-    <div className="ml-8">
+    <div className="ml-8 pr-32">
       <h2 className="text-2xl font-bold text-white mb-2">
         Welcome back, {userName}! 👋
       </h2>
