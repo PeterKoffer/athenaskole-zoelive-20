@@ -1,0 +1,92 @@
+[
+  {
+    "id": "kc_math_g4_add_fractions_likedenom",
+    "name": "Adding Fractions with Like Denominators",
+    "description": "Understand addition of fractions with the same denominator as joining parts referring to the same whole.",
+    "subject": "Mathematics",
+    "gradeLevels": [4],
+    "domain": "Number & Operations - Fractions",
+    "curriculumStandards": [
+      {
+        "standardId": "CCSS.Math.Content.4.NF.B.3a",
+        "standardSet": "CCSSM",
+        "description": "Understand addition and subtraction of fractions as joining and separating parts referring to the same whole."
+      }
+    ],
+    "prerequisiteKcs": ["kc_math_g3_understand_fractions_unit"],
+    "postrequisiteKcs": ["kc_math_g4_add_subtract_mixed_numbers_likedenom"],
+    "difficultyEstimate": 2,
+    "tags": ["fractions", "addition", "like denominators"]
+  },
+  {
+    "id": "kc_math_g3_understand_fractions_unit",
+    "name": "Understanding Unit Fractions",
+    "description": "Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts.",
+    "subject": "Mathematics",
+    "gradeLevels": [3],
+    "domain": "Number & Operations - Fractions",
+    "curriculumStandards": [
+      {
+        "standardId": "CCSS.Math.Content.3.NF.A.1",
+        "standardSet": "CCSSM"
+      }
+    ],
+    "prerequisiteKcs": [],
+    "postrequisiteKcs": ["kc_math_g4_add_fractions_likedenom"],
+    "difficultyEstimate": 1,
+    "tags": ["fractions", "unit fractions", "foundational"]
+  },
+  {
+    "id": "kc_math_g4_identify_prime_numbers_lt_100",
+    "name": "Identifying Prime Numbers less than 100",
+    "description": "Recognize prime numbers as whole numbers greater than 1 that have only two factors: 1 and themselves.",
+    "subject": "Mathematics",
+    "gradeLevels": [4, 5],
+    "domain": "Operations & Algebraic Thinking",
+    "curriculumStandards": [
+      {
+        "standardId": "CCSS.Math.Content.4.OA.B.4",
+        "standardSet": "CCSSM",
+        "description": "Find all factor pairs for a whole number in the range 1-100. Recognize that a whole number is a multiple of each of its factors. Determine whether a given whole number in the range 1-100 is prime or composite."
+      }
+    ],
+    "prerequisiteKcs": ["kc_math_g3_multiplication_facts"],
+    "difficultyEstimate": 3,
+    "tags": ["prime numbers", "factors", "number theory"]
+  },
+  {
+    "id": "kc_math_g3_multiplication_facts",
+    "name": "Multiplication Facts Fluency (0-10)",
+    "description": "Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division or properties of operations.",
+    "subject": "Mathematics",
+    "gradeLevels": [3],
+    "domain": "Operations & Algebraic Thinking",
+    "curriculumStandards": [
+      {
+        "standardId": "CCSS.Math.Content.3.OA.C.7",
+        "standardSet": "CCSSM"
+      }
+    ],
+    "prerequisiteKcs": [],
+    "postrequisiteKcs": ["kc_math_g4_identify_prime_numbers_lt_100"],
+    "difficultyEstimate": 2,
+    "tags": ["multiplication", "fluency", "division"]
+  },
+  {
+    "id": "kc_ela_g4_main_idea_details",
+    "name": "Identifying Main Idea and Supporting Details",
+    "description": "Determine the main idea of a text and explain how it is supported by key details; summarize the text.",
+    "subject": "English Language Arts",
+    "gradeLevels": [4],
+    "domain": "Reading: Informational Text",
+    "curriculumStandards": [
+      {
+        "standardId": "CCSS.ELA-Literacy.RI.4.2",
+        "standardSet": "CCSS ELA"
+      }
+    ],
+    "prerequisiteKcs": ["kc_ela_g3_ask_answer_questions_text"],
+    "difficultyEstimate": 3,
+    "tags": ["reading comprehension", "main idea", "informational text"]
+  }
+]
