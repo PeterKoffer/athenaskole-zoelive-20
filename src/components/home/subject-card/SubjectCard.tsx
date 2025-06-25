@@ -47,7 +47,9 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ subject, index, onStartLearni
         {/* Speaker Icon - top right corner */}
         <button
           onClick={handleSpeakerClick}
-          className="absolute top-3 right-3 p-2 bg-gradient-to-br from-blue-300/80 via-purple-400/80 to-pink-400/80 rounded-xl transition-all duration-200 backdrop-blur-sm hover:scale-125 hover:rotate-12 z-10"
+          className="absolute top-3 right-3 p-2 bg-gradient-to-br from-blue-300/80 via-purple-400/80 to-pink-400/80 rounded-xl transition-all duration-200 backdrop-blur-sm hover:scale-125 hover:rotate-12 z-10
+            shadow-[0_8px_20px_rgba(0,0,0,0.25),inset_0_2px_0_rgba(255,255,255,0.2)]
+            before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:rounded-xl before:pointer-events-none"
           title="Ask Nelie to explain this subject"
         >
           <Volume2 size={14} className="text-white drop-shadow-lg" />
