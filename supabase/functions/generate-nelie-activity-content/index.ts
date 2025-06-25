@@ -83,12 +83,57 @@ function craftLLMPrompt(request: DynamicContentRequest): string {
       specificInstructions = `Generate a concise summary for a K-12 lesson on "${focusArea}" in ${subject}. Include 2-3 key takeaways, a brief preview of potential next steps, and a final encouraging message. The student is at grade level ${gradeLevel} (difficulty: ${difficulty}/10).`;
       outputFormatHint = `Respond with a JSON object matching this structure: {"title": "...", "content": {"keyTakeaways": ["...", "..."], "nextStepsPreview": "...", "finalEncouragement": "..."}}`;
       break;
+    case 'simulation':
+      // The focusArea or promptDetails.theme might hint at the type of simulation (e.g., "Lemonade Stand Business", "Basketball Team Season")
+      // LLM needs to infer a specific simulationType from: basketball_team_management, business_operation, event_planning
+      specificInstructions = `
+        Design an interactive simulation activity for a K-12 ${subject} lesson on "${focusArea}".
+        The student is at grade level ${gradeLevel} (difficulty: ${difficulty}/10).
+        The simulation should have a clear goal or challenge.
+        1. Determine an appropriate 'simulationType' (e.g., 'business_operation', 'basketball_team_management', 'event_planning') based on the focus area: "${focusArea}".
+        2. Define an 'initialState' with relevant SimulationVariables (e.g., budget, resources, team stats, inventory).
+        3. Provide a brief 'rulesSummary' (1-2 rules, as an array of {description: string}).
+        4. Suggest 1-2 'decisionPointsTemplates' (as an array of {id: string, prompt: string, options: [{id: string, text: string}]}) relevant to the simulation.
+        5. Define 1-2 'successMetrics' (as an array of {metricName: string, targetValue?: any, isHigherBetter: boolean}).
+        6. Include a narrative 'introductionText' for the simulation.
+      `;
+      // This outputFormatHint is complex and needs to be very precise.
+      // It might be beneficial to ask the LLM for each part (initialState, rules, etc.) separately if it struggles with one giant JSON.
+      // For now, we'll try with a combined hint.
+      outputFormatHint = `
+        Respond with a JSON object matching this structure:
+        {
+          "title": "Engaging Simulation Title for ${focusArea}",
+          "content": {
+            "simulationType": "YOUR_CHOSEN_SIMULATION_TYPE_STRING",
+            "introductionText": "Narrative introduction to the simulation...",
+            "details": {
+              "simulationType": "MUST_MATCH_ABOVE_SIMULATION_TYPE_STRING",
+              "initialState": {
+                "variable1": {"name": "VarName1", "value": 100, "unit": "$"},
+                "variable2": {"name": "VarName2", "value": 5, "min": 0, "max": 10}
+                /* ... other state variables based on chosen simulationType ... */
+              },
+              "rulesSummary": [{"description": "Rule 1..."}, {"description": "Rule 2..."}],
+              "decisionPointsTemplates": [
+                {"id": "decision1", "prompt": "What will you do first?", "options": [{"id": "optA", "text": "Option A"}, {"id": "optB", "text": "Option B"}]}
+              ],
+              "successMetrics": [
+                {"metricName": "Primary Goal", "targetValue": 1000, "isHigherBetter": true}
+              ]
+              // Include other fields relevant to the chosen simulationType like 'seasonLength' for basketball, etc.
+            }
+          }
+        }
+      `;
+      break;
     default:
       specificInstructions = `Generate general educational content for "${focusArea}" in ${subject}. Grade: ${gradeLevel}, Difficulty: ${difficulty}/10.`;
       outputFormatHint = `Respond with a JSON object: {"title": "...", "content": {"text": "..."}}`;
   }
 
-  // It's often better to put JSON instructions at the end or in system prompt
+  // It's often better to put JSON instructions at the end or in system prompt.
+  // The "IMPORTANT: Your entire response MUST be a single JSON object..." is key.
   return \`
     You are ${persona}, an AI Tutor.
     Your characteristics:
@@ -142,42 +187,67 @@ serve(async (req: Request) => {
 
     // --- Mock Response (until LLM is integrated) ---
     // This mock attempts to return a structure based on the outputFormatHint.
-    let mockContent: LessonActivityContent = { text: "This is mock content. LLM not called." };
     let mockTitle = \`Mock Activity: \${requestBody.focusArea}\`;
+    let mockLessonContent: LessonActivityContent; // This will be content for DynamicContentResponse
 
     // Simulate structure based on activity type for more realistic mocking
     switch (requestBody.activityType) {
         case 'introduction':
             mockTitle = \`Intro to \${requestBody.focusArea}\`;
-            mockContent = { hook: "Mock Hook: Welcome to " + requestBody.focusArea + "!", realWorldExample: "Mock Example: This is used in everyday life when...", learningObjectives: ["Learn X", "Understand Y", "Apply Z"] };
+            mockLessonContent = { hook: "Mock Hook: Welcome to " + requestBody.focusArea + "!", realWorldExample: "Mock Example: This is used in everyday life when...", learningObjectives: ["Learn X", "Understand Y", "Apply Z"] };
             break;
         case 'content-delivery':
             mockTitle = \`Exploring \${requestBody.focusArea}\`;
-            mockContent = { introductionText: "Let's learn about " + requestBody.focusArea, mainExplanation: "This is the main explanation for " + requestBody.focusArea + ". It's very interesting!", examples: ["Example 1", "Example 2"], segments: [{title: "Part 1", explanation: "Detail 1", examples: ["SegEx1"]}]};
+            mockLessonContent = { introductionText: "Let's learn about " + requestBody.focusArea, mainExplanation: "This is the main explanation for " + requestBody.focusArea + ". It's very interesting!", examples: ["Example 1", "Example 2"], segments: [{title: "Part 1", explanation: "Detail 1", examples: ["SegEx1"]}]};
             break;
         case 'interactive-game':
             mockTitle = \`\${requestBody.focusArea} Game Challenge\`;
-            mockContent = { gameType: "multiple-choice-quiz", question: \`Mock Question: What is the capital of \${requestBody.focusArea} (if it's a place)?\`, options: ["Option 1", "Option 2", "Correct Answer", "Option 4"], correctAnswerIndex: 2, explanation: "The correct answer is Correct Answer because..." };
+            mockLessonContent = { gameType: "multiple-choice-quiz", question: \`Mock Question: What is the capital of \${requestBody.focusArea} (if it's a place)?\`, options: ["Option 1", "Option 2", "Correct Answer", "Option 4"], correctAnswerIndex: 2, explanation: "The correct answer is Correct Answer because..." };
             break;
         case 'application':
             mockTitle = \`Apply Your Knowledge: \${requestBody.focusArea}\`;
-            mockContent = { scenario: "Imagine a situation involving " + requestBody.focusArea + ".", task: "Your task is to solve problem X.", hints: ["Hint 1", "Hint 2"]};
+            mockLessonContent = { scenario: "Imagine a situation involving " + requestBody.focusArea + ".", task: "Your task is to solve problem X.", hints: ["Hint 1", "Hint 2"]};
             break;
         case 'creative-exploration':
             mockTitle = \`Get Creative with \${requestBody.focusArea}\`;
-            mockContent = { creativePrompt: "Create something amazing related to " + requestBody.focusArea + "!", guidelines: ["Be imaginative!", "Use what you've learned."]};
+            mockLessonContent = { creativePrompt: "Create something amazing related to " + requestBody.focusArea + "!", guidelines: ["Be imaginative!", "Use what you've learned."]};
             break;
         case 'summary':
             mockTitle = \`Summary of \${requestBody.focusArea}\`;
-            mockContent = { keyTakeaways: ["Key takeaway 1 for " + requestBody.focusArea, "Key takeaway 2"], nextStepsPreview: "Next, we'll explore...", finalEncouragement: "Great job learning about " + requestBody.focusArea + "!"};
+            mockLessonContent = { keyTakeaways: ["Key takeaway 1 for " + requestBody.focusArea, "Key takeaway 2"], nextStepsPreview: "Next, we'll explore...", finalEncouragement: "Great job learning about " + requestBody.focusArea + "!"};
+            break;
+        case 'simulation':
+            mockTitle = \`Simulation: \${requestBody.focusArea} Adventure\`;
+            // This needs to be SimulationActivityContent
+            mockLessonContent = {
+                simulationType: "business_operation", // Mocking one type
+                introductionText: \`Welcome to the "\${requestBody.focusArea}" Business Challenge! Manage your resources wisely.\`,
+                details: {
+                    simulationType: "business_operation",
+                    initialState: {
+                        businessName: \`\${requestBody.focusArea} Emporium\`,
+                        cash: { name: "Cash", value: 1000, unit: "$", description: "Your starting money." },
+                        inventory: {
+                            "widgets": { name: "Widgets", value: 50, unit: "units", description: "Popular items." },
+                            "gadgets": { name: "Gadgets", value: 30, unit: "units", description: "Newer items." }
+                        },
+                        reputation: { name: "Reputation", value: 5, min: 0, max: 10, description: "How customers see you." }
+                    },
+                    rulesSummary: [ {description: "Selling items increases cash. Running out of stock hurts reputation."} ],
+                    decisionPointsTemplates: [
+                        { id: "buy_stock", prompt: "Order more stock?", options: [{id: "widgets_10", text: "10 Widgets"}, {id: "gadgets_5", text: "5 Gadgets"}, {id: "none", text: "No stock for now"}] }
+                    ],
+                    successMetrics: [ {metricName: "Final Cash", targetValue: 1500, isHigherBetter: true} ]
+                }
+            };
             break;
         default:
-            mockContent = { text: \`This is mock content for \${requestBody.focusArea}. LLM not called.\` };
+            mockLessonContent = { text: \`This is mock content for \${requestBody.focusArea}. LLM not called.\` };
     }
 
     const mockResponse: DynamicContentResponse = {
         title: mockTitle,
-        content: mockContent
+        content: mockLessonContent // Use the correctly typed mock content here
     };
     // --- End Mock Response ---
 

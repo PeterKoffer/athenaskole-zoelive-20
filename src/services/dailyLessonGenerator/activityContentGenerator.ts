@@ -7,8 +7,14 @@ import {
     IntroductionContent,
     CreativeExplorationContent,
     SummaryContent,
-    ActivityType
+    ActivityType,
+    // Assuming SimulationActivityContent would be re-exported or available from LessonTypes eventually
+    // For now, we'll define a local reference or import directly if the path is known and stable.
+    // Let's assume it might be part of LessonActivityContent or a specific import:
+    LessonActivityContent as GenericLessonActivityContent // Use existing flexible type for now
 } from '@/components/education/components/types/LessonTypes';
+// If SimulationActivityContent is in its own file as created in a previous step:
+import type { SimulationActivityContent, BusinessSimContent, BasketballSimContent, EventSimContent, SimulationVariable } from '@/types/simulationContentTypes';
 import { StudentProgressData } from './types';
 import { supabase } from '@/integrations/supabase/client'; // Ensure Supabase client is imported
 
@@ -75,6 +81,9 @@ export class ActivityContentGenerator {
         case 'summary':
           aiResponse = await this.createSummaryContent(subject, focusArea, difficulty, gradeLevel, baseRequest);
           break;
+        case 'simulation':
+          aiResponse = await this.createSimulationContent(subject, focusArea, difficulty, gradeLevel, baseRequest);
+          break;
         default:
           console.warn(`Unknown activity type: ${activityType}. Using generic fallback.`);
           aiResponse = null;
@@ -89,37 +98,41 @@ export class ActivityContentGenerator {
     }
 
     console.warn(`Supabase function call failed or returned null/invalid data for ${activityType}. Using fallback content.`);
-    let fallbackContent: LessonActivityContent;
+    let fallbackLessonActivityContent: GenericLessonActivityContent; // Use the generic type for fallbacks
     let fallbackTitle = `${focusArea.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Session`;
 
     switch (activityType) {
         case 'introduction':
-          fallbackContent = this.createFallbackIntroductionContent(subject, focusArea, gradeLevel);
+          fallbackLessonActivityContent = this.createFallbackIntroductionContent(subject, focusArea, gradeLevel);
           fallbackTitle = `Welcome to ${focusArea.replace(/_/g, ' ')}`;
           break;
         case 'content-delivery':
-          fallbackContent = this.createFallbackContentDeliveryContent(subject, focusArea, gradeLevel);
+          fallbackLessonActivityContent = this.createFallbackContentDeliveryContent(subject, focusArea, gradeLevel);
           break;
         case 'interactive-game':
-          fallbackContent = this.createFallbackInteractiveGameContent(subject, focusArea, difficulty, gradeLevel);
+          fallbackLessonActivityContent = this.createFallbackInteractiveGameContent(subject, focusArea, difficulty, gradeLevel);
           break;
         case 'application':
-          fallbackContent = this.createFallbackApplicationContent(subject, focusArea, difficulty, gradeLevel);
+          fallbackLessonActivityContent = this.createFallbackApplicationContent(subject, focusArea, difficulty, gradeLevel);
           break;
         case 'creative-exploration':
-          fallbackContent = this.createFallbackCreativeExplorationContent(subject, focusArea, gradeLevel);
+          fallbackLessonActivityContent = this.createFallbackCreativeExplorationContent(subject, focusArea, gradeLevel);
           fallbackTitle = `Explore Your Creativity with ${focusArea.replace(/_/g, ' ')}`;
           break;
         case 'summary':
-          fallbackContent = this.createFallbackSummaryContent(subject, focusArea, gradeLevel);
+          fallbackLessonActivityContent = this.createFallbackSummaryContent(subject, focusArea, gradeLevel);
           fallbackTitle = `Reviewing ${focusArea.replace(/_/g, ' ')}`;
           break;
+        case 'simulation':
+          fallbackLessonActivityContent = this.createFallbackSimulationContent(subject, focusArea, difficulty, gradeLevel);
+          fallbackTitle = `Simulation: ${focusArea.replace(/_/g, ' ')} Challenge`;
+          break;
         default:
-          fallbackContent = { genericPlaceholder: `No content available for unknown type: ${activityType}` };
+          fallbackLessonActivityContent = { genericPlaceholder: `No content available for unknown type: ${activityType}` };
           break;
     }
 
-    return { content: fallbackContent, title: fallbackTitle };
+    return { content: fallbackLessonActivityContent, title: fallbackTitle };
   }
 
   static async createCurriculumActivity(
@@ -171,9 +184,17 @@ export class ActivityContentGenerator {
     if (data && data.content) {
       // Basic validation: ensure 'content' is an object. More specific checks could be added.
       if (typeof data.content !== 'object' || data.content === null) {
-        console.warn(`Unexpected content structure (not an object or null) from Supabase function for ${request.activityType}:`, data);
+      console.warn(`Unexpected content structure (content not an object or null) from Supabase function for ${request.activityType}:`, data);
         return null;
       }
+    // Further validation for simulation type
+    if (request.activityType === 'simulation') {
+      const simContent = data.content as SimulationActivityContent;
+      if (!simContent.simulationType || !simContent.details || typeof simContent.details !== 'object') {
+        console.warn(`Invalid SimulationActivityContent structure from Supabase for ${request.activityType}:`, data);
+        return null;
+      }
+    }
       return data as DynamicContentResponse;
     } else {
       console.warn(`Unexpected response structure (no data or data.content missing) from Supabase function for ${request.activityType}:`, data);
@@ -254,7 +275,18 @@ export class ActivityContentGenerator {
     return this.invokeNelieContentFunction(request);
   }
 
-  // --- Fallback Content Creation Methods (Remain Unchanged) ---
+  private static async createSimulationContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number, baseRequest: DynamicContentRequest): Promise<DynamicContentResponse | null> {
+    const promptDetails = {
+      ...NELIE_PERSONA_PROMPT_DETAILS,
+      requestType: 'interactive-simulation-setup',
+      // Include theme or context if available in focusArea or baseRequest for better simulation type inference by AI
+      themeHint: focusArea, // The Supabase function's prompt will use this to guide simulationType
+    };
+    const request: DynamicContentRequest = { ...baseRequest, activityType: 'simulation', promptDetails };
+    return this.invokeNelieContentFunction(request);
+  }
+
+  // --- Fallback Content Creation Methods ---
   private static createFallbackIntroductionContent(subject: string, focusArea: string, gradeLevel: number): IntroductionContent {
     return {
       hook: `Get ready to explore the amazing world of ${focusArea.replace(/_/g, ' ')}! It's more exciting than you think!`,
@@ -346,6 +378,47 @@ export class ActivityContentGenerator {
       ],
       nextStepsPreview: `Guess what? Next time, we'll see how ${focusArea.replace(/_/g, ' ')} helps us understand even cooler things!`,
       finalEncouragement: `You did an absolutely fantastic job today exploring ${focusArea.replace(/_/g, ' ')}! NELIE is so proud of your effort. Keep learning and stay curious!`,
+    };
+  }
+
+  private static createFallbackSimulationContent(subject: string, focusArea: string, difficulty: number, gradeLevel: number): SimulationActivityContent {
+    // For fallback, let's create a very simple 'business_operation' simulation
+    const simFocus = focusArea.replace(/_/g, ' ') || "My Cool Venture";
+    return {
+      simulationType: "business_operation",
+      title: `Mini Business Challenge: ${simFocus}`,
+      introductionText: `Welcome to your very own "\${simFocus}"! Let's see how you manage it. You have a small budget to start.`,
+      details: {
+        simulationType: "business_operation", // Ensure this matches the outer simulationType
+        initialState: {
+          businessName: simFocus,
+          cash: { name: "Cash", value: 100, unit: "$", description: "Your starting money." },
+          inventory: {
+            "itemA": { name: "Item A", value: 10, unit: "units", description: "A basic item to sell." }
+          },
+          reputation: { name: "Reputation", value: 5, min: 0, max: 10, description: "Customer happiness." }
+        },
+        rulesSummary: [
+          {description: "Selling items increases cash."},
+          {description: "Buying more items costs cash."}
+        ],
+        decisionPointsTemplates: [
+          {
+            id: "day1_decision",
+            prompt: "It's Day 1! What will you do?",
+            options: [
+              {id: "buy_5_itemA", text: "Buy 5 more Item A (Cost: $25)"},
+              {id: "advertise_small", text: "Small advertisement (Cost: $10)"},
+              {id: "do_nothing", text: "Do nothing today"}
+            ]
+          }
+        ],
+        successMetrics: [
+          {metricName: "End Day with Cash > $80", isHigherBetter: true},
+          {metricName: "Reputation > 4", isHigherBetter: true}
+        ],
+        simulatedDuration: 1 // e.g., 1 day for this simple fallback
+      }
     };
   }
 

@@ -1,16 +1,24 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Added React for FC type
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea'; // Added for input fields
+import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Volume2, VolumeX, Play, Pause, Home } from 'lucide-react';
 import ClassroomEnvironment from '../shared/ClassroomEnvironment';
 import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity, IntroductionContent, ContentDeliveryContent, InteractiveGameContent, ApplicationContent, CreativeExplorationContent, SummaryContent } from '../types/LessonTypes';
 
+// Imports for Simulation
+import GameEngine, { GameConfig, GameState, GameActions } from '@/components/games/GameEngine'; // Assuming GameEngine path
+import SimulationActivityDisplay from '@/components/simulations/SimulationActivityDisplay'; // Assuming path
+import { SimulationActivityContent } from '@/types/simulationContentTypes'; // Assuming path
+
 interface UniversalLearningMainContentProps {
   subject: string;
   skillArea: string;
   studentName: string;
+  // For GameConfig, assuming these might come from a higher-level context or props
+  gradeLevelMin?: number;
+  gradeLevelMax?: number;
   timeElapsed: number;
   targetLessonLength: number;
   score: number;
@@ -26,10 +34,12 @@ interface UniversalLearningMainContentProps {
   onActivityComplete: (result: any) => void;
 }
 
-const UniversalLearningMainContent = ({
+const UniversalLearningMainContent: React.FC<UniversalLearningMainContentProps> = ({ // Added React.FC
   subject,
   skillArea,
   studentName,
+  gradeLevelMin = 3, // Defaulting if not provided
+  gradeLevelMax = 5, // Defaulting if not provided
   timeElapsed,
   targetLessonLength,
   score,
@@ -295,11 +305,90 @@ const UniversalLearningMainContent = ({
           </div>
         );
 
+      case 'simulation':
+        const simActivityContent = content as SimulationActivityContent;
+        if (!simActivityContent || !simActivityContent.details || !simActivityContent.simulationType) {
+          return (
+            <div className="text-red-500 p-4">
+              Error: Simulation content is missing or malformed for activity: {currentActivity.title}.
+              <Button onClick={() => onActivityComplete({ error: 'malformed_simulation_content' })} className="mt-4">Skip Activity</Button>
+            </div>
+          );
+        }
+
+        const gameConfigForSim: GameConfig = {
+          id: currentActivity.id + '_sim_game', // Unique ID for this game instance
+          title: simActivityContent.title || currentActivity.title || 'Simulation Challenge',
+          subject: subject,
+          interactionType: 'simulation', // Crucial: tells GameEngine this is a simulation
+          difficulty: currentActivity.metadata?.difficulty || 3,
+          gradeLevel: [gradeLevelMin, gradeLevelMax],
+          objectives: [simActivityContent.introductionText || 'Complete the simulation successfully.'],
+          maxScore: 1000,
+          timeLimit: currentActivity.duration,
+          adaptiveRules: {
+            successThreshold: 0.7, // Example: 70% of maxScore or specific sim success
+            failureThreshold: 0.3,
+            difficultyIncrease: 1,
+            difficultyDecrease: 1,
+          },
+          // other metadata can be passed if GameConfig supports it
+        };
+
+        return (
+          <div className="w-full mx-auto relative" style={{ minHeight: '500px' /* Ensure GameEngine has space */ }}>
+            <GameEngine
+              gameConfig={gameConfigForSim}
+              onComplete={(finalScore, achievements) => {
+                console.log('Simulation completed via GameEngine!', { finalScore, achievements });
+                // Determine success based on simulation's own metrics or score vs objectives
+                const success = simActivityContent.details.successMetrics ?
+                  simActivityContent.details.successMetrics.every(metric => {
+                    // This logic would need access to final simState from gameState.gameData
+                    // For now, let's assume finalScore reflects overall success
+                    return finalScore >= (gameConfigForSim.adaptiveRules?.successThreshold || 0.7) * gameConfigForSim.maxScore;
+                  })
+                  : finalScore >= (gameConfigForSim.adaptiveRules?.successThreshold || 0.7) * gameConfigForSim.maxScore;
+
+                onActivityComplete({ success: success, score: finalScore, achievements });
+              }}
+              onBack={() => {
+                console.log('Simulation backed out via GameEngine.');
+                // Decide how to handle "back" from a simulation - e.g., mark as incomplete or allow resume?
+                onActivityComplete({ success: false, status: 'backed_out' });
+              }}
+              // Pass the lessonActivity for SimulationActivityDisplay to use
+              // GameEngine might need a way to pass this through to its children function
+              // For now, we assume SimulationActivityDisplay can access it if GameEngine exposes it or if we pass it directly.
+              // Let's assume GameEngine's children render prop gets the full currentActivity or specific parts.
+              // The SimulationActivityDisplay expects lessonActivity directly.
+              // So GameEngine needs to make this available to its child function.
+              // This might require a small adjustment to GameEngine's children render prop signature
+              // if it doesn't already pass through arbitrary context or the activity object.
+              // For this subtask, we'll assume GameEngine's child function can receive `lessonActivity`
+              // or GameEngine itself takes `currentLessonActivity` prop.
+              // Simplest is to assume GameEngine's children render prop provides gameState and gameActions
+              // and SimulationActivityDisplay uses currentActivity from its own closure.
+            >
+              {(gameState: GameState, gameActions: GameActions) => (
+                <SimulationActivityDisplay
+                  gameState={gameState}
+                  gameActions={gameActions}
+                  gameConfig={gameConfigForSim}
+                  lessonActivity={currentActivity} // Pass the full LessonActivity
+                />
+              )}
+            </GameEngine>
+          </div>
+        );
+
       default:
+        // This default case should ideally not be reached if all ActivityTypes are handled.
+        console.warn("Unhandled activity type in renderActivityContent:", type);
         return (
           <div className="text-center text-white">
-            <p>Activity content not available for type: {type}.</p>
-            <Button onClick={() => onActivityComplete({})} className="mt-4">Continue</Button>
+            <p>Cannot display activity of type: {type}.</p>
+            <Button onClick={() => onActivityComplete({ error: 'unknown_type' })} className="mt-4">Skip</Button>
           </div>
         );
     }

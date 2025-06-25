@@ -1,8 +1,33 @@
 
+// import type { SimulationActivityContent } from '../../../../types/simulationContentTypes'; // Path to be adjusted if used for discriminated union
+
+export type ActivityType =
+  | 'introduction'
+  | 'content-delivery'
+  | 'interactive-game'
+  | 'application'
+  | 'creative-exploration'
+  | 'summary'
+  | 'quiz'
+  | 'simulation' // 'simulation' type is included here
+  | 'adventure-game';
+
+// If LessonActivity.content were to become a discriminated union:
+// export type LessonSpecificContent =
+//   | IntroductionContent // Assuming this and others below are defined or imported
+//   | ContentDeliveryContent
+//   | InteractiveGameContent
+//   | ApplicationContent
+//   | CreativeExplorationContent
+//   | SummaryContent
+//   | QuizContent
+//   | SimulationActivityContent // This would be added to the union
+//   | AdventureGameContent;
+
 export interface LessonActivity {
   id: string;
-  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'adventure-game';
-  phase: 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary' | 'quiz' | 'simulation' | 'adventure-game';
+  type: ActivityType; // Using the defined ActivityType union
+  phase: ActivityType; // Using the defined ActivityType union for phase as well
   title: string;
   duration: number;
   phaseDescription: string;
