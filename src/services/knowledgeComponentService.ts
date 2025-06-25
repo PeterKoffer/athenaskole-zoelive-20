@@ -22,7 +22,7 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
     // For now, we're using the imported JSON.
     // Simulate async loading
     await Promise.resolve();
-
+    
     this.kcs = mockKcsData as KnowledgeComponent[];
     this.kcs.forEach(kc => this.kcsById.set(kc.id, kc));
     this.isInitialized = true;
