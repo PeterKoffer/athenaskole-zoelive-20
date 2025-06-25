@@ -269,12 +269,12 @@ class LearnerProfileService implements ILearnerProfileService {
     if (!userId) throw new Error("User ID is required for recommendations.");
     const profile = await this.getProfile(userId);
     
-    const allKcs = await knowledgeComponentService.searchKcs('');
+    const allKcs = await knowledgeComponentService.searchKcs(''); 
     
     const potentialKcs = allKcs.filter(kc => {
       const mastery = profile.kcMasteryMap[kc.id];
-      if (!mastery) return true;
-      return mastery.masteryLevel < 0.8;
+      if (!mastery) return true; 
+      return mastery.masteryLevel < 0.8; 
     });
 
     potentialKcs.sort((a, b) => {
