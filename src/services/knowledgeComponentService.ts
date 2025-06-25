@@ -21,7 +21,7 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
     // In a real application, this might fetch from a database or API
     // For now, we're using the imported JSON.
     // Simulate async loading
-    await Promise.resolve();
+    await Promise.resolve(); 
     
     this.kcs = mockKcsData as KnowledgeComponent[];
     this.kcs.forEach(kc => this.kcsById.set(kc.id, kc));
@@ -58,8 +58,8 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
 
   async getKcsBySubjectAndGrade(subject: string, gradeLevel: number): Promise<KnowledgeComponent[]> {
     await this.ensureInitialized();
-    return this.kcs.filter(kc =>
-      kc.subject.toLowerCase() === subject.toLowerCase() &&
+    return this.kcs.filter(kc => 
+      kc.subject.toLowerCase() === subject.toLowerCase() && 
       kc.gradeLevels.includes(gradeLevel)
     );
   }
@@ -78,7 +78,7 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
     const lowerQuery = query.toLowerCase();
     if (!lowerQuery) return [];
 
-    return this.kcs.filter(kc =>
+    return this.kcs.filter(kc => 
       kc.name.toLowerCase().includes(lowerQuery) ||
       kc.description?.toLowerCase().includes(lowerQuery) ||
       kc.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
