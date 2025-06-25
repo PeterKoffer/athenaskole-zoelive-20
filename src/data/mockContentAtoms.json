@@ -1,0 +1,141 @@
+[
+  {
+    "id": "atom_expl_fraction_intro_1",
+    "atomType": "TEXT_EXPLANATION",
+    "knowledgeComponentIds": ["kc_math_g3_understand_fractions_unit"],
+    "content": {
+      "text": "A fraction represents a part of a whole. When we talk about a 'unit fraction', like 1/4, it means we have 1 part out of 4 equal parts that make up the whole. Imagine a pizza cut into 4 equal slices; one slice is 1/4 of the pizza!"
+    },
+    "metadata": {
+      "difficulty": 0.2,
+      "estimatedInteractionTimeSeconds": 30,
+      "worldviewTags": ["Secular"],
+      "culturalContextTags": ["General"],
+      "learningObjective": "Understand the concept of a unit fraction.",
+      "interactionStyle": "passive",
+      "bloomsTaxonomyLevel": "Understand",
+      "suitabilityForNelieVoice": true
+    },
+    "version": 1
+  },
+  {
+    "id": "atom_img_fraction_pizza_1_4",
+    "atomType": "IMAGE",
+    "knowledgeComponentIds": ["kc_math_g3_understand_fractions_unit"],
+    "content": {
+      "url": "/public/placeholder.svg",
+      "altText": "A pizza cut into 4 equal slices with one slice highlighted.",
+      "caption": "This shows 1/4 of a pizza."
+    },
+    "metadata": {
+      "difficulty": 0.1,
+      "estimatedInteractionTimeSeconds": 10,
+      "worldviewTags": ["Secular"],
+      "culturalContextTags": ["General"],
+      "interactionStyle": "passive"
+    },
+    "version": 1
+  },
+  {
+    "id": "atom_qmc_identify_unit_fraction_1",
+    "atomType": "QUESTION_MULTIPLE_CHOICE",
+    "knowledgeComponentIds": ["kc_math_g3_understand_fractions_unit"],
+    "content": {
+      "questionText": "Which of these shapes shows 1/3 shaded?",
+      "options": [
+        { "id": "opt_a", "text": "Shape A (1 out of 2 parts shaded)", "isCorrect": false, "feedbackIfSelected": "Not quite! Count how many equal parts the whole is divided into." },
+        { "id": "opt_b", "text": "Shape B (1 out of 3 parts shaded)", "isCorrect": true, "feedbackIfSelected": "That's right!" },
+        { "id": "opt_c", "text": "Shape C (1 out of 4 parts shaded)", "isCorrect": false, "feedbackIfSelected": "Close! Check the total number of equal parts." }
+      ],
+      "correctFeedback": "Excellent! You correctly identified the shape showing 1/3.",
+      "generalIncorrectFeedback": "Hmm, take another look. Remember, 1/3 means one part out of three equal parts."
+    },
+    "metadata": {
+      "difficulty": 0.3,
+      "estimatedInteractionTimeSeconds": 45,
+      "worldviewTags": ["Secular"],
+      "culturalContextTags": ["General"],
+      "interactionStyle": "active_input",
+      "bloomsTaxonomyLevel": "Apply"
+    },
+    "version": 1
+  },
+  {
+    "id": "atom_expl_adding_like_denom_1",
+    "atomType": "TEXT_EXPLANATION",
+    "knowledgeComponentIds": ["kc_math_g4_add_fractions_likedenom"],
+    "content": {
+      "text": "When adding fractions that have the same denominator (the bottom number), it's like adding pieces of the same size. You just add the numerators (the top numbers) and keep the denominator the same. For example, 1/5 + 2/5 = (1+2)/5 = 3/5."
+    },
+    "metadata": {
+      "difficulty": 0.4,
+      "estimatedInteractionTimeSeconds": 40,
+      "worldviewTags": ["Secular"],
+      "culturalContextTags": ["General"],
+      "learningObjective": "Understand how to add fractions with like denominators.",
+      "interactionStyle": "passive",
+      "bloomsTaxonomyLevel": "Understand",
+      "suitabilityForNelieVoice": true
+    },
+    "version": 1
+  },
+  {
+    "id": "atom_qmc_add_like_denom_easy_1",
+    "atomType": "QUESTION_MULTIPLE_CHOICE",
+    "knowledgeComponentIds": ["kc_math_g4_add_fractions_likedenom"],
+    "content": {
+      "questionText": "What is 2/7 + 3/7?",
+      "options": [
+        { "id": "opt_a", "text": "5/14", "isCorrect": false, "feedbackIfSelected": "Remember, when the denominators are the same, we don't add them together." },
+        { "id": "opt_b", "text": "5/7", "isCorrect": true },
+        { "id": "opt_c", "text": "6/7", "isCorrect": false, "feedbackIfSelected": "Double-check your addition of the numerators." }
+      ],
+      "correctFeedback": "Great job! That's exactly how you add fractions with the same denominator.",
+      "generalIncorrectFeedback": "Not quite. When denominators are the same, just add the numerators."
+    },
+    "metadata": {
+      "difficulty": 0.45,
+      "estimatedInteractionTimeSeconds": 50,
+      "worldviewTags": ["Secular"],
+      "culturalContextTags": ["General"],
+      "interactionStyle": "active_input",
+      "bloomsTaxonomyLevel": "Apply"
+    },
+    "version": 1
+  },
+  {
+    "id": "atom_narrative_fraction_quest_start_1",
+    "atomType": "NARRATIVE_PROMPT",
+    "knowledgeComponentIds": ["kc_math_g3_understand_fractions_unit", "kc_math_g4_add_fractions_likedenom"],
+    "content": {
+      "promptForNelie": "Start a fun quest where the student needs to help a character (e.g., a friendly robot or animal) collect fractional parts of a special energy crystal. Introduce the idea that understanding fractions is key to succeeding in the quest."
+    },
+    "metadata": {
+      "estimatedInteractionTimeSeconds": 20,
+      "worldviewTags": ["Secular", "Christian"],
+      "culturalContextTags": ["General", "Urban"],
+      "suitabilityForNelieVoice": true,
+      "visualGenerationHints": ["friendly robot character", "glowing crystal pieces"]
+    },
+    "version": 1
+  },
+  {
+    "id": "atom_ela_main_idea_expl_1",
+    "atomType": "TEXT_EXPLANATION",
+    "knowledgeComponentIds": ["kc_ela_g4_main_idea_details"],
+    "content": {
+      "text": "The main idea of a story or paragraph is what it's mostly about. Supporting details are facts or examples that tell you more about the main idea. Think of the main idea as the tabletop and the supporting details as the legs holding it up!"
+    },
+    "metadata": {
+      "difficulty": 0.3,
+      "estimatedInteractionTimeSeconds": 35,
+      "worldviewTags": ["Secular"],
+      "culturalContextTags": ["General"],
+      "learningObjective": "Define main idea and supporting details.",
+      "interactionStyle": "passive",
+      "bloomsTaxonomyLevel": "Understand",
+      "suitabilityForNelieVoice": true
+    },
+    "version": 1
+  }
+]
