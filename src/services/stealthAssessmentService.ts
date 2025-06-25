@@ -13,16 +13,23 @@ import {
   // Import other specific event types as needed
 } from '@/types/stealthAssessment';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client'; // Import Supabase client
 
 // Placeholder for user context - in a real app, this would come from an auth service
 // For now, we'll mock it.
-const getCurrentUserId = (): string => {
-  // TODO: Replace with actual user ID from auth context
-  return 'mockUser123';
+// TODO: Replace with actual user ID from Supabase auth context (e.g., supabase.auth.getUser())
+const getCurrentUserId = async (): Promise<string | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    return user.id;
+  }
+  console.warn('StealthAssessmentService: No authenticated user found. Using mockUser123 for now.');
+  return 'mockUser123'; // Fallback to mock if no user, or handle error
 };
+
 const getCurrentSessionId = (): string | undefined => {
-  // TODO: Replace with actual session ID from session context
-  return 'mockSession456';
+  // TODO: Implement actual session ID management if needed, or get from context
+  return 'mockSession456'; // Placeholder
 }
 
 class StealthAssessmentService implements IStealthAssessmentService {
@@ -30,6 +37,7 @@ class StealthAssessmentService implements IStealthAssessmentService {
   private eventQueue: InteractionEvent[] = [];
   private flushInterval: number = 5000; // Flush queue every 5 seconds
   private flushTimerId?: NodeJS.Timeout;
+  private isFlushing = false; // To prevent concurrent flushes
 
   constructor() {
     this.init();
@@ -38,74 +46,73 @@ class StealthAssessmentService implements IStealthAssessmentService {
   private init(): void {
     if (this.isInitialized) return;
     console.log('StealthAssessmentService: Initializing...');
-    // In a real scenario, this might connect to a WebSocket or initialize API clients
-    // For now, we'll set up a mock queue flusher
     this.flushTimerId = setInterval(() => this.flushEventQueue(), this.flushInterval);
     this.isInitialized = true;
     console.log('StealthAssessmentService: Initialized.');
   }
 
-  private generateEventMetadata(sourceComponentId?: string): Omit<BaseInteractionEvent, 'userId'> {
+  private generateEventMetadata(sourceComponentId?: string): Omit<BaseInteractionEvent, 'userId' | 'timestamp' | 'eventId'> {
+    // eventId and timestamp will be generated per event to ensure uniqueness if batched
     return {
-      eventId: uuidv4(),
-      timestamp: Date.now(),
       sessionId: getCurrentSessionId(),
       sourceComponentId,
     };
   }
 
   public async logEvent(
-    eventData: Omit<InteractionEvent, 'eventId' | 'timestamp' | 'userId' | 'sessionId'>,
+    eventData: Omit<InteractionEvent, 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, // Adjusted Omit
     sourceComponentId?: string
   ): Promise<void> {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId(); // Now async
     if (!userId) {
       console.warn('StealthAssessmentService: No user ID found. Event not logged.');
       return;
     }
 
     const fullEvent: InteractionEvent = {
-      ...this.generateEventMetadata(sourceComponentId),
+      eventId: uuidv4(), // Generate unique ID for each event
+      timestamp: Date.now(), // Current timestamp for each event
       userId,
+      sessionId: getCurrentSessionId(), // Add sessionId here
+      sourceComponentId, // Add sourceComponentId here
       ...eventData,
-    } as InteractionEvent; // Type assertion needed due to Omit complexity
+    } as InteractionEvent; // Type assertion might still be needed
 
     this.eventQueue.push(fullEvent);
-    console.log('StealthAssessmentService: Event logged to queue:', fullEvent);
+    console.log('StealthAssessmentService: Event logged to queue:', fullEvent.type, fullEvent.eventId);
 
-    // Optional: Immediate flush if queue size exceeds a threshold
-    if (this.eventQueue.length >= 10) {
+    if (this.eventQueue.length >= 10) { // Trigger immediate flush if queue is large
       await this.flushEventQueue();
     }
   }
 
   // Specific helper methods
-  public async logQuestionAttempt(details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId'>, sourceComponentId?: string): Promise<void> {
+  public async logQuestionAttempt(details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
     await this.logEvent({ type: InteractionEventType.QUESTION_ATTEMPT, ...details }, sourceComponentId);
   }
 
-  public async logHintUsage(details: Omit<HintUsageEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId'>, sourceComponentId?: string): Promise<void> {
+  public async logHintUsage(details: Omit<HintUsageEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
     await this.logEvent({ type: InteractionEventType.HINT_USAGE, ...details }, sourceComponentId);
   }
 
-  public async logGameInteraction(details: Omit<GameInteractionEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId'>, sourceComponentId?: string): Promise<void> {
+  public async logGameInteraction(details: Omit<GameInteractionEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
     await this.logEvent({ type: InteractionEventType.GAME_INTERACTION, ...details }, sourceComponentId);
   }
 
-  public async logTutorQuery(details: Omit<TutorQueryEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId'>, sourceComponentId?: string): Promise<void> {
+  public async logTutorQuery(details: Omit<TutorQueryEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
     await this.logEvent({ type: InteractionEventType.TUTOR_QUERY, ...details }, sourceComponentId);
   }
 
-  public async logContentView(details: Omit<ContentViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId'>, sourceComponentId?: string): Promise<void> {
+  public async logContentView(details: Omit<ContentViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
     await this.logEvent({ type: InteractionEventType.CONTENT_VIEW, ...details }, sourceComponentId);
   }
 
-  // TODO: Add other specific helper methods from IStealthAssessmentService as needed
 
   private async flushEventQueue(): Promise<void> {
-    if (this.eventQueue.length === 0) {
+    if (this.eventQueue.length === 0 || this.isFlushing) {
       return;
     }
+    this.isFlushing = true;
 
     const eventsToFlush = [...this.eventQueue];
     this.eventQueue = [];
@@ -113,14 +120,38 @@ class StealthAssessmentService implements IStealthAssessmentService {
     console.log(`StealthAssessmentService: Flushing ${eventsToFlush.length} events...`);
 
     try {
-      // In a real implementation, this would send events to a backend (e.g., Supabase)
-      // For now, we just log them as "sent"
-      // Example: await supabase.from('interaction_events').insert(eventsToFlush);
-      console.log('StealthAssessmentService: Events successfully "sent" to backend (mocked):', eventsToFlush);
+      const recordsToInsert = eventsToFlush.map(event => ({
+        event_id: event.eventId,
+        user_id: event.userId,
+        session_id: event.sessionId,
+        timestamp: new Date(event.timestamp).toISOString(), // Ensure ISO string for timestamptz
+        event_type: event.type,
+        source_component_id: event.sourceComponentId,
+        event_data: event, // Store the whole event object in event_data JSONB
+        // Denormalized fields for easier querying (extract from event object)
+        question_id: (event as QuestionAttemptEvent).questionId || undefined,
+        kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || undefined,
+        is_correct: (event as QuestionAttemptEvent).isCorrect, // Might be undefined if not QuestionAttemptEvent
+        game_id: (event as GameInteractionEvent).gameId || undefined,
+        content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
+      }));
+
+      const { data, error } = await supabase
+        .from('interaction_events')
+        .insert(recordsToInsert);
+
+      if (error) {
+        console.error('StealthAssessmentService: Supabase error flushing event queue:', error);
+        // Re-queue events on failure
+        this.eventQueue.unshift(...eventsToFlush);
+      } else {
+        console.log(`StealthAssessmentService: Successfully flushed ${eventsToFlush.length} events to Supabase.`);
+      }
     } catch (error) {
-      console.error('StealthAssessmentService: Error flushing event queue:', error);
-      // Handle error, e.g., re-queue events, implement retry logic
-      this.eventQueue.unshift(...eventsToFlush); // Add back to front for retry
+      console.error('StealthAssessmentService: Exception during event queue flush:', error);
+      this.eventQueue.unshift(...eventsToFlush); // Re-queue on exception
+    } finally {
+      this.isFlushing = false;
     }
   }
 
@@ -128,7 +159,8 @@ class StealthAssessmentService implements IStealthAssessmentService {
     if (this.flushTimerId) {
       clearInterval(this.flushTimerId);
     }
-    this.flushEventQueue(); // Final flush before destroying
+    // Attempt a final flush, but don't wait indefinitely if it's a browser context closing
+    this.flushEventQueue().catch(err => console.error("Error on final flush:", err));
     this.isInitialized = false;
     console.log('StealthAssessmentService: Destroyed.');
   }
@@ -137,30 +169,3 @@ class StealthAssessmentService implements IStealthAssessmentService {
 // Export a singleton instance of the service
 const stealthAssessmentService = new StealthAssessmentService();
 export default stealthAssessmentService;
-
-// Example Usage (typically in a component):
-// import stealthAssessmentService from '@/services/stealthAssessmentService';
-//
-// // In some component method or useEffect:
-// stealthAssessmentService.logQuestionAttempt({
-//   questionId: 'q1',
-//   knowledgeComponentIds: ['kc_add_fractions'],
-//   answerGiven: '3/4',
-//   isCorrect: true,
-//   attemptsMade: 1,
-//   timeTakenMs: 15000
-// }, 'MyQuestionComponent_Instance1');
-//
-// stealthAssessmentService.logGameInteraction({
-//   gameId: 'fraction_pizza_game',
-//   knowledgeComponentIds: ['kc_visual_fractions'],
-//   interactionType: 'SLICE_PLACED',
-//   interactionValue: { slice: '1/4', target: '2/4_pizza' },
-//   scoreChange: 10
-// }, 'PizzaGameComponent_Main');
-
-// Remember to handle service destruction if used in a context that can be unmounted,
-// e.g., in a React context provider's cleanup effect.
-// For a global singleton like this, it might be destroyed when the app closes,
-// but that's harder to manage in a frontend JS environment.
-// For now, we assume it lives as long as the app.
