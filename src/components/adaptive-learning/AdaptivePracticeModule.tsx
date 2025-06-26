@@ -15,8 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
 
-// MOCK USER ID - Replace with actual user ID from auth context later
-const MOCK_USER_ID = 'mockUser123';
+// MOCK USER ID - Using a proper UUID format for testing
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 const AdaptivePracticeModule: React.FC = () => {
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
