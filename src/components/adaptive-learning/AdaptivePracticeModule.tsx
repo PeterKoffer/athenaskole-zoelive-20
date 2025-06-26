@@ -37,6 +37,7 @@ const AdaptivePracticeModule: React.FC = () => {
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(profile);
       console.log("AdaptivePracticeModule: Learner profile loaded:", profile);
+      setIsLoading(false);
     } catch (err) {
       console.error("AdaptivePracticeModule: Error loading learner profile:", err);
       setError("Failed to load learner profile. Please try again.");
