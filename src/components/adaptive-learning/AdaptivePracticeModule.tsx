@@ -1,4 +1,3 @@
-
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import learnerProfileService from '@/services/learnerProfileService';
@@ -83,7 +82,7 @@ const AdaptivePracticeModule: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []); // Remove sessionKcs from dependencies to prevent infinite loop
+  }, []);
 
   useEffect(() => {
     console.log("AdaptivePracticeModule: Initializing...");
@@ -96,7 +95,7 @@ const AdaptivePracticeModule: React.FC = () => {
       const excludedKcIds = sessionKcs.map(kc => kc.id);
       recommendAndLoadNextKc(learnerProfile, excludedKcIds);
     }
-  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc]); // Remove sessionKcs from dependencies
+  }, [learnerProfile, currentKc, isLoading, error]);
 
   const handleNextAtom = () => {
     setShowFeedback(false); 
