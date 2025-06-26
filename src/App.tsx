@@ -1,5 +1,5 @@
 import AdaptivePracticeTestPage from './pages/AdaptivePracticeTestPage'; // Adjust path if App.tsx is not in src/
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'; // Added useNavigate
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Removed useNavigate
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
