@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
@@ -26,8 +25,8 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
     if (onGetStarted) {
       onGetStarted();
     } else {
-      // Navigate directly to mathematics learning
-      navigate("/learn/mathematics");
+      // Navigate to the adaptive practice test page
+      navigate("/adaptive-practice-test");
     }
   };
 
