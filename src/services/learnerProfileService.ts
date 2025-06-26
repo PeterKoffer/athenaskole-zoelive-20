@@ -1,3 +1,4 @@
+
 // src/services/learnerProfileService.ts
 
 import {
@@ -21,6 +22,12 @@ const getCurrentUserId = async (): Promise<string | null> => {
   return null; // Indicate no user
 };
 
+// Helper function to safely parse JSON data from Supabase
+const safeJsonParse = <T>(data: any, defaultValue: T): T => {
+  if (data === null || data === undefined) return defaultValue;
+  if (typeof data === 'object') return data as T;
+  return defaultValue;
+};
 
 class LearnerProfileService implements ILearnerProfileService {
   
@@ -56,7 +63,7 @@ class LearnerProfileService implements ILearnerProfileService {
           attempts: km.attempts,
           correctAttempts: km.correct_attempts,
           lastAttemptedTimestamp: km.last_attempted_timestamp ? new Date(km.last_attempted_timestamp).getTime() : undefined,
-          history: km.history || [],
+          history: safeJsonParse<Array<{ timestamp: number; eventType: string; score?: number; details?: any }>>(km.history, []),
         };
       });
 
@@ -65,7 +72,7 @@ class LearnerProfileService implements ILearnerProfileService {
         overallMastery: existingProfileData.overall_mastery || undefined,
         currentLearningFocusKcs: existingProfileData.current_learning_focus_kcs || undefined,
         suggestedNextKcs: existingProfileData.suggested_next_kcs || undefined,
-        preferences: existingProfileData.preferences || { learningPace: 'medium', learningStyle: 'mixed' },
+        preferences: safeJsonParse(existingProfileData.preferences, { learningPace: 'medium' as const, learningStyle: 'mixed' as const }),
         lastUpdatedTimestamp: new Date(existingProfileData.last_updated_timestamp).getTime(),
         kcMasteryMap,
       };
@@ -93,7 +100,7 @@ class LearnerProfileService implements ILearnerProfileService {
     return {
       userId: createdProfile.user_id,
       kcMasteryMap: {},
-      preferences: createdProfile.preferences || { learningPace: 'medium', learningStyle: 'mixed' },
+      preferences: safeJsonParse(createdProfile.preferences, { learningPace: 'medium' as const, learningStyle: 'mixed' as const }),
       lastUpdatedTimestamp: new Date(createdProfile.last_updated_timestamp).getTime(),
     };
   }
@@ -237,7 +244,7 @@ class LearnerProfileService implements ILearnerProfileService {
       attempts: data.attempts,
       correctAttempts: data.correct_attempts,
       lastAttemptedTimestamp: data.last_attempted_timestamp ? new Date(data.last_attempted_timestamp).getTime() : undefined,
-      history: data.history || [],
+      history: safeJsonParse<Array<{ timestamp: number; eventType: string; score?: number; details?: any }>>(data.history, []),
     };
   }
 
