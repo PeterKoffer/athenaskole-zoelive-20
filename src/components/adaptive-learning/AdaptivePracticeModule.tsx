@@ -1,14 +1,14 @@
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { learnerProfileService } from '@/services/learnerProfileService';
-import { knowledgeComponentService } from '@/services/knowledgeComponentService';
-import { aiCreativeDirectorService } from '@/services/aiCreativeDirectorService';
-import { stealthAssessmentService } from '@/services/stealthAssessmentService';
-import type { LearnerProfile, KnowledgeComponent } from '@/types/learner';
+import learnerProfileService from '@/services/learnerProfileService';
+import knowledgeComponentService from '@/services/knowledgeComponentService';
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
+import stealthAssessmentService from '@/services/stealthAssessmentService';
+import type { LearnerProfile, KcMastery } from '@/types/learner';
 import type { AtomSequence, ContentAtom } from '@/types/content';
 import type { QuestionAttemptEvent, InteractionEventType } from '@/types/interaction';
-import TextExplanationAtom from './atoms/TextExplanationAtom'; // Verify this path
-import QuestionCard from './cards/QuestionCard'; // Verify this path
+import TextExplanationAtom from './atoms/TextExplanationAtom';
+import QuestionCard from './cards/QuestionCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
@@ -18,12 +18,12 @@ const MOCK_USER_ID = 'mockUser123';
 
 const AdaptivePracticeModule: React.FC = () => {
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
-  const [currentKc, setCurrentKc] = useState<KnowledgeComponent | null>(null);
+  const [currentKc, setCurrentKc] = useState<KcMastery | null>(null);
   const [atomSequence, setAtomSequence] = useState<AtomSequence | null>(null);
   const [currentAtomIndex, setCurrentAtomIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [sessionKcs, setSessionKcs] = useState<KnowledgeComponent[]>([]);
+  const [sessionKcs, setSessionKcs] = useState<KcMastery[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");

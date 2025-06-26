@@ -100,6 +100,43 @@ class StealthAssessmentService implements IStealthAssessmentService {
     await this.logEvent({ type: InteractionEventType.CONTENT_VIEW, ...details }, sourceComponentId);
   }
 
+  public async logInteractionEvent(event: {
+    event_type: InteractionEventType;
+    user_id: string;
+    event_data: any;
+    kc_ids?: string[];
+    content_atom_id?: string;
+    is_correct?: boolean;
+  }): Promise<void> {
+    console.log('StealthAssessmentService: Logging interaction event:', event.event_type);
+    
+    try {
+      const recordToInsert = {
+        event_id: uuidv4(),
+        user_id: event.user_id,
+        session_id: getCurrentSessionId(),
+        timestamp: new Date().toISOString(),
+        event_type: event.event_type,
+        event_data: event.event_data,
+        kc_ids: event.kc_ids,
+        content_atom_id: event.content_atom_id,
+        is_correct: event.is_correct,
+      };
+
+      const { error } = await supabase
+        .from('interaction_events')
+        .insert(recordToInsert);
+
+      if (error) {
+        console.error('StealthAssessmentService: Supabase error logging interaction event:', error);
+      } else {
+        console.log('StealthAssessmentService: Successfully logged interaction event to Supabase.');
+      }
+    } catch (error) {
+      console.error('StealthAssessmentService: Exception during interaction event logging:', error);
+    }
+  }
+
   private async flushEventQueue(): Promise<void> {
     if (this.eventQueue.length === 0 || this.isFlushing) {
       return;
