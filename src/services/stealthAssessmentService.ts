@@ -1,3 +1,4 @@
+
 // src/services/stealthAssessmentService.ts
 
 import {
@@ -14,18 +15,25 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
+// Mock user ID - should match the one used in other services
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
+
 const getCurrentUserId = async (): Promise<string | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
     return user.id;
   }
-  console.warn('StealthAssessmentService: No authenticated user found. Using mockUser123 for now.');
-  return 'mockUser123';
+  console.warn('StealthAssessmentService: No authenticated user found. Using mock user for testing.');
+  return MOCK_USER_ID;
 };
 
 const getCurrentSessionId = (): string | undefined => {
   return 'mockSession456';
 }
+
+const isMockUser = (userId: string): boolean => {
+  return userId === MOCK_USER_ID;
+};
 
 class StealthAssessmentService implements IStealthAssessmentService {
   private isInitialized = false;
@@ -72,6 +80,12 @@ class StealthAssessmentService implements IStealthAssessmentService {
       ...eventData,
     } as InteractionEvent;
 
+    // For mock users, just log to console instead of queuing for database
+    if (isMockUser(userId)) {
+      console.log('StealthAssessmentService: Mock event logged (not persisted):', fullEvent.type, fullEvent.eventId);
+      return;
+    }
+
     this.eventQueue.push(fullEvent);
     console.log('StealthAssessmentService: Event logged to queue:', fullEvent.type, fullEvent.eventId);
 
@@ -109,6 +123,12 @@ class StealthAssessmentService implements IStealthAssessmentService {
     is_correct?: boolean;
   }): Promise<void> {
     console.log('StealthAssessmentService: Logging interaction event:', event.event_type);
+    
+    // Skip database logging for mock users
+    if (isMockUser(event.user_id)) {
+      console.log('StealthAssessmentService: Mock interaction event logged (not persisted):', event.event_type);
+      return;
+    }
     
     try {
       const recordToInsert = {
