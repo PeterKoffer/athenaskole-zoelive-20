@@ -1,14 +1,13 @@
+
 // src/pages/AdaptivePracticeTestPage.tsx
-import React from 'react'; // Make sure React is imported
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TestTube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Path to the module we created in src/components/adaptive-learning/
-// Adjust this path if your alias or actual file location is different.
-// If src/pages/ and src/components/ are siblings, this should be correct:
-import AdaptivePracticeModule from '../components/adaptive-learning/AdaptivePracticeModule';
+// Using the @/ alias path which is consistent with this project's setup
+import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
 
 const AdaptivePracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,7 +51,7 @@ const AdaptivePracticeTestPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Render Adaptive Practice Module HERE instead of the placeholder */}
+        {/* Render Adaptive Practice Module */}
         <AdaptivePracticeModule />
         
       </div>
