@@ -1,3 +1,4 @@
+
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import learnerProfileService from '@/services/learnerProfileService';
@@ -6,7 +7,8 @@ import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
 import stealthAssessmentService from '@/services/stealthAssessmentService';
 import type { LearnerProfile, KcMastery } from '@/types/learner';
 import type { AtomSequence, ContentAtom } from '@/types/content';
-import type { QuestionAttemptEvent, InteractionEventType } from '@/types/interaction';
+import type { KnowledgeComponent } from '@/types/knowledgeComponent';
+import { InteractionEventType } from '@/types/stealthAssessment';
 import TextExplanationAtom from './atoms/TextExplanationAtom';
 import QuestionCard from './cards/QuestionCard';
 import { Button } from '@/components/ui/button';
@@ -18,12 +20,12 @@ const MOCK_USER_ID = 'mockUser123';
 
 const AdaptivePracticeModule: React.FC = () => {
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
-  const [currentKc, setCurrentKc] = useState<KcMastery | null>(null);
+  const [currentKc, setCurrentKc] = useState<KnowledgeComponent | null>(null);
   const [atomSequence, setAtomSequence] = useState<AtomSequence | null>(null);
   const [currentAtomIndex, setCurrentAtomIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [sessionKcs, setSessionKcs] = useState<KcMastery[]>([]);
+  const [sessionKcs, setSessionKcs] = useState<KnowledgeComponent[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
@@ -48,9 +50,9 @@ const AdaptivePracticeModule: React.FC = () => {
       setError(null);
       setIsLoading(true);
       console.log("AdaptivePracticeModule: Recommending next KC for profile:", profile);
-      const excludedKcIds = sessionKcs.map(kc => kc.kc_id);
+      const excludedKcIds = sessionKcs.map(kc => kc.id);
       console.log("AdaptivePracticeModule: Excluding already attempted KC IDs in this session:", excludedKcIds);
-      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.user_id, 1, excludedKcIds);
+      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.userId, 1, excludedKcIds);
       
       if (recommendedKcs.length === 0) {
         console.warn("AdaptivePracticeModule: No more KCs to recommend or all attempted in this session.");
@@ -65,15 +67,15 @@ const AdaptivePracticeModule: React.FC = () => {
       setCurrentKc(nextKc);
       setSessionKcs(prevKcs => [...prevKcs, nextKc]); 
 
-      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.kc_id);
-      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.kc_id, profile.user_id);
+      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.id);
+      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
       setAtomSequence(sequence);
       setCurrentAtomIndex(0);
       setShowFeedback(false); 
       console.log("AdaptivePracticeModule: Atom sequence received:", sequence);
 
       if (!sequence || sequence.atoms.length === 0) {
-        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.kc_id);
+        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.id);
         setError(`No content atoms found for the topic: ${nextKc.name}. Please try refreshing for another topic.`);
       }
     } catch (err) {
@@ -112,11 +114,11 @@ const AdaptivePracticeModule: React.FC = () => {
       return;
     }
 
-    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.kc_id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
+    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
     
-    const eventData: QuestionAttemptEvent = {
+    const eventData = {
       questionId: atom.atom_id, 
-      kc_ids: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.kc_id],
+      kc_ids: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.id],
       answerGiven: answerGiven,
       isCorrect: isCorrectAnswer,
       timestamp: new Date().toISOString(),
@@ -124,8 +126,8 @@ const AdaptivePracticeModule: React.FC = () => {
 
     try {
       await stealthAssessmentService.logInteractionEvent({
-        event_type: 'QUESTION_ATTEMPT' as InteractionEventType,
-        user_id: learnerProfile.user_id,
+        event_type: InteractionEventType.QUESTION_ATTEMPT,
+        user_id: learnerProfile.userId,
         event_data: eventData, 
         kc_ids: eventData.kc_ids,
         content_atom_id: atom.atom_id,
@@ -238,14 +240,14 @@ const AdaptivePracticeModule: React.FC = () => {
         <CardTitle className="text-xl md:text-2xl font-bold text-center text-sky-300">
           Adaptive Practice: {currentKc.name} 
         </CardTitle>
-        {learnerProfile && currentKc && learnerProfile.kc_mastery[currentKc.kc_id] && (
+        {learnerProfile && currentKc && learnerProfile.kcMasteryMap[currentKc.id] && (
           <p className="text-xs text-center text-slate-400 mt-1">
-            User: {learnerProfile.user_id} | KC Mastery: {learnerProfile.kc_mastery[currentKc.kc_id].mastery_level.toFixed(2)}
+            User: {learnerProfile.userId} | KC Mastery: {learnerProfile.kcMasteryMap[currentKc.id].masteryLevel.toFixed(2)}
           </p>
         )}
-         {learnerProfile && currentKc && !learnerProfile.kc_mastery[currentKc.kc_id] && (
+         {learnerProfile && currentKc && !learnerProfile.kcMasteryMap[currentKc.id] && (
           <p className="text-xs text-center text-slate-400 mt-1">
-            User: {learnerProfile.user_id} | KC Mastery: N/A
+            User: {learnerProfile.userId} | KC Mastery: N/A
           </p>
         )}
       </CardHeader>
