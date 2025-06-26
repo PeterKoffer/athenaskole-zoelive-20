@@ -1,3 +1,4 @@
+
 // src/services/learnerProfileService.ts
 
 import {
@@ -18,9 +19,68 @@ const getCurrentUserId = async (): Promise<string | null> => {
   return null;
 };
 
+// Mock user for testing - matches the one used in AdaptivePracticeModule
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
+
 class LearnerProfileService implements ILearnerProfileService {
   
+  private async createMockProfile(userId: string): Promise<LearnerProfile> {
+    console.log(`LearnerProfileService: Creating mock profile for testing user ${userId}`);
+    
+    const mockProfile: LearnerProfile = {
+      userId: userId,
+      kcMasteryMap: {
+        'kc_math_g4_add_fractions_likedenom': {
+          kcId: 'kc_math_g4_add_fractions_likedenom',
+          masteryLevel: 0.3,
+          attempts: 2,
+          correctAttempts: 1,
+          lastAttemptedTimestamp: Date.now() - 24 * 60 * 60 * 1000, // 1 day ago
+          history: [
+            {
+              timestamp: Date.now() - 24 * 60 * 60 * 1000,
+              eventType: 'QUESTION_ATTEMPT',
+              score: 0.5,
+              details: { isCorrect: true }
+            }
+          ]
+        },
+        'kc_math_g4_subtract_fractions_likedenom': {
+          kcId: 'kc_math_g4_subtract_fractions_likedenom',
+          masteryLevel: 0.1,
+          attempts: 1,
+          correctAttempts: 0,
+          lastAttemptedTimestamp: Date.now() - 48 * 60 * 60 * 1000, // 2 days ago
+          history: [
+            {
+              timestamp: Date.now() - 48 * 60 * 60 * 1000,
+              eventType: 'QUESTION_ATTEMPT',
+              score: 0.0,
+              details: { isCorrect: false }
+            }
+          ]
+        }
+      },
+      preferences: {
+        learningPace: 'medium',
+        learningStyle: 'visual'
+      },
+      lastUpdatedTimestamp: Date.now(),
+      overallMastery: 0.2,
+      currentLearningFocusKcs: ['kc_math_g4_add_fractions_likedenom'],
+      suggestedNextKcs: ['kc_math_g5_multiply_decimals']
+    };
+
+    return mockProfile;
+  }
+
   private async fetchOrCreateProfileFromSupabase(userId: string): Promise<LearnerProfile> {
+    // Check if this is our mock user for testing
+    if (userId === MOCK_USER_ID) {
+      console.log('LearnerProfileService: Using mock profile for testing');
+      return this.createMockProfile(userId);
+    }
+
     const { data: existingProfileData, error: fetchError } = await supabase
       .from('learner_profiles')
       .select('*')
@@ -116,6 +176,48 @@ class LearnerProfileService implements ILearnerProfileService {
     }
   ): Promise<LearnerProfile> {
     if (!userId) throw new Error("User ID is required to update KC mastery.");
+
+    // For mock user, just return updated mock profile
+    if (userId === MOCK_USER_ID) {
+      console.log('LearnerProfileService: Mock KC mastery update for testing');
+      const profile = await this.getProfile(userId);
+      
+      // Update the mock profile with new mastery data
+      let kcMastery = profile.kcMasteryMap[kcId];
+      if (!kcMastery) {
+        kcMastery = {
+          kcId,
+          masteryLevel: eventDetails.isCorrect ? 0.3 : 0.1,
+          attempts: 1,
+          correctAttempts: eventDetails.isCorrect ? 1 : 0,
+          history: []
+        };
+      } else {
+        if (eventDetails.newAttempt) {
+          kcMastery.attempts += 1;
+        }
+        if (eventDetails.isCorrect) {
+          kcMastery.correctAttempts += 1;
+          kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + 0.1);
+        } else {
+          kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - 0.05);
+        }
+      }
+      
+      kcMastery.lastAttemptedTimestamp = Date.now();
+      kcMastery.history = kcMastery.history || [];
+      kcMastery.history.unshift({
+        timestamp: Date.now(),
+        eventType: eventDetails.interactionType,
+        score: eventDetails.score,
+        details: eventDetails.interactionDetails
+      });
+      
+      profile.kcMasteryMap[kcId] = kcMastery;
+      profile.lastUpdatedTimestamp = Date.now();
+      
+      return profile;
+    }
 
     const profile = await this.getProfile(userId);
     let kcMastery = profile.kcMasteryMap[kcId];
@@ -219,6 +321,13 @@ class LearnerProfileService implements ILearnerProfileService {
 
   async getKcMastery(userId: string, kcId: string): Promise<KcMastery | undefined> {
     if (!userId) throw new Error("User ID is required to get KC mastery.");
+    
+    // Handle mock user
+    if (userId === MOCK_USER_ID) {
+      const profile = await this.getProfile(userId);
+      return profile.kcMasteryMap[kcId];
+    }
+    
     const { data, error } = await supabase
       .from('kc_mastery')
       .select('*')
@@ -247,6 +356,15 @@ class LearnerProfileService implements ILearnerProfileService {
     preferences: Partial<LearnerProfile['preferences']>
   ): Promise<LearnerProfile> {
     if (!userId) throw new Error("User ID is required to update preferences.");
+    
+    // Handle mock user
+    if (userId === MOCK_USER_ID) {
+      console.log('LearnerProfileService: Mock preferences update for testing');
+      const profile = await this.getProfile(userId);
+      profile.preferences = { ...profile.preferences, ...preferences };
+      return profile;
+    }
+    
     const currentISOTimestamp = new Date().toISOString();
     const { data, error } = await supabase
       .from('learner_profiles')
