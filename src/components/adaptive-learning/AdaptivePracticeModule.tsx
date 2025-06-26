@@ -45,12 +45,11 @@ const AdaptivePracticeModule: React.FC = () => {
     }
   }, []);
 
-  const recommendAndLoadNextKc = useCallback(async (profile: LearnerProfile) => {
+  const recommendAndLoadNextKc = useCallback(async (profile: LearnerProfile, excludedKcIds: string[] = []) => {
     try {
       setError(null);
       setIsLoading(true);
       console.log("AdaptivePracticeModule: Recommending next KC for profile:", profile);
-      const excludedKcIds = sessionKcs.map(kc => kc.id);
       console.log("AdaptivePracticeModule: Excluding already attempted KC IDs in this session:", excludedKcIds);
       const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.userId, 1, excludedKcIds);
       
@@ -84,7 +83,7 @@ const AdaptivePracticeModule: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionKcs]); 
+  }, []); // Remove sessionKcs from dependencies to prevent infinite loop
 
   useEffect(() => {
     console.log("AdaptivePracticeModule: Initializing...");
@@ -94,9 +93,10 @@ const AdaptivePracticeModule: React.FC = () => {
   useEffect(() => {
     if (learnerProfile && !currentKc && !isLoading && !error) { 
       console.log("AdaptivePracticeModule: Learner profile available, no current KC, not loading, and no error. Attempting to recommend KC.");
-      recommendAndLoadNextKc(learnerProfile);
+      const excludedKcIds = sessionKcs.map(kc => kc.id);
+      recommendAndLoadNextKc(learnerProfile, excludedKcIds);
     }
-  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc]);
+  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc]); // Remove sessionKcs from dependencies
 
   const handleNextAtom = () => {
     setShowFeedback(false); 
@@ -104,7 +104,8 @@ const AdaptivePracticeModule: React.FC = () => {
       setCurrentAtomIndex(prevIndex => prevIndex + 1);
     } else if (learnerProfile) {
       console.log("AdaptivePracticeModule: End of sequence, recommending next KC.");
-      recommendAndLoadNextKc(learnerProfile);
+      const excludedKcIds = sessionKcs.map(kc => kc.id);
+      recommendAndLoadNextKc(learnerProfile, excludedKcIds);
     }
   };
   
