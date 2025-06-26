@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
@@ -21,9 +22,13 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   const { user } = useAuth();
 
   const handleGetStarted = () => {
-    console.log('🚀 Hero: Get Started clicked - navigating to adaptive practice test');
-    // Navigate directly to the adaptive practice test page
-    navigate("/adaptive-practice-test");
+    console.log('🚀 Hero: Get Started clicked');
+    if (onGetStarted) {
+      onGetStarted();
+    } else {
+      // Navigate directly to mathematics learning
+      navigate("/learn/mathematics");
+    }
   };
 
   const handleViewDailyProgram = () => {
@@ -88,7 +93,6 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                   Start Learning Now
                 </Button>
                 
-                {/* View Daily Program button */}
                 <Button
                   onClick={handleViewDailyProgram}
                   variant="outline"

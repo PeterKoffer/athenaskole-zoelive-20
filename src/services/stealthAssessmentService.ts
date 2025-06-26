@@ -1,4 +1,3 @@
-
 // src/services/stealthAssessmentService.ts
 
 import {
@@ -124,17 +123,17 @@ class StealthAssessmentService implements IStealthAssessmentService {
       const recordsToInsert = eventsToFlush.map(event => ({
         event_id: event.eventId,
         user_id: event.userId,
-        session_id: event.sessionId || null,
+        session_id: event.sessionId,
         timestamp: new Date(event.timestamp).toISOString(), // Ensure ISO string for timestamptz
         event_type: event.type,
-        source_component_id: event.sourceComponentId || null,
-        event_data: JSON.parse(JSON.stringify(event)), // Convert to plain JSON object compatible with Supabase
+        source_component_id: event.sourceComponentId,
+        event_data: event, // Store the whole event object in event_data JSONB
         // Denormalized fields for easier querying (extract from event object)
-        question_id: (event as QuestionAttemptEvent).questionId || null,
-        kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || null,
-        is_correct: (event as QuestionAttemptEvent).isCorrect || null, // Might be undefined if not QuestionAttemptEvent
-        game_id: (event as GameInteractionEvent).gameId || null,
-        content_atom_id: (event as ContentViewEvent).contentAtomId || null,
+        question_id: (event as QuestionAttemptEvent).questionId || undefined,
+        kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || undefined,
+        is_correct: (event as QuestionAttemptEvent).isCorrect, // Might be undefined if not QuestionAttemptEvent
+        game_id: (event as GameInteractionEvent).gameId || undefined,
+        content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
       }));
 
       const { data, error } = await supabase
