@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
@@ -22,12 +23,11 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
 
   const handleGetStarted = () => {
     console.log('🚀 Hero: Get Started clicked');
-    if (onGetStarted) {
-      onGetStarted();
-    } else {
-      // Navigate to the adaptive practice test page
-      navigate("/adaptive-practice-test");
-    }
+    console.log('🚀 Hero: onGetStarted prop:', onGetStarted);
+    
+    // Always navigate to the adaptive practice test page, ignore the prop for now
+    console.log('🚀 Hero: Navigating to /adaptive-practice-test');
+    navigate("/adaptive-practice-test");
   };
 
   const handleViewDailyProgram = () => {
