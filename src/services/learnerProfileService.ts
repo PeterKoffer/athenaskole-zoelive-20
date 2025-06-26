@@ -6,21 +6,17 @@ import {
   ILearnerProfileService,
 } from '@/types/learnerProfile';
 import { KnowledgeComponent } from '@/types/knowledgeComponent';
-import knowledgeComponentService from './knowledgeComponentService'; // To get KC details
-// import stealthAssessmentService from './stealthAssessmentService'; // Not directly used here for logging profile changes yet
-// import { InteractionEventType } from '@/types/stealthAssessment'; // Not directly used here
+import knowledgeComponentService from './knowledgeComponentService';
 import { supabase } from '@/integrations/supabase/client';
 
-// TODO: Replace with actual user ID from Supabase auth context (e.g., supabase.auth.getUser())
 const getCurrentUserId = async (): Promise<string | null> => {
   const { data: { user } } = await supabase.auth.getUser();
    if (user) {
     return user.id;
   }
   console.warn('LearnerProfileService: No authenticated user found. Operations will likely fail or use mocks if not handled by caller.');
-  return null; // Indicate no user
+  return null;
 };
-
 
 class LearnerProfileService implements ILearnerProfileService {
   
@@ -31,13 +27,12 @@ class LearnerProfileService implements ILearnerProfileService {
       .eq('user_id', userId)
       .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116: "Searched for a single row, but found no rows"
+    if (fetchError && fetchError.code !== 'PGRST116') {
       console.error('LearnerProfileService: Error fetching profile:', fetchError);
       throw fetchError;
     }
 
     if (existingProfileData) {
-      // Fetch associated kc_mastery records
       const { data: kcMasteryData, error: kcsError } = await supabase
         .from('kc_mastery')
         .select('*')
@@ -56,25 +51,31 @@ class LearnerProfileService implements ILearnerProfileService {
           attempts: km.attempts,
           correctAttempts: km.correct_attempts,
           lastAttemptedTimestamp: km.last_attempted_timestamp ? new Date(km.last_attempted_timestamp).getTime() : undefined,
-          history: km.history || [],
+          history: Array.isArray(km.history) ? km.history as Array<{timestamp: number; eventType: string; score?: number; details?: any}> : [],
         };
       });
+
+      // Type assertion for preferences with fallback
+      const preferences = (existingProfileData.preferences && typeof existingProfileData.preferences === 'object' && !Array.isArray(existingProfileData.preferences)) 
+        ? existingProfileData.preferences as { learningPace?: 'medium' | 'slow' | 'fast'; learningStyle?: 'mixed' | 'visual' | 'kinesthetic' | 'auditory' }
+        : { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
 
       return {
         userId: existingProfileData.user_id,
         overallMastery: existingProfileData.overall_mastery || undefined,
         currentLearningFocusKcs: existingProfileData.current_learning_focus_kcs || undefined,
         suggestedNextKcs: existingProfileData.suggested_next_kcs || undefined,
-        preferences: existingProfileData.preferences || { learningPace: 'medium', learningStyle: 'mixed' },
+        preferences,
         lastUpdatedTimestamp: new Date(existingProfileData.last_updated_timestamp).getTime(),
         kcMasteryMap,
       };
     }
 
     // Create a new profile if one doesn't exist
+    const defaultPreferences = { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
     const newProfileData = {
       user_id: userId,
-      preferences: { learningPace: 'medium', learningStyle: 'mixed' },
+      preferences: defaultPreferences,
       last_updated_timestamp: new Date().toISOString(),
       created_at: new Date().toISOString(),
     };
@@ -93,7 +94,7 @@ class LearnerProfileService implements ILearnerProfileService {
     return {
       userId: createdProfile.user_id,
       kcMasteryMap: {},
-      preferences: createdProfile.preferences || { learningPace: 'medium', learningStyle: 'mixed' },
+      preferences: defaultPreferences,
       lastUpdatedTimestamp: new Date(createdProfile.last_updated_timestamp).getTime(),
     };
   }
@@ -116,7 +117,7 @@ class LearnerProfileService implements ILearnerProfileService {
   ): Promise<LearnerProfile> {
     if (!userId) throw new Error("User ID is required to update KC mastery.");
 
-    const profile = await this.getProfile(userId); // Ensures profile exists and kcMasteryMap is populated
+    const profile = await this.getProfile(userId);
     let kcMastery = profile.kcMasteryMap[kcId];
 
     const currentTimestamp = Date.now();
@@ -237,7 +238,7 @@ class LearnerProfileService implements ILearnerProfileService {
       attempts: data.attempts,
       correctAttempts: data.correct_attempts,
       lastAttemptedTimestamp: data.last_attempted_timestamp ? new Date(data.last_attempted_timestamp).getTime() : undefined,
-      history: data.history || [],
+      history: Array.isArray(data.history) ? data.history as Array<{timestamp: number; eventType: string; score?: number; details?: any}> : [],
     };
   }
 
@@ -261,7 +262,6 @@ class LearnerProfileService implements ILearnerProfileService {
     if (!data) throw new Error("Profile not found for preference update.");
 
     console.log(`LearnerProfileService: Updated preferences in Supabase for user ${userId}`);
-    // Refetch the full profile to return consistent data including KCs
     return this.getProfile(userId);
   }
 
@@ -294,6 +294,5 @@ class LearnerProfileService implements ILearnerProfileService {
   }
 }
 
-// Export a singleton instance
 const learnerProfileService = new LearnerProfileService();
 export default learnerProfileService;

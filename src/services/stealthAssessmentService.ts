@@ -10,34 +10,29 @@ import {
   TutorQueryEvent,
   ContentViewEvent,
   IStealthAssessmentService,
-  // Import other specific event types as needed
 } from '@/types/stealthAssessment';
 import { v4 as uuidv4 } from 'uuid';
-import { supabase } from '@/integrations/supabase/client'; // Import Supabase client
+import { supabase } from '@/integrations/supabase/client';
 
-// Placeholder for user context - in a real app, this would come from an auth service
-// For now, we'll mock it.
-// TODO: Replace with actual user ID from Supabase auth context (e.g., supabase.auth.getUser())
 const getCurrentUserId = async (): Promise<string | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
     return user.id;
   }
   console.warn('StealthAssessmentService: No authenticated user found. Using mockUser123 for now.');
-  return 'mockUser123'; // Fallback to mock if no user, or handle error
+  return 'mockUser123';
 };
 
 const getCurrentSessionId = (): string | undefined => {
-  // TODO: Implement actual session ID management if needed, or get from context
-  return 'mockSession456'; // Placeholder
+  return 'mockSession456';
 }
 
 class StealthAssessmentService implements IStealthAssessmentService {
   private isInitialized = false;
   private eventQueue: InteractionEvent[] = [];
-  private flushInterval: number = 5000; // Flush queue every 5 seconds
+  private flushInterval: number = 5000;
   private flushTimerId?: NodeJS.Timeout;
-  private isFlushing = false; // To prevent concurrent flushes
+  private isFlushing = false;
 
   constructor() {
     this.init();
@@ -52,7 +47,6 @@ class StealthAssessmentService implements IStealthAssessmentService {
   }
 
   private generateEventMetadata(sourceComponentId?: string): Omit<BaseInteractionEvent, 'userId' | 'timestamp' | 'eventId'> {
-    // eventId and timestamp will be generated per event to ensure uniqueness if batched
     return {
       sessionId: getCurrentSessionId(),
       sourceComponentId,
@@ -60,33 +54,32 @@ class StealthAssessmentService implements IStealthAssessmentService {
   }
 
   public async logEvent(
-    eventData: Omit<InteractionEvent, 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, // Adjusted Omit
+    eventData: Omit<InteractionEvent, 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>,
     sourceComponentId?: string
   ): Promise<void> {
-    const userId = await getCurrentUserId(); // Now async
+    const userId = await getCurrentUserId();
     if (!userId) {
       console.warn('StealthAssessmentService: No user ID found. Event not logged.');
       return;
     }
 
     const fullEvent: InteractionEvent = {
-      eventId: uuidv4(), // Generate unique ID for each event
-      timestamp: Date.now(), // Current timestamp for each event
+      eventId: uuidv4(),
+      timestamp: Date.now(),
       userId,
-      sessionId: getCurrentSessionId(), // Add sessionId here
-      sourceComponentId, // Add sourceComponentId here
+      sessionId: getCurrentSessionId(),
+      sourceComponentId,
       ...eventData,
-    } as InteractionEvent; // Type assertion might still be needed
+    } as InteractionEvent;
 
     this.eventQueue.push(fullEvent);
     console.log('StealthAssessmentService: Event logged to queue:', fullEvent.type, fullEvent.eventId);
 
-    if (this.eventQueue.length >= 10) { // Trigger immediate flush if queue is large
+    if (this.eventQueue.length >= 10) {
       await this.flushEventQueue();
     }
   }
 
-  // Specific helper methods
   public async logQuestionAttempt(details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
     await this.logEvent({ type: InteractionEventType.QUESTION_ATTEMPT, ...details }, sourceComponentId);
   }
@@ -107,7 +100,6 @@ class StealthAssessmentService implements IStealthAssessmentService {
     await this.logEvent({ type: InteractionEventType.CONTENT_VIEW, ...details }, sourceComponentId);
   }
 
-
   private async flushEventQueue(): Promise<void> {
     if (this.eventQueue.length === 0 || this.isFlushing) {
       return;
@@ -123,15 +115,14 @@ class StealthAssessmentService implements IStealthAssessmentService {
       const recordsToInsert = eventsToFlush.map(event => ({
         event_id: event.eventId,
         user_id: event.userId,
-        session_id: event.sessionId,
-        timestamp: new Date(event.timestamp).toISOString(), // Ensure ISO string for timestamptz
+        session_id: event.sessionId || undefined,
+        timestamp: new Date(event.timestamp).toISOString(),
         event_type: event.type,
-        source_component_id: event.sourceComponentId,
-        event_data: event, // Store the whole event object in event_data JSONB
-        // Denormalized fields for easier querying (extract from event object)
+        source_component_id: event.sourceComponentId || undefined,
+        event_data: event as any,
         question_id: (event as QuestionAttemptEvent).questionId || undefined,
         kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || undefined,
-        is_correct: (event as QuestionAttemptEvent).isCorrect, // Might be undefined if not QuestionAttemptEvent
+        is_correct: 'isCorrect' in event ? (event as QuestionAttemptEvent).isCorrect : undefined,
         game_id: (event as GameInteractionEvent).gameId || undefined,
         content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
       }));
@@ -142,14 +133,13 @@ class StealthAssessmentService implements IStealthAssessmentService {
 
       if (error) {
         console.error('StealthAssessmentService: Supabase error flushing event queue:', error);
-        // Re-queue events on failure
         this.eventQueue.unshift(...eventsToFlush);
       } else {
         console.log(`StealthAssessmentService: Successfully flushed ${eventsToFlush.length} events to Supabase.`);
       }
     } catch (error) {
       console.error('StealthAssessmentService: Exception during event queue flush:', error);
-      this.eventQueue.unshift(...eventsToFlush); // Re-queue on exception
+      this.eventQueue.unshift(...eventsToFlush);
     } finally {
       this.isFlushing = false;
     }
@@ -159,13 +149,11 @@ class StealthAssessmentService implements IStealthAssessmentService {
     if (this.flushTimerId) {
       clearInterval(this.flushTimerId);
     }
-    // Attempt a final flush, but don't wait indefinitely if it's a browser context closing
     this.flushEventQueue().catch(err => console.error("Error on final flush:", err));
     this.isInitialized = false;
     console.log('StealthAssessmentService: Destroyed.');
   }
 }
 
-// Export a singleton instance of the service
 const stealthAssessmentService = new StealthAssessmentService();
 export default stealthAssessmentService;

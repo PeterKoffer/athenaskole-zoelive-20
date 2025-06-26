@@ -1,3 +1,4 @@
+
 // src/pages/AdaptivePracticeTestPage.tsx
 import React from 'react'; // Make sure React is imported
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,10 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, TestTube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Path to the module we created in src/components/adaptive-learning/
-// Adjust this path if your alias or actual file location is different.
-// If src/pages/ and src/components/ are siblings, this should be correct:
-import AdaptivePracticeModule from '../components/adaptive-learning/AdaptivePracticeModule';
+// Corrected import path:
+import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
 
 const AdaptivePracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
