@@ -7,7 +7,7 @@ import stealthAssessmentService from '@/services/stealthAssessmentService'; // D
 import type { LearnerProfile } from '@/types/learner'; 
 import type { KnowledgeComponent } from '@/types/knowledgeComponent'; 
 import type { AtomSequence, ContentAtom } from '@/types/content';
-import { InteractionEventType } from '@/types/interaction'; // Assuming this is the correct path now
+import { InteractionEventType } from '@/types/stealthAssessment'; // Import from the correct location
 
 import TextExplanationAtom from './atoms/TextExplanationAtom'; // PLEASE VERIFY THIS PATH
 import QuestionCard from './cards/QuestionCard'; // PLEASE VERIFY THIS PATH
