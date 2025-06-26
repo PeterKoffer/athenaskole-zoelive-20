@@ -1,16 +1,14 @@
 
-// src/pages/AdaptivePracticeTestPage.tsx
-import React, { useEffect } from 'react';
+import React from 'react';
+import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
 
 const AdaptivePracticeTestPage: React.FC = () => {
-  useEffect(() => {
-    console.log("AdaptivePracticeTestPage: MOUNTED AND LOGGING");
-  }, []);
-
   return (
-    <div style={{ padding: '20px', backgroundColor: 'lightgreen', minHeight: '100vh' }}>
-      <h1>Adaptive Practice Test Page - BASIC RENDER SUCCESS</h1>
-      <p>If you see this, the test page itself is rendering correctly.</p>
+    <div style={{ padding: '20px' }}>
+      <h1>Adaptive Practice Module Test Page</h1>
+      <p>This page is for testing the end-to-end flow of the adaptive practice module.</p>
+      <hr style={{ margin: '20px 0' }} />
+      <AdaptivePracticeModule />
     </div>
   );
 };
