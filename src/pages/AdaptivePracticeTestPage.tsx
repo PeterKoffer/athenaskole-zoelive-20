@@ -1,28 +1,19 @@
-
 // src/pages/AdaptivePracticeTestPage.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TestTube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 const AdaptivePracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
-
   const handleBack = () => {
     navigate(-1);
   };
-
-  return (
-    <div className="min-h-screen bg-gray-900 p-6">
+  return <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button
-            onClick={handleBack}
-            variant="outline"
-            className="text-white border-gray-600 hover:bg-gray-700"
-          >
+          <Button onClick={handleBack} variant="outline" className="border-gray-600 text-slate-950 bg-zinc-50">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -73,8 +64,6 @@ const AdaptivePracticeTestPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AdaptivePracticeTestPage;
