@@ -1,0 +1,16 @@
+// src/components/adaptive-learning/AdaptivePracticeModule.tsx
+import React, { useEffect } from 'react';
+
+const AdaptivePracticeModule: React.FC = () => {
+  useEffect(() => {
+    console.log("AdaptivePracticeModule: MOUNTED AND RUNNING SIMPLE LOG FROM CORRECT LOCATION");
+  }, []);
+
+  return (
+    <div>
+      <h2>Adaptive Practice Module - Basic Render Test</h2>
+      <p>If you see this, the module component itself is rendering from src/components/adaptive-learning/.</p>
+    </div>
+  );
+};
+export default AdaptivePracticeModule;
