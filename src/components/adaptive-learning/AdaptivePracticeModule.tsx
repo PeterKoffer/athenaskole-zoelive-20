@@ -1,5 +1,7 @@
 
 import React, { useEffect } from 'react';
+import AdaptivePracticeHeader from './components/AdaptivePracticeHeader';
+import AdaptivePracticeContent from './components/AdaptivePracticeContent';
 
 const AdaptivePracticeModule: React.FC = () => {
   useEffect(() => {
@@ -8,8 +10,8 @@ const AdaptivePracticeModule: React.FC = () => {
 
   return (
     <div>
-      <h2>Adaptive Practice Module - Basic Render Test</h2>
-      <p>If you see this, the module component itself is rendering from src/components/adaptive-learning/.</p>
+      <AdaptivePracticeHeader />
+      <AdaptivePracticeContent />
     </div>
   );
 };
