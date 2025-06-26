@@ -1,15 +1,22 @@
 // src/pages/AdaptivePracticeTestPage.tsx
-import React from 'react';
+import React from 'react'; // Make sure React is imported
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TestTube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+// Path to the module we created in src/components/adaptive-learning/
+// Adjust this path if your alias or actual file location is different.
+// If src/pages/ and src/components/ are siblings, this should be correct:
+import AdaptivePracticeModule from '../components/adaptive-learning/AdaptivePracticeModule';
+
 const AdaptivePracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
   const handleBack = () => {
     navigate(-1);
   };
-  return <div className="min-h-screen bg-gray-900 p-6">
+  return (
+    <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -39,31 +46,18 @@ const AdaptivePracticeTestPage: React.FC = () => {
             </p>
             <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700">
               <p className="text-blue-300 text-sm">
-                <strong>Note:</strong> This is a development/testing page. The adaptive practice module 
-                will be integrated here once the component is available.
+                <strong>Note:</strong> This is a development/testing page.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Placeholder for Adaptive Practice Module */}
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Adaptive Practice Module</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-12">
-              <TestTube className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400 mb-4">
-                Adaptive Practice Module will be rendered here
-              </p>
-              <p className="text-gray-500 text-sm">
-                Component: @/components/adaptive-learning/AdaptivePracticeModule
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Render Adaptive Practice Module HERE instead of the placeholder */}
+        <AdaptivePracticeModule />
+        
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AdaptivePracticeTestPage;
