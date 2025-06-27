@@ -1,33 +1,29 @@
 
-import { Brain, Sparkles } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingStateProps {
-  subject?: string;
-  skillArea?: string;
+  title?: string;
+  message?: string;
 }
 
-const LoadingState = ({ subject = "general", skillArea = "content" }: LoadingStateProps) => {
+const LoadingState: React.FC<LoadingStateProps> = ({ 
+  title = "Loading Adaptive Practice...",
+  message = "Preparing your learning experience..."
+}) => {
   return (
-    <div className="flex flex-col items-center justify-center p-12 text-center">
-      <div className="relative mb-6">
-        <Brain className="w-12 h-12 text-lime-400 animate-pulse" />
-        <Sparkles className="w-6 h-6 text-yellow-400 absolute -top-2 -right-2 animate-bounce" />
-      </div>
-      
-      <h3 className="text-xl font-semibold text-white mb-2">
-        Preparing Your Learning Experience
-      </h3>
-      
-      <p className="text-gray-300 mb-4">
-        Setting up your personalized lesson...
-      </p>
-      
-      <div className="flex space-x-1">
-        <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce"></div>
-        <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-        <div className="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-      </div>
-    </div>
+    <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-gray-800 text-white">
+      <CardHeader>
+        <CardTitle className="text-2xl font-semibold text-center text-blue-300">
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="h-16 w-16 animate-spin text-blue-400 mb-6" />
+        <p className="text-lg">{message}</p>
+      </CardContent>
+    </Card>
   );
 };
 
