@@ -300,3 +300,4 @@ const AdaptivePracticeModule: React.FC = () => {
 };
 
 export default AdaptivePracticeModule;
+
