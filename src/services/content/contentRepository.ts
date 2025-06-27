@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { GeneratedContent, AdaptiveContentRecord } from '../types/contentTypes';
+import type { ContentAtom } from '@/types/content';
 
 export class ContentRepository {
   async getExistingContent(subject: string, skillArea: string, difficultyLevel: number): Promise<any> {
@@ -73,6 +74,37 @@ export class ContentRepository {
       console.error('❌ Error saving fallback content:', saveError);
       return fallbackContent;
     }
+  }
+
+  async getAtomsByKcId(kcId: string): Promise<ContentAtom[]> {
+    console.log(`🔍 ContentRepository: Looking for atoms with KC ID: ${kcId}`);
+    
+    const { data: atoms, error } = await supabase
+      .from('content_atoms')
+      .select('*')
+      .contains('kc_ids', [kcId]);
+
+    if (error) {
+      console.error('❌ ContentRepository: Error fetching atoms:', error);
+      throw error;
+    }
+
+    console.log(`📋 ContentRepository: Found ${atoms?.length || 0} atoms for KC ID: ${kcId}`);
+    
+    // Transform the data to match ContentAtom interface with proper field mapping
+    const transformedAtoms: ContentAtom[] = (atoms || []).map(atom => ({
+      atom_id: atom.id, // Map 'id' to 'atom_id'
+      atom_type: atom.atom_type as 'TEXT_EXPLANATION' | 'QUESTION_MULTIPLE_CHOICE' | 'INTERACTIVE_EXERCISE',
+      content: atom.content,
+      kc_ids: atom.kc_ids || [], // Ensure it's always an array
+      metadata: atom.metadata,
+      version: atom.version,
+      author_id: atom.author_id,
+      created_at: atom.created_at,
+      updated_at: atom.updated_at
+    }));
+
+    return transformedAtoms;
   }
 }
 

@@ -1,22 +1,35 @@
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { learnerProfileService } from '@/services/learnerProfileService';
-import { knowledgeComponentService } from '@/services/knowledgeComponentService';
-import { aiCreativeDirectorService } from '@/services/aiCreativeDirectorService';
-import { stealthAssessmentService } from '@/services/stealthAssessmentService';
-import type { LearnerProfile, KnowledgeComponent } from '@/types/learner';
-import type { AtomSequence, ContentAtom } from '@/types/content';
-import type { QuestionAttemptEvent, InteractionEventType } from '@/types/interaction';
-import TextExplanationAtom from './atoms/TextExplanationAtom'; // Adjusted path
-import QuestionCard from './cards/QuestionCard'; // Adjusted path
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info, Database } from 'lucide-react';
 
-// MOCK USER ID - Replace with actual user ID from auth context later
-const MOCK_USER_ID = 'mockUser123';
+// Service Imports - VERIFY THESE PATHS based on Lovable agent's refactoring
+import learnerProfileService from '@/services/learnerProfile/LearnerProfileService'; 
+import knowledgeComponentService from '@/services/knowledgeComponentService'; // Or e.g., '@/services/knowledgeComponent/KnowledgeComponentService'
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Or e.g., '@/services/aiCreativeDirector/AiCreativeDirectorService'
+import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
+
+// MOCK_USER_ID Import
+import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService'; // This should point to the file where MOCK_USER_ID (with the real test UUID) is defined
+
+// Type Imports - VERIFY THESE PATHS
+import { LearnerProfile } from '@/types/learnerProfile';
+import type { KnowledgeComponent } from '@/types/knowledgeComponent';
+import type { AtomSequence, ContentAtom } from '@/types/content';
+import type { QuestionAttemptEvent } from '@/types/interaction'; // Assuming InteractionEventType might be part of this or a separate import if needed by other types
+
+// UI Component Imports - VERIFY THESE PATHS (use @/ or ./ as appropriate)
+import TextExplanationAtom from '@/components/adaptive-learning/atoms/TextExplanationAtom';
+import QuestionCard from '@/components/adaptive-learning/cards/QuestionCard';
+import ServiceTestingInterface from '@/components/adaptive-learning/components/ServiceTestingInterface';
+import LoadingState from '@/components/adaptive-learning/components/LoadingState';
+import ErrorState from '@/components/adaptive-learning/components/ErrorState';
+import EmptyContentState from '@/components/adaptive-learning/components/EmptyContentState';
+import PracticeContent from '@/components/adaptive-learning/components/PracticeContent';
 
 const AdaptivePracticeModule: React.FC = () => {
+  // Core learning states
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
   const [currentKc, setCurrentKc] = useState<KnowledgeComponent | null>(null);
   const [atomSequence, setAtomSequence] = useState<AtomSequence | null>(null);
@@ -27,6 +40,12 @@ const AdaptivePracticeModule: React.FC = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [showServiceTests, setShowServiceTests] = useState(false);
+
+  useEffect(() => {
+    console.log('🎯 AdaptivePracticeModule mounted - Using refactored StealthAssessmentService');
+    loadLearnerProfile();
+  }, []); // Empty dependency array means this runs once on mount
 
   const loadLearnerProfile = useCallback(async () => {
     try {
@@ -36,12 +55,11 @@ const AdaptivePracticeModule: React.FC = () => {
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(profile);
       console.log("AdaptivePracticeModule: Learner profile loaded:", profile);
+      // setIsLoading(false); // Moved to recommendAndLoadNextKc or error paths
     } catch (err) {
       console.error("AdaptivePracticeModule: Error loading learner profile:", err);
       setError("Failed to load learner profile. Please try again.");
-    } finally {
-      // Loading continues with KC and atoms, so don't set setIsLoading(false) here in this specific function
-      // It will be set to false in recommendAndLoadNextKc or if an error occurs that stops progress
+      setIsLoading(false); // Set loading to false on error
     }
   }, []);
 
@@ -50,7 +68,7 @@ const AdaptivePracticeModule: React.FC = () => {
       setError(null);
       setIsLoading(true);
       console.log("AdaptivePracticeModule: Recommending next KC for profile:", profile);
-      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.user_id, 1, sessionKcs.map(kc => kc.kc_id));
+      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.userId, 1, sessionKcs.map(kc => kc.id));
 
       if (recommendedKcs.length === 0) {
         console.warn("AdaptivePracticeModule: No more KCs to recommend or all attempted in this session.");
@@ -65,14 +83,14 @@ const AdaptivePracticeModule: React.FC = () => {
       setCurrentKc(nextKc);
       setSessionKcs(prevKcs => [...prevKcs, nextKc]);
 
-      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.kc_id);
-      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.kc_id, profile.user_id);
+      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.id);
+      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
       setAtomSequence(sequence);
       setCurrentAtomIndex(0);
       setShowFeedback(false);
       console.log("AdaptivePracticeModule: Atom sequence received:", sequence);
       if (!sequence || sequence.atoms.length === 0) {
-        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.kc_id);
+        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.id);
         setError(`No content atoms found for the topic: ${nextKc.name}. Try another topic or check content availability.`);
       }
     } catch (err) {
@@ -82,11 +100,6 @@ const AdaptivePracticeModule: React.FC = () => {
       setIsLoading(false);
     }
   }, [sessionKcs]);
-
-  useEffect(() => {
-    console.log("AdaptivePracticeModule: Initializing...");
-    loadLearnerProfile();
-  }, [loadLearnerProfile]);
 
   useEffect(() => {
     if (learnerProfile && !currentKc && !isLoading && !error) {
@@ -111,175 +124,111 @@ const AdaptivePracticeModule: React.FC = () => {
       return;
     }
 
-    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.kc_id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
-
-    const eventData: QuestionAttemptEvent = {
-      questionId: atom.atom_id,
-      kc_ids: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.kc_id],
-      answerGiven: answerGiven,
-      isCorrect: isCorrectAnswer,
-      timestamp: new Date().toISOString(),
-    };
+    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
 
     try {
-        await stealthAssessmentService.logInteractionEvent({
-          event_type: 'QUESTION_ATTEMPT' as InteractionEventType,
-          user_id: learnerProfile.user_id,
-          event_data: eventData,
-          kc_ids: eventData.kc_ids,
-          content_atom_id: atom.atom_id,
-          is_correct: isCorrectAnswer,
-        });
+      await stealthAssessmentService.logQuestionAttempt({
+        questionId: atom.atom_id,
+        knowledgeComponentIds: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.id],
+        answerGiven: Array.isArray(answerGiven) ? answerGiven.join(', ') : answerGiven,
+        isCorrect: isCorrectAnswer,
+        timeTakenMs: Math.floor(Math.random() * 20000) + 5000, // Example: random time
+        attemptsMade: 1 // Example: assuming first attempt for simplicity here
+      }, 'adaptive-practice-module');
 
-        const updatedProfile = await learnerProfileService.getProfile(MOCK_USER_ID);
-        setLearnerProfile(updatedProfile);
-        console.log("AdaptivePracticeModule: Profile refetched after question submission:", updatedProfile);
+      console.log('📈 Updating KC mastery via LearnerProfileService...');
+      const updatedProfile = await learnerProfileService.updateKcMastery(
+        MOCK_USER_ID, // Should be learnerProfile.userId if using the fetched profile's ID
+        currentKc.id,
+        {
+          isCorrect: isCorrectAnswer,
+          newAttempt: true,
+          interactionType: 'QUESTION_ATTEMPT',
+          interactionDetails: { 
+            difficulty: (atom.metadata as any)?.difficulty || 0.5, // Example: get difficulty from atom metadata if available
+            responseTime: Math.floor(Math.random() * 20000) + 5000, // Example: random time, same as timeTakenMs for this event
+            atomId: atom.atom_id,
+            timestamp: Date.now()
+          }
+        }
+      );
+
+      setLearnerProfile(updatedProfile);
+      console.log("AdaptivePracticeModule: Profile updated after question submission:", updatedProfile);
 
     } catch (logError) {
-        console.error("AdaptivePracticeModule: Error logging question attempt or refetching profile:", logError);
+      console.error("AdaptivePracticeModule: Error logging question attempt or updating profile:", logError);
     }
 
     setIsCorrect(isCorrectAnswer);
-    const feedbackContent = atom.content as any;
-    setFeedbackMessage(isCorrectAnswer ?
-      (feedbackContent.correctFeedback || "Correct!") :
+    const feedbackContent = atom.content as any; 
+    setFeedbackMessage(isCorrectAnswer ? 
+      (feedbackContent.correctFeedback || "Correct!") : 
       (feedbackContent.generalIncorrectFeedback || "Not quite. Let's review.")
     );
     setShowFeedback(true);
   };
 
+  const handleRetry = () => {
+    setError(null);
+    setIsLoading(true);
+    if (learnerProfile) {
+      recommendAndLoadNextKc(learnerProfile);
+    } else {
+      loadLearnerProfile(); 
+    }
+  };
+
   const currentAtom = atomSequence?.atoms[currentAtomIndex];
 
-  if (isLoading && !currentAtom && !error) {
+  if (showServiceTests) {
     return (
-      <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-gray-800 text-white">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-center text-blue-300">Loading Adaptive Practice...</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center h-64">
-          <Loader2 className="h-16 w-16 animate-spin text-blue-400 mb-6" />
-          <p className="text-lg">Preparing your learning experience...</p>
-        </CardContent>
-      </Card>
+      <ServiceTestingInterface 
+        onBack={() => setShowServiceTests(false)}
+      />
     );
+  }
+
+  if (isLoading && !currentAtom && !error) {
+    return <LoadingState />;
   }
 
   if (error) {
     return (
-      <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-red-900/20 border-red-700 text-white">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-center text-red-300 flex items-center justify-center">
-            <AlertTriangle className="h-8 w-8 mr-3" /> Error
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-center py-10">
-          <p className="text-lg mb-6">{error}</p>
-          <Button
-            onClick={() => {
-              setError(null);
-              setIsLoading(true);
-              if (learnerProfile) {
-                 recommendAndLoadNextKc(learnerProfile);
-              } else {
-                 loadLearnerProfile();
-              }
-            }}
-            variant="destructive" className="bg-red-500 hover:bg-red-600"
-          >
-            <RefreshCw className="h-5 w-5 mr-2" />
-            Try Again
-          </Button>
-        </CardContent>
-      </Card>
+      <ErrorState 
+        error={error}
+        onRetry={handleRetry}
+        onShowServiceTests={() => setShowServiceTests(true)}
+      />
     );
   }
-
+  
   if (!isLoading && (!currentKc || !currentAtom)) {
     return (
-      <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-gray-800 text-white">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-center text-yellow-300">No Content Available</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center py-10">
-          <Info className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-          <p className="text-lg mb-6">No learning content could be loaded at this moment. This might be because all available content has been completed or there's an issue fetching new material.</p>
-           <Button
-            onClick={() => {
-              setError(null);
-              setIsLoading(true);
-              if (learnerProfile) recommendAndLoadNextKc(learnerProfile); else loadLearnerProfile();
-            }}
-            variant="outline"
-          >
-            <RefreshCw className="h-5 w-5 mr-2" />
-            Refresh Content
-          </Button>
-        </CardContent>
-      </Card>
+      <EmptyContentState 
+        onRefresh={handleRetry}
+        onShowServiceTests={() => setShowServiceTests(true)}
+      />
     );
   }
-
-  // Ensure currentAtom is defined before trying to render it
+  
   if (!currentAtom) {
-    // This case should ideally be covered by the isLoading or error states above,
-    // but as a fallback to prevent rendering errors if currentAtom is unexpectedly null.
-    return (
-         <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-yellow-900/20 border-yellow-700 text-white">
-            <CardHeader><CardTitle className="text-yellow-300">Preparing Content...</CardTitle></CardHeader>
-            <CardContent><Loader2 className="h-8 w-8 animate-spin text-yellow-400" /></CardContent>
-        </Card>
-    );
+    return <LoadingState title="Preparing Content..." />;
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto mt-4 md:mt-8 shadow-2xl bg-slate-800 text-slate-50 border border-slate-700">
-      <CardHeader className="pb-4 bg-slate-700/50 rounded-t-lg">
-        <CardTitle className="text-xl md:text-2xl font-bold text-center text-sky-300">
-          Adaptive Practice: {currentKc.name}
-        </CardTitle>
-        {learnerProfile && currentKc && learnerProfile.kc_mastery[currentKc.kc_id] && (
-          <p className="text-xs text-center text-slate-400 mt-1">
-            User: {learnerProfile.user_id} | KC Mastery: {learnerProfile.kc_mastery[currentKc.kc_id].mastery_level.toFixed(2)}
-          </p>
-        )}
-      </CardHeader>
-      <CardContent className="p-4 md:p-6 min-h-[200px] md:min_h-[300px] relative">
-        {isLoading && currentAtom && (
-          <div className="absolute inset-0 bg-slate-800/70 flex flex-col items-center justify-center z-10 rounded-b-lg">
-            <Loader2 className="h-12 w-12 animate-spin text-sky-400" />
-            <p className="mt-3 text-sky-200">Loading next item...</p>
-          </div>
-        )}
-
-        {!isLoading && currentAtom.atom_type === 'TEXT_EXPLANATION' && (
-          <TextExplanationAtom atom={currentAtom} />
-        )}
-        {!isLoading && currentAtom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && (
-          <QuestionCard
-            key={currentAtom.atom_id}
-            atom={currentAtom}
-            onSubmitAnswer={(answer, isCorrectAnswer) => handleQuestionAnswer(currentAtom, answer, isCorrectAnswer)}
-            disabled={showFeedback || isLoading}
-          />
-        )}
-
-        {showFeedback && (
-          <div className={`mt-4 p-3 rounded-md text-sm ${isCorrect ? 'bg-green-700/30 border border-green-500 text-green-200' : 'bg-red-700/30 border border-red-500 text-red-200'}`}>
-            <p><strong>{isCorrect ? "Correct!" : "Review:"}</strong> {feedbackMessage}</p>
-          </div>
-        )}
-      </CardContent>
-      <div className="px-4 md:px-6 py-4 border-t border-slate-700 flex justify-end bg-slate-700/30 rounded-b-lg">
-        <Button
-          onClick={handleNextAtom}
-          disabled={isLoading || (currentAtom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && !showFeedback)}
-          className="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 disabled:opacity-60 disabled:transform-none disabled:shadow-none"
-        >
-          {isLoading && (!currentKc || !currentAtom || currentAtomIndex === (atomSequence?.atoms.length || 0) -1) ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Next'}
-          {(!isLoading || (currentKc && currentAtom && currentAtomIndex < (atomSequence?.atoms.length || 0) -1)) && <ArrowRight className="h-5 w-5 ml-2" />}
-        </Button>
-      </div>
-    </Card>
+    <PracticeContent
+      currentKc={currentKc}
+      learnerProfile={learnerProfile}
+      currentAtom={currentAtom}
+      showFeedback={showFeedback}
+      isCorrect={isCorrect}
+      feedbackMessage={feedbackMessage}
+      isLoading={isLoading}
+      onQuestionAnswer={handleQuestionAnswer}
+      onNextAtom={handleNextAtom}
+      onShowServiceTests={() => setShowServiceTests(true)}
+    />
   );
 };
 

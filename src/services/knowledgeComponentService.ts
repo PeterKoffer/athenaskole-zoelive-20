@@ -86,6 +86,26 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
     );
   }
 
+  async recommendNextKcs(userId: string, count: number = 3, excludedKcIds: string[] = []): Promise<KnowledgeComponent[]> {
+    await this.ensureInitialized();
+    
+    console.log(`KnowledgeComponentService: Recommending ${count} KCs for user ${userId}, excluding:`, excludedKcIds);
+    
+    // Filter out excluded KCs
+    const availableKcs = this.kcs.filter(kc => !excludedKcIds.includes(kc.id));
+    
+    if (availableKcs.length === 0) {
+      console.warn('KnowledgeComponentService: No available KCs after filtering excluded ones.');
+      return [];
+    }
+    
+    // Simple recommendation: return first available KCs (in a real system this would be more sophisticated)
+    const recommended = availableKcs.slice(0, count);
+    
+    console.log('KnowledgeComponentService: Recommended KCs:', recommended.map(kc => kc.id));
+    return recommended;
+  }
+
   // Placeholder for future methods (CRUD operations)
   // async addKc(kcData: Omit<KnowledgeComponent, 'id'>): Promise<KnowledgeComponent> {
   //   // Implementation would involve generating an ID, adding to the list/map,
