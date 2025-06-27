@@ -13,6 +13,8 @@ export const useContentGeneration = () => {
     onError: (error: string) => void
   ) => {
     try {
+      console.log('🎯 Starting AI-powered content generation...');
+
       // Step 1: Get KC recommendations
       const excludedKcIds = sessionKcs.map(kc => kc.id);
       
@@ -29,28 +31,30 @@ export const useContentGeneration = () => {
       }
 
       const nextKc = recommendedKcs[0];
+      console.log(`🎯 Selected KC for AI generation: ${nextKc.name} (${nextKc.id})`);
 
-      // Step 2: Get atom sequence for the KC
+      // Step 2: Generate AI-powered content sequence for the KC
       const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
       
       if (!sequence) {
-        const errorMsg = `Failed to generate content sequence for topic: ${nextKc.name}`;
-        console.error('❌ No sequence returned:', errorMsg);
+        const errorMsg = `Failed to generate AI content for topic: ${nextKc.name}. Please try again.`;
+        console.error('❌ No AI sequence generated:', errorMsg);
         onError(errorMsg);
         return;
       }
 
       if (!sequence.atoms || sequence.atoms.length === 0) {
-        const errorMsg = `No content atoms found for topic: ${nextKc.name}. The content repository may be empty for this KC.`;
+        const errorMsg = `No AI questions generated for topic: ${nextKc.name}. Please try again.`;
         onError(errorMsg);
         return;
       }
 
+      console.log(`✅ AI Content generated successfully: ${sequence.atoms.length} questions for ${nextKc.name}`);
       onSuccess(nextKc, sequence);
 
     } catch (error) {
-      const errorMsg = `Content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      console.error('💥 Content generation error:', error);
+      const errorMsg = `AI content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      console.error('💥 AI content generation error:', error);
       onError(errorMsg);
     }
   }, []);

@@ -73,30 +73,11 @@ export class ContentRepository {
   }
 
   async getAtomsByKcId(kcId: string): Promise<ContentAtom[]> {
-    const { data: atoms, error } = await supabase
-      .from('content_atoms')
-      .select('*')
-      .contains('kc_ids', [kcId]);
-
-    if (error) {
-      console.error('❌ ContentRepository: Error fetching atoms:', error);
-      throw error;
-    }
+    console.log('⚠️ ContentRepository.getAtomsByKcId called - now using AI generation instead');
     
-    // Transform the data to match ContentAtom interface with proper field mapping
-    const transformedAtoms: ContentAtom[] = (atoms || []).map(atom => ({
-      atom_id: atom.id, // Map 'id' to 'atom_id'
-      atom_type: atom.atom_type as 'TEXT_EXPLANATION' | 'QUESTION_MULTIPLE_CHOICE' | 'INTERACTIVE_EXERCISE',
-      content: atom.content,
-      kc_ids: atom.kc_ids || [], // Ensure it's always an array
-      metadata: atom.metadata,
-      version: atom.version,
-      author_id: atom.author_id,
-      created_at: atom.created_at,
-      updated_at: atom.updated_at
-    }));
-
-    return transformedAtoms;
+    // This method is now legacy - AI generation handles content creation
+    // Return empty array to trigger AI generation path
+    return [];
   }
 }
 
