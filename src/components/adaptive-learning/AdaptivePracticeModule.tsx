@@ -4,10 +4,10 @@ import learnerProfileService from '@/services/learnerProfileService'; // Default
 import knowledgeComponentService from '@/services/knowledgeComponentService'; // Default import (from main)
 import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Default import (from main)
 import stealthAssessmentService from '@/services/stealthAssessmentService'; // Default import (from main)
-import type { LearnerProfile } from '@/types/learner'; // Using LearnerProfile type (likely updated on main)
-import type { KnowledgeComponent } from '@/types/knowledgeComponent'; // Using KnowledgeComponent type (likely updated on main)
+import type { LearnerProfile } from '@/types/learner'; 
+import type { KnowledgeComponent } from '@/types/knowledgeComponent'; 
 import type { AtomSequence, ContentAtom } from '@/types/content';
-// Corrected path for InteractionEventType based on Lovable agent's fixes
+// Corrected path for InteractionEventType - it's in stealthAssessment types
 import { InteractionEventType } from '@/types/stealthAssessment'; 
 
 import TextExplanationAtom from './atoms/TextExplanationAtom'; // PLEASE VERIFY THIS PATH
