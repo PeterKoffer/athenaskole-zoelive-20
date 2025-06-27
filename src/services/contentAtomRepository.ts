@@ -33,8 +33,7 @@ export class ContentAtomRepository {
         if (error.code === 'PGRST116') { // PostgREST error code for "object not found"
           return null;
         }
-        console.error('ContentAtomRepository: Error fetching atom by ID from Supabase:', error);
-        throw error; // Re-throw other errors
+        throw error;
       }
 
       if (!data) {
@@ -42,21 +41,13 @@ export class ContentAtomRepository {
       }
 
       // Map Supabase row to ContentAtom type
-      const atom: ContentAtom = {
-        atom_id: data.id,
-        atom_type: data.atom_type,
-        content: data.content,
-        kc_ids: data.kc_ids || [], // Ensure kc_ids is always an array
-        metadata: data.metadata,
-        version: data.version,
-        author_id: data.author_id,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
-      };
-      return atom;
+      return this.mapDbRowToContentAtom(data);
     } catch (err) {
-      console.error(`ContentAtomRepository: Exception fetching atom by ID ${id}:`, err);
-      return null; // Return null on exception to prevent breaking caller
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`ContentAtomRepository: Exception fetching atom by ID ${id}:`, err);
+      }
+      return null;
     }
   }
 
@@ -73,7 +64,6 @@ export class ContentAtomRepository {
         .contains('kc_ids', [kcId]); // Use 'contains' for array membership
 
       if (error) {
-        console.error('ContentAtomRepository: Error fetching atoms by KC ID from Supabase:', error);
         throw error;
       }
 
@@ -81,50 +71,128 @@ export class ContentAtomRepository {
         return [];
       }
 
-      const atoms: ContentAtom[] = data.map(dbAtom => ({
-        atom_id: dbAtom.id,
-        atom_type: dbAtom.atom_type,
-        content: dbAtom.content,
-        kc_ids: dbAtom.kc_ids || [],
-        metadata: dbAtom.metadata,
-        version: dbAtom.version,
-        author_id: dbAtom.author_id,
-        created_at: dbAtom.created_at,
-        updated_at: dbAtom.updated_at,
-      }));
-      return atoms;
+      return data.map(dbAtom => this.mapDbRowToContentAtom(dbAtom));
     } catch (err) {
-      console.error(`ContentAtomRepository: Exception fetching atoms for KC ID ${kcId}:`, err);
-      return []; // Return empty array on exception
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`ContentAtomRepository: Exception fetching atoms for KC ID ${kcId}:`, err);
+      }
+      return [];
     }
   }
 
-  // Add other methods like getAtomsByType, findAtoms, addAtom as needed,
-  // following a similar pattern of Supabase interaction and error handling.
-  // For now, focusing on the read operations needed by AiCreativeDirectorService.
+  /**
+   * Maps a database row to a ContentAtom object.
+   * @param dbAtom - The database row object
+   * @returns A ContentAtom object
+   */
+  private mapDbRowToContentAtom(dbAtom: any): ContentAtom {
+    return {
+      atom_id: dbAtom.id,
+      atom_type: dbAtom.atom_type,
+      content: dbAtom.content,
+      kc_ids: dbAtom.kc_ids || [],
+      metadata: dbAtom.metadata,
+      version: dbAtom.version,
+      author_id: dbAtom.author_id,
+      created_at: dbAtom.created_at,
+      updated_at: dbAtom.updated_at,
+    };
+  }
 
   /**
-   * (Placeholder) Adds a new content atom to the database.
-   * For now, it just logs. Implement Supabase insert if needed.
+   * Adds a new content atom to the database.
+   * @param atomData - Partial content atom data
+   * @returns The created ContentAtom or null if failed
    */
   async addAtom(atomData: Partial<ContentAtom>): Promise<ContentAtom | null> {
-    // To implement:
-    // const { data, error } = await supabase
-    //   .from('content_atoms')
-    //   .insert([
-    //     {
-    //       atom_type: atomData.atom_type,
-    //       kc_ids: atomData.kc_ids,
-    //       content: atomData.content,
-    //       metadata: atomData.metadata,
-    //       // ... other fields, handle defaults and nullables
-    //     },
-    //   ])
-    //   .select()
-    //   .single();
-    // if (error) { ... }
-    // return mapped data;
-    return null;
+    try {
+      const { data, error } = await supabase
+        .from('content_atoms')
+        .insert([
+          {
+            atom_type: atomData.atom_type,
+            kc_ids: atomData.kc_ids,
+            content: atomData.content,
+            metadata: atomData.metadata,
+            version: atomData.version || 1,
+            author_id: atomData.author_id,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return data ? this.mapDbRowToContentAtom(data) : null;
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('ContentAtomRepository: Exception adding atom:', err);
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Updates an existing content atom.
+   * @param id - The atom ID to update
+   * @param updates - Partial updates to apply
+   * @returns The updated ContentAtom or null if failed
+   */
+  async updateAtom(id: string, updates: Partial<ContentAtom>): Promise<ContentAtom | null> {
+    try {
+      const { data, error } = await supabase
+        .from('content_atoms')
+        .update({
+          atom_type: updates.atom_type,
+          content: updates.content,
+          kc_ids: updates.kc_ids,
+          metadata: updates.metadata,
+          version: updates.version,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return data ? this.mapDbRowToContentAtom(data) : null;
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`ContentAtomRepository: Exception updating atom ${id}:`, err);
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Deletes a content atom by ID.
+   * @param id - The atom ID to delete
+   * @returns True if successful, false otherwise
+   */
+  async deleteAtom(id: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('content_atoms')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      return true;
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`ContentAtomRepository: Exception deleting atom ${id}:`, err);
+      }
+      return false;
+    }
   }
 }
 
