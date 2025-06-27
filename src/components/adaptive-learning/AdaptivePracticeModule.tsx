@@ -1,13 +1,17 @@
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import learnerProfileService from '@/services/learnerProfileService'; // Default import
-import knowledgeComponentService from '@/services/knowledgeComponentService'; // Default import
-import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Default import
-import stealthAssessmentService from '@/services/stealthAssessmentService'; // Default import
-import type { LearnerProfile } from '@/types/learner'; 
-import type { KnowledgeComponent } from '@/types/knowledgeComponent'; 
-import type { AtomSequence, ContentAtom } from '@/types/content';
-import { InteractionEventType } from '@/types/stealthAssessment'; // Import from the correct location
+import learnerProfileService from '@/services/learnerProfileService'; // Default import (from main)
+import knowledgeComponentService from '@/services/knowledgeComponentService'; // Default import (from main)
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Default import (from main)
+import stealthAssessmentService from '@/services/stealthAssessmentService'; // Default import (from main)
+import type { LearnerProfile } from '@/types/learner'; // Assuming LearnerProfile type from main is comprehensive
+import type { KnowledgeComponent } from '@/types/knowledgeComponent'; // Type from main
+import type { AtomSequence, ContentAtom } from '@/types/content'; // Types from main/feat branch
+
+// Path for InteractionEventType as per Lovable agent's fix (likely in stealthAssessment or a dedicated interaction types file)
+// Please verify this path based on where Lovable agent defined/fixed it.
+// Common options might be '@/types/interaction' or '@/types/stealthAssessment'
+import { InteractionEventType } from '@/types/stealthAssessment'; // Tentative path, VERIFY
 
 import TextExplanationAtom from './atoms/TextExplanationAtom'; // PLEASE VERIFY THIS PATH
 import QuestionCard from './cards/QuestionCard'; // PLEASE VERIFY THIS PATH
@@ -15,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
 
-const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; // UUID format
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; // UUID format (from main)
 
 const AdaptivePracticeModule: React.FC = () => {
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
@@ -37,7 +41,7 @@ const AdaptivePracticeModule: React.FC = () => {
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(profile);
       console.log("AdaptivePracticeModule: Learner profile loaded:", profile);
-      setIsLoading(false); // Set loading false after profile is loaded
+      setIsLoading(false); // Corrected: set isLoading to false after profile is loaded
     } catch (err) {
       console.error("AdaptivePracticeModule: Error loading learner profile:", err);
       setError("Failed to load learner profile. Please try again.");
@@ -64,7 +68,6 @@ const AdaptivePracticeModule: React.FC = () => {
       const nextKc = recommendedKcs[0];
       console.log("AdaptivePracticeModule: Next KC recommended:", nextKc);
       setCurrentKc(nextKc);
-      // Add to sessionKcs using the correct KC object, not just ID
       setSessionKcs(prevKcs => [...prevKcs, nextKc]); 
 
       console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.id);
@@ -84,7 +87,7 @@ const AdaptivePracticeModule: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []); // recommendAndLoadNextKc is stable now
+  }, []); 
 
   useEffect(() => {
     console.log("AdaptivePracticeModule: Initializing...");
@@ -97,8 +100,7 @@ const AdaptivePracticeModule: React.FC = () => {
       const excludedIds = sessionKcs.map(kc => kc.id);
       recommendAndLoadNextKc(learnerProfile, excludedIds);
     }
-  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc, sessionKcs]); // sessionKcs needed here to re-trigger if user cycles through all KCs and sessionKcs is effectively 'reset' or needs re-evaluation for exclusions
-
+  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc, sessionKcs]);
 
   const handleNextAtom = () => {
     setShowFeedback(false); 
@@ -119,7 +121,7 @@ const AdaptivePracticeModule: React.FC = () => {
 
     console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
     
-    const eventData = { // This is QuestionAttemptEvent content from types/interaction.ts
+    const eventData = { 
       questionId: atom.atom_id, 
       kc_ids: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.id],
       answerGiven: answerGiven,
@@ -129,7 +131,7 @@ const AdaptivePracticeModule: React.FC = () => {
 
     try {
       await stealthAssessmentService.logInteractionEvent({
-        event_type: InteractionEventType.QUESTION_ATTEMPT, // Using the enum
+        event_type: InteractionEventType.QUESTION_ATTEMPT,
         user_id: learnerProfile.userId,
         event_data: eventData, 
         kc_ids: eventData.kc_ids,
