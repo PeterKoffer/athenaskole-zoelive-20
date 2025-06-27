@@ -1,23 +1,32 @@
-
+// src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info, Database } from 'lucide-react';
-import learnerProfileService from '@/services/learnerProfile/LearnerProfileService';
-import knowledgeComponentService from '@/services/knowledgeComponentService';
-import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
+
+// Service Imports - VERIFY THESE PATHS based on Lovable agent's refactoring
+import learnerProfileService from '@/services/learnerProfile/LearnerProfileService'; 
+import knowledgeComponentService from '@/services/knowledgeComponentService'; // Or e.g., '@/services/knowledgeComponent/KnowledgeComponentService'
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Or e.g., '@/services/aiCreativeDirector/AiCreativeDirectorService'
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
-import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
+
+// MOCK_USER_ID Import
+import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService'; // This should point to the file where MOCK_USER_ID (with the real test UUID) is defined
+
+// Type Imports - VERIFY THESE PATHS
 import { LearnerProfile } from '@/types/learnerProfile';
 import type { KnowledgeComponent } from '@/types/knowledgeComponent';
 import type { AtomSequence, ContentAtom } from '@/types/content';
-import TextExplanationAtom from './atoms/TextExplanationAtom';
-import QuestionCard from './cards/QuestionCard';
-import ServiceTestingInterface from './components/ServiceTestingInterface';
-import LoadingState from './components/LoadingState';
-import ErrorState from './components/ErrorState';
-import EmptyContentState from './components/EmptyContentState';
-import PracticeContent from './components/PracticeContent';
+import type { QuestionAttemptEvent } from '@/types/interaction'; // Assuming InteractionEventType might be part of this or a separate import if needed by other types
+
+// UI Component Imports - VERIFY THESE PATHS (use @/ or ./ as appropriate)
+import TextExplanationAtom from '@/components/adaptive-learning/atoms/TextExplanationAtom';
+import QuestionCard from '@/components/adaptive-learning/cards/QuestionCard';
+import ServiceTestingInterface from '@/components/adaptive-learning/components/ServiceTestingInterface';
+import LoadingState from '@/components/adaptive-learning/components/LoadingState';
+import ErrorState from '@/components/adaptive-learning/components/ErrorState';
+import EmptyContentState from '@/components/adaptive-learning/components/EmptyContentState';
+import PracticeContent from '@/components/adaptive-learning/components/PracticeContent';
 
 const AdaptivePracticeModule: React.FC = () => {
   // Core learning states
@@ -36,7 +45,7 @@ const AdaptivePracticeModule: React.FC = () => {
   useEffect(() => {
     console.log('🎯 AdaptivePracticeModule mounted - Using refactored StealthAssessmentService');
     loadLearnerProfile();
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
   const loadLearnerProfile = useCallback(async () => {
     try {
@@ -46,10 +55,11 @@ const AdaptivePracticeModule: React.FC = () => {
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(profile);
       console.log("AdaptivePracticeModule: Learner profile loaded:", profile);
+      // setIsLoading(false); // Moved to recommendAndLoadNextKc or error paths
     } catch (err) {
       console.error("AdaptivePracticeModule: Error loading learner profile:", err);
       setError("Failed to load learner profile. Please try again.");
-      setIsLoading(false);
+      setIsLoading(false); // Set loading to false on error
     }
   }, []);
 
@@ -117,28 +127,26 @@ const AdaptivePracticeModule: React.FC = () => {
     console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
 
     try {
-      // Log the interaction using the refactored service
       await stealthAssessmentService.logQuestionAttempt({
         questionId: atom.atom_id,
         knowledgeComponentIds: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.id],
         answerGiven: Array.isArray(answerGiven) ? answerGiven.join(', ') : answerGiven,
         isCorrect: isCorrectAnswer,
-        timeTakenMs: Math.floor(Math.random() * 20000) + 5000,
-        attemptsMade: 1
+        timeTakenMs: Math.floor(Math.random() * 20000) + 5000, // Example: random time
+        attemptsMade: 1 // Example: assuming first attempt for simplicity here
       }, 'adaptive-practice-module');
 
-      // Update KC mastery
       console.log('📈 Updating KC mastery via LearnerProfileService...');
       const updatedProfile = await learnerProfileService.updateKcMastery(
-        MOCK_USER_ID,
+        MOCK_USER_ID, // Should be learnerProfile.userId if using the fetched profile's ID
         currentKc.id,
         {
           isCorrect: isCorrectAnswer,
           newAttempt: true,
           interactionType: 'QUESTION_ATTEMPT',
           interactionDetails: { 
-            difficulty: 3, 
-            responseTime: Math.floor(Math.random() * 20000) + 5000,
+            difficulty: (atom.metadata as any)?.difficulty || 0.5, // Example: get difficulty from atom metadata if available
+            responseTime: Math.floor(Math.random() * 20000) + 5000, // Example: random time, same as timeTakenMs for this event
             atomId: atom.atom_id,
             timestamp: Date.now()
           }
@@ -153,9 +161,9 @@ const AdaptivePracticeModule: React.FC = () => {
     }
 
     setIsCorrect(isCorrectAnswer);
-    const feedbackContent = atom.content as any;
-    setFeedbackMessage(isCorrectAnswer ?
-      (feedbackContent.correctFeedback || "Correct!") :
+    const feedbackContent = atom.content as any; 
+    setFeedbackMessage(isCorrectAnswer ? 
+      (feedbackContent.correctFeedback || "Correct!") : 
       (feedbackContent.generalIncorrectFeedback || "Not quite. Let's review.")
     );
     setShowFeedback(true);
@@ -167,13 +175,12 @@ const AdaptivePracticeModule: React.FC = () => {
     if (learnerProfile) {
       recommendAndLoadNextKc(learnerProfile);
     } else {
-      loadLearnerProfile();
+      loadLearnerProfile(); 
     }
   };
 
   const currentAtom = atomSequence?.atoms[currentAtomIndex];
 
-  // Show service testing interface if enabled
   if (showServiceTests) {
     return (
       <ServiceTestingInterface 
@@ -195,7 +202,7 @@ const AdaptivePracticeModule: React.FC = () => {
       />
     );
   }
-
+  
   if (!isLoading && (!currentKc || !currentAtom)) {
     return (
       <EmptyContentState 
@@ -204,7 +211,7 @@ const AdaptivePracticeModule: React.FC = () => {
       />
     );
   }
-
+  
   if (!currentAtom) {
     return <LoadingState title="Preparing Content..." />;
   }
