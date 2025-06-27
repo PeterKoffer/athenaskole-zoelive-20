@@ -8,13 +8,12 @@ import type { LearnerProfile } from '@/types/learner'; // Assuming LearnerProfil
 import type { KnowledgeComponent } from '@/types/knowledgeComponent'; // Type from main
 import type { AtomSequence, ContentAtom } from '@/types/content'; // Types from main/feat branch
 
-// Path for InteractionEventType as per Lovable agent's fix (likely in stealthAssessment or a dedicated interaction types file)
-// Please verify this path based on where Lovable agent defined/fixed it.
-// Common options might be '@/types/interaction' or '@/types/stealthAssessment'
-import { InteractionEventType } from '@/types/stealthAssessment'; // Tentative path, VERIFY
+// Corrected import path for InteractionEventType - it's in stealthAssessment types
+import { InteractionEventType } from '@/types/stealthAssessment';
 
-import TextExplanationAtom from './atoms/TextExplanationAtom'; // PLEASE VERIFY THIS PATH
-import QuestionCard from './cards/QuestionCard'; // PLEASE VERIFY THIS PATH
+// Corrected import paths for components - they are in the atoms and cards subdirectories
+import TextExplanationAtom from './atoms/TextExplanationAtom';
+import QuestionCard from './cards/QuestionCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
