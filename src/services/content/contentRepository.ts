@@ -5,8 +5,6 @@ import type { ContentAtom } from '@/types/content';
 
 export class ContentRepository {
   async getExistingContent(subject: string, skillArea: string, difficultyLevel: number): Promise<any> {
-    console.log(`🔍 Looking for existing content: ${subject}/${skillArea} level ${difficultyLevel}`);
-    
     const { data: existingContent, error: fetchError } = await supabase
       .from('adaptive_content')
       .select('*')
@@ -20,7 +18,6 @@ export class ContentRepository {
       return null;
     }
 
-    console.log('📋 Existing content found:', existingContent);
     return existingContent && existingContent.length > 0 ? existingContent[0] : null;
   }
 
@@ -57,7 +54,6 @@ export class ContentRepository {
       };
     }
 
-    console.log('✅ Successfully saved and retrieved generated content:', savedContent);
     return savedContent;
   }
 
@@ -77,8 +73,6 @@ export class ContentRepository {
   }
 
   async getAtomsByKcId(kcId: string): Promise<ContentAtom[]> {
-    console.log(`🔍 ContentRepository: Looking for atoms with KC ID: ${kcId}`);
-    
     const { data: atoms, error } = await supabase
       .from('content_atoms')
       .select('*')
@@ -88,8 +82,6 @@ export class ContentRepository {
       console.error('❌ ContentRepository: Error fetching atoms:', error);
       throw error;
     }
-
-    console.log(`📋 ContentRepository: Found ${atoms?.length || 0} atoms for KC ID: ${kcId}`);
     
     // Transform the data to match ContentAtom interface with proper field mapping
     const transformedAtoms: ContentAtom[] = (atoms || []).map(atom => ({

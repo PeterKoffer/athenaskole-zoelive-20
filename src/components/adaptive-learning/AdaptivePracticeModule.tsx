@@ -24,7 +24,6 @@ const AdaptivePracticeModule: React.FC = () => {
 
   // Load initial profile
   useEffect(() => {
-    console.log('🎯 AdaptivePracticeModule mounted - Starting initialization');
     loadLearnerProfile(
       (profile) => {
         updateState({ learnerProfile: profile, isLoading: false });
@@ -38,7 +37,6 @@ const AdaptivePracticeModule: React.FC = () => {
   // Load content when profile is ready
   useEffect(() => {
     if (state.learnerProfile && !state.currentKc && !state.isLoading && !state.error) {
-      console.log('🔄 Profile ready, loading content...');
       setLoading(true);
       
       recommendAndLoadContent(
@@ -68,7 +66,6 @@ const AdaptivePracticeModule: React.FC = () => {
     if (state.atomSequence && state.currentAtomIndex < state.atomSequence.atoms.length - 1) {
       updateState({ currentAtomIndex: state.currentAtomIndex + 1 });
     } else if (state.learnerProfile) {
-      console.log('🔄 End of sequence, loading next content...');
       setLoading(true);
       
       recommendAndLoadContent(
@@ -95,12 +92,6 @@ const AdaptivePracticeModule: React.FC = () => {
       console.error('❌ Cannot handle answer - missing KC or profile');
       return;
     }
-
-    console.log('📝 Question answered:', {
-      kcId: state.currentKc.id,
-      atomId: atom.atom_id,
-      isCorrect: isCorrectAnswer
-    });
 
     try {
       // Log the attempt

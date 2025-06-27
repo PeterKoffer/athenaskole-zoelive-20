@@ -10,17 +10,11 @@ export const useProfileManagement = () => {
     onError: (error: string) => void
   ) => {
     try {
-      console.log('👤 Loading learner profile for user:', MOCK_USER_ID);
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       
       if (!profile) {
         throw new Error('No profile returned from service');
       }
-
-      console.log('✅ Profile loaded successfully:', {
-        userId: profile.userId,
-        kcCount: Object.keys(profile.kcMasteryMap || {}).length
-      });
 
       onSuccess(profile);
     } catch (error) {

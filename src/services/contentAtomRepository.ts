@@ -1,3 +1,4 @@
+
 // src/services/contentAtomRepository.ts
 import { supabase } from '@/integrations/supabase/client';
 
@@ -22,7 +23,6 @@ export class ContentAtomRepository {
    * @returns A ContentAtom object or null if not found or an error occurs.
    */
   async getAtomById(id: string): Promise<ContentAtom | null> {
-    console.log(`ContentAtomRepository: Fetching atom by ID: ${id}`);
     try {
       const { data, error } = await supabase
         .from('content_atoms')
@@ -32,7 +32,6 @@ export class ContentAtomRepository {
 
       if (error) {
         if (error.code === 'PGRST116') { // PostgREST error code for "object not found"
-          console.warn(`ContentAtomRepository: No atom found with ID: ${id}`);
           return null;
         }
         console.error('ContentAtomRepository: Error fetching atom by ID from Supabase:', error);
@@ -55,7 +54,6 @@ export class ContentAtomRepository {
         created_at: data.created_at,
         updated_at: data.updated_at,
       };
-      console.log(`ContentAtomRepository: Successfully fetched atom:`, atom);
       return atom;
     } catch (err) {
       console.error(`ContentAtomRepository: Exception fetching atom by ID ${id}:`, err);
@@ -69,7 +67,6 @@ export class ContentAtomRepository {
    * @returns An array of ContentAtom objects.
    */
   async getAtomsByKcId(kcId: string): Promise<ContentAtom[]> {
-    console.log(`ContentAtomRepository: Fetching atoms for KC ID: ${kcId}`);
     try {
       const { data, error } = await supabase
         .from('content_atoms')
@@ -82,7 +79,6 @@ export class ContentAtomRepository {
       }
 
       if (!data || data.length === 0) {
-        console.warn(`ContentAtomRepository: No atoms found for KC ID: ${kcId}`);
         return [];
       }
 
@@ -97,7 +93,6 @@ export class ContentAtomRepository {
         created_at: dbAtom.created_at,
         updated_at: dbAtom.updated_at,
       }));
-      console.log(`ContentAtomRepository: Successfully fetched ${atoms.length} atoms for KC ID ${kcId}:`, atoms);
       return atoms;
     } catch (err) {
       console.error(`ContentAtomRepository: Exception fetching atoms for KC ID ${kcId}:`, err);
@@ -114,7 +109,6 @@ export class ContentAtomRepository {
    * For now, it just logs. Implement Supabase insert if needed.
    */
   async addAtom(atomData: Partial<ContentAtom>): Promise<ContentAtom | null> {
-    console.log("ContentAtomRepository: addAtom called with (data will be logged if not too large):", atomData);
     // To implement:
     // const { data, error } = await supabase
     //   .from('content_atoms')
