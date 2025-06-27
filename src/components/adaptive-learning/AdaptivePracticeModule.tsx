@@ -1,20 +1,23 @@
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { learnerProfileService } from '@/services/learnerProfileService';
-import { knowledgeComponentService } from '@/services/knowledgeComponentService';
-import { aiCreativeDirectorService } from '@/services/aiCreativeDirectorService';
-import { stealthAssessmentService } from '@/services/stealthAssessmentService';
-import type { LearnerProfile, KnowledgeComponent } from '@/types/learner';
+import learnerProfileService from '@/services/learnerProfileService'; // Default import (from main)
+import knowledgeComponentService from '@/services/knowledgeComponentService'; // Default import (from main)
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Default import (from main)
+import stealthAssessmentService from '@/services/stealthAssessmentService'; // Default import (from main)
+import type { LearnerProfile } from '@/types/learner'; // Using LearnerProfile type (likely updated on main)
+import type { KnowledgeComponent } from '@/types/knowledgeComponent'; // Using KnowledgeComponent type (likely updated on main)
 import type { AtomSequence, ContentAtom } from '@/types/content';
-import type { QuestionAttemptEvent, InteractionEventType } from '@/types/interaction';
-import TextExplanationAtom from './atoms/TextExplanationAtom'; // Verify this path
-import QuestionCard from './cards/QuestionCard'; // Verify this path
+// Corrected path for InteractionEventType based on Lovable agent's fixes
+import { InteractionEventType } from '@/types/stealthAssessment';
+
+import TextExplanationAtom from './atoms/TextExplanationAtom'; // PLEASE VERIFY THIS PATH
+import QuestionCard from './cards/QuestionCard'; // PLEASE VERIFY THIS PATH
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
 
-// MOCK USER ID - Replace with actual user ID from auth context later
-const MOCK_USER_ID = 'mockUser123';
+// Using UUID format MOCK_USER_ID (from main)
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 const AdaptivePracticeModule: React.FC = () => {
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
@@ -36,6 +39,7 @@ const AdaptivePracticeModule: React.FC = () => {
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(profile);
       console.log("AdaptivePracticeModule: Learner profile loaded:", profile);
+      setIsLoading(false); // Corrected: set isLoading to false after profile is loaded
     } catch (err) {
       console.error("AdaptivePracticeModule: Error loading learner profile:", err);
       setError("Failed to load learner profile. Please try again.");
@@ -43,37 +47,36 @@ const AdaptivePracticeModule: React.FC = () => {
     }
   }, []);
 
-  const recommendAndLoadNextKc = useCallback(async (profile: LearnerProfile) => {
+  const recommendAndLoadNextKc = useCallback(async (profile: LearnerProfile, excludedKcIds: string[]) => {
     try {
       setError(null);
       setIsLoading(true);
       console.log("AdaptivePracticeModule: Recommending next KC for profile:", profile);
-      const excludedKcIds = sessionKcs.map(kc => kc.kc_id);
       console.log("AdaptivePracticeModule: Excluding already attempted KC IDs in this session:", excludedKcIds);
-      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.user_id, 1, excludedKcIds);
+      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.userId, 1, excludedKcIds);
       
       if (recommendedKcs.length === 0) {
         console.warn("AdaptivePracticeModule: No more KCs to recommend or all attempted in this session.");
         setError("No more new Knowledge Components to practice in this session. You've covered a lot! Try refreshing for a new set or check back later.");
         setCurrentKc(null);
         setAtomSequence(null);
-        setIsLoading(false); 
+        setIsLoading(false);
         return;
       }
       const nextKc = recommendedKcs[0];
       console.log("AdaptivePracticeModule: Next KC recommended:", nextKc);
       setCurrentKc(nextKc);
-      setSessionKcs(prevKcs => [...prevKcs, nextKc]); 
+      setSessionKcs(prevKcs => [...prevKcs, nextKc]);
 
-      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.kc_id);
-      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.kc_id, profile.user_id);
+      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.id);
+      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
       setAtomSequence(sequence);
       setCurrentAtomIndex(0);
-      setShowFeedback(false); 
+      setShowFeedback(false);
       console.log("AdaptivePracticeModule: Atom sequence received:", sequence);
 
       if (!sequence || sequence.atoms.length === 0) {
-        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.kc_id);
+        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.id);
         setError(`No content atoms found for the topic: ${nextKc.name}. Please try refreshing for another topic.`);
       }
     } catch (err) {
@@ -82,7 +85,7 @@ const AdaptivePracticeModule: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionKcs]); 
+  }, []);
 
   useEffect(() => {
     console.log("AdaptivePracticeModule: Initializing...");
@@ -90,19 +93,21 @@ const AdaptivePracticeModule: React.FC = () => {
   }, [loadLearnerProfile]);
 
   useEffect(() => {
-    if (learnerProfile && !currentKc && !isLoading && !error) { 
+    if (learnerProfile && !currentKc && !isLoading && !error) {
       console.log("AdaptivePracticeModule: Learner profile available, no current KC, not loading, and no error. Attempting to recommend KC.");
-      recommendAndLoadNextKc(learnerProfile);
+      const excludedIds = sessionKcs.map(kc => kc.id);
+      recommendAndLoadNextKc(learnerProfile, excludedIds);
     }
-  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc]);
+  }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc, sessionKcs]);
 
   const handleNextAtom = () => {
-    setShowFeedback(false); 
+    setShowFeedback(false);
     if (atomSequence && currentAtomIndex < atomSequence.atoms.length - 1) {
       setCurrentAtomIndex(prevIndex => prevIndex + 1);
     } else if (learnerProfile) {
       console.log("AdaptivePracticeModule: End of sequence, recommending next KC.");
-      recommendAndLoadNextKc(learnerProfile);
+      const excludedIds = sessionKcs.map(kc => kc.id);
+      recommendAndLoadNextKc(learnerProfile, excludedIds);
     }
   };
   
@@ -112,11 +117,11 @@ const AdaptivePracticeModule: React.FC = () => {
       return;
     }
 
-    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.kc_id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
+    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
     
-    const eventData: QuestionAttemptEvent = {
-      questionId: atom.atom_id, 
-      kc_ids: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.kc_id],
+    const eventData = {
+      questionId: atom.atom_id,
+      kc_ids: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.id],
       answerGiven: answerGiven,
       isCorrect: isCorrectAnswer,
       timestamp: new Date().toISOString(),
@@ -124,9 +129,9 @@ const AdaptivePracticeModule: React.FC = () => {
 
     try {
       await stealthAssessmentService.logInteractionEvent({
-        event_type: 'QUESTION_ATTEMPT' as InteractionEventType,
-        user_id: learnerProfile.user_id,
-        event_data: eventData, 
+        event_type: InteractionEventType.QUESTION_ATTEMPT,
+        user_id: learnerProfile.userId,
+        event_data: eventData,
         kc_ids: eventData.kc_ids,
         content_atom_id: atom.atom_id,
         is_correct: isCorrectAnswer,
@@ -141,9 +146,9 @@ const AdaptivePracticeModule: React.FC = () => {
     }
 
     setIsCorrect(isCorrectAnswer);
-    const feedbackContent = atom.content as any; 
-    setFeedbackMessage(isCorrectAnswer ? 
-      (feedbackContent.correctFeedback || "Correct!") : 
+    const feedbackContent = atom.content as any;
+    setFeedbackMessage(isCorrectAnswer ?
+      (feedbackContent.correctFeedback || "Correct!") :
       (feedbackContent.generalIncorrectFeedback || "Not quite. Let's review.")
     );
     setShowFeedback(true);
@@ -175,16 +180,17 @@ const AdaptivePracticeModule: React.FC = () => {
         </CardHeader>
         <CardContent className="text-center py-10">
           <p className="text-lg mb-6">{error}</p>
-          <Button 
-            onClick={() => { 
-              setError(null); 
-              setIsLoading(true); 
+          <Button
+            onClick={() => {
+              setError(null);
+              setIsLoading(true);
               if (learnerProfile) {
-                 recommendAndLoadNextKc(learnerProfile);
+                 const excludedIds = sessionKcs.map(kc => kc.id);
+                 recommendAndLoadNextKc(learnerProfile, excludedIds);
               } else {
-                 loadLearnerProfile(); 
+                 loadLearnerProfile();
               }
-            }} 
+            }}
             variant="destructive" className="bg-red-500 hover:bg-red-600"
           >
             <RefreshCw className="h-5 w-5 mr-2" />
@@ -195,7 +201,7 @@ const AdaptivePracticeModule: React.FC = () => {
     );
   }
   
-  if (!isLoading && (!currentKc || !currentAtom)) { 
+  if (!isLoading && (!currentKc || !currentAtom)) {
     return (
       <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-gray-800 text-white">
         <CardHeader>
@@ -204,12 +210,16 @@ const AdaptivePracticeModule: React.FC = () => {
         <CardContent className="text-center py-10">
           <Info className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
           <p className="text-lg mb-6">No new learning content could be loaded right now. You might have completed all available topics for this session, or there was an issue fetching new material.</p>
-           <Button 
-            onClick={() => { 
+           <Button
+            onClick={() => {
               setError(null);
-              setIsLoading(true); 
-              if (learnerProfile) recommendAndLoadNextKc(learnerProfile); else loadLearnerProfile(); 
-            }} 
+              setIsLoading(true);
+              if (learnerProfile) {
+                const excludedIds = sessionKcs.map(kc => kc.id);
+                recommendAndLoadNextKc(learnerProfile, excludedIds);
+              }
+              else loadLearnerProfile();
+            }}
             variant="outline"
           >
             <RefreshCw className="h-5 w-5 mr-2" />
@@ -220,7 +230,7 @@ const AdaptivePracticeModule: React.FC = () => {
     );
   }
   
-  if (!currentAtom) { 
+  if (!currentAtom) {
     return (
          <Card className="w-full max-w-2xl mx-auto mt-10 shadow-xl bg-yellow-900/20 border-yellow-700 text-white">
             <CardHeader><CardTitle className="text-yellow-300">Preparing Content...</CardTitle></CardHeader>
@@ -236,21 +246,21 @@ const AdaptivePracticeModule: React.FC = () => {
     <Card className="w-full max-w-2xl mx-auto mt-4 md:mt-8 shadow-2xl bg-slate-800 text-slate-50 border border-slate-700">
       <CardHeader className="pb-4 bg-slate-700/50 rounded-t-lg">
         <CardTitle className="text-xl md:text-2xl font-bold text-center text-sky-300">
-          Adaptive Practice: {currentKc.name} 
+          Adaptive Practice: {currentKc.name}
         </CardTitle>
-        {learnerProfile && currentKc && learnerProfile.kc_mastery[currentKc.kc_id] && (
+        {learnerProfile && currentKc && learnerProfile.kcMasteryMap && learnerProfile.kcMasteryMap[currentKc.id] && (
           <p className="text-xs text-center text-slate-400 mt-1">
-            User: {learnerProfile.user_id} | KC Mastery: {learnerProfile.kc_mastery[currentKc.kc_id].mastery_level.toFixed(2)}
+            User: {learnerProfile.userId} | KC Mastery: {learnerProfile.kcMasteryMap[currentKc.id].masteryLevel.toFixed(2)}
           </p>
         )}
-         {learnerProfile && currentKc && !learnerProfile.kc_mastery[currentKc.kc_id] && (
+         {learnerProfile && currentKc && (!learnerProfile.kcMasteryMap || !learnerProfile.kcMasteryMap[currentKc.id]) && (
           <p className="text-xs text-center text-slate-400 mt-1">
-            User: {learnerProfile.user_id} | KC Mastery: N/A
+            User: {learnerProfile.userId} | KC Mastery: N/A
           </p>
         )}
       </CardHeader>
       <CardContent className="p-4 md:p-6 min-h-[200px] md:min_h-[300px] relative">
-        {isLoading && currentAtom && ( 
+        {isLoading && currentAtom && (
           <div className="absolute inset-0 bg-slate-800/70 flex flex-col items-center justify-center z-10 rounded-b-lg">
             <Loader2 className="h-12 w-12 animate-spin text-sky-400" />
             <p className="mt-3 text-sky-200">Loading next item...</p>
@@ -276,12 +286,12 @@ const AdaptivePracticeModule: React.FC = () => {
         )}
       </CardContent>
       <div className="px-4 md:px-6 py-4 border-t border-slate-700 flex justify-end bg-slate-700/30 rounded-b-lg">
-        <Button 
-          onClick={handleNextAtom} 
+        <Button
+          onClick={handleNextAtom}
           disabled={isLoading || (currentAtom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && !showFeedback)}
           className="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 disabled:opacity-60 disabled:transform-none disabled:shadow-none"
         >
-          {isLoading && currentAtomIndex === (atomSequence?.atoms.length || 0) -1 ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Next'} 
+          {isLoading && currentAtomIndex === (atomSequence?.atoms.length || 0) -1 ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Next'}
           {(!isLoading || !(currentAtomIndex === (atomSequence?.atoms.length || 0) -1)) && <ArrowRight className="h-5 w-5 ml-2" />}
         </Button>
       </div>
