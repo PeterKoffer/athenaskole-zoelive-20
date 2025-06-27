@@ -2,11 +2,10 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, TestTube } from 'lucide-react';
+import { ArrowLeft, TestTube, CheckCircle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
 import { contentRepository } from '@/services/content/contentRepository';
-import type { ContentAtom } from '@/types/content';
 
 const AdaptivePracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,31 +19,32 @@ const AdaptivePracticeTestPage: React.FC = () => {
     const testContentAtomRepository = async () => {
       console.log('🧪 Testing ContentAtomRepository...');
       
-      // Test with a sample KC ID - using a common math KC ID
-      const testKcId = 'math-algebra-linear-equations';
+      // Test with the KC IDs we just inserted
+      const testKcIds = [
+        'kc_math_g4_add_fractions_likedenom',
+        'kc_math_g4_subtract_fractions_likedenom'
+      ];
       
-      try {
-        console.log(`📋 Fetching atoms for KC ID: ${testKcId}`);
-        const atoms = await contentRepository.getAtomsByKcId(testKcId);
-        console.log(`✅ ContentAtomRepository test successful! Found ${atoms.length} atoms:`, atoms);
-        
-        // Log each atom for detailed inspection
-        atoms.forEach((atom, index) => {
-          console.log(`📝 Atom ${index + 1}:`, {
-            atom_id: atom.atom_id,
-            atom_type: atom.atom_type,
-            kc_ids: atom.kc_ids,
-            content_preview: typeof atom.content === 'object' ? 
-              JSON.stringify(atom.content).substring(0, 100) + '...' : 
-              atom.content?.toString().substring(0, 100) + '...'
+      for (const kcId of testKcIds) {
+        try {
+          console.log(`📋 Fetching atoms for KC ID: ${kcId}`);
+          const atoms = await contentRepository.getAtomsByKcId(kcId);
+          console.log(`✅ ContentAtomRepository test successful for ${kcId}! Found ${atoms.length} atoms:`, atoms);
+          
+          // Log each atom for detailed inspection
+          atoms.forEach((atom, index) => {
+            console.log(`📝 Atom ${index + 1} for ${kcId}:`, {
+              atom_id: atom.atom_id,
+              atom_type: atom.atom_type,
+              kc_ids: atom.kc_ids,
+              content_preview: typeof atom.content === 'object' ? 
+                JSON.stringify(atom.content).substring(0, 100) + '...' : 
+                atom.content?.toString().substring(0, 100) + '...'
+            });
           });
-        });
-      } catch (error) {
-        console.error('❌ ContentAtomRepository test failed:', error);
-        console.error('Error details:', {
-          message: error instanceof Error ? error.message : 'Unknown error',
-          stack: error instanceof Error ? error.stack : 'No stack trace'
-        });
+        } catch (error) {
+          console.error(`❌ ContentAtomRepository test failed for ${kcId}:`, error);
+        }
       }
     };
 
@@ -63,7 +63,7 @@ const AdaptivePracticeTestPage: React.FC = () => {
           
           <div className="flex items-center space-x-2">
             <TestTube className="w-6 h-6 text-blue-400" />
-            <h1 className="text-2xl font-bold text-white">Test Environment</h1>
+            <h1 className="text-2xl font-bold text-white">Content Atoms Test Environment</h1>
           </div>
         </div>
 
@@ -72,23 +72,41 @@ const AdaptivePracticeTestPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <TestTube className="w-5 h-5 mr-2 text-blue-400" />
-              Adaptive Practice Module Test Page
+              Adaptive Practice Module Test - With Real Database Content
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-300 mb-4">
-              This page is for testing the end-to-end flow of the adaptive practice module.
-              Use this environment to verify all functionality works as expected.
+              This page tests the end-to-end flow of the adaptive practice module with real content atoms 
+              from the Supabase database. The module should now fetch actual content instead of mock data.
             </p>
-            <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700 mb-4">
-              <p className="text-blue-300 text-sm">
-                <strong>Note:</strong> This is a development/testing page.
-              </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-green-900/30 p-4 rounded-lg border border-green-700">
+                <div className="flex items-center mb-2">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+                  <p className="text-green-300 font-medium">Database Content</p>
+                </div>
+                <p className="text-green-200 text-sm">
+                  Sample content atoms for fractions have been added to the database.
+                </p>
+              </div>
+              
+              <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700">
+                <div className="flex items-center mb-2">
+                  <TestTube className="w-5 h-5 text-blue-400 mr-2" />
+                  <p className="text-blue-300 font-medium">Testing Process</p>
+                </div>
+                <p className="text-blue-200 text-sm">
+                  Check the browser console for detailed test results and content fetching logs.
+                </p>
+              </div>
             </div>
-            <div className="bg-green-900/30 p-4 rounded-lg border border-green-700">
-              <p className="text-green-300 text-sm">
-                <strong>ContentAtomRepository Test:</strong> Check the browser console for test results.
-                The test will attempt to fetch content atoms for KC ID 'math-algebra-linear-equations'.
+
+            <div className="bg-yellow-900/30 p-4 rounded-lg border border-yellow-700">
+              <p className="text-yellow-300 text-sm">
+                <strong>Expected Behavior:</strong> The module should now display real content atoms for 
+                "Adding Fractions with Like Denominators" including explanations and practice questions.
               </p>
             </div>
           </CardContent>
