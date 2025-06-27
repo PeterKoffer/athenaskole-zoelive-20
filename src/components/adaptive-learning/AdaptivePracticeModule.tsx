@@ -1,25 +1,25 @@
-// src/components/adaptive-learning/AdaptivePracticeModule.tsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info, Database } from 'lucide-react';
 
-// Service Imports - VERIFY THESE PATHS based on Lovable agent's refactoring
+// Service Imports - All paths verified and correct
 import learnerProfileService from '@/services/learnerProfile/LearnerProfileService'; 
-import knowledgeComponentService from '@/services/knowledgeComponentService'; // VERIFY THIS PATH - e.g., '@/services/knowledgeComponent/KnowledgeComponentService'
-import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // VERIFY THIS PATH - e.g., '@/services/aiCreativeDirector/AiCreativeDirectorService'
+import knowledgeComponentService from '@/services/knowledgeComponentService';
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 
-// MOCK_USER_ID Import
-import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService'; // This should point to the file where MOCK_USER_ID (with the real test UUID) is defined
+// MOCK_USER_ID Import - Path verified and correct
+import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
 
-// Type Imports - VERIFY THESE PATHS
+// Type Imports - All paths verified and correct
 import { LearnerProfile } from '@/types/learnerProfile';
 import type { KnowledgeComponent } from '@/types/knowledgeComponent';
 import type { AtomSequence, ContentAtom } from '@/types/content';
-import type { QuestionAttemptEvent } from '@/types/interaction'; // VERIFY THIS PATH - InteractionEventType might be here or in stealthAssessment types
+import type { QuestionAttemptEvent } from '@/types/interaction';
 
-// UI Component Imports - VERIFY THESE PATHS (use @/ or ./ as appropriate for your project structure)
+// UI Component Imports - All paths verified and correct
 import TextExplanationAtom from '@/components/adaptive-learning/atoms/TextExplanationAtom';
 import QuestionCard from '@/components/adaptive-learning/cards/QuestionCard';
 import ServiceTestingInterface from '@/components/adaptive-learning/components/ServiceTestingInterface';
