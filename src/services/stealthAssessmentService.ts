@@ -27,13 +27,9 @@ const getCurrentUserId = async (): Promise<string | null> => {
   return TEST_USER_ID;
 };
 
-const getCurrentSessionId = (): string | undefined => {
+const getCurrentSessionId = (): string => {
   return 'mockSession456';
 }
-
-const isTestUser = (userId: string): boolean => {
-  return userId === TEST_USER_ID;
-};
 
 class StealthAssessmentService implements IStealthAssessmentService {
   private isInitialized = false;
@@ -82,23 +78,12 @@ class StealthAssessmentService implements IStealthAssessmentService {
 
     console.log(`StealthAssessmentService: Logging event for user ${userId}:`, fullEvent.type, fullEvent.eventId);
 
-    // For the test user, log to Supabase (no mock bypass)
-    if (isTestUser(userId)) {
-      console.log('StealthAssessmentService: Test user detected - logging to Supabase queue');
-      this.eventQueue.push(fullEvent);
-      
-      // Flush immediately for test user to ensure data is written
-      if (this.eventQueue.length >= 1) {
-        await this.flushEventQueue();
-      }
-      return;
-    }
-
-    // For other authenticated users, also use Supabase
+    // Always use Supabase for all users now
     this.eventQueue.push(fullEvent);
-    console.log('StealthAssessmentService: Event logged to queue:', fullEvent.type, fullEvent.eventId);
+    console.log('StealthAssessmentService: Event added to queue:', fullEvent.type, fullEvent.eventId);
 
-    if (this.eventQueue.length >= 10) {
+    // Flush immediately if we have a significant number of events
+    if (this.eventQueue.length >= 5) {
       await this.flushEventQueue();
     }
   }
@@ -132,13 +117,6 @@ class StealthAssessmentService implements IStealthAssessmentService {
     is_correct?: boolean;
   }): Promise<void> {
     console.log('StealthAssessmentService: Logging interaction event to Supabase:', event.event_type, 'for user:', event.user_id);
-    
-    // For test user, always use Supabase (no mock bypass)
-    if (isTestUser(event.user_id)) {
-      console.log('StealthAssessmentService: Test user detected - writing interaction event to Supabase');
-    } else {
-      console.log('StealthAssessmentService: Production user - writing interaction event to Supabase');
-    }
     
     try {
       const recordToInsert = {
