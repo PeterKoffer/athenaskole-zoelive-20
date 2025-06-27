@@ -6,6 +6,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export class SupabaseProfileService {
   async fetchOrCreateProfile(userId: string): Promise<LearnerProfile> {
+    console.log(`SupabaseProfileService: Fetching or creating profile for user ${userId}`);
+    
     try {
       const { data: existingProfileData, error: fetchError } = await supabase
         .from('learner_profiles')
@@ -19,6 +21,8 @@ export class SupabaseProfileService {
       }
 
       if (existingProfileData) {
+        console.log('SupabaseProfileService: Found existing profile, fetching KC mastery data...');
+        
         const { data: kcMasteryData, error: kcsError } = await supabase
           .from('kc_mastery')
           .select('*')
@@ -41,6 +45,8 @@ export class SupabaseProfileService {
           };
         });
 
+        console.log(`SupabaseProfileService: Successfully loaded profile with ${Object.keys(kcMasteryMap).length} KC mastery entries`);
+
         // Type assertion for preferences with fallback
         const preferences = (existingProfileData.preferences && typeof existingProfileData.preferences === 'object' && !Array.isArray(existingProfileData.preferences)) 
           ? existingProfileData.preferences as { learningPace?: 'medium' | 'slow' | 'fast'; learningStyle?: 'mixed' | 'visual' | 'kinesthetic' | 'auditory' }
@@ -57,10 +63,12 @@ export class SupabaseProfileService {
         };
       }
 
+      console.log('SupabaseProfileService: No existing profile found, creating new one...');
       return this.createNewProfile(userId);
     } catch (error) {
       console.error('SupabaseProfileService: Error in fetchOrCreateProfile:', error);
       // Return a basic profile structure as fallback
+      console.log('SupabaseProfileService: Returning fallback profile structure');
       return {
         userId: userId,
         kcMasteryMap: {},
@@ -71,6 +79,8 @@ export class SupabaseProfileService {
   }
 
   private async createNewProfile(userId: string): Promise<LearnerProfile> {
+    console.log(`SupabaseProfileService: Creating new profile for user ${userId}`);
+    
     const defaultPreferences = { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
     const newProfileData = {
       user_id: userId,
@@ -90,7 +100,7 @@ export class SupabaseProfileService {
       throw createError;
     }
     
-    console.log(`SupabaseProfileService: Initialized new profile for user ${userId} in Supabase.`);
+    console.log(`SupabaseProfileService: Successfully created new profile for user ${userId}`);
     return {
       userId: createdProfile.user_id,
       kcMasteryMap: {},
@@ -104,6 +114,8 @@ export class SupabaseProfileService {
     kcId: string,
     kcMastery: KcMastery
   ): Promise<void> {
+    console.log(`SupabaseProfileService: Updating KC mastery in Supabase for user ${userId}, KC ${kcId}`);
+    
     const currentISOTimestamp = new Date(kcMastery.lastAttemptedTimestamp || Date.now()).toISOString();
 
     const { error: upsertError } = await supabase
@@ -125,15 +137,21 @@ export class SupabaseProfileService {
     }
 
     // Update profile's lastUpdatedTimestamp
-    await supabase
+    const { error: profileUpdateError } = await supabase
       .from('learner_profiles')
       .update({ last_updated_timestamp: currentISOTimestamp })
       .eq('user_id', userId);
       
-    console.log(`SupabaseProfileService: Updated KC mastery in Supabase for user ${userId}, KC ${kcId}`);
+    if (profileUpdateError) {
+      console.error(`SupabaseProfileService: Error updating profile timestamp:`, profileUpdateError);
+    }
+      
+    console.log(`SupabaseProfileService: Successfully updated KC mastery in Supabase for user ${userId}, KC ${kcId}`);
   }
 
   async getKcMastery(userId: string, kcId: string): Promise<KcMastery | undefined> {
+    console.log(`SupabaseProfileService: Getting KC mastery for user ${userId}, KC ${kcId}`);
+    
     const { data, error } = await supabase
       .from('kc_mastery')
       .select('*')
@@ -145,8 +163,12 @@ export class SupabaseProfileService {
       console.error('SupabaseProfileService: Error fetching single KC mastery:', error);
       throw error;
     }
-    if (!data) return undefined;
+    if (!data) {
+      console.log(`SupabaseProfileService: No KC mastery found for user ${userId}, KC ${kcId}`);
+      return undefined;
+    }
 
+    console.log(`SupabaseProfileService: Successfully retrieved KC mastery for user ${userId}, KC ${kcId}`);
     return {
       kcId: data.kc_id,
       masteryLevel: data.mastery_level,
@@ -161,6 +183,8 @@ export class SupabaseProfileService {
     userId: string,
     preferences: Partial<LearnerProfile['preferences']>
   ): Promise<void> {
+    console.log(`SupabaseProfileService: Updating preferences for user ${userId}`);
+    
     const currentISOTimestamp = new Date().toISOString();
     const { data, error } = await supabase
       .from('learner_profiles')
@@ -175,7 +199,7 @@ export class SupabaseProfileService {
     }
     if (!data) throw new Error("Profile not found for preference update.");
 
-    console.log(`SupabaseProfileService: Updated preferences in Supabase for user ${userId}`);
+    console.log(`SupabaseProfileService: Successfully updated preferences for user ${userId}`);
   }
 }
 

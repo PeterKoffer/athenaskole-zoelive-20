@@ -17,12 +17,14 @@ class LearnerProfileService implements ILearnerProfileService {
     if (!userId) throw new Error("User ID is required to get a profile.");
     console.log(`LearnerProfileService: Getting profile for user ${userId}`);
 
-    // Check if this is our mock user for testing
+    // For the real test user, always use Supabase (no mock fallback)
     if (userId === MOCK_USER_ID) {
-      console.log('LearnerProfileService: Using mock profile for testing');
-      return mockProfileService.createMockProfile(userId);
+      console.log('LearnerProfileService: Using Supabase for test user (no mock fallback)');
+      return supabaseProfileService.fetchOrCreateProfile(userId);
     }
 
+    // For all other users, also use Supabase (this is the production behavior)
+    console.log('LearnerProfileService: Using Supabase for production user');
     return supabaseProfileService.fetchOrCreateProfile(userId);
   }
 
@@ -38,11 +40,13 @@ class LearnerProfileService implements ILearnerProfileService {
     }
   ): Promise<LearnerProfile> {
     if (!userId) throw new Error("User ID is required to update KC mastery.");
+    console.log(`LearnerProfileService: Updating KC mastery for user ${userId}, KC ${kcId}`);
 
-    // For mock user, just return updated mock profile
+    // For the real test user, always use Supabase (no mock fallback)
     if (userId === MOCK_USER_ID) {
-      const profile = await this.getProfile(userId);
-      return mockProfileService.updateMockKcMastery(profile, kcId, eventDetails);
+      console.log('LearnerProfileService: Using Supabase KC mastery update for test user');
+    } else {
+      console.log('LearnerProfileService: Using Supabase KC mastery update for production user');
     }
 
     const profile = await this.getProfile(userId);
@@ -88,12 +92,14 @@ class LearnerProfileService implements ILearnerProfileService {
     });
     if (kcMastery.history.length > 10) kcMastery.history.pop();
 
-    // Update in Supabase
+    // Update in Supabase (for both test and production users)
+    console.log(`LearnerProfileService: Attempting Supabase KC mastery update for user ${userId}, KC ${kcId}`);
     await supabaseProfileService.updateKcMasteryInSupabase(userId, kcId, kcMastery);
       
     profile.kcMasteryMap[kcId] = kcMastery;
     profile.lastUpdatedTimestamp = currentTimestamp;
     
+    console.log(`LearnerProfileService: Successfully updated KC mastery in Supabase for user ${userId}, KC ${kcId}`);
     return profile;
   }
 
@@ -111,6 +117,8 @@ class LearnerProfileService implements ILearnerProfileService {
     }>
   ): Promise<LearnerProfile> {
     if (!userId) throw new Error("User ID is required for batch update.");
+    console.log(`LearnerProfileService: Batch updating KC mastery for user ${userId}`);
+    
     // For simplicity, we'll call updateKcMastery repeatedly.
     // A more optimized batch update would construct a single Supabase query if possible,
     // or use a transaction/stored procedure.
@@ -123,13 +131,9 @@ class LearnerProfileService implements ILearnerProfileService {
 
   async getKcMastery(userId: string, kcId: string): Promise<KcMastery | undefined> {
     if (!userId) throw new Error("User ID is required to get KC mastery.");
+    console.log(`LearnerProfileService: Getting KC mastery for user ${userId}, KC ${kcId}`);
     
-    // Handle mock user
-    if (userId === MOCK_USER_ID) {
-      const profile = await this.getProfile(userId);
-      return profile.kcMasteryMap[kcId];
-    }
-    
+    // Always use Supabase for KC mastery retrieval
     return supabaseProfileService.getKcMastery(userId, kcId);
   }
 
@@ -138,19 +142,17 @@ class LearnerProfileService implements ILearnerProfileService {
     preferences: Partial<LearnerProfile['preferences']>
   ): Promise<LearnerProfile> {
     if (!userId) throw new Error("User ID is required to update preferences.");
+    console.log(`LearnerProfileService: Updating preferences for user ${userId}`);
     
-    // Handle mock user
-    if (userId === MOCK_USER_ID) {
-      const profile = await this.getProfile(userId);
-      return mockProfileService.updateMockPreferences(profile, preferences);
-    }
-    
+    // Always use Supabase for preferences update
     await supabaseProfileService.updatePreferences(userId, preferences);
     return this.getProfile(userId);
   }
 
   async recommendNextKcs(userId: string, count: number = 3): Promise<KnowledgeComponent[]> {
     if (!userId) throw new Error("User ID is required for recommendations.");
+    console.log(`LearnerProfileService: Getting recommendations for user ${userId}`);
+    
     const profile = await this.getProfile(userId);
     return profileRecommendationService.recommendNextKcs(profile, count);
   }
