@@ -1,22 +1,27 @@
-
 // src/components/adaptive-learning/AdaptivePracticeModule.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info, Database } from 'lucide-react';
 
-// Service Imports
+// Service Imports - VERIFY THESE PATHS based on Lovable agent's refactoring
 import learnerProfileService from '@/services/learnerProfile/LearnerProfileService'; 
-import knowledgeComponentService from '@/services/knowledgeComponentService';
-import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
+import knowledgeComponentService from '@/services/knowledgeComponentService'; // VERIFY THIS PATH - e.g., '@/services/knowledgeComponent/KnowledgeComponentService'
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // VERIFY THIS PATH - e.g., '@/services/aiCreativeDirector/AiCreativeDirectorService'
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 
 // MOCK_USER_ID Import
-import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
+import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService'; // This should point to the file where MOCK_USER_ID (with the real test UUID) is defined
 
-// Type Imports
+// Type Imports - VERIFY THESE PATHS
 import { LearnerProfile } from '@/types/learnerProfile';
 import type { KnowledgeComponent } from '@/types/knowledgeComponent';
 import type { AtomSequence, ContentAtom } from '@/types/content';
+import type { QuestionAttemptEvent } from '@/types/interaction'; // VERIFY THIS PATH - InteractionEventType might be here or in stealthAssessment types
 
-// UI Component Imports
+// UI Component Imports - VERIFY THESE PATHS (use @/ or ./ as appropriate for your project structure)
+import TextExplanationAtom from '@/components/adaptive-learning/atoms/TextExplanationAtom';
+import QuestionCard from '@/components/adaptive-learning/cards/QuestionCard';
 import ServiceTestingInterface from '@/components/adaptive-learning/components/ServiceTestingInterface';
 import LoadingState from '@/components/adaptive-learning/components/LoadingState';
 import ErrorState from '@/components/adaptive-learning/components/ErrorState';
@@ -38,7 +43,7 @@ const AdaptivePracticeModule: React.FC = () => {
   const [showServiceTests, setShowServiceTests] = useState(false);
 
   useEffect(() => {
-    console.log('🎯 AdaptivePracticeModule mounted - Starting content generation flow');
+    console.log('🎯 AdaptivePracticeModule mounted - Using refactored StealthAssessmentService');
     loadLearnerProfile();
   }, []);
 
@@ -46,123 +51,58 @@ const AdaptivePracticeModule: React.FC = () => {
     try {
       setError(null);
       setIsLoading(true);
-      console.log("📊 Fetching learner profile for user:", MOCK_USER_ID);
+      console.log("AdaptivePracticeModule: Fetching learner profile for user:", MOCK_USER_ID);
       const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(profile);
-      console.log("✅ Learner profile loaded:", profile);
+      console.log("AdaptivePracticeModule: Learner profile loaded:", profile);
     } catch (err) {
-      console.error("❌ Error loading learner profile:", err);
+      console.error("AdaptivePracticeModule: Error loading learner profile:", err);
       setError("Failed to load learner profile. Please try again.");
       setIsLoading(false);
     }
-  }, []);
-
-  const createFallbackContent = useCallback((kc: KnowledgeComponent): AtomSequence => {
-    console.log("🔄 Creating fallback content for KC:", kc.name);
-    
-    const fallbackAtoms: ContentAtom[] = [
-      {
-        atom_id: `fallback_explanation_${kc.id}_${Date.now()}`,
-        atom_type: 'TEXT_EXPLANATION',
-        content: {
-          title: `Understanding ${kc.name}`,
-          text: `Let's learn about ${kc.name}. This is an important mathematical concept that builds on your previous knowledge.`,
-          examples: [
-            "This concept is used in everyday math problems",
-            "You'll use this skill in more advanced topics"
-          ]
-        },
-        kc_ids: [kc.id],
-        metadata: { source: 'fallback', difficulty: 0.5 }
-      },
-      {
-        atom_id: `fallback_question_${kc.id}_${Date.now()}`,
-        atom_type: 'QUESTION_MULTIPLE_CHOICE',
-        content: {
-          question: `Which of the following best describes ${kc.name}?`,
-          options: [
-            "A mathematical concept",
-            "A type of equation", 
-            "A calculation method",
-            "A problem-solving strategy"
-          ],
-          correctAnswer: 0,
-          correctFeedback: "Excellent! You understand this concept.",
-          generalIncorrectFeedback: "Let's review this concept together."
-        },
-        kc_ids: [kc.id],
-        metadata: { source: 'fallback', difficulty: 0.5 }
-      }
-    ];
-
-    return {
-      sequence_id: `fallback_sequence_${kc.id}_${Date.now()}`,
-      atoms: fallbackAtoms,
-      kc_id: kc.id,
-      user_id: MOCK_USER_ID,
-      created_at: new Date().toISOString()
-    };
   }, []);
 
   const recommendAndLoadNextKc = useCallback(async (profile: LearnerProfile) => {
     try {
       setError(null);
       setIsLoading(true);
-      console.log("🎯 Recommending next KC for profile:", profile.userId);
-      
-      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(
-        profile.userId, 
-        1, 
-        sessionKcs.map(kc => kc.id)
-      );
+      console.log("AdaptivePracticeModule: Recommending next KC for profile:", profile);
+      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(profile.userId, 1, sessionKcs.map(kc => kc.id));
 
       if (recommendedKcs.length === 0) {
-        console.warn("⚠️ No more KCs to recommend");
-        setError("No more Knowledge Components available for practice. Great job completing your learning session!");
+        console.warn("AdaptivePracticeModule: No more KCs to recommend or all attempted in this session.");
+        setError("No more new Knowledge Components to practice in this session, or an error occurred fetching them. Try refreshing or starting a new session later.");
         setCurrentKc(null);
         setAtomSequence(null);
         setIsLoading(false);
         return;
       }
-
       const nextKc = recommendedKcs[0];
-      console.log("✅ Next KC recommended:", nextKc.name);
+      console.log("AdaptivePracticeModule: Next KC recommended:", nextKc);
       setCurrentKc(nextKc);
       setSessionKcs(prevKcs => [...prevKcs, nextKc]);
 
-      console.log("🎨 Requesting atom sequence from AI Creative Director...");
-      
-      try {
-        const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
-        
-        if (sequence && sequence.atoms && sequence.atoms.length > 0) {
-          console.log("✅ AI-generated atom sequence received:", sequence.atoms.length, "atoms");
-          setAtomSequence(sequence);
-        } else {
-          console.warn("⚠️ AI service returned empty sequence, using fallback");
-          const fallbackSequence = createFallbackContent(nextKc);
-          setAtomSequence(fallbackSequence);
-        }
-      } catch (aiError) {
-        console.error("❌ AI Creative Director failed, using fallback content:", aiError);
-        const fallbackSequence = createFallbackContent(nextKc);
-        setAtomSequence(fallbackSequence);
-      }
-
+      console.log("AdaptivePracticeModule: Requesting atom sequence for KC:", nextKc.id);
+      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
+      setAtomSequence(sequence);
       setCurrentAtomIndex(0);
       setShowFeedback(false);
-      
+      console.log("AdaptivePracticeModule: Atom sequence received:", sequence);
+      if (!sequence || sequence.atoms.length === 0) {
+        console.warn("AdaptivePracticeModule: No atoms found for KC:", nextKc.id);
+        setError(`No content atoms found for the topic: ${nextKc.name}. Try another topic or check content availability.`);
+      }
     } catch (err) {
-      console.error("❌ Error in recommendAndLoadNextKc:", err);
+      console.error("AdaptivePracticeModule: Error recommending or loading KC/atoms:", err);
       setError("Failed to load new content. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [sessionKcs, createFallbackContent]);
+  }, [sessionKcs]);
 
   useEffect(() => {
     if (learnerProfile && !currentKc && !isLoading && !error) {
-      console.log("🚀 Profile loaded, starting KC recommendation flow");
+      console.log("AdaptivePracticeModule: Learner profile loaded, attempting to recommend KC.");
       recommendAndLoadNextKc(learnerProfile);
     }
   }, [learnerProfile, currentKc, isLoading, error, recommendAndLoadNextKc]);
@@ -172,22 +112,18 @@ const AdaptivePracticeModule: React.FC = () => {
     if (atomSequence && currentAtomIndex < atomSequence.atoms.length - 1) {
       setCurrentAtomIndex(prevIndex => prevIndex + 1);
     } else if (learnerProfile) {
-      console.log("📚 End of sequence, loading next KC");
+      console.log("AdaptivePracticeModule: End of sequence, recommending next KC.");
       recommendAndLoadNextKc(learnerProfile);
     }
   };
 
   const handleQuestionAnswer = async (atom: ContentAtom, answerGiven: string | string[], isCorrectAnswer: boolean) => {
     if (!currentKc || !learnerProfile) {
-      console.error("❌ Cannot handle answer - missing KC or profile");
+      console.error("AdaptivePracticeModule: Cannot handle answer - missing KC or profile.");
       return;
     }
 
-    console.log("📝 Question answered:", {
-      kc: currentKc.name,
-      atom: atom.atom_id,
-      correct: isCorrectAnswer
-    });
+    console.log("AdaptivePracticeModule: Question answered. KC:", currentKc.id, "Atom:", atom.atom_id, "Correct:", isCorrectAnswer);
 
     try {
       await stealthAssessmentService.logQuestionAttempt({
@@ -195,21 +131,21 @@ const AdaptivePracticeModule: React.FC = () => {
         knowledgeComponentIds: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [currentKc.id],
         answerGiven: Array.isArray(answerGiven) ? answerGiven.join(', ') : answerGiven,
         isCorrect: isCorrectAnswer,
-        timeTakenMs: Math.floor(Math.random() * 20000) + 5000,
-        attemptsMade: 1
+        timeTakenMs: Math.floor(Math.random() * 20000) + 5000, 
+        attemptsMade: 1 
       }, 'adaptive-practice-module');
 
-      console.log('📈 Updating KC mastery...');
+      console.log('📈 Updating KC mastery via LearnerProfileService...');
       const updatedProfile = await learnerProfileService.updateKcMastery(
-        MOCK_USER_ID,
+        MOCK_USER_ID, 
         currentKc.id,
         {
           isCorrect: isCorrectAnswer,
           newAttempt: true,
           interactionType: 'QUESTION_ATTEMPT',
           interactionDetails: { 
-            difficulty: (atom.metadata as any)?.difficulty || 0.5,
-            responseTime: Math.floor(Math.random() * 20000) + 5000,
+            difficulty: (atom.metadata as any)?.difficulty || 0.5, 
+            responseTime: Math.floor(Math.random() * 20000) + 5000, 
             atomId: atom.atom_id,
             timestamp: Date.now()
           }
@@ -217,17 +153,17 @@ const AdaptivePracticeModule: React.FC = () => {
       );
 
       setLearnerProfile(updatedProfile);
-      console.log("✅ Profile updated after question submission");
+      console.log("AdaptivePracticeModule: Profile updated after question submission:", updatedProfile);
 
     } catch (logError) {
-      console.error("❌ Error logging question attempt:", logError);
+      console.error("AdaptivePracticeModule: Error logging question attempt or updating profile:", logError);
     }
 
     setIsCorrect(isCorrectAnswer);
     const feedbackContent = atom.content as any; 
     setFeedbackMessage(isCorrectAnswer ? 
-      (feedbackContent.correctFeedback || "Correct! Well done!") : 
-      (feedbackContent.generalIncorrectFeedback || "Let's review this concept together.")
+      (feedbackContent.correctFeedback || "Correct!") : 
+      (feedbackContent.generalIncorrectFeedback || "Not quite. Let's review.")
     );
     setShowFeedback(true);
   };
