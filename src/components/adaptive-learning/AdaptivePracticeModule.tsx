@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,10 +54,10 @@ const AdaptivePracticeModule = () => {
       await stealthAssessmentService.logQuestionAttempt({
         questionId: 'test-question-123',
         knowledgeComponentIds: ['kc_math_g4_add_fractions_likedenom'],
+        answerGiven: 'correct_answer',
         isCorrect: true,
-        responseTime: 15000,
-        attemptNumber: 1,
-        hintUsed: false
+        timeTakenMs: 15000,
+        attemptsMade: 1
       }, 'adaptive-practice-module');
       
       addTestResult('✅ Question attempt event logged successfully');
@@ -70,9 +69,8 @@ const AdaptivePracticeModule = () => {
       await stealthAssessmentService.logHintUsage({
         questionId: 'test-question-123',
         knowledgeComponentIds: ['kc_math_g4_add_fractions_likedenom'],
-        hintType: 'explanation',
-        hintContent: 'When adding fractions with the same denominator, add only the numerators',
-        sequenceNumber: 1
+        hintId: 'hint-explanation-001',
+        hintLevel: 1
       }, 'adaptive-practice-module');
       
       addTestResult('✅ Hint usage event logged successfully');
@@ -84,9 +82,8 @@ const AdaptivePracticeModule = () => {
       await stealthAssessmentService.logContentView({
         contentAtomId: 'content-atom-fractions-001',
         knowledgeComponentIds: ['kc_math_g4_add_fractions_likedenom'],
-        viewDuration: 45000,
-        viewType: 'explanation',
-        interactionDepth: 'deep'
+        contentType: 'EXPLANATION',
+        timeViewedMs: 45000
       }, 'adaptive-practice-module');
       
       addTestResult('✅ Content view event logged successfully');
@@ -136,10 +133,10 @@ const AdaptivePracticeModule = () => {
       await stealthAssessmentService.logQuestionAttempt({
         questionId: `adaptive-question-${Date.now()}`,
         knowledgeComponentIds: [kcId],
+        answerGiven: isCorrect ? 'correct_answer' : 'incorrect_answer',
         isCorrect,
-        responseTime: Math.floor(Math.random() * 20000) + 5000,
-        attemptNumber: 1,
-        hintUsed: false
+        timeTakenMs: Math.floor(Math.random() * 20000) + 5000,
+        attemptsMade: 1
       }, 'adaptive-practice-normal-flow');
       
       // Update KC mastery (this is what would happen in real flow)
