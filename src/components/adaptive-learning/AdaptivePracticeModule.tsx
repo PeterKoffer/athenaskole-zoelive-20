@@ -4,21 +4,20 @@ import learnerProfileService from '@/services/learnerProfileService'; // Default
 import knowledgeComponentService from '@/services/knowledgeComponentService'; // Default import (from main)
 import aiCreativeDirectorService from '@/services/aiCreativeDirectorService'; // Default import (from main)
 import stealthAssessmentService from '@/services/stealthAssessmentService'; // Default import (from main)
-import type { LearnerProfile } from '@/types/learner'; // Assuming LearnerProfile type from main is comprehensive
-import type { KnowledgeComponent } from '@/types/knowledgeComponent'; // Type from main
-import type { AtomSequence, ContentAtom } from '@/types/content'; // Types from main/feat branch
+import type { LearnerProfile } from '@/types/learner'; // Using LearnerProfile type (likely updated on main)
+import type { KnowledgeComponent } from '@/types/knowledgeComponent'; // Using KnowledgeComponent type (likely updated on main)
+import type { AtomSequence, ContentAtom } from '@/types/content';
+// Corrected path for InteractionEventType based on Lovable agent's fixes
+import { InteractionEventType } from '@/types/stealthAssessment'; 
 
-// Corrected import path for InteractionEventType - it's in stealthAssessment types
-import { InteractionEventType } from '@/types/stealthAssessment';
-
-// Corrected import paths for components - they are in the atoms and cards subdirectories
-import TextExplanationAtom from './atoms/TextExplanationAtom';
-import QuestionCard from './cards/QuestionCard';
+import TextExplanationAtom from './atoms/TextExplanationAtom'; // PLEASE VERIFY THIS PATH
+import QuestionCard from './cards/QuestionCard'; // PLEASE VERIFY THIS PATH
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
 
-const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; // UUID format (from main)
+// Using UUID format MOCK_USER_ID (from main)
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; 
 
 const AdaptivePracticeModule: React.FC = () => {
   const [learnerProfile, setLearnerProfile] = useState<LearnerProfile | null>(null);
