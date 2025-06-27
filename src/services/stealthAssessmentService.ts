@@ -15,24 +15,24 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
-// Mock user ID - should match the one used in other services
-const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
+// Test user ID - should match the one used in LearnerProfileService
+const TEST_USER_ID = '12345678-1234-5678-9012-123456789012';
 
 const getCurrentUserId = async (): Promise<string | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
     return user.id;
   }
-  console.warn('StealthAssessmentService: No authenticated user found. Using mock user for testing.');
-  return MOCK_USER_ID;
+  console.warn('StealthAssessmentService: No authenticated user found. Using test user for integration testing.');
+  return TEST_USER_ID;
 };
 
 const getCurrentSessionId = (): string | undefined => {
   return 'mockSession456';
 }
 
-const isMockUser = (userId: string): boolean => {
-  return userId === MOCK_USER_ID;
+const isTestUser = (userId: string): boolean => {
+  return userId === TEST_USER_ID;
 };
 
 class StealthAssessmentService implements IStealthAssessmentService {
@@ -80,12 +80,21 @@ class StealthAssessmentService implements IStealthAssessmentService {
       ...eventData,
     } as InteractionEvent;
 
-    // For mock users, just log to console instead of queuing for database
-    if (isMockUser(userId)) {
-      console.log('StealthAssessmentService: Mock event logged (not persisted):', fullEvent.type, fullEvent.eventId);
+    console.log(`StealthAssessmentService: Logging event for user ${userId}:`, fullEvent.type, fullEvent.eventId);
+
+    // For the test user, log to Supabase (no mock bypass)
+    if (isTestUser(userId)) {
+      console.log('StealthAssessmentService: Test user detected - logging to Supabase queue');
+      this.eventQueue.push(fullEvent);
+      
+      // Flush immediately for test user to ensure data is written
+      if (this.eventQueue.length >= 1) {
+        await this.flushEventQueue();
+      }
       return;
     }
 
+    // For other authenticated users, also use Supabase
     this.eventQueue.push(fullEvent);
     console.log('StealthAssessmentService: Event logged to queue:', fullEvent.type, fullEvent.eventId);
 
@@ -122,12 +131,13 @@ class StealthAssessmentService implements IStealthAssessmentService {
     content_atom_id?: string;
     is_correct?: boolean;
   }): Promise<void> {
-    console.log('StealthAssessmentService: Logging interaction event:', event.event_type);
+    console.log('StealthAssessmentService: Logging interaction event to Supabase:', event.event_type, 'for user:', event.user_id);
     
-    // Skip database logging for mock users
-    if (isMockUser(event.user_id)) {
-      console.log('StealthAssessmentService: Mock interaction event logged (not persisted):', event.event_type);
-      return;
+    // For test user, always use Supabase (no mock bypass)
+    if (isTestUser(event.user_id)) {
+      console.log('StealthAssessmentService: Test user detected - writing interaction event to Supabase');
+    } else {
+      console.log('StealthAssessmentService: Production user - writing interaction event to Supabase');
     }
     
     try {
@@ -143,17 +153,21 @@ class StealthAssessmentService implements IStealthAssessmentService {
         is_correct: event.is_correct,
       };
 
-      const { error } = await supabase
+      console.log('StealthAssessmentService: Inserting record to interaction_events:', recordToInsert);
+
+      const { data, error } = await supabase
         .from('interaction_events')
         .insert(recordToInsert);
 
       if (error) {
         console.error('StealthAssessmentService: Supabase error logging interaction event:', error);
+        throw error;
       } else {
-        console.log('StealthAssessmentService: Successfully logged interaction event to Supabase.');
+        console.log('StealthAssessmentService: Successfully logged interaction event to Supabase for user:', event.user_id);
       }
     } catch (error) {
       console.error('StealthAssessmentService: Exception during interaction event logging:', error);
+      throw error;
     }
   }
 
@@ -166,7 +180,7 @@ class StealthAssessmentService implements IStealthAssessmentService {
     const eventsToFlush = [...this.eventQueue];
     this.eventQueue = [];
 
-    console.log(`StealthAssessmentService: Flushing ${eventsToFlush.length} events...`);
+    console.log(`StealthAssessmentService: Flushing ${eventsToFlush.length} events to Supabase...`);
 
     try {
       const recordsToInsert = eventsToFlush.map(event => ({
@@ -184,18 +198,22 @@ class StealthAssessmentService implements IStealthAssessmentService {
         content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
       }));
 
+      console.log(`StealthAssessmentService: Attempting to insert ${recordsToInsert.length} records to interaction_events table`);
+
       const { data, error } = await supabase
         .from('interaction_events')
         .insert(recordsToInsert);
 
       if (error) {
         console.error('StealthAssessmentService: Supabase error flushing event queue:', error);
+        // Re-add events to queue for retry
         this.eventQueue.unshift(...eventsToFlush);
       } else {
-        console.log(`StealthAssessmentService: Successfully flushed ${eventsToFlush.length} events to Supabase.`);
+        console.log(`StealthAssessmentService: Successfully flushed ${eventsToFlush.length} events to Supabase interaction_events table.`);
       }
     } catch (error) {
       console.error('StealthAssessmentService: Exception during event queue flush:', error);
+      // Re-add events to queue for retry
       this.eventQueue.unshift(...eventsToFlush);
     } finally {
       this.isFlushing = false;
@@ -206,7 +224,7 @@ class StealthAssessmentService implements IStealthAssessmentService {
     if (this.flushTimerId) {
       clearInterval(this.flushTimerId);
     }
-    this.flushEventQueue().catch(err => console.error("Error on final flush:", err));
+    this.flushEventQueue().catch(err => console.error("StealthAssessmentService: Error on final flush:", err));
     this.isInitialized = false;
     console.log('StealthAssessmentService: Destroyed.');
   }
