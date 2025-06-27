@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, TestTube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
-import contentAtomRepository from '@/services/content/contentRepository';
+import { contentRepository } from '@/services/content/contentRepository';
 import type { ContentAtom } from '@/types/content';
 
 const AdaptivePracticeTestPage: React.FC = () => {
@@ -25,7 +25,7 @@ const AdaptivePracticeTestPage: React.FC = () => {
       
       try {
         console.log(`📋 Fetching atoms for KC ID: ${testKcId}`);
-        const atoms = await contentAtomRepository.getAtomsByKcId(testKcId);
+        const atoms = await contentRepository.getAtomsByKcId(testKcId);
         console.log(`✅ ContentAtomRepository test successful! Found ${atoms.length} atoms:`, atoms);
         
         // Log each atom for detailed inspection
