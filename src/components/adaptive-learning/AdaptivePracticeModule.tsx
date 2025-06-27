@@ -14,11 +14,68 @@ const AdaptivePracticeModule = () => {
   const [testStatus, setTestStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
 
   useEffect(() => {
-    console.log('🎯 AdaptivePracticeModule mounted - Testing with real Supabase user:', MOCK_USER_ID);
+    console.log('🎯 AdaptivePracticeModule mounted - Ready for normal flow testing with real Supabase user:', MOCK_USER_ID);
+    
+    // Load initial profile for the normal flow
+    const loadInitialProfile = async () => {
+      try {
+        console.log('📊 Loading initial profile for normal adaptive learning flow...');
+        const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
+        setLearnerProfile(profile);
+        console.log('✅ Initial profile loaded for adaptive learning:', profile);
+      } catch (error) {
+        console.error('❌ Error loading initial profile:', error);
+      }
+    };
+    
+    loadInitialProfile();
   }, []);
 
   const addTestResult = (message: string) => {
     setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+  };
+
+  // Simulate answering a question in the normal flow
+  const handleQuestionAnswer = async (kcId: string, isCorrect: boolean) => {
+    console.log('🎯 AdaptivePracticeModule: Question answered for KC:', kcId, 'Correct:', isCorrect);
+    
+    try {
+      // Update KC mastery (this is what would happen in real flow)
+      console.log('📈 Updating KC mastery via LearnerProfileService...');
+      const updatedProfile = await learnerProfileService.updateKcMastery(
+        MOCK_USER_ID,
+        kcId,
+        {
+          isCorrect,
+          newAttempt: true,
+          interactionType: 'QUESTION_ATTEMPT',
+          interactionDetails: { 
+            difficulty: 3, 
+            responseTime: Math.floor(Math.random() * 20000) + 5000,
+            normalFlow: true,
+            timestamp: Date.now()
+          }
+        }
+      );
+      
+      console.log('✅ KC mastery updated successfully:', updatedProfile.kcMasteryMap[kcId]);
+      
+      // Refetch profile to get latest data (this is what the UI would do)
+      console.log('🔄 Refetching profile after question submission...');
+      const refreshedProfile = await learnerProfileService.getProfile(MOCK_USER_ID);
+      setLearnerProfile(refreshedProfile);
+      
+      console.log('🎯 AdaptivePracticeModule: Profile refetched after question submission:', {
+        kcMasteryMap: refreshedProfile.kcMasteryMap,
+        kcSpecific: refreshedProfile.kcMasteryMap[kcId]
+      });
+      
+      addTestResult(`✅ Question answered for ${kcId}: ${isCorrect ? 'Correct' : 'Incorrect'} - Mastery updated`);
+      
+    } catch (error) {
+      console.error('❌ Error handling question answer:', error);
+      addTestResult(`❌ Error updating mastery for ${kcId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const testSupabaseIntegration = async () => {
@@ -153,42 +210,100 @@ const AdaptivePracticeModule = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-3">
             <Database className="w-8 h-8 text-blue-400" />
-            Adaptive Practice Module - Comprehensive Supabase Test
+            Adaptive Practice Module - Normal Flow Testing
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-300 mb-4">
-            Testing the LearnerProfileService with real Supabase database integration using test user ID: 
+            Testing normal adaptive learning flow with real Supabase integration using test user ID: 
             <code className="bg-gray-800 px-2 py-1 rounded text-green-400 ml-2">{MOCK_USER_ID}</code>
           </p>
           
-          <div className="bg-green-900/30 p-4 rounded-lg border border-green-700 mb-4">
+          <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700 mb-4">
             <div className="flex items-center mb-2">
-              <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-              <p className="text-green-300 font-medium">Real Supabase User Created ✅</p>
+              <CheckCircle className="w-5 h-5 text-blue-400 mr-2" />
+              <p className="text-blue-300 font-medium">Ready for Normal Flow Testing ✅</p>
             </div>
-            <p className="text-green-200 text-sm">
-              Test user has been successfully created in the Supabase database and is ready for comprehensive integration testing.
+            <p className="text-blue-200 text-sm">
+              This module is now ready to test the complete question answering flow with real Supabase updates.
             </p>
           </div>
           
-          <Button 
-            onClick={testSupabaseIntegration}
-            disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {loading ? (
-              <>
-                <Zap className="w-4 h-4 mr-2 animate-spin" />
-                Running Comprehensive Tests...
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 mr-2" />
-                Run Comprehensive Supabase Test
-              </>
-            )}
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              onClick={testSupabaseIntegration}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {loading ? (
+                <>
+                  <Zap className="w-4 h-4 mr-2 animate-spin" />
+                  Running Comprehensive Tests...
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 mr-2" />
+                  Run Comprehensive Supabase Test
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Normal Flow Simulation */}
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Target className="w-6 h-6 text-green-400" />
+            Normal Flow Question Simulation
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-300 mb-4">
+            Test the normal question answering flow that would happen during actual adaptive learning:
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-4">
+            <Button 
+              onClick={() => handleQuestionAnswer('kc_math_g4_add_fractions_likedenom', true)}
+              className="bg-green-600 hover:bg-green-700 text-white h-auto p-4"
+            >
+              <div className="text-center">
+                <CheckCircle className="w-6 h-6 mx-auto mb-2" />
+                <div className="font-medium">Answer Correctly</div>
+                <div className="text-sm opacity-80">Fractions Addition</div>
+              </div>
+            </Button>
+            
+            <Button 
+              onClick={() => handleQuestionAnswer('kc_math_g4_subtract_fractions_likedenom', false)}
+              className="bg-red-600 hover:bg-red-700 text-white h-auto p-4"
+            >
+              <div className="text-center">
+                <AlertCircle className="w-6 h-6 mx-auto mb-2" />
+                <div className="font-medium">Answer Incorrectly</div>
+                <div className="text-sm opacity-80">Fractions Subtraction</div>
+              </div>
+            </Button>
+            
+            <Button 
+              onClick={() => handleQuestionAnswer('kc_math_g5_multiply_decimals', true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white h-auto p-4"
+            >
+              <div className="text-center">
+                <CheckCircle className="w-6 h-6 mx-auto mb-2" />
+                <div className="font-medium">Answer Correctly</div>
+                <div className="text-sm opacity-80">Decimals Multiplication</div>
+              </div>
+            </Button>
+          </div>
+          
+          <div className="mt-4 p-3 bg-yellow-900/30 rounded-lg border border-yellow-700">
+            <p className="text-yellow-300 text-sm">
+              <strong>Watch the console logs and profile data below</strong> to see real-time KC mastery updates.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -229,7 +344,7 @@ const AdaptivePracticeModule = () => {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Brain className="w-6 h-6 text-purple-400" />
-              Updated Learner Profile Data
+              Live Learner Profile Data (Updates in Real-Time)
             </CardTitle>
           </CardHeader>
           <CardContent className="text-gray-300">
@@ -251,7 +366,7 @@ const AdaptivePracticeModule = () => {
                       <div className="flex items-center gap-2">
                         <div className="flex-1 bg-gray-600 rounded-full h-2">
                           <div 
-                            className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full"
+                            className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full transition-all duration-500"
                             style={{ width: `${mastery.masteryLevel * 100}%` }}
                           />
                         </div>
@@ -261,6 +376,11 @@ const AdaptivePracticeModule = () => {
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
                         Correct: {mastery.correctAttempts}/{mastery.attempts}
+                        {mastery.lastAttemptedTimestamp && (
+                          <span className="ml-2">
+                            Last: {new Date(mastery.lastAttemptedTimestamp).toLocaleTimeString()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
