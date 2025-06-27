@@ -3,8 +3,8 @@
 
 import { LearnerProfile, KcMastery } from '@/types/learnerProfile';
 
-// Mock user for testing - matches the one used in AdaptivePracticeModule
-export const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
+// Test user for Supabase integration testing - matches the one we created in Supabase
+export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012';
 
 export class MockProfileService {
   createMockProfile(userId: string): LearnerProfile {
