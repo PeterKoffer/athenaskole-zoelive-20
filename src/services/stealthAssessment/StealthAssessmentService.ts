@@ -30,9 +30,9 @@ class StealthAssessmentService implements IStealthAssessmentService {
 
   private init(): void {
     if (this.isInitialized) return;
-    console.log('StealthAssessmentService: Initializing...');
+    console.log('StealthAssessmentService: Initializing refactored service...');
     this.isInitialized = true;
-    console.log('StealthAssessmentService: Initialized.');
+    console.log('StealthAssessmentService: Refactored service initialized and ready.');
   }
 
   public async logEvent(
@@ -86,7 +86,7 @@ class StealthAssessmentService implements IStealthAssessmentService {
   public destroy(): void {
     this.eventQueue.destroy();
     this.isInitialized = false;
-    console.log('StealthAssessmentService: Destroyed.');
+    console.log('StealthAssessmentService: Refactored service destroyed.');
   }
 }
 

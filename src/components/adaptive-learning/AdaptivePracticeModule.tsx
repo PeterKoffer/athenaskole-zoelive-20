@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, Play, BarChart3, Target, Zap, Database, CheckCircle, AlertCircle } from 'lucide-react';
 import learnerProfileService from '@/services/learnerProfile/LearnerProfileService';
+// Import the refactored service
+import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
+import { InteractionEventType } from '@/types/stealthAssessment';
 import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
 import { LearnerProfile } from '@/types/learnerProfile';
 
@@ -14,12 +17,12 @@ const AdaptivePracticeModule = () => {
   const [testStatus, setTestStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
 
   useEffect(() => {
-    console.log('🎯 AdaptivePracticeModule mounted - Ready for normal flow testing with real Supabase user:', MOCK_USER_ID);
+    console.log('🎯 AdaptivePracticeModule mounted - Using refactored StealthAssessmentService');
     
     // Load initial profile for the normal flow
     const loadInitialProfile = async () => {
       try {
-        console.log('📊 Loading initial profile for normal adaptive learning flow...');
+        console.log('📊 Loading initial profile for adaptive learning flow...');
         const profile = await learnerProfileService.getProfile(MOCK_USER_ID);
         setLearnerProfile(profile);
         console.log('✅ Initial profile loaded for adaptive learning:', profile);
@@ -35,11 +38,110 @@ const AdaptivePracticeModule = () => {
     setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
   };
 
+  // Test the refactored StealthAssessmentService
+  const testStealthAssessmentService = async () => {
+    setLoading(true);
+    setTestResults([]);
+    setTestStatus('running');
+    
+    try {
+      console.log('🚀 TESTING REFACTORED STEALTH ASSESSMENT SERVICE');
+      addTestResult('🚀 Testing refactored StealthAssessmentService...');
+      
+      // Test 1: Log a question attempt event
+      console.log('📝 Test 1: Logging question attempt event...');
+      addTestResult('📝 Test 1: Logging question attempt event...');
+      
+      await stealthAssessmentService.logQuestionAttempt({
+        questionId: 'test-question-123',
+        knowledgeComponentIds: ['kc_math_g4_add_fractions_likedenom'],
+        isCorrect: true,
+        responseTime: 15000,
+        attemptNumber: 1,
+        hintUsed: false
+      }, 'adaptive-practice-module');
+      
+      addTestResult('✅ Question attempt event logged successfully');
+      
+      // Test 2: Log a hint usage event
+      console.log('💡 Test 2: Logging hint usage event...');
+      addTestResult('💡 Test 2: Logging hint usage event...');
+      
+      await stealthAssessmentService.logHintUsage({
+        questionId: 'test-question-123',
+        knowledgeComponentIds: ['kc_math_g4_add_fractions_likedenom'],
+        hintType: 'explanation',
+        hintContent: 'When adding fractions with the same denominator, add only the numerators',
+        sequenceNumber: 1
+      }, 'adaptive-practice-module');
+      
+      addTestResult('✅ Hint usage event logged successfully');
+      
+      // Test 3: Log a content view event
+      console.log('👁️ Test 3: Logging content view event...');
+      addTestResult('👁️ Test 3: Logging content view event...');
+      
+      await stealthAssessmentService.logContentView({
+        contentAtomId: 'content-atom-fractions-001',
+        knowledgeComponentIds: ['kc_math_g4_add_fractions_likedenom'],
+        viewDuration: 45000,
+        viewType: 'explanation',
+        interactionDepth: 'deep'
+      }, 'adaptive-practice-module');
+      
+      addTestResult('✅ Content view event logged successfully');
+      
+      // Test 4: Log using legacy method for backward compatibility
+      console.log('🔄 Test 4: Testing legacy logging method...');
+      addTestResult('🔄 Test 4: Testing legacy logging method...');
+      
+      await stealthAssessmentService.logInteractionEvent({
+        event_type: InteractionEventType.QUESTION_ATTEMPT,
+        user_id: MOCK_USER_ID,
+        event_data: {
+          question_id: 'legacy-test-question',
+          is_correct: true,
+          response_time: 12000
+        },
+        kc_ids: ['kc_math_g4_subtract_fractions_likedenom'],
+        is_correct: true
+      });
+      
+      addTestResult('✅ Legacy method logged successfully');
+      
+      setTestStatus('success');
+      addTestResult('🎉 ALL STEALTH ASSESSMENT TESTS COMPLETED SUCCESSFULLY!');
+      console.log('🎉 REFACTORED STEALTH ASSESSMENT SERVICE TESTS COMPLETED!');
+      
+    } catch (error) {
+      console.error('❌ StealthAssessmentService test failed:', error);
+      setTestStatus('error');
+      addTestResult(`❌ Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      if (error instanceof Error) {
+        console.error('Error stack:', error.stack);
+        addTestResult(`Error details: ${error.stack || 'No stack trace available'}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Simulate answering a question in the normal flow
   const handleQuestionAnswer = async (kcId: string, isCorrect: boolean) => {
     console.log('🎯 AdaptivePracticeModule: Question answered for KC:', kcId, 'Correct:', isCorrect);
     
     try {
+      // Log the interaction using the refactored service
+      await stealthAssessmentService.logQuestionAttempt({
+        questionId: `adaptive-question-${Date.now()}`,
+        knowledgeComponentIds: [kcId],
+        isCorrect,
+        responseTime: Math.floor(Math.random() * 20000) + 5000,
+        attemptNumber: 1,
+        hintUsed: false
+      }, 'adaptive-practice-normal-flow');
+      
       // Update KC mastery (this is what would happen in real flow)
       console.log('📈 Updating KC mastery via LearnerProfileService...');
       const updatedProfile = await learnerProfileService.updateKcMastery(
@@ -60,17 +162,11 @@ const AdaptivePracticeModule = () => {
       
       console.log('✅ KC mastery updated successfully:', updatedProfile.kcMasteryMap[kcId]);
       
-      // Refetch profile to get latest data (this is what the UI would do)
-      console.log('🔄 Refetching profile after question submission...');
+      // Refetch profile to get latest data
       const refreshedProfile = await learnerProfileService.getProfile(MOCK_USER_ID);
       setLearnerProfile(refreshedProfile);
       
-      console.log('🎯 AdaptivePracticeModule: Profile refetched after question submission:', {
-        kcMasteryMap: refreshedProfile.kcMasteryMap,
-        kcSpecific: refreshedProfile.kcMasteryMap[kcId]
-      });
-      
-      addTestResult(`✅ Question answered for ${kcId}: ${isCorrect ? 'Correct' : 'Incorrect'} - Mastery updated`);
+      addTestResult(`✅ Question answered for ${kcId}: ${isCorrect ? 'Correct' : 'Incorrect'} - Both interaction logged and mastery updated`);
       
     } catch (error) {
       console.error('❌ Error handling question answer:', error);
@@ -210,40 +306,40 @@ const AdaptivePracticeModule = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-3">
             <Database className="w-8 h-8 text-blue-400" />
-            Adaptive Practice Module - Normal Flow Testing
+            Adaptive Practice Module - Refactored Services Integration
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-300 mb-4">
-            Testing normal adaptive learning flow with real Supabase integration using test user ID: 
+            Testing both the refactored StealthAssessmentService and LearnerProfileService integration with real Supabase using test user ID: 
             <code className="bg-gray-800 px-2 py-1 rounded text-green-400 ml-2">{MOCK_USER_ID}</code>
           </p>
           
-          <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700 mb-4">
+          <div className="bg-green-900/30 p-4 rounded-lg border border-green-700 mb-4">
             <div className="flex items-center mb-2">
-              <CheckCircle className="w-5 h-5 text-blue-400 mr-2" />
-              <p className="text-blue-300 font-medium">Ready for Normal Flow Testing ✅</p>
+              <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+              <p className="text-green-300 font-medium">Refactored Services Ready ✅</p>
             </div>
-            <p className="text-blue-200 text-sm">
-              This module is now ready to test the complete question answering flow with real Supabase updates.
+            <p className="text-green-200 text-sm">
+              Both services are now modularized and ready for testing with the existing Supabase interaction_events table.
             </p>
           </div>
           
           <div className="flex gap-4">
             <Button 
-              onClick={testSupabaseIntegration}
+              onClick={testStealthAssessmentService}
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
             >
               {loading ? (
                 <>
                   <Zap className="w-4 h-4 mr-2 animate-spin" />
-                  Running Comprehensive Tests...
+                  Testing Refactored Service...
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4 mr-2" />
-                  Run Comprehensive Supabase Test
+                  Test Refactored StealthAssessmentService
                 </>
               )}
             </Button>
@@ -256,12 +352,12 @@ const AdaptivePracticeModule = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Target className="w-6 h-6 text-green-400" />
-            Normal Flow Question Simulation
+            Integrated Flow Question Simulation
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-300 mb-4">
-            Test the normal question answering flow that would happen during actual adaptive learning:
+            Test the integrated flow with both interaction logging AND KC mastery updates:
           </p>
           
           <div className="grid md:grid-cols-3 gap-4">
@@ -299,9 +395,9 @@ const AdaptivePracticeModule = () => {
             </Button>
           </div>
           
-          <div className="mt-4 p-3 bg-yellow-900/30 rounded-lg border border-yellow-700">
-            <p className="text-yellow-300 text-sm">
-              <strong>Watch the console logs and profile data below</strong> to see real-time KC mastery updates.
+          <div className="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-700">
+            <p className="text-blue-300 text-sm">
+              <strong>Integrated Flow:</strong> Each interaction logs to Supabase AND updates KC mastery in real-time.
             </p>
           </div>
         </CardContent>
@@ -315,7 +411,7 @@ const AdaptivePracticeModule = () => {
               {testStatus === 'success' && <CheckCircle className="w-6 h-6 text-green-400" />}
               {testStatus === 'error' && <AlertCircle className="w-6 h-6 text-red-400" />}
               {testStatus === 'running' && <Zap className="w-6 h-6 text-blue-400 animate-spin" />}
-              Test Results
+              Service Test Results
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -447,41 +543,41 @@ const AdaptivePracticeModule = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Database className="w-6 h-6 text-blue-400" />
-            Database Integration Status
+            Refactored Services Integration Status
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-4 gap-4">
             <div className="bg-green-900/30 p-4 rounded-lg border border-green-700">
               <div className="flex items-center justify-between">
-                <span className="text-green-300 font-medium">Supabase Connection</span>
+                <span className="text-green-300 font-medium">Interaction Events Table</span>
                 <CheckCircle className="w-5 h-5 text-green-400" />
               </div>
-              <p className="text-green-200 text-sm mt-1">Active & Ready</p>
+              <p className="text-green-200 text-sm mt-1">Ready & Active</p>
             </div>
             
             <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700">
               <div className="flex items-center justify-between">
-                <span className="text-blue-300 font-medium">Test User</span>
+                <span className="text-blue-300 font-medium">Refactored Service</span>
                 <CheckCircle className="w-5 h-5 text-blue-400" />
               </div>
-              <p className="text-blue-200 text-sm mt-1">Real User in Auth</p>
+              <p className="text-blue-200 text-sm mt-1">Modular Structure</p>
             </div>
             
             <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-700">
               <div className="flex items-center justify-between">
-                <span className="text-purple-300 font-medium">Profile Operations</span>
+                <span className="text-purple-300 font-medium">Event Logging</span>
                 <CheckCircle className="w-5 h-5 text-purple-400" />
               </div>
-              <p className="text-purple-200 text-sm mt-1">CRUD Ready</p>
+              <p className="text-purple-200 text-sm mt-1">Queue & Batch</p>
             </div>
             
             <div className="bg-yellow-900/30 p-4 rounded-lg border border-yellow-700">
               <div className="flex items-center justify-between">
-                <span className="text-yellow-300 font-medium">KC Mastery</span>
+                <span className="text-yellow-300 font-medium">KC Integration</span>
                 <CheckCircle className="w-5 h-5 text-yellow-400" />
               </div>
-              <p className="text-yellow-200 text-sm mt-1">Tracking Active</p>
+              <p className="text-yellow-200 text-sm mt-1">Real-time Updates</p>
             </div>
           </div>
         </CardContent>
