@@ -91,12 +91,12 @@ export class ContentRepository {
 
     console.log(`📋 ContentRepository: Found ${atoms?.length || 0} atoms for KC ID: ${kcId}`);
     
-    // Transform the data to match ContentAtom interface with proper type casting
+    // Transform the data to match ContentAtom interface with proper field mapping
     const transformedAtoms: ContentAtom[] = (atoms || []).map(atom => ({
-      atom_id: atom.id,
+      atom_id: atom.id, // Map 'id' to 'atom_id'
       atom_type: atom.atom_type as 'TEXT_EXPLANATION' | 'QUESTION_MULTIPLE_CHOICE' | 'INTERACTIVE_EXERCISE',
       content: atom.content,
-      kc_ids: atom.kc_ids,
+      kc_ids: atom.kc_ids || [], // Ensure it's always an array
       metadata: atom.metadata,
       version: atom.version,
       author_id: atom.author_id,
