@@ -1,5 +1,4 @@
 
-// src/services/contentAtomRepository.ts
 import { supabase } from '@/integrations/supabase/client';
 
 // Temporarily defining ContentAtom here. Ideally, this would be in src/types/content.ts
