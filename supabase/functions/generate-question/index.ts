@@ -10,11 +10,18 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log(`🚀 Edge function called at ${new Date().toISOString()}`);
+  console.log(`📊 Request method: ${req.method}`);
+  console.log(`🔑 OpenAI API Key available: ${!!openAIApiKey}`);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const requestBody = await req.json();
+    console.log(`📥 Request body:`, requestBody);
+
     const { 
       subject, 
       skillArea, 
@@ -23,9 +30,20 @@ serve(async (req) => {
       questionIndex = 0,
       promptVariation = 'basic',
       specificContext = ''
-    } = await req.json();
+    } = requestBody;
 
     console.log(`🎯 Generating ${promptVariation} question for ${subject}/${skillArea} (Level ${difficultyLevel})`);
+
+    if (!openAIApiKey) {
+      console.error('❌ OpenAI API key not found in environment');
+      return new Response(JSON.stringify({ 
+        error: 'OpenAI API key not configured',
+        success: false 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Create varied prompts based on type
     let systemPrompt = '';
@@ -78,6 +96,9 @@ Requirements:
 - Use age-appropriate language for Grade ${difficultyLevel}
 - Include step-by-step explanation`;
 
+    console.log(`🤖 Calling OpenAI with system prompt: ${systemPrompt.substring(0, 100)}...`);
+    console.log(`🤖 User prompt: ${fullPrompt.substring(0, 100)}...`);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -95,14 +116,18 @@ Requirements:
       }),
     });
 
+    console.log(`📊 OpenAI response status: ${response.status}`);
+
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`❌ OpenAI API error: ${response.status} - ${errorText}`);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
     const content = data.choices[0].message.content.trim();
     
-    console.log(`🤖 Raw AI response: ${content.substring(0, 100)}...`);
+    console.log(`🤖 Raw AI response: ${content}`);
 
     // Parse JSON response
     let questionData;
@@ -111,8 +136,10 @@ Requirements:
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
       const jsonStr = jsonMatch ? jsonMatch[1] : content;
       questionData = JSON.parse(jsonStr);
+      console.log(`✅ Parsed question data:`, questionData);
     } catch (parseError) {
       console.error('❌ Failed to parse AI response as JSON:', parseError);
+      console.error('❌ Raw content was:', content);
       throw new Error('Invalid JSON response from AI');
     }
 
@@ -120,6 +147,7 @@ Requirements:
     if (!questionData.question || !Array.isArray(questionData.options) || 
         questionData.options.length !== 4 || typeof questionData.correct !== 'number' ||
         questionData.correct < 0 || questionData.correct > 3) {
+      console.error('❌ Invalid question structure:', questionData);
       throw new Error('Invalid question structure from AI');
     }
 

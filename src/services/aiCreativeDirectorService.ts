@@ -1,4 +1,3 @@
-
 import type { AtomSequence, ContentAtom } from '@/types/content';
 
 export interface IAiCreativeDirectorService {
@@ -113,7 +112,7 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
     count: number = 3
   ): Promise<any[]> {
     try {
-      console.log(`🤖 Generating ${count} questions for ${subject}/${skillArea}`);
+      console.log(`🤖 Generating ${count} AI questions for ${subject}/${skillArea}`);
       
       const questions = [];
       
@@ -121,11 +120,12 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
         try {
           console.log(`📡 Calling generate-question API for question ${i + 1}...`);
           
-          const response = await fetch('/functions/v1/generate-question', {
+          // Use the correct Supabase project URL
+          const response = await fetch('https://tgjudtnjhtumrfthegis.supabase.co/functions/v1/generate-question', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+              'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnanVkdG5qaHR1bXJmdGhlZ2lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NTk4NjEsImV4cCI6MjA2NDQzNTg2MX0.1OexubPIEWxM3sZ4ds3kSeWxNslKXbJo5GzCDOZRHcQ`
             },
             body: JSON.stringify({
               subject,
@@ -138,11 +138,16 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
             }),
           });
 
+          console.log(`📊 API Response status: ${response.status}`);
+
           if (response.ok) {
             const questionData = await response.json();
             
+            console.log(`📝 Raw API response:`, questionData);
+            
             // Check if response has error field (from our error handling)
             if (questionData.error || !questionData.question) {
+              console.error(`❌ API returned error: ${questionData.error || 'Invalid response structure'}`);
               throw new Error(questionData.error || 'Invalid response structure');
             }
             
@@ -169,7 +174,8 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
               questions.push(fallback);
             }
           } else {
-            console.error(`❌ HTTP error for question ${i + 1}:`, response.status, await response.text());
+            const errorText = await response.text();
+            console.error(`❌ HTTP error for question ${i + 1}:`, response.status, errorText);
             const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
             questions.push(fallback);
           }
@@ -180,7 +186,8 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
         }
       }
 
-      console.log(`✅ Final result: Generated ${questions.length} questions (AI + fallback mix)`);
+      const aiGeneratedCount = questions.filter(q => !q.question.includes('Practice')).length;
+      console.log(`✅ Final result: Generated ${questions.length} questions (${aiGeneratedCount} AI-generated, ${questions.length - aiGeneratedCount} fallback)`);
       return questions;
     } catch (error) {
       console.error('❌ Error in generateVariedQuestionsForKc:', error);
