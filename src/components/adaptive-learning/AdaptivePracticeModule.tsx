@@ -6,10 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { Brain, ArrowLeft, CheckCircle, Loader2, Lightbulb } from 'lucide-react';
 import { LearnerProfile } from '@/types/learnerProfile';
 import { KnowledgeComponent } from '@/types/knowledgeComponent';
-import { ContentAtom } from '@/types/contentAtom';
+import { ContentAtom } from '@/types/content';
 import learnerProfileService from '@/services/learnerProfileService';
 import { useContentGeneration } from './hooks/useContentGeneration';
-import ContentAtomRenderer from './components/ContentAtomRenderer';
 import { useToast } from '@/hooks/use-toast';
 
 interface AdaptivePracticeModuleProps {
@@ -215,7 +214,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
                       {currentKc?.name || 'Loading...'}
                     </h3>
                     <p className="text-sm text-gray-400">
-                      Grade {currentKc?.grade_level} • {currentKc?.subject}
+                      Grade {currentKc?.gradeLevels?.[0] || 'N/A'} • {currentKc?.subject}
                     </p>
                   </div>
                 </div>
@@ -226,12 +225,32 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
         </div>
 
         {currentAtom && (
-          <ContentAtomRenderer
-            atom={currentAtom}
-            onComplete={handleAtomComplete}
-            questionNumber={currentAtomIndex + 1}
-            totalQuestions={totalAtoms}
-          />
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Content Loading...
+                </h3>
+                <p className="text-gray-400">
+                  Content atom renderer is being implemented.
+                </p>
+                <Button 
+                  onClick={() => handleAtomComplete({})}
+                  className="mt-4"
+                >
+                  Continue to Next Question
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!currentAtom && !isLoading && (
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-400">No content available</p>
+            </Card>
+          </CardContent>
         )}
       </div>
     </div>

@@ -51,8 +51,8 @@ const AdaptivePracticeTestPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Render Adaptive Practice Module HERE instead of the placeholder */}
-        <AdaptivePracticeModule />
+        {/* Render Adaptive Practice Module with required onBack prop */}
+        <AdaptivePracticeModule onBack={handleBack} />
         
       </div>
     </div>
