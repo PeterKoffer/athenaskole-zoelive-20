@@ -36,13 +36,13 @@ const RobotAvatar: React.FC<RobotAvatarProps> = ({
       className
     )}>
       <img 
-        src="/lovable-uploads/4dd9342c-d485-4995-b97f-3619b8452d16.png"
+        src="/lovable-uploads/8c10bee3-a90a-42e9-9f33-382dd2fcd151.png"
         alt="Nelie AI Robot"
         className="w-full h-full object-cover"
         onError={(e) => {
           console.error('Failed to load Nelie avatar image');
           // Fallback to another Nelie image if this one fails
-          (e.target as HTMLImageElement).src = "/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png";
+          (e.target as HTMLImageElement).src = "/lovable-uploads/4dd9342c-d485-4995-b97f-3619b8452d16.png";
         }}
       />
     </div>
