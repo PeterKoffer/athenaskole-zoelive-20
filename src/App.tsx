@@ -4,41 +4,26 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import ErrorBoundary from "@/components/ErrorBoundary";
-
-import Index from "./pages/Index";
-import GameHub from "./pages/GameHub";
-import LanguageLearning from "@/components/LanguageLearning";
-import ProgressDashboard from "./pages/ProgressDashboard";
-import AdaptivePracticeTestPage from "./pages/AdaptivePracticeTestPage";
+import { navItems } from "./nav-items";
+import DailyProgram from "./pages/DailyProgram";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  console.log('🚀 App component rendering...');
-  
-  return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/games" element={<GameHub />} />
-                <Route path="/language-learning" element={<LanguageLearning />} />
-                <Route path="/progress" element={<ProgressDashboard />} />
-                <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
-              </Routes>
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {navItems.map(({ to, page }) => (
+            <Route key={to} path={to} element={page} />
+          ))}
+          <Route path="/daily-program" element={<DailyProgram />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
