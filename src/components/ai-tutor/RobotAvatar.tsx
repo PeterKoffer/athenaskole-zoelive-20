@@ -29,26 +29,31 @@ const RobotAvatar: React.FC<RobotAvatarProps> = ({
 
   return (
     <div className={cn(
-      'flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 shadow-2xl border-4 border-white/20 overflow-hidden relative',
+      'flex items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 shadow-2xl border-4 border-white/20 overflow-hidden relative',
       sizeClasses[size],
-      isActive && 'ring-4 ring-purple-400 ring-opacity-75 animate-pulse',
-      isSpeaking && 'ring-4 ring-blue-400 animate-pulse',
+      isActive && 'ring-4 ring-blue-400 ring-opacity-75 animate-pulse',
+      isSpeaking && 'ring-4 ring-cyan-400 animate-pulse',
       className
     )}>
       <img 
-        src="/lovable-uploads/1bc3f66e-699d-4712-81bb-9188d2ddf964.png"
+        src="/lovable-uploads/8c10bee3-a90a-42e9-9f33-382dd2fcd151.png"
         alt="Nelie AI Robot"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover scale-110"
         onError={(e) => {
           console.error('Failed to load Nelie avatar image');
-          // Fallback to another Nelie image if this one fails
-          (e.target as HTMLImageElement).src = "/lovable-uploads/8c10bee3-a90a-42e9-9f33-382dd2fcd151.png";
+          // Fallback to another available Nelie image if this one fails
+          (e.target as HTMLImageElement).src = "/lovable-uploads/1bc3f66e-699d-4712-81bb-9188d2ddf964.png";
         }}
       />
       
       {/* Blinking dot when speaking */}
       {isSpeaking && (
-        <div className="absolute bottom-2 right-2 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
+        <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-400 rounded-full animate-ping shadow-lg"></div>
+      )}
+      
+      {/* Subtle glow effect when active */}
+      {isActive && (
+        <div className="absolute inset-0 rounded-full bg-blue-400/20 animate-pulse"></div>
       )}
     </div>
   );
