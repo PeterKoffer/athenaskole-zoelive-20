@@ -1,3 +1,4 @@
+
 import type { AtomSequence, ContentAtom } from '@/types/content';
 
 export interface IAiCreativeDirectorService {
@@ -10,12 +11,13 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
 
   async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
     try {
-      console.log(`🎯 AI Creative Director: Generating dynamic content for KC ${kcId}`);
+      console.log(`🎯 AI Creative Director: Generating content for KC ${kcId}, User ${userId}`);
       
-      // Map KC ID to subject and skill area for AI generation
+      // Map KC ID to generation parameters
       const { subject, skillArea, difficultyLevel } = this.mapKcToGenerationParams(kcId);
+      console.log(`📚 Mapped to: ${subject} / ${skillArea} (Level ${difficultyLevel})`);
       
-      // Generate varied AI-powered questions for this KC
+      // Generate AI-powered questions for this KC
       const generatedQuestions = await this.generateVariedQuestionsForKc(
         subject, 
         skillArea, 
@@ -52,7 +54,7 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
         }
       }));
 
-      console.log(`✅ Generated AI sequence with ${atoms.length} specific questions for ${skillArea}`);
+      console.log(`✅ Generated AI sequence with ${atoms.length} questions for ${skillArea}`);
 
       return {
         sequence_id: `ai_seq_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
@@ -68,7 +70,6 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
   }
 
   private mapKcToGenerationParams(kcId: string): { subject: string; skillArea: string; difficultyLevel: number } {
-    // Enhanced mappings with more variety
     const kcMappings = {
       'kc_math_g5_multiply_decimals': {
         subject: 'mathematics',
@@ -112,16 +113,13 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
     count: number = 3
   ): Promise<any[]> {
     try {
-      console.log(`🤖 Generating ${count} SPECIFIC ${subject} questions for ${skillArea}`);
+      console.log(`🤖 Generating ${count} questions for ${subject}/${skillArea}`);
       
       const questions = [];
-      const questionPrompts = this.createVariedPrompts(subject, skillArea, difficultyLevel, count);
       
       for (let i = 0; i < count; i++) {
         try {
-          const specificPrompt = questionPrompts[i] || questionPrompts[0];
-          
-          console.log(`📡 Calling OpenAI for question ${i + 1} with variation: ${specificPrompt.variation}`);
+          console.log(`📡 Calling generate-question API for question ${i + 1}...`);
           
           const response = await fetch('/functions/v1/generate-question', {
             method: 'POST',
@@ -131,31 +129,26 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
             },
             body: JSON.stringify({
               subject,
-              skillArea: specificPrompt.skillVariation,
+              skillArea,
               difficultyLevel,
               userId,
               questionIndex: i,
-              promptVariation: specificPrompt.variation,
-              specificContext: specificPrompt.context
+              promptVariation: i === 0 ? 'basic' : i === 1 ? 'word_problem' : 'mixed',
+              specificContext: 'grade-appropriate learning'
             }),
           });
 
           if (response.ok) {
             const questionData = await response.json();
             
-            console.log(`📝 Received question ${i + 1}:`, {
+            console.log(`📝 Question ${i + 1} received:`, {
               question: questionData.question?.substring(0, 50) + '...',
               hasOptions: Array.isArray(questionData.options),
               optionsCount: questionData.options?.length,
               correctIndex: questionData.correct
             });
             
-            if (questionData.question && 
-                Array.isArray(questionData.options) && 
-                questionData.options.length === 4 &&
-                typeof questionData.correct === 'number' &&
-                !this.isDuplicateQuestion(questionData.question)) {
-              
+            if (this.validateQuestion(questionData) && !this.isDuplicateQuestion(questionData.question)) {
               this.usedQuestions.add(questionData.question);
               questions.push({
                 question: questionData.question,
@@ -164,60 +157,41 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
                 explanation: questionData.explanation || "Good work!"
               });
               
-              console.log(`✅ Added specific question ${i + 1}: ${questionData.question.substring(0, 40)}...`);
+              console.log(`✅ Added question ${i + 1}`);
             } else {
               console.log(`⚠️ Question ${i + 1} failed validation, using fallback`);
-              const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, i);
+              const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
               questions.push(fallback);
             }
           } else {
             console.error(`❌ HTTP error for question ${i + 1}:`, response.status);
-            const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, i);
+            const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
             questions.push(fallback);
           }
         } catch (questionError) {
           console.error(`❌ Failed to generate question ${i + 1}:`, questionError);
-          const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, i);
+          const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
           questions.push(fallback);
         }
       }
 
-      console.log(`✅ Final result: Generated ${questions.length} questions for ${skillArea}`);
-      questions.forEach((q, i) => {
-        console.log(`   ${i + 1}. ${q.question.substring(0, 50)}...`);
-      });
-
+      console.log(`✅ Final result: Generated ${questions.length} questions`);
       return questions;
     } catch (error) {
       console.error('❌ Error in generateVariedQuestionsForKc:', error);
-      return [this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, 0)];
+      // Return at least one fallback question
+      return [this.createSpecificFallback(subject, skillArea, difficultyLevel, 0)];
     }
   }
 
-  private createVariedPrompts(subject: string, skillArea: string, difficultyLevel: number, count: number) {
-    const basePrompts = {
-      'decimal multiplication': [
-        { variation: 'basic', skillVariation: 'basic decimal multiplication', context: 'simple decimal problems' },
-        { variation: 'word_problem', skillVariation: 'decimal multiplication word problems', context: 'real-world scenarios' },
-        { variation: 'mixed', skillVariation: 'decimal multiplication with different place values', context: 'varying difficulty' }
-      ],
-      'fraction subtraction with like denominators': [
-        { variation: 'basic', skillVariation: 'basic fraction subtraction', context: 'same denominators' },
-        { variation: 'simplify', skillVariation: 'fraction subtraction with simplification', context: 'requiring simplification' },
-        { variation: 'word_problem', skillVariation: 'fraction subtraction word problems', context: 'real-world contexts' }
-      ],
-      'reading comprehension and main ideas': [
-        { variation: 'passage', skillVariation: 'reading comprehension with short passages', context: 'identifying main ideas' },
-        { variation: 'inference', skillVariation: 'reading inference questions', context: 'drawing conclusions' },
-        { variation: 'details', skillVariation: 'reading for specific details', context: 'supporting details' }
-      ]
-    };
-
-    return basePrompts[skillArea as keyof typeof basePrompts] || [
-      { variation: 'basic', skillVariation: skillArea, context: 'fundamental concepts' },
-      { variation: 'applied', skillVariation: skillArea + ' applications', context: 'practical problems' },
-      { variation: 'mixed', skillVariation: skillArea + ' mixed problems', context: 'varied approaches' }
-    ];
+  private validateQuestion(questionData: any): boolean {
+    return questionData && 
+           questionData.question && 
+           Array.isArray(questionData.options) && 
+           questionData.options.length === 4 &&
+           typeof questionData.correct === 'number' &&
+           questionData.correct >= 0 && 
+           questionData.correct <= 3;
   }
 
   private isDuplicateQuestion(question: string): boolean {
@@ -225,113 +199,79 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
     return this.usedQuestions.has(questionKey);
   }
 
-  private createUniqueSpecificFallback(subject: string, skillArea: string, difficultyLevel: number, index: number) {
-    const timestamp = Date.now();
-    const randomSeed = Math.random().toString(36).substring(2, 8);
+  private createSpecificFallback(subject: string, skillArea: string, difficultyLevel: number, index: number) {
+    console.log(`🔧 Creating fallback question ${index + 1} for ${skillArea}`);
     
     if (skillArea.includes('fraction') && skillArea.includes('like denominators')) {
-      // Create mathematically correct fraction questions
-      const denominators = [6, 8, 10, 12];
-      const denominator = denominators[index % denominators.length];
-      
-      // Ensure we create proper fractions that don't exceed the denominator
-      const maxNumerator = Math.floor(denominator / 2); // Keep it reasonable for addition
-      const numerator1 = Math.max(1, Math.min(maxNumerator, 1 + index));
-      const numerator2 = Math.max(1, Math.min(denominator - numerator1 - 1, 1 + (index % 2)));
-      const correctSum = numerator1 + numerator2;
-      
-      // Create mathematically sound distractors
-      const correctAnswer = `${correctSum}/${denominator}`;
-      const simplifiedAnswer = this.simplifyFraction(correctSum, denominator);
-      
-      // Common mistake distractors
-      const addDenominators = `${correctSum}/${denominator + denominator}`; // Wrong: adding denominators
-      const wrongNumerator = `${correctSum + 1}/${denominator}`; // Off by one error
-      const multiplyError = `${numerator1 * numerator2}/${denominator}`; // Multiplication instead of addition
-      
-      // Build unique options
-      const options = [correctAnswer];
-      const distractors = [addDenominators, wrongNumerator, multiplyError];
-      
-      // Add distractors that are different from correct answer
-      distractors.forEach(distractor => {
-        if (distractor !== correctAnswer && options.length < 4) {
-          options.push(distractor);
-        }
-      });
-      
-      // Fill remaining slots if needed
-      while (options.length < 4) {
-        const randomDistractor = `${correctSum - 1 + (options.length - 1)}/${denominator}`;
-        if (!options.includes(randomDistractor)) {
-          options.push(randomDistractor);
-        }
-      }
-      
-      return {
-        question: `What is ${numerator1}/${denominator} + ${numerator2}/${denominator}?`,
-        options: options,
-        correct: 0,
-        explanation: `When adding fractions with the same denominator, add the numerators and keep the denominator: ${numerator1} + ${numerator2} = ${correctSum}. So the answer is ${correctSum}/${denominator}${simplifiedAnswer !== correctAnswer ? ` or ${simplifiedAnswer} when simplified` : ''}.`
-      };
+      return this.createFractionFallback(index);
     }
     
     if (skillArea.includes('decimal multiplication')) {
-      const factor1 = (1.2 + index * 0.3).toFixed(1);
-      const factor2 = (2.1 + index * 0.2).toFixed(1);
-      const product = (parseFloat(factor1) * parseFloat(factor2)).toFixed(2);
-      
-      // Create realistic distractors
-      const options = [
-        product,
-        (parseFloat(product) + 1).toFixed(2),
-        (parseFloat(product) - 0.5).toFixed(2),
-        (parseFloat(factor1) + parseFloat(factor2)).toFixed(2) // Addition instead of multiplication
-      ];
-      
-      return {
-        question: `What is ${factor1} × ${factor2}?`,
-        options: options,
-        correct: 0,
-        explanation: `To multiply decimals: ${factor1} × ${factor2} = ${product}. Multiply the numbers then place the decimal point correctly.`
-      };
+      return this.createDecimalFallback(index);
     }
 
     // Generic fallback
+    const timestamp = Date.now().toString().slice(-4);
     return {
-      question: `What is an important concept in Grade ${difficultyLevel} ${subject}? (Question ${index + 1})`,
-      options: [`Concept A-${randomSeed}`, `Concept B-${randomSeed}`, `Concept C-${randomSeed}`, `Concept D-${randomSeed}`],
+      question: `What is an important concept in Grade ${difficultyLevel} ${subject}? (Question ${index + 1}-${timestamp})`,
+      options: [`Concept A-${timestamp}`, `Concept B-${timestamp}`, `Concept C-${timestamp}`, `Concept D-${timestamp}`],
       correct: 0,
       explanation: `This helps you practice ${skillArea} skills.`
     };
   }
 
-  private simplifyFraction(numerator: number, denominator: number): string {
-    const gcd = this.findGCD(numerator, denominator);
-    const simplifiedNum = numerator / gcd;
-    const simplifiedDen = denominator / gcd;
+  private createFractionFallback(index: number) {
+    const denominators = [6, 8, 10, 12];
+    const denominator = denominators[index % denominators.length];
+    const numerator1 = 1 + index;
+    const numerator2 = 1 + (index % 2);
+    const correctSum = numerator1 + numerator2;
     
-    if (simplifiedDen === 1) {
-      return simplifiedNum.toString();
+    // Ensure we don't exceed the denominator
+    if (correctSum >= denominator) {
+      return this.createFractionFallback((index + 1) % 4);
     }
     
-    return `${simplifiedNum}/${simplifiedDen}`;
+    const correctAnswer = `${correctSum}/${denominator}`;
+    const wrongOptions = [
+      `${correctSum + 1}/${denominator}`,
+      `${correctSum}/${denominator + denominator}`,
+      `${correctSum - 1}/${denominator}`
+    ];
+    
+    return {
+      question: `What is ${numerator1}/${denominator} + ${numerator2}/${denominator}?`,
+      options: [correctAnswer, ...wrongOptions],
+      correct: 0,
+      explanation: `When adding fractions with the same denominator, add the numerators: ${numerator1} + ${numerator2} = ${correctSum}. The answer is ${correctAnswer}.`
+    };
   }
 
-  private findGCD(a: number, b: number): number {
-    while (b !== 0) {
-      const temp = b;
-      b = a % b;
-      a = temp;
-    }
-    return a;
+  private createDecimalFallback(index: number) {
+    const factor1 = (1.2 + index * 0.3).toFixed(1);
+    const factor2 = (2.1 + index * 0.2).toFixed(1);
+    const product = (parseFloat(factor1) * parseFloat(factor2)).toFixed(2);
+    
+    return {
+      question: `What is ${factor1} × ${factor2}?`,
+      options: [
+        product,
+        (parseFloat(product) + 1).toFixed(2),
+        (parseFloat(product) - 0.5).toFixed(2),
+        (parseFloat(factor1) + parseFloat(factor2)).toFixed(2)
+      ],
+      correct: 0,
+      explanation: `To multiply decimals: ${factor1} × ${factor2} = ${product}.`
+    };
   }
 
   private createFallbackSequence(kcId: string, userId: string, subject: string, skillArea: string, difficultyLevel: number): AtomSequence {
+    console.log(`🔧 Creating fallback sequence for ${kcId}`);
+    
     const fallbackQuestions = [
-      this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, 0),
-      this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, 1),
-      this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, 2)
+      this.createSpecificFallback(subject, skillArea, difficultyLevel, 0),
+      this.createSpecificFallback(subject, skillArea, difficultyLevel, 1),
+      this.createSpecificFallback(subject, skillArea, difficultyLevel, 2)
     ];
 
     const atoms: ContentAtom[] = fallbackQuestions.map((question, index) => ({

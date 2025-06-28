@@ -23,11 +23,14 @@ const AdaptivePracticeModule: React.FC = () => {
 
   // Load initial profile
   useEffect(() => {
+    console.log('🚀 AdaptivePracticeModule: Loading initial profile...');
     loadLearnerProfile(
       (profile) => {
+        console.log('✅ Profile loaded successfully:', profile.userId);
         updateState({ learnerProfile: profile, isLoading: false });
       },
       (error) => {
+        console.error('❌ Profile loading failed:', error);
         setError(error);
       }
     );
@@ -36,12 +39,14 @@ const AdaptivePracticeModule: React.FC = () => {
   // Load content when profile is ready
   useEffect(() => {
     if (state.learnerProfile && !state.currentKc && !state.isLoading && !state.error) {
+      console.log('🎯 Profile ready, generating content...');
       setLoading(true);
       
       recommendAndLoadContent(
         state.learnerProfile,
         state.sessionKcs,
         (kc, sequence) => {
+          console.log('✅ Content generated successfully:', kc.name, sequence.atoms.length, 'atoms');
           updateState({
             currentKc: kc,
             atomSequence: sequence,
@@ -53,6 +58,7 @@ const AdaptivePracticeModule: React.FC = () => {
           resetFeedback();
         },
         (error) => {
+          console.error('❌ Content generation failed:', error);
           setError(error);
         }
       );
@@ -60,17 +66,21 @@ const AdaptivePracticeModule: React.FC = () => {
   }, [state.learnerProfile, state.currentKc, state.isLoading, state.error, state.sessionKcs, recommendAndLoadContent, updateState, setLoading, setError, resetFeedback]);
 
   const handleNextAtom = () => {
+    console.log('➡️ Moving to next atom...');
     resetFeedback();
     
     if (state.atomSequence && state.currentAtomIndex < state.atomSequence.atoms.length - 1) {
+      console.log(`📝 Next atom in sequence: ${state.currentAtomIndex + 1}/${state.atomSequence.atoms.length}`);
       updateState({ currentAtomIndex: state.currentAtomIndex + 1 });
     } else if (state.learnerProfile) {
+      console.log('🔄 Generating new content sequence...');
       setLoading(true);
       
       recommendAndLoadContent(
         state.learnerProfile,
         state.sessionKcs,
         (kc, sequence) => {
+          console.log('✅ New sequence generated:', kc.name, sequence.atoms.length, 'atoms');
           updateState({
             currentKc: kc,
             atomSequence: sequence,
@@ -80,6 +90,7 @@ const AdaptivePracticeModule: React.FC = () => {
           });
         },
         (error) => {
+          console.error('❌ New sequence generation failed:', error);
           setError(error);
         }
       );
@@ -91,6 +102,12 @@ const AdaptivePracticeModule: React.FC = () => {
       console.error('❌ Cannot handle answer - missing KC or profile');
       return;
     }
+
+    console.log('📝 Processing answer:', { 
+      atomId: atom.atom_id, 
+      isCorrect: isCorrectAnswer,
+      answer: answerGiven 
+    });
 
     try {
       // Log the attempt
@@ -138,6 +155,7 @@ const AdaptivePracticeModule: React.FC = () => {
   };
 
   const handleRetry = () => {
+    console.log('🔄 Retrying content generation...');
     updateState({ error: null, isLoading: true });
     
     if (state.learnerProfile) {
@@ -145,6 +163,7 @@ const AdaptivePracticeModule: React.FC = () => {
         state.learnerProfile,
         state.sessionKcs,
         (kc, sequence) => {
+          console.log('✅ Retry successful:', kc.name);
           updateState({
             currentKc: kc,
             atomSequence: sequence,
@@ -154,15 +173,19 @@ const AdaptivePracticeModule: React.FC = () => {
           });
         },
         (error) => {
+          console.error('❌ Retry failed:', error);
           setError(error);
         }
       );
     } else {
+      console.log('🔄 Reloading profile...');
       loadLearnerProfile(
         (profile) => {
+          console.log('✅ Profile reloaded successfully');
           updateState({ learnerProfile: profile, isLoading: false });
         },
         (error) => {
+          console.error('❌ Profile reload failed:', error);
           setError(error);
         }
       );
@@ -170,6 +193,19 @@ const AdaptivePracticeModule: React.FC = () => {
   };
 
   const currentAtom = state.atomSequence?.atoms[state.currentAtomIndex];
+
+  // Console logging for debugging
+  console.log('🔍 AdaptivePracticeModule state:', {
+    hasProfile: !!state.learnerProfile,
+    hasCurrentKc: !!state.currentKc,
+    hasAtomSequence: !!state.atomSequence,
+    currentAtomIndex: state.currentAtomIndex,
+    totalAtoms: state.atomSequence?.atoms.length || 0,
+    hasCurrentAtom: !!currentAtom,
+    isLoading: state.isLoading,
+    error: state.error,
+    showServiceTests: state.showServiceTests
+  });
 
   // Render states
   if (state.showServiceTests) {
