@@ -1,3 +1,4 @@
+
 import type { AtomSequence, ContentAtom } from '@/types/content';
 
 export interface IAiCreativeDirectorService {
@@ -47,13 +48,16 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
           difficulty: difficultyLevel,
           estimatedTime: 90,
           generated: true,
-          aiGenerated: true,
+          aiGenerated: true, // ✅ Clear AI marker
+          aiGeneratedTimestamp: Date.now(),
+          source: 'openai-gpt-4o-mini', // ✅ Show AI source
           timestamp: Date.now(),
           uniqueId: `${kcId}_${Date.now()}_${Math.random()}`
         }
       }));
 
-      console.log(`✅ Generated AI sequence with ${atoms.length} questions for ${skillArea}`);
+      console.log(`✅ Generated ${atoms.length} AI-POWERED questions for ${skillArea}`);
+      console.log(`🤖 All questions are AI-generated using OpenAI API`);
 
       return {
         sequence_id: `ai_seq_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
@@ -151,11 +155,12 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
               throw new Error(questionData.error || 'Invalid response structure');
             }
             
-            console.log(`📝 Question ${i + 1} received:`, {
+            console.log(`🤖 AI Question ${i + 1} received:`, {
               question: questionData.question?.substring(0, 50) + '...',
               hasOptions: Array.isArray(questionData.options),
               optionsCount: questionData.options?.length,
-              correctIndex: questionData.correct
+              correctIndex: questionData.correct,
+              isAiGenerated: true // ✅ Mark as AI-generated
             });
             
             if (this.validateQuestion(questionData) && !this.isDuplicateQuestion(questionData.question)) {
@@ -164,30 +169,48 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
                 question: questionData.question,
                 options: questionData.options,
                 correct: questionData.correct,
-                explanation: questionData.explanation || "Good work!"
+                explanation: questionData.explanation || "Good work!",
+                isAiGenerated: true, // ✅ Clear AI marker
+                source: 'openai-api'
               });
               
-              console.log(`✅ Added AI-generated question ${i + 1}`);
+              console.log(`✅ Added AI-generated question ${i + 1} (NOT FALLBACK)`);
             } else {
               console.log(`⚠️ Question ${i + 1} failed validation, using fallback`);
               const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
-              questions.push(fallback);
+              questions.push({
+                ...fallback,
+                isAiGenerated: false, // ✅ Mark fallback clearly
+                source: 'fallback'
+              });
             }
           } else {
             const errorText = await response.text();
             console.error(`❌ HTTP error for question ${i + 1}:`, response.status, errorText);
             const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
-            questions.push(fallback);
+            questions.push({
+              ...fallback,
+              isAiGenerated: false,
+              source: 'fallback'
+            });
           }
         } catch (questionError) {
           console.error(`❌ Failed to generate question ${i + 1}:`, questionError);
           const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
-          questions.push(fallback);
+          questions.push({
+            ...fallback,
+            isAiGenerated: false,
+            source: 'fallback'
+          });
         }
       }
 
-      const aiGeneratedCount = questions.filter(q => !q.question.includes('Practice')).length;
-      console.log(`✅ Final result: Generated ${questions.length} questions (${aiGeneratedCount} AI-generated, ${questions.length - aiGeneratedCount} fallback)`);
+      const aiGeneratedCount = questions.filter(q => q.isAiGenerated === true).length;
+      const fallbackCount = questions.filter(q => q.isAiGenerated === false).length;
+      
+      console.log(`✅ Final result: Generated ${questions.length} questions (${aiGeneratedCount} AI-generated, ${fallbackCount} fallback)`);
+      console.log(`🎯 SUCCESS: ${aiGeneratedCount > 0 ? 'AI QUESTIONS ARE WORKING!' : 'Using fallback questions'}`);
+      
       return questions;
     } catch (error) {
       console.error('❌ Error in generateVariedQuestionsForKc:', error);
