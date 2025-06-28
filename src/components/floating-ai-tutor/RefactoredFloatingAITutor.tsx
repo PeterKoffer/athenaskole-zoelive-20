@@ -16,8 +16,8 @@ const RefactoredFloatingAITutor = () => {
   const [isListening, setIsListening] = useState(false);
   
   const { isDragging, position, dragRef, handleMouseDown, hasMoved } = useDragBehavior();
-  const { messages, addUserMessage, addNelieMessage } = useFloatingTutorMessages();
-  const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
+  const { messages, handleUserMessage } = useFloatingTutorMessages();
+  const { isSpeaking, stop } = useUnifiedSpeech();
   const { isOpen, setIsOpen, shouldHide } = useFloatingTutorState();
 
   // Don't show if user is not logged in
@@ -33,24 +33,8 @@ const RefactoredFloatingAITutor = () => {
   }
 
   const handleSendMessage = async (inputText: string) => {
-    addUserMessage(inputText);
-
-    // Simulate Nelie's response
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! Let me help you understand that concept better.",
-        "I can see you're working hard on your learning journey. Keep it up!",
-        "Let's break this down into smaller, easier steps.",
-        "Would you like me to explain this in a different way?",
-        "That's exactly the kind of thinking that leads to mastery!"
-      ];
-      
-      const response = responses[Math.floor(Math.random() * responses.length)];
-      addNelieMessage(response);
-      
-      // Speak Nelie's response
-      speakAsNelie(response, true, 'floating-tutor-response');
-    }, 1000);
+    console.log('📨 Nelie received message:', inputText);
+    handleUserMessage(inputText);
   };
 
   const handleVoiceToggle = () => {

@@ -1,70 +1,74 @@
 
-import { Button } from "@/components/ui/button";
-import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
+import React from 'react';
+import RobotAvatar from '../ai-tutor/RobotAvatar';
+import { Button } from '../ui/button';
+import { Home, RotateCcw } from 'lucide-react';
 
 interface CollapsedButtonProps {
   onExpand: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onTouchStart: (e: React.TouchEvent) => void;
   onResetToHome: () => void;
-  isDragging?: boolean;
-  hasMoved?: boolean;
-  isSpeaking?: boolean;
+  isDragging: boolean;
+  hasMoved: boolean;
+  isSpeaking: boolean;
 }
 
-const CollapsedButton = ({ 
-  onExpand, 
-  onMouseDown, 
-  onTouchStart, 
-  onResetToHome, 
-  isDragging, 
+const CollapsedButton = ({
+  onExpand,
+  onMouseDown,
+  onTouchStart,
+  onResetToHome,
+  isDragging,
   hasMoved,
-  isSpeaking = false
+  isSpeaking
 }: CollapsedButtonProps) => {
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    if (!hasMoved && !isDragging) {
+  const handleClick = () => {
+    if (!isDragging && !hasMoved) {
       onExpand();
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleResetClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onMouseDown(e);
+    onResetToHome();
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onTouchStart(e);
-  };
-
-  console.log('🎯 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
-  
   return (
-    <div className="relative select-none flex items-center space-x-1">      
+    <div className="relative">
       <div
+        className="cursor-pointer select-none"
         onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        className="cursor-grab active:cursor-grabbing transition-transform duration-200 hover:scale-105"
-        style={{
-          cursor: isDragging ? 'grabbing' : 'grab',
-          transform: isDragging ? 'scale(1.1)' : 'scale(1)',
-          userSelect: 'none',
-          touchAction: 'none',
-        }}
+        onMouseDown={onMouseDown}
+        onTouchStart={onTouchStart}
       >
         <RobotAvatar 
-          size="3xl" 
+          size="xl" 
           isActive={true} 
           isSpeaking={isSpeaking}
-          className="pointer-events-none drop-shadow-2xl"
+          className="drop-shadow-2xl hover:scale-105 transition-transform"
         />
       </div>
+      
+      {/* Small control buttons */}
+      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleResetClick}
+          className="w-6 h-6 p-0 bg-gray-800/90 border-gray-600 hover:bg-gray-700/90 text-white rounded-full"
+          title="Reset to home position"
+        >
+          <Home className="w-3 h-3" />
+        </Button>
+      </div>
+      
+      {/* Speech indicator */}
+      {isSpeaking && (
+        <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-500 rounded-full animate-pulse">
+          <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
+        </div>
+      )}
     </div>
   );
 };
