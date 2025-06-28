@@ -141,6 +141,11 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
           if (response.ok) {
             const questionData = await response.json();
             
+            // Check if response has error field (from our error handling)
+            if (questionData.error || !questionData.question) {
+              throw new Error(questionData.error || 'Invalid response structure');
+            }
+            
             console.log(`📝 Question ${i + 1} received:`, {
               question: questionData.question?.substring(0, 50) + '...',
               hasOptions: Array.isArray(questionData.options),
@@ -157,14 +162,14 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
                 explanation: questionData.explanation || "Good work!"
               });
               
-              console.log(`✅ Added question ${i + 1}`);
+              console.log(`✅ Added AI-generated question ${i + 1}`);
             } else {
               console.log(`⚠️ Question ${i + 1} failed validation, using fallback`);
               const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
               questions.push(fallback);
             }
           } else {
-            console.error(`❌ HTTP error for question ${i + 1}:`, response.status);
+            console.error(`❌ HTTP error for question ${i + 1}:`, response.status, await response.text());
             const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
             questions.push(fallback);
           }
@@ -175,7 +180,7 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
         }
       }
 
-      console.log(`✅ Final result: Generated ${questions.length} questions`);
+      console.log(`✅ Final result: Generated ${questions.length} questions (AI + fallback mix)`);
       return questions;
     } catch (error) {
       console.error('❌ Error in generateVariedQuestionsForKc:', error);
