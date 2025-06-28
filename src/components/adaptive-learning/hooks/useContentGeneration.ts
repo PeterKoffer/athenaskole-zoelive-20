@@ -45,10 +45,10 @@ export const useContentGeneration = () => {
 
       console.log('🎲 Enhanced uniqueness context:', uniqueSessionContext);
 
+      // Fix: Call with only 2 arguments as expected by the service
       const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(
         nextKc.id, 
-        profile.userId,
-        uniqueSessionContext
+        profile.userId
       );
       
       if (!sequence) {
