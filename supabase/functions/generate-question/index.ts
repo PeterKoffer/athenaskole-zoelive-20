@@ -80,7 +80,12 @@ serve(async (req) => {
 
     const fullPrompt = `${userPrompt}
 
-IMPORTANT: Return ONLY a valid JSON object with this exact structure:
+CRITICAL INSTRUCTIONS: 
+1. Calculate the correct answer step by step before creating options
+2. Make sure the "correct" field matches the index of the mathematically correct answer
+3. Double-check your math before finalizing
+
+Return ONLY a valid JSON object with this exact structure:
 {
   "question": "Your question here",
   "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -91,10 +96,11 @@ IMPORTANT: Return ONLY a valid JSON object with this exact structure:
 Requirements:
 - The "correct" field should be the index (0-3) of the correct answer
 - Make exactly 4 multiple choice options
-- Ensure the correct answer is actually correct
+- Ensure the correct answer is actually correct mathematically
 - Make wrong answers plausible but clearly incorrect
 - Use age-appropriate language for Grade ${difficultyLevel}
-- Include step-by-step explanation`;
+- Include step-by-step explanation
+- VERIFY: The option at index "correct" must be the mathematically correct answer`;
 
     console.log(`🤖 Calling OpenAI with system prompt: ${systemPrompt.substring(0, 100)}...`);
     console.log(`🤖 User prompt: ${fullPrompt.substring(0, 100)}...`);
@@ -151,7 +157,42 @@ Requirements:
       throw new Error('Invalid question structure from AI');
     }
 
+    // ADDITIONAL VALIDATION: For fraction problems, verify the math
+    if (skillArea.includes('fraction') && skillArea.includes('subtraction')) {
+      console.log(`🔍 Validating fraction subtraction math...`);
+      const question = questionData.question;
+      const correctOption = questionData.options[questionData.correct];
+      
+      // Extract fractions from question (basic pattern matching)
+      const fractionMatch = question.match(/(\d+)\/(\d+)\s*-\s*(\d+)\/(\d+)/);
+      if (fractionMatch) {
+        const [, num1, den1, num2, den2] = fractionMatch;
+        if (den1 === den2) { // Like denominators
+          const result = parseInt(num1) - parseInt(num2);
+          const expectedAnswer = `${result}/${den1}`;
+          
+          console.log(`🧮 Math check: ${num1}/${den1} - ${num2}/${den2} = ${expectedAnswer}`);
+          console.log(`🎯 AI says correct answer is: ${correctOption}`);
+          
+          // Verify the correct option matches our calculation
+          if (correctOption !== expectedAnswer) {
+            console.error(`❌ Math validation failed! Expected ${expectedAnswer}, got ${correctOption}`);
+            
+            // Find the correct index
+            const correctIndex = questionData.options.findIndex(opt => opt === expectedAnswer);
+            if (correctIndex !== -1) {
+              console.log(`🔧 Fixing correct index from ${questionData.correct} to ${correctIndex}`);
+              questionData.correct = correctIndex;
+            }
+          } else {
+            console.log(`✅ Math validation passed!`);
+          }
+        }
+      }
+    }
+
     console.log(`✅ Generated valid question: ${questionData.question.substring(0, 50)}...`);
+    console.log(`🎯 Final correct answer index: ${questionData.correct} -> "${questionData.options[questionData.correct]}"`);
 
     return new Response(JSON.stringify(questionData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -170,3 +211,4 @@ Requirements:
     });
   }
 });
+```
