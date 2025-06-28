@@ -1,9 +1,32 @@
 
 #root {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
+  min-height: 100vh;
+}
+
+/* Prevent horizontal scrolling globally */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure all containers respect viewport width */
+* {
+  box-sizing: border-box;
+  max-width: 100vw;
+}
+
+/* Prevent any element from causing horizontal overflow */
+*:not(html):not(body) {
+  max-width: 100%;
 }
 
 .logo {
@@ -29,7 +52,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .logo {
+  a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
@@ -40,19 +63,4 @@
 
 .read-the-docs {
   color: #888;
-}
-
-/* Animation delay utility classes */
-.animation-delay-1000 {
-  animation-delay: 1s;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-/* Ensure Nelie is always visible */
-.nelie-prominent {
-  z-index: 1000;
-  position: relative;
 }

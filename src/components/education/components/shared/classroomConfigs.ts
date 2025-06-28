@@ -19,7 +19,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#4CAF50",
       secondaryColor: "#81C784",
       accentColor: "#388E3C",
-      backgroundImage: "/lovable-uploads/4cc17a8b-1d30-4146-993f-7b97b7e6be5b.png", // Mathematics classroom
+      backgroundImage: "/lovable-uploads/4cc17a8b-1d30-4146-993f-7b97b7e6be5b.png",
       subjectColor: "#4CAF50",
       overlayOpacity: 0.7,
       environmentDescription: "A modern mathematics classroom with interactive whiteboard and mathematical tools"
@@ -29,7 +29,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF9800",
       secondaryColor: "#FFB74D",
       accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/c4321823-91d4-4b19-8f72-b00613b2603a.png", // English/Language Arts classroom
+      backgroundImage: "/lovable-uploads/c4321823-91d4-4b19-8f72-b00613b2603a.png",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
       environmentDescription: "A warm English classroom with books and educational materials"
@@ -39,7 +39,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF9800",
       secondaryColor: "#FFB74D",
       accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/c4321823-91d4-4b19-8f72-b00613b2603a.png", // English classroom
+      backgroundImage: "/lovable-uploads/c4321823-91d4-4b19-8f72-b00613b2603a.png",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
       environmentDescription: "A warm English classroom with books and educational materials"
@@ -49,7 +49,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#2196F3",
       secondaryColor: "#64B5F6",
       accentColor: "#1976D2",
-      backgroundImage: "/lovable-uploads/4f04a56b-d49f-4093-b974-e56c182dbefd.png", // Science laboratory
+      backgroundImage: "/lovable-uploads/4f04a56b-d49f-4093-b974-e56c182dbefd.png",
       subjectColor: "#2196F3",
       overlayOpacity: 0.7,
       environmentDescription: "A modern science laboratory with equipment and experimental setups"
@@ -59,7 +59,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#9C27B0",
       secondaryColor: "#BA68C8",
       accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/6cd62bdc-48a0-49e9-bcd0-aba0c756a278.png", // Computer lab
+      backgroundImage: "/lovable-uploads/6cd62bdc-48a0-49e9-bcd0-aba0c756a278.png",
       subjectColor: "#9C27B0",
       overlayOpacity: 0.7,
       environmentDescription: "A modern tech classroom with computers and digital learning tools"
@@ -69,7 +69,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#9C27B0",
       secondaryColor: "#BA68C8",
       accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/6cd62bdc-48a0-49e9-bcd0-aba0c756a278.png", // Computer lab
+      backgroundImage: "/lovable-uploads/6cd62bdc-48a0-49e9-bcd0-aba0c756a278.png",
       subjectColor: "#9C27B0",
       overlayOpacity: 0.7,
       environmentDescription: "A modern tech classroom with computers and digital learning tools"
@@ -79,7 +79,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#E91E63",
       secondaryColor: "#F06292",
       accentColor: "#C2185B",
-      backgroundImage: "/lovable-uploads/94aa529a-ae27-4300-b5f0-f414268f6785.png", // Music classroom
+      backgroundImage: "/lovable-uploads/94aa529a-ae27-4300-b5f0-f414268f6785.png",
       subjectColor: "#E91E63",
       overlayOpacity: 0.7,
       environmentDescription: "A vibrant music classroom with instruments and musical notation"
@@ -89,7 +89,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF5722",
       secondaryColor: "#FF8A65",
       accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/8c823620-22c3-424b-a10f-c9dbef745b76.png", // Art classroom
+      backgroundImage: "/lovable-uploads/8c823620-22c3-424b-a10f-c9dbef745b76.png",
       subjectColor: "#FF5722",
       overlayOpacity: 0.7,
       environmentDescription: "A colorful art classroom with creative supplies and student artwork"
@@ -99,7 +99,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF5722",
       secondaryColor: "#FF8A65",
       accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/8c823620-22c3-424b-a10f-c9dbef745b76.png", // Art classroom
+      backgroundImage: "/lovable-uploads/8c823620-22c3-424b-a10f-c9dbef745b76.png",
       subjectColor: "#FF5722",
       overlayOpacity: 0.7,
       environmentDescription: "A colorful art classroom with creative supplies and student artwork"
@@ -109,7 +109,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF5722",
       secondaryColor: "#FF8A65",
       accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/2c1a716d-f174-46e7-ba77-85b334751f7f.png", // Fine arts studio
+      backgroundImage: "/lovable-uploads/2c1a716d-f174-46e7-ba77-85b334751f7f.png",
       subjectColor: "#FF5722",
       overlayOpacity: 0.7,
       environmentDescription: "A professional art studio with easels, canvases, and artistic materials"
@@ -119,7 +119,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#8D6E63",
       secondaryColor: "#A1887F",
       accentColor: "#6D4C41",
-      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png", // History classroom
+      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png",
       subjectColor: "#8D6E63",
       overlayOpacity: 0.7,
       environmentDescription: "A traditional classroom with historical maps and educational materials"
@@ -129,17 +129,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#8D6E63",
       secondaryColor: "#A1887F",
       accentColor: "#6D4C41",
-      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png", // History classroom
-      subjectColor: "#8D6E63",
-      overlayOpacity: 0.7,
-      environmentDescription: "A traditional classroom with historical maps and educational materials"
-    },
-    history_religion: {
-      subjectName: "History & Religion",
-      primaryColor: "#8D6E63",
-      secondaryColor: "#A1887F",
-      accentColor: "#6D4C41",
-      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png", // History classroom
+      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png",
       subjectColor: "#8D6E63",
       overlayOpacity: 0.7,
       environmentDescription: "A traditional classroom with historical maps and educational materials"
@@ -149,7 +139,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#4CAF50",
       secondaryColor: "#81C784",
       accentColor: "#388E3C",
-      backgroundImage: "/lovable-uploads/9f597860-f509-47db-9bea-9ba445e633ec.png", // Geography classroom
+      backgroundImage: "/lovable-uploads/9f597860-f509-47db-9bea-9ba445e633ec.png",
       subjectColor: "#4CAF50",
       overlayOpacity: 0.7,
       environmentDescription: "A geography classroom with world maps, globes, and geographical resources"
@@ -159,7 +149,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#4CAF50",
       secondaryColor: "#81C784",
       accentColor: "#388E3C",
-      backgroundImage: "/lovable-uploads/9f597860-f509-47db-9bea-9ba445e633ec.png", // Geography classroom
+      backgroundImage: "/lovable-uploads/9f597860-f509-47db-9bea-9ba445e633ec.png",
       subjectColor: "#4CAF50",
       overlayOpacity: 0.7,
       environmentDescription: "A geography classroom with world maps, globes, and geographical resources"
@@ -169,17 +159,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#607D8B",
       secondaryColor: "#90A4AE",
       accentColor: "#455A64",
-      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png", // Life skills classroom
-      subjectColor: "#607D8B",
-      overlayOpacity: 0.7,
-      environmentDescription: "A clean, modern classroom focused on practical life skills education"
-    },
-    life_essentials: {
-      subjectName: "Life Essentials",
-      primaryColor: "#607D8B",
-      secondaryColor: "#90A4AE",
-      accentColor: "#455A64",
-      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png", // Life skills classroom
+      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png",
       subjectColor: "#607D8B",
       overlayOpacity: 0.7,
       environmentDescription: "A clean, modern classroom focused on practical life skills education"
@@ -189,17 +169,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#9C27B0",
       secondaryColor: "#BA68C8",
       accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/5f9c6e95-d949-47f5-bb3a-08f0c1c84d72.png", // Wellness classroom
-      subjectColor: "#9C27B0",
-      overlayOpacity: 0.7,
-      environmentDescription: "A calming wellness classroom designed for mindfulness and emotional learning"
-    },
-    mental_wellness: {
-      subjectName: "Mental Wellness",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/5f9c6e95-d949-47f5-bb3a-08f0c1c84d72.png", // Wellness classroom
+      backgroundImage: "/lovable-uploads/5f9c6e95-d949-47f5-bb3a-08f0c1c84d72.png",
       subjectColor: "#9C27B0",
       overlayOpacity: 0.7,
       environmentDescription: "A calming wellness classroom designed for mindfulness and emotional learning"
@@ -209,17 +179,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF5722",
       secondaryColor: "#FF8A65",
       accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png", // Health/fitness lab
-      subjectColor: "#FF5722",
-      overlayOpacity: 0.7,
-      environmentDescription: "A health and wellness laboratory for learning about the human body"
-    },
-    body_lab: {
-      subjectName: "BodyLab",
-      primaryColor: "#FF5722",
-      secondaryColor: "#FF8A65",
-      accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png", // Health/fitness lab
+      backgroundImage: "/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png",
       subjectColor: "#FF5722",
       overlayOpacity: 0.7,
       environmentDescription: "A health and wellness laboratory for learning about the human body"
@@ -229,17 +189,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#FF9800",
       secondaryColor: "#FFB74D",
       accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/ab7502b0-78bd-4d20-8254-3e5a2c355bfd.png", // Language lab
-      subjectColor: "#FF9800",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern language laboratory with audio-visual learning equipment"
-    },
-    language_lab: {
-      subjectName: "Language Lab",
-      primaryColor: "#FF9800",
-      secondaryColor: "#FFB74D",
-      accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/ab7502b0-78bd-4d20-8254-3e5a2c355bfd.png", // Language lab
+      backgroundImage: "/lovable-uploads/ab7502b0-78bd-4d20-8254-3e5a2c355bfd.png",
       subjectColor: "#FF9800",
       overlayOpacity: 0.7,
       environmentDescription: "A modern language laboratory with audio-visual learning equipment"
@@ -249,7 +199,7 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       primaryColor: "#607D8B",
       secondaryColor: "#90A4AE",
       accentColor: "#455A64",
-      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png", // General classroom
+      backgroundImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1600&h=900&fit=crop",
       subjectColor: "#607D8B",
       overlayOpacity: 0.7,
       environmentDescription: "A modern learning environment with educational tools"

@@ -144,23 +144,9 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             </div>
           </TextWithSpeaker>
 
-          {/* Nelie Avatar - Enhanced and Prominently Displayed */}
+          {/* Nelie Avatar */}
           <div className="flex justify-center lg:justify-end">
-            <div className="relative transform hover:scale-105 transition-transform duration-300">
-              <div className="animate-pulse">
-                <NelieAvatarDisplay isSpeaking={false} onStopSpeech={() => {}} />
-              </div>
-              
-              {/* Extra visual indicators to make Nelie more prominent */}
-              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-                <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-full text-lg font-bold shadow-2xl animate-bounce">
-                  👋 Hi, I'm Nelie!
-                </div>
-              </div>
-              
-              {/* Glowing effect around Nelie */}
-              <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-            </div>
+            <NelieAvatarDisplay isSpeaking={false} onStopSpeech={() => {}} />
           </div>
         </div>
       </div>

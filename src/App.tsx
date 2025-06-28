@@ -5,38 +5,40 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import ErrorBoundary from "@/components/ErrorBoundary";
+
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import SubjectLearningPage from "./pages/SubjectLearningPage";
+import GameHub from "./pages/GameHub";
+import LanguageLearning from "@/components/LanguageLearning";
+import ProgressDashboard from "./pages/ProgressDashboard";
 import AdaptivePracticeTestPage from "./pages/AdaptivePracticeTestPage";
-import StudentDashboard from "./pages/StudentDashboard";
-import DailyProgram from "./pages/DailyProgram";
-import ProfileContainer from "./components/profile/ProfileContainer";
-import FloatingAITutor from "./components/FloatingAITutor";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
+const App = () => {
+  console.log('🚀 App component rendering...');
+  
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/profile" element={<ProfileContainer />} />
-            <Route path="/student-dashboard" element={<StudentDashboard />} />
-            <Route path="/subject/:subject" element={<SubjectLearningPage />} />
-            <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
-            <Route path="/daily-program" element={<DailyProgram />} />
-          </Routes>
-          <FloatingAITutor />
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/games" element={<GameHub />} />
+                <Route path="/language-learning" element={<LanguageLearning />} />
+                <Route path="/progress" element={<ProgressDashboard />} />
+                <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
         </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;

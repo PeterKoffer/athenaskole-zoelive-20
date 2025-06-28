@@ -1,38 +1,16 @@
 
 import { QuestionGenerationRequest, GeneratedQuestion } from './types.ts';
-import { parseEducationalContext, buildEducationalPrompt } from './educationalParametersBuilder.ts';
+import { generatePrompts } from './promptGenerator.ts';
 
 export async function generateQuestionWithOpenAI(
   request: QuestionGenerationRequest,
   openAIApiKey: string
 ): Promise<GeneratedQuestion> {
+  const { systemPrompt, userPrompt } = generatePrompts(request);
   const { questionIndex = 0 } = request;
 
-  // Parse the comprehensive educational context
-  const educationalContext = parseEducationalContext(request);
-  console.log(`🎓 Educational context:`, {
-    grade: educationalContext.gradeLevel,
-    hasTeacherReqs: !!educationalContext.teacherRequirements,
-    hasSchoolStandards: !!educationalContext.schoolStandards,
-    hasStudentAdaptation: !!educationalContext.studentAdaptation,
-    learningStyle: educationalContext.studentAdaptation?.learningStyle
-  });
-
-  // Build comprehensive educational prompt
-  const educationalPrompt = buildEducationalPrompt(educationalContext);
-  
-  const systemPrompt = `You are an expert K-12 educational content creator specializing in personalized learning. You understand:
-- Grade-level appropriate curriculum standards
-- Individual student learning needs and adaptations
-- Teacher pedagogical requirements
-- School district policies and learning objectives
-
-Your role is to create questions that are perfectly aligned with all these educational parameters while ensuring mathematical and logical accuracy.
-
-CRITICAL: Never create questions with equivalent answer options (like 1/2 and 2/4, or 0.5 and 50%).`;
-
-  console.log(`🤖 Calling OpenAI with personalized K-12 prompt for Grade ${educationalContext.gradeLevel}`);
-  console.log(`📝 Educational prompt length: ${educationalPrompt.length} characters`);
+  console.log(`🤖 Calling OpenAI with system prompt: ${systemPrompt.substring(0, 100)}...`);
+  console.log(`🤖 User prompt: ${userPrompt.substring(0, 100)}...`);
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -44,10 +22,10 @@ CRITICAL: Never create questions with equivalent answer options (like 1/2 and 2/
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: educationalPrompt }
+        { role: 'user', content: userPrompt }
       ],
-      temperature: 0.7 + (questionIndex * 0.05), // Add slight variation for uniqueness
-      max_tokens: 1000,
+      temperature: 0.7 + (questionIndex * 0.1), // Vary temperature for diversity
+      max_tokens: 800,
     }),
   });
 
@@ -62,7 +40,7 @@ CRITICAL: Never create questions with equivalent answer options (like 1/2 and 2/
   const data = await response.json();
   const content = data.choices[0].message.content.trim();
   
-  console.log(`🤖 Raw AI response: ${content.substring(0, 200)}...`);
+  console.log(`🤖 Raw AI response: ${content}`);
 
   // Parse JSON response
   try {
@@ -70,13 +48,7 @@ CRITICAL: Never create questions with equivalent answer options (like 1/2 and 2/
     const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
     const jsonStr = jsonMatch ? jsonMatch[1] : content;
     const questionData = JSON.parse(jsonStr);
-    
-    console.log(`✅ Parsed personalized K-12 question data:`, {
-      hasQuestion: !!questionData.question,
-      optionsCount: questionData.options?.length,
-      correctIndex: questionData.correct,
-      hasEducationalNotes: !!questionData.educationalNotes
-    });
+    console.log(`✅ Parsed question data:`, questionData);
     
     return questionData;
   } catch (parseError) {
