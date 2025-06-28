@@ -43,7 +43,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
       stealthAssessmentService.logEvent({
         type: InteractionEventType.SESSION_START,
         learningGoals: scenario.educational.learningOutcomes
-      }, 'ScenarioPlayer');
+      } as const, 'ScenarioPlayer');
     }
   }, [scenario, session, currentNode]);
 
@@ -109,7 +109,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
         fromPath: currentNode.id,
         toPath: nextNodeId || 'scenario_end',
         navigationType: 'INTERNAL_LINK'
-      }, 'ScenarioPlayer');
+      } as const, 'ScenarioPlayer');
     } else {
       nextNodeId = currentNode.connections.next || null;
     }
@@ -147,7 +147,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
           percentComplete: session.progress.percentComplete,
           timeSpent: Date.now() - session.timestamps.startedAt.getTime()
         }
-      }, 'ScenarioPlayer');
+      } as const, 'ScenarioPlayer');
       
       console.log('✅ Final session:', finalSession);
     }
@@ -172,7 +172,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
           percentComplete: session.progress.percentComplete,
           timeSpent: Date.now() - session.timestamps.startedAt.getTime()
         }
-      }, 'ScenarioPlayer');
+      } as const, 'ScenarioPlayer');
     }
     onExit();
   };

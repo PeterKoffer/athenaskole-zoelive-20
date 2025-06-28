@@ -24,7 +24,7 @@ export const useScenarioAnswering = () => {
         type: InteractionEventType.REVISION,
         originalAnswer: selectedAnswer,
         revisedAnswer: answer
-      }, 'useScenarioAnswering');
+      } as const, 'useScenarioAnswering');
     }
   };
 
