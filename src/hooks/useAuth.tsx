@@ -1,95 +1,58 @@
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  signOut: () => Promise<void>; // Add this method
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('🔐 Setting up auth state listener...');
-    
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('🔄 Auth state changed. Event:', event, 'User ID:', session?.user?.id || 'no user', 'Current User State:', user?.id);
-        // If user becomes null and was previously set, it's a sign-out or session expiry
-        if (!session?.user && user) {
-           console.warn('🚨 User state changed to null, potential sign out or session expiry. Event:', event);
-        }
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-    // Check for existing session
-    const checkSession = async () => {
-      try {
-        console.log('🔍 Checking for existing session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('❌ Error getting session:', error);
-        } else {
-          console.log('✅ Session check result:', session?.user?.id || 'no session');
-        }
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch (error) {
-        console.error('❌ Error in session check:', error);
-        setLoading(false);
-      }
-    };
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-    checkSession();
-
-    return () => {
-      console.log('🧹 Cleaning up auth subscription');
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
-    console.log('👋 Signing out...');
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('❌ Sign out error:', error);
-      } else {
-        console.log('✅ Successfully signed out');
-      }
-    } catch (error) {
-      console.error('❌ Sign out exception:', error);
-    }
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
   };
 
-  const value = {
-    user,
-    session,
-    loading,
-    signOut
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   };
+
+  // Add signOut as an alias to logout for compatibility
+  const signOut = logout;
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, login, logout, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,31 +1,54 @@
-// src/components/education/BodyLabLearning.tsx
-import { useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
-import ClassroomEnvironment from './components/shared/ClassroomEnvironment';
-import { getClassroomConfig } from './components/shared/classroomConfigs';
-import EnhancedBodyLabLearning from './EnhancedBodyLabLearning';
+
+import { useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import UnifiedLessonManager from "./components/UnifiedLessonManager";
+import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
+import { getClassroomConfig } from "./components/shared/classroomConfigs";
 
 const BodyLabLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const classroomConfig = getClassroomConfig('bodyLab') || getClassroomConfig('default');
+  const { forceStopAll } = useUnifiedSpeech();
+  const classroomConfig = getClassroomConfig("body_lab");
 
+  console.log('💪 BodyLabLearning component state:', {
+    user: !!user,
+    userId: user?.id,
+    loading,
+    subject: 'body_lab',
+    skillArea: 'general_body_lab'
+  });
+
+  // Redirect to auth if not logged in
   useEffect(() => {
-    console.log(`[${classroomConfig?.subjectName || 'BodyLabLearning'}] Auth Check: Loading: ${loading}, User: ${user?.id}`);
     if (!loading && !user) {
-      console.warn(`[${classroomConfig?.subjectName || 'BodyLabLearning'}] Redirecting to /auth. Loading: ${loading}, User: ${user === null}`);
       navigate('/auth');
     }
-  }, [user, loading, navigate, classroomConfig?.subjectName]);
+  }, [user, loading, navigate]);
+
+  // Stop speech when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log('🔇 Stopping Nelie speech due to navigation away from body lab lesson');
+      forceStopAll();
+    };
+  }, [forceStopAll]);
+
+  const handleBackToProgram = () => {
+    console.log('🔇 Stopping Nelie speech before navigating back to program');
+    forceStopAll();
+    navigate('/');
+  };
 
   if (loading) {
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="min-h-screen flex items-center justify-center text-white">
-          <div className="text-center p-8 bg-gray-800 bg-opacity-75 rounded-lg">
-            <div className="text-5xl mb-6 animate-pulse">{classroomConfig.loadingIcon || '💪'}</div>
-            <p className="text-xl font-semibold text-gray-200">{classroomConfig.loadingMessage || 'Warming up BodyLab...'}</p>
+          <div className="text-center">
+            <div className="text-4xl mb-4">💪</div>
+            <p className="text-lg">Loading your BodyLab lesson...</p>
           </div>
         </div>
       </ClassroomEnvironment>
@@ -39,7 +62,12 @@ const BodyLabLearning = () => {
   return (
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
-        <EnhancedBodyLabLearning />
+        <UnifiedLessonManager
+          subject="body_lab"
+          skillArea="general_body_lab"
+          studentName={user.user_metadata?.first_name || 'Student'}
+          onBackToProgram={handleBackToProgram}
+        />
       </div>
     </ClassroomEnvironment>
   );

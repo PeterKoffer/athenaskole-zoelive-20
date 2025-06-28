@@ -7,13 +7,22 @@ interface NelieAvatarDisplayProps {
 }
 
 const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
+  console.log('🤖 NelieAvatarDisplay rendering, isSpeaking:', isSpeaking);
+  
   return (
-    <div className="flex items-center space-x-4">
-      <RobotAvatar 
-        size="xl" 
-        isActive={true} 
-        isSpeaking={isSpeaking}
-      />
+    <div className="flex items-center justify-center">
+      <div className="relative">
+        <RobotAvatar 
+          size="4xl" 
+          isActive={true} 
+          isSpeaking={isSpeaking}
+          className="drop-shadow-2xl animate-pulse"
+        />
+        {/* Fallback if RobotAvatar doesn't show */}
+        <div className="absolute inset-0 flex items-center justify-center text-6xl animate-bounce">
+          🤖
+        </div>
+      </div>
     </div>
   );
 };

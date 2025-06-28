@@ -7,18 +7,18 @@ import UnifiedLessonManager from "./components/UnifiedLessonManager";
 import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
 import { getClassroomConfig } from "./components/shared/classroomConfigs";
 
-const MentalWellnessLearning = () => {
+const HistoryReligionLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { forceStopAll } = useUnifiedSpeech();
-  const classroomConfig = getClassroomConfig("mental_wellness");
+  const classroomConfig = getClassroomConfig("history_religion");
 
-  console.log('🧠 MentalWellnessLearning component state:', {
+  console.log('📜 HistoryReligionLearning component state:', {
     user: !!user,
     userId: user?.id,
     loading,
-    subject: 'mental_wellness',
-    skillArea: 'general_mental_wellness'
+    subject: 'history_religion',
+    skillArea: 'general_history_religion'
   });
 
   // Redirect to auth if not logged in
@@ -31,7 +31,7 @@ const MentalWellnessLearning = () => {
   // Stop speech when component unmounts
   useEffect(() => {
     return () => {
-      console.log('🔇 Stopping Nelie speech due to navigation away from mental wellness lesson');
+      console.log('🔇 Stopping Nelie speech due to navigation away from history religion lesson');
       forceStopAll();
     };
   }, [forceStopAll]);
@@ -47,8 +47,8 @@ const MentalWellnessLearning = () => {
       <ClassroomEnvironment config={classroomConfig}>
         <div className="min-h-screen flex items-center justify-center text-white">
           <div className="text-center">
-            <div className="text-4xl mb-4">🧠</div>
-            <p className="text-lg">Loading your Mental Wellness lesson...</p>
+            <div className="text-4xl mb-4">📜</div>
+            <p className="text-lg">Loading your History & Religion lesson...</p>
           </div>
         </div>
       </ClassroomEnvironment>
@@ -63,8 +63,8 @@ const MentalWellnessLearning = () => {
     <ClassroomEnvironment config={classroomConfig}>
       <div className="min-h-screen py-10 px-2 flex items-center justify-center">
         <UnifiedLessonManager
-          subject="mental_wellness"
-          skillArea="general_mental_wellness"
+          subject="history_religion"
+          skillArea="general_history_religion"
           studentName={user.user_metadata?.first_name || 'Student'}
           onBackToProgram={handleBackToProgram}
         />
@@ -73,4 +73,4 @@ const MentalWellnessLearning = () => {
   );
 };
 
-export default MentalWellnessLearning;
+export default HistoryReligionLearning;
