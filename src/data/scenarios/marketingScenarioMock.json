@@ -1,0 +1,88 @@
+{
+  "id": "marketing_scenario_01",
+  "title": "New Product Launch Strategy",
+  "description": "You are the marketing lead for a new innovative gadget. You have a limited initial budget and need to decide on the launch strategy.",
+  "startNodeId": "node_intro",
+  "nodes": {
+    "node_intro": {
+      "id": "node_intro",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Welcome, Marketing Lead!",
+      "description": "Your new gadget, the 'ChronoWidget', is ready for launch. Initial market analysis is positive but competition is fierce. What's your first major strategic decision?",
+      "decisionOptions": [
+        {
+          "text": "Focus on a niche market of tech enthusiasts first.",
+          "nextNodeId": "node_niche_market"
+        },
+        {
+          "text": "Attempt a broad market appeal from day one.",
+          "nextNodeId": "node_broad_market"
+        }
+      ]
+    },
+    "node_niche_market": {
+      "id": "node_niche_market",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Niche Market Focus",
+      "description": "Focusing on tech enthusiasts has generated strong initial buzz and pre-orders from a dedicated small group. However, overall market penetration is slow. A major competitor just announced a similar product with a wider appeal.",
+      "decisionOptions": [
+        {
+          "text": "Double down on the niche, enhance features for enthusiasts.",
+          "nextNodeId": "node_niche_double_down",
+          "feedback": "Risky, but could solidify your core base."
+        },
+        {
+          "text": "Pivot quickly to broaden appeal and compete directly.",
+          "nextNodeId": "node_niche_pivot_broad",
+          "feedback": "This might alienate your early adopters but could capture a larger market."
+        }
+      ]
+    },
+    "node_broad_market": {
+      "id": "node_broad_market",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Broad Market Appeal",
+      "description": "Your broad marketing campaign has made many people aware of the ChronoWidget, but conversion rates are lower than expected due to its specialized nature not appealing to everyone. Marketing costs are high.",
+      "decisionOptions": [
+        {
+          "text": "Refine messaging to highlight benefits for a wider audience.",
+          "nextNodeId": "node_broad_refine_messaging",
+          "feedback": "Good idea, clear communication is key."
+        },
+        {
+          "text": "Cut marketing spend and focus on organic growth.",
+          "nextNodeId": "node_broad_cut_spend",
+          "feedback": "This will save money but might stall growth significantly."
+        }
+      ]
+    },
+    "node_niche_double_down": {
+      "id": "node_niche_double_down",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Niche Loyalty",
+      "description": "Your tech enthusiast base is extremely loyal, but the product remains a niche success. Competitor is gaining mass market share.",
+      "isEndPoint": true
+    },
+    "node_niche_pivot_broad": {
+      "id": "node_niche_pivot_broad",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Broad Pivot",
+      "description": "Pivoting was costly and some early adopters are unhappy. You're now directly competing with the established player, but have a chance at a larger market if you succeed.",
+      "isEndPoint": true
+    },
+    "node_broad_refine_messaging": {
+      "id": "node_broad_refine_messaging",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Messaging Refined",
+      "description": "Improved messaging has slightly increased conversions, but the product's core appeal is still somewhat niche. You've carved out a small segment of the broad market.",
+      "isEndPoint": true
+    },
+    "node_broad_cut_spend": {
+      "id": "node_broad_cut_spend",
+      "scenarioId": "marketing_scenario_01",
+      "title": "Reduced Spend",
+      "description": "Cutting marketing spend saved costs, but sales have stagnated. The ChronoWidget becomes a minor player in the market.",
+      "isEndPoint": true
+    }
+  }
+}

@@ -20,6 +20,7 @@ import ParentDashboard from '@/pages/ParentDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import DailyProgram from '@/pages/DailyProgram';
 import CurriculumDashboard from '@/components/curriculum/CurriculumDashboard';
+import SimulationLauncherPage from '@/pages/SimulationLauncherPage'; // Import the new page
 
 // Import new school management pages
 import StudentRecordsPage from '@/pages/StudentRecordsPage';
@@ -69,6 +70,7 @@ function AppRoutes() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/daily-program" element={<DailyProgram />} />
         <Route path="/curriculum" element={<CurriculumDashboard />} />
+        <Route path="/simulations" element={<SimulationLauncherPage />} /> {/* Add route for simulations */}
         
         {/* School management pages */}
         <Route path="/student-records" element={<StudentRecordsPage />} />

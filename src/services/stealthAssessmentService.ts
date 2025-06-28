@@ -100,6 +100,23 @@ class StealthAssessmentService implements IStealthAssessmentService {
     await this.logEvent({ type: InteractionEventType.CONTENT_VIEW, ...details }, sourceComponentId);
   }
 
+  // Scenario-specific logging methods
+  public async logScenarioStart(details: Omit<ScenarioStartEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    await this.logEvent({ type: InteractionEventType.SCENARIO_START, ...details }, sourceComponentId);
+  }
+
+  public async logScenarioEnd(details: Omit<ScenarioEndEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    await this.logEvent({ type: InteractionEventType.SCENARIO_END, ...details }, sourceComponentId);
+  }
+
+  public async logScenarioNodeView(details: Omit<ScenarioNodeViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    await this.logEvent({ type: InteractionEventType.SCENARIO_NODE_VIEW, ...details }, sourceComponentId);
+  }
+
+  public async logScenarioDecision(details: Omit<ScenarioDecisionEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    await this.logEvent({ type: InteractionEventType.SCENARIO_DECISION, ...details }, sourceComponentId);
+  }
+
   private async flushEventQueue(): Promise<void> {
     if (this.eventQueue.length === 0 || this.isFlushing) {
       return;

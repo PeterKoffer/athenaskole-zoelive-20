@@ -15,6 +15,12 @@ export enum InteractionEventType {
   NAVIGATION = 'NAVIGATION', // e.g., student navigates between sections
   SESSION_START = 'SESSION_START',
   SESSION_END = 'SESSION_END',
+
+  // Scenario-specific events
+  SCENARIO_START = 'SCENARIO_START',
+  SCENARIO_END = 'SCENARIO_END', // For when a scenario is completed or exited
+  SCENARIO_NODE_VIEW = 'SCENARIO_NODE_VIEW',
+  SCENARIO_DECISION = 'SCENARIO_DECISION',
 }
 
 /**
@@ -117,6 +123,45 @@ export interface SessionEndEvent extends BaseInteractionEvent {
   metrics?: Record<string, any>; // Summary metrics for the session
 }
 
+// Scenario-specific Event Interfaces
+
+export interface ScenarioStartEvent extends BaseInteractionEvent {
+  type: InteractionEventType.SCENARIO_START;
+  scenarioId: string;
+  scenarioTitle: string; // Title of the scenario for easier identification in logs
+  // initialResources?: Record<string, number>; // Optional: if tracking resources
+}
+
+export interface ScenarioEndEvent extends BaseInteractionEvent {
+  type: InteractionEventType.SCENARIO_END;
+  scenarioId: string;
+  scenarioTitle: string;
+  reason: 'COMPLETED' | 'ABORTED_BY_USER' | 'FAILED_CONDITION'; // e.g., ran out of resources
+  finalNodeId?: string; // The node ID where the scenario ended
+  pathTaken?: string[]; // Array of node IDs visited
+  // finalResources?: Record<string, number>; // Optional: final state of resources
+  // performanceMetrics?: Record<string, any>; // Optional: scenario-specific KPIs
+}
+
+export interface ScenarioNodeViewEvent extends BaseInteractionEvent {
+  type: InteractionEventType.SCENARIO_NODE_VIEW;
+  scenarioId: string;
+  nodeId: string;
+  nodeTitle?: string;
+  timeViewedMs?: number; // Optional: time spent on this node before making a decision or moving on
+}
+
+export interface ScenarioDecisionEvent extends BaseInteractionEvent {
+  type: InteractionEventType.SCENARIO_DECISION;
+  scenarioId: string;
+  nodeId: string; // The node where the decision was made
+  decisionText: string; // The text of the option chosen by the user
+  choiceIndex?: number; // Optional: 0-based index of the choice made
+  nextNodeId: string; // The node the user is transitioning to
+  // resourcesAffected?: Record<string, number>; // Optional: resources changed by this decision
+  // feedbackGiven?: string; // Optional: feedback shown to the user for this choice
+}
+
 
 /**
  * A union type for all possible interaction events.
@@ -132,7 +177,11 @@ export type InteractionEvent =
   | PauseResumeEvent
   | NavigationEvent
   | SessionStartEvent
-  | SessionEndEvent;
+  | SessionEndEvent
+  | ScenarioStartEvent
+  | ScenarioEndEvent
+  | ScenarioNodeViewEvent
+  | ScenarioDecisionEvent;
 
 /**
  * Interface for the service that handles logging of interaction events.
@@ -147,5 +196,10 @@ export interface IStealthAssessmentService {
   logGameInteraction(details: Omit<GameInteractionEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
   logTutorQuery(details: Omit<TutorQueryEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
   logContentView(details: Omit<ContentViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
-  // ... other helper methods can be added
+
+  // Scenario-specific helper methods
+  logScenarioStart(details: Omit<ScenarioStartEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
+  logScenarioEnd(details: Omit<ScenarioEndEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
+  logScenarioNodeView(details: Omit<ScenarioNodeViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
+  logScenarioDecision(details: Omit<ScenarioDecisionEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
 }
