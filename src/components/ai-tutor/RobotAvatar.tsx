@@ -22,18 +22,20 @@ const RobotAvatar: React.FC<RobotAvatarProps> = ({
     xl: 'w-20 h-20 text-5xl',
     '2xl': 'w-24 h-24 text-6xl',
     '3xl': 'w-32 h-32 text-7xl',
-    '4xl': 'w-40 h-40 text-8xl'
+    '4xl': 'w-48 h-48 text-9xl'
   };
+
+  console.log('🤖 RobotAvatar rendering with size:', size, 'isActive:', isActive, 'isSpeaking:', isSpeaking);
 
   return (
     <div className={cn(
-      'flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg',
+      'flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 shadow-2xl border-4 border-white/20',
       sizeClasses[size],
-      isActive && 'ring-4 ring-purple-400 ring-opacity-50',
-      isSpeaking && 'animate-pulse ring-4 ring-blue-400',
+      isActive && 'ring-4 ring-purple-400 ring-opacity-75 animate-pulse',
+      isSpeaking && 'ring-4 ring-blue-400 animate-pulse',
       className
     )}>
-      <span className="text-white filter drop-shadow-lg">
+      <span className="text-white filter drop-shadow-lg select-none">
         🤖
       </span>
     </div>

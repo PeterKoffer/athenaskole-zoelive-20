@@ -16,12 +16,8 @@ const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
           size="4xl" 
           isActive={true} 
           isSpeaking={isSpeaking}
-          className="drop-shadow-2xl animate-pulse"
+          className="drop-shadow-2xl"
         />
-        {/* Fallback if RobotAvatar doesn't show */}
-        <div className="absolute inset-0 flex items-center justify-center text-6xl animate-bounce">
-          🤖
-        </div>
       </div>
     </div>
   );
