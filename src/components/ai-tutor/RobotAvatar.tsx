@@ -29,22 +29,27 @@ const RobotAvatar: React.FC<RobotAvatarProps> = ({
 
   return (
     <div className={cn(
-      'flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 shadow-2xl border-4 border-white/20 overflow-hidden',
+      'flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 shadow-2xl border-4 border-white/20 overflow-hidden relative',
       sizeClasses[size],
       isActive && 'ring-4 ring-purple-400 ring-opacity-75 animate-pulse',
       isSpeaking && 'ring-4 ring-blue-400 animate-pulse',
       className
     )}>
       <img 
-        src="/lovable-uploads/8c10bee3-a90a-42e9-9f33-382dd2fcd151.png"
+        src="/lovable-uploads/1bc3f66e-699d-4712-81bb-9188d2ddf964.png"
         alt="Nelie AI Robot"
         className="w-full h-full object-cover"
         onError={(e) => {
           console.error('Failed to load Nelie avatar image');
           // Fallback to another Nelie image if this one fails
-          (e.target as HTMLImageElement).src = "/lovable-uploads/4dd9342c-d485-4995-b97f-3619b8452d16.png";
+          (e.target as HTMLImageElement).src = "/lovable-uploads/8c10bee3-a90a-42e9-9f33-382dd2fcd151.png";
         }}
       />
+      
+      {/* Blinking dot when speaking */}
+      {isSpeaking && (
+        <div className="absolute bottom-2 right-2 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
+      )}
     </div>
   );
 };
