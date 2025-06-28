@@ -230,23 +230,49 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
     const randomSeed = Math.random().toString(36).substring(2, 8);
     
     if (skillArea.includes('fraction') && skillArea.includes('like denominators')) {
-      // Create specific fraction questions
+      // Create mathematically correct fraction questions
       const denominators = [6, 8, 10, 12];
       const denominator = denominators[index % denominators.length];
-      const numerator1 = 2 + index;
-      const numerator2 = 1 + (index % 3);
+      
+      // Ensure we create proper fractions that don't exceed the denominator
+      const maxNumerator = Math.floor(denominator / 2); // Keep it reasonable for addition
+      const numerator1 = Math.max(1, Math.min(maxNumerator, 1 + index));
+      const numerator2 = Math.max(1, Math.min(denominator - numerator1 - 1, 1 + (index % 2)));
       const correctSum = numerator1 + numerator2;
+      
+      // Create mathematically sound distractors
+      const correctAnswer = `${correctSum}/${denominator}`;
+      const simplifiedAnswer = this.simplifyFraction(correctSum, denominator);
+      
+      // Common mistake distractors
+      const addDenominators = `${correctSum}/${denominator + denominator}`; // Wrong: adding denominators
+      const wrongNumerator = `${correctSum + 1}/${denominator}`; // Off by one error
+      const multiplyError = `${numerator1 * numerator2}/${denominator}`; // Multiplication instead of addition
+      
+      // Build unique options
+      const options = [correctAnswer];
+      const distractors = [addDenominators, wrongNumerator, multiplyError];
+      
+      // Add distractors that are different from correct answer
+      distractors.forEach(distractor => {
+        if (distractor !== correctAnswer && options.length < 4) {
+          options.push(distractor);
+        }
+      });
+      
+      // Fill remaining slots if needed
+      while (options.length < 4) {
+        const randomDistractor = `${correctSum - 1 + (options.length - 1)}/${denominator}`;
+        if (!options.includes(randomDistractor)) {
+          options.push(randomDistractor);
+        }
+      }
       
       return {
         question: `What is ${numerator1}/${denominator} + ${numerator2}/${denominator}?`,
-        options: [
-          `${correctSum}/${denominator}`,
-          `${correctSum}/${denominator * 2}`,
-          `${numerator1 + numerator2}/${denominator + denominator}`,
-          `${correctSum + 1}/${denominator}`
-        ],
+        options: options,
         correct: 0,
-        explanation: `When adding fractions with the same denominator, add the numerators: ${numerator1} + ${numerator2} = ${correctSum}. Keep the denominator the same: ${correctSum}/${denominator}.`
+        explanation: `When adding fractions with the same denominator, add the numerators and keep the denominator: ${numerator1} + ${numerator2} = ${correctSum}. So the answer is ${correctSum}/${denominator}${simplifiedAnswer !== correctAnswer ? ` or ${simplifiedAnswer} when simplified` : ''}.`
       };
     }
     
@@ -255,16 +281,19 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
       const factor2 = (2.1 + index * 0.2).toFixed(1);
       const product = (parseFloat(factor1) * parseFloat(factor2)).toFixed(2);
       
+      // Create realistic distractors
+      const options = [
+        product,
+        (parseFloat(product) + 1).toFixed(2),
+        (parseFloat(product) - 0.5).toFixed(2),
+        (parseFloat(factor1) + parseFloat(factor2)).toFixed(2) // Addition instead of multiplication
+      ];
+      
       return {
         question: `What is ${factor1} × ${factor2}?`,
-        options: [
-          product,
-          (parseFloat(product) + 1).toFixed(2),
-          (parseFloat(product) - 0.5).toFixed(2),
-          (parseFloat(product) + 0.3).toFixed(2)
-        ],
+        options: options,
         correct: 0,
-        explanation: "When multiplying decimals, multiply as whole numbers then place the decimal point correctly."
+        explanation: `To multiply decimals: ${factor1} × ${factor2} = ${product}. Multiply the numbers then place the decimal point correctly.`
       };
     }
 
@@ -275,6 +304,27 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
       correct: 0,
       explanation: `This helps you practice ${skillArea} skills.`
     };
+  }
+
+  private simplifyFraction(numerator: number, denominator: number): string {
+    const gcd = this.findGCD(numerator, denominator);
+    const simplifiedNum = numerator / gcd;
+    const simplifiedDen = denominator / gcd;
+    
+    if (simplifiedDen === 1) {
+      return simplifiedNum.toString();
+    }
+    
+    return `${simplifiedNum}/${simplifiedDen}`;
+  }
+
+  private findGCD(a: number, b: number): number {
+    while (b !== 0) {
+      const temp = b;
+      b = a % b;
+      a = temp;
+    }
+    return a;
   }
 
   private createFallbackSequence(kcId: string, userId: string, subject: string, skillArea: string, difficultyLevel: number): AtomSequence {
