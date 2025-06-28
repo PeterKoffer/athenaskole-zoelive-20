@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { User, BookOpen, GraduationCap, ChevronDown, UserPlus } from "lucide-react";
+import { User, BookOpen, GraduationCap, ChevronDown, UserPlus, TestTube } from "lucide-react";
 import { useAuth } from '@/hooks/useAuth';
 
 interface HeroSectionProps {
@@ -50,6 +50,10 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
 
   const handleCurriculumSystem = () => {
     navigate('/curriculum-system');
+  };
+
+  const handleSimulations = () => {
+    navigate('/simulations');
   };
 
   return (
@@ -102,19 +106,19 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 </Button>
 
                 {/* Dropdown Menu positioned right after the main buttons */}
-                {!user && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="outline"
-                        size="lg"
-                        className="w-full sm:w-auto border-2 border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-gray-900 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
-                      >
-                        More Options
-                        <ChevronDown className="w-4 h-4 ml-2" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56 bg-gray-800 border-gray-700" align="center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline"
+                      size="lg"
+                      className="w-full sm:w-auto border-2 border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-gray-900 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                    >
+                      More Options
+                      <ChevronDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-gray-800 border-gray-700" align="center">
+                    {!user && (
                       <DropdownMenuItem 
                         onClick={handleLogin}
                         className="text-white hover:bg-gray-700 focus:bg-gray-700"
@@ -122,24 +126,31 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                         <UserPlus className="mr-2 h-4 w-4" />
                         Login / Sign Up
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={handleProfile}
-                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        {user ? 'Profile' : 'Profile (Login Required)'}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-gray-700" />
-                      <DropdownMenuItem 
-                        onClick={handleCurriculumSystem}
-                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
-                      >
-                        <GraduationCap className="mr-2 h-4 w-4" />
-                        Curriculum System
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                    )}
+                    <DropdownMenuItem 
+                      onClick={handleProfile}
+                      className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      {user ? 'Profile' : 'Profile (Login Required)'}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuItem 
+                      onClick={handleCurriculumSystem}
+                      className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                    >
+                      <GraduationCap className="mr-2 h-4 w-4" />
+                      Curriculum System
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={handleSimulations}
+                      className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                    >
+                      <TestTube className="mr-2 h-4 w-4" />
+                      Scenario Testing
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </TextWithSpeaker>

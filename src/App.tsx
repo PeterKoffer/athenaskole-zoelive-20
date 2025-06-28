@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import AdaptivePracticeTestPage from "./pages/AdaptivePracticeTestPage";
+import SimulationsPage from "./pages/SimulationsPage";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/subject/:subject" element={<SubjectLearningPage />} />
             <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
+            <Route path="/simulations" element={<SimulationsPage />} />
           </Routes>
         </TooltipProvider>
       </AuthProvider>
