@@ -9,6 +9,12 @@ import { ScienceWelcome } from './welcome/ScienceWelcome';
 import { ComputerScienceWelcome } from './welcome/ComputerScienceWelcome';
 import { MusicWelcome } from './welcome/MusicWelcome';
 import { CreativeArtsWelcome } from './welcome/CreativeArtsWelcome';
+import { BodyLabWelcome } from './welcome/BodyLabWelcome';
+import { MentalWellnessWelcome } from './welcome/MentalWellnessWelcome';
+import { LanguageLabWelcome } from './welcome/LanguageLabWelcome';
+import { HistoryReligionWelcome } from './welcome/HistoryReligionWelcome';
+import { GeographyWelcome } from './welcome/GeographyWelcome';
+import { LifeEssentialsWelcome } from './welcome/LifeEssentialsWelcome';
 import ImprovedLearningSession from '@/components/adaptive-learning/components/ImprovedLearningSession';
 import MathLessonHeader from './math/MathLessonHeader';
 
@@ -64,8 +70,25 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
       case 'creative_arts':
       case 'creative-arts':
         return <CreativeArtsWelcome {...welcomeProps} />;
+      case 'body_lab':
+      case 'body-lab':
+        return <BodyLabWelcome {...welcomeProps} />;
+      case 'mental_wellness':
+      case 'mental-wellness':
+        return <MentalWellnessWelcome {...welcomeProps} />;
+      case 'language_lab':
+      case 'language-lab':
+        return <LanguageLabWelcome {...welcomeProps} />;
+      case 'history_religion':
+      case 'history-religion':
+        return <HistoryReligionWelcome {...welcomeProps} />;
+      case 'geography':
+        return <GeographyWelcome {...welcomeProps} />;
+      case 'life_essentials':
+      case 'life-essentials':
+        return <LifeEssentialsWelcome {...welcomeProps} />;
       default:
-        console.log('⚠️ Unknown subject, defaulting to MathematicsWelcome');
+        console.log('⚠️ Unknown subject, defaulting to MathematicsWelcome for:', subject);
         return <MathematicsWelcome {...welcomeProps} />;
     }
   };
