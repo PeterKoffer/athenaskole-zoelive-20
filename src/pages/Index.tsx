@@ -23,6 +23,9 @@ const Index = () => {
     setShowInsightsDashboard
   } = useHomeNavbarLogic();
 
+  console.log('🏠 Index page - User logged in:', !!user);
+  console.log('🏠 Index page - User data:', user?.user_metadata?.name);
+
   const handleGetStarted = () => {
     console.log('🚀 Index: Get Started clicked, navigating to mathematics');
     // This will be handled by the navigation in HomeMainContent

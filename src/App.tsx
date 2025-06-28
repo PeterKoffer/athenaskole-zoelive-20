@@ -10,7 +10,9 @@ import Auth from "./pages/Auth";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import AdaptivePracticeTestPage from "./pages/AdaptivePracticeTestPage";
 import StudentDashboard from "./pages/StudentDashboard";
+import DailyProgram from "./pages/DailyProgram";
 import ProfileContainer from "./components/profile/ProfileContainer";
+import FloatingAITutor from "./components/FloatingAITutor";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +30,9 @@ const App = () => (
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="/subject/:subject" element={<SubjectLearningPage />} />
             <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
+            <Route path="/daily-program" element={<DailyProgram />} />
           </Routes>
+          <FloatingAITutor />
         </TooltipProvider>
       </AuthProvider>
     </BrowserRouter>
