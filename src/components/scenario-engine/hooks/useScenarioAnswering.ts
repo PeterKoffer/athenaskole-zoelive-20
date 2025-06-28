@@ -20,11 +20,12 @@ export const useScenarioAnswering = () => {
     // Log answer selection as a revision event if changing answer
     if (selectedAnswer && selectedAnswer !== answer) {
       console.log('📊 Logging REVISION event for answer change');
-      stealthAssessmentService.logEvent({
-        type: InteractionEventType.REVISION,
+      const revisionEvent = {
+        type: InteractionEventType.REVISION as const,
         originalAnswer: selectedAnswer,
         revisedAnswer: answer
-      } as const, 'useScenarioAnswering');
+      };
+      stealthAssessmentService.logEvent(revisionEvent, 'useScenarioAnswering');
     }
   };
 

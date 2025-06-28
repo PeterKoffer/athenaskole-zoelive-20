@@ -40,10 +40,11 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
   React.useEffect(() => {
     if (session && currentNode) {
       console.log('📊 Logging SESSION_START event');
-      stealthAssessmentService.logEvent({
-        type: InteractionEventType.SESSION_START,
+      const sessionStartEvent = {
+        type: InteractionEventType.SESSION_START as const,
         learningGoals: scenario.educational.learningOutcomes
-      } as const, 'ScenarioPlayer');
+      };
+      stealthAssessmentService.logEvent(sessionStartEvent, 'ScenarioPlayer');
     }
   }, [scenario, session, currentNode]);
 
@@ -104,12 +105,13 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
       
       // Log the branching decision
       console.log('📊 Logging NAVIGATION event for branching decision');
-      stealthAssessmentService.logEvent({
-        type: InteractionEventType.NAVIGATION,
+      const navigationEvent = {
+        type: InteractionEventType.NAVIGATION as const,
         fromPath: currentNode.id,
         toPath: nextNodeId || 'scenario_end',
-        navigationType: 'INTERNAL_LINK'
-      } as const, 'ScenarioPlayer');
+        navigationType: 'INTERNAL_LINK' as const
+      };
+      stealthAssessmentService.logEvent(navigationEvent, 'ScenarioPlayer');
     } else {
       nextNodeId = currentNode.connections.next || null;
     }
@@ -137,9 +139,9 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
       
       // Log scenario completion
       console.log('📊 Logging SESSION_END event');
-      stealthAssessmentService.logEvent({
-        type: InteractionEventType.SESSION_END,
-        reason: 'COMPLETION',
+      const sessionEndEvent = {
+        type: InteractionEventType.SESSION_END as const,
+        reason: 'COMPLETION' as const,
         metrics: {
           totalScore: score,
           nodesCompleted: session.progress.nodesCompleted,
@@ -147,7 +149,8 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
           percentComplete: session.progress.percentComplete,
           timeSpent: Date.now() - session.timestamps.startedAt.getTime()
         }
-      } as const, 'ScenarioPlayer');
+      };
+      stealthAssessmentService.logEvent(sessionEndEvent, 'ScenarioPlayer');
       
       console.log('✅ Final session:', finalSession);
     }
@@ -162,9 +165,9 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
     if (session) {
       // Log scenario exit
       console.log('📊 Logging SESSION_END event for exit');
-      stealthAssessmentService.logEvent({
-        type: InteractionEventType.SESSION_END,
-        reason: 'USER_INITIATED',
+      const sessionEndEvent = {
+        type: InteractionEventType.SESSION_END as const,
+        reason: 'USER_INITIATED' as const,
         metrics: {
           totalScore: score,
           nodesCompleted: session.progress.nodesCompleted,
@@ -172,7 +175,8 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
           percentComplete: session.progress.percentComplete,
           timeSpent: Date.now() - session.timestamps.startedAt.getTime()
         }
-      } as const, 'ScenarioPlayer');
+      };
+      stealthAssessmentService.logEvent(sessionEndEvent, 'ScenarioPlayer');
     }
     onExit();
   };
