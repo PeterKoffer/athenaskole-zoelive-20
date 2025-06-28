@@ -69,7 +69,7 @@ export async function generateContentWithOpenAI(requestData: any) {
     }
 
     console.log('✅ OpenAI content generated successfully');
-    return parsedContent;
+    return { ...parsedContent, prompt_used: prompt };
 
   } catch (error) {
     console.error('❌ OpenAI generation failed:', error);
@@ -145,7 +145,7 @@ export async function generateContentWithDeepSeek(requestData: any) {
     }
 
     console.log('✅ DeepSeek content generated successfully');
-    return parsedContent;
+    return { ...parsedContent, prompt_used: prompt };
 
   } catch (error) {
     console.error('❌ DeepSeek generation failed:', error);

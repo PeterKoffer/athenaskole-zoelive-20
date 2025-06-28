@@ -4,6 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 import { UniqueQuestion, globalQuestionUniquenessService } from '@/services/globalQuestionUniquenessService';
 import { gradeAlignedQuestionGeneration, TeachingPerspective } from '@/services/gradeAlignedQuestionGeneration';
 import { teachingPerspectiveService } from '@/services/teachingPerspectiveService';
+import stealthAssessmentService from '@/services/stealthAssessmentService'; // Import stealthAssessmentService
+import type { QuestionAttemptEvent } from '@/types/stealthAssessment'; // Import type
 
 export interface UseUnifiedQuestionGenerationProps {
   subject: string;
@@ -157,16 +159,35 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
   ) => {
     try {
       await globalQuestionUniquenessService.trackQuestionUsage(question);
-      console.log(`📝 Saved question history for Grade ${effectiveGradeLevel}:`, {
+      console.log(`📝 Tracked question usage for Grade ${effectiveGradeLevel}: ${question.id}`);
+
+      // Log the question attempt using StealthAssessmentService
+      const attemptDetails: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'> = {
+        questionId: question.id,
+        // KC IDs might need to be passed via additionalContext or derived if not directly on UniqueQuestion
+        knowledgeComponentIds: additionalContext?.kc_ids || [question.metadata.skillArea || props.skillArea],
+        answerGiven: userAnswer, // Ensure userAnswer is in the correct format (any)
+        isCorrect: isCorrect,
+        attemptsMade: additionalContext?.attemptsMade || 1, // Default to 1 if not provided
+        timeTakenMs: responseTime,
+        prompt_used: question.metadata.prompt_used || additionalContext?.prompt_used,
+        ai_estimated_difficulty: question.metadata.ai_estimated_difficulty || additionalContext?.ai_estimated_difficulty,
+        generated_question_text: question.content.question,
+      };
+      // The sourceComponentId can be passed if available, e.g. from where handleAnswer is called
+      await stealthAssessmentService.logQuestionAttempt(attemptDetails, additionalContext?.sourceComponentId || 'unifiedQuestionGeneration');
+
+      console.log(`💾 Logged question attempt for Grade ${effectiveGradeLevel}:`, {
         questionId: question.id,
         isCorrect,
         responseTime,
         context: additionalContext
       });
+
     } catch (error) {
-      console.error('❌ Failed to save question history:', error);
+      console.error('❌ Failed to save question history or log attempt:', error);
     }
-  }, [effectiveGradeLevel]);
+  }, [effectiveGradeLevel, props.skillArea]); // Added props.skillArea to dependencies
 
   const updateTeachingPerspective = useCallback((newPerspective: TeachingPerspective) => {
     teachingPerspectiveService.saveTeachingPerspective(props.userId, newPerspective);

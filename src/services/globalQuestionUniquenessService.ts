@@ -17,6 +17,8 @@ export interface UniqueQuestion {
     sessionId: string;
     teachingPerspective?: any;
     gradeStandards?: string[];
+    prompt_used?: string; // Added for AI-generated questions
+    ai_estimated_difficulty?: number; // Added for AI-generated questions
   };
 }
 

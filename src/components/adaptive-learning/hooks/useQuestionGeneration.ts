@@ -11,6 +11,8 @@ export interface Question {
   learningObjectives: string[];
   estimatedTime: number;
   isRecap?: boolean; // Flag to allow repeated questions for recap/review
+  prompt_used?: string; // Added for AI-generated questions
+  ai_estimated_difficulty?: number; // Added for AI-generated questions
 }
 
 interface UseQuestionGenerationProps {
@@ -105,7 +107,9 @@ export const useQuestionGeneration = ({ subject, skillArea, difficultyLevel, use
         correct: content.correct,
         explanation: content.explanation || 'No explanation provided',
         learningObjectives: content.learningObjectives || [],
-        estimatedTime: content.estimatedTime || 30
+        estimatedTime: content.estimatedTime || 30,
+        prompt_used: content.prompt_used, // Pass through prompt_used
+        ai_estimated_difficulty: content.ai_estimated_difficulty // Pass through ai_estimated_difficulty
       };
 
       console.log('🎯 Final question data:', questionData);

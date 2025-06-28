@@ -80,9 +80,11 @@ export const useDiverseQuestionGeneration = ({
         options: uniqueQuestion.content.options,
         correct: uniqueQuestion.content.correctAnswer,
         explanation: uniqueQuestion.content.explanation,
-        learningObjectives: [],
-        estimatedTime: undefined,
-        conceptsCovered: []
+        learningObjectives: [], // Consider mapping if available in UniqueQuestion metadata
+        estimatedTime: undefined, // Consider mapping if available
+        conceptsCovered: [], // Consider mapping if available
+        prompt_used: uniqueQuestion.metadata.prompt_used,
+        ai_estimated_difficulty: uniqueQuestion.metadata.ai_estimated_difficulty
       };
 
       console.log('✅ UNIQUE question generated successfully:', uniqueQuestion.content.question.substring(0, 50) + '...');
@@ -123,7 +125,11 @@ export const useDiverseQuestionGeneration = ({
             ...additionalContext,
             legacyCompatibility: true,
             sessionQuestions: sessionQuestions.length,
-            topicsCovered: questionTopics.size
+            topicsCovered: questionTopics.size,
+            // Pass the new fields through additionalContext
+            prompt_used: question.prompt_used,
+            ai_estimated_difficulty: question.ai_estimated_difficulty,
+            generated_question_text: question.question
           }
         );
       } else {

@@ -120,7 +120,9 @@ export class GradeAlignedQuestionGeneration {
         userId: config.userId,
         teachingPerspective: config.teachingPerspective,
         gradeStandards: gradeStandards.map(s => s.code),
-        sessionId: `grade_aligned_${config.gradeLevel}`
+        sessionId: `grade_aligned_${config.gradeLevel}`,
+        prompt_used: response.data.generatedContent.prompt_used, // Capture the prompt used
+        // ai_estimated_difficulty: response.data.generatedContent.ai_estimated_difficulty, // Capture if available
       }
     };
   }

@@ -40,6 +40,9 @@ export interface QuestionAttemptEvent extends BaseInteractionEvent {
   isCorrect: boolean;
   attemptsMade: number; // How many times this specific question has been attempted in this instance
   timeTakenMs?: number; // Time spent on this attempt
+  prompt_used?: string; // Added for AI-generated questions
+  ai_estimated_difficulty?: number; // Added for AI-generated questions
+  generated_question_text?: string; // Added for AI-generated questions (full text)
 }
 
 export interface HintUsageEvent extends BaseInteractionEvent {

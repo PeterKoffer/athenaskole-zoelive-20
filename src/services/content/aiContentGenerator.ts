@@ -51,7 +51,10 @@ export class AIContentGenerator {
         correct: content.correct,
         explanation: content.explanation || 'No explanation provided',
         learningObjectives: content.learningObjectives || [],
-        estimatedTime: content.estimatedTime || 30
+        estimatedTime: content.estimatedTime || 30,
+        prompt_used: content.prompt_used, // Pass through the prompt_used
+        // ai_estimated_difficulty will be undefined if not present in content
+        ai_estimated_difficulty: content.ai_estimated_difficulty
       };
 
       console.log('✅ Returning validated content from DeepSeek:', validatedContent);

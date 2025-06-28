@@ -13,6 +13,8 @@ export interface GeneratedContent {
   explanation: string;
   learningObjectives: string[];
   estimatedTime: number;
+  prompt_used?: string; // Added for AI-generated questions
+  ai_estimated_difficulty?: number; // Added for AI-generated questions
 }
 
 export interface AdaptiveContentRecord {

@@ -138,13 +138,25 @@ class LearnerProfileService implements ILearnerProfileService {
     }
 
     if (eventDetails.isCorrect !== undefined) {
+      const difficulty = eventDetails.interactionDetails?.ai_estimated_difficulty as number | undefined;
+      const effectiveDifficulty = (typeof difficulty === 'number' && difficulty >= 0 && difficulty <= 1) ? difficulty : 0.5; // Default difficulty if not provided or invalid
+
       if (eventDetails.isCorrect) {
         kcMastery.correctAttempts += 1;
-        kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + 0.1);
+        // Harder questions (higher difficulty) give smaller mastery boosts when correct. Easier questions (lower difficulty) give larger boosts.
+        // This is one way to model it; P(S) in BKT is more about this. Let's use a simpler scaling for now.
+        // If correct on hard question (e.g. diff 0.8), gain = 0.05 + 0.1 * (1-0.8) = 0.07
+        // If correct on easy question (e.g. diff 0.2), gain = 0.05 + 0.1 * (1-0.2) = 0.13
+        const increment = 0.05 + (0.1 * (1 - effectiveDifficulty));
+        kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + increment);
       } else {
-        kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - 0.05);
+        // Failing harder questions penalizes more. Failing easier questions penalizes less.
+        // If incorrect on hard question (e.g. diff 0.8), loss = 0.025 + (0.1 * 0.8) = 0.105
+        // If incorrect on easy question (e.g. diff 0.2), loss = 0.025 + (0.1 * 0.2) = 0.045
+        const decrement = 0.025 + (0.1 * effectiveDifficulty);
+        kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - decrement);
       }
-    } else if (eventDetails.score !== undefined) {
+    } else if (eventDetails.score !== undefined) { // If a direct score is given, use that
       kcMastery.masteryLevel = Math.max(0.0, Math.min(1.0,
         (kcMastery.masteryLevel * (kcMastery.attempts - (eventDetails.newAttempt ? 1: 0)) + eventDetails.score) / (kcMastery.attempts || 1)
       ));

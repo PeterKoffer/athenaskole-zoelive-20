@@ -2,13 +2,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { learnerProfileService } from '@/services/learnerProfileService';
 import { knowledgeComponentService } from '@/services/knowledgeComponentService';
-import { aiCreativeDirectorService } from '@/services/aiCreativeDirectorService';
-import { stealthAssessmentService } from '@/services/stealthAssessmentService';
+// Assuming aiCreativeDirectorService is now handled by useQuestionGeneration or similar
+// import { aiCreativeDirectorService } from '@/services/aiCreativeDirectorService';
+import  stealthAssessmentService  from '@/services/stealthAssessmentService'; // Default import
 import type { LearnerProfile, KnowledgeComponent } from '@/types/learner';
-import type { AtomSequence, ContentAtom } from '@/types/content';
-import type { QuestionAttemptEvent, InteractionEventType } from '@/types/interaction';
-import TextExplanationAtom from './atoms/TextExplanationAtom'; // Adjusted path
-import QuestionCard from './cards/QuestionCard'; // Adjusted path
+// AtomSequence and ContentAtom might need to align with the Question type from useQuestionGeneration
+// For now, let's assume 'atom' in handleQuestionAnswer will be of 'Question' type
+import type { Question } from '@/components/adaptive-learning/hooks/useQuestionGeneration'; // Import Question type
+import type { QuestionAttemptEvent, InteractionEventType } from '@/types/stealthAssessment'; // Corrected path
+import TextExplanationAtom from './atoms/TextExplanationAtom';
+import QuestionCard from './cards/QuestionCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, RefreshCw, Loader2, AlertTriangle, Info } from 'lucide-react';
