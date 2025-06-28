@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { ScenarioDefinition } from '@/types/scenario';
@@ -39,7 +38,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
   // Log scenario start when component mounts
   React.useEffect(() => {
     if (session && currentNode) {
-      console.log('📊 Logging SCENARIO_START event');
+      console.log('📊 Logging SESSION_START event');
       stealthAssessmentService.logEvent({
         type: InteractionEventType.SESSION_START,
         learningGoals: scenario.educational.learningOutcomes
