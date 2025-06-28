@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ScenarioNode, ScenarioSession } from '@/types/scenario';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 
 export const useScenarioAnswering = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
@@ -14,6 +15,16 @@ export const useScenarioAnswering = () => {
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
     console.log('📝 Answer selected:', answer);
+    
+    // Log answer selection as a revision event if changing answer
+    if (selectedAnswer && selectedAnswer !== answer) {
+      console.log('📊 Logging REVISION event for answer change');
+      stealthAssessmentService.logEvent({
+        type: 'REVISION' as any, // InteractionEventType.REVISION
+        originalAnswer: selectedAnswer,
+        revisedAnswer: answer
+      }, 'useScenarioAnswering');
+    }
   };
 
   const handleSubmitAnswer = (
