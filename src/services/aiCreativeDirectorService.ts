@@ -1,4 +1,3 @@
-
 import type { AtomSequence, ContentAtom } from '@/types/content';
 
 export interface IAiCreativeDirectorService {
@@ -52,6 +51,8 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
           uniqueId: `${kcId}_${Date.now()}_${Math.random()}`
         }
       }));
+
+      console.log(`✅ Generated AI sequence with ${atoms.length} specific questions for ${skillArea}`);
 
       return {
         sequence_id: `ai_seq_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
@@ -111,7 +112,7 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
     count: number = 3
   ): Promise<any[]> {
     try {
-      console.log(`🤖 Generating ${count} VARIED AI questions for ${subject} - ${skillArea}`);
+      console.log(`🤖 Generating ${count} SPECIFIC ${subject} questions for ${skillArea}`);
       
       const questions = [];
       const questionPrompts = this.createVariedPrompts(subject, skillArea, difficultyLevel, count);
@@ -119,6 +120,8 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
       for (let i = 0; i < count; i++) {
         try {
           const specificPrompt = questionPrompts[i] || questionPrompts[0];
+          
+          console.log(`📡 Calling OpenAI for question ${i + 1} with variation: ${specificPrompt.variation}`);
           
           const response = await fetch('/functions/v1/generate-question', {
             method: 'POST',
@@ -139,29 +142,51 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
 
           if (response.ok) {
             const questionData = await response.json();
-            if (questionData.question && !this.isDuplicateQuestion(questionData.question)) {
+            
+            console.log(`📝 Received question ${i + 1}:`, {
+              question: questionData.question?.substring(0, 50) + '...',
+              hasOptions: Array.isArray(questionData.options),
+              optionsCount: questionData.options?.length,
+              correctIndex: questionData.correct
+            });
+            
+            if (questionData.question && 
+                Array.isArray(questionData.options) && 
+                questionData.options.length === 4 &&
+                typeof questionData.correct === 'number' &&
+                !this.isDuplicateQuestion(questionData.question)) {
+              
               this.usedQuestions.add(questionData.question);
               questions.push({
                 question: questionData.question,
-                options: questionData.options || [],
-                correct: questionData.correct || 0,
+                options: questionData.options,
+                correct: questionData.correct,
                 explanation: questionData.explanation || "Good work!"
               });
-              console.log(`✅ Generated unique question ${i + 1}: ${questionData.question.substring(0, 40)}...`);
+              
+              console.log(`✅ Added specific question ${i + 1}: ${questionData.question.substring(0, 40)}...`);
+            } else {
+              console.log(`⚠️ Question ${i + 1} failed validation, using fallback`);
+              const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, i);
+              questions.push(fallback);
             }
+          } else {
+            console.error(`❌ HTTP error for question ${i + 1}:`, response.status);
+            const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, i);
+            questions.push(fallback);
           }
         } catch (questionError) {
           console.error(`❌ Failed to generate question ${i + 1}:`, questionError);
+          const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, i);
+          questions.push(fallback);
         }
       }
 
-      // If we don't have enough unique questions, generate fallbacks
-      while (questions.length < count) {
-        const fallback = this.createUniqueSpecificFallback(subject, skillArea, difficultyLevel, questions.length);
-        questions.push(fallback);
-      }
+      console.log(`✅ Final result: Generated ${questions.length} questions for ${skillArea}`);
+      questions.forEach((q, i) => {
+        console.log(`   ${i + 1}. ${q.question.substring(0, 50)}...`);
+      });
 
-      console.log(`✅ Generated ${questions.length} varied questions for ${skillArea}`);
       return questions;
     } catch (error) {
       console.error('❌ Error in generateVariedQuestionsForKc:', error);
@@ -204,47 +229,52 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
     const timestamp = Date.now();
     const randomSeed = Math.random().toString(36).substring(2, 8);
     
-    const fallbackQuestions = {
-      'decimal multiplication': [
-        {
-          question: `What is ${(1.2 + index * 0.3).toFixed(1)} × ${(2.1 + index * 0.2).toFixed(1)}?`,
-          options: [`${((1.2 + index * 0.3) * (2.1 + index * 0.2)).toFixed(2)}`, `${((1.2 + index * 0.3) * (2.1 + index * 0.2) + 1).toFixed(2)}`, `${((1.2 + index * 0.3) * (2.1 + index * 0.2) - 0.5).toFixed(2)}`, `${((1.2 + index * 0.3) * (2.1 + index * 0.2) + 0.3).toFixed(2)}`],
-          correct: 0,
-          explanation: "When multiplying decimals, multiply as whole numbers then place the decimal point correctly."
-        },
-        {
-          question: `Sarah bought ${(2 + index)} items costing $${(1.25 + index * 0.15).toFixed(2)} each. How much did she spend?`,
-          options: [`$${((2 + index) * (1.25 + index * 0.15)).toFixed(2)}`, `$${((2 + index) * (1.25 + index * 0.15) + 1).toFixed(2)}`, `$${((2 + index) * (1.25 + index * 0.15) - 0.5).toFixed(2)}`, `$${((2 + index) * (1.25 + index * 0.15) + 0.25).toFixed(2)}`],
-          correct: 0,
-          explanation: "Multiply the number of items by the cost per item."
-        }
-      ],
-      'fraction subtraction with like denominators': [
-        {
-          question: `What is ${(5 + index)}/${(8 + index)} - ${(2 + index)}/${(8 + index)}?`,
-          options: [`${(3)}/${(8 + index)}`, `${(3 + index)}/${(8 + index)}`, `${(7 + index)}/${(8 + index)}`, `${(1)}/${(8 + index)}`],
-          correct: 1,
-          explanation: "When subtracting fractions with the same denominator, subtract the numerators and keep the denominator."
-        },
-        {
-          question: `Tom ate ${(4 + index)}/12 of a pizza and gave away ${(2 + index)}/12. How much pizza does he have left?`,
-          options: [`${(2)}/12`, `${(6 + index)}/12`, `${(2 + index)}/12`, `${(4 - index)}/12`],
-          correct: 0,
-          explanation: "Subtract the fractions: what he ate plus what he gave away from the total."
-        }
-      ]
-    };
-
-    const questionSet = fallbackQuestions[skillArea as keyof typeof fallbackQuestions] || [
-      {
-        question: `What is an important concept in Grade ${difficultyLevel} ${subject}? (Question ${index + 1})`,
-        options: [`Concept A-${randomSeed}`, `Concept B-${randomSeed}`, `Concept C-${randomSeed}`, `Concept D-${randomSeed}`],
+    if (skillArea.includes('fraction') && skillArea.includes('like denominators')) {
+      // Create specific fraction questions
+      const denominators = [6, 8, 10, 12];
+      const denominator = denominators[index % denominators.length];
+      const numerator1 = 2 + index;
+      const numerator2 = 1 + (index % 3);
+      const correctSum = numerator1 + numerator2;
+      
+      return {
+        question: `What is ${numerator1}/${denominator} + ${numerator2}/${denominator}?`,
+        options: [
+          `${correctSum}/${denominator}`,
+          `${correctSum}/${denominator * 2}`,
+          `${numerator1 + numerator2}/${denominator + denominator}`,
+          `${correctSum + 1}/${denominator}`
+        ],
         correct: 0,
-        explanation: `This helps you practice ${skillArea} skills.`
-      }
-    ];
+        explanation: `When adding fractions with the same denominator, add the numerators: ${numerator1} + ${numerator2} = ${correctSum}. Keep the denominator the same: ${correctSum}/${denominator}.`
+      };
+    }
+    
+    if (skillArea.includes('decimal multiplication')) {
+      const factor1 = (1.2 + index * 0.3).toFixed(1);
+      const factor2 = (2.1 + index * 0.2).toFixed(1);
+      const product = (parseFloat(factor1) * parseFloat(factor2)).toFixed(2);
+      
+      return {
+        question: `What is ${factor1} × ${factor2}?`,
+        options: [
+          product,
+          (parseFloat(product) + 1).toFixed(2),
+          (parseFloat(product) - 0.5).toFixed(2),
+          (parseFloat(product) + 0.3).toFixed(2)
+        ],
+        correct: 0,
+        explanation: "When multiplying decimals, multiply as whole numbers then place the decimal point correctly."
+      };
+    }
 
-    return questionSet[index % questionSet.length];
+    // Generic fallback
+    return {
+      question: `What is an important concept in Grade ${difficultyLevel} ${subject}? (Question ${index + 1})`,
+      options: [`Concept A-${randomSeed}`, `Concept B-${randomSeed}`, `Concept C-${randomSeed}`, `Concept D-${randomSeed}`],
+      correct: 0,
+      explanation: `This helps you practice ${skillArea} skills.`
+    };
   }
 
   private createFallbackSequence(kcId: string, userId: string, subject: string, skillArea: string, difficultyLevel: number): AtomSequence {
