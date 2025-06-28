@@ -20,11 +20,6 @@ const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
             isSpeaking={isSpeaking}
             className="drop-shadow-2xl transform hover:rotate-3 transition-transform duration-300"
           />
-          
-          {/* Backup emoji display in case RobotAvatar doesn't show */}
-          <div className="absolute inset-0 flex items-center justify-center text-9xl animate-pulse">
-            🤖
-          </div>
         </div>
         
         {/* Animated rings around Nelie */}
