@@ -40,11 +40,10 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
   React.useEffect(() => {
     if (session && currentNode) {
       console.log('📊 Logging SESSION_START event');
-      const sessionStartEvent = {
-        type: InteractionEventType.SESSION_START as const,
+      stealthAssessmentService.logEvent({
+        type: InteractionEventType.SESSION_START,
         learningGoals: scenario.educational.learningOutcomes
-      };
-      stealthAssessmentService.logEvent(sessionStartEvent, 'ScenarioPlayer');
+      }, 'ScenarioPlayer');
     }
   }, [scenario, session, currentNode]);
 
@@ -105,13 +104,12 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
       
       // Log the branching decision
       console.log('📊 Logging NAVIGATION event for branching decision');
-      const navigationEvent = {
-        type: InteractionEventType.NAVIGATION as const,
+      stealthAssessmentService.logEvent({
+        type: InteractionEventType.NAVIGATION,
         fromPath: currentNode.id,
         toPath: nextNodeId || 'scenario_end',
         navigationType: 'INTERNAL_LINK' as const
-      };
-      stealthAssessmentService.logEvent(navigationEvent, 'ScenarioPlayer');
+      }, 'ScenarioPlayer');
     } else {
       nextNodeId = currentNode.connections.next || null;
     }
@@ -139,8 +137,8 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
       
       // Log scenario completion
       console.log('📊 Logging SESSION_END event');
-      const sessionEndEvent = {
-        type: InteractionEventType.SESSION_END as const,
+      stealthAssessmentService.logEvent({
+        type: InteractionEventType.SESSION_END,
         reason: 'COMPLETION' as const,
         metrics: {
           totalScore: score,
@@ -149,8 +147,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
           percentComplete: session.progress.percentComplete,
           timeSpent: Date.now() - session.timestamps.startedAt.getTime()
         }
-      };
-      stealthAssessmentService.logEvent(sessionEndEvent, 'ScenarioPlayer');
+      }, 'ScenarioPlayer');
       
       console.log('✅ Final session:', finalSession);
     }
@@ -165,8 +162,8 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
     if (session) {
       // Log scenario exit
       console.log('📊 Logging SESSION_END event for exit');
-      const sessionEndEvent = {
-        type: InteractionEventType.SESSION_END as const,
+      stealthAssessmentService.logEvent({
+        type: InteractionEventType.SESSION_END,
         reason: 'USER_INITIATED' as const,
         metrics: {
           totalScore: score,
@@ -175,8 +172,7 @@ const ScenarioPlayer: React.FC<ScenarioPlayerProps> = ({
           percentComplete: session.progress.percentComplete,
           timeSpent: Date.now() - session.timestamps.startedAt.getTime()
         }
-      };
-      stealthAssessmentService.logEvent(sessionEndEvent, 'ScenarioPlayer');
+      }, 'ScenarioPlayer');
     }
     onExit();
   };
