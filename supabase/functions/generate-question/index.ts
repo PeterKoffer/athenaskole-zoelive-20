@@ -43,7 +43,11 @@ serve(async (req) => {
       gradeLevel = 5
     } = requestBody;
 
+    // Determine if this is a STEM subject that needs math validation
+    const isStemSubject = ['mathematics', 'science', 'computer_science'].includes(subject.toLowerCase());
+    
     console.log(`🎯 Generating personalized K-12 question for Grade ${gradeLevel} ${subject}/${skillArea}`);
+    console.log(`🔬 STEM subject (requires math validation): ${isStemSubject}`);
     console.log(`👨‍🏫 Teacher requirements: ${!!requestBody.teacherRequirements}`);
     console.log(`🏫 School standards: ${!!requestBody.schoolStandards}`);
     console.log(`👨‍🎓 Student adaptation: ${!!requestBody.studentAdaptation}`);
@@ -67,37 +71,45 @@ serve(async (req) => {
       throw new Error('Invalid question structure from AI');
     }
 
-    // Validate for equivalent answers (NEW!)
+    // Validate for equivalent answers (applies to all subjects)
     const equivalentValidation = validateForEquivalentAnswers(questionData, skillArea);
     if (!equivalentValidation.isValid) {
       console.error(`❌ Equivalent answers detected: ${equivalentValidation.error}`);
       throw new Error(equivalentValidation.error || 'Question has equivalent answer options');
     }
 
-    // Validate math for specific problem types
-    const mathValidation = validateMathAnswer(questionData, skillArea);
-    if (!mathValidation.isValid) {
-      console.log(`🔧 Applying math correction...`);
-      if (mathValidation.correctedIndex !== undefined) {
-        questionData.correct = mathValidation.correctedIndex;
-        console.log(`✅ Corrected answer index to: ${questionData.correct}`);
-      } else {
-        console.error(`❌ Math validation failed: ${mathValidation.error}`);
-        throw new Error(mathValidation.error || 'Math validation failed');
+    // Apply math validation only to STEM subjects
+    if (isStemSubject) {
+      const mathValidation = validateMathAnswer(questionData, skillArea);
+      if (!mathValidation.isValid) {
+        console.log(`🔧 Applying math correction for ${subject}...`);
+        if (mathValidation.correctedIndex !== undefined) {
+          questionData.correct = mathValidation.correctedIndex;
+          console.log(`✅ Corrected answer index to: ${questionData.correct}`);
+        } else {
+          console.error(`❌ Math validation failed: ${mathValidation.error}`);
+          throw new Error(mathValidation.error || 'Math validation failed');
+        }
       }
     }
 
-    console.log(`✅ Generated PERSONALIZED K-12 question: ${questionData.question.substring(0, 50)}...`);
+    const validations = ['structure', 'equivalents'];
+    if (isStemSubject) validations.push('math');
+
+    console.log(`✅ Generated PERSONALIZED K-12 ${subject.toUpperCase()} question: ${questionData.question.substring(0, 50)}...`);
     console.log(`🎯 Final correct answer index: ${questionData.correct} -> "${questionData.options[questionData.correct]}"`);
     console.log(`📚 Educational context applied: Grade ${gradeLevel}, adapted for student needs`);
+    console.log(`🔍 Validations passed: ${validations.join(', ')}`);
 
     return new Response(JSON.stringify({
       ...questionData,
       metadata: {
+        subject,
         gradeLevel,
         personalizedForStudent: true,
-        validationsPassed: ['structure', 'equivalents', 'math'],
-        generatedAt: new Date().toISOString()
+        validationsPassed: validations,
+        generatedAt: new Date().toISOString(),
+        isStemSubject
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
