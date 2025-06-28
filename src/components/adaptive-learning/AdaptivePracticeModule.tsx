@@ -26,6 +26,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
   const [error, setError] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('Loading your profile...');
   const [showServiceTests, setShowServiceTests] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
   
   const { recommendAndLoadContent } = useContentGeneration();
 
@@ -41,7 +42,8 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     hasCurrentAtom: !!currentAtom,
     isLoading,
     error,
-    showServiceTests
+    showServiceTests,
+    sessionId
   });
 
   // Load profile on mount
@@ -85,11 +87,14 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     setIsLoading(true);
     setLoadingMessage('Generating personalized questions...');
     
+    console.log('🎲 Generating content with enhanced uniqueness for session:', sessionId);
+    
     await recommendAndLoadContent(
       profile,
       sessionKcs,
       (kc, sequence) => {
         console.log('✅ Content generated successfully:', kc.name, sequence.atoms.length, 'atoms');
+        console.log('🎯 Session ID:', sessionId, 'Question batch:', Math.random());
         setCurrentKc(kc);
         setAtomSequence(sequence);
         setSessionKcs(prev => [...prev, kc]);
@@ -121,8 +126,9 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
         description: `You've completed all questions for ${currentKc?.name}!`,
       });
       
-      // Generate next KC content
+      // Generate next KC content with enhanced uniqueness
       setTimeout(() => {
+        console.log('🔄 Generating new content batch with fresh session context...');
         generateContent();
       }, 2000);
     }
@@ -229,16 +235,31 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
             <CardContent className="p-6">
               <div className="text-center">
                 <h3 className="text-xl font-semibold text-white mb-4">
-                  Content Loading...
+                  Dynamic Content Test
                 </h3>
-                <p className="text-gray-400">
-                  Content atom renderer is being implemented.
+                <div className="bg-blue-900/30 p-4 rounded-lg mb-4">
+                  <p className="text-blue-300 text-sm mb-2">
+                    <strong>Session ID:</strong> {sessionId}
+                  </p>
+                  <p className="text-blue-300 text-sm mb-2">
+                    <strong>Question #{currentAtomIndex + 1}:</strong> KC: {currentKc?.name}
+                  </p>
+                  <p className="text-blue-300 text-sm">
+                    <strong>Timestamp:</strong> {new Date().toLocaleTimeString()}
+                  </p>
+                </div>
+                <p className="text-gray-400 mb-4">
+                  Content atom renderer is being implemented. Each question should be unique based on session context.
                 </p>
                 <Button 
-                  onClick={() => handleAtomComplete({})}
+                  onClick={() => handleAtomComplete({
+                    sessionId,
+                    timestamp: Date.now(),
+                    questionIndex: currentAtomIndex
+                  })}
                   className="mt-4"
                 >
-                  Continue to Next Question
+                  Continue to Next Question ({currentAtomIndex + 1}/{totalAtoms})
                 </Button>
               </div>
             </CardContent>
@@ -249,8 +270,8 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6 text-center">
               <p className="text-gray-400">No content available</p>
-            </Card>
-          </CardContent>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

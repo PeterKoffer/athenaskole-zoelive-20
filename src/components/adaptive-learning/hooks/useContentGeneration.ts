@@ -13,7 +13,7 @@ export const useContentGeneration = () => {
     onError: (error: string) => void
   ) => {
     try {
-      console.log('🎯 Starting AI-powered content generation...');
+      console.log('🎯 Starting AI-powered content generation with enhanced uniqueness...');
 
       // Step 1: Get KC recommendations
       const excludedKcIds = sessionKcs.map(kc => kc.id);
@@ -33,8 +33,23 @@ export const useContentGeneration = () => {
       const nextKc = recommendedKcs[0];
       console.log(`🎯 Selected KC for AI generation: ${nextKc.name} (${nextKc.id})`);
 
-      // Step 2: Generate AI-powered content sequence for the KC
-      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(nextKc.id, profile.userId);
+      // Step 2: Generate AI-powered content sequence with enhanced uniqueness parameters
+      const uniqueSessionContext = {
+        sessionId: `session_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        timestamp: Date.now(),
+        previousSessionCount: sessionKcs.length,
+        userContext: profile.userId,
+        uniquenessBooster: Math.random() * 1000,
+        generationAttempt: Date.now() % 10000
+      };
+
+      console.log('🎲 Enhanced uniqueness context:', uniqueSessionContext);
+
+      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(
+        nextKc.id, 
+        profile.userId,
+        uniqueSessionContext
+      );
       
       if (!sequence) {
         const errorMsg = `Failed to generate AI content for topic: ${nextKc.name}. Please try again.`;
@@ -49,8 +64,21 @@ export const useContentGeneration = () => {
         return;
       }
 
-      console.log(`✅ AI Content generated successfully: ${sequence.atoms.length} questions for ${nextKc.name}`);
-      onSuccess(nextKc, sequence);
+      // Enhance each atom with unique identifiers
+      const enhancedSequence = {
+        ...sequence,
+        atoms: sequence.atoms.map((atom: any, index: number) => ({
+          ...atom,
+          uniqueId: `${uniqueSessionContext.sessionId}_atom_${index}`,
+          generatedAt: Date.now(),
+          sessionContext: uniqueSessionContext
+        }))
+      };
+
+      console.log(`✅ AI Content generated with enhanced uniqueness: ${enhancedSequence.atoms.length} questions for ${nextKc.name}`);
+      console.log('🎯 Session context applied to ensure content diversity');
+      
+      onSuccess(nextKc, enhancedSequence);
 
     } catch (error) {
       const errorMsg = `AI content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
