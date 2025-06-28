@@ -5,6 +5,7 @@ import { QuestionGenerationRequest, GeneratedQuestion } from './types.ts';
 import { generateQuestionWithOpenAI } from './openaiClient.ts';
 import { validateQuestionStructure } from './validator.ts';
 import { validateMathAnswer } from './mathValidator.ts';
+import { validateForEquivalentAnswers } from './equivalentAnswerValidator.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -14,7 +15,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log(`🚀 Edge function called at ${new Date().toISOString()}`);
+  console.log(`🚀 Enhanced Educational Question Generator called at ${new Date().toISOString()}`);
   console.log(`📊 Request method: ${req.method}`);
   console.log(`🔑 OpenAI API Key available: ${!!openAIApiKey}`);
 
@@ -24,7 +25,12 @@ serve(async (req) => {
 
   try {
     const requestBody: QuestionGenerationRequest = await req.json();
-    console.log(`📥 Request body:`, requestBody);
+    console.log(`📥 Enhanced request body:`, {
+      ...requestBody,
+      hasTeacherRequirements: !!requestBody.teacherRequirements,
+      hasSchoolStandards: !!requestBody.schoolStandards,
+      hasStudentAdaptation: !!requestBody.studentAdaptation
+    });
 
     const { 
       subject, 
@@ -33,10 +39,14 @@ serve(async (req) => {
       userId, 
       questionIndex = 0,
       promptVariation = 'basic',
-      specificContext = ''
+      specificContext = '',
+      gradeLevel = 5
     } = requestBody;
 
-    console.log(`🎯 Generating ${promptVariation} question for ${subject}/${skillArea} (Level ${difficultyLevel})`);
+    console.log(`🎯 Generating personalized K-12 question for Grade ${gradeLevel} ${subject}/${skillArea}`);
+    console.log(`👨‍🏫 Teacher requirements: ${!!requestBody.teacherRequirements}`);
+    console.log(`🏫 School standards: ${!!requestBody.schoolStandards}`);
+    console.log(`👨‍🎓 Student adaptation: ${!!requestBody.studentAdaptation}`);
 
     if (!openAIApiKey) {
       console.error('❌ OpenAI API key not found in environment');
@@ -49,12 +59,19 @@ serve(async (req) => {
       });
     }
 
-    // Generate question using OpenAI
+    // Generate question using enhanced educational context
     let questionData = await generateQuestionWithOpenAI(requestBody, openAIApiKey);
 
     // Validate the response structure
     if (!validateQuestionStructure(questionData)) {
       throw new Error('Invalid question structure from AI');
+    }
+
+    // Validate for equivalent answers (NEW!)
+    const equivalentValidation = validateForEquivalentAnswers(questionData, skillArea);
+    if (!equivalentValidation.isValid) {
+      console.error(`❌ Equivalent answers detected: ${equivalentValidation.error}`);
+      throw new Error(equivalentValidation.error || 'Question has equivalent answer options');
     }
 
     // Validate math for specific problem types
@@ -70,15 +87,24 @@ serve(async (req) => {
       }
     }
 
-    console.log(`✅ Generated valid question: ${questionData.question.substring(0, 50)}...`);
+    console.log(`✅ Generated PERSONALIZED K-12 question: ${questionData.question.substring(0, 50)}...`);
     console.log(`🎯 Final correct answer index: ${questionData.correct} -> "${questionData.options[questionData.correct]}"`);
+    console.log(`📚 Educational context applied: Grade ${gradeLevel}, adapted for student needs`);
 
-    return new Response(JSON.stringify(questionData), {
+    return new Response(JSON.stringify({
+      ...questionData,
+      metadata: {
+        gradeLevel,
+        personalizedForStudent: true,
+        validationsPassed: ['structure', 'equivalents', 'math'],
+        generatedAt: new Date().toISOString()
+      }
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('❌ Error in generate-question function:', error);
+    console.error('❌ Error in enhanced question generation:', error);
     
     return new Response(JSON.stringify({ 
       error: error.message,

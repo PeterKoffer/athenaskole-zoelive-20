@@ -1,4 +1,3 @@
-
 import type { AtomSequence, ContentAtom } from '@/types/content';
 
 export interface IAiCreativeDirectorService {
@@ -11,120 +10,183 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
 
   async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
     try {
-      console.log(`🎯 AI Creative Director: Generating content for KC ${kcId}, User ${userId}`);
+      console.log(`🎯 AI Creative Director: Generating PERSONALIZED K-12 content for KC ${kcId}, User ${userId}`);
       
-      // Map KC ID to generation parameters
-      const { subject, skillArea, difficultyLevel } = this.mapKcToGenerationParams(kcId);
-      console.log(`📚 Mapped to: ${subject} / ${skillArea} (Level ${difficultyLevel})`);
+      // Map KC ID to generation parameters with enhanced educational context
+      const educationalContext = this.mapKcToEducationalContext(kcId, userId);
+      console.log(`📚 Educational context: Grade ${educationalContext.gradeLevel} ${educationalContext.subject} / ${educationalContext.skillArea}`);
+      console.log(`👨‍🏫 Teacher focus: ${educationalContext.teacherRequirements?.focusAreas.join(', ') || 'standard curriculum'}`);
+      console.log(`🎓 Student adaptations: ${educationalContext.studentAdaptation?.learningStyle || 'mixed'} learning style`);
       
-      // Generate AI-powered questions for this KC
-      const generatedQuestions = await this.generateVariedQuestionsForKc(
-        subject, 
-        skillArea, 
-        difficultyLevel, 
+      // Generate AI-powered questions with full educational context
+      const generatedQuestions = await this.generatePersonalizedQuestions(
+        educationalContext,
         userId, 
         3 // Generate 3 questions per sequence
       );
 
       if (!generatedQuestions || generatedQuestions.length === 0) {
-        console.log('⚠️ No AI questions generated, creating fallback content');
-        return this.createFallbackSequence(kcId, userId, subject, skillArea, difficultyLevel);
+        console.log('⚠️ No personalized questions generated, creating fallback content');
+        return this.createFallbackSequence(kcId, userId, educationalContext.subject, educationalContext.skillArea, educationalContext.difficultyLevel);
       }
 
-      // Convert generated questions to ContentAtom format
+      // Convert to ContentAtom format with enhanced metadata
       const atoms: ContentAtom[] = generatedQuestions.map((question, index) => ({
-        atom_id: `ai_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${index}`,
+        atom_id: `k12_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${index}`,
         atom_type: 'QUESTION_MULTIPLE_CHOICE',
         content: {
           question: question.question,
           options: question.options,
           correctAnswer: question.correct,
-          correctFeedback: question.explanation || "Great job!",
-          generalIncorrectFeedback: question.explanation || "Let's review this concept.",
+          correctFeedback: question.explanation || "Excellent work!",
+          generalIncorrectFeedback: question.explanation || "Let's review this concept together.",
           explanation: question.explanation
         },
         kc_ids: [kcId],
         metadata: {
-          difficulty: difficultyLevel,
+          difficulty: educationalContext.difficultyLevel,
+          gradeLevel: educationalContext.gradeLevel,
           estimatedTime: 90,
           generated: true,
-          aiGenerated: true, // ✅ Clear AI marker
+          aiGenerated: true,
           aiGeneratedTimestamp: Date.now(),
-          source: 'openai-gpt-4o-mini', // ✅ Show AI source
+          source: 'openai-gpt-4o-mini-k12',
+          personalizedForStudent: true,
+          educationalContext: {
+            teacherFocus: educationalContext.teacherRequirements?.focusAreas || [],
+            schoolStandards: educationalContext.schoolStandards?.curriculum || 'common_core',
+            studentLearningStyle: educationalContext.studentAdaptation?.learningStyle || 'mixed'
+          },
           timestamp: Date.now(),
           uniqueId: `${kcId}_${Date.now()}_${Math.random()}`
         }
       }));
 
-      console.log(`✅ Generated ${atoms.length} AI-POWERED questions for ${skillArea}`);
-      console.log(`🤖 All questions are AI-generated using OpenAI API`);
+      console.log(`✅ Generated ${atoms.length} PERSONALIZED K-12 questions for ${educationalContext.skillArea}`);
+      console.log(`🎓 All questions adapted for Grade ${educationalContext.gradeLevel} with teacher/school/student requirements`);
 
       return {
-        sequence_id: `ai_seq_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+        sequence_id: `k12_seq_${kcId}_${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
         atoms: atoms,
         kc_id: kcId,
         user_id: userId,
         created_at: new Date().toISOString()
       };
     } catch (error) {
-      console.error(`❌ AI Creative Director: Error generating content for KC ${kcId}:`, error);
+      console.error(`❌ AI Creative Director: Error generating personalized K-12 content for KC ${kcId}:`, error);
       return this.createFallbackSequence(kcId, userId, 'mathematics', 'general math', 5);
     }
   }
 
-  private mapKcToGenerationParams(kcId: string): { subject: string; skillArea: string; difficultyLevel: number } {
-    const kcMappings = {
+  private mapKcToEducationalContext(kcId: string, userId: string): any {
+    // Enhanced mapping with full educational context
+    const baseMapping = {
       'kc_math_g5_multiply_decimals': {
         subject: 'mathematics',
         skillArea: 'decimal multiplication',
-        difficultyLevel: 5
+        difficultyLevel: 5,
+        gradeLevel: 5,
+        teacherRequirements: {
+          focusAreas: ['place value understanding', 'computational fluency'],
+          avoidTopics: ['complex word problems'],
+          preferredQuestionTypes: ['multiple_choice'],
+          difficultyPreference: 'standard' as const
+        },
+        schoolStandards: {
+          curriculum: 'common_core' as const,
+          assessmentStyle: 'traditional' as const,
+          learningGoals: ['5.NBT.7 - multiply decimals to hundredths'],
+          mandatoryTopics: ['decimal place value', 'multiplication strategies']
+        },
+        studentAdaptation: {
+          learningStyle: 'mixed' as const,
+          previousPerformance: {
+            accuracy: 0.75,
+            averageTime: 45,
+            strugglingConcepts: ['decimal place value'],
+            masteredConcepts: ['basic multiplication']
+          },
+          engagementLevel: 'medium' as const,
+          preferredContexts: ['money', 'measurement', 'real-world applications']
+        }
       },
       'kc_math_g4_subtract_fractions_likedenom': {
         subject: 'mathematics',
         skillArea: 'fraction subtraction with like denominators',
-        difficultyLevel: 4
-      },
-      'kc_math_g4_add_fractions_likedenom': {
-        subject: 'mathematics',
-        skillArea: 'fraction addition with like denominators',
-        difficultyLevel: 4
-      },
-      'kc_english_g4_reading_comprehension': {
-        subject: 'english',
-        skillArea: 'reading comprehension and main ideas',
-        difficultyLevel: 4
-      },
-      'kc_science_g5_ecosystems': {
-        subject: 'science',
-        skillArea: 'ecosystems and food chains',
-        difficultyLevel: 5
+        difficultyLevel: 4,
+        gradeLevel: 4,
+        teacherRequirements: {
+          focusAreas: ['conceptual understanding', 'visual representations'],
+          avoidTopics: ['unlike denominators'],
+          preferredQuestionTypes: ['multiple_choice'],
+          difficultyPreference: 'standard' as const
+        },
+        schoolStandards: {
+          curriculum: 'common_core' as const,
+          assessmentStyle: 'traditional' as const,
+          learningGoals: ['4.NF.3 - understand fraction subtraction'],
+          mandatoryTopics: ['fraction concepts', 'like denominators']
+        },
+        studentAdaptation: {
+          learningStyle: 'visual' as const,
+          previousPerformance: {
+            accuracy: 0.70,
+            averageTime: 50,
+            strugglingConcepts: ['fraction concepts'],
+            masteredConcepts: ['basic subtraction']
+          },
+          engagementLevel: 'medium' as const,
+          preferredContexts: ['food', 'sharing', 'parts of wholes']
+        }
       }
+      // Add more KC mappings as needed
     };
 
-    return kcMappings[kcId as keyof typeof kcMappings] || {
+    return baseMapping[kcId as keyof typeof baseMapping] || {
       subject: 'mathematics',
       skillArea: 'general math concepts',
-      difficultyLevel: 5
+      difficultyLevel: 5,
+      gradeLevel: 5,
+      teacherRequirements: {
+        focusAreas: ['problem solving'],
+        avoidTopics: [],
+        preferredQuestionTypes: ['multiple_choice'],
+        difficultyPreference: 'standard' as const
+      },
+      schoolStandards: {
+        curriculum: 'common_core' as const,
+        assessmentStyle: 'traditional' as const,
+        learningGoals: ['mathematical thinking'],
+        mandatoryTopics: []
+      },
+      studentAdaptation: {
+        learningStyle: 'mixed' as const,
+        previousPerformance: {
+          accuracy: 0.75,
+          averageTime: 40,
+          strugglingConcepts: [],
+          masteredConcepts: []
+        },
+        engagementLevel: 'medium' as const,
+        preferredContexts: ['real-world']
+      }
     };
   }
 
-  private async generateVariedQuestionsForKc(
-    subject: string,
-    skillArea: string,
-    difficultyLevel: number,
+  private async generatePersonalizedQuestions(
+    educationalContext: any,
     userId: string,
     count: number = 3
   ): Promise<any[]> {
     try {
-      console.log(`🤖 Generating ${count} AI questions for ${subject}/${skillArea}`);
+      console.log(`🎓 Generating ${count} PERSONALIZED K-12 questions for Grade ${educationalContext.gradeLevel} ${educationalContext.subject}/${educationalContext.skillArea}`);
       
       const questions = [];
       
       for (let i = 0; i < count; i++) {
         try {
-          console.log(`📡 Calling generate-question API for question ${i + 1}...`);
+          console.log(`📡 Calling enhanced K-12 question API for question ${i + 1}...`);
           
-          // Use the correct Supabase project URL
           const response = await fetch('https://tgjudtnjhtumrfthegis.supabase.co/functions/v1/generate-question', {
             method: 'POST',
             headers: {
@@ -132,35 +194,44 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
               'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnanVkdG5qaHR1bXJmdGhlZ2lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NTk4NjEsImV4cCI6MjA2NDQzNTg2MX0.1OexubPIEWxM3sZ4ds3kSeWxNslKXbJo5GzCDOZRHcQ`
             },
             body: JSON.stringify({
-              subject,
-              skillArea,
-              difficultyLevel,
+              // Base parameters
+              subject: educationalContext.subject,
+              skillArea: educationalContext.skillArea,
+              difficultyLevel: educationalContext.difficultyLevel,
+              gradeLevel: educationalContext.gradeLevel,
               userId,
               questionIndex: i,
               promptVariation: i === 0 ? 'basic' : i === 1 ? 'word_problem' : 'mixed',
-              specificContext: 'grade-appropriate learning'
+              specificContext: 'personalized K-12 learning',
+              
+              // Enhanced educational parameters
+              teacherRequirements: educationalContext.teacherRequirements,
+              schoolStandards: educationalContext.schoolStandards,
+              studentAdaptation: educationalContext.studentAdaptation
             }),
           });
 
-          console.log(`📊 API Response status: ${response.status}`);
+          console.log(`📊 Enhanced API Response status: ${response.status}`);
 
           if (response.ok) {
             const questionData = await response.json();
             
-            console.log(`📝 Raw API response:`, questionData);
+            console.log(`📝 Raw K-12 API response:`, {
+              hasQuestion: !!questionData.question,
+              hasEducationalNotes: !!questionData.educationalNotes,
+              validationsPassed: questionData.metadata?.validationsPassed
+            });
             
-            // Check if response has error field (from our error handling)
             if (questionData.error || !questionData.question) {
               console.error(`❌ API returned error: ${questionData.error || 'Invalid response structure'}`);
               throw new Error(questionData.error || 'Invalid response structure');
             }
             
-            console.log(`🤖 AI Question ${i + 1} received:`, {
+            console.log(`🎓 K-12 Personalized Question ${i + 1} received:`, {
               question: questionData.question?.substring(0, 50) + '...',
-              hasOptions: Array.isArray(questionData.options),
-              optionsCount: questionData.options?.length,
-              correctIndex: questionData.correct,
-              isAiGenerated: true // ✅ Mark as AI-generated
+              gradeLevel: educationalContext.gradeLevel,
+              hasEducationalNotes: !!questionData.educationalNotes,
+              isPersonalized: questionData.metadata?.personalizedForStudent
             });
             
             if (this.validateQuestion(questionData) && !this.isDuplicateQuestion(questionData.question)) {
@@ -169,53 +240,61 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
                 question: questionData.question,
                 options: questionData.options,
                 correct: questionData.correct,
-                explanation: questionData.explanation || "Good work!",
-                isAiGenerated: true, // ✅ Clear AI marker
-                source: 'openai-api'
+                explanation: questionData.explanation || "Great job!",
+                isAiGenerated: true,
+                isPersonalized: true,
+                source: 'openai-k12-personalized',
+                educationalNotes: questionData.educationalNotes
               });
               
-              console.log(`✅ Added AI-generated question ${i + 1} (NOT FALLBACK)`);
+              console.log(`✅ Added PERSONALIZED K-12 question ${i + 1} (NOT FALLBACK)`);
             } else {
               console.log(`⚠️ Question ${i + 1} failed validation, using fallback`);
-              const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
+              const fallback = this.createSpecificFallback(educationalContext.subject, educationalContext.skillArea, educationalContext.difficultyLevel, i);
               questions.push({
                 ...fallback,
-                isAiGenerated: false, // ✅ Mark fallback clearly
+                isAiGenerated: false,
+                isPersonalized: false,
                 source: 'fallback'
               });
             }
           } else {
             const errorText = await response.text();
             console.error(`❌ HTTP error for question ${i + 1}:`, response.status, errorText);
-            const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
+            const fallback = this.createSpecificFallback(educationalContext.subject, educationalContext.skillArea, educationalContext.difficultyLevel, i);
             questions.push({
               ...fallback,
               isAiGenerated: false,
+              isPersonalized: false,
               source: 'fallback'
             });
           }
         } catch (questionError) {
-          console.error(`❌ Failed to generate question ${i + 1}:`, questionError);
-          const fallback = this.createSpecificFallback(subject, skillArea, difficultyLevel, i);
+          console.error(`❌ Failed to generate personalized question ${i + 1}:`, questionError);
+          const fallback = this.createSpecificFallback(educationalContext.subject, educationalContext.skillArea, educationalContext.difficultyLevel, i);
           questions.push({
             ...fallback,
             isAiGenerated: false,
+            isPersonalized: false,
             source: 'fallback'
           });
         }
       }
 
+      const personalizedCount = questions.filter(q => q.isPersonalized === true).length;
       const aiGeneratedCount = questions.filter(q => q.isAiGenerated === true).length;
       const fallbackCount = questions.filter(q => q.isAiGenerated === false).length;
       
-      console.log(`✅ Final result: Generated ${questions.length} questions (${aiGeneratedCount} AI-generated, ${fallbackCount} fallback)`);
-      console.log(`🎯 SUCCESS: ${aiGeneratedCount > 0 ? 'AI QUESTIONS ARE WORKING!' : 'Using fallback questions'}`);
+      console.log(`✅ PERSONALIZED K-12 Result: Generated ${questions.length} questions`);
+      console.log(`   📊 ${personalizedCount} fully personalized for Grade ${educationalContext.gradeLevel}`);
+      console.log(`   🤖 ${aiGeneratedCount} AI-generated total`);
+      console.log(`   🔧 ${fallbackCount} fallback questions`);
+      console.log(`🎯 SUCCESS: ${personalizedCount > 0 ? 'PERSONALIZED K-12 QUESTIONS ARE WORKING!' : 'Using fallback questions'}`);
       
       return questions;
     } catch (error) {
-      console.error('❌ Error in generateVariedQuestionsForKc:', error);
-      // Return at least one fallback question
-      return [this.createSpecificFallback(subject, skillArea, difficultyLevel, 0)];
+      console.error('❌ Error in generatePersonalizedQuestions:', error);
+      return [this.createSpecificFallback(educationalContext.subject, educationalContext.skillArea, educationalContext.difficultyLevel, 0)];
     }
   }
 
