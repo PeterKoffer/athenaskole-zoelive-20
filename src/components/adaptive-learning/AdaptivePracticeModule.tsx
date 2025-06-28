@@ -4,7 +4,6 @@ import stealthAssessmentService from '@/services/stealthAssessment/StealthAssess
 import learnerProfileService from '@/services/learnerProfile/LearnerProfileService';
 import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
 import type { ContentAtom } from '@/types/content';
-import type { QuestionAttemptEvent } from '@/types/interaction';
 
 import ServiceTestingInterface from '@/components/adaptive-learning/components/ServiceTestingInterface';
 import LoadingState from '@/components/adaptive-learning/components/LoadingState';
