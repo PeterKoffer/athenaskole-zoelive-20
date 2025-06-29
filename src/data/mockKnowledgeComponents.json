@@ -3,51 +3,51 @@
   {
     "id": "kc_math_g4_add_fractions_likedenom",
     "name": "Adding Fractions with Like Denominators",
-    "description": "Understanding how to add fractions when denominators are the same",
+    "description": "Students will learn to add fractions that have the same denominator by adding numerators and keeping the denominator the same.",
     "subject": "Mathematics",
-    "gradeLevels": [3, 4, 5],
+    "gradeLevels": [4, 5],
     "domain": "Number & Operations - Fractions",
-    "difficultyEstimate": 3,
+    "difficultyEstimate": 0.4,
     "tags": ["fractions", "addition", "like_denominators"]
   },
   {
     "id": "kc_math_g4_subtract_fractions_likedenom",
-    "name": "Subtracting Fractions with Like Denominators", 
-    "description": "Understanding how to subtract fractions when denominators are the same",
+    "name": "Subtracting Fractions with Like Denominators",
+    "description": "Students will learn to subtract fractions that have the same denominator by subtracting numerators and keeping the denominator the same.",
     "subject": "Mathematics",
-    "gradeLevels": [3, 4, 5],
+    "gradeLevels": [4, 5],
     "domain": "Number & Operations - Fractions",
-    "difficultyEstimate": 3,
+    "difficultyEstimate": 0.4,
     "tags": ["fractions", "subtraction", "like_denominators"]
   },
   {
     "id": "kc_math_g5_multiply_decimals",
     "name": "Multiplying Decimals",
-    "description": "Understanding decimal multiplication concepts",
-    "subject": "Mathematics", 
-    "gradeLevels": [4, 5, 6],
-    "domain": "Number & Operations - Decimals",
-    "difficultyEstimate": 4,
-    "tags": ["decimals", "multiplication"]
+    "description": "Students will learn to multiply decimal numbers by understanding place value and decimal point placement.",
+    "subject": "Mathematics",
+    "gradeLevels": [5, 6],
+    "domain": "Number & Operations in Base Ten",
+    "difficultyEstimate": 0.6,
+    "tags": ["decimals", "multiplication", "place_value"]
   },
   {
-    "id": "kc_english_g4_reading_comprehension",
-    "name": "Reading Comprehension - Main Ideas",
-    "description": "Identifying main ideas and supporting details in texts",
-    "subject": "English Language Arts",
-    "gradeLevels": [3, 4, 5],
-    "domain": "Reading",
-    "difficultyEstimate": 3,
-    "tags": ["reading", "comprehension", "main_ideas"]
+    "id": "kc_math_g5_divide_decimals",
+    "name": "Dividing Decimals",
+    "description": "Students will learn to divide decimal numbers by understanding place value and decimal point placement.",
+    "subject": "Mathematics",
+    "gradeLevels": [5, 6],
+    "domain": "Number & Operations in Base Ten",
+    "difficultyEstimate": 0.7,
+    "tags": ["decimals", "division", "place_value"]
   },
   {
-    "id": "kc_science_g4_plants_lifecycle",
-    "name": "Plant Life Cycles",
-    "description": "Understanding the stages of plant growth and reproduction",
-    "subject": "Science",
-    "gradeLevels": [3, 4, 5],
-    "domain": "Life Science",
-    "difficultyEstimate": 2,
-    "tags": ["plants", "lifecycle", "biology"]
+    "id": "kc_math_g4_compare_fractions",
+    "name": "Comparing Fractions",
+    "description": "Students will learn to compare fractions using visual models and mathematical reasoning.",
+    "subject": "Mathematics",
+    "gradeLevels": [4, 5],
+    "domain": "Number & Operations - Fractions",
+    "difficultyEstimate": 0.5,
+    "tags": ["fractions", "comparison", "visual_models"]
   }
 ]

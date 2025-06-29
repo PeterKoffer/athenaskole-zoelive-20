@@ -3,7 +3,7 @@
 
 import { LearnerProfile } from '@/types/learnerProfile';
 import { KnowledgeComponent } from '@/types/knowledgeComponent';
-import knowledgeComponentService from '../knowledgeComponentService';
+import { knowledgeComponentService } from '@/services/knowledgeComponentService';
 
 export class ProfileRecommendationService {
   async recommendNextKcs(profile: LearnerProfile, count: number = 3): Promise<KnowledgeComponent[]> {

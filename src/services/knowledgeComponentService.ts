@@ -1,3 +1,4 @@
+
 // src/services/knowledgeComponentService.ts
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -109,7 +110,19 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
 
   async searchKcs(query: string): Promise<KnowledgeComponent[]> {
     const lowerQuery = query.toLowerCase();
-    if (!lowerQuery.trim()) return []; // Return empty if query is blank
+    if (!lowerQuery.trim()) {
+      // Return all KCs if query is blank
+      const { data, error } = await supabase
+        .from('knowledge_components')
+        .select('*')
+        .limit(50);
+
+      if (error) {
+        console.error('KnowledgeComponentService: Error fetching all KCs:', error.message);
+        throw error;
+      }
+      return data ? data.map(mapRowToKc) : [];
+    }
 
     // Using textSearch with a generated tsvector column would be more performant for larger datasets.
     // For now, using OR with ILIKE and array containment.
@@ -199,24 +212,34 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
     return true;
   }
 
-  // This was a method in the old mock service, not part of IKnowledgeComponentService
-  // It should be implemented elsewhere if generic recommendations are needed.
-  // For now, commenting out to align with the interface and new DB-backed approach.
-  // async recommendNextKcs(userId: string, count: number = 3, excludedKcIds: string[] = []): Promise<KnowledgeComponent[]> {
-  //   console.warn("KnowledgeComponentService: recommendNextKcs is not implemented in the DB version yet. Placeholder.");
-  //   // Basic placeholder: fetch some KCs, excluding specific ones.
-  //   // This would need actual recommendation logic based on user profile, etc.
-  //   let query = supabase.from('knowledge_components').select('*').limit(count);
-  //   if(excludedKcIds.length > 0) {
-  //       query = query.not('id', 'in', `(${excludedKcIds.join(',')})`);
-  //   }
-  //   const { data, error } = await query;
-  //   if (error) {
-  //       console.error('Error fetching KCs for recommendation placeholder:', error);
-  //       return [];
-  //   }
-  //   return data ? data.map(mapRowToKc) : [];
-  // }
+  // Recommendation method for adaptive practice
+  async recommendNextKcs(userId: string, count: number = 3, excludedKcIds: string[] = []): Promise<KnowledgeComponent[]> {
+    console.log(`KnowledgeComponentService: Recommending ${count} KCs for user ${userId}`);
+    
+    // Basic placeholder: fetch some KCs, excluding specific ones
+    let query = supabase.from('knowledge_components').select('*').limit(count * 2); // Get more than needed for filtering
+    
+    if (excludedKcIds.length > 0) {
+      query = query.not('id', 'in', `(${excludedKcIds.map(id => `"${id}"`).join(',')})`);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching KCs for recommendation:', error);
+      return [];
+    }
+    
+    const kcs = data ? data.map(mapRowToKc) : [];
+    
+    // Simple sorting by difficulty for now
+    kcs.sort((a, b) => (a.difficultyEstimate || 0) - (b.difficultyEstimate || 0));
+    
+    const recommended = kcs.slice(0, count);
+    console.log(`KnowledgeComponentService: Recommended KCs:`, recommended.map(kc => kc.id));
+    
+    return recommended;
+  }
 }
 
 export const knowledgeComponentService = new KnowledgeComponentService();

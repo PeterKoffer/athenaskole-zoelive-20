@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import knowledgeComponentService from '@/services/knowledgeComponentService';
+import { knowledgeComponentService } from '@/services/knowledgeComponentService';
 import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
 import { LearnerProfile } from '@/types/learnerProfile';
 import { KnowledgeComponent } from '@/types/knowledgeComponent';

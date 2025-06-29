@@ -1,3 +1,4 @@
+
 import { knowledgeComponentService } from '@/services/knowledgeComponentService';
 import mockKcsData from '@/data/mockKnowledgeComponents.json';
 import type { KnowledgeComponent } from '@/types/knowledgeComponent';
@@ -9,38 +10,36 @@ async function populateKcs() {
   let failureCount = 0;
   let skippedCount = 0;
 
-  for (const kc of mockKcsData as Omit<KnowledgeComponent, 'id'> & { id: string }[]) {
+  for (const kcData of mockKcsData) {
     try {
       // Check if KC already exists
-      const existingKc = await knowledgeComponentService.getKcById(kc.id);
+      const existingKc = await knowledgeComponentService.getKcById(kcData.id);
       if (existingKc) {
-        console.log(`KC with ID ${kc.id} already exists. Skipping.`);
+        console.log(`KC with ID ${kcData.id} already exists. Skipping.`);
         skippedCount++;
         continue;
       }
 
-      // Type assertion, as mockKcsData might not perfectly match the full KnowledgeComponent type
-      // or the input type of addKc if there are subtle differences (e.g. undefined vs null)
-      // The service's mapKcToDbRow should handle this.
+      // Prepare KC data for insertion
       const kcToAdd: Omit<KnowledgeComponent, 'id'> & { id: string } = {
-        id: kc.id,
-        name: kc.name,
-        description: kc.description || undefined,
-        subject: kc.subject,
-        gradeLevels: kc.gradeLevels || [],
-        domain: kc.domain || undefined,
-        curriculumStandards: kc.curriculumStandards || undefined,
-        prerequisiteKcs: kc.prerequisiteKcs || undefined,
-        postrequisiteKcs: kc.postrequisiteKcs || undefined,
-        tags: kc.tags || undefined,
-        difficultyEstimate: kc.difficultyEstimate === null ? undefined : Number(kc.difficultyEstimate),
+        id: kcData.id,
+        name: kcData.name,
+        description: kcData.description || undefined,
+        subject: kcData.subject,
+        gradeLevels: kcData.gradeLevels || [],
+        domain: kcData.domain || undefined,
+        curriculumStandards: undefined,
+        prerequisiteKcs: undefined,
+        postrequisiteKcs: undefined,
+        tags: kcData.tags || undefined,
+        difficultyEstimate: kcData.difficultyEstimate ? Number(kcData.difficultyEstimate) : undefined,
       };
 
       await knowledgeComponentService.addKc(kcToAdd);
-      console.log(`Successfully added KC: ${kc.name} (ID: ${kc.id})`);
+      console.log(`Successfully added KC: ${kcData.name} (ID: ${kcData.id})`);
       successCount++;
     } catch (error: any) {
-      console.error(`Failed to add KC ${kc.name} (ID: ${kc.id}): ${error.message}`);
+      console.error(`Failed to add KC ${kcData.name} (ID: ${kcData.id}): ${error.message}`);
       if (error.details) console.error('Error details:', error.details);
       failureCount++;
     }
