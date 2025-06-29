@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { Clock, CheckCircle, XCircle } from 'lucide-react';
 import { ContentAtom } from '@/types/content';
 
 interface QuestionRendererProps {
@@ -15,6 +15,60 @@ const QuestionRenderer = ({ atom, onComplete }: QuestionRendererProps) => {
   const [showResult, setShowResult] = useState(false);
   const [startTime] = useState(Date.now());
 
+  console.log('🔍 QuestionRenderer atom:', {
+    atomId: atom.atom_id,
+    atomType: atom.atom_type,
+    content: atom.content,
+    contentKeys: Object.keys(atom.content || {})
+  });
+
+  // Handle different content structures from database vs AI generation
+  const getQuestionData = () => {
+    const content = atom.content as any;
+    
+    // Handle database format (multiple choice questions)
+    if (content.question && content.options && Array.isArray(content.options)) {
+      return {
+        question: content.question,
+        options: content.options,
+        correctAnswer: content.correctAnswerIndex ?? content.correct ?? 0,
+        explanation: content.explanation || 'Great work!'
+      };
+    }
+    
+    // Handle AI-generated format 
+    if (content.question && content.options && Array.isArray(content.options)) {
+      return {
+        question: content.question,
+        options: content.options,
+        correctAnswer: content.correct ?? 0,
+        explanation: content.explanation || 'Great work!'
+      };
+    }
+    
+    // Handle text explanation atoms
+    if (content.text) {
+      return {
+        question: "Click continue to proceed with the lesson.",
+        options: ["Continue"],
+        correctAnswer: 0,
+        explanation: content.text,
+        isExplanation: true
+      };
+    }
+    
+    // Fallback for unknown formats
+    console.error('❌ Unknown content format:', content);
+    return {
+      question: "Content format not supported",
+      options: ["Continue"],
+      correctAnswer: 0,
+      explanation: "This content type is not yet supported."
+    };
+  };
+
+  const questionData = getQuestionData();
+
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return;
     setSelectedAnswer(answerIndex);
@@ -24,109 +78,124 @@ const QuestionRenderer = ({ atom, onComplete }: QuestionRendererProps) => {
     if (selectedAnswer === null) return;
     
     const timeSpent = Date.now() - startTime;
-    const isCorrect = selectedAnswer === atom.content.correctAnswer;
+    const isCorrect = selectedAnswer === questionData.correctAnswer;
     
     setShowResult(true);
     
-    // Auto-continue after showing result
+    // Auto-complete after showing result
     setTimeout(() => {
-      onComplete({ isCorrect, selectedAnswer, timeSpent });
-    }, 2000);
+      onComplete({
+        isCorrect,
+        selectedAnswer,
+        timeSpent
+      });
+    }, 3000);
   };
 
-  const handleContinue = () => {
-    if (selectedAnswer === null) return;
-    
-    const timeSpent = Date.now() - startTime;
-    const isCorrect = selectedAnswer === atom.content.correctAnswer;
-    
-    onComplete({ isCorrect, selectedAnswer, timeSpent });
-  };
+  useEffect(() => {
+    // Auto-submit for explanation-type atoms
+    if (questionData.isExplanation) {
+      const timer = setTimeout(() => {
+        onComplete({
+          isCorrect: true,
+          selectedAnswer: 0,
+          timeSpent: Date.now() - startTime
+        });
+      }, 5000); // Give time to read the explanation
+
+      return () => clearTimeout(timer);
+    }
+  }, [questionData.isExplanation, onComplete, startTime]);
 
   return (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardContent className="p-6">
-        <div className="space-y-6">
-          {/* Question */}
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-white mb-6">
-              {atom.content.question}
-            </h3>
+    <div className="space-y-6">
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center justify-between">
+            <span>{questionData.isExplanation ? "Learn" : "Question"}</span>
+            <Clock className="w-5 h-5 text-blue-400" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="text-lg text-gray-200 leading-relaxed">
+            {questionData.question}
           </div>
 
-          {/* Answer Options */}
-          <div className="space-y-3">
-            {atom.content.options.map((option: string, index: number) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrect = index === atom.content.correctAnswer;
-              
-              let buttonClass = "w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ";
-              
-              if (showResult) {
-                if (isCorrect) {
-                  buttonClass += "bg-green-900/30 border-green-500 text-green-300";
-                } else if (isSelected && !isCorrect) {
-                  buttonClass += "bg-red-900/30 border-red-500 text-red-300";
-                } else {
-                  buttonClass += "bg-gray-700 border-gray-600 text-gray-400";
-                }
-              } else if (isSelected) {
-                buttonClass += "bg-blue-900/30 border-blue-500 text-blue-300";
-              } else {
-                buttonClass += "bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500";
-              }
-
-              return (
+          {!questionData.isExplanation && (
+            <div className="grid gap-3">
+              {questionData.options.map((option, index) => (
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(index)}
-                  className={buttonClass}
                   disabled={showResult}
+                  className={`
+                    p-4 text-left rounded-lg border transition-all duration-200
+                    ${showResult
+                      ? index === questionData.correctAnswer
+                        ? 'bg-green-900 border-green-600 text-green-100'
+                        : index === selectedAnswer && index !== questionData.correctAnswer
+                        ? 'bg-red-900 border-red-600 text-red-100'
+                        : 'bg-gray-700 border-gray-600 text-gray-300'
+                      : selectedAnswer === index
+                      ? 'bg-blue-900 border-blue-500 text-blue-100'
+                      : 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600'
+                    }
+                  `}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-lg">{option}</span>
-                    {showResult && isCorrect && (
+                    <span>{option}</span>
+                    {showResult && index === questionData.correctAnswer && (
                       <CheckCircle className="w-5 h-5 text-green-400" />
                     )}
-                    {showResult && isSelected && !isCorrect && (
+                    {showResult && index === selectedAnswer && index !== questionData.correctAnswer && (
                       <XCircle className="w-5 h-5 text-red-400" />
                     )}
                   </div>
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Explanation (shown after answer) */}
-          {showResult && atom.content.explanation && (
-            <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-700/50">
-              <h4 className="text-blue-300 font-medium mb-2">Explanation:</h4>
-              <p className="text-gray-300">{atom.content.explanation}</p>
+              ))}
             </div>
           )}
 
-          {/* Action Button */}
-          <div className="text-center">
-            {!showResult ? (
-              <Button
-                onClick={handleSubmit}
-                disabled={selectedAnswer === null}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-              >
-                Submit Answer
-              </Button>
-            ) : (
-              <Button
-                onClick={handleContinue}
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
-              >
-                Continue
-              </Button>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          {showResult && (
+            <Card className={`${selectedAnswer === questionData.correctAnswer ? 'bg-green-900 border-green-600' : 'bg-blue-900 border-blue-600'}`}>
+              <CardContent className="p-4">
+                <div className="flex items-start space-x-3">
+                  {selectedAnswer === questionData.correctAnswer ? (
+                    <CheckCircle className="w-6 h-6 text-green-400 mt-0.5" />
+                  ) : (
+                    <CheckCircle className="w-6 h-6 text-blue-400 mt-0.5" />
+                  )}
+                  <div>
+                    <h4 className={`font-semibold mb-2 ${selectedAnswer === questionData.correctAnswer ? 'text-green-100' : 'text-blue-100'}`}>
+                      {selectedAnswer === questionData.correctAnswer ? 'Correct!' : 'Good try!'}
+                    </h4>
+                    <p className={`${selectedAnswer === questionData.correctAnswer ? 'text-green-200' : 'text-blue-200'}`}>
+                      {questionData.explanation}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {!showResult && !questionData.isExplanation && (
+            <Button
+              onClick={handleSubmit}
+              disabled={selectedAnswer === null}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Submit Answer
+            </Button>
+          )}
+
+          {questionData.isExplanation && (
+            <div className="text-center text-gray-400 text-sm">
+              Automatically continuing in a few seconds...
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
