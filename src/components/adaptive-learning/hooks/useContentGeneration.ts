@@ -45,10 +45,17 @@ export const useContentGeneration = () => {
 
       console.log('🎲 Enhanced uniqueness context:', uniqueSessionContext);
 
-      // Fix: Call with only 2 arguments as expected by the service
+      // Construct UserContext for the AiCreativeDirectorService
+      const userContext = {
+        userId: profile.userId,
+        targetLanguage: profile.preferences?.preferredLanguage || 'en-US', // Default to en-US
+        targetContextCurriculum: profile.preferences?.activeCurriculumContext || 'US_CCSSM', // Default to US_CCSSM
+      };
+      console.log('👤 UserContext for AI Director:', userContext);
+
       const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(
         nextKc.id, 
-        profile.userId
+        userContext // Pass the full UserContext object
       );
       
       if (!sequence) {

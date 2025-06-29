@@ -39,6 +39,28 @@ export class ContentAtomRepository {
   }
 
   /**
+   * Fetches all content atoms associated with a specific Knowledge Component ID and language.
+   * @param kcId - The Knowledge Component ID.
+   * @param language - The desired language code (e.g., "en-US", "da-DK").
+   * @returns An array of ContentAtom objects matching the KC and language.
+   */
+  async getAtomsByKcIdAndLanguage(kcId: string, language: string): Promise<ContentAtom[]> {
+    try {
+      const allAtomsForKc = await this.getAtomsByKcId(kcId);
+      if (!allAtomsForKc || allAtomsForKc.length === 0) {
+        return [];
+      }
+      // Client-side filtering by language
+      return allAtomsForKc.filter(atom => atom.metadata?.language === language);
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`ContentAtomRepository: Exception fetching atoms for KC ID ${kcId} and language ${language}:`, err);
+      }
+      return [];
+    }
+  }
+
+  /**
    * Fetches all content atoms associated with a specific Knowledge Component ID.
    * @param kcId - The Knowledge Component ID.
    * @returns An array of ContentAtom objects.
