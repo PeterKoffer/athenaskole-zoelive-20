@@ -47,10 +47,22 @@ export class SupabaseProfileService {
 
         console.log(`SupabaseProfileService: Successfully loaded profile with ${Object.keys(kcMasteryMap).length} KC mastery entries`);
 
-        // Type assertion for preferences with fallback
-        const preferences = (existingProfileData.preferences && typeof existingProfileData.preferences === 'object' && !Array.isArray(existingProfileData.preferences)) 
-          ? existingProfileData.preferences as { learningPace?: 'medium' | 'slow' | 'fast'; learningStyle?: 'mixed' | 'visual' | 'kinesthetic' | 'auditory' }
-          : { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
+        // Type assertion for preferences with fallback, now reflecting the updated LearnerProfile['preferences'] type
+        const defaultPrefs: Required<LearnerProfile['preferences']> = {
+          learningPace: 'medium',
+          learningStyle: 'mixed',
+          preferredLanguage: 'en-US', // Default preferred language
+          activeCurriculumContext: 'US_CCSS', // Default curriculum context
+        };
+
+        let preferences: LearnerProfile['preferences'] = defaultPrefs;
+        if (existingProfileData.preferences && typeof existingProfileData.preferences === 'object' && !Array.isArray(existingProfileData.preferences)) {
+          // Merge fetched preferences with defaults to ensure all keys are present
+          preferences = {
+            ...defaultPrefs,
+            ...(existingProfileData.preferences as Partial<LearnerProfile['preferences']>),
+          };
+        }
 
         return {
           userId: existingProfileData.user_id,
@@ -81,7 +93,12 @@ export class SupabaseProfileService {
   private async createNewProfile(userId: string): Promise<LearnerProfile> {
     console.log(`SupabaseProfileService: Creating new profile for user ${userId}`);
     
-    const defaultPreferences = { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
+    const defaultPreferences: Required<LearnerProfile['preferences']> = {
+      learningPace: 'medium',
+      learningStyle: 'mixed',
+      preferredLanguage: 'en-US', // Default preferred language
+      activeCurriculumContext: 'US_CCSS', // Default curriculum context
+    };
     const newProfileData = {
       user_id: userId,
       preferences: defaultPreferences,

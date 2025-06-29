@@ -6,9 +6,12 @@
  */
 export interface KnowledgeComponent {
   id: string; // Unique identifier for the KC, e.g., "kc_math_g4_add_fractions_likedenom"
+  // TODO: Future localization: name and description will need to be translatable.
+  // This might involve a separate kc_translations table or language-specific columns.
+  // For now, these are assumed to be in a primary reference language (e.g., English).
   name: string; // Human-readable name, e.g., "Adding Fractions with Like Denominators"
   description?: string; // Optional detailed description
-  subject: string; // e.g., "Mathematics", "English Language Arts"
+  subject: string; // e.g., "Mathematics", "English Language Arts" (Subject itself might also need localization or mapping)
   gradeLevels: number[]; // Array of applicable grade levels, e.g., [3, 4]
   domain?: string; // Broader area within the subject, e.g., "Number & Operations - Fractions"
   curriculumStandards?: CurriculumStandardLink[]; // Links to specific curriculum standards
@@ -24,8 +27,9 @@ export interface KnowledgeComponent {
  */
 export interface CurriculumStandardLink {
   standardId: string; // e.g., "CCSS.Math.Content.4.NF.B.3a"
-  standardSet: string; // e.g., "CCSSM", "NGSS", "TEKS"
-  description?: string; // Short description of the standard alignment
+  standardId: string; // Should be the UUID (id column) from the 'curriculum_standards' table.
+  standardSet: string; // e.g., "CCSSM", "NGSS", "TEKS". This can act as a denormalized quick reference.
+  description?: string; // Short description of the standard alignment, if needed beyond the standard's own description.
 }
 
 /**

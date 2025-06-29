@@ -28,6 +28,8 @@ export interface LearnerProfile {
   preferences?: {
     learningPace?: 'slow' | 'medium' | 'fast';
     learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'mixed'; // As per NELIE vision
+    preferredLanguage?: string; // e.g., "en-US", "da-DK"
+    activeCurriculumContext?: string; // e.g., "US_CCSS", "DK_FM_Matematik_4kl", or a specific curriculum ID
     // Other preferences can be added here
   };
   lastUpdatedTimestamp: number; // Timestamp of the last profile update
