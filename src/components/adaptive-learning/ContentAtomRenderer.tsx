@@ -62,14 +62,14 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
               </div>
             )}
             
-            {content.examples && content.examples.length > 0 && (
+            {content.examples && Array.isArray(content.examples) && content.examples.length > 0 && (
               <div className="bg-blue-900/30 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-200 mb-3">Examples:</h4>
                 <ul className="space-y-2">
-                  {content.examples.map((example: string, index: number) => (
-                    <li key={index} className="text-blue-100 flex items-center">
+                  {content.examples.map((example, index) => (
+                    <li key={`example-${index}-${atom.atom_id}`} className="text-blue-100 flex items-center">
                       <span className="text-blue-400 mr-2">•</span>
-                      {example}
+                      {String(example)}
                     </li>
                   ))}
                 </ul>
@@ -157,7 +157,7 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
             <div className="grid gap-3">
               {questionData.options.map((option, index) => (
                 <button
-                  key={index}
+                  key={`option-${index}-${atom.atom_id}`}
                   onClick={() => handleAnswerSelect(index)}
                   disabled={showResult}
                   className={`
@@ -175,7 +175,7 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
                   `}
                 >
                   <div className="flex items-center justify-between">
-                    <span>{option}</span>
+                    <span>{String(option)}</span>
                     {showResult && index === questionData.correctAnswer && (
                       <CheckCircle className="w-5 h-5 text-green-400" />
                     )}
