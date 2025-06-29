@@ -24,7 +24,7 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
 
   // Handle TEXT_EXPLANATION atoms
   if (atom.atom_type === 'TEXT_EXPLANATION') {
-    const content = atom.content as any;
+    const content = atom.content as { text?: string };
     
     useEffect(() => {
       // Auto-complete explanation atoms after 5 seconds
@@ -79,7 +79,13 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
 
   // Handle QUESTION_MULTIPLE_CHOICE atoms
   if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE') {
-    const content = atom.content as any;
+    const content = atom.content as {
+      question?: string;
+      options?: string[];
+      correctAnswerIndex?: number;
+      correct?: number;
+      explanation?: string;
+    };
     
     // Safely extract question data with fallbacks
     const questionData = {
