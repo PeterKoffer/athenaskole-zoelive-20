@@ -24,7 +24,11 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
 
   // Handle TEXT_EXPLANATION atoms
   if (atom.atom_type === 'TEXT_EXPLANATION') {
-    const content = atom.content as { text?: string };
+    const content = atom.content as { 
+      title?: string; 
+      explanation?: string; 
+      examples?: string[];
+    };
     
     useEffect(() => {
       // Auto-complete explanation atoms after 5 seconds
@@ -46,15 +50,31 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
             <CardTitle className="text-white flex items-center justify-between">
               <span className="flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-green-400" />
-                Learn
+                {content.title || 'Learn'}
               </span>
               <Clock className="w-5 h-5 text-blue-400" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="text-lg text-gray-200 leading-relaxed">
-              {content.text || 'Loading explanation...'}
-            </div>
+            {content.explanation && (
+              <div className="text-lg text-gray-200 leading-relaxed">
+                {content.explanation}
+              </div>
+            )}
+            
+            {content.examples && content.examples.length > 0 && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-200 mb-3">Examples:</h4>
+                <ul className="space-y-2">
+                  {content.examples.map((example: string, index: number) => (
+                    <li key={index} className="text-blue-100 flex items-center">
+                      <span className="text-blue-400 mr-2">•</span>
+                      {example}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             
             <div className="text-center">
               <div className="text-gray-400 text-sm mb-4">
@@ -82,8 +102,10 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
     const content = atom.content as {
       question?: string;
       options?: string[];
-      correctAnswerIndex?: number;
+      correctAnswer?: number;
       correct?: number;
+      correctFeedback?: string;
+      generalIncorrectFeedback?: string;
       explanation?: string;
     };
     
@@ -91,8 +113,8 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
     const questionData = {
       question: content.question || 'Question not available',
       options: Array.isArray(content.options) ? content.options : ['Continue'],
-      correctAnswer: content.correctAnswerIndex ?? content.correct ?? 0,
-      explanation: content.explanation || 'Great work!'
+      correctAnswer: content.correctAnswer ?? content.correct ?? 0,
+      explanation: content.correctFeedback || content.generalIncorrectFeedback || content.explanation || 'Great work!'
     };
 
     const handleAnswerSelect = (answerIndex: number) => {
