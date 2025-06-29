@@ -10,6 +10,9 @@ export interface KnowledgeComponentMastery {
   history: InteractionEvent[];
 }
 
+// Type alias for backward compatibility
+export type KcMastery = KnowledgeComponentMastery;
+
 export interface InteractionEvent {
   timestamp: number;
   eventType: string;
