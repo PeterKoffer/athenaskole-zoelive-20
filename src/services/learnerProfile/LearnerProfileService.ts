@@ -84,13 +84,25 @@ class LearnerProfileService implements ILearnerProfileService {
     kcMastery.lastAttemptedTimestamp = currentTimestamp;
     
     kcMastery.history = kcMastery.history || [];
+
+    // Determine the binary correctness for BKT-friendly history
+    let observedCorrect: boolean | undefined = eventDetails.isCorrect;
+    if (observedCorrect === undefined && eventDetails.score !== undefined) {
+      // Attempt to infer from score if isCorrect is not explicitly provided
+      // This threshold might need adjustment based on scoring system (e.g. > 0.5 for normalized scores)
+      observedCorrect = eventDetails.score > 0;
+    }
+
     kcMastery.history.unshift({
       timestamp: currentTimestamp,
       eventType: eventDetails.interactionType,
-      score: eventDetails.score,
+      score: eventDetails.score, // Keep original score for other purposes
+      isCorrect: observedCorrect, // Add the binary correctness observation
       details: eventDetails.interactionDetails,
     });
-    if (kcMastery.history.length > 10) kcMastery.history.pop();
+    if (kcMastery.history.length > 20) { // Increased history length for BKT
+        kcMastery.history.pop();
+    }
 
     // Update in Supabase (for both test and production users)
     console.log(`LearnerProfileService: Attempting Supabase KC mastery update for user ${userId}, KC ${kcId}`);
