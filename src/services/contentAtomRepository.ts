@@ -1,19 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-
-// Temporarily defining ContentAtom here. Ideally, this would be in src/types/content.ts
-// and imported. This definition is based on the Supabase schema and previous discussion.
-export interface ContentAtom {
-  atom_id: string; // Maps to 'id' (uuid) in Supabase
-  atom_type: 'TEXT_EXPLANATION' | 'QUESTION_MULTIPLE_CHOICE' | 'INTERACTIVE_EXERCISE' | string; // Allow other string types
-  content: any; // Maps to 'content' (jsonb)
-  kc_ids: string[]; // Maps to 'kc_ids' (text[], NOT NULL in DB)
-  metadata?: any; // Maps to 'metadata' (jsonb, nullable)
-  version?: number; // Maps to 'version'
-  author_id?: string; // Maps to 'author_id' (uuid)
-  created_at?: string; // Maps to 'created_at' (timestamptz)
-  updated_at?: string; // Maps to 'updated_at' (timestamptz)
-}
+import type { ContentAtom } from '@/types/content'; // Import the centralized type
 
 export class ContentAtomRepository {
   /**

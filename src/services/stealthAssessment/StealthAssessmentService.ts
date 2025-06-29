@@ -53,25 +53,70 @@ class StealthAssessmentService implements IStealthAssessmentService {
 
   // Convenience methods for specific event types
   public async logQuestionAttempt(details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    if (!details.questionId) {
+      console.warn('StealthAssessmentService: logQuestionAttempt called without questionId.', details);
+    }
+    if (!details.knowledgeComponentIds || details.knowledgeComponentIds.length === 0) {
+      console.warn('StealthAssessmentService: logQuestionAttempt called without knowledgeComponentIds.', details);
+    }
     await this.logEvent({ type: InteractionEventType.QUESTION_ATTEMPT, ...details }, sourceComponentId);
   }
 
   public async logHintUsage(details: Omit<HintUsageEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    if (!details.hintId) {
+      console.warn('StealthAssessmentService: logHintUsage called without hintId.', details);
+    }
+    // knowledgeComponentIds and questionId are optional for hints, but good to encourage.
+    if (!details.knowledgeComponentIds || details.knowledgeComponentIds.length === 0) {
+      console.info('StealthAssessmentService: logHintUsage called without knowledgeComponentIds (optional but recommended).', details);
+    }
+    if (!details.questionId) {
+      console.info('StealthAssessmentService: logHintUsage called without questionId (optional but recommended).', details);
+    }
     await this.logEvent({ type: InteractionEventType.HINT_USAGE, ...details }, sourceComponentId);
   }
 
   public async logGameInteraction(details: Omit<GameInteractionEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    if (!details.gameId) {
+      console.warn('StealthAssessmentService: logGameInteraction called without gameId.', details);
+    }
+    if (!details.interactionType) {
+      console.warn('StealthAssessmentService: logGameInteraction called without interactionType.', details);
+    }
+    // KCs are highly recommended for game interactions for learning analytics
+    if (!details.knowledgeComponentIds || details.knowledgeComponentIds.length === 0) {
+      console.info('StealthAssessmentService: logGameInteraction called without knowledgeComponentIds (optional but recommended for learning analytics).', details);
+    }
     await this.logEvent({ type: InteractionEventType.GAME_INTERACTION, ...details }, sourceComponentId);
   }
 
   public async logTutorQuery(details: Omit<TutorQueryEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    if (!details.queryText) {
+      console.warn('StealthAssessmentService: logTutorQuery called without queryText.', details);
+    }
+    // Context is important for tutor queries
+    if (!details.context) {
+      console.info('StealthAssessmentService: logTutorQuery called without context (optional but recommended).', details);
+    }
     await this.logEvent({ type: InteractionEventType.TUTOR_QUERY, ...details }, sourceComponentId);
   }
 
   public async logContentView(details: Omit<ContentViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void> {
+    if (!details.contentAtomId) {
+      console.warn('StealthAssessmentService: logContentView called without contentAtomId.', details);
+    }
+    if (!details.knowledgeComponentIds || details.knowledgeComponentIds.length === 0) {
+      console.warn('StealthAssessmentService: logContentView called without knowledgeComponentIds.', details);
+    }
+    if (!details.contentType) {
+      console.warn('StealthAssessmentService: logContentView called without contentType.', details);
+    }
     await this.logEvent({ type: InteractionEventType.CONTENT_VIEW, ...details }, sourceComponentId);
   }
 
+  // This specific method `logInteractionEvent` seems to be a direct pass-through to supabaseLogger,
+  // It's less about enriching with client-side metadata and more about direct logging.
+  // We'll assume callers of this method are providing all necessary fields directly.
   public async logInteractionEvent(event: {
     event_type: InteractionEventType;
     user_id: string;
