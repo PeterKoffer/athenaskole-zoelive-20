@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { ContentAtom } from '@/types/content';
 import learnerProfileService from '@/services/learnerProfileService';
 import { useContentGeneration } from './hooks/useContentGeneration';
 import { useToast } from '@/hooks/use-toast';
-import QuestionRenderer from './QuestionRenderer';
+import ContentAtomRenderer from './ContentAtomRenderer';
 
 interface AdaptivePracticeModuleProps {
   onBack: () => void;
@@ -234,7 +233,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
         </div>
 
         {currentAtom ? (
-          <QuestionRenderer
+          <ContentAtomRenderer
             atom={currentAtom}
             onComplete={handleQuestionComplete}
           />
