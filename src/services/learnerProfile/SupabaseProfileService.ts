@@ -1,7 +1,7 @@
 
 // src/services/learnerProfile/SupabaseProfileService.ts
 
-import { LearnerProfile, KcMastery } from '@/types/learnerProfile';
+import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
 import { supabase } from '@/integrations/supabase/client';
 
 export class SupabaseProfileService {
@@ -33,14 +33,14 @@ export class SupabaseProfileService {
           throw kcsError;
         }
         
-        const kcMasteryMap: Record<string, KcMastery> = {};
+        const kcMasteryMap: Record<string, KnowledgeComponentMastery> = {};
         kcMasteryData?.forEach(km => {
           kcMasteryMap[km.kc_id] = {
             kcId: km.kc_id,
             masteryLevel: km.mastery_level,
             attempts: km.attempts,
             correctAttempts: km.correct_attempts,
-            lastAttemptedTimestamp: km.last_attempted_timestamp ? new Date(km.last_attempted_timestamp).getTime() : undefined,
+            lastAttemptTimestamp: km.last_attempted_timestamp ? new Date(km.last_attempted_timestamp).getTime() : Date.now(),
             history: Array.isArray(km.history) ? km.history as Array<{timestamp: number; eventType: string; score?: number; details?: any}> : [],
           };
         });
@@ -49,17 +49,21 @@ export class SupabaseProfileService {
 
         // Type assertion for preferences with fallback
         const preferences = (existingProfileData.preferences && typeof existingProfileData.preferences === 'object' && !Array.isArray(existingProfileData.preferences)) 
-          ? existingProfileData.preferences as { learningPace?: 'medium' | 'slow' | 'fast'; learningStyle?: 'mixed' | 'visual' | 'kinesthetic' | 'auditory' }
-          : { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
+          ? existingProfileData.preferences as { learningStyle?: 'mixed' | 'visual' | 'kinesthetic' | 'auditory'; difficultyPreference?: number; sessionLength?: number }
+          : { learningStyle: 'mixed' as const, difficultyPreference: 0.5, sessionLength: 15 };
 
         return {
           userId: existingProfileData.user_id,
-          overallMastery: existingProfileData.overall_mastery || undefined,
-          currentLearningFocusKcs: existingProfileData.current_learning_focus_kcs || undefined,
-          suggestedNextKcs: existingProfileData.suggested_next_kcs || undefined,
-          preferences,
+          overallMastery: existingProfileData.overall_mastery || 0,
+          preferences: {
+            learningStyle: preferences.learningStyle || 'mixed',
+            difficultyPreference: preferences.difficultyPreference || 0.5,
+            sessionLength: preferences.sessionLength || 15
+          },
           lastUpdatedTimestamp: new Date(existingProfileData.last_updated_timestamp).getTime(),
           kcMasteryMap,
+          recentPerformance: [],
+          createdAt: Date.now()
         };
       }
 
@@ -72,8 +76,11 @@ export class SupabaseProfileService {
       return {
         userId: userId,
         kcMasteryMap: {},
-        preferences: { learningPace: 'medium' as const, learningStyle: 'mixed' as const },
+        preferences: { learningStyle: 'mixed' as const, difficultyPreference: 0.5, sessionLength: 15 },
         lastUpdatedTimestamp: Date.now(),
+        recentPerformance: [],
+        overallMastery: 0,
+        createdAt: Date.now()
       };
     }
   }
@@ -81,7 +88,7 @@ export class SupabaseProfileService {
   private async createNewProfile(userId: string): Promise<LearnerProfile> {
     console.log(`SupabaseProfileService: Creating new profile for user ${userId}`);
     
-    const defaultPreferences = { learningPace: 'medium' as const, learningStyle: 'mixed' as const };
+    const defaultPreferences = { learningStyle: 'mixed' as const, difficultyPreference: 0.5, sessionLength: 15 };
     const newProfileData = {
       user_id: userId,
       preferences: defaultPreferences,
@@ -106,17 +113,20 @@ export class SupabaseProfileService {
       kcMasteryMap: {},
       preferences: defaultPreferences,
       lastUpdatedTimestamp: new Date(createdProfile.last_updated_timestamp).getTime(),
+      recentPerformance: [],
+      overallMastery: 0,
+      createdAt: Date.now()
     };
   }
 
   async updateKcMasteryInSupabase(
     userId: string,
     kcId: string,
-    kcMastery: KcMastery
+    kcMastery: KnowledgeComponentMastery
   ): Promise<void> {
     console.log(`SupabaseProfileService: Updating KC mastery in Supabase for user ${userId}, KC ${kcId}`);
     
-    const currentISOTimestamp = new Date(kcMastery.lastAttemptedTimestamp || Date.now()).toISOString();
+    const currentISOTimestamp = new Date(kcMastery.lastAttemptTimestamp || Date.now()).toISOString();
 
     const { error: upsertError } = await supabase
       .from('kc_mastery')
@@ -149,7 +159,7 @@ export class SupabaseProfileService {
     console.log(`SupabaseProfileService: Successfully updated KC mastery in Supabase for user ${userId}, KC ${kcId}`);
   }
 
-  async getKcMastery(userId: string, kcId: string): Promise<KcMastery | undefined> {
+  async getKcMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | undefined> {
     console.log(`SupabaseProfileService: Getting KC mastery for user ${userId}, KC ${kcId}`);
     
     const { data, error } = await supabase
@@ -174,7 +184,7 @@ export class SupabaseProfileService {
       masteryLevel: data.mastery_level,
       attempts: data.attempts,
       correctAttempts: data.correct_attempts,
-      lastAttemptedTimestamp: data.last_attempted_timestamp ? new Date(data.last_attempted_timestamp).getTime() : undefined,
+      lastAttemptTimestamp: data.last_attempted_timestamp ? new Date(data.last_attempted_timestamp).getTime() : Date.now(),
       history: Array.isArray(data.history) ? data.history as Array<{timestamp: number; eventType: string; score?: number; details?: any}> : [],
     };
   }

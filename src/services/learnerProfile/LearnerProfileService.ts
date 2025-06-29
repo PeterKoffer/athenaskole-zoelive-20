@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { LearnerProfile, InteractionEvent } from '@/types/learnerProfile';
 
@@ -31,6 +32,63 @@ class LearnerProfileService {
       console.error('💥 Error in getProfile:', error);
       return this.createFallbackProfile(userId);
     }
+  }
+
+  async updateKcMastery(
+    userId: string,
+    kcId: string,
+    eventDetails: {
+      isCorrect?: boolean;
+      newAttempt?: boolean;
+      score?: number;
+      interactionType: string;
+      interactionDetails?: any;
+    }
+  ): Promise<LearnerProfile> {
+    console.log(`📊 Updating KC mastery for user ${userId}, KC ${kcId}`);
+    
+    // Get current profile
+    const profile = await this.getProfile(userId);
+    if (!profile) {
+      throw new Error('Profile not found for KC mastery update');
+    }
+
+    // Update the KC mastery
+    let kcMastery = profile.kcMasteryMap[kcId];
+    if (!kcMastery) {
+      kcMastery = {
+        kcId,
+        masteryLevel: eventDetails.isCorrect ? 0.3 : 0.1,
+        attempts: 1,
+        correctAttempts: eventDetails.isCorrect ? 1 : 0,
+        lastAttemptTimestamp: Date.now(),
+        history: []
+      };
+    } else {
+      if (eventDetails.newAttempt) {
+        kcMastery.attempts += 1;
+      }
+      if (eventDetails.isCorrect) {
+        kcMastery.correctAttempts += 1;
+        kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + 0.1);
+      } else {
+        kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - 0.05);
+      }
+      kcMastery.lastAttemptTimestamp = Date.now();
+    }
+    
+    kcMastery.history = kcMastery.history || [];
+    kcMastery.history.unshift({
+      timestamp: Date.now(),
+      eventType: eventDetails.interactionType,
+      score: eventDetails.score,
+      details: eventDetails.interactionDetails
+    });
+    
+    profile.kcMasteryMap[kcId] = kcMastery;
+    profile.lastUpdatedTimestamp = Date.now();
+    
+    return profile;
   }
 
   async saveInteractionEvent(

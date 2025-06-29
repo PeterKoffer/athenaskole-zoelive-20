@@ -1,7 +1,7 @@
 
 // src/services/learnerProfile/MockProfileService.ts
 
-import { LearnerProfile, KcMastery } from '@/types/learnerProfile';
+import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
 
 // Test user for Supabase integration testing - matches the one we created in Supabase
 export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012';
@@ -18,7 +18,7 @@ export class MockProfileService {
           masteryLevel: 0.3,
           attempts: 2,
           correctAttempts: 1,
-          lastAttemptedTimestamp: Date.now() - 24 * 60 * 60 * 1000, // 1 day ago
+          lastAttemptTimestamp: Date.now() - 24 * 60 * 60 * 1000, // 1 day ago
           history: [
             {
               timestamp: Date.now() - 24 * 60 * 60 * 1000,
@@ -33,7 +33,7 @@ export class MockProfileService {
           masteryLevel: 0.1,
           attempts: 1,
           correctAttempts: 0,
-          lastAttemptedTimestamp: Date.now() - 48 * 60 * 60 * 1000, // 2 days ago
+          lastAttemptTimestamp: Date.now() - 48 * 60 * 60 * 1000, // 2 days ago
           history: [
             {
               timestamp: Date.now() - 48 * 60 * 60 * 1000,
@@ -45,13 +45,14 @@ export class MockProfileService {
         }
       },
       preferences: {
-        learningPace: 'medium',
-        learningStyle: 'visual'
+        learningStyle: 'visual',
+        difficultyPreference: 0.5,
+        sessionLength: 15
       },
       lastUpdatedTimestamp: Date.now(),
       overallMastery: 0.2,
-      currentLearningFocusKcs: ['kc_math_g4_add_fractions_likedenom'],
-      suggestedNextKcs: ['kc_math_g5_multiply_decimals']
+      recentPerformance: [],
+      createdAt: Date.now()
     };
 
     return mockProfile;
@@ -78,6 +79,7 @@ export class MockProfileService {
         masteryLevel: eventDetails.isCorrect ? 0.3 : 0.1,
         attempts: 1,
         correctAttempts: eventDetails.isCorrect ? 1 : 0,
+        lastAttemptTimestamp: Date.now(),
         history: []
       };
     } else {
@@ -92,7 +94,7 @@ export class MockProfileService {
       }
     }
     
-    kcMastery.lastAttemptedTimestamp = Date.now();
+    kcMastery.lastAttemptTimestamp = Date.now();
     kcMastery.history = kcMastery.history || [];
     kcMastery.history.unshift({
       timestamp: Date.now(),
