@@ -1,202 +1,204 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { LearnerProfile, InteractionEvent } from '@/types/learnerProfile';
+import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences, InteractionEvent } from '@/types/learnerProfile';
 
 class LearnerProfileService {
   async getProfile(userId: string): Promise<LearnerProfile | null> {
     try {
-      console.log(`📊 Loading learner profile for user: ${userId}`);
+      console.log(`🔍 LearnerProfileService: Getting profile for user ${userId}`);
       
-      // Try to get existing profile from database
+      // Get learner profile
       const { data: profileData, error: profileError } = await supabase
         .from('learner_profiles')
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('❌ Error fetching learner profile:', profileError);
+      if (profileError) {
+        console.error('Error fetching learner profile:', profileError);
         throw profileError;
       }
 
-      if (profileData) {
-        console.log('✅ Found existing learner profile');
-        return this.mapDbToProfile(profileData);
+      // Get KC mastery data
+      const { data: kcMasteryData, error: kcError } = await supabase
+        .from('kc_mastery')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (kcError) {
+        console.error('Error fetching KC mastery:', kcError);
+        throw kcError;
       }
 
-      // Create new profile if none exists
-      console.log('🆕 Creating new learner profile');
-      return await this.createDefaultProfile(userId);
+      // Get user preferences
+      const { data: preferencesData, error: prefError } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    } catch (error) {
-      console.error('💥 Error in getProfile:', error);
-      return this.createFallbackProfile(userId);
-    }
-  }
+      if (prefError) {
+        console.error('Error fetching user preferences:', prefError);
+        throw prefError;
+      }
 
-  async updateKcMastery(
-    userId: string,
-    kcId: string,
-    eventDetails: {
-      isCorrect?: boolean;
-      newAttempt?: boolean;
-      score?: number;
-      interactionType: string;
-      interactionDetails?: any;
-    }
-  ): Promise<LearnerProfile> {
-    console.log(`📊 Updating KC mastery for user ${userId}, KC ${kcId}`);
-    
-    // Get current profile
-    const profile = await this.getProfile(userId);
-    if (!profile) {
-      throw new Error('Profile not found for KC mastery update');
-    }
+      // If no profile exists, create one
+      if (!profileData) {
+        console.log(`🆕 Creating new learner profile for user ${userId}`);
+        return await this.createInitialProfile(userId);
+      }
 
-    // Update the KC mastery
-    let kcMastery = profile.kcMasteryMap[kcId];
-    if (!kcMastery) {
-      kcMastery = {
-        kcId,
-        masteryLevel: eventDetails.isCorrect ? 0.3 : 0.1,
-        attempts: 1,
-        correctAttempts: eventDetails.isCorrect ? 1 : 0,
-        lastAttemptTimestamp: Date.now(),
-        history: []
+      // Build KC mastery map
+      const kcMasteryMap: Record<string, KnowledgeComponentMastery> = {};
+      
+      if (kcMasteryData) {
+        kcMasteryData.forEach(kc => {
+          kcMasteryMap[kc.kc_id] = {
+            kcId: kc.kc_id,
+            masteryLevel: kc.mastery_level,
+            attempts: kc.attempts,
+            correctAttempts: kc.correct_attempts,
+            lastAttemptTimestamp: new Date(kc.last_attempted_timestamp || Date.now()).getTime(),
+            history: kc.history || []
+          };
+        });
+      }
+
+      // Build preferences
+      const preferences: LearnerPreferences = {
+        learningStyle: preferencesData?.preferred_voice === 'visual' ? 'visual' : 'mixed',
+        difficultyPreference: 0.5,
+        sessionLength: 20
       };
-    } else {
-      if (eventDetails.newAttempt) {
-        kcMastery.attempts += 1;
-      }
-      if (eventDetails.isCorrect) {
-        kcMastery.correctAttempts += 1;
-        kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + 0.1);
-      } else {
-        kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - 0.05);
-      }
-      kcMastery.lastAttemptTimestamp = Date.now();
-    }
-    
-    kcMastery.history = kcMastery.history || [];
-    kcMastery.history.unshift({
-      timestamp: Date.now(),
-      eventType: eventDetails.interactionType,
-      score: eventDetails.score,
-      details: eventDetails.interactionDetails
-    });
-    
-    profile.kcMasteryMap[kcId] = kcMastery;
-    profile.lastUpdatedTimestamp = Date.now();
-    
-    return profile;
-  }
 
-  async saveInteractionEvent(
-    userId: string,
-    kcId: string,
-    isCorrect: boolean,
-    responseTime: number,
-    contentAtomId: string,
-    sourceComponentId: string,
-    eventData: any
-  ): Promise<void> {
-    try {
-      console.log(`⏺️  Saving interaction event for user ${userId}, KC ${kcId}`);
+      const profile: LearnerProfile = {
+        userId: userId,
+        kcMasteryMap: kcMasteryMap,
+        preferences: preferences,
+        recentPerformance: [],
+        overallMastery: profileData.overall_mastery || 0.0,
+        lastUpdatedTimestamp: new Date(profileData.last_updated_timestamp).getTime(),
+        createdAt: new Date(profileData.created_at).getTime()
+      };
 
-      // Save interaction event to database
-      const { data, error } = await supabase
-        .from('interaction_events')
-        .insert([
-          {
-            user_id: userId,
-            kc_ids: [kcId],
-            content_atom_id: contentAtomId,
-            source_component_id: sourceComponentId,
-            event_type: 'question_answered',
-            event_data: eventData,
-          },
-        ])
-        .select();
-
-      if (error) {
-        console.error('❌ Error saving interaction event:', error);
-        throw error;
-      }
-
-      console.log('✅ Interaction event saved successfully:', data);
+      console.log(`✅ Retrieved profile for user ${userId} with ${Object.keys(kcMasteryMap).length} KC masteries`);
+      return profile;
 
     } catch (error) {
-      console.error('💥 Error in saveInteractionEvent:', error);
+      console.error('Error in getProfile:', error);
       throw error;
     }
   }
 
-  private async createDefaultProfile(userId: string): Promise<LearnerProfile> {
-    const defaultProfile: LearnerProfile = {
-      userId,
-      kcMasteryMap: {},
-      preferences: {
-        learningStyle: 'mixed',
-        difficultyPreference: 0.5,
-        sessionLength: 15
-      },
-      recentPerformance: [],
-      overallMastery: 0.0,
-      lastUpdatedTimestamp: Date.now(),
-      createdAt: Date.now()
-    };
-
+  async createInitialProfile(userId: string): Promise<LearnerProfile> {
     try {
-      const { error } = await supabase
+      console.log(`🆕 Creating initial profile for user ${userId}`);
+      
+      // Create learner profile
+      const { data: profileData, error: profileError } = await supabase
         .from('learner_profiles')
-        .insert({
+        .insert([{
           user_id: userId,
           overall_mastery: 0.0,
-          preferences: defaultProfile.preferences,
+          preferences: {
+            learningStyle: 'mixed',
+            difficultyPreference: 0.5,
+            sessionLength: 20
+          },
           suggested_next_kcs: [],
           current_learning_focus_kcs: []
-        });
+        }])
+        .select()
+        .single();
 
-      if (error) {
-        console.warn('⚠️ Could not save profile to DB, using in-memory profile:', error);
+      if (profileError) {
+        console.error('Error creating learner profile:', profileError);
+        throw profileError;
       }
+
+      // Create user preferences
+      const { error: prefError } = await supabase
+        .from('user_preferences')
+        .insert([{
+          user_id: userId,
+          preferred_voice: 'mixed',
+          speech_enabled: true,
+          theme: 'dark'
+        }]);
+
+      if (prefError) {
+        console.error('Error creating user preferences:', prefError);
+        // Don't throw - preferences are optional
+      }
+
+      const profile: LearnerProfile = {
+        userId: userId,
+        kcMasteryMap: {},
+        preferences: {
+          learningStyle: 'mixed',
+          difficultyPreference: 0.5,
+          sessionLength: 20
+        },
+        recentPerformance: [],
+        overallMastery: 0.0,
+        lastUpdatedTimestamp: new Date(profileData.last_updated_timestamp).getTime(),
+        createdAt: new Date(profileData.created_at).getTime()
+      };
+
+      console.log(`✅ Created initial profile for user ${userId}`);
+      return profile;
+
     } catch (error) {
-      console.warn('⚠️ Error saving profile to DB:', error);
+      console.error('Error in createInitialProfile:', error);
+      throw error;
     }
-
-    return defaultProfile;
   }
 
-  private createFallbackProfile(userId: string): LearnerProfile {
-    return {
-      userId,
-      kcMasteryMap: {},
-      preferences: {
-        learningStyle: 'mixed',
-        difficultyPreference: 0.5,
-        sessionLength: 15
-      },
-      recentPerformance: [],
-      overallMastery: 0.0,
-      lastUpdatedTimestamp: Date.now(),
-      createdAt: Date.now()
-    };
-  }
+  async updateProfile(profile: LearnerProfile): Promise<void> {
+    try {
+      console.log(`🔄 Updating profile for user ${profile.userId}`);
+      
+      // Update learner profile
+      const { error: profileError } = await supabase
+        .from('learner_profiles')
+        .update({
+          overall_mastery: profile.overallMastery,
+          preferences: profile.preferences,
+          last_updated_timestamp: new Date().toISOString()
+        })
+        .eq('user_id', profile.userId);
 
-  private mapDbToProfile(dbData: any): LearnerProfile {
-    return {
-      userId: dbData.user_id,
-      kcMasteryMap: {},
-      preferences: dbData.preferences || {
-        learningStyle: 'mixed',
-        difficultyPreference: 0.5,
-        sessionLength: 15
-      },
-      recentPerformance: [],
-      overallMastery: dbData.overall_mastery || 0.0,
-      lastUpdatedTimestamp: new Date(dbData.last_updated_timestamp).getTime(),
-      createdAt: new Date(dbData.created_at).getTime()
-    };
+      if (profileError) {
+        console.error('Error updating learner profile:', profileError);
+        throw profileError;
+      }
+
+      // Update KC mastery data
+      for (const [kcId, mastery] of Object.entries(profile.kcMasteryMap)) {
+        const { error: kcError } = await supabase
+          .from('kc_mastery')
+          .upsert({
+            user_id: profile.userId,
+            kc_id: kcId,
+            mastery_level: mastery.masteryLevel,
+            attempts: mastery.attempts,
+            correct_attempts: mastery.correctAttempts,
+            last_attempted_timestamp: new Date(mastery.lastAttemptTimestamp).toISOString(),
+            history: mastery.history
+          });
+
+        if (kcError) {
+          console.error(`Error updating KC mastery for ${kcId}:`, kcError);
+          // Continue with other KCs
+        }
+      }
+
+      console.log(`✅ Updated profile for user ${profile.userId}`);
+
+    } catch (error) {
+      console.error('Error in updateProfile:', error);
+      throw error;
+    }
   }
 }
 

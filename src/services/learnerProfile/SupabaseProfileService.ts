@@ -1,216 +1,176 @@
 
-// src/services/learnerProfile/SupabaseProfileService.ts
-
-import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
 import { supabase } from '@/integrations/supabase/client';
+import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
 
-export class SupabaseProfileService {
-  async fetchOrCreateProfile(userId: string): Promise<LearnerProfile> {
-    console.log(`SupabaseProfileService: Fetching or creating profile for user ${userId}`);
-    
+class SupabaseProfileService {
+  async getProfile(userId: string): Promise<LearnerProfile | null> {
     try {
-      const { data: existingProfileData, error: fetchError } = await supabase
+      console.log(`🔍 SupabaseProfileService: Getting profile for user ${userId}`);
+      
+      // Get learner profile
+      const { data: profileData, error: profileError } = await supabase
         .from('learner_profiles')
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (fetchError) {
-        console.error('SupabaseProfileService: Error fetching profile:', fetchError);
-        throw fetchError;
+      if (profileError) {
+        console.error('Error fetching learner profile:', profileError);
+        throw profileError;
       }
 
-      if (existingProfileData) {
-        console.log('SupabaseProfileService: Found existing profile, fetching KC mastery data...');
-        
-        const { data: kcMasteryData, error: kcsError } = await supabase
-          .from('kc_mastery')
-          .select('*')
-          .eq('user_id', userId);
+      // Get KC mastery data
+      const { data: kcMasteryData, error: kcError } = await supabase
+        .from('kc_mastery')
+        .select('*')
+        .eq('user_id', userId);
 
-        if (kcsError) {
-          console.error('SupabaseProfileService: Error fetching KC mastery data:', kcsError);
-          throw kcsError;
-        }
-        
-        const kcMasteryMap: Record<string, KnowledgeComponentMastery> = {};
-        kcMasteryData?.forEach(km => {
-          kcMasteryMap[km.kc_id] = {
-            kcId: km.kc_id,
-            masteryLevel: km.mastery_level,
-            attempts: km.attempts,
-            correctAttempts: km.correct_attempts,
-            lastAttemptTimestamp: km.last_attempted_timestamp ? new Date(km.last_attempted_timestamp).getTime() : Date.now(),
-            history: Array.isArray(km.history) ? km.history as Array<{timestamp: number; eventType: string; score?: number; details?: any}> : [],
+      if (kcError) {
+        console.error('Error fetching KC mastery:', kcError);
+        throw kcError;
+      }
+
+      // If no profile exists, create one
+      if (!profileData) {
+        console.log(`🆕 Creating new profile for user ${userId}`);
+        return await this.createInitialProfile(userId);
+      }
+
+      // Build KC mastery map
+      const kcMasteryMap: Record<string, KnowledgeComponentMastery> = {};
+      
+      if (kcMasteryData) {
+        kcMasteryData.forEach(kc => {
+          kcMasteryMap[kc.kc_id] = {
+            kcId: kc.kc_id,
+            masteryLevel: kc.mastery_level,
+            attempts: kc.attempts,
+            correctAttempts: kc.correct_attempts,
+            lastAttemptTimestamp: new Date(kc.last_attempted_timestamp || Date.now()).getTime(),
+            history: kc.history || []
           };
         });
-
-        console.log(`SupabaseProfileService: Successfully loaded profile with ${Object.keys(kcMasteryMap).length} KC mastery entries`);
-
-        // Type assertion for preferences with fallback
-        const preferences = (existingProfileData.preferences && typeof existingProfileData.preferences === 'object' && !Array.isArray(existingProfileData.preferences)) 
-          ? existingProfileData.preferences as { learningStyle?: 'mixed' | 'visual' | 'kinesthetic' | 'auditory'; difficultyPreference?: number; sessionLength?: number }
-          : { learningStyle: 'mixed' as const, difficultyPreference: 0.5, sessionLength: 15 };
-
-        return {
-          userId: existingProfileData.user_id,
-          overallMastery: existingProfileData.overall_mastery || 0,
-          preferences: {
-            learningStyle: preferences.learningStyle || 'mixed',
-            difficultyPreference: preferences.difficultyPreference || 0.5,
-            sessionLength: preferences.sessionLength || 15
-          },
-          lastUpdatedTimestamp: new Date(existingProfileData.last_updated_timestamp).getTime(),
-          kcMasteryMap,
-          recentPerformance: [],
-          createdAt: Date.now()
-        };
       }
 
-      console.log('SupabaseProfileService: No existing profile found, creating new one...');
-      return this.createNewProfile(userId);
+      // Build preferences from profile data
+      const preferences: LearnerPreferences = profileData.preferences || {
+        learningStyle: 'mixed',
+        difficultyPreference: 0.5,
+        sessionLength: 20
+      };
+
+      const profile: LearnerProfile = {
+        userId: userId,
+        kcMasteryMap: kcMasteryMap,
+        preferences: preferences,
+        recentPerformance: [],
+        overallMastery: profileData.overall_mastery || 0.0,
+        lastUpdatedTimestamp: new Date(profileData.last_updated_timestamp).getTime(),
+        createdAt: new Date(profileData.created_at).getTime()
+      };
+
+      console.log(`✅ Retrieved profile for user ${userId} with ${Object.keys(kcMasteryMap).length} KC masteries`);
+      return profile;
+
     } catch (error) {
-      console.error('SupabaseProfileService: Error in fetchOrCreateProfile:', error);
-      // Return a basic profile structure as fallback
-      console.log('SupabaseProfileService: Returning fallback profile structure');
-      return {
+      console.error('Error in getProfile:', error);
+      throw error;
+    }
+  }
+
+  async createInitialProfile(userId: string): Promise<LearnerProfile> {
+    try {
+      console.log(`🆕 Creating initial profile for user ${userId}`);
+      
+      const initialPreferences: LearnerPreferences = {
+        learningStyle: 'mixed',
+        difficultyPreference: 0.5,
+        sessionLength: 20
+      };
+
+      // Create learner profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('learner_profiles')
+        .insert([{
+          user_id: userId,
+          overall_mastery: 0.0,
+          preferences: initialPreferences,
+          suggested_next_kcs: [],
+          current_learning_focus_kcs: []
+        }])
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('Error creating learner profile:', profileError);
+        throw profileError;
+      }
+
+      const profile: LearnerProfile = {
         userId: userId,
         kcMasteryMap: {},
-        preferences: { learningStyle: 'mixed' as const, difficultyPreference: 0.5, sessionLength: 15 },
-        lastUpdatedTimestamp: Date.now(),
+        preferences: initialPreferences,
         recentPerformance: [],
-        overallMastery: 0,
-        createdAt: Date.now()
+        overallMastery: 0.0,
+        lastUpdatedTimestamp: new Date(profileData.last_updated_timestamp).getTime(),
+        createdAt: new Date(profileData.created_at).getTime()
       };
-    }
-  }
 
-  private async createNewProfile(userId: string): Promise<LearnerProfile> {
-    console.log(`SupabaseProfileService: Creating new profile for user ${userId}`);
-    
-    const defaultPreferences = { learningStyle: 'mixed' as const, difficultyPreference: 0.5, sessionLength: 15 };
-    const newProfileData = {
-      user_id: userId,
-      preferences: defaultPreferences,
-      last_updated_timestamp: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    };
-    
-    const { data: createdProfile, error: createError } = await supabase
-      .from('learner_profiles')
-      .insert(newProfileData)
-      .select()
-      .single();
+      console.log(`✅ Created initial profile for user ${userId}`);
+      return profile;
 
-    if (createError) {
-      console.error('SupabaseProfileService: Error creating new profile:', createError);
-      throw createError;
-    }
-    
-    console.log(`SupabaseProfileService: Successfully created new profile for user ${userId}`);
-    return {
-      userId: createdProfile.user_id,
-      kcMasteryMap: {},
-      preferences: defaultPreferences,
-      lastUpdatedTimestamp: new Date(createdProfile.last_updated_timestamp).getTime(),
-      recentPerformance: [],
-      overallMastery: 0,
-      createdAt: Date.now()
-    };
-  }
-
-  async updateKcMasteryInSupabase(
-    userId: string,
-    kcId: string,
-    kcMastery: KnowledgeComponentMastery
-  ): Promise<void> {
-    console.log(`SupabaseProfileService: Updating KC mastery in Supabase for user ${userId}, KC ${kcId}`);
-    
-    const currentISOTimestamp = new Date(kcMastery.lastAttemptTimestamp || Date.now()).toISOString();
-
-    const { error: upsertError } = await supabase
-      .from('kc_mastery')
-      .upsert({
-        user_id: userId,
-        kc_id: kcId,
-        mastery_level: kcMastery.masteryLevel,
-        attempts: kcMastery.attempts,
-        correct_attempts: kcMastery.correctAttempts,
-        last_attempted_timestamp: currentISOTimestamp,
-        history: kcMastery.history,
-        last_updated_timestamp: currentISOTimestamp,
-      }, { onConflict: 'user_id, kc_id' });
-
-    if (upsertError) {
-      console.error(`SupabaseProfileService: Error upserting KC mastery for ${kcId}:`, upsertError);
-      throw upsertError;
-    }
-
-    // Update profile's lastUpdatedTimestamp
-    const { error: profileUpdateError } = await supabase
-      .from('learner_profiles')
-      .update({ last_updated_timestamp: currentISOTimestamp })
-      .eq('user_id', userId);
-      
-    if (profileUpdateError) {
-      console.error(`SupabaseProfileService: Error updating profile timestamp:`, profileUpdateError);
-    }
-      
-    console.log(`SupabaseProfileService: Successfully updated KC mastery in Supabase for user ${userId}, KC ${kcId}`);
-  }
-
-  async getKcMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | undefined> {
-    console.log(`SupabaseProfileService: Getting KC mastery for user ${userId}, KC ${kcId}`);
-    
-    const { data, error } = await supabase
-      .from('kc_mastery')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('kc_id', kcId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('SupabaseProfileService: Error fetching single KC mastery:', error);
+    } catch (error) {
+      console.error('Error in createInitialProfile:', error);
       throw error;
     }
-    if (!data) {
-      console.log(`SupabaseProfileService: No KC mastery found for user ${userId}, KC ${kcId}`);
-      return undefined;
-    }
-
-    console.log(`SupabaseProfileService: Successfully retrieved KC mastery for user ${userId}, KC ${kcId}`);
-    return {
-      kcId: data.kc_id,
-      masteryLevel: data.mastery_level,
-      attempts: data.attempts,
-      correctAttempts: data.correct_attempts,
-      lastAttemptTimestamp: data.last_attempted_timestamp ? new Date(data.last_attempted_timestamp).getTime() : Date.now(),
-      history: Array.isArray(data.history) ? data.history as Array<{timestamp: number; eventType: string; score?: number; details?: any}> : [],
-    };
   }
 
-  async updatePreferences(
-    userId: string,
-    preferences: Partial<LearnerProfile['preferences']>
-  ): Promise<void> {
-    console.log(`SupabaseProfileService: Updating preferences for user ${userId}`);
-    
-    const currentISOTimestamp = new Date().toISOString();
-    const { data, error } = await supabase
-      .from('learner_profiles')
-      .update({ preferences, last_updated_timestamp: currentISOTimestamp })
-      .eq('user_id', userId)
-      .select()
-      .single();
+  async updateProfile(profile: LearnerProfile): Promise<void> {
+    try {
+      console.log(`🔄 Updating profile for user ${profile.userId}`);
+      
+      // Update learner profile
+      const { error: profileError } = await supabase
+        .from('learner_profiles')
+        .update({
+          overall_mastery: profile.overallMastery,
+          preferences: profile.preferences,
+          last_updated_timestamp: new Date().toISOString()
+        })
+        .eq('user_id', profile.userId);
 
-    if (error) {
-      console.error('SupabaseProfileService: Error updating preferences:', error);
+      if (profileError) {
+        console.error('Error updating learner profile:', profileError);
+        throw profileError;
+      }
+
+      // Update KC mastery data
+      for (const [kcId, mastery] of Object.entries(profile.kcMasteryMap)) {
+        const { error: kcError } = await supabase
+          .from('kc_mastery')
+          .upsert({
+            user_id: profile.userId,
+            kc_id: kcId,
+            mastery_level: mastery.masteryLevel,
+            attempts: mastery.attempts,
+            correct_attempts: mastery.correctAttempts,
+            last_attempted_timestamp: new Date(mastery.lastAttemptTimestamp).toISOString(),
+            history: mastery.history
+          });
+
+        if (kcError) {
+          console.error(`Error updating KC mastery for ${kcId}:`, kcError);
+          // Continue with other KCs
+        }
+      }
+
+      console.log(`✅ Updated profile for user ${profile.userId}`);
+
+    } catch (error) {
+      console.error('Error in updateProfile:', error);
       throw error;
     }
-    if (!data) throw new Error("Profile not found for preference update.");
-
-    console.log(`SupabaseProfileService: Successfully updated preferences for user ${userId}`);
   }
 }
 
-export const supabaseProfileService = new SupabaseProfileService();
+export default new SupabaseProfileService();
