@@ -1,4 +1,6 @@
 
+// src/types/learnerProfile.ts
+
 export interface KnowledgeComponentMastery {
   kcId: string;
   masteryLevel: number; // 0.0 to 1.0
@@ -8,27 +10,24 @@ export interface KnowledgeComponentMastery {
   history: InteractionEvent[];
 }
 
-// Export alias for backward compatibility
-export type KcMastery = KnowledgeComponentMastery;
-
 export interface InteractionEvent {
   timestamp: number;
   eventType: string;
-  score?: number;
+  score: number;
   details?: any;
 }
 
 export interface LearnerPreferences {
   learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
   difficultyPreference: number; // 0.0 to 1.0
-  sessionLength: number; // preferred minutes
+  sessionLength: number; // minutes
 }
 
 export interface LearnerProfile {
   userId: string;
   kcMasteryMap: Record<string, KnowledgeComponentMastery>;
   preferences: LearnerPreferences;
-  recentPerformance: InteractionEvent[];
+  recentPerformance: number[];
   overallMastery: number;
   lastUpdatedTimestamp: number;
   createdAt: number;
