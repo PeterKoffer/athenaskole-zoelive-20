@@ -7,7 +7,7 @@ import { knowledgeComponentService } from '@/services/knowledgeComponentService'
 
 export class ProfileRecommendationService {
   async recommendNextKcs(profile: LearnerProfile, count: number = 3): Promise<KnowledgeComponent[]> {
-    const allKcs = await knowledgeComponentService.searchKcs(''); 
+    const allKcs = await knowledgeComponentService.getAllKcs(); 
     
     const potentialKcs = allKcs.filter(kc => {
       const mastery = profile.kcMasteryMap[kc.id];

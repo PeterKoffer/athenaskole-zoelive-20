@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences, InteractionEvent } from '@/types/learnerProfile';
 
@@ -197,6 +196,93 @@ class LearnerProfileService {
 
     } catch (error) {
       console.error('Error in updateProfile:', error);
+      throw error;
+    }
+  }
+
+  async updateKcMastery(userId: string, kcId: string, masteryUpdate: {
+    isCorrect: boolean;
+    newAttempt: boolean;
+    interactionType: string;
+    interactionDetails?: any;
+  }): Promise<LearnerProfile> {
+    try {
+      console.log(`🔄 Updating KC mastery for user ${userId}, KC ${kcId}`);
+      
+      // Get current mastery
+      const { data: currentMastery, error: fetchError } = await supabase
+        .from('kc_mastery')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('kc_id', kcId)
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching current mastery:', fetchError);
+        throw fetchError;
+      }
+
+      let newMasteryLevel: number;
+      let newAttempts: number;
+      let newCorrectAttempts: number;
+      let newHistory: InteractionEvent[];
+
+      if (currentMastery) {
+        // Update existing mastery
+        newAttempts = currentMastery.attempts + (masteryUpdate.newAttempt ? 1 : 0);
+        newCorrectAttempts = currentMastery.correct_attempts + (masteryUpdate.isCorrect ? 1 : 0);
+        
+        // Simple mastery calculation: percentage of correct attempts
+        newMasteryLevel = newAttempts > 0 ? newCorrectAttempts / newAttempts : 0;
+        
+        newHistory = [...(currentMastery.history || []), {
+          timestamp: Date.now(),
+          eventType: masteryUpdate.interactionType,
+          score: masteryUpdate.isCorrect ? 1 : 0,
+          details: masteryUpdate.interactionDetails
+        }];
+      } else {
+        // Create new mastery record
+        newAttempts = masteryUpdate.newAttempt ? 1 : 0;
+        newCorrectAttempts = masteryUpdate.isCorrect ? 1 : 0;
+        newMasteryLevel = newAttempts > 0 ? newCorrectAttempts / newAttempts : 0;
+        newHistory = [{
+          timestamp: Date.now(),
+          eventType: masteryUpdate.interactionType,
+          score: masteryUpdate.isCorrect ? 1 : 0,
+          details: masteryUpdate.interactionDetails
+        }];
+      }
+
+      // Update or insert mastery record
+      const { error: upsertError } = await supabase
+        .from('kc_mastery')
+        .upsert({
+          user_id: userId,
+          kc_id: kcId,
+          mastery_level: newMasteryLevel,
+          attempts: newAttempts,
+          correct_attempts: newCorrectAttempts,
+          last_attempted_timestamp: new Date().toISOString(),
+          history: newHistory
+        });
+
+      if (upsertError) {
+        console.error('Error updating KC mastery:', upsertError);
+        throw upsertError;
+      }
+
+      // Return updated profile
+      const updatedProfile = await this.getProfile(userId);
+      if (!updatedProfile) {
+        throw new Error('Failed to retrieve updated profile');
+      }
+
+      console.log(`✅ Updated KC mastery for ${kcId}: ${newMasteryLevel}`);
+      return updatedProfile;
+
+    } catch (error) {
+      console.error('Error in updateKcMastery:', error);
       throw error;
     }
   }

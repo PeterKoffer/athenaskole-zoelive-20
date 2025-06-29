@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { KnowledgeComponent } from '@/types/knowledgeComponent';
 
@@ -58,6 +57,52 @@ class KnowledgeComponentService {
       return data || [];
     } catch (error) {
       console.error('Error in getKcsBySubject:', error);
+      throw error;
+    }
+  }
+
+  async searchKcs(query: string): Promise<KnowledgeComponent[]> {
+    try {
+      const { data, error } = await supabase
+        .from('knowledge_components')
+        .select('*')
+        .or(`name.ilike.%${query}%,description.ilike.%${query}%,tags.cs.{${query}}`)
+        .order('name');
+
+      if (error) {
+        console.error('Error searching knowledge components:', error);
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in searchKcs:', error);
+      throw error;
+    }
+  }
+
+  async recommendNextKcs(userId: string, count: number = 3, excludedKcIds: string[] = []): Promise<KnowledgeComponent[]> {
+    try {
+      // Get all KCs except excluded ones
+      let query = supabase
+        .from('knowledge_components')
+        .select('*')
+        .order('difficulty_estimate', { ascending: true });
+
+      if (excludedKcIds.length > 0) {
+        query = query.not('id', 'in', `(${excludedKcIds.join(',')})`);
+      }
+
+      const { data, error } = await query.limit(count);
+
+      if (error) {
+        console.error('Error getting recommended KCs:', error);
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in recommendNextKcs:', error);
       throw error;
     }
   }
