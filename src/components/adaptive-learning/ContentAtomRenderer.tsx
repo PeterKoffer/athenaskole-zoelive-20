@@ -22,16 +22,9 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
     contentKeys: Object.keys(atom.content || {})
   });
 
-  // Handle TEXT_EXPLANATION atoms
-  if (atom.atom_type === 'TEXT_EXPLANATION') {
-    const content = atom.content as { 
-      title?: string; 
-      explanation?: string; 
-      examples?: string[];
-    };
-    
-    useEffect(() => {
-      // Auto-complete explanation atoms after 5 seconds
+  // Auto-complete explanation atoms after 5 seconds - moved to useEffect with dependency
+  useEffect(() => {
+    if (atom.atom_type === 'TEXT_EXPLANATION') {
       const timer = setTimeout(() => {
         onComplete({
           isCorrect: true,
@@ -41,7 +34,16 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
       }, 5000);
 
       return () => clearTimeout(timer);
-    }, [onComplete, startTime]);
+    }
+  }, [atom.atom_type, onComplete, startTime]);
+
+  // Handle TEXT_EXPLANATION atoms
+  if (atom.atom_type === 'TEXT_EXPLANATION') {
+    const content = atom.content as { 
+      title?: string; 
+      explanation?: string; 
+      examples?: string[];
+    };
 
     return (
       <div className="space-y-6">
