@@ -18,15 +18,7 @@ export interface AtomSequence {
 }
 
 class ContentGenerationService {
-  // Testing flag to force AI generation and skip database/fallback
-  private forceAIGenerationForTesting = true;
-
   async generateFromDatabase(kcId: string): Promise<any[]> {
-    if (this.forceAIGenerationForTesting) {
-      console.log('🧪 Skipping database check due to forceAIGenerationForTesting=true');
-      return [];
-    }
-
     console.log('🔍 Checking database for pre-built atoms...');
     
     const { data: existingAtoms, error } = await supabase
@@ -91,12 +83,6 @@ class ContentGenerationService {
   }
 
   generateFallbackContent(kc: any): any[] {
-    if (this.forceAIGenerationForTesting) {
-      console.log('🧪 Skipping fallback content due to forceAIGenerationForTesting=true');
-      console.error('❌ AI generation failed and fallback is disabled for testing');
-      throw new Error('AI generation failed and fallback content is disabled for testing purposes');
-    }
-
     console.log('🔄 Generating fallback content for:', kc.name);
     
     const timestamp = Date.now();
