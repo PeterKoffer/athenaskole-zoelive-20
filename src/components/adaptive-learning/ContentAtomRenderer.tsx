@@ -1,16 +1,21 @@
 
-import { ContentAtom } from '@/types/content';
+import { memo } from 'react';
 import TextExplanationRenderer from './atoms/TextExplanationRenderer';
-import MultipleChoiceRenderer from './atoms/MultipleChoiceRenderer';
+import StableMultipleChoiceRenderer from './atoms/StableMultipleChoiceRenderer';
 import InteractiveExerciseRenderer from './atoms/InteractiveExerciseRenderer';
 import FallbackRenderer from './atoms/FallbackRenderer';
 
 interface ContentAtomRendererProps {
-  atom: ContentAtom;
+  atom: any;
   onComplete: (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => void;
 }
 
-const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => {
+const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps) => {
+  if (!atom) {
+    console.error('❌ ContentAtomRenderer: No atom provided');
+    return <FallbackRenderer atom={null} onComplete={onComplete} />;
+  }
+
   console.log('🎯 ContentAtomRenderer routing atom:', {
     atomId: atom.atom_id,
     atomType: atom.atom_type,
@@ -18,62 +23,23 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
     contentKeys: atom.content ? Object.keys(atom.content) : []
   });
 
-  // Validate atom structure
-  if (!atom || !atom.atom_id || !atom.atom_type) {
-    console.error('❌ Invalid atom structure:', atom);
-    return <FallbackRenderer atom={atom} onComplete={onComplete} />;
-  }
-
   // Route to appropriate renderer based on atom type
   switch (atom.atom_type) {
     case 'TEXT_EXPLANATION':
-      return (
-        <TextExplanationRenderer
-          content={atom.content as { title?: string; explanation?: string; examples?: string[] }}
-          atomId={atom.atom_id}
-          onComplete={onComplete}
-        />
-      );
-
+      return <TextExplanationRenderer atom={atom} onComplete={onComplete} />;
+    
     case 'QUESTION_MULTIPLE_CHOICE':
-      return (
-        <MultipleChoiceRenderer
-          content={atom.content as {
-            question?: string;
-            options?: string[];
-            correctAnswer?: number;
-            correct?: number;
-            correctFeedback?: string;
-            generalIncorrectFeedback?: string;
-            explanation?: string;
-          }}
-          atomId={atom.atom_id}
-          onComplete={onComplete}
-        />
-      );
-
+      return <StableMultipleChoiceRenderer atom={atom} onComplete={onComplete} />;
+    
     case 'INTERACTIVE_EXERCISE':
-      return (
-        <InteractiveExerciseRenderer
-          content={atom.content as {
-            title?: string;
-            description?: string;
-            exerciseType?: string;
-            components?: {
-              problem?: string;
-              answer?: string;
-              [key: string]: any;
-            };
-          }}
-          atomId={atom.atom_id}
-          onComplete={onComplete}
-        />
-      );
-
+      return <InteractiveExerciseRenderer atom={atom} onComplete={onComplete} />;
+    
     default:
-      console.warn('🔄 Unknown atom type, using fallback:', atom.atom_type);
+      console.warn('⚠️ Unknown atom type:', atom.atom_type);
       return <FallbackRenderer atom={atom} onComplete={onComplete} />;
   }
-};
+});
+
+ContentAtomRenderer.displayName = 'ContentAtomRenderer';
 
 export default ContentAtomRenderer;
