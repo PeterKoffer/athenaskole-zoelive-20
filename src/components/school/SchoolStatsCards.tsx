@@ -1,57 +1,58 @@
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Users, TrendingUp, Calendar } from "lucide-react";
-import { SchoolStats } from "@/types/school";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, GraduationCap, TrendingUp, Calendar } from "lucide-react";
 
 interface SchoolStatsCardsProps {
-  stats: SchoolStats;
+  stats: {
+    totalStudents: number;
+    totalTeachers: number;
+    averageProgress: number;
+    attendanceRate: number;
+  };
 }
 
 const SchoolStatsCards = ({ stats }: SchoolStatsCardsProps) => {
+  console.log('[SchoolStatsCards] Rendering with stats:', stats);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <Users className="w-8 h-8 text-blue-500" />
-            <div>
-              <p className="text-2xl font-bold text-white">{stats.totalStudents}</p>
-              <p className="text-gray-400">Elever</p>
-            </div>
-          </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-gray-300">Total Students</CardTitle>
+          <Users className="h-4 w-4 text-blue-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{stats.totalStudents}</div>
         </CardContent>
       </Card>
+
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <Users className="w-8 h-8 text-green-500" />
-            <div>
-              <p className="text-2xl font-bold text-white">{stats.totalTeachers}</p>
-              <p className="text-gray-400">Lærere</p>
-            </div>
-          </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-gray-300">Total Teachers</CardTitle>
+          <GraduationCap className="h-4 w-4 text-green-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{stats.totalTeachers}</div>
         </CardContent>
       </Card>
+
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <TrendingUp className="w-8 h-8 text-purple-500" />
-            <div>
-              <p className="text-2xl font-bold text-white">{stats.averageProgress}%</p>
-              <p className="text-gray-400">Gennemsnit fremskridt</p>
-            </div>
-          </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-gray-300">Average Progress</CardTitle>
+          <TrendingUp className="h-4 w-4 text-purple-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{stats.averageProgress}%</div>
         </CardContent>
       </Card>
+
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <Calendar className="w-8 h-8 text-orange-500" />
-            <div>
-              <p className="text-2xl font-bold text-white">{stats.attendanceRate}%</p>
-              <p className="text-gray-400">Fremmøde</p>
-            </div>
-          </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-gray-300">Attendance Rate</CardTitle>
+          <Calendar className="h-4 w-4 text-orange-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{stats.attendanceRate}%</div>
         </CardContent>
       </Card>
     </div>
