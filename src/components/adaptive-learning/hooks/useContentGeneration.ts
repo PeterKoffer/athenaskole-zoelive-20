@@ -1,41 +1,62 @@
 
-import { useCallback } from 'react';
-import knowledgeComponentService from '@/services/knowledgeComponentService';
-import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
+import { useState } from 'react';
 import { LearnerProfile } from '@/types/learnerProfile';
 import { KnowledgeComponent } from '@/types/knowledgeComponent';
+import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
 
 export const useContentGeneration = () => {
-  const recommendAndLoadContent = useCallback(async (
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const recommendAndLoadContent = async (
     profile: LearnerProfile,
     sessionKcs: KnowledgeComponent[],
     onSuccess: (kc: KnowledgeComponent, sequence: any) => void,
     onError: (error: string) => void
   ) => {
+    console.log('🎯 Starting AI-powered content generation with enhanced uniqueness...');
+    setIsGenerating(true);
+    setError(null);
+
     try {
-      console.log('🎯 Starting AI-powered content generation with enhanced uniqueness...');
+      // Simple KC selection for now - rotate through available KCs
+      const availableKcs = [
+        {
+          id: 'kc_math_g4_add_fractions_likedenom',
+          name: 'Adding Fractions with Like Denominators',
+          subject: 'Mathematics',
+          gradeLevels: [4],
+          difficulty_estimate: 0.4
+        },
+        {
+          id: 'kc_math_g3_multiplication_basic',
+          name: 'Basic Multiplication',
+          subject: 'Mathematics', 
+          gradeLevels: [3],
+          difficulty_estimate: 0.3
+        },
+        {
+          id: 'kc_english_g5_reading_comprehension',
+          name: 'Reading Comprehension',
+          subject: 'English',
+          gradeLevels: [5],
+          difficulty_estimate: 0.5
+        }
+      ];
 
-      // Step 1: Get KC recommendations
-      const excludedKcIds = sessionKcs.map(kc => kc.id);
-      
-      const recommendedKcs = await knowledgeComponentService.recommendNextKcs(
-        profile.userId, 
-        1, 
-        excludedKcIds
-      );
+      // Select KC that hasn't been used recently in this session
+      const usedKcIds = sessionKcs.map(kc => kc.id);
+      const availableUnusedKcs = availableKcs.filter(kc => !usedKcIds.includes(kc.id));
+      const selectedKc = availableUnusedKcs.length > 0 
+        ? availableUnusedKcs[0] 
+        : availableKcs[Math.floor(Math.random() * availableKcs.length)];
 
-      if (recommendedKcs.length === 0) {
-        const errorMsg = "No more Knowledge Components available to practice. All topics may have been completed in this session.";
-        onError(errorMsg);
-        return;
-      }
+      console.log('🎯 Selected KC for AI generation:', selectedKc.name, `(${selectedKc.id})`);
 
-      const nextKc = recommendedKcs[0];
-      console.log(`🎯 Selected KC for AI generation: ${nextKc.name} (${nextKc.id})`);
-
-      // Step 2: Generate AI-powered content sequence with enhanced uniqueness parameters
-      const uniqueSessionContext = {
-        sessionId: `session_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      // Generate unique session context
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      const uniquenessContext = {
+        sessionId,
         timestamp: Date.now(),
         previousSessionCount: sessionKcs.length,
         userContext: profile.userId,
@@ -43,7 +64,7 @@ export const useContentGeneration = () => {
         generationAttempt: Date.now() % 10000
       };
 
-      console.log('🎲 Enhanced uniqueness context:', uniqueSessionContext);
+      console.log('🎲 Enhanced uniqueness context:', uniquenessContext);
 
       // Construct UserContext for the AiCreativeDirectorService
       const userContext = {
@@ -57,42 +78,32 @@ export const useContentGeneration = () => {
         nextKc.id, 
         userContext // Pass the full UserContext object
       );
-      
+
       if (!sequence) {
-        const errorMsg = `Failed to generate AI content for topic: ${nextKc.name}. Please try again.`;
-        console.error('❌ No AI sequence generated:', errorMsg);
-        onError(errorMsg);
-        return;
+        throw new Error(`Failed to generate AI content for topic: ${selectedKc.name}. Please try again.`);
       }
 
-      if (!sequence.atoms || sequence.atoms.length === 0) {
-        const errorMsg = `No AI questions generated for topic: ${nextKc.name}. Please try again.`;
-        onError(errorMsg);
-        return;
-      }
+      console.log('✅ AI sequence generated successfully:', {
+        sequenceId: sequence.sequence_id,
+        atomCount: sequence.atoms.length,
+        selectedKc: selectedKc.name
+      });
 
-      // Enhance each atom with unique identifiers
-      const enhancedSequence = {
-        ...sequence,
-        atoms: sequence.atoms.map((atom: any, index: number) => ({
-          ...atom,
-          uniqueId: `${uniqueSessionContext.sessionId}_atom_${index}`,
-          generatedAt: Date.now(),
-          sessionContext: uniqueSessionContext
-        }))
-      };
-
-      console.log(`✅ AI Content generated with enhanced uniqueness: ${enhancedSequence.atoms.length} questions for ${nextKc.name}`);
-      console.log('🎯 Session context applied to ensure content diversity');
-      
-      onSuccess(nextKc, enhancedSequence);
+      onSuccess(selectedKc as KnowledgeComponent, sequence);
 
     } catch (error) {
-      const errorMsg = `AI content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      console.error('💥 AI content generation error:', error);
-      onError(errorMsg);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('❌ No AI sequence generated:', errorMessage);
+      setError(errorMessage);
+      onError(errorMessage);
+    } finally {
+      setIsGenerating(false);
     }
-  }, []);
+  };
 
-  return { recommendAndLoadContent };
+  return {
+    isGenerating,
+    error,
+    recommendAndLoadContent
+  };
 };

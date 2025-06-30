@@ -114,5 +114,4 @@ class AiCreativeDirectorService implements IAiCreativeDirectorService {
   */
 }
 
-const aiCreativeDirectorService = new AiCreativeDirectorService();
-export default aiCreativeDirectorService;
+export default new AICreativeDirectorService();

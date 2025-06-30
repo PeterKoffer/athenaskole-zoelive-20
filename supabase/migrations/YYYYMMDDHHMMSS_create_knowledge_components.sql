@@ -58,7 +58,6 @@ COMMENT ON COLUMN public.knowledge_components.name IS 'Human-readable name of th
 COMMENT ON COLUMN public.knowledge_components.description IS 'Optional detailed description of the KC. TODO: Future localization considerations apply here as well.';
 COMMENT ON COLUMN public.knowledge_components.subject IS 'Subject domain of the KC, e.g., "Mathematics". TODO: Subject names may also need localization or a mapping table.';
 COMMENT ON COLUMN public.knowledge_components.grade_levels IS 'Array of applicable grade levels, e.g., [3, 4].';
-COMMENT ON COLUMN public.knowledge_components.curriculum_standards IS 'Array of links to specific curriculum standards; JSONB structure: [{standardId: "UUID_of_standard_in_curriculum_standards_table", standardSet: "CCSSM", description: "..."}].';
 COMMENT ON COLUMN public.knowledge_components.prerequisite_kcs IS 'Array of KC IDs that are prerequisites for this one.';
 COMMENT ON COLUMN public.knowledge_components.postrequisite_kcs IS 'Array of KC IDs that this KC is a prerequisite for.';
 COMMENT ON COLUMN public.knowledge_components.difficulty_estimate IS 'Initial estimate of difficulty (e.g., value between 0.0 and 1.0, or a 1-5 scale).';

@@ -519,6 +519,54 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_components: {
+        Row: {
+          created_at: string
+          curriculum_standards: Json | null
+          description: string | null
+          difficulty_estimate: number | null
+          domain: string | null
+          grade_levels: number[] | null
+          id: string
+          name: string
+          postrequisite_kcs: string[] | null
+          prerequisite_kcs: string[] | null
+          subject: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          curriculum_standards?: Json | null
+          description?: string | null
+          difficulty_estimate?: number | null
+          domain?: string | null
+          grade_levels?: number[] | null
+          id: string
+          name: string
+          postrequisite_kcs?: string[] | null
+          prerequisite_kcs?: string[] | null
+          subject: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          curriculum_standards?: Json | null
+          description?: string | null
+          difficulty_estimate?: number | null
+          domain?: string | null
+          grade_levels?: number[] | null
+          id?: string
+          name?: string
+          postrequisite_kcs?: string[] | null
+          prerequisite_kcs?: string[] | null
+          subject?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       learner_profiles: {
         Row: {
           created_at: string

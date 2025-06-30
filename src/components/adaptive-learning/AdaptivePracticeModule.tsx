@@ -10,6 +10,7 @@ import { ContentAtom } from '@/types/content';
 import learnerProfileService from '@/services/learnerProfileService';
 import { useContentGeneration } from './hooks/useContentGeneration';
 import { useToast } from '@/hooks/use-toast';
+import ContentAtomRenderer from './ContentAtomRenderer';
 
 interface AdaptivePracticeModuleProps {
   onBack: () => void;
@@ -25,7 +26,6 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('Loading your profile...');
-  const [showServiceTests, setShowServiceTests] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
   
   const { recommendAndLoadContent } = useContentGeneration();
@@ -40,9 +40,9 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     currentAtomIndex,
     totalAtoms,
     hasCurrentAtom: !!currentAtom,
+    currentAtomType: currentAtom?.atom_type,
     isLoading,
     error,
-    showServiceTests,
     sessionId
   });
 
@@ -93,8 +93,13 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
       profile,
       sessionKcs,
       (kc, sequence) => {
-        console.log('✅ Content generated successfully:', kc.name, sequence.atoms.length, 'atoms');
-        console.log('🎯 Session ID:', sessionId, 'Question batch:', Math.random());
+        console.log('✅ Content generated successfully:', {
+          kcName: kc.name,
+          atomsCount: sequence.atoms.length,
+          atomTypes: sequence.atoms.map(atom => atom.atom_type),
+          sessionId
+        });
+        
         setCurrentKc(kc);
         setAtomSequence(sequence);
         setSessionKcs(prev => [...prev, kc]);
@@ -114,8 +119,13 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     );
   };
 
-  const handleAtomComplete = (atomResult: any) => {
-    console.log('📝 Atom completed:', atomResult);
+  const handleQuestionComplete = (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => {
+    console.log('📝 Question completed:', {
+      ...result,
+      questionIndex: currentAtomIndex,
+      totalQuestions: totalAtoms,
+      atomType: currentAtom?.atom_type
+    });
     
     if (currentAtomIndex < totalAtoms - 1) {
       setCurrentAtomIndex(prev => prev + 1);
@@ -230,43 +240,12 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
           </Card>
         </div>
 
-        {currentAtom && (
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  Dynamic Content Test
-                </h3>
-                <div className="bg-blue-900/30 p-4 rounded-lg mb-4">
-                  <p className="text-blue-300 text-sm mb-2">
-                    <strong>Session ID:</strong> {sessionId}
-                  </p>
-                  <p className="text-blue-300 text-sm mb-2">
-                    <strong>Question #{currentAtomIndex + 1}:</strong> KC: {currentKc?.name}
-                  </p>
-                  <p className="text-blue-300 text-sm">
-                    <strong>Timestamp:</strong> {new Date().toLocaleTimeString()}
-                  </p>
-                </div>
-                <p className="text-gray-400 mb-4">
-                  Content atom renderer is being implemented. Each question should be unique based on session context.
-                </p>
-                <Button 
-                  onClick={() => handleAtomComplete({
-                    sessionId,
-                    timestamp: Date.now(),
-                    questionIndex: currentAtomIndex
-                  })}
-                  className="mt-4"
-                >
-                  Continue to Next Question ({currentAtomIndex + 1}/{totalAtoms})
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {!currentAtom && !isLoading && (
+        {currentAtom ? (
+          <ContentAtomRenderer
+            atom={currentAtom}
+            onComplete={handleQuestionComplete}
+          />
+        ) : (
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6 text-center">
               <p className="text-gray-400">No content available</p>

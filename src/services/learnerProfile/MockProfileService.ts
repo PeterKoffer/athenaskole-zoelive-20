@@ -1,119 +1,54 @@
 
 // src/services/learnerProfile/MockProfileService.ts
 
-import { LearnerProfile, KcMastery } from '@/types/learnerProfile';
+import { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
 
-// Test user for Supabase integration testing - matches the one we created in Supabase
 export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012';
 
 export class MockProfileService {
-  createMockProfile(userId: string): LearnerProfile {
-    console.log(`MockProfileService: Creating mock profile for testing user ${userId}`);
+  async getProfile(userId: string): Promise<LearnerProfile | null> {
+    console.log(`🔍 MockProfileService: Getting profile for user ${userId}`);
     
-    const mockProfile: LearnerProfile = {
-      userId: userId,
-      kcMasteryMap: {
-        'kc_math_g4_add_fractions_likedenom': {
-          kcId: 'kc_math_g4_add_fractions_likedenom',
-          masteryLevel: 0.3,
-          attempts: 2,
-          correctAttempts: 1,
-          lastAttemptedTimestamp: Date.now() - 24 * 60 * 60 * 1000, // 1 day ago
-          history: [
-            {
-              timestamp: Date.now() - 24 * 60 * 60 * 1000,
-              eventType: 'QUESTION_ATTEMPT',
-              score: 0.5,
-              details: { isCorrect: true }
-            }
-          ]
-        },
-        'kc_math_g4_subtract_fractions_likedenom': {
-          kcId: 'kc_math_g4_subtract_fractions_likedenom',
-          masteryLevel: 0.1,
-          attempts: 1,
-          correctAttempts: 0,
-          lastAttemptedTimestamp: Date.now() - 48 * 60 * 60 * 1000, // 2 days ago
-          history: [
-            {
-              timestamp: Date.now() - 48 * 60 * 60 * 1000,
-              eventType: 'QUESTION_ATTEMPT',
-              score: 0.0,
-              details: { isCorrect: false }
-            }
-          ]
-        }
-      },
-      preferences: {
-        learningPace: 'medium',
-        learningStyle: 'visual'
-      },
-      lastUpdatedTimestamp: Date.now(),
-      overallMastery: 0.2,
-      currentLearningFocusKcs: ['kc_math_g4_add_fractions_likedenom'],
-      suggestedNextKcs: ['kc_math_g5_multiply_decimals']
+    // Return a mock profile for testing
+    const mockKcMasteryMap: Record<string, KnowledgeComponentMastery> = {
+      'add_fractions_likedenom': {
+        kcId: 'add_fractions_likedenom',
+        masteryLevel: 0.6,
+        attempts: 5,
+        correctAttempts: 3,
+        lastAttemptTimestamp: Date.now() - 86400000, // 1 day ago
+        history: []
+      }
     };
 
+    const mockPreferences: LearnerPreferences = {
+      learningStyle: 'mixed',
+      difficultyPreference: 0.5,
+      sessionLength: 20
+    };
+
+    const mockProfile: LearnerProfile = {
+      userId: userId,
+      kcMasteryMap: mockKcMasteryMap,
+      preferences: mockPreferences,
+      recentPerformance: [],
+      overallMastery: 0.6,
+      lastUpdatedTimestamp: Date.now(),
+      createdAt: Date.now() - 7 * 86400000 // 7 days ago
+    };
+
+    console.log(`✅ MockProfileService: Returning mock profile for user ${userId}`);
     return mockProfile;
   }
 
-  updateMockKcMastery(
-    profile: LearnerProfile,
-    kcId: string,
-    eventDetails: {
-      isCorrect?: boolean;
-      newAttempt?: boolean;
-      score?: number;
-      interactionType: string;
-      interactionDetails?: any;
-    }
-  ): LearnerProfile {
-    console.log('MockProfileService: Mock KC mastery update for testing');
-    
-    // Update the mock profile with new mastery data
-    let kcMastery = profile.kcMasteryMap[kcId];
-    if (!kcMastery) {
-      kcMastery = {
-        kcId,
-        masteryLevel: eventDetails.isCorrect ? 0.3 : 0.1,
-        attempts: 1,
-        correctAttempts: eventDetails.isCorrect ? 1 : 0,
-        history: []
-      };
-    } else {
-      if (eventDetails.newAttempt) {
-        kcMastery.attempts += 1;
-      }
-      if (eventDetails.isCorrect) {
-        kcMastery.correctAttempts += 1;
-        kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + 0.1);
-      } else {
-        kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - 0.05);
-      }
-    }
-    
-    kcMastery.lastAttemptedTimestamp = Date.now();
-    kcMastery.history = kcMastery.history || [];
-    kcMastery.history.unshift({
-      timestamp: Date.now(),
-      eventType: eventDetails.interactionType,
-      score: eventDetails.score,
-      details: eventDetails.interactionDetails
-    });
-    
-    profile.kcMasteryMap[kcId] = kcMastery;
-    profile.lastUpdatedTimestamp = Date.now();
-    
-    return profile;
+  async updateProfile(profile: LearnerProfile): Promise<void> {
+    console.log(`🔄 MockProfileService: Mock update for user ${profile.userId}`);
+    // In a real implementation, this would persist the changes
   }
 
-  updateMockPreferences(
-    profile: LearnerProfile,
-    preferences: Partial<LearnerProfile['preferences']>
-  ): LearnerProfile {
-    console.log('MockProfileService: Mock preferences update for testing');
-    profile.preferences = { ...profile.preferences, ...preferences };
-    return profile;
+  async createInitialProfile(userId: string): Promise<LearnerProfile> {
+    console.log(`🆕 MockProfileService: Creating initial profile for user ${userId}`);
+    return this.getProfile(userId) as Promise<LearnerProfile>;
   }
 }
 

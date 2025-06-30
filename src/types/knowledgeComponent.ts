@@ -1,9 +1,6 @@
+
 // src/types/knowledgeComponent.ts
 
-/**
- * Represents a single, fine-grained Knowledge Component (KC).
- * KCs are the smallest units of knowledge or skill that the system tracks.
- */
 export interface KnowledgeComponent {
   id: string; // Unique identifier for the KC, e.g., "kc_math_g4_add_fractions_likedenom"
   // TODO: Future localization: name and description will need to be translatable.
