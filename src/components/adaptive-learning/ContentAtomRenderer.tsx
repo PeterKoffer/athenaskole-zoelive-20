@@ -26,13 +26,25 @@ const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps
   // Route to appropriate renderer based on atom type
   switch (atom.atom_type) {
     case 'TEXT_EXPLANATION':
-      return <TextExplanationRenderer atom={atom} onComplete={onComplete} />;
+      return (
+        <TextExplanationRenderer 
+          content={atom.content || {}} 
+          atomId={atom.atom_id} 
+          onComplete={onComplete} 
+        />
+      );
     
     case 'QUESTION_MULTIPLE_CHOICE':
       return <StableMultipleChoiceRenderer atom={atom} onComplete={onComplete} />;
     
     case 'INTERACTIVE_EXERCISE':
-      return <InteractiveExerciseRenderer atom={atom} onComplete={onComplete} />;
+      return (
+        <InteractiveExerciseRenderer 
+          content={atom.content || {}} 
+          atomId={atom.atom_id} 
+          onComplete={onComplete} 
+        />
+      );
     
     default:
       console.warn('⚠️ Unknown atom type:', atom.atom_type);
