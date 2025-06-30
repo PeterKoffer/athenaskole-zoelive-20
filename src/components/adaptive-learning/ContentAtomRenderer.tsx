@@ -20,13 +20,14 @@ const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps
     atomId: atom.atom_id,
     atomType: atom.atom_type,
     hasContent: !!atom.content,
-    contentKeys: atom.content ? Object.keys(atom.content) : []
+    contentKeys: atom.content ? Object.keys(atom.content) : [],
+    fullAtom: atom
   });
 
   // Route to appropriate renderer based on atom type
   switch (atom.atom_type) {
     case 'TEXT_EXPLANATION':
-      console.log('📝 Rendering TEXT_EXPLANATION with TextExplanationRenderer');
+      console.log('📝 Routing to TextExplanationRenderer');
       return (
         <TextExplanationRenderer 
           content={atom.content || {}} 
@@ -36,11 +37,12 @@ const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps
       );
     
     case 'QUESTION_MULTIPLE_CHOICE':
-      console.log('❓ Rendering QUESTION_MULTIPLE_CHOICE with StableMultipleChoiceRenderer');
+      console.log('❓ Routing to StableMultipleChoiceRenderer');
+      console.log('❓ Atom data being passed:', JSON.stringify(atom, null, 2));
       return <StableMultipleChoiceRenderer atom={atom} onComplete={onComplete} />;
     
     case 'INTERACTIVE_EXERCISE':
-      console.log('🎮 Rendering INTERACTIVE_EXERCISE with InteractiveExerciseRenderer');
+      console.log('🎮 Routing to InteractiveExerciseRenderer');
       return (
         <InteractiveExerciseRenderer 
           content={atom.content || {}} 
@@ -50,7 +52,8 @@ const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps
       );
     
     default:
-      console.warn('⚠️ Unknown atom type:', atom.atom_type);
+      console.warn('⚠️ Unknown atom type, using fallback:', atom.atom_type);
+      console.warn('⚠️ Full atom data:', JSON.stringify(atom, null, 2));
       return <FallbackRenderer atom={atom} onComplete={onComplete} />;
   }
 });

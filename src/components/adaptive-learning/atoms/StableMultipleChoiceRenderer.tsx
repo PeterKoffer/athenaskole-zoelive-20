@@ -15,6 +15,14 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
   const [startTime] = useState(Date.now());
   const [isCompleted, setIsCompleted] = useState(false);
 
+  console.log('🎯 StableMultipleChoiceRenderer received atom:', {
+    atomId: atom?.atom_id,
+    atomType: atom?.atom_type,
+    hasContent: !!atom?.content,
+    contentKeys: atom?.content ? Object.keys(atom.content) : [],
+    content: atom?.content
+  });
+
   // Prevent multiple completions
   const handleComplete = useCallback(() => {
     if (isCompleted || selectedAnswer === null) return;
@@ -39,6 +47,12 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
   const handleAnswerSelect = useCallback((answerIndex: number) => {
     if (showResult || isCompleted) return;
     
+    console.log('👆 Answer selected:', {
+      answerIndex,
+      atomId: atom?.atom_id,
+      question: atom?.content?.question
+    });
+    
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     
@@ -46,13 +60,15 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
     setTimeout(() => {
       handleComplete();
     }, 2000);
-  }, [showResult, isCompleted, handleComplete]);
+  }, [showResult, isCompleted, handleComplete, atom]);
 
   if (!atom?.content) {
+    console.error('❌ StableMultipleChoiceRenderer: No content in atom:', atom);
     return (
       <Card className="bg-red-900/20 border-red-700">
         <CardContent className="p-4">
           <p className="text-red-400">Error: Invalid question data</p>
+          <pre className="text-xs text-red-300 mt-2">{JSON.stringify(atom, null, 2)}</pre>
         </CardContent>
       </Card>
     );
@@ -60,6 +76,18 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
 
   const correctAnswer = atom.content.correctAnswer ?? atom.content.correct ?? 0;
   const options = atom.content.options || [];
+
+  if (!options.length) {
+    console.error('❌ StableMultipleChoiceRenderer: No options found:', atom.content);
+    return (
+      <Card className="bg-red-900/20 border-red-700">
+        <CardContent className="p-4">
+          <p className="text-red-400">Error: No answer options available</p>
+          <pre className="text-xs text-red-300 mt-2">{JSON.stringify(atom.content, null, 2)}</pre>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-gray-800 border-gray-700">
