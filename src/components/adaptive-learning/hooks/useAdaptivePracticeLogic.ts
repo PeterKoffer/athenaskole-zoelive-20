@@ -15,6 +15,45 @@ interface AdaptivePracticeState {
   error: string | null;
 }
 
+// Dynamic Knowledge Components for variety
+const DIVERSE_KCS = [
+  {
+    id: 'kc_math_g4_add_fractions_likedenom',
+    name: 'Adding Fractions with Like Denominators',
+    subject: 'Mathematics',
+    gradeLevels: [4],
+    difficulty_estimate: 0.4
+  },
+  {
+    id: 'kc_math_g5_multiply_decimals',
+    name: 'Multiplying Decimal Numbers',
+    subject: 'Mathematics',
+    gradeLevels: [5],
+    difficulty_estimate: 0.6
+  },
+  {
+    id: 'kc_math_g3_basic_division',
+    name: 'Basic Division with Remainders',
+    subject: 'Mathematics',
+    gradeLevels: [3],
+    difficulty_estimate: 0.5
+  },
+  {
+    id: 'kc_math_g4_area_rectangles',
+    name: 'Finding Area of Rectangles',
+    subject: 'Mathematics',
+    gradeLevels: [4],
+    difficulty_estimate: 0.4
+  },
+  {
+    id: 'kc_math_g5_equivalent_fractions',
+    name: 'Understanding Equivalent Fractions',
+    subject: 'Mathematics',
+    gradeLevels: [5],
+    difficulty_estimate: 0.7
+  }
+];
+
 export const useAdaptivePracticeLogic = () => {
   const { toast } = useToast();
   
@@ -27,10 +66,27 @@ export const useAdaptivePracticeLogic = () => {
     error: null
   });
 
+  // Track used KCs to ensure variety
+  const [usedKcIds, setUsedKcIds] = useState<Set<string>>(new Set());
+
   // Load initial profile and generate content
   useEffect(() => {
     loadInitialContent();
   }, []);
+
+  const getRandomKc = useCallback(() => {
+    // Filter out already used KCs if we haven't used all of them
+    const availableKcs = usedKcIds.size < DIVERSE_KCS.length 
+      ? DIVERSE_KCS.filter(kc => !usedKcIds.has(kc.id))
+      : DIVERSE_KCS; // Reset if all have been used
+
+    // Select random KC
+    const randomIndex = Math.floor(Math.random() * availableKcs.length);
+    const selectedKc = availableKcs[randomIndex];
+    
+    console.log('🎲 Selected random KC:', selectedKc.name, 'from', availableKcs.length, 'available');
+    return selectedKc;
+  }, [usedKcIds]);
 
   const loadInitialContent = async () => {
     console.log('🚀 AdaptivePracticeModule: Loading initial profile...');
@@ -48,16 +104,13 @@ export const useAdaptivePracticeLogic = () => {
 
       console.log('✅ Profile loaded successfully:', profile.userId);
 
-      // Generate AI content using ContentOrchestrator
-      const selectedKc = {
-        id: 'kc_math_g4_add_fractions_likedenom',
-        name: 'Adding Fractions with Like Denominators',
-        subject: 'Mathematics',
-        gradeLevels: [4],
-        difficulty_estimate: 0.4
-      };
+      // Select a diverse KC
+      const selectedKc = getRandomKc();
+      
+      // Add to used KCs
+      setUsedKcIds(prev => new Set([...prev, selectedKc.id]));
 
-      console.log('🎯 Generating atom sequence for KC:', selectedKc.id);
+      console.log('🎯 Generating diverse atom sequence for KC:', selectedKc.id);
       const atomSequence = await ContentOrchestrator.getAtomSequenceForKc(
         selectedKc.id, 
         profile.userId
@@ -70,7 +123,8 @@ export const useAdaptivePracticeLogic = () => {
       console.log('✅ AI atom sequence loaded:', {
         sequenceId: atomSequence.sequence_id,
         atomCount: atomSequence.atoms.length,
-        firstAtomType: atomSequence.atoms[0]?.atom_type
+        firstAtomType: atomSequence.atoms[0]?.atom_type,
+        kcName: selectedKc.name
       });
 
       setState({
@@ -111,8 +165,8 @@ export const useAdaptivePracticeLogic = () => {
     const nextIndex = state.currentAtomIndex + 1;
     
     if (nextIndex >= state.atomSequence.atoms.length) {
-      console.log('🔄 End of sequence reached, generating new content...');
-      // Generate new content when we reach the end
+      console.log('🔄 End of sequence reached, generating NEW diverse content...');
+      // Generate new content with a different KC when we reach the end
       loadInitialContent();
       return;
     }

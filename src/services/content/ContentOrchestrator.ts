@@ -6,7 +6,7 @@ class ContentOrchestrator {
   async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
     const forceAIGenerationForTesting = true; // Enable AI generation for testing
     try {
-      console.log('🎯 ContentOrchestrator: Generating atom sequence for KC:', kcId);
+      console.log('🎯 ContentOrchestrator: Generating diverse atom sequence for KC:', kcId);
       
       // Step 1: Try database first (unless forcing AI)
       if (!forceAIGenerationForTesting) {
@@ -16,14 +16,29 @@ class ContentOrchestrator {
         }
       }
 
-      // Step 2: Try AI generation
+      // Step 2: Enhanced AI generation with variety
+      const diversityPrompts = [
+        'Create unique and engaging examples',
+        'Use real-world scenarios and applications',
+        'Include creative problem-solving approaches',
+        'Design interactive and hands-on activities',
+        'Focus on visual and conceptual understanding'
+      ];
+
+      const randomPrompt = diversityPrompts[Math.floor(Math.random() * diversityPrompts.length)];
+      const sessionId = `diverse_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
       const request: ContentGenerationRequest = {
         kcId,
         userId,
         contentTypes: ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE', 'INTERACTIVE_EXERCISE'],
-        maxAtoms: 3
+        maxAtoms: 3,
+        diversityPrompt: randomPrompt,
+        sessionId: sessionId,
+        forceUnique: true
       };
 
+      console.log('🎨 Using diversity prompt:', randomPrompt);
       const aiAtoms = await ContentGenerationService.generateFromAI(request);
       if (aiAtoms.length > 0) {
         return this.createAtomSequence('ai_generated', aiAtoms, kcId, userId);
@@ -50,7 +65,7 @@ class ContentOrchestrator {
     console.log(`✅ Created ${source} sequence:`, {
       sequenceId,
       atomCount: atoms.length,
-      kcId
+      kcId: kcId.split('_').pop()
     });
 
     return {
