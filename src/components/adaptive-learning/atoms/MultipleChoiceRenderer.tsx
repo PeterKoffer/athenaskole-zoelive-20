@@ -33,8 +33,18 @@ const MultipleChoiceRenderer = ({ content, atomId, onComplete }: MultipleChoiceR
     explanation: content.correctFeedback || content.generalIncorrectFeedback || content.explanation || 'Great work!'
   };
 
+  console.log('❓ MultipleChoiceRenderer rendering:', {
+    atomId,
+    hasQuestion: !!questionData.question,
+    optionsCount: questionData.options.length,
+    correctAnswer: questionData.correctAnswer,
+    hasExplanation: !!questionData.explanation
+  });
+
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return;
+    
+    console.log('👆 Answer selected:', answerIndex);
     setSelectedAnswer(answerIndex);
   };
 
@@ -43,6 +53,13 @@ const MultipleChoiceRenderer = ({ content, atomId, onComplete }: MultipleChoiceR
     
     const timeSpent = Date.now() - startTime;
     const isCorrect = selectedAnswer === questionData.correctAnswer;
+    
+    console.log('📊 Question submitted:', {
+      selectedAnswer,
+      correctAnswer: questionData.correctAnswer,
+      isCorrect,
+      timeSpent
+    });
     
     setShowResult(true);
     

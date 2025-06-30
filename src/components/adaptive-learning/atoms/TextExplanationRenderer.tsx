@@ -19,8 +19,17 @@ interface TextExplanationRendererProps {
 const TextExplanationRenderer = ({ content, atomId, onComplete }: TextExplanationRendererProps) => {
   const [startTime] = useState(Date.now());
 
+  console.log('📖 TextExplanationRenderer rendering:', {
+    atomId,
+    hasTitle: !!content.title,
+    hasExplanation: !!content.explanation,
+    hasExamples: !!content.examples,
+    examplesCount: content.examples?.length || 0
+  });
+
   useEffect(() => {
     const timer = setTimeout(() => {
+      console.log('⏰ Auto-completing text explanation after 5 seconds');
       onComplete({
         isCorrect: true,
         selectedAnswer: 0,
@@ -30,6 +39,15 @@ const TextExplanationRenderer = ({ content, atomId, onComplete }: TextExplanatio
 
     return () => clearTimeout(timer);
   }, [onComplete, startTime]);
+
+  const handleManualContinue = () => {
+    console.log('👆 Manual continue clicked');
+    onComplete({
+      isCorrect: true,
+      selectedAnswer: 0,
+      timeSpent: Date.now() - startTime
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -69,11 +87,7 @@ const TextExplanationRenderer = ({ content, atomId, onComplete }: TextExplanatio
               Automatically continuing in a few seconds...
             </div>
             <Button
-              onClick={() => onComplete({
-                isCorrect: true,
-                selectedAnswer: 0,
-                timeSpent: Date.now() - startTime
-              })}
+              onClick={handleManualContinue}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               Continue

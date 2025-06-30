@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     currentAtomIndex,
     totalAtoms,
     hasCurrentAtom: !!currentAtom,
+    currentAtomType: currentAtom?.atom_type,
     isLoading,
     error,
     sessionId
@@ -91,8 +93,13 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
       profile,
       sessionKcs,
       (kc, sequence) => {
-        console.log('✅ Content generated successfully:', kc.name, sequence.atoms.length, 'atoms');
-        console.log('🎯 Session ID:', sessionId, 'Question batch:', Math.random());
+        console.log('✅ Content generated successfully:', {
+          kcName: kc.name,
+          atomsCount: sequence.atoms.length,
+          atomTypes: sequence.atoms.map(atom => atom.atom_type),
+          sessionId
+        });
+        
         setCurrentKc(kc);
         setAtomSequence(sequence);
         setSessionKcs(prev => [...prev, kc]);
@@ -116,7 +123,8 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     console.log('📝 Question completed:', {
       ...result,
       questionIndex: currentAtomIndex,
-      totalQuestions: totalAtoms
+      totalQuestions: totalAtoms,
+      atomType: currentAtom?.atom_type
     });
     
     if (currentAtomIndex < totalAtoms - 1) {

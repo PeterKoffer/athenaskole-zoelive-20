@@ -10,12 +10,18 @@ interface ContentAtomRendererProps {
 }
 
 const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => {
-  console.log('🔍 ContentAtomRenderer atom:', {
+  console.log('🎯 ContentAtomRenderer routing atom:', {
     atomId: atom.atom_id,
     atomType: atom.atom_type,
-    content: atom.content,
-    contentKeys: Object.keys(atom.content || {})
+    hasContent: !!atom.content,
+    contentKeys: atom.content ? Object.keys(atom.content) : []
   });
+
+  // Validate atom structure
+  if (!atom || !atom.atom_id || !atom.atom_type) {
+    console.error('❌ Invalid atom structure:', atom);
+    return <FallbackRenderer atom={atom} onComplete={onComplete} />;
+  }
 
   // Route to appropriate renderer based on atom type
   switch (atom.atom_type) {
@@ -46,6 +52,7 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
       );
 
     default:
+      console.warn('🔄 Unknown atom type, using fallback:', atom.atom_type);
       return <FallbackRenderer atom={atom} onComplete={onComplete} />;
   }
 };
