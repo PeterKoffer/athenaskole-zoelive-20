@@ -7,6 +7,9 @@ export interface ContentGenerationRequest {
   difficultyLevel?: number;
   contentTypes?: string[];
   maxAtoms?: number;
+  diversityPrompt?: string;
+  sessionId?: string;
+  forceUnique?: boolean;
 }
 
 export interface AtomSequence {
@@ -60,7 +63,10 @@ class ContentGenerationService {
           kcId: request.kcId,
           userId: request.userId,
           contentTypes: request.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE', 'INTERACTIVE_EXERCISE'],
-          maxAtoms: request.maxAtoms || 3
+          maxAtoms: request.maxAtoms || 3,
+          diversityPrompt: request.diversityPrompt,
+          sessionId: request.sessionId,
+          forceUnique: request.forceUnique
         }
       });
 
