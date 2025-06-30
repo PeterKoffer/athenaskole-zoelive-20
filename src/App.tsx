@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/hooks/useAuth';
@@ -17,7 +16,7 @@ import StudentDashboard from '@/pages/StudentDashboard';
 import ParentDashboard from '@/pages/ParentDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import DailyProgram from '@/pages/DailyProgram';
-import Curriculum from '@/pages/Curriculum';
+import CurriculumSystem from '@/pages/CurriculumSystem';
 
 // Education pages
 import MathematicsLearning from '@/components/education/MathematicsLearning';
@@ -57,7 +56,7 @@ function AppContent() {
       
       {/* Program Routes */}
       <Route path="/daily-program" element={<DailyProgram />} />
-      <Route path="/curriculum" element={<Curriculum />} />
+      <Route path="/curriculum" element={<CurriculumSystem />} />
       
       {/* Learning Routes */}
       <Route path="/learn/mathematics" element={<MathematicsLearning />} />
