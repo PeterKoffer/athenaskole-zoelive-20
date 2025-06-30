@@ -2,6 +2,7 @@
 import { ContentAtom } from '@/types/content';
 import TextExplanationRenderer from './atoms/TextExplanationRenderer';
 import MultipleChoiceRenderer from './atoms/MultipleChoiceRenderer';
+import InteractiveExerciseRenderer from './atoms/InteractiveExerciseRenderer';
 import FallbackRenderer from './atoms/FallbackRenderer';
 
 interface ContentAtomRendererProps {
@@ -45,6 +46,24 @@ const ContentAtomRenderer = ({ atom, onComplete }: ContentAtomRendererProps) => 
             correctFeedback?: string;
             generalIncorrectFeedback?: string;
             explanation?: string;
+          }}
+          atomId={atom.atom_id}
+          onComplete={onComplete}
+        />
+      );
+
+    case 'INTERACTIVE_EXERCISE':
+      return (
+        <InteractiveExerciseRenderer
+          content={atom.content as {
+            title?: string;
+            description?: string;
+            exerciseType?: string;
+            components?: {
+              problem?: string;
+              answer?: string;
+              [key: string]: any;
+            };
           }}
           atomId={atom.atom_id}
           onComplete={onComplete}
