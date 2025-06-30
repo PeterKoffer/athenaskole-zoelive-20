@@ -130,7 +130,7 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
       console.error('KnowledgeComponentService: Error searching KCs:', error.message);
       throw error;
     }
-    
+
     // Additional client-side filtering for tags if the DB query is not sufficient
     return data ? data.filter(row => {
         const kc = mapRowToKc(row);
@@ -217,6 +217,44 @@ class KnowledgeComponentService implements IKnowledgeComponentService {
   //   }
   //   return data ? data.map(mapRowToKc) : [];
   // }
+
+  async recommendNextKcs(userId: string, count: number = 3, excludedKcIds: string[] = []): Promise<KnowledgeComponent[]> {
+    // This is a basic recommendation: fetch some KCs, not yet personalized to userId beyond exclusion.
+    // A more advanced version would look at KcMastery, prerequisites, learning goals, etc.
+    console.log(`KnowledgeComponentService (DB): Recommending ${count} KCs, excluding ${excludedKcIds.length} KCs for user ${userId}.`);
+
+    let query = supabase
+      .from('knowledge_components')
+      .select('*')
+      .limit(count + excludedKcIds.length); // Fetch a bit more to account for exclusions
+
+    if (excludedKcIds.length > 0) {
+      // Supabase `not('id', 'in', ...)` expects a string like `('id1','id2')`
+      // This can be problematic if an ID itself has a comma or quote.
+      // A safer way if IDs are complex is multiple .not() calls or a filter post-fetch.
+      // For now, assuming simple KC IDs. If IDs can have special chars, this needs care.
+      // Using a loop of .not() for safety with multiple exclusions.
+      excludedKcIds.forEach(id => {
+        query = query.not('id', 'eq', id);
+      });
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('KnowledgeComponentService (DB): Error fetching KCs for recommendation:', error.message);
+      return [];
+    }
+
+    if (!data) {
+      return [];
+    }
+
+    // Ensure we still respect the original count after potential over-fetching for exclusion
+    const finalRecommendations = data.map(mapRowToKc).slice(0, count);
+    console.log(`KnowledgeComponentService (DB): Recommended KCs:`, finalRecommendations.map(kc => kc.id));
+    return finalRecommendations;
+  }
 }
 
 export const knowledgeComponentService = new KnowledgeComponentService();
