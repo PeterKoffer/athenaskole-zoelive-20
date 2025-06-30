@@ -23,30 +23,6 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
     content: atom?.content
   });
 
-  const handleComplete = useCallback(() => {
-    if (isCompleted || selectedAnswer === null) {
-      console.log('⚠️ Complete blocked:', { isCompleted, selectedAnswer });
-      return;
-    }
-    
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    const correctAnswer = atom.content.correctAnswer ?? atom.content.correct ?? 0;
-    const isCorrect = selectedAnswer === correctAnswer;
-    
-    setIsCompleted(true);
-    
-    console.log('✅ Question completed:', {
-      selectedAnswer,
-      correctAnswer,
-      isCorrect,
-      timeSpent,
-      atomId: atom.atom_id
-    });
-    
-    // Call completion immediately without timeout
-    onComplete({ isCorrect, selectedAnswer, timeSpent });
-  }, [selectedAnswer, atom, startTime, onComplete, isCompleted]);
-
   const handleAnswerSelect = useCallback((answerIndex: number) => {
     if (showResult || isCompleted) return;
     
@@ -61,9 +37,26 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
   }, [showResult, isCompleted, atom]);
 
   const handleContinueClick = useCallback(() => {
-    console.log('🔄 Continue button clicked');
-    handleComplete();
-  }, [handleComplete]);
+    if (isCompleted || selectedAnswer === null) {
+      console.log('⚠️ Continue blocked:', { isCompleted, selectedAnswer });
+      return;
+    }
+    
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    const correctAnswer = atom.content.correctAnswer ?? atom.content.correct ?? 0;
+    const isCorrect = selectedAnswer === correctAnswer;
+    
+    console.log('✅ Question completed:', {
+      selectedAnswer,
+      correctAnswer,
+      isCorrect,
+      timeSpent,
+      atomId: atom.atom_id
+    });
+    
+    setIsCompleted(true);
+    onComplete({ isCorrect, selectedAnswer, timeSpent });
+  }, [selectedAnswer, atom, startTime, onComplete, isCompleted]);
 
   if (!atom?.content) {
     console.error('❌ StableMultipleChoiceRenderer: No content in atom:', atom);
@@ -96,7 +89,7 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center justify-between">
-          <span>AI Generated Question</span>
+          <span>Grade 5 Math Question</span>
           <Clock className="w-5 h-5 text-blue-400" />
         </CardTitle>
       </CardHeader>
