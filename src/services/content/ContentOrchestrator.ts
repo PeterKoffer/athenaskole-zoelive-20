@@ -5,10 +5,12 @@ import KnowledgeComponentService, { KnowledgeComponent } from './KnowledgeCompon
 class ContentOrchestrator {
   async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
     const forceAIGenerationForTesting = false; // REVERTED TEST FLAG
+    const forceAIGenerationForTesting = true; // Enable AI generation for testing
     try {
       console.log('🎯 ContentOrchestrator: Generating atom sequence for KC:', kcId);
       // console.log(`🧪 TEST MODE: forceAIGenerationForTesting is ${forceAIGenerationForTesting}`); // Commented out test log
       
+
       // Step 1: Try database first
       if (!forceAIGenerationForTesting) {
         // console.log('[ContentOrchestrator] Checking database for pre-built atoms (forceAIGenerationForTesting is false).'); // Commented out test log
@@ -21,6 +23,8 @@ class ContentOrchestrator {
       } else {
         // This path should ideally not be taken in production due to the flag above being false.
         console.warn('[ContentOrchestrator] 🧪 Skipping database check because forceAIGenerationForTesting is true. THIS SHOULD BE FALSE IN PRODUCTION.');
+      // Step 1: Try database first (unless forcing AI)
+      if (!forceAIGenerationForTesting) {
       }
 
       // Step 2: Try AI generation

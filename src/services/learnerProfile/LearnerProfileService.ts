@@ -184,6 +184,8 @@ class LearnerProfileService {
             correct_attempts: mastery.correctAttempts,
             last_attempted_timestamp: new Date(mastery.lastAttemptTimestamp).toISOString(),
             history: mastery.history
+          }, {
+            onConflict: 'user_id,kc_id'
           });
 
         if (kcError) {
@@ -207,7 +209,7 @@ class LearnerProfileService {
     interactionDetails?: any;
   }): Promise<LearnerProfile> {
     try {
-      console.log(`🔄 Updating KC mastery for user ${userId}, KC ${kcId}`);
+      console.log(`🔄 KC Mastery Update - User: ${userId}, KC: ${kcId}, Correct: ${masteryUpdate.isCorrect}`);
       
       // Get current mastery
       const { data: currentMastery, error: fetchError } = await supabase
@@ -228,6 +230,7 @@ class LearnerProfileService {
       let newHistory: InteractionEvent[];
 
       if (currentMastery) {
+        console.log(`📊 Existing mastery found - Level: ${currentMastery.mastery_level}, Attempts: ${currentMastery.attempts}`);
         // Update existing mastery
         newAttempts = currentMastery.attempts + (masteryUpdate.newAttempt ? 1 : 0);
         newCorrectAttempts = currentMastery.correct_attempts + (masteryUpdate.isCorrect ? 1 : 0);
@@ -242,6 +245,7 @@ class LearnerProfileService {
           details: masteryUpdate.interactionDetails
         }];
       } else {
+        console.log(`🆕 Creating new mastery record for KC: ${kcId}`);
         // Create new mastery record
         newAttempts = masteryUpdate.newAttempt ? 1 : 0;
         newCorrectAttempts = masteryUpdate.isCorrect ? 1 : 0;
@@ -254,7 +258,9 @@ class LearnerProfileService {
         }];
       }
 
-      // Update or insert mastery record
+      console.log(`📈 New mastery metrics - Level: ${newMasteryLevel}, Attempts: ${newAttempts}, Correct: ${newCorrectAttempts}`);
+
+      // Use upsert with proper conflict resolution
       const { error: upsertError } = await supabase
         .from('kc_mastery')
         .upsert({
@@ -271,8 +277,14 @@ class LearnerProfileService {
 
       if (upsertError) {
         console.error('Error updating KC mastery (upsert operation):', upsertError);
+        });
+
+      if (upsertError) {
+        console.error('❌ Error in KC mastery upsert:', upsertError);
         throw upsertError;
       }
+
+      console.log(`✅ KC mastery upsert successful`);
 
       // Return updated profile
       const updatedProfile = await this.getProfile(userId);
@@ -280,11 +292,11 @@ class LearnerProfileService {
         throw new Error('Failed to retrieve updated profile');
       }
 
-      console.log(`✅ Updated KC mastery for ${kcId}: ${newMasteryLevel}`);
+      console.log(`✅ Updated KC mastery for ${kcId}: ${newMasteryLevel.toFixed(3)} (${newCorrectAttempts}/${newAttempts})`);
       return updatedProfile;
 
     } catch (error) {
-      console.error('Error in updateKcMastery:', error);
+      console.error('❌ Critical error in updateKcMastery:', error);
       throw error;
     }
   }
