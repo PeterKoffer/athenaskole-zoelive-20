@@ -1,16 +1,12 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Brain, ArrowLeft, CheckCircle, Loader2, Lightbulb } from 'lucide-react';
-import { LearnerProfile } from '@/types/learnerProfile';
-import { KnowledgeComponent } from '@/types/knowledgeComponent';
-import { ContentAtom } from '@/types/content';
-import learnerProfileService from '@/services/learnerProfileService';
-import { useContentGeneration } from './hooks/useContentGeneration';
 import { useToast } from '@/hooks/use-toast';
 import ContentAtomRenderer from './ContentAtomRenderer';
+import { useAdaptivePracticeLogic } from './hooks/useAdaptivePracticeLogic';
 
 interface AdaptivePracticeModuleProps {
   onBack: () => void;
@@ -18,133 +14,58 @@ interface AdaptivePracticeModuleProps {
 
 const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
   const { toast } = useToast();
-  const [profile, setProfile] = useState<LearnerProfile | null>(null);
-  const [currentKc, setCurrentKc] = useState<KnowledgeComponent | null>(null);
-  const [atomSequence, setAtomSequence] = useState<any>(null);
-  const [currentAtomIndex, setCurrentAtomIndex] = useState(0);
-  const [sessionKcs, setSessionKcs] = useState<KnowledgeComponent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [loadingMessage, setLoadingMessage] = useState('Loading your profile...');
+  const { state, handleNextAtom, handleQuestionAnswer, handleRetry } = useAdaptivePracticeLogic();
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
-  
-  const { recommendAndLoadContent } = useContentGeneration();
 
-  const currentAtom = atomSequence?.atoms?.[currentAtomIndex] || null;
-  const totalAtoms = atomSequence?.atoms?.length || 0;
+  const currentAtom = state.atomSequence?.atoms?.[state.currentAtomIndex] || null;
+  const totalAtoms = state.atomSequence?.atoms?.length || 0;
 
   console.log('🔍 AdaptivePracticeModule state:', {
-    hasProfile: !!profile,
-    hasCurrentKc: !!currentKc,
-    hasAtomSequence: !!atomSequence,
-    currentAtomIndex,
+    hasProfile: !!state.learnerProfile,
+    hasCurrentKc: !!state.currentKc,
+    hasAtomSequence: !!state.atomSequence,
+    currentAtomIndex: state.currentAtomIndex,
     totalAtoms,
     hasCurrentAtom: !!currentAtom,
     currentAtomType: currentAtom?.atom_type,
-    isLoading,
-    error,
+    isLoading: state.isLoading,
+    error: state.error,
     sessionId
   });
-
-  // Load profile on mount
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  // Generate content when profile is ready
-  useEffect(() => {
-    if (profile && !isLoading && !currentKc) {
-      console.log('🎯 Profile ready, generating content...');
-      generateContent();
-    }
-  }, [profile, isLoading, currentKc]);
-
-  const loadProfile = async () => {
-    try {
-      console.log('🚀 AdaptivePracticeModule: Loading initial profile...');
-      setLoadingMessage('Analyzing your learning profile...');
-      
-      const testUserId = '12345678-1234-5678-9012-123456789012';
-      const loadedProfile = await learnerProfileService.getProfile(testUserId);
-      
-      if (loadedProfile) {
-        console.log('✅ Profile loaded successfully:', loadedProfile.userId);
-        setProfile(loadedProfile);
-      } else {
-        throw new Error('Failed to load profile');
-      }
-    } catch (error) {
-      console.error('❌ Error loading profile:', error);
-      setError('Failed to load learning profile. Please refresh and try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const generateContent = async () => {
-    if (!profile) return;
-    
-    setIsLoading(true);
-    setLoadingMessage('Generating personalized questions...');
-    
-    console.log('🎲 Generating content with enhanced uniqueness for session:', sessionId);
-    
-    await recommendAndLoadContent(
-      profile,
-      sessionKcs,
-      (kc, sequence) => {
-        console.log('✅ Content generated successfully:', {
-          kcName: kc.name,
-          atomsCount: sequence.atoms.length,
-          atomTypes: sequence.atoms.map(atom => atom.atom_type),
-          sessionId
-        });
-        
-        setCurrentKc(kc);
-        setAtomSequence(sequence);
-        setSessionKcs(prev => [...prev, kc]);
-        setCurrentAtomIndex(0);
-        setIsLoading(false);
-        
-        toast({
-          title: "Content Ready! 🎯",
-          description: `Generated ${sequence.atoms.length} personalized questions for ${kc.name}`,
-        });
-      },
-      (errorMsg) => {
-        console.error('❌ Content generation failed:', errorMsg);
-        setError(errorMsg);
-        setIsLoading(false);
-      }
-    );
-  };
 
   const handleQuestionComplete = (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => {
     console.log('📝 Question completed:', {
       ...result,
-      questionIndex: currentAtomIndex,
+      questionIndex: state.currentAtomIndex,
       totalQuestions: totalAtoms,
       atomType: currentAtom?.atom_type
     });
-    
-    if (currentAtomIndex < totalAtoms - 1) {
-      setCurrentAtomIndex(prev => prev + 1);
-    } else {
-      // Session complete
-      toast({
-        title: "Great Job! 🎉",
-        description: `You've completed all questions for ${currentKc?.name}!`,
-      });
-      
-      // Generate next KC content with enhanced uniqueness
-      setTimeout(() => {
-        console.log('🔄 Generating new content batch with fresh session context...');
-        generateContent();
-      }, 2000);
-    }
+
+    if (!currentAtom) return;
+
+    // Handle the answer with stealth assessment
+    handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
+
+    // Show feedback briefly, then move to next
+    setTimeout(() => {
+      if (state.currentAtomIndex < totalAtoms - 1) {
+        handleNextAtom();
+      } else {
+        // Session complete - generate new content
+        toast({
+          title: "Great Job! 🎉",
+          description: `You've completed all questions for ${state.currentKc?.name}!`,
+        });
+        
+        setTimeout(() => {
+          console.log('🔄 Generating new content batch...');
+          handleNextAtom(); // This will trigger new content generation
+        }, 2000);
+      }
+    }, 3000);
   };
 
-  if (isLoading) {
+  if (state.isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl bg-gray-800 border-gray-700">
@@ -153,15 +74,15 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
               <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              {loadingMessage}
+              Preparing Your Learning Experience
             </h2>
             <p className="text-gray-300 mb-6">
-              Our AI is creating the perfect learning experience for you...
+              Our AI is creating personalized content just for you...
             </p>
             <Progress value={65} className="w-full h-3" />
             <div className="flex items-center justify-center mt-6 text-sm text-gray-400">
               <Lightbulb className="w-4 h-4 mr-2" />
-              Analyzing your knowledge level and generating personalized content
+              Analyzing your knowledge level and generating AI content
             </div>
           </CardContent>
         </Card>
@@ -169,24 +90,24 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     );
   }
 
-  if (error) {
+  if (state.error) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl bg-red-900/20 border-red-700">
           <CardHeader>
             <CardTitle className="text-red-400 text-center">
-              Something went wrong
+              AI Generation Error
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-gray-300 mb-6">{error}</p>
+            <p className="text-gray-300 mb-6">{state.error}</p>
             <div className="flex gap-4 justify-center">
               <Button onClick={onBack} variant="outline">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Go Back
               </Button>
-              <Button onClick={() => window.location.reload()}>
-                Try Again
+              <Button onClick={handleRetry}>
+                Try AI Generation Again
               </Button>
             </div>
           </CardContent>
@@ -210,10 +131,10 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
           
           <div className="flex items-center space-x-4">
             <div className="text-sm text-gray-400">
-              Question {currentAtomIndex + 1} of {totalAtoms}
+              Question {state.currentAtomIndex + 1} of {totalAtoms}
             </div>
             <Progress 
-              value={((currentAtomIndex + 1) / totalAtoms) * 100} 
+              value={((state.currentAtomIndex + 1) / totalAtoms) * 100} 
               className="w-32 h-2" 
             />
           </div>
@@ -227,10 +148,10 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
                   <Brain className="w-6 h-6 text-blue-400" />
                   <div>
                     <h3 className="text-white font-medium">
-                      {currentKc?.name || 'Loading...'}
+                      {state.currentKc?.name || 'Loading AI Content...'}
                     </h3>
                     <p className="text-sm text-gray-400">
-                      Grade {currentKc?.gradeLevels?.[0] || 'N/A'} • {currentKc?.subject}
+                      Grade {state.currentKc?.gradeLevels?.[0] || 'N/A'} • {state.currentKc?.subject} • AI Generated
                     </p>
                   </div>
                 </div>
@@ -248,7 +169,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
         ) : (
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6 text-center">
-              <p className="text-gray-400">No content available</p>
+              <p className="text-gray-400">AI content not available</p>
             </CardContent>
           </Card>
         )}

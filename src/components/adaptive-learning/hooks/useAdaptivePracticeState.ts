@@ -1,54 +1,61 @@
 
-import { useState, useCallback } from 'react';
-import { LearnerProfile } from '@/types/learnerProfile';
-import { KnowledgeComponent } from '@/types/knowledgeComponent';
-import { AtomSequence, ContentAtom } from '@/types/content';
+import { useState } from 'react';
+import type { LearnerProfile } from '@/types/learnerProfile';
+import type { KnowledgeComponent } from '@/types/knowledgeComponent';
 
 export interface AdaptivePracticeState {
   learnerProfile: LearnerProfile | null;
   currentKc: KnowledgeComponent | null;
-  atomSequence: AtomSequence | null;
+  atomSequence: any | null;
   currentAtomIndex: number;
+  sessionKcs: KnowledgeComponent[];
   isLoading: boolean;
   error: string | null;
-  sessionKcs: KnowledgeComponent[];
   showFeedback: boolean;
-  isCorrect: boolean;
+  isCorrect: boolean | null;
   feedbackMessage: string;
-  showServiceTests: boolean;
 }
 
+const initialState: AdaptivePracticeState = {
+  learnerProfile: null,
+  currentKc: null,
+  atomSequence: null,
+  currentAtomIndex: 0,
+  sessionKcs: [],
+  isLoading: true,
+  error: null,
+  showFeedback: false,
+  isCorrect: null,
+  feedbackMessage: ''
+};
+
 export const useAdaptivePracticeState = () => {
-  const [state, setState] = useState<AdaptivePracticeState>({
-    learnerProfile: null,
-    currentKc: null,
-    atomSequence: null,
-    currentAtomIndex: 0,
-    isLoading: true,
-    error: null,
-    sessionKcs: [],
-    showFeedback: false,
-    isCorrect: false,
-    feedbackMessage: "",
-    showServiceTests: false,
-  });
+  const [state, setState] = useState<AdaptivePracticeState>(initialState);
 
-  const updateState = useCallback((updates: Partial<AdaptivePracticeState>) => {
+  const updateState = (updates: Partial<AdaptivePracticeState>) => {
     setState(prev => ({ ...prev, ...updates }));
-  }, []);
+  };
 
-  const resetFeedback = useCallback(() => {
-    updateState({ showFeedback: false, isCorrect: false, feedbackMessage: "" });
-  }, [updateState]);
+  const resetFeedback = () => {
+    setState(prev => ({
+      ...prev,
+      showFeedback: false,
+      isCorrect: null,
+      feedbackMessage: ''
+    }));
+  };
 
-  const setError = useCallback((error: string | null) => {
-    console.error('🚨 AdaptivePractice Error:', error);
-    updateState({ error, isLoading: false });
-  }, [updateState]);
+  const setError = (error: string) => {
+    setState(prev => ({
+      ...prev,
+      error,
+      isLoading: false
+    }));
+  };
 
-  const setLoading = useCallback((isLoading: boolean) => {
-    updateState({ isLoading });
-  }, [updateState]);
+  const setLoading = (isLoading: boolean) => {
+    setState(prev => ({ ...prev, isLoading }));
+  };
 
   return {
     state,
