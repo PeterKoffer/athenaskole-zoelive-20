@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,7 +34,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
   });
 
   const handleQuestionComplete = (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => {
-    console.log('📝 Question completed:', {
+    console.log('📝 Question completed in module:', {
       ...result,
       questionIndex: state.currentAtomIndex,
       totalQuestions: totalAtoms,
@@ -50,23 +49,41 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     // Handle the answer with stealth assessment
     handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
 
-    // Show feedback briefly, then move to next
+    // Show feedback toast
+    if (result.isCorrect) {
+      toast({
+        title: "Correct! 🎉",
+        description: "Great job! Moving to the next question...",
+        duration: 2000,
+      });
+    } else {
+      toast({
+        title: "Keep Learning! 📚",
+        description: "That's okay, let's try the next one!",
+        duration: 2000,
+      });
+    }
+
+    // Move to next question immediately
     setTimeout(() => {
       if (state.currentAtomIndex < totalAtoms - 1) {
+        console.log('➡️ Moving to next atom');
         handleNextAtom();
       } else {
         // Session complete - generate new content
+        console.log('🎉 Session complete, generating new content');
         toast({
-          title: "Great Job! 🎉",
-          description: `You've completed all questions for ${state.currentKc?.name}!`,
+          title: "Session Complete! 🎓",
+          description: `You've completed all questions for ${state.currentKc?.name}! Loading new content...`,
+          duration: 3000,
         });
         
         setTimeout(() => {
-          console.log('🔄 Generating new content batch...');
+          console.log('🔄 Loading new content batch...');
           handleNextAtom(); // This will trigger new content generation
-        }, 2000);
+        }, 1000);
       }
-    }, 3000);
+    }, 1500); // Reduced timeout for faster progression
   };
 
   if (state.isLoading) {

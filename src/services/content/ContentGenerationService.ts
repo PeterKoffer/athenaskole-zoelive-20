@@ -101,55 +101,57 @@ class ContentGenerationService {
   }
 
   generateFallbackContent(kc: any): any[] {
-    console.log('🔄 Generating DIVERSE fallback content for:', kc.name);
+    console.log('🔄 Generating ENHANCED fallback content for:', kc.name);
     
     const timestamp = Date.now();
-    const randomSeed = Math.floor(Math.random() * 1000);
+    const randomSeed = Math.floor(Math.random() * 10000); // Increased for more variety
     
-    // Create diverse question variations based on the KC
-    const questionTemplates = this.getQuestionTemplatesForKc(kc);
+    // Create truly diverse question variations based on the KC
+    const questionTemplates = this.getAdvancedQuestionTemplatesForKc(kc, randomSeed);
     const selectedTemplate = questionTemplates[randomSeed % questionTemplates.length];
     
     return [
       {
-        atom_id: `atom_${timestamp}_1`,
+        atom_id: `atom_${timestamp}_1_${randomSeed}`,
         atom_type: 'TEXT_EXPLANATION',
         content: {
           title: `Understanding ${kc.name}`,
-          explanation: this.getExplanationForKc(kc),
-          examples: this.getExamplesForKc(kc)
+          explanation: this.getDetailedExplanationForKc(kc, randomSeed),
+          examples: this.getVariedExamplesForKc(kc, randomSeed)
         },
         kc_ids: [kc.id],
         metadata: {
           difficulty: kc.difficulty_estimate || 0.5,
           estimatedTimeMs: 30000,
-          source: 'diverse_fallback',
+          source: 'enhanced_fallback',
           generated_at: timestamp,
-          randomSeed
+          randomSeed,
+          diversity_factor: randomSeed % 5
         }
       },
       {
-        atom_id: `atom_${timestamp}_2`,
+        atom_id: `atom_${timestamp}_2_${randomSeed}`,
         atom_type: 'QUESTION_MULTIPLE_CHOICE',
         content: selectedTemplate,
         kc_ids: [kc.id],
         metadata: {
           difficulty: kc.difficulty_estimate || 0.5,
           estimatedTimeMs: 45000,
-          source: 'diverse_fallback',
+          source: 'enhanced_fallback',
           generated_at: timestamp,
-          randomSeed
+          randomSeed,
+          diversity_factor: randomSeed % 5
         }
       },
       {
-        atom_id: `atom_${timestamp}_3`,
+        atom_id: `atom_${timestamp}_3_${randomSeed}`,
         atom_type: 'INTERACTIVE_EXERCISE',
         content: {
           title: `Practice ${kc.name}`,
-          description: this.getExerciseDescriptionForKc(kc),
+          description: this.getVariedExerciseDescriptionForKc(kc, randomSeed),
           exerciseType: 'problem-solving',
           components: {
-            problem: this.getProblemForKc(kc),
+            problem: this.getVariedProblemForKc(kc, randomSeed),
             answer: 'correct solution'
           }
         },
@@ -157,138 +159,213 @@ class ContentGenerationService {
         metadata: {
           difficulty: kc.difficulty_estimate || 0.5,
           estimatedTimeMs: 60000,
-          source: 'diverse_fallback',
+          source: 'enhanced_fallback',
           generated_at: timestamp,
-          randomSeed
+          randomSeed,
+          diversity_factor: randomSeed % 5
         }
       }
     ];
   }
 
-  private getQuestionTemplatesForKc(kc: any) {
+  private getAdvancedQuestionTemplatesForKc(kc: any, seed: number) {
     const kcId = kc.id.toLowerCase();
     
     if (kcId.includes('area_rectangles')) {
-      return [
+      const areaQuestions = [
         {
-          question: "A rectangle has a length of 8 units and a width of 5 units. What is its area?",
-          options: ["40 square units", "13 square units", "26 square units", "30 square units"],
+          question: `A rectangle has a length of ${8 + (seed % 5)} units and a width of ${4 + (seed % 3)} units. What is its area?`,
+          options: [`${(8 + (seed % 5)) * (4 + (seed % 3))} square units`, `${(8 + (seed % 5)) + (4 + (seed % 3))} square units`, `${(8 + (seed % 5)) * 2 + (4 + (seed % 3)) * 2} square units`, `${(8 + (seed % 5)) / (4 + (seed % 3))} square units`],
           correctAnswer: 0,
           correct: 0,
-          explanation: "Area = length × width = 8 × 5 = 40 square units"
+          explanation: `Area = length × width = ${8 + (seed % 5)} × ${4 + (seed % 3)} = ${(8 + (seed % 5)) * (4 + (seed % 3))} square units`
         },
         {
-          question: "If a rectangular garden is 6 meters long and 4 meters wide, how much space does it cover?",
-          options: ["24 square meters", "10 square meters", "20 square meters", "14 square meters"],
+          question: `If a rectangular garden is ${5 + (seed % 4)} meters long and ${3 + (seed % 3)} meters wide, how much space does it cover?`,
+          options: [`${(5 + (seed % 4)) * (3 + (seed % 3))} square meters`, `${(5 + (seed % 4)) + (3 + (seed % 3))} square meters`, `${(5 + (seed % 4)) - (3 + (seed % 3))} square meters`, `${(5 + (seed % 4)) * 2} square meters`],
           correctAnswer: 0,
           correct: 0,
-          explanation: "The area of a rectangle is length × width = 6 × 4 = 24 square meters"
+          explanation: `The area of a rectangle is length × width = ${5 + (seed % 4)} × ${3 + (seed % 3)} = ${(5 + (seed % 4)) * (3 + (seed % 3))} square meters`
         },
         {
-          question: "What formula do we use to find the area of a rectangle?",
-          options: ["length × width", "length + width", "length ÷ width", "2 × (length + width)"],
+          question: "What is the correct formula for finding the area of a rectangle?",
+          options: ["Area = length × width", "Area = length + width", "Area = 2 × (length + width)", "Area = length ÷ width"],
           correctAnswer: 0,
           correct: 0,
-          explanation: "The area of a rectangle is always length × width"
+          explanation: "The area of a rectangle is always calculated by multiplying length times width"
         }
       ];
+      return areaQuestions;
     }
     
-    if (kcId.includes('add_fractions')) {
-      return [
+    if (kcId.includes('add_fractions') || kcId.includes('fractions')) {
+      const fractionQuestions = [
         {
-          question: "What is 2/5 + 1/5?",
-          options: ["3/5", "3/10", "2/5", "1/5"],
+          question: `What is ${1 + (seed % 3)}/${4 + (seed % 4)} + ${1 + (seed % 2)}/${4 + (seed % 4)}?`,
+          options: [`${(1 + (seed % 3)) + (1 + (seed % 2))}/${4 + (seed % 4)}`, `${(1 + (seed % 3)) + (1 + (seed % 2))}/${(4 + (seed % 4)) * 2}`, `${(1 + (seed % 3)) * (1 + (seed % 2))}/${4 + (seed % 4)}`, `${1 + (seed % 3)}/${1 + (seed % 2)}`],
           correctAnswer: 0,
           correct: 0,
-          explanation: "When adding fractions with the same denominator, add the numerators: 2 + 1 = 3, so 2/5 + 1/5 = 3/5"
+          explanation: `When adding fractions with the same denominator, add the numerators: ${1 + (seed % 3)} + ${1 + (seed % 2)} = ${(1 + (seed % 3)) + (1 + (seed % 2))}, so the answer is ${(1 + (seed % 3)) + (1 + (seed % 2))}/${4 + (seed % 4)}`
         },
         {
-          question: "Solve: 1/4 + 2/4",
-          options: ["3/4", "3/8", "1/2", "2/4"],
+          question: `Solve: ${2 + (seed % 3)}/${6 + (seed % 2)} + ${1 + (seed % 2)}/${6 + (seed % 2)}`,
+          options: [`${(2 + (seed % 3)) + (1 + (seed % 2))}/${6 + (seed % 2)}`, `${(2 + (seed % 3)) + (1 + (seed % 2))}/${(6 + (seed % 2)) * 2}`, `${2 + (seed % 3)}/${1 + (seed % 2)}`, `${(2 + (seed % 3)) * (1 + (seed % 2))}/${6 + (seed % 2)}`],
           correctAnswer: 0,
           correct: 0,
-          explanation: "Add the numerators: 1 + 2 = 3, keep the denominator: 3/4"
+          explanation: `Add the numerators: ${2 + (seed % 3)} + ${1 + (seed % 2)} = ${(2 + (seed % 3)) + (1 + (seed % 2))}, keep the denominator: ${(2 + (seed % 3)) + (1 + (seed % 2))}/${6 + (seed % 2)}`
+        },
+        {
+          question: "When adding fractions with the same denominator, what do you do?",
+          options: ["Add the numerators, keep the denominator", "Add both numerators and denominators", "Multiply the numerators", "Find a common denominator first"],
+          correctAnswer: 0,
+          correct: 0,
+          explanation: "When fractions have the same denominator, you simply add the numerators and keep the denominator the same"
         }
       ];
+      return fractionQuestions;
+    }
+
+    if (kcId.includes('equivalent_fractions')) {
+      const equivalentQuestions = [
+        {
+          question: `Which fraction is equivalent to ${1 + (seed % 2)}/${2 + (seed % 2)}?`,
+          options: [`${(1 + (seed % 2)) * 2}/${(2 + (seed % 2)) * 2}`, `${1 + (seed % 2)}/${4 + (seed % 2)}`, `${2 + (seed % 2)}/${1 + (seed % 2)}`, `${1 + (seed % 2)} + 1/${2 + (seed % 2)} + 1`],
+          correctAnswer: 0,
+          correct: 0,
+          explanation: `Equivalent fractions are created by multiplying both numerator and denominator by the same number: ${1 + (seed % 2)}/${2 + (seed % 2)} = ${(1 + (seed % 2)) * 2}/${(2 + (seed % 2)) * 2}`
+        },
+        {
+          question: `What is ${2 + (seed % 3)}/${4 + (seed % 2)} in simplest form?`,
+          options: [`${2 + (seed % 3)}/${4 + (seed % 2)}`, `${(2 + (seed % 3)) * 2}/${(4 + (seed % 2)) * 2}`, `${2 + (seed % 3)} + 1/${4 + (seed % 2)} + 1`, `${4 + (seed % 2)}/${2 + (seed % 3)}`],
+          correctAnswer: 0,
+          correct: 0,
+          explanation: `This fraction is already in its simplest form since ${2 + (seed % 3)} and ${4 + (seed % 2)} share no common factors other than 1`
+        }
+      ];
+      return equivalentQuestions;
     }
     
-    // Default templates for other KCs
-    return [
+    // Enhanced default templates for other KCs
+    const genericQuestions = [
       {
-        question: `What is a key concept in ${kc.name}?`,
-        options: ["Understanding the fundamentals", "Memorizing rules", "Skipping practice", "Avoiding examples"],
+        question: `What is the most important strategy when learning ${kc.name}?`,
+        options: ["Practice with different examples", "Memorize without understanding", "Skip difficult problems", "Avoid asking questions"],
         correctAnswer: 0,
         correct: 0,
-        explanation: `Understanding the fundamentals is essential for mastering ${kc.name}`
+        explanation: `Practicing with different examples helps build deep understanding of ${kc.name}`
       },
       {
-        question: `How can you improve at ${kc.name}?`,
-        options: ["Practice regularly", "Avoid difficult problems", "Skip explanations", "Rush through examples"],
+        question: `Which approach works best for mastering ${kc.name}?`,
+        options: ["Step-by-step problem solving", "Guessing the answers", "Avoiding practice", "Rushing through problems"],
         correctAnswer: 0,
         correct: 0,
-        explanation: `Regular practice is the best way to improve at ${kc.name}`
+        explanation: `Taking a systematic, step-by-step approach is key to mastering ${kc.name}`
+      },
+      {
+        question: `What should you do when you encounter a challenging ${kc.name} problem?`,
+        options: ["Break it down into smaller steps", "Give up immediately", "Guess randomly", "Skip to easier problems"],
+        correctAnswer: 0,
+        correct: 0,
+        explanation: `Breaking complex problems into smaller, manageable steps is essential for learning ${kc.name}`
       }
     ];
+    
+    return genericQuestions;
   }
 
-  private getExplanationForKc(kc: any) {
+  private getDetailedExplanationForKc(kc: any, seed: number) {
+    const kcId = kc.id.toLowerCase();
+    const variations = [
+      "Let's explore this step by step.",
+      "Here's what you need to know.",
+      "Understanding this concept is key.",
+      "Let's break this down together.",
+      "This is an important skill to master."
+    ];
+    
+    const intro = variations[seed % variations.length];
+    
+    if (kcId.includes('area_rectangles')) {
+      return `${intro} Finding the area of rectangles helps us understand how much space shapes cover. The area represents the total number of square units that fit inside the rectangle. To calculate this, we multiply the length by the width, which gives us the total space covered.`;
+    }
+    
+    if (kcId.includes('add_fractions') || kcId.includes('fractions')) {
+      return `${intro} Adding fractions with like denominators is about combining parts of the same whole. When denominators match, we're dealing with the same-sized pieces, so we can simply add up how many pieces we have in total while keeping the piece size the same.`;
+    }
+
+    if (kcId.includes('equivalent_fractions')) {
+      return `${intro} Equivalent fractions represent the same amount using different numbers. Think of it like having the same amount of pizza, but cutting it into different numbers of pieces. The key is understanding that we can multiply or divide both parts of a fraction by the same number.`;
+    }
+    
+    return `${intro} ${kc.name} is a fundamental concept that builds important mathematical thinking skills. Mastering this topic will help you solve more complex problems in the future.`;
+  }
+
+  private getVariedExamplesForKc(kc: any, seed: number) {
     const kcId = kc.id.toLowerCase();
     
     if (kcId.includes('area_rectangles')) {
-      return "Finding the area of rectangles is a fundamental skill in geometry. The area tells us how much space a rectangle covers. To find the area, we multiply the length by the width. This gives us the total number of square units inside the rectangle.";
-    }
-    
-    if (kcId.includes('add_fractions')) {
-      return "Adding fractions with like denominators is straightforward. When the denominators are the same, we simply add the numerators together and keep the denominator the same. This represents combining parts of the same whole.";
-    }
-    
-    return `${kc.name} is an important concept that builds foundational understanding in ${kc.subject}. Let's explore this topic step by step.`;
-  }
-
-  private getExamplesForKc(kc: any) {
-    const kcId = kc.id.toLowerCase();
-    
-    if (kcId.includes('area_rectangles')) {
-      return [
-        "A classroom that is 10 feet long and 8 feet wide has an area of 80 square feet",
-        "A book cover that is 9 inches long and 6 inches wide has an area of 54 square inches"
+      const examples = [
+        [`A classroom that is ${10 + (seed % 5)} feet long and ${8 + (seed % 3)} feet wide has an area of ${(10 + (seed % 5)) * (8 + (seed % 3))} square feet`],
+        [`A book cover that is ${9 + (seed % 4)} inches long and ${6 + (seed % 2)} inches wide has an area of ${(9 + (seed % 4)) * (6 + (seed % 2))} square inches`],
+        [`A garden plot that is ${12 + (seed % 6)} meters long and ${7 + (seed % 3)} meters wide covers ${(12 + (seed % 6)) * (7 + (seed % 3))} square meters`]
       ];
+      return examples[seed % examples.length];
     }
     
-    if (kcId.includes('add_fractions')) {
-      return [
-        "1/3 + 1/3 = 2/3 (one-third plus one-third equals two-thirds)",
-        "3/8 + 2/8 = 5/8 (three-eighths plus two-eighths equals five-eighths)"
+    if (kcId.includes('add_fractions') || kcId.includes('fractions')) {
+      const examples = [
+        [`${1 + (seed % 2)}/${3 + (seed % 3)} + ${1 + (seed % 2)}/${3 + (seed % 3)} = ${(1 + (seed % 2)) + (1 + (seed % 2))}/${3 + (seed % 3)}`],
+        [`${2 + (seed % 3)}/${5 + (seed % 2)} + ${1 + (seed % 2)}/${5 + (seed % 2)} = ${(2 + (seed % 3)) + (1 + (seed % 2))}/${5 + (seed % 2)}`],
+        [`${3 + (seed % 2)}/${8 + (seed % 3)} + ${2 + (seed % 2)}/${8 + (seed % 3)} = ${(3 + (seed % 2)) + (2 + (seed % 2))}/${8 + (seed % 3)}`]
       ];
+      return examples[seed % examples.length];
     }
     
-    return [`Example of ${kc.name} in practice`, `Real-world application of ${kc.name}`];
+    return [`Example of ${kc.name} in practice`, `Real-world application of ${kc.name}`, `Step-by-step ${kc.name} solution`];
   }
 
-  private getExerciseDescriptionForKc(kc: any) {
+  private getVariedExerciseDescriptionForKc(kc: any, seed: number) {
+    const kcId = kc.id.toLowerCase();
+    const variations = [
+      "Let's practice with some problems.",
+      "Try solving this step by step.",
+      "Apply what you've learned here.",
+      "Test your understanding with this exercise.",
+      "Practice makes perfect - let's try this."
+    ];
+    
+    const intro = variations[seed % variations.length];
+    
+    if (kcId.includes('area_rectangles')) {
+      return `${intro} Practice calculating areas of different rectangles. Remember: Area = length × width`;
+    }
+    
+    if (kcId.includes('add_fractions') || kcId.includes('fractions')) {
+      return `${intro} Practice adding fractions with the same denominator. Add the numerators and keep the denominator.`;
+    }
+    
+    return `${intro} Let's practice ${kc.name} with hands-on activities.`;
+  }
+
+  private getVariedProblemForKc(kc: any, seed: number) {
     const kcId = kc.id.toLowerCase();
     
     if (kcId.includes('area_rectangles')) {
-      return "Practice calculating areas of different rectangles. Remember: Area = length × width";
+      const problems = [
+        `Find the area of a rectangular playground that is ${12 + (seed % 8)} meters long and ${7 + (seed % 5)} meters wide.`,
+        `Calculate the area of a rectangular room that measures ${15 + (seed % 5)} feet by ${10 + (seed % 4)} feet.`,
+        `What's the area of a rectangular poster that is ${18 + (seed % 7)} inches long and ${12 + (seed % 6)} inches wide?`
+      ];
+      return problems[seed % problems.length];
     }
     
-    if (kcId.includes('add_fractions')) {
-      return "Practice adding fractions with the same denominator. Add the numerators and keep the denominator.";
-    }
-    
-    return `Let's practice ${kc.name} with hands-on activities.`;
-  }
-
-  private getProblemForKc(kc: any) {
-    const kcId = kc.id.toLowerCase();
-    
-    if (kcId.includes('area_rectangles')) {
-      return "Find the area of a rectangular playground that is 12 meters long and 7 meters wide.";
-    }
-    
-    if (kcId.includes('add_fractions')) {
-      return "Add these fractions: 2/7 + 3/7";
+    if (kcId.includes('add_fractions') || kcId.includes('fractions')) {
+      const problems = [
+        `Add these fractions: ${2 + (seed % 3)}/${7 + (seed % 2)} + ${3 + (seed % 2)}/${7 + (seed % 2)}`,
+        `Solve: ${1 + (seed % 4)}/${9 + (seed % 3)} + ${2 + (seed % 3)}/${9 + (seed % 3)}`,
+        `Find the sum: ${4 + (seed % 2)}/${11 + (seed % 4)} + ${1 + (seed % 3)}/${11 + (seed % 4)}`
+      ];
+      return problems[seed % problems.length];
     }
     
     return `Solve this problem involving ${kc.name}`;

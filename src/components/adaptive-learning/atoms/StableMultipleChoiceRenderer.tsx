@@ -23,9 +23,11 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
     content: atom?.content
   });
 
-  // Prevent multiple completions
   const handleComplete = useCallback(() => {
-    if (isCompleted || selectedAnswer === null) return;
+    if (isCompleted || selectedAnswer === null) {
+      console.log('⚠️ Complete blocked:', { isCompleted, selectedAnswer });
+      return;
+    }
     
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
     const correctAnswer = atom.content.correctAnswer ?? atom.content.correct ?? 0;
@@ -33,7 +35,7 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
     
     setIsCompleted(true);
     
-    console.log('🎯 Question completed:', {
+    console.log('✅ Question completed:', {
       selectedAnswer,
       correctAnswer,
       isCorrect,
@@ -41,6 +43,7 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
       atomId: atom.atom_id
     });
     
+    // Call completion immediately without timeout
     onComplete({ isCorrect, selectedAnswer, timeSpent });
   }, [selectedAnswer, atom, startTime, onComplete, isCompleted]);
 
@@ -55,12 +58,12 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
     
     setSelectedAnswer(answerIndex);
     setShowResult(true);
-    
-    // Auto-complete after showing result briefly
-    setTimeout(() => {
-      handleComplete();
-    }, 2000);
-  }, [showResult, isCompleted, handleComplete, atom]);
+  }, [showResult, isCompleted, atom]);
+
+  const handleContinueClick = useCallback(() => {
+    console.log('🔄 Continue button clicked');
+    handleComplete();
+  }, [handleComplete]);
 
   if (!atom?.content) {
     console.error('❌ StableMultipleChoiceRenderer: No content in atom:', atom);
@@ -136,24 +139,38 @@ const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoice
           })}
         </div>
 
-        {showResult && atom.content.explanation && (
-          <Card className={selectedAnswer === correctAnswer ? 'bg-green-900/30 border-green-700' : 'bg-red-900/30 border-red-700'}>
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-3">
-                {selectedAnswer === correctAnswer ? (
-                  <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                ) : (
-                  <XCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
-                )}
-                <div>
-                  <h4 className="font-semibold mb-2 text-white">
-                    {selectedAnswer === correctAnswer ? 'Correct!' : 'Not quite right'}
-                  </h4>
-                  <p className="text-gray-300">{atom.content.explanation}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {showResult && (
+          <>
+            {atom.content.explanation && (
+              <Card className={selectedAnswer === correctAnswer ? 'bg-green-900/30 border-green-700' : 'bg-red-900/30 border-red-700'}>
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-3">
+                    {selectedAnswer === correctAnswer ? (
+                      <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                    )}
+                    <div>
+                      <h4 className="font-semibold mb-2 text-white">
+                        {selectedAnswer === correctAnswer ? 'Correct!' : 'Not quite right'}
+                      </h4>
+                      <p className="text-gray-300">{atom.content.explanation}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={handleContinueClick}
+                disabled={isCompleted}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-8 text-lg"
+              >
+                {isCompleted ? 'Processing...' : 'Continue'}
+              </Button>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
