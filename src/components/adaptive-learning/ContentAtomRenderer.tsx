@@ -26,6 +26,7 @@ const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps
   // Route to appropriate renderer based on atom type
   switch (atom.atom_type) {
     case 'TEXT_EXPLANATION':
+      console.log('📝 Rendering TEXT_EXPLANATION with TextExplanationRenderer');
       return (
         <TextExplanationRenderer 
           content={atom.content || {}} 
@@ -35,9 +36,11 @@ const ContentAtomRenderer = memo(({ atom, onComplete }: ContentAtomRendererProps
       );
     
     case 'QUESTION_MULTIPLE_CHOICE':
+      console.log('❓ Rendering QUESTION_MULTIPLE_CHOICE with StableMultipleChoiceRenderer');
       return <StableMultipleChoiceRenderer atom={atom} onComplete={onComplete} />;
     
     case 'INTERACTIVE_EXERCISE':
+      console.log('🎮 Rendering INTERACTIVE_EXERCISE with InteractiveExerciseRenderer');
       return (
         <InteractiveExerciseRenderer 
           content={atom.content || {}} 

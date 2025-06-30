@@ -1,47 +1,63 @@
 
-import { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock } from 'lucide-react';
-import type { ContentAtom } from '@/types/content';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface FallbackRendererProps {
-  atom: ContentAtom;
+  atom: any;
   onComplete: (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => void;
 }
 
-const FallbackRenderer = ({ atom, onComplete }: FallbackRendererProps) => {
-  const [startTime] = useState(Date.now());
+const FallbackRenderer: React.FC<FallbackRendererProps> = ({ atom, onComplete }) => {
+  const [startTime] = React.useState(Date.now());
+
+  const handleContinue = () => {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    
+    console.log('⚠️ Fallback renderer used:', {
+      atomId: atom?.atom_id || 'unknown',
+      atomType: atom?.atom_type || 'unknown',
+      timeSpent
+    });
+    
+    onComplete({ 
+      isCorrect: true, 
+      selectedAnswer: 0, 
+      timeSpent 
+    });
+  };
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center justify-between">
-            <span>Content</span>
-            <Clock className="w-5 h-5 text-orange-400" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-lg text-gray-200 leading-relaxed">
-            Content type "{atom.atom_type}" is not yet supported.
-          </div>
-          
-          <div className="text-center">
-            <Button
-              onClick={() => onComplete({
-                isCorrect: true,
-                selectedAnswer: 0,
-                timeSpent: Date.now() - startTime
-              })}
-              className="bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              Continue
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="bg-yellow-900/20 border-yellow-700">
+      <CardHeader>
+        <CardTitle className="text-yellow-400 flex items-center">
+          <AlertTriangle className="w-5 h-5 mr-2" />
+          Content Not Available
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="text-yellow-200">
+          {atom ? (
+            <p>
+              Unable to display content of type: <code className="bg-yellow-800/30 px-2 py-1 rounded">{atom.atom_type}</code>
+            </p>
+          ) : (
+            <p>No content available to display.</p>
+          )}
+        </div>
+        
+        <div className="pt-4 flex justify-end">
+          <Button 
+            onClick={handleContinue}
+            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Continue Anyway
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
