@@ -1,205 +1,184 @@
 
-import { useEffect } from 'react';
-import { useAdaptivePracticeState } from './useAdaptivePracticeState';
-import { useContentGeneration } from './useContentGeneration';
-import { useProfileManagement } from './useProfileManagement';
-import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
-import learnerProfileService from '@/services/learnerProfile/LearnerProfileService';
-import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
-import type { ContentAtom } from '@/types/content';
+import { useState, useEffect, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import LearnerProfileService from '@/services/learnerProfile/LearnerProfileService';
+import ContentOrchestrator from '@/services/content/ContentOrchestrator';
+import { LearnerProfile } from '@/types/learnerProfile';
+import { KnowledgeComponent } from '@/types/knowledgeComponent';
+
+interface AdaptivePracticeState {
+  learnerProfile: LearnerProfile | null;
+  currentKc: KnowledgeComponent | null;
+  atomSequence: any | null;
+  currentAtomIndex: number;
+  isLoading: boolean;
+  error: string | null;
+}
 
 export const useAdaptivePracticeLogic = () => {
-  const { state, updateState, resetFeedback, setError, setLoading } = useAdaptivePracticeState();
-  const { recommendAndLoadContent } = useContentGeneration();
-  const { loadLearnerProfile } = useProfileManagement();
+  const { toast } = useToast();
+  
+  const [state, setState] = useState<AdaptivePracticeState>({
+    learnerProfile: null,
+    currentKc: null,
+    atomSequence: null,
+    currentAtomIndex: 0,
+    isLoading: true,
+    error: null
+  });
 
-  // Load initial profile
+  // Load initial profile and generate content
   useEffect(() => {
+    loadInitialContent();
+  }, []);
+
+  const loadInitialContent = async () => {
     console.log('🚀 AdaptivePracticeModule: Loading initial profile...');
-    loadLearnerProfile(
-      (profile) => {
-        console.log('✅ Profile loaded successfully:', profile.userId);
-        updateState({ learnerProfile: profile, isLoading: false });
-      },
-      (error) => {
-        console.error('❌ Profile loading failed:', error);
-        setError(error);
-      }
-    );
-  }, [loadLearnerProfile, updateState, setError]);
-
-  // Load content when profile is ready
-  useEffect(() => {
-    if (state.learnerProfile && !state.currentKc && !state.isLoading && !state.error) {
-      console.log('🎯 Profile ready, generating content...');
-      setLoading(true);
-      
-      recommendAndLoadContent(
-        state.learnerProfile,
-        state.sessionKcs,
-        (kc, sequence) => {
-          console.log('✅ Content generated successfully:', kc.name, sequence.atoms.length, 'atoms');
-          updateState({
-            currentKc: kc,
-            atomSequence: sequence,
-            currentAtomIndex: 0,
-            sessionKcs: [...state.sessionKcs, kc],
-            isLoading: false,
-            error: null
-          });
-          resetFeedback();
-        },
-        (error) => {
-          console.error('❌ Content generation failed:', error);
-          setError(error);
-        }
-      );
-    }
-  }, [state.learnerProfile, state.currentKc, state.isLoading, state.error, state.sessionKcs, recommendAndLoadContent, updateState, setLoading, setError, resetFeedback]);
-
-  const handleNextAtom = () => {
-    console.log('➡️ Moving to next atom...');
-    resetFeedback();
     
-    if (state.atomSequence && state.currentAtomIndex < state.atomSequence.atoms.length - 1) {
-      console.log(`📝 Next atom in sequence: ${state.currentAtomIndex + 1}/${state.atomSequence.atoms.length}`);
-      updateState({ currentAtomIndex: state.currentAtomIndex + 1 });
-    } else if (state.learnerProfile) {
-      console.log('🔄 Generating new content sequence...');
-      setLoading(true);
+    try {
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+      // Load learner profile
+      console.log('🚀 Loading learner profile...');
+      const profile = await LearnerProfileService.getProfile('12345678-1234-5678-9012-123456789012');
       
-      recommendAndLoadContent(
-        state.learnerProfile,
-        state.sessionKcs,
-        (kc, sequence) => {
-          console.log('✅ New sequence generated:', kc.name, sequence.atoms.length, 'atoms');
-          updateState({
-            currentKc: kc,
-            atomSequence: sequence,
-            currentAtomIndex: 0,
-            sessionKcs: [...state.sessionKcs, kc],
-            isLoading: false
-          });
-        },
-        (error) => {
-          console.error('❌ New sequence generation failed:', error);
-          setError(error);
-        }
+      if (!profile) {
+        throw new Error('Failed to load learner profile');
+      }
+
+      console.log('✅ Profile loaded successfully:', profile.userId);
+
+      // Generate AI content using ContentOrchestrator
+      const selectedKc = {
+        id: 'kc_math_g4_add_fractions_likedenom',
+        name: 'Adding Fractions with Like Denominators',
+        subject: 'Mathematics',
+        gradeLevels: [4],
+        difficulty_estimate: 0.4
+      };
+
+      console.log('🎯 Generating atom sequence for KC:', selectedKc.id);
+      const atomSequence = await ContentOrchestrator.getAtomSequenceForKc(
+        selectedKc.id, 
+        profile.userId
       );
+
+      if (!atomSequence || !atomSequence.atoms || atomSequence.atoms.length === 0) {
+        throw new Error('Failed to generate AI content sequence');
+      }
+
+      console.log('✅ AI atom sequence loaded:', {
+        sequenceId: atomSequence.sequence_id,
+        atomCount: atomSequence.atoms.length,
+        firstAtomType: atomSequence.atoms[0]?.atom_type
+      });
+
+      setState({
+        learnerProfile: profile,
+        currentKc: selectedKc,
+        atomSequence: atomSequence,
+        currentAtomIndex: 0,
+        isLoading: false,
+        error: null
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to load initial content:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage
+      }));
+
+      toast({
+        title: "Loading Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     }
   };
 
-  const handleQuestionAnswer = async (atom: ContentAtom, answerGiven: string | string[], isCorrectAnswer: boolean) => {
-    if (!state.currentKc || !state.learnerProfile) {
-      console.error('❌ Cannot handle answer - missing KC or profile');
+  const handleNextAtom = useCallback(() => {
+    console.log('➡️ Moving to next atom...');
+    
+    if (!state.atomSequence || !state.atomSequence.atoms) {
+      console.error('❌ No atom sequence available');
       return;
     }
 
-    console.log('📝 Processing answer:', { 
-      atomId: atom.atom_id, 
-      kcId: state.currentKc.id,
-      isCorrect: isCorrectAnswer,
-      answer: answerGiven,
-      userId: MOCK_USER_ID
+    const nextIndex = state.currentAtomIndex + 1;
+    
+    if (nextIndex >= state.atomSequence.atoms.length) {
+      console.log('🔄 End of sequence reached, generating new content...');
+      // Generate new content when we reach the end
+      loadInitialContent();
+      return;
+    }
+
+    setState(prev => ({
+      ...prev,
+      currentAtomIndex: nextIndex
+    }));
+
+    console.log('✅ Moved to atom index:', nextIndex);
+  }, [state.atomSequence, state.currentAtomIndex]);
+
+  const handleQuestionAnswer = useCallback(async (
+    atom: any,
+    userAnswer: string,
+    isCorrect: boolean
+  ) => {
+    console.log('📝 Processing answer:', {
+      atomId: atom.atom_id,
+      userAnswer,
+      isCorrect,
+      kcId: state.currentKc?.id
     });
 
-    try {
-      // Log the attempt first
-      await stealthAssessmentService.logQuestionAttempt({
-        questionId: atom.atom_id,
-        knowledgeComponentIds: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [state.currentKc.id],
-        answerGiven: Array.isArray(answerGiven) ? answerGiven.join(', ') : answerGiven,
-        isCorrect: isCorrectAnswer,
-        timeTakenMs: Math.floor(Math.random() * 20000) + 5000,
-        attemptsMade: 1 
-      }, 'adaptive-practice-module');
+    if (!state.learnerProfile || !state.currentKc) {
+      console.error('❌ Missing profile or KC data');
+      return;
+    }
 
-      console.log('🔄 About to update KC mastery - KC:', state.currentKc.id, 'User:', MOCK_USER_ID);
-      
-      // Update mastery - this is where we test the duplicate key fix
-      const updatedProfile = await learnerProfileService.updateKcMastery(
-        MOCK_USER_ID, 
+    try {
+      // Update KC mastery with stealth assessment
+      const updatedProfile = await LearnerProfileService.updateKcMastery(
+        state.learnerProfile.userId,
         state.currentKc.id,
         {
-          isCorrect: isCorrectAnswer,
+          isCorrect,
           newAttempt: true,
-          interactionType: 'QUESTION_ATTEMPT',
-          interactionDetails: { 
-            difficulty: (atom.metadata as any)?.difficulty || 0.5,
-            responseTime: Math.floor(Math.random() * 20000) + 5000,
+          interactionType: 'multiple_choice_question',
+          interactionDetails: {
             atomId: atom.atom_id,
-            timestamp: Date.now(),
-            questionText: (atom.content as any)?.question || 'Unknown question'
+            userAnswer,
+            correctAnswer: atom.content.correctAnswer || atom.content.correct,
+            questionText: atom.content.question
           }
         }
       );
 
-      console.log('✅ KC mastery update completed successfully');
-      updateState({ learnerProfile: updatedProfile });
+      setState(prev => ({
+        ...prev,
+        learnerProfile: updatedProfile
+      }));
 
-    } catch (logError) {
-      console.error('❌ Critical error handling question answer:', logError);
-      console.error('❌ Error details:', {
-        message: logError.message,
-        stack: logError.stack,
-        kcId: state.currentKc.id,
-        userId: MOCK_USER_ID,
-        isCorrect: isCorrectAnswer
-      });
+      console.log('✅ KC mastery updated successfully');
+
+    } catch (error) {
+      console.error('❌ Failed to update KC mastery:', error);
     }
+  }, [state.learnerProfile, state.currentKc]);
 
-    // Show feedback
-    const feedbackContent = atom.content as any;
-    updateState({
-      isCorrect: isCorrectAnswer,
-      feedbackMessage: isCorrectAnswer 
-        ? (feedbackContent.correctFeedback || "Correct!")
-        : (feedbackContent.generalIncorrectFeedback || "Not quite. Let's review."),
-      showFeedback: true
-    });
-  };
-
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     console.log('🔄 Retrying content generation...');
-    updateState({ error: null, isLoading: true });
-    
-    if (state.learnerProfile) {
-      recommendAndLoadContent(
-        state.learnerProfile,
-        state.sessionKcs,
-        (kc, sequence) => {
-          console.log('✅ Retry successful:', kc.name);
-          updateState({
-            currentKc: kc,
-            atomSequence: sequence,
-            currentAtomIndex: 0,
-            sessionKcs: [...state.sessionKcs, kc],
-            isLoading: false
-          });
-        },
-        (error) => {
-          console.error('❌ Retry failed:', error);
-          setError(error);
-        }
-      );
-    } else {
-      console.log('🔄 Reloading profile...');
-      loadLearnerProfile(
-        (profile) => {
-          console.log('✅ Profile reloaded successfully');
-          updateState({ learnerProfile: profile, isLoading: false });
-        },
-        (error) => {
-          console.error('❌ Profile reload failed:', error);
-          setError(error);
-        }
-      );
-    }
-  };
+    loadInitialContent();
+  }, []);
 
   return {
     state,
-    updateState,
     handleNextAtom,
     handleQuestionAnswer,
     handleRetry

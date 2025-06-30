@@ -30,7 +30,8 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     currentAtomType: currentAtom?.atom_type,
     isLoading: state.isLoading,
     error: state.error,
-    sessionId
+    sessionId,
+    atomSequenceId: state.atomSequence?.sequence_id
   });
 
   const handleQuestionComplete = (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => {
@@ -41,7 +42,10 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
       atomType: currentAtom?.atom_type
     });
 
-    if (!currentAtom) return;
+    if (!currentAtom) {
+      console.error('❌ No current atom to process');
+      return;
+    }
 
     // Handle the answer with stealth assessment
     handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
@@ -74,7 +78,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
               <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              Preparing Your Learning Experience
+              Preparing Your AI Learning Experience
             </h2>
             <p className="text-gray-300 mb-6">
               Our AI is creating personalized content just for you...
@@ -82,7 +86,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
             <Progress value={65} className="w-full h-3" />
             <div className="flex items-center justify-center mt-6 text-sm text-gray-400">
               <Lightbulb className="w-4 h-4 mr-2" />
-              Analyzing your knowledge level and generating AI content
+              Generating AI content with ContentOrchestrator
             </div>
           </CardContent>
         </Card>
@@ -110,6 +114,26 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
                 Try AI Generation Again
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!currentAtom) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl bg-yellow-900/20 border-yellow-700">
+          <CardContent className="p-8 text-center">
+            <p className="text-yellow-300 mb-4">No AI content atom available</p>
+            <p className="text-gray-400 text-sm mb-6">
+              Sequence ID: {state.atomSequence?.sequence_id || 'None'}<br/>
+              Total atoms: {totalAtoms}<br/>
+              Current index: {state.currentAtomIndex}
+            </p>
+            <Button onClick={handleRetry}>
+              Retry AI Generation
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -161,18 +185,10 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
           </Card>
         </div>
 
-        {currentAtom ? (
-          <ContentAtomRenderer
-            atom={currentAtom}
-            onComplete={handleQuestionComplete}
-          />
-        ) : (
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6 text-center">
-              <p className="text-gray-400">AI content not available</p>
-            </CardContent>
-          </Card>
-        )}
+        <ContentAtomRenderer
+          atom={currentAtom}
+          onComplete={handleQuestionComplete}
+        />
       </div>
     </div>
   );
