@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences, InteractionEvent } from '@/types/learnerProfile';
 
