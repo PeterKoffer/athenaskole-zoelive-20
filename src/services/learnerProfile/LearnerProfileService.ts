@@ -265,10 +265,12 @@ class LearnerProfileService {
           correct_attempts: newCorrectAttempts,
           last_attempted_timestamp: new Date().toISOString(),
           history: newHistory
+        }, {
+          onConflict: 'user_id,kc_id' // Explicitly specify conflict target
         });
 
       if (upsertError) {
-        console.error('Error updating KC mastery:', upsertError);
+        console.error('Error updating KC mastery (upsert operation):', upsertError);
         throw upsertError;
       }
 
