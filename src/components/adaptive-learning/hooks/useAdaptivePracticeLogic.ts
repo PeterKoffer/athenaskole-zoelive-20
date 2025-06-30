@@ -97,12 +97,14 @@ export const useAdaptivePracticeLogic = () => {
 
     console.log('📝 Processing answer:', { 
       atomId: atom.atom_id, 
+      kcId: state.currentKc.id,
       isCorrect: isCorrectAnswer,
-      answer: answerGiven 
+      answer: answerGiven,
+      userId: MOCK_USER_ID
     });
 
     try {
-      // Log the attempt
+      // Log the attempt first
       await stealthAssessmentService.logQuestionAttempt({
         questionId: atom.atom_id,
         knowledgeComponentIds: atom.kc_ids && atom.kc_ids.length > 0 ? atom.kc_ids : [state.currentKc.id],
@@ -112,7 +114,9 @@ export const useAdaptivePracticeLogic = () => {
         attemptsMade: 1 
       }, 'adaptive-practice-module');
 
-      // Update mastery
+      console.log('🔄 About to update KC mastery - KC:', state.currentKc.id, 'User:', MOCK_USER_ID);
+      
+      // Update mastery - this is where we test the duplicate key fix
       const updatedProfile = await learnerProfileService.updateKcMastery(
         MOCK_USER_ID, 
         state.currentKc.id,
@@ -124,15 +128,24 @@ export const useAdaptivePracticeLogic = () => {
             difficulty: (atom.metadata as any)?.difficulty || 0.5,
             responseTime: Math.floor(Math.random() * 20000) + 5000,
             atomId: atom.atom_id,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            questionText: (atom.content as any)?.question || 'Unknown question'
           }
         }
       );
 
+      console.log('✅ KC mastery update completed successfully');
       updateState({ learnerProfile: updatedProfile });
 
     } catch (logError) {
-      console.error('❌ Error handling question answer:', logError);
+      console.error('❌ Critical error handling question answer:', logError);
+      console.error('❌ Error details:', {
+        message: logError.message,
+        stack: logError.stack,
+        kcId: state.currentKc.id,
+        userId: MOCK_USER_ID,
+        isCorrect: isCorrectAnswer
+      });
     }
 
     // Show feedback
