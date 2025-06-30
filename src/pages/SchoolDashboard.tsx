@@ -23,7 +23,12 @@ const SchoolDashboard = () => {
   const navigate = useNavigate();
   const [showTeachingSettings, setShowTeachingSettings] = useState(false);
 
-  console.log('[SchoolDashboard] Rendering with role:', userRole, 'loading:', loading, 'user:', user?.email);
+  console.log('[SchoolDashboard] Current state:', { 
+    userRole, 
+    loading, 
+    userEmail: user?.email,
+    hasUser: !!user 
+  });
 
   const stats = {
     totalStudents: 485,
@@ -32,9 +37,9 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
-  // Show loading state while auth is still loading OR if we have a user but no role yet
-  if (loading || (user && userRole === null)) {
-    console.log('[SchoolDashboard] Showing loading state - loading:', loading, 'userRole:', userRole);
+  // Show loading state only while auth is loading AND we don't have a user yet
+  if (loading && !user) {
+    console.log('[SchoolDashboard] Showing loading state');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -50,17 +55,56 @@ const SchoolDashboard = () => {
   const allowedRoles = ['admin', 'school_leader', 'school_staff'];
   const hasAccess = userRole && allowedRoles.includes(userRole);
   
-  console.log('[SchoolDashboard] Access check - userRole:', userRole, 'hasAccess:', hasAccess);
+  console.log('[SchoolDashboard] Access check:', { 
+    userRole, 
+    allowedRoles, 
+    hasAccess,
+    hasUser: !!user 
+  });
 
-  if (!hasAccess) {
-    console.log('[SchoolDashboard] Access denied for role:', userRole);
+  // If no user but not loading, show access denied
+  if (!user && !loading) {
+    console.log('[SchoolDashboard] No user, showing access denied');
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔐</div>
+          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+          <p className="text-gray-400">Please log in to access the school dashboard.</p>
+          <Button 
+            onClick={() => navigate('/auth')}
+            className="mt-4 bg-purple-600 hover:bg-purple-700"
+          >
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // If user but no access, show role-based access denied
+  if (user && !hasAccess) {
+    console.log('[SchoolDashboard] User exists but no access, role:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🏫</div>
           <h1 className="text-2xl font-bold mb-4">School Dashboard Access Required</h1>
-          <p className="text-gray-400">You need administrator, school leader, or staff privileges to access this dashboard.</p>
-          <p className="text-gray-400 mt-2">Current role: {userRole || 'None'}</p>
+          <p className="text-gray-400 mb-2">You need administrator, school leader, or staff privileges to access this dashboard.</p>
+          <p className="text-gray-400 mb-4">Current role: {userRole || 'None assigned'}</p>
+          <Button 
+            onClick={() => navigate('/auth')}
+            className="bg-purple-600 hover:bg-purple-700 mr-2"
+          >
+            Change Role
+          </Button>
+          <Button 
+            onClick={() => navigate('/')}
+            variant="outline"
+            className="border-gray-600 text-white hover:bg-gray-700"
+          >
+            Go Home
+          </Button>
         </div>
       </div>
     );
