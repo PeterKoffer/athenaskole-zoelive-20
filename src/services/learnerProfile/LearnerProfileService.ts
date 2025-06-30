@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences, InteractionEvent } from '@/types/learnerProfile';
 
@@ -261,7 +262,7 @@ class LearnerProfileService {
       console.log(`📈 New mastery metrics - Level: ${newMasteryLevel}, Attempts: ${newAttempts}, Correct: ${newCorrectAttempts}`);
 
       // Prepare the upsert data
-      const upsertData = {
+      const masteryData = {
         user_id: userId,
         kc_id: kcId,
         mastery_level: newMasteryLevel,
@@ -271,12 +272,12 @@ class LearnerProfileService {
         history: newHistory
       };
 
-      console.log(`🔄 Attempting upsert with data:`, upsertData);
+      console.log(`🔄 Attempting upsert with data:`, masteryData);
 
       // Use upsert with proper conflict resolution
-      const { data: upsertData, error: upsertError } = await supabase
+      const { data: upsertResult, error: upsertError } = await supabase
         .from('kc_mastery')
-        .upsert(upsertData, {
+        .upsert(masteryData, {
           onConflict: 'user_id,kc_id',
           ignoreDuplicates: false
         })
@@ -287,7 +288,7 @@ class LearnerProfileService {
         console.error('❌ Error code:', upsertError.code);
         console.error('❌ Error details:', upsertError.details);
         console.error('❌ Error hint:', upsertError.hint);
-        console.error('❌ Upsert data:', upsertData);
+        console.error('❌ Upsert data:', masteryData);
         
         // If upsert fails, try manual update/insert approach
         console.log('🔄 Attempting manual update/insert approach...');
@@ -332,7 +333,7 @@ class LearnerProfileService {
           console.log('✅ Manual insert successful');
         }
       } else {
-        console.log(`✅ KC mastery upsert successful:`, upsertData);
+        console.log(`✅ KC mastery upsert successful:`, upsertResult);
       }
 
       // Return updated profile
