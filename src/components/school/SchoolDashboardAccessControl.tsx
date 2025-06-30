@@ -20,8 +20,8 @@ const SchoolDashboardAccessControl = ({ children }: AccessControlProps) => {
     hasUser: !!user 
   });
 
-  // Show loading state only while auth is loading AND we don't have a user yet
-  if (loading && !user) {
+  // Show loading state while auth is loading
+  if (loading) {
     console.log('[SchoolDashboardAccessControl] Showing loading state');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -34,19 +34,8 @@ const SchoolDashboardAccessControl = ({ children }: AccessControlProps) => {
     );
   }
 
-  // Check access permissions - allow school_leader, admin, and school_staff
-  const allowedRoles = ['admin', 'school_leader', 'school_staff'];
-  const hasAccess = userRole && allowedRoles.includes(userRole);
-  
-  console.log('[SchoolDashboardAccessControl] Access check:', { 
-    userRole, 
-    allowedRoles, 
-    hasAccess,
-    hasUser: !!user 
-  });
-
-  // If no user but not loading, show access denied
-  if (!user && !loading) {
+  // If no user, show auth required
+  if (!user) {
     console.log('[SchoolDashboardAccessControl] No user, showing access denied');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -65,8 +54,19 @@ const SchoolDashboardAccessControl = ({ children }: AccessControlProps) => {
     );
   }
 
-  // If user but no access, show role-based access denied
-  if (user && !hasAccess) {
+  // Check access permissions - allow school_leader, admin, and school_staff
+  const allowedRoles = ['admin', 'school_leader', 'school_staff'];
+  const hasAccess = userRole && allowedRoles.includes(userRole);
+  
+  console.log('[SchoolDashboardAccessControl] Access check:', { 
+    userRole, 
+    allowedRoles, 
+    hasAccess,
+    hasUser: !!user 
+  });
+
+  // If user exists but doesn't have access, show role-based access denied
+  if (!hasAccess) {
     console.log('[SchoolDashboardAccessControl] User exists but no access, role:', userRole);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -93,7 +93,8 @@ const SchoolDashboardAccessControl = ({ children }: AccessControlProps) => {
     );
   }
 
-  console.log('[SchoolDashboardAccessControl] Rendering dashboard content');
+  // User has access - render the dashboard content
+  console.log('[SchoolDashboardAccessControl] Rendering dashboard content for user:', user.email, 'with role:', userRole);
   return <>{children}</>;
 };
 

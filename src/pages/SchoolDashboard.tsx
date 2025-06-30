@@ -17,6 +17,8 @@ const SchoolDashboard = () => {
     attendanceRate: 94.2
   };
 
+  console.log('[SchoolDashboard] Rendering with stats:', stats);
+
   return (
     <SchoolDashboardAccessControl>
       <div className="min-h-screen bg-gray-900 text-white">

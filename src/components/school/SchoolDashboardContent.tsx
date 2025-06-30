@@ -19,6 +19,8 @@ interface SchoolDashboardContentProps {
 }
 
 const SchoolDashboardContent = ({ stats }: SchoolDashboardContentProps) => {
+  console.log('[SchoolDashboardContent] Rendering with stats:', stats);
+
   return (
     <>
       <SchoolStatsCards stats={stats} />
