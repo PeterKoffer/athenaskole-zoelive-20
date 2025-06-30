@@ -4,11 +4,11 @@ import KnowledgeComponentService, { KnowledgeComponent } from './KnowledgeCompon
 
 class ContentOrchestrator {
   async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
-    const forceAIGenerationForTesting = false;
+    const forceAIGenerationForTesting = true; // Enable AI generation for testing
     try {
       console.log('🎯 ContentOrchestrator: Generating atom sequence for KC:', kcId);
       
-      // Step 1: Try database first
+      // Step 1: Try database first (unless forcing AI)
       if (!forceAIGenerationForTesting) {
         const dbAtoms = await ContentGenerationService.generateFromDatabase(kcId);
         if (dbAtoms.length > 0) {
