@@ -22,8 +22,8 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
 
   const handleGetStarted = () => {
     console.log('🚀 Hero: Get Started clicked');
-    console.log('🚀 Hero: Navigating to /adaptive-learning');
-    navigate("/adaptive-learning");
+    console.log('🚀 Hero: Navigating to /adaptive-practice-test');
+    navigate("/adaptive-practice-test");
   };
 
   const handleViewDailyProgram = () => {

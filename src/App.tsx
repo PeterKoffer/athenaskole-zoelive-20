@@ -19,6 +19,7 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import DailyProgram from '@/pages/DailyProgram';
 import CurriculumSystem from '@/pages/CurriculumSystem';
 import AdaptiveLearning from '@/pages/AdaptiveLearning';
+import AdaptivePracticeTestPage from '@/pages/AdaptivePracticeTestPage';
 
 // Education pages
 import MathematicsLearning from '@/components/education/MathematicsLearning';
@@ -60,6 +61,7 @@ function AppContent() {
       <Route path="/daily-program" element={<DailyProgram />} />
       <Route path="/curriculum" element={<CurriculumSystem />} />
       <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
+      <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
       
       {/* Learning Routes */}
       <Route path="/learn/mathematics" element={<MathematicsLearning />} />

@@ -21,8 +21,82 @@ class AICreativeDirectorService {
   async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
     try {
       console.log('🎯 AICreativeDirectorService: Generating atom sequence for KC:', kcId);
+      console.log('📊 TEST CASE 1: Looking for pre-built atoms in database first...');
       
-      // Get KC details
+      // STEP 1: Try to get pre-built atoms from database
+      const { data: existingAtoms, error: atomError } = await supabase
+        .from('content_atoms')
+        .select('*')
+        .contains('kc_ids', [kcId])
+        .limit(5);
+
+      if (!atomError && existingAtoms && existingAtoms.length > 0) {
+        console.log('✅ TEST CASE 1: Found pre-built atoms in database:', existingAtoms.length);
+        console.log('🎯 Database atoms:', existingAtoms.map(atom => ({
+          id: atom.id,
+          type: atom.atom_type,
+          kc_ids: atom.kc_ids
+        })));
+
+        const sequence: AtomSequence = {
+          sequence_id: `db_seq_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          atoms: existingAtoms.map(atom => ({
+            atom_id: atom.id,
+            atom_type: atom.atom_type,
+            content: atom.content,
+            kc_ids: atom.kc_ids,
+            metadata: {
+              ...atom.metadata,
+              source: 'database',
+              loadedAt: Date.now()
+            }
+          })),
+          kc_id: kcId,
+          user_id: userId,
+          created_at: new Date().toISOString()
+        };
+
+        console.log('✅ TEST CASE 1: Database content loaded successfully');
+        return sequence;
+      }
+
+      console.log('⚠️ TEST CASE 1: No pre-built atoms found in database, trying Edge Function...');
+
+      // STEP 2: Try Edge Function (AI generation)
+      try {
+        console.log('🤖 Calling Edge Function for AI content generation...');
+        const { data: edgeResponse, error: edgeError } = await supabase.functions.invoke('generate-content-atoms', {
+          body: {
+            kcId,
+            userId,
+            contentTypes: ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE', 'INTERACTIVE_EXERCISE'],
+            maxAtoms: 3
+          }
+        });
+
+        if (!edgeError && edgeResponse?.atoms) {
+          console.log('✅ Edge Function generated content successfully:', edgeResponse.atoms.length, 'atoms');
+          
+          const sequence: AtomSequence = {
+            sequence_id: `ai_seq_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+            atoms: edgeResponse.atoms,
+            kc_id: kcId,
+            user_id: userId,
+            created_at: new Date().toISOString()
+          };
+
+          return sequence;
+        }
+
+        console.log('⚠️ Edge Function failed or returned no content:', edgeError);
+      } catch (edgeError) {
+        console.log('❌ Edge Function call failed:', edgeError);
+      }
+
+      // STEP 3: Fallback to client-side generation
+      console.log('🔄 Both database and Edge Function failed, using client-side fallback...');
+      
+      // Get KC details for fallback generation
       const { data: kc, error: kcError } = await supabase
         .from('knowledge_components')
         .select('*')
@@ -30,12 +104,10 @@ class AICreativeDirectorService {
         .single();
 
       if (kcError || !kc) {
-        console.error('❌ Failed to fetch KC details:', kcError);
+        console.error('❌ Failed to fetch KC details for fallback:', kcError);
         throw new Error(`Knowledge component not found: ${kcId}`);
       }
 
-      // Always use fallback atoms since the edge function is not working
-      console.log('🔄 Using fallback atoms due to edge function issues');
       const atoms = this.generateFallbackAtoms(kc);
       
       if (!atoms || atoms.length === 0) {
@@ -44,19 +116,14 @@ class AICreativeDirectorService {
       }
 
       const sequence: AtomSequence = {
-        sequence_id: `seq_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        sequence_id: `fallback_seq_${Date.now()}_${Math.random().toString(36).substring(7)}`,
         atoms: atoms,
         kc_id: kcId,
         user_id: userId,
         created_at: new Date().toISOString()
       };
 
-      console.log('✅ Generated atom sequence:', {
-        sequenceId: sequence.sequence_id,
-        atomCount: atoms.length,
-        kcId: kcId
-      });
-
+      console.log('✅ Client-side fallback content generated');
       return sequence;
 
     } catch (error) {
@@ -81,7 +148,7 @@ class AICreativeDirectorService {
         metadata: {
           difficulty: kc.difficulty_estimate || 0.5,
           estimatedTimeMs: 30000,
-          source: 'fallback_generator'
+          source: 'client_fallback'
         }
       },
       {
@@ -105,7 +172,7 @@ class AICreativeDirectorService {
         metadata: {
           difficulty: kc.difficulty_estimate || 0.5,
           estimatedTimeMs: 45000,
-          source: 'fallback_generator'
+          source: 'client_fallback'
         }
       },
       {
@@ -124,7 +191,7 @@ class AICreativeDirectorService {
         metadata: {
           difficulty: kc.difficulty_estimate || 0.5,
           estimatedTimeMs: 60000,
-          source: 'fallback_generator'
+          source: 'client_fallback'
         }
       }
     ];
