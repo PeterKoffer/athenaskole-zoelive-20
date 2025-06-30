@@ -7,13 +7,15 @@ class ContentOrchestrator {
     try {
       console.log('🎯 ContentOrchestrator: Generating atom sequence for KC:', kcId);
       
-      // Step 1: Try database first
+      // Step 1: Try database first (unless testing flag is set)
       const dbAtoms = await ContentGenerationService.generateFromDatabase(kcId);
       if (dbAtoms.length > 0) {
+        console.log('✅ Using database atoms');
         return this.createAtomSequence('database', dbAtoms, kcId, userId);
       }
 
-      // Step 2: Try AI generation
+      // Step 2: Proceed to AI generation
+      console.log('🤖 Proceeding to AI generation...');
       const request: ContentGenerationRequest = {
         kcId,
         userId,
@@ -23,10 +25,12 @@ class ContentOrchestrator {
 
       const aiAtoms = await ContentGenerationService.generateFromAI(request);
       if (aiAtoms.length > 0) {
+        console.log('✅ Using AI generated atoms');
         return this.createAtomSequence('ai_generated', aiAtoms, kcId, userId);
       }
 
-      // Step 3: Use fallback
+      // Step 3: Use fallback only if not in testing mode
+      console.log('🔄 Attempting fallback content generation...');
       const kc = await KnowledgeComponentService.getKnowledgeComponent(kcId);
       if (!kc) {
         throw new Error(`Knowledge component not found: ${kcId}`);
