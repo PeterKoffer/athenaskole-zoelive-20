@@ -261,80 +261,27 @@ class LearnerProfileService {
 
       console.log(`📈 New mastery metrics - Level: ${newMasteryLevel}, Attempts: ${newAttempts}, Correct: ${newCorrectAttempts}`);
 
-      // Prepare the upsert data
-      const masteryData = {
-        user_id: userId,
-        kc_id: kcId,
-        mastery_level: newMasteryLevel,
-        attempts: newAttempts,
-        correct_attempts: newCorrectAttempts,
-        last_attempted_timestamp: new Date().toISOString(),
-        history: newHistory
-      };
-
-      console.log(`🔄 Attempting upsert with data:`, masteryData);
-
       // Use upsert with proper conflict resolution
-      const { data: upsertResult, error: upsertError } = await supabase
+      const { error: upsertError } = await supabase
         .from('kc_mastery')
-        .upsert(masteryData, {
-          onConflict: 'user_id,kc_id',
-          ignoreDuplicates: false
-        })
-        .select();
+        .upsert({
+          user_id: userId,
+          kc_id: kcId,
+          mastery_level: newMasteryLevel,
+          attempts: newAttempts,
+          correct_attempts: newCorrectAttempts,
+          last_attempted_timestamp: new Date().toISOString(),
+          history: newHistory
+        }, {
+          onConflict: 'user_id,kc_id'
+        });
 
       if (upsertError) {
         console.error('❌ Error in KC mastery upsert:', upsertError);
-        console.error('❌ Error code:', upsertError.code);
-        console.error('❌ Error details:', upsertError.details);
-        console.error('❌ Error hint:', upsertError.hint);
-        console.error('❌ Upsert data:', masteryData);
-        
-        // If upsert fails, try manual update/insert approach
-        console.log('🔄 Attempting manual update/insert approach...');
-        
-        if (currentMastery) {
-          // Update existing record
-          const { error: updateError } = await supabase
-            .from('kc_mastery')
-            .update({
-              mastery_level: newMasteryLevel,
-              attempts: newAttempts,
-              correct_attempts: newCorrectAttempts,
-              last_attempted_timestamp: new Date().toISOString(),
-              history: newHistory
-            })
-            .eq('user_id', userId)
-            .eq('kc_id', kcId);
-
-          if (updateError) {
-            console.error('❌ Manual update failed:', updateError);
-            throw updateError;
-          }
-          console.log('✅ Manual update successful');
-        } else {
-          // Insert new record
-          const { error: insertError } = await supabase
-            .from('kc_mastery')
-            .insert({
-              user_id: userId,
-              kc_id: kcId,
-              mastery_level: newMasteryLevel,
-              attempts: newAttempts,
-              correct_attempts: newCorrectAttempts,
-              last_attempted_timestamp: new Date().toISOString(),
-              history: newHistory
-            });
-
-          if (insertError) {
-            console.error('❌ Manual insert failed:', insertError);
-            throw insertError;
-          }
-          console.log('✅ Manual insert successful');
-        }
-      } else {
-        console.log(`✅ KC mastery upsert successful:`, upsertResult);
+        throw upsertError;
       }
+
+      console.log(`✅ KC mastery upsert successful`);
 
       // Return updated profile
       const updatedProfile = await this.getProfile(userId);
