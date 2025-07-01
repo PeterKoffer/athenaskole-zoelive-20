@@ -14,5 +14,3 @@ export interface User extends SupabaseUser {
   user_metadata: UserMetadata;
   role?: string;
 }
-
-export type { UserMetadata };
