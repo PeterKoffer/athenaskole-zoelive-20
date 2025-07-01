@@ -7,6 +7,8 @@ export interface UserMetadata {
   name?: string;
   profile_picture_url?: string;
   role?: string;
+  grade_level?: number;
+  age?: number;
   [key: string]: any;
 }
 

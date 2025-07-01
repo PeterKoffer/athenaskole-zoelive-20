@@ -10,6 +10,8 @@ export interface UserMetadata {
   name?: string; // This can be derived from first_name and last_name or stored directly
   profile_picture_url?: string;
   role?: UserRole;
+  grade_level?: number;
+  age?: number;
   // Add other custom fields from your Supabase user_metadata if any
   school_code?: string; // Assuming schoolCode might be here
   child_code?: string;  // Assuming childCode might be here

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +20,41 @@ interface TestResult {
 interface Grade3FractionTestInterfaceProps {
   onBack: () => void;
 }
+
+// Helper functions moved outside component
+const analyzeGradeLevel = (question: string): string => {
+  const indicators = {
+    appropriate: ['one half', '1/2', '1/3', '1/4', 'parts', 'whole', 'equal parts', 'shaded'],
+    tooAdvanced: ['equivalent', 'compare', 'add', 'subtract', 'mixed number', 'improper']
+  };
+  
+  const lowerQuestion = question.toLowerCase();
+  const hasAppropriate = indicators.appropriate.some(term => lowerQuestion.includes(term));
+  const hasTooAdvanced = indicators.tooAdvanced.some(term => lowerQuestion.includes(term));
+  
+  if (hasAppropriate && !hasTooAdvanced) return 'Grade 3 Appropriate';
+  if (hasTooAdvanced) return 'Possibly Too Advanced';
+  return 'Needs Analysis';
+};
+
+const analyzeConceptualFocus = (question: string): string => {
+  const lowerQuestion = question.toLowerCase();
+  
+  if (lowerQuestion.includes('what fraction') || lowerQuestion.includes('which fraction')) {
+    return 'Fraction Identification (Good)';
+  }
+  if (lowerQuestion.includes('shaded') || lowerQuestion.includes('colored')) {
+    return 'Visual Representation (Excellent)';
+  }
+  if (lowerQuestion.includes('equal parts') || lowerQuestion.includes('divided')) {
+    return 'Partitioning Concept (Excellent)';
+  }
+  if (lowerQuestion.includes('calculate') || lowerQuestion.includes('compute')) {
+    return 'Computational (Not Ideal for Grade 3)';
+  }
+  
+  return 'General Fraction Question';
+};
 
 const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = ({ onBack }) => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
@@ -102,8 +136,8 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
           
           if (atom.content?.question) {
             console.log(`    Question: ${atom.content.question}`);
-            console.log(`    Grade Level Check: ${this.analyzeGradeLevel(atom.content.question)}`);
-            console.log(`    Conceptual Focus: ${this.analyzeConceptualFocus(atom.content.question)}`);
+            console.log(`    Grade Level Check: ${analyzeGradeLevel(atom.content.question)}`);
+            console.log(`    Conceptual Focus: ${analyzeConceptualFocus(atom.content.question)}`);
             
             if (atom.content?.options) {
               console.log(`    Options: ${atom.content.options.join(', ')}`);
@@ -144,40 +178,6 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
         fallbackTest: testFallback
       };
     }
-  };
-
-  const analyzeGradeLevel = (question: string): string => {
-    const indicators = {
-      appropriate: ['one half', '1/2', '1/3', '1/4', 'parts', 'whole', 'equal parts', 'shaded'],
-      tooAdvanced: ['equivalent', 'compare', 'add', 'subtract', 'mixed number', 'improper']
-    };
-    
-    const lowerQuestion = question.toLowerCase();
-    const hasAppropriate = indicators.appropriate.some(term => lowerQuestion.includes(term));
-    const hasTooAdvanced = indicators.tooAdvanced.some(term => lowerQuestion.includes(term));
-    
-    if (hasAppropriate && !hasTooAdvanced) return 'Grade 3 Appropriate';
-    if (hasTooAdvanced) return 'Possibly Too Advanced';
-    return 'Needs Analysis';
-  };
-
-  const analyzeConceptualFocus = (question: string): string => {
-    const lowerQuestion = question.toLowerCase();
-    
-    if (lowerQuestion.includes('what fraction') || lowerQuestion.includes('which fraction')) {
-      return 'Fraction Identification (Good)';
-    }
-    if (lowerQuestion.includes('shaded') || lowerQuestion.includes('colored')) {
-      return 'Visual Representation (Excellent)';
-    }
-    if (lowerQuestion.includes('equal parts') || lowerQuestion.includes('divided')) {
-      return 'Partitioning Concept (Excellent)';
-    }
-    if (lowerQuestion.includes('calculate') || lowerQuestion.includes('compute')) {
-      return 'Computational (Not Ideal for Grade 3)';
-    }
-    
-    return 'General Fraction Question';
   };
 
   const runAllTests = async () => {
@@ -406,16 +406,16 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
                                 <div className="flex gap-1 flex-wrap">
                                   {atom.content?.question && (
                                     <Badge className={
-                                      this.analyzeGradeLevel(atom.content.question).includes('Appropriate') 
+                                      analyzeGradeLevel(atom.content.question).includes('Appropriate') 
                                         ? "bg-green-100 text-green-800" 
                                         : "bg-yellow-100 text-yellow-800"
                                     }>
-                                      {this.analyzeGradeLevel(atom.content.question)}
+                                      {analyzeGradeLevel(atom.content.question)}
                                     </Badge>
                                   )}
                                   {atom.content?.question && (
                                     <Badge className="bg-blue-100 text-blue-800">
-                                      {this.analyzeConceptualFocus(atom.content.question)}
+                                      {analyzeConceptualFocus(atom.content.question)}
                                     </Badge>
                                   )}
                                 </div>
