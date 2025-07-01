@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { UserRole } from '@/types/auth';
+import { UserRole, UserMetadata } from '@/types/auth'; // Import UserMetadata
 
 export const useSimpleRoleAccess = () => {
   const { user, loading } = useAuth();
@@ -12,7 +12,8 @@ export const useSimpleRoleAccess = () => {
 
     // Simple role determination
     if (user) {
-      const role = user.user_metadata?.role as UserRole;
+      const metadata = user.user_metadata as UserMetadata | undefined;
+      const role = metadata?.role;
       setUserRole(role || 'student');
     } else {
       // For testing, default to school_leader when not authenticated

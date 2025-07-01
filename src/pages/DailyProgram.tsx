@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { UserMetadata } from "@/types/auth"; // Import UserMetadata
 import WelcomeCard from "@/components/daily-program/WelcomeCard";
 import TodaysProgramGrid from "@/components/daily-program/TodaysProgramGrid";
 import NeliesTips from "@/components/daily-program/NeliesTips";
@@ -13,7 +14,8 @@ const DailyProgram = () => {
   const { user, loading } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   
-  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'Student';
+  const metadata = user?.user_metadata as UserMetadata | undefined;
+  const firstName = metadata?.name?.split(' ')[0] || metadata?.first_name || 'Student';
   
   // Scroll to top when page loads
   useEffect(() => {

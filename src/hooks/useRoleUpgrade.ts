@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { UserRole, ROLE_CONFIGS } from "@/types/auth";
+import { UserRole, ROLE_CONFIGS, UserMetadata } from "@/types/auth"; // Import UserMetadata
 import { useToast } from "@/hooks/use-toast";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 
@@ -23,7 +23,8 @@ export function useRoleUpgrade() {
       console.log("[useRoleUpgrade] Checking user role for:", user.email);
 
       // Meta role
-      const metaRole = user.user_metadata?.role;
+      const metadata = user.user_metadata as UserMetadata | undefined;
+      const metaRole = metadata?.role;
       console.log("[useRoleUpgrade] Current meta role:", metaRole);
       
       // If we already have a valid role (either from metadata or session), don't interfere
@@ -60,7 +61,7 @@ export function useRoleUpgrade() {
           
           await supabase.auth.updateUser({
             data: {
-              ...user.user_metadata,
+              ...(user.user_metadata as UserMetadata), // Ensure existing metadata is spread correctly
               role: guessedRole,
             },
           });

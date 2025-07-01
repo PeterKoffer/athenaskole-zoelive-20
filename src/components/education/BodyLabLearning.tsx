@@ -1,6 +1,7 @@
 
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { UserMetadata } from "@/types/auth"; // Import UserMetadata
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import UnifiedLessonManager from "./components/UnifiedLessonManager";
