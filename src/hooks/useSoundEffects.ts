@@ -15,7 +15,7 @@ export const useSoundEffects = () => {
     try {
       const audioContext = initAudioContext();
       
-      // Create a euphoric, dopamine-inducing sound sequence
+      // Faster, more immediate dopamine-inducing sound
       const oscillator1 = audioContext.createOscillator();
       const oscillator2 = audioContext.createOscillator();
       const oscillator3 = audioContext.createOscillator();
@@ -27,43 +27,36 @@ export const useSoundEffects = () => {
       oscillator3.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
-      // Create a triumphant major chord progression (C-E-G to F-A-C to G-B-D)
-      // First chord: C Major
+      // Faster chord progression - C Major to G Major (instant satisfaction)
       oscillator1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
       oscillator2.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
       oscillator3.frequency.setValueAtTime(783.99, audioContext.currentTime); // G5
       
-      // Second chord: F Major (uplifting transition)
-      oscillator1.frequency.setValueAtTime(698.46, audioContext.currentTime + 0.15); // F5
-      oscillator2.frequency.setValueAtTime(880.00, audioContext.currentTime + 0.15); // A5
-      oscillator3.frequency.setValueAtTime(1046.5, audioContext.currentTime + 0.15); // C6
-      
-      // Final chord: G Major (resolution with higher octave for excitement)
-      oscillator1.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.3); // G5
-      oscillator2.frequency.setValueAtTime(987.77, audioContext.currentTime + 0.3); // B5
-      oscillator3.frequency.setValueAtTime(1174.7, audioContext.currentTime + 0.3); // D6
+      // Quick transition to higher, more exciting chord
+      oscillator1.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.08); // G5
+      oscillator2.frequency.setValueAtTime(987.77, audioContext.currentTime + 0.08); // B5
+      oscillator3.frequency.setValueAtTime(1174.7, audioContext.currentTime + 0.08); // D6
       
       // Set oscillator types for rich, warm sound
       oscillator1.type = 'triangle';
       oscillator2.type = 'sine';
       oscillator3.type = 'triangle';
       
-      // Create euphoric envelope - quick attack, sustained high, gentle decay
+      // Much faster, more immediate envelope
       gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.05); // Quick attack
-      gainNode.gain.setValueAtTime(0.35, audioContext.currentTime + 0.2); // Sustain
-      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.35); // Keep energy
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6); // Gentle fade
+      gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.02); // Very quick attack
+      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.1); // Short sustain
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25); // Quick fade
       
-      // Start and stop oscillators
+      // Start and stop oscillators - much shorter duration
       oscillator1.start(audioContext.currentTime);
       oscillator2.start(audioContext.currentTime);
       oscillator3.start(audioContext.currentTime);
-      oscillator1.stop(audioContext.currentTime + 0.6);
-      oscillator2.stop(audioContext.currentTime + 0.6);
-      oscillator3.stop(audioContext.currentTime + 0.6);
+      oscillator1.stop(audioContext.currentTime + 0.25);
+      oscillator2.stop(audioContext.currentTime + 0.25);
+      oscillator3.stop(audioContext.currentTime + 0.25);
       
-      console.log('🎉 Playing dopamine-inducing correct answer sound!');
+      console.log('🎉 Playing fast dopamine-inducing correct answer sound!');
     } catch (error) {
       console.error('❌ Error playing sound effect:', error);
     }
@@ -73,27 +66,28 @@ export const useSoundEffects = () => {
     try {
       const audioContext = initAudioContext();
       
-      // Create a gentle, encouraging sound for wrong answers
+      // Faster, gentler sound for wrong answers
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
-      // Gentle descending tone
+      // Quick descending tone
       oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-      oscillator.frequency.linearRampToValueAtTime(350, audioContext.currentTime + 0.3);
+      oscillator.frequency.linearRampToValueAtTime(350, audioContext.currentTime + 0.15);
       
       oscillator.type = 'sine';
       
+      // Faster envelope
       gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.05);
-      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+      gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.02);
+      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.15);
       
       oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.3);
+      oscillator.stop(audioContext.currentTime + 0.15);
       
-      console.log('🔊 Playing wrong answer sound effect');
+      console.log('🔊 Playing fast wrong answer sound effect');
     } catch (error) {
       console.error('❌ Error playing wrong answer sound:', error);
     }
