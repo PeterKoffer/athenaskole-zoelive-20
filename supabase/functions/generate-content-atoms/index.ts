@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -25,9 +24,9 @@ interface Atom {
   metadata: any;
 }
 
-// Enhanced fallback content generator for when APIs fail
+// Enhanced fallback content generator with actual math questions
 function generateFallbackContent(kcId: string, maxAtoms: number): Atom[] {
-  console.log(`🔄 Generating fallback content for ${kcId}`);
+  console.log(`🔄 Generating enhanced math fallback content for ${kcId}`);
   
   const timestamp = Date.now();
   const atoms: Atom[] = [];
@@ -37,24 +36,24 @@ function generateFallbackContent(kcId: string, maxAtoms: number): Atom[] {
   const grade = parts[2]?.replace('g', '') || '5';
   const topic = parts.slice(3).join(' ').replace(/_/g, ' ') || 'mathematics';
   
-  // Generate TEXT_EXPLANATION atom
+  // Create topic-specific math questions
+  const mathQuestions = createMathQuestionsByTopic(topic, grade);
+  
+  // Generate TEXT_EXPLANATION atom with actual math content
   atoms.push({
     atom_id: `fallback_explanation_${timestamp}_1`,
     atom_type: 'TEXT_EXPLANATION',
     content: {
       title: `Understanding ${topic.charAt(0).toUpperCase() + topic.slice(1)}`,
-      explanation: `Let's explore ${topic} for Grade ${grade}. This concept builds on your previous knowledge and helps you develop stronger mathematical skills. We'll work through examples step by step to ensure you understand the process.`,
-      examples: [
-        `Example 1: Practice problem for ${topic}`,
-        `Example 2: Real-world application of ${topic}`
-      ]
+      explanation: mathQuestions.explanation,
+      examples: mathQuestions.examples
     },
     kc_ids: [kcId],
     metadata: {
       difficulty: 0.5,
       estimatedTimeMs: 30000,
-      source: 'curriculum_fallback',
-      model: 'Fallback Generator',
+      source: 'enhanced_math_fallback',
+      model: 'Enhanced Fallback Generator',
       generated_at: timestamp,
       curriculumAligned: true,
       mathTopic: topic,
@@ -62,28 +61,23 @@ function generateFallbackContent(kcId: string, maxAtoms: number): Atom[] {
     }
   });
   
-  // Generate QUESTION_MULTIPLE_CHOICE atom if requested
+  // Generate QUESTION_MULTIPLE_CHOICE atom with actual math problem
   if (maxAtoms > 1) {
     atoms.push({
       atom_id: `fallback_question_${timestamp}_2`,
       atom_type: 'QUESTION_MULTIPLE_CHOICE',
       content: {
-        question: `Which of the following best describes ${topic}?`,
-        options: [
-          "A mathematical concept we're learning",
-          "An advanced topic for higher grades",
-          "A basic skill we already know",
-          "Something not related to math"
-        ],
-        correctAnswer: 0,
-        explanation: `${topic.charAt(0).toUpperCase() + topic.slice(1)} is indeed a mathematical concept that we're currently learning in Grade ${grade}.`
+        question: mathQuestions.question,
+        options: mathQuestions.options,
+        correctAnswer: mathQuestions.correctAnswer,
+        explanation: mathQuestions.questionExplanation
       },
       kc_ids: [kcId],
       metadata: {
-        difficulty: 0.4,
-        estimatedTimeMs: 25000,
-        source: 'curriculum_fallback',
-        model: 'Fallback Generator',
+        difficulty: 0.6,
+        estimatedTimeMs: 45000,
+        source: 'enhanced_math_fallback',
+        model: 'Enhanced Fallback Generator',
         generated_at: timestamp,
         curriculumAligned: true,
         mathTopic: topic,
@@ -93,6 +87,92 @@ function generateFallbackContent(kcId: string, maxAtoms: number): Atom[] {
   }
   
   return atoms.slice(0, maxAtoms);
+}
+
+// Create topic-specific math questions
+function createMathQuestionsByTopic(topic: string, grade: string) {
+  if (topic.includes('equivalent') && topic.includes('fractions')) {
+    return {
+      explanation: `Equivalent fractions are fractions that represent the same value even though they look different. For example, 1/2 and 2/4 are equivalent because they both represent half of a whole. To find equivalent fractions, you can multiply or divide both the numerator and denominator by the same number.`,
+      examples: [
+        "1/2 = 2/4 = 3/6 = 4/8 (all represent one half)",
+        "3/4 = 6/8 = 9/12 = 12/16 (all represent three quarters)"
+      ],
+      question: "Which fraction is equivalent to 2/3?",
+      options: ["4/6", "3/4", "2/5", "1/3"],
+      correctAnswer: 0,
+      questionExplanation: "To find equivalent fractions, multiply both numerator and denominator by the same number. 2/3 × 2/2 = 4/6"
+    };
+  }
+  
+  if (topic.includes('basic') && topic.includes('division')) {
+    return {
+      explanation: `Division is sharing things equally into groups. When we divide, we're finding out how many are in each group or how many groups we can make. Division is the opposite of multiplication.`,
+      examples: [
+        "12 ÷ 3 = 4 (12 items shared equally among 3 groups gives 4 in each group)",
+        "15 ÷ 5 = 3 (15 items divided into groups of 5 makes 3 groups)"
+      ],
+      question: "What is 24 ÷ 6?",
+      options: ["4", "5", "3", "6"],
+      correctAnswer: 0,
+      questionExplanation: "24 ÷ 6 = 4 because 6 × 4 = 24. We can fit 6 into 24 exactly 4 times."
+    };
+  }
+  
+  if (topic.includes('add') && topic.includes('fractions')) {
+    return {
+      explanation: `When adding fractions with the same denominator (bottom number), we add the numerators (top numbers) and keep the denominator the same. For example: 1/4 + 2/4 = 3/4.`,
+      examples: [
+        "1/5 + 2/5 = 3/5 (one fifth plus two fifths equals three fifths)",
+        "3/8 + 1/8 = 4/8 = 1/2 (three eighths plus one eighth equals four eighths, which simplifies to one half)"
+      ],
+      question: "What is 2/7 + 3/7?",
+      options: ["5/7", "5/14", "6/7", "2/3"],
+      correctAnswer: 0,
+      questionExplanation: "When adding fractions with the same denominator, add the numerators: 2 + 3 = 5, so 2/7 + 3/7 = 5/7"
+    };
+  }
+  
+  if (topic.includes('multiply') && topic.includes('decimals')) {
+    return {
+      explanation: `When multiplying decimals, multiply the numbers as if they were whole numbers, then count the total number of decimal places in both numbers and place the decimal point in the answer.`,
+      examples: [
+        "2.5 × 3 = 7.5 (multiply 25 × 3 = 75, then place decimal 1 place from right)",
+        "1.2 × 0.4 = 0.48 (multiply 12 × 4 = 48, then place decimal 2 places from right)"
+      ],
+      question: "What is 3.2 × 1.5?",
+      options: ["4.8", "4.7", "5.2", "3.8"],
+      correctAnswer: 0,
+      questionExplanation: "Multiply 32 × 15 = 480. Count decimal places: 3.2 has 1, 1.5 has 1, total 2. So 480 becomes 4.80 or 4.8"
+    };
+  }
+  
+  if (topic.includes('divide') && topic.includes('decimals')) {
+    return {
+      explanation: `When dividing decimals, we can move the decimal point in both numbers to make the divisor a whole number, then divide normally.`,
+      examples: [
+        "4.8 ÷ 1.2 = 48 ÷ 12 = 4 (move decimal 1 place in both numbers)",
+        "6.4 ÷ 0.8 = 64 ÷ 8 = 8 (move decimal 1 place in both numbers)"
+      ],
+      question: "What is 7.2 ÷ 1.8?",
+      options: ["4", "3.6", "5", "4.2"],
+      correctAnswer: 0,
+      questionExplanation: "7.2 ÷ 1.8 = 72 ÷ 18 = 4. We moved the decimal 1 place in both numbers and divided."
+    };
+  }
+  
+  // Default for any other topic
+  return {
+    explanation: `This is an important Grade ${grade} mathematics concept that builds on your previous knowledge and helps develop stronger mathematical skills.`,
+    examples: [
+      `Example 1: Practice problem for Grade ${grade} mathematics`,
+      `Example 2: Real-world application of mathematical concepts`
+    ],
+    question: `Which operation would you use to solve a problem involving ${topic}?`,
+    options: ["Addition", "Subtraction", "Multiplication", "Division"],
+    correctAnswer: 0,
+    questionExplanation: `The specific operation depends on the problem context in ${topic}.`
+  };
 }
 
 async function generateWithAI(
@@ -267,11 +347,11 @@ serve(async (req) => {
 
     // Enhanced fallback: Generate curriculum-aligned content locally if all APIs fail
     if (atoms.length === 0) {
-      console.log("🔄 All API providers failed, generating enhanced fallback content");
+      console.log("🔄 All API providers failed, generating enhanced math fallback content");
       atoms = generateFallbackContent(kcId, maxAtoms);
-      providerUsed = "Curriculum-Enhanced Fallback";
+      providerUsed = "Enhanced Math Fallback";
       generationError = null;
-      console.log(`✅ Fallback curriculum generation successful: ${atoms.length} atoms created`);
+      console.log(`✅ Enhanced math fallback generation successful: ${atoms.length} atoms created`);
     }
 
     if (atoms.length > 0) {
