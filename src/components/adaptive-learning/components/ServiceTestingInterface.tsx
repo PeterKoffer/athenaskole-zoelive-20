@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Database, Play, Zap } from 'lucide-react';
+import { Database, Play, Zap, BookOpen } from 'lucide-react';
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 import { InteractionEventType } from '@/types/stealthAssessment';
 import { MOCK_USER_ID } from '@/services/learnerProfile/MockProfileService';
+import CurriculumTestInterface from './CurriculumTestInterface';
 
 interface ServiceTestingInterfaceProps {
   onBack: () => void;
@@ -15,6 +16,7 @@ const ServiceTestingInterface: React.FC<ServiceTestingInterfaceProps> = ({ onBac
   const [loading, setLoading] = useState(false);
   const [testResults, setTestResults] = useState<string[]>([]);
   const [testStatus, setTestStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
+  const [activeView, setActiveView] = useState<'main' | 'curriculum'>('main');
 
   const addTestResult = (message: string) => {
     setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -106,6 +108,10 @@ const ServiceTestingInterface: React.FC<ServiceTestingInterfaceProps> = ({ onBac
     }
   };
 
+  if (activeView === 'curriculum') {
+    return <CurriculumTestInterface onBack={() => setActiveView('main')} />;
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-700">
@@ -140,6 +146,13 @@ const ServiceTestingInterface: React.FC<ServiceTestingInterfaceProps> = ({ onBac
                   Test Refactored Service
                 </>
               )}
+            </Button>
+            <Button 
+              onClick={() => setActiveView('curriculum')}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Test Curriculum Integration
             </Button>
           </div>
           
