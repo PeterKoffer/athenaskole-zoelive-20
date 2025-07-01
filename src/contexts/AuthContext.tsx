@@ -1,5 +1,5 @@
 
-import { AuthProvider } from '@/hooks/useAuth';
+import { AuthProvider, useAuth } from '@/hooks/useAuth';
 
 // Re-export the AuthProvider from useAuth for compatibility
-export { AuthProvider, useAuth } from '@/hooks/useAuth';
+export { AuthProvider, useAuth };
