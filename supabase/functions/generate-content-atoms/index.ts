@@ -38,7 +38,7 @@ function createMathPrompt(kcId: string, userId: string, contentTypes: string[], 
   } else if (topic.includes('area_rectangles')) {
     specificInstructions = `Create area questions like "A rectangle has length 8 units and width 5 units. What is its area?" with options like "40 square units", "13 square units", "26 square units", "35 square units"`;
   } else if (topic.includes('add_fractions')) {
-    specificInstructions = `Create fraction addition questions like "What is 2/5 + 1/5?" with fraction answer options`;
+    specificInstructions = `Create fraction addition questions like "What is 2/5 + 1/5?" with fraction answer options. CRITICAL: Make sure the correctAnswer index points to the mathematically correct sum.`;
   } else if (topic.includes('basic_division')) {
     specificInstructions = `Create basic division questions like "What is 24 ÷ 6?" with numerical answer choices. MAKE SURE the correctAnswer index points to the mathematically correct result.`;
   } else {
@@ -56,7 +56,7 @@ For QUESTION_MULTIPLE_CHOICE atoms, create ACTUAL MATH PROBLEMS with numbers, no
 
 CRITICAL: For multiple choice questions, you MUST ensure the correctAnswer index points to the option that contains the mathematically correct answer. 
 
-Example for division: If the question is "What is 24 ÷ 6?" and your options are ["6", "4", "8", "7"], then correctAnswer should be 1 (because "4" is at index 1 and 24 ÷ 6 = 4).
+Example for fraction addition: If the question is "What is 2/5 + 3/5?" and your options are ["4/5", "5/5", "1/2", "1/5"], then correctAnswer should be 1 (because "5/5" is at index 1 and 2/5 + 3/5 = 5/5).
 
 Return JSON with this exact structure:
 {
@@ -84,6 +84,71 @@ Return JSON with this exact structure:
 DOUBLE-CHECK: Before finalizing your response, verify that the correctAnswer index matches the position of the mathematically correct answer in the options array. This is CRITICAL for the learning system to work properly.
 
 IMPORTANT: Create real mathematical calculations, not questions about concepts. Use actual numbers and math problems appropriate for Grade ${gradeNumber}.`;
+}
+
+function validateMathAnswer(question: string, options: string[], correctAnswerIndex: number): number {
+  console.log(`🔍 Validating math answer for: "${question}"`);
+  console.log(`📝 Options:`, options);
+  console.log(`🎯 Original correctAnswer index:`, correctAnswerIndex);
+  
+  // Handle fraction addition questions
+  if (question.includes('+') && question.includes('/')) {
+    const fractionMatch = question.match(/(\d+)\/(\d+)\s*\+\s*(\d+)\/(\d+)/);
+    if (fractionMatch) {
+      const [, num1, den1, num2, den2] = fractionMatch.map(Number);
+      
+      // Only handle like denominators for now
+      if (den1 === den2) {
+        const correctSum = `${num1 + num2}/${den1}`;
+        console.log(`🧮 Calculated correct answer: ${correctSum}`);
+        
+        // Find the index of the correct answer
+        for (let i = 0; i < options.length; i++) {
+          if (options[i].trim() === correctSum) {
+            console.log(`✅ Found correct answer "${correctSum}" at index ${i}`);
+            return i;
+          }
+        }
+      }
+    }
+  }
+  
+  // Handle basic multiplication
+  if (question.includes('×') || question.includes('*')) {
+    const multMatch = question.match(/(\d+(?:\.\d+)?)\s*[×*]\s*(\d+(?:\.\d+)?)/);
+    if (multMatch) {
+      const [, num1, num2] = multMatch;
+      const result = (parseFloat(num1) * parseFloat(num2)).toString();
+      
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].trim() === result) {
+          console.log(`✅ Found correct multiplication answer "${result}" at index ${i}`);
+          return i;
+        }
+      }
+    }
+  }
+  
+  // Handle basic division
+  if (question.includes('÷') || question.includes('/')) {
+    const divMatch = question.match(/(\d+)\s*[÷/]\s*(\d+)/);
+    if (divMatch) {
+      const [, num1, num2] = divMatch.map(Number);
+      if (num2 !== 0) {
+        const result = (num1 / num2).toString();
+        
+        for (let i = 0; i < options.length; i++) {
+          if (options[i].trim() === result) {
+            console.log(`✅ Found correct division answer "${result}" at index ${i}`);
+            return i;
+          }
+        }
+      }
+    }
+  }
+  
+  console.log(`⚠️ Could not validate math, keeping original index: ${correctAnswerIndex}`);
+  return correctAnswerIndex;
 }
 
 async function generateWithAI(
@@ -153,13 +218,22 @@ async function generateWithAI(
           originalCorrectAnswer: correctAnswer
         });
         
+        // Validate the math and get the correct index
+        const validatedCorrectAnswer = validateMathAnswer(question, options, correctAnswer);
+        
+        // Update the correctAnswer if it was wrong
+        if (validatedCorrectAnswer !== correctAnswer) {
+          console.log(`🔧 Correcting answer from index ${correctAnswer} to ${validatedCorrectAnswer}`);
+          atom.content.correctAnswer = validatedCorrectAnswer;
+        }
+        
         // Basic validation - ensure correctAnswer is within bounds
-        if (typeof correctAnswer !== 'number' || correctAnswer < 0 || correctAnswer >= options.length) {
-          console.warn(`⚠️ Invalid correctAnswer index ${correctAnswer} for question with ${options.length} options. Setting to 0.`);
+        if (atom.content.correctAnswer < 0 || atom.content.correctAnswer >= options.length) {
+          console.warn(`⚠️ Invalid correctAnswer index ${atom.content.correctAnswer} for question with ${options.length} options. Setting to 0.`);
           atom.content.correctAnswer = 0;
         }
         
-        console.log(`✅ Question ${atomIndex + 1} validated - correctAnswer: ${atom.content.correctAnswer}, answer: "${options[atom.content.correctAnswer]}"`);
+        console.log(`✅ Question ${atomIndex + 1} final validation - correctAnswer: ${atom.content.correctAnswer}, answer: "${options[atom.content.correctAnswer]}"`);
       }
     });
 
