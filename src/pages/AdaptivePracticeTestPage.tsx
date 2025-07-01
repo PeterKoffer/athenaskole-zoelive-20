@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,6 @@ import { Progress } from '@/components/ui/progress';
 import { Brain, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
-import FloatingAITutor from '@/components/FloatingAITutor';
 
 const AdaptivePracticeTestPage = () => {
   const { user } = useAuth();
@@ -35,7 +35,6 @@ const AdaptivePracticeTestPage = () => {
     return (
       <div className="relative">
         <AdaptivePracticeModule onBack={handleBack} />
-        <FloatingAITutor />
       </div>
     );
   }

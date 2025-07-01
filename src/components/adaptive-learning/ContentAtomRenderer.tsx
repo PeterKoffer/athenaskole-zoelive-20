@@ -22,7 +22,10 @@ const ContentAtomRenderer: React.FC<ContentAtomRendererProps> = ({ atom, onCompl
   // Auto-read content when atom changes
   useEffect(() => {
     if (atom.atom_type === 'TEXT_EXPLANATION') {
-      const textToSpeak = `${atom.content.title}. ${atom.content.explanation}`;
+      const examplesText = atom.content.examples && atom.content.examples.length > 0 
+        ? ` Examples: ${atom.content.examples.join('. ')}`
+        : '';
+      const textToSpeak = `${atom.content.title}. ${atom.content.explanation}.${examplesText}`;
       setTimeout(() => {
         speakAsNelie(textToSpeak, false, 'atom-explanation');
       }, 1000);
@@ -61,7 +64,10 @@ const ContentAtomRenderer: React.FC<ContentAtomRendererProps> = ({ atom, onCompl
   };
 
   if (atom.atom_type === 'TEXT_EXPLANATION') {
-    const speakText = `${atom.content.title}. ${atom.content.explanation}. ${atom.content.examples ? 'Examples: ' + atom.content.examples.join('. ') : ''}`;
+    const examplesText = atom.content.examples && atom.content.examples.length > 0 
+      ? atom.content.examples.join('. ')
+      : '';
+    const speakText = `${atom.content.title}. ${atom.content.explanation}. ${examplesText ? 'Examples: ' + examplesText : ''}`;
     
     return (
       <SpeakableCard
