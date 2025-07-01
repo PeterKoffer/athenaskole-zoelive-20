@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, CheckCircle, XCircle, Clock, BookOpen, Target } from 'lucide-react';
+import { Play, CheckCircle, XCircle, Clock, BookOpen, Target, Beaker } from 'lucide-react';
+import Grade3FractionTestInterface from './Grade3FractionTestInterface';
 
 interface TestResult {
   kcId: string;
@@ -25,6 +27,11 @@ const CurriculumTestInterface: React.FC<CurriculumTestInterfaceProps> = ({ onBac
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [currentTest, setCurrentTest] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'main' | 'grade3-fractions'>('main');
+
+  if (currentView === 'grade3-fractions') {
+    return <Grade3FractionTestInterface onBack={() => setCurrentView('main')} />;
+  }
 
   const testCases = [
     {
@@ -218,7 +225,7 @@ const CurriculumTestInterface: React.FC<CurriculumTestInterfaceProps> = ({ onBac
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-4">
+          <div className="flex gap-4 mb-4 flex-wrap">
             <Button 
               onClick={onBack}
               variant="outline"
@@ -242,6 +249,13 @@ const CurriculumTestInterface: React.FC<CurriculumTestInterfaceProps> = ({ onBac
                   Run Enhanced Tests
                 </>
               )}
+            </Button>
+            <Button 
+              onClick={() => setCurrentView('grade3-fractions')}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Beaker className="w-4 h-4 mr-2" />
+              Grade 3 Fraction Tests
             </Button>
           </div>
 
@@ -421,30 +435,20 @@ const CurriculumTestInterface: React.FC<CurriculumTestInterfaceProps> = ({ onBac
                 <div className="text-2xl font-bold text-blue-600">
                   {testResults.filter(r => r.curriculumAligned).length}
                 </div>
-                <p className="text-sm text-gray-600">Curriculum Enhanced</p>
+                <p className="text-sm text-gray-600">Enhanced</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
-                  {testResults.filter(r => r.kcId.includes('g5') || r.kcId.includes('g6')).filter(r => r.curriculumAligned).length}
-                </div>
-                <p className="text-sm text-gray-600">New Topics Enhanced</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">
                   {testResults.filter(r => r.status === 'error').length}
                 </div>
                 <p className="text-sm text-gray-600">Failed</p>
               </div>
-            </div>
-            
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-blue-900 mb-2">🔍 Analysis Notes:</h4>
-              <ul className="text-blue-800 text-sm space-y-1">
-                <li>• Check console logs for prompt_generator.ts curriculum topic matching</li>
-                <li>• Verify validateMathAnswer handles decimal operations correctly</li>
-                <li>• Assess ratio/rate question generation and validation needs</li>
-                <li>• Review AI content alignment with new curriculum descriptions</li>
-              </ul>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">
+                  {Math.round(testResults.filter(r => r.duration).reduce((acc, r) => acc + (r.duration || 0), 0) / testResults.length)}ms
+                </div>
+                <p className="text-sm text-gray-600">Avg Time</p>
+              </div>
             </div>
           </CardContent>
         </Card>
