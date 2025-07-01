@@ -5,6 +5,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @deno-lint-ignore-file no-explicit-any
 import { validateMathAnswer } from './math_utils.ts';
 import { createMathPrompt } from './prompt_generator.ts';
+import { generateWithEnhancedRetry, type Atom } from './ai-providers.ts';
+import { createEnhancedPrompt } from './prompt-enhancer.ts';
+import { validateAndCorrectAIContent } from './validation-utils.ts';
+import { generateMinimalFallback } from './fallback-generator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -132,16 +136,15 @@ async function generateWithAI(
     throw error;
   }
 }
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('🧮 MATH Content Generation function invoked');
+    console.log('🤖 AI-FOCUSED Content Generation function invoked');
     const { kcId, userId, contentTypes = ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE'], maxAtoms = 2 } = await req.json();
-    console.log('📊 Math request:', { kcId, userId, contentTypes, maxAtoms });
+    console.log('🎯 AI-focused request:', { kcId, userId, contentTypes, maxAtoms });
 
     if (!kcId || !userId) {
       return new Response(JSON.stringify({ error: "Missing kcId or userId" }), {
@@ -154,57 +157,49 @@ serve(async (req) => {
     let providerUsed = "None";
     let generationError = null;
 
-    if (OPENAI_API_KEY) {
-      try {
-        atoms = await generateWithAI(OPENAI_API_KEY, OPENAI_ENDPOINT, "gpt-4o-mini", kcId, userId, contentTypes, maxAtoms, "OpenAI");
-        providerUsed = "OpenAI";
-      } catch (error) {
-        console.error("❌ OpenAI math generation failed:", error.message);
-        generationError = error;
-      }
+    // Focus on AI generation with enhanced retry
+    try {
+      console.log('🚀 Starting AI-focused generation with enhanced retry logic...');
+      
+      // Create enhanced prompt for better AI generation
+      const enhancedPrompt = createEnhancedPrompt(kcId, userId, contentTypes, maxAtoms, "AI Enhanced", 1);
+      
+      atoms = await generateWithEnhancedRetry(kcId, userId, contentTypes, maxAtoms, enhancedPrompt);
+      
+      // Validate and correct AI-generated content
+      validateAndCorrectAIContent(atoms);
+      
+      providerUsed = "AI Enhanced Retry";
+      console.log(`✅ AI generation successful: ${atoms.length} atoms created`);
+    } catch (error) {
+      console.error("❌ All AI generation attempts failed:", error.message);
+      generationError = error;
     }
 
-    if (atoms.length === 0 && DEEPSEEK_API_KEY) {
-      console.log("🔄 Trying DeepSeek for math generation");
-      try {
-        atoms = await generateWithAI(DEEPSEEK_API_KEY, DEEPSEEK_ENDPOINT, "deepseek-chat", kcId, userId, contentTypes, maxAtoms, "DeepSeek");
-        providerUsed = "DeepSeek";
-        generationError = null;
-      } catch (error) {
-        console.error("❌ DeepSeek math generation failed:", error.message);
-        if (!generationError) generationError = error;
-      }
-    } else if (atoms.length === 0 && !OPENAI_API_KEY && !DEEPSEEK_API_KEY) {
-      console.error("❌ No API keys configured");
-      return new Response(JSON.stringify({ error: "Math content generation failed: No API keys configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    // Only use minimal fallback as absolute last resort
+    if (atoms.length === 0) {
+      console.log("⚠️ ABSOLUTE LAST RESORT: Using minimal fallback (all AI attempts failed)");
+      atoms = generateMinimalFallback(kcId, maxAtoms);
+      providerUsed = "Minimal Fallback";
+      generationError = null;
+      console.log(`📝 Minimal fallback generation: ${atoms.length} atoms created`);
     }
 
     if (atoms.length > 0) {
-      console.log(`✅ REAL MATH content generated using ${providerUsed}:`, atoms.length, 'atoms');
-      // Log each question for debugging
-      atoms.forEach((atom, index) => {
-        if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE') {
-          console.log(`📝 Generated Question ${index + 1}:`, {
-            question: atom.content.question,
-            options: atom.content.options,
-            correctAnswer: atom.content.correctAnswer,
-            correctAnswerText: atom.content.options[atom.content.correctAnswer]
-          });
-        }
-      });
+      const aiGenerated = atoms.some(atom => atom.metadata.aiGenerated === true);
+      console.log(`🎉 Content generated successfully using ${providerUsed}:`, atoms.length, 'atoms');
+      console.log(`🤖 AI Generated: ${aiGenerated ? 'YES' : 'NO'}`);
       
       return new Response(JSON.stringify({ atoms }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } else {
-      console.error('❌ Math generation failed for all providers');
-      const errorMessage = generationError ? generationError.message : "Unknown math generation error";
+      console.error('❌ All generation methods failed completely');
+      const errorMessage = generationError ? generationError.message : "Unknown generation error";
       return new Response(JSON.stringify({
-        error: `Math content generation failed. Provider: ${providerUsed}. Details: ${errorMessage}`,
-        details: generationError ? generationError.toString() : "No further details."
+        error: `Content generation failed completely. Provider: ${providerUsed}. Details: ${errorMessage}`,
+        details: generationError ? generationError.toString() : "No further details.",
+        aiGenerated: false
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -212,8 +207,12 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('❌ Math Content Generation main error:', error);
-    return new Response(JSON.stringify({ error: error.message, details: error.toString() }), {
+    console.error('❌ Content Generation main error:', error);
+    return new Response(JSON.stringify({ 
+      error: error.message, 
+      details: error.toString(),
+      aiGenerated: false 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

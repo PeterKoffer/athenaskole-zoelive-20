@@ -18,6 +18,9 @@ export const useRoleAccess = () => {
   const getRoleFromUser = (): UserRole | null => {
     const metadata = user?.user_metadata as UserMetadata | undefined;
     if (metadata?.role) return metadata.role;
+    if (!user) return null;
+    const meta = user.user_metadata;
+    if (meta?.role) return meta.role as UserRole;
     return null;
   };
 

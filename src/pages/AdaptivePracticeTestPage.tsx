@@ -32,7 +32,11 @@ const AdaptivePracticeTestPage = () => {
   };
 
   if (showModule) {
-    return <AdaptivePracticeModule onBack={handleBack} />;
+    return (
+      <div className="relative">
+        <AdaptivePracticeModule onBack={handleBack} />
+      </div>
+    );
   }
 
   if (isInitializing) {

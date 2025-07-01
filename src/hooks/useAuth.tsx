@@ -1,27 +1,41 @@
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js'; // Aliased for clarity
 import type { User } from '@/types/auth'; // Our augmented User type
+import { User } from '@/types/user';
 
 interface AuthContextType {
   user: User | null; // Use our augmented User type
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  signOut: () => Promise<void>; // Add this method
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+ fix/correct-answer-validation
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // Already using our augmented User type due to interface
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+
       setUser(session?.user as User | null ?? null); // Cast to our augmented User type
+      if (session?.user) {
+        const userWithMetadata: User = {
+          ...session.user,
+          user_metadata: session.user.user_metadata || {},
+          role: session.user.user_metadata?.role || session.user.role
+        };
+        setUser(userWithMetadata);
+      }
       setLoading(false);
     });
 
@@ -29,14 +43,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+
       setUser(session?.user as User | null ?? null); // Cast to our augmented User type
+      if (session?.user) {
+        const userWithMetadata: User = {
+          ...session.user,
+          user_metadata: session.user.user_metadata || {},
+          role: session.user.user_metadata?.role || session.user.role
+        };
+        setUser(userWithMetadata);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -44,16 +69,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (error) throw error;
   };
 
-  const logout = async () => {
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`
+      }
+    });
+    if (error) throw error;
+  };
+
+  const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
 
-  // Add signOut as an alias to logout for compatibility
-  const signOut = logout;
-
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

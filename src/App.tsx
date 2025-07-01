@@ -1,99 +1,70 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/hooks/useAuth';
-import { RoleProvider } from '@/contexts/RoleContext';
-import { Toaster } from '@/components/ui/toaster';
-import { useAuthRedirect } from '@/hooks/useAuthRedirect';
-import { useEffect } from 'react';
-
-// Pages
-import Index from '@/pages/Index';
-import Auth from '@/pages/Auth';
-import SchoolDashboard from '@/pages/SchoolDashboard';
-import SimpleSchoolDashboard from '@/pages/SimpleSchoolDashboard';
-import TeacherDashboard from '@/pages/TeacherDashboard';
-import StudentDashboard from '@/pages/StudentDashboard';
-import ParentDashboard from '@/pages/ParentDashboard';
-import AdminDashboard from '@/pages/AdminDashboard';
-import DailyProgram from '@/pages/DailyProgram';
-import CurriculumSystem from '@/pages/CurriculumSystem';
-import AdaptiveLearning from '@/pages/AdaptiveLearning';
-import AdaptivePracticeTestPage from '@/pages/AdaptivePracticeTestPage';
-
-// Education pages
-import MathematicsLearning from '@/components/education/MathematicsLearning';
-import EnglishLearning from '@/components/education/EnglishLearning';
-import ScienceLearning from '@/components/education/ScienceLearning';
-import HistoryReligionLearning from '@/components/education/HistoryReligionLearning';
-import GeographyLearning from '@/components/education/GeographyLearning';
-import MusicLearning from '@/components/education/MusicLearning';
-import CreativeArtsLearning from '@/components/education/CreativeArtsLearning';
-import ComputerScienceLearning from '@/components/education/ComputerScienceLearning';
-import LanguageLabLearning from '@/components/education/LanguageLabLearning';
-import BodyLabLearning from '@/components/education/BodyLabLearning';
-import MentalWellnessLearning from '@/components/education/MentalWellnessLearning';
-import LifeEssentialsLearning from '@/components/education/LifeEssentialsLearning';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/components/theme-provider";
+import Index from "@/pages/Index";
+import HomePage from "@/pages/HomePage";
+import AuthPage from "@/pages/AuthPage";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import ProfilePage from "@/pages/ProfilePage";
+import ProgressPage from "@/pages/ProgressPage";
+import CommunicationPage from "@/pages/CommunicationPage";
+import CalendarPage from "@/pages/CalendarPage";
+import GameHubPage from "@/pages/GameHubPage";
+import AdminPage from "@/pages/AdminPage";
+import ParentPage from "@/pages/ParentPage";
+import SchoolAdminPage from "@/pages/SchoolAdminPage";
+import TeacherPage from "@/pages/TeacherPage";
+import StudentPage from "@/pages/StudentPage";
+import AIInsightsPage from "@/pages/AIInsightsPage";
+import AdaptiveLearningPage from "@/pages/AdaptiveLearningPage";
+import AdaptivePracticeTestPage from "@/pages/AdaptivePracticeTestPage";
+import SubscriptionPage from "@/pages/SubscriptionPage";
+import ScenarioPlayerPage from "@/pages/ScenarioPlayerPage";
+import FloatingAITutor from "@/components/FloatingAITutor";
+import "./App.css";
 
 const queryClient = new QueryClient();
-
-function AppContent() {
-  useAuthRedirect();
-
-  useEffect(() => {
-    console.log('Page view:', window.location.pathname);
-  }, []);
-
-  return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/auth" element={<Auth />} />
-      
-      {/* Dashboard Routes */}
-      <Route path="/school-dashboard" element={<SchoolDashboard />} />
-      <Route path="/simple-school-dashboard" element={<SimpleSchoolDashboard />} />
-      <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-      <Route path="/student-dashboard" element={<StudentDashboard />} />
-      <Route path="/parent-dashboard" element={<ParentDashboard />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      
-      {/* Program Routes */}
-      <Route path="/daily-program" element={<DailyProgram />} />
-      <Route path="/curriculum" element={<CurriculumSystem />} />
-      <Route path="/adaptive-learning" element={<AdaptiveLearning />} />
-      <Route path="/adaptive-practice-test" element={<AdaptivePracticeTestPage />} />
-      
-      {/* Learning Routes */}
-      <Route path="/learn/mathematics" element={<MathematicsLearning />} />
-      <Route path="/learn/english" element={<EnglishLearning />} />
-      <Route path="/learn/science" element={<ScienceLearning />} />
-      <Route path="/learn/history-religion" element={<HistoryReligionLearning />} />
-      <Route path="/learn/geography" element={<GeographyLearning />} />
-      <Route path="/learn/music" element={<MusicLearning />} />
-      <Route path="/learn/creative-arts" element={<CreativeArtsLearning />} />
-      <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
-      <Route path="/learn/language-lab" element={<LanguageLabLearning />} />
-      <Route path="/learn/body-lab" element={<BodyLabLearning />} />
-      <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
-      <Route path="/learn/life-essentials" element={<LifeEssentialsLearning />} />
-      
-      {/* Fallback route */}
-      <Route path="*" element={<Index />} />
-    </Routes>
-  );
-}
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RoleProvider>
-          <Router>
-            <AppContent />
+      <ThemeProvider defaultTheme="dark">
+        <AuthProvider>
+          <TooltipProvider>
             <Toaster />
-          </Router>
-        </RoleProvider>
-      </AuthProvider>
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+                <Route path="/communication" element={<ProtectedRoute><CommunicationPage /></ProtectedRoute>} />
+                <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+                <Route path="/games" element={<ProtectedRoute><GameHubPage /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>} />
+                <Route path="/parent" element={<ProtectedRoute requiredRole="parent"><ParentPage /></ProtectedRoute>} />
+                <Route path="/school-admin" element={<ProtectedRoute requiredRole="school_admin"><SchoolAdminPage /></ProtectedRoute>} />
+                <Route path="/teacher" element={<ProtectedRoute requiredRole="teacher"><TeacherPage /></ProtectedRoute>} />
+                <Route path="/student" element={<ProtectedRoute requiredRole="student"><StudentPage /></ProtectedRoute>} />
+                <Route path="/ai-insights" element={<ProtectedRoute><AIInsightsPage /></ProtectedRoute>} />
+                <Route path="/adaptive-learning" element={<ProtectedRoute><AdaptiveLearningPage /></ProtectedRoute>} />
+                <Route path="/adaptive-practice-test" element={<ProtectedRoute><AdaptivePracticeTestPage /></ProtectedRoute>} />
+                <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+                <Route path="/scenario-player" element={<ProtectedRoute><ScenarioPlayerPage /></ProtectedRoute>} />
+              </Routes>
+              {/* Global FloatingAITutor - visible on all pages */}
+              <FloatingAITutor />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
