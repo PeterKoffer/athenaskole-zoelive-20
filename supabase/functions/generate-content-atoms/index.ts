@@ -39,6 +39,8 @@ function createMathPrompt(kcId: string, userId: string, contentTypes: string[], 
     specificInstructions = `Create area questions like "A rectangle has length 8 units and width 5 units. What is its area?" with options like "40 square units", "13 square units", "26 square units", "35 square units"`;
   } else if (topic.includes('add_fractions')) {
     specificInstructions = `Create fraction addition questions like "What is 2/5 + 1/5?" with fraction answer options`;
+  } else if (topic.includes('basic_division')) {
+    specificInstructions = `Create basic division questions like "What is 24 ÷ 6?" with numerical answer choices. MAKE SURE the correctAnswer index points to the mathematically correct result.`;
   } else {
     specificInstructions = `Create grade ${gradeNumber} math questions about ${topic} with numerical problems and calculations`;
   }
@@ -51,6 +53,10 @@ ${specificInstructions}
 
 For TEXT_EXPLANATION atoms, explain the math concept clearly with examples.
 For QUESTION_MULTIPLE_CHOICE atoms, create ACTUAL MATH PROBLEMS with numbers, not generic questions about concepts.
+
+CRITICAL: For multiple choice questions, you MUST ensure the correctAnswer index points to the option that contains the mathematically correct answer. 
+
+Example for division: If the question is "What is 24 ÷ 6?" and your options are ["6", "4", "8", "7"], then correctAnswer should be 1 (because "4" is at index 1 and 24 ÷ 6 = 4).
 
 Return JSON with this exact structure:
 {
@@ -74,6 +80,8 @@ Return JSON with this exact structure:
     }
   ]
 }
+
+DOUBLE-CHECK: Before finalizing your response, verify that the correctAnswer index matches the position of the mathematically correct answer in the options array. This is CRITICAL for the learning system to work properly.
 
 IMPORTANT: Create real mathematical calculations, not questions about concepts. Use actual numbers and math problems appropriate for Grade ${gradeNumber}.`;
 }
@@ -132,6 +140,28 @@ async function generateWithAI(
       console.error(`❌ Invalid JSON from ${providerName}:`, aiGeneratedData);
       throw new Error(`Invalid JSON structure from ${providerName}: "atoms" array not found`);
     }
+
+    // Validate and fix correctAnswer indices for multiple choice questions
+    aiGeneratedData.atoms.forEach((atom: any, atomIndex: number) => {
+      if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && atom.content) {
+        const { question, options, correctAnswer } = atom.content;
+        
+        // Log the original data for debugging
+        console.log(`🔍 Validating question ${atomIndex + 1}:`, {
+          question,
+          options,
+          originalCorrectAnswer: correctAnswer
+        });
+        
+        // Basic validation - ensure correctAnswer is within bounds
+        if (typeof correctAnswer !== 'number' || correctAnswer < 0 || correctAnswer >= options.length) {
+          console.warn(`⚠️ Invalid correctAnswer index ${correctAnswer} for question with ${options.length} options. Setting to 0.`);
+          atom.content.correctAnswer = 0;
+        }
+        
+        console.log(`✅ Question ${atomIndex + 1} validated - correctAnswer: ${atom.content.correctAnswer}, answer: "${options[atom.content.correctAnswer]}"`);
+      }
+    });
 
     const timestamp = Date.now();
     return aiGeneratedData.atoms.map((atom: any, index: number) => ({
@@ -206,6 +236,18 @@ serve(async (req) => {
 
     if (atoms.length > 0) {
       console.log(`✅ REAL MATH content generated using ${providerUsed}:`, atoms.length, 'atoms');
+      // Log each question for debugging
+      atoms.forEach((atom, index) => {
+        if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE') {
+          console.log(`📝 Generated Question ${index + 1}:`, {
+            question: atom.content.question,
+            options: atom.content.options,
+            correctAnswer: atom.content.correctAnswer,
+            correctAnswerText: atom.content.options[atom.content.correctAnswer]
+          });
+        }
+      });
+      
       return new Response(JSON.stringify({ atoms }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
