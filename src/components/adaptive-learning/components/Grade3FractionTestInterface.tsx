@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, CheckCircle, XCircle, Clock, BookOpen, Target, Eye } from 'lucide-react';
+import { Play, CheckCircle, XCircle, Clock, BookOpen, Target, Eye, Beaker } from 'lucide-react';
+import Grade3FractionTestExecutor from './Grade3FractionTestExecutor';
+import TestResultsAnalyzer from './TestResultsAnalyzer';
 
 interface TestResult {
   kcId: string;
@@ -60,6 +62,8 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [currentTest, setCurrentTest] = useState<string | null>(null);
+  const [comprehensiveResults, setComprehensiveResults] = useState<any[]>([]);
+  const [showComprehensiveAnalysis, setShowComprehensiveAnalysis] = useState(false);
 
   const grade3FractionTestCases = [
     {
@@ -223,6 +227,11 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
     console.log('  4. Unit fraction (1/b) focus as per 3.NF.A.1 standard');
   };
 
+  const handleComprehensiveResults = (results: any[]) => {
+    setComprehensiveResults(results);
+    setShowComprehensiveAnalysis(true);
+  };
+
   const getStatusIcon = (status: TestResult['status']) => {
     switch (status) {
       case 'success':
@@ -315,6 +324,14 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
           </div>
         </CardContent>
       </Card>
+
+      {/* New Comprehensive Test Executor */}
+      <Grade3FractionTestExecutor onResults={handleComprehensiveResults} />
+
+      {/* Comprehensive Results Analyzer */}
+      {showComprehensiveAnalysis && comprehensiveResults.length > 0 && (
+        <TestResultsAnalyzer results={comprehensiveResults} />
+      )}
 
       {/* Test Cases Overview */}
       <Card>
