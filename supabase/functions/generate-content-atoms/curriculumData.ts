@@ -155,16 +155,79 @@ export const completeStudyPugCurriculum: CurriculumLevel[] = [
       },
       {
         name: "Number and Operations in Base Ten",
-        description: "Understand the place value system",
+        description: "Understand the place value system and perform operations with multi-digit whole numbers and decimals",
         topics: [
           {
-            id: "5-nbt-7",
-            name: "Decimal operations",
-            description: "Add, subtract, multiply, and divide decimals to hundredths",
+            id: "5-nbt-7-add-subtract",
+            name: "Add and subtract decimals",
+            description: "Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value",
             difficulty: 6,
             estimatedTime: 55,
             prerequisites: [],
             standards: ["5.NBT.B.7"]
+          },
+          {
+            id: "5-nbt-7-multiply",
+            name: "Multiply decimals",
+            description: "Multiply decimals to hundredths using concrete models, drawings, and strategies based on place value and properties of operations",
+            difficulty: 7,
+            estimatedTime: 60,
+            prerequisites: ["5-nbt-7-add-subtract"],
+            standards: ["5.NBT.B.7"]
+          },
+          {
+            id: "5-nbt-7-divide",
+            name: "Divide decimals",
+            description: "Divide decimals to hundredths using concrete models, drawings, and strategies based on place value and properties of operations",
+            difficulty: 8,
+            estimatedTime: 65,
+            prerequisites: ["5-nbt-7-multiply"],
+            standards: ["5.NBT.B.7"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    grade: 6,
+    description: "Grade 6 Mathematics",
+    subjects: [
+      {
+        name: "Ratios and Proportional Relationships",
+        description: "Understand ratio concepts and use ratio reasoning to solve problems",
+        topics: [
+          {
+            id: "6-rp-1",
+            name: "Ratios and rates",
+            description: "Understand the concept of a ratio and use ratio language to describe a ratio relationship between two quantities",
+            difficulty: 6,
+            estimatedTime: 50,
+            prerequisites: ["5-nf-4"],
+            standards: ["6.RP.A.1"]
+          },
+          {
+            id: "6-rp-2",
+            name: "Unit rates",
+            description: "Understand the concept of a unit rate a/b associated with a ratio a:b with b ≠ 0, and use rate language in the context of a ratio relationship",
+            difficulty: 7,
+            estimatedTime: 55,
+            prerequisites: ["6-rp-1"],
+            standards: ["6.RP.A.2"]
+          }
+        ]
+      },
+      {
+        name: "The Number System",
+        description: "Apply and extend previous understandings of numbers to the system of rational numbers",
+        topics: [
+          {
+            id: "6-ns-5",
+            name: "Positive and negative numbers",
+            description: "Understand that positive and negative numbers are used together to describe quantities having opposite directions or values",
+            difficulty: 6,
+            estimatedTime: 45,
+            prerequisites: ["5-nbt-7-divide"],
+            standards: ["6.NS.C.5"]
           }
         ]
       }
