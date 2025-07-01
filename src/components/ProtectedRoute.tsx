@@ -7,11 +7,13 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAuth?: boolean;
+  requiredRole?: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requireAuth = true 
+  requireAuth = true,
+  requiredRole
 }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -33,6 +35,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // If user is logged in but trying to access auth page, redirect to home
   if (!requireAuth && user && location.pathname === '/auth') {
     return <Navigate to="/" replace />;
+  }
+
+  // Check role-based access (simplified - in a real app you'd check against user roles)
+  if (requiredRole && user) {
+    // For now, just allow access - role checking would be implemented with proper user roles
+    console.log(`Role-based access check for: ${requiredRole}`);
   }
 
   return <>{children}</>;
