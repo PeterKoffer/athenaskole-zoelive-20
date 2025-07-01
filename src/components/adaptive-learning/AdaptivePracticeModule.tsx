@@ -53,20 +53,20 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
       // Handle the answer with stealth assessment
       handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
 
-      // Show feedback toast and play sound for questions only
+      // Play sound immediately for faster feedback
       if (result.isCorrect) {
         playCorrectAnswerSound();
         toast({
           title: "Correct! 🎉",
           description: "Great job! Moving to the next question...",
-          duration: 2000,
+          duration: 1500, // Reduced duration
         });
       } else {
         playWrongAnswerSound();
         toast({
           title: "Keep Learning! 📚",
           description: "That's okay, let's try the next one!",
-          duration: 2000,
+          duration: 1500, // Reduced duration
         });
       }
     } else if (currentAtom.atom_type === 'TEXT_EXPLANATION') {
@@ -74,7 +74,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
       console.log('📖 Explanation completed, continuing silently');
     }
 
-    // Move to next question immediately
+    // Move to next question faster
     setTimeout(() => {
       if (state.currentAtomIndex < totalAtoms - 1) {
         console.log('➡️ Moving to next atom');
@@ -85,15 +85,15 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
         toast({
           title: "Session Complete! 🎓",
           description: `You've completed all questions for ${state.currentKc?.name}! Loading new content...`,
-          duration: 3000,
+          duration: 2000, // Reduced duration
         });
         
         setTimeout(() => {
           console.log('🔄 Loading new content batch...');
           handleNextAtom(); // This will trigger new content generation
-        }, 1000);
+        }, 500); // Faster transition
       }
-    }, 1500); // Reduced timeout for faster progression
+    }, 800); // Reduced timeout for much faster progression
   };
 
   if (state.isLoading) {
@@ -110,10 +110,10 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
             <p className="text-gray-300 mb-6">
               Our AI is creating personalized content just for you...
             </p>
-            <Progress value={65} className="w-full h-3" />
+            <Progress value={75} className="w-full h-3" />
             <div className="flex items-center justify-center mt-6 text-sm text-gray-400">
               <Lightbulb className="w-4 h-4 mr-2" />
-              Generating AI content with ContentOrchestrator
+              Fast AI generation in progress
             </div>
           </CardContent>
         </Card>

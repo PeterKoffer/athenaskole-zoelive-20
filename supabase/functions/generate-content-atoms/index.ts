@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -24,6 +23,7 @@ interface Atom {
   kc_ids: string[];
   metadata: any;
 }
+
 function createMathPrompt(kcId: string, userId: string, contentTypes: string[], maxAtoms: number): string {
   // Extract math topic from KC ID
   const kcParts = kcId.toLowerCase().split('_');
@@ -285,6 +285,10 @@ async function generateWithAI(
   const prompt = createMathPrompt(kcId, userId, contentTypes, maxAtoms);
   
   try {
+    // Optimized request with timeout for faster responses
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
     const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
@@ -295,8 +299,13 @@ async function generateWithAI(
         model: model,
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
+        max_tokens: 1500, // Reduced for faster generation
+        temperature: 0.7, // Balanced creativity vs speed
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorBody = await response.text();
@@ -325,34 +334,26 @@ async function generateWithAI(
       throw new Error(`Invalid JSON structure from ${providerName}: "atoms" array not found`);
     }
 
-    // Validate and fix correctAnswer indices for multiple choice questions
+    // Optimized validation - only validate math questions
     aiGeneratedData.atoms.forEach((atom: any, atomIndex: number) => {
       if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && atom.content) {
         const { question, options, correctAnswer } = atom.content;
         
-        // Log the original data for debugging
-        console.log(`🔍 Validating question ${atomIndex + 1}:`, {
-          question,
-          options,
-          originalCorrectAnswer: correctAnswer
-        });
-        
-        // Validate the math and get the correct index
-        const validatedCorrectAnswer = validateMathAnswer(question, options, correctAnswer);
-        
-        // Update the correctAnswer if it was wrong
-        if (validatedCorrectAnswer !== correctAnswer) {
-          console.log(`🔧 Correcting answer from index ${correctAnswer} to ${validatedCorrectAnswer}`);
-          atom.content.correctAnswer = validatedCorrectAnswer;
+        // Fast validation for math questions only
+        if (question.includes('÷') || question.includes('×') || question.includes('+') || question.includes('-') || question.includes('/')) {
+          const validatedCorrectAnswer = validateMathAnswer(question, options, correctAnswer);
+          
+          if (validatedCorrectAnswer !== correctAnswer) {
+            console.log(`🔧 Correcting answer from index ${correctAnswer} to ${validatedCorrectAnswer}`);
+            atom.content.correctAnswer = validatedCorrectAnswer;
+          }
         }
         
-        // Basic validation - ensure correctAnswer is within bounds
+        // Basic bounds check
         if (atom.content.correctAnswer < 0 || atom.content.correctAnswer >= options.length) {
-          console.warn(`⚠️ Invalid correctAnswer index ${atom.content.correctAnswer} for question with ${options.length} options. Setting to 0.`);
+          console.warn(`⚠️ Invalid correctAnswer index ${atom.content.correctAnswer}. Setting to 0.`);
           atom.content.correctAnswer = 0;
         }
-        
-        console.log(`✅ Question ${atomIndex + 1} final validation - correctAnswer: ${atom.content.correctAnswer}, answer: "${options[atom.content.correctAnswer]}"`);
       }
     });
 
@@ -364,7 +365,7 @@ async function generateWithAI(
       kc_ids: [kcId],
       metadata: {
         difficulty: 0.5,
-        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 30000 : 45000,
+        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 20000 : 30000, // Reduced time estimates
         source: 'ai_math_generated',
         model: `${providerName}: ${model}`,
         generated_at: timestamp,
@@ -373,6 +374,10 @@ async function generateWithAI(
     }));
 
   } catch (error) {
+    if (error.name === 'AbortError') {
+      console.error(`❌ ${providerName} request timed out`);
+      throw new Error(`${providerName} request timed out - please try again`);
+    }
     console.error(`❌ Error during ${providerName} math generation:`, error);
     throw error;
   }
@@ -399,6 +404,7 @@ serve(async (req) => {
     let providerUsed = "None";
     let generationError = null;
 
+    // Try OpenAI first for speed
     if (OPENAI_API_KEY) {
       try {
         atoms = await generateWithAI(OPENAI_API_KEY, OPENAI_ENDPOINT, "gpt-4o-mini", kcId, userId, contentTypes, maxAtoms, "OpenAI");
@@ -409,6 +415,7 @@ serve(async (req) => {
       }
     }
 
+    // Fallback to DeepSeek only if OpenAI fails
     if (atoms.length === 0 && DEEPSEEK_API_KEY) {
       console.log("🔄 Trying DeepSeek for math generation");
       try {
@@ -429,17 +436,6 @@ serve(async (req) => {
 
     if (atoms.length > 0) {
       console.log(`✅ REAL MATH content generated using ${providerUsed}:`, atoms.length, 'atoms');
-      // Log each question for debugging
-      atoms.forEach((atom, index) => {
-        if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE') {
-          console.log(`📝 Generated Question ${index + 1}:`, {
-            question: atom.content.question,
-            options: atom.content.options,
-            correctAnswer: atom.content.correctAnswer,
-            correctAnswerText: atom.content.options[atom.content.correctAnswer]
-          });
-        }
-      });
       
       return new Response(JSON.stringify({ atoms }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
