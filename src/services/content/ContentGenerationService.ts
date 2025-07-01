@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ContentGenerationRequest {
@@ -89,7 +88,17 @@ class ContentGenerationService {
 
       if (edgeResponse?.atoms && edgeResponse.atoms.length > 0) {
         console.log('✅ AI generated content successfully:', edgeResponse.atoms.length, 'atoms');
-        return edgeResponse.atoms;
+        
+        // Normalize the data structure to match renderer expectations
+        return edgeResponse.atoms.map((atom: any) => ({
+          ...atom,
+          content: {
+            ...atom.content,
+            // Ensure both correctAnswer and correct are set for compatibility
+            correctAnswer: atom.content.correctAnswer ?? atom.content.correct ?? 0,
+            correct: atom.content.correct ?? atom.content.correctAnswer ?? 0
+          }
+        }));
       }
 
       console.log('⚠️ Edge Function returned no atoms');
