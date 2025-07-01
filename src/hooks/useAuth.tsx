@@ -1,10 +1,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { User as SupabaseUser } from '@supabase/supabase-js'; // Aliased for clarity
+import type { User } from '@/types/auth'; // Our augmented User type
 import { User } from '@/types/user';
 
 interface AuthContextType {
-  user: User | null;
+  user: User | null; // Use our augmented User type
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
@@ -13,6 +15,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+ fix/correct-answer-validation
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null); // Already using our augmented User type due to interface
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,6 +26,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+
+      setUser(session?.user as User | null ?? null); // Cast to our augmented User type
       if (session?.user) {
         const userWithMetadata: User = {
           ...session.user,
@@ -35,6 +43,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+
+      setUser(session?.user as User | null ?? null); // Cast to our augmented User type
       if (session?.user) {
         const userWithMetadata: User = {
           ...session.user,

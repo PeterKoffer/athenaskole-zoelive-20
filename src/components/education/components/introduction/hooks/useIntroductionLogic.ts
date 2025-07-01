@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -49,13 +50,18 @@ export const useIntroductionLogic = ({
 
         if (profile?.name) {
           setUserName(profile.name.split(' ')[0]); // Use first name
-        } else if (user.user_metadata?.name) {
-          setUserName(user.user_metadata.name.split(' ')[0]); // Fallback to auth metadata
+        } else if ((user?.user_metadata as UserMetadata)?.name) {
+          setUserName((user.user_metadata as UserMetadata).name!.split(' ')[0]); // Fallback to auth metadata
+        } else if ((user?.user_metadata as UserMetadata)?.first_name) {
+          setUserName((user.user_metadata as UserMetadata).first_name!);
         }
       } catch (error) {
-        console.log('Could not fetch user name, using default');
-        if (user.user_metadata?.name) {
-          setUserName(user.user_metadata.name.split(' ')[0]);
+        console.log('Could not fetch user name, using default', error);
+        const metadata = user?.user_metadata as UserMetadata | undefined;
+        if (metadata?.name) {
+          setUserName(metadata.name.split(' ')[0]);
+        } else if (metadata?.first_name) {
+          setUserName(metadata.first_name);
         }
       }
     };

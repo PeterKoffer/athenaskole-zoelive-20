@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 import { supabase } from '@/integrations/supabase/client';
 
 interface WelcomeCardProps {
@@ -36,15 +37,20 @@ const WelcomeCard = ({ userName }: WelcomeCardProps) => {
         if (profile?.name) {
           const firstName = profile.name.split(' ')[0];
           setActualUserName(firstName);
-        } else if (user.user_metadata?.name) {
-          const firstName = user.user_metadata.name.split(' ')[0];
+        } else if ((user?.user_metadata as UserMetadata)?.name) {
+          const firstName = (user.user_metadata as UserMetadata).name!.split(' ')[0];
           setActualUserName(firstName);
+        } else if ((user?.user_metadata as UserMetadata)?.first_name) {
+          setActualUserName((user.user_metadata as UserMetadata).first_name!);
         }
       } catch (error) {
-        console.log('Could not fetch user name, using provided userName');
-        if (user.user_metadata?.name) {
-          const firstName = user.user_metadata.name.split(' ')[0];
+        console.log('Could not fetch user name, using provided userName or fallback from user_metadata', error);
+        const metadata = user?.user_metadata as UserMetadata | undefined;
+        if (metadata?.name) {
+          const firstName = metadata.name.split(' ')[0];
           setActualUserName(firstName);
+        } else if (metadata?.first_name) {
+          setActualUserName(metadata.first_name);
         }
       }
     };

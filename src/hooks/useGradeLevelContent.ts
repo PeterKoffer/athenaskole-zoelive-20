@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 import { commonStandardsAPI } from '@/services/commonStandardsAPI';
 import { CommonStandard } from '@/types/gradeStandards';
 
@@ -63,14 +64,15 @@ export const useGradeLevelContent = (subject: string) => {
   };
 
   const getUserGradeLevel = (): number => {
+    const metadata = user?.user_metadata as UserMetadata | undefined;
     // Try to get from user metadata, profile, or default calculation
-    if (user?.user_metadata?.grade_level) {
-      return parseInt(user.user_metadata.grade_level);
+    if (metadata?.grade_level) {
+      return parseInt(String(metadata.grade_level));
     }
     
     // Calculate from age if available
-    if (user?.user_metadata?.age) {
-      const age = parseInt(user.user_metadata.age);
+    if (metadata?.age) {
+      const age = parseInt(String(metadata.age));
       return Math.max(1, Math.min(12, age - 5)); // Age 6 = Grade 1, Age 17 = Grade 12
     }
     

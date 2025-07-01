@@ -2,6 +2,9 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+// @deno-lint-ignore-file no-explicit-any
+import { validateMathAnswer } from './math_utils.ts';
+import { createMathPrompt } from './prompt_generator.ts';
 import { generateWithEnhancedRetry, type Atom } from './ai-providers.ts';
 import { createEnhancedPrompt } from './prompt-enhancer.ts';
 import { validateAndCorrectAIContent } from './validation-utils.ts';
@@ -12,6 +15,127 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY") || Deno.env.get("DeepSeek_API");
+
+const OPENAI_ENDPOINT = "https://api.openai.com/v1/chat/completions";
+const DEEPSEEK_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
+
+interface Atom {
+  atom_id: string;
+  atom_type: string;
+  content: any;
+  kc_ids: string[];
+  metadata: any;
+}
+
+async function generateWithAI(
+  apiKey: string,
+  apiEndpoint: string,
+  model: string,
+  kcId: string,
+  userId: string,
+  contentTypes: string[],
+  maxAtoms: number,
+  providerName: string
+): Promise<Atom[]> {
+  console.log(`🧠 Generating REAL MATH content with ${providerName}`);
+
+  const prompt = createMathPrompt(kcId, userId, contentTypes, maxAtoms);
+  
+  try {
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`❌ ${providerName} API error (${response.status}): ${errorBody}`);
+      throw new Error(`${providerName} API request failed with status ${response.status}`);
+    }
+
+    const jsonResponse = await response.json();
+    let aiContentString = "";
+    
+    if (providerName === "OpenAI") {
+      aiContentString = jsonResponse.choices[0].message.content;
+    } else if (providerName === "DeepSeek") {
+      if (jsonResponse.choices && jsonResponse.choices[0] && jsonResponse.choices[0].message && jsonResponse.choices[0].message.content) {
+        aiContentString = jsonResponse.choices[0].message.content;
+      } else {
+        console.warn(`⚠️ ${providerName} response structure different:`, jsonResponse);
+        aiContentString = JSON.stringify(jsonResponse);
+      }
+    }
+
+    const aiGeneratedData = JSON.parse(aiContentString);
+
+    if (!aiGeneratedData.atoms || !Array.isArray(aiGeneratedData.atoms)) {
+      console.error(`❌ Invalid JSON from ${providerName}:`, aiGeneratedData);
+      throw new Error(`Invalid JSON structure from ${providerName}: "atoms" array not found`);
+    }
+
+    // Validate and fix correctAnswer indices for multiple choice questions
+    aiGeneratedData.atoms.forEach((atom: any, atomIndex: number) => {
+      if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && atom.content) {
+        const { question, options, correctAnswer } = atom.content;
+        
+        // Log the original data for debugging
+        console.log(`🔍 Validating question ${atomIndex + 1}:`, {
+          question,
+          options,
+          originalCorrectAnswer: correctAnswer
+        });
+        
+        // Validate the math and get the correct index
+        const validatedCorrectAnswer = validateMathAnswer(question, options, correctAnswer);
+        
+        // Update the correctAnswer if it was wrong
+        if (validatedCorrectAnswer !== correctAnswer) {
+          console.log(`🔧 Correcting answer from index ${correctAnswer} to ${validatedCorrectAnswer}`);
+          atom.content.correctAnswer = validatedCorrectAnswer;
+        }
+        
+        // Basic validation - ensure correctAnswer is within bounds
+        if (atom.content.correctAnswer < 0 || atom.content.correctAnswer >= options.length) {
+          console.warn(`⚠️ Invalid correctAnswer index ${atom.content.correctAnswer} for question with ${options.length} options. Setting to 0.`);
+          atom.content.correctAnswer = 0;
+        }
+        
+        console.log(`✅ Question ${atomIndex + 1} final validation - correctAnswer: ${atom.content.correctAnswer}, answer: "${options[atom.content.correctAnswer]}"`);
+      }
+    });
+
+    const timestamp = Date.now();
+    return aiGeneratedData.atoms.map((atom: any, index: number) => ({
+      atom_id: `math_${providerName.toLowerCase()}_${timestamp}_${index + 1}`,
+      atom_type: atom.atom_type,
+      content: atom.content,
+      kc_ids: [kcId],
+      metadata: {
+        difficulty: 0.5,
+        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 30000 : 45000,
+        source: 'ai_math_generated',
+        model: `${providerName}: ${model}`,
+        generated_at: timestamp,
+        mathTopic: kcId.split('_').slice(3).join('_')
+      },
+    }));
+
+  } catch (error) {
+    console.error(`❌ Error during ${providerName} math generation:`, error);
+    throw error;
+  }
+}
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });

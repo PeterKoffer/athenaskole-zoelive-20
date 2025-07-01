@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 import { supabase } from '@/integrations/supabase/client';
 
 export const useStudentName = () => {
@@ -20,13 +21,18 @@ export const useStudentName = () => {
 
         if (profile?.name) {
           setStudentName(profile.name.split(' ')[0]); // Use first name
-        } else if (user.user_metadata?.name) {
-          setStudentName(user.user_metadata.name.split(' ')[0]);
+        } else if ((user?.user_metadata as UserMetadata)?.name) {
+          setStudentName((user.user_metadata as UserMetadata).name!.split(' ')[0]);
+        } else if ((user?.user_metadata as UserMetadata)?.first_name) {
+          setStudentName((user.user_metadata as UserMetadata).first_name!);
         }
       } catch (error) {
-        console.log('Could not fetch student name, using default');
-        if (user.user_metadata?.name) {
-          setStudentName(user.user_metadata.name.split(' ')[0]);
+        console.log('Could not fetch student name, using default', error);
+        const metadata = user?.user_metadata as UserMetadata | undefined;
+        if (metadata?.name) {
+          setStudentName(metadata.name.split(' ')[0]);
+        } else if (metadata?.first_name) {
+          setStudentName(metadata.first_name);
         }
       }
     };

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { UserRole } from '@/types/auth';
+import { UserRole, UserMetadata } from '@/types/auth'; // Import UserMetadata
 
 const SESSION_ROLE_KEY = "lovable-session-userRole";
 const MANUAL_ROLE_CHANGE_FLAG = "lovable-manual-role-change";
@@ -16,10 +16,11 @@ export const useRoleAccess = () => {
   };
 
   const getRoleFromUser = (): UserRole | null => {
+    const metadata = user?.user_metadata as UserMetadata | undefined;
+    if (metadata?.role) return metadata.role;
     if (!user) return null;
     const meta = user.user_metadata;
     if (meta?.role) return meta.role as UserRole;
-    if (user.role) return user.role as UserRole;
     return null;
   };
 

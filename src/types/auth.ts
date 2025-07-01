@@ -1,13 +1,35 @@
 
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+
 export type UserRole = 'admin' | 'school_leader' | 'school_staff' | 'teacher' | 'student' | 'parent';
 
+// Interface for the custom data stored within user.user_metadata
+export interface UserMetadata {
+  first_name?: string;
+  last_name?: string;
+  name?: string; // This can be derived from first_name and last_name or stored directly
+  profile_picture_url?: string;
+  role?: UserRole;
+  // Add other custom fields from your Supabase user_metadata if any
+  school_code?: string; // Assuming schoolCode might be here
+  child_code?: string;  // Assuming childCode might be here
+}
+
+// This will be our primary User type, extending Supabase's User type
+// and strongly typing user_metadata.
+export interface User extends SupabaseUser {
+  user_metadata: UserMetadata & SupabaseUser['user_metadata'];
+}
+
+// UserProfile might still be useful for forms or data fetched from a separate 'profiles' table.
+// Review its usage to see if it can be consolidated or if it serves a distinct purpose.
 export interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  schoolCode?: string;
-  childCode?: string;
+  id: string; // Corresponds to User.id
+  email?: string; // Corresponds to User.email
+  name?: string; // Derived or from User.user_metadata.name/first_name/last_name
+  role?: UserRole; // Corresponds to User.user_metadata.role
+  schoolCode?: string; // Potentially from User.user_metadata.school_code
+  childCode?: string;  // Potentially from User.user_metadata.child_code
 }
 
 export interface RoleConfig {

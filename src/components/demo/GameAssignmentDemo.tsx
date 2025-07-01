@@ -6,6 +6,7 @@ import GameAnalyticsDashboard from '@/components/teacher/GameAnalyticsDashboard'
 import StudentGameAssignments from '@/components/games/StudentGameAssignments';
 import GameEngine from '@/components/games/GameEngine';
 import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 
 /**
  * Demonstration component showing how the new game assignment and tracking
@@ -59,7 +60,8 @@ const GameAssignmentDemo = () => {
   };
 
   // Determine user role for demo purposes
-  const isTeacher = user?.email?.includes('teacher') || user?.role === 'teacher';
+  const userRole = (user?.user_metadata as UserMetadata)?.role;
+  const isTeacher = user?.email?.includes('teacher') || userRole === 'teacher';
 
   if (selectedGame) {
     return (

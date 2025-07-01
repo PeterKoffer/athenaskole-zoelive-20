@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
 import { getClassroomConfig } from './shared/classroomConfigs';
 import MathematicsWelcome from './welcome/MathematicsWelcome';
@@ -37,7 +38,7 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
     subject,
     skillArea,
     showWelcome,
-    studentName: user?.user_metadata?.first_name || studentName,
+    studentName: (user?.user_metadata as UserMetadata)?.first_name || studentName,
     timestamp: new Date().toISOString()
   });
 
@@ -49,7 +50,7 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
   const renderWelcome = () => {
     const welcomeProps = {
       onStartLesson: handleStartLesson,
-      studentName: user?.user_metadata?.first_name || studentName
+      studentName: (user?.user_metadata as UserMetadata)?.first_name || studentName
     };
 
     console.log('📝 Rendering welcome for subject:', subject.toLowerCase());
@@ -113,7 +114,7 @@ const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram
         {/* Add MathLessonHeader with scoreboard for mathematics */}
         {subject.toLowerCase() === 'mathematics' && (
           <MathLessonHeader
-            studentName={user?.user_metadata?.first_name || studentName}
+            studentName={(user?.user_metadata as UserMetadata)?.first_name || studentName}
             timeElapsed={timeElapsed}
             targetLessonLength={20}
             score={score}

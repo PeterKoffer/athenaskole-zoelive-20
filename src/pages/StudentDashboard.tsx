@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Trophy, Clock, Star } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { UserMetadata } from "@/types/auth"; // Import UserMetadata
 import { useNavigate } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
 import PracticeSkillsModal from "@/components/student/PracticeSkillsModal";
@@ -25,21 +26,23 @@ const StudentDashboard = () => {
           .eq('user_id', user.id)
           .single();
 
+        const metadata = user?.user_metadata as UserMetadata | undefined;
         if (profile?.name) {
           const firstName = profile.name.split(' ')[0];
           setStudentName(firstName);
-        } else if (user.user_metadata?.first_name) {
-          setStudentName(user.user_metadata.first_name);
-        } else if (user.user_metadata?.name) {
-          const firstName = user.user_metadata.name.split(' ')[0];
+        } else if (metadata?.first_name) {
+          setStudentName(metadata.first_name);
+        } else if (metadata?.name) {
+          const firstName = metadata.name.split(' ')[0];
           setStudentName(firstName);
         }
       } catch (error) {
-        console.log('Could not fetch student name from profile, using fallback');
-        if (user.user_metadata?.first_name) {
-          setStudentName(user.user_metadata.first_name);
-        } else if (user.user_metadata?.name) {
-          const firstName = user.user_metadata.name.split(' ')[0];
+        console.log('Could not fetch student name from profile, using fallback', error);
+        const metadata = user?.user_metadata as UserMetadata | undefined;
+        if (metadata?.first_name) {
+          setStudentName(metadata.first_name);
+        } else if (metadata?.name) {
+          const firstName = metadata.name.split(' ')[0];
           setStudentName(firstName);
         }
       }

@@ -1,6 +1,7 @@
 
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { UserMetadata } from "@/types/auth"; // Import UserMetadata
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import UnifiedLessonManager from "./components/UnifiedLessonManager";
@@ -65,7 +66,7 @@ const ComputerScienceLearning = () => {
         <UnifiedLessonManager
           subject="computer_science"
           skillArea="programming_basics"
-          studentName={user.user_metadata?.first_name || 'Student'}
+          studentName={(user.user_metadata as UserMetadata)?.first_name || 'Student'}
           onBackToProgram={handleBackToProgram}
         />
       </div>
