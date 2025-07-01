@@ -11,7 +11,7 @@ const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY") || Deno.env.get("DeepSeek_API");
 
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/chat/completions";
-const DEEPSEEK_ENDPOINT = "https://api.deepseek.com/v1/chat/completions"; // Assumption
+const DEEPSEEK_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
 
 interface Atom {
   atom_id: string;
@@ -19,6 +19,63 @@ interface Atom {
   content: any;
   kc_ids: string[];
   metadata: any;
+}
+
+function createMathPrompt(kcId: string, userId: string, contentTypes: string[], maxAtoms: number): string {
+  // Extract math topic from KC ID
+  const kcParts = kcId.toLowerCase().split('_');
+  const subject = kcParts[1] || 'math';
+  const grade = kcParts[2] || 'g4';
+  const gradeNumber = grade.replace('g', '');
+  const topic = kcParts.slice(3).join(' ').replace(/_/g, ' ');
+
+  let specificInstructions = "";
+  
+  if (topic.includes('equivalent_fractions')) {
+    specificInstructions = `Create questions about equivalent fractions like "Which fraction is equivalent to 2/4?" with options like "1/2", "3/6", "4/8", "All of the above" (correct: All of the above)`;
+  } else if (topic.includes('multiply_decimals')) {
+    specificInstructions = `Create decimal multiplication questions like "What is 2.5 × 1.6?" with numerical answer choices`;
+  } else if (topic.includes('area_rectangles')) {
+    specificInstructions = `Create area questions like "A rectangle has length 8 units and width 5 units. What is its area?" with options like "40 square units", "13 square units", "26 square units", "35 square units"`;
+  } else if (topic.includes('add_fractions')) {
+    specificInstructions = `Create fraction addition questions like "What is 2/5 + 1/5?" with fraction answer options`;
+  } else {
+    specificInstructions = `Create grade ${gradeNumber} math questions about ${topic} with numerical problems and calculations`;
+  }
+
+  return `You are a Grade ${gradeNumber} math teacher creating educational content about ${topic}.
+
+Generate ${maxAtoms} educational atoms with these exact types: ${contentTypes.join(', ')}.
+
+${specificInstructions}
+
+For TEXT_EXPLANATION atoms, explain the math concept clearly with examples.
+For QUESTION_MULTIPLE_CHOICE atoms, create ACTUAL MATH PROBLEMS with numbers, not generic questions about concepts.
+
+Return JSON with this exact structure:
+{
+  "atoms": [
+    {
+      "atom_type": "TEXT_EXPLANATION",
+      "content": {
+        "title": "Understanding ${topic}",
+        "explanation": "Clear explanation of the math concept with step-by-step process",
+        "examples": ["Example: 3 × 4 = 12", "Example: Area = length × width"]
+      }
+    },
+    {
+      "atom_type": "QUESTION_MULTIPLE_CHOICE", 
+      "content": {
+        "question": "What is 12 × 15?",
+        "options": ["180", "170", "190", "200"],
+        "correctAnswer": 0,
+        "explanation": "12 × 15 = 180. You can solve this by multiplying 12 × 10 = 120, then 12 × 5 = 60, so 120 + 60 = 180."
+      }
+    }
+  ]
+}
+
+IMPORTANT: Create real mathematical calculations, not questions about concepts. Use actual numbers and math problems appropriate for Grade ${gradeNumber}.`;
 }
 
 async function generateWithAI(
@@ -31,37 +88,10 @@ async function generateWithAI(
   maxAtoms: number,
   providerName: string
 ): Promise<Atom[]> {
-  console.log(`🧠 Attempting content generation with ${providerName}`);
+  console.log(`🧠 Generating REAL MATH content with ${providerName}`);
 
-  const desiredContentTypesString = contentTypes.join(", ");
-  const prompt = `
-    You are an AI assistant specialized in creating educational content.
-    Generate content for a knowledge component identified as "${kcId}".
-    The user ID is "${userId}".
-    Please provide ${maxAtoms} content atoms.
-    The desired atom types are: ${desiredContentTypesString}. For example, a TEXT_EXPLANATION and a QUESTION_MULTIPLE_CHOICE.
-
-    Respond with a JSON object containing a single key "atoms".
-    The value of "atoms" should be an array of atom objects.
-    Each atom object must have the following structure:
-    {
-      "atom_type": "TYPE_STRING", // e.g., "TEXT_EXPLANATION" or "QUESTION_MULTIPLE_CHOICE"
-      "content": {
-        // Content structure depends on atom_type
-        // For TEXT_EXPLANATION:
-        //   "title": "AI Generated Title for ${kcId}",
-        //   "explanation": "AI generated explanation text...",
-        //   "examples": ["AI generated example 1", "AI generated example 2"]
-        // For QUESTION_MULTIPLE_CHOICE:
-        //   "question": "AI generated question about ${kcId}?",
-        //   "options": ["Option A", "Option B", "Option C", "Option D"],
-        //   "correctAnswer": 0, // index of the correct option
-        //   "explanation": "AI generated explanation for the correct answer."
-      }
-    }
-    Ensure the output is a valid JSON.
-  `;
-
+  const prompt = createMathPrompt(kcId, userId, contentTypes, maxAtoms);
+  
   try {
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -72,69 +102,56 @@ async function generateWithAI(
       body: JSON.stringify({
         model: model,
         messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" }, // For OpenAI GPT-4 Turbo and newer
+        response_format: { type: "json_object" },
       }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`❌ ${providerName} API error (${response.status}): ${errorBody}`);
-      throw new Error(`${providerName} API request failed with status ${response.status}. Body: ${errorBody}`);
+      throw new Error(`${providerName} API request failed with status ${response.status}`);
     }
 
     const jsonResponse = await response.json();
-
-    if (providerName === "OpenAI" && (!jsonResponse.choices || !jsonResponse.choices[0] || !jsonResponse.choices[0].message || !jsonResponse.choices[0].message.content)) {
-      console.error(`❌ Invalid response structure from ${providerName}:`, jsonResponse);
-      throw new Error(`Invalid response structure from ${providerName}. Missing 'choices[0].message.content'.`);
-    }
-
-    // DeepSeek might have a different response structure, this part might need adjustment
-    // For now, assuming it's similar to OpenAI or the main content is directly in a field.
-    // If DeepSeek returns JSON directly in a specific field (e.g. data.result), adjust here.
     let aiContentString = "";
+    
     if (providerName === "OpenAI") {
-        aiContentString = jsonResponse.choices[0].message.content;
+      aiContentString = jsonResponse.choices[0].message.content;
     } else if (providerName === "DeepSeek") {
-        // Placeholder: Adjust if DeepSeek's response structure for JSON output is different.
-        // For example, if DeepSeek also uses choices[0].message.content:
-        if (jsonResponse.choices && jsonResponse.choices[0] && jsonResponse.choices[0].message && jsonResponse.choices[0].message.content) {
-            aiContentString = jsonResponse.choices[0].message.content;
-        } else {
-            // Fallback if the structure is unknown or different, try to parse the whole response.
-            // This is a guess and might fail if the response isn't a simple JSON string.
-            console.warn(`⚠️ ${providerName} response structure might be different. Attempting to parse directly. Response:`, jsonResponse)
-            aiContentString = JSON.stringify(jsonResponse);
-        }
+      if (jsonResponse.choices && jsonResponse.choices[0] && jsonResponse.choices[0].message && jsonResponse.choices[0].message.content) {
+        aiContentString = jsonResponse.choices[0].message.content;
+      } else {
+        console.warn(`⚠️ ${providerName} response structure different:`, jsonResponse);
+        aiContentString = JSON.stringify(jsonResponse);
+      }
     }
-
 
     const aiGeneratedData = JSON.parse(aiContentString);
 
     if (!aiGeneratedData.atoms || !Array.isArray(aiGeneratedData.atoms)) {
-      console.error(`❌ Invalid JSON structure from ${providerName} AI: "atoms" array not found or not an array. Parsed data:`, aiGeneratedData);
-      throw new Error(`Invalid JSON structure from ${providerName} AI: "atoms" array not found or not an array.`);
+      console.error(`❌ Invalid JSON from ${providerName}:`, aiGeneratedData);
+      throw new Error(`Invalid JSON structure from ${providerName}: "atoms" array not found`);
     }
 
     const timestamp = Date.now();
     return aiGeneratedData.atoms.map((atom: any, index: number) => ({
-      atom_id: `ai_${providerName.toLowerCase()}_${timestamp}_${index + 1}`,
+      atom_id: `math_${providerName.toLowerCase()}_${timestamp}_${index + 1}`,
       atom_type: atom.atom_type,
       content: atom.content,
       kc_ids: [kcId],
       metadata: {
-        difficulty: 0.5, // Placeholder, AI could provide this
-        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 30000 : 45000, // Placeholder
-        source: 'ai_generated',
+        difficulty: 0.5,
+        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 30000 : 45000,
+        source: 'ai_math_generated',
         model: `${providerName}: ${model}`,
         generated_at: timestamp,
-        raw_ai_response_truncated: jsonResponse // Storing for debug, might want to truncate/remove for prod
+        mathTopic: kcId.split('_').slice(3).join('_')
       },
     }));
 
   } catch (error) {
-    console.error(`❌ Error during ${providerName} AI generation or parsing:`, error);
-    throw error; // Re-throw to be caught by the main handler
+    console.error(`❌ Error during ${providerName} math generation:`, error);
+    throw error;
   }
 }
 
@@ -144,9 +161,9 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🤖 AI Content Generation function invoked');
+    console.log('🧮 MATH Content Generation function invoked');
     const { kcId, userId, contentTypes = ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE'], maxAtoms = 2 } = await req.json();
-    console.log('📝 Request details:', { kcId, userId, contentTypes, maxAtoms });
+    console.log('📊 Math request:', { kcId, userId, contentTypes, maxAtoms });
 
     if (!kcId || !userId) {
       return new Response(JSON.stringify({ error: "Missing kcId or userId" }), {
@@ -161,45 +178,42 @@ serve(async (req) => {
 
     if (OPENAI_API_KEY) {
       try {
-        atoms = await generateWithAI(OPENAI_API_KEY, OPENAI_ENDPOINT, "gpt-3.5-turbo", kcId, userId, contentTypes, maxAtoms, "OpenAI");
+        atoms = await generateWithAI(OPENAI_API_KEY, OPENAI_ENDPOINT, "gpt-4o-mini", kcId, userId, contentTypes, maxAtoms, "OpenAI");
         providerUsed = "OpenAI";
       } catch (error) {
-        console.error("❌ OpenAI generation failed:", error.message);
-        generationError = error; // Store error to potentially try next provider
+        console.error("❌ OpenAI math generation failed:", error.message);
+        generationError = error;
       }
     }
 
     if (atoms.length === 0 && DEEPSEEK_API_KEY) {
-      console.log("🔄 OpenAI failed or key not present, trying DeepSeek.");
+      console.log("🔄 Trying DeepSeek for math generation");
       try {
-        // Note: DeepSeek model name might differ, e.g., "deepseek-chat" or "deepseek-coder"
-        // Using "deepseek-chat" as a common guess.
         atoms = await generateWithAI(DEEPSEEK_API_KEY, DEEPSEEK_ENDPOINT, "deepseek-chat", kcId, userId, contentTypes, maxAtoms, "DeepSeek");
         providerUsed = "DeepSeek";
-        generationError = null; // Clear previous error if DeepSeek succeeds
+        generationError = null;
       } catch (error) {
-        console.error("❌ DeepSeek generation failed:", error.message);
-        if (!generationError) generationError = error; // Keep first error if OpenAI wasn't tried
+        console.error("❌ DeepSeek math generation failed:", error.message);
+        if (!generationError) generationError = error;
       }
     } else if (atoms.length === 0 && !OPENAI_API_KEY && !DEEPSEEK_API_KEY) {
-       console.error("❌ No API keys configured for OpenAI or DeepSeek.");
-       return new Response(JSON.stringify({ error: "AI content generation failed: No API keys configured." }), {
+      console.error("❌ No API keys configured");
+      return new Response(JSON.stringify({ error: "Math content generation failed: No API keys configured" }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-
     if (atoms.length > 0) {
-      console.log(`✅ AI content generated successfully using ${providerUsed}. Atoms:`, atoms.length);
+      console.log(`✅ REAL MATH content generated using ${providerUsed}:`, atoms.length, 'atoms');
       return new Response(JSON.stringify({ atoms }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } else {
-      console.error('❌ AI content generation failed for all providers or no keys configured.');
-      const errorMessage = generationError ? generationError.message : "Unknown error during AI generation.";
+      console.error('❌ Math generation failed for all providers');
+      const errorMessage = generationError ? generationError.message : "Unknown math generation error";
       return new Response(JSON.stringify({
-        error: `AI content generation failed. Provider: ${providerUsed}. Details: ${errorMessage}`,
+        error: `Math content generation failed. Provider: ${providerUsed}. Details: ${errorMessage}`,
         details: generationError ? generationError.toString() : "No further details."
       }), {
         status: 500,
@@ -208,8 +222,7 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('❌ AI Content Generation main error catch:', error);
-    // This catches errors from req.json() or other unexpected issues
+    console.error('❌ Math Content Generation main error:', error);
     return new Response(JSON.stringify({ error: error.message, details: error.toString() }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
