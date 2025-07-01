@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -24,155 +25,34 @@ interface Atom {
   metadata: any;
 }
 
-// Enhanced fallback content generator with actual math questions
-function generateFallbackContent(kcId: string, maxAtoms: number): Atom[] {
-  console.log(`🔄 Generating enhanced math fallback content for ${kcId}`);
+// Minimized fallback - only used as absolute last resort
+function generateMinimalFallback(kcId: string, maxAtoms: number): Atom[] {
+  console.log(`⚠️ LAST RESORT: Minimal fallback for ${kcId} (AI generation completely failed)`);
   
   const timestamp = Date.now();
   const atoms: Atom[] = [];
   
-  // Extract topic info from kcId
-  const parts = kcId.toLowerCase().split('_');
-  const grade = parts[2]?.replace('g', '') || '5';
-  const topic = parts.slice(3).join(' ').replace(/_/g, ' ') || 'mathematics';
-  
-  // Create topic-specific math questions
-  const mathQuestions = createMathQuestionsByTopic(topic, grade);
-  
-  // Generate TEXT_EXPLANATION atom with actual math content
   atoms.push({
-    atom_id: `fallback_explanation_${timestamp}_1`,
+    atom_id: `minimal_fallback_${timestamp}_1`,
     atom_type: 'TEXT_EXPLANATION',
     content: {
-      title: `Understanding ${topic.charAt(0).toUpperCase() + topic.slice(1)}`,
-      explanation: mathQuestions.explanation,
-      examples: mathQuestions.examples
+      title: `Mathematics Practice`,
+      explanation: `This is an important mathematical concept that requires practice and understanding.`,
+      examples: [`Practice helps build mathematical skills`]
     },
     kc_ids: [kcId],
     metadata: {
       difficulty: 0.5,
       estimatedTimeMs: 30000,
-      source: 'enhanced_math_fallback',
-      model: 'Enhanced Fallback Generator',
+      source: 'minimal_fallback',
+      model: 'Minimal Fallback',
       generated_at: timestamp,
-      curriculumAligned: true,
-      mathTopic: topic,
-      studypugIntegration: false
+      curriculumAligned: false,
+      aiGenerated: false
     }
   });
   
-  // Generate QUESTION_MULTIPLE_CHOICE atom with actual math problem
-  if (maxAtoms > 1) {
-    atoms.push({
-      atom_id: `fallback_question_${timestamp}_2`,
-      atom_type: 'QUESTION_MULTIPLE_CHOICE',
-      content: {
-        question: mathQuestions.question,
-        options: mathQuestions.options,
-        correctAnswer: mathQuestions.correctAnswer,
-        explanation: mathQuestions.questionExplanation
-      },
-      kc_ids: [kcId],
-      metadata: {
-        difficulty: 0.6,
-        estimatedTimeMs: 45000,
-        source: 'enhanced_math_fallback',
-        model: 'Enhanced Fallback Generator',
-        generated_at: timestamp,
-        curriculumAligned: true,
-        mathTopic: topic,
-        studypugIntegration: false
-      }
-    });
-  }
-  
   return atoms.slice(0, maxAtoms);
-}
-
-// Create topic-specific math questions
-function createMathQuestionsByTopic(topic: string, grade: string) {
-  if (topic.includes('equivalent') && topic.includes('fractions')) {
-    return {
-      explanation: `Equivalent fractions are fractions that represent the same value even though they look different. For example, 1/2 and 2/4 are equivalent because they both represent half of a whole. To find equivalent fractions, you can multiply or divide both the numerator and denominator by the same number.`,
-      examples: [
-        "1/2 = 2/4 = 3/6 = 4/8 (all represent one half)",
-        "3/4 = 6/8 = 9/12 = 12/16 (all represent three quarters)"
-      ],
-      question: "Which fraction is equivalent to 2/3?",
-      options: ["4/6", "3/4", "2/5", "1/3"],
-      correctAnswer: 0,
-      questionExplanation: "To find equivalent fractions, multiply both numerator and denominator by the same number. 2/3 × 2/2 = 4/6"
-    };
-  }
-  
-  if (topic.includes('basic') && topic.includes('division')) {
-    return {
-      explanation: `Division is sharing things equally into groups. When we divide, we're finding out how many are in each group or how many groups we can make. Division is the opposite of multiplication.`,
-      examples: [
-        "12 ÷ 3 = 4 (12 items shared equally among 3 groups gives 4 in each group)",
-        "15 ÷ 5 = 3 (15 items divided into groups of 5 makes 3 groups)"
-      ],
-      question: "What is 24 ÷ 6?",
-      options: ["4", "5", "3", "6"],
-      correctAnswer: 0,
-      questionExplanation: "24 ÷ 6 = 4 because 6 × 4 = 24. We can fit 6 into 24 exactly 4 times."
-    };
-  }
-  
-  if (topic.includes('add') && topic.includes('fractions')) {
-    return {
-      explanation: `When adding fractions with the same denominator (bottom number), we add the numerators (top numbers) and keep the denominator the same. For example: 1/4 + 2/4 = 3/4.`,
-      examples: [
-        "1/5 + 2/5 = 3/5 (one fifth plus two fifths equals three fifths)",
-        "3/8 + 1/8 = 4/8 = 1/2 (three eighths plus one eighth equals four eighths, which simplifies to one half)"
-      ],
-      question: "What is 2/7 + 3/7?",
-      options: ["5/7", "5/14", "6/7", "2/3"],
-      correctAnswer: 0,
-      questionExplanation: "When adding fractions with the same denominator, add the numerators: 2 + 3 = 5, so 2/7 + 3/7 = 5/7"
-    };
-  }
-  
-  if (topic.includes('multiply') && topic.includes('decimals')) {
-    return {
-      explanation: `When multiplying decimals, multiply the numbers as if they were whole numbers, then count the total number of decimal places in both numbers and place the decimal point in the answer.`,
-      examples: [
-        "2.5 × 3 = 7.5 (multiply 25 × 3 = 75, then place decimal 1 place from right)",
-        "1.2 × 0.4 = 0.48 (multiply 12 × 4 = 48, then place decimal 2 places from right)"
-      ],
-      question: "What is 3.2 × 1.5?",
-      options: ["4.8", "4.7", "5.2", "3.8"],
-      correctAnswer: 0,
-      questionExplanation: "Multiply 32 × 15 = 480. Count decimal places: 3.2 has 1, 1.5 has 1, total 2. So 480 becomes 4.80 or 4.8"
-    };
-  }
-  
-  if (topic.includes('divide') && topic.includes('decimals')) {
-    return {
-      explanation: `When dividing decimals, we can move the decimal point in both numbers to make the divisor a whole number, then divide normally.`,
-      examples: [
-        "4.8 ÷ 1.2 = 48 ÷ 12 = 4 (move decimal 1 place in both numbers)",
-        "6.4 ÷ 0.8 = 64 ÷ 8 = 8 (move decimal 1 place in both numbers)"
-      ],
-      question: "What is 7.2 ÷ 1.8?",
-      options: ["4", "3.6", "5", "4.2"],
-      correctAnswer: 0,
-      questionExplanation: "7.2 ÷ 1.8 = 72 ÷ 18 = 4. We moved the decimal 1 place in both numbers and divided."
-    };
-  }
-  
-  // Default for any other topic
-  return {
-    explanation: `This is an important Grade ${grade} mathematics concept that builds on your previous knowledge and helps develop stronger mathematical skills.`,
-    examples: [
-      `Example 1: Practice problem for Grade ${grade} mathematics`,
-      `Example 2: Real-world application of mathematical concepts`
-    ],
-    question: `Which operation would you use to solve a problem involving ${topic}?`,
-    options: ["Addition", "Subtraction", "Multiplication", "Division"],
-    correctAnswer: 0,
-    questionExplanation: `The specific operation depends on the problem context in ${topic}.`
-  };
 }
 
 async function generateWithAI(
@@ -183,17 +63,48 @@ async function generateWithAI(
   userId: string,
   contentTypes: string[],
   maxAtoms: number,
-  providerName: string
+  providerName: string,
+  attemptNumber: number = 1
 ): Promise<Atom[]> {
-  console.log(`🧠 Generating CURRICULUM-ENHANCED content with ${providerName}`);
+  console.log(`🚀 AI Generation Attempt #${attemptNumber} with ${providerName}`);
 
-  // Use our curriculum-enhanced prompt generator
-  const prompt = createMathPrompt(kcId, userId, contentTypes, maxAtoms);
+  // Enhanced prompt with uniqueness and creativity boosters
+  const diversityPrompts = [
+    "Create completely unique questions with fresh scenarios and different numbers",
+    "Use creative real-world applications and engaging story contexts",
+    "Design innovative problem-solving approaches with varied difficulty",
+    "Generate original mathematical scenarios with practical applications",
+    "Create engaging word problems with diverse characters and situations"
+  ];
   
+  const randomDiversityPrompt = diversityPrompts[Math.floor(Math.random() * diversityPrompts.length)];
+  const basePrompt = createMathPrompt(kcId, userId, contentTypes, maxAtoms);
+  
+  // Enhanced prompt with creativity boosters
+  const enhancedPrompt = `${basePrompt}
+
+CREATIVITY ENHANCEMENT (Attempt #${attemptNumber}):
+${randomDiversityPrompt}
+
+UNIQUENESS REQUIREMENTS:
+- Use completely different numbers and scenarios from typical examples
+- Create original word problems with unique contexts
+- Vary mathematical operations and problem presentation
+- Make content engaging and age-appropriate
+- Ensure educational value while being creative
+
+GENERATION CONTEXT:
+- Provider: ${providerName}
+- Attempt: ${attemptNumber}
+- Session: ${Date.now()}
+- Randomization: ${Math.random().toString(36).substring(7)}
+
+Generate HIGH-QUALITY, CREATIVE, and EDUCATIONALLY VALUABLE content!`;
+
   try {
-    // Increased timeout and optimized for better success rate
+    // More aggressive timeout strategy - shorter but with more retries
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // Increased to 20 seconds
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // Reduced timeout
 
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -203,10 +114,13 @@ async function generateWithAI(
       },
       body: JSON.stringify({
         model: model,
-        messages: [{ role: "user", content: prompt }],
+        messages: [{ role: "user", content: enhancedPrompt }],
         response_format: { type: "json_object" },
-        max_tokens: 1500, // Reduced for faster response
-        temperature: 0.7,
+        max_tokens: 1200,
+        temperature: 0.8 + (attemptNumber * 0.1), // Increase creativity with each attempt
+        top_p: 0.9,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.3,
       }),
       signal: controller.signal,
     });
@@ -216,7 +130,7 @@ async function generateWithAI(
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`❌ ${providerName} API error (${response.status}): ${errorBody}`);
-      throw new Error(`${providerName} API request failed with status ${response.status}: ${errorBody}`);
+      throw new Error(`${providerName} API request failed: ${response.status} - ${errorBody}`);
     }
 
     const jsonResponse = await response.json();
@@ -225,10 +139,10 @@ async function generateWithAI(
     if (providerName === "OpenAI") {
       aiContentString = jsonResponse.choices[0].message.content;
     } else if (providerName === "DeepSeek") {
-      if (jsonResponse.choices && jsonResponse.choices[0] && jsonResponse.choices[0].message && jsonResponse.choices[0].message.content) {
+      if (jsonResponse.choices?.[0]?.message?.content) {
         aiContentString = jsonResponse.choices[0].message.content;
       } else {
-        console.warn(`⚠️ ${providerName} response structure different:`, jsonResponse);
+        console.warn(`⚠️ ${providerName} unexpected response structure:`, jsonResponse);
         throw new Error(`Invalid response structure from ${providerName}`);
       }
     }
@@ -237,27 +151,27 @@ async function generateWithAI(
 
     if (!aiGeneratedData.atoms || !Array.isArray(aiGeneratedData.atoms)) {
       console.error(`❌ Invalid JSON from ${providerName}:`, aiGeneratedData);
-      throw new Error(`Invalid JSON structure from ${providerName}: "atoms" array not found`);
+      throw new Error(`Invalid JSON structure from ${providerName}: missing atoms array`);
     }
 
-    console.log(`✅ CURRICULUM-ENHANCED content generated: ${aiGeneratedData.atoms.length} atoms`);
+    console.log(`✅ ${providerName} SUCCESS: Generated ${aiGeneratedData.atoms.length} atoms on attempt #${attemptNumber}`);
 
-    // Enhanced validation for curriculum-aligned content
+    // Enhanced validation for AI-generated content
     aiGeneratedData.atoms.forEach((atom: any, atomIndex: number) => {
       if (atom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && atom.content) {
         const { question, options, correctAnswer } = atom.content;
         
-        console.log(`🔍 Validating curriculum-aligned question ${atomIndex + 1}: "${question.substring(0, 50)}..."`);
+        console.log(`🔍 Validating AI question ${atomIndex + 1}: "${question.substring(0, 50)}..."`);
         
-        // Enhanced math validation for curriculum content
+        // Math validation
         if (question.includes('÷') || question.includes('×') || question.includes('+') || question.includes('-') || question.includes('/')) {
           const validatedCorrectAnswer = validateMathAnswer(question, options, correctAnswer);
           
           if (validatedCorrectAnswer !== correctAnswer) {
-            console.log(`🔧 Curriculum content: Correcting answer from index ${correctAnswer} to ${validatedCorrectAnswer}`);
+            console.log(`🔧 AI Content: Correcting answer from ${correctAnswer} to ${validatedCorrectAnswer}`);
             atom.content.correctAnswer = validatedCorrectAnswer;
           } else {
-            console.log(`✅ Curriculum content: Answer validation passed for question ${atomIndex + 1}`);
+            console.log(`✅ AI Content: Answer validation passed for question ${atomIndex + 1}`);
           }
         }
         
@@ -271,30 +185,87 @@ async function generateWithAI(
 
     const timestamp = Date.now();
     return aiGeneratedData.atoms.map((atom: any, index: number) => ({
-      atom_id: `curriculum_${providerName.toLowerCase()}_${timestamp}_${index + 1}`,
+      atom_id: `ai_${providerName.toLowerCase()}_${timestamp}_${index + 1}_attempt${attemptNumber}`,
       atom_type: atom.atom_type,
       content: atom.content,
       kc_ids: [kcId],
       metadata: {
-        difficulty: 0.6, // Slightly higher for curriculum-aligned content
-        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 25000 : 35000,
-        source: 'curriculum_enhanced_ai',
+        difficulty: 0.7, // Higher difficulty for AI content
+        estimatedTimeMs: atom.atom_type === 'TEXT_EXPLANATION' ? 30000 : 40000,
+        source: 'ai_generated',
         model: `${providerName}: ${model}`,
         generated_at: timestamp,
         curriculumAligned: true,
         mathTopic: kcId.split('_').slice(3).join('_'),
-        studypugIntegration: true
+        studypugIntegration: true,
+        aiGenerated: true,
+        attemptNumber: attemptNumber,
+        creativityLevel: 0.8 + (attemptNumber * 0.1)
       },
     }));
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.error(`❌ ${providerName} curriculum generation timed out`);
-      throw new Error(`${providerName} curriculum generation timed out - please try again`);
+      console.error(`❌ ${providerName} timed out on attempt #${attemptNumber}`);
+      throw new Error(`${providerName} generation timed out (attempt ${attemptNumber})`);
     }
-    console.error(`❌ Error during ${providerName} curriculum generation:`, error);
+    console.error(`❌ ${providerName} generation failed (attempt #${attemptNumber}):`, error);
     throw error;
   }
+}
+
+// Enhanced retry logic with multiple providers and attempts
+async function generateWithEnhancedRetry(kcId: string, userId: string, contentTypes: string[], maxAtoms: number): Promise<Atom[]> {
+  const maxAttempts = 3;
+  let lastError = null;
+
+  // Try OpenAI with multiple attempts
+  if (OPENAI_API_KEY) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        console.log(`🎯 OpenAI Generation - Attempt ${attempt}/${maxAttempts}`);
+        const atoms = await generateWithAI(OPENAI_API_KEY, OPENAI_ENDPOINT, "gpt-4o-mini", kcId, userId, contentTypes, maxAtoms, "OpenAI", attempt);
+        if (atoms.length > 0) {
+          console.log(`🎉 OpenAI SUCCESS on attempt ${attempt}: ${atoms.length} atoms generated`);
+          return atoms;
+        }
+      } catch (error) {
+        console.warn(`⚠️ OpenAI attempt ${attempt} failed:`, error.message);
+        lastError = error;
+        
+        // Short delay between attempts
+        if (attempt < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+  }
+
+  // Try DeepSeek with multiple attempts
+  if (DEEPSEEK_API_KEY) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        console.log(`🎯 DeepSeek Generation - Attempt ${attempt}/${maxAttempts}`);
+        const atoms = await generateWithAI(DEEPSEEK_API_KEY, DEEPSEEK_ENDPOINT, "deepseek-chat", kcId, userId, contentTypes, maxAtoms, "DeepSeek", attempt);
+        if (atoms.length > 0) {
+          console.log(`🎉 DeepSeek SUCCESS on attempt ${attempt}: ${atoms.length} atoms generated`);
+          return atoms;
+        }
+      } catch (error) {
+        console.warn(`⚠️ DeepSeek attempt ${attempt} failed:`, error.message);
+        lastError = error;
+        
+        // Short delay between attempts
+        if (attempt < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+  }
+
+  // If all AI attempts failed, throw the last error
+  console.error(`❌ ALL AI GENERATION ATTEMPTS FAILED after ${maxAttempts * 2} tries`);
+  throw lastError || new Error("All AI providers failed");
 }
 
 serve(async (req) => {
@@ -303,9 +274,9 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🎓 CURRICULUM-ENHANCED Content Generation function invoked');
+    console.log('🤖 AI-FOCUSED Content Generation function invoked');
     const { kcId, userId, contentTypes = ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE'], maxAtoms = 2 } = await req.json();
-    console.log('📚 Curriculum-enhanced request:', { kcId, userId, contentTypes, maxAtoms });
+    console.log('🎯 AI-focused request:', { kcId, userId, contentTypes, maxAtoms });
 
     if (!kcId || !userId) {
       return new Response(JSON.stringify({ error: "Missing kcId or userId" }), {
@@ -318,56 +289,41 @@ serve(async (req) => {
     let providerUsed = "None";
     let generationError = null;
 
-    // Try OpenAI first for curriculum-enhanced generation
-    if (OPENAI_API_KEY) {
-      try {
-        console.log('🚀 Attempting OpenAI curriculum-enhanced generation...');
-        atoms = await generateWithAI(OPENAI_API_KEY, OPENAI_ENDPOINT, "gpt-4o-mini", kcId, userId, contentTypes, maxAtoms, "OpenAI");
-        providerUsed = "OpenAI";
-        console.log(`✅ OpenAI curriculum generation successful: ${atoms.length} atoms created`);
-      } catch (error) {
-        console.error("❌ OpenAI curriculum generation failed:", error.message);
-        generationError = error;
-      }
+    // Focus on AI generation with enhanced retry
+    try {
+      console.log('🚀 Starting AI-focused generation with enhanced retry logic...');
+      atoms = await generateWithEnhancedRetry(kcId, userId, contentTypes, maxAtoms);
+      providerUsed = "AI Enhanced Retry";
+      console.log(`✅ AI generation successful: ${atoms.length} atoms created`);
+    } catch (error) {
+      console.error("❌ All AI generation attempts failed:", error.message);
+      generationError = error;
     }
 
-    // Fallback to DeepSeek only if OpenAI fails
-    if (atoms.length === 0 && DEEPSEEK_API_KEY) {
-      console.log("🔄 Trying DeepSeek for curriculum generation");
-      try {
-        atoms = await generateWithAI(DEEPSEEK_API_KEY, DEEPSEEK_ENDPOINT, "deepseek-chat", kcId, userId, contentTypes, maxAtoms, "DeepSeek");
-        providerUsed = "DeepSeek";
-        generationError = null;
-        console.log(`✅ DeepSeek curriculum generation successful: ${atoms.length} atoms created`);
-      } catch (error) {
-        console.error("❌ DeepSeek curriculum generation failed:", error.message);
-        if (!generationError) generationError = error;
-      }
-    }
-
-    // Enhanced fallback: Generate curriculum-aligned content locally if all APIs fail
+    // Only use minimal fallback as absolute last resort
     if (atoms.length === 0) {
-      console.log("🔄 All API providers failed, generating enhanced math fallback content");
-      atoms = generateFallbackContent(kcId, maxAtoms);
-      providerUsed = "Enhanced Math Fallback";
+      console.log("⚠️ ABSOLUTE LAST RESORT: Using minimal fallback (all AI attempts failed)");
+      atoms = generateMinimalFallback(kcId, maxAtoms);
+      providerUsed = "Minimal Fallback";
       generationError = null;
-      console.log(`✅ Enhanced math fallback generation successful: ${atoms.length} atoms created`);
+      console.log(`📝 Minimal fallback generation: ${atoms.length} atoms created`);
     }
 
     if (atoms.length > 0) {
-      console.log(`🎉 CURRICULUM-ENHANCED content generated successfully using ${providerUsed}:`, atoms.length, 'atoms');
-      console.log('🏷️ Curriculum metadata:', atoms.map(a => a.metadata.curriculumAligned ? 'Aligned' : 'Standard').join(', '));
+      const aiGenerated = atoms.some(atom => atom.metadata.aiGenerated === true);
+      console.log(`🎉 Content generated successfully using ${providerUsed}:`, atoms.length, 'atoms');
+      console.log(`🤖 AI Generated: ${aiGenerated ? 'YES' : 'NO'}`);
       
       return new Response(JSON.stringify({ atoms }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } else {
-      console.error('❌ All curriculum generation methods failed');
-      const errorMessage = generationError ? generationError.message : "Unknown curriculum generation error";
+      console.error('❌ All generation methods failed completely');
+      const errorMessage = generationError ? generationError.message : "Unknown generation error";
       return new Response(JSON.stringify({
-        error: `Curriculum content generation failed. Provider: ${providerUsed}. Details: ${errorMessage}`,
+        error: `Content generation failed completely. Provider: ${providerUsed}. Details: ${errorMessage}`,
         details: generationError ? generationError.toString() : "No further details.",
-        curriculumEnhanced: false
+        aiGenerated: false
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -375,11 +331,11 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('❌ Curriculum Content Generation main error:', error);
+    console.error('❌ Content Generation main error:', error);
     return new Response(JSON.stringify({ 
       error: error.message, 
       details: error.toString(),
-      curriculumEnhanced: false 
+      aiGenerated: false 
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
