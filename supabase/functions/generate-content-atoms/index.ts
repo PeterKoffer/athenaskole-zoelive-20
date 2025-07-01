@@ -2,6 +2,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+// @deno-lint-ignore-file no-explicit-any
+import { validateMathAnswer } from './math_utils.ts';
+import { createMathPrompt } from './prompt_generator.ts';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -20,7 +24,6 @@ interface Atom {
   kc_ids: string[];
   metadata: any;
 }
-
 function createMathPrompt(kcId: string, userId: string, contentTypes: string[], maxAtoms: number): string {
   // Extract math topic from KC ID
   const kcParts = kcId.toLowerCase().split('_');
