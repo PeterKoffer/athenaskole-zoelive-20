@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Brain, ArrowLeft, CheckCircle, Loader2, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import ContentAtomRenderer from './ContentAtomRenderer';
 import { useAdaptivePracticeLogic } from './hooks/useAdaptivePracticeLogic';
 
@@ -13,6 +14,7 @@ interface AdaptivePracticeModuleProps {
 
 const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
   const { toast } = useToast();
+  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
   const { state, handleNextAtom, handleQuestionAnswer, handleRetry } = useAdaptivePracticeLogic();
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
 
@@ -46,22 +48,30 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
       return;
     }
 
-    // Handle the answer with stealth assessment
-    handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
+    // Only show feedback and play sounds for actual questions, not explanations
+    if (currentAtom.atom_type === 'QUESTION_MULTIPLE_CHOICE') {
+      // Handle the answer with stealth assessment
+      handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
 
-    // Show feedback toast
-    if (result.isCorrect) {
-      toast({
-        title: "Correct! 🎉",
-        description: "Great job! Moving to the next question...",
-        duration: 2000,
-      });
-    } else {
-      toast({
-        title: "Keep Learning! 📚",
-        description: "That's okay, let's try the next one!",
-        duration: 2000,
-      });
+      // Show feedback toast and play sound for questions only
+      if (result.isCorrect) {
+        playCorrectAnswerSound();
+        toast({
+          title: "Correct! 🎉",
+          description: "Great job! Moving to the next question...",
+          duration: 2000,
+        });
+      } else {
+        playWrongAnswerSound();
+        toast({
+          title: "Keep Learning! 📚",
+          description: "That's okay, let's try the next one!",
+          duration: 2000,
+        });
+      }
+    } else if (currentAtom.atom_type === 'TEXT_EXPLANATION') {
+      // For explanations, just continue without toast or sound
+      console.log('📖 Explanation completed, continuing silently');
     }
 
     // Move to next question immediately
