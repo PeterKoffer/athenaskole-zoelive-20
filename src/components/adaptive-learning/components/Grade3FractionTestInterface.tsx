@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import Grade3FractionTestExecutor from './Grade3FractionTestExecutor';
@@ -9,6 +8,7 @@ import Grade3TestResults from './Grade3TestResults';
 import Grade3TestSummary from './Grade3TestSummary';
 import { grade3FractionTestCases, TestResult } from '../config/grade3FractionTestCases';
 import { analyzeGradeLevel, analyzeConceptualFocus } from '../utils/grade3FractionTestUtils';
+import Grade3TestPage from './Grade3TestPage';
 
 interface Grade3FractionTestInterfaceProps {
   onBack: () => void;
@@ -228,26 +228,7 @@ const Grade3FractionTestInterface: React.FC<Grade3FractionTestInterfaceProps> = 
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <Grade3TestControls 
-        onBack={onBack}
-        onRunTests={runAllTests}
-        isRunning={isRunning}
-        currentTest={currentTest}
-      />
-
-      <Grade3FractionTestExecutor onResults={handleComprehensiveResults} />
-
-      {showComprehensiveAnalysis && comprehensiveResults.length > 0 && (
-        <TestResultsAnalyzer results={comprehensiveResults} />
-      )}
-
-      <Grade3TestCasesDisplay />
-
-      {testResults.length > 0 && (
-        <Grade3TestResults testResults={testResults} />
-      )}
-
-      <Grade3TestSummary testResults={testResults} />
+      <Grade3TestPage onBack={onBack} />
     </div>
   );
 };
