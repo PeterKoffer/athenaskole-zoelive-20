@@ -1,3 +1,4 @@
+
 // Curriculum type definitions
 export interface CurriculumTopic {
   id: string;
@@ -30,6 +31,30 @@ export const completeStudyPugCurriculum: CurriculumLevel[] = [
     description: "Grade 3 Mathematics",
     subjects: [
       {
+        name: "Operations and Algebraic Thinking",
+        description: "Represent and solve problems involving multiplication and division",
+        topics: [
+          {
+            id: "3-oa-1",
+            name: "Interpret products of whole numbers",
+            description: "Interpret products of whole numbers, e.g., interpret 5 × 7 as the total number of objects in 5 groups of 7 objects each. For example: 3 × 4 can be thought of as 3 groups of 4 objects, or 4 groups of 3 objects.",
+            difficulty: 4,
+            estimatedTime: 40,
+            prerequisites: [],
+            standards: ["3.OA.A.1"]
+          },
+          {
+            id: "3-oa-2", 
+            name: "Interpret whole-number quotients",
+            description: "Interpret whole-number quotients of whole numbers, e.g., interpret 56 ÷ 8 as the number of objects in each share when 56 objects are partitioned equally into 8 shares",
+            difficulty: 5,
+            estimatedTime: 45,
+            prerequisites: ["3-oa-1"],
+            standards: ["3.OA.A.2"]
+          }
+        ]
+      },
+      {
         name: "Number and Operations - Fractions",
         description: "Understanding fractions as numbers",
         topics: [
@@ -41,21 +66,6 @@ export const completeStudyPugCurriculum: CurriculumLevel[] = [
             estimatedTime: 45,
             prerequisites: [],
             standards: ["3.NF.A.1"]
-          }
-        ]
-      },
-      {
-        name: "Operations and Algebraic Thinking",
-        description: "Represent and solve problems involving multiplication and division",
-        topics: [
-          {
-            id: "3-oa-1",
-            name: "Interpret products of whole numbers",
-            description: "Interpret products of whole numbers, e.g., interpret 5 × 7 as the total number of objects in 5 groups of 7 objects each",
-            difficulty: 4,
-            estimatedTime: 40,
-            prerequisites: [],
-            standards: ["3.OA.A.1"]
           }
         ]
       }
@@ -108,7 +118,7 @@ export const completeStudyPugCurriculum: CurriculumLevel[] = [
             description: "Interpret multiplication equations as comparisons",
             difficulty: 4,
             estimatedTime: 40,
-            prerequisites: [],
+            prerequisites: ["3-oa-1"],
             standards: ["4.OA.A.1"]
           },
           {

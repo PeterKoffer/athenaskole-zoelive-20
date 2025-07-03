@@ -1,4 +1,3 @@
-
 // Assuming curriculumIntegration.ts is located at ../../src/services/curriculum/curriculumIntegration.ts
 // This path will likely need adjustment based on the actual directory structure.
 // For now, I will use a placeholder and we can refine it.
@@ -118,39 +117,50 @@ IMPORTANT: Create real mathematical calculations, not questions about concepts. 
 
 export function createMathPrompt(kcId: string, userId: string, contentTypes: string[], maxAtoms: number): string {
   // Extract grade and topic from KC ID
-  // Example kcId: "kc_math_g4_fraction_equivalence"
+  // Example kcId: "kc_math_g3_oa_1" should map to Grade 3, Operations and Algebraic Thinking, Standard 1
   const parts = kcId.toLowerCase().split('_');
   const gradeStr = parts[2]?.replace('g', '');
   const grade = parseInt(gradeStr || '4'); // Default to grade 4 if parsing fails
-  const topicKeyword = parts.slice(3).join(' ').replace(/-/g, ' '); // e.g., "fraction equivalence"
-
+  
+  // Parse the standard part (e.g., "oa_1" from "kc_math_g3_oa_1")
+  const standardParts = parts.slice(3); // ["oa", "1"]
+  const domain = standardParts[0]; // "oa" 
+  const standardNum = standardParts[1]; // "1"
+  
   console.log(`🎯 Creating REAL curriculum-enhanced prompt for kcId: ${kcId}`);
-  console.log(`📚 Grade: ${grade}, Topic Keyword: "${topicKeyword}"`);
+  console.log(`📚 Grade: ${grade}, Domain: "${domain}", Standard: "${standardNum}"`);
 
   // Get curriculum data using the integrated service
-  const matchingTopics = CurriculumIntegrationService.searchTopics(topicKeyword);
   const gradeTopics = CurriculumIntegrationService.getTopicsForGrade(grade);
-
-  console.log(`🔍 Found ${matchingTopics.length} matching topics and ${gradeTopics.length} grade topics`);
   
-  // Find the most relevant topic
-  // Prioritize topics that are in the specified grade and match the keyword.
-  let relevantTopic = null;
-  if (matchingTopics.length > 0 && gradeTopics.length > 0) {
-    relevantTopic = matchingTopics.find(t =>
-      gradeTopics.some(gt => gt.id === t.id && t.name.toLowerCase().includes(topicKeyword))
+  // Find the specific topic by mapping KC ID to curriculum ID
+  // KC ID "kc_math_g3_oa_1" should map to curriculum ID "3-oa-1"
+  const targetCurriculumId = `${grade}-${domain}-${standardNum}`;
+  console.log(`🔍 Looking for curriculum ID: ${targetCurriculumId}`);
+  
+  let relevantTopic = gradeTopics.find(topic => topic.id === targetCurriculumId);
+
+  if (!relevantTopic) {
+    console.warn(`⚠️ Could not find specific topic for curriculum ID "${targetCurriculumId}" in grade ${grade}`);
+    
+    // Fallback: search by domain keywords
+    const domainKeywords = {
+      'oa': ['multiplication', 'division', 'operations', 'algebraic', 'thinking'],
+      'nf': ['fraction', 'fractions', 'number'],
+      'nbt': ['number', 'base', 'ten', 'place', 'value'],
+      'md': ['measurement', 'data', 'area', 'perimeter'],
+      'g': ['geometry', 'shape', 'shapes']
+    };
+    
+    const keywords = domainKeywords[domain] || [domain];
+    console.log(`🔍 Fallback search with keywords: ${keywords.join(', ')}`);
+    
+    relevantTopic = gradeTopics.find(topic => 
+      keywords.some(keyword => 
+        topic.name.toLowerCase().includes(keyword) || 
+        topic.description.toLowerCase().includes(keyword)
+      )
     );
-  }
-
-  // If no exact match by keyword search within grade, try finding first topic in grade that loosely matches
-  if (!relevantTopic && gradeTopics.length > 0) {
-    relevantTopic = gradeTopics.find(gt => gt.name.toLowerCase().includes(topicKeyword));
-  }
-
-  // As a final fallback, if still no relevant topic, use the first topic of the grade.
-  if (!relevantTopic && gradeTopics.length > 0) {
-    console.warn(`⚠️ Could not find specific topic for "${topicKeyword}" in grade ${grade}. Using first topic of the grade: ${gradeTopics[0].name}`);
-    relevantTopic = gradeTopics[0];
   }
 
   if (relevantTopic) {
