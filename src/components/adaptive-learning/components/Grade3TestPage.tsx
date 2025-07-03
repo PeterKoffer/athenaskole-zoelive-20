@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Grade3FractionTestTrigger from './Grade3FractionTestTrigger';
+import FocusedGrade3Test from './FocusedGrade3Test';
 
 interface Grade3TestPageProps {
   onBack: () => void;
@@ -26,6 +27,7 @@ const Grade3TestPage: React.FC<Grade3TestPageProps> = ({ onBack }) => {
         </div>
       </div>
 
+      <FocusedGrade3Test />
       <Grade3FractionTestTrigger />
     </div>
   );
