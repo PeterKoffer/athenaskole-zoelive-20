@@ -4,31 +4,6 @@
 // For now, I will use a placeholder and we can refine it.
 // import { CurriculumIntegrationService } from '../../src/services/curriculum/curriculumIntegration.ts';
 
-// Placeholder for CurriculumIntegrationService and its types until the actual import path is confirmed
-// and I can verify its structure. For development, I'll mock its expected behavior.
-const CurriculumIntegrationService = {
-  searchTopics: (keyword: string): any[] => {
-    console.log(`Mock CurriculumIntegrationService.searchTopics called with: ${keyword}`);
-    if (keyword.includes("fraction equivalence")) {
-      return [{ id: "4-nf-1", name: "Fraction equivalence", description: "Understand fraction equivalence and comparison", difficulty: 5, estimatedTime: 50, prerequisites: ["3-nf-1"], standards: ["4.NF.1", "4.NF.2"] }];
-    }
-    return [];
-  },
-  getTopicsForGrade: (grade: number): any[] => {
-    console.log(`Mock CurriculumIntegrationService.getTopicsForGrade called with: ${grade}`);
-    if (grade === 4) {
-      return [{ id: "4-nf-1", name: "Fraction equivalence", description: "Understand fraction equivalence and comparison", difficulty: 5, estimatedTime: 50, prerequisites: ["3-nf-1"], standards: ["4.NF.1", "4.NF.2"] }, {id: "4-oa-1", name: "Operations and Algebraic Thinking", description: "Use the four operations with whole numbers to solve problems.", difficulty: 4, standards: ["4.OA.A.1"] }];
-    }
-    return [];
-  },
-  getPrerequisiteTopics: (topicId: string): any[] => {
-    console.log(`Mock CurriculumIntegrationService.getPrerequisiteTopics called with: ${topicId}`);
-    if (topicId === "4-nf-1") {
-      return [{ id: "3-nf-1", name: "Understand fractions as numbers" }];
-    }
-    return [];
-  }
-};
 // Import the curriculum data and service logic directly
 import { completeStudyPugCurriculum, CurriculumLevel, CurriculumSubject, CurriculumTopic } from './curriculumData.ts';
 
@@ -149,12 +124,6 @@ export function createMathPrompt(kcId: string, userId: string, contentTypes: str
   const grade = parseInt(gradeStr || '4'); // Default to grade 4 if parsing fails
   const topicKeyword = parts.slice(3).join(' ').replace(/-/g, ' '); // e.g., "fraction equivalence"
 
-  console.log(`Creating enhanced prompt for kcId: ${kcId}, Grade: ${grade}, Topic Keyword: "${topicKeyword}"`);
-
-  // Get curriculum data
-  const matchingTopics = CurriculumIntegrationService.searchTopics(topicKeyword);
-  const gradeTopics = CurriculumIntegrationService.getTopicsForGrade(grade);
-
   console.log(`🎯 Creating REAL curriculum-enhanced prompt for kcId: ${kcId}`);
   console.log(`📚 Grade: ${grade}, Topic Keyword: "${topicKeyword}"`);
 
@@ -163,12 +132,12 @@ export function createMathPrompt(kcId: string, userId: string, contentTypes: str
   const gradeTopics = CurriculumIntegrationService.getTopicsForGrade(grade);
 
   console.log(`🔍 Found ${matchingTopics.length} matching topics and ${gradeTopics.length} grade topics`);
+  
   // Find the most relevant topic
   // Prioritize topics that are in the specified grade and match the keyword.
   let relevantTopic = null;
   if (matchingTopics.length > 0 && gradeTopics.length > 0) {
     relevantTopic = matchingTopics.find(t =>
-      gradeTopics.some(gt => gt.id === t.id && t.name.toLowerCase().includes(topicKeyword)) // Check name match too
       gradeTopics.some(gt => gt.id === t.id && t.name.toLowerCase().includes(topicKeyword))
     );
   }
@@ -180,76 +149,11 @@ export function createMathPrompt(kcId: string, userId: string, contentTypes: str
 
   // As a final fallback, if still no relevant topic, use the first topic of the grade.
   if (!relevantTopic && gradeTopics.length > 0) {
-    console.warn(`Could not find specific topic for "${topicKeyword}" in grade ${grade}. Using first topic of the grade: ${gradeTopics[0].name}`);
     console.warn(`⚠️ Could not find specific topic for "${topicKeyword}" in grade ${grade}. Using first topic of the grade: ${gradeTopics[0].name}`);
     relevantTopic = gradeTopics[0];
   }
 
   if (relevantTopic) {
-    console.log(`Found relevant topic: ${relevantTopic.name} (ID: ${relevantTopic.id})`);
-    // Get prerequisites for context
-    const prerequisites = CurriculumIntegrationService.getPrerequisiteTopics(relevantTopic.id);
-    const prerequisiteNames = prerequisites.map((p:any) => p.name).join(', ') || 'None';
-
-    // Constructing the detailed prompt
-    // Base structure from your example, enhanced with curriculum data
-    return `You are a Grade ${grade} math teacher. Your task is to create educational content.
-
-Topic Details to Focus On:
-- Name: ${relevantTopic.name}
-- Description: ${relevantTopic.description}
-- Target Difficulty Level (1-10 scale, aim for this): ${relevantTopic.difficulty}
-- Relevant Common Core Standards: ${relevantTopic.standards ? relevantTopic.standards.join(', ') : 'N/A'}
-- Important Prerequisites to consider: ${prerequisiteNames}
-
-Generate ${maxAtoms} educational atoms with these exact types: ${contentTypes.join(', ')}.
-The atoms should be about "${relevantTopic.name}".
-
-For TEXT_EXPLANATION atoms:
-- Provide a clear explanation of the concept: "${relevantTopic.description}".
-- Include step-by-step processes if applicable.
-- Offer 1-2 illustrative examples.
-
-For QUESTION_MULTIPLE_CHOICE atoms:
-- Create ACTUAL MATH PROBLEMS directly related to "${relevantTopic.name}" using numbers and scenarios appropriate for Grade ${grade}.
-- Ensure questions align with the specified Common Core Standards: ${relevantTopic.standards ? relevantTopic.standards.join(', ') : 'N/A'}.
-- The question difficulty should be around ${relevantTopic.difficulty} on a 1-10 scale.
-- CRITICAL: The 'correctAnswer' field in your JSON response MUST be the 0-based index of the mathematically correct option in the 'options' array.
-
-Return JSON with this exact structure:
-{
-  "atoms": [
-    // Example TEXT_EXPLANATION atom:
-    // {
-    //   "atom_type": "TEXT_EXPLANATION",
-    //   "content": {
-    //     "title": "Understanding ${relevantTopic.name}",
-    //     "explanation": "Detailed explanation relevant to ${relevantTopic.description}...",
-    //     "examples": ["Example 1 related to ${relevantTopic.name}", "Example 2 related to ${relevantTopic.name}"]
-    //   }
-    // },
-    // Example QUESTION_MULTIPLE_CHOICE atom:
-    // {
-    //   "atom_type": "QUESTION_MULTIPLE_CHOICE",
-    //   "content": {
-    //     "question": "A specific math problem about ${relevantTopic.name} for Grade ${grade}...",
-    //     "options": ["Option A", "Option B (Correct)", "Option C", "Option D"],
-    //     "correctAnswer": 1, // Index of "Option B (Correct)"
-    //     "explanation": "Step-by-step solution and explanation for this problem."
-    //   }
-    // }
-  ]
-}
-
-DOUBLE-CHECK your response:
-1. The JSON structure is exactly as specified.
-2. The 'correctAnswer' index is accurate for all multiple-choice questions.
-3. The content is appropriate for Grade ${grade} and targets "${relevantTopic.name}" and its standards.
-`;
-  }
-
-  // Fallback to original prompt if no curriculum data found at all
-  console.warn(`No relevant curriculum data found for kcId: ${kcId}. Using fallback prompt generator.`);
     console.log(`✅ Found relevant curriculum topic: ${relevantTopic.name} (ID: ${relevantTopic.id})`);
     console.log(`📊 Topic difficulty: ${relevantTopic.difficulty}, Standards: ${relevantTopic.standards?.join(', ') || 'N/A'}`);
     
