@@ -285,30 +285,76 @@ const Grade3FractionTestTrigger: React.FC = () => {
                 Test Results Summary:
               </h4>
               {testResults.map((result) => (
-                <div key={result.kcId} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    {result.status === 'success' ? 
-                      <CheckCircle className="w-5 h-5 text-green-500" /> :
-                      <XCircle className="w-5 h-5 text-red-500" />
-                    }
-                    <div>
-                      <p className="font-mono text-sm">{result.kcId}</p>
-                      <p className="text-xs text-gray-600">
-                        {result.status === 'success' && result.atoms ? 
-                          `${result.atoms.length} atoms generated` : 
-                          result.error || result.status
-                        }
-                      </p>
+                <div key={result.kcId} className="border rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between p-3 bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      {result.status === 'success' ? 
+                        <CheckCircle className="w-5 h-5 text-green-500" /> :
+                        <XCircle className="w-5 h-5 text-red-500" />
+                      }
+                      <div>
+                        <p className="font-mono text-sm font-semibold">{result.kcId}</p>
+                        <p className="text-xs text-gray-600">
+                          {result.status === 'success' && result.atoms ? 
+                            `${result.atoms.length} atoms generated at ${result.timestamp}` : 
+                            result.error || result.status
+                          }
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {result.status === 'success' && (
+                        <Badge className="bg-green-100 text-green-800">Success</Badge>
+                      )}
+                      {result.duration && (
+                        <Badge variant="outline">{result.duration}ms</Badge>
+                      )}
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    {result.status === 'success' && (
-                      <Badge className="bg-green-100 text-green-800">Success</Badge>
-                    )}
-                    {result.duration && (
-                      <Badge variant="outline">{result.duration}ms</Badge>
-                    )}
-                  </div>
+                  
+                  {result.status === 'success' && result.atoms && (
+                    <div className="p-4 space-y-4">
+                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        <h5 className="font-semibold text-blue-800 mb-2">📋 Raw JSON Atoms Output:</h5>
+                        <div className="bg-white p-3 rounded border max-h-96 overflow-auto">
+                          <pre className="text-xs text-gray-800 whitespace-pre-wrap font-mono">
+                            {JSON.stringify(result.atoms, null, 2)}
+                          </pre>
+                        </div>
+                        <p className="text-xs text-blue-600 mt-2">
+                          💡 Copy this JSON for detailed analysis of generated content structure and validation
+                        </p>
+                      </div>
+                      
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <h5 className="font-semibold text-green-800 mb-2">🔍 Content Analysis Summary:</h5>
+                        {result.atoms.map((atom: any, index: number) => (
+                          <div key={index} className="mb-3 p-2 bg-white rounded border-l-4 border-green-400">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="font-semibold text-sm">Atom {index + 1}: {atom.atom_type}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {atom.metadata?.model || 'N/A'}
+                              </Badge>
+                            </div>
+                            {atom.content?.question && (
+                              <div className="text-sm space-y-1">
+                                <p><strong>Question:</strong> {atom.content.question}</p>
+                                {atom.content.options && (
+                                  <div>
+                                    <p><strong>Options:</strong> [{atom.content.options.join(', ')}]</p>
+                                    <p><strong>Correct Answer:</strong> Index {atom.content.correctAnswer} = "{atom.content.options[atom.content.correctAnswer]}"</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            {atom.content?.explanation && (
+                              <p className="text-sm"><strong>Explanation:</strong> {atom.content.explanation.substring(0, 150)}...</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
