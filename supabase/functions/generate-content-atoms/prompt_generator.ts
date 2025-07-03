@@ -122,7 +122,7 @@ export function createMathPrompt(kcId: string, userId: string, contentTypes: str
   const gradeStr = parts[2]?.replace('g', '');
   const grade = parseInt(gradeStr || '4'); // Default to grade 4 if parsing fails
   
-  // Parse the standard part (e.g., "oa_1" from "kc_math_g3_oa_1")
+  // Parse the standard part (e.g., "oa_1 from "kc_math_g3_oa_1")
   const standardParts = parts.slice(3); // ["oa", "1"]
   const domain = standardParts[0]; // "oa" 
   const standardNum = standardParts[1]; // "1"
@@ -197,7 +197,12 @@ For QUESTION_MULTIPLE_CHOICE atoms:
 - Ensure questions directly assess understanding of "${relevantTopic.name}"
 - Align difficulty with level ${relevantTopic.difficulty} on a 1-10 scale
 - Target the specific Common Core Standards: ${relevantTopic.standards ? relevantTopic.standards.join(', ') : 'Grade-appropriate standards'}
-- CRITICAL: The 'correctAnswer' field MUST be the 0-based index of the mathematically correct option
+
+🔍 CRITICAL VALIDATION REQUIREMENTS:
+- BEFORE finalizing your response, calculate the correct answer to each math problem
+- Verify that the 'correctAnswer' index (0-based) points to the option containing the mathematically correct result
+- Double-check your arithmetic: if 6×9=54, then correctAnswer should point to the index of "54"
+- If 4×10=40, then correctAnswer should point to the index containing "40", NOT "50"
 
 🏗️ RESPONSE STRUCTURE:
 Return JSON with this exact structure:
@@ -223,12 +228,19 @@ Return JSON with this exact structure:
   ]
 }
 
-✅ QUALITY CHECKLIST:
-1. JSON structure matches specification exactly
-2. correctAnswer index is mathematically accurate for all questions
-3. Content targets Grade ${grade} and addresses "${relevantTopic.name}"
-4. Difficulty level appropriate for ${relevantTopic.difficulty}/10 scale
-5. Standards alignment: ${relevantTopic.standards ? relevantTopic.standards.join(', ') : 'Grade-appropriate'}
+✅ FINAL QUALITY CHECKLIST - VERIFY EACH ITEM:
+1. ✓ JSON structure matches specification exactly
+2. ✓ All math calculations performed correctly (show your work!)
+3. ✓ correctAnswer index points to the mathematically accurate option
+4. ✓ Content targets Grade ${grade} and addresses "${relevantTopic.name}"
+5. ✓ Difficulty level appropriate for ${relevantTopic.difficulty}/10 scale
+6. ✓ Standards alignment: ${relevantTopic.standards ? relevantTopic.standards.join(', ') : 'Grade-appropriate'}
+
+EXAMPLE VALIDATION:
+- Question: "What is 3×4?" Options: ["10", "12", "14", "16"]
+- Correct calculation: 3×4 = 12
+- Find "12" in options: index 1 (0-based)
+- Set correctAnswer: 1 ✓
 `;
   }
 
