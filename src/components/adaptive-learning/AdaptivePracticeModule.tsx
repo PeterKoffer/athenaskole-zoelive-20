@@ -16,17 +16,6 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
     console.log('TEMPORARY LOG: AdaptivePracticeModule basic useEffect running!');
   }, []);
 
-  // Commenting out all complex logic for testing
-  /*
-  const { toast } = useToast();
-  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
-  const { state, handleNextAtom, handleQuestionAnswer, handleRetry } = useAdaptivePracticeLogic();
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
-
-  const currentAtom = state.atomSequence?.atoms?.[state.currentAtomIndex] || null;
-  const totalAtoms = state.atomSequence?.atoms?.length || 0;
-  */
-
   console.log('🧪 SIMPLIFIED TEST: About to render basic JSX');
 
   return (

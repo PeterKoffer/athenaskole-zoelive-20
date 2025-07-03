@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Brain, ArrowLeft, Loader2 } from 'lucide-react';
+import { Brain, ArrowLeft, Loader2, TestTube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
 import FocusedGrade3Test from '@/components/adaptive-learning/components/FocusedGrade3Test';
@@ -16,6 +17,7 @@ const AdaptivePracticeTestPage = () => {
   const [showModule, setShowModule] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const [showGrade3Tests, setShowGrade3Tests] = useState(false);
+  const [showSimplifiedTest, setShowSimplifiedTest] = useState(false);
 
   console.log('🧪 AdaptivePracticeTestPage rendering...');
 
@@ -34,10 +36,28 @@ const AdaptivePracticeTestPage = () => {
     navigate('/');
   };
 
+  const handleShowSimplifiedTest = () => {
+    console.log('🧪 Showing simplified AdaptivePracticeModule test...');
+    setShowSimplifiedTest(true);
+  };
+
+  const handleBackFromSimplified = () => {
+    console.log('⬅️ Going back from simplified test...');
+    setShowSimplifiedTest(false);
+  };
+
   if (showModule) {
     return (
       <div className="relative">
         <AdaptivePracticeModule onBack={handleBack} />
+      </div>
+    );
+  }
+
+  if (showSimplifiedTest) {
+    return (
+      <div className="relative">
+        <AdaptivePracticeModule onBack={handleBackFromSimplified} />
       </div>
     );
   }
@@ -79,6 +99,32 @@ const AdaptivePracticeTestPage = () => {
             Back to Home
           </Button>
         </div>
+
+        {/* Simplified Test Section */}
+        <Card className="bg-gray-800 border-gray-700 mb-6">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <TestTube className="w-5 h-5 text-blue-400" />
+              🧪 Simplified AdaptivePracticeModule Test
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 mb-4">
+              Test the simplified AdaptivePracticeModule component to check if basic rendering works.
+            </p>
+            <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700 mb-4">
+              <p className="text-blue-300 text-sm">
+                <strong>Expected:</strong> Should show basic test content and console log "TEMPORARY LOG: AdaptivePracticeModule basic useEffect running!"
+              </p>
+            </div>
+            <Button 
+              onClick={handleShowSimplifiedTest}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Test Simplified AdaptivePracticeModule
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="text-center pb-6">
