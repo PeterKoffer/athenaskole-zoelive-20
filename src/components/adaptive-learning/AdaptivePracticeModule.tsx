@@ -167,16 +167,22 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
           <div className="space-y-6">
             {currentAtom.atom_type === 'TEXT_EXPLANATION' && (
               <TextExplanationRenderer
-                atom={currentAtom}
-                onNext={handleNextAtom}
+                content={currentAtom.content || {}}
+                atomId={currentAtom.atom_id || 'unknown'}
+                onComplete={(result) => {
+                  console.log('📖 Text explanation completed:', result);
+                  handleNextAtom();
+                }}
               />
             )}
             
             {currentAtom.atom_type === 'QUESTION_MULTIPLE_CHOICE' && (
               <StableMultipleChoiceRenderer
                 atom={currentAtom}
-                onAnswer={(userAnswer, isCorrect) => {
-                  console.log('🔍 Answer submitted:', { userAnswer, isCorrect });
+                onComplete={(result) => {
+                  console.log('🔍 Question completed:', result);
+                  
+                  const { isCorrect, selectedAnswer } = result;
                   
                   // Play sound feedback
                   if (isCorrect) {
@@ -195,7 +201,7 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
                   });
 
                   // Update learning profile
-                  handleQuestionAnswer(currentAtom, userAnswer, isCorrect);
+                  handleQuestionAnswer(currentAtom, selectedAnswer, isCorrect);
 
                   // Move to next atom after a short delay
                   setTimeout(() => {
