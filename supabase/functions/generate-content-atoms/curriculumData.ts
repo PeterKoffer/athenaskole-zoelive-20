@@ -1,4 +1,3 @@
-
 // Curriculum type definitions
 export interface CurriculumTopic {
   id: string;
@@ -42,6 +41,21 @@ export const completeStudyPugCurriculum: CurriculumLevel[] = [
             estimatedTime: 45,
             prerequisites: [],
             standards: ["3.NF.A.1"]
+          }
+        ]
+      },
+      {
+        name: "Operations and Algebraic Thinking",
+        description: "Represent and solve problems involving multiplication and division",
+        topics: [
+          {
+            id: "3-oa-1",
+            name: "Interpret products of whole numbers",
+            description: "Interpret products of whole numbers, e.g., interpret 5 × 7 as the total number of objects in 5 groups of 7 objects each",
+            difficulty: 4,
+            estimatedTime: 40,
+            prerequisites: [],
+            standards: ["3.OA.A.1"]
           }
         ]
       }
