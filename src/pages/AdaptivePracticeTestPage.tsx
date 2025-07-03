@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
 import FocusedGrade3Test from '@/components/adaptive-learning/components/FocusedGrade3Test';
 import Grade3FractionTestTrigger from '@/components/adaptive-learning/components/Grade3FractionTestTrigger';
+import FocusedGrade3MultiplicationTest from '@/components/adaptive-learning/components/FocusedGrade3MultiplicationTest';
 
 const AdaptivePracticeTestPage = () => {
   const { user } = useAuth();
@@ -147,7 +147,7 @@ const AdaptivePracticeTestPage = () => {
                   variant="outline"
                   className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white mb-4"
                 >
-                  {showGrade3Tests ? 'Hide' : 'Show'} Grade 3 Fraction Tests (Dev Tools)
+                  {showGrade3Tests ? 'Hide' : 'Show'} Grade 3 Tests (Dev Tools)
                 </Button>
               </div>
               
@@ -168,6 +168,7 @@ const AdaptivePracticeTestPage = () => {
           <div className="mt-8 space-y-6">
             <FocusedGrade3Test />
             <Grade3FractionTestTrigger />
+            <FocusedGrade3MultiplicationTest />
           </div>
         )}
       </div>
