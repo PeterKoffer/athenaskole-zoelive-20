@@ -7,12 +7,15 @@ import { Progress } from '@/components/ui/progress';
 import { Brain, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdaptivePracticeModule from '@/components/adaptive-learning/AdaptivePracticeModule';
+import FocusedGrade3Test from '@/components/adaptive-learning/components/FocusedGrade3Test';
+import Grade3FractionTestTrigger from '@/components/adaptive-learning/components/Grade3FractionTestTrigger';
 
 const AdaptivePracticeTestPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showModule, setShowModule] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [showGrade3Tests, setShowGrade3Tests] = useState(false);
 
   console.log('🧪 AdaptivePracticeTestPage rendering...');
 
@@ -138,6 +141,16 @@ const AdaptivePracticeTestPage = () => {
             </div>
 
             <div className="text-center pt-6 border-t border-gray-700">
+              <div className="mb-6">
+                <Button
+                  onClick={() => setShowGrade3Tests(!showGrade3Tests)}
+                  variant="outline"
+                  className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white mb-4"
+                >
+                  {showGrade3Tests ? 'Hide' : 'Show'} Grade 3 Fraction Tests (Dev Tools)
+                </Button>
+              </div>
+              
               <Button
                 onClick={handleStartPractice}
                 className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-4 px-12 rounded-lg text-lg transition-all duration-300 transform hover:scale-105"
@@ -150,6 +163,13 @@ const AdaptivePracticeTestPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {showGrade3Tests && (
+          <div className="mt-8 space-y-6">
+            <FocusedGrade3Test />
+            <Grade3FractionTestTrigger />
+          </div>
+        )}
       </div>
     </div>
   );
