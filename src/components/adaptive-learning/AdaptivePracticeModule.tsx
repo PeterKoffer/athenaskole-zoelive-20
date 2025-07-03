@@ -1,18 +1,23 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Brain, ArrowLeft, CheckCircle, Loader2, Lightbulb } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useSoundEffects } from '@/hooks/useSoundEffects';
-import ContentAtomRenderer from './ContentAtomRenderer';
-import { useAdaptivePracticeLogic } from './hooks/useAdaptivePracticeLogic';
+import { ArrowLeft } from 'lucide-react';
 
 interface AdaptivePracticeModuleProps {
   onBack: () => void;
 }
 
 const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
+  console.log('🔍 SIMPLIFIED AdaptivePracticeModule rendering - basic test');
+
+  // Simple useEffect to test component lifecycle
+  useEffect(() => {
+    console.log('TEMPORARY LOG: AdaptivePracticeModule basic useEffect running!');
+  }, []);
+
+  // Commenting out all complex logic for testing
+  /*
   const { toast } = useToast();
   const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
   const { state, handleNextAtom, handleQuestionAnswer, handleRetry } = useAdaptivePracticeLogic();
@@ -20,152 +25,9 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
 
   const currentAtom = state.atomSequence?.atoms?.[state.currentAtomIndex] || null;
   const totalAtoms = state.atomSequence?.atoms?.length || 0;
+  */
 
-  console.log('🔍 AdaptivePracticeModule state:', {
-    hasProfile: !!state.learnerProfile,
-    hasCurrentKc: !!state.currentKc,
-    hasAtomSequence: !!state.atomSequence,
-    currentAtomIndex: state.currentAtomIndex,
-    totalAtoms,
-    hasCurrentAtom: !!currentAtom,
-    currentAtomType: currentAtom?.atom_type,
-    isLoading: state.isLoading,
-    error: state.error,
-    sessionId,
-    atomSequenceId: state.atomSequence?.sequence_id
-  });
-
-  const handleQuestionComplete = (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => {
-    console.log('📝 Question completed in module:', {
-      ...result,
-      questionIndex: state.currentAtomIndex,
-      totalQuestions: totalAtoms,
-      atomType: currentAtom?.atom_type
-    });
-
-    if (!currentAtom) {
-      console.error('❌ No current atom to process');
-      return;
-    }
-
-    // Only show feedback and play sounds for actual questions, not explanations
-    if (currentAtom.atom_type === 'QUESTION_MULTIPLE_CHOICE') {
-      // Handle the answer with stealth assessment
-      handleQuestionAnswer(currentAtom, result.selectedAnswer.toString(), result.isCorrect);
-
-      // Play sound immediately for faster feedback
-      if (result.isCorrect) {
-        playCorrectAnswerSound();
-        toast({
-          title: "Correct! 🎉",
-          description: "Great job! Moving to the next question...",
-          duration: 1500, // Reduced duration
-        });
-      } else {
-        playWrongAnswerSound();
-        toast({
-          title: "Keep Learning! 📚",
-          description: "That's okay, let's try the next one!",
-          duration: 1500, // Reduced duration
-        });
-      }
-    } else if (currentAtom.atom_type === 'TEXT_EXPLANATION') {
-      // For explanations, just continue without toast or sound
-      console.log('📖 Explanation completed, continuing silently');
-    }
-
-    // Move to next question faster
-    setTimeout(() => {
-      if (state.currentAtomIndex < totalAtoms - 1) {
-        console.log('➡️ Moving to next atom');
-        handleNextAtom();
-      } else {
-        // Session complete - generate new content
-        console.log('🎉 Session complete, generating new content');
-        toast({
-          title: "Session Complete! 🎓",
-          description: `You've completed all questions for ${state.currentKc?.name}! Loading new content...`,
-          duration: 2000, // Reduced duration
-        });
-        
-        setTimeout(() => {
-          console.log('🔄 Loading new content batch...');
-          handleNextAtom(); // This will trigger new content generation
-        }, 500); // Faster transition
-      }
-    }, 800); // Reduced timeout for much faster progression
-  };
-
-  if (state.isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-gray-800 border-gray-700">
-          <CardContent className="p-12 text-center">
-            <div className="flex items-center justify-center mb-6">
-              <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Preparing Your AI Learning Experience
-            </h2>
-            <p className="text-gray-300 mb-6">
-              Our AI is creating personalized content just for you...
-            </p>
-            <Progress value={75} className="w-full h-3" />
-            <div className="flex items-center justify-center mt-6 text-sm text-gray-400">
-              <Lightbulb className="w-4 h-4 mr-2" />
-              Fast AI generation in progress
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (state.error) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-red-900/20 border-red-700">
-          <CardHeader>
-            <CardTitle className="text-red-400 text-center">
-              AI Generation Error
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-gray-300 mb-6">{state.error}</p>
-            <div className="flex gap-4 justify-center">
-              <Button onClick={onBack} variant="outline">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Back
-              </Button>
-              <Button onClick={handleRetry}>
-                Try AI Generation Again
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!currentAtom) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-yellow-900/20 border-yellow-700">
-          <CardContent className="p-8 text-center">
-            <p className="text-yellow-300 mb-4">No AI content atom available</p>
-            <p className="text-gray-400 text-sm mb-6">
-              Sequence ID: {state.atomSequence?.sequence_id || 'None'}<br/>
-              Total atoms: {totalAtoms}<br/>
-              Current index: {state.currentAtomIndex}
-            </p>
-            <Button onClick={handleRetry}>
-              Retry AI Generation
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  console.log('🧪 SIMPLIFIED TEST: About to render basic JSX');
 
   return (
     <div className="min-h-screen bg-gray-900 p-4">
@@ -177,45 +39,40 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
             className="text-gray-400 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            Back (Simplified Test)
           </Button>
-          
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-400">
-              Question {state.currentAtomIndex + 1} of {totalAtoms}
+        </div>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white text-center">
+              🧪 SIMPLIFIED AdaptivePracticeModule Test
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center p-8">
+            <div className="text-white text-xl mb-4">
+              ✅ Basic Component Rendering Test
             </div>
-            <Progress 
-              value={((state.currentAtomIndex + 1) / totalAtoms) * 100} 
-              className="w-32 h-2" 
-            />
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <Card className="bg-blue-900/20 border-blue-700/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Brain className="w-6 h-6 text-blue-400" />
-                  <div>
-                    <h3 className="text-white font-medium">
-                      {state.currentKc?.name || 'Loading AI Content...'}
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      Grade {state.currentKc?.gradeLevels?.[0] || 'N/A'} • {state.currentKc?.subject} • AI Generated
-                    </p>
-                  </div>
-                </div>
-                <CheckCircle className="w-5 h-5 text-green-400" />
+            <div className="text-gray-300 mb-6">
+              If you can see this text, the AdaptivePracticeModule component is rendering successfully!
+            </div>
+            <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4 mb-6">
+              <div className="text-blue-300 text-sm">
+                <strong>Test Status:</strong> This is the simplified version with all complex logic commented out.
+                Check the browser console for "TEMPORARY LOG" message.
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <ContentAtomRenderer
-          atom={currentAtom}
-          onComplete={handleQuestionComplete}
-        />
+            </div>
+            <Button
+              onClick={() => {
+                console.log('🔘 SIMPLIFIED TEST: Button clicked!');
+                onBack();
+              }}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Test Button - Check Console & Go Back
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
