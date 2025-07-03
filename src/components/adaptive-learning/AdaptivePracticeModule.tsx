@@ -200,8 +200,11 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
                     variant: isCorrect ? "default" : "destructive",
                   });
 
+                  // Convert selectedAnswer index to actual answer string
+                  const userAnswerText = currentAtom.content.options?.[selectedAnswer] || 'Unknown';
+
                   // Update learning profile
-                  handleQuestionAnswer(currentAtom, selectedAnswer, isCorrect);
+                  handleQuestionAnswer(currentAtom, userAnswerText, isCorrect);
 
                   // Move to next atom after a short delay
                   setTimeout(() => {
