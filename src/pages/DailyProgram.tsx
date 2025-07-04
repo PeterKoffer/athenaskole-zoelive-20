@@ -3,11 +3,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { UserMetadata } from "@/types/auth";
+import { UserMetadata } from "@/types/auth"; // Import UserMetadata
 import WelcomeCard from "@/components/daily-program/WelcomeCard";
 import TodaysProgramGrid from "@/components/daily-program/TodaysProgramGrid";
 import NeliesTips from "@/components/daily-program/NeliesTips";
-import DailyUniverseCard from "@/components/daily-program/DailyUniverseCard";
 import { dailyActivities } from "@/components/daily-program/dailyActivitiesData";
 
 const DailyProgram = () => {
@@ -57,11 +56,6 @@ const DailyProgram = () => {
     
     // Navigate to the specific educational component
     navigate(`/learn/${activityId}`);
-  };
-
-  const handleStartUniverse = () => {
-    console.log("Starting Daily Universe for user:", user?.id);
-    navigate('/daily-universe');
   };
 
   // Show loading state while authentication is being checked
@@ -115,20 +109,7 @@ const DailyProgram = () => {
           todaysDate={todaysDate} 
           activityCount={dailyActivities.length}
         />
-        
-        {/* Featured Daily Universe */}
-        <div className="mb-8">
-          <DailyUniverseCard onStartUniverse={handleStartUniverse} />
-        </div>
-
-        {/* Alternative Individual Activities */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-300 mb-4">
-            Or choose individual subject practice:
-          </h2>
-          <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
-        </div>
-        
+        <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
         <NeliesTips />
 
         {/* Navigation */}

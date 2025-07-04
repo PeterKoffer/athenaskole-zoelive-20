@@ -23,12 +23,31 @@ export interface Curriculum {
   order: number;
 }
 
+import { LearningAtomPerformance } from "./learning";
+
+export interface ObjectiveProgressMetrics {
+  isCompleted: boolean;
+  completedAt?: string;
+  totalAttempts: number;          // Total attempts across all encounters
+  successfulAttempts: number;     // Total successful completions
+  totalTimeSpentSeconds: number;  // Sum of time taken across all attempts
+  avgTimeSpentSeconds?: number;   // Can be calculated
+  successRate?: number;           // Can be calculated (successfulAttempts / totalAttempts)
+  avgHintsUsed?: number;          // Average hints used on successful attempts
+  // Stores the performance of the most recent attempt. Could be an array for history.
+  lastAttemptPerformance?: LearningAtomPerformance;
+  // Optional: Could store a list of all historical LearningAtomPerformance objects if needed later.
+  // historicalPerformances?: LearningAtomPerformance[];
+}
+
 export interface UserStepProgress {
   id: string;
   userId: string;
   stepId: string;
-  isCompleted: boolean;
-  completedAt?: string;
-  timeSpent: number;
-  curriculumProgress: Record<string, boolean>;
+  isCompleted: boolean; // Overall status of the step
+  completedAt?: string; // When the step was fully completed
+  timeSpent: number; // Could be sum of totalTimeSpentSeconds from objectives, or overall session time on step
+  // Key: curriculumObjectiveId from Curriculum.id
+  // Value: Metrics related to the student's interaction with that objective over time
+  curriculumProgress: Record<string, ObjectiveProgressMetrics>;
 }
