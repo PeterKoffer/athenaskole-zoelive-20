@@ -1,3 +1,4 @@
+
 // UNESCO Curriculum Integration Service
 // Based on UNESCO's Education 2030 Framework and ISCED levels
 
@@ -20,7 +21,7 @@ export interface CountryCurriculum {
   educationSystem: string;
   gradeLevels: number[];
   subjects: CurriculumSubject[];
-  unescoAlignment: UNESCOStandard[];
+  unescoAlignment: string[]; // Changed to string[] to match usage
   languageOfInstruction: string[];
 }
 
