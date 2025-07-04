@@ -20,6 +20,9 @@ export interface InteractionEvent {
   details?: any;
 }
 
+// Add the missing type that was being imported
+export type KcMasteryHistoryItem = InteractionEvent;
+
 export interface LearnerPreferences {
   learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
   difficultyPreference: number; // 0.0 to 1.0
