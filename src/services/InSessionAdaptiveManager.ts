@@ -1,6 +1,5 @@
-
 import { LearningAtom, LearningAtomPerformance } from '@/types/learning';
-import { DifficultyLevel } from './AdaptiveDifficultyEngine';
+import { DifficultyLevel } from '@/services/AdaptiveDifficultyEngine';
 
 interface InSessionPerformanceMetrics {
   consecutiveCorrect: number;
