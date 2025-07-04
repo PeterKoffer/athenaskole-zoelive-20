@@ -210,7 +210,10 @@ export class DailyUniverseGenerator {
         content: {
           title: objInput.objectiveTitle,
           description: originalObjective.description, // Base description from curriculum
-          data: { standards: originalObjective.standards }
+          data: { 
+            type: 'multiple_choice',
+            standards: [] // Default empty array since Curriculum doesn't have standards property
+          }
         },
       };
     });

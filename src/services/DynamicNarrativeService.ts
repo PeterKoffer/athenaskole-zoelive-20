@@ -1,4 +1,5 @@
-import OpenAIContentService from './openaiContentService'; // Assuming this path and default export
+
+import { openaiContentService } from './openaiContentService'; // Import named export instead of default
 import { Curriculum } from '@/types/curriculum'; // For LearningObjective structure
 
 // Predefined themes and fallback contexts (similar to what was in DailyUniverseGenerator)
@@ -151,23 +152,25 @@ The "atomContexts" array must contain exactly ${desiredAtomCount} entries, one f
 `;
 
     try {
-      // Assuming OpenAIContentService has a method like generateText or generateStructuredText
-      // For now, let's assume generateText which might return a stringified JSON.
-      const rawResponse = await OpenAIContentService.generateText(prompt);
+      // Use the named export method
+      const rawResponse = await openaiContentService.generateText ? 
+        await openaiContentService.generateText(prompt) :
+        await openaiContentService.getOrGenerateContent('narrative', 'story_generation', 1, 'system');
+      
       console.log("[DynamicNarrativeService] Raw AI Response:", rawResponse);
 
       // Attempt to parse the response as JSON
       // The AI might sometimes include ```json ... ``` or other text around the JSON.
-      let jsonResponseString = rawResponse;
-      const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/);
+      let jsonResponseString = typeof rawResponse === 'string' ? rawResponse : JSON.stringify(rawResponse);
+      const jsonMatch = jsonResponseString.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonMatch && jsonMatch[1]) {
         jsonResponseString = jsonMatch[1];
       } else {
         // Attempt to find the first '{' and last '}' if no markdown block
-        const firstBrace = rawResponse.indexOf('{');
-        const lastBrace = rawResponse.lastIndexOf('}');
+        const firstBrace = jsonResponseString.indexOf('{');
+        const lastBrace = jsonResponseString.lastIndexOf('}');
         if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          jsonResponseString = rawResponse.substring(firstBrace, lastBrace + 1);
+          jsonResponseString = jsonResponseString.substring(firstBrace, lastBrace + 1);
         }
       }
 
