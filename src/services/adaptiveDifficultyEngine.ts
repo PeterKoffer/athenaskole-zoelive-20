@@ -1,204 +1,111 @@
+import { LearningAtomPerformance } from '@/types/learning';
+import { ObjectiveProgressMetrics } from '@/types/curriculum';
+import { mockUserProgressService } from './mockUserProgressService'; // Assuming path
 
-// Adaptive Difficulty Engine - Dynamically adjusts content difficulty
-export interface StudentPerformanceMetrics {
-  accuracy_rate: number;
-  response_time_avg: number;
-  consistency_score: number;
-  engagement_level: number;
-  recent_session_scores: number[];
-  mistake_patterns: string[];
-  strength_areas: string[];
-  challenge_areas: string[];
-}
+export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
-export interface DifficultyAdjustment {
-  new_difficulty_level: number;
-  adjustment_reason: string;
-  recommended_interventions: string[];
-  suggested_practice_areas: string[];
-  encouragement_strategy: 'celebrate' | 'encourage' | 'challenge' | 'support';
-}
+class AdaptiveDifficultyEngine {
 
-export class AdaptiveDifficultyEngine {
-  private static readonly DIFFICULTY_THRESHOLDS = {
-    increase: { accuracy: 85, consistency: 80, engagement: 90 },
-    decrease: { accuracy: 60, consistency: 50, engagement: 60 },
-    maintain: { accuracy_range: [70, 84], consistency_range: [60, 79] }
-  };
+  public async suggestInitialDifficulty(
+    userId: string,
+    objectiveId: string,
+    subject: string // Keep subject for potential future use (e.g. overall subject performance)
+  ): Promise<DifficultyLevel> {
+    console.log(`[AdaptiveDifficultyEngine] Suggesting initial difficulty for userId: ${userId}, objectiveId: ${objectiveId}, subject: ${subject}`);
 
-  static analyzeDifficultyAdjustment(
-    currentDifficulty: number,
-    metrics: StudentPerformanceMetrics,
-    sessionContext: {
-      subject: string;
-      skill_area: string;
-      total_questions: number;
-      time_spent_minutes: number;
-    }
-  ): DifficultyAdjustment {
-    console.log('🔄 Analyzing difficulty adjustment:', {
-      current: currentDifficulty,
-      accuracy: metrics.accuracy_rate,
-      consistency: metrics.consistency_score,
-      engagement: metrics.engagement_level
-    });
+    const objectiveMetrics = await mockUserProgressService.getObjectiveProgress(userId, objectiveId);
 
-    // Check for difficulty increase conditions
-    if (this.shouldIncreaseDifficulty(metrics)) {
-      return this.createDifficultyIncrease(currentDifficulty, metrics, sessionContext);
+    if (!objectiveMetrics || objectiveMetrics.totalAttempts === 0) {
+      console.log(`[AdaptiveDifficultyEngine] No prior history for objective ${objectiveId}. Defaulting to medium.`);
+      return 'medium'; // No history, start with medium
     }
 
-    // Check for difficulty decrease conditions  
-    if (this.shouldDecreaseDifficulty(metrics)) {
-      return this.createDifficultyDecrease(currentDifficulty, metrics, sessionContext);
+    // Calculate success rate, avoid division by zero
+    const successRate = objectiveMetrics.totalAttempts > 0
+      ? objectiveMetrics.successfulAttempts / objectiveMetrics.totalAttempts
+      : 0;
+
+    if (objectiveMetrics.isCompleted) {
+        // If completed, and success rate was high, maybe try harder if it's for revision.
+        // Or, if it was a struggle to complete, revise on easy/medium.
+        // For initial placement into a new universe, if it's for REVISION, medium is safe.
+        // If it's somehow being picked as NEW despite being complete, that's an issue for DailyUniverseGenerator.
+        // Let's assume if it's picked, and was completed easily, it could be a harder variant for revision.
+        if (successRate > 0.7 && objectiveMetrics.totalAttempts <= 2) return 'hard'; // Completed easily, try harder revision
+        if (successRate < 0.4) return 'easy'; // Was a struggle, revise on easy
+        return 'medium'; // Default for completed items picked for revision
     }
 
-    // Maintain current difficulty with targeted support
-    return this.maintainDifficultyWithSupport(currentDifficulty, metrics, sessionContext);
+
+    // If not completed, but has attempts:
+    if (successRate > 0.6 && objectiveMetrics.totalAttempts < 3) {
+      // Doing reasonably well, few attempts
+      console.log(`[AdaptiveDifficultyEngine] Good partial history. Suggesting medium.`);
+      return 'medium';
+    } else if (successRate < 0.3 && objectiveMetrics.totalAttempts >= 2) {
+      // Struggling significantly
+      console.log(`[AdaptiveDifficultyEngine] Struggling history. Suggesting easy.`);
+      return 'easy';
+    } else if (objectiveMetrics.totalAttempts >= 3) {
+        // Many attempts, not clearly succeeding or failing hard
+        console.log(`[AdaptiveDifficultyEngine] Many attempts, mixed results. Suggesting easy to solidify.`);
+        return 'easy';
+    }
+
+    console.log(`[AdaptiveDifficultyEngine] Defaulting to medium due to mixed/insufficient history.`);
+    return 'medium';
   }
 
-  private static shouldIncreaseDifficulty(metrics: StudentPerformanceMetrics): boolean {
-    const thresholds = this.DIFFICULTY_THRESHOLDS.increase;
-    
-    return (
-      metrics.accuracy_rate >= thresholds.accuracy &&
-      metrics.consistency_score >= thresholds.consistency &&
-      metrics.engagement_level >= thresholds.engagement &&
-      metrics.recent_session_scores.slice(-3).every(score => score >= 80)
-    );
-  }
+  public suggestNextDifficultyOnRetry(
+    currentAtomDifficulty: DifficultyLevel,
+    performanceOfLastAttempt: LearningAtomPerformance,
+    historicalMetrics?: ObjectiveProgressMetrics
+  ): DifficultyLevel {
+    console.log(`[AdaptiveDifficultyEngine] Suggesting next difficulty on retry. Last attempt success: ${performanceOfLastAttempt.success}`);
 
-  private static shouldDecreaseDifficulty(metrics: StudentPerformanceMetrics): boolean {
-    const thresholds = this.DIFFICULTY_THRESHOLDS.decrease;
-    
-    return (
-      metrics.accuracy_rate <= thresholds.accuracy ||
-      metrics.consistency_score <= thresholds.consistency ||
-      metrics.engagement_level <= thresholds.engagement ||
-      metrics.recent_session_scores.slice(-2).every(score => score <= 65)
-    );
-  }
-
-  private static createDifficultyIncrease(
-    currentDifficulty: number,
-    metrics: StudentPerformanceMetrics,
-    context: any
-  ): DifficultyAdjustment {
-    const newDifficulty = Math.min(5, currentDifficulty + 1);
-    
-    return {
-      new_difficulty_level: newDifficulty,
-      adjustment_reason: `Excellent performance! Ready for greater challenges (${metrics.accuracy_rate}% accuracy)`,
-      recommended_interventions: [
-        'Introduce advanced problem-solving strategies',
-        'Add multi-step word problems',
-        'Include conceptual reasoning questions'
-      ],
-      suggested_practice_areas: this.identifyGrowthAreas(metrics, 'advance'),
-      encouragement_strategy: 'challenge'
-    };
-  }
-
-  private static createDifficultyDecrease(
-    currentDifficulty: number,
-    metrics: StudentPerformanceMetrics,
-    context: any
-  ): DifficultyAdjustment {
-    const newDifficulty = Math.max(1, currentDifficulty - 1);
-    
-    return {
-      new_difficulty_level: newDifficulty,
-      adjustment_reason: `Providing more foundational support (${metrics.accuracy_rate}% accuracy)`,
-      recommended_interventions: [
-        'Review prerequisite concepts',
-        'Provide step-by-step guided practice',
-        'Include visual aids and manipulatives',
-        'Offer additional practice time'
-      ],
-      suggested_practice_areas: this.identifyGrowthAreas(metrics, 'support'),
-      encouragement_strategy: 'support'
-    };
-  }
-
-  private static maintainDifficultyWithSupport(
-    currentDifficulty: number,
-    metrics: StudentPerformanceMetrics,
-    context: any
-  ): DifficultyAdjustment {
-    return {
-      new_difficulty_level: currentDifficulty,
-      adjustment_reason: `Maintaining current level while building confidence (${metrics.accuracy_rate}% accuracy)`,
-      recommended_interventions: [
-        'Vary question formats to maintain engagement',
-        'Focus on mistake patterns for improvement',
-        'Celebrate progress in strength areas'
-      ],
-      suggested_practice_areas: metrics.challenge_areas.slice(0, 2),
-      encouragement_strategy: metrics.accuracy_rate >= 75 ? 'celebrate' : 'encourage'
-    };
-  }
-
-  private static identifyGrowthAreas(metrics: StudentPerformanceMetrics, direction: 'advance' | 'support'): string[] {
-    if (direction === 'advance') {
-      // For advancing students, focus on extending their strengths
-      return [
-        ...metrics.strength_areas.slice(0, 2),
-        'advanced_applications',
-        'creative_problem_solving'
-      ];
+    if (!performanceOfLastAttempt.success) {
+      // If failed, definitely go easier or stay easy
+      if (currentAtomDifficulty === 'hard') return 'medium';
+      if (currentAtomDifficulty === 'medium') return 'easy';
+      return 'easy'; // Already easy, stay easy
     } else {
-      // For students needing support, focus on addressing challenges
-      return [
-        ...metrics.challenge_areas.slice(0, 2),
-        'foundational_concepts',
-        'basic_skill_building'
-      ];
+      // If succeeded, but it's a retry (implying previous failure)
+      // Don't ramp up too quickly. Stay at current or one step up if it was easy.
+      if (currentAtomDifficulty === 'easy') return 'medium'; // Succeeded on easy after failure, try medium
+      return currentAtomDifficulty; // Succeeded on medium/hard after failure, solidify at this level.
     }
   }
 
-  // Real-time difficulty adjustment during sessions
-  static getRealtimeAdjustment(
-    questionNumber: number,
-    recentAnswers: boolean[],
-    responseTimeSeconds: number
-  ): 'easier' | 'harder' | 'maintain' {
-    if (questionNumber < 3) return 'maintain'; // Need baseline data
+  public suggestDifficultyAdjustmentForNextAtomInSubject(
+    currentAtomSubject: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    currentAtomDifficulty: DifficultyLevel,
+    performanceOfLastAtom: LearningAtomPerformance,
+    historicalSubjectSuccessRate?: number // Overall success rate in this subject (0.0 to 1.0)
+  ): DifficultyLevel {
+    console.log(`[AdaptiveDifficultyEngine] Suggesting adjustment for next atom in subject. Last atom success: ${performanceOfLastAtom.success}`);
 
-    const recentAccuracy = recentAnswers.slice(-3).filter(Boolean).length / Math.min(3, recentAnswers.length);
-    const isRespondingQuickly = responseTimeSeconds < 15; // Quick responses might indicate too easy
-    const isStruggling = responseTimeSeconds > 60; // Slow responses might indicate too hard
-
-    // Increase difficulty if performing well
-    if (recentAccuracy >= 0.8 && isRespondingQuickly) {
-      return 'harder';
+    if (performanceOfLastAtom.success) {
+      if (performanceOfLastAtom.firstAttemptSuccess && performanceOfLastAtom.hintsUsed === 0) {
+        // Strong success
+        if (currentAtomDifficulty === 'easy') return 'medium';
+        if (currentAtomDifficulty === 'medium') {
+            // If historical success in subject is also high, go hard. Otherwise, stay medium.
+            return (historicalSubjectSuccessRate && historicalSubjectSuccessRate > 0.75) ? 'hard' : 'medium';
+        }
+        return 'hard'; // Already hard, stay hard
+      } else {
+        // Moderate success (e.g., needed hints or multiple attempts but got there)
+        // Stay at current difficulty, or one step down if they were on hard and struggled a bit
+        if (currentAtomDifficulty === 'hard' && (performanceOfLastAtom.attempts > 1 || performanceOfLastAtom.hintsUsed > 0)) return 'medium';
+        return currentAtomDifficulty;
+      }
+    } else {
+      // Failure
+      if (currentAtomDifficulty === 'hard') return 'medium';
+      if (currentAtomDifficulty === 'medium') return 'easy';
+      return 'easy'; // Already easy, stay easy
     }
-
-    // Decrease difficulty if struggling
-    if (recentAccuracy <= 0.4 || isStruggling) {
-      return 'easier';
-    }
-
-    return 'maintain';
-  }
-
-  // Calculate engagement level based on multiple factors
-  static calculateEngagementLevel(sessionData: {
-    questions_completed: number;
-    total_time_minutes: number;
-    interaction_count: number;
-    help_requests: number;
-    voluntary_breaks: number;
-  }): number {
-    const completionRate = sessionData.questions_completed / Math.max(1, sessionData.total_time_minutes / 3);
-    const interactionRate = sessionData.interaction_count / Math.max(1, sessionData.questions_completed);
-    const selfRegulation = sessionData.voluntary_breaks > 0 ? 10 : 0; // Bonus for self-regulation
-    
-    // Normalize to 0-100 scale
-    const baseEngagement = Math.min(100, (completionRate * 40) + (interactionRate * 30) + selfRegulation + 20);
-    
-    // Reduce engagement if too many help requests (indicates frustration)
-    const helpPenalty = Math.min(20, sessionData.help_requests * 2);
-    
-    return Math.max(0, baseEngagement - helpPenalty);
   }
 }
+
+export default new AdaptiveDifficultyEngine();
