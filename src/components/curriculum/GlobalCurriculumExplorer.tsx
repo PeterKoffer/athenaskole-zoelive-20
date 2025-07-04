@@ -35,7 +35,8 @@ const GlobalCurriculumExplorer = () => {
       'GB': '🇬🇧',
       'CA': '🇨🇦',
       'AU': '🇦🇺',
-      'SG': '🇸🇬'
+      'SG': '🇸🇬',
+      'DK': '🇩🇰'
     };
     return flags[countryCode] || '🌍';
   };
@@ -254,7 +255,7 @@ const GlobalCurriculumExplorer = () => {
                   ))}
                 </div>
               )}
-            </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

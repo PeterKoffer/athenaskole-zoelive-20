@@ -1,5 +1,86 @@
+
 {
   "languageCode": "da",
   "languageName": "Danish",
-  "levels": []
+  "levels": [
+    {
+      "level": "A1",
+      "name": "Beginner Danish",
+      "description": "Basic Danish for beginners - everyday phrases and simple communication",
+      "units": [
+        {
+          "id": "da_a1_u1",
+          "title": "Greetings and Introductions (Hilsner og præsentationer)",
+          "description": "Learn basic greetings and how to introduce yourself in Danish",
+          "lessons": [
+            {
+              "id": "da_a1_u1_l1",
+              "title": "Hello and Goodbye (Hej og farvel)",
+              "vocabulary": [
+                {"word": "hej", "translation": "hello", "pronunciation": "hi"},
+                {"word": "farvel", "translation": "goodbye", "pronunciation": "far-vel"},
+                {"word": "tak", "translation": "thanks", "pronunciation": "tak"},
+                {"word": "undskyld", "translation": "excuse me", "pronunciation": "oon-skil"}
+              ],
+              "phrases": [
+                {"phrase": "Hej, jeg hedder...", "translation": "Hello, my name is...", "pronunciation": "hi, yai hed-der"},
+                {"phrase": "Hvor kommer du fra?", "translation": "Where are you from?", "pronunciation": "vor kom-mer doo fra"},
+                {"phrase": "Jeg kommer fra...", "translation": "I come from...", "pronunciation": "yai kom-mer fra"}
+              ]
+            }
+          ]
+        },
+        {
+          "id": "da_a1_u2", 
+          "title": "Numbers and Basic Information (Tal og grundlæggende information)",
+          "description": "Learn numbers, age, and basic personal information in Danish",
+          "lessons": [
+            {
+              "id": "da_a1_u2_l1",
+              "title": "Numbers 1-20 (Tal 1-20)",
+              "vocabulary": [
+                {"word": "en/et", "translation": "one", "pronunciation": "en/ed"},
+                {"word": "to", "translation": "two", "pronunciation": "toh"},
+                {"word": "tre", "translation": "three", "pronunciation": "treh"},
+                {"word": "fire", "translation": "four", "pronunciation": "fee-reh"},
+                {"word": "fem", "translation": "five", "pronunciation": "fem"}
+              ],
+              "phrases": [
+                {"phrase": "Hvor gammel er du?", "translation": "How old are you?", "pronunciation": "vor gam-mel ar doo"},
+                {"phrase": "Jeg er... år gammel", "translation": "I am... years old", "pronunciation": "yai ar... oar gam-mel"}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": "A2",
+      "name": "Elementary Danish",
+      "description": "Build on basic Danish with more complex sentences and everyday situations",
+      "units": [
+        {
+          "id": "da_a2_u1",
+          "title": "Daily Activities (Daglige aktiviteter)",
+          "description": "Describe daily routines and activities in Danish",
+          "lessons": [
+            {
+              "id": "da_a2_u1_l1",
+              "title": "My Daily Routine (Min daglige rutine)",
+              "vocabulary": [
+                {"word": "spiser", "translation": "eat", "pronunciation": "spee-ser"},
+                {"word": "arbejder", "translation": "work", "pronunciation": "ar-bi-der"},
+                {"word": "sover", "translation": "sleep", "pronunciation": "soh-ver"},
+                {"word": "læser", "translation": "read", "pronunciation": "lay-ser"}
+              ],
+              "phrases": [
+                {"phrase": "Om morgenen spiser jeg morgenmad", "translation": "In the morning I eat breakfast", "pronunciation": "om mor-nen spee-ser yai mor-nen-mad"},
+                {"phrase": "Jeg arbejder fra ni til fem", "translation": "I work from nine to five", "pronunciation": "yai ar-bi-der fra nee til fem"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

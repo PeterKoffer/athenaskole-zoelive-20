@@ -1,4 +1,3 @@
-
 // UNESCO Curriculum Integration Service
 // Based on UNESCO's Education 2030 Framework and ISCED levels
 
@@ -87,6 +86,7 @@ class UNESCOCurriculumService {
     this.addCountryCurriculum(this.createCanadianCurriculum());
     this.addCountryCurriculum(this.createAustralianCurriculum());
     this.addCountryCurriculum(this.createSingaporeCurriculum());
+    this.addCountryCurriculum(this.createDanishCurriculum());
   }
 
   private createUSCurriculum(): CountryCurriculum {
@@ -226,6 +226,106 @@ class UNESCOCurriculumService {
       ],
       unescoAlignment: ['unesco-math-primary-numeracy'],
       languageOfInstruction: ['en', 'zh', 'ms', 'ta']
+    };
+  }
+
+  private createDanishCurriculum(): CountryCurriculum {
+    return {
+      countryCode: 'DK',
+      countryName: 'Denmark',
+      educationSystem: 'Danish Folkeskole System',
+      gradeLevels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // 0. klasse to 9./10. klasse
+      subjects: [
+        {
+          name: 'Mathematics (Matematik)',
+          description: 'Danish Mathematics Curriculum with emphasis on problem-solving and real-world applications',
+          topics: [
+            {
+              id: 'dk-math-basic-arithmetic',
+              name: 'Basic Arithmetic (Grundlæggende regning)',
+              description: 'Addition, subtraction, multiplication and division with focus on understanding',
+              difficulty: 3,
+              estimatedTime: 45,
+              prerequisites: [],
+              standards: ['DK-MATH-FOLK-BASIC']
+            },
+            {
+              id: 'dk-math-fractions',
+              name: 'Fractions (Brøker)',
+              description: 'Understanding fractions through visual and practical approaches',
+              difficulty: 4,
+              estimatedTime: 50,
+              prerequisites: ['dk-math-basic-arithmetic'],
+              standards: ['DK-MATH-FOLK-FRAC']
+            },
+            {
+              id: 'dk-math-geometry',
+              name: 'Geometry (Geometri)',
+              description: 'Shapes, measurement, and spatial understanding',
+              difficulty: 4,
+              estimatedTime: 40,
+              prerequisites: [],
+              standards: ['DK-MATH-FOLK-GEOM']
+            }
+          ]
+        },
+        {
+          name: 'Danish Language (Dansk)',
+          description: 'Danish language and literature curriculum',
+          topics: [
+            {
+              id: 'dk-danish-reading',
+              name: 'Reading Comprehension (Læseforståelse)',
+              description: 'Developing reading skills and text comprehension',
+              difficulty: 3,
+              estimatedTime: 35,
+              prerequisites: [],
+              standards: ['DK-DANSK-READ']
+            },
+            {
+              id: 'dk-danish-writing',
+              name: 'Written Expression (Skriftlig fremstilling)',
+              description: 'Writing skills from basic sentences to complex texts',
+              difficulty: 4,
+              estimatedTime: 45,
+              prerequisites: ['dk-danish-reading'],
+              standards: ['DK-DANSK-WRITE']
+            }
+          ]
+        },
+        {
+          name: 'English (Engelsk)',
+          description: 'English as a foreign language curriculum',
+          topics: [
+            {
+              id: 'dk-english-basic',
+              name: 'Basic English Communication',
+              description: 'Fundamental English speaking and listening skills',
+              difficulty: 3,
+              estimatedTime: 40,
+              prerequisites: [],
+              standards: ['DK-ENG-BASIC']
+            }
+          ]
+        },
+        {
+          name: 'Science (Natur/teknik)',
+          description: 'Nature and technology curriculum combining physics, chemistry, biology, and geography',
+          topics: [
+            {
+              id: 'dk-science-nature',
+              name: 'Nature Studies (Naturstudier)',
+              description: 'Understanding the natural world through observation and experimentation',
+              difficulty: 3,
+              estimatedTime: 50,
+              prerequisites: [],
+              standards: ['DK-NT-NATURE']
+            }
+          ]
+        }
+      ],
+      unescoAlignment: ['unesco-math-primary-numeracy', 'unesco-literacy-primary-reading'],
+      languageOfInstruction: ['da', 'en'] // Danish primary, English taught as subject
     };
   }
 
