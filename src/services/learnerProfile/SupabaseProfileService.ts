@@ -1,6 +1,33 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
+import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences, KcMasteryHistoryItem } from '@/types/learnerProfile';
+import type { Json } from '@/types/supabase'; // Assuming you have this type from Supabase
+
+// Helper function to safely parse JSON fields
+function safeParseJsonField<T>(jsonValue: Json | undefined | null, defaultValue: T): T {
+  if (jsonValue === null || jsonValue === undefined) {
+    return defaultValue;
+  }
+  if (typeof jsonValue === 'string') {
+    try {
+      const parsed = JSON.parse(jsonValue);
+      // Add more specific type checks if necessary based on T
+      return parsed as T;
+    } catch (e) {
+      console.warn('SupabaseProfileService: Failed to parse JSON string, returning default value:', jsonValue, e);
+      return defaultValue;
+    }
+  }
+  // If it's already an object/array (and not null), assume it's in the correct shape or close enough.
+  // More specific validation could be added here if T is complex.
+  if (typeof jsonValue === 'object') {
+    return jsonValue as T;
+  }
+  // For other primitive types if they are directly assignable or if it's an unexpected type
+  console.warn(`SupabaseProfileService: Unexpected type for JSON field, returning default. Value: ${jsonValue}`);
+  return defaultValue;
+}
+
 
 class SupabaseProfileService {
   async getProfile(userId: string): Promise<LearnerProfile | null> {
@@ -47,17 +74,18 @@ class SupabaseProfileService {
             attempts: kc.attempts,
             correctAttempts: kc.correct_attempts,
             lastAttemptTimestamp: new Date(kc.last_attempted_timestamp || Date.now()).getTime(),
-            history: kc.history || []
+            history: safeParseJsonField<KcMasteryHistoryItem[]>(kc.history, [])
           };
         });
       }
 
       // Build preferences from profile data
-      const preferences: LearnerPreferences = profileData.preferences || {
+      const defaultPreferences: LearnerPreferences = {
         learningStyle: 'mixed',
         difficultyPreference: 0.5,
         sessionLength: 20
       };
+      const preferences: LearnerPreferences = safeParseJsonField<LearnerPreferences>(profileData.preferences, defaultPreferences);
 
       const profile: LearnerProfile = {
         userId: userId,

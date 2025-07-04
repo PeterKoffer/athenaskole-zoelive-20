@@ -54,20 +54,40 @@ export class SupabaseEventLogger {
     console.log(`SupabaseEventLogger: Flushing ${events.length} events to Supabase...`);
 
     try {
-      const recordsToInsert = events.map(event => ({
-        event_id: event.eventId,
-        user_id: event.userId,
-        session_id: event.sessionId || undefined,
-        timestamp: new Date(event.timestamp).toISOString(),
-        event_type: event.type,
-        source_component_id: event.sourceComponentId || undefined,
-        event_data: event as any,
-        question_id: (event as QuestionAttemptEvent).questionId || undefined,
-        kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || undefined,
-        is_correct: 'isCorrect' in event ? (event as QuestionAttemptEvent).isCorrect : undefined,
-        game_id: (event as GameInteractionEvent).gameId || undefined,
-        content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
-      }));
+      const recordsToInsert = events.map(event => {
+        // Create a base object for event_data by excluding common fields
+        const {
+          eventId,
+          userId,
+          sessionId,
+          timestamp,
+          type,
+          sourceComponentId,
+          // Specific fields that have their own columns
+          questionId,
+          knowledgeComponentIds,
+          isCorrect,
+          gameId,
+          contentAtomId,
+          // Destructure the rest into a new object for event_data
+          ...specificEventData
+        } = event as any; // Use 'as any' carefully here for destructuring various event types
+
+        return {
+          event_id: event.eventId,
+          user_id: event.userId,
+          session_id: event.sessionId || undefined,
+          timestamp: new Date(event.timestamp).toISOString(),
+          event_type: event.type,
+          source_component_id: event.sourceComponentId || undefined,
+          event_data: specificEventData, // This is now a plain object suitable for JSON
+          question_id: (event as QuestionAttemptEvent).questionId || undefined,
+          kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || undefined,
+          is_correct: 'isCorrect' in event ? (event as QuestionAttemptEvent).isCorrect : undefined,
+          game_id: (event as GameInteractionEvent).gameId || undefined,
+          content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
+        };
+      });
 
       console.log(`SupabaseEventLogger: Attempting to insert ${recordsToInsert.length} records to interaction_events table`);
 
