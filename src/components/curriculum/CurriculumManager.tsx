@@ -31,25 +31,32 @@ const CurriculumManager = ({ step, onBack, onCurriculumComplete }: CurriculumMan
 
   // Load existing curriculums for this step
   useEffect(() => {
-    // Generate 12 sample curriculums for each step
-    const sampleCurriculums: Curriculum[] = Array.from({ length: 12 }, (_, index) => ({
-      id: `${step.id}-curriculum-${index + 1}`,
-      stepId: step.id,
-      title: `Curriculum ${index + 1}: ${step.title} Module ${index + 1}`,
-      description: `This curriculum covers essential concepts for ${step.title.toLowerCase()} - Module ${index + 1}`,
-      subject: getSubjectForStep(step.stepNumber, index),
-      content: `Detailed content for curriculum ${index + 1} of step ${step.stepNumber}`,
-      duration: 20 + (index * 5), // Varying duration
-      isCompleted: Math.random() > 0.7, // Some randomly completed
-      order: index + 1
-    }));
-
-    setCurriculums(sampleCurriculums);
+    if (step.curriculums && step.curriculums.length > 0) {
+      // Sort by order just in case they are not already sorted
+      const sortedCurriculums = [...step.curriculums].sort((a, b) => a.order - b.order);
+      setCurriculums(sortedCurriculums);
+    } else {
+      // Fallback: Generate 12 sample curriculums if step.curriculums is empty
+      const sampleCurriculums: Curriculum[] = Array.from({ length: 12 }, (_, index) => ({
+        id: `${step.id}-curriculum-sample-${index + 1}`, // Added -sample- to distinguish from real IDs
+        stepId: step.id,
+        title: `Sample Curriculum ${index + 1} for ${step.title}`,
+        description: `This is sample content for ${step.title.toLowerCase()} - Module ${index + 1}`,
+        subject: getSubjectForStep(step.stepNumber, index),
+        content: `Detailed sample content for curriculum ${index + 1} of step ${step.stepNumber}. This is placeholder data.`,
+        duration: 20 + (index * 5), // Varying duration
+        isCompleted: Math.random() > 0.7, // Some randomly completed
+        order: index + 1
+      }));
+      setCurriculums(sampleCurriculums);
+    }
   }, [step]);
 
+  // This function is needed for the sample curriculum fallback
   const getSubjectForStep = (stepNumber: number, curriculumIndex: number) => {
     const subjects = ['Mathematics', 'English', 'Science', 'History', 'Geography', 'Art', 'Music', 'Physical Education', 'Technology', 'Language', 'Philosophy', 'Psychology'];
-    return subjects[curriculumIndex % subjects.length];
+    // Use stepNumber to vary the starting subject, making samples look a bit different per step
+    return subjects[(curriculumIndex + stepNumber) % subjects.length];
   };
 
   const handleAddCurriculum = () => {
