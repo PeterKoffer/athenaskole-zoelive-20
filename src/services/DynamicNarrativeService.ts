@@ -32,11 +32,14 @@ const FALLBACK_THEMES = [
 ];
 
 
+import { DifficultyLevel } from './AdaptiveDifficultyEngine'; // Import DifficultyLevel
+
 export interface LearningObjectiveInput {
   objectiveId: string;
   objectiveTitle: string;
   subject: string;
   estimatedMinutes?: number;
+  difficulty: DifficultyLevel; // Added difficulty
 }
 
 export interface DynamicNarrativeComponents {
@@ -63,21 +66,25 @@ interface AIResponseFormat {
 class DynamicNarrativeService {
   private formatObjectivesForPrompt(objectives: LearningObjectiveInput[]): string {
     return objectives.map((obj, index) =>
-      `${index + 1}. ID: "${obj.objectiveId}", Title: "${obj.objectiveTitle}", Subject: "${obj.subject}"${obj.estimatedMinutes ? `, Duration: ${obj.estimatedMinutes} mins` : ''}`
+      `${index + 1}. ID: "${obj.objectiveId}", Title: "${obj.objectiveTitle}", Subject: "${obj.subject}", Difficulty: "${obj.difficulty}"${obj.estimatedMinutes ? `, Duration: ${obj.estimatedMinutes} mins` : ''}`
     ).join('\n');
   }
 
   private generateFallbackNarrative(
     themeName: string,
-    objectives: LearningObjectiveInput[]
+    objectives: LearningObjectiveInput[] // objectives now include difficulty
   ): DynamicNarrativeComponents {
-    const theme = FALLBACK_THEMES.find(t => t.name === themeName) || FALLBACK_THEMES[0]; // Default to first theme if not found
+    const theme = FALLBACK_THEMES.find(t => t.name === themeName) || FALLBACK_THEMES[0];
 
     const atomContexts = objectives.map(obj => {
+      // Fallback contexts don't currently adapt to difficulty, but they could be structured differently if needed.
+      // For now, the narrative context will be generic, but the atom itself will have a difficulty property.
       const contextTemplate = theme.contexts[obj.subject as keyof typeof theme.contexts] || theme.contexts.default;
       return {
         objectiveId: obj.objectiveId,
-        narrativeContext: contextTemplate.replace("{objectiveTitle}", obj.objectiveTitle)
+        // Example: "The ship's navigation (easy) requires calculations for..."
+        // For simplicity, fallback narrative won't explicitly mention difficulty in text, but the atom will have it.
+        narrativeContext: contextTemplate.replace("{objectiveTitle}", `${obj.objectiveTitle}`)
       };
     });
 
@@ -111,7 +118,7 @@ Theme: "${themeName}"
 Target Age/Grade: ${studentAge} years old / Grade ${gradeLevel}
 Number of Learning Atoms to Integrate: ${desiredAtomCount}
 
-Learning Objectives to Integrate:
+Learning Objectives to Integrate (each with an ID, Title, Subject, and assigned Difficulty):
 ${formattedObjectives}
 
 Please generate the following components in a single JSON object format:
@@ -120,7 +127,7 @@ Please generate the following components in a single JSON object format:
 
 2.  "atomContexts": An array of objects. Each object in the array should correspond to one of the provided Learning Objectives (matching the order and IDs if possible) and must include:
     *   "objectiveId": The exact ID of the learning objective as provided above (e.g., "math_multiply_1").
-    *   "narrativeContext": A creative and engaging narrative snippet (2-3 sentences) that seamlessly embeds this specific learning objective into the "${themeName}" storyline. The snippet should provide a reason *within the story* for why the student needs to engage with this learning objective. Make sure the context clearly relates to the objective's title and subject.
+    *   "narrativeContext": A creative and engaging narrative snippet (2-3 sentences). This snippet should seamlessly embed the specific learning objective (considering its Title, Subject, and assigned Difficulty) into the "${themeName}" storyline. For example, if Difficulty is 'easy', the context might offer more clues or simplify the problem's framing within the story. If 'hard', it might present a more complex scenario. The snippet should provide a reason *within the story* for why the student needs to engage with this learning objective.
 
 3.  "storylineOutro": A short (2-3 sentences) concluding narrative snippet that wraps up the day's adventure for the theme "${themeName}" and offers a sense of accomplishment.
 
