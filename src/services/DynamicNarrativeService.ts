@@ -152,10 +152,13 @@ The "atomContexts" array must contain exactly ${desiredAtomCount} entries, one f
 `;
 
     try {
-      // Use the named export method
-      const rawResponse = await openaiContentService.generateText ? 
-        await openaiContentService.generateText(prompt) :
-        await openaiContentService.getOrGenerateContent('narrative', 'story_generation', 1, 'system');
+      // Use the correct method from openaiContentService
+      const rawResponse = await openaiContentService.getOrGenerateContent(
+        'narrative', 
+        'story_generation', 
+        1, 
+        'system'
+      );
       
       console.log("[DynamicNarrativeService] Raw AI Response:", rawResponse);
 
