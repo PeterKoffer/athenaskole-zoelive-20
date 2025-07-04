@@ -1,3 +1,4 @@
+
 import { LearningAtom, LearningAtomPerformance } from '@/types/learning';
 import { DifficultyLevel } from '@/services/AdaptiveDifficultyEngine';
 
@@ -94,7 +95,12 @@ export class InSessionAdaptiveManager {
       }
     }
 
-    console.log(`[InSessionAdaptiveManager] Updated metrics for ${atomId}:`, metrics);
+    console.log(`[InSessionAdaptiveManager] Updated metrics for ${atomId}:`, {
+      attempts: metrics.totalAttempts,
+      consecutive: { correct: metrics.consecutiveCorrect, incorrect: metrics.consecutiveIncorrect },
+      struggling: metrics.strugglingIndicators.length,
+      mastery: metrics.masteryIndicators.length
+    });
   }
 
   public shouldAdaptAtomDifficulty(atomId: string): { 
@@ -108,12 +114,12 @@ export class InSessionAdaptiveManager {
       return { shouldAdapt: false };
     }
 
-    // Check for need to make easier
+    // Check for need to make easier (stronger conditions for clearer struggling signals)
     if (metrics.strugglingIndicators.length >= 2 || metrics.consecutiveIncorrect >= 2) {
       return {
         shouldAdapt: true,
         newDifficulty: 'easy',
-        reason: 'Student showing signs of struggle',
+        reason: 'Student showing signs of struggle - providing additional support',
         contentModifications: {
           simplifiedInstructions: 'Let me break this down into simpler steps for you.',
           additionalHints: [
@@ -130,12 +136,12 @@ export class InSessionAdaptiveManager {
       };
     }
 
-    // Check for need to make harder
+    // Check for need to make harder (evidence of mastery)
     if (metrics.masteryIndicators.length >= 2 || metrics.consecutiveCorrect >= 3) {
       return {
         shouldAdapt: true,
         newDifficulty: 'hard',
-        reason: 'Student demonstrating mastery, ready for challenge',
+        reason: 'Student demonstrating mastery - ready for enhanced challenge',
         contentModifications: {
           advancedChallenges: [
             'Now try solving this in a different way',
@@ -172,7 +178,8 @@ export class InSessionAdaptiveManager {
           ...originalAtom.content.data,
           adaptiveModifications: contentModifications,
           originalDifficulty: originalAtom.difficulty,
-          adaptationReason: `Adapted to ${targetDifficulty} based on student performance`
+          adaptationReason: `Real-time adaptation to ${targetDifficulty} based on current performance`,
+          adaptationTimestamp: new Date().toISOString()
         }
       }
     };
@@ -204,7 +211,10 @@ export class InSessionAdaptiveManager {
 
   public endAtomSession(atomId: string): LearningAtomPerformance | null {
     const metrics = this.sessionMetrics.get(atomId);
-    if (!metrics) return null;
+    if (!metrics) {
+        console.warn(`[InSessionAdaptiveManager] No metrics found for atom: ${atomId}`);
+        return null;
+    }
 
     const performance: LearningAtomPerformance = {
       attempts: metrics.totalAttempts,
@@ -218,7 +228,14 @@ export class InSessionAdaptiveManager {
     // Clean up session data
     this.sessionMetrics.delete(atomId);
 
-    console.log(`[InSessionAdaptiveManager] Session ended for ${atomId}. Final performance:`, performance);
+    console.log(`[InSessionAdaptiveManager] Session ended for ${atomId}. Final performance:`, {
+      ...performance,
+      adaptiveIndicators: {
+        strugglingSignals: metrics.strugglingIndicators.length,
+        masterySignals: metrics.masteryIndicators.length
+      }
+    });
+    
     return performance;
   }
 

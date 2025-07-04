@@ -6,8 +6,8 @@ import { UserMetadata } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import AdaptiveDifficultyEngine from '@/services/AdaptiveDifficultyEngine';
 import DailyUniverseGenerator from '@/services/DailyUniverseGenerator';
+import UniverseSessionManager from '@/services/UniverseSessionManager';
 import { LearningAtom, DailyUniverse } from '@/types/learning';
 import AdaptiveLearningAtomRenderer from '@/components/adaptive-learning/AdaptiveLearningAtomRenderer';
 import { ArrowLeft, RefreshCw, Brain, Sparkles } from 'lucide-react';
@@ -44,6 +44,10 @@ const EnhancedDailyProgram: React.FC = () => {
         setDailyUniverse(universe);
         setCurrentAtomIndex(0);
         setCompletedAtoms([]);
+        
+        // Initialize UniverseSessionManager with the new universe
+        await UniverseSessionManager.startSession(user.id, universe);
+        console.log('[EnhancedDailyProgram] Started UniverseSessionManager session');
       }
     } catch (error) {
       console.error('Error generating daily universe:', error);
@@ -53,7 +57,7 @@ const EnhancedDailyProgram: React.FC = () => {
   };
 
   const handleAtomComplete = (performance: any) => {
-    console.log('Atom completed with performance:', performance);
+    console.log('[EnhancedDailyProgram] Atom completed with performance:', performance);
     
     setCompletedAtoms(prev => [...prev, currentAtomIndex]);
     
@@ -61,10 +65,18 @@ const EnhancedDailyProgram: React.FC = () => {
       setTimeout(() => {
         setCurrentAtomIndex(prev => prev + 1);
       }, 1000);
+    } else {
+      // All atoms completed - end the session
+      setTimeout(() => {
+        UniverseSessionManager.endSession();
+        console.log('[EnhancedDailyProgram] Ended UniverseSessionManager session');
+      }, 1000);
     }
   };
 
   const resetProgram = () => {
+    // End current session before generating new universe
+    UniverseSessionManager.endSession();
     generateDailyUniverse();
   };
 
@@ -104,7 +116,7 @@ const EnhancedDailyProgram: React.FC = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
-            <h1 className="text-2xl font-bold">Enhanced Daily Program</h1>
+            <h1 className="text-2xl font-bold">Enhanced Adaptive Learning</h1>
           </div>
           <Button
             variant="outline"
@@ -132,6 +144,7 @@ const EnhancedDailyProgram: React.FC = () => {
               <div className="flex items-center space-x-4 text-sm text-gray-400">
                 <span>⏱️ Est. Time: {dailyUniverse.estimatedTotalMinutes} minutes</span>
                 <span>🎯 Learning Atoms: {dailyUniverse.learningAtoms.length}</span>
+                <span>🧠 Adaptive AI: Enabled</span>
               </div>
             </CardContent>
           </Card>
@@ -167,7 +180,7 @@ const EnhancedDailyProgram: React.FC = () => {
                     variant={completedAtoms.includes(index) ? "default" : "secondary"}
                     className={completedAtoms.includes(index) ? "bg-green-600" : ""}
                   >
-                    {atom.subject}
+                    {atom.subject} ({atom.difficulty})
                   </Badge>
                 ))}
               </div>
@@ -187,7 +200,7 @@ const EnhancedDailyProgram: React.FC = () => {
                 Generating Your Personal Learning Journey
               </h2>
               <p className="text-gray-300">
-                Our AI is crafting a unique educational adventure just for you...
+                Our AI is crafting a unique educational adventure with adaptive difficulty based on your learning history...
               </p>
             </CardContent>
           </Card>
@@ -218,18 +231,17 @@ const EnhancedDailyProgram: React.FC = () => {
             <CardContent className="p-8 text-center">
               <div className="text-6xl mb-4">🎉</div>
               <h2 className="text-2xl font-bold text-white mb-4">
-                Journey Complete!
+                Adaptive Learning Journey Complete!
               </h2>
               <p className="text-gray-300 mb-4">{dailyUniverse.storylineOutro}</p>
               <p className="text-gray-400 mb-6">
-                You've successfully completed your adaptive learning journey. 
-                The system has been personalizing content based on your responses!
+                You've successfully completed your adaptive learning journey. The AI system dynamically adjusted content difficulty based on your real-time performance, and all progress has been saved to inform future learning sessions!
               </p>
               <Button
                 onClick={resetProgram}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                Start New Journey
+                Start New Adaptive Journey
               </Button>
             </CardContent>
           </Card>

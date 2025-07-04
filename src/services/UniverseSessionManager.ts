@@ -1,8 +1,9 @@
+
 import { DailyUniverse, LearningAtom, LearningAtomPerformance } from '@/types/learning';
 import { mockUserProgressService } from './mockUserProgressService';
-import curriculumStepsData from '../../public/data/curriculum-steps.json'; // Adjusted path
+import curriculumStepsData from '../../public/data/curriculum-steps.json';
 import { CurriculumStep } from '@/types/curriculum';
-import AdaptiveDifficultyEngine from './AdaptiveDifficultyEngine'; // Import the engine
+import AdaptiveDifficultyEngine from './AdaptiveDifficultyEngine';
 
 export class UniverseSessionManager {
   private currentUserId: string | null = null;
@@ -17,12 +18,10 @@ export class UniverseSessionManager {
     this.currentSessionAtomPerformance.clear(); // Reset for new session
 
     // Pre-populate atom isCompleted status based on historical objective completion
-    // This doesn't affect currentSessionAtomPerformance, which is for new interactions.
     if (this.currentUniverse) {
       for (const atom of this.currentUniverse.learningAtoms) {
         const isObjectiveHistoricallyCompleted = await mockUserProgressService.isObjectiveCompleted(userId, atom.curriculumObjectiveId);
         atom.isCompleted = isObjectiveHistoricallyCompleted;
-        // Note: atom.performance is for the *current* attempt in *this* session.
       }
     }
     console.log(`[UniverseSessionManager] Session started for user: ${userId}, universe theme: ${universe.theme}`);
@@ -34,7 +33,13 @@ export class UniverseSessionManager {
       return;
     }
 
-    const atom = this.currentUniverse.learningAtoms.find(a => a.id === atomId);
+    console.log(`[UniverseSessionManager] Recording performance for atomId: ${atomId}`, performance);
+
+    // Find the atom by atomId (might be adapted with suffix)
+    const atom = this.currentUniverse.learningAtoms.find(a => 
+      a.id === atomId || atomId.startsWith(a.id + '-')
+    );
+    
     if (!atom) {
       console.error(`[UniverseSessionManager] Atom with id ${atomId} not found in current universe to record performance.`);
       return;
@@ -68,21 +73,25 @@ export class UniverseSessionManager {
             const allObjectiveIdsInStep = stepDefinition.curriculums.map(c => c.id);
             mockUserProgressService.checkAndUpdateStepCompletion(this.currentUserId!, stepIdForObjective, allObjectiveIdsInStep);
         }
+    }).catch(error => {
+        console.error('[UniverseSessionManager] Error recording objective attempt:', error);
     });
 
-    // --- Foundation for Adaptation (Example: Suggesting difficulty for a retry) ---
-    // This part is conceptual for now, as actual retry mechanism isn't fully built.
-    if (!performance.success && performance.attempts < 3) { // Example: if failed and can retry
-        const suggestedRetryDifficulty = AdaptiveDifficultyEngine.suggestNextDifficultyOnRetry(
-            atom.difficulty,
-            performance
-            // We could also pass historical metrics for this objective if needed by the engine's rule
-        );
-        console.log(`[UniverseSessionManager] For objective ${atom.curriculumObjectiveTitle}, a retry could be at difficulty: ${suggestedRetryDifficulty}`);
-        // Next step would be to trigger UI for retry, and if user accepts,
-        // potentially call DailyUniverseGenerator to create a new atom instance for this objective
-        // with the new difficulty, and then replace/insert it into the currentUniverse.learningAtoms.
-        // This is out of scope for the current plan step's core implementation.
+    // Enhanced adaptive suggestion for potential retry scenarios
+    if (!performance.success && performance.attempts < 3) { 
+        // Get historical metrics for more informed retry suggestion
+        mockUserProgressService.getObjectiveProgress(this.currentUserId, atom.curriculumObjectiveId)
+            .then(historicalMetrics => {
+                const suggestedRetryDifficulty = AdaptiveDifficultyEngine.suggestNextDifficultyOnRetry(
+                    atom.difficulty,
+                    performance,
+                    historicalMetrics
+                );
+                console.log(`[UniverseSessionManager] For objective ${atom.curriculumObjectiveTitle}, suggested retry difficulty: ${suggestedRetryDifficulty} (Historical context: ${historicalMetrics ? 'available' : 'none'})`);
+            })
+            .catch(error => {
+                console.error('[UniverseSessionManager] Error getting historical metrics for retry suggestion:', error);
+            });
     }
   }
 
@@ -95,7 +104,6 @@ export class UniverseSessionManager {
     return null;
   }
 
-
   public getAtomPerformance(atomId: string): LearningAtomPerformance | undefined {
     return this.currentSessionAtomPerformance.get(atomId);
   }
@@ -105,20 +113,23 @@ export class UniverseSessionManager {
     return performance?.success || false;
   }
 
-
   public getCurrentUniverse(): DailyUniverse | null {
     return this.currentUniverse;
   }
 
   public endSession(): void {
-    console.log(`[UniverseSessionManager] Session ended for user: ${this.currentUserId}.`);
-    // Potentially save summary of currentSessionAtomPerformance or other cleanup
+    console.log(`[UniverseSessionManager] Session ended for user: ${this.currentUserId}. Total atoms completed: ${this.currentSessionAtomPerformance.size}`);
+    
+    // Log session summary before cleanup
+    if (this.currentSessionAtomPerformance.size > 0) {
+        const successfulAtoms = Array.from(this.currentSessionAtomPerformance.values()).filter(p => p.success).length;
+        console.log(`[UniverseSessionManager] Session summary - Successful: ${successfulAtoms}/${this.currentSessionAtomPerformance.size} atoms`);
+    }
+    
     this.currentUserId = null;
     this.currentUniverse = null;
     this.currentSessionAtomPerformance.clear();
   }
-
-  // Add other methods as needed, e.g., getCurrentAtom, nextAtom, getSessionProgressPercentage etc.
 }
 
 export default new UniverseSessionManager();
