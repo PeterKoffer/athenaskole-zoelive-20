@@ -14,11 +14,14 @@ import { AlertTriangle, CheckCircle2, Clock, Target } from 'lucide-react';
 // Test atom for testing purposes
 const createTestAtom = (objectiveId: string, difficulty: 'easy' | 'medium' | 'hard'): LearningAtom => ({
   id: `test-atom-${objectiveId}-${difficulty}`,
+  type: 'challenge',
   curriculumObjectiveId: objectiveId,
   curriculumObjectiveTitle: `Test Objective: ${objectiveId}`,
   subject: 'Mathematics',
+  narrativeContext: `Welcome to the ${difficulty} level challenge for ${objectiveId}! Let's test your skills.`,
   difficulty,
   estimatedMinutes: 5,
+  interactionType: 'game',
   content: {
     title: `Test Content: ${objectiveId}`,
     description: `This is a ${difficulty} level test question for ${objectiveId}`,
