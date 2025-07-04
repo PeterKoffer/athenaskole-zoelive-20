@@ -7,12 +7,16 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import "./index.css";
 
+// Import auth provider
+import { AuthProvider } from "@/contexts/AuthContext";
+
 // Import all pages and components
 import Index from "./pages/Index";
 import DailyProgram from "./pages/DailyProgram";
 import Auth from "./pages/Auth";
 import AdaptiveLearningDemo from "./pages/AdaptiveLearningDemo";
 import AdaptiveIntegrationTest from "./pages/AdaptiveIntegrationTest";
+import HomePage from "./pages/HomePage";
 
 // Import learning modules
 import MathematicsLearning from "./components/education/MathematicsLearning";
@@ -51,36 +55,39 @@ const root = createRoot(rootElement);
 root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/daily-program" element={<DailyProgram />} />
-            <Route path="/enhanced-daily-program" element={<EnhancedDailyProgram />} />
-            <Route path="/adaptive-learning-demo" element={<AdaptiveLearningDemo />} />
-            <Route path="/adaptive-integration-test" element={<AdaptiveIntegrationTest />} />
+      <AuthProvider>
+        <BrowserRouter>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/daily-program" element={<DailyProgram />} />
+              <Route path="/enhanced-daily-program" element={<EnhancedDailyProgram />} />
+              <Route path="/adaptive-learning-demo" element={<AdaptiveLearningDemo />} />
+              <Route path="/adaptive-integration-test" element={<AdaptiveIntegrationTest />} />
+              
+              {/* Learning module routes */}
+              <Route path="/learn/mathematics" element={<MathematicsLearning />} />
+              <Route path="/learn/english" element={<EnglishLearning />} />
+              <Route path="/learn/science" element={<ScienceLearning />} />
+              <Route path="/learn/history-religion" element={<HistoryReligionLearning />} />
+              <Route path="/learn/geography" element={<GeographyLearning />} />
+              <Route path="/learn/creative-arts" element={<CreativeLearning />} />
+              <Route path="/learn/life-essentials" element={<LifeEssentialsLearning />} />
+              <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
+              <Route path="/learn/body-lab" element={<BodyLabLearning />} />
+              <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
+              <Route path="/learn/music" element={<MusicLearning />} />
+              <Route path="/learn/language-lab" element={<LanguageLabLearning />} />
+              <Route path="/learn/universal" element={<UniversalLearning subject="Universal Learning" skillArea="General Knowledge" />} />
+            </Routes>
             
-            {/* Learning module routes */}
-            <Route path="/learn/mathematics" element={<MathematicsLearning />} />
-            <Route path="/learn/english" element={<EnglishLearning />} />
-            <Route path="/learn/science" element={<ScienceLearning />} />
-            <Route path="/learn/history-religion" element={<HistoryReligionLearning />} />
-            <Route path="/learn/geography" element={<GeographyLearning />} />
-            <Route path="/learn/creative-arts" element={<CreativeLearning />} />
-            <Route path="/learn/life-essentials" element={<LifeEssentialsLearning />} />
-            <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
-            <Route path="/learn/body-lab" element={<BodyLabLearning />} />
-            <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
-            <Route path="/learn/music" element={<MusicLearning />} />
-            <Route path="/learn/language-lab" element={<LanguageLabLearning />} />
-            <Route path="/learn/universal" element={<UniversalLearning subject="Universal Learning" skillArea="General Knowledge" />} />
-          </Routes>
-          
-          <RefactoredFloatingAITutor />
-          <Toaster />
-        </ErrorBoundary>
-      </BrowserRouter>
+            <RefactoredFloatingAITutor />
+            <Toaster />
+          </ErrorBoundary>
+        </BrowserRouter>
+      </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>
