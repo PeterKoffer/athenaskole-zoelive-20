@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { QueryDevtools } from "@tanstack/react-query-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import "./index.css";
 
@@ -11,7 +11,6 @@ import "./index.css";
 import Index from "./pages/Index";
 import DailyProgram from "./pages/DailyProgram";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
 import AdaptiveLearningDemo from "./pages/AdaptiveLearningDemo";
 import AdaptiveIntegrationTest from "./pages/AdaptiveIntegrationTest";
 
@@ -57,7 +56,6 @@ root.render(
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/daily-program" element={<DailyProgram />} />
             <Route path="/enhanced-daily-program" element={<EnhancedDailyProgram />} />
             <Route path="/adaptive-learning-demo" element={<AdaptiveLearningDemo />} />
@@ -76,14 +74,14 @@ root.render(
             <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
             <Route path="/learn/music" element={<MusicLearning />} />
             <Route path="/learn/language-lab" element={<LanguageLabLearning />} />
-            <Route path="/learn/universal" element={<UniversalLearning />} />
+            <Route path="/learn/universal" element={<UniversalLearning subject="Universal Learning" skillArea="General Knowledge" />} />
           </Routes>
           
           <RefactoredFloatingAITutor />
           <Toaster />
         </ErrorBoundary>
       </BrowserRouter>
-      <QueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>
 );

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Brain, Calendar, GameController2, Settings, TestTube2 } from "lucide-react";
+import { BookOpen, Brain, Calendar, Gamepad2, Settings, TestTube2 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Index = () => {
       description: "From mathematics to creative arts, covering all essential subjects"
     },
     {
-      icon: GameController2,
+      icon: Gamepad2,
       title: "Interactive Games",
       description: "Learn through engaging games and interactive experiences"
     },

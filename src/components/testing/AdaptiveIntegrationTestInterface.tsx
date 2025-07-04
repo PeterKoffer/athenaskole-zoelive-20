@@ -20,7 +20,7 @@ const createTestAtom = (objectiveId: string, difficulty: 'easy' | 'medium' | 'ha
   difficulty,
   estimatedMinutes: 5,
   content: {
-    type: 'multiple_choice',
+    title: `Test Content: ${objectiveId}`,
     description: `This is a ${difficulty} level test question for ${objectiveId}`,
     data: {
       question: `What is 2 + 2? (${difficulty} level)`,
