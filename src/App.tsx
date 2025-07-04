@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import HomePage from './pages/HomePage';
 import CurriculumDemo from './components/curriculum/CurriculumDemo';
 import GlobalCurriculumExplorer from './components/curriculum/GlobalCurriculumExplorer';
+import AdaptiveLearningDemo from './pages/AdaptiveLearningDemo';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/curriculum/demo" element={<CurriculumDemo />} />
             <Route path="/curriculum/global" element={<GlobalCurriculumExplorer />} />
+            <Route path="/adaptive-learning-demo" element={<AdaptiveLearningDemo />} />
           </Routes>
         </div>
       </BrowserRouter>
