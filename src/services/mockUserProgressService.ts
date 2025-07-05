@@ -91,9 +91,10 @@ const userProgressStore: Record<string, UserStepProgress[]> = {
             timestamp: new Date(Date.now() - 7200000).toISOString() // 2 hours ago
           }
         },
-        // k-cc-3: Moderate performance (should suggest medium)
+        // k-cc-3: FIXED - Completed with moderate performance (should suggest medium)
         'k-cc-3': { 
-          isCompleted: false, 
+          isCompleted: true, 
+          completedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
           totalAttempts: 3, 
           successfulAttempts: 2, 
           totalTimeSpentSeconds: 150,
