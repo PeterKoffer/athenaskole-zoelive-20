@@ -222,37 +222,37 @@ const AdaptiveTestScenarios: React.FC = () => {
     if (!results) return null;
 
     return (
-      <Card className="mt-4">
+      <Card className="mt-4 bg-white border border-gray-200">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-900">
             {icon}
             {title} - Results
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="summary">
-            <TabsList>
-              <TabsTrigger value="summary">Summary</TabsTrigger>
-              <TabsTrigger value="metrics">Session Metrics</TabsTrigger>
-              <TabsTrigger value="historical">Historical Update</TabsTrigger>
-              <TabsTrigger value="logs">Console Logs</TabsTrigger>
+            <TabsList className="bg-gray-100">
+              <TabsTrigger value="summary" className="text-gray-900">Summary</TabsTrigger>
+              <TabsTrigger value="metrics" className="text-gray-900">Session Metrics</TabsTrigger>
+              <TabsTrigger value="historical" className="text-gray-900">Historical Update</TabsTrigger>
+              <TabsTrigger value="logs" className="text-gray-900">Console Logs</TabsTrigger>
             </TabsList>
             
             <TabsContent value="summary" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold text-sm">Initial Difficulty</h4>
-                  <Badge variant="outline">{results.initialDifficulty}</Badge>
+                  <h4 className="font-semibold text-sm text-gray-900">Initial Difficulty</h4>
+                  <Badge variant="outline" className="text-gray-900">{results.initialDifficulty}</Badge>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm">Final Difficulty</h4>
-                  <Badge variant="outline">{results.finalDifficulty}</Badge>
+                  <h4 className="font-semibold text-sm text-gray-900">Final Difficulty</h4>
+                  <Badge variant="outline" className="text-gray-900">{results.finalDifficulty}</Badge>
                 </div>
               </div>
               
               {results.initialDifficulty !== results.finalDifficulty && (
-                <Alert>
-                  <AlertDescription>
+                <Alert className="border-blue-200 bg-blue-50">
+                  <AlertDescription className="text-blue-800">
                     Difficulty suggestion changed from {results.initialDifficulty} to {results.finalDifficulty}!
                   </AlertDescription>
                 </Alert>
@@ -260,13 +260,13 @@ const AdaptiveTestScenarios: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="metrics">
-              <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
+              <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto text-gray-900 border">
                 {JSON.stringify(results.sessionMetrics, null, 2)}
               </pre>
             </TabsContent>
             
             <TabsContent value="historical">
-              <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
+              <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto text-gray-900 border">
                 {JSON.stringify(results.historicalUpdate, null, 2)}
               </pre>
             </TabsContent>
@@ -274,7 +274,7 @@ const AdaptiveTestScenarios: React.FC = () => {
             <TabsContent value="logs">
               <div className="space-y-2">
                 {results.consoleLogs.map((log, index) => (
-                  <div key={index} className="font-mono text-sm bg-gray-100 p-2 rounded">
+                  <div key={index} className="font-mono text-sm bg-gray-100 p-2 rounded border text-gray-900">
                     {log}
                   </div>
                 ))}
@@ -290,9 +290,9 @@ const AdaptiveTestScenarios: React.FC = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Scenario 1: Struggling Student */}
-        <Card>
+        <Card className="bg-white border border-gray-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-gray-900">
               <TrendingDown className="w-5 h-5 text-red-500" />
               Scenario 1: Struggling Student
             </CardTitle>
@@ -325,9 +325,9 @@ const AdaptiveTestScenarios: React.FC = () => {
         </Card>
 
         {/* Scenario 2: Mastery Student */}
-        <Card>
+        <Card className="bg-white border border-gray-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-gray-900">
               <TrendingUp className="w-5 h-5 text-green-500" />
               Scenario 2: Mastery Student
             </CardTitle>
