@@ -61,7 +61,8 @@ class MockUserProgressService implements UserProgressService {
       stepProgress.curriculumProgress[objectiveId] = objectiveMetrics;
     }
 
-    objectiveMetrics.totalAttempts += performance.attempts > 0 ? performance.attempts : 1;
+    // Record this as ONE attempt (session-level), not individual interactions
+    objectiveMetrics.totalAttempts += 1;
     objectiveMetrics.totalTimeSpentSeconds += performance.timeTakenSeconds;
     objectiveMetrics.lastAttemptPerformance = performance;
 
