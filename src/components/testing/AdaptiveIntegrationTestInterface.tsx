@@ -3,514 +3,679 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/hooks/useAuth';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Brain, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  Lightbulb, 
+  RefreshCw, 
+  Play, 
+  Target,
+  Database,
+  Activity,
+  TrendingUp,
+  AlertTriangle,
+  Zap
+} from 'lucide-react';
 import { mockUserProgressService } from '@/services/mockUserProgressService';
 import AdaptiveDifficultyEngine from '@/services/AdaptiveDifficultyEngine';
 import { useAdaptiveLearningSession } from '@/hooks/useAdaptiveLearningSession';
-import { LearningAtom } from '@/types/learning';
-import { AlertTriangle, CheckCircle2, Clock, Target, Play, Pause, RotateCcw } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LearningAtom, LearningAtomPerformance } from '@/types/learning';
+import UniverseSessionManager from '@/services/UniverseSessionManager';
+import InSessionAdaptiveManager from '@/services/InSessionAdaptiveManager';
 
-// Use the specific test user ID that has historical data
 const TEST_USER_ID = '62612ab6-0c5f-4713-b716-feee788c89d9';
 
-// Test atom for testing purposes
-const createTestAtom = (objectiveId: string, difficulty: 'easy' | 'medium' | 'hard'): LearningAtom => ({
-  id: `test-atom-${objectiveId}-${difficulty}`,
-  type: 'challenge',
-  curriculumObjectiveId: objectiveId,
-  curriculumObjectiveTitle: `Test Objective: ${objectiveId}`,
-  subject: 'Mathematics',
-  narrativeContext: `Welcome to the ${difficulty} level challenge for ${objectiveId}! Let's test your skills.`,
-  difficulty,
-  estimatedMinutes: 5,
-  interactionType: 'game',
-  content: {
-    title: `Test Content: ${objectiveId}`,
-    description: `This is a ${difficulty} level test question for ${objectiveId}`,
-    data: {
-      question: `What is 2 + 2? (${difficulty} level)`,
-      options: ['3', '4', '5', '6'],
-      correctAnswer: 1,
-      explanation: 'The answer is 4 because 2 + 2 = 4'
-    }
+// Test objectives with their expected behaviors
+const TEST_OBJECTIVES = [
+  { id: 'k-cc-1', title: 'Counting 1-10', expectedDifficulty: 'hard', reason: 'Completed easily (success rate: 1.0)' },
+  { id: 'k-cc-2', title: 'Counting 11-20', expectedDifficulty: 'easy', reason: 'Multiple failures (success rate: 0.25)' },
+  { id: 'k-cc-3', title: 'Skip Counting', expectedDifficulty: 'medium', reason: 'Moderate performance (success rate: 0.67)' },
+  { id: 'dk-math-basic-arithmetic', title: 'Basic Arithmetic', expectedDifficulty: 'medium', reason: 'Good after initial struggle' },
+  { id: '1-oa-1', title: 'Addition Problems', expectedDifficulty: 'medium', reason: 'No history, default' },
+  { id: '1-oa-2', title: 'Subtraction Problems', expectedDifficulty: 'medium', reason: 'One successful attempt' }
+];
+
+// Performance simulation presets
+const PERFORMANCE_PRESETS = {
+  struggling: {
+    name: 'Struggling Student',
+    responseTime: 120,
+    hintsUsed: 3,
+    isCorrect: false,
+    icon: AlertTriangle,
+    color: 'text-red-400'
   },
-  variantId: `test-${difficulty}`,
-  isCompleted: false
-});
+  moderate: {
+    name: 'Moderate Performance',
+    responseTime: 45,
+    hintsUsed: 1,
+    isCorrect: true,
+    icon: TrendingUp,
+    color: 'text-yellow-400'
+  },
+  quickSuccess: {
+    name: 'Quick Success',
+    responseTime: 15,
+    hintsUsed: 0,
+    isCorrect: true,
+    icon: Zap,
+    color: 'text-green-400'
+  }
+};
+
+interface TestResult {
+  id: string;
+  type: string;
+  status: 'pass' | 'fail' | 'running';
+  message: string;
+  details?: any;
+  timestamp: string;
+}
 
 const AdaptiveIntegrationTestInterface: React.FC = () => {
-  const { user } = useAuth();
-  const [testResults, setTestResults] = useState<any[]>([]);
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentTest, setCurrentTest] = useState<string>('');
-  const [historicalData, setHistoricalData] = useState<any>({});
-  const [testAtom, setTestAtom] = useState<LearningAtom | null>(null);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [isRunningTests, setIsRunningTests] = useState(false);
+  const [historicalData, setHistoricalData] = useState<any>(null);
+  const [selectedObjective, setSelectedObjective] = useState<string>('');
+  const [currentAtom, setCurrentAtom] = useState<LearningAtom | null>(null);
+  const [isRunningFullLoop, setIsRunningFullLoop] = useState(false);
   
-  // Enhanced testing controls
-  const [selectedObjective, setSelectedObjective] = useState<string>('k-cc-2');
+  // Simulation controls
   const [simulationSettings, setSimulationSettings] = useState({
-    responseTime: 5,
-    hintsUsed: 0,
+    responseTime: 45,
+    hintsUsed: 1,
     isCorrect: true
   });
 
-  const availableObjectives = [
-    { id: 'k-cc-1', label: 'k-cc-1 (High performer - should start hard)' },
-    { id: 'k-cc-2', label: 'k-cc-2 (Struggling - should start easy)' },
-    { id: 'k-cc-3', label: 'k-cc-3 (Moderate - should start medium)' },
-    { id: 'dk-math-basic-arithmetic', label: 'dk-math-basic-arithmetic (Recovered - should start medium)' },
-    { id: '1-oa-1', label: '1-oa-1 (No history - should start medium)' },
-    { id: '1-oa-2', label: '1-oa-2 (One success - should start medium)' }
-  ];
+  const addTestResult = (type: string, status: 'pass' | 'fail' | 'running', message: string, details?: any) => {
+    const result: TestResult = {
+      id: `${Date.now()}-${Math.random()}`,
+      type,
+      status,
+      message,
+      details,
+      timestamp: new Date().toISOString()
+    };
+    
+    setTestResults(prev => [result, ...prev.slice(0, 19)]); // Keep last 20 results
+    return result.id;
+  };
 
-  const {
-    currentAtom,
-    isAdapting,
-    adaptationReason,
-    currentAttempt,
-    recordResponse,
-    completeSession,
-    getSessionMetrics
-  } = useAdaptiveLearningSession(testAtom);
+  const updateTestResult = (id: string, status: 'pass' | 'fail', message: string, details?: any) => {
+    setTestResults(prev => prev.map(result => 
+      result.id === id ? { ...result, status, message, details } : result
+    ));
+  };
+
+  const loadHistoricalData = async () => {
+    console.log('[Test] Loading historical data for test user:', TEST_USER_ID);
+    try {
+      const userProgress = await mockUserProgressService.getUserProgress(TEST_USER_ID);
+      const historicalObjectives: any = {};
+      
+      for (const stepProgress of userProgress) {
+        Object.assign(historicalObjectives, stepProgress.curriculumProgress);
+      }
+      
+      console.log('[Test] Loaded historical data for test user', TEST_USER_ID + ':', historicalObjectives);
+      setHistoricalData(historicalObjectives);
+      
+      addTestResult('Historical Data', 'pass', `Loaded ${Object.keys(historicalObjectives).length} historical objectives`);
+    } catch (error) {
+      console.error('[Test] Error loading historical data:', error);
+      addTestResult('Historical Data', 'fail', 'Failed to load historical data');
+    }
+  };
+
+  const testDifficultySuggestions = async () => {
+    const testId = addTestResult('Difficulty Suggestions', 'running', 'Testing difficulty suggestions for all objectives...');
+    
+    try {
+      let allPassed = true;
+      const results: any[] = [];
+      
+      for (const objective of TEST_OBJECTIVES) {
+        console.log(`[Test] Testing difficulty suggestion for ${objective.id}`);
+        
+        const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
+          TEST_USER_ID,
+          objective.id,
+          'mathematics'
+        );
+        
+        const passed = suggestedDifficulty === objective.expectedDifficulty;
+        if (!passed) allPassed = false;
+        
+        results.push({
+          objectiveId: objective.id,
+          title: objective.title,
+          expected: objective.expectedDifficulty,
+          actual: suggestedDifficulty,
+          passed,
+          reason: objective.reason
+        });
+        
+        console.log(`[Test] ${objective.id}: Expected ${objective.expectedDifficulty}, Got ${suggestedDifficulty} - ${passed ? 'PASS' : 'FAIL'}`);
+      }
+      
+      updateTestResult(
+        testId, 
+        allPassed ? 'pass' : 'fail',
+        `Difficulty suggestions: ${results.filter(r => r.passed).length}/${results.length} passed`,
+        results
+      );
+    } catch (error) {
+      console.error('[Test] Error testing difficulty suggestions:', error);
+      updateTestResult(testId, 'fail', 'Error testing difficulty suggestions');
+    }
+  };
+
+  const startFullLoopTest = async () => {
+    if (!selectedObjective) {
+      addTestResult('Full Loop Test', 'fail', 'Please select an objective first');
+      return;
+    }
+
+    setIsRunningFullLoop(true);
+    const testId = addTestResult('Full Loop Test', 'running', `Starting full loop test for ${selectedObjective}...`);
+
+    try {
+      console.log(`[Test] Starting full loop test for objective: ${selectedObjective}`);
+      
+      // Step 1: Get initial difficulty suggestion
+      const initialDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
+        TEST_USER_ID,
+        selectedObjective,
+        'mathematics'
+      );
+      
+      console.log(`[Test] Initial difficulty suggestion for ${selectedObjective}: ${initialDifficulty}`);
+      
+      // Step 2: Create a test atom
+      const testAtom: LearningAtom = {
+        id: `test-atom-${selectedObjective}-${Date.now()}`,
+        curriculumObjectiveId: selectedObjective,
+        curriculumObjectiveTitle: TEST_OBJECTIVES.find(obj => obj.id === selectedObjective)?.title || selectedObjective,
+        subject: 'mathematics',
+        difficulty: initialDifficulty,
+        atomType: 'multiple-choice',
+        content: {
+          question: `Test question for ${selectedObjective}`,
+          options: ['Option A', 'Option B', 'Option C', 'Option D'],
+          correctAnswer: 0,
+          explanation: 'This is a test explanation',
+          data: {}
+        },
+        estimatedDuration: 60,
+        isCompleted: false
+      };
+      
+      setCurrentAtom(testAtom);
+      
+      // Step 3: Start InSessionAdaptiveManager session
+      InSessionAdaptiveManager.startAtomSession(testAtom.id);
+      console.log(`[Test] Started InSessionAdaptiveManager session for atom: ${testAtom.id}`);
+      
+      updateTestResult(testId, 'pass', `Full loop test ready for ${selectedObjective} at ${initialDifficulty} difficulty`);
+      
+    } catch (error) {
+      console.error('[Test] Error starting full loop test:', error);
+      updateTestResult(testId, 'fail', 'Error starting full loop test');
+      setIsRunningFullLoop(false);
+    }
+  };
+
+  const simulateUserResponse = () => {
+    if (!currentAtom) {
+      addTestResult('Simulation', 'fail', 'No active atom to simulate response for');
+      return;
+    }
+
+    const testId = addTestResult('Simulation', 'running', 'Simulating user response...');
+    
+    try {
+      console.log('[Test] Simulating user response with settings:', simulationSettings);
+      
+      // Record interaction with InSessionAdaptiveManager
+      InSessionAdaptiveManager.recordAtomInteraction(
+        currentAtom.id,
+        simulationSettings.isCorrect,
+        simulationSettings.responseTime,
+        simulationSettings.hintsUsed
+      );
+      
+      console.log(`[Test] Recorded interaction for ${currentAtom.id}: correct=${simulationSettings.isCorrect}, time=${simulationSettings.responseTime}s, hints=${simulationSettings.hintsUsed}`);
+      
+      // Check for adaptation suggestions
+      const adaptationCheck = InSessionAdaptiveManager.shouldAdaptAtomDifficulty(currentAtom.id);
+      console.log('[Test] Adaptation check result:', adaptationCheck);
+      
+      let message = `Response simulated: ${simulationSettings.isCorrect ? 'Correct' : 'Incorrect'}, ${simulationSettings.responseTime}s, ${simulationSettings.hintsUsed} hints`;
+      
+      if (adaptationCheck.shouldAdapt) {
+        message += ` | ADAPTATION TRIGGERED: ${adaptationCheck.reason} → ${adaptationCheck.newDifficulty}`;
+        
+        // Generate adapted atom
+        if (adaptationCheck.newDifficulty && adaptationCheck.contentModifications) {
+          const adaptedAtom = InSessionAdaptiveManager.generateAdaptiveAtomVariant(
+            currentAtom,
+            adaptationCheck.newDifficulty,
+            adaptationCheck.contentModifications
+          );
+          setCurrentAtom(adaptedAtom);
+          console.log('[Test] Generated adapted atom:', adaptedAtom.id);
+        }
+      }
+      
+      updateTestResult(testId, 'pass', message);
+      
+    } catch (error) {
+      console.error('[Test] Error simulating response:', error);
+      updateTestResult(testId, 'fail', 'Error simulating response');
+    }
+  };
+
+  const completeAndTestPersistence = async () => {
+    if (!currentAtom) {
+      addTestResult('Persistence Test', 'fail', 'No active atom to complete');
+      return;
+    }
+
+    const testId = addTestResult('Persistence Test', 'running', 'Completing atom and testing persistence...');
+    
+    try {
+      console.log('[Test] Completing atom and testing persistence for:', currentAtom.id);
+      
+      // End InSessionAdaptiveManager session
+      const performance = InSessionAdaptiveManager.endAtomSession(currentAtom.id);
+      console.log('[Test] Final performance from InSessionAdaptiveManager:', performance);
+      
+      if (performance) {
+        // Record with UniverseSessionManager
+        UniverseSessionManager.recordAtomPerformance(currentAtom.id, performance);
+        console.log('[Test] Recorded performance with UniverseSessionManager');
+        
+        // Test persistence by getting updated difficulty suggestion
+        const updatedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
+          TEST_USER_ID,
+          currentAtom.curriculumObjectiveId,
+          'mathematics'
+        );
+        
+        console.log(`[Test] Updated difficulty suggestion for ${currentAtom.curriculumObjectiveId}: ${updatedDifficulty}`);
+        
+        updateTestResult(testId, 'pass', `Atom completed and persisted. Updated difficulty: ${updatedDifficulty}`, {
+          performance,
+          updatedDifficulty
+        });
+      } else {
+        updateTestResult(testId, 'fail', 'No performance data returned from session');
+      }
+      
+      // Reset for next test
+      setCurrentAtom(null);
+      setIsRunningFullLoop(false);
+      await loadHistoricalData(); // Refresh historical data
+      
+    } catch (error) {
+      console.error('[Test] Error completing and testing persistence:', error);
+      updateTestResult(testId, 'fail', 'Error completing and testing persistence');
+    }
+  };
+
+  const runAllTests = async () => {
+    setIsRunningTests(true);
+    setTestResults([]);
+    
+    await loadHistoricalData();
+    await testDifficultySuggestions();
+    
+    setIsRunningTests(false);
+  };
+
+  const applyPreset = (presetKey: keyof typeof PERFORMANCE_PRESETS) => {
+    const preset = PERFORMANCE_PRESETS[presetKey];
+    setSimulationSettings({
+      responseTime: preset.responseTime,
+      hintsUsed: preset.hintsUsed,
+      isCorrect: preset.isCorrect
+    });
+  };
 
   useEffect(() => {
     loadHistoricalData();
   }, []);
 
-  const loadHistoricalData = async () => {
-    try {
-      const progress = await mockUserProgressService.getUserProgress(TEST_USER_ID);
-      const objectiveData: any = {};
-      
-      for (const stepProgress of progress) {
-        for (const [objId, metrics] of Object.entries(stepProgress.curriculumProgress)) {
-          objectiveData[objId] = metrics;
-        }
-      }
-      
-      setHistoricalData(objectiveData);
-      console.log(`[Test] Loaded historical data for test user ${TEST_USER_ID}:`, objectiveData);
-    } catch (error) {
-      console.error('Error loading historical data:', error);
-    }
-  };
-
-  const addTestResult = (testName: string, success: boolean, details: any) => {
-    setTestResults(prev => [...prev, {
-      testName,
-      success,
-      details,
-      timestamp: new Date().toISOString()
-    }]);
-  };
-
-  const runTest1_HistoricalDifficultyInitialization = async () => {
-    setCurrentTest('Historical Difficulty Initialization');
-    
-    try {
-      const testObjectives = [
-        { id: 'k-cc-1', expectedBehavior: 'Should suggest hard (completed easily)' },
-        { id: 'k-cc-2', expectedBehavior: 'Should suggest easy (multiple failures)' },
-        { id: 'k-cc-3', expectedBehavior: 'Should suggest medium (moderate performance)' },
-        { id: 'dk-math-basic-arithmetic', expectedBehavior: 'Should suggest medium/hard (high performance after struggle)' },
-        { id: 'new-objective-test', expectedBehavior: 'Should default to medium (no history)' }
-      ];
-
-      for (const testObj of testObjectives) {
-        console.log(`[Test] Testing difficulty suggestion for objective: ${testObj.id}`);
-        
-        const historicalMetrics = await mockUserProgressService.getObjectiveProgress(TEST_USER_ID, testObj.id);
-        console.log(`[Test] Historical metrics for ${testObj.id}:`, historicalMetrics);
-        
-        const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
-          TEST_USER_ID,
-          testObj.id,
-          'Mathematics'
-        );
-
-        addTestResult(`Difficulty Suggestion for ${testObj.id}`, true, {
-          objectiveId: testObj.id,
-          suggestedDifficulty,
-          historicalMetrics,
-          expectedBehavior: testObj.expectedBehavior,
-          hasHistory: !!historicalMetrics,
-          successRate: historicalMetrics?.successRate || 'N/A',
-          isCompleted: historicalMetrics?.isCompleted || false
-        });
-      }
-
-    } catch (error) {
-      addTestResult('Historical Difficulty Initialization', false, { error: error.message });
-    }
-  };
-
-  const runTest2_StartAdaptiveSession = async () => {
-    setCurrentTest('Starting Adaptive Session');
-    
-    try {
-      console.log(`[Test] Starting adaptive session for objective: ${selectedObjective}`);
-      
-      const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
-        TEST_USER_ID,
-        selectedObjective,
-        'Mathematics'
-      );
-      
-      const atom = createTestAtom(selectedObjective, suggestedDifficulty);
-      setTestAtom(atom);
-
-      addTestResult('Adaptive Session Started', true, {
-        objectiveId: selectedObjective,
-        suggestedDifficulty,
-        atomId: atom.id,
-        atomDifficulty: atom.difficulty,
-        reasoning: 'Session initialized with historically-informed difficulty'
-      });
-
-    } catch (error) {
-      addTestResult('Start Adaptive Session', false, { error: error.message });
-    }
-  };
-
-  const simulateUserResponse = () => {
-    if (currentAtom) {
-      const { responseTime, hintsUsed, isCorrect } = simulationSettings;
-      
-      console.log(`[Test] Simulating response - Correct: ${isCorrect}, Time: ${responseTime}s, Hints: ${hintsUsed}`);
-      
-      recordResponse(isCorrect, hintsUsed);
-      
-      addTestResult('User Response Simulated', true, {
-        atomId: currentAtom.id,
-        attempt: currentAttempt,
-        isCorrect,
-        responseTime,
-        hintsUsed,
-        isAdapting,
-        adaptationReason
-      });
-    }
-  };
-
-  const runTest3_CompletionAndPersistence = async () => {
-    if (!currentAtom) return;
-    
-    setCurrentTest('Completion and Persistence');
-    
-    try {
-      const performance = completeSession();
-      
-      if (performance) {
-        addTestResult('Session Completion', true, {
-          atomId: currentAtom.id,
-          performance,
-          objectiveId: currentAtom.curriculumObjectiveId
-        });
-
-        // Wait for persistence to complete, then check historical data
-        setTimeout(async () => {
-          await loadHistoricalData();
-          const updatedMetrics = historicalData[currentAtom.curriculumObjectiveId];
-          
-          addTestResult('Historical Data Update', true, {
-            objectiveId: currentAtom.curriculumObjectiveId,
-            updatedMetrics,
-            performanceRecorded: performance
-          });
-          
-          // Test if future difficulty suggestions have changed
-          setTimeout(async () => {
-            const newSuggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
-              TEST_USER_ID,
-              currentAtom.curriculumObjectiveId,
-              'Mathematics'
-            );
-            
-            addTestResult('Future Difficulty Influence', true, {
-              objectiveId: currentAtom.curriculumObjectiveId,
-              newSuggestedDifficulty,
-              previousDifficulty: currentAtom.difficulty,
-              influenceDetected: newSuggestedDifficulty !== currentAtom.difficulty
-            });
-          }, 1000);
-        }, 2000);
-      }
-
-    } catch (error) {
-      addTestResult('Completion and Persistence', false, { error: error.message });
-    }
-  };
-
-  const runFullAdaptiveLoopTest = async () => {
-    setIsRunning(true);
-    setTestResults([]);
-    
-    console.log(`[Test] Starting full adaptive loop test with objective: ${selectedObjective}`);
-    
-    // Step 1: Historical difficulty
-    await runTest1_HistoricalDifficultyInitialization();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Step 2: Start session
-    await runTest2_StartAdaptiveSession();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsRunning(false);
-  };
-
-  const resetTest = () => {
-    setTestAtom(null);
-    setTestResults([]);
-    setCurrentTest('');
-  };
-
-  const TestResultCard = ({ result }: { result: any }) => (
-    <Card className={`mb-2 ${result.success ? 'border-green-500' : 'border-red-500'}`}>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm flex items-center gap-2">
-            {result.success ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <AlertTriangle className="w-4 h-4 text-red-500" />}
-            {result.testName}
-          </CardTitle>
-          <Badge variant={result.success ? 'default' : 'destructive'}>
-            {result.success ? 'PASS' : 'FAIL'}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-32">
-          {JSON.stringify(result.details, null, 2)}
-        </pre>
-      </CardContent>
-    </Card>
-  );
-
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            Full Adaptive Learning Loop Integration Test
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 p-3 bg-blue-50 rounded">
-            <p className="text-sm font-medium">Test Configuration:</p>
-            <p className="text-xs text-gray-600">Test User ID: {TEST_USER_ID}</p>
-            <p className="text-xs text-gray-600">Auth User: {user?.id || 'Not logged in'}</p>
-            <p className="text-xs text-gray-600">Historical Objectives: {Object.keys(historicalData).length}</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <Label htmlFor="objective-select">Select Objective for Testing</Label>
-              <Select value={selectedObjective} onValueChange={setSelectedObjective}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose objective" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableObjectives.map(obj => (
-                    <SelectItem key={obj.id} value={obj.id}>{obj.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={runFullAdaptiveLoopTest} disabled={isRunning}>
-                {isRunning ? 'Running...' : 'Start Full Loop Test'}
-              </Button>
-              <Button onClick={resetTest} variant="outline">
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reset
-              </Button>
-            </div>
-          </div>
-          
-          {currentTest && (
-            <div className="mb-4 p-2 bg-blue-50 rounded flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Currently running: {currentTest}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="results" className="w-full">
-        <TabsList>
-          <TabsTrigger value="results">Test Results</TabsTrigger>
-          <TabsTrigger value="session">Active Session</TabsTrigger>
-          <TabsTrigger value="simulation">Simulation Controls</TabsTrigger>
-          <TabsTrigger value="historical">Historical Data</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="results">
-          <Card>
-            <CardHeader>
-              <CardTitle>Test Results ({testResults.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {testResults.length === 0 ? (
-                <p className="text-gray-500">No test results yet. Run the test suite to see results.</p>
-              ) : (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {testResults.map((result, index) => (
-                    <TestResultCard key={index} result={result} />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="session">
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Adaptive Session</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentAtom ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-semibold">Current Atom</h4>
-                      <p className="text-sm">ID: {currentAtom.id}</p>
-                      <p className="text-sm">Objective: {currentAtom.curriculumObjectiveId}</p>
-                      <p className="text-sm">Difficulty: {currentAtom.difficulty}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">Session State</h4>
-                      <p className="text-sm">Attempt: {currentAttempt}</p>
-                      <p className="text-sm">Adapting: {isAdapting ? 'Yes' : 'No'}</p>
-                      {adaptationReason && <p className="text-sm">Reason: {adaptationReason}</p>}
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2 flex-wrap">
-                    <Button onClick={simulateUserResponse} size="sm" variant="outline">
-                      Simulate Response
-                    </Button>
-                    <Button 
-                      onClick={runTest3_CompletionAndPersistence} 
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      Complete & Test Persistence
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">No active session. Run the full loop test to start a session.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="simulation">
-          <Card>
-            <CardHeader>
-              <CardTitle>Simulation Controls</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="response-time">Response Time (seconds)</Label>
-                  <Input
-                    id="response-time"
-                    type="number"
-                    value={simulationSettings.responseTime}
-                    onChange={(e) => setSimulationSettings(prev => ({
-                      ...prev,
-                      responseTime: parseInt(e.target.value) || 5
-                    }))}
-                    min="1"
-                    max="120"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="hints-used">Hints Used</Label>
-                  <Input
-                    id="hints-used"
-                    type="number"
-                    value={simulationSettings.hintsUsed}
-                    onChange={(e) => setSimulationSettings(prev => ({
-                      ...prev,
-                      hintsUsed: parseInt(e.target.value) || 0
-                    }))}
-                    min="0"
-                    max="5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="is-correct">Response Correctness</Label>
-                  <Select 
-                    value={simulationSettings.isCorrect.toString()} 
-                    onValueChange={(value) => setSimulationSettings(prev => ({
-                      ...prev,
-                      isCorrect: value === 'true'
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Correct</SelectItem>
-                      <SelectItem value="false">Incorrect</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="bg-gray-700">
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Brain className="w-6 h-6 text-blue-400" />
+              Adaptive Learning Integration Test Suite
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="bg-gray-800 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-700 rounded-lg">
+              <div>
+                <Label className="text-gray-300">Test User ID:</Label>
+                <p className="text-sm font-mono text-blue-300">{TEST_USER_ID}</p>
               </div>
-              
-              <div className="mt-4 p-3 bg-gray-50 rounded">
-                <h4 className="font-semibold mb-2">Quick Simulation Presets:</h4>
-                <div className="flex gap-2 flex-wrap">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => setSimulationSettings({ responseTime: 2, hintsUsed: 0, isCorrect: true })}
-                  >
-                    Quick Success
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => setSimulationSettings({ responseTime: 30, hintsUsed: 2, isCorrect: false })}
-                  >
-                    Struggling
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => setSimulationSettings({ responseTime: 8, hintsUsed: 1, isCorrect: true })}
-                  >
-                    Moderate Success
-                  </Button>
-                </div>
+              <div>
+                <Label className="text-gray-300">Auth User:</Label>
+                <p className="text-sm text-gray-400">Not logged in</p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="historical">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historical Data (Test User: {TEST_USER_ID})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={loadHistoricalData} className="mb-4" size="sm">
+              <div>
+                <Label className="text-gray-300">Historical Objectives:</Label>
+                <p className="text-sm text-green-400">{historicalData ? Object.keys(historicalData).length : 'Loading...'}</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              <Button 
+                onClick={runAllTests} 
+                disabled={isRunningTests}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {isRunningTests && <RefreshCw className="w-4 h-4 mr-2 animate-spin" />}
+                Run All Tests
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={loadHistoricalData}
+                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              >
+                <Database className="w-4 h-4 mr-2" />
                 Refresh Historical Data
               </Button>
-              <pre className="text-xs bg-gray-100 p-4 rounded overflow-auto max-h-96">
-                {JSON.stringify(historicalData, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="results" className="space-y-6">
+          <TabsList className="bg-gray-800 border-gray-700">
+            <TabsTrigger value="results" className="data-[state=active]:bg-gray-700 data-[state=active]:text-white">Test Results</TabsTrigger>
+            <TabsTrigger value="session" className="data-[state=active]:bg-gray-700 data-[state=active]:text-white">Active Session</TabsTrigger>
+            <TabsTrigger value="historical" className="data-[state=active]:bg-gray-700 data-[state=active]:text-white">Historical Data</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="results">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="bg-gray-700">
+                <CardTitle className="text-white">Test Results ({testResults.length})</CardTitle>
+              </CardHeader>
+              <CardContent className="bg-gray-800 space-y-3 max-h-96 overflow-y-auto">
+                {testResults.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">
+                    <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No test results yet. Run some tests to see results here.</p>
+                  </div>
+                ) : (
+                  testResults.map((result) => (
+                    <div key={result.id} className="border border-gray-700 rounded-lg p-4 bg-gray-750">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {result.status === 'pass' && <CheckCircle className="w-5 h-5 text-green-400" />}
+                          {result.status === 'fail' && <XCircle className="w-5 h-5 text-red-400" />}
+                          {result.status === 'running' && <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" />}
+                          <Badge 
+                            variant={result.status === 'pass' ? 'default' : result.status === 'fail' ? 'destructive' : 'secondary'}
+                            className={
+                              result.status === 'pass' ? 'bg-green-900 text-green-300' :
+                              result.status === 'fail' ? 'bg-red-900 text-red-300' :
+                              'bg-blue-900 text-blue-300'
+                            }
+                          >
+                            {result.status.toUpperCase()}
+                          </Badge>
+                          <span className="font-medium text-white">{result.type}</span>
+                        </div>
+                        <span className="text-xs text-gray-400">
+                          {new Date(result.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="text-gray-300 mb-2">{result.message}</p>
+                      {result.details && (
+                        <details className="text-xs text-gray-400">
+                          <summary className="cursor-pointer hover:text-gray-300">Show details</summary>
+                          <pre className="mt-2 p-2 bg-gray-900 rounded overflow-x-auto">
+                            {JSON.stringify(result.details, null, 2)}
+                          </pre>
+                        </details>
+                      )}
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="session">
+            <div className="space-y-6">
+              {/* Objective Selection */}
+              <Card className="bg-gray-800 border-gray-700">
+                <CardHeader className="bg-gray-700">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <Target className="w-5 h-5 text-purple-400" />
+                    Full Loop Test Setup
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="bg-gray-800 space-y-4">
+                  <div>
+                    <Label className="text-gray-300">Select Objective for Testing:</Label>
+                    <Select value={selectedObjective} onValueChange={setSelectedObjective}>
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                        <SelectValue placeholder="Choose an objective to test..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-700 border-gray-600">
+                        {TEST_OBJECTIVES.map(obj => (
+                          <SelectItem key={obj.id} value={obj.id} className="text-white hover:bg-gray-600">
+                            <div>
+                              <div className="font-medium">{obj.title} ({obj.id})</div>
+                              <div className="text-xs text-gray-400">Expected: {obj.expectedDifficulty} - {obj.reason}</div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <Button 
+                    onClick={startFullLoopTest} 
+                    disabled={!selectedObjective || isRunningFullLoop}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Full Loop Test
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Active Session */}
+              {currentAtom && (
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardHeader className="bg-gray-700">
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Activity className="w-5 h-5 text-green-400" />
+                      Active Learning Atom
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="bg-gray-800 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-300">Atom ID:</Label>
+                        <p className="text-sm font-mono text-blue-300">{currentAtom.id}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">Difficulty:</Label>
+                        <Badge className="ml-2 bg-orange-900 text-orange-300">{currentAtom.difficulty.toUpperCase()}</Badge>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">Objective:</Label>
+                        <p className="text-sm text-gray-300">{currentAtom.curriculumObjectiveTitle}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">Subject:</Label>
+                        <p className="text-sm text-gray-300">{currentAtom.subject}</p>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-gray-600" />
+
+                    {/* Performance Simulation Controls */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-white">Simulation Controls</h4>
+                      
+                      {/* Presets */}
+                      <div className="flex gap-2 flex-wrap">
+                        {Object.entries(PERFORMANCE_PRESETS).map(([key, preset]) => {
+                          const Icon = preset.icon;
+                          return (
+                            <Button
+                              key={key}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => applyPreset(key as keyof typeof PERFORMANCE_PRESETS)}
+                              className={`border-gray-600 hover:bg-gray-700 ${preset.color}`}
+                            >
+                              <Icon className="w-4 h-4 mr-2" />
+                              {preset.name}
+                            </Button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Manual Controls */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-gray-300">Response Time (seconds)</Label>
+                          <Input
+                            type="number"
+                            value={simulationSettings.responseTime}
+                            onChange={(e) => setSimulationSettings(prev => ({
+                              ...prev,
+                              responseTime: parseInt(e.target.value) || 0
+                            }))}
+                            className="bg-gray-700 border-gray-600 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-gray-300">Hints Used</Label>
+                          <Input
+                            type="number"
+                            value={simulationSettings.hintsUsed}
+                            onChange={(e) => setSimulationSettings(prev => ({
+                              ...prev,
+                              hintsUsed: parseInt(e.target.value) || 0
+                            }))}
+                            className="bg-gray-700 border-gray-600 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-gray-300">Correctness</Label>
+                          <Select 
+                            value={simulationSettings.isCorrect.toString()} 
+                            onValueChange={(value) => setSimulationSettings(prev => ({
+                              ...prev,
+                              isCorrect: value === 'true'
+                            }))}
+                          >
+                            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-700 border-gray-600">
+                              <SelectItem value="true" className="text-white hover:bg-gray-600">Correct</SelectItem>
+                              <SelectItem value="false" className="text-white hover:bg-gray-600">Incorrect</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-4">
+                        <Button onClick={simulateUserResponse} className="bg-green-600 hover:bg-green-700">
+                          <Activity className="w-4 h-4 mr-2" />
+                          Simulate Response
+                        </Button>
+                        <Button onClick={completeAndTestPersistence} variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Complete & Test Persistence
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="historical">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="bg-gray-700">
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Database className="w-5 h-5 text-indigo-400" />
+                  Historical Performance Data
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="bg-gray-800">
+                {historicalData ? (
+                  <div className="space-y-4">
+                    {Object.entries(historicalData).map(([objectiveId, data]: [string, any]) => (
+                      <div key={objectiveId} className="border border-gray-700 rounded-lg p-4 bg-gray-750">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-medium text-white">{objectiveId}</h4>
+                          <Badge 
+                            variant={data.isCompleted ? 'default' : 'secondary'}
+                            className={data.isCompleted ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}
+                          >
+                            {data.isCompleted ? 'Completed' : 'In Progress'}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <Label className="text-gray-400">Success Rate</Label>
+                            <p className="text-white">{((data.successRate || 0) * 100).toFixed(1)}%</p>
+                          </div>
+                          <div>
+                            <Label className="text-gray-400">Attempts</Label>
+                            <p className="text-white">{data.totalAttempts}</p>
+                          </div>
+                          <div>
+                            <Label className="text-gray-400">Avg Time</Label>
+                            <p className="text-white">{data.avgTimeSpentSeconds || 0}s</p>
+                          </div>
+                          <div>
+                            <Label className="text-gray-400">Last Attempt</Label>
+                            <p className="text-white">
+                              {data.lastAttemptPerformance?.success ? 
+                                <CheckCircle className="w-4 h-4 inline text-green-400" /> : 
+                                <XCircle className="w-4 h-4 inline text-red-400" />
+                              }
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <Database className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Loading historical data...</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
