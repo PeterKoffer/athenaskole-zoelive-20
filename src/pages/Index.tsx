@@ -35,8 +35,13 @@ const Index = () => {
       {/* Navigation */}
       <nav className="flex justify-between items-center p-6 max-w-6xl mx-auto">
         <div className="flex items-center space-x-2">
+          <img 
+            src="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png"
+            alt="Nelie AI Tutor Robot"
+            className="w-8 h-8 object-contain"
+          />
           <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            StudyPug Kids
+            NELIE
           </div>
         </div>
         <div className="flex space-x-4">
@@ -53,11 +58,11 @@ const Index = () => {
       <div className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            The Future of Learning
+            Meet NELIE
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Discover personalized, AI-powered education that adapts to every child's unique learning journey. 
-            Make learning fun, engaging, and effective.
+            Your AI-powered learning companion that adapts to every child's unique learning journey. 
+            Make learning fun, engaging, and effective with personalized education.
           </p>
           <div className="flex justify-center space-x-4">
             <Button size="lg" onClick={() => navigate('/daily-program')} className="bg-purple-600 hover:bg-purple-700">
@@ -127,7 +132,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-white/10 mt-20 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center text-gray-400">
-          <p>&copy; 2024 StudyPug Kids. Empowering the next generation of learners.</p>
+          <p>&copy; 2024 NELIE. Empowering the next generation of learners with AI.</p>
         </div>
       </footer>
     </div>
