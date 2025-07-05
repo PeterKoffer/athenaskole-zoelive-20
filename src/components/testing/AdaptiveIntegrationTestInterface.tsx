@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,10 @@ import { mockUserProgressService } from '@/services/mockUserProgressService';
 import AdaptiveDifficultyEngine from '@/services/AdaptiveDifficultyEngine';
 import { useAdaptiveLearningSession } from '@/hooks/useAdaptiveLearningSession';
 import { LearningAtom } from '@/types/learning';
-import { AlertTriangle, CheckCircle2, Clock, Target } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, Target, Play, Pause, RotateCcw } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Use the specific test user ID that has historical data
 const TEST_USER_ID = '62612ab6-0c5f-4713-b716-feee788c89d9';
@@ -45,6 +49,23 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
   const [currentTest, setCurrentTest] = useState<string>('');
   const [historicalData, setHistoricalData] = useState<any>({});
   const [testAtom, setTestAtom] = useState<LearningAtom | null>(null);
+  
+  // Enhanced testing controls
+  const [selectedObjective, setSelectedObjective] = useState<string>('k-cc-2');
+  const [simulationSettings, setSimulationSettings] = useState({
+    responseTime: 5,
+    hintsUsed: 0,
+    isCorrect: true
+  });
+
+  const availableObjectives = [
+    { id: 'k-cc-1', label: 'k-cc-1 (High performer - should start hard)' },
+    { id: 'k-cc-2', label: 'k-cc-2 (Struggling - should start easy)' },
+    { id: 'k-cc-3', label: 'k-cc-3 (Moderate - should start medium)' },
+    { id: 'dk-math-basic-arithmetic', label: 'dk-math-basic-arithmetic (Recovered - should start medium)' },
+    { id: '1-oa-1', label: '1-oa-1 (No history - should start medium)' },
+    { id: '1-oa-2', label: '1-oa-2 (One success - should start medium)' }
+  ];
 
   const {
     currentAtom,
@@ -62,7 +83,6 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
 
   const loadHistoricalData = async () => {
     try {
-      // Always use the test user ID to load historical data
       const progress = await mockUserProgressService.getUserProgress(TEST_USER_ID);
       const objectiveData: any = {};
       
@@ -92,7 +112,6 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
     setCurrentTest('Historical Difficulty Initialization');
     
     try {
-      // Test objectives with different historical patterns using the test user ID
       const testObjectives = [
         { id: 'k-cc-1', expectedBehavior: 'Should suggest hard (completed easily)' },
         { id: 'k-cc-2', expectedBehavior: 'Should suggest easy (multiple failures)' },
@@ -104,11 +123,9 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
       for (const testObj of testObjectives) {
         console.log(`[Test] Testing difficulty suggestion for objective: ${testObj.id}`);
         
-        // First, verify the historical data exists
         const historicalMetrics = await mockUserProgressService.getObjectiveProgress(TEST_USER_ID, testObj.id);
         console.log(`[Test] Historical metrics for ${testObj.id}:`, historicalMetrics);
         
-        // Then get the difficulty suggestion
         const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
           TEST_USER_ID,
           testObj.id,
@@ -131,60 +148,48 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
     }
   };
 
-  const runTest2_AdaptiveSessionFlow = async () => {
-    setCurrentTest('Adaptive Session Flow');
+  const runTest2_StartAdaptiveSession = async () => {
+    setCurrentTest('Starting Adaptive Session');
     
     try {
-      // Create a test atom with the objective that has struggling history
-      const testObj = 'k-cc-2'; // This has multiple failed attempts in mock data
+      console.log(`[Test] Starting adaptive session for objective: ${selectedObjective}`);
+      
       const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
         TEST_USER_ID,
-        testObj,
+        selectedObjective,
         'Mathematics'
       );
       
-      const atom = createTestAtom(testObj, suggestedDifficulty);
+      const atom = createTestAtom(selectedObjective, suggestedDifficulty);
       setTestAtom(atom);
 
-      addTestResult('Session Initialization with Adaptive Difficulty', true, {
-        atomId: atom.id,
-        objectiveId: atom.curriculumObjectiveId,
+      addTestResult('Adaptive Session Started', true, {
+        objectiveId: selectedObjective,
         suggestedDifficulty,
-        actualDifficulty: atom.difficulty,
-        reasoning: 'Difficulty suggested based on historical performance'
+        atomId: atom.id,
+        atomDifficulty: atom.difficulty,
+        reasoning: 'Session initialized with historically-informed difficulty'
       });
-
-      // Wait a moment for session to initialize
-      setTimeout(() => {
-        addTestResult('Session Ready for Interaction', true, {
-          currentAtom: currentAtom?.id,
-          sessionMetrics: getSessionMetrics()
-        });
-      }, 1000);
 
     } catch (error) {
-      addTestResult('Adaptive Session Flow', false, { error: error.message });
+      addTestResult('Start Adaptive Session', false, { error: error.message });
     }
   };
 
-  const simulateCorrectResponse = () => {
+  const simulateUserResponse = () => {
     if (currentAtom) {
-      recordResponse(true, 0); // Correct answer, no hints
-      addTestResult('Simulated Correct Response', true, {
+      const { responseTime, hintsUsed, isCorrect } = simulationSettings;
+      
+      console.log(`[Test] Simulating response - Correct: ${isCorrect}, Time: ${responseTime}s, Hints: ${hintsUsed}`);
+      
+      recordResponse(isCorrect, hintsUsed);
+      
+      addTestResult('User Response Simulated', true, {
         atomId: currentAtom.id,
         attempt: currentAttempt,
-        isAdapting,
-        adaptationReason
-      });
-    }
-  };
-
-  const simulateIncorrectResponse = () => {
-    if (currentAtom) {
-      recordResponse(false, 2); // Incorrect answer, used 2 hints
-      addTestResult('Simulated Incorrect Response', true, {
-        atomId: currentAtom.id,
-        attempt: currentAttempt,
+        isCorrect,
+        responseTime,
+        hintsUsed,
         isAdapting,
         adaptationReason
       });
@@ -216,6 +221,22 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
             updatedMetrics,
             performanceRecorded: performance
           });
+          
+          // Test if future difficulty suggestions have changed
+          setTimeout(async () => {
+            const newSuggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
+              TEST_USER_ID,
+              currentAtom.curriculumObjectiveId,
+              'Mathematics'
+            );
+            
+            addTestResult('Future Difficulty Influence', true, {
+              objectiveId: currentAtom.curriculumObjectiveId,
+              newSuggestedDifficulty,
+              previousDifficulty: currentAtom.difficulty,
+              influenceDetected: newSuggestedDifficulty !== currentAtom.difficulty
+            });
+          }, 1000);
         }, 2000);
       }
 
@@ -224,21 +245,27 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
     }
   };
 
-  const runAllTests = async () => {
+  const runFullAdaptiveLoopTest = async () => {
     setIsRunning(true);
     setTestResults([]);
     
-    console.log(`[Test] Starting integration tests with test user ID: ${TEST_USER_ID}`);
+    console.log(`[Test] Starting full adaptive loop test with objective: ${selectedObjective}`);
     
+    // Step 1: Historical difficulty
     await runTest1_HistoricalDifficultyInitialization();
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    await runTest2_AdaptiveSessionFlow();
+    // Step 2: Start session
+    await runTest2_StartAdaptiveSession();
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Tests 3 will be run manually after user interactions
-    
     setIsRunning(false);
+  };
+
+  const resetTest = () => {
+    setTestAtom(null);
+    setTestResults([]);
+    setCurrentTest('');
   };
 
   const TestResultCard = ({ result }: { result: any }) => (
@@ -268,7 +295,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="w-5 h-5" />
-            Adaptive Learning Integration Test Suite
+            Full Adaptive Learning Loop Integration Test
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -279,14 +306,31 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
             <p className="text-xs text-gray-600">Historical Objectives: {Object.keys(historicalData).length}</p>
           </div>
           
-          <div className="flex gap-2 mb-4">
-            <Button onClick={runAllTests} disabled={isRunning}>
-              {isRunning ? 'Running Tests...' : 'Run All Tests'}
-            </Button>
-            <Button onClick={loadHistoricalData} variant="outline">
-              Refresh Historical Data
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <Label htmlFor="objective-select">Select Objective for Testing</Label>
+              <Select value={selectedObjective} onValueChange={setSelectedObjective}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose objective" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableObjectives.map(obj => (
+                    <SelectItem key={obj.id} value={obj.id}>{obj.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={runFullAdaptiveLoopTest} disabled={isRunning}>
+                {isRunning ? 'Running...' : 'Start Full Loop Test'}
+              </Button>
+              <Button onClick={resetTest} variant="outline">
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
+            </div>
           </div>
+          
           {currentTest && (
             <div className="mb-4 p-2 bg-blue-50 rounded flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -300,6 +344,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         <TabsList>
           <TabsTrigger value="results">Test Results</TabsTrigger>
           <TabsTrigger value="session">Active Session</TabsTrigger>
+          <TabsTrigger value="simulation">Simulation Controls</TabsTrigger>
           <TabsTrigger value="historical">Historical Data</TabsTrigger>
         </TabsList>
 
@@ -312,7 +357,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
               {testResults.length === 0 ? (
                 <p className="text-gray-500">No test results yet. Run the test suite to see results.</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-96 overflow-y-auto">
                   {testResults.map((result, index) => (
                     <TestResultCard key={index} result={result} />
                   ))}
@@ -330,7 +375,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
             <CardContent>
               {currentAtom ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h4 className="font-semibold">Current Atom</h4>
                       <p className="text-sm">ID: {currentAtom.id}</p>
@@ -345,21 +390,107 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
-                    <Button onClick={simulateCorrectResponse} size="sm" variant="outline">
-                      Simulate Correct Response
+                  <div className="flex gap-2 flex-wrap">
+                    <Button onClick={simulateUserResponse} size="sm" variant="outline">
+                      Simulate Response
                     </Button>
-                    <Button onClick={simulateIncorrectResponse} size="sm" variant="outline">
-                      Simulate Incorrect Response
-                    </Button>
-                    <Button onClick={runTest3_CompletionAndPersistence} size="sm">
-                      Complete Session & Test Persistence
+                    <Button 
+                      onClick={runTest3_CompletionAndPersistence} 
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Complete & Test Persistence
                     </Button>
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-500">No active session. Run Test 2 to start a session.</p>
+                <p className="text-gray-500">No active session. Run the full loop test to start a session.</p>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="simulation">
+          <Card>
+            <CardHeader>
+              <CardTitle>Simulation Controls</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="response-time">Response Time (seconds)</Label>
+                  <Input
+                    id="response-time"
+                    type="number"
+                    value={simulationSettings.responseTime}
+                    onChange={(e) => setSimulationSettings(prev => ({
+                      ...prev,
+                      responseTime: parseInt(e.target.value) || 5
+                    }))}
+                    min="1"
+                    max="120"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="hints-used">Hints Used</Label>
+                  <Input
+                    id="hints-used"
+                    type="number"
+                    value={simulationSettings.hintsUsed}
+                    onChange={(e) => setSimulationSettings(prev => ({
+                      ...prev,
+                      hintsUsed: parseInt(e.target.value) || 0
+                    }))}
+                    min="0"
+                    max="5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="is-correct">Response Correctness</Label>
+                  <Select 
+                    value={simulationSettings.isCorrect.toString()} 
+                    onValueChange={(value) => setSimulationSettings(prev => ({
+                      ...prev,
+                      isCorrect: value === 'true'
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Correct</SelectItem>
+                      <SelectItem value="false">Incorrect</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-gray-50 rounded">
+                <h4 className="font-semibold mb-2">Quick Simulation Presets:</h4>
+                <div className="flex gap-2 flex-wrap">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => setSimulationSettings({ responseTime: 2, hintsUsed: 0, isCorrect: true })}
+                  >
+                    Quick Success
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => setSimulationSettings({ responseTime: 30, hintsUsed: 2, isCorrect: false })}
+                  >
+                    Struggling
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => setSimulationSettings({ responseTime: 8, hintsUsed: 1, isCorrect: true })}
+                  >
+                    Moderate Success
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -370,6 +501,9 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
               <CardTitle>Historical Data (Test User: {TEST_USER_ID})</CardTitle>
             </CardHeader>
             <CardContent>
+              <Button onClick={loadHistoricalData} className="mb-4" size="sm">
+                Refresh Historical Data
+              </Button>
               <pre className="text-xs bg-gray-100 p-4 rounded overflow-auto max-h-96">
                 {JSON.stringify(historicalData, null, 2)}
               </pre>
