@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,9 @@ import AdaptiveDifficultyEngine from '@/services/AdaptiveDifficultyEngine';
 import { useAdaptiveLearningSession } from '@/hooks/useAdaptiveLearningSession';
 import { LearningAtom } from '@/types/learning';
 import { AlertTriangle, CheckCircle2, Clock, Target } from 'lucide-react';
+
+// Use the specific test user ID that has historical data
+const TEST_USER_ID = '62612ab6-0c5f-4713-b716-feee788c89d9';
 
 // Test atom for testing purposes
 const createTestAtom = (objectiveId: string, difficulty: 'easy' | 'medium' | 'hard'): LearningAtom => ({
@@ -55,16 +57,13 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
   } = useAdaptiveLearningSession(testAtom);
 
   useEffect(() => {
-    if (user) {
-      loadHistoricalData();
-    }
-  }, [user]);
+    loadHistoricalData();
+  }, []);
 
   const loadHistoricalData = async () => {
-    if (!user) return;
-    
     try {
-      const progress = await mockUserProgressService.getUserProgress(user.id);
+      // Always use the test user ID to load historical data
+      const progress = await mockUserProgressService.getUserProgress(TEST_USER_ID);
       const objectiveData: any = {};
       
       for (const stepProgress of progress) {
@@ -74,6 +73,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
       }
       
       setHistoricalData(objectiveData);
+      console.log(`[Test] Loaded historical data for test user ${TEST_USER_ID}:`, objectiveData);
     } catch (error) {
       console.error('Error loading historical data:', error);
     }
@@ -89,41 +89,42 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
   };
 
   const runTest1_HistoricalDifficultyInitialization = async () => {
-    if (!user) return;
-    
     setCurrentTest('Historical Difficulty Initialization');
     
     try {
-      // Test with objective that has history
-      const objectiveWithHistory = 'k-cc-1'; // This has history in mock data
-      const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
-        user.id,
-        objectiveWithHistory,
-        'Mathematics'
-      );
+      // Test objectives with different historical patterns using the test user ID
+      const testObjectives = [
+        { id: 'k-cc-1', expectedBehavior: 'Should suggest hard (completed easily)' },
+        { id: 'k-cc-2', expectedBehavior: 'Should suggest easy (multiple failures)' },
+        { id: 'k-cc-3', expectedBehavior: 'Should suggest medium (moderate performance)' },
+        { id: 'dk-math-basic-arithmetic', expectedBehavior: 'Should suggest medium/hard (high performance after struggle)' },
+        { id: 'new-objective-test', expectedBehavior: 'Should default to medium (no history)' }
+      ];
 
-      const historicalMetrics = historicalData[objectiveWithHistory];
-      
-      addTestResult('Historical Difficulty Suggestion', true, {
-        objectiveId: objectiveWithHistory,
-        suggestedDifficulty,
-        historicalMetrics,
-        expectedBehavior: historicalMetrics?.isCompleted ? 'Should suggest medium/hard for completed' : 'Should suggest based on success rate'
-      });
+      for (const testObj of testObjectives) {
+        console.log(`[Test] Testing difficulty suggestion for objective: ${testObj.id}`);
+        
+        // First, verify the historical data exists
+        const historicalMetrics = await mockUserProgressService.getObjectiveProgress(TEST_USER_ID, testObj.id);
+        console.log(`[Test] Historical metrics for ${testObj.id}:`, historicalMetrics);
+        
+        // Then get the difficulty suggestion
+        const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
+          TEST_USER_ID,
+          testObj.id,
+          'Mathematics'
+        );
 
-      // Test with objective that has no history
-      const newObjective = 'test-new-objective';
-      const newObjectiveDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
-        user.id,
-        newObjective,
-        'Mathematics'
-      );
-
-      addTestResult('New Objective Default Difficulty', true, {
-        objectiveId: newObjective,
-        suggestedDifficulty: newObjectiveDifficulty,
-        expectedBehavior: 'Should default to medium for new objectives'
-      });
+        addTestResult(`Difficulty Suggestion for ${testObj.id}`, true, {
+          objectiveId: testObj.id,
+          suggestedDifficulty,
+          historicalMetrics,
+          expectedBehavior: testObj.expectedBehavior,
+          hasHistory: !!historicalMetrics,
+          successRate: historicalMetrics?.successRate || 'N/A',
+          isCompleted: historicalMetrics?.isCompleted || false
+        });
+      }
 
     } catch (error) {
       addTestResult('Historical Difficulty Initialization', false, { error: error.message });
@@ -131,25 +132,30 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
   };
 
   const runTest2_AdaptiveSessionFlow = async () => {
-    if (!user) return;
-    
     setCurrentTest('Adaptive Session Flow');
     
     try {
-      // Create a test atom with medium difficulty
-      const testObj = 'k-cc-2'; // This has some failed attempts in mock data
-      const atom = createTestAtom(testObj, 'medium');
+      // Create a test atom with the objective that has struggling history
+      const testObj = 'k-cc-2'; // This has multiple failed attempts in mock data
+      const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
+        TEST_USER_ID,
+        testObj,
+        'Mathematics'
+      );
+      
+      const atom = createTestAtom(testObj, suggestedDifficulty);
       setTestAtom(atom);
 
-      addTestResult('Session Initialization', true, {
+      addTestResult('Session Initialization with Adaptive Difficulty', true, {
         atomId: atom.id,
-        initialDifficulty: atom.difficulty,
-        objectiveId: atom.curriculumObjectiveId
+        objectiveId: atom.curriculumObjectiveId,
+        suggestedDifficulty,
+        actualDifficulty: atom.difficulty,
+        reasoning: 'Difficulty suggested based on historical performance'
       });
 
       // Wait a moment for session to initialize
       setTimeout(() => {
-        // Simulate some responses to trigger adaptation
         addTestResult('Session Ready for Interaction', true, {
           currentAtom: currentAtom?.id,
           sessionMetrics: getSessionMetrics()
@@ -186,7 +192,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
   };
 
   const runTest3_CompletionAndPersistence = async () => {
-    if (!user || !currentAtom) return;
+    if (!currentAtom) return;
     
     setCurrentTest('Completion and Persistence');
     
@@ -222,6 +228,8 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
     setIsRunning(true);
     setTestResults([]);
     
+    console.log(`[Test] Starting integration tests with test user ID: ${TEST_USER_ID}`);
+    
     await runTest1_HistoricalDifficultyInitialization();
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -254,16 +262,6 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
     </Card>
   );
 
-  if (!user) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p>Please log in to run adaptive integration tests.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <Card>
@@ -274,6 +272,13 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 p-3 bg-blue-50 rounded">
+            <p className="text-sm font-medium">Test Configuration:</p>
+            <p className="text-xs text-gray-600">Test User ID: {TEST_USER_ID}</p>
+            <p className="text-xs text-gray-600">Auth User: {user?.id || 'Not logged in'}</p>
+            <p className="text-xs text-gray-600">Historical Objectives: {Object.keys(historicalData).length}</p>
+          </div>
+          
           <div className="flex gap-2 mb-4">
             <Button onClick={runAllTests} disabled={isRunning}>
               {isRunning ? 'Running Tests...' : 'Run All Tests'}
@@ -362,7 +367,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         <TabsContent value="historical">
           <Card>
             <CardHeader>
-              <CardTitle>Historical Data (Mock Service)</CardTitle>
+              <CardTitle>Historical Data (Test User: {TEST_USER_ID})</CardTitle>
             </CardHeader>
             <CardContent>
               <pre className="text-xs bg-gray-100 p-4 rounded overflow-auto max-h-96">
