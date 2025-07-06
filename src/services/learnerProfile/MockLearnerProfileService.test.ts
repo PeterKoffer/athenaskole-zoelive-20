@@ -1,5 +1,7 @@
+
 // src/services/learnerProfile/MockLearnerProfileService.test.ts
 
+import { describe, it, expect, beforeEach } from 'vitest';
 import { MockLearnerProfileService, MOCK_USER_ID } from './MockLearnerProfileService';
 import { LearnerProfile } from '@/types/learnerProfile';
 
