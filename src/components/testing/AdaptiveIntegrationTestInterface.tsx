@@ -65,13 +65,13 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
       // Always use the test user ID to load historical data
       const progress = await mockUserProgressService.getUserProgress(TEST_USER_ID);
       const objectiveData: any = {};
-      
+
       for (const stepProgress of progress) {
         for (const [objId, metrics] of Object.entries(stepProgress.curriculumProgress)) {
           objectiveData[objId] = metrics;
         }
       }
-      
+
       setHistoricalData(objectiveData);
       console.log(`[Test] Loaded historical data for test user ${TEST_USER_ID}:`, objectiveData);
     } catch (error) {
@@ -90,7 +90,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
 
   const runTest1_HistoricalDifficultyInitialization = async () => {
     setCurrentTest('Historical Difficulty Initialization');
-    
+
     try {
       // Test objectives with different historical patterns using the test user ID
       const testObjectives = [
@@ -103,11 +103,11 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
 
       for (const testObj of testObjectives) {
         console.log(`[Test] Testing difficulty suggestion for objective: ${testObj.id}`);
-        
+
         // First, verify the historical data exists
         const historicalMetrics = await mockUserProgressService.getObjectiveProgress(TEST_USER_ID, testObj.id);
         console.log(`[Test] Historical metrics for ${testObj.id}:`, historicalMetrics);
-        
+
         // Then get the difficulty suggestion
         const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
           TEST_USER_ID,
@@ -133,7 +133,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
 
   const runTest2_AdaptiveSessionFlow = async () => {
     setCurrentTest('Adaptive Session Flow');
-    
+
     try {
       // Create a test atom with the objective that has struggling history
       const testObj = 'k-cc-2'; // This has multiple failed attempts in mock data
@@ -142,7 +142,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         testObj,
         'Mathematics'
       );
-      
+
       const atom = createTestAtom(testObj, suggestedDifficulty);
       setTestAtom(atom);
 
@@ -193,12 +193,12 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
 
   const runTest3_CompletionAndPersistence = async () => {
     if (!currentAtom) return;
-    
+
     setCurrentTest('Completion and Persistence');
-    
+
     try {
       const performance = completeSession();
-      
+
       if (performance) {
         addTestResult('Session Completion', true, {
           atomId: currentAtom.id,
@@ -210,7 +210,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         setTimeout(async () => {
           await loadHistoricalData();
           const updatedMetrics = historicalData[currentAtom.curriculumObjectiveId];
-          
+
           addTestResult('Historical Data Update', true, {
             objectiveId: currentAtom.curriculumObjectiveId,
             updatedMetrics,
@@ -227,17 +227,17 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
   const runAllTests = async () => {
     setIsRunning(true);
     setTestResults([]);
-    
+
     console.log(`[Test] Starting integration tests with test user ID: ${TEST_USER_ID}`);
-    
+
     await runTest1_HistoricalDifficultyInitialization();
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     await runTest2_AdaptiveSessionFlow();
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     // Tests 3 will be run manually after user interactions
-    
+
     setIsRunning(false);
   };
 
@@ -278,7 +278,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
             <p className="text-xs text-gray-600">Auth User: {user?.id || 'Not logged in'}</p>
             <p className="text-xs text-gray-600">Historical Objectives: {Object.keys(historicalData).length}</p>
           </div>
-          
+
           <div className="flex gap-2 mb-4">
             <Button onClick={runAllTests} disabled={isRunning}>
               {isRunning ? 'Running Tests...' : 'Run All Tests'}
@@ -344,7 +344,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
                       {adaptationReason && <p className="text-sm">Reason: {adaptationReason}</p>}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button onClick={simulateCorrectResponse} size="sm" variant="outline">
                       Simulate Correct Response
