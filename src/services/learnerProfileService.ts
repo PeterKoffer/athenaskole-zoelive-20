@@ -1,18 +1,20 @@
 
 import SupabaseProfileService from './learnerProfile/SupabaseProfileService';
+import { mockLearnerProfileService } from './learnerProfile/MockLearnerProfileService';
 import type { LearnerProfile } from '@/types/learnerProfile';
 
 class LearnerProfileService {
   async getProfile(userId: string): Promise<LearnerProfile | null> {
-    return await SupabaseProfileService.getProfile(userId);
+    // For now, use the mock service. Later we can switch based on environment or config
+    return await mockLearnerProfileService.getProfile(userId);
   }
 
   async createInitialProfile(userId: string): Promise<LearnerProfile> {
-    return await SupabaseProfileService.createInitialProfile(userId);
+    return await mockLearnerProfileService.createInitialProfile(userId);
   }
 
   async updateProfile(profile: LearnerProfile): Promise<void> {
-    return await SupabaseProfileService.updateProfile(profile);
+    return await mockLearnerProfileService.updateProfile(profile);
   }
 
   async updateKcMastery(userId: string, kcId: string, masteryUpdate: {
@@ -21,9 +23,7 @@ class LearnerProfileService {
     interactionType: string;
     interactionDetails?: any;
   }): Promise<LearnerProfile> {
-    // For now, delegate to the LearnerProfileService which has this method
-    const LearnerProfileServiceInstance = await import('./learnerProfile/LearnerProfileService');
-    return await LearnerProfileServiceInstance.default.updateKcMastery(userId, kcId, masteryUpdate);
+    return await mockLearnerProfileService.updateKcMastery(userId, kcId, masteryUpdate);
   }
 }
 
