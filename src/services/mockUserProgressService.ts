@@ -61,7 +61,6 @@ class MockUserProgressService implements UserProgressService {
       stepProgress.curriculumProgress[objectiveId] = objectiveMetrics;
     }
 
-
     // Objective's total attempts increments by 1 for this session,
     // as each session is considered one attempt at the objective level.
     objectiveMetrics.totalAttempts += 1;
