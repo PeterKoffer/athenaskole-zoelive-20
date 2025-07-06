@@ -39,7 +39,7 @@ export async function updateKcMasteryFromObjectivePerformance(
           hintsUsed: performance.hintsUsed,
           timeTakenSeconds: performance.timeTakenSeconds,
           attempts: performance.attempts,
-          difficulty: performance.difficulty || 'medium'
+          difficulty: 'medium' // Default difficulty since it's not in performance data
         }
       });
     }
