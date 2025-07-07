@@ -71,6 +71,14 @@ export class ScalableQuestionGenerationService {
       }
     ];
   }
+
+  getSystemStats(): any {
+    return {
+      totalQuestions: 100,
+      activeUsers: 25,
+      averageResponseTime: 1200
+    };
+  }
 }
 
 export const scalableQuestionGenerationService = new ScalableQuestionGenerationService();

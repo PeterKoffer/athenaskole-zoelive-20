@@ -11,3 +11,6 @@ export class ProfileRecommendationService {
     console.log('🔄 ProfileRecommendationService: updateRecommendations');
   }
 }
+
+// Create a default profileRecommendationService instance
+export const profileRecommendationService = new ProfileRecommendationService();

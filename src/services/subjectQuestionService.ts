@@ -69,6 +69,11 @@ export class SubjectQuestionService {
       let question = template.question_template;
       let explanation = template.explanation_template;
       
+      // Calculate result for math templates
+      if (template.id === 'math_addition_1' && variables.a && variables.b) {
+        variables.result = variables.a + variables.b;
+      }
+      
       Object.entries(variables).forEach(([key, value]) => {
         question = question.replace(new RegExp(`{${key}}`, 'g'), String(value));
         explanation = explanation.replace(new RegExp(`{${key}}`, 'g'), String(value));
@@ -106,11 +111,13 @@ export class SubjectQuestionService {
     if (templates.length === 0) return null;
     
     const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-    return this.generateQuestionFromTemplate(randomTemplate.id, {
+    const variables = {
       a: Math.floor(Math.random() * 10) + 1,
       b: Math.floor(Math.random() * 10) + 1,
       result: 0 // Will be calculated in the template
-    });
+    };
+    
+    return this.generateQuestionFromTemplate(randomTemplate.id, variables);
   }
 
   async createDynamicQuestion(subject: string, difficulty: number): Promise<any> {
@@ -122,11 +129,13 @@ export class SubjectQuestionService {
     }
     
     const template = filteredTemplates[Math.floor(Math.random() * filteredTemplates.length)];
-    return this.generateQuestionFromTemplate(template.id, {
+    const variables = {
       a: Math.floor(Math.random() * 10) + 1,
       b: Math.floor(Math.random() * 10) + 1,
       result: 0
-    });
+    };
+    
+    return this.generateQuestionFromTemplate(template.id, variables);
   }
 }
 

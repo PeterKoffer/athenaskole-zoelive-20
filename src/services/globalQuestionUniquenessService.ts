@@ -6,6 +6,18 @@ export interface UniqueQuestion {
   userId: string;
   questionData: any;
   timestamp: number;
+  content?: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+  };
+  metadata?: {
+    subject?: string;
+    skillArea?: string;
+    difficultyLevel?: number;
+    gradeLevel?: number;
+  };
 }
 
 export class GlobalQuestionUniquenessService {
