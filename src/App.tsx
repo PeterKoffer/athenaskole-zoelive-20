@@ -4,26 +4,26 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import Index from "./pages/Index";
-import StealthAssessmentInspector from "./components/dev/StealthAssessmentInspector";
+import { navItems } from "./nav-items";
+import AdaptiveIntegrationTest from "./pages/AdaptiveIntegrationTest";
+import StealthAssessmentTest from "./pages/StealthAssessmentTest";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-          </Routes>
-        </BrowserRouter>
-        {/* Development tool for monitoring stealth assessment events */}
-        {process.env.NODE_ENV === 'development' && <StealthAssessmentInspector />}
-      </AuthProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {navItems.map(({ to, page }) => (
+            <Route key={to} path={to} element={page} />
+          ))}
+          <Route path="/adaptive-integration-test" element={<AdaptiveIntegrationTest />} />
+          <Route path="/stealth-assessment-test" element={<StealthAssessmentTest />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
