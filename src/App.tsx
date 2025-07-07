@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { navItems } from "./nav-items";
 import AdaptiveIntegrationTest from "./pages/AdaptiveIntegrationTest";
 import StealthAssessmentTest from "./pages/StealthAssessmentTest";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -20,8 +21,6 @@ const App = () => (
           {navItems.map(({ to, page }) => (
             <Route key={to} path={to} element={page} />
           ))}
-          <Route path="/adaptive-integration-test" element={<AdaptiveIntegrationTest />} />
-          <Route path="/stealth-assessment-test" element={<StealthAssessmentTest />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
