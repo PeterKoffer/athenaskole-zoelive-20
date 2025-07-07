@@ -104,6 +104,78 @@ export type Database = {
         }
         Relationships: []
       }
+      concept_mastery: {
+        Row: {
+          concept_name: string
+          correct_attempts: number
+          created_at: string
+          id: string
+          last_practice: string
+          mastery_level: number
+          practice_count: number
+          subject: string
+          total_attempts: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          concept_name: string
+          correct_attempts?: number
+          created_at?: string
+          id?: string
+          last_practice?: string
+          mastery_level?: number
+          practice_count?: number
+          subject: string
+          total_attempts?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          concept_name?: string
+          correct_attempts?: number
+          created_at?: string
+          id?: string
+          last_practice?: string
+          mastery_level?: number
+          practice_count?: number
+          subject?: string
+          total_attempts?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      curriculum_standards: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          grade_level: number
+          id: string
+          name: string
+          subject: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          grade_level: number
+          id?: string
+          name: string
+          subject: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          grade_level?: number
+          id?: string
+          name?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       daily_analytics: {
         Row: {
           achievements_earned: Json | null
@@ -139,6 +211,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      learning_objectives: {
+        Row: {
+          created_at: string
+          curriculum_standard_id: string | null
+          description: string | null
+          difficulty_level: number
+          estimated_time_minutes: number | null
+          id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          curriculum_standard_id?: string | null
+          description?: string | null
+          difficulty_level?: number
+          estimated_time_minutes?: number | null
+          id?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          curriculum_standard_id?: string | null
+          description?: string | null
+          difficulty_level?: number
+          estimated_time_minutes?: number | null
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_objectives_curriculum_standard_id_fkey"
+            columns: ["curriculum_standard_id"]
+            isOneToOne: false
+            referencedRelation: "curriculum_standards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       learning_paths: {
         Row: {
@@ -483,6 +593,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      update_concept_mastery: {
+        Args: {
+          p_user_id: string
+          p_concept_name: string
+          p_subject: string
+          p_is_correct: boolean
+        }
+        Returns: undefined
+      }
       update_real_time_progress: {
         Args: {
           p_user_id: string
