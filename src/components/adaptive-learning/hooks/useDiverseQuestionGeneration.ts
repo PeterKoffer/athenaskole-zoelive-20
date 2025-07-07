@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -76,13 +77,14 @@ export const useDiverseQuestionGeneration = ({
       
       // Convert UniqueQuestion to legacy Question format
       const legacyQuestion: Question = {
+        id: uniqueQuestion.id,
         question: uniqueQuestion.content.question,
         options: uniqueQuestion.content.options,
         correct: uniqueQuestion.content.correctAnswer,
         explanation: uniqueQuestion.content.explanation,
         learningObjectives: [],
-        estimatedTime: undefined,
-        conceptsCovered: []
+        estimatedTime: 30,
+        conceptsCovered: [skillArea]
       };
 
       console.log('✅ UNIQUE question generated successfully:', uniqueQuestion.content.question.substring(0, 50) + '...');

@@ -1,61 +1,66 @@
 
-// src/services/learnerProfile/ProfileRecommendationService.ts
+// Stub implementation for profile recommendation service
 
-import { LearnerProfile } from '@/types/learnerProfile';
-import { KnowledgeComponent } from '@/types/knowledgeComponent';
 import { knowledgeComponentService } from '@/services/knowledgeComponentService';
+import { MockProfileService } from './MockProfileService';
 
 export class ProfileRecommendationService {
-  async recommendNextKcs(profile: LearnerProfile, count: number = 3): Promise<KnowledgeComponent[]> {
+  static async getPersonalizedRecommendations(userId: string): Promise<any[]> {
+    console.log('💡 Profile Recommendation Service: getPersonalizedRecommendations (stub implementation)');
+    
     try {
-      const allKcs = await knowledgeComponentService.getAllKcs(); 
+      // Get all available knowledge components
+      const allKcs = await knowledgeComponentService.getAllKnowledgeComponents();
+      const profile = await MockProfileService.getLearnerProfile(userId);
       
-      const potentialKcs = allKcs.filter(kc => {
-        const mastery = profile.kcMasteryMap[kc.id];
-        if (!mastery) return true; 
-        return mastery.masteryLevel < 0.8; 
-      });
-
-      potentialKcs.sort((a, b) => {
-        const masteryA = profile.kcMasteryMap[a.id]?.masteryLevel || 0;
-        const masteryB = profile.kcMasteryMap[b.id]?.masteryLevel || 0;
-        const attemptsA = profile.kcMasteryMap[a.id]?.attempts || 0;
-        const attemptsB = profile.kcMasteryMap[b.id]?.attempts || 0;
-
-        if (attemptsA > 0 && masteryA < 0.8 && (attemptsB === 0 || masteryB >= 0.8)) return -1;
-        if (attemptsB > 0 && masteryB < 0.8 && (attemptsA === 0 || masteryA >= 0.8)) return 1;
-        
-        return (a.difficultyEstimate || 0) - (b.difficultyEstimate || 0);
-      });
-
-      console.log(`ProfileRecommendationService: Recommended next KCs:`, potentialKcs.slice(0, count).map(kc=>kc.id));
-      return potentialKcs.slice(0, count);
+      // Mock recommendation logic
+      const recommendations = allKcs.slice(0, 3).map(kc => ({
+        type: 'knowledge_component',
+        kcId: kc.id,
+        title: kc.name,
+        subject: kc.subject,
+        difficulty: kc.difficulty_estimate,
+        reason: 'Recommended based on your learning profile',
+        priority: 'medium'
+      }));
+      
+      return recommendations;
     } catch (error) {
-      console.error('Error in recommendNextKcs:', error);
+      console.error('Error generating recommendations:', error);
       return [];
     }
   }
 
-  async getRecommendationsForUser(userId: string, subject?: string): Promise<KnowledgeComponent[]> {
+  static async getLearningPathSuggestions(userId: string, subject: string): Promise<any[]> {
+    console.log('🛤️ Profile Recommendation Service: getLearningPathSuggestions (stub implementation)');
+    
     try {
-      // This would typically get the user's profile first, then make recommendations
-      // For now, return basic recommendations
-      const allKcs = await knowledgeComponentService.getAllKcs();
+      // Get subject-specific knowledge components
+      const allKcs = await knowledgeComponentService.getAllKnowledgeComponents();
+      const subjectKcs = allKcs.filter(kc => 
+        kc.subject.toLowerCase().includes(subject.toLowerCase())
+      );
       
-      let filteredKcs = allKcs;
-      if (subject) {
-        filteredKcs = allKcs.filter(kc => kc.subject === subject);
-      }
+      // Mock learning path suggestions
+      const pathSuggestions = subjectKcs.map(kc => ({
+        kcId: kc.id,
+        title: kc.name,
+        estimatedTime: 30,
+        difficulty: kc.difficulty_estimate,
+        prerequisites: []
+      }));
       
-      // Return easiest KCs first for new users
-      return filteredKcs
-        .sort((a, b) => (a.difficultyEstimate || 0) - (b.difficultyEstimate || 0))
-        .slice(0, 3);
+      return pathSuggestions;
     } catch (error) {
-      console.error('Error in getRecommendationsForUser:', error);
+      console.error('Error generating learning path suggestions:', error);
       return [];
     }
+  }
+
+  static async updatePreferences(userId: string, preferences: any): Promise<boolean> {
+    console.log('⚙️ Profile Recommendation Service: updatePreferences (stub implementation)');
+    
+    // Mock implementation
+    return true;
   }
 }
-
-export const profileRecommendationService = new ProfileRecommendationService();

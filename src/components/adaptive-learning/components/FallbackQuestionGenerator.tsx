@@ -33,6 +33,7 @@ export class FallbackQuestionGenerator {
     const correctIndex = options.indexOf(correctAnswer);
     
     return {
+      id: `fallback-math-${Date.now()}-${Math.random().toString(36).substring(7)}`,
       question: `What is ${num1} + ${num2}?`,
       options: options.map(String),
       correct: correctIndex,
@@ -45,6 +46,7 @@ export class FallbackQuestionGenerator {
 
   private static generateGenericQuestion(subject: string, skillArea: string, difficultyLevel: number): Question {
     return {
+      id: `fallback-generic-${Date.now()}-${Math.random().toString(36).substring(7)}`,
       question: `What is an important concept in ${subject}?`,
       options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
       correct: 0,

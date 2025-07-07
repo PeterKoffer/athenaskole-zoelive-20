@@ -1,6 +1,5 @@
 
-// Global Question Uniqueness Service
-// Stub implementation for managing question uniqueness across sessions
+// Stub implementation for global question uniqueness service
 
 export interface UniqueQuestion {
   id: string;
@@ -10,37 +9,69 @@ export interface UniqueQuestion {
     correctAnswer: number;
     explanation: string;
   };
-  metadata?: any;
+  metadata: {
+    subject: string;
+    skillArea: string;
+    difficultyLevel: number;
+    gradeLevel?: number;
+    timestamp: number;
+    userId: string;
+    sessionId: string;
+  };
 }
 
-export const globalQuestionUniquenessService = {
-  async canGenerateRecap(userId: string, subject: string, skillArea: string): Promise<boolean> {
-    console.log('🔄 GlobalQuestionUniquenessService: canGenerateRecap called (stub implementation)');
-    // For now, always return true - would check actual question history in real implementation
-    return true;
-  },
-
-  async getQuestionsForRecap(
-    userId: string, 
-    subject: string, 
-    skillArea: string, 
-    limit: number
-  ): Promise<any[]> {
-    console.log('📚 GlobalQuestionUniquenessService: getQuestionsForRecap called (stub implementation)');
+export class GlobalQuestionUniquenessService {
+  private static usedQuestions = new Set<string>();
+  
+  async generateUniqueQuestion(params: {
+    subject: string;
+    skillArea: string;
+    difficultyLevel: number;
+    userId: string;
+    gradeLevel?: number;
+    context?: any;
+  }): Promise<UniqueQuestion> {
+    console.log('🎯 Global Question Uniqueness Service: generateUniqueQuestion (stub implementation)');
     
-    // Return mock recap questions
-    return [
-      {
-        question: `Review: What is a key concept in ${subject} ${skillArea}?`,
+    const questionId = `unique_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    
+    // Mock unique question
+    const uniqueQuestion: UniqueQuestion = {
+      id: questionId,
+      content: {
+        question: `Grade ${params.gradeLevel || 5} ${params.subject}: What is a key concept in ${params.skillArea}?`,
         options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
-        correct: 0,
-        explanation: `This reviews important concepts in ${subject} ${skillArea}.`
+        correctAnswer: 0,
+        explanation: `This is an important concept for Grade ${params.gradeLevel || 5} ${params.subject}.`
+      },
+      metadata: {
+        subject: params.subject,
+        skillArea: params.skillArea,
+        difficultyLevel: params.difficultyLevel,
+        gradeLevel: params.gradeLevel,
+        timestamp: Date.now(),
+        userId: params.userId,
+        sessionId: `session_${Date.now()}`
       }
-    ];
-  },
+    };
+    
+    this.usedQuestions.add(uniqueQuestion.content.question);
+    return uniqueQuestion;
+  }
 
   async trackQuestionUsage(questionId: string, userId: string): Promise<void> {
-    console.log('📊 GlobalQuestionUniquenessService: trackQuestionUsage called (stub implementation)');
-    // Stub implementation for tracking question usage
+    console.log('📊 Tracking question usage (stub implementation):', { questionId, userId });
+    // Mock implementation
   }
-};
+
+  async isQuestionUsed(questionText: string): Promise<boolean> {
+    return this.usedQuestions.has(questionText);
+  }
+
+  async clearUsedQuestions(): Promise<void> {
+    this.usedQuestions.clear();
+    console.log('🗑️ Cleared used questions cache');
+  }
+}
+
+export const globalQuestionUniquenessService = new GlobalQuestionUniquenessService();

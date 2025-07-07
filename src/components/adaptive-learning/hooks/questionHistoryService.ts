@@ -1,25 +1,8 @@
 
-// src/components/adaptive-learning/hooks/questionHistoryService.ts
+// Stub implementation for Question History Service
 
-// Stub implementation to resolve build errors
-// This service would need proper database tables to function
-
-export const questionHistoryService = {
-  async getQuestionHistory(userId: string, subject: string, skillArea: string) {
-    console.log('📚 QuestionHistoryService: getQuestionHistory called (stub implementation)');
-    // Return empty array for now since user_question_history table doesn't exist
-    return [];
-  },
-
-  async saveQuestionToHistory(userId: string, questionData: any) {
-    console.log('📚 QuestionHistoryService: saveQuestionToHistory called (stub implementation)');
-    // Stub implementation - would save to database in real version
-    return true;
-  }
-};
-
-export const QuestionHistoryService = {
-  async saveQuestionHistory(
+export class QuestionHistoryService {
+  static async saveQuestionHistory(
     userId: string,
     subject: string,
     skillArea: string,
@@ -29,9 +12,40 @@ export const QuestionHistoryService = {
     isCorrect: boolean,
     responseTime: number,
     additionalContext?: any
-  ) {
-    console.log('📚 QuestionHistoryService: saveQuestionHistory called (stub implementation)');
-    // Stub implementation - would save to database in real version
+  ): Promise<boolean> {
+    console.log('📝 Question History Service: saveQuestionHistory (stub implementation)');
+    console.log('Question details:', {
+      userId,
+      subject,
+      skillArea,
+      difficultyLevel,
+      questionId: question.id,
+      userAnswer,
+      isCorrect,
+      responseTime,
+      additionalContext
+    });
+    
+    // Mock implementation - would save to database in production
     return true;
   }
-};
+
+  static async getQuestionHistory(userId: string, subject?: string): Promise<any[]> {
+    console.log('📚 Question History Service: getQuestionHistory (stub implementation)');
+    
+    // Mock implementation - would retrieve from database in production
+    return [];
+  }
+
+  static async getQuestionPerformance(userId: string, questionId: string): Promise<any> {
+    console.log('📊 Question History Service: getQuestionPerformance (stub implementation)');
+    
+    // Mock implementation
+    return {
+      attempts: 1,
+      correctAttempts: 1,
+      averageResponseTime: 30000,
+      lastAttempted: new Date().toISOString()
+    };
+  }
+}
