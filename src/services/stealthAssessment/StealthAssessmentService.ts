@@ -133,6 +133,15 @@ class StealthAssessmentService implements IStealthAssessmentService {
     this.isInitialized = false;
     console.log('StealthAssessmentService: Refactored service destroyed.');
   }
+
+  // --- Debug/Test methods for in-memory queue ---
+  public async getInMemoryEvents(): Promise<InteractionEvent[]> {
+    return this.eventQueue.getEvents();
+  }
+
+  public async clearInMemoryEvents(): Promise<void> {
+    this.eventQueue.clearEvents();
+  }
 }
 
 const stealthAssessmentService = new StealthAssessmentService();

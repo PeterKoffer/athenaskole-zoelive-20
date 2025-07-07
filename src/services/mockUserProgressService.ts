@@ -4,6 +4,8 @@ import { LearningAtomPerformance } from '@/types/learning';
 import { userProgressStore } from './mockUserProgressService/mockData';
 import { createInitialObjectiveMetrics, updateDerivedMetrics } from './mockUserProgressService/helpers';
 import type { UserProgressService } from './mockUserProgressService/types';
+import { mockProfileService } from '@/services/learnerProfile/MockProfileService';
+import { mockCurriculumService } from '@/services/curriculumService/mockCurriculumService';
 
 class MockUserProgressService implements UserProgressService {
   
@@ -61,8 +63,11 @@ class MockUserProgressService implements UserProgressService {
       stepProgress.curriculumProgress[objectiveId] = objectiveMetrics;
     }
 
-    objectiveMetrics.totalAttempts += performance.attempts > 0 ? performance.attempts : 1;
+    // Objective's total attempts increments by 1 for this session,
+    // as each session is considered one attempt at the objective level.
+    objectiveMetrics.totalAttempts += 1;
     objectiveMetrics.totalTimeSpentSeconds += performance.timeTakenSeconds;
+    // Keep detailed performance of the last session, including its internal attempts
     objectiveMetrics.lastAttemptPerformance = performance;
 
     if (performance.success) {
@@ -76,6 +81,24 @@ class MockUserProgressService implements UserProgressService {
     updateDerivedMetrics(objectiveMetrics);
 
     console.log(`[MockUserProgressService] Updated objective metrics for ${objectiveId}:`, objectiveMetrics);
+
+    // Integration: Update KC mastery in LearnerProfile
+    try {
+      console.log(`[MockUserProgressService] Attempting to update KC mastery for objective ${objectiveId}`);
+      const childKCs = await mockCurriculumService.getNodes({ parentId: objectiveId, nodeType: 'kc' });
+
+      if (childKCs && childKCs.length > 0) {
+        console.log(`[MockUserProgressService] Found ${childKCs.length} KCs for objective ${objectiveId}:`, childKCs.map(kc => kc.id));
+        for (const kc of childKCs) {
+          await mockProfileService.updateKCMastery(userId, kc.id, performance);
+          console.log(`[MockUserProgressService] Updated mastery for KC ${kc.id} for user ${userId}`);
+        }
+      } else {
+        console.log(`[MockUserProgressService] No child KCs found for objective ${objectiveId}.`);
+      }
+    } catch (error) {
+      console.error(`[MockUserProgressService] Error updating KC mastery for objective ${objectiveId}:`, error);
+    }
   }
 
   async checkAndUpdateStepCompletion(userId: string, stepId: string, allObjectiveIdsInStep: string[]): Promise<void> {

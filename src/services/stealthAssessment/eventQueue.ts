@@ -62,4 +62,22 @@ export class EventQueue {
     }
     this.flush().catch(err => console.error("EventQueue: Error on final flush:", err));
   }
+
+  // --- Methods for debugging/testing ---
+  /**
+   * Returns a copy of the current events in the queue.
+   * Does not clear the queue.
+   */
+  public getEvents(): InteractionEvent[] {
+    return [...this.queue]; // Return a copy
+  }
+
+  /**
+   * Clears all events from the queue without flushing them.
+   * Useful for test setup/teardown.
+   */
+  public clearEvents(): void {
+    this.queue = [];
+    console.log('EventQueue: Events cleared from queue (manual)');
+  }
 }

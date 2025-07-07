@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage';
 import CurriculumDemo from './components/curriculum/CurriculumDemo';
 import GlobalCurriculumExplorer from './components/curriculum/GlobalCurriculumExplorer';
 import AdaptiveLearningDemo from './pages/AdaptiveLearningDemo';
+import StealthAssessmentTestPage from './pages/StealthAssessmentTestPage'; // Import the new page
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/curriculum/demo" element={<CurriculumDemo />} />
             <Route path="/curriculum/global" element={<GlobalCurriculumExplorer />} />
             <Route path="/adaptive-learning-demo" element={<AdaptiveLearningDemo />} />
+            <Route path="/stealth-assessment-test" element={<StealthAssessmentTestPage />} /> {/* Add new route */}
           </Routes>
         </div>
       </BrowserRouter>
