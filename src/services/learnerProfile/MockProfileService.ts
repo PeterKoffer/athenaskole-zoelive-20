@@ -2,6 +2,7 @@
 // Mock Profile Service with proper exports
 
 import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
+import { mockLearnerProfileService } from './MockLearnerProfileService';
 
 export const MOCK_USER_ID = 'mock-user-12345';
 
@@ -33,6 +34,23 @@ export class MockProfileService {
         lastAssessed: new Date().toISOString()
       }
     ];
+  }
+
+  // Delegate to the main service for test methods
+  static async updateKCMastery(userId: string, kcId: string, performance: any): Promise<void> {
+    return mockLearnerProfileService.updateKCMastery(userId, kcId, performance);
+  }
+
+  static async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
+    return mockLearnerProfileService.getKCMastery(userId, kcId);
+  }
+
+  static async getProfile(userId: string): Promise<LearnerProfile | null> {
+    return mockLearnerProfileService.getProfile(userId);
+  }
+
+  static resetStore(): void {
+    mockLearnerProfileService.resetStore();
   }
 }
 

@@ -1,4 +1,3 @@
-
 // src/services/learnerProfile/MockLearnerProfileService.ts
 
 import { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
@@ -19,7 +18,7 @@ export class MockLearnerProfileService implements LearnerProfileService {
       return null;
     }
 
-    console.log(`✅ Found profile for user ${userId} with ${Object.keys(profile.kcMasteryMap).length} KCs tracked`);
+    console.log(`✅ Found profile for user ${userId} with ${Object.keys(profile.kcMasteryMap || {}).length} KCs tracked`);
     return { ...profile }; // Return a copy to prevent direct mutation
   }
 
@@ -38,46 +37,58 @@ export class MockLearnerProfileService implements LearnerProfileService {
     }
 
     // Get or create KC mastery record
-    let kcMastery = profile.kcMasteryMap[kcId];
+    let kcMastery = profile.kcMasteryMap?.[kcId];
     if (!kcMastery) {
       kcMastery = {
         kcId,
         masteryLevel: 0.5, // Start at neutral
-        attempts: 0,
-        correctAttempts: 0,
-        lastAttemptTimestamp: Date.now(),
-        history: []
+        practiceCount: 0,
+        lastAssessed: new Date().toISOString(),
+        totalAttempts: 0,
+        successfulAttempts: 0,
+        currentStreak: 0,
+        interactionHistory: []
       };
+      if (!profile.kcMasteryMap) profile.kcMasteryMap = {};
       profile.kcMasteryMap[kcId] = kcMastery;
     }
 
     // Update mastery based on performance
     if (masteryUpdate.newAttempt) {
-      kcMastery.attempts += 1;
+      kcMastery.totalAttempts = (kcMastery.totalAttempts || 0) + 1;
       if (masteryUpdate.isCorrect) {
-        kcMastery.correctAttempts += 1;
+        kcMastery.successfulAttempts = (kcMastery.successfulAttempts || 0) + 1;
+        kcMastery.currentStreak = (kcMastery.currentStreak || 0) + 1;
+      } else {
+        kcMastery.currentStreak = 0;
       }
     }
 
-    // Simple mastery calculation (will be replaced with BKT/IRT later)
-    const successRate = kcMastery.attempts > 0 ? kcMastery.correctAttempts / kcMastery.attempts : 0;
-    
-    // Update mastery level using a simple learning curve
+    // Simple mastery calculation using BKT-like approach
     if (masteryUpdate.isCorrect) {
-      kcMastery.masteryLevel = Math.min(1.0, kcMastery.masteryLevel + (1 - kcMastery.masteryLevel) * 0.1);
+      kcMastery.masteryLevel = Math.min(0.99, kcMastery.masteryLevel + (1 - kcMastery.masteryLevel) * 0.25);
     } else {
-      kcMastery.masteryLevel = Math.max(0.0, kcMastery.masteryLevel - kcMastery.masteryLevel * 0.05);
+      kcMastery.masteryLevel = Math.max(0.01, kcMastery.masteryLevel - kcMastery.masteryLevel * 0.25);
     }
 
-    // Add to history
-    kcMastery.history.push({
-      timestamp: Date.now(),
-      eventType: masteryUpdate.interactionType,
-      score: masteryUpdate.isCorrect ? 1.0 : 0.0,
-      details: masteryUpdate.interactionDetails
+    // Add to history (keep last 20 entries)
+    if (!kcMastery.interactionHistory) kcMastery.interactionHistory = [];
+    kcMastery.interactionHistory.push({
+      timestamp: new Date().toISOString(),
+      success: masteryUpdate.isCorrect,
+      timeTakenSeconds: masteryUpdate.interactionDetails?.timeTakenSeconds || 30,
+      hintsUsed: masteryUpdate.interactionDetails?.hintsUsed || 0,
+      attempts: masteryUpdate.interactionDetails?.attempts || 1,
+      firstAttemptSuccess: masteryUpdate.isCorrect && (masteryUpdate.interactionDetails?.attempts || 1) === 1
     });
 
-    kcMastery.lastAttemptTimestamp = Date.now();
+    // Keep only last 20 interactions
+    if (kcMastery.interactionHistory.length > 20) {
+      kcMastery.interactionHistory = kcMastery.interactionHistory.slice(-20);
+    }
+
+    kcMastery.lastAssessed = new Date().toISOString();
+    kcMastery.practiceCount = kcMastery.totalAttempts || 0;
 
     // Update overall profile metrics
     this.updateOverallMastery(profile);
@@ -85,13 +96,13 @@ export class MockLearnerProfileService implements LearnerProfileService {
 
     mockProfileStore[userId] = profile;
 
-    console.log(`✅ Updated KC mastery for ${kcId}: level=${kcMastery.masteryLevel.toFixed(3)}, attempts=${kcMastery.attempts}`);
+    console.log(`✅ Updated KC mastery for ${kcId}: level=${kcMastery.masteryLevel.toFixed(3)}, attempts=${kcMastery.totalAttempts}`);
     return { ...profile };
   }
 
   async getKcMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
     const profile = await this.getProfile(userId);
-    if (!profile) return null;
+    if (!profile || !profile.kcMasteryMap) return null;
 
     return profile.kcMasteryMap[kcId] || null;
   }
@@ -117,6 +128,7 @@ export class MockLearnerProfileService implements LearnerProfileService {
       userId,
       kcMasteryMap: {},
       preferences: {
+        preferredSubjects: ['Mathematics'],
         learningStyle: 'mixed',
         difficultyPreference: 0.5,
         sessionLength: 20
@@ -124,7 +136,12 @@ export class MockLearnerProfileService implements LearnerProfileService {
       recentPerformance: [],
       overallMastery: 0.0,
       lastUpdatedTimestamp: Date.now(),
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      aggregateMetrics: {
+        overallMastery: 0,
+        completedKCs: 0,
+        totalKCsAttempted: 0
+      }
     };
 
     mockProfileStore[userId] = profile;
@@ -139,24 +156,59 @@ export class MockLearnerProfileService implements LearnerProfileService {
   }
 
   private updateOverallMastery(profile: LearnerProfile): void {
+    if (!profile.kcMasteryMap) {
+      profile.overallMastery = 0.0;
+      if (!profile.aggregateMetrics) profile.aggregateMetrics = { overallMastery: 0, completedKCs: 0, totalKCsAttempted: 0 };
+      profile.aggregateMetrics.overallMastery = 0;
+      profile.aggregateMetrics.completedKCs = 0;
+      profile.aggregateMetrics.totalKCsAttempted = 0;
+      return;
+    }
+
     const masteryValues = Object.values(profile.kcMasteryMap).map(kc => kc.masteryLevel);
     if (masteryValues.length === 0) {
       profile.overallMastery = 0.0;
     } else {
       profile.overallMastery = masteryValues.reduce((sum, level) => sum + level, 0) / masteryValues.length;
     }
+
+    // Update aggregate metrics
+    if (!profile.aggregateMetrics) profile.aggregateMetrics = { overallMastery: 0, completedKCs: 0, totalKCsAttempted: 0 };
+    profile.aggregateMetrics.overallMastery = profile.overallMastery;
+    profile.aggregateMetrics.totalKCsAttempted = masteryValues.length;
+    profile.aggregateMetrics.completedKCs = masteryValues.filter(level => level >= 0.85).length;
   }
 
-  // Utility method for testing - clear all data
-  clearAllProfiles(): void {
+  // Additional methods for testing
+  async updateKCMastery(userId: string, kcId: string, performance: {
+    attempts: number;
+    timeTakenSeconds: number;
+    hintsUsed: number;
+    success: boolean;
+    firstAttemptSuccess: boolean;
+    timestamp: string;
+  }): Promise<void> {
+    await this.updateKcMastery(userId, kcId, {
+      isCorrect: performance.success,
+      newAttempt: true,
+      interactionType: 'question_attempt',
+      interactionDetails: performance
+    });
+  }
+
+  async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
+    return this.getKcMastery(userId, kcId);
+  }
+
+  resetStore(): void {
     Object.keys(mockProfileStore).forEach(key => delete mockProfileStore[key]);
     console.log('🧹 Cleared all mock profile data');
   }
 
-  // Utility method for testing - get store size
   getStoreSize(): number {
     return Object.keys(mockProfileStore).length;
   }
 }
 
 export const mockLearnerProfileService = new MockLearnerProfileService();
+export const mockProfileService = mockLearnerProfileService;
