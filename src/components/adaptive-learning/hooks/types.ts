@@ -9,6 +9,7 @@ export interface Question {
   estimatedTime?: number;
   conceptsCovered?: string[];
   isRecap?: boolean;
+  knowledgeComponentIds?: string[];
 }
 
 export interface UseDiverseQuestionGenerationProps {

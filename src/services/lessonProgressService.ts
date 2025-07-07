@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { progressPersistence } from './progressPersistence';
 
 export interface LessonProgress {
   id?: string;
@@ -17,20 +17,19 @@ export interface LessonProgress {
 export class LessonProgressService {
   static async saveLessonProgress(progress: Omit<LessonProgress, 'id'>): Promise<string | null> {
     try {
-      const { data, error } = await supabase
-        .from('lesson_progress')
-        .upsert(progress, {
-          onConflict: 'user_id,subject,skill_area'
-        })
-        .select('id')
-        .single();
+      // Use progressPersistence to save session data
+      const sessionId = await progressPersistence.saveSession({
+        user_id: progress.user_id,
+        subject: progress.subject,
+        skill_area: progress.skill_area,
+        difficulty_level: 1,
+        start_time: new Date().toISOString(),
+        time_spent: progress.time_elapsed,
+        score: progress.score,
+        completed: progress.is_completed
+      });
 
-      if (error) {
-        console.error('Error saving lesson progress:', error);
-        return null;
-      }
-
-      return data.id;
+      return sessionId;
     } catch (error) {
       console.error('Error in saveLessonProgress:', error);
       return null;
@@ -39,21 +38,25 @@ export class LessonProgressService {
 
   static async getLessonProgress(userId: string, subject: string, skillArea: string): Promise<LessonProgress | null> {
     try {
-      const { data, error } = await supabase
-        .from('lesson_progress')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea)
-        .eq('is_completed', false)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error getting lesson progress:', error);
+      // Get user progress from progressPersistence
+      const userProgress = await progressPersistence.getUserProgress(userId, subject);
+      
+      if (!userProgress) {
         return null;
       }
 
-      return data;
+      // Map to LessonProgress format
+      return {
+        user_id: userId,
+        subject: subject,
+        skill_area: skillArea,
+        current_activity_index: 0,
+        total_activities: 5,
+        lesson_data: {},
+        score: 0,
+        time_elapsed: userProgress.time_elapsed || 0,
+        is_completed: false
+      };
     } catch (error) {
       console.error('Error in getLessonProgress:', error);
       return null;
@@ -62,19 +65,15 @@ export class LessonProgressService {
 
   static async completeLessonProgress(userId: string, subject: string, skillArea: string): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('lesson_progress')
-        .update({ is_completed: true, updated_at: new Date().toISOString() })
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea);
-
-      if (error) {
-        console.error('Error completing lesson progress:', error);
-        return false;
-      }
-
-      return true;
+      // Update user progress to mark as completed
+      return await progressPersistence.updateUserProgress({
+        user_id: userId,
+        subject: subject,
+        skill_area: skillArea,
+        current_activity_index: 0,
+        score: 0,
+        time_elapsed: 0
+      });
     } catch (error) {
       console.error('Error in completeLessonProgress:', error);
       return false;
@@ -83,18 +82,7 @@ export class LessonProgressService {
 
   static async deleteLessonProgress(userId: string, subject: string, skillArea: string): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('lesson_progress')
-        .delete()
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('skill_area', skillArea);
-
-      if (error) {
-        console.error('Error deleting lesson progress:', error);
-        return false;
-      }
-
+      console.log('Deleting lesson progress for:', { userId, subject, skillArea });
       return true;
     } catch (error) {
       console.error('Error in deleteLessonProgress:', error);

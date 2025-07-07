@@ -1,7 +1,6 @@
 
 // Fixed learner profile service with proper imports
 
-import { SupabaseProfileService } from './learnerProfile/SupabaseProfileService';
 import { mockProfileService } from './learnerProfile/MockProfileService';
 import type { LearnerProfile } from '@/types/learnerProfile';
 

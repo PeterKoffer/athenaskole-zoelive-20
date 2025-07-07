@@ -11,5 +11,7 @@ export { stepManagementService } from './stepManagementService';
 export type { LearningPathway, LearningPathStep, LearningPathService } from './types';
 
 // Create default service instances
-export const pathGenerationService = new PathGenerationService();
-export const pathwayManagementService = new PathwayManagementService();
+const pathGenerationService = new PathGenerationService();
+const pathwayManagementService = new PathwayManagementService();
+
+export { pathGenerationService, pathwayManagementService };

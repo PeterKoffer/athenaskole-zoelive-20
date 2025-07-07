@@ -9,7 +9,7 @@ export const MOCK_USER_ID = 'mock-user-12345';
 export class MockProfileService {
   private mockService = new MockLearnerProfileService();
 
-  static async getLearnerProfile(userId: string): Promise<LearnerProfile | null> {
+  async getLearnerProfile(userId: string): Promise<LearnerProfile | null> {
     console.log('👤 MockProfileService: getLearnerProfile');
     
     return {
@@ -24,7 +24,7 @@ export class MockProfileService {
     };
   }
 
-  static async getKnowledgeComponentMastery(userId: string): Promise<any[]> {
+  async getKnowledgeComponentMastery(userId: string): Promise<any[]> {
     console.log('📊 MockProfileService: getKnowledgeComponentMastery');
     
     return [
