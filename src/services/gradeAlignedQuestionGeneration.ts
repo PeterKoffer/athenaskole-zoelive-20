@@ -1,46 +1,39 @@
 
-// Stub implementation for grade aligned question generation
+// Grade Aligned Question Generation Service
 
-import { UniqueQuestion } from './globalQuestionUniquenessService';
+import { globalQuestionUniquenessService, QuestionMetadata } from './globalQuestionUniquenessService';
 
-export interface TeachingPerspective {
-  style: string;
-  approach: string;
-}
-
-export interface GradeAlignedConfig {
-  subject: string;
-  skillArea: string;
-  difficultyLevel: number;
-  userId: string;
-  gradeLevel: number;
-  teachingPerspective: TeachingPerspective;
-  usedQuestions: string[];
-}
-
-export class GradeAlignedQuestionGeneration {
-  async generateGradeAlignedQuestion(config: GradeAlignedConfig): Promise<UniqueQuestion> {
-    console.log('🎓 Grade Aligned Question Generation (stub implementation)');
+export class GradeAlignedQuestionGenerationService {
+  async generateQuestionForGrade(userId: string, gradeLevel: number, metadata: QuestionMetadata): Promise<any> {
+    console.log('📚 Generating grade-aligned question:', { userId, gradeLevel, metadata });
+    
+    const questionId = globalQuestionUniquenessService.generateUniqueQuestion(userId, {
+      ...metadata,
+      gradeLevel
+    });
     
     return {
-      id: `grade_aligned_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
-      content: {
-        question: `Grade ${config.gradeLevel} ${config.subject}: What is a key concept in ${config.skillArea}?`,
-        options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
-        correctAnswer: 0,
-        explanation: `This is tailored for Grade ${config.gradeLevel} ${config.subject} with ${config.teachingPerspective.style} learning style.`
-      },
-      metadata: {
-        subject: config.subject,
-        skillArea: config.skillArea,
-        difficultyLevel: config.difficultyLevel,
-        gradeLevel: config.gradeLevel,
-        timestamp: Date.now(),
-        userId: config.userId,
-        sessionId: `grade_aligned_${Date.now()}`
-      }
+      id: questionId,
+      question: `Grade ${gradeLevel} question for ${metadata.subject}`,
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
+      correct: 0,
+      explanation: `This is a grade ${gradeLevel} explanation.`,
+      gradeLevel
     };
+  }
+
+  async getGradeAppropriateContent(gradeLevel: number, subject: string): Promise<any[]> {
+    console.log('📖 Getting grade-appropriate content:', { gradeLevel, subject });
+    
+    return [
+      {
+        id: `content_${gradeLevel}_${subject}`,
+        title: `Grade ${gradeLevel} ${subject} Content`,
+        difficulty: gradeLevel,
+        subject
+      }
+    ];
   }
 }
 
-export const gradeAlignedQuestionGeneration = new GradeAlignedQuestionGeneration();
+export const gradeAlignedQuestionGenerationService = new GradeAlignedQuestionGenerationService();

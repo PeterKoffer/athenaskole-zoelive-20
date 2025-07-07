@@ -1,17 +1,8 @@
 
-// Learning Path Services
+// Fixed exports for learning path services
 
-export { PathGenerationService } from './pathGenerationService';
-export { PathwayManagementService } from './pathwayManagementService'; 
-export { ProgressTrackingService, progressTrackingService } from './progressTrackingService';
-export { learningPathService } from './LearningPathService';
-export { stepManagementService } from './stepManagementService';
+export { PathGenerationService, pathGenerationService } from './pathGenerationService';
+export { PathwayManagementService } from './pathwayManagementService';
 
-// Export types
-export type { LearningPathway, LearningPathStep, LearningPathService } from './types';
-
-// Create default service instances
-const pathGenerationService = new PathGenerationService();
-const pathwayManagementService = new PathwayManagementService();
-
-export { pathGenerationService, pathwayManagementService };
+// Create instances for backward compatibility
+export const pathwayManagementService = new PathwayManagementService();

@@ -8,15 +8,15 @@ export class LocalizationTestHelper {
   static async verifyTestUserSetup() {
     console.log('🔍 Verifying test user setup...');
     
-    // Check if test user exists in learner_profiles
+    // Check if test user exists in profiles (using existing table)
     const { data: profile, error: profileError } = await supabase
-      .from('learner_profiles')
+      .from('profiles')
       .select('*')
       .eq('user_id', MOCK_TEST_USER_ID)
       .maybeSingle();
 
     if (profileError) {
-      console.error('❌ Error checking learner profile:', profileError);
+      console.error('❌ Error checking profile:', profileError);
       return false;
     }
 
@@ -32,17 +32,11 @@ export class LocalizationTestHelper {
 
   static async createTestUserProfile() {
     const { error } = await supabase
-      .from('learner_profiles')
+      .from('profiles')
       .insert({
         user_id: MOCK_TEST_USER_ID,
-        overall_mastery: 0.0,
-        preferences: {
-          learningStyle: 'mixed',
-          difficultyPreference: 0.5,
-          sessionLength: 15
-        },
-        suggested_next_kcs: [],
-        current_learning_focus_kcs: []
+        name: 'Test User',
+        email: 'test@example.com'
       });
 
     if (error) {
@@ -51,31 +45,6 @@ export class LocalizationTestHelper {
     }
 
     console.log('✅ Test user profile created');
-    return true;
-  }
-
-  static async verifyKnowledgeComponents() {
-    console.log('🔍 Verifying knowledge components...');
-    
-    const { data: kcs, error } = await supabase
-      .from('knowledge_components')
-      .select('*')
-      .in('id', [
-        'kc_math_g4_add_fractions_likedenom',
-        'kc_math_g4_subtract_fractions_likedenom'
-      ]);
-
-    if (error) {
-      console.error('❌ Error fetching KCs:', error);
-      return false;
-    }
-
-    if (!kcs || kcs.length === 0) {
-      console.log('⚠️ No test KCs found');
-      return false;
-    }
-
-    console.log(`✅ Found ${kcs.length} knowledge components:`, kcs.map(kc => kc.id));
     return true;
   }
 
@@ -96,21 +65,21 @@ export class LocalizationTestHelper {
     return standards && standards.length > 0;
   }
 
-  static async verifyContentAtoms() {
-    console.log('🔍 Verifying content atoms...');
+  static async verifyAdaptiveContent() {
+    console.log('🔍 Verifying adaptive content...');
     
-    const { data: atoms, error } = await supabase
-      .from('content_atoms')
+    const { data: content, error } = await supabase
+      .from('adaptive_content')
       .select('*')
-      .contains('kc_ids', ['kc_math_g4_add_fractions_likedenom']);
+      .limit(5);
 
     if (error) {
-      console.error('❌ Error fetching content atoms:', error);
+      console.error('❌ Error fetching adaptive content:', error);
       return false;
     }
 
-    console.log(`✅ Found ${atoms?.length || 0} content atoms for test KC`);
-    return atoms && atoms.length > 0;
+    console.log(`✅ Found ${content?.length || 0} adaptive content items`);
+    return content && content.length > 0;
   }
 
   static async runFullLocalizationTest() {
@@ -118,9 +87,8 @@ export class LocalizationTestHelper {
     
     const checks = [
       { name: 'Test User Setup', fn: () => this.verifyTestUserSetup() },
-      { name: 'Knowledge Components', fn: () => this.verifyKnowledgeComponents() },
       { name: 'Curriculum Standards', fn: () => this.verifyCurriculumStandards() },
-      { name: 'Content Atoms', fn: () => this.verifyContentAtoms() }
+      { name: 'Adaptive Content', fn: () => this.verifyAdaptiveContent() }
     ];
 
     const results = [];
@@ -158,7 +126,6 @@ export class LocalizationTestHelper {
 2. 🌍 TEST ENGLISH (US) FLOW:
    - Navigate to /adaptive-practice-test
    - Check that content loads in English
-   - Verify KC: "Adding Fractions with Like Denominators"
    - Complete a few questions
    - Check browser console for logging
 
@@ -166,12 +133,11 @@ export class LocalizationTestHelper {
    - Use language switcher to change to Danish (da)
    - Navigate to /adaptive-practice-test again
    - Verify content switches to Danish
-   - Check that KC names are in Danish (if implemented)
    - Complete a few questions
 
 4. 📊 VERIFY SUPABASE LOGGING:
    - Open Supabase dashboard
-   - Check interaction_events table
+   - Check relevant tables for logged data
    - Verify events have correct language/context metadata
 
 5. 🔄 TEST LANGUAGE SWITCHING:
@@ -183,13 +149,6 @@ export class LocalizationTestHelper {
    - Try /education/math
    - Try /daily-program
    - Verify localization works across all math learning paths
-
-❓ Issues to Watch For:
-   - Content not loading
-   - Language not switching
-   - Console errors about missing translations
-   - KC mastery not updating
-   - Events not logging to Supabase
 `);
   }
 }

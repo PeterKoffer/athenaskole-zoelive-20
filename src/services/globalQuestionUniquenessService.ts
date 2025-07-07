@@ -1,6 +1,13 @@
 
 // Global Question Uniqueness Service
 
+export interface QuestionMetadata {
+  subject?: string;
+  skillArea?: string;
+  difficultyLevel?: number;
+  gradeLevel?: number;
+}
+
 export interface UniqueQuestion {
   id: string;
   userId: string;
@@ -12,12 +19,7 @@ export interface UniqueQuestion {
     correctAnswer: number;
     explanation: string;
   };
-  metadata?: {
-    subject?: string;
-    skillArea?: string;
-    difficultyLevel?: number;
-    gradeLevel?: number;
-  };
+  metadata?: QuestionMetadata;
 }
 
 export class GlobalQuestionUniquenessService {

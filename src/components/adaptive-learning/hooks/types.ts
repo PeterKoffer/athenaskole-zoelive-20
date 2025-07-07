@@ -5,11 +5,10 @@ export interface Question {
   options: string[];
   correct: number;
   explanation: string;
-  learningObjectives?: string[];
-  estimatedTime?: number;
-  conceptsCovered?: string[];
+  learningObjectives: string[];
+  estimatedTime: number;
+  conceptsCovered: string[];
   isRecap?: boolean;
-  knowledgeComponentIds?: string[];
 }
 
 export interface UseDiverseQuestionGenerationProps {
@@ -17,12 +16,6 @@ export interface UseDiverseQuestionGenerationProps {
   skillArea: string;
   difficultyLevel: number;
   userId: string;
-  gradeLevel?: number;
-  standardsAlignment?: any;
-}
-
-export interface QuestionContext {
-  gradeLevel?: number;
-  standard?: any;
-  contentPrompt?: string;
+  gradeLevel: number;
+  standardsAlignment?: string[];
 }

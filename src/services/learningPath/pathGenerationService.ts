@@ -2,18 +2,15 @@
 // Path Generation Service
 
 export class PathGenerationService {
-  static async generatePath(userId: string, subject: string, requirements: any): Promise<any> {
+  static async generatePath(userId: string, preferences: any): Promise<any> {
     console.log('🛤️ PathGenerationService: generatePath (stub implementation)');
-    return { pathId: `path_${Date.now()}`, userId, subject, requirements };
+    return { pathId: `path_${Date.now()}`, steps: [] };
   }
 
-  static async optimizePath(pathId: string, performanceData: any): Promise<boolean> {
-    console.log('🔧 PathGenerationService: optimizePath (stub implementation)');
+  static async updatePath(pathId: string, updates: any): Promise<boolean> {
+    console.log('🔧 PathGenerationService: updatePath (stub implementation)');
     return true;
   }
-
-  static async getPathRecommendations(userId: string): Promise<any[]> {
-    console.log('💡 PathGenerationService: getPathRecommendations (stub implementation)');
-    return [];
-  }
 }
+
+export const pathGenerationService = new PathGenerationService();

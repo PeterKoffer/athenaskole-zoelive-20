@@ -1,18 +1,25 @@
 
 // src/services/stealthAssessment/eventQueue.ts
 
-import { InteractionEvent } from '@/types/stealthAssessment';
-import { SupabaseEventLogger } from './supabaseEventLogger';
+import { supabaseEventLogger } from './supabaseEventLogger';
 import { STEALTH_ASSESSMENT_CONFIG } from './config';
 
+// Simple event interface for queue compatibility
+interface QueueEvent {
+  type: string;
+  eventId: string;
+  timestamp: number;
+  userId: string;
+  sessionId?: string;
+  data: any;
+}
+
 export class EventQueue {
-  private queue: InteractionEvent[] = [];
+  private queue: QueueEvent[] = [];
   private flushTimerId?: NodeJS.Timeout;
   private isFlushing = false;
-  private logger: SupabaseEventLogger;
 
   constructor() {
-    this.logger = new SupabaseEventLogger();
     this.startFlushTimer();
   }
 
@@ -22,7 +29,7 @@ export class EventQueue {
     }, STEALTH_ASSESSMENT_CONFIG.flushInterval);
   }
 
-  async addEvent(event: InteractionEvent): Promise<void> {
+  async addEvent(event: QueueEvent): Promise<void> {
     this.queue.push(event);
     console.log('EventQueue: Event added to queue:', event.type, event.eventId);
 
@@ -42,7 +49,16 @@ export class EventQueue {
     this.queue = [];
 
     try {
-      await this.logger.flushEventBatch(eventsToFlush);
+      // Convert to format expected by supabaseEventLogger
+      const convertedEvents = eventsToFlush.map(event => ({
+        user_id: event.userId,
+        session_id: event.sessionId || 'default',
+        event_type: event.type,
+        event_data: event.data,
+        timestamp: new Date(event.timestamp).toISOString()
+      }));
+
+      await supabaseEventLogger.flushEventBatch(convertedEvents);
     } catch (error) {
       console.error('EventQueue: Error during flush, re-adding events to queue:', error);
       // Re-add events to queue for retry
