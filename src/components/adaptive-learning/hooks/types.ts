@@ -1,13 +1,13 @@
 
 export interface Question {
-  id?: string;
+  id: string; // Add missing id property
   question: string;
   options: string[];
   correct: number;
   explanation: string;
   learningObjectives?: string[];
   estimatedTime?: number;
-  conceptsCovered?: string[];
+  conceptsCovered?: string[]; // Add missing conceptsCovered property
   isRecap?: boolean; // Flag to allow repeated questions for recap/review
 }
 
