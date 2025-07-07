@@ -6,6 +6,9 @@ export interface LearnerPreferences {
   learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
   difficultyPreference: number;
   sessionLength?: number;
+  learningPace?: number;
+  preferredDifficulty?: number;
+  targetSessionLengthMinutes?: number;
 }
 
 export interface KnowledgeComponentMastery {

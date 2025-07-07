@@ -1,7 +1,7 @@
 
 // Mock Profile Service with proper exports
 
-import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
+import { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
 import { mockLearnerProfileService } from './MockLearnerProfileService';
 
 export const MOCK_USER_ID = 'mock-user-12345';
@@ -49,9 +49,18 @@ export class MockProfileService {
     return mockLearnerProfileService.getProfile(userId);
   }
 
+  static async updateUserPreferences(userId: string, preferences: Partial<LearnerPreferences>): Promise<void> {
+    return mockLearnerProfileService.updatePreferences(userId, preferences);
+  }
+
+  static getStoreSize(): number {
+    return mockLearnerProfileService.getStoreSize();
+  }
+
   static resetStore(): void {
     mockLearnerProfileService.resetStore();
   }
 }
 
 export const mockProfileService = MockProfileService;
+export const mockLearnerProfileService = mockLearnerProfileService;

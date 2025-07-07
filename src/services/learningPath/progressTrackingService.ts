@@ -1,57 +1,64 @@
 
+// Progress Tracking Service
+
 import { supabase } from '@/integrations/supabase/client';
 
-export const progressTrackingService = {
-  async updatePathProgress(
-    pathwayId: string,
-    stepId: string,
-    score: number,
-    isCompleted: boolean = true
-  ): Promise<boolean> {
-    try {
-      // Update the specific step
-      const { error: stepError } = await supabase
-        .from('learning_pathway_steps')
-        .update({
-          is_completed: isCompleted,
-          completion_time: new Date().toISOString(),
-          score: score
-        })
-        .eq('id', stepId);
+export class ProgressTrackingService {
+  async getStepProgress(userId: string, stepId: string): Promise<any> {
+    console.log('📊 Progress Tracking Service: getStepProgress (stub implementation)');
+    
+    // Use learning_paths table instead of non-existent learning_pathway_steps
+    const { data, error } = await supabase
+      .from('learning_paths')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('id', stepId)
+      .single();
 
-      if (stepError) {
-        console.error('Error updating path step:', stepError);
-        return false;
-      }
+    if (error) {
+      console.error('Error fetching step progress:', error);
+      return null;
+    }
 
-      // Update pathway current step
-      const { data: steps } = await supabase
-        .from('learning_pathway_steps')
-        .select('step_number')
-        .eq('pathway_id', pathwayId)
-        .eq('is_completed', true)
-        .order('step_number', { ascending: false })
-        .limit(1);
+    return data;
+  }
 
-      if (steps && steps.length > 0) {
-        const { error: pathwayError } = await supabase
-          .from('learning_pathways')
-          .update({
-            current_step: steps[0].step_number,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', pathwayId);
+  async updateStepProgress(userId: string, stepId: string, progress: number): Promise<boolean> {
+    console.log('📈 Progress Tracking Service: updateStepProgress (stub implementation)');
+    
+    // Use learning_paths table instead of non-existent learning_pathway_steps
+    const { error } = await supabase
+      .from('learning_paths')
+      .update({
+        completion_percentage: progress,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .eq('id', stepId);
 
-        if (pathwayError) {
-          console.error('Error updating pathway progress:', pathwayError);
-          return false;
-        }
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error in updatePathProgress:', error);
+    if (error) {
+      console.error('Error updating step progress:', error);
       return false;
     }
+
+    return true;
   }
-};
+
+  async getAllUserProgress(userId: string): Promise<any[]> {
+    console.log('📋 Progress Tracking Service: getAllUserProgress');
+    
+    const { data, error } = await supabase
+      .from('learning_paths')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error fetching user progress:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+}
+
+export const progressTrackingService = new ProgressTrackingService();

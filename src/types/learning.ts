@@ -17,6 +17,13 @@ export interface LearningAtom {
   subject: string;
   difficulty: string;
   estimatedMinutes: number;
+  curriculumObjectiveId?: string;
+  curriculumObjectiveTitle?: string;
+  narrativeContext?: string;
+  interactionType?: string;
+  variantId?: string;
+  isCompleted?: boolean;
+  performance?: LearningAtomPerformance;
 }
 
 export interface DailyUniverse {
@@ -25,4 +32,5 @@ export interface DailyUniverse {
   storylineOutro: string;
   estimatedTotalMinutes: number;
   learningAtoms: LearningAtom[];
+  userId?: string;
 }

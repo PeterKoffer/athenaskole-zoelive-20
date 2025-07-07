@@ -2,16 +2,16 @@
 // Fixed learner profile service with proper imports
 
 import { SupabaseProfileService } from './learnerProfile/SupabaseProfileService';
-import { mockLearnerProfileService } from './learnerProfile/MockProfileService';
+import { mockProfileService } from './learnerProfile/MockProfileService';
 import type { LearnerProfile } from '@/types/learnerProfile';
 
 class LearnerProfileService {
   async getProfile(userId: string): Promise<LearnerProfile | null> {
-    return await mockLearnerProfileService.getLearnerProfile(userId) as LearnerProfile | null;
+    return await mockProfileService.getLearnerProfile(userId) as LearnerProfile | null;
   }
 
   async createInitialProfile(userId: string): Promise<LearnerProfile> {
-    const profile = await mockLearnerProfileService.getLearnerProfile(userId);
+    const profile = await mockProfileService.getLearnerProfile(userId);
     return profile as LearnerProfile;
   }
 
