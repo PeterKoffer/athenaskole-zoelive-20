@@ -17,3 +17,21 @@ export const questionHistoryService = {
     return true;
   }
 };
+
+export const QuestionHistoryService = {
+  async saveQuestionHistory(
+    userId: string,
+    subject: string,
+    skillArea: string,
+    difficultyLevel: number,
+    question: any,
+    userAnswer: number,
+    isCorrect: boolean,
+    responseTime: number,
+    additionalContext?: any
+  ) {
+    console.log('📚 QuestionHistoryService: saveQuestionHistory called (stub implementation)');
+    // Stub implementation - would save to database in real version
+    return true;
+  }
+};

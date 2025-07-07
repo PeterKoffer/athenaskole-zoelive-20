@@ -1,7 +1,13 @@
 
-// src/components/adaptive-learning/hooks/useReliableQuestionGeneration.ts
-
 import { useState, useCallback } from 'react';
+
+export interface Question {
+  id: string;
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+}
 
 export const useReliableQuestionGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -41,8 +47,20 @@ export const useReliableQuestionGeneration = () => {
     }
   }, []);
 
+  const saveQuestionHistory = useCallback(async (
+    question: any,
+    userAnswer: number,
+    isCorrect: boolean,
+    responseTime: number
+  ) => {
+    console.log('📝 Saving question history (stub implementation)');
+    // Stub implementation
+    return true;
+  }, []);
+
   return {
     generateQuestion,
+    saveQuestionHistory,
     isGenerating,
     error
   };

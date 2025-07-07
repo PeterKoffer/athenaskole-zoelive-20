@@ -1,6 +1,4 @@
 
-// src/components/profile/hooks/useProfileFetch.ts
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,13 +32,7 @@ export const useProfileFetch = () => {
         throw fetchError;
       }
 
-      // Add default avatar_color if missing
-      const profileWithDefaults = {
-        ...data,
-        avatar_color: data.avatar_color || '#3B82F6' // Default blue color
-      };
-
-      setProfile(profileWithDefaults);
+      setProfile(data);
     } catch (err) {
       console.error('Error fetching profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch profile');
@@ -51,6 +43,10 @@ export const useProfileFetch = () => {
 
   return {
     profile,
+    profileData: profile,
+    setProfileData: setProfile,
+    profileExists: !!profile,
+    setProfileExists: () => {},
     loading,
     error,
     refetch: fetchProfile
