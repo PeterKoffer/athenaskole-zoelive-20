@@ -7,7 +7,10 @@ export const generateFallbackQuestion = (subject: string, skillArea: string): Qu
     question: `What is an important concept in ${subject} ${skillArea}?`,
     options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
     correct: 0,
-    explanation: `This is a fundamental concept in ${subject} ${skillArea}.`
+    explanation: `This is a fundamental concept in ${subject} ${skillArea}.`,
+    learningObjectives: [`Understanding ${subject} ${skillArea} concepts`],
+    estimatedTime: 60,
+    conceptsCovered: [skillArea]
   };
 };
 

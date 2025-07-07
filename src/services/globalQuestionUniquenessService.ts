@@ -2,6 +2,17 @@
 // Global Question Uniqueness Service
 // Stub implementation for managing question uniqueness across sessions
 
+export interface UniqueQuestion {
+  id: string;
+  content: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+  };
+  metadata?: any;
+}
+
 export const globalQuestionUniquenessService = {
   async canGenerateRecap(userId: string, subject: string, skillArea: string): Promise<boolean> {
     console.log('🔄 GlobalQuestionUniquenessService: canGenerateRecap called (stub implementation)');
@@ -26,5 +37,10 @@ export const globalQuestionUniquenessService = {
         explanation: `This reviews important concepts in ${subject} ${skillArea}.`
       }
     ];
+  },
+
+  async trackQuestionUsage(questionId: string, userId: string): Promise<void> {
+    console.log('📊 GlobalQuestionUniquenessService: trackQuestionUsage called (stub implementation)');
+    // Stub implementation for tracking question usage
   }
 };

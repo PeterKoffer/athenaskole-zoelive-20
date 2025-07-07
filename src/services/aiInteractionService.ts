@@ -20,6 +20,14 @@ export interface AIInteraction extends AIInteractionData {
   created_at: string;
 }
 
+export interface InteractionStats {
+  totalInteractions: number;
+  successRate: number;
+  averageProcessingTime: number;
+  tokensUsed: number;
+  estimatedCost: number;
+}
+
 export const aiInteractionService = {
   async logInteraction(interaction: AIInteractionData): Promise<string> {
     console.log('📊 Logging AI interaction (stub implementation):', interaction);
@@ -30,5 +38,16 @@ export const aiInteractionService = {
   async getInteractionHistory(userId: string, limit?: number): Promise<AIInteraction[]> {
     console.log('📚 Getting interaction history (stub implementation)');
     return [];
+  },
+
+  async getInteractionStats(userId: string): Promise<InteractionStats> {
+    console.log('📊 Getting interaction stats (stub implementation)');
+    return {
+      totalInteractions: 0,
+      successRate: 0,
+      averageProcessingTime: 0,
+      tokensUsed: 0,
+      estimatedCost: 0
+    };
   }
 };

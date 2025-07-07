@@ -31,3 +31,6 @@ export class ContentOrchestrator {
 }
 
 export const contentOrchestrator = new ContentOrchestrator();
+
+// Default export for compatibility
+export default ContentOrchestrator;

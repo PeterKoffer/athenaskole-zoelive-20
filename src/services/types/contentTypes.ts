@@ -9,6 +9,14 @@ export interface GeneratedContent {
   conceptsCovered?: string[];
 }
 
+export interface GenerateContentRequest {
+  subject: string;
+  skillArea: string;
+  difficultyLevel: number;
+  userId?: string;
+  previousQuestions?: string[];
+}
+
 export interface AdaptiveContentRecord {
   id?: string;
   subject: string;

@@ -9,4 +9,11 @@ export interface ContentAtom {
   prerequisites?: string[];
   created_at?: string;
   updated_at?: string;
+  atom_id?: string; // Adding this for compatibility
+}
+
+export interface AtomSequence {
+  id: string;
+  atoms: ContentAtom[];
+  metadata?: any;
 }

@@ -34,6 +34,11 @@ const ProfileContainer = () => {
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleProfileUpdate(profileData);
+  };
+
   if (!user) {
     navigate('/auth');
     return null;
@@ -57,7 +62,7 @@ const ProfileContainer = () => {
             loading={loading}
             uploading={uploading}
             onDataChange={setProfileData}
-            onSubmit={handleProfileUpdate}
+            onSubmit={handleFormSubmit}
             onAvatarUpload={handleAvatarUploadWrapper}
           />
         )}
