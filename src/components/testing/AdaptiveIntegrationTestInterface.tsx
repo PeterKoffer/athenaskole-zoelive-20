@@ -255,7 +255,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-32">
+        <pre className="text-xs bg-muted text-foreground p-2 rounded overflow-auto max-h-32 border">
           {JSON.stringify(result.details, null, 2)}
         </pre>
       </CardContent>
@@ -272,11 +272,11 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 p-3 bg-blue-50 rounded">
-            <p className="text-sm font-medium">Test Configuration:</p>
-            <p className="text-xs text-gray-600">Test User ID: {TEST_USER_ID}</p>
-            <p className="text-xs text-gray-600">Auth User: {user?.id || 'Not logged in'}</p>
-            <p className="text-xs text-gray-600">Historical Objectives: {Object.keys(historicalData).length}</p>
+          <div className="mb-4 p-3 bg-muted rounded border">
+            <p className="text-sm font-medium text-foreground">Test Configuration:</p>
+            <p className="text-xs text-muted-foreground">Test User ID: {TEST_USER_ID}</p>
+            <p className="text-xs text-muted-foreground">Auth User: {user?.id || 'Not logged in'}</p>
+            <p className="text-xs text-muted-foreground">Historical Objectives: {Object.keys(historicalData).length}</p>
           </div>
 
           <div className="flex gap-2 mb-4">
@@ -288,9 +288,9 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
             </Button>
           </div>
           {currentTest && (
-            <div className="mb-4 p-2 bg-blue-50 rounded flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Currently running: {currentTest}
+            <div className="mb-4 p-2 bg-muted rounded border flex items-center gap-2">
+              <Clock className="w-4 h-4 text-foreground" />
+              <span className="text-foreground">Currently running: {currentTest}</span>
             </div>
           )}
         </CardContent>
@@ -370,7 +370,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
               <CardTitle>Historical Data (Test User: {TEST_USER_ID})</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="text-xs bg-gray-100 p-4 rounded overflow-auto max-h-96">
+              <pre className="text-xs bg-muted text-foreground p-4 rounded overflow-auto max-h-96 border">
                 {JSON.stringify(historicalData, null, 2)}
               </pre>
             </CardContent>
