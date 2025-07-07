@@ -14,13 +14,27 @@ export class MockProfileService {
     
     return {
       userId,
+      user_id: userId,
+      overall_mastery: 0.5,
+      kc_masteries: [],
+      kcMasteryMap: {},
       preferences: {
         preferredSubjects: ['Mathematics'],
         learningStyle: 'visual',
-        difficultyPreference: 3
+        difficultyPreference: 3,
+        sessionLength: 20
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      recentPerformance: [],
+      overallMastery: 0.5,
+      lastUpdatedTimestamp: Date.now(),
+      createdAt: Date.now(),
+      aggregateMetrics: {
+        overallMastery: 0.5,
+        completedKCs: 0,
+        totalKCsAttempted: 0
+      }
     };
   }
 

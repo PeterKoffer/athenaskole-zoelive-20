@@ -38,7 +38,7 @@ export const EnhancedMusicLesson = ({ onComplete }: EnhancedMusicLessonProps) =>
           maxAttempts: 3
         };
 
-        const result = await unifiedQuestionGeneration.generateUniqueQuestion(config);
+        const result = await unifiedQuestionGeneration.generateQuestion(user.id, config);
         
         if (result.question) {
           musicQuestions.push({

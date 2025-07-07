@@ -45,6 +45,12 @@ export const useLessonProgressManager = (subject: string) => {
     getNextQuestion,
     getRandomQuestion,
     isLoading,
-    error
+    error,
+    isLoadingProgress: isLoading,
+    usedQuestionIds: [],
+    saveProgress: async () => {},
+    completeLessonProgress: async () => {},
+    generateSubjectQuestion: getNextQuestion,
+    resetProgress: () => {}
   };
 };

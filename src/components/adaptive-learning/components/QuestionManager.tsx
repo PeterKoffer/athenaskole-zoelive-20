@@ -73,13 +73,13 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
         // Ensure the question has all required properties
         const completeQuestion: Question = {
           id: newQuestion.id || `question-${Date.now()}`,
-          question: newQuestion.question,
-          options: newQuestion.options,
-          correct: newQuestion.correct,
-          explanation: newQuestion.explanation,
+          question: newQuestion.question || 'Sample question',
+          options: newQuestion.options || ['Option A', 'Option B', 'Option C', 'Option D'],
+          correct: newQuestion.correct || 0,
+          explanation: newQuestion.explanation || 'Sample explanation',
           learningObjectives: newQuestion.learningObjectives || [`Learning ${subject} ${skillArea}`],
           estimatedTime: newQuestion.estimatedTime || 60,
-          conceptsCovered: newQuestion.conceptsCovered || [skillArea],
+          conceptsCovered: [skillArea], // Use skillArea as conceptsCovered
           isRecap: newQuestion.isRecap || false
         };
         

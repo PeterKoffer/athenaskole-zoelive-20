@@ -126,6 +126,9 @@ export class MockLearnerProfileService implements LearnerProfileService {
 
     const profile: LearnerProfile = {
       userId,
+      user_id: userId,
+      overall_mastery: 0.0,
+      kc_masteries: [],
       kcMasteryMap: {},
       preferences: {
         preferredSubjects: ['Mathematics'],
@@ -133,6 +136,8 @@ export class MockLearnerProfileService implements LearnerProfileService {
         difficultyPreference: 0.5,
         sessionLength: 20
       },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       recentPerformance: [],
       overallMastery: 0.0,
       lastUpdatedTimestamp: Date.now(),

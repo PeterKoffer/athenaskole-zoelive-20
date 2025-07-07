@@ -44,6 +44,9 @@ export const useUnifiedQuestionGeneration = (userId: string) => {
   return {
     generateQuestion,
     generateBatchQuestions,
+    generateUniqueQuestion: generateQuestion,
+    saveQuestionHistory: async () => {},
+    generationStats: { total: 0, unique: 0 },
     isGenerating,
     error
   };

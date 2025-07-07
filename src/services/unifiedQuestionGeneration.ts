@@ -50,6 +50,11 @@ export class UnifiedQuestionGenerationService {
     const history = globalQuestionUniquenessService.getUserQuestionHistory(userId);
     return history.map(id => ({ id, metadata }));
   }
+
+  async generateUniqueQuestion(userId: string, metadata: QuestionMetadata): Promise<any> {
+    return this.generateQuestion(userId, metadata);
+  }
 }
 
 export const unifiedQuestionGenerationService = new UnifiedQuestionGenerationService();
+export const unifiedQuestionGeneration = unifiedQuestionGenerationService;

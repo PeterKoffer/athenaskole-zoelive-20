@@ -6,6 +6,9 @@ export interface QuestionMetadata {
   skillArea?: string;
   difficultyLevel?: number;
   gradeLevel?: number;
+  queuePosition?: number;
+  batchIndex?: number;
+  totalInQueue?: number;
 }
 
 export interface UniqueQuestion {
