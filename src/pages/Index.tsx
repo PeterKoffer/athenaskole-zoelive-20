@@ -119,10 +119,19 @@ const Index = () => {
             <Button
               variant="outline"
               size="lg"
+              onClick={() => navigate('/stealth-assessment-test')}
+              className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 h-16"
+            >
+              <Brain className="w-5 h-5 mr-2" />
+              Stealth Assessment Test
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
               onClick={() => navigate('/auth')}
               className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10 h-16"
             >
-              <Brain className="w-5 h-5 mr-2" />
+              <Settings className="w-5 h-5 mr-2" />
               Sign In
             </Button>
           </div>
