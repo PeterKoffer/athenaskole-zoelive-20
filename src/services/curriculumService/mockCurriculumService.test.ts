@@ -1,5 +1,3 @@
-
-import { describe, it, expect, beforeEach } from 'vitest';
 import { mockCurriculumService } from './mockCurriculumService';
 import { mockCurriculumData } from '@/data/mockCurriculumData';
 import { CurriculumNode } from '@/types/curriculumIndex';
