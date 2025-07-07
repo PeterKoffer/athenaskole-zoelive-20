@@ -13,6 +13,8 @@ import {
 class StealthAssessmentService implements IStealthAssessmentService {
   private userId: string = 'test-user-123'; // Mock user ID for testing
   private sessionId: string = `session-${Date.now()}`;
+  private eventQueue: InteractionEvent[] = [];
+  private maxQueueSize: number = 1000;
 
   async logEvent(
     eventData: Omit<InteractionEvent, 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, 
@@ -25,13 +27,41 @@ class StealthAssessmentService implements IStealthAssessmentService {
       userId: this.userId,
       sessionId: this.sessionId,
       sourceComponentId: sourceComponentId || 'unknown'
-    };
+    } as InteractionEvent;
+
+    // Add to queue
+    this.eventQueue.push(fullEvent);
+    
+    // Maintain queue size limit
+    if (this.eventQueue.length > this.maxQueueSize) {
+      this.eventQueue.shift();
+    }
 
     console.log('🎯 Stealth Assessment Event Logged:', eventData.type);
     console.log('📊 Event Details:', fullEvent);
     
     // In a real implementation, this would send data to a backend
     // For now, we'll just log to console for testing
+  }
+
+  // Legacy method for backward compatibility
+  async logInteractionEvent(eventData: any): Promise<void> {
+    console.log('⚠️ Using legacy logInteractionEvent method');
+    await this.logEvent(eventData);
+  }
+
+  // Queue management methods
+  getRecentEvents(limit: number = 20): InteractionEvent[] {
+    return this.eventQueue.slice(-limit);
+  }
+
+  getQueueSize(): number {
+    return this.eventQueue.length;
+  }
+
+  clearQueue(): void {
+    this.eventQueue = [];
+    console.log('🗑️ Event queue cleared');
   }
 
   async logQuestionAttempt(
