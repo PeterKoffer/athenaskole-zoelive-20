@@ -68,14 +68,14 @@ const Index = () => {
             Make learning fun, engaging, and effective with personalized education.
           </p>
           <div className="flex justify-center space-x-4">
-            <Button size="lg" onClick={() => navigate('/daily-program')} className="bg-purple-600 hover:bg-purple-700">
-              Start Learning
+            <Button size="lg" onClick={() => navigate('/test')} className="bg-purple-600 hover:bg-purple-700">
+              Start Test
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/enhanced-daily-program')} className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-              Enhanced Program
+            <Button size="lg" variant="outline" onClick={() => navigate('/stealth-assessment-test')} className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+              Stealth Assessment
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/adaptive-learning-demo')} className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white">
-              Try Demo
+            <Button size="lg" variant="outline" onClick={() => navigate('/simple-stealth-test')} className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white">
+              Simple Test
             </Button>
           </div>
         </div>
@@ -104,20 +104,20 @@ const Index = () => {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/test')}
               className="border-white/20 text-white hover:bg-white/10 h-16"
             >
               <Settings className="w-5 h-5 mr-2" />
-              Dashboard
+              Test Page
             </Button>
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate('/adaptive-integration-test')}
+              onClick={() => navigate('/simple-stealth-test')}
               className="border-green-400/50 text-green-400 hover:bg-green-400/10 h-16"
             >
               <TestTube2 className="w-5 h-5 mr-2" />
-              Integration Tests
+              Simple Test
             </Button>
             <Button
               variant="outline"
