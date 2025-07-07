@@ -2,11 +2,13 @@
 // Mock Profile Service with proper exports
 
 import { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
-import { mockLearnerProfileService } from './MockLearnerProfileService';
+import { MockLearnerProfileService } from './MockLearnerProfileService';
 
 export const MOCK_USER_ID = 'mock-user-12345';
 
 export class MockProfileService {
+  private mockService = new MockLearnerProfileService();
+
   static async getLearnerProfile(userId: string): Promise<LearnerProfile | null> {
     console.log('👤 MockProfileService: getLearnerProfile');
     
@@ -36,31 +38,29 @@ export class MockProfileService {
     ];
   }
 
-  // Delegate to the main service for test methods
-  static async updateKCMastery(userId: string, kcId: string, performance: any): Promise<void> {
-    return mockLearnerProfileService.updateKCMastery(userId, kcId, performance);
+  async updateKCMastery(userId: string, kcId: string, performance: any): Promise<void> {
+    return this.mockService.updateKCMastery(userId, kcId, performance);
   }
 
-  static async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
-    return mockLearnerProfileService.getKCMastery(userId, kcId);
+  async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
+    return this.mockService.getKCMastery(userId, kcId);
   }
 
-  static async getProfile(userId: string): Promise<LearnerProfile | null> {
-    return mockLearnerProfileService.getProfile(userId);
+  async getProfile(userId: string): Promise<LearnerProfile | null> {
+    return this.mockService.getProfile(userId);
   }
 
-  static async updateUserPreferences(userId: string, preferences: Partial<LearnerPreferences>): Promise<void> {
-    return mockLearnerProfileService.updatePreferences(userId, preferences);
+  async updateUserPreferences(userId: string, preferences: Partial<LearnerPreferences>): Promise<void> {
+    return this.mockService.updatePreferences(userId, preferences);
   }
 
-  static getStoreSize(): number {
-    return mockLearnerProfileService.getStoreSize();
+  getStoreSize(): number {
+    return this.mockService.getStoreSize();
   }
 
-  static resetStore(): void {
-    mockLearnerProfileService.resetStore();
+  resetStore(): void {
+    this.mockService.resetStore();
   }
 }
 
-export const mockProfileService = MockProfileService;
-export const mockLearnerProfileService = mockLearnerProfileService;
+export const mockProfileService = new MockProfileService();

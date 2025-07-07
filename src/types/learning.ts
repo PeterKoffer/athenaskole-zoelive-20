@@ -33,4 +33,5 @@ export interface DailyUniverse {
   estimatedTotalMinutes: number;
   learningAtoms: LearningAtom[];
   userId?: string;
+  dateGenerated?: string;
 }
