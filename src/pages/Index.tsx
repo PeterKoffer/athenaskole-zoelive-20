@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Brain, Calendar, Gamepad2, Settings, TestTube2 } from "lucide-react";
+import AuthModal from "@/components/AuthModal";
+import { useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const features = [
     {
@@ -45,10 +48,10 @@ const Index = () => {
           </div>
         </div>
         <div className="flex space-x-4">
-          <Button variant="ghost" onClick={() => navigate('/auth')}>
+          <Button variant="ghost" onClick={() => setShowAuthModal(true)}>
             Sign In
           </Button>
-          <Button onClick={() => navigate('/auth')}>
+          <Button onClick={() => setShowAuthModal(true)}>
             Get Started
           </Button>
         </div>
@@ -144,6 +147,17 @@ const Index = () => {
           <p>&copy; 2024 NELIE. Empowering the next generation of learners with AI.</p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLogin={() => {
+            setShowAuthModal(false);
+            console.log('✅ User logged in successfully');
+          }}
+        />
+      )}
     </div>
   );
 };
