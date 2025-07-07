@@ -24,10 +24,11 @@ describe('MockCurriculumService', () => {
 
   it('should retrieve child nodes using parentId', async () => {
     const children = await mockCurriculumService.getChildren('g4-math-oa-A');
-    expect(children.length).toBe(3); // Expecting 3 learning objectives under this topic
+    expect(children.length).toBe(4); // Expecting 4 learning objectives under this topic (A-1, A-2, A-3, A-4)
     expect(children.some(node => node.id === 'g4-math-oa-A-1')).toBe(true);
     expect(children.some(node => node.id === 'g4-math-oa-A-2')).toBe(true);
     expect(children.some(node => node.id === 'g4-math-oa-A-3')).toBe(true);
+    expect(children.some(node => node.id === 'g4-math-oa-A-4')).toBe(true);
   });
 
   it('should retrieve KCs using parentId (children of a learning objective)', async () => {
@@ -43,14 +44,16 @@ describe('MockCurriculumService', () => {
       subjectName: 'Mathematics',
       nodeType: 'domain',
     });
-    expect(nodes.length).toBe(2); // Expecting 2 domains in Grade 4 Math
+    expect(nodes.length).toBe(5); // Expecting 5 domains in Grade 4 Math (OA, NBT, NF, MD, G)
     expect(nodes.every(node => node.educationalLevel === '4' && node.subjectName === 'Mathematics' && node.nodeType === 'domain')).toBe(true);
   });
 
   it('should retrieve all nodes of a specific type, e.g., all KCs', async () => {
     const kcs = await mockCurriculumService.getNodes({ nodeType: 'kc' });
-    // We added 2 KCs for g4-math-oa-A-1 and 3 KCs for g4-math-oa-A-2
-    expect(kcs.length).toBe(5);
+    // Original: 2 (oa-A-1) + 3 (oa-A-2) = 5
+    // Added:  1 (nf-A-1) + 1 (md-A-1) + 1 (md-B-4) + 1 (g-A-1) + 2 (oa-A-4) = 6 more KCs from the ones I explicitly added.
+    // Total KCs: 5 (original detailed) + 2 (nf-A-1) + 2 (md-A-1) + 1 (md-B-4) + 2 (g-A-1) + 2 (oa-A-4) = 14
+    expect(kcs.length).toBe(14);
     expect(kcs.every(kc => kc.nodeType === 'kc')).toBe(true);
   });
 
@@ -72,8 +75,9 @@ describe('MockCurriculumService', () => {
     //           3 learning objectives under that topic
     //           2 KCs under g4-math-oa-A-1
     //           3 KCs under g4-math-oa-A-2
-    // Total = 1 + 3 + 2 + 3 = 9
-    expect(descendants.length).toBe(9);
+    //           1 LO (g4-math-oa-A-4) + 2 KCs under it
+    // Total = 1 (topic) + 3 (LO1+2KCs) + 4 (LO2+3KCs) + 1 (LO3) + 3 (LO4+2KCs) = 12
+    expect(descendants.length).toBe(12);
     expect(descendants.some(d => d.id === 'g4-math-oa-A')).toBe(true); // topic
     expect(descendants.some(d => d.id === 'g4-math-oa-A-1')).toBe(true); // learning objective
     expect(descendants.some(d => d.id === 'g4-math-oa-A-1-kc1')).toBe(true); // kc
@@ -97,9 +101,9 @@ describe('MockCurriculumService', () => {
     expect(nodes.length).toBe(2);
 
     const nodes2 = await mockCurriculumService.getNodes({ nodeType: ['domain', 'subject'] });
-    expect(nodes2.filter(n => n.nodeType === 'domain').length).toBe(2); // g4-math-oa, g4-math-nbt
+    expect(nodes2.filter(n => n.nodeType === 'domain').length).toBe(5); // g4-math-oa, g4-math-nbt, g4-math-nf, g4-math-md, g4-math-g
     expect(nodes2.filter(n => n.nodeType === 'subject').length).toBe(1); // g4-math
-    expect(nodes2.length).toBe(3);
+    expect(nodes2.length).toBe(6); // 5 domains + 1 subject
   });
 
 });
