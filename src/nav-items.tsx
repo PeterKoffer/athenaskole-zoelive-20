@@ -1,8 +1,10 @@
 
-import { Home, TestTube, Eye } from "lucide-react";
+import { Home, TestTube, Eye, User } from "lucide-react";
 import Index from "./pages/Index";
-import AdaptiveIntegrationTest from "./pages/AdaptiveIntegrationTest";
+import TestPage from "./pages/TestPage";
 import StealthAssessmentTest from "./pages/StealthAssessmentTest";
+import SimpleStealthTest from "./pages/SimpleStealthTest";
+import AuthPage from "./pages/AuthPage";
 
 export const navItems = [
   {
@@ -12,15 +14,27 @@ export const navItems = [
     page: <Index />,
   },
   {
-    title: "Adaptive Integration Test",
-    to: "/adaptive-integration-test", 
+    title: "Authentication",
+    to: "/auth",
+    icon: <User className="h-4 w-4" />,
+    page: <AuthPage />,
+  },
+  {
+    title: "Test Page", 
+    to: "/test",
     icon: <TestTube className="h-4 w-4" />,
-    page: <AdaptiveIntegrationTest />,
+    page: <TestPage />,
   },
   {
     title: "Stealth Assessment Test",
     to: "/stealth-assessment-test",
     icon: <Eye className="h-4 w-4" />,
     page: <StealthAssessmentTest />,
+  },
+  {
+    title: "Simple Stealth Test",
+    to: "/simple-stealth-test",
+    icon: <Eye className="h-4 w-4" />,
+    page: <SimpleStealthTest />,
   },
 ];
