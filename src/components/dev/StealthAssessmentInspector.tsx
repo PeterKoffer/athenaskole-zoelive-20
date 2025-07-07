@@ -95,7 +95,7 @@ const StealthAssessmentInspector = () => {
             <Button
               onClick={handleClearQueue}
               variant="outline"
-              size="xs"
+              size="sm"
               className="h-6 text-xs border-red-600 text-red-400 hover:bg-red-600/20"
             >
               <Trash2 className="w-3 h-3 mr-1" />
@@ -104,7 +104,7 @@ const StealthAssessmentInspector = () => {
             <Button
               onClick={handleExportEvents}
               variant="outline"
-              size="xs"
+              size="sm"
               className="h-6 text-xs border-blue-600 text-blue-400 hover:bg-blue-600/20"
             >
               <Download className="w-3 h-3 mr-1" />

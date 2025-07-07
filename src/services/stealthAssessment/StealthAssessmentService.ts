@@ -101,6 +101,26 @@ class MockStealthAssessmentService implements IStealthAssessmentService {
     }
   }
 
+  // Legacy method for backward compatibility
+  async logInteractionEvent(eventData: {
+    event_type: InteractionEventType;
+    user_id: string;
+    event_data: any;
+    kc_ids?: string[];
+    content_atom_id?: string;
+    is_correct?: boolean;
+  }): Promise<void> {
+    console.log('🔄 Legacy logInteractionEvent called:', eventData.event_type);
+    
+    // Convert legacy format to new format
+    const newEventData = {
+      type: eventData.event_type,
+      ...eventData.event_data
+    };
+
+    await this.logEvent(newEventData, 'LegacyMethod');
+  }
+
   // Convenience methods for common event types
   async logQuestionAttempt(
     details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, 

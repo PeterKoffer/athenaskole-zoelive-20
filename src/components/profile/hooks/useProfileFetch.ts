@@ -1,83 +1,15 @@
 
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { UserMetadata } from "@/types/auth"; // Import UserMetadata
-import { supabase } from "@/integrations/supabase/client";
-import { ProfileData } from "./types";
+// src/components/profile/hooks/useProfileFetch.ts
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useProfileFetch = () => {
   const { user } = useAuth();
-  const [profileExists, setProfileExists] = useState(false);
-  const [profileData, setProfileData] = useState<ProfileData>({
-    name: "",
-    email: "",
-    birth_date: "",
-    grade: "",
-    school: "",
-    address: "",
-    avatar_url: "",
-    avatar_color: "from-purple-400 to-cyan-400"
-  });
-
-  const fetchProfile = async () => {
-    if (!user) return;
-
-    try {
-      console.log('🔍 Fetching profile for user:', user.id);
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('❌ Error fetching profile:', error);
-        throw error;
-      }
-
-      if (data) {
-        console.log('✅ Profile found:', data);
-        setProfileExists(true);
-        setProfileData({
-          name: data.name || (user.user_metadata as UserMetadata)?.name || "",
-          email: data.email || user.email || "",
-          birth_date: data.birth_date || "",
-          grade: data.grade || "",
-          school: data.school || "",
-          address: data.address || "",
-          avatar_url: data.avatar_url || "",
-          avatar_color: data.avatar_color || "from-purple-400 to-cyan-400"
-        });
-      } else {
-        console.log('ℹ️ No profile found, using user metadata');
-        setProfileExists(false);
-        setProfileData({
-          name: (user.user_metadata as UserMetadata)?.name || "",
-          email: user.email || "",
-          birth_date: "",
-          grade: "",
-          school: "",
-          address: "",
-          avatar_url: "",
-          avatar_color: "from-purple-400 to-cyan-400"
-        });
-      }
-    } catch (error) {
-      console.error('❌ Error in fetchProfile:', error);
-      setProfileExists(false);
-      setProfileData({
-        name: (user.user_metadata as UserMetadata)?.name || "",
-        email: user.email || "",
-        birth_date: "",
-        grade: "",
-        school: "",
-        address: "",
-        avatar_url: "",
-        avatar_color: "from-purple-400 to-cyan-400"
-      });
-    }
-  };
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -85,11 +17,42 @@ export const useProfileFetch = () => {
     }
   }, [user]);
 
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      // Add default avatar_color if missing
+      const profileWithDefaults = {
+        ...data,
+        avatar_color: data.avatar_color || '#3B82F6' // Default blue color
+      };
+
+      setProfile(profileWithDefaults);
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
-    profileData,
-    setProfileData,
-    profileExists,
-    setProfileExists,
-    fetchProfile
+    profile,
+    loading,
+    error,
+    refetch: fetchProfile
   };
 };
