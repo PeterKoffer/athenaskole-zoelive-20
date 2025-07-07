@@ -74,3 +74,4 @@ export class ScalableQuestionGenerationService {
 }
 
 export const scalableQuestionGenerationService = new ScalableQuestionGenerationService();
+export const scalableQuestionGeneration = scalableQuestionGenerationService;

@@ -53,6 +53,17 @@ export class SupabaseEventLogger {
     }
   }
 
+  async flushEventBatch(): Promise<boolean> {
+    try {
+      console.log('🔄 [SupabaseEventLogger] Flushing event batch');
+      // In a real implementation, this would send events to Supabase
+      return true;
+    } catch (error) {
+      console.error('❌ [SupabaseEventLogger] Failed to flush event batch:', error);
+      return false;
+    }
+  }
+
   getStoredEventsCount(): number {
     return this.events.length;
   }

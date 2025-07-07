@@ -100,6 +100,34 @@ export class SubjectQuestionService {
       return null;
     }
   }
+
+  async getRandomQuestionForSubject(subject: string): Promise<any> {
+    const templates = await this.getQuestionTemplates(subject);
+    if (templates.length === 0) return null;
+    
+    const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+    return this.generateQuestionFromTemplate(randomTemplate.id, {
+      a: Math.floor(Math.random() * 10) + 1,
+      b: Math.floor(Math.random() * 10) + 1,
+      result: 0 // Will be calculated in the template
+    });
+  }
+
+  async createDynamicQuestion(subject: string, difficulty: number): Promise<any> {
+    const templates = await this.getQuestionTemplates(subject);
+    const filteredTemplates = templates.filter(t => t.difficulty_level === difficulty);
+    
+    if (filteredTemplates.length === 0) {
+      return this.getRandomQuestionForSubject(subject);
+    }
+    
+    const template = filteredTemplates[Math.floor(Math.random() * filteredTemplates.length)];
+    return this.generateQuestionFromTemplate(template.id, {
+      a: Math.floor(Math.random() * 10) + 1,
+      b: Math.floor(Math.random() * 10) + 1,
+      result: 0
+    });
+  }
 }
 
 export const subjectQuestionService = new SubjectQuestionService();

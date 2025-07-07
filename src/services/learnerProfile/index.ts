@@ -8,5 +8,4 @@ export { ProfileRecommendationService } from './ProfileRecommendationService';
 export { userIdService } from './UserIdService';
 
 // Create a default profileRecommendationService instance
-const profileRecommendationService = new ProfileRecommendationService();
-export { profileRecommendationService };
+export const profileRecommendationService = new ProfileRecommendationService();

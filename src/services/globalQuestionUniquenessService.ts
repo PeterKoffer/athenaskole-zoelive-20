@@ -1,6 +1,13 @@
 
 // Global Question Uniqueness Service
 
+export interface UniqueQuestion {
+  id: string;
+  userId: string;
+  questionData: any;
+  timestamp: number;
+}
+
 export class GlobalQuestionUniquenessService {
   private questionHistory: Map<string, Set<string>> = new Map();
 
@@ -20,9 +27,17 @@ export class GlobalQuestionUniquenessService {
     return questionId;
   }
 
+  generateUniqueQuestionId(userId: string): string {
+    return this.generateUniqueQuestion(userId, {});
+  }
+
   hasUserSeenQuestion(userId: string, questionId: string): boolean {
     const userHistory = this.questionHistory.get(userId);
     return userHistory ? userHistory.has(questionId) : false;
+  }
+
+  isQuestionUnique(userId: string, questionId: string): boolean {
+    return !this.hasUserSeenQuestion(userId, questionId);
   }
 
   addQuestionToHistory(userId: string, questionId: string): void {
@@ -30,6 +45,10 @@ export class GlobalQuestionUniquenessService {
       this.questionHistory.set(userId, new Set());
     }
     this.questionHistory.get(userId)!.add(questionId);
+  }
+
+  trackQuestionUsage(userId: string, questionId: string): void {
+    this.addQuestionToHistory(userId, questionId);
   }
 }
 
