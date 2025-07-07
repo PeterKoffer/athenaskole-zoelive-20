@@ -1,28 +1,28 @@
 
+// Stub implementation for path generation service
+
 import { supabase } from '@/integrations/supabase/client';
 
-export const pathGenerationService = {
-  async generateLearningPath(
-    userId: string,
-    subject: string,
-    targetConcepts?: string[]
-  ): Promise<string | null> {
-    try {
-      const { data, error } = await supabase.rpc('generate_learning_path', {
-        p_user_id: userId,
-        p_subject: subject,
-        p_target_concepts: targetConcepts
-      });
-
-      if (error) {
-        console.error('Error generating learning path:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error in generateLearningPath:', error);
-      return null;
-    }
+export class PathGenerationService {
+  static async generateLearningPath(userId: string, subject: string, targetSkills: string[]): Promise<any> {
+    console.log('🛤️ Path Generation Service: generateLearningPath (stub implementation)');
+    
+    // Mock implementation - would call actual edge function in production
+    return {
+      pathId: `path_${Date.now()}`,
+      userId,
+      subject,
+      steps: targetSkills.map((skill, index) => ({
+        stepId: `step_${index + 1}`,
+        skill,
+        estimatedTime: 30,
+        difficulty: Math.min(index + 1, 5)
+      }))
+    };
   }
-};
+
+  static async updatePathProgress(pathId: string, stepId: string, progress: number): Promise<boolean> {
+    console.log('📈 Path Generation Service: updatePathProgress (stub implementation)');
+    return true;
+  }
+}

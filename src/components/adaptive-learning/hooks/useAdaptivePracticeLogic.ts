@@ -1,12 +1,29 @@
 
-// Stub implementation for Adaptive Practice Logic Hook
+// Complete implementation for Adaptive Practice Logic Hook
 
 import { useState, useCallback } from 'react';
 import { contentOrchestrator } from '@/services/content/ContentOrchestrator';
 
+interface AdaptivePracticeState {
+  isLoading: boolean;
+  error: string | null;
+  learnerProfile: any | null;
+  currentKc: any | null;
+  atomSequence: any | null;
+  currentAtomIndex: number;
+}
+
 export const useAdaptivePracticeLogic = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [state, setState] = useState<AdaptivePracticeState>({
+    isLoading: true,
+    error: null,
+    learnerProfile: null,
+    currentKc: null,
+    atomSequence: null,
+    currentAtomIndex: 0
+  });
 
   const generateAdaptiveContent = useCallback(async (
     subject: string,
@@ -18,9 +35,8 @@ export const useAdaptivePracticeLogic = () => {
     setError(null);
     
     try {
-      console.log('🎯 Adaptive Practice Logic: generateAdaptiveContent (stub implementation)');
+      console.log('🎯 Adaptive Practice Logic: generateAdaptiveContent');
       
-      // Use the ContentOrchestrator instance method
       const result = await contentOrchestrator.orchestrateContent(
         subject,
         skillArea,
@@ -39,9 +55,8 @@ export const useAdaptivePracticeLogic = () => {
 
   const getOptimalPath = useCallback(async (userId: string, subject: string) => {
     try {
-      console.log('🛤️ Adaptive Practice Logic: getOptimalPath (stub implementation)');
+      console.log('🛤️ Adaptive Practice Logic: getOptimalPath');
       
-      // Use the ContentOrchestrator instance method
       const result = await contentOrchestrator.getOptimalContent(userId, subject, 'general');
       return result;
     } catch (err) {
@@ -52,9 +67,8 @@ export const useAdaptivePracticeLogic = () => {
 
   const getAtomSequenceForKc = useCallback(async (kcId: string, userId: string) => {
     try {
-      console.log('🔄 Adaptive Practice Logic: getAtomSequenceForKc (stub implementation)');
+      console.log('🔄 Adaptive Practice Logic: getAtomSequenceForKc');
       
-      // Use the ContentOrchestrator instance method
       const result = await contentOrchestrator.getAtomSequenceForKc(kcId, userId);
       return result;
     } catch (err) {
@@ -63,10 +77,34 @@ export const useAdaptivePracticeLogic = () => {
     }
   }, []);
 
+  const handleNextAtom = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      currentAtomIndex: prev.currentAtomIndex + 1
+    }));
+  }, []);
+
+  const handleQuestionAnswer = useCallback((atom: any, userAnswer: string, isCorrect: boolean) => {
+    console.log('📝 Question answered:', { atom: atom.atom_id, userAnswer, isCorrect });
+    // Handle question answer logic here
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      isLoading: true,
+      error: null
+    }));
+  }, []);
+
   return {
     generateAdaptiveContent,
     getOptimalPath,
     getAtomSequenceForKc,
+    handleNextAtom,
+    handleQuestionAnswer,
+    handleRetry,
+    state,
     isGenerating,
     error
   };

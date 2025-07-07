@@ -1,69 +1,58 @@
 
+// Stub implementation for Content Orchestrator
+
 export class ContentOrchestrator {
   async orchestrateContent(subject: string, skillArea: string, difficultyLevel: number) {
-    console.log('🎭 ContentOrchestrator: orchestrateContent called (stub implementation)');
+    console.log('🎼 Content Orchestrator: orchestrateContent (stub implementation)');
     
-    // Stub implementation - would normally orchestrate content generation
     return {
       success: true,
       content: {
-        id: `stub-content-${Date.now()}`,
+        id: `content_${Date.now()}`,
         subject,
         skillArea,
         difficultyLevel,
-        title: `Sample ${subject} content for ${skillArea}`,
+        title: `${subject} - ${skillArea}`,
         content: {
-          question: `What is an important concept in ${subject}?`,
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correct: 0,
-          explanation: 'This is a sample explanation.'
+          type: 'practice',
+          questions: []
         }
       }
     };
   }
 
-  async getOptimalContent(userId: string, subject: string, skillArea: string) {
-    console.log('🎯 ContentOrchestrator: getOptimalContent called (stub implementation)');
+  async getOptimalContent(userId: string, subject: string, context: string) {
+    console.log('🎯 Content Orchestrator: getOptimalContent (stub implementation)');
     
-    // Stub implementation
-    return this.orchestrateContent(subject, skillArea, 3);
+    return {
+      success: true,
+      content: {
+        id: `optimal_${Date.now()}`,
+        userId,
+        subject,
+        context
+      }
+    };
   }
 
   async getAtomSequenceForKc(kcId: string, userId: string) {
-    console.log('🔄 ContentOrchestrator: getAtomSequenceForKc called (stub implementation)');
+    console.log('🔬 Content Orchestrator: getAtomSequenceForKc (stub implementation)');
     
-    // Stub implementation - return a mock atom sequence
     return {
-      sequence_id: `seq_${Date.now()}`,
+      success: true,
       atoms: [
         {
-          id: `atom_${Date.now()}_1`,
-          kc_id: kcId,
-          atom_id: `atom_${Date.now()}_1`,
+          atom_id: `atom_${Date.now()}`,
           atom_type: 'QUESTION_MULTIPLE_CHOICE',
           content: {
-            question: 'What is 2 + 2?',
-            options: ['3', '4', '5', '6'],
-            correct: 1,
-            explanation: 'The sum of 2 + 2 equals 4.'
-          },
-          difficulty_level: 3,
-          estimated_time: 60,
-          prerequisites: [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+            question: 'Sample question?',
+            options: ['A', 'B', 'C', 'D'],
+            correct: 0
+          }
         }
-      ],
-      metadata: {
-        kcId,
-        userId,
-        generatedAt: new Date().toISOString()
-      }
+      ]
     };
   }
 }
 
 export const contentOrchestrator = new ContentOrchestrator();
-
-// Default export for compatibility
-export default ContentOrchestrator;

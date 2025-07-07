@@ -1,30 +1,24 @@
 
-// Stub implementation for Supabase profile service
-// Note: This service requires tables that don't exist yet in the database
+// Stub implementation for Supabase profile service with proper exports
 
 import { supabase } from '@/integrations/supabase/client';
 
 export class SupabaseProfileService {
   static async createLearnerProfile(userId: string, preferences: any): Promise<boolean> {
-    console.log('🆕 Creating learner profile (stub implementation - table does not exist)');
-    
-    // Mock implementation since learner_profiles table doesn't exist
+    console.log('🆕 Creating learner profile (stub implementation)');
     console.log('Would create profile for user:', userId, 'with preferences:', preferences);
     return true;
   }
 
   static async updateLearnerProfile(userId: string, updates: any): Promise<boolean> {
-    console.log('📝 Updating learner profile (stub implementation - table does not exist)');
-    
-    // Mock implementation since learner_profiles table doesn't exist
+    console.log('📝 Updating learner profile (stub implementation)');
     console.log('Would update profile for user:', userId, 'with updates:', updates);
     return true;
   }
 
   static async getLearnerProfile(userId: string): Promise<any | null> {
-    console.log('👤 Getting learner profile (stub implementation - table does not exist)');
+    console.log('👤 Getting learner profile (stub implementation)');
     
-    // Mock implementation since learner_profiles table doesn't exist
     return {
       userId,
       preferences: {
@@ -38,9 +32,8 @@ export class SupabaseProfileService {
   }
 
   static async getKnowledgeComponentMastery(userId: string): Promise<any[]> {
-    console.log('📊 Getting KC mastery (stub implementation - table does not exist)');
+    console.log('📊 Getting KC mastery (stub implementation)');
     
-    // Mock implementation since kc_mastery table doesn't exist
     return [
       {
         userId,
@@ -57,9 +50,7 @@ export class SupabaseProfileService {
     kcId: string,
     masteryData: any
   ): Promise<boolean> {
-    console.log('📈 Updating KC mastery (stub implementation - table does not exist)');
-    
-    // Mock implementation
+    console.log('📈 Updating KC mastery (stub implementation)');
     console.log('Would update KC mastery:', { userId, kcId, masteryData });
     return true;
   }
@@ -69,9 +60,9 @@ export class SupabaseProfileService {
     interactionData: any
   ): Promise<boolean> {
     console.log('📝 Recording learning interaction (stub implementation)');
-    
-    // Mock implementation
     console.log('Would record interaction:', { userId, interactionData });
     return true;
   }
 }
+
+export default SupabaseProfileService;

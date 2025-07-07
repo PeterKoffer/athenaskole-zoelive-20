@@ -17,10 +17,6 @@ export interface UseUnifiedQuestionGenerationProps {
   teachingPerspective?: TeachingPerspective;
 }
 
-/**
- * Enhanced unified hook for K-12 grade-aligned question generation
- * with teaching perspective integration and guaranteed uniqueness
- */
 export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGenerationProps) => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -33,10 +29,8 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     averageGenerationTime: 0
   });
 
-  // Get effective grade level - fallback to grade 5 if not specified
   const effectiveGradeLevel = props.gradeLevel || 5;
   
-  // Get teaching perspective
   const teachingPerspective = props.teachingPerspective || 
     teachingPerspectiveService.getTeachingPerspective(props.userId, effectiveGradeLevel);
 
@@ -54,14 +48,13 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
         userId: props.userId,
         gradeLevel: effectiveGradeLevel,
         teachingPerspective,
-        usedQuestions: [] // Could be enhanced to track used questions
+        usedQuestions: []
       };
 
       const startTime = Date.now();
       const result = await gradeAlignedQuestionGeneration.generateGradeAlignedQuestion(config);
       const generationTime = Date.now() - startTime;
       
-      // Update statistics
       setGenerationStats(prev => ({
         totalGenerated: prev.totalGenerated + 1,
         gradeAlignedGenerated: prev.gradeAlignedGenerated + 1,
@@ -72,7 +65,6 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
 
       setCurrentQuestion(result);
 
-      // Show success toast with grade information
       toast({
         title: `🎓 Grade ${effectiveGradeLevel} Question Generated!`,
         description: `Personalized ${props.subject} question with ${teachingPerspective.style} learning style`,
@@ -91,11 +83,9 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     } catch (error) {
       console.error('❌ Grade-aligned question generation failed:', error);
       
-      // Fallback to basic generation if grade-aligned fails
       try {
         console.log('🔄 Attempting fallback question generation...');
         
-        // Create a basic fallback question
         const fallbackQuestion: UniqueQuestion = {
           id: `fallback_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
           content: {
@@ -187,27 +177,16 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
   }, [generationStats, effectiveGradeLevel, teachingPerspective]);
 
   return {
-    // Core functionality
     generateUniqueQuestion,
     updateTeachingPerspective,
     saveQuestionHistory,
-    
-    // State
     isGenerating,
     currentQuestion,
-    
-    // Enhanced statistics
     generationStats: getGenerationStats(),
-    
-    // Grade and teaching info
     gradeLevel: effectiveGradeLevel,
     teachingPerspective,
-    
-    // Utility
     questionId: currentQuestion?.id || null,
     isQuestionLoaded: currentQuestion !== null,
-    
-    // Enhanced features
     isGradeAligned: true,
     supportsTeachingPerspectives: true,
     maxConcurrentUsers: 500

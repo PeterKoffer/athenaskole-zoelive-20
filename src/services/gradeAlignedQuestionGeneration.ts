@@ -1,9 +1,11 @@
 
-// Stub implementation for grade-aligned question generation
+// Stub implementation for grade aligned question generation
+
+import { UniqueQuestion } from './globalQuestionUniquenessService';
 
 export interface TeachingPerspective {
   style: string;
-  preferences: Record<string, any>;
+  approach: string;
 }
 
 export interface GradeAlignedConfig {
@@ -16,25 +18,29 @@ export interface GradeAlignedConfig {
   usedQuestions: string[];
 }
 
-export const gradeAlignedQuestionGeneration = {
-  async generateGradeAlignedQuestion(config: GradeAlignedConfig) {
-    console.log('🎓 Grade-aligned question generation (stub implementation)');
+export class GradeAlignedQuestionGeneration {
+  async generateGradeAlignedQuestion(config: GradeAlignedConfig): Promise<UniqueQuestion> {
+    console.log('🎓 Grade Aligned Question Generation (stub implementation)');
     
-    // Mock implementation
     return {
-      id: `grade-aligned-${Date.now()}`,
+      id: `grade_aligned_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
       content: {
-        question: `Grade ${config.gradeLevel} ${config.subject}: What is an important concept?`,
+        question: `Grade ${config.gradeLevel} ${config.subject}: What is a key concept in ${config.skillArea}?`,
         options: ['Concept A', 'Concept B', 'Concept C', 'Concept D'],
         correctAnswer: 0,
-        explanation: `This is aligned to Grade ${config.gradeLevel} standards.`
+        explanation: `This is tailored for Grade ${config.gradeLevel} ${config.subject} with ${config.teachingPerspective.style} learning style.`
       },
       metadata: {
-        gradeLevel: config.gradeLevel,
         subject: config.subject,
         skillArea: config.skillArea,
-        teachingStyle: config.teachingPerspective.style
+        difficultyLevel: config.difficultyLevel,
+        gradeLevel: config.gradeLevel,
+        timestamp: Date.now(),
+        userId: config.userId,
+        sessionId: `grade_aligned_${Date.now()}`
       }
     };
   }
-};
+}
+
+export const gradeAlignedQuestionGeneration = new GradeAlignedQuestionGeneration();

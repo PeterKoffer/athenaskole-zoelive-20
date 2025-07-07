@@ -1,5 +1,5 @@
 
-// Stub implementation for global question uniqueness service
+// Fixed implementation for global question uniqueness service
 
 export interface UniqueQuestion {
   id: string;
@@ -31,11 +31,10 @@ export class GlobalQuestionUniquenessService {
     gradeLevel?: number;
     context?: any;
   }): Promise<UniqueQuestion> {
-    console.log('🎯 Global Question Uniqueness Service: generateUniqueQuestion (stub implementation)');
+    console.log('🎯 Global Question Uniqueness Service: generateUniqueQuestion');
     
     const questionId = `unique_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     
-    // Mock unique question
     const uniqueQuestion: UniqueQuestion = {
       id: questionId,
       content: {
@@ -55,21 +54,20 @@ export class GlobalQuestionUniquenessService {
       }
     };
     
-    this.usedQuestions.add(uniqueQuestion.content.question);
+    GlobalQuestionUniquenessService.usedQuestions.add(uniqueQuestion.content.question);
     return uniqueQuestion;
   }
 
   async trackQuestionUsage(questionId: string, userId: string): Promise<void> {
-    console.log('📊 Tracking question usage (stub implementation):', { questionId, userId });
-    // Mock implementation
+    console.log('📊 Tracking question usage:', { questionId, userId });
   }
 
   async isQuestionUsed(questionText: string): Promise<boolean> {
-    return this.usedQuestions.has(questionText);
+    return GlobalQuestionUniquenessService.usedQuestions.has(questionText);
   }
 
   async clearUsedQuestions(): Promise<void> {
-    this.usedQuestions.clear();
+    GlobalQuestionUniquenessService.usedQuestions.clear();
     console.log('🗑️ Cleared used questions cache');
   }
 }

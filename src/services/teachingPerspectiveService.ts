@@ -3,26 +3,22 @@
 
 export interface TeachingPerspective {
   style: string;
-  preferences: Record<string, any>;
+  approach: string;
 }
 
-export const teachingPerspectiveService = {
+export class TeachingPerspectiveService {
   getTeachingPerspective(userId: string, gradeLevel: number): TeachingPerspective {
-    console.log('🎨 Getting teaching perspective (stub implementation)');
+    console.log('🎨 Teaching Perspective Service (stub implementation)');
     
-    // Mock implementation
     return {
       style: 'visual',
-      preferences: {
-        useImages: true,
-        interactiveElements: true,
-        gradeLevel
-      }
+      approach: 'interactive'
     };
-  },
+  }
 
   saveTeachingPerspective(userId: string, perspective: TeachingPerspective): void {
     console.log('💾 Saving teaching perspective (stub implementation):', perspective);
-    // Mock implementation
   }
-};
+}
+
+export const teachingPerspectiveService = new TeachingPerspectiveService();
