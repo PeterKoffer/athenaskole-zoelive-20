@@ -1,12 +1,13 @@
 
 export interface Question {
+  id?: string;
   question: string;
   options: string[];
   correct: number;
   explanation: string;
-  learningObjectives: string[];
-  estimatedTime: number;
-  conceptsCovered: string[];
+  learningObjectives?: string[];
+  estimatedTime?: number;
+  conceptsCovered?: string[];
   isRecap?: boolean; // Flag to allow repeated questions for recap/review
 }
 

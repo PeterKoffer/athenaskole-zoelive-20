@@ -1,5 +1,5 @@
 
-import { Question } from '../hooks/useReliableQuestionGeneration';
+import { Question } from '../hooks/types';
 
 export const generateFallbackQuestion = (subject: string, skillArea: string): Question => {
   return {

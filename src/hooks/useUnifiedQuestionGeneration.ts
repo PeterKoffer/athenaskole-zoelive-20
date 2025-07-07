@@ -156,7 +156,7 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     additionalContext?: any
   ) => {
     try {
-      await globalQuestionUniquenessService.trackQuestionUsage(question);
+      await globalQuestionUniquenessService.trackQuestionUsage(question.id, props.userId);
       console.log(`📝 Saved question history for Grade ${effectiveGradeLevel}:`, {
         questionId: question.id,
         isCorrect,
@@ -166,7 +166,7 @@ export const useUnifiedQuestionGeneration = (props: UseUnifiedQuestionGeneration
     } catch (error) {
       console.error('❌ Failed to save question history:', error);
     }
-  }, [effectiveGradeLevel]);
+  }, [effectiveGradeLevel, props.userId]);
 
   const updateTeachingPerspective = useCallback((newPerspective: TeachingPerspective) => {
     teachingPerspectiveService.saveTeachingPerspective(props.userId, newPerspective);

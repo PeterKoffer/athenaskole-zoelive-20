@@ -1,6 +1,8 @@
+
 import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useQuestionGeneration, Question } from "../hooks/useQuestionGeneration";
+import { useQuestionGeneration } from "../hooks/useQuestionGeneration";
+import { Question } from "../hooks/types";
 import { createFallbackQuestion } from "../utils/fallbackQuestions";
 
 export interface QuestionManagerProps {
@@ -68,9 +70,21 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
       if (newQuestion) {
         console.log('✅ AI question generated successfully:', newQuestion.question);
         
+        // Ensure the question has all required properties
+        const completeQuestion: Question = {
+          id: newQuestion.id || `question-${Date.now()}`,
+          question: newQuestion.question,
+          options: newQuestion.options,
+          correct: newQuestion.correct,
+          explanation: newQuestion.explanation,
+          learningObjectives: newQuestion.learningObjectives || [`Learning ${subject} ${skillArea}`],
+          estimatedTime: newQuestion.estimatedTime || 60,
+          conceptsCovered: newQuestion.conceptsCovered || [skillArea],
+          isRecap: newQuestion.isRecap || false
+        };
+        
         // Check if this question has been used before (unless it's a recap question)
-        const currentQuestion = newQuestion as Question & { isRecap?: boolean };
-        if (!currentQuestion.isRecap && usedQuestions.includes(newQuestion.question)) {
+        if (!completeQuestion.isRecap && usedQuestions.includes(newQuestion.question)) {
           console.log('⚠️ Duplicate question detected, retrying...');
           // Add to attempts and try again
           setQuestionAttempts(prev => new Set([...prev, newQuestion.question]));
@@ -80,7 +94,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
           }
         }
         
-        setSessionQuestions(prev => [...prev, newQuestion]);
+        setSessionQuestions(prev => [...prev, completeQuestion]);
         setQuestionAttempts(prev => new Set([...prev, newQuestion.question]));
         setHasTriedFallback(false);
       } else {
@@ -107,7 +121,7 @@ export const useQuestionManager = ({ subject, skillArea, difficultyLevel, userId
           });
         } else {
           console.log('⚠️ Even fallback question is duplicate, creating unique one...');
-          const uniqueFallback = {
+          const uniqueFallback: Question = {
             ...fallbackQuestion,
             question: `${fallbackQuestion.question} (Question ${sessionQuestions.length + 1})`
           };

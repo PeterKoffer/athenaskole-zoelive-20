@@ -28,6 +28,39 @@ export class ContentOrchestrator {
     // Stub implementation
     return this.orchestrateContent(subject, skillArea, 3);
   }
+
+  async getAtomSequenceForKc(kcId: string, userId: string) {
+    console.log('🔄 ContentOrchestrator: getAtomSequenceForKc called (stub implementation)');
+    
+    // Stub implementation - return a mock atom sequence
+    return {
+      sequence_id: `seq_${Date.now()}`,
+      atoms: [
+        {
+          id: `atom_${Date.now()}_1`,
+          kc_id: kcId,
+          atom_id: `atom_${Date.now()}_1`,
+          atom_type: 'QUESTION_MULTIPLE_CHOICE',
+          content: {
+            question: 'What is 2 + 2?',
+            options: ['3', '4', '5', '6'],
+            correct: 1,
+            explanation: 'The sum of 2 + 2 equals 4.'
+          },
+          difficulty_level: 3,
+          estimated_time: 60,
+          prerequisites: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ],
+      metadata: {
+        kcId,
+        userId,
+        generatedAt: new Date().toISOString()
+      }
+    };
+  }
 }
 
 export const contentOrchestrator = new ContentOrchestrator();
