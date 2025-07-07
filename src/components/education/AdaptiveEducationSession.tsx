@@ -11,12 +11,14 @@ interface AdaptiveEducationSessionProps {
   subject: string;
   skillArea: string;
   onComplete?: () => void;
+  onBack?: () => void;
 }
 
 const AdaptiveEducationSession: React.FC<AdaptiveEducationSessionProps> = ({
   subject,
   skillArea,
-  onComplete
+  onComplete,
+  onBack
 }) => {
   const { user } = useAuth();
   const { profile, preferences, getRecommendedDifficulty, getPersonalizedSettings } = useLearningProfile();
@@ -77,6 +79,11 @@ const AdaptiveEducationSession: React.FC<AdaptiveEducationSessionProps> = ({
             </div>
             <Progress value={sessionProgress} className="w-full" />
           </div>
+          {onBack && (
+            <Button onClick={onBack} variant="outline" className="mt-4">
+              ← Back
+            </Button>
+          )}
         </CardContent>
       </Card>
 

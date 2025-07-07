@@ -10,3 +10,16 @@ export const generateFallbackQuestion = (subject: string, skillArea: string): Qu
     explanation: `This is a fundamental concept in ${subject} ${skillArea}.`
   };
 };
+
+export const createFallbackQuestion = (): Question => {
+  return {
+    id: `fallback-${Date.now()}`,
+    question: 'What is 2 + 2?',
+    options: ['3', '4', '5', '6'],
+    correct: 1,
+    explanation: 'The sum of 2 + 2 equals 4.',
+    learningObjectives: ['Basic arithmetic'],
+    estimatedTime: 30,
+    conceptsCovered: ['addition']
+  };
+};

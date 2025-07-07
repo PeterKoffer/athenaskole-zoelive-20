@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { aiInteractionService, AIInteraction } from '@/services/aiInteractionService';
+import { aiInteractionService, AIInteractionData } from '@/services/aiInteractionService';
 
 export const useAIInteractionLogger = () => {
   const { user } = useAuth();
@@ -22,7 +22,7 @@ export const useAIInteractionLogger = () => {
   ) => {
     if (!user) return null;
 
-    const interaction: Omit<AIInteraction, 'id'> = {
+    const interaction: AIInteractionData = {
       user_id: user.id,
       ai_service: aiService,
       interaction_type: interactionType,
