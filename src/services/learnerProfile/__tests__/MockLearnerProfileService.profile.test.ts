@@ -11,9 +11,9 @@ describe('MockLearnerProfileService - Profile Management', () => {
     const profile = await mockProfileService.getProfile(MOCK_USER_ID);
     expect(profile).toBeDefined();
     expect(profile.userId).toBe(MOCK_USER_ID);
-    expect(profile.preferences.learningPace).toBe('medium');
-    expect(profile.preferences.preferredDifficulty).toBe('medium');
-    expect(profile.preferences.targetSessionLengthMinutes).toBe(30);
+    expect(profile.preferences.learningStyle).toBe('mixed');
+    expect(profile.preferences.difficultyPreference).toBe(0.5);
+    expect(profile.preferences.sessionLength).toBe(30);
   });
 
   it('should retrieve an existing profile', async () => {
@@ -25,14 +25,14 @@ describe('MockLearnerProfileService - Profile Management', () => {
 
   it('should update user preferences', async () => {
     const newPreferences: Partial<LearnerPreferences> = {
-      learningPace: 'fast',
-      preferredDifficulty: 'hard',
-      targetSessionLengthMinutes: 60,
+      learningStyle: 'kinesthetic',
+      difficultyPreference: 0.8, // Corresponds to 'hard' conceptually
+      sessionLength: 45,
     };
     const updatedProfile = await mockProfileService.updateUserPreferences(MOCK_USER_ID, newPreferences);
-    expect(updatedProfile.preferences.learningPace).toBe('fast');
-    expect(updatedProfile.preferences.preferredDifficulty).toBe('hard');
-    expect(updatedProfile.preferences.targetSessionLengthMinutes).toBe(60);
+    expect(updatedProfile.preferences.learningStyle).toBe('kinesthetic');
+    expect(updatedProfile.preferences.difficultyPreference).toBe(0.8);
+    expect(updatedProfile.preferences.sessionLength).toBe(45);
 
     const storedProfile = await mockProfileService.getProfile(MOCK_USER_ID);
     expect(storedProfile.preferences).toEqual(expect.objectContaining(newPreferences));

@@ -1,21 +1,20 @@
-
 // src/services/learnerProfile/MockProfileService.ts
 
 import {
   LearnerProfile,
   KnowledgeComponentMastery,
   LearnerPreferences,
-  InteractionEvent
+  InteractionEvent as LocalInteractionEvent, // Renamed to avoid clash with global/richer InteractionEvent
+  KCMasteryUpdateData
 } from '@/types/learnerProfile';
-import { LearningAtomPerformance } from '@/types/learning';
+// We don't need LearningAtomPerformance here anymore for updateKCMastery
 
-export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012';
+export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012'; // Keep for tests that might use it
 
 const DEFAULT_PREFERENCES: LearnerPreferences = {
-  learningPace: 'medium',
-  preferredDifficulty: 'medium',
-  preferredInteractionTypes: [],
-  targetSessionLengthMinutes: 30,
+  learningStyle: 'mixed', // Default as per new type
+  difficultyPreference: 0.5, // Default as per new type
+  sessionLength: 30, // Default as per new type
 };
 
 export class MockProfileService {
@@ -28,13 +27,8 @@ export class MockProfileService {
         userId,
         kcMasteryMap: {},
         preferences: { ...DEFAULT_PREFERENCES },
-        recentPerformance: [],
-        aggregateMetrics: {
-          overallMastery: 0,
-          completedKCs: 0,
-          totalKCsAttempted: 0,
-          timeSpentSeconds: 0,
-        },
+        recentPerformance: [], // As per LearnerProfile type
+        overallMastery: 0,     // As per LearnerProfile type
         lastUpdatedTimestamp: now,
         createdAt: now,
       };
@@ -46,17 +40,8 @@ export class MockProfileService {
 
   async getProfile(userId: string): Promise<LearnerProfile> {
     console.log(`🔍 MockProfileService: Getting profile for user ${userId}`);
-    return JSON.parse(JSON.stringify(this.getOrCreateProfileSync(userId))); // Deep copy
-  }
-
-  async updateProfile(userId: string, updates: Partial<LearnerProfile>): Promise<LearnerProfile> {
-    console.log(`🔄 MockProfileService: Updating profile for user ${userId}`);
-    const profile = this.getOrCreateProfileSync(userId);
-    // Simple merge, not handling deep merge of kcMasteryMap or preferences here directly
-    // Those should be updated via specific methods like updateKCMastery or updateUserPreferences
-    const updatedProfile = { ...profile, ...updates, lastUpdatedTimestamp: Date.now() };
-    this.store.set(userId, updatedProfile);
-    return JSON.parse(JSON.stringify(updatedProfile));
+    // Return a deep copy to prevent direct mutation of store from outside
+    return JSON.parse(JSON.stringify(this.getOrCreateProfileSync(userId)));
   }
 
   async updateUserPreferences(userId: string, preferences: Partial<LearnerPreferences>): Promise<LearnerProfile> {
@@ -64,90 +49,83 @@ export class MockProfileService {
     const profile = this.getOrCreateProfileSync(userId);
     profile.preferences = { ...profile.preferences, ...preferences };
     profile.lastUpdatedTimestamp = Date.now();
-    this.store.set(userId, profile);
+    // No need to call this.store.set if profile is a direct reference and mutated
     return JSON.parse(JSON.stringify(profile));
   }
 
   async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | undefined> {
     const profile = this.getOrCreateProfileSync(userId);
-    return profile.kcMasteryMap[kcId] ? JSON.parse(JSON.stringify(profile.kcMasteryMap[kcId])) : undefined;
+    const kcMastery = profile.kcMasteryMap[kcId];
+    return kcMastery ? JSON.parse(JSON.stringify(kcMastery)) : undefined;
   }
 
-  async updateKCMastery(userId: string, kcId: string, performance: LearningAtomPerformance): Promise<KnowledgeComponentMastery> {
-    console.log(`🧠 MockProfileService: Updating KC mastery for user ${userId}, KC ${kcId}`);
-    const profile = this.getOrCreateProfileSync(userId);
+  async updateKCMastery(userId: string, kcId: string, updateData: KCMasteryUpdateData): Promise<KnowledgeComponentMastery> {
+    console.log(`🧠 MockProfileService: Updating KC mastery for user ${userId}, KC ${kcId}`, updateData);
+    const profile = this.getOrCreateProfileSync(userId); // Get direct reference from store
     
     let kcMastery = profile.kcMasteryMap[kcId];
     if (!kcMastery) {
       kcMastery = {
         kcId,
         masteryLevel: 0.5, // Initial neutral mastery
-        totalAttempts: 0,
-        successfulAttempts: 0,
-        interactionHistory: [],
+        attempts: 0,
+        correctAttempts: 0,
+        history: [],
         lastAttemptTimestamp: 0,
-        currentStreak: 0,
-        timeSpentSeconds: 0,
+        // currentStreak and timeSpentSeconds are not in the new KnowledgeComponentMastery type
       };
+      profile.kcMasteryMap[kcId] = kcMastery;
     }
 
-    kcMastery.totalAttempts += performance.attempts; // Assuming performance.attempts is for this interaction with the KC
-    kcMastery.timeSpentSeconds += performance.timeTakenSeconds;
+    kcMastery.attempts += updateData.attemptsInInteraction || 1; // Default to 1 attempt if not specified
 
-    const interactionEvent: InteractionEvent = {
-      timestamp: new Date(performance.timestamp).getTime(),
-      success: performance.success,
-      timeTakenSeconds: performance.timeTakenSeconds,
-      hintsUsed: performance.hintsUsed,
-      // difficulty: performance.difficulty || 'medium', // performance.difficulty doesn't exist on LearningAtomPerformance
-      // For now, we'll assume the difficulty is handled by the learning atom itself
+    const historyEvent: LocalInteractionEvent = {
+      timestamp: new Date(updateData.timestamp).getTime(),
+      eventType: updateData.eventType || 'kc_interaction', // Generic type if not specified
+      score: updateData.success ? 1 : 0, // Simple score based on success
+      details: {
+        ...(updateData.details || {}), // Preserve other details if any
+        timeTakenMs: updateData.timeTakenMs,
+        hintsUsed: updateData.hintsUsed,
+      },
     };
-    kcMastery.interactionHistory.push(interactionEvent);
-    if (kcMastery.interactionHistory.length > 20) { // Keep history capped
-      kcMastery.interactionHistory.shift();
+    kcMastery.history.push(historyEvent);
+    if (kcMastery.history.length > 20) { // Keep history capped
+      kcMastery.history.shift();
     }
 
-    if (performance.success) {
-      kcMastery.successfulAttempts += 1; // Assuming performance.attempts was 1 for this specific KC interaction
-      kcMastery.currentStreak = (kcMastery.currentStreak || 0) + 1;
-      // Simple learning curve: increase mastery, more if already somewhat proficient
+    if (updateData.success) {
+      kcMastery.correctAttempts += 1; // Assuming one successful outcome for this update trigger
+      // Simple learning curve: increase mastery
       kcMastery.masteryLevel += (1 - kcMastery.masteryLevel) * 0.25;
     } else {
-      kcMastery.currentStreak = 0;
-      // Simple learning curve: decrease mastery, more if already struggling
+      // Simple learning curve: decrease mastery
       kcMastery.masteryLevel -= kcMastery.masteryLevel * 0.25;
     }
     kcMastery.masteryLevel = Math.max(0.01, Math.min(0.99, kcMastery.masteryLevel)); // Bound mastery
-    kcMastery.lastAttemptTimestamp = new Date(performance.timestamp).getTime();
+    kcMastery.lastAttemptTimestamp = new Date(updateData.timestamp).getTime();
 
-    profile.kcMasteryMap[kcId] = kcMastery;
-    this.calculateOverallMastery(profile); // Update aggregate
+    this.calculateOverallMastery(profile); // Update aggregate overallMastery
     profile.lastUpdatedTimestamp = Date.now();
-    this.store.set(userId, profile);
+    // profile is a direct reference to the object in the store, so mutations are automatically reflected.
+    // this.store.set(userId, profile); // is redundant but harmless.
 
-    return JSON.parse(JSON.stringify(kcMastery));
+    return JSON.parse(JSON.stringify(kcMastery)); // Return a copy
   }
 
   private calculateOverallMastery(profile: LearnerProfile): void {
     const kcIds = Object.keys(profile.kcMasteryMap);
     if (kcIds.length === 0) {
-      profile.aggregateMetrics.overallMastery = 0;
-      profile.aggregateMetrics.completedKCs = 0;
-      profile.aggregateMetrics.totalKCsAttempted = 0;
+      profile.overallMastery = 0;
+      // aggregateMetrics.completedKCs and totalKCsAttempted are not on the new LearnerProfile type
       return;
     }
     let totalMasterySum = 0;
-    let completedKCs = 0;
     kcIds.forEach(kcId => {
-      const mastery = profile.kcMasteryMap[kcId].masteryLevel;
-      totalMasterySum += mastery;
-      if (mastery >= 0.85) { // Arbitrary threshold for "completed" KC
-        completedKCs++;
-      }
+      totalMasterySum += profile.kcMasteryMap[kcId].masteryLevel;
     });
-    profile.aggregateMetrics.overallMastery = totalMasterySum / kcIds.length;
-    profile.aggregateMetrics.completedKCs = completedKCs;
-    profile.aggregateMetrics.totalKCsAttempted = kcIds.length;
+    profile.overallMastery = totalMasterySum / kcIds.length;
+    // No completedKCs or totalKCsAttempted in the new LearnerProfile.aggregateMetrics
   }
 
   // For testing purposes
@@ -161,4 +139,5 @@ export class MockProfileService {
   }
 }
 
+// Ensure a single instance is exported for consistent mocking and usage
 export const mockProfileService = new MockProfileService();
