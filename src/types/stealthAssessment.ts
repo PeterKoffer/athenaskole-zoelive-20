@@ -145,4 +145,8 @@ export interface IStealthAssessmentService {
   logTutorQuery(details: Omit<TutorQueryEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
   logContentView(details: Omit<ContentViewEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, sourceComponentId?: string): Promise<void>;
   // ... other helper methods can be added
+
+  // Methods for debugging/testing the in-memory queue aspect
+  getInMemoryEvents(): Promise<InteractionEvent[]>;
+  clearInMemoryEvents(): Promise<void>;
 }

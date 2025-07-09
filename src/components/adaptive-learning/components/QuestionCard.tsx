@@ -42,12 +42,12 @@ const QuestionCard = ({
     // Example: Log content view when question is first displayed
     // This assumes question.id can serve as a contentAtomId for this context
     // and that knowledgeComponentIds are available on the question object.
-    // stealthAssessmentService.logContentView({
-    //   contentAtomId: question.id, 
-    //   knowledgeComponentIds: question.knowledgeComponentIds || ['unknown_kc_question_view'],
-    //   contentType: 'QUESTION_INTERACTIVE_VIEW',
-    // }, `QuestionCard-View-${question.id}`);
-  }, [question.id]); // Only re-run if question.id changes
+    stealthAssessmentService.logContentView({
+      contentAtomId: question.id,
+      knowledgeComponentIds: question.knowledgeComponentIds || ['unknown_kc_question_view'],
+      contentType: 'QUESTION_DISPLAYED', // Using a clear content type
+    }, `QuestionCard-View-${question.id}`);
+  }, [question.id, question.knowledgeComponentIds]); // Re-run if question or its KCs change
 
   const handleActualSubmission = (selectedIndex: number) => {
     const isCorrect = selectedIndex === question.correct;

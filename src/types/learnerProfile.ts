@@ -8,6 +8,23 @@ export interface KcMastery {
   last_updated: string;
 }
 
+/**
+ * Data structure for updating Knowledge Component mastery,
+ * typically derived from a stealth assessment event (e.g., QuestionInteractionEvent from stealthAssessment.ts).
+ */
+export interface KCMasteryUpdateData {
+  success: boolean;
+  /** Number of attempts within the specific interaction/session that this data point refers to.
+   *  For a single question answer, this would usually be 1 from the perspective of the KC.
+   */
+  attemptsInInteraction?: number;
+  timeTakenMs?: number;
+  hintsUsed?: number;
+  timestamp: string; // ISO string from the richer stealth assessment event
+  eventType?: string; // e.g., 'answer_submitted', 'hint_used', to be stored in the simpler local InteractionEvent history
+  details?: any; // To store other parts of the payload from the richer event
+}
+
 export interface KnowledgeComponentMastery {
   kcId: string;
   masteryLevel: number;

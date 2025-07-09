@@ -6,9 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Brain, TrendingUp, TrendingDown } from 'lucide-react';
+import stealthAssessmentService from '@/services/stealthAssessmentService';
+import { InteractionEventType, InteractionEventContext } from '@/types/stealthAssessment'; // Assuming InteractionEventContext is here
+import { v4 as uuidv4 } from 'uuid'; // For generating eventId if not handled by service's createFullEvent
 
 interface AdaptiveLearningAtomRendererProps {
   atom: LearningAtom;
+  eventContext?: InteractionEventContext; // Allow context to be passed in
   onComplete: (performance: any) => void;
 }
 
@@ -30,6 +34,20 @@ const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
+  const [questionLoadTime, setQuestionLoadTime] = useState<number>(0);
+
+  useEffect(() => {
+    if (currentAtom) {
+      setQuestionLoadTime(Date.now());
+      stealthAssessmentService.logContentView({
+        contentAtomId: currentAtom.id,
+        knowledgeComponentIds: currentAtom.knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_load'],
+        contentType: 'LEARNING_ATOM_QUESTION_LOADED',
+        // eventContext can be passed as a prop or defaulted
+      }, `AdaptiveLearningAtomRenderer-Load-${currentAtom.id}`);
+    }
+  }, [currentAtom?.id]); // Trigger when currentAtom or its ID changes
+
 
   // Mock question data - in real implementation, this would come from the atom's content
   const mockQuestions = {
@@ -61,8 +79,21 @@ const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> 
     setSelectedAnswer(answerIndex.toString());
     const isCorrect = answerIndex === currentQuestion.correct;
     
-    recordResponse(isCorrect, hintsUsed);
+    recordResponse(isCorrect, hintsUsed); // This hook likely handles internal state for attempts, etc.
     setShowFeedback(true);
+
+    const timeTakenMs = Date.now() - questionLoadTime;
+
+    stealthAssessmentService.logQuestionAttempt({
+      questionId: currentAtom?.id || 'unknown_question', // Use currentAtom.id as questionId
+      knowledgeComponentIds: currentAtom?.knowledgeComponentIds || [currentAtom?.curriculumObjectiveId || 'unknown_kc_atom_answer'],
+      answerGiven: currentQuestion.options[answerIndex],
+      isCorrect: isCorrect,
+      attemptsMade: currentAttempt, // from useAdaptiveLearningSession hook
+      timeTakenMs: timeTakenMs,
+      // eventContext can be passed as a prop or defaulted
+    }, `AdaptiveLearningAtomRenderer-Submit-${currentAtom?.id}`);
+
 
     if (isCorrect) {
       setTimeout(() => {
@@ -72,15 +103,28 @@ const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> 
         }
       }, 2000);
     } else {
+      // Allow retry or show feedback longer before next action
       setTimeout(() => {
         setShowFeedback(false);
         setSelectedAnswer(null);
-      }, 2000);
+        // Potentially log a "retry_initiated" or similar if applicable
+      }, 3000); // Increased time for feedback visibility on wrong answer
     }
   };
 
   const handleHintRequest = () => {
-    setHintsUsed(prev => prev + 1);
+    const newHintsUsed = hintsUsed + 1;
+    setHintsUsed(newHintsUsed);
+
+    if (currentAtom && currentQuestion.hints[newHintsUsed -1]) {
+      stealthAssessmentService.logHintUsage({
+        questionId: currentAtom.id,
+        knowledgeComponentIds: currentAtom.knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_hint'],
+        hintId: `hint_${newHintsUsed}`, // Or actual hint text/ID if available
+        hintLevel: newHintsUsed,
+        // eventContext can be passed as a prop or defaulted
+      }, `AdaptiveLearningAtomRenderer-Hint-${currentAtom.id}`);
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {

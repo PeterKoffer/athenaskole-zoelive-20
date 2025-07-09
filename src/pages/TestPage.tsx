@@ -1,28 +1,16 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
 
 const TestPage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <Button onClick={() => navigate('/')} className="mb-6">
-          ← Back to Home
-        </Button>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Test Page</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>This is a simple test page to verify routing works.</p>
-            <p>If you can see this, routing is working fine.</p>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="p-4 text-white"> {/* Added text-white for visibility on dark background */}
+      <h1 className="text-2xl font-bold">Minimal Test Page</h1>
+      <p>If you see this, basic rendering and routing to /test are working.</p>
+      <button
+        onClick={() => console.log('TestPage button clicked!')}
+        className="mt-4 p-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded"
+      >
+        Click Me for Console Log
+      </button>
     </div>
   );
 };
