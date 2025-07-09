@@ -130,12 +130,12 @@ class StealthAssessmentService implements IStealthAssessmentService {
   }
 
   // --- Debug/Test methods for in-memory queue ---
-  public async getInMemoryEvents(): Promise<InteractionEvent[]> {
-    return this.eventQueue.getEvents();
+  public async getInMemoryEvents(): Promise<any[]> {
+    return [...this.eventQueue];
   }
 
   public async clearInMemoryEvents(): Promise<void> {
-    this.eventQueue.clearEvents();
+    this.eventQueue = [];
   }
 }
 
