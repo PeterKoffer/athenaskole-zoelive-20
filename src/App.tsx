@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -52,7 +53,9 @@ const App = () => (
             {/* If HomePage is still needed for a different path, add it here.
                 Otherwise, if Index replaces its functionality, HomePage import can be removed.
                 Example: <Route path="/home" element={<HomePage />} />
-            */}
+    
+            <Route path="/" element={<Index />} />
+        */}
           </Routes>
         </AuthProvider>
       </BrowserRouter>

@@ -6,10 +6,13 @@ import { UseProfileDataReturn } from "./types";
 
 export const useProfileData = (): UseProfileDataReturn => {
   const {
+    profile,
     profileData,
     setProfileData,
     profileExists,
-    setProfileExists
+    setProfileExists,
+    loading: fetchLoading,
+    error: fetchError
   } = useProfileFetch();
 
   const { uploading, handleAvatarUpload } = useAvatarUpload(
@@ -17,7 +20,7 @@ export const useProfileData = (): UseProfileDataReturn => {
     setProfileData
   );
 
-  const { loading, handleProfileUpdate } = useProfileUpdate(
+  const { loading: updateLoading, handleProfileUpdate } = useProfileUpdate(
     profileData,
     profileExists,
     setProfileExists
@@ -26,7 +29,7 @@ export const useProfileData = (): UseProfileDataReturn => {
   return {
     profileData,
     setProfileData,
-    loading,
+    loading: fetchLoading || updateLoading,
     uploading,
     handleAvatarUpload,
     handleProfileUpdate

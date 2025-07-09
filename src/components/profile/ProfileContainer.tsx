@@ -27,6 +27,18 @@ const ProfileContainer = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  const handleAvatarUploadWrapper = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleAvatarUpload(file);
+    }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleProfileUpdate(profileData);
+  };
+
   if (!user) {
     navigate('/auth');
     return null;
@@ -50,8 +62,8 @@ const ProfileContainer = () => {
             loading={loading}
             uploading={uploading}
             onDataChange={setProfileData}
-            onSubmit={handleProfileUpdate}
-            onAvatarUpload={handleAvatarUpload}
+            onSubmit={handleFormSubmit}
+            onAvatarUpload={handleAvatarUploadWrapper}
           />
         )}
 

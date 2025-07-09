@@ -1,102 +1,67 @@
 
-import { useState } from 'react';
-import { LearnerProfile } from '@/types/learnerProfile';
-import { KnowledgeComponent } from '@/types/knowledgeComponent';
-import aiCreativeDirectorService from '@/services/aiCreativeDirectorService';
+import { useState, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { aiCreativeDirectorService } from '@/services/aiCreativeDirectorService';
 
 export const useContentGeneration = () => {
+  const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const recommendAndLoadContent = async (
-    profile: LearnerProfile,
-    sessionKcs: KnowledgeComponent[],
-    onSuccess: (kc: KnowledgeComponent, sequence: any) => void,
-    onError: (error: string) => void
-  ) => {
-    console.log('🎯 Starting AI-powered content generation with enhanced uniqueness...');
+  const generateContent = useCallback(async (prompt: string, context: any) => {
     setIsGenerating(true);
     setError(null);
-
+    
     try {
-      // Simple KC selection for now - rotate through available KCs
-      const availableKcs = [
-        {
-          id: 'kc_math_g4_add_fractions_likedenom',
-          name: 'Adding Fractions with Like Denominators',
-          subject: 'Mathematics',
-          gradeLevels: [4],
-          difficulty_estimate: 0.4
-        },
-        {
-          id: 'kc_math_g3_multiplication_basic',
-          name: 'Basic Multiplication',
-          subject: 'Mathematics', 
-          gradeLevels: [3],
-          difficulty_estimate: 0.3
-        },
-        {
-          id: 'kc_english_g5_reading_comprehension',
-          name: 'Reading Comprehension',
-          subject: 'English',
-          gradeLevels: [5],
-          difficulty_estimate: 0.5
-        }
-      ];
-
-      // Select KC that hasn't been used recently in this session
-      const usedKcIds = sessionKcs.map(kc => kc.id);
-      const availableUnusedKcs = availableKcs.filter(kc => !usedKcIds.includes(kc.id));
-      const selectedKc = availableUnusedKcs.length > 0 
-        ? availableUnusedKcs[0] 
-        : availableKcs[Math.floor(Math.random() * availableKcs.length)];
-
-      console.log('🎯 Selected KC for AI generation:', selectedKc.name, `(${selectedKc.id})`);
-
-      // Generate unique session context
-      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      const uniquenessContext = {
-        sessionId,
-        timestamp: Date.now(),
-        previousSessionCount: sessionKcs.length,
-        userContext: profile.userId,
-        uniquenessBooster: Math.random() * 1000,
-        generationAttempt: Date.now() % 10000
-      };
-
-      console.log('🎲 Enhanced uniqueness context:', uniquenessContext);
-
-      // Get atom sequence from AI Creative Director
-      const sequence = await aiCreativeDirectorService.getAtomSequenceForKc(
-        selectedKc.id,
-        profile.userId
-      );
-
-      if (!sequence) {
-        throw new Error(`Failed to generate AI content for topic: ${selectedKc.name}. Please try again.`);
-      }
-
-      console.log('✅ AI sequence generated successfully:', {
-        sequenceId: sequence.sequence_id,
-        atomCount: sequence.atoms.length,
-        selectedKc: selectedKc.name
+      console.log('🎨 Generating content with AI Creative Director');
+      const result = await aiCreativeDirectorService.generateCreativeContent(prompt, context);
+      
+      toast({
+        title: "Content Generated",
+        description: "AI Creative Director has generated new content",
+        duration: 3000
       });
-
-      onSuccess(selectedKc as KnowledgeComponent, sequence);
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      console.error('❌ No AI sequence generated:', errorMessage);
+      
+      return result;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate content';
       setError(errorMessage);
-      onError(errorMessage);
+      
+      toast({
+        title: "Generation Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000
+      });
+      
+      return null;
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [toast]);
+
+  const getAtomSequence = useCallback(async (kcId: string, userId: string) => {
+    setIsGenerating(true);
+    setError(null);
+    
+    try {
+      console.log('🔄 Getting atom sequence for KC:', kcId);
+      const result = await aiCreativeDirectorService.getAtomSequenceForKc(kcId, userId);
+      return result;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to get atom sequence';
+      setError(errorMessage);
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  }, []);
 
   return {
+    generateContent,
+    getAtomSequence,
     isGenerating,
-    error,
-    recommendAndLoadContent
+    error
   };
 };

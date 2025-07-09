@@ -1,5 +1,12 @@
 
-// src/types/learnerProfile.ts
+// Learner Profile Types
+
+export interface KcMastery {
+  kc_id: string;
+  mastery_level: number;
+  confidence: number;
+  last_updated: string;
+}
 
 /**
  * Data structure for updating Knowledge Component mastery,
@@ -20,38 +27,45 @@ export interface KCMasteryUpdateData {
 
 export interface KnowledgeComponentMastery {
   kcId: string;
-  masteryLevel: number; // 0.0 to 1.0
-  attempts: number;
-  correctAttempts: number;
-  lastAttemptTimestamp: number;
-  history: InteractionEvent[];
+  masteryLevel: number;
+  practiceCount: number;
+  lastAssessed: string;
+  totalAttempts: number;
+  successfulAttempts: number;
+  currentStreak: number;
+  interactionHistory: Array<{
+    timestamp: string;
+    success: boolean;
+    timeTakenSeconds: number;
+    hintsUsed: number;
+    attempts: number;
+    firstAttemptSuccess: boolean;
+  }>;
 }
-
-// Type alias for backward compatibility
-export type KcMastery = KnowledgeComponentMastery;
-
-export interface InteractionEvent {
-  timestamp: number;
-  eventType: string;
-  score: number;
-  details?: any;
-}
-
-// Add the missing type that was being imported
-export type KcMasteryHistoryItem = InteractionEvent;
 
 export interface LearnerPreferences {
-  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
-  difficultyPreference: number; // 0.0 to 1.0
-  sessionLength: number; // minutes
+  preferredSubjects: string[];
+  learningStyle: string;
+  difficultyPreference: number;
+  sessionLength: number;
 }
 
 export interface LearnerProfile {
   userId: string;
-  kcMasteryMap: Record<string, KnowledgeComponentMastery>;
+  user_id: string;
+  overall_mastery: number;
+  kc_masteries: KcMastery[];
+  kcMasteryMap?: Record<string, KnowledgeComponentMastery>;
   preferences: LearnerPreferences;
-  recentPerformance: number[];
+  created_at: string;
+  updated_at: string;
+  recentPerformance: any[];
   overallMastery: number;
   lastUpdatedTimestamp: number;
   createdAt: number;
+  aggregateMetrics: {
+    overallMastery: number;
+    completedKCs: number;
+    totalKCsAttempted: number;
+  };
 }

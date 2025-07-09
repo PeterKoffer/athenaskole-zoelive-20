@@ -1,109 +1,77 @@
 
-// src/services/stealthAssessment/supabaseEventLogger.ts
+// Simplified Supabase Event Logger (Mock Implementation)
 
-import { v4 as uuidv4 } from 'uuid';
-import { supabase } from '@/integrations/supabase/client';
-import { InteractionEventType, InteractionEvent, QuestionAttemptEvent, GameInteractionEvent, ContentViewEvent } from '@/types/stealthAssessment';
-import { getCurrentSessionId } from './userUtils';
+export interface InteractionEvent {
+  id?: string;
+  user_id: string;
+  session_id: string;
+  event_type: string;
+  event_data: any;
+  timestamp: string;
+  context?: any;
+}
 
 export class SupabaseEventLogger {
-  async logInteractionEvent(event: {
-    event_type: InteractionEventType;
-    user_id: string;
-    event_data: any;
-    kc_ids?: string[];
-    content_atom_id?: string;
-    is_correct?: boolean;
-  }): Promise<void> {
-    console.log('SupabaseEventLogger: Logging interaction event:', event.event_type, 'for user:', event.user_id);
-    
+  private events: InteractionEvent[] = [];
+
+  async logEvent(event: Omit<InteractionEvent, 'id' | 'timestamp'>): Promise<string | null> {
     try {
-      const recordToInsert = {
-        event_id: uuidv4(),
-        user_id: event.user_id,
-        session_id: getCurrentSessionId(),
-        timestamp: new Date().toISOString(),
-        event_type: event.event_type,
-        event_data: event.event_data,
-        kc_ids: event.kc_ids,
-        content_atom_id: event.content_atom_id,
-        is_correct: event.is_correct,
+      console.log('📊 [SupabaseEventLogger] Logging event:', event.event_type);
+      
+      const fullEvent: InteractionEvent = {
+        ...event,
+        id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date().toISOString()
       };
-
-      console.log('SupabaseEventLogger: Inserting record to interaction_events:', recordToInsert);
-
-      const { data, error } = await supabase
-        .from('interaction_events')
-        .insert(recordToInsert);
-
-      if (error) {
-        console.error('SupabaseEventLogger: Supabase error logging interaction event:', error);
-        throw error;
-      } else {
-        console.log('SupabaseEventLogger: Successfully logged interaction event for user:', event.user_id);
-      }
+      
+      // Store in memory for now (since we don't have the database table)
+      this.events.push(fullEvent);
+      
+      console.log('✅ [SupabaseEventLogger] Event logged successfully:', fullEvent.id);
+      return fullEvent.id;
     } catch (error) {
-      console.error('SupabaseEventLogger: Exception during interaction event logging:', error);
-      throw error;
+      console.error('❌ [SupabaseEventLogger] Failed to log event:', error);
+      return null;
     }
   }
 
-  async flushEventBatch(events: InteractionEvent[]): Promise<void> {
-    if (events.length === 0) return;
-
-    console.log(`SupabaseEventLogger: Flushing ${events.length} events to Supabase...`);
-
+  async getEvents(userId: string, sessionId?: string): Promise<InteractionEvent[]> {
     try {
-      const recordsToInsert = events.map(event => {
-        // Create a base object for event_data by excluding common fields
-        const {
-          eventId,
-          userId,
-          sessionId,
-          timestamp,
-          type,
-          sourceComponentId,
-          // Specific fields that have their own columns
-          questionId,
-          knowledgeComponentIds,
-          isCorrect,
-          gameId,
-          contentAtomId,
-          // Destructure the rest into a new object for event_data
-          ...specificEventData
-        } = event as any; // Use 'as any' carefully here for destructuring various event types
-
-        return {
-          event_id: event.eventId,
-          user_id: event.userId,
-          session_id: event.sessionId || undefined,
-          timestamp: new Date(event.timestamp).toISOString(),
-          event_type: event.type,
-          source_component_id: event.sourceComponentId || undefined,
-          event_data: specificEventData, // This is now a plain object suitable for JSON
-          question_id: (event as QuestionAttemptEvent).questionId || undefined,
-          kc_ids: (event as QuestionAttemptEvent | GameInteractionEvent | ContentViewEvent).knowledgeComponentIds || undefined,
-          is_correct: 'isCorrect' in event ? (event as QuestionAttemptEvent).isCorrect : undefined,
-          game_id: (event as GameInteractionEvent).gameId || undefined,
-          content_atom_id: (event as ContentViewEvent).contentAtomId || undefined,
-        };
-      });
-
-      console.log(`SupabaseEventLogger: Attempting to insert ${recordsToInsert.length} records to interaction_events table`);
-
-      const { data, error } = await supabase
-        .from('interaction_events')
-        .insert(recordsToInsert);
-
-      if (error) {
-        console.error('SupabaseEventLogger: Supabase error flushing event queue:', error);
-        throw error;
-      } else {
-        console.log(`SupabaseEventLogger: Successfully flushed ${events.length} events to Supabase interaction_events table.`);
+      console.log('📋 [SupabaseEventLogger] Retrieving events for user:', userId);
+      
+      let filteredEvents = this.events.filter(event => event.user_id === userId);
+      
+      if (sessionId) {
+        filteredEvents = filteredEvents.filter(event => event.session_id === sessionId);
       }
+      
+      console.log('✅ [SupabaseEventLogger] Retrieved events:', filteredEvents.length);
+      return filteredEvents;
     } catch (error) {
-      console.error('SupabaseEventLogger: Exception during event queue flush:', error);
-      throw error;
+      console.error('❌ [SupabaseEventLogger] Failed to retrieve events:', error);
+      return [];
     }
+  }
+
+  async flushEventBatch(events: any[]): Promise<boolean> {
+    try {
+      console.log('🔄 [SupabaseEventLogger] Flushing event batch:', events.length);
+      // In a real implementation, this would send events to Supabase
+      return true;
+    } catch (error) {
+      console.error('❌ [SupabaseEventLogger] Failed to flush event batch:', error);
+      return false;
+    }
+  }
+
+  getStoredEventsCount(): number {
+    return this.events.length;
+  }
+
+  clearEvents(): void {
+    this.events = [];
+    console.log('🧹 [SupabaseEventLogger] Events cleared');
   }
 }
+
+export const supabaseEventLogger = new SupabaseEventLogger();

@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Brain, Calendar, Gamepad2, Settings, TestTube2 } from "lucide-react";
+import AuthModal from "@/components/AuthModal";
+import { useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const features = [
     {
@@ -45,10 +48,10 @@ const Index = () => {
           </div>
         </div>
         <div className="flex space-x-4">
-          <Button variant="ghost" onClick={() => navigate('/auth')}>
+          <Button variant="ghost" onClick={() => setShowAuthModal(true)}>
             Sign In
           </Button>
-          <Button onClick={() => navigate('/auth')}>
+          <Button onClick={() => setShowAuthModal(true)}>
             Get Started
           </Button>
         </div>
@@ -65,14 +68,14 @@ const Index = () => {
             Make learning fun, engaging, and effective with personalized education.
           </p>
           <div className="flex justify-center space-x-4">
-            <Button size="lg" onClick={() => navigate('/daily-program')} className="bg-purple-600 hover:bg-purple-700">
-              Start Learning
+            <Button size="lg" onClick={() => navigate('/test')} className="bg-purple-600 hover:bg-purple-700">
+              Start Test
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/enhanced-daily-program')} className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-              Enhanced Program
+            <Button size="lg" variant="outline" onClick={() => navigate('/stealth-assessment-test')} className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+              Stealth Assessment
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/adaptive-learning-demo')} className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white">
-              Try Demo
+            <Button size="lg" variant="outline" onClick={() => navigate('/simple-stealth-test')} className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white">
+              Simple Test
             </Button>
           </div>
         </div>
@@ -101,20 +104,29 @@ const Index = () => {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/test')}
               className="border-white/20 text-white hover:bg-white/10 h-16"
             >
               <Settings className="w-5 h-5 mr-2" />
-              Dashboard
+              Test Page
             </Button>
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate('/adaptive-integration-test')}
+              onClick={() => navigate('/simple-stealth-test')}
               className="border-green-400/50 text-green-400 hover:bg-green-400/10 h-16"
             >
               <TestTube2 className="w-5 h-5 mr-2" />
-              Integration Tests
+              Simple Test
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/stealth-assessment-test')}
+              className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 h-16"
+            >
+              <Brain className="w-5 h-5 mr-2" />
+              Stealth Assessment Test
             </Button>
             <Button
               variant="outline"
@@ -122,7 +134,7 @@ const Index = () => {
               onClick={() => navigate('/auth')}
               className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10 h-16"
             >
-              <Brain className="w-5 h-5 mr-2" />
+              <Settings className="w-5 h-5 mr-2" />
               Sign In
             </Button>
           </div>
@@ -135,6 +147,17 @@ const Index = () => {
           <p>&copy; 2024 NELIE. Empowering the next generation of learners with AI.</p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLogin={() => {
+            setShowAuthModal(false);
+            console.log('✅ User logged in successfully');
+          }}
+        />
+      )}
     </div>
   );
 };

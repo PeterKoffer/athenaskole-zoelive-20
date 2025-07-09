@@ -91,6 +91,7 @@ ENSURE MAXIMUM CREATIVITY AND ORIGINALITY!
     const content = data.generatedContent;
     
     return {
+      id: `api-generated-${timestamp}-${Math.random().toString(36).substring(7)}`,
       question: content.question,
       options: content.options,
       correct: content.correct,

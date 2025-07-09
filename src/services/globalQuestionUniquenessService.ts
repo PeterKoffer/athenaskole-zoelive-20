@@ -1,147 +1,71 @@
 
+// Global Question Uniqueness Service
+
+export interface QuestionMetadata {
+  subject?: string;
+  skillArea?: string;
+  difficultyLevel?: number;
+  gradeLevel?: number;
+  queuePosition?: number;
+  batchIndex?: number;
+  totalInQueue?: number;
+}
+
 export interface UniqueQuestion {
   id: string;
-  content: {
+  userId: string;
+  questionData: any;
+  timestamp: number;
+  content?: {
     question: string;
     options: string[];
     correctAnswer: number;
     explanation: string;
   };
-  metadata: {
-    subject: string;
-    skillArea: string;
-    difficultyLevel: number;
-    gradeLevel?: number;
-    timestamp: number;
-    userId: string;
-    sessionId: string;
-    teachingPerspective?: any;
-    gradeStandards?: string[];
-  };
+  metadata?: QuestionMetadata;
 }
 
-class GlobalQuestionUniquenessService {
+export class GlobalQuestionUniquenessService {
   private questionHistory: Map<string, Set<string>> = new Map();
-  private questionDatabase: Map<string, UniqueQuestion> = new Map();
-  private sessionTracker: Map<string, string[]> = new Map();
 
-  /**
-   * Generate a unique question ID
-   */
-  generateUniqueQuestionId(userId: string, subject: string, skillArea: string): string {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 8);
-    return `q_${userId.substring(0, 8)}_${subject}_${skillArea}_${timestamp}_${random}`;
+  getUserQuestionHistory(userId: string): string[] {
+    const userHistory = this.questionHistory.get(userId);
+    return userHistory ? Array.from(userHistory) : [];
   }
 
-  /**
-   * Track question usage to prevent duplicates
-   */
-  async trackQuestionUsage(question: UniqueQuestion): Promise<void> {
-    const userKey = `${question.metadata.userId}_${question.metadata.subject}`;
+  generateUniqueQuestion(userId: string, questionData: any): string {
+    const questionId = `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    if (!this.questionHistory.has(userKey)) {
-      this.questionHistory.set(userKey, new Set());
+    if (!this.questionHistory.has(userId)) {
+      this.questionHistory.set(userId, new Set());
     }
     
-    const userQuestions = this.questionHistory.get(userKey)!;
-    userQuestions.add(question.content.question);
-    
-    // Store full question data
-    this.questionDatabase.set(question.id, question);
-    
-    // Track by session
-    if (!this.sessionTracker.has(question.metadata.sessionId)) {
-      this.sessionTracker.set(question.metadata.sessionId, []);
+    this.questionHistory.get(userId)!.add(questionId);
+    return questionId;
+  }
+
+  generateUniqueQuestionId(userId: string): string {
+    return this.generateUniqueQuestion(userId, {});
+  }
+
+  hasUserSeenQuestion(userId: string, questionId: string): boolean {
+    const userHistory = this.questionHistory.get(userId);
+    return userHistory ? userHistory.has(questionId) : false;
+  }
+
+  isQuestionUnique(userId: string, questionId: string): boolean {
+    return !this.hasUserSeenQuestion(userId, questionId);
+  }
+
+  addQuestionToHistory(userId: string, questionId: string): void {
+    if (!this.questionHistory.has(userId)) {
+      this.questionHistory.set(userId, new Set());
     }
-    this.sessionTracker.get(question.metadata.sessionId)!.push(question.id);
-    
-    console.log(`📊 Tracked question usage: ${userQuestions.size} total questions for user`);
+    this.questionHistory.get(userId)!.add(questionId);
   }
 
-  /**
-   * Get user's question history
-   */
-  getUserQuestionHistory(userId: string, subject: string, limit: number = 50): string[] {
-    const userKey = `${userId}_${subject}`;
-    const questions = this.questionHistory.get(userKey);
-    
-    if (!questions) return [];
-    
-    return Array.from(questions).slice(-limit);
-  }
-
-  /**
-   * Check if question is unique for user
-   */
-  isQuestionUnique(userId: string, subject: string, questionText: string): boolean {
-    const userKey = `${userId}_${subject}`;
-    const userQuestions = this.questionHistory.get(userKey);
-    
-    if (!userQuestions) return true;
-    
-    return !userQuestions.has(questionText);
-  }
-
-  /**
-   * Check if user can generate recap questions
-   */
-  canGenerateRecap(userId: string, subject: string, skillArea: string): Promise<boolean> {
-    const userKey = `${userId}_${subject}`;
-    const userQuestions = this.questionHistory.get(userKey);
-    
-    // Need at least 3 questions answered to generate recap
-    return Promise.resolve(userQuestions ? userQuestions.size >= 3 : false);
-  }
-
-  /**
-   * Get questions for recap generation
-   */
-  getQuestionsForRecap(userId: string, subject: string, skillArea: string, limit: number = 5): Promise<any[]> {
-    const userKey = `${userId}_${subject}`;
-    const userQuestions = this.questionHistory.get(userKey);
-    
-    if (!userQuestions) {
-      return Promise.resolve([]);
-    }
-
-    // Get recent questions for recap
-    const recentQuestions = Array.from(userQuestions)
-      .slice(-limit)
-      .map(questionText => ({
-        question: questionText,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'], // Default options
-        correct: 0, // Default correct answer
-        explanation: 'This is a recap question based on your previous learning.'
-      }));
-
-    return Promise.resolve(recentQuestions);
-  }
-
-  /**
-   * Get session statistics
-   */
-  getSessionStats(sessionId: string) {
-    const sessionQuestions = this.sessionTracker.get(sessionId) || [];
-    return {
-      totalQuestions: sessionQuestions.length,
-      questionIds: sessionQuestions
-    };
-  }
-
-  /**
-   * Clear old data to prevent memory buildup
-   */
-  cleanup(olderThanHours: number = 24): void {
-    const cutoffTime = Date.now() - (olderThanHours * 60 * 60 * 1000);
-    
-    for (const [questionId, question] of this.questionDatabase.entries()) {
-      if (question.metadata.timestamp < cutoffTime) {
-        this.questionDatabase.delete(questionId);
-      }
-    }
-    
-    console.log(`🧹 Cleaned up old question data older than ${olderThanHours} hours`);
+  trackQuestionUsage(userId: string, questionId: string): void {
+    this.addQuestionToHistory(userId, questionId);
   }
 }
 

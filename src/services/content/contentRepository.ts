@@ -35,6 +35,7 @@ export class ContentRepository {
         difficulty_level: difficultyLevel,
         title: generatedContent.question,
         content: generatedContent as any,
+        content_type: 'question',
         learning_objectives: generatedContent.learningObjectives,
         estimated_time: generatedContent.estimatedTime
       })
@@ -49,6 +50,7 @@ export class ContentRepository {
         difficulty_level: difficultyLevel,
         title: generatedContent.question,
         content: generatedContent,
+        content_type: 'question',
         learning_objectives: generatedContent.learningObjectives,
         estimated_time: generatedContent.estimatedTime
       };
@@ -59,16 +61,24 @@ export class ContentRepository {
 
   async saveFallbackContent(fallbackContent: AdaptiveContentRecord): Promise<any> {
     try {
+      const contentWithType = {
+        ...fallbackContent,
+        content_type: 'question'
+      };
+
       const { data: savedFallback } = await supabase
         .from('adaptive_content')
-        .insert(fallbackContent)
+        .insert(contentWithType)
         .select()
         .single();
       
-      return savedFallback || fallbackContent;
+      return savedFallback || contentWithType;
     } catch (saveError) {
       console.error('❌ Error saving fallback content:', saveError);
-      return fallbackContent;
+      return {
+        ...fallbackContent,
+        content_type: 'question'
+      };
     }
   }
 
