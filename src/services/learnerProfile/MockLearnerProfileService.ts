@@ -1,26 +1,37 @@
 
 // src/services/learnerProfile/MockLearnerProfileService.ts
 
-import { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
-import { LearnerProfileService } from './types';
+import { LearnerProfile, KnowledgeComponentMastery, KCMasteryUpdateData } from '@/types/learnerProfile';
+import { ProfileFactory } from './profileFactory';
 import { MockProfileStore } from './mockStore';
 import { MasteryCalculator } from './masteryCalculator';
-import { ProfileFactory } from './profileFactory';
+import type { LearnerProfileService } from './types';
 
-export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012';
+export const MOCK_USER_ID = 'mock-user-123';
 
-export class MockLearnerProfileService implements LearnerProfileService {
+class MockLearnerProfileService implements LearnerProfileService {
   async getProfile(userId: string): Promise<LearnerProfile | null> {
     console.log(`🔍 MockLearnerProfileService: Getting profile for user ${userId}`);
     
-    const profile = MockProfileStore.get(userId);
-    if (!profile) {
-      console.log(`📝 No profile found for user ${userId}`);
-      return null;
+    if (!MockProfileStore.has(userId)) {
+      const newProfile = ProfileFactory.createInitialProfile(userId);
+      MockProfileStore.set(userId, newProfile);
+      console.log(`✅ MockLearnerProfileService: Created new profile for user ${userId}`);
     }
+    
+    return MockProfileStore.get(userId) || null;
+  }
 
-    console.log(`✅ Found profile for user ${userId} with ${Object.keys(profile.kcMasteryMap || {}).length} KCs tracked`);
-    return { ...profile }; // Return a copy to prevent direct mutation
+  async createInitialProfile(userId: string): Promise<LearnerProfile> {
+    console.log(`🆕 MockLearnerProfileService: Creating initial profile for user ${userId}`);
+    const profile = ProfileFactory.createInitialProfile(userId);
+    MockProfileStore.set(userId, profile);
+    return profile;
+  }
+
+  async updateProfile(profile: LearnerProfile): Promise<void> {
+    console.log(`💾 MockLearnerProfileService: Updating profile for user ${profile.userId}`);
+    MockProfileStore.set(profile.userId, profile);
   }
 
   async updateKcMastery(userId: string, kcId: string, masteryUpdate: {
@@ -29,93 +40,72 @@ export class MockLearnerProfileService implements LearnerProfileService {
     interactionType: string;
     interactionDetails?: any;
   }): Promise<LearnerProfile> {
-    console.log(`🔄 MockLearnerProfileService: Updating KC mastery for user ${userId}, KC ${kcId}`, masteryUpdate);
-
-    // Ensure profile exists
-    let profile = MockProfileStore.get(userId);
+    console.log(`📊 MockLearnerProfileService: Updating KC mastery for user ${userId}, KC ${kcId}`);
+    
+    const profile = await this.getProfile(userId);
     if (!profile) {
-      profile = await this.createInitialProfile(userId);
+      throw new Error(`Profile not found for user ${userId}`);
     }
 
-    // Get or create KC mastery record
-    let kcMastery = profile.kcMasteryMap?.[kcId];
-    if (!kcMastery) {
-      kcMastery = MasteryCalculator.createInitialKcMastery(kcId);
-      if (!profile.kcMasteryMap) profile.kcMasteryMap = {};
-      profile.kcMasteryMap[kcId] = kcMastery;
+    // Initialize kcMasteryMap if it doesn't exist
+    if (!profile.kcMasteryMap) {
+      profile.kcMasteryMap = {};
     }
 
-    // Update mastery using the calculator
-    MasteryCalculator.updateKcMastery(kcMastery, masteryUpdate);
+    // Create KC mastery if it doesn't exist
+    if (!profile.kcMasteryMap[kcId]) {
+      profile.kcMasteryMap[kcId] = MasteryCalculator.createInitialKcMastery(kcId);
+    }
 
-    // Update overall profile metrics
+    // Update KC mastery
+    MasteryCalculator.updateKcMastery(profile.kcMasteryMap[kcId], masteryUpdate);
+    
+    // Update overall mastery
     MasteryCalculator.updateOverallMastery(profile);
+    
+    // Update timestamps
+    profile.updated_at = new Date().toISOString();
     profile.lastUpdatedTimestamp = Date.now();
 
+    // Save updated profile
     MockProfileStore.set(userId, profile);
+    
+    console.log(`✅ MockLearnerProfileService: Updated KC ${kcId} mastery to ${profile.kcMasteryMap[kcId].masteryLevel.toFixed(3)}`);
+    
+    return profile;
+  }
 
-    console.log(`✅ Updated KC mastery for ${kcId}: level=${kcMastery.masteryLevel.toFixed(3)}, attempts=${kcMastery.totalAttempts}`);
-    return { ...profile };
+  // New method using KCMasteryUpdateData
+  async updateKCMastery(userId: string, kcId: string, updateData: KCMasteryUpdateData): Promise<LearnerProfile> {
+    return this.updateKcMastery(userId, kcId, {
+      isCorrect: updateData.success,
+      newAttempt: true,
+      interactionType: updateData.eventType || 'interaction',
+      interactionDetails: {
+        timeTakenSeconds: (updateData.timeTakenMs || 30000) / 1000,
+        hintsUsed: updateData.hintsUsed || 0,
+        attempts: updateData.attemptsInInteraction || 1
+      }
+    });
   }
 
   async getKcMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
     const profile = await this.getProfile(userId);
-    if (!profile || !profile.kcMasteryMap) return null;
-
-    return profile.kcMasteryMap[kcId] || null;
+    return profile?.kcMasteryMap?.[kcId] || null;
   }
 
-  async updatePreferences(userId: string, preferences: Partial<LearnerPreferences>): Promise<void> {
-    console.log(`🎯 MockLearnerProfileService: Updating preferences for user ${userId}`, preferences);
-
-    let profile = MockProfileStore.get(userId);
-    if (!profile) {
-      profile = await this.createInitialProfile(userId);
+  async updatePreferences(userId: string, preferences: Partial<LearnerProfile['preferences']>): Promise<void> {
+    const profile = await this.getProfile(userId);
+    if (profile) {
+      profile.preferences = { ...profile.preferences, ...preferences };
+      await this.updateProfile(profile);
     }
-
-    profile.preferences = { ...profile.preferences, ...preferences };
-    profile.lastUpdatedTimestamp = Date.now();
-
-    MockProfileStore.set(userId, profile);
   }
 
-  async createInitialProfile(userId: string): Promise<LearnerProfile> {
-    const profile = ProfileFactory.createInitialProfile(userId);
-    MockProfileStore.set(userId, profile);
-    return { ...profile };
-  }
-
-  async updateProfile(profile: LearnerProfile): Promise<void> {
-    console.log(`🔄 MockLearnerProfileService: Updating full profile for user ${profile.userId}`);
-    
-    profile.lastUpdatedTimestamp = Date.now();
-    MockProfileStore.set(profile.userId, { ...profile });
-  }
-
-  // Additional methods for testing
-  async updateKCMastery(userId: string, kcId: string, performance: {
-    attempts: number;
-    timeTakenSeconds: number;
-    hintsUsed: number;
-    success: boolean;
-    firstAttemptSuccess: boolean;
-    timestamp: string;
-  }): Promise<void> {
-    await this.updateKcMastery(userId, kcId, {
-      isCorrect: performance.success,
-      newAttempt: true,
-      interactionType: 'question_attempt',
-      interactionDetails: performance
-    });
-  }
-
-  async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | null> {
-    return this.getKcMastery(userId, kcId);
-  }
-
+  // Test utility methods
   resetStore(): void {
     MockProfileStore.clear();
-    console.log('🧹 Cleared all mock profile data');
+    console.log('🧹 MockLearnerProfileService: Store reset');
   }
 
   getStoreSize(): number {
@@ -123,5 +113,5 @@ export class MockLearnerProfileService implements LearnerProfileService {
   }
 }
 
-export const mockLearnerProfileService = new MockLearnerProfileService();
-export const mockProfileService = mockLearnerProfileService;
+export const mockProfileService = new MockLearnerProfileService();
+export { MockLearnerProfileService };
