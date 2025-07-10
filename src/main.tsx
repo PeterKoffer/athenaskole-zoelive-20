@@ -7,7 +7,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import "./index.css";
 
-// Import auth provider
+// Import auth provider from the correct location
 import { AuthProvider } from "@/hooks/useAuth";
 
 // Import services for debugging
