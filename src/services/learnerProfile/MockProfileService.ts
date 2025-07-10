@@ -29,7 +29,6 @@ export class MockProfileService {
     if (!profile) {
       profile = {
         userId,
-        user_id: userId,
         overall_mastery: 0.0,
         kc_masteries: [],
         kcMasteryMap: {},

@@ -6,7 +6,6 @@ export class ProfileDataTransformers {
   static transformToLearnerProfile(profileData: any, kcData: any[]): LearnerProfile {
     return {
       userId: profileData.user_id,
-      user_id: profileData.user_id,
       overall_mastery: profileData.overall_mastery || 0.0,
       overallMastery: profileData.overall_mastery || 0.0,
       kc_masteries: kcData?.map(kc => ({

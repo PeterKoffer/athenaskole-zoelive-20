@@ -9,7 +9,6 @@ export class ProfileFactory {
 
     return {
       userId,
-      user_id: userId,
       overall_mastery: 0.0,
       kc_masteries: [],
       kcMasteryMap: {},
