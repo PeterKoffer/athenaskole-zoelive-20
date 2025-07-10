@@ -1,5 +1,5 @@
-
 export interface Question {
+  id: string;
   question: string;
   options: string[];
   correct: number;
@@ -7,7 +7,7 @@ export interface Question {
   learningObjectives: string[];
   estimatedTime: number;
   conceptsCovered: string[];
-  isRecap?: boolean; // Flag to allow repeated questions for recap/review
+  isRecap?: boolean;
 }
 
 export interface UseDiverseQuestionGenerationProps {
@@ -15,12 +15,6 @@ export interface UseDiverseQuestionGenerationProps {
   skillArea: string;
   difficultyLevel: number;
   userId: string;
-  gradeLevel?: number;
-  standardsAlignment?: any;
-}
-
-export interface QuestionContext {
-  gradeLevel?: number;
-  standard?: any;
-  contentPrompt?: string;
+  gradeLevel: number;
+  standardsAlignment?: string[];
 }

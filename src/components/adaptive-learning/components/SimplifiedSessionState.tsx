@@ -39,12 +39,7 @@ export const useSimplifiedSessionState = ({
     isGenerating, 
     generateQuestion, 
     saveQuestionHistory 
-  } = useReliableQuestionGeneration({
-    subject,
-    skillArea,
-    difficultyLevel,
-    userId: user?.id || ''
-  });
+  } = useReliableQuestionGeneration();
 
   const {
     progress,
@@ -56,10 +51,14 @@ export const useSimplifiedSessionState = ({
   useEffect(() => {
     if (user?.id && !currentQuestion && !isGenerating) {
       console.log('🎬 Starting session, generating first question...');
-      generateQuestion().then(setCurrentQuestion);
+      generateQuestion({
+        subject,
+        skillArea,
+        difficulty: difficultyLevel
+      }).then(setCurrentQuestion);
       setQuestionStartTime(new Date());
     }
-  }, [user?.id, currentQuestion, isGenerating, generateQuestion]);
+  }, [user?.id, currentQuestion, isGenerating, generateQuestion, subject, skillArea, difficultyLevel]);
 
   const handleAnswerSelect = async (answerIndex: number) => {
     if (showResult || selectedAnswer !== null) return;
@@ -115,7 +114,11 @@ export const useSimplifiedSessionState = ({
       setQuestionStartTime(new Date());
       
       console.log(`🔄 Generating question ${questionNumber + 1}...`);
-      const nextQuestion = await generateQuestion();
+      const nextQuestion = await generateQuestion({
+        subject,
+        skillArea,
+        difficulty: difficultyLevel
+      });
       setCurrentQuestion(nextQuestion);
     }, 3000);
   };

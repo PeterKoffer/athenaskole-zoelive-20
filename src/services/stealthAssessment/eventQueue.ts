@@ -2,19 +2,19 @@
 // src/services/stealthAssessment/eventQueue.ts
 
 import { InteractionEvent, InteractionEventType, QuestionAttemptEvent } from '@/types/stealthAssessment';
+
 import { SupabaseEventLogger } from './supabaseEventLogger';
 import { STEALTH_ASSESSMENT_CONFIG } from './config';
 import { mockProfileService } from '@/services/learnerProfile/MockProfileService';
 import { KCMasteryUpdateData } from '@/types/learnerProfile';
 
+
 export class EventQueue {
-  private queue: InteractionEvent[] = [];
+  private queue: QueueEvent[] = [];
   private flushTimerId?: NodeJS.Timeout;
   private isFlushing = false;
-  private logger: SupabaseEventLogger;
 
   constructor() {
-    this.logger = new SupabaseEventLogger();
     this.startFlushTimer();
   }
 
@@ -24,13 +24,15 @@ export class EventQueue {
     }, STEALTH_ASSESSMENT_CONFIG.flushInterval);
   }
 
-  async addEvent(event: InteractionEvent): Promise<void> {
+  async addEvent(event: QueueEvent): Promise<void> {
     this.queue.push(event);
     console.log('EventQueue: Event added to queue:', event.type, event.eventId);
 
     // --- Integration with Learner Profile ---
     if (event.type === InteractionEventType.QUESTION_ATTEMPT) {
+
       const questionEvent = event as QuestionAttemptEvent;
+
       const { userId, knowledgeComponentIds, isCorrect, attemptsMade, timeTakenMs, timestamp } = questionEvent;
 
       if (userId && knowledgeComponentIds && knowledgeComponentIds.length > 0) {
@@ -73,7 +75,16 @@ export class EventQueue {
     this.queue = [];
 
     try {
-      await this.logger.flushEventBatch(eventsToFlush);
+      // Convert to format expected by supabaseEventLogger
+      const convertedEvents = eventsToFlush.map(event => ({
+        user_id: event.userId,
+        session_id: event.sessionId || 'default',
+        event_type: event.type,
+        event_data: event.data,
+        timestamp: new Date(event.timestamp).toISOString()
+      }));
+
+      await supabaseEventLogger.flushEventBatch(convertedEvents);
     } catch (error) {
       console.error('EventQueue: Error during flush, re-adding events to queue:', error);
       // Re-add events to queue for retry
@@ -99,7 +110,9 @@ export class EventQueue {
    * Returns a copy of the current events in the queue.
    * Does not clear the queue.
    */
+
   public getEvents(): InteractionEvent[] {
+
     return [...this.queue]; // Return a copy
   }
 

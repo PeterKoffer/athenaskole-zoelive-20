@@ -3,7 +3,7 @@ import { DailyUniverse, LearningAtom, LearningAtomPerformance } from '@/types/le
 import { mockUserProgressService } from './mockUserProgressService';
 import curriculumStepsData from '../../public/data/curriculum-steps.json';
 import { CurriculumStep } from '@/types/curriculum';
-import AdaptiveDifficultyEngine from './AdaptiveDifficultyEngine';
+import AdaptiveDifficultyEngine, { DifficultyLevel } from './AdaptiveDifficultyEngine';
 
 export class UniverseSessionManager {
   private currentUserId: string | null = null;
@@ -20,8 +20,10 @@ export class UniverseSessionManager {
     // Pre-populate atom isCompleted status based on historical objective completion
     if (this.currentUniverse) {
       for (const atom of this.currentUniverse.learningAtoms) {
-        const isObjectiveHistoricallyCompleted = await mockUserProgressService.isObjectiveCompleted(userId, atom.curriculumObjectiveId);
-        atom.isCompleted = isObjectiveHistoricallyCompleted;
+        if (atom.curriculumObjectiveId) {
+          const isObjectiveHistoricallyCompleted = await mockUserProgressService.isObjectiveCompleted(userId, atom.curriculumObjectiveId);
+          atom.isCompleted = isObjectiveHistoricallyCompleted;
+        }
       }
     }
     console.log(`[UniverseSessionManager] Session started for user: ${userId}, universe theme: ${universe.theme}`);
@@ -50,48 +52,50 @@ export class UniverseSessionManager {
     atom.performance = performance; // Store on the atom instance as well
     atom.isCompleted = performance.success; // Update atom's completion status based on this performance
 
-    console.log(`[UniverseSessionManager] Performance recorded for Atom ${atomId} (Objective: ${atom.curriculumObjectiveTitle}). Success: ${performance.success}`);
+    console.log(`[UniverseSessionManager] Performance recorded for Atom ${atomId} (Objective: ${atom.curriculumObjectiveTitle || 'Unknown'}). Success: ${performance.success}`);
 
     // Find the stepId associated with this curriculumObjectiveId
-    const stepIdForObjective = this.getStepIdForObjective(atom.curriculumObjectiveId);
+    if (atom.curriculumObjectiveId) {
+      const stepIdForObjective = this.getStepIdForObjective(atom.curriculumObjectiveId);
 
-    if (!stepIdForObjective) {
-        console.error(`[UniverseSessionManager] Could not find stepId for objectiveId: ${atom.curriculumObjectiveId} when recording performance.`);
-        return;
-    }
+      if (!stepIdForObjective) {
+          console.error(`[UniverseSessionManager] Could not find stepId for objectiveId: ${atom.curriculumObjectiveId} when recording performance.`);
+          return;
+      }
 
-    // Update persistent historical progress using the mock service
-    mockUserProgressService.recordObjectiveAttempt(
-      this.currentUserId,
-      stepIdForObjective,
-      atom.curriculumObjectiveId,
-      performance
-    ).then(() => {
-        // After updating objective, check if the whole step is complete
-        const stepDefinition = this.curriculumSteps.find(s => s.id === stepIdForObjective);
-        if (stepDefinition) {
-            const allObjectiveIdsInStep = stepDefinition.curriculums.map(c => c.id);
-            mockUserProgressService.checkAndUpdateStepCompletion(this.currentUserId!, stepIdForObjective, allObjectiveIdsInStep);
-        }
-    }).catch(error => {
-        console.error('[UniverseSessionManager] Error recording objective attempt:', error);
-    });
+      // Update persistent historical progress using the mock service
+      mockUserProgressService.recordObjectiveAttempt(
+        this.currentUserId,
+        stepIdForObjective,
+        atom.curriculumObjectiveId,
+        performance
+      ).then(() => {
+          // After updating objective, check if the whole step is complete
+          const stepDefinition = this.curriculumSteps.find(s => s.id === stepIdForObjective);
+          if (stepDefinition) {
+              const allObjectiveIdsInStep = stepDefinition.curriculums.map(c => c.id);
+              mockUserProgressService.checkAndUpdateStepCompletion(this.currentUserId!, stepIdForObjective, allObjectiveIdsInStep);
+          }
+      }).catch(error => {
+          console.error('[UniverseSessionManager] Error recording objective attempt:', error);
+      });
 
-    // Enhanced adaptive suggestion for potential retry scenarios
-    if (!performance.success && performance.attempts < 3) { 
-        // Get historical metrics for more informed retry suggestion
-        mockUserProgressService.getObjectiveProgress(this.currentUserId, atom.curriculumObjectiveId)
-            .then(historicalMetrics => {
-                const suggestedRetryDifficulty = AdaptiveDifficultyEngine.suggestNextDifficultyOnRetry(
-                    atom.difficulty,
-                    performance,
-                    historicalMetrics
-                );
-                console.log(`[UniverseSessionManager] For objective ${atom.curriculumObjectiveTitle}, suggested retry difficulty: ${suggestedRetryDifficulty} (Historical context: ${historicalMetrics ? 'available' : 'none'})`);
-            })
-            .catch(error => {
-                console.error('[UniverseSessionManager] Error getting historical metrics for retry suggestion:', error);
-            });
+      // Enhanced adaptive suggestion for potential retry scenarios
+      if (!performance.success && performance.attempts < 3) { 
+          // Get historical metrics for more informed retry suggestion
+          mockUserProgressService.getObjectiveProgress(this.currentUserId, atom.curriculumObjectiveId)
+              .then(historicalMetrics => {
+                  const suggestedRetryDifficulty = AdaptiveDifficultyEngine.suggestNextDifficultyOnRetry(
+                      atom.difficulty as DifficultyLevel,
+                      performance,
+                      historicalMetrics
+                  );
+                  console.log(`[UniverseSessionManager] For objective ${atom.curriculumObjectiveTitle || 'Unknown'}, suggested retry difficulty: ${suggestedRetryDifficulty} (Historical context: ${historicalMetrics ? 'available' : 'none'})`);
+              })
+              .catch(error => {
+                  console.error('[UniverseSessionManager] Error getting historical metrics for retry suggestion:', error);
+              });
+      }
     }
   }
 

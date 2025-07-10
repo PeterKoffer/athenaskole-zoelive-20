@@ -61,22 +61,7 @@ export const useExtendedLessonManager = ({
     completeLessonProgress,
     generateSubjectQuestion,
     resetProgress
-  } = useLessonProgressManager({
-    subject,
-    skillArea,
-    lessonActivities: variedLessonActivities,
-    currentActivityIndex,
-    score,
-    timeElapsed,
-    onProgressLoaded: (progress) => {
-      if (!hasRestoredProgress && progress) {
-        console.log('🔄 Restoring lesson progress:', progress);
-        setCurrentActivityIndex(progress.current_activity_index);
-        setScore(progress.score);
-        setHasRestoredProgress(true);
-      }
-    }
-  });
+  } = useLessonProgressManager(subject);
 
   const {
     dynamicActivities,

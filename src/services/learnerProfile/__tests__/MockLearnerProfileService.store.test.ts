@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mockProfileService, MOCK_USER_ID } from '../MockProfileService';
 
+
 describe('MockLearnerProfileService - Store Management', () => {
   beforeEach(() => {
     // We call resetStore in most tests, but here we test resetStore itself and initial state

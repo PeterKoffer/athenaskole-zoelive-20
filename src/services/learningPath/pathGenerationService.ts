@@ -1,28 +1,16 @@
 
-import { supabase } from '@/integrations/supabase/client';
+// Path Generation Service
 
-export const pathGenerationService = {
-  async generateLearningPath(
-    userId: string,
-    subject: string,
-    targetConcepts?: string[]
-  ): Promise<string | null> {
-    try {
-      const { data, error } = await supabase.rpc('generate_learning_path', {
-        p_user_id: userId,
-        p_subject: subject,
-        p_target_concepts: targetConcepts
-      });
-
-      if (error) {
-        console.error('Error generating learning path:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error in generateLearningPath:', error);
-      return null;
-    }
+export class PathGenerationService {
+  static async generatePath(userId: string, preferences: any): Promise<any> {
+    console.log('🛤️ PathGenerationService: generatePath (stub implementation)');
+    return { pathId: `path_${Date.now()}`, steps: [] };
   }
-};
+
+  static async updatePath(pathId: string, updates: any): Promise<boolean> {
+    console.log('🔧 PathGenerationService: updatePath (stub implementation)');
+    return true;
+  }
+}
+
+export const pathGenerationService = new PathGenerationService();

@@ -1,4 +1,6 @@
 
+// Learning Path Type Definitions
+
 export interface LearningPathway {
   id: string;
   userId: string;
@@ -7,10 +9,10 @@ export interface LearningPathway {
   description: string;
   currentStep: number;
   totalSteps: number;
-  difficultyProgression: number[];
   estimatedCompletionTime: number;
   isActive: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface LearningPathStep {
@@ -18,8 +20,14 @@ export interface LearningPathStep {
   pathwayId: string;
   stepNumber: number;
   learningObjectiveId: string;
-  contentId?: string;
+  contentId: string;
   isCompleted: boolean;
   completionTime?: string;
   score?: number;
+}
+
+export interface LearningPathService {
+  getUserLearningPaths(userId: string): Promise<LearningPathway[]>;
+  generateLearningPath(userId: string, subject: string): Promise<string | null>;
+  getLearningPathSteps(pathwayId: string): Promise<LearningPathStep[]>;
 }

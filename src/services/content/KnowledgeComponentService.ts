@@ -4,62 +4,101 @@ import { supabase } from '@/integrations/supabase/client';
 export interface KnowledgeComponent {
   id: string;
   name: string;
-  description?: string;
   subject: string;
-  domain?: string;
-  grade_levels?: number[];
-  difficulty_estimate?: number;
+  grade_level: number;
+  difficulty_estimate: number;
+  prerequisites: string[];
+  description?: string;
 }
 
 class KnowledgeComponentService {
-  async getKnowledgeComponent(kcId: string): Promise<KnowledgeComponent | null> {
-    console.log('🔍 Fetching KC details for:', kcId);
+  async getKnowledgeComponents(filters?: {
+    subject?: string;
+    gradeLevel?: number;
+    difficulty?: number;
+  }): Promise<KnowledgeComponent[]> {
+    console.log('🧠 Fetching knowledge components (stub implementation)');
     
-    const { data: kc, error } = await supabase
-      .from('knowledge_components')
-      .select('*')
-      .eq('id', kcId)
-      .single();
-
-    if (error) {
-      console.error('❌ Failed to fetch KC details:', error);
-      return null;
-    }
-
-    if (!kc) {
-      console.error('❌ Knowledge component not found:', kcId);
-      return null;
-    }
-
-    console.log('✅ KC details loaded:', kc.name);
-    return kc as KnowledgeComponent;
-  }
-
-  getAvailableKCs(): KnowledgeComponent[] {
-    // This could be expanded to fetch from database
-    return [
+    // Since knowledge_components table doesn't exist, return mock data
+    const mockComponents: KnowledgeComponent[] = [
       {
-        id: 'kc_math_g4_add_fractions_likedenom',
-        name: 'Adding Fractions with Like Denominators',
-        subject: 'Mathematics',
-        grade_levels: [4],
-        difficulty_estimate: 0.4
+        id: 'kc_math_g4_addition',
+        name: 'Basic Addition',
+        subject: 'math',
+        grade_level: 4,
+        difficulty_estimate: 0.3,
+        prerequisites: [],
+        description: 'Understanding basic addition concepts'
       },
       {
-        id: 'kc_math_g3_multiplication_basic',
-        name: 'Basic Multiplication',
-        subject: 'Mathematics',
-        grade_levels: [3],
-        difficulty_estimate: 0.3
+        id: 'kc_math_g4_multiplication',
+        name: 'Multiplication Tables',
+        subject: 'math',
+        grade_level: 4,
+        difficulty_estimate: 0.5,
+        prerequisites: ['kc_math_g4_addition'],
+        description: 'Learning multiplication tables'
       },
       {
-        id: 'kc_english_g5_reading_comprehension',
-        name: 'Reading Comprehension',
-        subject: 'English',
-        grade_levels: [5],
-        difficulty_estimate: 0.5
+        id: 'kc_math_g5_fractions',
+        name: 'Basic Fractions',
+        subject: 'math',
+        grade_level: 5,
+        difficulty_estimate: 0.6,
+        prerequisites: ['kc_math_g4_multiplication'],
+        description: 'Understanding fractions and their operations'
       }
     ];
+
+    // Apply filters if provided
+    let filteredComponents = mockComponents;
+    
+    if (filters?.subject) {
+      filteredComponents = filteredComponents.filter(kc => kc.subject === filters.subject);
+    }
+    
+    if (filters?.gradeLevel) {
+      filteredComponents = filteredComponents.filter(kc => kc.grade_level === filters.gradeLevel);
+    }
+    
+    if (filters?.difficulty) {
+      filteredComponents = filteredComponents.filter(kc => 
+        Math.abs(kc.difficulty_estimate - filters.difficulty) <= 0.2
+      );
+    }
+
+    console.log(`📚 Returning ${filteredComponents.length} knowledge components`);
+    return filteredComponents;
+  }
+
+  async getKnowledgeComponentById(id: string): Promise<KnowledgeComponent | null> {
+    console.log(`🔍 Fetching knowledge component: ${id}`);
+    
+    const components = await this.getKnowledgeComponents();
+    const component = components.find(kc => kc.id === id);
+    
+    if (component) {
+      console.log(`✅ Found knowledge component: ${component.name}`);
+      return component;
+    }
+    
+    console.log(`❌ Knowledge component not found: ${id}`);
+    return null;
+  }
+
+  async getPrerequisites(kcId: string): Promise<KnowledgeComponent[]> {
+    console.log(`📋 Fetching prerequisites for: ${kcId}`);
+    
+    const kc = await this.getKnowledgeComponentById(kcId);
+    if (!kc || !kc.prerequisites.length) {
+      return [];
+    }
+    
+    const prerequisites = await Promise.all(
+      kc.prerequisites.map(prereqId => this.getKnowledgeComponentById(prereqId))
+    );
+    
+    return prerequisites.filter(Boolean) as KnowledgeComponent[];
   }
 }
 

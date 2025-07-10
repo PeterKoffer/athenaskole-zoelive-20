@@ -1,27 +1,27 @@
 
-import ContentOrchestrator from './content/ContentOrchestrator';
+// Stub implementation for AI Creative Director Service
 
-interface ContentGenerationRequest {
-  kcId: string;
-  userId: string;
-  difficultyLevel?: number;
-  contentTypes?: string[];
-  maxAtoms?: number;
-}
+import { ContentOrchestrator } from './content/ContentOrchestrator';
 
-interface AtomSequence {
-  sequence_id: string;
-  atoms: any[];
-  kc_id: string;
-  user_id: string;
-  created_at: string;
-}
+export class AICreativeDirectorService {
+  async generateCreativeContent(prompt: string, context: any): Promise<any> {
+    console.log('🎨 AI Creative Director generating content (stub implementation)');
+    
+    return {
+      id: `creative_${Date.now()}`,
+      content: `Generated creative content for: ${prompt}`,
+      type: 'creative_generation',
+      context
+    };
+  }
 
-class AICreativeDirectorService {
-  async getAtomSequenceForKc(kcId: string, userId: string): Promise<AtomSequence | null> {
-    console.log('🎯 AICreativeDirectorService: Delegating to ContentOrchestrator');
-    return ContentOrchestrator.getAtomSequenceForKc(kcId, userId);
+  async getAtomSequenceForKc(kcId: string, userId: string): Promise<any> {
+    console.log('🔄 AI Creative Director: getAtomSequenceForKc (stub implementation)');
+    
+    // Delegate to ContentOrchestrator
+    const orchestrator = new ContentOrchestrator();
+    return orchestrator.getAtomSequenceForKc(kcId, userId);
   }
 }
 
-export default new AICreativeDirectorService();
+export const aiCreativeDirectorService = new AICreativeDirectorService();

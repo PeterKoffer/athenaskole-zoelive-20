@@ -1,10 +1,11 @@
+
 // src/components/adaptive-learning/components/QuestionCard.tsx
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import QuestionBadge from './QuestionBadge';
 import AnswerOption from './AnswerOption';
 import { Question } from '../hooks/useQuestionGeneration'; // Assuming Question type is defined here
-import stealthAssessmentService from '@/services/stealthAssessmentService';
+import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 // InteractionEventType is not directly used here but good for context if expanding logging
 // import { InteractionEventType } from '@/types/stealthAssessment'; 
 import { useEffect, useState } from 'react';

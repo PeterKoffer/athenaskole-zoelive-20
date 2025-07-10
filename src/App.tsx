@@ -52,6 +52,7 @@ const App = () => (
             {/* If HomePage is still needed for a different path, add it here.
                 Otherwise, if Index replaces its functionality, HomePage import can be removed.
                 Example: <Route path="/home" element={<HomePage />} />
+
             */}
           </Routes>
         </AuthProvider>

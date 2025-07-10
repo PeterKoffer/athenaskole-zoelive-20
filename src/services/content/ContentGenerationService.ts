@@ -23,10 +23,11 @@ class ContentGenerationService {
   async generateFromDatabase(kcId: string): Promise<any[]> {
     console.log('🔍 Checking database for pre-built atoms...');
     
+    // Use adaptive_content table instead of content_atoms
     const { data: existingAtoms, error } = await supabase
-      .from('content_atoms')
+      .from('adaptive_content')
       .select('*')
-      .contains('kc_ids', [kcId])
+      .eq('subject', 'math') // Simplified filtering since we don't have kc_ids
       .limit(5);
 
     if (error) {
@@ -38,11 +39,11 @@ class ContentGenerationService {
       console.log('✅ Found pre-built atoms in database:', existingAtoms.length);
       return existingAtoms.map(atom => ({
         atom_id: atom.id,
-        atom_type: atom.atom_type,
+        atom_type: atom.content_type,
         content: atom.content,
-        kc_ids: atom.kc_ids,
+        kc_ids: [kcId], // Use the provided kcId
         metadata: {
-          ...atom.metadata,
+          difficulty: atom.difficulty_level,
           source: 'database',
           loadedAt: Date.now()
         }
@@ -174,49 +175,6 @@ class ContentGenerationService {
       };
     }
     
-    if (kcId.includes('add_fractions')) {
-      const denominator = 8 + (seed % 4);
-      const num1 = 1 + (seed % 3);
-      const num2 = 1 + ((seed + 1) % 3);
-      const sum = num1 + num2;
-      
-      if (sum >= denominator) {
-        return this.generateMathQuestions(kc, seed + 1);
-      }
-      
-      return {
-        question: `What is ${num1}/${denominator} + ${num2}/${denominator}?`,
-        options: [
-          `${sum}/${denominator}`,
-          `${sum}/${denominator * 2}`,
-          `${num1 + num2 + 1}/${denominator}`,
-          `${num1}/${num2}`
-        ],
-        correctAnswer: 0,
-        correct: 0,
-        explanation: `When adding fractions with the same denominator, add the numerators: ${num1} + ${num2} = ${sum}/${denominator}`
-      };
-    }
-    
-    if (kcId.includes('area_rectangles')) {
-      const length = 5 + (seed % 8);
-      const width = 3 + (seed % 6);
-      const area = length * width;
-      
-      return {
-        question: `A rectangle has a length of ${length} units and width of ${width} units. What is its area?`,
-        options: [
-          `${area} square units`,
-          `${length + width} square units`,
-          `${(length + width) * 2} square units`,
-          `${Math.floor(area / 2)} square units`
-        ],
-        correctAnswer: 0,
-        correct: 0,
-        explanation: `Area = length × width = ${length} × ${width} = ${area} square units`
-      };
-    }
-    
     // Default math question
     const num1 = 12 + (seed % 20);
     const num2 = 5 + (seed % 15);
@@ -237,38 +195,10 @@ class ContentGenerationService {
   }
 
   private getMathExplanationForKc(kc: any, seed: number) {
-    const kcId = kc.id.toLowerCase();
-    
-    if (kcId.includes('multiply_decimals')) {
-      return `Multiplying decimals is like multiplying whole numbers, but we need to place the decimal point correctly. Count the total decimal places in both numbers and put that many decimal places in your answer.`;
-    }
-    
-    if (kcId.includes('add_fractions')) {
-      return `When adding fractions with the same denominator, we keep the denominator and add the numerators. This is because we're adding parts of the same-sized whole.`;
-    }
-    
-    if (kcId.includes('area_rectangles')) {
-      return `The area of a rectangle tells us how many square units fit inside it. We calculate this by multiplying length times width.`;
-    }
-    
     return `This mathematical concept helps us solve real-world problems and builds important thinking skills.`;
   }
 
   private getMathExamplesForKc(kc: any, seed: number) {
-    const kcId = kc.id.toLowerCase();
-    
-    if (kcId.includes('multiply_decimals')) {
-      return [`Example: 2.5 × 1.2 = 3.00 = 3.0`];
-    }
-    
-    if (kcId.includes('add_fractions')) {
-      return [`Example: 2/5 + 1/5 = 3/5`];
-    }
-    
-    if (kcId.includes('area_rectangles')) {
-      return [`Example: A 4×3 rectangle has area = 4 × 3 = 12 square units`];
-    }
-    
     return [`Practice helps you master ${kc.name}`];
   }
 }

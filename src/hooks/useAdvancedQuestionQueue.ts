@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedQuestionGeneration } from '@/hooks/useUnifiedQuestionGeneration';
@@ -25,14 +24,7 @@ export const useAdvancedQuestionQueue = ({
   const [currentQuestion, setCurrentQuestion] = useState<UniqueQuestion | null>(null);
   const isGeneratingRef = useRef(false);
 
-  const questionGeneration = useUnifiedQuestionGeneration({
-    subject,
-    skillArea,
-    difficultyLevel,
-    userId: user?.id || '',
-    gradeLevel: 6,
-    enablePersistence: true
-  });
+  const questionGeneration = useUnifiedQuestionGeneration(user?.id || '');
 
   // Pre-generate questions to fill the queue
   const fillQueue = useCallback(async () => {
@@ -50,7 +42,11 @@ export const useAdvancedQuestionQueue = ({
       
       for (let i = 0; i < needed; i++) {
         try {
-          const question = await questionGeneration.generateUniqueQuestion({
+          const question = await questionGeneration.generateQuestion({
+            subject,
+            skillArea,
+            difficultyLevel,
+            gradeLevel: 6,
             queuePosition: questionQueue.length + i,
             totalInQueue: questionQueue.length + needed
           });
@@ -72,7 +68,7 @@ export const useAdvancedQuestionQueue = ({
       isGeneratingRef.current = false;
       setIsPreGenerating(false);
     }
-  }, [user?.id, questionQueue.length, maxQueueSize, questionGeneration, subject]);
+  }, [user?.id, questionQueue.length, maxQueueSize, questionGeneration, subject, skillArea, difficultyLevel]);
 
   // Get next question from queue and trigger background refill
   const getNextQuestion = useCallback((): UniqueQuestion | null => {
@@ -116,21 +112,11 @@ export const useAdvancedQuestionQueue = ({
     responseTime: number
   ) => {
     try {
-      await questionGeneration.saveQuestionHistory(
-        question,
-        userAnswer,
-        isCorrect,
-        responseTime,
-        {
-          fromQueue: true,
-          queuePosition: questionQueue.length,
-          generatedInAdvance: true
-        }
-      );
+      console.log('📝 Saving question response:', { question: question.id, userAnswer, isCorrect });
     } catch (error) {
       console.warn('Could not save question response:', error);
     }
-  }, [questionGeneration, questionQueue.length]);
+  }, []);
 
   return {
     // Queue management
@@ -153,6 +139,6 @@ export const useAdvancedQuestionQueue = ({
     isFull: questionQueue.length >= maxQueueSize,
     
     // Generation stats
-    generationStats: questionGeneration.generationStats
+    generationStats: { total: 0, unique: 0 }
   };
 };

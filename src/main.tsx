@@ -8,35 +8,22 @@ import { Toaster } from "@/components/ui/sonner";
 import "./index.css";
 
 // Import auth provider
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/hooks/useAuth";
 
-// Import all pages and components
+// Import services for debugging
+import stealthAssessmentService from "@/services/stealthAssessment/StealthAssessmentService";
+import { mockProfileService } from "@/services/learnerProfile/MockProfileService";
+
+// Import simple pages for the working app
 import Index from "./pages/Index";
-import DailyProgram from "./pages/DailyProgram";
-import Auth from "./pages/Auth";
-import AdaptiveLearningDemo from "./pages/AdaptiveLearningDemo";
-import AdaptiveIntegrationTest from "./pages/AdaptiveIntegrationTest";
-import HomePage from "./pages/HomePage";
+import TestPage from "./pages/TestPage";
+import SimpleStealthTest from "./pages/SimpleStealthTest";
+import StealthAssessmentTest from "./pages/StealthAssessmentTest";
+import AuthPage from "./pages/AuthPage";
 
-// Import learning modules
-import MathematicsLearning from "./components/education/MathematicsLearning";
-import EnglishLearning from "./components/education/EnglishLearning";
-import ScienceLearning from "./components/education/ScienceLearning";
-import HistoryReligionLearning from "./components/education/HistoryReligionLearning";
-import GeographyLearning from "./components/education/GeographyLearning";
-import CreativeLearning from "./components/education/CreativeLearning";
-import LifeEssentialsLearning from "./components/education/LifeEssentialsLearning";
-import MentalWellnessLearning from "./components/education/MentalWellnessLearning";
-import BodyLabLearning from "./components/education/BodyLabLearning";
-import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
-import MusicLearning from "./components/education/MusicLearning";
-import LanguageLabLearning from "./components/education/LanguageLabLearning";
-import UniversalLearning from "./components/education/UniversalLearning";
-import EnhancedDailyProgram from "./components/daily-program/EnhancedDailyProgram";
 
 // Import other components
 import ErrorBoundary from "./components/ErrorBoundary";
-import RefactoredFloatingAITutor from "./components/floating-ai-tutor/RefactoredFloatingAITutor";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +37,13 @@ const queryClient = new QueryClient({
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
 
+// Expose services to window object for debugging in development mode
+if (import.meta.env.DEV) {
+  (window as any).stealthAssessmentService = stealthAssessmentService;
+  (window as any).mockProfileService = mockProfileService;
+  console.log('🔧 Development mode: stealthAssessmentService and mockProfileService exposed to window object');
+}
+
 const root = createRoot(rootElement);
 
 root.render(
@@ -60,30 +54,12 @@ root.render(
           <ErrorBoundary>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/daily-program" element={<DailyProgram />} />
-              <Route path="/enhanced-daily-program" element={<EnhancedDailyProgram />} />
-              <Route path="/adaptive-learning-demo" element={<AdaptiveLearningDemo />} />
-              <Route path="/adaptive-integration-test" element={<AdaptiveIntegrationTest />} />
-              
-              {/* Learning module routes */}
-              <Route path="/learn/mathematics" element={<MathematicsLearning />} />
-              <Route path="/learn/english" element={<EnglishLearning />} />
-              <Route path="/learn/science" element={<ScienceLearning />} />
-              <Route path="/learn/history-religion" element={<HistoryReligionLearning />} />
-              <Route path="/learn/geography" element={<GeographyLearning />} />
-              <Route path="/learn/creative-arts" element={<CreativeLearning />} />
-              <Route path="/learn/life-essentials" element={<LifeEssentialsLearning />} />
-              <Route path="/learn/mental-wellness" element={<MentalWellnessLearning />} />
-              <Route path="/learn/body-lab" element={<BodyLabLearning />} />
-              <Route path="/learn/computer-science" element={<ComputerScienceLearning />} />
-              <Route path="/learn/music" element={<MusicLearning />} />
-              <Route path="/learn/language-lab" element={<LanguageLabLearning />} />
-              <Route path="/learn/universal" element={<UniversalLearning subject="Universal Learning" skillArea="General Knowledge" />} />
+              <Route path="/test" element={<TestPage />} />
+              <Route path="/stealth-assessment-test" element={<StealthAssessmentTest />} />
+              <Route path="/simple-stealth-test" element={<SimpleStealthTest />} />
+              <Route path="/auth" element={<AuthPage />} />
             </Routes>
             
-            <RefactoredFloatingAITutor />
             <Toaster />
           </ErrorBoundary>
         </BrowserRouter>
