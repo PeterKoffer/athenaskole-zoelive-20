@@ -212,6 +212,53 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_component_mastery: {
+        Row: {
+          attempts: number | null
+          correct_attempts: number | null
+          created_at: string | null
+          history: Json | null
+          id: string
+          kc_id: string
+          last_attempt_timestamp: string | null
+          mastery_level: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number | null
+          correct_attempts?: number | null
+          created_at?: string | null
+          history?: Json | null
+          id?: string
+          kc_id: string
+          last_attempt_timestamp?: string | null
+          mastery_level?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number | null
+          correct_attempts?: number | null
+          created_at?: string | null
+          history?: Json | null
+          id?: string
+          kc_id?: string
+          last_attempt_timestamp?: string | null
+          mastery_level?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_component_mastery_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       learning_objectives: {
         Row: {
           created_at: string
@@ -427,6 +474,9 @@ export type Database = {
           grade: string | null
           id: string
           name: string | null
+          overall_mastery: number | null
+          preferences: Json | null
+          recent_performance: Json | null
           school: string | null
           updated_at: string
           user_id: string
@@ -440,6 +490,9 @@ export type Database = {
           grade?: string | null
           id?: string
           name?: string | null
+          overall_mastery?: number | null
+          preferences?: Json | null
+          recent_performance?: Json | null
           school?: string | null
           updated_at?: string
           user_id: string
@@ -453,6 +506,9 @@ export type Database = {
           grade?: string | null
           id?: string
           name?: string | null
+          overall_mastery?: number | null
+          preferences?: Json | null
+          recent_performance?: Json | null
           school?: string | null
           updated_at?: string
           user_id?: string
