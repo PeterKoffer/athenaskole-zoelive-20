@@ -13,6 +13,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 // Import services for debugging
 import stealthAssessmentService from "@/services/stealthAssessment/StealthAssessmentService";
 import { mockProfileService } from "@/services/learnerProfile/MockProfileService";
+import { SupabaseProfileService } from "@/services/learnerProfile/SupabaseProfileService";
 
 // Import simple pages for the working app
 import Index from "./pages/Index";
@@ -20,7 +21,6 @@ import TestPage from "./pages/TestPage";
 import SimpleStealthTest from "./pages/SimpleStealthTest";
 import StealthAssessmentTest from "./pages/StealthAssessmentTest";
 import AuthPage from "./pages/AuthPage";
-
 
 // Import other components
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -39,9 +39,16 @@ if (!rootElement) throw new Error("Failed to find the root element");
 
 // Expose services to window object for debugging in development mode
 if (import.meta.env.DEV) {
+  const supabaseProfileService = new SupabaseProfileService();
   (window as any).stealthAssessmentService = stealthAssessmentService;
   (window as any).mockProfileService = mockProfileService;
-  console.log('🔧 Development mode: stealthAssessmentService and mockProfileService exposed to window object');
+  (window as any).supabaseProfileService = supabaseProfileService;
+  
+  console.log('🔧 Development mode: Services exposed to window object');
+  console.log('📋 Available debug services:');
+  console.log('  - window.stealthAssessmentService');
+  console.log('  - window.mockProfileService');
+  console.log('  - window.supabaseProfileService');
 }
 
 const root = createRoot(rootElement);

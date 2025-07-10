@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Eye, Brain, RefreshCw, CheckCircle, XCircle, Clock, Target } from 'lucide-react';
 import QuestionCard from '@/components/adaptive-learning/components/QuestionCard';
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
+import ProfileDebugButton from '@/components/ProfileDebugButton';
 import { useToast } from '@/hooks/use-toast';
 
 const StealthAssessmentTest: React.FC = () => {
@@ -244,6 +244,7 @@ const StealthAssessmentTest: React.FC = () => {
           </Button>
           
           <div className="flex items-center space-x-4">
+            <ProfileDebugButton />
             <Button
               variant="outline"
               size="sm"
@@ -329,6 +330,7 @@ const StealthAssessmentTest: React.FC = () => {
                   <li>• Check browser console (F12) for detailed logging information</li>
                   <li>• Each question tracks response time, attempts, and accuracy</li>
                   <li>• Data is used to personalize your learning experience</li>
+                  <li>• Use "Check Profile" button to verify database integration</li>
                 </ul>
               </CardContent>
             </Card>
@@ -365,6 +367,7 @@ const StealthAssessmentTest: React.FC = () => {
               </div>
 
               <div className="flex justify-center space-x-4">
+                <ProfileDebugButton />
                 <Button onClick={resetAssessment} className="bg-purple-600 hover:bg-purple-700">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Take Again
