@@ -43,17 +43,16 @@ const AuthTestHelper = () => {
     }
   };
 
-  const createAndSignInTestUser = async () => {
+  const createTestUserOnly = async () => {
     try {
-      // Generate a unique test email with a more standard domain
+      // Generate a unique test email
       const timestamp = Date.now();
       const testEmail = `testuser${timestamp}@gmail.com`;
       const testPassword = "testpassword123";
       
-      console.log('🧪 Creating and signing in test user:', testEmail);
+      console.log('🧪 Creating test user (no auto sign-in):', testEmail);
       
-      // First, create the user
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: testEmail,
         password: testPassword,
         options: {
@@ -65,40 +64,102 @@ const AuthTestHelper = () => {
         }
       });
 
-      if (signUpError) {
-        throw signUpError;
+      if (error) {
+        throw error;
       }
 
-      console.log('🧪 User created successfully:', signUpData);
+      console.log('🧪 User created successfully:', data);
       
-      // Then immediately sign them in
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: testEmail,
-        password: testPassword,
+      toast({
+        title: "Test User Created",
+        description: `User created: ${testEmail}. Password: ${testPassword}. Try signing in manually or use the quick sign-in button below.`,
       });
 
-      if (signInError) {
-        console.warn('⚠️ Sign up successful but sign in failed:', signInError);
+      // Store the test credentials for easy access
+      (window as any).testUserCredentials = {
+        email: testEmail,
+        password: testPassword
+      };
+      
+      console.log('🧪 Test credentials stored in window.testUserCredentials');
+      
+    } catch (error: any) {
+      console.error('🧪 User creation failed:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create test user",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const signInWithStoredCredentials = async () => {
+    try {
+      const credentials = (window as any).testUserCredentials;
+      if (!credentials) {
         toast({
-          title: "User Created",
-          description: `User ${testEmail} created but not signed in. Try signing in manually with password: ${testPassword}`,
+          title: "No Credentials",
+          description: "Create a test user first",
           variant: "destructive"
         });
         return;
       }
 
-      console.log('🎉 User signed in successfully:', signInData);
+      console.log('🔑 Attempting to sign in with stored credentials:', credentials.email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      if (error) {
+        console.error('🔑 Sign in failed:', error);
+        toast({
+          title: "Sign In Failed",
+          description: `Error: ${error.message}. You may need to check Supabase email confirmation settings.`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('🎉 Sign in successful:', data);
       
       toast({
         title: "Success!",
-        description: `Test user created and signed in: ${testEmail}. You can now test the profile functionality!`,
+        description: `Signed in as: ${credentials.email}`,
       });
       
     } catch (error: any) {
-      console.error('🧪 Test user creation failed:', error);
+      console.error('🔑 Sign in error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create test user",
+        description: error.message || "Failed to sign in",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const checkAuthSettings = async () => {
+    try {
+      console.log('🔍 Checking current session...');
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Session check error:', error);
+      }
+      
+      console.log('Current session:', session);
+      
+      toast({
+        title: "Session Check",
+        description: session ? `Signed in as: ${session.user.email}` : "No active session",
+      });
+      
+    } catch (error: any) {
+      console.error('Auth check error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to check auth status",
         variant: "destructive",
       });
     }
@@ -111,7 +172,7 @@ const AuthTestHelper = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-yellow-700">
-          Use these tools to manage authentication state during testing.
+          Enhanced tools to debug authentication issues.
         </p>
         
         <Button 
@@ -121,23 +182,46 @@ const AuthTestHelper = () => {
         >
           🧹 Clear All Authentication
         </Button>
-        
+
         <Button 
-          onClick={createAndSignInTestUser}
+          onClick={createTestUserOnly}
+          variant="outline"
+          className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
+        >
+          👤 Create Test User (No Auto Sign-In)
+        </Button>
+
+        <Button 
+          onClick={signInWithStoredCredentials}
           variant="outline"
           className="w-full border-green-300 text-green-700 hover:bg-green-50"
         >
-          🚀 Create & Sign In Test User
+          🔑 Sign In With Last Created User
         </Button>
-        
+
+        <Button 
+          onClick={checkAuthSettings}
+          variant="outline"
+          className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+        >
+          🔍 Check Current Auth Status
+        </Button>
+
         <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
-          <strong>How to test:</strong>
+          <strong>Debug Steps:</strong>
           <ol className="list-decimal list-inside mt-1 space-y-1">
-            <li>Click "Create & Sign In Test User"</li>
-            <li>You should see success message and be automatically signed in</li>
-            <li>Navigate to "Stealth Assessment Test" to test profile creation</li>
-            <li>Use "Check Profile" button to verify database integration</li>
+            <li>Click "Create Test User" - this will store credentials</li>
+            <li>Click "Sign In With Last Created User" to test manual sign-in</li>
+            <li>If sign-in fails, check Supabase settings:</li>
+            <ul className="list-disc list-inside ml-4 text-xs">
+              <li>Authentication → Settings → Email Confirm: OFF</li>
+              <li>Authentication → Settings → Enable email confirmations: OFF</li>
+            </ul>
           </ol>
+        </div>
+
+        <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
+          <strong>If still having issues:</strong> The email confirmation setting might be cached. Try creating a completely new test user email or check if there are multiple email confirmation settings in your Supabase project.
         </div>
       </CardContent>
     </Card>
