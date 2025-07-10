@@ -2,7 +2,9 @@
 // src/services/learnerProfile/integrationHelpers.ts
 
 import { mockCurriculumService } from '@/services/curriculumService/mockCurriculumService';
-import { mockLearnerProfileService } from './MockLearnerProfileService';
+import { SupabaseProfileService } from './SupabaseProfileService';
+
+const profileService = new SupabaseProfileService();
 import { LearningAtomPerformance } from '@/types/learning';
 
 /**
@@ -30,7 +32,7 @@ export async function updateKcMasteryFromObjectivePerformance(
 
     // Update mastery for each KC
     for (const kc of knowledgeComponents) {
-      await mockLearnerProfileService.updateKcMastery(userId, kc.id, {
+      await profileService.updateKcMastery(userId, kc.id, {
         isCorrect: performance.success,
         newAttempt: true,
         interactionType: 'objective_practice',
@@ -70,7 +72,7 @@ export async function getRecommendedDifficultyFromKcMastery(
     // Get mastery levels for all related KCs
     const masteryLevels: number[] = [];
     for (const kc of knowledgeComponents) {
-      const kcMastery = await mockLearnerProfileService.getKcMastery(userId, kc.id);
+      const kcMastery = await profileService.getKcMastery(userId, kc.id);
       if (kcMastery) {
         masteryLevels.push(kcMastery.masteryLevel);
       }

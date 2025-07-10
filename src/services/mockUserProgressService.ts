@@ -4,7 +4,9 @@ import { LearningAtomPerformance } from '@/types/learning';
 import { userProgressStore } from './mockUserProgressService/mockData';
 import { createInitialObjectiveMetrics, updateDerivedMetrics } from './mockUserProgressService/helpers';
 import type { UserProgressService } from './mockUserProgressService/types';
-import { mockProfileService } from '@/services/learnerProfile/MockProfileService';
+import { SupabaseProfileService } from '@/services/learnerProfile/SupabaseProfileService';
+
+const profileService = new SupabaseProfileService();
 import { mockCurriculumService } from '@/services/curriculumService/mockCurriculumService';
 
 class MockUserProgressService implements UserProgressService {
@@ -90,7 +92,15 @@ class MockUserProgressService implements UserProgressService {
       if (childKCs && childKCs.length > 0) {
         console.log(`[MockUserProgressService] Found ${childKCs.length} KCs for objective ${objectiveId}:`, childKCs.map(kc => kc.id));
         for (const kc of childKCs) {
-          await mockProfileService.updateKCMastery(userId, kc.id, performance);
+          await profileService.updateKcMastery(userId, kc.id, {
+            isCorrect: performance.success,
+            newAttempt: true,
+            interactionType: 'question_attempt',
+            interactionDetails: { 
+              timeTakenMs: performance.timeTakenSeconds * 1000, 
+              hintsUsed: performance.hintsUsed 
+            }
+          });
           console.log(`[MockUserProgressService] Updated mastery for KC ${kc.id} for user ${userId}`);
         }
       } else {
