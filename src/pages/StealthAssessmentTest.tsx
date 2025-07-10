@@ -4,10 +4,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Eye, Brain, RefreshCw, CheckCircle, XCircle, Clock, Target } from 'lucide-react';
+import { ArrowLeft, Eye, Brain, RefreshCw, CheckCircle, XCircle, Clock, Target, Database } from 'lucide-react';
 import QuestionCard from '@/components/adaptive-learning/components/QuestionCard';
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 import ProfileDebugButton from '@/components/ProfileDebugButton';
+import UserVerificationDebug from '@/components/UserVerificationDebug';
 import { useToast } from '@/hooks/use-toast';
 
 const StealthAssessmentTest: React.FC = () => {
@@ -25,8 +26,8 @@ const StealthAssessmentTest: React.FC = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
 
-  // Mock questions for comprehensive testing
   const questions = [
     {
       id: 'stealth-q-001',
@@ -244,6 +245,15 @@ const StealthAssessmentTest: React.FC = () => {
           </Button>
           
           <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDebugPanel(!showDebugPanel)}
+              className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10"
+            >
+              <Database className="w-4 h-4 mr-2" />
+              {showDebugPanel ? 'Hide' : 'Show'} User Data
+            </Button>
             <ProfileDebugButton />
             <Button
               variant="outline"
@@ -265,6 +275,20 @@ const StealthAssessmentTest: React.FC = () => {
             </Button>
           </div>
         </div>
+
+        {/* Debug Panel */}
+        {showDebugPanel && (
+          <div className="mb-6">
+            <Card className="bg-black/40 border-cyan-500/30 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-cyan-400">User Verification Data</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UserVerificationDebug />
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Main Content */}
         {!isComplete ? (
@@ -330,7 +354,7 @@ const StealthAssessmentTest: React.FC = () => {
                   <li>• Check browser console (F12) for detailed logging information</li>
                   <li>• Each question tracks response time, attempts, and accuracy</li>
                   <li>• Data is used to personalize your learning experience</li>
-                  <li>• Use "Check Profile" button to verify database integration</li>
+                  <li>• Use "Show User Data" button to verify database integration</li>
                 </ul>
               </CardContent>
             </Card>
@@ -367,6 +391,14 @@ const StealthAssessmentTest: React.FC = () => {
               </div>
 
               <div className="flex justify-center space-x-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDebugPanel(!showDebugPanel)}
+                  className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10"
+                >
+                  <Database className="w-4 h-4 mr-2" />
+                  Check User Data
+                </Button>
                 <ProfileDebugButton />
                 <Button onClick={resetAssessment} className="bg-purple-600 hover:bg-purple-700">
                   <RefreshCw className="w-4 h-4 mr-2" />
