@@ -45,9 +45,9 @@ const AuthTestHelper = () => {
 
   const createTestUser = async () => {
     try {
-      // Generate a unique test email
+      // Generate a unique test email with a more standard domain
       const timestamp = Date.now();
-      const testEmail = `testuser${timestamp}@example.org`; // Using .org instead of .com
+      const testEmail = `testuser${timestamp}@gmail.com`; // Using gmail.com for better compatibility
       const testPassword = "testpassword123";
       
       console.log('🧪 Creating test user:', testEmail);
@@ -70,10 +70,17 @@ const AuthTestHelper = () => {
 
       toast({
         title: "Test User Created",
-        description: `Created user: ${testEmail} with password: ${testPassword}`,
+        description: `Created user: ${testEmail} with password: ${testPassword}. User should be automatically signed in.`,
       });
       
       console.log('🧪 Test user created successfully:', data);
+      
+      // Check if user is immediately signed in (when email confirmation is disabled)
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('🧪 User created but not confirmed. Check if email confirmation is disabled in Supabase.');
+      } else if (data.user && data.user.email_confirmed_at) {
+        console.log('🧪 User created and confirmed automatically!');
+      }
       
     } catch (error: any) {
       console.error('🧪 Test user creation failed:', error);
@@ -113,7 +120,7 @@ const AuthTestHelper = () => {
         
         <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
           <strong>Pro tip:</strong> Use "Clear All Authentication" first, then reload the page, 
-          then use "Create Random Test User" for clean testing.
+          then use "Create Random Test User" for clean testing. The new user should be automatically signed in if email confirmation is disabled.
         </div>
       </CardContent>
     </Card>
