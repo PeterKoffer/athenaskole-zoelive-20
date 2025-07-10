@@ -43,16 +43,17 @@ const AuthTestHelper = () => {
     }
   };
 
-  const createTestUser = async () => {
+  const createAndSignInTestUser = async () => {
     try {
       // Generate a unique test email with a more standard domain
       const timestamp = Date.now();
-      const testEmail = `testuser${timestamp}@gmail.com`; // Using gmail.com for better compatibility
+      const testEmail = `testuser${timestamp}@gmail.com`;
       const testPassword = "testpassword123";
       
-      console.log('🧪 Creating test user:', testEmail);
+      console.log('🧪 Creating and signing in test user:', testEmail);
       
-      const { data, error } = await supabase.auth.signUp({
+      // First, create the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: testEmail,
         password: testPassword,
         options: {
@@ -64,23 +65,34 @@ const AuthTestHelper = () => {
         }
       });
 
-      if (error) {
-        throw error;
+      if (signUpError) {
+        throw signUpError;
       }
 
-      toast({
-        title: "Test User Created",
-        description: `Created user: ${testEmail} with password: ${testPassword}. User should be automatically signed in.`,
+      console.log('🧪 User created successfully:', signUpData);
+      
+      // Then immediately sign them in
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: testEmail,
+        password: testPassword,
       });
-      
-      console.log('🧪 Test user created successfully:', data);
-      
-      // Check if user is immediately signed in (when email confirmation is disabled)
-      if (data.user && !data.user.email_confirmed_at) {
-        console.log('🧪 User created but not confirmed. Check if email confirmation is disabled in Supabase.');
-      } else if (data.user && data.user.email_confirmed_at) {
-        console.log('🧪 User created and confirmed automatically!');
+
+      if (signInError) {
+        console.warn('⚠️ Sign up successful but sign in failed:', signInError);
+        toast({
+          title: "User Created",
+          description: `User ${testEmail} created but not signed in. Try signing in manually with password: ${testPassword}`,
+          variant: "destructive"
+        });
+        return;
       }
+
+      console.log('🎉 User signed in successfully:', signInData);
+      
+      toast({
+        title: "Success!",
+        description: `Test user created and signed in: ${testEmail}. You can now test the profile functionality!`,
+      });
       
     } catch (error: any) {
       console.error('🧪 Test user creation failed:', error);
@@ -111,16 +123,21 @@ const AuthTestHelper = () => {
         </Button>
         
         <Button 
-          onClick={createTestUser}
+          onClick={createAndSignInTestUser}
           variant="outline"
           className="w-full border-green-300 text-green-700 hover:bg-green-50"
         >
-          👤 Create Random Test User
+          🚀 Create & Sign In Test User
         </Button>
         
         <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
-          <strong>Pro tip:</strong> Use "Clear All Authentication" first, then reload the page, 
-          then use "Create Random Test User" for clean testing. The new user should be automatically signed in if email confirmation is disabled.
+          <strong>How to test:</strong>
+          <ol className="list-decimal list-inside mt-1 space-y-1">
+            <li>Click "Create & Sign In Test User"</li>
+            <li>You should see success message and be automatically signed in</li>
+            <li>Navigate to "Stealth Assessment Test" to test profile creation</li>
+            <li>Use "Check Profile" button to verify database integration</li>
+          </ol>
         </div>
       </CardContent>
     </Card>
