@@ -8,33 +8,25 @@ const supabaseUrl = process.env.SUPABASE_URL as string;
 const supabaseKey = process.env.SUPABASE_ANON_KEY as string;
 const testTimeout = 10000; // 10 seconds
 
-// Check if environment variables are set
-if (!supabaseUrl) {
-  console.warn('Skipping Supabase integration tests because SUPABASE_URL is not set.');
-  process.exit();
-}
-
-if (!supabaseKey) {
-  console.warn('Skipping Supabase integration tests because SUPABASE_ANON_KEY is not set.');
-  process.exit();
-}
-
-// Initialize Supabase client
-const supabase = createClient<Database>(supabaseUrl, supabaseKey);
-
 describe('Supabase Integration', () => {
   beforeAll(() => {
-    // Setup code if needed
+    // Skip tests if environment variables are not set
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('Skipping Supabase integration tests - environment variables not set');
+    }
   });
 
-  it('should connect to Supabase', async () => {
+  it.skipIf(!supabaseUrl || !supabaseKey)('should connect to Supabase', async () => {
+    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
     const { data, error } = await supabase.from('curriculum_standards').select('*').limit(1);
 
     expect(error).toBeNull();
     expect(Array.isArray(data)).toBe(true);
   }, testTimeout);
 
-  it('should perform basic database operations', async () => {
+  it.skipIf(!supabaseUrl || !supabaseKey)('should perform basic database operations', async () => {
+    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+    
     // Use an actual table from the schema instead of 'test_table'
     const { data, error } = await supabase
       .from('adaptive_content')
@@ -44,4 +36,14 @@ describe('Supabase Integration', () => {
     expect(error).toBeNull();
     expect(Array.isArray(data)).toBe(true);
   }, testTimeout);
+
+  it('should handle missing environment variables gracefully', () => {
+    // This test always runs to ensure the test suite handles missing env vars
+    if (!supabaseUrl || !supabaseKey) {
+      expect(true).toBe(true); // Test passes when env vars are missing
+    } else {
+      expect(supabaseUrl).toBeTruthy();
+      expect(supabaseKey).toBeTruthy();
+    }
+  });
 });

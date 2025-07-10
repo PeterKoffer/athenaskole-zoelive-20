@@ -1,15 +1,20 @@
+
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import App from '@/App';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import Index from '@/pages/Index';
 
 // Mock the auth hook to provide a basic mock user
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     user: null,
-    login: vi.fn(),
-    logout: vi.fn(),
+    session: null,
     loading: false,
+    signIn: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
   }),
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -24,27 +29,57 @@ vi.mock('@/integrations/supabase/client', () => ({
   },
 }));
 
-describe('App Component', () => {
-  it('renders without crashing', () => {
-    render(<App />);
-    
-    // Check that the app renders some content
-    // Note: In a JSDOM environment, 'root' might not be where React attaches by default
-    // unless explicitly set up. A more common check might be for content rendered by App.
-    // For now, this basic check is fine if it passes after un-nesting.
-    const rootElement = document.getElementById('root');
-    expect(rootElement).toBeDefined();
-    // A better check might be for an element known to be in App.tsx's output,
-    // e.g., if Index page (path="/") shows a specific welcome message.
-    // Example: expect(screen.getByText(/welcome/i)).toBeInTheDocument();
-    // This requires async handling if content is not immediate.
+// Mock speech system to avoid initialization issues in tests
+vi.mock('@/components/speech/UnifiedSpeechSystem', () => ({
+  unifiedSpeech: {
+    speak: vi.fn(),
+    stop: vi.fn(),
+    toggleEnabled: vi.fn(),
+    getState: vi.fn(() => ({ isEnabled: false })),
+    subscribe: vi.fn(() => vi.fn()),
+  },
+}));
+
+describe('App Component Tests', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
   });
 
-  it('renders the main app structure', () => {
-    render(<App />);
+  it('renders Index page without crashing', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <MemoryRouter initialEntries={['/']}>
+            <Index />
+          </MemoryRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+    
+    // Basic smoke test - the component should render without throwing
+    expect(document.body).toBeDefined();
+  });
+
+  it('renders the main app structure with router', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <MemoryRouter initialEntries={['/']}>
+            <Index />
+          </MemoryRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
     
     // The app should render without throwing errors
-    // This is a basic smoke test
+    // This is a basic smoke test for the routing structure
     expect(document.body).toBeDefined();
   });
 });

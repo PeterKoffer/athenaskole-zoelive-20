@@ -13,7 +13,12 @@ export default mergeConfig(
       include: [
         'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
         'src/**/__tests__/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-        'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+      ],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'playwright/**', // Exclude Playwright tests from Vitest
+        'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}' // Exclude Playwright test directory
       ],
       coverage: {
         provider: 'v8',
@@ -24,6 +29,7 @@ export default mergeConfig(
           '**/*.d.ts',
           '**/*.config.*',
           'dist/',
+          'playwright/**', // Exclude Playwright from coverage
         ],
       },
       reporter: ['verbose', 'junit'],
