@@ -28,9 +28,10 @@ const ProfileDebugButton = () => {
       console.log('📊 Profile Result:', profile);
       
       if (profile) {
+        const kcCount = profile.kcMasteryMap ? Object.keys(profile.kcMasteryMap).length : 0;
         toast({
           title: "Profile Found",
-          description: `Profile exists with ${Object.keys(profile.knowledgeComponents).length} KCs`,
+          description: `Profile exists with ${kcCount} KCs`,
         });
       } else {
         toast({
