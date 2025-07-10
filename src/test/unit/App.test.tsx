@@ -26,23 +26,22 @@ vi.mock('@/integrations/supabase/client', () => ({
 
 describe('App Component', () => {
   it('renders without crashing', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     
     // Check that the app renders some content
+    // Note: In a JSDOM environment, 'root' might not be where React attaches by default
+    // unless explicitly set up. A more common check might be for content rendered by App.
+    // For now, this basic check is fine if it passes after un-nesting.
     const rootElement = document.getElementById('root');
     expect(rootElement).toBeDefined();
+    // A better check might be for an element known to be in App.tsx's output,
+    // e.g., if Index page (path="/") shows a specific welcome message.
+    // Example: expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+    // This requires async handling if content is not immediate.
   });
 
   it('renders the main app structure', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     
     // The app should render without throwing errors
     // This is a basic smoke test

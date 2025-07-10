@@ -1,55 +1,143 @@
-
 // src/services/learnerProfile/MockProfileService.ts
 
-import { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences } from '@/types/learnerProfile';
+import {
+  LearnerProfile,
+  KnowledgeComponentMastery,
+  LearnerPreferences,
+  InteractionEvent as LocalInteractionEvent, // Renamed to avoid clash with global/richer InteractionEvent
+  KCMasteryUpdateData
+} from '@/types/learnerProfile';
+// We don't need LearningAtomPerformance here anymore for updateKCMastery
 
-export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012';
+export const MOCK_USER_ID = '12345678-1234-5678-9012-123456789012'; // Keep for tests that might use it
+
+const DEFAULT_PREFERENCES: LearnerPreferences = {
+  learningStyle: 'mixed', // Default as per new type
+  difficultyPreference: 0.5, // Default as per new type
+  sessionLength: 30, // Default as per new type
+};
 
 export class MockProfileService {
-  async getProfile(userId: string): Promise<LearnerProfile | null> {
+  private store: Map<string, LearnerProfile> = new Map();
+
+  private getOrCreateProfileSync(userId: string): LearnerProfile {
+    if (!this.store.has(userId)) {
+      const now = Date.now();
+      const newProfile: LearnerProfile = {
+        userId,
+        kcMasteryMap: {},
+        preferences: { ...DEFAULT_PREFERENCES },
+        recentPerformance: [], // As per LearnerProfile type
+        overallMastery: 0,     // As per LearnerProfile type
+        lastUpdatedTimestamp: now,
+        createdAt: now,
+      };
+      this.store.set(userId, newProfile);
+      console.log(`🆕 MockProfileService: Created initial profile for user ${userId}`);
+    }
+    return this.store.get(userId)!;
+  }
+
+  async getProfile(userId: string): Promise<LearnerProfile> {
     console.log(`🔍 MockProfileService: Getting profile for user ${userId}`);
+    // Return a deep copy to prevent direct mutation of store from outside
+    return JSON.parse(JSON.stringify(this.getOrCreateProfileSync(userId)));
+  }
+
+  async updateUserPreferences(userId: string, preferences: Partial<LearnerPreferences>): Promise<LearnerProfile> {
+    console.log(`⚙️ MockProfileService: Updating preferences for user ${userId}`);
+    const profile = this.getOrCreateProfileSync(userId);
+    profile.preferences = { ...profile.preferences, ...preferences };
+    profile.lastUpdatedTimestamp = Date.now();
+    // No need to call this.store.set if profile is a direct reference and mutated
+    return JSON.parse(JSON.stringify(profile));
+  }
+
+  async getKCMastery(userId: string, kcId: string): Promise<KnowledgeComponentMastery | undefined> {
+    const profile = this.getOrCreateProfileSync(userId);
+    const kcMastery = profile.kcMasteryMap[kcId];
+    return kcMastery ? JSON.parse(JSON.stringify(kcMastery)) : undefined;
+  }
+
+  async updateKCMastery(userId: string, kcId: string, updateData: KCMasteryUpdateData): Promise<KnowledgeComponentMastery> {
+    console.log(`🧠 MockProfileService: Updating KC mastery for user ${userId}, KC ${kcId}`, updateData);
+    const profile = this.getOrCreateProfileSync(userId); // Get direct reference from store
     
-    // Return a mock profile for testing
-    const mockKcMasteryMap: Record<string, KnowledgeComponentMastery> = {
-      'add_fractions_likedenom': {
-        kcId: 'add_fractions_likedenom',
-        masteryLevel: 0.6,
-        attempts: 5,
-        correctAttempts: 3,
-        lastAttemptTimestamp: Date.now() - 86400000, // 1 day ago
-        history: []
-      }
-    };
+    let kcMastery = profile.kcMasteryMap[kcId];
+    if (!kcMastery) {
+      kcMastery = {
+        kcId,
+        masteryLevel: 0.5, // Initial neutral mastery
+        attempts: 0,
+        correctAttempts: 0,
+        history: [],
+        lastAttemptTimestamp: 0,
+        // currentStreak and timeSpentSeconds are not in the new KnowledgeComponentMastery type
+      };
+      profile.kcMasteryMap[kcId] = kcMastery;
+    }
 
-    const mockPreferences: LearnerPreferences = {
-      learningStyle: 'mixed',
-      difficultyPreference: 0.5,
-      sessionLength: 20
-    };
+    kcMastery.attempts += updateData.attemptsInInteraction || 1; // Default to 1 attempt if not specified
 
-    const mockProfile: LearnerProfile = {
-      userId: userId,
-      kcMasteryMap: mockKcMasteryMap,
-      preferences: mockPreferences,
-      recentPerformance: [],
-      overallMastery: 0.6,
-      lastUpdatedTimestamp: Date.now(),
-      createdAt: Date.now() - 7 * 86400000 // 7 days ago
+    const historyEvent: LocalInteractionEvent = {
+      timestamp: new Date(updateData.timestamp).getTime(),
+      eventType: updateData.eventType || 'kc_interaction', // Generic type if not specified
+      score: updateData.success ? 1 : 0, // Simple score based on success
+      details: {
+        ...(updateData.details || {}), // Preserve other details if any
+        timeTakenMs: updateData.timeTakenMs,
+        hintsUsed: updateData.hintsUsed,
+      },
     };
+    kcMastery.history.push(historyEvent);
+    if (kcMastery.history.length > 20) { // Keep history capped
+      kcMastery.history.shift();
+    }
 
-    console.log(`✅ MockProfileService: Returning mock profile for user ${userId}`);
-    return mockProfile;
+    if (updateData.success) {
+      kcMastery.correctAttempts += 1; // Assuming one successful outcome for this update trigger
+      // Simple learning curve: increase mastery
+      kcMastery.masteryLevel += (1 - kcMastery.masteryLevel) * 0.25;
+    } else {
+      // Simple learning curve: decrease mastery
+      kcMastery.masteryLevel -= kcMastery.masteryLevel * 0.25;
+    }
+    kcMastery.masteryLevel = Math.max(0.01, Math.min(0.99, kcMastery.masteryLevel)); // Bound mastery
+    kcMastery.lastAttemptTimestamp = new Date(updateData.timestamp).getTime();
+
+    this.calculateOverallMastery(profile); // Update aggregate overallMastery
+    profile.lastUpdatedTimestamp = Date.now();
+    // profile is a direct reference to the object in the store, so mutations are automatically reflected.
+    // this.store.set(userId, profile); // is redundant but harmless.
+
+    return JSON.parse(JSON.stringify(kcMastery)); // Return a copy
   }
 
-  async updateProfile(profile: LearnerProfile): Promise<void> {
-    console.log(`🔄 MockProfileService: Mock update for user ${profile.userId}`);
-    // In a real implementation, this would persist the changes
+  private calculateOverallMastery(profile: LearnerProfile): void {
+    const kcIds = Object.keys(profile.kcMasteryMap);
+    if (kcIds.length === 0) {
+      profile.overallMastery = 0;
+      // aggregateMetrics.completedKCs and totalKCsAttempted are not on the new LearnerProfile type
+      return;
+    }
+    let totalMasterySum = 0;
+    kcIds.forEach(kcId => {
+      totalMasterySum += profile.kcMasteryMap[kcId].masteryLevel;
+    });
+    profile.overallMastery = totalMasterySum / kcIds.length;
+    // No completedKCs or totalKCsAttempted in the new LearnerProfile.aggregateMetrics
   }
 
-  async createInitialProfile(userId: string): Promise<LearnerProfile> {
-    console.log(`🆕 MockProfileService: Creating initial profile for user ${userId}`);
-    return this.getProfile(userId) as Promise<LearnerProfile>;
+  // For testing purposes
+  public resetStore(): void {
+    this.store.clear();
+    console.log('🧹 MockProfileService: Store cleared.');
+  }
+
+  public getStoreSize(): number {
+    return this.store.size;
   }
 }
 
+// Ensure a single instance is exported for consistent mocking and usage
 export const mockProfileService = new MockProfileService();
