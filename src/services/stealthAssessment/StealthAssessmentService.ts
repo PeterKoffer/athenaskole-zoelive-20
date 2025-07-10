@@ -50,19 +50,6 @@ class StealthAssessmentService implements IStealthAssessmentService {
     await this.logEvent(eventData);
   }
 
-  // Queue management methods
-  getRecentEvents(limit: number = 20): InteractionEvent[] {
-    return this.eventQueue.slice(-limit);
-  }
-
-  getQueueSize(): number {
-    return this.eventQueue.length;
-  }
-
-  clearQueue(): void {
-    this.eventQueue = [];
-    console.log('🗑️ Event queue cleared');
-  }
 
   async logQuestionAttempt(
     details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, 
@@ -130,7 +117,7 @@ class StealthAssessmentService implements IStealthAssessmentService {
   }
 
   // --- Debug/Test methods for in-memory queue ---
-  public async getInMemoryEvents(): Promise<any[]> {
+  public async getInMemoryEvents(): Promise<InteractionEvent[]> {
     return [...this.eventQueue];
   }
 
@@ -138,13 +125,16 @@ class StealthAssessmentService implements IStealthAssessmentService {
     this.eventQueue = [];
   }
 
-  // --- Debug/Test methods for in-memory queue ---
-  public async getInMemoryEvents(): Promise<InteractionEvent[]> {
-    return this.eventQueue.getEvents();
+  public getRecentEvents(count: number): InteractionEvent[] {
+    return this.eventQueue.slice(-count);
   }
 
-  public async clearInMemoryEvents(): Promise<void> {
-    this.eventQueue.clearEvents();
+  public clearQueue(): void {
+    this.eventQueue = [];
+  }
+
+  public getQueueSize(): number {
+    return this.eventQueue.length;
   }
 }
 

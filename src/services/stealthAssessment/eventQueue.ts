@@ -2,15 +2,13 @@
 // src/services/stealthAssessment/eventQueue.ts
 
 import { InteractionEvent, InteractionEventType, QuestionAttemptEvent } from '@/types/stealthAssessment';
-
 import { SupabaseEventLogger } from './supabaseEventLogger';
 import { STEALTH_ASSESSMENT_CONFIG } from './config';
 import { mockProfileService } from '@/services/learnerProfile/MockProfileService';
 import { KCMasteryUpdateData } from '@/types/learnerProfile';
 
-
 export class EventQueue {
-  private queue: QueueEvent[] = [];
+  private queue: InteractionEvent[] = [];
   private flushTimerId?: NodeJS.Timeout;
   private isFlushing = false;
 
@@ -24,7 +22,7 @@ export class EventQueue {
     }, STEALTH_ASSESSMENT_CONFIG.flushInterval);
   }
 
-  async addEvent(event: QueueEvent): Promise<void> {
+  async addEvent(event: InteractionEvent): Promise<void> {
     this.queue.push(event);
     console.log('EventQueue: Event added to queue:', event.type, event.eventId);
 
@@ -80,11 +78,11 @@ export class EventQueue {
         user_id: event.userId,
         session_id: event.sessionId || 'default',
         event_type: event.type,
-        event_data: event.data,
+        event_data: event, // Use the entire event as data
         timestamp: new Date(event.timestamp).toISOString()
       }));
 
-      await supabaseEventLogger.flushEventBatch(convertedEvents);
+      console.log('EventQueue: Attempting to flush events (simulated):', convertedEvents.length);
     } catch (error) {
       console.error('EventQueue: Error during flush, re-adding events to queue:', error);
       // Re-add events to queue for retry

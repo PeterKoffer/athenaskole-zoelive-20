@@ -150,3 +150,14 @@ export interface IStealthAssessmentService {
   getInMemoryEvents(): Promise<InteractionEvent[]>;
   clearInMemoryEvents(): Promise<void>;
 }
+
+/**
+ * Context types for different interaction scenarios
+ */
+export type InteractionEventContext = 
+  | 'adaptive_practice'
+  | 'assessment'
+  | 'tutorial'
+  | 'free_play'
+  | 'guided_practice'
+  | 'review';

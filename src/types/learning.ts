@@ -24,6 +24,7 @@ export interface LearningAtom {
   variantId?: string;
   isCompleted?: boolean;
   performance?: LearningAtomPerformance;
+  knowledgeComponentIds?: string[];
 }
 
 export interface DailyUniverse {
