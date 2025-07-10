@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -50,9 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔑 Attempting sign in for:', email);
     setLoading(true);
     
+    // Clean the password to remove any extra spaces
+    const cleanPassword = password.trim();
+    
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: email.trim(),
+      password: cleanPassword,
     });
     
     if (error) {
@@ -64,14 +67,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔑 Sign in successful:', data.user?.email);
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, metadata?: any) => {
     console.log('🔑 Attempting sign up for:', email);
     setLoading(true);
     
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: email.trim(),
+      password: password.trim(),
       options: {
+        data: metadata,
         emailRedirectTo: `${window.location.origin}/`
       }
     });
@@ -113,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

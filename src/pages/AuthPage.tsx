@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import QuickTestAuth from '@/components/auth/QuickTestAuth';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -42,7 +43,10 @@ const AuthPage = () => {
           description: "Successfully logged in.",
         });
       } else {
-        await signUp(formData.email, formData.password);
+        await signUp(formData.email, formData.password, {
+          name: formData.name,
+          age: formData.age
+        });
         toast({
           title: "Account created!",
           description: "Please check your email to verify your account, or try logging in if email confirmation is disabled.",
@@ -78,7 +82,7 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md space-y-4">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
@@ -87,6 +91,9 @@ const AuthPage = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
+
+        {/* Quick Test Auth Component */}
+        <QuickTestAuth />
 
         <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
           <CardHeader className="text-center">
@@ -182,12 +189,6 @@ const AuthPage = () => {
               >
                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
               </Button>
-            </div>
-
-            <div className="mt-4 p-3 bg-yellow-600/20 border border-yellow-400/30 rounded-lg">
-              <p className="text-yellow-200 text-sm">
-                <strong>Test Account:</strong> You can create a new account or use: test@example.com / password123
-              </p>
             </div>
           </CardContent>
         </Card>
