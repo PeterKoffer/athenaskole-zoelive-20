@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const AuthTestHelper = () => {
   const { toast } = useToast();
+  const [lastCreatedEmail, setLastCreatedEmail] = useState<string>("");
 
   const clearAllAuth = async () => {
     try {
@@ -15,13 +17,6 @@ const AuthTestHelper = () => {
       // Clear all local storage
       localStorage.clear();
       sessionStorage.clear();
-      
-      // Clear cookies by setting them to expire
-      document.cookie.split(";").forEach((c) => {
-        const eqPos = c.indexOf("=");
-        const name = eqPos > -1 ? c.substr(0, eqPos) : c;
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-      });
       
       toast({
         title: "Authentication Cleared",
@@ -43,16 +38,18 @@ const AuthTestHelper = () => {
     }
   };
 
-  const createTestUserOnly = async () => {
+  const createAndSignInUser = async () => {
     try {
-      // Generate a unique test email
+      // Generate a completely unique test email to avoid rate limits
       const timestamp = Date.now();
-      const testEmail = `testuser${timestamp}@gmail.com`;
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const testEmail = `test${timestamp}${randomSuffix}@example.com`;
       const testPassword = "testpassword123";
       
-      console.log('🧪 Creating test user (no auto sign-in):', testEmail);
+      console.log('🧪 Creating and signing in new user:', testEmail);
       
-      const { data, error } = await supabase.auth.signUp({
+      // First, create the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: testEmail,
         password: testPassword,
         options: {
@@ -64,42 +61,83 @@ const AuthTestHelper = () => {
         }
       });
 
-      if (error) {
-        throw error;
+      if (signUpError) {
+        throw signUpError;
       }
 
-      console.log('🧪 User created successfully:', data);
+      console.log('🧪 User created successfully:', signUpData);
       
-      toast({
-        title: "Test User Created",
-        description: `User created: ${testEmail}. Password: ${testPassword}. Try signing in manually or use the quick sign-in button below.`,
-      });
-
-      // Store the test credentials for easy access
+      // Store the credentials
+      setLastCreatedEmail(testEmail);
       (window as any).testUserCredentials = {
         email: testEmail,
         password: testPassword
       };
       
-      console.log('🧪 Test credentials stored in window.testUserCredentials');
+      // Wait a moment, then try to sign in
+      setTimeout(async () => {
+        try {
+          console.log('🔑 Now attempting to sign in with:', testEmail);
+          
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: testEmail,
+            password: testPassword,
+          });
+
+          if (signInError) {
+            console.error('🔑 Sign in failed:', signInError);
+            toast({
+              title: "Sign In Failed",
+              description: `Created user but sign-in failed: ${signInError.message}`,
+              variant: "destructive"
+            });
+            return;
+          }
+
+          console.log('🎉 Sign in successful:', signInData);
+          
+          toast({
+            title: "Success!",
+            description: `Created and signed in as: ${testEmail}`,
+          });
+          
+        } catch (error: any) {
+          console.error('🔑 Sign in error:', error);
+          toast({
+            title: "Sign In Error",
+            description: error.message || "Failed to sign in after creation",
+            variant: "destructive",
+          });
+        }
+      }, 2000); // Wait 2 seconds before sign-in attempt
       
     } catch (error: any) {
       console.error('🧪 User creation failed:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create test user",
-        variant: "destructive",
-      });
+      
+      // Handle rate limiting specifically
+      if (error.message?.includes('rate limit') || error.status === 429) {
+        toast({
+          title: "Rate Limited",
+          description: "Too many requests. Wait a few minutes before trying again, or use the existing test account.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create test user",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const signInWithStoredCredentials = async () => {
+  const signInWithExistingCredentials = async () => {
     try {
       const credentials = (window as any).testUserCredentials;
       if (!credentials) {
         toast({
           title: "No Credentials",
-          description: "Create a test user first",
+          description: "No test user credentials found. Create a test user first.",
           variant: "destructive"
         });
         return;
@@ -116,7 +154,7 @@ const AuthTestHelper = () => {
         console.error('🔑 Sign in failed:', error);
         toast({
           title: "Sign In Failed",
-          description: `Error: ${error.message}. You may need to check Supabase email confirmation settings.`,
+          description: `Error: ${error.message}`,
           variant: "destructive"
         });
         return;
@@ -165,6 +203,46 @@ const AuthTestHelper = () => {
     }
   };
 
+  const useTestAccount = async () => {
+    try {
+      // Use a known working test account
+      const testEmail = "test@example.com";
+      const testPassword = "password123";
+      
+      console.log('🔑 Attempting to sign in with test account:', testEmail);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: testEmail,
+        password: testPassword,
+      });
+
+      if (error) {
+        console.error('🔑 Test account sign in failed:', error);
+        toast({
+          title: "Test Account Failed",
+          description: `Error: ${error.message}. This account may not exist yet.`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('🎉 Test account sign in successful:', data);
+      
+      toast({
+        title: "Success!",
+        description: `Signed in with test account: ${testEmail}`,
+      });
+      
+    } catch (error: any) {
+      console.error('🔑 Test account sign in error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in with test account",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto mt-8 bg-yellow-50 border-yellow-200">
       <CardHeader>
@@ -172,7 +250,7 @@ const AuthTestHelper = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-yellow-700">
-          Enhanced tools to debug authentication issues.
+          Tools to test authentication. Rate limits may apply.
         </p>
         
         <Button 
@@ -184,19 +262,27 @@ const AuthTestHelper = () => {
         </Button>
 
         <Button 
-          onClick={createTestUserOnly}
+          onClick={createAndSignInUser}
           variant="outline"
           className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
         >
-          👤 Create Test User (No Auto Sign-In)
+          👤 Create New Test User & Sign In
         </Button>
 
         <Button 
-          onClick={signInWithStoredCredentials}
+          onClick={signInWithExistingCredentials}
           variant="outline"
           className="w-full border-green-300 text-green-700 hover:bg-green-50"
         >
           🔑 Sign In With Last Created User
+        </Button>
+
+        <Button 
+          onClick={useTestAccount}
+          variant="outline"
+          className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+        >
+          🎯 Use Test Account (test@example.com)
         </Button>
 
         <Button 
@@ -207,21 +293,18 @@ const AuthTestHelper = () => {
           🔍 Check Current Auth Status
         </Button>
 
-        <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
-          <strong>Debug Steps:</strong>
-          <ol className="list-decimal list-inside mt-1 space-y-1">
-            <li>Click "Create Test User" - this will store credentials</li>
-            <li>Click "Sign In With Last Created User" to test manual sign-in</li>
-            <li>If sign-in fails, check Supabase settings:</li>
-            <ul className="list-disc list-inside ml-4 text-xs">
-              <li>Authentication → Settings → Email Confirm: OFF</li>
-              <li>Authentication → Settings → Enable email confirmations: OFF</li>
-            </ul>
-          </ol>
+        {lastCreatedEmail && (
+          <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+            <strong>Last created:</strong> {lastCreatedEmail}
+          </div>
+        )}
+
+        <div className="text-xs text-blue-600 bg-blue-100 p-2 rounded">
+          <strong>Rate Limit Issue?</strong> If you see "email rate limit exceeded", wait 5-10 minutes or try the test account button instead.
         </div>
 
-        <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
-          <strong>If still having issues:</strong> The email confirmation setting might be cached. Try creating a completely new test user email or check if there are multiple email confirmation settings in your Supabase project.
+        <div className="text-xs text-green-600 bg-green-100 p-2 rounded">
+          <strong>Quick Test:</strong> Use the "Use Test Account" button for instant testing with test@example.com / password123
         </div>
       </CardContent>
     </Card>
