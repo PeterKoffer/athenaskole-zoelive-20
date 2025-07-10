@@ -4,7 +4,10 @@
 import { InteractionEvent, InteractionEventType, QuestionAttemptEvent } from '@/types/stealthAssessment';
 import { SupabaseEventLogger } from './supabaseEventLogger';
 import { STEALTH_ASSESSMENT_CONFIG } from './config';
-import { mockProfileService } from '@/services/learnerProfile/MockProfileService';
+import { SupabaseProfileService } from '@/services/learnerProfile';
+
+// Create instance of SupabaseProfileService
+const profileService = new SupabaseProfileService();
 import { KCMasteryUpdateData } from '@/types/learnerProfile';
 
 export class EventQueue {
@@ -48,7 +51,12 @@ export class EventQueue {
           };
           try {
             console.log(`EventQueue: Triggering KC mastery update for KC ${kcId}, User ${userId}`);
-            await mockProfileService.updateKCMastery(userId, kcId, updateData);
+            await profileService.updateKcMastery(userId, kcId, {
+              isCorrect,
+              newAttempt: true,
+              interactionType: InteractionEventType.QUESTION_ATTEMPT,
+              interactionDetails: { timeTakenMs, hintsUsed: updateData.hintsUsed }
+            });
           } catch (error) {
             console.error(`EventQueue: Error updating KC mastery for KC ${kcId}, User ${userId}:`, error);
           }
