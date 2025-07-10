@@ -2,20 +2,12 @@
 // src/services/stealthAssessment/eventQueue.ts
 
 import { InteractionEvent, InteractionEventType, QuestionAttemptEvent } from '@/types/stealthAssessment';
-import { supabaseEventLogger } from './supabaseEventLogger';
+
+import { SupabaseEventLogger } from './supabaseEventLogger';
 import { STEALTH_ASSESSMENT_CONFIG } from './config';
 import { mockProfileService } from '@/services/learnerProfile/MockProfileService';
 import { KCMasteryUpdateData } from '@/types/learnerProfile';
 
-// Simple event interface for queue compatibility
-interface QueueEvent {
-  type: string;
-  eventId: string;
-  timestamp: number;
-  userId: string;
-  sessionId?: string;
-  data: any;
-}
 
 export class EventQueue {
   private queue: QueueEvent[] = [];
@@ -38,7 +30,9 @@ export class EventQueue {
 
     // --- Integration with Learner Profile ---
     if (event.type === InteractionEventType.QUESTION_ATTEMPT) {
-      const questionEvent = event as unknown as QuestionAttemptEvent;
+
+      const questionEvent = event as QuestionAttemptEvent;
+
       const { userId, knowledgeComponentIds, isCorrect, attemptsMade, timeTakenMs, timestamp } = questionEvent;
 
       if (userId && knowledgeComponentIds && knowledgeComponentIds.length > 0) {
@@ -116,7 +110,9 @@ export class EventQueue {
    * Returns a copy of the current events in the queue.
    * Does not clear the queue.
    */
-  public getEvents(): QueueEvent[] {
+
+  public getEvents(): InteractionEvent[] {
+
     return [...this.queue]; // Return a copy
   }
 

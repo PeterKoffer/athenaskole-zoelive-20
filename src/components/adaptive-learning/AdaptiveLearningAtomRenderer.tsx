@@ -7,12 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Brain, TrendingUp, TrendingDown } from 'lucide-react';
 import stealthAssessmentService from '@/services/stealthAssessmentService';
-import { InteractionEventType } from '@/types/stealthAssessment';
+
+import { InteractionEventType, InteractionEventContext } from '@/types/stealthAssessment'; // Assuming InteractionEventContext is here
 import { v4 as uuidv4 } from 'uuid'; // For generating eventId if not handled by service's createFullEvent
 
 interface AdaptiveLearningAtomRendererProps {
   atom: LearningAtom;
-  eventContext?: string; // Allow context to be passed in
+  eventContext?: InteractionEventContext; // Allow context to be passed in
   onComplete: (performance: any) => void;
 }
 
@@ -41,7 +42,9 @@ const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> 
       setQuestionLoadTime(Date.now());
       stealthAssessmentService.logContentView({
         contentAtomId: currentAtom.id,
-        knowledgeComponentIds: (currentAtom as any).knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_load'],
+
+        knowledgeComponentIds: currentAtom.knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_load'],
+
         contentType: 'LEARNING_ATOM_QUESTION_LOADED',
         // eventContext can be passed as a prop or defaulted
       }, `AdaptiveLearningAtomRenderer-Load-${currentAtom.id}`);
@@ -86,7 +89,8 @@ const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> 
 
     stealthAssessmentService.logQuestionAttempt({
       questionId: currentAtom?.id || 'unknown_question', // Use currentAtom.id as questionId
-      knowledgeComponentIds: (currentAtom as any)?.knowledgeComponentIds || [currentAtom?.curriculumObjectiveId || 'unknown_kc_atom_answer'],
+      knowledgeComponentIds: currentAtom?.knowledgeComponentIds || [currentAtom?.curriculumObjectiveId || 'unknown_kc_atom_answer'],
+
       answerGiven: currentQuestion.options[answerIndex],
       isCorrect: isCorrect,
       attemptsMade: currentAttempt, // from useAdaptiveLearningSession hook
@@ -119,7 +123,7 @@ const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> 
     if (currentAtom && currentQuestion.hints[newHintsUsed -1]) {
       stealthAssessmentService.logHintUsage({
         questionId: currentAtom.id,
-        knowledgeComponentIds: (currentAtom as any).knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_hint'],
+        knowledgeComponentIds: currentAtom.knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_hint'],
         hintId: `hint_${newHintsUsed}`, // Or actual hint text/ID if available
         hintLevel: newHintsUsed,
         // eventContext can be passed as a prop or defaulted
