@@ -305,6 +305,7 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
     languageCode: 'en',
     educationalLevel: '1',
     subjectName: 'English Language Arts',
+
     subject: NELIESubject.ENGLISH,
     estimatedDuration: 180,
     prerequisites: ['us-k-ela'],
