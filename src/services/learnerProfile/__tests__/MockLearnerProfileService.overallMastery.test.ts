@@ -35,49 +35,46 @@ describe('MockLearnerProfileService - Overall Mastery Calculation', () => {
   });
 
   it('should calculate overallMastery as the average of KC mastery levels', async () => {
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true)); // KC1: 0.625
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_2, createKCMasteryUpdateData(false)); // KC2: 0.375
+    // KC1: 1 success (0.5 initial, 0.2 learningRate) -> 0.5 + (1-0.5)*0.2 = 0.6
+    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
+    // KC2: 1 failure (0.5 initial, 0.1 forgettingRate) -> 0.5 - 0.5*0.1 = 0.45
+    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_2, createKCMasteryUpdateData(false));
 
     const profile = await mockProfileService.getProfile(MOCK_USER_ID);
-    const expectedOverallMastery = (0.625 + 0.375) / 2;
+    const expectedOverallMastery = (0.6 + 0.45) / 2; // (0.6 + 0.45) / 2 = 0.525
     expect(profile.overallMastery).toBeCloseTo(expectedOverallMastery);
     // expect(profile.aggregateMetrics.totalKCsAttempted).toBe(2); // No longer on LearnerProfile type directly
   });
 
   it('should update overallMastery when KCs are added and their mastery changes', async () => {
-    // KC1: Strong mastery -> should reach 0.881...
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
-    const masteryKC1 = 0.5 * Math.pow(1.25, 0) * Math.pow(0.75,0); // Start
-    const m1_1 = masteryKC1 + (1-masteryKC1)*0.25; // 0.625
-    const m1_2 = m1_1 + (1-m1_1)*0.25; // 0.71875
-    const m1_3 = m1_2 + (1-m1_2)*0.25; // 0.7890625
-    const m1_4 = m1_3 + (1-m1_3)*0.25; // 0.841796875
-    const m1_5 = m1_4 + (1-m1_4)*0.25; // 0.88134765625
+    // KC1: Strong mastery (5 successes, initial 0.5, rate 0.2)
+    let currentMasteryKC1 = 0.5;
+    const learningRate = 0.2;
+    for (let i=0; i<5; i++) {
+      await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(true));
+      currentMasteryKC1 = currentMasteryKC1 + (1 - currentMasteryKC1) * learningRate;
+    }
+    // currentMasteryKC1 will be 0.83616
 
-
-    // KC2: Lower mastery -> 0.375
+    // KC2: Lower mastery (1 failure, initial 0.5, rate 0.1)
     await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_2, createKCMasteryUpdateData(false));
-    const masteryKC2 = 0.375;
+    const masteryKC2 = 0.5 - (0.5 * 0.1); // 0.45
 
     let profile = await mockProfileService.getProfile(MOCK_USER_ID);
-    expect(profile.overallMastery).toBeCloseTo((m1_5 + masteryKC2) / 2);
+    expect(profile.overallMastery).toBeCloseTo((currentMasteryKC1 + masteryKC2) / 2);
     // expect(profile.aggregateMetrics.completedKCs).toBe(1); // No aggregateMetrics.completedKCs
     // expect(profile.aggregateMetrics.totalKCsAttempted).toBe(2);
 
-    // KC3: Also strong mastery -> should also reach 0.881...
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_3, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_3, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_3, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_3, createKCMasteryUpdateData(true));
-    await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_3, createKCMasteryUpdateData(true));
-    const masteryKC3 = m1_5; // Same as KC1 after 5 successes
+    // KC3: Also strong mastery (5 successes, initial 0.5, rate 0.2)
+    let currentMasteryKC3 = 0.5;
+    for (let i=0; i<5; i++) {
+      await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_3, createKCMasteryUpdateData(true));
+      currentMasteryKC3 = currentMasteryKC3 + (1 - currentMasteryKC3) * learningRate;
+    }
+    // currentMasteryKC3 will be 0.83616
 
     const updatedProfile = await mockProfileService.getProfile(MOCK_USER_ID);
-    expect(updatedProfile.overallMastery).toBeCloseTo((m1_5 + masteryKC2 + masteryKC3) / 3);
+    expect(updatedProfile.overallMastery).toBeCloseTo((currentMasteryKC1 + masteryKC2 + currentMasteryKC3) / 3);
     // expect(updatedProfile.aggregateMetrics.completedKCs).toBe(2);
     // expect(updatedProfile.aggregateMetrics.totalKCsAttempted).toBe(3);
   });
@@ -89,10 +86,11 @@ describe('MockLearnerProfileService - Overall Mastery Calculation', () => {
     mockProfileService.resetStore(); // Ensure clean start
     await mockProfileService.getProfile(MOCK_USER_ID); // Initialize profile
 
-    for(let i=0; i<20; i++) { // 20 iterations will hit the 0.01 floor
+    // Increased iterations to 40 to ensure floor is hit
+    for(let i=0; i<40; i++) {
       await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_1, createKCMasteryUpdateData(false));
     }
-    for(let i=0; i<20; i++) { // 20 iterations will hit the 0.01 floor
+    for(let i=0; i<40; i++) {
       await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_2, createKCMasteryUpdateData(false));
     }
 
