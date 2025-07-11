@@ -11,11 +11,15 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 
 ## United States (US) - English Language
 
-| Subject                 | Grade | Focus Area                                               | Status                                    | Primary Sources             | Notes/Next Steps                                |
-|-------------------------|-------|----------------------------------------------------------|-------------------------------------------|-----------------------------|-------------------------------------------------|
-| English Language Arts | K     | Reading: Foundational Skills (Print concepts)            | 🟠 In Progress (Course, 1 Domain, 1 LO)   | Common Core State Standards | Add more K ELA domains, LOs, and KCs          |
-| English Language Arts | 1     | Reading: Foundational Skills (Phonological awareness)    | 🟠 In Progress (Course, 1 Domain, 1 LO)   | Common Core State Standards | Add more G1 ELA domains, LOs, and KCs         |
-| English Language Arts | 2-12  | (Various)                                                | ❌ Not Started                            | Common Core State Standards | Expand ELA coverage to other grades             |
+| Subject                 | Grade | Focus Area                                                                 | Status                                                       | Primary Sources             | Notes/Next Steps                                     |
+|-------------------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-----------------------------|------------------------------------------------------|
+| English Language Arts | K     | All Domains (RL, RI, RF, W, SL, L) - Key LOs populated                     | 🟢 Detailed (Key LOs Populated for all 6 domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| English Language Arts | 1     | All Domains (RL, RI, RF, W, SL, L) - Key LOs populated                     | 🟢 Detailed (Key LOs Populated for all 6 domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| English Language Arts | 2     | All Domains (RL, RI, RF, W, SL, L) - Key LOs populated                     | 🟢 Detailed (Key LOs Populated for all 6 domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| English Language Arts | 3     | All Domains (RL, RI, RF, W, SL, L) - Key LOs populated                     | 🟢 Detailed (Key LOs Populated for all 6 domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| English Language Arts | 4     | All Domains (RL, RI, RF, W, SL, L) - Key LOs populated                     | 🟢 Detailed (Key LOs Populated for all 6 domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| English Language Arts | 5     | All Domains (RL, RI, RF, W, SL, L) - Key LOs populated                     | 🟢 Detailed (Key LOs Populated for all 6 domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| English Language Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | Common Core State Standards | Expand ELA coverage to Middle and High School grades |
 
 ## United States (US) - Mathematics
 
@@ -30,6 +34,54 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Subject | Grade | Focus Area | Status         | Primary Sources | Notes/Next Steps    |
 |---------|-------|------------|----------------|-----------------|---------------------|
 | Science | K-12  | (Various)  | ❌ Not Started | NGSS            | Add US Science data |
+
+## United States (US) - Mental Wellness
+
+| Subject         | Grade | Focus Area                                                                 | Status                                              | Primary Sources   | Notes/Next Steps                                     |
+|-----------------|-------|----------------------------------------------------------------------------|-----------------------------------------------------|-------------------|------------------------------------------------------|
+| Mental Wellness | K     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 1     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 2     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 3     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 4     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 5     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 6-12  | (Various)                                                                  | ❌ Not Started                                      | User Guidelines | Expand Mental Wellness to Middle & High School |
+
+## United States (US) - Life Essentials
+
+| Subject         | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                     |
+|-----------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|------------------------------------------------------|
+| Life Essentials | K     | Personal Care & Health, Safety & Emergency Skills, Money Basics, Social Skills & Relationships | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 1     | Personal Care & Health, Safety & Emergency Skills, Money Basics, Social Skills & Relationships | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 2     | Personal Care & Health, Safety & Emergency Skills, Money Basics, Social Skills & Relationships | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 3     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 4     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 5     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Life Essentials to Middle & High School     |
+
+## United States (US) - Computer Science
+
+| Subject          | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                       |
+|------------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|--------------------------------------------------------|
+| Computer Science | K     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 1     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 2     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 3     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 4     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 5     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Computer Science to Middle & High School grades |
+
+## United States (US) - Creative Arts
+
+| Subject       | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                   |
+|---------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|----------------------------------------------------|
+| Creative Arts | K     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 1     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 2     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 3     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 4     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 5     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Creative Arts to Middle & High School grades |
 
 ## Denmark (DK) - Danish Language
 
@@ -52,12 +104,13 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Science (DK)            | ❌ Not Started | No Danish Science data found           |
 | Social Studies (US, DK) | ❌ Not Started | No Social Studies data found           |
 | Physical Education      | ❌ Not Started | No Physical Education data found       |
-| Creative Arts           | ❌ Not Started | No Creative Arts data found            |
 | Music                   | ❌ Not Started | No Music data found                    |
-| Computer Science        | ❌ Not Started | No Computer Science data found         |
-| Mental Wellness         | ❌ Not Started | No Mental Wellness data found          |
-| Life Essentials         | ❌ Not Started | No Life Essentials data found          |
 | Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
+| Mental Wellness (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+| Life Essentials (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+| Computer Science (DK)   | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+| Creative Arts (DK)      | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+
 
 ## Priority Expansion Areas (General - based on current minimal data)
 
