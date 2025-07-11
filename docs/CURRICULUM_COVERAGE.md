@@ -31,6 +31,18 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 |---------|-------|------------|----------------|-----------------|---------------------|
 | Science | K-12  | (Various)  | ❌ Not Started | NGSS            | Add US Science data |
 
+## United States (US) - Mental Wellness
+
+| Subject         | Grade | Focus Area                                                                 | Status                                              | Primary Sources   | Notes/Next Steps                                     |
+|-----------------|-------|----------------------------------------------------------------------------|-----------------------------------------------------|-------------------|------------------------------------------------------|
+| Mental Wellness | K     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 1     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 2     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 3     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 4     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 5     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 6-12  | (Various)                                                                  | ❌ Not Started                                      | User Guidelines | Expand Mental Wellness to Middle & High School |
+
 ## Denmark (DK) - Danish Language
 
 | Subject | Grade     | Focus Area              | Status                               | Primary Sources | Notes/Next Steps                                    |
@@ -55,9 +67,10 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Creative Arts           | ❌ Not Started | No Creative Arts data found            |
 | Music                   | ❌ Not Started | No Music data found                    |
 | Computer Science        | ❌ Not Started | No Computer Science data found         |
-| Mental Wellness         | ❌ Not Started | No Mental Wellness data found          |
 | Life Essentials         | ❌ Not Started | No Life Essentials data found          |
 | Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
+| Mental Wellness (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+
 
 ## Priority Expansion Areas (General - based on current minimal data)
 
