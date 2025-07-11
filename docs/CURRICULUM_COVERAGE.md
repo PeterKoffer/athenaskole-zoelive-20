@@ -71,6 +71,18 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Computer Science | 5     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
 | Computer Science | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Computer Science to Middle & High School grades |
 
+## United States (US) - Creative Arts
+
+| Subject       | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                   |
+|---------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|----------------------------------------------------|
+| Creative Arts | K     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 1     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 2     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 3     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 4     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 5     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Creative Arts to Middle & High School grades |
+
 ## Denmark (DK) - Danish Language
 
 | Subject | Grade     | Focus Area              | Status                               | Primary Sources | Notes/Next Steps                                    |
@@ -92,12 +104,12 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Science (DK)            | ❌ Not Started | No Danish Science data found           |
 | Social Studies (US, DK) | ❌ Not Started | No Social Studies data found           |
 | Physical Education      | ❌ Not Started | No Physical Education data found       |
-| Creative Arts           | ❌ Not Started | No Creative Arts data found            |
 | Music                   | ❌ Not Started | No Music data found                    |
 | Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
 | Mental Wellness (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Life Essentials (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Computer Science (DK)   | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+| Creative Arts (DK)      | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 
 
 ## Priority Expansion Areas (General - based on current minimal data)
