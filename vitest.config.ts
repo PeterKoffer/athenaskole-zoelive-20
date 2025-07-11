@@ -1,11 +1,16 @@
 
-import { defineConfig } from 'vitest/config';
+import { defineConfig as defineVitestConfig } from 'vitest/config';
 import { mergeConfig } from 'vite';
-import viteConfig from './vite.config';
+import baseViteConfigFn from './vite.config'; // Renamed to indicate it's a function
+
+// Call the function to get the base Vite configuration object
+// We assume 'test' mode for Vitest context, or Vitest might set process.env.MODE
+const mode = process.env.VITEST_MODE || process.env.NODE_ENV || 'test';
+const baseViteConfig = baseViteConfigFn({ mode, command: 'serve' }); // command might be 'build' or 'serve'
 
 export default mergeConfig(
-  viteConfig,
-  defineConfig({
+  baseViteConfig,
+  defineVitestConfig({
     test: {
       globals: true,
       environment: 'jsdom',

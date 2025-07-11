@@ -227,5 +227,158 @@ export const mockCurriculumData: CurriculumNode[] = [
     languageCode: 'da',
     educationalLevel: '6',
     subjectName: 'Mathematics'
+  },
+
+  // --- Enhancements for USA ELA (Grade 6) ---
+  {
+    id: 'us-g6-ela-rl',
+    parentId: 'us-g6-ela', // Assumes 'us-g6-ela' subject node exists
+    nodeType: 'domain',
+    name: 'Reading: Literature',
+    description: 'Key Ideas and Details in Literature for Grade 6.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.6',
+    tags: ['literature', 'reading_comprehension', 'analysis']
+  },
+  {
+    id: 'us-g6-ela-rl-1',
+    parentId: 'us-g6-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text.',
+    description: 'Students will be able to accurately quote or paraphrase evidence from the text to support their understanding and interpretations.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.6.1',
+    assessmentTypes: ['formative', 'summative', 'project'],
+    preferredTeachingMethods: ['close_reading', 'text-based_discussion', 'modeling'],
+    subjectSpecific: {
+      linguisticSkill: 'reading',
+      proficiencyLevel: 'native', // For US ELA context
+    },
+    tags: ['textual_evidence', 'inference', 'analysis']
+  },
+  {
+    id: 'us-g6-ela-rl-1-kc1',
+    parentId: 'us-g6-ela-rl-1',
+    nodeType: 'kc',
+    name: 'Identify explicit textual evidence',
+    description: 'Skill of locating sentences or phrases in the text that directly state a piece of information.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    estimatedDuration: 20, // minutes
+    subjectSpecific: {
+      linguisticSkill: 'reading',
+      proficiencyLevel: 'native',
+    }
+  },
+  {
+    id: 'us-g6-ela-rl-1-kc2',
+    parentId: 'us-g6-ela-rl-1',
+    nodeType: 'kc',
+    name: 'Draw inferences from textual details',
+    description: 'Skill of combining textual clues with background knowledge to make a logical conclusion not explicitly stated.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    estimatedDuration: 30, // minutes
+    subjectSpecific: {
+      linguisticSkill: 'reading',
+      proficiencyLevel: 'native',
+    }
+  },
+
+  // --- Adding Danish Language Arts ("Dansk") for Denmark Grade 6 ---
+  {
+    id: 'dk-g6-dansk',
+    parentId: 'dk-g6', // Assumes 'dk-g6' grade level node exists
+    nodeType: 'subject',
+    name: 'Dansk',
+    description: '6. klasse Dansk (Danish Language Arts)',
+    countryCode: 'DK',
+    languageCode: 'da',
+    educationalLevel: '6',
+    subjectName: 'Danish Language Arts', // Standardized name
+    tags: ['danish', 'native_language']
+  },
+  {
+    id: 'dk-g6-dansk-laesning',
+    parentId: 'dk-g6-dansk',
+    nodeType: 'domain',
+    name: 'Læsning (Reading)',
+    description: 'Fokus på læsefærdigheder og tekstforståelse i 6. klasse.',
+    countryCode: 'DK',
+    languageCode: 'da',
+    educationalLevel: '6',
+    subjectName: 'Danish Language Arts',
+    tags: ['læsning', 'reading_comprehension']
+  },
+  {
+    id: 'dk-g6-dansk-laesning-obj1',
+    parentId: 'dk-g6-dansk-laesning',
+    nodeType: 'learning_objective',
+    name: 'Eleven kan sammenfatte hovedindholdet af en tekst (The student can summarize the main content of a text).',
+    description: 'Fælles Mål, Dansk, Læsning, Kompetenceområde: Tekstforståelse, efter 6. kl.',
+    countryCode: 'DK',
+    languageCode: 'da',
+    educationalLevel: '6',
+    subjectName: 'Danish Language Arts',
+    sourceIdentifier: 'FM-DA-LAE-6-TEKSTFORSTAAELSE-1', // Example Fælles Mål identifier
+    subjectSpecific: {
+      linguisticSkill: 'reading',
+      proficiencyLevel: 'native', // For Danish in Denmark
+    },
+    tags: ['summarize', 'hovedindhold', 'tekstforståelse']
+  },
+
+  // --- Adding English as a Foreign Language for Denmark Grade 6 ---
+  {
+    id: 'dk-g6-engelsk',
+    parentId: 'dk-g6', // Assumes 'dk-g6' grade level node exists
+    nodeType: 'subject',
+    name: 'Engelsk',
+    description: '6. klasse Engelsk (English as a Foreign Language)',
+    countryCode: 'DK',
+    languageCode: 'da', // The curriculum itself is likely in Danish
+    educationalLevel: '6',
+    subjectName: 'English as a Foreign Language', // Standardized name
+    tags: ['english', 'foreign_language', 'efl']
+  },
+  {
+    id: 'dk-g6-engelsk-mundtlig',
+    parentId: 'dk-g6-engelsk',
+    nodeType: 'domain',
+    name: 'Mundtlig kommunikation (Oral Communication)',
+    description: 'Fokus på mundtlige engelskfærdigheder i 6. klasse.',
+    countryCode: 'DK',
+    languageCode: 'da',
+    educationalLevel: '6',
+    subjectName: 'English as a Foreign Language',
+    tags: ['speaking', 'listening', 'oral_communication']
+  },
+  {
+    id: 'dk-g6-engelsk-mundtlig-obj1',
+    parentId: 'dk-g6-engelsk-mundtlig',
+    nodeType: 'learning_objective',
+    name: 'Eleven kan deltage i enkle, forberedte samtaler om nære emner (The student can participate in simple, prepared conversations about familiar topics).',
+    description: 'Fælles Mål, Engelsk, Mundtlig Kommunikation, Kompetenceområde: Samtale, efter 6. kl.',
+    countryCode: 'DK',
+    languageCode: 'da',
+    educationalLevel: '6',
+    subjectName: 'English as a Foreign Language',
+    sourceIdentifier: 'FM-EN-MUN-6-SAMTALE-1', // Example Fælles Mål identifier
+    subjectSpecific: {
+      targetLanguage: 'en',
+      linguisticSkill: 'speaking',
+      proficiencyLevel: 'beginner', // Or A1/A2 level for CEFR if applicable
+    },
+    tags: ['conversation', 'dialogue', 'familiar_topics']
   }
 ];
