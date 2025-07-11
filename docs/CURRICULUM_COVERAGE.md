@@ -82,7 +82,6 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Creative Arts | 4     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
 | Creative Arts | 5     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
 | Creative Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Creative Arts to Middle & High School grades |
-
 ## United States (US) - Music
 
 | Subject | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                |
