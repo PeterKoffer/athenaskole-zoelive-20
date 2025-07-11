@@ -37,6 +37,7 @@ export interface CurriculumNode {
 
   educationalLevel?: string; // e.g., "K", "1", "2", ..., "12" (especially for 'grade_level' type or content nodes)
   subjectName?: string; // Standardized subject name (e.g., "Mathematics", "Language Arts", "Physical Science"). Useful for filtering.
+  subject?: import('./NELIESubjects').NELIESubject; // Strongly types the subject using the core enum
 
   sourceIdentifier?: string; // Original ID from the source curriculum (e.g., CCSS.Math.Content.6.RP.A.1)
   sourceUrl?: string; // URL to the original curriculum document/page for this node, if applicable
