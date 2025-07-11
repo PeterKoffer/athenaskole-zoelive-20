@@ -1,4 +1,5 @@
-import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculumIndex';
+
+import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
 
 export interface CurriculumService {
   /**
