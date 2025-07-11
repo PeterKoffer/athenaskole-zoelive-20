@@ -1,7 +1,7 @@
 
 import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
 
-export interface CurriculumService {
+export interface ICurriculumService { // Renamed to ICurriculumService
   /**
    * Retrieves curriculum nodes based on the provided filters.
    * @param filters - Optional filters to apply.
@@ -29,4 +29,11 @@ export interface CurriculumService {
    * @returns A promise that resolves to an array of all descendant curriculum nodes.
    */
   getDescendants(parentId: string): Promise<CurriculumNode[]>;
+
+  /**
+   * Generates a string context for a given curriculum node, intended for AI prompt enrichment.
+   * @param nodeId The unique ID of the curriculum node.
+   * @returns A promise that resolves to a string containing AI context, or null if node not found.
+   */
+  generateAIContextForNode(nodeId: string): Promise<string | null>;
 }
