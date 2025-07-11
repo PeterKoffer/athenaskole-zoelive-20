@@ -47,6 +47,7 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Mental Wellness | 5     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
 | Mental Wellness | 6-12  | (Various)                                                                  | ❌ Not Started                                      | User Guidelines | Expand Mental Wellness to Middle & High School |
 
+
 ## United States (US) - Life Essentials
 
 | Subject         | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                     |

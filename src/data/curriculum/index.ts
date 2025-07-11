@@ -14,6 +14,7 @@ export const mockCurriculumData: CurriculumNode[] = [
   ...usRootCurriculumNodes,
   ...usMathCurriculumNodes,
   ...usElaCurriculumNodes,
+
   ...usMentalWellnessCurriculumData,
   ...usLifeEssentialsCurriculumData, // Add US Life Essentials
   ...dkCurriculumNodes,
