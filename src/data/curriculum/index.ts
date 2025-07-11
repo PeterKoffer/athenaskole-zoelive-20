@@ -5,20 +5,23 @@ import { usRootCurriculumNodes } from './us/usRootData';
 import { usMathCurriculumNodes } from './us/usMathData';
 import { usElaCurriculumNodes } from './us/usElaData';
 import { usMentalWellnessCurriculumData } from './us/usMentalWellnessData';
-import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData'; // Import US Life Essentials
+import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData';
+import { usComputerScienceCurriculumData } from './us/usComputerScienceData'; // Import US Computer Science
 import { dkCurriculumNodes } from './dk/dkData';
-import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData'; // Import DK Life Essentials
+import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData';
+import { dkComputerScienceCurriculumData } from './dk/dkComputerScienceData'; // Import DK Computer Science
 
 // Combine all curriculum data from different countries and subjects
 export const mockCurriculumData: CurriculumNode[] = [
   ...usRootCurriculumNodes,
   ...usMathCurriculumNodes,
   ...usElaCurriculumNodes,
-
   ...usMentalWellnessCurriculumData,
-  ...usLifeEssentialsCurriculumData, // Add US Life Essentials
+  ...usLifeEssentialsCurriculumData,
+  ...usComputerScienceCurriculumData, // Add US Computer Science
   ...dkCurriculumNodes,
-  ...dkLifeEssentialsCurriculumData // Add DK Life Essentials
+  ...dkLifeEssentialsCurriculumData,
+  ...dkComputerScienceCurriculumData // Add DK Computer Science
 ];
 
 // Export individual country/subject data for specific use cases
@@ -27,9 +30,11 @@ export {
   usMathCurriculumNodes,
   usElaCurriculumNodes,
   usMentalWellnessCurriculumData,
-  usLifeEssentialsCurriculumData, // Export US Life Essentials
+  usLifeEssentialsCurriculumData,
+  usComputerScienceCurriculumData, // Export US Computer Science
   dkCurriculumNodes,
-  dkLifeEssentialsCurriculumData // Export DK Life Essentials
+  dkLifeEssentialsCurriculumData,
+  dkComputerScienceCurriculumData // Export DK Computer Science
 };
 
 // Helper functions for filtering data

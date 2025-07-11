@@ -47,7 +47,6 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Mental Wellness | 5     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
 | Mental Wellness | 6-12  | (Various)                                                                  | ❌ Not Started                                      | User Guidelines | Expand Mental Wellness to Middle & High School |
 
-
 ## United States (US) - Life Essentials
 
 | Subject         | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                     |
@@ -59,6 +58,18 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Life Essentials | 4     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
 | Life Essentials | 5     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
 | Life Essentials | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Life Essentials to Middle & High School     |
+
+## United States (US) - Computer Science
+
+| Subject          | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                       |
+|------------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|--------------------------------------------------------|
+| Computer Science | K     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 1     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 2     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 3     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 4     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 5     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Computer Science to Middle & High School grades |
 
 ## Denmark (DK) - Danish Language
 
@@ -83,10 +94,10 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Physical Education      | ❌ Not Started | No Physical Education data found       |
 | Creative Arts           | ❌ Not Started | No Creative Arts data found            |
 | Music                   | ❌ Not Started | No Music data found                    |
-| Computer Science        | ❌ Not Started | No Computer Science data found         |
 | Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
 | Mental Wellness (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Life Essentials (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+| Computer Science (DK)   | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 
 
 ## Priority Expansion Areas (General - based on current minimal data)
