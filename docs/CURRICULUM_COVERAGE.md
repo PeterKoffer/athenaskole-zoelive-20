@@ -11,11 +11,15 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 
 ## United States (US) - English Language
 
-| Subject                 | Grade | Focus Area                                               | Status                                    | Primary Sources             | Notes/Next Steps                                |
-|-------------------------|-------|----------------------------------------------------------|-------------------------------------------|-----------------------------|-------------------------------------------------|
-| English Language Arts | K     | Reading: Foundational Skills (Print concepts)            | 🟠 In Progress (Course, 1 Domain, 1 LO)   | Common Core State Standards | Add more K ELA domains, LOs, and KCs          |
-| English Language Arts | 1     | Reading: Foundational Skills (Phonological awareness)    | 🟠 In Progress (Course, 1 Domain, 1 LO)   | Common Core State Standards | Add more G1 ELA domains, LOs, and KCs         |
-| English Language Arts | 2-12  | (Various)                                                | ❌ Not Started                            | Common Core State Standards | Expand ELA coverage to other grades             |
+| Subject                 | Grade | Focus Area                                                                 | Status                                                       | Primary Sources             | Notes/Next Steps                                     |
+|-------------------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-----------------------------|------------------------------------------------------|
+| English Language Arts | K     | All Domains (RL, RI, RF, W, SL, L) - RF: Print concepts partially populated | 🟠 In Progress (Course, 6 Domains, 1+ sample LOs)            | Common Core State Standards | Detail K ELA domains with more LOs, then KCs       |
+| English Language Arts | 1     | All Domains (RL, RI, RF, W, SL, L) - RF: Phonological awareness partially populated | 🟠 In Progress (Course, 6 Domains, 1+ sample LOs)            | Common Core State Standards | Detail G1 ELA domains with more LOs, then KCs      |
+| English Language Arts | 2     | All Domains (RL, RI, RF, W, SL, L)                                         | 🟠 In Progress (Course, 6 Domains, 2-3 sample LOs per domain) | Common Core State Standards | Detail G2 ELA domains with more LOs, then KCs      |
+| English Language Arts | 3     | All Domains (RL, RI, RF, W, SL, L)                                         | 🟠 In Progress (Course, 6 Domains, 2-3 sample LOs per domain) | Common Core State Standards | Detail G3 ELA domains with more LOs, then KCs      |
+| English Language Arts | 4     | All Domains (RL, RI, RF, W, SL, L)                                         | 🟠 In Progress (Course, 6 Domains, 2-3 sample LOs per domain) | Common Core State Standards | Detail G4 ELA domains with more LOs, then KCs      |
+| English Language Arts | 5     | All Domains (RL, RI, RF, W, SL, L)                                         | 🟠 In Progress (Course, 6 Domains, 2-3 sample LOs per domain) | Common Core State Standards | Detail G5 ELA domains with more LOs, then KCs      |
+| English Language Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | Common Core State Standards | Expand ELA coverage to Middle and High School grades |
 
 ## United States (US) - Mathematics
 

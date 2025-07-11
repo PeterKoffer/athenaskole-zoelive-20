@@ -1,4 +1,4 @@
-import { CurriculumNode, CurriculumNodeType } from '@/types/curriculum/CurriculumNode';
+import { CurriculumNode } from '@/types/curriculum/CurriculumNode'; // CurriculumNodeType is not needed here
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 export const usMentalWellnessCurriculumData: CurriculumNode[] = [
