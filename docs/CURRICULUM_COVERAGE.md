@@ -1,101 +1,80 @@
-
 # NELIE Curriculum Coverage Tracking
 
-This document tracks the status of curriculum data across all NELIE subjects, countries, and grade levels to ensure comprehensive coverage and avoid gaps.
+This document tracks the status of curriculum data across all NELIE subjects, countries, and grade levels to ensure comprehensive coverage and avoid gaps. It reflects the content currently present in the `src/data/curriculum/` directory.
 
 ## Coverage Status Legend
-- ❌ **Not Started**: No data exists
-- 🟡 **Basic Structure**: Subject/Grade level exists but minimal detail
-- 🟠 **In Progress**: Domains/topics added, some learning objectives
-- 🟢 **Detailed**: Complete with domains, learning objectives, and knowledge components
-- ✅ **Comprehensive**: Fully detailed with rich metadata and subject-specific fields
+- ❌ **Not Started**: No data exists in `src/data/curriculum/`
+- 🟡 **Basic Structure**: Country/Subject/Grade level root node exists.
+- 🟠 **In Progress**: Some Domains and/or Learning Objectives (LOs) added.
+- 🟢 **Detailed**: Multiple Domains, LOs, and some Knowledge Components (KCs) added.
+- ✅ **Comprehensive**: Fully detailed with rich metadata and subject-specific fields (aspirational for mock data).
 
 ## United States (US) - English Language
 
-| Subject | Grade | Focus Area | Status | Primary Sources | Notes/Next Steps |
-|---------|-------|------------|--------|----------------|------------------|
-| English Language Arts | K | Reading Foundations, Literature | ❌ | Common Core State Standards | Need to add basic phonics, letter recognition |
-| English Language Arts | 1 | Reading Foundations, Literature | ❌ | Common Core State Standards | Need to add sight words, basic comprehension |
-| English Language Arts | 2 | Reading Foundations, Literature | ❌ | Common Core State Standards | Need to add fluency, comprehension strategies |
-| English Language Arts | 3 | Reading Literature/Informational, Writing, Language | 🟢 | Common Core State Standards | Complete with sample LOs and KCs |
-| English Language Arts | 4 | Reading Literature/Informational, Writing, Language | 🟢 | Common Core State Standards | Complete with sample LOs and KCs |
-| English Language Arts | 5 | Reading Literature/Informational, Writing, Language | 🟢 | Common Core State Standards | Complete with sample LOs and KCs |
-| English Language Arts | 6 | Reading Literature, Writing Analysis | 🟢 | Common Core State Standards | Complete with textual evidence focus |
-| English Language Arts | 7-12 | Literature, Writing, Language | ❌ | Common Core State Standards | High school expansion needed |
+| Subject                 | Grade | Focus Area                                               | Status                                    | Primary Sources             | Notes/Next Steps                                |
+|-------------------------|-------|----------------------------------------------------------|-------------------------------------------|-----------------------------|-------------------------------------------------|
+| English Language Arts | K     | Reading: Foundational Skills (Print concepts)            | 🟠 In Progress (Course, 1 Domain, 1 LO)   | Common Core State Standards | Add more K ELA domains, LOs, and KCs          |
+| English Language Arts | 1     | Reading: Foundational Skills (Phonological awareness)    | 🟠 In Progress (Course, 1 Domain, 1 LO)   | Common Core State Standards | Add more G1 ELA domains, LOs, and KCs         |
+| English Language Arts | 2-12  | (Various)                                                | ❌ Not Started                            | Common Core State Standards | Expand ELA coverage to other grades             |
 
 ## United States (US) - Mathematics
 
-| Subject | Grade | Focus Area | Status | Primary Sources | Notes/Next Steps |
-|---------|-------|------------|--------|----------------|------------------|
-| Mathematics | K | Counting, Basic Operations | 🟡 | Common Core, StudyPug | Need detailed domains and KCs |
-| Mathematics | 1 | Addition/Subtraction, Place Value | 🟡 | Common Core, StudyPug | Need detailed domains and KCs |
-| Mathematics | 2 | Addition/Subtraction, Measurement | 🟡 | Common Core, StudyPug | Need detailed domains and KCs |
-| Mathematics | 3 | Operations, Fractions | 🟢 | Common Core, StudyPug | Complete with multiplication focus |
-| Mathematics | 4 | Multi-digit Operations, Fractions | 🟠 | Common Core, StudyPug | Has StudyPug integration data |
-| Mathematics | 5 | Fractions, Decimals | 🟠 | Common Core, StudyPug | Has StudyPug integration data |
-| Mathematics | 6 | Ratios, Proportional Relationships | 🟢 | Common Core, StudyPug | Complete with detailed structure |
-| Mathematics | 7-8 | Algebra Prep, Geometry | ❌ | Common Core, StudyPug | Middle school expansion needed |
-| Mathematics | 9-12 | Algebra, Geometry, Statistics | ❌ | Common Core, StudyPug | High school expansion needed |
+| Subject     | Grade | Focus Area                                                                 | Status                                     | Primary Sources             | Notes/Next Steps                                |
+|-------------|-------|----------------------------------------------------------------------------|--------------------------------------------|-----------------------------|-------------------------------------------------|
+| Mathematics | K     | Counting and Cardinality (3 LOs), Operations and Algebraic Thinking (1 LO) | 🟠 In Progress (Course, 2 Domains, 4 LOs)  | Common Core State Standards | Add KCs for existing LOs, add other K Math domains |
+| Mathematics | 1     | Operations and Algebraic Thinking (2 LOs)                                    | 🟠 In Progress (Course, 1 Domain, 2 LOs)   | Common Core State Standards | Add KCs for existing LOs, add other G1 Math domains |
+| Mathematics | 2-12  | (Various)                                                                  | ❌ Not Started                             | Common Core State Standards | Expand Math coverage to other grades            |
 
 ## United States (US) - Science
 
-| Subject | Grade | Focus Area | Status | Primary Sources | Notes/Next Steps |
-|---------|-------|------------|--------|----------------|------------------|
-| Science | K | Earth Sciences, Physical Sciences | 🟡 | NGSS | Basic structure added |
-| Science | 1 | Life Sciences, Physical Sciences | 🟡 | NGSS | Basic structure added |
-| Science | 2 | Life Sciences, Earth Sciences | 🟡 | NGSS | Basic structure added |
-| Science | 3 | Life Sciences, Physical Sciences | 🟡 | NGSS | Basic structure added |
-| Science | 4 | Energy, Waves, Earth Sciences | 🟡 | NGSS | Basic structure added |
-| Science | 5 | Matter, Ecosystems, Earth Systems | 🟡 | NGSS | Basic structure added |
-| Science | 6-8 | Life/Physical/Earth Sciences | ❌ | NGSS | Middle school expansion needed |
-| Science | 9-12 | Biology, Chemistry, Physics | ❌ | NGSS | High school expansion needed |
+| Subject | Grade | Focus Area | Status         | Primary Sources | Notes/Next Steps    |
+|---------|-------|------------|----------------|-----------------|---------------------|
+| Science | K-12  | (Various)  | ❌ Not Started | NGSS            | Add US Science data |
 
 ## Denmark (DK) - Danish Language
 
-| Subject | Grade | Focus Area | Status | Primary Sources | Notes/Next Steps |
-|---------|-------|------------|--------|----------------|------------------|
-| World Languages (English) | 6 | Oral Communication | 🟠 | Fælles Mål | One domain with sample LO |
-| Dansk | 0-3 | Indskoling basics | ❌ | Fælles Mål | Need fundamental Danish language skills |
-| Dansk | 4-6 | Mellemtrin | ❌ | Fælles Mål | Need reading, writing, oral skills |
-| Dansk | 7-9 | Udskoling | ❌ | Fælles Mål | Need advanced language arts |
+| Subject | Grade     | Focus Area              | Status                               | Primary Sources | Notes/Next Steps                                    |
+|---------|-----------|-------------------------|--------------------------------------|-----------------|-----------------------------------------------------|
+| Dansk   | Unspecified | Reading Comprehension   | 🟠 In Progress (Subject, 1 LO)       | Fælles Mål      | Specify grade levels, add more Dansk LOs and KCs  |
 
 ## Denmark (DK) - Mathematics
 
-| Subject | Grade | Focus Area | Status | Primary Sources | Notes/Next Steps |
-|---------|-------|------------|--------|----------------|------------------|
-| Mathematics | 6 | Basic Math Concepts | 🟡 | Fælles Mål | Very minimal data |
-| Matematik | 0-3 | Indskoling | ❌ | Fælles Mål | Need basic number concepts |
-| Matematik | 4-6 | Mellemtrin | ❌ | Fælles Mål | Need operations, fractions |
-| Matematik | 7-9 | Udskoling | ❌ | Fælles Mål | Need algebra, geometry prep |
+| Subject   | Grade     | Focus Area                   | Status                               | Primary Sources | Notes/Next Steps                                      |
+|-----------|-----------|------------------------------|--------------------------------------|-----------------|-------------------------------------------------------|
+| Matematik | Unspecified | Basic Arithmetic Operations  | 🟠 In Progress (Subject, 1 LO)       | Fælles Mål      | Specify grade levels, add more Matematik LOs and KCs |
 
 ## Other NELIE Subjects - Coverage Gaps
 
-| Subject | Status | Notes |
-|---------|--------|--------|
-| Social Studies | ❌ | No data for any country/grade |
-| Physical Education | ❌ | No data for any country/grade |
-| Art | ❌ | No data for any country/grade |
-| Music | ❌ | No data for any country/grade |
-| Computer Science | ❌ | No data for any country/grade |
-| Health | ❌ | No data for any country/grade |
+*This section reflects subjects for which no data was found in `src/data/curriculum/`.*
 
-## Priority Expansion Areas
+| Subject                 | Status         | Notes                                  |
+|-------------------------|----------------|----------------------------------------|
+| Science (DK)            | ❌ Not Started | No Danish Science data found           |
+| Social Studies (US, DK) | ❌ Not Started | No Social Studies data found           |
+| Physical Education      | ❌ Not Started | No Physical Education data found       |
+| Creative Arts           | ❌ Not Started | No Creative Arts data found            |
+| Music                   | ❌ Not Started | No Music data found                    |
+| Computer Science        | ❌ Not Started | No Computer Science data found         |
+| Mental Wellness         | ❌ Not Started | No Mental Wellness data found          |
+| Life Essentials         | ❌ Not Started | No Life Essentials data found          |
+| Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
 
-### High Priority (Foundation Skills)
-1. **US Math K-2**: Complete detailed structure with domains, LOs, and KCs
-2. **US ELA K-2**: Add reading foundations, phonics, early literacy
-3. **Danish Matematik 0-6**: Basic number concepts and operations
-4. **Danish Dansk 0-6**: Core language skills
+## Priority Expansion Areas (General - based on current minimal data)
 
-### Medium Priority (Core Subjects)
-1. **US Science K-5**: Expand beyond basic structure to detailed LOs and KCs
-2. **US Math/ELA 7-8**: Middle school transition content
-3. **Danish subjects 7-9**: Upper elementary content
+### High Priority (Foundation Skills for existing data)
+1. **US Math K-1**: Add KCs, detail more domains/LOs per Common Core.
+2. **US ELA K-1**: Add KCs, detail more domains/LOs per Common Core.
+3. **Danish Matematik & Dansk**: Specify grade levels (e.g., Indskoling 0-3), add more LOs/KCs based on Fælles Mål.
+
+### Medium Priority (Broaden initial coverage)
+1. **US Science K-2**: Add initial structure (Subject, Course, Domains, sample LOs) based on NGSS.
+2. **US Math/ELA Grade 2**: Add initial structure.
+3. **Denmark Indskoling (0-3)**: Broaden subject coverage if possible from Fælles Mål.
 
 ### Future Expansion
-1. **High School (9-12)**: All core subjects for both countries
-2. **Specialty Subjects**: Art, Music, PE, Computer Science, Health
-3. **Additional Countries**: Expand beyond US and Denmark
+1. **Higher Grades (US & DK)**: Systematically add content for higher grades.
+2. **All NELIE Subjects**: Begin populating currently untouched subjects.
+3. **Additional Countries**: Expand beyond US and Denmark.
 
 ## Quality Standards for "Comprehensive" Status
 
@@ -110,12 +89,12 @@ To achieve ✅ **Comprehensive** status, curriculum data should include:
 
 ## Data Sources Reference
 
-- **US Mathematics**: Common Core State Standards (CCSS), StudyPug curriculum
+- **US Mathematics**: Common Core State Standards (CCSS)
 - **US English Language Arts**: Common Core State Standards (CCSS)
-- **US Science**: Next Generation Science Standards (NGSS)
+- **US Science**: Next Generation Science Standards (NGSS) - *Planned for future data*
 - **Danish Subjects**: Fælles Mål (Common Goals)
-- **General Structure**: NELIE subject taxonomy and node type hierarchy
+- **General Structure**: NELIE subject taxonomy and node type hierarchy from `src/types/curriculum/`
 
 ---
-*Last Updated: 2025-07-11*
-*Total Curriculum Nodes: Tracking in mockCurriculumData.ts*
+*Last Updated: (Will be updated by script/commit date)*
+*This document reflects the state of mock data in `src/data/curriculum/`.*
