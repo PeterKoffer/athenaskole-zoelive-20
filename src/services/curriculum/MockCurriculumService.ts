@@ -1,6 +1,7 @@
-import { CurriculumNode, CurriculumNodeFilters } from '../../types/curriculum'; // Adjusted path
+
+import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
 import { ICurriculumService } from './types';
-import { mockCurriculumData } from '../../data/mockCurriculumData'; // Adjusted path
+import { mockCurriculumData } from '@/data/mockCurriculumData';
 
 export class MockCurriculumService implements ICurriculumService {
   private data: CurriculumNode[];
@@ -15,8 +16,62 @@ export class MockCurriculumService implements ICurriculumService {
     return this.data.find(node => node.id === id);
   }
 
-  async getChildrenOfNode(parentId: string): Promise<CurriculumNode[]> {
+  async getChildren(parentId: string): Promise<CurriculumNode[]> {
     return this.data.filter(node => node.parentId === parentId);
+  }
+
+  async getChildrenOfNode(parentId: string): Promise<CurriculumNode[]> {
+    return this.getChildren(parentId);
+  }
+
+  async getDescendants(parentId: string): Promise<CurriculumNode[]> {
+    const results: CurriculumNode[] = [];
+    const queue: string[] = [parentId];
+    const visited: Set<string> = new Set();
+
+    while (queue.length > 0) {
+      const currentParentId = queue.shift()!;
+      
+      if (visited.has(currentParentId) && currentParentId !== parentId) {
+        continue;
+      }
+      visited.add(currentParentId);
+
+      const children = await this.getChildren(currentParentId);
+      for (const child of children) {
+        results.push(child);
+        queue.push(child.id);
+      }
+    }
+
+    return results;
+  }
+
+  async generateAIContextForNode(nodeId: string): Promise<string> {
+    const node = await this.getNodeById(nodeId);
+    if (!node) {
+      return `Node with ID ${nodeId} not found.`;
+    }
+
+    let context = `**${node.nodeType.toUpperCase()}: ${node.name}**\n`;
+    
+    if (node.description) {
+      context += `Description: ${node.description}\n`;
+    }
+
+    if (node.countryCode) {
+      context += `Country: ${node.countryCode}\n`;
+    }
+
+    if (node.educationalLevel) {
+      context += `Grade Level: ${node.educationalLevel}\n`;
+    }
+
+    if (node.subjectName) {
+      context += `Subject: ${node.subjectName}\n`;
+    }
+
+    return context.trim();
   }
 
   async getNodes(filters: CurriculumNodeFilters): Promise<CurriculumNode[]> {
@@ -49,7 +104,7 @@ export class MockCurriculumService implements ICurriculumService {
       }
       if (filters.subjectName) {
         const subjectsToFilter = Array.isArray(filters.subjectName) ? filters.subjectName : [filters.subjectName];
-        if (!node.subjectName || !subjectsToFilter.includes(node.subjectName)) { // Assuming subjectName is on CurriculumNode based on schema
+        if (!node.subjectName || !subjectsToFilter.includes(node.subjectName)) {
           match = false;
         }
       }
@@ -62,7 +117,6 @@ export class MockCurriculumService implements ICurriculumService {
         match = false;
       }
 
-      // Basic subjectSpecificFilters check - can be expanded for more complex logic
       if (filters.subjectSpecificFilters) {
         if (!node.subjectSpecific) {
           match = false;
@@ -78,22 +132,7 @@ export class MockCurriculumService implements ICurriculumService {
         }
       }
 
-      // Add other filter conditions from CurriculumNodeFilters as needed
-
       return match;
     });
   }
-
-  // Placeholder for potential future methods, can be expanded from ICurriculumService
-  // async getDescendantsOfNode(parentId: string, maxDepth?: number, filters?: CurriculumNodeFilters): Promise<CurriculumNode[]> {
-  //   // Implementation for fetching descendants would go here
-  //   console.warn("getDescendantsOfNode not fully implemented in MockCurriculumService");
-  //   return [];
-  // }
-
-  // async getNodePath(nodeId: string): Promise<CurriculumNode[]> {
-  //   // Implementation for fetching node path would go here
-  //   console.warn("getNodePath not fully implemented in MockCurriculumService");
-  //   return [];
-  // }
 }

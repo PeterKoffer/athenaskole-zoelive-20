@@ -69,8 +69,12 @@ const CurriculumDashboard: React.FC = () => {
     setFilteredNodes(filtered);
   };
 
-  const getUniqueValues = (field: keyof CurriculumNode) => {
-    return [...new Set(nodes.map(node => node[field]).filter(Boolean))];
+  const getUniqueStringValues = (field: keyof CurriculumNode): string[] => {
+    return [...new Set(
+      nodes
+        .map(node => node[field])
+        .filter((value): value is string => typeof value === 'string' && value !== null && value !== undefined)
+    )];
   };
 
   const clearFilters = () => {
@@ -169,8 +173,8 @@ const CurriculumDashboard: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Countries</SelectItem>
-                {getUniqueValues('countryCode').map((country) => (
-                  <SelectItem key={country} value={country as string}>
+                {getUniqueStringValues('countryCode').map((country) => (
+                  <SelectItem key={country} value={country}>
                     {country}
                   </SelectItem>
                 ))}
@@ -183,9 +187,9 @@ const CurriculumDashboard: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Types</SelectItem>
-                {getUniqueValues('nodeType').map((type) => (
-                  <SelectItem key={type} value={type as string}>
-                    {type?.replace('_', ' ').toUpperCase()}
+                {getUniqueStringValues('nodeType').map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type.replace('_', ' ').toUpperCase()}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -197,8 +201,8 @@ const CurriculumDashboard: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Subjects</SelectItem>
-                {getUniqueValues('subjectName').map((subject) => (
-                  <SelectItem key={subject} value={subject as string}>
+                {getUniqueStringValues('subjectName').map((subject) => (
+                  <SelectItem key={subject} value={subject}>
                     {subject}
                   </SelectItem>
                 ))}

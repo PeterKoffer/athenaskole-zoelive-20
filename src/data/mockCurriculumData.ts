@@ -1,1255 +1,336 @@
-import { CurriculumNode } from '../types/curriculum/CurriculumNode';
-import { NELIESubject } from '../types/curriculum/NELIESubjects';
+
+import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
+import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 export const mockCurriculumData: CurriculumNode[] = [
-  // === ROOT COUNTRIES ===
+  // Root countries
   {
     id: 'us',
     parentId: null,
     nodeType: 'country',
     name: 'United States',
-    description: 'United States education system with Common Core and state standards',
     countryCode: 'US',
-    languageCode: 'en',
-    sourceUrl: 'https://www.corestandards.org/'
+    languageCode: 'en'
   },
   {
     id: 'dk',
     parentId: null,
     nodeType: 'country',
     name: 'Denmark',
-    description: 'Danish education system based on Fælles Mål (Common Goals)',
     countryCode: 'DK',
-    languageCode: 'da',
-    sourceUrl: 'https://www.emu.dk/fagligmaal'
+    languageCode: 'da'
   },
 
-  // === US GRADE LEVELS ===
-  {
-    id: 'us-k',
-    parentId: 'us',
-    nodeType: 'grade_level',
-    name: 'Kindergarten',
-    description: 'Kindergarten curriculum for ages 5-6',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: 'K'
-  },
-  {
-    id: 'us-g1',
-    parentId: 'us',
-    nodeType: 'grade_level',
-    name: 'Grade 1',
-    description: 'First grade curriculum for ages 6-7',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '1'
-  },
-  {
-    id: 'us-g2',
-    parentId: 'us',
-    nodeType: 'grade_level',
-    name: 'Grade 2',
-    description: 'Second grade curriculum for ages 7-8',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '2'
-  },
+  // Grade levels for US
   {
     id: 'us-g3',
     parentId: 'us',
     nodeType: 'grade_level',
     name: 'Grade 3',
-    description: 'Third grade curriculum for ages 8-9',
     countryCode: 'US',
     languageCode: 'en',
     educationalLevel: '3'
-  },
-  {
-    id: 'us-g4',
-    parentId: 'us',
-    nodeType: 'grade_level',
-    name: 'Grade 4',
-    description: 'Fourth grade curriculum for ages 9-10',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4'
-  },
-  {
-    id: 'us-g5',
-    parentId: 'us',
-    nodeType: 'grade_level',
-    name: 'Grade 5',
-    description: 'Fifth grade curriculum for ages 10-11',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5'
   },
   {
     id: 'us-g6',
     parentId: 'us',
     nodeType: 'grade_level',
     name: 'Grade 6',
-    description: 'Sixth grade curriculum for ages 11-12',
     countryCode: 'US',
     languageCode: 'en',
     educationalLevel: '6'
   },
 
-  // === US SUBJECTS ===
-  // Math subjects for each grade
-  {
-    id: 'us-k-math',
-    parentId: 'us-k',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Kindergarten Mathematics - Number sense and basic operations',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: 'K',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-  {
-    id: 'us-g1-math',
-    parentId: 'us-g1',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Grade 1 Mathematics - Operations and algebraic thinking',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '1',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-  {
-    id: 'us-g2-math',
-    parentId: 'us-g2',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Grade 2 Mathematics - Place value and operations',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '2',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-  {
-    id: 'us-g3-math',
-    parentId: 'us-g3',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Grade 3 Mathematics - Multiplication, division, and fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-  {
-    id: 'us-g4-math',
-    parentId: 'us-g4',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Grade 4 Mathematics - Multi-digit operations and fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-  {
-    id: 'us-g5-math',
-    parentId: 'us-g5',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Grade 5 Mathematics - Decimals, fractions, and volume',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-  {
-    id: 'us-g6-math',
-    parentId: 'us-g6',
-    nodeType: 'subject',
-    name: 'Mathematics',
-    description: 'Grade 6 Mathematics - Ratios, proportions, and negative numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH
-  },
-
-  // ELA subjects for K-2
-  {
-    id: 'us-k-ela',
-    parentId: 'us-k',
-    nodeType: 'subject',
-    name: 'English Language Arts',
-    description: 'Kindergarten English Language Arts - Phonics and basic reading',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: 'K',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH
-  },
-  {
-    id: 'us-g1-ela',
-    parentId: 'us-g1',
-    nodeType: 'subject',
-    name: 'English Language Arts',
-    description: 'Grade 1 English Language Arts - Beginning reading and writing',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '1',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH
-  },
-  {
-    id: 'us-g2-ela',
-    parentId: 'us-g2',
-    nodeType: 'subject',
-    name: 'English Language Arts',
-    description: 'Grade 2 English Language Arts - Fluent reading and writing',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '2',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH
-  },
-
-  // === GRADE 3 MATH DOMAINS (from StudyPug) ===
-  {
-    id: 'us-g3-math-oa',
-    parentId: 'us-g3-math',
-    nodeType: 'domain',
-    name: 'Operations and Algebraic Thinking',
-    description: 'Understanding multiplication, division, and patterns',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['operations', 'algebra', 'patterns']
-  },
-  {
-    id: 'us-g3-math-nbt',
-    parentId: 'us-g3-math',
-    nodeType: 'domain',
-    name: 'Number and Operations in Base Ten',
-    description: 'Place value and multi-digit arithmetic',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['place_value', 'multi_digit', 'base_ten']
-  },
-  {
-    id: 'us-g3-math-nf',
-    parentId: 'us-g3-math',
-    nodeType: 'domain',
-    name: 'Number and Operations—Fractions',
-    description: 'Understanding fractions as numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['fractions', 'unit_fractions', 'equivalent']
-  },
-  {
-    id: 'us-g3-math-md',
-    parentId: 'us-g3-math',
-    nodeType: 'domain',
-    name: 'Measurement and Data',
-    description: 'Time, liquid volume, mass, and data representation',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['measurement', 'data', 'time', 'mass', 'volume']
-  },
-  {
-    id: 'us-g3-math-g',
-    parentId: 'us-g3-math',
-    nodeType: 'domain',
-    name: 'Geometry',
-    description: 'Shapes, attributes, and partitioning',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['shapes', 'geometry', 'attributes', 'partitioning']
-  },
-
-  // === GRADE 4 MATH DOMAINS ===
-  {
-    id: 'us-g4-math-oa',
-    parentId: 'us-g4-math',
-    nodeType: 'domain',
-    name: 'Operations and Algebraic Thinking',
-    description: 'Multi-step problems and factors/multiples',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['multi_step', 'factors', 'multiples', 'patterns']
-  },
-  {
-    id: 'us-g4-math-nbt',
-    parentId: 'us-g4-math',
-    nodeType: 'domain',
-    name: 'Number and Operations in Base Ten',
-    description: 'Multi-digit arithmetic and place value to millions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['place_value', 'multi_digit', 'millions']
-  },
-  {
-    id: 'us-g4-math-nf',
-    parentId: 'us-g4-math',
-    nodeType: 'domain',
-    name: 'Number and Operations—Fractions',
-    description: 'Equivalent fractions and operations with fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['fractions', 'equivalent', 'operations', 'mixed_numbers']
-  },
-  {
-    id: 'us-g4-math-md',
-    parentId: 'us-g4-math',
-    nodeType: 'domain',
-    name: 'Measurement and Data',
-    description: 'Unit conversions, area, perimeter, and data analysis',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['measurement', 'conversions', 'area', 'perimeter', 'data']
-  },
-  {
-    id: 'us-g4-math-g',
-    parentId: 'us-g4-math',
-    nodeType: 'domain',
-    name: 'Geometry',
-    description: 'Lines, angles, and classification of shapes',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['lines', 'angles', 'shapes', 'classification']
-  },
-
-  // === GRADE 5 MATH DOMAINS ===
-  {
-    id: 'us-g5-math-oa',
-    parentId: 'us-g5-math',
-    nodeType: 'domain',
-    name: 'Operations and Algebraic Thinking',
-    description: 'Patterns, expressions, and coordinate systems',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['patterns', 'expressions', 'coordinates']
-  },
-  {
-    id: 'us-g5-math-nbt',
-    parentId: 'us-g5-math',
-    nodeType: 'domain',
-    name: 'Number and Operations in Base Ten',
-    description: 'Decimal place value and operations',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['decimals', 'place_value', 'operations']
-  },
-  {
-    id: 'us-g5-math-nf',
-    parentId: 'us-g5-math',
-    nodeType: 'domain',
-    name: 'Number and Operations—Fractions',
-    description: 'Adding, subtracting, and multiplying fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['fractions', 'operations', 'multiplication']
-  },
-  {
-    id: 'us-g5-math-md',
-    parentId: 'us-g5-math',
-    nodeType: 'domain',
-    name: 'Measurement and Data',
-    description: 'Volume and graphing in coordinate plane',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['volume', 'coordinate_plane', 'graphing']
-  },
-  {
-    id: 'us-g5-math-g',
-    parentId: 'us-g5-math',
-    nodeType: 'domain',
-    name: 'Geometry',
-    description: 'Coordinate geometry and classification of figures',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['coordinate_geometry', 'classification']
-  },
-
-  // === GRADE 6 MATH DOMAINS ===
-  {
-    id: 'us-g6-math-rp',
-    parentId: 'us-g6-math',
-    nodeType: 'domain',
-    name: 'Ratios and Proportional Relationships',
-    description: 'Understanding ratios and rates',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['ratios', 'rates', 'proportions']
-  },
-  {
-    id: 'us-g6-math-ns',
-    parentId: 'us-g6-math',
-    nodeType: 'domain',
-    name: 'The Number System',
-    description: 'Negative numbers and rational numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['negative_numbers', 'rational_numbers']
-  },
-  {
-    id: 'us-g6-math-ee',
-    parentId: 'us-g6-math',
-    nodeType: 'domain',
-    name: 'Expressions and Equations',
-    description: 'Algebraic expressions and equations',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['expressions', 'equations', 'algebra']
-  },
-  {
-    id: 'us-g6-math-g',
-    parentId: 'us-g6-math',
-    nodeType: 'domain',
-    name: 'Geometry',
-    description: 'Area, surface area, and volume',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['area', 'surface_area', 'volume']
-  },
-  {
-    id: 'us-g6-math-sp',
-    parentId: 'us-g6-math',
-    nodeType: 'domain',
-    name: 'Statistics and Probability',
-    description: 'Data analysis and statistical thinking',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    tags: ['statistics', 'probability', 'data_analysis']
-  },
-
-  // === GRADE 3 MATH LEARNING OBJECTIVES (StudyPug Topics) ===
-  // Operations and Algebraic Thinking
-  {
-    id: 'us-g3-math-oa-multiplication-as-groups',
-    parentId: 'us-g3-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Multiplication as Equal Groups',
-    description: 'Interpret products of whole numbers as total number of objects in equal groups',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-oa-1',
-    estimatedDuration: 45,
-    prerequisites: [],
-    tags: ['multiplication', 'equal_groups', 'arrays']
-  },
-  {
-    id: 'us-g3-math-oa-division-as-groups',
-    parentId: 'us-g3-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Division as Equal Groups',
-    description: 'Interpret whole-number quotients as number of groups or number in each group',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-oa-2',
-    estimatedDuration: 45,
-    prerequisites: ['us-g3-math-oa-multiplication-as-groups'],
-    tags: ['division', 'equal_groups', 'sharing']
-  },
-  {
-    id: 'us-g3-math-oa-word-problems',
-    parentId: 'us-g3-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Multiplication and Division Word Problems',
-    description: 'Solve word problems involving multiplication and division within 100',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-oa-3',
-    estimatedDuration: 50,
-    prerequisites: ['us-g3-math-oa-multiplication-as-groups', 'us-g3-math-oa-division-as-groups'],
-    tags: ['word_problems', 'problem_solving']
-  },
-  {
-    id: 'us-g3-math-oa-multiplication-facts',
-    parentId: 'us-g3-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Multiplication Facts to 100',
-    description: 'Fluently multiply and divide within 100 using strategies and properties',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-oa-7',
-    estimatedDuration: 60,
-    prerequisites: ['us-g3-math-oa-multiplication-as-groups'],
-    tags: ['fluency', 'multiplication_facts', 'strategies']
-  },
-
-  // Number and Operations in Base Ten
-  {
-    id: 'us-g3-math-nbt-rounding',
-    parentId: 'us-g3-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Rounding Whole Numbers',
-    description: 'Round whole numbers to the nearest 10 or 100',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-nbt-1',
-    estimatedDuration: 40,
-    prerequisites: [],
-    tags: ['rounding', 'place_value', 'estimation']
-  },
-  {
-    id: 'us-g3-math-nbt-addition-subtraction',
-    parentId: 'us-g3-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Add and Subtract within 1000',
-    description: 'Fluently add and subtract within 1000 using strategies and algorithms',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-nbt-2',
-    estimatedDuration: 50,
-    prerequisites: ['us-g3-math-nbt-rounding'],
-    tags: ['addition', 'subtraction', 'algorithms']
-  },
-  {
-    id: 'us-g3-math-nbt-multiplication',
-    parentId: 'us-g3-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Multiply One-digit by Multiples of 10',
-    description: 'Multiply one-digit whole numbers by multiples of 10',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-nbt-3',
-    estimatedDuration: 35,
-    prerequisites: ['us-g3-math-oa-multiplication-facts'],
-    tags: ['multiplication', 'multiples_of_10', 'place_value']
-  },
-
-  // Fractions
-  {
-    id: 'us-g3-math-nf-unit-fractions',
-    parentId: 'us-g3-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Understanding Unit Fractions',
-    description: 'Understand fractions as numbers and represent unit fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-nf-1',
-    estimatedDuration: 45,
-    prerequisites: [],
-    tags: ['fractions', 'unit_fractions', 'number_line']
-  },
-  {
-    id: 'us-g3-math-nf-fractions-on-number-line',
-    parentId: 'us-g3-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Fractions on Number Line',
-    description: 'Represent fractions on a number line',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-nf-2',
-    estimatedDuration: 40,
-    prerequisites: ['us-g3-math-nf-unit-fractions'],
-    tags: ['fractions', 'number_line', 'representation']
-  },
-  {
-    id: 'us-g3-math-nf-equivalent-fractions',
-    parentId: 'us-g3-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Equivalent Fractions',
-    description: 'Explain equivalence of fractions and compare fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '3',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '3-nf-3',
-    estimatedDuration: 50,
-    prerequisites: ['us-g3-math-nf-fractions-on-number-line'],
-    tags: ['equivalent_fractions', 'comparison', 'reasoning']
-  },
-
-  // === GRADE 4 MATH LEARNING OBJECTIVES ===
-  // Operations and Algebraic Thinking
-  {
-    id: 'us-g4-math-oa-multi-step-problems',
-    parentId: 'us-g4-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Multi-step Word Problems',
-    description: 'Solve multi-step word problems with whole numbers and assess reasonableness',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-oa-3',
-    estimatedDuration: 55,
-    prerequisites: ['us-g3-math-oa-word-problems'],
-    tags: ['multi_step', 'word_problems', 'problem_solving']
-  },
-  {
-    id: 'us-g4-math-oa-factors-multiples',
-    parentId: 'us-g4-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Factors and Multiples',
-    description: 'Find factor pairs and identify multiples of whole numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-oa-4',
-    estimatedDuration: 45,
-    prerequisites: ['us-g3-math-oa-multiplication-facts'],
-    tags: ['factors', 'multiples', 'number_theory']
-  },
-  {
-    id: 'us-g4-math-oa-patterns',
-    parentId: 'us-g4-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Number Patterns',
-    description: 'Generate and analyze patterns using given rules',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-oa-5',
-    estimatedDuration: 40,
-    prerequisites: [],
-    tags: ['patterns', 'rules', 'sequences']
-  },
-
-  // Number and Operations in Base Ten
-  {
-    id: 'us-g4-math-nbt-place-value',
-    parentId: 'us-g4-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Place Value to Millions',
-    description: 'Recognize place value in multi-digit whole numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-nbt-1',
-    estimatedDuration: 45,
-    prerequisites: ['us-g3-math-nbt-rounding'],
-    tags: ['place_value', 'millions', 'expanded_form']
-  },
-  {
-    id: 'us-g4-math-nbt-multi-digit-arithmetic',
-    parentId: 'us-g4-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Multi-digit Arithmetic',
-    description: 'Add, subtract, multiply, and divide multi-digit numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-nbt-4',
-    estimatedDuration: 60,
-    prerequisites: ['us-g4-math-nbt-place-value'],
-    tags: ['multi_digit', 'operations', 'algorithms']
-  },
-
-  // Fractions
-  {
-    id: 'us-g4-math-nf-equivalent-fractions',
-    parentId: 'us-g4-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Generate Equivalent Fractions',
-    description: 'Generate equivalent fractions using visual models and reasoning',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-nf-1',
-    estimatedDuration: 50,
-    prerequisites: ['us-g3-math-nf-equivalent-fractions'],
-    tags: ['equivalent_fractions', 'visual_models']
-  },
-  {
-    id: 'us-g4-math-nf-compare-fractions',
-    parentId: 'us-g4-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Compare Fractions',
-    description: 'Compare fractions with different numerators and denominators',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-nf-2',
-    estimatedDuration: 45,
-    prerequisites: ['us-g4-math-nf-equivalent-fractions'],
-    tags: ['compare_fractions', 'benchmarks']
-  },
-  {
-    id: 'us-g4-math-nf-decompose-fractions',
-    parentId: 'us-g4-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Decompose Fractions',
-    description: 'Decompose fractions into sums of unit fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '4',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '4-nf-3',
-    estimatedDuration: 40,
-    prerequisites: ['us-g4-math-nf-equivalent-fractions'],
-    tags: ['decompose', 'unit_fractions', 'addition']
-  },
-
-  // === GRADE 5 MATH LEARNING OBJECTIVES ===
-  // Operations and Algebraic Thinking
-  {
-    id: 'us-g5-math-oa-expressions',
-    parentId: 'us-g5-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Numerical Expressions',
-    description: 'Write and evaluate numerical expressions with parentheses and brackets',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-oa-1',
-    estimatedDuration: 45,
-    prerequisites: ['us-g4-math-oa-multi-step-problems'],
-    tags: ['expressions', 'order_of_operations', 'parentheses']
-  },
-  {
-    id: 'us-g5-math-oa-patterns',
-    parentId: 'us-g5-math-oa',
-    nodeType: 'learning_objective',
-    name: 'Analyze Patterns and Relationships',
-    description: 'Analyze patterns and relationships using tables and coordinate plane',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-oa-2',
-    estimatedDuration: 50,
-    prerequisites: ['us-g4-math-oa-patterns'],
-    tags: ['patterns', 'coordinate_plane', 'relationships']
-  },
-
-  // Number and Operations in Base Ten
-  {
-    id: 'us-g5-math-nbt-place-value-decimals',
-    parentId: 'us-g5-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Decimal Place Value',
-    description: 'Understand place value in decimal numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-nbt-1',
-    estimatedDuration: 45,
-    prerequisites: ['us-g4-math-nbt-place-value'],
-    tags: ['decimals', 'place_value', 'powers_of_10']
-  },
-  {
-    id: 'us-g5-math-nbt-compare-decimals',
-    parentId: 'us-g5-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Compare and Round Decimals',
-    description: 'Compare, round, and use decimal notation for fractions',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-nbt-3',
-    estimatedDuration: 40,
-    prerequisites: ['us-g5-math-nbt-place-value-decimals'],
-    tags: ['compare_decimals', 'rounding', 'fractions_to_decimals']
-  },
-  {
-    id: 'us-g5-math-nbt-decimal-operations',
-    parentId: 'us-g5-math-nbt',
-    nodeType: 'learning_objective',
-    name: 'Operations with Decimals',
-    description: 'Add, subtract, multiply, and divide decimals',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-nbt-7',
-    estimatedDuration: 60,
-    prerequisites: ['us-g5-math-nbt-compare-decimals'],
-    tags: ['decimal_operations', 'algorithms', 'estimation']
-  },
-
-  // Fractions
-  {
-    id: 'us-g5-math-nf-add-subtract-fractions',
-    parentId: 'us-g5-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Add and Subtract Fractions',
-    description: 'Add and subtract fractions with unlike denominators',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-nf-1',
-    estimatedDuration: 55,
-    prerequisites: ['us-g4-math-nf-decompose-fractions'],
-    tags: ['fraction_operations', 'unlike_denominators', 'common_denominators']
-  },
-  {
-    id: 'us-g5-math-nf-multiply-fractions',
-    parentId: 'us-g5-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Multiply Fractions',
-    description: 'Multiply fractions and mixed numbers',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-nf-4',
-    estimatedDuration: 50,
-    prerequisites: ['us-g5-math-nf-add-subtract-fractions'],
-    tags: ['multiply_fractions', 'mixed_numbers', 'area_models']
-  },
-  {
-    id: 'us-g5-math-nf-divide-fractions',
-    parentId: 'us-g5-math-nf',
-    nodeType: 'learning_objective',
-    name: 'Divide Unit Fractions',
-    description: 'Divide unit fractions by whole numbers and vice versa',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '5',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: '5-nf-7',
-    estimatedDuration: 45,
-    prerequisites: ['us-g5-math-nf-multiply-fractions'],
-    tags: ['divide_fractions', 'unit_fractions', 'visual_models']
-  },
-
-  // === GRADE 6 MATH LEARNING OBJECTIVES ===
-  // Keep existing Grade 6 content from original file
-  {
-    id: 'us-g6-math-rp-1',
-    parentId: 'us-g6-math-rp',
-    nodeType: 'topic',
-    name: 'Understanding Ratios',
-    description: 'Understand the concept of a ratio and use ratio language to describe relationships',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: 'CCSS.MATH.CONTENT.6.RP.A.1',
-    estimatedDuration: 45,
-    prerequisites: [],
-    tags: ['ratios', 'relationships', 'proportional_thinking']
-  },
-  {
-    id: 'us-g6-math-rp-1-obj1',
-    parentId: 'us-g6-math-rp-1',
-    nodeType: 'learning_objective',
-    name: 'Define and Use Ratio Language',
-    description: 'Students will understand the concept of a ratio and use ratio language to describe a relationship between two quantities',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    sourceIdentifier: 'CCSS.MATH.CONTENT.6.RP.A.1',
-    estimatedDuration: 30,
-    prerequisites: [],
-    tags: ['ratio_definition', 'mathematical_language']
-  },
-  {
-    id: 'us-g6-math-rp-1-obj1-kc1',
-    parentId: 'us-g6-math-rp-1-obj1',
-    nodeType: 'kc',
-    name: 'Define ratio',
-    description: 'Students can define what a ratio is and explain it in their own words',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    estimatedDuration: 10,
-    prerequisites: [],
-    tags: ['definition', 'conceptual_understanding']
-  },
-  {
-    id: 'us-g6-math-rp-1-obj1-kc2',
-    parentId: 'us-g6-math-rp-1-obj1',
-    nodeType: 'kc',
-    name: 'Use ratio language',
-    description: 'Students can use appropriate ratio language such as "for every", "to", and ":"',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'Mathematics',
-    subject: NELIESubject.MATH,
-    estimatedDuration: 15,
-    prerequisites: ['us-g6-math-rp-1-obj1-kc1'],
-    tags: ['mathematical_language', 'communication']
-  },
-
-  // === ELA CONTENT (K-2) ===
-  // Keep existing K-2 ELA content
-  {
-    id: 'us-k-ela-rf',
-    parentId: 'us-k-ela',
-    nodeType: 'domain',
-    name: 'Reading: Foundational Skills',
-    description: 'Print concepts, phonological awareness, phonics, and fluency',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: 'K',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    tags: ['foundational_skills', 'phonics', 'fluency']
-  },
-  {
-    id: 'us-k-ela-rf-print-concepts',
-    parentId: 'us-k-ela-rf',
-    nodeType: 'learning_objective',
-    name: 'Print Concepts',
-    description: 'Demonstrate understanding of the organization and basic features of print',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: 'K',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RF.K.1',
-    estimatedDuration: 30,
-    prerequisites: [],
-    tags: ['print_concepts', 'directionality', 'words_letters']
-  },
-  {
-    id: 'us-k-ela-rf-phonological-awareness',
-    parentId: 'us-k-ela-rf',
-    nodeType: 'learning_objective',
-    name: 'Phonological Awareness',
-    description: 'Demonstrate understanding of spoken words, syllables, and sounds',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: 'K',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RF.K.2',
-    estimatedDuration: 40,
-    prerequisites: [],
-    tags: ['phonological_awareness', 'syllables', 'phonemes']
-  },
-
-  // Grade 1 ELA
-  {
-    id: 'us-g1-ela-rf',
-    parentId: 'us-g1-ela',
-    nodeType: 'domain',
-    name: 'Reading: Foundational Skills',
-    description: 'Print concepts, phonological awareness, phonics, and fluency',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '1',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    tags: ['foundational_skills', 'phonics', 'fluency']
-  },
-  {
-    id: 'us-g1-ela-rf-phonics',
-    parentId: 'us-g1-ela-rf',
-    nodeType: 'learning_objective',
-    name: 'Phonics and Word Recognition',
-    description: 'Know and apply grade-level phonics and word analysis skills',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '1',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RF.1.3',
-    estimatedDuration: 45,
-    prerequisites: ['us-k-ela-rf-phonological-awareness'],
-    tags: ['phonics', 'word_recognition', 'decoding']
-  },
-  {
-    id: 'us-g1-ela-rf-fluency',
-    parentId: 'us-g1-ela-rf',
-    nodeType: 'learning_objective',
-    name: 'Reading Fluency',
-    description: 'Read with sufficient accuracy and fluency to support comprehension',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '1',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RF.1.4',
-    estimatedDuration: 40,
-    prerequisites: ['us-g1-ela-rf-phonics'],
-    tags: ['fluency', 'accuracy', 'comprehension']
-  },
-
-  // Grade 2 ELA
-  {
-    id: 'us-g2-ela-rf',
-    parentId: 'us-g2-ela',
-    nodeType: 'domain',
-    name: 'Reading: Foundational Skills',
-    description: 'Phonics, word recognition, and fluency',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '2',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    tags: ['foundational_skills', 'phonics', 'fluency']
-  },
-  {
-    id: 'us-g2-ela-rf-advanced-phonics',
-    parentId: 'us-g2-ela-rf',
-    nodeType: 'learning_objective',
-    name: 'Advanced Phonics',
-    description: 'Know and apply grade-level phonics and word analysis skills including long vowels',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '2',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RF.2.3',
-    estimatedDuration: 50,
-    prerequisites: ['us-g1-ela-rf-phonics'],
-    tags: ['advanced_phonics', 'long_vowels', 'word_patterns']
-  },
-  {
-    id: 'us-g2-ela-rf-fluent-reading',
-    parentId: 'us-g2-ela-rf',
-    nodeType: 'learning_objective',
-    name: 'Fluent Reading',
-    description: 'Read with sufficient accuracy and fluency including expression',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '2',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RF.2.4',
-    estimatedDuration: 45,
-    prerequisites: ['us-g1-ela-rf-fluency'],
-    tags: ['fluent_reading', 'expression', 'rate']
-  },
-
-  // === DANISH CONTENT (Grade 6) ===
-  // Keep existing Danish Grade 6 content
+  // Grade levels for Denmark
   {
     id: 'dk-g6',
     parentId: 'dk',
     nodeType: 'grade_level',
     name: '6. klasse',
-    description: 'Sixth grade in Danish Folkeskole system',
     countryCode: 'DK',
     languageCode: 'da',
     educationalLevel: '6'
   },
+
+  // Subjects for US Grade 3
   {
-    id: 'dk-g6-math',
-    parentId: 'dk-g6',
+    id: 'us-g3-math',
+    parentId: 'us-g3',
     nodeType: 'subject',
-    name: 'Matematik',
-    description: 'Mathematics in Danish 6th grade curriculum',
-    countryCode: 'DK',
-    languageCode: 'da',
+    name: 'Mathematics',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH
+  },
+
+  // Subjects for US Grade 6
+  {
+    id: 'us-g6-math',
+    parentId: 'us-g6',
+    nodeType: 'subject',
+    name: 'Mathematics',
+    countryCode: 'US',
+    languageCode: 'en',
     educationalLevel: '6',
     subjectName: 'Mathematics',
     subject: NELIESubject.MATH
   },
   {
-    id: 'dk-g6-dansk',
+    id: 'us-g6-ela',
+    parentId: 'us-g6',
+    nodeType: 'subject',
+    name: 'English Language Arts',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH
+  },
+
+  // Subjects for Denmark Grade 6
+  {
+    id: 'dk-g6-math',
     parentId: 'dk-g6',
     nodeType: 'subject',
-    name: 'Dansk',
-    description: 'Danish language and literature',
+    name: 'Matematik',
     countryCode: 'DK',
     languageCode: 'da',
     educationalLevel: '6',
-    subjectName: 'Danish Language Arts',
-    subject: NELIESubject.ENGLISH // Using ENGLISH as primary language for this context
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH
   },
   {
     id: 'dk-g6-engelsk',
     parentId: 'dk-g6',
     nodeType: 'subject',
     name: 'Engelsk',
-    description: 'English as a foreign language',
     countryCode: 'DK',
     languageCode: 'da',
     educationalLevel: '6',
-    subjectName: 'English as Foreign Language',
-    subject: NELIESubject.OTHER_LANGUAGES
+    subjectName: 'World Languages',
+    subject: NELIESubject.WORLD_LANGUAGES
   },
 
-  // Danish Math domains and topics
+  // Domains for US Grade 3 Math
   {
-    id: 'dk-g6-math-tal',
-    parentId: 'dk-g6-math',
+    id: 'us-g3-math-oa',
+    parentId: 'us-g3-math',
     nodeType: 'domain',
-    name: 'Tal og algebra',
-    description: 'Numbers and algebra - working with integers and basic algebraic thinking',
-    countryCode: 'DK',
-    languageCode: 'da',
-    educationalLevel: '6',
+    name: 'Operations and Algebraic Thinking',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
     subjectName: 'Mathematics',
     subject: NELIESubject.MATH,
-    tags: ['tal', 'algebra', 'heltal']
+    sourceIdentifier: 'CCSS.Math.Content.3.OA'
   },
+
+  // Topics for US Grade 3 Math OA
   {
-    id: 'dk-g6-math-tal-obj1',
-    parentId: 'dk-g6-math-tal',
-    nodeType: 'learning_objective',
-    name: 'Arbejde med heltal',
-    description: 'Students can work with positive and negative integers in practical contexts',
-    countryCode: 'DK',
-    languageCode: 'da',
-    educationalLevel: '6',
+    id: 'us-g3-math-oa-1',
+    parentId: 'us-g3-math-oa',
+    nodeType: 'topic',
+    name: 'Interpret products of whole numbers',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
     subjectName: 'Mathematics',
     subject: NELIESubject.MATH,
-    sourceIdentifier: 'DK-MATH-6-TAL-1',
+    sourceIdentifier: 'CCSS.Math.Content.3.OA.A.1'
+  },
+
+  // Learning objectives for US Grade 3 Math
+  {
+    id: 'us-g3-math-oa-1-obj1',
+    parentId: 'us-g3-math-oa-1',
+    nodeType: 'learning_objective',
+    name: 'Interpret products of whole numbers',
+    description: 'Interpret products of whole numbers, e.g., interpret 5 × 7 as the total number of objects in 5 groups of 7 objects each.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.3.OA.A.1',
     estimatedDuration: 45,
-    prerequisites: [],
-    tags: ['heltal', 'positive', 'negative', 'praktisk_kontekst']
+    tags: ['foundational', 'multiplication']
   },
 
-  // Danish Language Arts
+  // Knowledge components for US Grade 3 Math
   {
-    id: 'dk-g6-dansk-laesning',
-    parentId: 'dk-g6-dansk',
-    nodeType: 'domain',
-    name: 'Læsning',
-    description: 'Reading skills and literature comprehension',
-    countryCode: 'DK',
-    languageCode: 'da',
-    educationalLevel: '6',
-    subjectName: 'Danish Language Arts',
-    subject: NELIESubject.ENGLISH,
-    tags: ['læsning', 'forståelse', 'litteratur']
+    id: 'us-g3-math-oa-1-obj1-kc1',
+    parentId: 'us-g3-math-oa-1-obj1',
+    nodeType: 'kc',
+    name: 'Understand multiplication as groups',
+    description: 'Understand that multiplication represents equal groups',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    estimatedDuration: 20,
+    tags: ['foundational'],
+    subjectSpecific: {
+      mathDomain: 'arithmetic',
+      problemType: 'word_problem'
+    }
   },
   {
-    id: 'dk-g6-dansk-laesning-obj1',
-    parentId: 'dk-g6-dansk-laesning',
-    nodeType: 'learning_objective',
-    name: 'Læse og forstå skønlitterære tekster',
-    description: 'Students can read and understand fictional texts appropriate for their level',
-    countryCode: 'DK',
-    languageCode: 'da',
-    educationalLevel: '6',
-    subjectName: 'Danish Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'DK-DANSK-6-LAES-1',
-    estimatedDuration: 50,
-    prerequisites: [],
-    tags: ['skønlitterær', 'forståelse', 'fiktion'],
+    id: 'us-g3-math-oa-1-obj1-kc2',
+    parentId: 'us-g3-math-oa-1-obj1',
+    nodeType: 'kc',
+    name: 'Count objects in equal groups',
+    description: 'Count the total number of objects arranged in equal groups',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    estimatedDuration: 20,
+    tags: ['foundational'],
     subjectSpecific: {
-      linguisticSkill: 'reading',
-      textType: 'fiction',
-      complexityLevel: 'intermediate'
+      mathDomain: 'arithmetic',
+      problemType: 'computation'
     }
   },
 
-  // English as Foreign Language
+  // Domains for US Grade 6 Math
+  {
+    id: 'us-g6-math-rp',
+    parentId: 'us-g6-math',
+    nodeType: 'domain',
+    name: 'Ratios and Proportional Relationships',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.6.RP'
+  },
+
+  // Topics for US Grade 6 Math RP
+  {
+    id: 'us-g6-math-rp-1',
+    parentId: 'us-g6-math-rp',
+    nodeType: 'topic',
+    name: 'Understand ratio concepts and use ratio reasoning',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.6.RP.A'
+  },
+
+  // Learning objectives for US Grade 6 Math
+  {
+    id: 'us-g6-math-rp-1-obj1',
+    parentId: 'us-g6-math-rp-1',
+    nodeType: 'learning_objective',
+    name: 'Understand the concept of a ratio',
+    description: 'Understand the concept of a ratio and use ratio language to describe a ratio relationship between two quantities.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.6.RP.A.1',
+    estimatedDuration: 50,
+    tags: ['ratios', 'proportional_reasoning']
+  },
+
+  // Knowledge components for US Grade 6 Math
+  {
+    id: 'us-g6-math-rp-1-obj1-kc1',
+    parentId: 'us-g6-math-rp-1-obj1',
+    nodeType: 'kc',
+    name: 'Define ratio',
+    description: 'Define what a ratio is and identify ratio relationships',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
+    estimatedDuration: 25,
+    tags: ['definition'],
+    subjectSpecific: {
+      mathDomain: 'arithmetic',
+      problemType: 'word_problem'
+    }
+  },
+
+  // Domains for US Grade 6 ELA
+  {
+    id: 'us-g6-ela-rl',
+    parentId: 'us-g6-ela',
+    nodeType: 'domain',
+    name: 'Reading: Literature',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.6'
+  },
+
+  // Learning objectives for US Grade 6 ELA
+  {
+    id: 'us-g6-ela-rl-1',
+    parentId: 'us-g6-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Cite textual evidence',
+    description: 'Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.6.1',
+    estimatedDuration: 45,
+    tags: ['textual_evidence', 'analysis']
+  },
+
+  // Knowledge components for US Grade 6 ELA
+  {
+    id: 'us-g6-ela-rl-1-kc1',
+    parentId: 'us-g6-ela-rl-1',
+    nodeType: 'kc',
+    name: 'Identify explicit textual evidence',
+    description: 'Find direct statements in text that support analysis',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    estimatedDuration: 20,
+    tags: ['textual_evidence'],
+    subjectSpecific: {
+      linguisticSkill: 'reading',
+      textType: 'literary'
+    }
+  },
+  {
+    id: 'us-g6-ela-rl-1-kc2',
+    parentId: 'us-g6-ela-rl-1',
+    nodeType: 'kc',
+    name: 'Make inferences from text',
+    description: 'Draw logical conclusions from textual evidence',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '6',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    estimatedDuration: 25,
+    tags: ['inference'],
+    subjectSpecific: {
+      linguisticSkill: 'reading',
+      textType: 'literary'
+    }
+  },
+
+  // Danish curriculum content
   {
     id: 'dk-g6-engelsk-mundtlig',
     parentId: 'dk-g6-engelsk',
@@ -1259,107 +340,27 @@ export const mockCurriculumData: CurriculumNode[] = [
     countryCode: 'DK',
     languageCode: 'da',
     educationalLevel: '6',
-    subjectName: 'English as Foreign Language',
-    subject: NELIESubject.OTHER_LANGUAGES,
-    tags: ['mundtlig', 'kommunikation', 'engelsk']
+    subjectName: 'World Languages',
+    subject: NELIESubject.WORLD_LANGUAGES
   },
+
+  // Learning objective for Danish English
   {
     id: 'dk-g6-engelsk-mundtlig-obj1',
     parentId: 'dk-g6-engelsk-mundtlig',
     nodeType: 'learning_objective',
-    name: 'Deltage i simple samtaler',
-    description: 'Students can participate in simple conversations about familiar topics',
+    name: 'Deltage i samtaler',
+    description: 'Participate in conversations and dialogues in English',
     countryCode: 'DK',
     languageCode: 'da',
     educationalLevel: '6',
-    subjectName: 'English as Foreign Language',
-    subject: NELIESubject.OTHER_LANGUAGES,
-    sourceIdentifier: 'DK-ENG-6-MUND-1',
+    subjectName: 'World Languages',
+    subject: NELIESubject.WORLD_LANGUAGES,
     estimatedDuration: 40,
-    prerequisites: [],
-    tags: ['samtale', 'bekendte_emner', 'kommunikation'],
+    tags: ['speaking', 'conversation'],
     subjectSpecific: {
       linguisticSkill: 'speaking',
-      proficiencyLevel: 'beginner',
-      interactionType: 'dialogue'
+      interactionType: 'discussion'
     }
-  },
-
-  // === EXISTING GRADE 6 ELA CONTENT ===
-  {
-    id: 'us-g6-ela',
-    parentId: 'us-g6',
-    nodeType: 'subject',
-    name: 'English Language Arts',
-    description: 'Grade 6 English Language Arts - Reading literature and informational texts',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH
-  },
-  {
-    id: 'us-g6-ela-rl',
-    parentId: 'us-g6-ela',
-    nodeType: 'domain',
-    name: 'Reading: Literature',
-    description: 'Reading and comprehension of literary texts',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    tags: ['literature', 'reading_comprehension', 'literary_analysis']
-  },
-  {
-    id: 'us-g6-ela-rl-1',
-    parentId: 'us-g6-ela-rl',
-    nodeType: 'learning_objective',
-    name: 'Cite Textual Evidence',
-    description: 'Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    sourceIdentifier: 'CCSS.ELA-LITERACY.RL.6.1',
-    estimatedDuration: 45,
-    prerequisites: [],
-    tags: ['textual_evidence', 'inference', 'analysis'],
-    subjectSpecific: {
-      linguisticSkill: 'reading',
-      textType: 'literature',
-      complexityLevel: 'intermediate'
-    }
-  },
-  {
-    id: 'us-g6-ela-rl-1-kc1',
-    parentId: 'us-g6-ela-rl-1',
-    nodeType: 'kc',
-    name: 'Identify explicit information',
-    description: 'Students can identify information that is directly stated in the text',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    estimatedDuration: 15,
-    prerequisites: [],
-    tags: ['explicit_information', 'literal_comprehension']
-  },
-  {
-    id: 'us-g6-ela-rl-1-kc2',
-    parentId: 'us-g6-ela-rl-1',
-    nodeType: 'kc',
-    name: 'Make inferences from text',
-    description: 'Students can draw logical conclusions based on textual evidence',
-    countryCode: 'US',
-    languageCode: 'en',
-    educationalLevel: '6',
-    subjectName: 'English Language Arts',
-    subject: NELIESubject.ENGLISH,
-    estimatedDuration: 20,
-    prerequisites: ['us-g6-ela-rl-1-kc1'],
-    tags: ['inference', 'logical_reasoning', 'textual_evidence']
   }
 ];

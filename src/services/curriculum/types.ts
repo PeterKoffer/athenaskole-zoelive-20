@@ -1,4 +1,5 @@
-import { CurriculumNode, CurriculumNodeFilters } from '../../types/curriculum'; // Adjusted path
+
+import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
 
 export interface ICurriculumService {
   /**
@@ -20,23 +21,26 @@ export interface ICurriculumService {
    * @param parentId The unique ID of the parent curriculum node.
    * @returns A promise that resolves to an array of child CurriculumNodes.
    */
+  getChildren(parentId: string): Promise<CurriculumNode[]>;
+
+  /**
+   * Retrieves all direct children of a given curriculum node.
+   * @param parentId The unique ID of the parent curriculum node.
+   * @returns A promise that resolves to an array of child CurriculumNodes.
+   */
   getChildrenOfNode(parentId: string): Promise<CurriculumNode[]>;
 
   /**
-   * Retrieves all descendants of a given curriculum node up to a certain depth or matching specific criteria.
-   * (Optional for initial implementation, can be added later)
+   * Retrieves all descendants of a given curriculum node.
    * @param parentId The unique ID of the parent curriculum node.
-   * @param maxDepth The maximum depth of descendants to retrieve.
-   * @param filters Optional filters to apply to descendants.
    * @returns A promise that resolves to an array of descendant CurriculumNodes.
    */
-  // getDescendantsOfNode?(parentId: string, maxDepth?: number, filters?: CurriculumNodeFilters): Promise<CurriculumNode[]>;
+  getDescendants(parentId: string): Promise<CurriculumNode[]>;
 
   /**
-   * Retrieves the path from a curriculum node up to the root (or a specified ancestor).
-   * (Optional for initial implementation, can be added later)
+   * Generates AI context for a specific curriculum node.
    * @param nodeId The unique ID of the curriculum node.
-   * @returns A promise that resolves to an array of CurriculumNodes representing the path.
+   * @returns A promise that resolves to a string containing AI context.
    */
-  // getNodePath?(nodeId: string): Promise<CurriculumNode[]>;
+  generateAIContextForNode(nodeId: string): Promise<string>;
 }
