@@ -82,6 +82,17 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Creative Arts | 4     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
 | Creative Arts | 5     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
 | Creative Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Creative Arts to Middle & High School grades |
+## United States (US) - Music
+
+| Subject | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                |
+|---------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|-------------------------------------------------|
+| Music   | K     | Musical Elements, Singing & Vocal Development, Instrument Exploration, Music & Movement, Music Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 1     | Musical Elements, Singing & Vocal Development, Instrument Exploration, Music & Movement, Music Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 2     | Musical Elements, Singing & Vocal Development, Instrument Exploration, Music & Movement, Music Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 3     | Music Theory Foundations, Instrumental Skills, Vocal Development, Music Creation, Cultural Music Studies | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 4     | Music Theory Foundations, Instrumental Skills, Vocal Development, Music Creation, Cultural Music Studies | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 5     | Music Theory Foundations, Instrumental Skills, Vocal Development, Music Creation, Cultural Music Studies | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Music to Middle & High School grades |
 
 ## Denmark (DK) - Danish Language
 
@@ -104,12 +115,12 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Science (DK)            | ❌ Not Started | No Danish Science data found           |
 | Social Studies (US, DK) | ❌ Not Started | No Social Studies data found           |
 | Physical Education      | ❌ Not Started | No Physical Education data found       |
-| Music                   | ❌ Not Started | No Music data found                    |
 | Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
 | Mental Wellness (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Life Essentials (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Computer Science (DK)   | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Creative Arts (DK)      | 🟡 Basic Structure | Root subject node exists, needs LOs    |
+| Music (DK)              | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 
 
 ## Priority Expansion Areas (General - based on current minimal data)

@@ -7,11 +7,13 @@ import { usElaCurriculumNodes } from './us/usElaData';
 import { usMentalWellnessCurriculumData } from './us/usMentalWellnessData';
 import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData';
 import { usComputerScienceCurriculumData } from './us/usComputerScienceData';
-import { usCreativeArtsCurriculumData } from './us/usCreativeArtsData'; // Import US Creative Arts
+import { usCreativeArtsCurriculumData } from './us/usCreativeArtsData';
+import { usMusicCurriculumData } from './us/usMusicData'; // Import US Music
 import { dkCurriculumNodes } from './dk/dkData';
 import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData';
 import { dkComputerScienceCurriculumData } from './dk/dkComputerScienceData';
-import { dkCreativeArtsCurriculumData } from './dk/dkCreativeArtsData'; // Import DK Creative Arts
+import { dkCreativeArtsCurriculumData } from './dk/dkCreativeArtsData';
+import { dkMusicCurriculumData } from './dk/dkMusicData'; // Import DK Music
 
 // Combine all curriculum data from different countries and subjects
 export const mockCurriculumData: CurriculumNode[] = [
@@ -21,11 +23,13 @@ export const mockCurriculumData: CurriculumNode[] = [
   ...usMentalWellnessCurriculumData,
   ...usLifeEssentialsCurriculumData,
   ...usComputerScienceCurriculumData,
-  ...usCreativeArtsCurriculumData, // Add US Creative Arts
+  ...usCreativeArtsCurriculumData,
+  ...usMusicCurriculumData, // Add US Music
   ...dkCurriculumNodes,
   ...dkLifeEssentialsCurriculumData,
   ...dkComputerScienceCurriculumData,
-  ...dkCreativeArtsCurriculumData // Add DK Creative Arts
+  ...dkCreativeArtsCurriculumData,
+  ...dkMusicCurriculumData // Add DK Music
 ];
 
 // Export individual country/subject data for specific use cases
@@ -36,11 +40,13 @@ export {
   usMentalWellnessCurriculumData,
   usLifeEssentialsCurriculumData,
   usComputerScienceCurriculumData,
-  usCreativeArtsCurriculumData, // Export US Creative Arts
+  usCreativeArtsCurriculumData,
+  usMusicCurriculumData, // Export US Music
   dkCurriculumNodes,
   dkLifeEssentialsCurriculumData,
   dkComputerScienceCurriculumData,
-  dkCreativeArtsCurriculumData // Export DK Creative Arts
+  dkCreativeArtsCurriculumData,
+  dkMusicCurriculumData // Export DK Music
 };
 
 // Helper functions for filtering data
