@@ -57,6 +57,7 @@ export const mockCurriculumData: CurriculumNode[] = [
     languageCode: 'en',
     educationalLevel: 'K',
     subjectName: 'Mathematics',
+    subject: NELIESubject.MATH, // Added subject enum
     tags: ['foundational', 'number-sense']
   },
   {
@@ -69,6 +70,7 @@ export const mockCurriculumData: CurriculumNode[] = [
     languageCode: 'en',
     educationalLevel: '1',
     subjectName: 'Mathematics',
+    subject: NELIESubject.MATH, // Added subject enum
     tags: ['foundational', 'addition', 'subtraction']
   },
   {
@@ -81,6 +83,7 @@ export const mockCurriculumData: CurriculumNode[] = [
     languageCode: 'en',
     educationalLevel: '6',
     subjectName: 'Mathematics',
+    subject: NELIESubject.MATH, // Added subject enum
     tags: ['ratios', 'algebra-readiness']
   },
 
@@ -195,7 +198,8 @@ export const mockCurriculumData: CurriculumNode[] = [
       labRequired: true,
       safetyConsiderations: ['eye_protection', 'chemical_handling'],
       experimentType: 'hypothesis_testing'
-    }
+    },
+    subject: NELIESubject.SCIENCE // Added subject enum
   },
 
   // Denmark example for international support
@@ -1565,5 +1569,99 @@ export const mockCurriculumData: CurriculumNode[] = [
     subject: NELIESubject.SCIENCE,
     subjectName: 'Science',
     tags: ['materials', 'properties', 'investigation', 'classification']
+  },
+
+  // --- US Math - Kindergarten (Adding Detail) ---
+  // 'us-k-math' subject node already exists. Adding domains and LOs.
+  {
+    id: 'us-k-math-cc', // Counting & Cardinality
+    parentId: 'us-k-math',
+    nodeType: 'domain',
+    name: 'Counting and Cardinality',
+    description: 'Know number names and the count sequence. Count to tell the number of objects. Compare numbers.',
+    countryCode: 'US', languageCode: 'en', educationalLevel: 'K', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    sourceIdentifier: 'CCSS.Math.Content.K.CC'
+  },
+  {
+    id: 'us-k-math-cc-a-1',
+    parentId: 'us-k-math-cc',
+    nodeType: 'learning_objective',
+    name: 'Count to 100 by ones and by tens.',
+    sourceIdentifier: 'CCSS.Math.Content.K.CC.A.1',
+    countryCode: 'US', languageCode: 'en', educationalLevel: 'K', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    tags: ['counting', 'hundreds_chart']
+  },
+
+  // --- US Math - Grade 1 (Adding Detail) ---
+  // 'us-g1-math' subject node already exists. Adding domains and LOs.
+  {
+    id: 'us-g1-math-oa', // Operations & Algebraic Thinking
+    parentId: 'us-g1-math',
+    nodeType: 'domain',
+    name: 'Operations and Algebraic Thinking',
+    description: 'Represent and solve problems involving addition and subtraction. Understand and apply properties of operations and the relationship between addition and subtraction. Add and subtract within 20. Work with addition and subtraction equations.',
+    countryCode: 'US', languageCode: 'en', educationalLevel: '1', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    sourceIdentifier: 'CCSS.Math.Content.1.OA'
+  },
+  {
+    id: 'us-g1-math-oa-a-1',
+    parentId: 'us-g1-math-oa',
+    nodeType: 'learning_objective',
+    name: 'Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.',
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.A.1',
+    countryCode: 'US', languageCode: 'en', educationalLevel: '1', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    tags: ['word_problems', 'addition', 'subtraction', 'within_20']
+  },
+
+  // --- US Math - Grade 2 (Adding Subject, Domain, LO) ---
+  // 'us-g2' grade node already exists.
+  {
+    id: 'us-g2-math',
+    parentId: 'us-g2',
+    nodeType: 'subject',
+    name: 'Mathematics - Grade 2',
+    description: 'Grade 2 Mathematics based on Common Core State Standards.',
+    countryCode: 'US', languageCode: 'en', educationalLevel: '2', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    tags: ['math', 'grade2', 'common_core']
+  },
+  {
+    id: 'us-g2-math-nbt', // Number & Operations in Base Ten
+    parentId: 'us-g2-math',
+    nodeType: 'domain',
+    name: 'Number and Operations in Base Ten',
+    description: 'Understand place value. Use place value understanding and properties of operations to add and subtract.',
+    countryCode: 'US', languageCode: 'en', educationalLevel: '2', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    sourceIdentifier: 'CCSS.Math.Content.2.NBT'
+  },
+  {
+    id: 'us-g2-math-nbt-a-1',
+    parentId: 'us-g2-math-nbt',
+    nodeType: 'learning_objective',
+    name: 'Understand that the three digits of a three-digit number represent amounts of hundreds, tens, and ones; e.g., 706 equals 7 hundreds, 0 tens, and 6 ones.',
+    sourceIdentifier: 'CCSS.Math.Content.2.NBT.A.1',
+    countryCode: 'US', languageCode: 'en', educationalLevel: '2', subject: NELIESubject.MATH, subjectName: 'Mathematics',
+    tags: ['place_value', 'three_digit_numbers', 'hundreds_tens_ones']
+  },
+
+  // --- US Science - Grades 3-5 (Adding Subject Stubs and sample Domains) ---
+  // 'us-g3', 'us-g4', 'us-g5' grade nodes exist from StudyPug Math transformation.
+  {
+    id: 'us-g3-science', parentId: 'us-g3', nodeType: 'subject', name: 'Science - Grade 3', educationalLevel: '3', subject: NELIESubject.SCIENCE, subjectName: 'Science', countryCode: 'US', languageCode: 'en', tags: ['science', 'grade3']
+  },
+  {
+    id: 'us-g3-science-ls', parentId: 'us-g3-science', nodeType: 'domain', name: 'Life Science (G3)', educationalLevel: '3', subject: NELIESubject.SCIENCE, subjectName: 'Science', countryCode: 'US', languageCode: 'en'
+  },
+  {
+    id: 'us-g4-science', parentId: 'us-g4', nodeType: 'subject', name: 'Science - Grade 4', educationalLevel: '4', subject: NELIESubject.SCIENCE, subjectName: 'Science', countryCode: 'US', languageCode: 'en', tags: ['science', 'grade4']
+  },
+  {
+    id: 'us-g4-science-ps', parentId: 'us-g4-science', nodeType: 'domain', name: 'Physical Science (G4)', educationalLevel: '4', subject: NELIESubject.SCIENCE, subjectName: 'Science', countryCode: 'US', languageCode: 'en'
+  },
+  {
+    id: 'us-g5-science', parentId: 'us-g5', nodeType: 'subject', name: 'Science - Grade 5', educationalLevel: '5', subject: NELIESubject.SCIENCE, subjectName: 'Science', countryCode: 'US', languageCode: 'en', tags: ['science', 'grade5']
+  },
+  {
+    id: 'us-g5-science-ess', parentId: 'us-g5-science', nodeType: 'domain', name: 'Earth and Space Science (G5)', educationalLevel: '5', subject: NELIESubject.SCIENCE, subjectName: 'Science', countryCode: 'US', languageCode: 'en'
   }
+  // Note: 'us-g6-science' subject node already exists as a stub.
 ];
