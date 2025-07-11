@@ -4,16 +4,21 @@ import { NELIESubject } from '@/types/curriculum/NELIESubjects'; // Added for th
 import { usRootCurriculumNodes } from './us/usRootData';
 import { usMathCurriculumNodes } from './us/usMathData';
 import { usElaCurriculumNodes } from './us/usElaData';
-import { usMentalWellnessCurriculumData } from './us/usMentalWellnessData'; // Import new data
+import { usMentalWellnessCurriculumData } from './us/usMentalWellnessData';
+import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData'; // Import US Life Essentials
 import { dkCurriculumNodes } from './dk/dkData';
+import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData'; // Import DK Life Essentials
 
 // Combine all curriculum data from different countries and subjects
 export const mockCurriculumData: CurriculumNode[] = [
   ...usRootCurriculumNodes,
   ...usMathCurriculumNodes,
   ...usElaCurriculumNodes,
-  ...usMentalWellnessCurriculumData, // Add new data to the array
-  ...dkCurriculumNodes
+
+  ...usMentalWellnessCurriculumData,
+  ...usLifeEssentialsCurriculumData, // Add US Life Essentials
+  ...dkCurriculumNodes,
+  ...dkLifeEssentialsCurriculumData // Add DK Life Essentials
 ];
 
 // Export individual country/subject data for specific use cases
@@ -21,8 +26,10 @@ export {
   usRootCurriculumNodes,
   usMathCurriculumNodes,
   usElaCurriculumNodes,
-  usMentalWellnessCurriculumData, // Export new data array
-  dkCurriculumNodes
+  usMentalWellnessCurriculumData,
+  usLifeEssentialsCurriculumData, // Export US Life Essentials
+  dkCurriculumNodes,
+  dkLifeEssentialsCurriculumData // Export DK Life Essentials
 };
 
 // Helper functions for filtering data
