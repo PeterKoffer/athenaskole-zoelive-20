@@ -18,7 +18,8 @@ describe('MockCurriculumService', () => {
       const node = await service.getNodeById('k-cc-1');
       expect(node).toBeDefined();
       expect(node!.id).toBe('k-cc-1');
-      expect(node!.name).toBe('Count to 100 by ones and by tens');
+
+      expect(node!.name).toBe('Count to 100 by ones and by tens (K.CC.A.1)');
     });
 
     it('should return undefined if node not found', async () => {
@@ -29,12 +30,14 @@ describe('MockCurriculumService', () => {
 
   describe('getChildrenOfNode', () => {
     it('should return direct children of a parent node', async () => {
-      // Using 'k-cc' (domain) which has 'k-cc-1', 'k-cc-2', 'k-cc-3' as children
+      // Using 'k-cc' (domain) which has 'k-cc-1', 'k-cc-2', 'k-cc-3', 'k-cc-4', 'k-cc-5'
       const children = await service.getChildrenOfNode('k-cc');
-      expect(children).toHaveLength(3); // k-cc has 3 LOs
+      expect(children).toHaveLength(5); // k-cc now has 5 LOs
       expect(children.some(c => c.id === 'k-cc-1')).toBe(true);
       expect(children.some(c => c.id === 'k-cc-2')).toBe(true);
       expect(children.some(c => c.id === 'k-cc-3')).toBe(true);
+      expect(children.some(c => c.id === 'k-cc-4')).toBe(true);
+      expect(children.some(c => c.id === 'k-cc-5')).toBe(true);
     });
 
     it('should return an empty array if parent has no children', async () => {

@@ -16,7 +16,8 @@ describe('CurriculumService', () => {
       const node = await service.getNodeById('k-cc-1');
       expect(node).toBeDefined();
       expect(node!.id).toBe('k-cc-1');
-      expect(node!.name).toBe('Count to 100 by ones and by tens');
+
+      expect(node!.name).toBe('Count to 100 by ones and by tens (K.CC.A.1)');
     });
 
     it('should return undefined if node not found', async () => {

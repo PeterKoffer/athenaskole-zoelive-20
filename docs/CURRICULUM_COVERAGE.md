@@ -23,11 +23,15 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 
 ## United States (US) - Mathematics
 
-| Subject     | Grade | Focus Area                                                                 | Status                                     | Primary Sources             | Notes/Next Steps                                |
-|-------------|-------|----------------------------------------------------------------------------|--------------------------------------------|-----------------------------|-------------------------------------------------|
-| Mathematics | K     | Counting and Cardinality (3 LOs), Operations and Algebraic Thinking (1 LO) | 🟠 In Progress (Course, 2 Domains, 4 LOs)  | Common Core State Standards | Add KCs for existing LOs, add other K Math domains |
-| Mathematics | 1     | Operations and Algebraic Thinking (2 LOs)                                    | 🟠 In Progress (Course, 1 Domain, 2 LOs)   | Common Core State Standards | Add KCs for existing LOs, add other G1 Math domains |
-| Mathematics | 2-12  | (Various)                                                                  | ❌ Not Started                             | Common Core State Standards | Expand Math coverage to other grades            |
+| Subject     | Grade | Focus Area                                                                 | Status                                                       | Primary Sources             | Notes/Next Steps                                     |
+|-------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-----------------------------|------------------------------------------------------|
+| Mathematics | K     | All Domains (CC, OA, NBT, MD, G) - Key LOs populated                       | 🟢 Detailed (Key LOs Populated for all domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| Mathematics | 1     | All Domains (OA, NBT, MD, G) - Key LOs populated                           | 🟢 Detailed (Key LOs Populated for all domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| Mathematics | 2     | All Domains (OA, NBT, MD, G) - Key LOs populated                           | 🟢 Detailed (Key LOs Populated for all domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| Mathematics | 3     | All Domains (OA, NBT, NF, MD, G) - Key LOs populated                       | 🟢 Detailed (Key LOs Populated for all domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| Mathematics | 4     | All Domains (OA, NBT, NF, MD, G) - Key LOs populated                       | 🟢 Detailed (Key LOs Populated for all domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| Mathematics | 5     | All Domains (OA, NBT, NF, MD, G) - Key LOs populated                       | 🟢 Detailed (Key LOs Populated for all domains)            | Common Core State Standards | Consider adding KCs or more specific LOs             |
+| Mathematics | 6-12  | (Various)                                                                  | ❌ Not Started                                               | Common Core State Standards | Expand Math coverage to Middle and High School grades |
 
 ## United States (US) - Science
 
@@ -82,6 +86,7 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Creative Arts | 4     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
 | Creative Arts | 5     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
 | Creative Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Creative Arts to Middle & High School grades |
+
 ## United States (US) - Music
 
 | Subject | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                |
