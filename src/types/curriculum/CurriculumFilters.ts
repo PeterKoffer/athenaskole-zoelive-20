@@ -2,25 +2,36 @@
 import { CurriculumNodeType } from './CurriculumNode';
 import { SubjectSpecificMetadata } from './SubjectMetadata';
 
-/**
- * Filters for querying curriculum nodes.
- * All properties are optional.
- */
 export interface CurriculumNodeFilters {
+  // Hierarchy filters
   parentId?: string | null;
   nodeType?: CurriculumNodeType | CurriculumNodeType[];
+  
+  // Geographic filters
   countryCode?: string;
   languageCode?: string;
   regionCode?: string;
+  
+  // Educational filters
   educationalLevel?: string | string[];
   subjectName?: string | string[];
-  tags?: string[]; // Match if node has ANY of these tags
-  nameContains?: string; // Case-insensitive search within the name
   
-  // Enhanced filtering capabilities
+  // Search filters
+  nameContains?: string;
+  tags?: string[];
+  
+  // Subject-specific filters
   subjectSpecificFilters?: Partial<SubjectSpecificMetadata>;
-  hasAccessibilitySupport?: string[]; // Filter by accessibility considerations
+  
+  // Accessibility filters
+  hasAccessibilitySupport?: string[];
+  
+  // Assessment filters
   assessmentType?: string;
-  maxDuration?: number; // Filter by estimated duration
+  
+  // Time filters
+  maxDuration?: number;
+  
+  // Pedagogical filters
   teachingMethod?: string;
 }

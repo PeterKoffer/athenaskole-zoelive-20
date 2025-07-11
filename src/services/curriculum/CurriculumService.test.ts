@@ -1,7 +1,7 @@
-
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CurriculumService } from './CurriculumService';
 import { mockCurriculumData } from '@/data/mockCurriculumData';
-import { CurriculumNodeFilters } from '@/types/curriculum';
+import { CurriculumNodeFilters } from '@/types/curriculum/CurriculumFilters';
 
 describe('CurriculumService', () => {
   let service: CurriculumService;

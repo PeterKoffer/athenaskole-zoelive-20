@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { CurriculumNode } from '@/types/curriculum';
+import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
 import { curriculumService } from '@/services/curriculum/CurriculumService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

@@ -1,20 +1,15 @@
 
-/**
- * Subject mapping utilities
- */
 export const NELIE_SUBJECTS = {
   MATHEMATICS: 'Mathematics',
-  ENGLISH: 'English Language Arts', 
-  OTHER_LANGUAGES: 'World Languages',
+  ENGLISH_LANGUAGE_ARTS: 'English Language Arts',
   SCIENCE: 'Science',
-  MENTAL_WELLNESS: 'Mental Wellness',
-  COMPUTER_SCIENCE: 'Computer Science',
-  CREATIVE_ARTS: 'Creative Arts',
+  SOCIAL_STUDIES: 'Social Studies',
+  PHYSICAL_EDUCATION: 'Physical Education',
+  ART: 'Art',
   MUSIC: 'Music',
-  HISTORY_RELIGION: 'History & Religion',
-  GEOGRAPHY: 'Geography',
-  BODY_LAB: 'Physical Education',
-  LIFE_ESSENTIALS: 'Life Essentials'
+  WORLD_LANGUAGES: 'World Languages',
+  COMPUTER_SCIENCE: 'Computer Science',
+  HEALTH: 'Health'
 } as const;
 
 export type NelieSubject = typeof NELIE_SUBJECTS[keyof typeof NELIE_SUBJECTS];

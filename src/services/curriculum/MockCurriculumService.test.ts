@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import { MockCurriculumService } from './MockCurriculumService';
 import { mockCurriculumData } from '../../data/mockCurriculumData';
 import { CurriculumNodeType, CurriculumNodeFilters } from '../../types/curriculum'; // Adjusted path

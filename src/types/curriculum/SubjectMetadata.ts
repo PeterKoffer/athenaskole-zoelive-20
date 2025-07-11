@@ -1,50 +1,40 @@
 
 /**
- * Subject-specific metadata for enhanced curriculum indexing
+ * Subject-specific metadata that can be attached to curriculum nodes
+ * to provide additional context for different academic disciplines.
  */
 export interface SubjectSpecificMetadata {
-  // Language-specific (for Other Languages, English)
-  targetLanguage?: string; // ISO 639-1 code for the language being learned
-  proficiencyLevel?: 'beginner' | 'intermediate' | 'advanced' | 'native';
-  linguisticSkill?: 'speaking' | 'listening' | 'reading' | 'writing' | 'grammar' | 'vocabulary';
-
-  // Creative Arts & Music
-  medium?: string; // "digital", "traditional", "mixed", "instrumental", "vocal"
-  technique?: string; // "watercolor", "sculpture", "piano", "guitar", etc.
-  artisticStyle?: string; // "classical", "contemporary", "folk", etc.
-
-  // Physical Education / Body Lab
-  activityType?: 'individual' | 'team' | 'fitness' | 'sport' | 'dance' | 'martial_arts';
-  physicalRequirements?: string[]; // ["coordination", "strength", "endurance", "flexibility"]
-  equipmentNeeded?: string[];
-
-  // Mental Wellness
-  wellnessArea?: 'emotional_regulation' | 'social_skills' | 'stress_management' | 'self_awareness' | 'mindfulness';
-  sensitivityLevel?: 'low' | 'medium' | 'high'; // For age-appropriate content
-  therapeuticApproach?: string; // "cognitive_behavioral", "mindfulness_based", etc.
-
-  // Life Essentials
-  lifeStage?: 'childhood' | 'adolescence' | 'young_adult' | 'adult' | 'general';
-  practicalApplication?: 'financial_literacy' | 'health_nutrition' | 'relationships' | 'career_planning' | 'civic_responsibility';
-  realWorldContext?: string; // Specific scenarios or contexts
-
-  // Science-specific enhancements
-  labRequired?: boolean;
-  safetyConsiderations?: string[];
-  experimentType?: 'observation' | 'hypothesis_testing' | 'demonstration' | 'field_study';
-
-  // Computer Science
-  programmingLanguage?: string;
-  conceptualArea?: 'algorithms' | 'data_structures' | 'software_engineering' | 'cybersecurity' | 'ai_ml';
-  practicalProject?: boolean;
-
-  // History & Religion
-  culturalContext?: string[];
-  timesPeriod?: string; // "ancient", "medieval", "modern", "contemporary"
-  geographicalScope?: 'local' | 'national' | 'regional' | 'global';
-  religiousTradition?: string;
-
-  // Geography
-  geographicalScale?: 'local' | 'regional' | 'national' | 'continental' | 'global';
-  geographicalType?: 'physical' | 'human' | 'environmental' | 'political' | 'economic';
+  // Language Arts specific
+  linguisticSkill?: 'reading' | 'writing' | 'speaking' | 'listening';
+  literatureGenre?: 'fiction' | 'non_fiction' | 'poetry' | 'drama';
+  writingType?: 'narrative' | 'expository' | 'persuasive' | 'descriptive';
+  textType?: 'informational' | 'literary' | 'technical' | 'academic';
+  readingLevel?: 'below_grade' | 'at_grade' | 'above_grade';
+  
+  // Mathematics specific
+  mathDomain?: 'arithmetic' | 'algebra' | 'geometry' | 'statistics' | 'calculus';
+  problemType?: 'word_problem' | 'computation' | 'proof' | 'application';
+  mathematicalPractice?: 'problem_solving' | 'reasoning' | 'modeling' | 'representation';
+  
+  // Science specific
+  scienceDiscipline?: 'physics' | 'chemistry' | 'biology' | 'earth_science';
+  inquiryType?: 'observation' | 'experiment' | 'investigation' | 'research';
+  scientificPractice?: 'asking_questions' | 'developing_models' | 'planning_investigations' | 'analyzing_data';
+  
+  // Social Studies specific
+  historicalPeriod?: 'ancient' | 'medieval' | 'modern' | 'contemporary';
+  geographicRegion?: 'local' | 'national' | 'global';
+  civicsConcept?: 'government' | 'citizenship' | 'economics' | 'law';
+  
+  // General interaction and engagement
+  interactionType?: 'individual' | 'collaborative' | 'peer_review' | 'discussion';
+  cognitiveLevel?: 'remember' | 'understand' | 'apply' | 'analyze' | 'evaluate' | 'create';
+  
+  // Technology integration
+  technologyRequired?: boolean;
+  digitalTools?: string[];
+  
+  // Differentiation support
+  multipleIntelligences?: ('linguistic' | 'logical' | 'spatial' | 'bodily' | 'musical' | 'interpersonal' | 'intrapersonal' | 'naturalistic')[];
+  learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading_writing';
 }
