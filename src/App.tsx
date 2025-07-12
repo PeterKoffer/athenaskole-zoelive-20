@@ -27,6 +27,7 @@ const App = () => (
                 <ProfileDebugButton />
               </div>
               
+
               {/* Main content */}
               <div className="container mx-auto p-4">
                 <Routes>
