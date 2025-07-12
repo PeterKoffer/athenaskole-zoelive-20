@@ -29,8 +29,22 @@ export class CurriculumAIContext {
       context += `Grade Level: ${node.educationalLevel}\n`;
     }
 
-    if (node.subjectName) {
-      context += `Subject: ${node.subjectName}\n`;
+    // Attempt to find subjectName by traversing up if not directly on the node
+    let currentSubjectName = node.subjectName;
+    if (!currentSubjectName && node.parentId) {
+      let currentParent = parent;
+      while (currentParent && !currentSubjectName) {
+        currentSubjectName = currentParent.subjectName;
+        if (!currentSubjectName && currentParent.parentId) {
+          currentParent = await getNodeById(currentParent.parentId);
+        } else {
+          break; // No more parents or subjectName found
+        }
+      }
+    }
+
+    if (currentSubjectName) {
+      context += `Subject: ${currentSubjectName}\n`;
     }
 
     if (node.estimatedDuration) {
