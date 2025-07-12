@@ -10,10 +10,9 @@ interface LessonTemplateFactoryProps {
   onBack: () => void;
 }
 
-// This factory can be extended to support different lesson types
+// This factory now supports comprehensive multi-subject lesson generation
 const LessonTemplateFactory: React.FC<LessonTemplateFactoryProps> = (props) => {
-  // For now, use the universal template for all subjects
-  // In the future, we can add subject-specific templates here
+  // The Universal template now includes both single-subject and multi-subject options
   return <UniversalLessonTemplate {...props} />;
 };
 
