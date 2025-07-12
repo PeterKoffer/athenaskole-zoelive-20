@@ -1,5 +1,5 @@
 
-import { Home, TestTube, Eye, User, Calendar, Settings } from "lucide-react";
+import { Home, TestTube, Eye, User, Calendar, Settings, Calculator } from "lucide-react";
 import Index from "./pages/Index";
 import TestPage from "./pages/TestPage";
 import StealthAssessmentTest from "./pages/StealthAssessmentTest";
@@ -7,6 +7,7 @@ import SimpleStealthTest from "./pages/SimpleStealthTest";
 import AuthPage from "./pages/AuthPage";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import PreferencesPage from "./pages/PreferencesPage";
+import MathPage from "./pages/MathPage";
 
 export const navItems = [
   {
@@ -20,6 +21,12 @@ export const navItems = [
     to: "/universe",
     icon: <Calendar className="h-4 w-4" />,
     page: <DailyUniversePage />,
+  },
+  {
+    title: "Math",
+    to: "/math",
+    icon: <Calculator className="h-4 w-4" />,
+    page: <MathPage />,
   },
   {
     title: "Preferences",

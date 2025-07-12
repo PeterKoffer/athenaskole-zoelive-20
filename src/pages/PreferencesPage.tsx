@@ -52,28 +52,28 @@ const PreferencesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center">
             <Settings className="w-8 h-8 mr-3" />
             Preferences
           </h1>
-          <p className="text-gray-400">Customize your learning experience</p>
+          <p className="text-muted-foreground">Customize your learning experience</p>
         </div>
 
         <div className="grid gap-6">
           {/* Speech Settings */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
+              <CardTitle className="text-card-foreground flex items-center">
                 <Speech className="w-5 h-5 mr-2" />
                 Speech Settings
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
-                <Label htmlFor="speech-enabled" className="text-gray-300">
+                <Label htmlFor="speech-enabled" className="text-muted-foreground">
                   Enable Text-to-Speech
                 </Label>
                 <Switch
@@ -86,7 +86,7 @@ const PreferencesPage = () => {
               {preferences.speech_enabled && (
                 <>
                   <div className="space-y-2">
-                    <Label className="text-gray-300">Speech Rate: {preferences.speech_rate}</Label>
+                    <Label className="text-muted-foreground">Speech Rate: {preferences.speech_rate}</Label>
                     <Slider
                       value={[preferences.speech_rate]}
                       onValueChange={([value]) => updatePreference('speech_rate', value)}
@@ -98,7 +98,7 @@ const PreferencesPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-gray-300">Speech Pitch: {preferences.speech_pitch}</Label>
+                    <Label className="text-muted-foreground">Speech Pitch: {preferences.speech_pitch}</Label>
                     <Slider
                       value={[preferences.speech_pitch]}
                       onValueChange={([value]) => updatePreference('speech_pitch', value)}
@@ -110,15 +110,15 @@ const PreferencesPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-gray-300">Preferred Voice</Label>
+                    <Label className="text-muted-foreground">Preferred Voice</Label>
                     <Select
                       value={preferences.preferred_voice}
                       onValueChange={(value) => updatePreference('preferred_voice', value)}
                     >
-                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectTrigger className="bg-input border-border text-foreground">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectContent className="bg-popover border-border">
                         <SelectItem value="female">Female</SelectItem>
                         <SelectItem value="male">Male</SelectItem>
                       </SelectContent>
@@ -130,16 +130,16 @@ const PreferencesPage = () => {
           </Card>
 
           {/* Auto-Read Settings */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
+              <CardTitle className="text-card-foreground flex items-center">
                 <Volume2 className="w-5 h-5 mr-2" />
                 Auto-Read Settings
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="auto-read-questions" className="text-gray-300">
+                <Label htmlFor="auto-read-questions" className="text-muted-foreground">
                   Automatically read questions aloud
                 </Label>
                 <Switch
@@ -150,7 +150,7 @@ const PreferencesPage = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="auto-read-explanations" className="text-gray-300">
+                <Label htmlFor="auto-read-explanations" className="text-muted-foreground">
                   Automatically read explanations aloud
                 </Label>
                 <Switch
