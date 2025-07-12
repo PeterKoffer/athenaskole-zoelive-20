@@ -554,6 +554,60 @@ export type Database = {
         }
         Relationships: []
       }
+      school_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          school_id: string
+          subject_weights: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          school_id: string
+          subject_weights?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          school_id?: string
+          subject_weights?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      teacher_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          school_id: string
+          subject_weights: Json
+          teacher_id: string
+          updated_at: string
+          weekly_emphasis: Json | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          school_id: string
+          subject_weights?: Json
+          teacher_id: string
+          updated_at?: string
+          weekly_emphasis?: Json | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          school_id?: string
+          subject_weights?: Json
+          teacher_id?: string
+          updated_at?: string
+          weekly_emphasis?: Json | null
+        }
+        Relationships: []
+      }
       user_activity_sessions: {
         Row: {
           completion_status: string

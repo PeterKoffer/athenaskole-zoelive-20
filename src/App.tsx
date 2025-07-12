@@ -15,29 +15,32 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="min-h-screen bg-background">
-            {/* Debug tools in top right */}
-            <div className="fixed top-4 right-4 z-50 flex gap-2">
-              <ProfileDebugButton />
-            </div>
-            
-            {/* Main content */}
-            <div className="container mx-auto p-4">
-              <Routes>
-                {navItems.map(({ to, page }) => (
-                  <Route key={to} path={to} element={page} />
-                ))}
-                <Route path="/universe" element={<DailyUniversePage />} />
-              </Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-background">
+              {/* Debug tools in top right */}
+              <div className="fixed top-4 right-4 z-50 flex gap-2">
+                <ProfileDebugButton />
+              </div>
               
-              {/* Test component for profile service */}
-              <div className="mt-8">
-                <ProfileServiceTest />
+
+              {/* Main content */}
+              <div className="container mx-auto p-4">
+                <Routes>
+                  {navItems.map(({ to, page }) => (
+                    <Route key={to} path={to} element={page} />
+                  ))}
+                  <Route path="/universe" element={<DailyUniversePage />} />
+                </Routes>
+                
+                {/* Test component for profile service */}
+                <div className="mt-8">
+                  <ProfileServiceTest />
+                </div>
               </div>
             </div>
           </BrowserRouter>
