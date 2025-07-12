@@ -9,7 +9,9 @@ export enum NELIESubject {
   MUSIC = 'Music',
   WORLD_LANGUAGES = 'World Languages',
   COMPUTER_SCIENCE = 'Computer Science',
-  HEALTH = 'Health'
+  HEALTH = 'Health',
+  MENTAL_WELLNESS = 'Mental Wellness',
+  LIFE_ESSENTIALS = 'Life Essentials'
 }
 
 export type NelieSubject = NELIESubject;

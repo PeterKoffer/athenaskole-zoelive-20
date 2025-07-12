@@ -1,16 +1,37 @@
 
 import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
+import { NELIESubject } from '@/types/curriculum/NELIESubjects'; // Added for the helper
 import { usRootCurriculumNodes } from './us/usRootData';
 import { usMathCurriculumNodes } from './us/usMathData';
 import { usElaCurriculumNodes } from './us/usElaData';
+import { usMentalWellnessCurriculumData } from './us/usMentalWellnessData';
+import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData';
+import { usComputerScienceCurriculumData } from './us/usComputerScienceData';
+import { usCreativeArtsCurriculumData } from './us/usCreativeArtsData';
+import { usMusicCurriculumData } from './us/usMusicData'; // Import US Music
+import { usScienceCurriculumData } from './us/usScienceData';
 import { dkCurriculumNodes } from './dk/dkData';
+import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData';
+import { dkComputerScienceCurriculumData } from './dk/dkComputerScienceData';
+import { dkCreativeArtsCurriculumData } from './dk/dkCreativeArtsData';
+import { dkMusicCurriculumData } from './dk/dkMusicData'; // Import DK Music
 
 // Combine all curriculum data from different countries and subjects
 export const mockCurriculumData: CurriculumNode[] = [
   ...usRootCurriculumNodes,
   ...usMathCurriculumNodes,
   ...usElaCurriculumNodes,
-  ...dkCurriculumNodes
+  ...usMentalWellnessCurriculumData,
+  ...usLifeEssentialsCurriculumData,
+  ...usComputerScienceCurriculumData,
+  ...usCreativeArtsCurriculumData,
+  ...usMusicCurriculumData, // Add US Music
+  ...usScienceCurriculumData,
+  ...dkCurriculumNodes,
+  ...dkLifeEssentialsCurriculumData,
+  ...dkComputerScienceCurriculumData,
+  ...dkCreativeArtsCurriculumData,
+  ...dkMusicCurriculumData // Add DK Music
 ];
 
 // Export individual country/subject data for specific use cases
@@ -18,7 +39,16 @@ export {
   usRootCurriculumNodes,
   usMathCurriculumNodes,
   usElaCurriculumNodes,
-  dkCurriculumNodes
+  usMentalWellnessCurriculumData,
+  usLifeEssentialsCurriculumData,
+  usComputerScienceCurriculumData,
+  usCreativeArtsCurriculumData,
+  usMusicCurriculumData, // Export US Music
+  dkCurriculumNodes,
+  dkLifeEssentialsCurriculumData,
+  dkComputerScienceCurriculumData,
+  dkCreativeArtsCurriculumData,
+  dkMusicCurriculumData // Export DK Music
 };
 
 // Helper functions for filtering data
@@ -26,8 +56,8 @@ export const getCurriculumByCountry = (countryCode: string): CurriculumNode[] =>
   return mockCurriculumData.filter(node => node.countryCode === countryCode);
 };
 
-export const getCurriculumBySubject = (subjectName: string): CurriculumNode[] => {
-  return mockCurriculumData.filter(node => node.subjectName === subjectName);
+export const getCurriculumBySubject = (subject: NELIESubject): CurriculumNode[] => { // Changed parameter to NELIESubject
+  return mockCurriculumData.filter(node => node.subject === subject); // Changed to filter by subject enum
 };
 
 export const getCurriculumByGrade = (educationalLevel: string): CurriculumNode[] => {

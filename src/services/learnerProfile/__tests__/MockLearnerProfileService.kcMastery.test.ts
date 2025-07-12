@@ -29,7 +29,7 @@ describe('MockLearnerProfileService - KC Mastery Logic', () => {
     const profile = await mockProfileService.getProfile(MOCK_USER_ID);
     const kcMastery = profile.kcMasteryMap[TEST_KC_ID_1];
     
-    expect(kcMastery.masteryLevel).toBe(0.625); // 0.5 + (1-0.5)*0.25
+    expect(kcMastery.masteryLevel).toBe(0.6); // Initial 0.5 + (1-0.5)*0.2 (learningRate)
     expect(kcMastery.currentStreak).toBe(1);
   });
 
@@ -43,7 +43,7 @@ describe('MockLearnerProfileService - KC Mastery Logic', () => {
     const profile = await mockProfileService.getProfile(MOCK_USER_ID);
     const kcMastery = profile.kcMasteryMap[TEST_KC_ID_1];
     
-    expect(kcMastery.masteryLevel).toBeLessThan(0.625);
+    expect(kcMastery.masteryLevel).toBe(0.54); // 0.6 - 0.6*0.1
     expect(kcMastery.currentStreak).toBe(0);
   });
 
@@ -86,11 +86,14 @@ describe('MockLearnerProfileService - KC Mastery Logic', () => {
     expect(profile.kcMasteryMap[TEST_KC_ID_1].masteryLevel).toBeLessThanOrEqual(0.99);
     
     // Test lower bound (should not go below 0.01)
-    for (let i = 0; i < 20; i++) {
+    // Need more iterations to hit the 0.01 floor from 0.5 with forgettingRate 0.1
+    // 0.5 * (0.9^N) <= 0.01  => N >= log(0.02)/log(0.9) approx 37.17. So use 40.
+    for (let i = 0; i < 40; i++) {
       await mockProfileService.updateKCMastery(MOCK_USER_ID, TEST_KC_ID_2, createKCMasteryUpdateData(false));
     }
     
     profile = await mockProfileService.getProfile(MOCK_USER_ID);
-    expect(profile.kcMasteryMap[TEST_KC_ID_2].masteryLevel).toBeGreaterThanOrEqual(0.01);
+    // After enough iterations, it should hit the floor
+    expect(profile.kcMasteryMap[TEST_KC_ID_2].masteryLevel).toBe(0.01);
   });
 });
