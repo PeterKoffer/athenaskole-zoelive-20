@@ -1,16 +1,13 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
-
-interface User {
-  id: string;
-  name?: string;
-  email?: string;
-}
+import { User } from '@/types/auth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: { name?: string; age?: string }) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -21,32 +18,80 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate checking for existing session
-    const checkAuth = async () => {
+    // Get initial session
+    const getInitialSession = async () => {
       try {
-        // For now, just set a mock user to test the preferences page
-        setUser({ id: '1', name: 'Test User', email: 'test@example.com' });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser(session.user as User);
+        }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        console.error('Error getting initial session:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
+    getInitialSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user as User);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    console.log('Sign in attempt:', email);
-    setUser({ id: '1', name: 'Test User', email });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      throw error;
+    }
+    
+    if (data.user) {
+      setUser(data.user as User);
+    }
+  };
+
+  const signUp = async (email: string, password: string, metadata?: { name?: string; age?: string }) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata || {}
+      }
+    });
+    
+    if (error) {
+      throw error;
+    }
+    
+    if (data.user) {
+      setUser(data.user as User);
+    }
   };
 
   const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw error;
+    }
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
