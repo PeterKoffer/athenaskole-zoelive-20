@@ -1,5 +1,4 @@
 
-
 import { Home, TestTube, Eye, User, Calendar, Settings, Calculator } from "lucide-react";
 import Index from "./pages/Index";
 import TestPage from "./pages/TestPage";
@@ -60,11 +59,5 @@ export const navItems = [
     to: "/simple-stealth-test",
     icon: <Eye className="h-4 w-4" />,
     page: <SimpleStealthTest />,
-  },
-  {
-    title: "Preferences",
-    to: "/preferences",
-    icon: <Settings className="h-4 w-4" />,
-    page: <PreferencesPage />,
   },
 ];
