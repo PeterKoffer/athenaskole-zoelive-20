@@ -8,6 +8,7 @@ import AuthPage from "./pages/AuthPage";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import PreferencesPage from "./pages/PreferencesPage";
 import MathPage from "./pages/MathPage";
+import ProfilePage from "./pages/ProfilePage";
 
 console.log('PreferencesPage component:', PreferencesPage);
 
@@ -35,6 +36,12 @@ export const navItems = [
     to: "/preferences",
     icon: <Settings className="h-4 w-4" />,
     page: <PreferencesPage />,
+  },
+  {
+    title: "Profile",
+    to: "/profile",
+    icon: <User className="h-4 w-4" />,
+    page: <ProfilePage />,
   },
   {
     title: "Authentication",

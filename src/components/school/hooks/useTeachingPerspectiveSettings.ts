@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS: TeachingPerspectiveSettings = {
   wishes: "",
   avoid: "",
   lastUpdated: undefined,
+  subjectWeights: {},
 };
 
 /**
