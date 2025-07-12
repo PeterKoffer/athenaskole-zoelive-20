@@ -3,45 +3,68 @@ import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 export const usElaCurriculumNodes: CurriculumNode[] = [
-  // US ELA Root
+  // US English Language Arts Subject Node
   {
     id: 'us-ela',
     parentId: 'us',
     nodeType: 'subject',
     name: 'English Language Arts',
-    description: 'K-12 English Language Arts curriculum following Common Core State Standards',
+    description: 'United States English Language Arts curriculum covering reading, writing, speaking, listening, and language skills from K-12.',
+    educationalLevel: 'K-12',
+    subject: NELIESubject.ENGLISH,
     countryCode: 'US',
     languageCode: 'en',
-    subjectName: 'English Language Arts',
-    tags: ['core_subject', 'literacy']
+    tags: ['english', 'language_arts', 'core_subject', 'united_states'],
   },
 
   // Kindergarten ELA
   {
-    id: 'us-k-ela',
+    id: 'us-ela-k-reading-foundational',
     parentId: 'us-ela',
-    nodeType: 'course',
-    name: 'Kindergarten English Language Arts',
-    description: 'Foundational literacy skills for kindergarten students',
+    nodeType: 'learning_objective',
+    name: 'Reading Foundational Skills',
+    description: 'Demonstrate understanding of the organization and basic features of print, phonological awareness, phonics and word recognition.',
+    educationalLevel: 'K',
+    subject: NELIESubject.ENGLISH,
     countryCode: 'US',
     languageCode: 'en',
+    estimatedDuration: 30,
+    tags: ['phonics', 'phonological_awareness', 'print_concepts', 'kindergarten'],
+  },
+  {
+    id: 'us-ela-k-reading-literature',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Reading Literature',
+    description: 'Ask and answer questions about key details in a text and identify characters, settings, and major events.',
     educationalLevel: 'K',
+
     subjectName: 'English Language Arts',
     subject: NELIESubject.ENGLISH, // Added
     estimatedDuration: 150,
     tags: ['foundational', 'literacy', 'early_childhood']
   },
-
-  // K.RF - Reading: Foundational Skills
   {
-    id: 'k-rf',
-    parentId: 'us-k-ela',
-    nodeType: 'domain',
-    name: 'Reading: Foundational Skills',
-    description: 'Print concepts, phonological awareness, phonics and word recognition, and fluency',
+    id: 'us-ela-k-reading-informational',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Reading Informational Text',
+    description: 'Ask and answer questions about key details in informational texts.',
+    educationalLevel: 'K',
+    subject: NELIESubject.ENGLISH,
     countryCode: 'US',
     languageCode: 'en',
+    estimatedDuration: 20,
+    tags: ['informational_text', 'comprehension', 'nonfiction', 'kindergarten'],
+  },
+  {
+    id: 'us-ela-k-writing',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Writing',
+    description: 'Use a combination of drawing, dictating, and writing to compose texts.',
     educationalLevel: 'K',
+
     subjectName: 'English Language Arts',
     subject: NELIESubject.ENGLISH, // Added
     sourceIdentifier: 'K.RF',
@@ -174,6 +197,15 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
     description: 'Demonstrate understanding of the organization and basic features of print. (e.g., follow words left to right, top to bottom, page by page).',
     countryCode: 'US',
     languageCode: 'en',
+    estimatedDuration: 20,
+    tags: ['speaking', 'listening', 'collaboration', 'kindergarten'],
+  },
+  {
+    id: 'us-ela-k-language',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Language',
+    description: 'Demonstrate command of the conventions of standard English grammar and usage.',
     educationalLevel: 'K',
     subjectName: 'English Language Arts',
     subject: NELIESubject.ENGLISH,
@@ -296,13 +328,24 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
 
   // Grade 1 ELA
   {
-    id: 'us-1-ela',
+    id: 'us-ela-1-reading-foundational',
     parentId: 'us-ela',
-    nodeType: 'course',
-    name: 'Grade 1 English Language Arts',
-    description: 'First grade literacy skills building on kindergarten foundations',
+    nodeType: 'learning_objective',
+    name: 'Reading Foundational Skills',
+    description: 'Demonstrate understanding of phonological awareness, phonics and word recognition, and fluency.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
     countryCode: 'US',
     languageCode: 'en',
+    estimatedDuration: 35,
+    tags: ['phonics', 'fluency', 'decoding', 'grade_1'],
+  },
+  {
+    id: 'us-ela-1-reading-literature',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Reading Literature',
+    description: 'Ask and answer questions about key details and retell stories including key details.',
     educationalLevel: '1',
     subjectName: 'English Language Arts',
     subject: NELIESubject.ENGLISH,
@@ -342,6 +385,15 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
     description: 'Phonological awareness, phonics and word recognition, and fluency for Grade 1.',
     countryCode: 'US',
     languageCode: 'en',
+    estimatedDuration: 25,
+    tags: ['informational_text', 'main_topic', 'details', 'grade_1'],
+  },
+  {
+    id: 'us-ela-1-writing',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Writing',
+    description: 'Write opinion pieces, informative/explanatory texts, and narratives.',
     educationalLevel: '1',
     subjectName: 'English Language Arts',
     subject: NELIESubject.ENGLISH,
@@ -409,6 +461,54 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
   },
   // G1 LOs for RI
   {
+  {
+    id: 'g1-ela-sl',
+    parentId: 'us-1-ela',
+    nodeType: 'domain',
+    name: 'Speaking & Listening (SL)',
+    description: 'Comprehension and Collaboration, Presentation of Knowledge and Ideas for Grade 1.',
+    educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['speaking', 'listening', 'communication', 'grade1']
+  },
+  // G1 ELA: Language (L) Domain
+  {
+    id: 'g1-ela-l',
+    parentId: 'us-1-ela',
+    nodeType: 'domain',
+    name: 'Language (L)',
+    description: 'Conventions of Standard English, Knowledge of Language, Vocabulary Acquisition and Use for Grade 1.',
+    educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['language', 'grammar', 'vocabulary', 'grade1']
+  },
+  // G1 LOs for RL
+  {
+    id: 'g1-ela-rl-lo1',
+    parentId: 'g1-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Ask and answer questions about key details in a text. (RL.1.1)',
+    description: 'Ask and answer questions about key details in a text.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.1.1',
+    tags: ['reading_comprehension', 'questioning', 'key_details']
+  },
+  {
+    id: 'g1-ela-rl-lo2',
+    parentId: 'g1-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Retell stories, including key details (RL.1.2)',
+    description: 'Retell stories, including key details, and demonstrate understanding of their central message or lesson.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.1.2',
+    tags: ['story_retelling', 'central_message']
+  },
+  // G1 LOs for RI
+  {
     id: 'g1-ela-ri-lo1',
     parentId: 'g1-ela-ri',
     nodeType: 'learning_objective',
@@ -428,7 +528,374 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
     description: 'Demonstrate understanding of spoken words, syllables, and sounds (phonemes).',
     countryCode: 'US',
     languageCode: 'en',
+    estimatedDuration: 25,
+    tags: ['speaking', 'listening', 'collaboration', 'grade_1'],
+  },
+  {
+    id: 'us-ela-1-language',
+    parentId: 'us-ela',
+    nodeType: 'learning_objective',
+    name: 'Language',
+    description: 'Demonstrate command of the conventions of standard English grammar and usage.',
     educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RF.1.2', // Corrected standard
+    tags: ['phonological_awareness', 'phonemes', 'syllables']
+  },
+  {
+    id: 'g1-rf-lo2',
+    parentId: '1-rf',
+    nodeType: 'learning_objective',
+    name: 'Know and apply grade-level phonics and word analysis skills in decoding words. (RF.1.3)',
+    description: 'Know and apply grade-level phonics and word analysis skills in decoding words.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RF.1.3',
+    tags: ['phonics', 'word_analysis', 'decoding']
+  },
+  // G1 LOs for W
+  {
+    id: 'g1-ela-w-lo1',
+    parentId: 'g1-ela-w',
+    nodeType: 'learning_objective',
+    name: 'Write opinion pieces with a reason and sense of closure. (W.1.1)',
+    description: 'Write opinion pieces in which they introduce the topic or name the book they are writing about, state an opinion, supply a reason for the opinion, and provide some sense of closure.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.W.1.1',
+    tags: ['opinion_writing', 'reasons', 'closure']
+  },
+  // G1 LOs for SL
+  {
+    id: 'g1-ela-sl-lo1',
+    parentId: 'g1-ela-sl',
+    nodeType: 'learning_objective',
+    name: 'Participate in collaborative conversations, building on others\' talk. (SL.1.1)',
+    description: 'Participate in collaborative conversations with diverse partners about grade 1 topics and texts with peers and adults in small and larger groups, building on others\' talk in conversations by responding to the comments of others through multiple exchanges.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.SL.1.1',
+    tags: ['collaborative_discussion', 'active_listening', 'conversation_skills']
+  },
+  // G1 LOs for L
+  {
+    id: 'g1-ela-l-lo1',
+    parentId: 'g1-ela-l',
+    nodeType: 'learning_objective',
+    name: 'Use common, proper, and possessive nouns. (L.1.1b)',
+    description: 'Use common, proper, and possessive nouns.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.L.1.1b',
+    tags: ['grammar', 'nouns', 'possessives']
+  },
+  {
+    id: 'g1-ela-l-lo2',
+    parentId: 'g1-ela-l',
+    nodeType: 'learning_objective',
+    name: 'Use singular and plural nouns with matching verbs. (L.1.1c)',
+    description: 'Use singular and plural nouns with matching verbs in basic sentences (e.g., He hops; We hop).',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.L.1.1c',
+    tags: ['grammar', 'subject_verb_agreement', 'nouns', 'verbs']
+  },
+
+  // Grade 2 ELA - Reviewing and expanding existing G2 ELA data
+  {
+    id: 'us-g2-ela',
+    parentId: 'us-ela',
+    nodeType: 'course',
+    name: 'Grade 2 English Language Arts',
+    description: 'Grade 2 literacy skills, building on Grade 1.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '2',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    estimatedDuration: 180,
+    prerequisites: ['us-1-ela'],
+    tags: ['elementary', 'literacy', 'grade2']
+  },
+  // Grade 2 Domains
+  {
+    id: 'g2-ela-rl',
+    parentId: 'us-g2-ela',
+    nodeType: 'domain',
+    name: 'Reading: Literature (RL)',
+    description: 'Key Ideas and Details, Craft and Structure, Integration of Knowledge and Ideas, Range of Reading and Level of Text Complexity.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'literature']
+  },
+  {
+    id: 'g2-ela-ri',
+    parentId: 'us-g2-ela',
+    nodeType: 'domain',
+    name: 'Reading: Informational Text (RI)',
+    description: 'Key Ideas and Details, Craft and Structure, Integration of Knowledge and Ideas, Range of Reading and Level of Text Complexity.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'informational_text']
+  },
+  {
+    id: 'g2-ela-rf',
+    parentId: 'us-g2-ela',
+    nodeType: 'domain',
+    name: 'Reading: Foundational Skills (RF)',
+    description: 'Print Concepts, Phonological Awareness, Phonics and Word Recognition, Fluency.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'foundational_skills', 'phonics', 'fluency']
+  },
+  {
+    id: 'g2-ela-w',
+    parentId: 'us-g2-ela',
+    nodeType: 'domain',
+    name: 'Writing (W)',
+    description: 'Text Types and Purposes, Production and Distribution of Writing, Research to Build and Present Knowledge, Range of Writing.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    tags: ['writing', 'composition']
+  },
+  {
+    id: 'g2-ela-sl',
+    parentId: 'us-g2-ela',
+    nodeType: 'domain',
+    name: 'Speaking & Listening (SL)',
+    description: 'Comprehension and Collaboration, Presentation of Knowledge and Ideas.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    tags: ['speaking', 'listening', 'communication']
+  },
+  {
+    id: 'g2-ela-l',
+    parentId: 'us-g2-ela',
+    nodeType: 'domain',
+    name: 'Language (L)',
+    description: 'Conventions of Standard English, Knowledge of Language, Vocabulary Acquisition and Use.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    tags: ['language', 'grammar', 'vocabulary']
+  },
+  // Grade 2 LOs (Sample 2-3 per domain)
+  {
+    id: 'g2-ela-rl-lo1',
+    parentId: 'g2-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Ask and answer questions about key details in a text (RL.2.1)',
+    description: 'Ask and answer such questions as who, what, where, when, why, and how to demonstrate understanding of key details in a text.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.2.1',
+    tags: ['reading_comprehension', 'questioning', 'key_details']
+  },
+  {
+    id: 'g2-ela-rl-lo2',
+    parentId: 'g2-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Recount stories and determine their central message (RL.2.2)',
+    description: 'Recount stories, including fables and folktales from diverse cultures, and determine their central message, lesson, or moral.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.2.2',
+    tags: ['story_retelling', 'central_message', 'fables', 'folktales']
+  },
+  {
+    id: 'g2-ela-rf-lo1',
+    parentId: 'g2-ela-rf',
+    nodeType: 'learning_objective',
+    name: 'Distinguish long and short vowels in one-syllable words (RF.2.3a)',
+    description: 'Distinguish long and short vowels when reading regularly spelled one-syllable words.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RF.2.3a',
+    tags: ['phonics', 'vowels', 'decoding']
+  },
+  {
+    id: 'g2-ela-w-lo1',
+    parentId: 'g2-ela-w',
+    nodeType: 'learning_objective',
+    name: 'Write opinion pieces with reasons (W.2.1)',
+    description: 'Write opinion pieces in which they introduce the topic or book they are writing about, state an opinion, supply reasons that support the opinion, use linking words (e.g., because, and, also) to connect opinion and reasons, and provide a concluding statement or section.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.W.2.1',
+    tags: ['opinion_writing', 'persuasive_writing', 'reasons', 'linking_words']
+  },
+  {
+    id: 'g2-ela-l-lo1',
+    parentId: 'g2-ela-l',
+    nodeType: 'learning_objective',
+    name: 'Use collective nouns (L.2.1a)',
+    description: 'Use collective nouns (e.g., group).',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.L.2.1a',
+    tags: ['grammar', 'nouns', 'collective_nouns']
+  },
+  {
+    id: 'g2-ela-sl-lo1',
+    parentId: 'g2-ela-sl',
+    nodeType: 'learning_objective',
+    name: 'Participate in collaborative conversations (SL.2.1)',
+    description: 'Participate in collaborative conversations with diverse partners about grade 2 topics and texts with peers and adults in small and larger groups.',
+    educationalLevel: '2',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.SL.2.1',
+    tags: ['collaboration', 'conversation', 'discussion_skills']
+  },
+
+  // Grade 3 ELA - Reviewing and expanding existing G3 ELA data
+  {
+    id: 'us-g3-ela',
+    parentId: 'us-ela',
+    nodeType: 'course',
+    name: 'Grade 3 English Language Arts',
+    description: 'Grade 3 literacy skills.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '3',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    estimatedDuration: 180,
+    prerequisites: ['us-g2-ela'],
+    tags: ['elementary', 'literacy', 'grade3']
+  },
+  // Grade 3 Domains
+  {
+    id: 'g3-ela-rl',
+    parentId: 'us-g3-ela',
+    nodeType: 'domain',
+    name: 'Reading: Literature (RL)',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'literature']
+  },
+  {
+    id: 'g3-ela-ri',
+    parentId: 'us-g3-ela',
+    nodeType: 'domain',
+    name: 'Reading: Informational Text (RI)',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'informational_text']
+  },
+  {
+    id: 'g3-ela-rf',
+    parentId: 'us-g3-ela',
+    nodeType: 'domain',
+    name: 'Reading: Foundational Skills (RF)',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'foundational_skills', 'phonics', 'fluency']
+  },
+  {
+    id: 'g3-ela-w',
+    parentId: 'us-g3-ela',
+    nodeType: 'domain',
+    name: 'Writing (W)',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    tags: ['writing', 'composition']
+  },
+  {
+    id: 'g3-ela-sl',
+    parentId: 'us-g3-ela',
+    nodeType: 'domain',
+    name: 'Speaking & Listening (SL)',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    tags: ['speaking', 'listening', 'communication']
+  },
+  {
+    id: 'g3-ela-l',
+    parentId: 'us-g3-ela',
+    nodeType: 'domain',
+    name: 'Language (L)',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    tags: ['language', 'grammar', 'vocabulary']
+  },
+  // Grade 3 LOs (Sample 2-3 per domain)
+  {
+    id: 'g3-ela-rl-lo1',
+    parentId: 'g3-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Ask and answer questions, referring to text (RL.3.1)',
+    description: 'Ask and answer questions to demonstrate understanding of a text, referring explicitly to the text as the basis for the answers.',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.3.1',
+    tags: ['reading_comprehension', 'textual_evidence']
+  },
+  {
+    id: 'g3-ela-ri-lo1',
+    parentId: 'g3-ela-ri',
+    nodeType: 'learning_objective',
+    name: 'Determine the main idea of a text (RI.3.2)',
+    description: 'Determine the main idea of a text; recount the key details and explain how they support the main idea.',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RI.3.2',
+    tags: ['main_idea', 'key_details', 'informational_text']
+  },
+  {
+    id: 'g3-ela-rf-lo1',
+    parentId: 'g3-ela-rf',
+    nodeType: 'learning_objective',
+    name: 'Decode multisyllable words (RF.3.3c)',
+    description: 'Decode multisyllable words.',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RF.3.3c',
+    tags: ['phonics', 'decoding', 'multisyllable_words']
+  },
+  {
+    id: 'g3-ela-w-lo1',
+    parentId: 'g3-ela-w',
+    nodeType: 'learning_objective',
+    name: 'Write opinion pieces with reasons and linking words (W.3.1)',
+    description: 'Write opinion pieces on topics or texts, supporting a point of view with reasons. Use linking words and phrases (e.g., because, therefore, since, for example) to connect opinion and reasons.',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.W.3.1',
+    tags: ['opinion_writing', 'linking_words', 'reasons']
+  },
+  {
+    id: 'g3-ela-sl-lo1',
+    parentId: 'g3-ela-sl',
+    nodeType: 'learning_objective',
+    name: 'Engage effectively in collaborative discussions (SL.3.1)',
+    description: 'Engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners on grade 3 topics and texts, building on others’ ideas and expressing their own clearly.',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.SL.3.1',
+    tags: ['collaborative_discussion', 'communication_skills']
+  },
+  {
+    id: 'g3-ela-l-lo1',
+    parentId: 'g3-ela-l',
+    nodeType: 'learning_objective',
+    name: 'Explain function of nouns, pronouns, verbs, adjectives, adverbs (L.3.1a)',
+    description: 'Explain the function of nouns, pronouns, verbs, adjectives, and adverbs in general and their functions in particular sentences.',
+    educationalLevel: '3',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.L.3.1a',
+    tags: ['grammar', 'parts_of_speech']
+  },
+
+  // Grade 4 ELA - Reviewing and expanding existing G4 ELA data
+  {
+    id: 'us-g4-ela',
+    parentId: 'us-ela',
+    nodeType: 'course',
+    name: 'Grade 4 English Language Arts',
+    description: 'Grade 4 literacy skills.',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '4',
     subjectName: 'English Language Arts',
     subject: NELIESubject.ENGLISH,
     sourceIdentifier: 'CCSS.ELA-Literacy.RF.1.2', // Corrected standard
