@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Settings } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Settings, Calculator } from 'lucide-react';
 
 const Profile = () => {
   const { user, signOut, loading } = useAuth();

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,17 +30,12 @@ const UserImpersonation = () => {
     }
 
     try {
-      const { error } = await supabase.auth.signIn({
-        id: targetUserId,
-      });
-
-      if (error) {
-        throw error;
-      }
-
+      // User impersonation would typically require admin-level API calls
+      // This is a placeholder for the actual implementation
       toast({
-        title: 'Success',
-        description: `Successfully impersonating user ${targetUserId}.`,
+        title: 'Error',
+        description: 'User impersonation requires server-side implementation.',
+        variant: 'destructive',
       });
     } catch (error) {
       toast({
