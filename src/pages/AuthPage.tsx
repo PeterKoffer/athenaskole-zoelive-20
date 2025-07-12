@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import QuickTestAuth from '@/components/auth/QuickTestAuth';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ const AuthPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user && !loading) {
-      navigate('/');
+      navigate('/profile');
     }
   }, [user, loading, navigate]);
 
@@ -42,6 +41,7 @@ const AuthPage = () => {
           title: "Welcome back!",
           description: "Successfully logged in.",
         });
+        navigate('/profile');
       } else {
         await signUp(formData.email, formData.password, {
           name: formData.name,
@@ -69,6 +69,27 @@ const AuthPage = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Quick test login buttons
+  const quickLogin = async (email: string, password: string = 'testpassword123') => {
+    setAuthLoading(true);
+    try {
+      await signIn(email, password);
+      toast({
+        title: "Logged in!",
+        description: `Logged in as ${email}`,
+      });
+      navigate('/profile');
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
@@ -92,8 +113,38 @@ const AuthPage = () => {
           Back to Home
         </Button>
 
-        {/* Quick Test Auth Component */}
-        <QuickTestAuth />
+        {/* Quick Test Logins */}
+        <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-white text-lg">Quick Test Login</CardTitle>
+            <p className="text-gray-300 text-sm">
+              Use these test accounts for quick access
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button
+              onClick={() => quickLogin('admin@test.com')}
+              disabled={authLoading}
+              className="w-full bg-red-600 hover:bg-red-700 text-white"
+            >
+              Login as Admin
+            </Button>
+            <Button
+              onClick={() => quickLogin('teacher@test.com')}
+              disabled={authLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Login as Teacher
+            </Button>
+            <Button
+              onClick={() => quickLogin('student@test.com')}
+              disabled={authLoading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              Login as Student
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
           <CardHeader className="text-center">
