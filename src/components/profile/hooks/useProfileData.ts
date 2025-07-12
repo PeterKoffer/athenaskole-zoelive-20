@@ -6,11 +6,13 @@ import { UseProfileDataReturn } from "./types";
 
 export const useProfileData = (): UseProfileDataReturn => {
   const {
+    profile,
     profileData,
     setProfileData,
+    profileExists,
+    setProfileExists,
     loading: fetchLoading,
-    error: fetchError,
-    refetch,
+    error: fetchError
   } = useProfileFetch();
 
   const { uploading, handleAvatarUpload } = useAvatarUpload(
@@ -18,12 +20,11 @@ export const useProfileData = (): UseProfileDataReturn => {
     setProfileData
   );
 
-  const { loading: updateLoading, handleProfileUpdate: updateProfile } = useProfileUpdate();
-
-  const handleProfileUpdate = async (data: any) => {
-    await updateProfile(data);
-    refetch();
-  };
+  const { loading: updateLoading, handleProfileUpdate } = useProfileUpdate(
+    profileData,
+    profileExists,
+    setProfileExists
+  );
 
   return {
     profileData,

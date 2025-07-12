@@ -2,42 +2,39 @@
 import { useState } from 'react';
 import { SupabaseProfileService } from '@/services/learnerProfile/SupabaseProfileService';
 import { useAuth } from '@/hooks/useAuth';
-import { LearnerProfile } from '@/types/learnerProfile';
-import { toast } from '@/hooks/use-toast';
 
 const profileService = new SupabaseProfileService();
 
-export const useProfileUpdate = () => {
+export const useProfileUpdate = (
+  profileData: any,
+  profileExists: boolean,
+  setProfileExists: (exists: boolean) => void
+) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const handleProfileUpdate = async (data: Partial<LearnerProfile>) => {
+  const handleProfileUpdate = async (data: any) => {
     if (!user) return;
     
     setLoading(true);
     try {
-      const currentProfile = await profileService.getProfile(user.id);
-      if (currentProfile) {
-        const updatedProfile = { ...currentProfile, ...data };
-        await profileService.updateProfile(updatedProfile);
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been successfully updated.",
-        });
+      console.log('Profile update with Supabase service');
+
+      if (profileExists) {
+        // Update existing profile
+        const currentProfile = await profileService.getProfile(user.id);
+        if (currentProfile) {
+          const updatedProfile = { ...currentProfile, ...data };
+          await profileService.updateProfile(updatedProfile);
+        }
       } else {
-        toast({
-          title: "Profile Not Found",
-          description: "Could not find a profile to update.",
-          variant: "destructive",
-        });
+        // Create new profile
+        await profileService.createInitialProfile(user.id);
+        setProfileExists(true);
       }
     } catch (error) {
       console.error('Profile update error:', error);
-      toast({
-        title: "Update Failed",
-        description: "There was an error updating your profile. Please try again.",
-        variant: "destructive",
-      });
+      throw error;
     } finally {
       setLoading(false);
     }

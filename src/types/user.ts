@@ -1,24 +1,18 @@
 
 import { User as SupabaseUser } from '@supabase/supabase-js';
-import { UserRole } from './auth';
 
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl?: string;
-  role: UserRole;
-  preferences: {
-    theme: 'light' | 'dark';
-    language: string;
-  };
+export interface UserMetadata {
+  first_name?: string;
+  last_name?: string;
+  name?: string;
+  profile_picture_url?: string;
+  role?: string;
+  grade_level?: number;
+  age?: number;
+  [key: string]: any;
 }
 
 export interface User extends SupabaseUser {
-  user_metadata: {
-    name?: string;
-    avatar_url?: string;
-    role?: UserRole;
-  };
-  role: UserRole;
+  user_metadata: UserMetadata;
+  role?: string;
 }

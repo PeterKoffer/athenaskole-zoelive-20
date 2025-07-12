@@ -1,58 +1,58 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { SupabaseProfileService } from '@/services/learnerProfile/SupabaseProfileService';
-import { LearnerProfile } from '@/types/learnerProfile';
 
 const profileService = new SupabaseProfileService();
 
 export const useProfileFetch = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<LearnerProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [profileExists, setProfileExists] = useState(false);
 
-  const fetchProfile = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
     }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
     
     setLoading(true);
     setError(null);
     
     try {
+      console.log('Fetching profile with SupabaseProfileService');
       const learnerProfile = await profileService.getProfile(user.id);
+
       if (learnerProfile) {
-        setProfile(learnerProfile);
-        setProfileExists(true);
+        // Transform LearnerProfile to the format expected by the UI
+        const uiProfile = {
+          user_id: learnerProfile.userId,
+          name: learnerProfile.preferences?.preferredSubjects?.join(', ') || '',
+          email: '', // This might be available from auth.user if needed
+          // Map other fields as needed
+        };
+        setProfile(uiProfile);
       } else {
-        // If no profile exists, create one
-        const newProfile = await profileService.createInitialProfile(user.id);
-        setProfile(newProfile);
-        setProfileExists(true);
+        setProfile(null);
       }
     } catch (err) {
       console.error('Error fetching profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch profile');
-      setProfile(null);
-      setProfileExists(false);
     } finally {
       setLoading(false);
     }
-  }, [user]);
-
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  };
 
   return {
     profile,
     profileData: profile,
     setProfileData: setProfile,
-    profileExists,
-    setProfileExists,
+    profileExists: !!profile,
+    setProfileExists: () => {},
     loading,
     error,
     refetch: fetchProfile
