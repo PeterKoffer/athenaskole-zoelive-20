@@ -45,6 +45,12 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Science | 5     | Physical, Life, Earth & Space Sciences, Engineering Design                 | 🟠 In Progress (Course, placeholder LOs)                       | Next Generation Science Standards | Detail Domains, add more LOs and KCs               |
 | Science | 6-12  | (Various)                                                                  | ❌ Not Started                                               | Next Generation Science Standards | Expand Science coverage to Middle & High School |
 
+## United States (US) - Geography
+
+| Subject   | Grade | Focus Area                                                                 | Status                                                       | Primary Sources                 | Notes/Next Steps                                   |
+|-----------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|---------------------------------|----------------------------------------------------|
+| Geography | K-5   | Spatial Terms, Places & Regions, Human Systems                             | 🟠 In Progress (Course, 2 LOs per grade)                     | NatGeo / State Standards        | Detail Domains, add more LOs and KCs               |
+| Geography | 6-12  | (Various)                                                                  | ❌ Not Started                                               | NatGeo / State Standards        | Expand Geography to Middle & High School           |
 ## United States (US) - Mental Wellness
 
 | Subject         | Grade | Focus Area                                                                 | Status                                              | Primary Sources   | Notes/Next Steps                                     |

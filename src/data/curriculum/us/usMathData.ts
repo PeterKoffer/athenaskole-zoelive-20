@@ -206,6 +206,34 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'k-cc-5',
     parentId: 'k-cc',
     nodeType: 'learning_objective',
+    name: 'Write numbers from 0 to 20. Represent objects with numerals 0-20 (K.CC.A.3)',
+    description: 'Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.CC.A.3',
+    tags: ['number_writing', 'numerals', 'object_counting']
+  },
+  {
+    id: 'k-cc-4',
+    parentId: 'k-cc',
+    nodeType: 'learning_objective',
+    name: 'Understand relationship between numbers and quantities (K.CC.B.4)',
+    description: 'Understand the relationship between numbers and quantities; connect counting to cardinality.',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.CC.B.4',
+    tags: ['cardinality', 'quantity', 'one_to_one_correspondence']
+  },
+  {
+    id: 'k-cc-5',
+    parentId: 'k-cc',
+    nodeType: 'learning_objective',
+    name: 'Count to answer "how many?" (K.CC.B.5)',
+    description: 'Count to answer "how many?" questions about as many as 20 things arranged in a line, a rectangular array, or a circle, or as many as 10 things in a scattered configuration; given a number from 1-20, count out that many objects.',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.CC.B.5',
+    tags: ['object_counting', 'quantification']
     name: 'Count to answer "how many?" (K.CC.B.5)',
     description: 'Count to answer "how many?" questions about as many as 20 things arranged in a line, a rectangular array, or a circle, or as many as 10 things in a scattered configuration; given a number from 1-20, count out that many objects.',
     educationalLevel: 'K',
@@ -331,6 +359,39 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
   },
   {
     id: 'k-oa-2',
+    parentId: 'k-oa',
+    nodeType: 'learning_objective',
+    name: 'Represent addition and subtraction in various ways (K.OA.A.1)',
+    description: 'Represent addition and subtraction with objects, fingers, mental images, drawings, sounds (e.g., claps), acting out situations, verbal explanations, expressions, or equations.',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.OA.A.1',
+    tags: ['addition_representation', 'subtraction_representation']
+  },
+  {
+    id: 'k-oa-2',
+    parentId: 'k-oa',
+    nodeType: 'learning_objective',
+    name: 'Solve addition and subtraction word problems within 10 (K.OA.A.2)',
+    description: 'Solve addition and subtraction word problems, and add and subtract within 10, e.g., by using objects or drawings to represent the problem.',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.OA.A.2',
+    tags: ['word_problems', 'problem_solving_math']
+  },
+  {
+    id: 'k-oa-3',
+    parentId: 'k-oa',
+    nodeType: 'learning_objective',
+    name: 'Decompose numbers less than or equal to 10 (K.OA.A.3)',
+    description: 'Decompose numbers less than or equal to 10 into pairs in more than one way, e.g., by using objects or drawings, and record each decomposition by a drawing or equation (e.g., 5 = 2 + 3 and 5 = 4 + 1).',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.OA.A.3',
+    tags: ['number_decomposition', 'part_whole_relationships']
+  },
+  {
+    id: 'k-oa-4',
     parentId: 'k-oa',
     nodeType: 'learning_objective',
     name: 'Represent addition and subtraction in various ways (K.OA.A.1)',
@@ -540,6 +601,13 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     tags: ['operations', 'problem_solving', 'equations_grade1']
   },
   // 1.OA LOs (expanding existing)
+    educationalLevel: '1',
+    subjectName: 'Mathematics', // Retaining for now
+    subject: NELIESubject.MATH, // Added
+    sourceIdentifier: '1.OA',
+    tags: ['operations', 'problem_solving', 'equations_grade1']
+  },
+  // 1.OA LOs (expanding existing)
     id: 'us-math-3-measurement',
     parentId: 'us-math',
     nodeType: 'learning_objective',
@@ -577,6 +645,12 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'us-math-4-operations',
     parentId: 'us-math',
     nodeType: 'learning_objective',
+    name: 'Use addition and subtraction within 20 to solve word problems (1.OA.A.1)',
+    description: 'Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.A.1',
+    tags: ['word_problems', 'addition_within_20', 'subtraction_within_20']
     name: 'Operations and Algebraic Thinking',
     description: 'Represent and solve problems involving addition and subtraction. Understand and apply properties of operations and the relationship between addition and subtraction. Add and subtract within 20. Work with addition and subtraction equations.',
     educationalLevel: '1',
@@ -1408,6 +1482,39 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     nodeType: 'course',
     name: 'Grade 5 Mathematics',
     description: 'Fifth grade mathematics focusing on operations with fractions and decimals, understanding volume, and the coordinate plane.',
+    educationalLevel: '5',
+    subject: NELIESubject.MATH,
+    countryCode: 'US',
+    languageCode: 'en',
+    prerequisites: ['us-g4-math'],
+    tags: ['grade5', 'fractions_operations', 'decimals_operations', 'volume_concepts', 'coordinate_plane']
+  },
+  // G5 Domains
+  {
+    id: 'g5-oa',
+    parentId: 'us-g5-math',
+    nodeType: 'domain',
+    name: 'Operations & Algebraic Thinking (OA)',
+    description: 'Write and interpret numerical expressions. Analyze patterns and relationships.',
+    educationalLevel: '5',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: '5.OA',
+    tags: ['numerical_expressions_g5', 'order_of_operations_g5', 'patterns_analysis_g5']
+  },
+  {
+    id: 'g5-nbt',
+    parentId: 'us-g5-math',
+    nodeType: 'domain',
+    name: 'Number & Operations in Base Ten (NBT)',
+    description: 'Understand the place value system. Perform operations with multi-digit whole numbers and with decimals to hundredths.',
+    educationalLevel: '5',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: '5.NBT',
+    tags: ['place_value_decimals_g5', 'decimal_operations', 'multi_digit_arithmetic_g5']
+  },
+  {
+    id: 'g5-nf',
+    parentId: 'us-g5-math',
     countryCode: 'US',
     languageCode: 'en',
     prerequisites: ['us-1-math'],
