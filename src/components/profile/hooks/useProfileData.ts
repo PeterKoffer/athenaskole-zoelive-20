@@ -3,6 +3,7 @@ import { useProfileFetch } from "./useProfileFetch";
 import { useAvatarUpload } from "./useAvatarUpload";
 import { useProfileUpdate } from "./useProfileUpdate";
 import { UseProfileDataReturn } from "./types";
+import { LearnerProfile } from "@/types/learnerProfile";
 
 export const useProfileData = (): UseProfileDataReturn => {
   const {
@@ -20,7 +21,7 @@ export const useProfileData = (): UseProfileDataReturn => {
 
   const { loading: updateLoading, handleProfileUpdate: updateProfile } = useProfileUpdate();
 
-  const handleProfileUpdate = async (data: any) => {
+  const handleProfileUpdate = async (data: Partial<LearnerProfile>) => {
     await updateProfile(data);
     refetch();
   };

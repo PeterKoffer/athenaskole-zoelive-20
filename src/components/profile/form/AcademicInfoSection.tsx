@@ -1,42 +1,27 @@
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { School } from "lucide-react";
-import { ProfileData } from "../hooks/types";
+import { LearnerProfile } from "@/types/learnerProfile";
 
 interface AcademicInfoSectionProps {
-  profileData: ProfileData;
-  onInputChange: (field: keyof ProfileData, value: string) => void;
+  profileData: LearnerProfile;
+  onDataChange: (data: Partial<LearnerProfile>) => void;
 }
 
-const AcademicInfoSection = ({ profileData, onInputChange }: AcademicInfoSectionProps) => {
+const AcademicInfoSection = ({ profileData, onDataChange }: AcademicInfoSectionProps) => {
   return (
-    <>
-      <div className="space-y-3">
-        <Label htmlFor="grade" className="text-gray-300">Grade</Label>
-        <Input
-          id="grade"
-          value={profileData.grade}
-          onChange={(e) => onInputChange('grade', e.target.value)}
-          placeholder="e.g. 5th grade"
-          className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
-        />
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="school" className="text-gray-300 flex items-center">
-          <School className="w-4 h-4 mr-2" />
-          School
-        </Label>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-300">Academic Information</h3>
+      <div className="space-y-2">
+        <label htmlFor="school" className="text-gray-300">School</label>
         <Input
           id="school"
-          value={profileData.school}
-          onChange={(e) => onInputChange('school', e.target.value)}
-          placeholder="Your school name"
-          className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
+          type="text"
+          value={profileData?.school || ''}
+          onChange={(e) => onDataChange({ school: e.target.value })}
+          className="bg-gray-700 text-white border-gray-600"
         />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -52,6 +52,14 @@ export interface LearnerPreferences {
 
 export interface LearnerProfile {
   userId: string;
+  name?: string;
+  email?: string;
+  avatarUrl?: string;
+  avatarColor?: string;
+  birth_date?: string;
+  address?: string;
+  grade?: string;
+  school?: string;
   overall_mastery: number;
   kc_masteries: KcMastery[];
   kcMasteryMap?: Record<string, KnowledgeComponentMastery>;

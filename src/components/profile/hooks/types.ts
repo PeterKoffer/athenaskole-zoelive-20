@@ -1,20 +1,11 @@
 
-export interface ProfileData {
-  name: string;
-  email: string;
-  birth_date: string;
-  address: string;
-  grade: string;
-  school: string;
-  avatar_url?: string;
-  avatar_color?: string;
-}
+import { LearnerProfile } from '@/types/learnerProfile';
 
 export interface UseProfileDataReturn {
-  profileData: ProfileData;
-  setProfileData: (data: ProfileData) => void;
+  profileData: LearnerProfile | null;
+  setProfileData: (data: Partial<LearnerProfile>) => void;
   loading: boolean;
   uploading: boolean;
   handleAvatarUpload: (file: File) => Promise<void>;
-  handleProfileUpdate: (data: ProfileData) => Promise<void>;
+  handleProfileUpdate: (data: Partial<LearnerProfile>) => Promise<void>;
 }

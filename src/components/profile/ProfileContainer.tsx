@@ -7,6 +7,7 @@ import ProfileHeader from "./ProfileHeader";
 import ProfileTabs from "./ProfileTabs";
 import ProfileCard from "./ProfileCard";
 import { useProfileData } from "./hooks/useProfileData";
+import { LearnerProfile } from "@/types/learnerProfile";
 
 const ProfileContainer = () => {
   const navigate = useNavigate();
@@ -36,7 +37,15 @@ const ProfileContainer = () => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleProfileUpdate(profileData);
+    if (profileData) {
+      handleProfileUpdate(profileData);
+    }
+  };
+
+  const handleDataChange = (data: Partial<LearnerProfile>) => {
+    if (profileData) {
+      setProfileData({ ...profileData, ...data });
+    }
   };
 
   if (!user) {
@@ -56,12 +65,12 @@ const ProfileContainer = () => {
 
         <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {activeTab === "profile" && (
+        {activeTab === "profile" && profileData && (
           <ProfileCard
             profileData={profileData}
             loading={loading}
             uploading={uploading}
-            onDataChange={setProfileData}
+            onDataChange={handleDataChange}
             onSubmit={handleFormSubmit}
             onAvatarUpload={handleAvatarUploadWrapper}
           />

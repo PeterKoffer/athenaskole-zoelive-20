@@ -15,19 +15,6 @@ interface ProfileFormProps {
 }
 
 const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFormProps) => {
-  const handleInputChange = (field: keyof LearnerProfile, value: string) => {
-    onDataChange({ [field]: value });
-  };
-
-  const handlePreferencesChange = (field: string, value: any) => {
-    onDataChange({
-      preferences: {
-        ...profileData.preferences,
-        [field]: value,
-      },
-    });
-  };
-
   return (
     <form onSubmit={onSubmit} className="space-y-8 mt-6">
        <div className="space-y-2">

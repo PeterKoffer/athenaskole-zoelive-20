@@ -1,45 +1,39 @@
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { User, Calendar } from "lucide-react";
-import { ProfileData } from "../hooks/types";
+import { LearnerProfile } from "@/types/learnerProfile";
 
 interface PersonalInfoSectionProps {
-  profileData: ProfileData;
-  onInputChange: (field: keyof ProfileData, value: string) => void;
+  profileData: LearnerProfile;
+  onDataChange: (data: Partial<LearnerProfile>) => void;
 }
 
-const PersonalInfoSection = ({ profileData, onInputChange }: PersonalInfoSectionProps) => {
+const PersonalInfoSection = ({ profileData, onDataChange }: PersonalInfoSectionProps) => {
   return (
-    <>
-      <div className="space-y-3">
-        <Label htmlFor="name" className="text-gray-300 flex items-center">
-          <User className="w-4 h-4 mr-2" />
-          Full Name
-        </Label>
-        <Input
-          id="name"
-          value={profileData.name}
-          onChange={(e) => onInputChange('name', e.target.value)}
-          placeholder="Enter your name"
-          className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400"
-        />
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-300">Personal Information</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label htmlFor="birth_date" className="text-gray-300">Birth Date</label>
+          <Input
+            id="birth_date"
+            type="date"
+            value={profileData?.birth_date || ''}
+            onChange={(e) => onDataChange({ birth_date: e.target.value })}
+            className="bg-gray-700 text-white border-gray-600"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="grade" className="text-gray-300">Grade</label>
+          <Input
+            id="grade"
+            type="text"
+            value={profileData?.grade || ''}
+            onChange={(e) => onDataChange({ grade: e.target.value })}
+            className="bg-gray-700 text-white border-gray-600"
+          />
+        </div>
       </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="birth_date" className="text-gray-300 flex items-center">
-          <Calendar className="w-4 h-4 mr-2" />
-          Birth Date
-        </Label>
-        <Input
-          id="birth_date"
-          type="date"
-          value={profileData.birth_date}
-          onChange={(e) => onInputChange('birth_date', e.target.value)}
-          className="bg-gray-700 border-gray-600 text-white focus:border-purple-400"
-        />
-      </div>
-    </>
+    </div>
   );
 };
 
