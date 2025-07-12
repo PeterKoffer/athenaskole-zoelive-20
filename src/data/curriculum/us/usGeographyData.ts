@@ -1,3 +1,4 @@
+
 import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
@@ -90,6 +91,7 @@ export const usGeographyCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g3-geo-lo2', parentId: 'us-g3-geo-state', nodeType: 'learning_objective', name: 'Explain how the environment affects human activity in their region.',
     educationalLevel: '3', subject: NELIESubject.GEOGRAPHY, tags: ['human_environment_interaction', 'regional_adaptation'],
+  },
 
   // --- Grade 4: U.S. Regions ---
   {
@@ -108,7 +110,6 @@ export const usGeographyCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g4-geo-lo2', parentId: 'us-g4-geo-regions', nodeType: 'learning_objective', name: 'Compare the climate, landforms, and natural resources of different U.S. regions.',
     educationalLevel: '4', subject: NELIESubject.GEOGRAPHY, tags: ['regional_comparison', 'physical_systems', 'natural_resources'],
-     
   },
 
   // --- Grade 5: The United States in the World ---
