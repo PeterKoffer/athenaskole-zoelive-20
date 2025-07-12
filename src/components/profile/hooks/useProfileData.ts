@@ -8,7 +8,7 @@ import { LearnerProfile } from "@/types/learnerProfile";
 export const useProfileData = (): UseProfileDataReturn => {
   const {
     profileData,
-    setProfileData,
+    setProfileData: setProfileDataState,
     loading: fetchLoading,
     error: fetchError,
     refetch,
@@ -16,10 +16,17 @@ export const useProfileData = (): UseProfileDataReturn => {
 
   const { uploading, handleAvatarUpload } = useAvatarUpload(
     profileData,
-    setProfileData
+    setProfileDataState
   );
 
   const { loading: updateLoading, handleProfileUpdate: updateProfile } = useProfileUpdate();
+
+  // Create a wrapper function that handles partial updates
+  const setProfileData = (data: Partial<LearnerProfile>) => {
+    if (profileData) {
+      setProfileDataState({ ...profileData, ...data });
+    }
+  };
 
   const handleProfileUpdate = async (data: Partial<LearnerProfile>) => {
     await updateProfile(data);
