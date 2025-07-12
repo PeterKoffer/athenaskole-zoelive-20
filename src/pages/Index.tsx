@@ -16,7 +16,7 @@ const Index = () => {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate('/daily-program');
+      navigate('/daily-universe');
     } else {
       setShowAuthModal(true);
     }
@@ -24,7 +24,7 @@ const Index = () => {
 
   const handleLogin = () => {
     setShowAuthModal(false);
-    navigate('/daily-program');
+    navigate('/daily-universe');
   };
 
   return (
@@ -119,6 +119,13 @@ const Index = () => {
 
         {/* Quick Access Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mt-12">
+          <Button
+            onClick={() => navigate('/daily-universe')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Daily Universe
+          </Button>
           <Button
             onClick={() => navigate('/test')}
             variant="outline"

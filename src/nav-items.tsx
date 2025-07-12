@@ -1,10 +1,11 @@
 
-import { Home, TestTube, Eye, User } from "lucide-react";
+import { Home, TestTube, Eye, User, Calendar } from "lucide-react";
 import Index from "./pages/Index";
 import TestPage from "./pages/TestPage";
 import StealthAssessmentTest from "./pages/StealthAssessmentTest";
 import SimpleStealthTest from "./pages/SimpleStealthTest";
 import AuthPage from "./pages/AuthPage";
+import DailyUniversePage from "./pages/DailyUniversePage";
 
 export const navItems = [
   {
@@ -12,6 +13,12 @@ export const navItems = [
     to: "/",
     icon: <Home className="h-4 w-4" />,
     page: <Index />,
+  },
+  {
+    title: "Daily Universe",
+    to: "/daily-universe",
+    icon: <Calendar className="h-4 w-4" />,
+    page: <DailyUniversePage />,
   },
   {
     title: "Authentication",
