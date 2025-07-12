@@ -111,6 +111,7 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     subject: NELIESubject.MATH,
     sourceIdentifier: 'CCSS.Math.Content.K.CC.A.1',
     tags: ['counting', 'sequences', 'number_sense']
+
     name: 'Operations and Algebraic Thinking',
     description: 'Represent and solve problems involving addition and subtraction within 20.',
     educationalLevel: '1',
@@ -332,6 +333,17 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'k-oa-2',
     parentId: 'k-oa',
     nodeType: 'learning_objective',
+    name: 'Represent addition and subtraction in various ways (K.OA.A.1)',
+    description: 'Represent addition and subtraction with objects, fingers, mental images, drawings, sounds (e.g., claps), acting out situations, verbal explanations, expressions, or equations.',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.OA.A.1',
+    tags: ['addition_representation', 'subtraction_representation']
+  },
+  {
+    id: 'k-oa-2',
+    parentId: 'k-oa',
+    nodeType: 'learning_objective',
     name: 'Solve addition and subtraction word problems within 10 (K.OA.A.2)',
     description: 'Solve addition and subtraction word problems, and add and subtract within 10, e.g., by using objects or drawings to represent the problem.',
     educationalLevel: 'K',
@@ -519,6 +531,15 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: '1-oa',
     parentId: 'us-1-math',
     nodeType: 'domain',
+    name: 'Operations and Algebraic Thinking',
+    description: 'Represent and solve problems involving addition and subtraction. Understand and apply properties of operations and the relationship between addition and subtraction. Add and subtract within 20. Work with addition and subtraction equations.',
+    educationalLevel: '1',
+    subjectName: 'Mathematics', // Retaining for now
+    subject: NELIESubject.MATH, // Added
+    sourceIdentifier: '1.OA',
+    tags: ['operations', 'problem_solving', 'equations_grade1']
+  },
+  // 1.OA LOs (expanding existing)
     id: 'us-math-3-measurement',
     parentId: 'us-math',
     nodeType: 'learning_objective',
@@ -535,6 +556,12 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'us-math-3-geometry',
     parentId: 'us-math',
     nodeType: 'learning_objective',
+    name: 'Use addition and subtraction within 20 to solve word problems (1.OA.A.1)',
+    description: 'Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.A.1',
+    tags: ['word_problems', 'addition_within_20', 'subtraction_within_20']
     name: 'Geometry',
     description: 'Reason with shapes and their attributes.',
     educationalLevel: '3',
@@ -571,6 +598,174 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'us-math-4-base-ten',
     parentId: 'us-math',
     nodeType: 'learning_objective',
+    name: 'Solve word problems with three whole numbers (sum <= 20) (1.OA.A.2)',
+    description: 'Solve word problems that call for addition of three whole numbers whose sum is less than or equal to 20, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.A.2',
+    tags: ['three_addends', 'word_problems_addition']
+  },
+  {
+    id: '1-oa-6',
+    parentId: '1-oa',
+    nodeType: 'learning_objective',
+    name: 'Add and subtract within 20, demonstrating fluency for addition and subtraction within 10 (1.OA.C.6)',
+    description: 'Add and subtract within 20, demonstrating fluency for addition and subtraction within 10. Use strategies such as counting on; making ten; decomposing a number leading to a ten; using the relationship between addition and subtraction; and creating equivalent but easier or known sums.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.C.6',
+    tags: ['addition_fluency', 'subtraction_fluency', 'number_strategies']
+  },
+  {
+    id: '1-oa-7',
+    parentId: '1-oa',
+    nodeType: 'learning_objective',
+    name: 'Understand the meaning of the equal sign (1.OA.D.7)',
+    description: 'Understand the meaning of the equal sign, and determine if equations involving addition and subtraction are true or false. For example, which of the following equations are true and which are false? 6 = 6, 7 = 8 – 1, 5 + 2 = 2 + 5, 4 + 1 = 5 + 2.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.D.7',
+    tags: ['equal_sign', 'true_false_equations', 'equation_understanding']
+  },
+
+  // 1.NBT - Number & Operations in Base Ten
+  {
+    id: 'g1-nbt',
+    parentId: 'us-1-math',
+    nodeType: 'domain',
+    name: 'Number & Operations in Base Ten',
+    description: 'Extend the counting sequence. Understand place value. Use place value understanding and properties of operations to add and subtract.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: '1.NBT',
+    tags: ['place_value_grade1', 'counting_extended', 'two_digit_numbers']
+  },
+  {
+    id: 'g1-nbt-1',
+    parentId: 'g1-nbt',
+    nodeType: 'learning_objective',
+    name: 'Count to 120, starting at any number less than 120 (1.NBT.A.1)',
+    description: 'Count to 120, starting at any number less than 120. In this range, read and write numerals and represent a number of objects with a written numeral.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.NBT.A.1',
+    tags: ['counting_to_120', 'numeral_writing', 'number_representation']
+  },
+  {
+    id: 'g1-nbt-2',
+    parentId: 'g1-nbt',
+    nodeType: 'learning_objective',
+    name: 'Understand two-digit numbers as tens and ones (1.NBT.B.2)',
+    description: 'Understand that the two digits of a two-digit number represent amounts of tens and ones.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.NBT.B.2',
+    tags: ['place_value_tens_ones', 'two_digit_understanding']
+  },
+  {
+    id: 'g1-nbt-4',
+    parentId: 'g1-nbt',
+    nodeType: 'learning_objective',
+    name: 'Add within 100, including adding a two-digit number and a one-digit number (1.NBT.C.4)',
+    description: 'Add within 100, including adding a two-digit number and a one-digit number, and adding a two-digit number and a multiple of 10, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.NBT.C.4',
+    tags: ['addition_within_100', 'two_digit_addition', 'place_value_strategies']
+  },
+
+  // 1.MD - Measurement & Data
+  {
+    id: 'g1-md',
+    parentId: 'us-1-math',
+    nodeType: 'domain',
+    name: 'Measurement & Data',
+    description: 'Measure lengths indirectly and by iterating length units. Tell and write time. Represent and interpret data.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: '1.MD',
+    tags: ['measurement_grade1', 'time_telling', 'data_interpretation_grade1']
+  },
+  {
+    id: 'g1-md-1',
+    parentId: 'g1-md',
+    nodeType: 'learning_objective',
+    name: 'Order three objects by length; compare lengths (1.MD.A.1)',
+    description: 'Order three objects by length; compare the lengths of two objects indirectly by using a third object.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.MD.A.1',
+    tags: ['length_comparison', 'ordering_objects', 'indirect_measurement']
+  },
+  {
+    id: 'g1-md-3',
+    parentId: 'g1-md',
+    nodeType: 'learning_objective',
+    name: 'Tell and write time in hours and half-hours (1.MD.B.3)',
+    description: 'Tell and write time in hours and half-hours using analog and digital clocks.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.MD.B.3',
+    tags: ['time_telling_hours_halfhours', 'analog_clocks', 'digital_clocks']
+  },
+  {
+    id: 'g1-md-4',
+    parentId: 'g1-md',
+    nodeType: 'learning_objective',
+    name: 'Organize, represent, and interpret data with up to three categories (1.MD.C.4)',
+    description: 'Organize, represent, and interpret data with up to three categories; ask and answer questions about the total number of data points, how many in each category, and how many more or less are in one category than in another.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.MD.C.4',
+    tags: ['data_representation_grade1', 'bar_graphs_simple', 'data_analysis_simple']
+  },
+
+  // 1.G - Geometry
+  {
+    id: 'g1-g',
+    parentId: 'us-1-math',
+    nodeType: 'domain',
+    name: 'Geometry',
+    description: 'Reason with shapes and their attributes.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: '1.G',
+    tags: ['shapes_grade1', 'shape_attributes_grade1', 'composing_shapes']
+  },
+  {
+    id: 'g1-g-1',
+    parentId: 'g1-g',
+    nodeType: 'learning_objective',
+    name: 'Distinguish between defining attributes vs. non-defining attributes of shapes (1.G.A.1)',
+    description: 'Distinguish between defining attributes (e.g., triangles are closed and three-sided) versus non-defining attributes (e.g., color, orientation, overall size); build and draw shapes to possess defining attributes.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.G.A.1',
+    tags: ['shape_attributes', 'defining_attributes', 'drawing_shapes']
+  },
+  {
+    id: 'g1-g-2',
+    parentId: 'g1-g',
+    nodeType: 'learning_objective',
+    name: 'Compose two-dimensional or three-dimensional shapes (1.G.A.2)',
+    description: 'Compose two-dimensional shapes (rectangles, squares, trapezoids, triangles, half-circles, and quarter-circles) or three-dimensional shapes (cubes, right rectangular prisms, right circular cones, and right circular cylinders) to create a composite shape, and compose new shapes from the composite shape.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.G.A.2',
+    tags: ['composing_shapes_2d', 'composing_shapes_3d', 'composite_shapes']
+  },
+
+  // --- Grade 2 Mathematics ---
+  {
+    id: 'us-g2-math',
+    parentId: 'us-math',
+    nodeType: 'course',
+    name: 'Grade 2 Mathematics',
+    description: 'Second grade mathematics focusing on base-ten notation, fluency with addition/subtraction, measurement, and shapes.',
+    educationalLevel: '2',
+    subject: NELIESubject.MATH,
+    countryCode: 'US',
+    languageCode: 'en',
     name: 'Number and Operations in Base Ten',
     description: 'Generalize place value understanding for multi-digit whole numbers.',
     educationalLevel: '4',
