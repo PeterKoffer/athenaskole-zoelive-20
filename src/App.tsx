@@ -30,9 +30,10 @@ const App = () => (
               {/* Main content */}
               <div className="container mx-auto p-4">
                 <Routes>
-                  {navItems.map(({ to, page }) => (
-                    <Route key={to} path={to} element={page} />
-                  ))}
+                  {navItems.map(({ to, page }) => {
+                    console.log('Registering route:', to, page);
+                    return <Route key={to} path={to} element={page} />;
+                  })}
                   <Route path="/universe" element={<DailyUniversePage />} />
                   <Route path="/universe/*" element={<DailyUniversePage />} />
                   <Route path="/curriculum/:subject" element={<DailyUniversePage />} />
