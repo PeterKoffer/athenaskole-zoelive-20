@@ -9,6 +9,7 @@ import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData';
 import { usComputerScienceCurriculumData } from './us/usComputerScienceData';
 import { usCreativeArtsCurriculumData } from './us/usCreativeArtsData';
 import { usMusicCurriculumData } from './us/usMusicData'; // Import US Music
+import { usScienceCurriculumData } from './us/usScienceData';
 import { dkCurriculumNodes } from './dk/dkData';
 import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData';
 import { dkComputerScienceCurriculumData } from './dk/dkComputerScienceData';
@@ -25,6 +26,7 @@ export const mockCurriculumData: CurriculumNode[] = [
   ...usComputerScienceCurriculumData,
   ...usCreativeArtsCurriculumData,
   ...usMusicCurriculumData, // Add US Music
+  ...usScienceCurriculumData,
   ...dkCurriculumNodes,
   ...dkLifeEssentialsCurriculumData,
   ...dkComputerScienceCurriculumData,
