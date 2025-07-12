@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Settings, Volume2, Speech, Palette } from 'lucide-react';
+import { Settings, Volume2, Speech } from 'lucide-react';
 
 interface UserPreferences {
   speech_enabled: boolean;
@@ -36,7 +36,6 @@ const PreferencesPage = () => {
     
     setLoading(true);
     try {
-      // In a real app, this would save to the backend
       console.log('Saving preferences:', preferences);
       toast.success('Preferences saved successfully!');
     } catch (error) {
@@ -55,7 +54,7 @@ const PreferencesPage = () => {
     <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center">
+          <h1 className="text-3xl font-bold mb-2 flex items-center text-foreground">
             <Settings className="w-8 h-8 mr-3" />
             Preferences
           </h1>
@@ -64,7 +63,7 @@ const PreferencesPage = () => {
 
         <div className="grid gap-6">
           {/* Speech Settings */}
-          <Card className="bg-card border-border">
+          <Card className="border-border bg-card">
             <CardHeader>
               <CardTitle className="text-card-foreground flex items-center">
                 <Speech className="w-5 h-5 mr-2" />
@@ -73,7 +72,7 @@ const PreferencesPage = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
-                <Label htmlFor="speech-enabled" className="text-muted-foreground">
+                <Label htmlFor="speech-enabled" className="text-card-foreground">
                   Enable Text-to-Speech
                 </Label>
                 <Switch
@@ -86,7 +85,7 @@ const PreferencesPage = () => {
               {preferences.speech_enabled && (
                 <>
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">Speech Rate: {preferences.speech_rate}</Label>
+                    <Label className="text-card-foreground">Speech Rate: {preferences.speech_rate}</Label>
                     <Slider
                       value={[preferences.speech_rate]}
                       onValueChange={([value]) => updatePreference('speech_rate', value)}
@@ -98,7 +97,7 @@ const PreferencesPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">Speech Pitch: {preferences.speech_pitch}</Label>
+                    <Label className="text-card-foreground">Speech Pitch: {preferences.speech_pitch}</Label>
                     <Slider
                       value={[preferences.speech_pitch]}
                       onValueChange={([value]) => updatePreference('speech_pitch', value)}
@@ -110,12 +109,12 @@ const PreferencesPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">Preferred Voice</Label>
+                    <Label className="text-card-foreground">Preferred Voice</Label>
                     <Select
                       value={preferences.preferred_voice}
                       onValueChange={(value) => updatePreference('preferred_voice', value)}
                     >
-                      <SelectTrigger className="bg-input border-border text-foreground">
+                      <SelectTrigger className="bg-background border-border text-foreground">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-popover border-border">
@@ -130,7 +129,7 @@ const PreferencesPage = () => {
           </Card>
 
           {/* Auto-Read Settings */}
-          <Card className="bg-card border-border">
+          <Card className="border-border bg-card">
             <CardHeader>
               <CardTitle className="text-card-foreground flex items-center">
                 <Volume2 className="w-5 h-5 mr-2" />
@@ -139,7 +138,7 @@ const PreferencesPage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="auto-read-questions" className="text-muted-foreground">
+                <Label htmlFor="auto-read-questions" className="text-card-foreground">
                   Automatically read questions aloud
                 </Label>
                 <Switch
@@ -150,7 +149,7 @@ const PreferencesPage = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="auto-read-explanations" className="text-muted-foreground">
+                <Label htmlFor="auto-read-explanations" className="text-card-foreground">
                   Automatically read explanations aloud
                 </Label>
                 <Switch
@@ -167,7 +166,7 @@ const PreferencesPage = () => {
             <Button
               onClick={handleSavePreferences}
               disabled={loading}
-              className="bg-gradient-to-r from-purple-400 to-cyan-400 hover:from-purple-500 hover:to-cyan-500 text-white px-8"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
             >
               {loading ? 'Saving...' : 'Save Preferences'}
             </Button>
