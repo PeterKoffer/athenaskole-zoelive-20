@@ -1,100 +1,162 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, TestTube, Shield, GraduationCap } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, BookOpen, Users, BarChart3, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import AuthModal from "@/components/AuthModal";
+import AuthTestHelper from "@/components/auth/AuthTestHelper";
+import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/daily-program');
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
+  const handleLogin = () => {
+    setShowAuthModal(false);
+    navigate('/daily-program');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to the Learning Platform
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Navigation */}
+      <nav className="flex justify-between items-center p-6">
+        <div className="text-2xl font-bold text-white">
+          NELIE
+        </div>
+        <NavbarUserMenu user={user} onGetStarted={handleGetStarted} />
+      </nav>
+
+      {/* Hero Section */}
+      <main className="container mx-auto px-6 py-12">
+        <div className="text-center max-w-4xl mx-auto mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            Personalized Learning
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-cyan-400">
+              {" "}with AI
+            </span>
           </h1>
-          <p className="text-xl text-gray-600">
-            Explore our educational tools and curriculum system
+          <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+            NELIE adapts to every student's learning style, providing real-time feedback
+            and personalized educational experiences that help students excel.
           </p>
-        </header>
+          <Button
+            onClick={handleGetStarted}
+            size="lg"
+            className="bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold text-lg px-8 py-4 border-none"
+          >
+            Get Started <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-blue-600" />
-                Daily Universe
-              </CardTitle>
-              <CardDescription>
-                Explore personalized learning objectives from our curriculum index
-              </CardDescription>
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-all">
+            <CardHeader className="text-center">
+              <BookOpen className="w-12 h-12 text-lime-400 mx-auto mb-4" />
+              <CardTitle className="text-white">Adaptive Content</CardTitle>
             </CardHeader>
             <CardContent>
-              <Link to="/universe">
-                <Button className="w-full">
-                  View Daily Universe
-                </Button>
-              </Link>
+              <p className="text-gray-300 text-center">
+                Content that adjusts to your learning pace and style
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TestTube className="h-5 w-5 text-green-600" />
-                Test Page
-              </CardTitle>
-              <CardDescription>
-                Test various system components and functionality
-              </CardDescription>
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-all">
+            <CardHeader className="text-center">
+              <BarChart3 className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+              <CardTitle className="text-white">Real-time Analytics</CardTitle>
             </CardHeader>
             <CardContent>
-              <Link to="/test">
-                <Button variant="outline" className="w-full">
-                  Go to Tests
-                </Button>
-              </Link>
+              <p className="text-gray-300 text-center">
+                Track progress and identify areas for improvement
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <GraduationCap className="h-5 w-5 text-purple-600" />
-                Educational Simulator
-              </CardTitle>
-              <CardDescription>
-                Interactive educational simulation environment
-              </CardDescription>
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-all">
+            <CardHeader className="text-center">
+              <Users className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+              <CardTitle className="text-white">Collaborative Learning</CardTitle>
             </CardHeader>
             <CardContent>
-              <Link to="/educational-simulator">
-                <Button variant="outline" className="w-full">
-                  Launch Simulator
-                </Button>
-              </Link>
+              <p className="text-gray-300 text-center">
+                Connect with peers and learn together
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-orange-600" />
-                Stealth Assessment
-              </CardTitle>
-              <CardDescription>
-                Advanced assessment and evaluation tools
-              </CardDescription>
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-all">
+            <CardHeader className="text-center">
+              <Shield className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+              <CardTitle className="text-white">Safe Environment</CardTitle>
             </CardHeader>
             <CardContent>
-              <Link to="/stealth-assessment-test">
-                <Button variant="outline" className="w-full">
-                  Try Assessment
-                </Button>
-              </Link>
+              <p className="text-gray-300 text-center">
+                GDPR-compliant and privacy-focused platform
+              </p>
             </CardContent>
           </Card>
         </div>
-      </div>
+
+        {/* Development Helper - Only show in development */}
+        {import.meta.env.DEV && (
+          <div className="max-w-md mx-auto">
+            <AuthTestHelper />
+          </div>
+        )}
+
+        {/* Quick Access Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mt-12">
+          <Button
+            onClick={() => navigate('/test')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Test Page
+          </Button>
+          <Button
+            onClick={() => navigate('/stealth-assessment-test')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Stealth Assessment Test
+          </Button>
+          <Button
+            onClick={() => navigate('/simple-stealth-test')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Simple Stealth Test
+          </Button>
+          <Button
+            onClick={() => navigate('/auth')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Auth Page
+          </Button>
+        </div>
+      </main>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLogin={handleLogin}
+        />
+      )}
     </div>
   );
 };
