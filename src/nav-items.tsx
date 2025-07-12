@@ -2,12 +2,9 @@
 import { Home, BookOpen, Calendar, User, Settings, Calculator, TestTube } from "lucide-react";
 import Index from "./pages/Index";
 import DailyUniversePage from "./pages/DailyUniversePage";
-import Profile from "./pages/Profile";
-import PreferencesPage from "./pages/PreferencesPage";
-import MathPage from "./pages/MathPage";
 import ProfilePage from "./pages/ProfilePage";
-
-console.log('PreferencesPage component:', PreferencesPage);
+import PreferencesPage from "./pages/PreferencesPage";
+import Auth from "./pages/Auth";
 
 export const navItems = [
   {
@@ -26,7 +23,7 @@ export const navItems = [
     title: "Profile",
     to: "/profile",
     icon: <User className="h-4 w-4" />,
-    page: <Profile />,
+    page: <ProfilePage />,
   },
   {
     title: "Preferences",
@@ -35,27 +32,9 @@ export const navItems = [
     page: <PreferencesPage />,
   },
   {
-    title: "Profile",
-    to: "/profile",
-    icon: <User className="h-4 w-4" />,
-    page: <ProfilePage />,
-  },
-  {
     title: "Authentication",
     to: "/auth",
     icon: <User className="h-4 w-4" />,
-    page: <AuthPage />,
-  },
-  {
-    title: "Simulator",
-    to: "/simulator",
-    icon: <TestTube className="h-4 w-4" />,
-    page: <SimulationsPage />,
-  },
-  {
-    title: "Auth",
-    to: "/auth",
-    icon: <User className="h-4 w-4" />,
-    page: <AuthPage />,
+    page: <Auth />,
   },
 ];
