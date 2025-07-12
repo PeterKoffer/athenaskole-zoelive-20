@@ -5,8 +5,9 @@ import DailyUniversePage from "./pages/DailyUniversePage";
 import Profile from "./pages/Profile";
 import PreferencesPage from "./pages/PreferencesPage";
 import MathPage from "./pages/MathPage";
-import SimulationsPage from "./pages/SimulationsPage";
-import AuthPage from "./pages/AuthPage";
+import ProfilePage from "./pages/ProfilePage";
+
+console.log('PreferencesPage component:', PreferencesPage);
 
 export const navItems = [
   {
@@ -34,10 +35,16 @@ export const navItems = [
     page: <PreferencesPage />,
   },
   {
-    title: "Math",
-    to: "/math",
-    icon: <Calculator className="h-4 w-4" />,
-    page: <MathPage />,
+    title: "Profile",
+    to: "/profile",
+    icon: <User className="h-4 w-4" />,
+    page: <ProfilePage />,
+  },
+  {
+    title: "Authentication",
+    to: "/auth",
+    icon: <User className="h-4 w-4" />,
+    page: <AuthPage />,
   },
   {
     title: "Simulator",

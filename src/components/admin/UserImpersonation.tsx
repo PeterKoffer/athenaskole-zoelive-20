@@ -30,12 +30,17 @@ const UserImpersonation = () => {
     }
 
     try {
-      // User impersonation would typically require admin-level API calls
-      // This is a placeholder for the actual implementation
+      const { error } = await supabase.auth.signIn({
+        id: targetUserId,
+      });
+
+      if (error) {
+        throw error;
+      }
+
       toast({
-        title: 'Error',
-        description: 'User impersonation requires server-side implementation.',
-        variant: 'destructive',
+        title: 'Success',
+        description: `Successfully impersonating user ${targetUserId}.`,
       });
     } catch (error) {
       toast({
