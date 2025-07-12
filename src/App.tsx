@@ -31,7 +31,7 @@ const App = () => (
                 {navItems.map(({ to, page }) => (
                   <Route key={to} path={to} element={page} />
                 ))}
-                <Route path="/universe" element={<DailyUniversePage />} />
+                
               </Routes>
               
               {/* Test component for profile service */}

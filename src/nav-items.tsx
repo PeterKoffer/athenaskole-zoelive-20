@@ -17,7 +17,7 @@ export const navItems = [
   },
   {
     title: "Daily Universe",
-    to: "/daily-universe",
+    to: "/universe",
     icon: <Calendar className="h-4 w-4" />,
     page: <DailyUniversePage />,
   },
