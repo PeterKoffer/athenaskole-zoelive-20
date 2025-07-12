@@ -1,15 +1,12 @@
 
-import { Home, TestTube, Eye, User, Calendar, Settings, Calculator } from "lucide-react";
+import { Home, BookOpen, Calendar, User, Settings, Calculator, TestTube } from "lucide-react";
 import Index from "./pages/Index";
-import TestPage from "./pages/TestPage";
-import StealthAssessmentTest from "./pages/StealthAssessmentTest";
-import SimpleStealthTest from "./pages/SimpleStealthTest";
-import AuthPage from "./pages/AuthPage";
 import DailyUniversePage from "./pages/DailyUniversePage";
+import Profile from "./pages/Profile";
 import PreferencesPage from "./pages/PreferencesPage";
 import MathPage from "./pages/MathPage";
-
-console.log('PreferencesPage component:', PreferencesPage);
+import SimulationsPage from "./pages/SimulationsPage";
+import AuthPage from "./pages/AuthPage";
 
 export const navItems = [
   {
@@ -20,15 +17,15 @@ export const navItems = [
   },
   {
     title: "Daily Universe",
-    to: "/universe",
+    to: "/daily-universe",
     icon: <Calendar className="h-4 w-4" />,
     page: <DailyUniversePage />,
   },
   {
-    title: "Math",
-    to: "/math",
-    icon: <Calculator className="h-4 w-4" />,
-    page: <MathPage />,
+    title: "Profile",
+    to: "/profile",
+    icon: <User className="h-4 w-4" />,
+    page: <Profile />,
   },
   {
     title: "Preferences",
@@ -37,27 +34,21 @@ export const navItems = [
     page: <PreferencesPage />,
   },
   {
-    title: "Authentication",
+    title: "Math",
+    to: "/math",
+    icon: <Calculator className="h-4 w-4" />,
+    page: <MathPage />,
+  },
+  {
+    title: "Simulator",
+    to: "/simulator",
+    icon: <TestTube className="h-4 w-4" />,
+    page: <SimulationsPage />,
+  },
+  {
+    title: "Auth",
     to: "/auth",
     icon: <User className="h-4 w-4" />,
     page: <AuthPage />,
-  },
-  {
-    title: "Test Page",
-    to: "/test",
-    icon: <TestTube className="h-4 w-4" />,
-    page: <TestPage />,
-  },
-  {
-    title: "Stealth Assessment Test",
-    to: "/stealth-assessment-test",
-    icon: <Eye className="h-4 w-4" />,
-    page: <StealthAssessmentTest />,
-  },
-  {
-    title: "Simple Stealth Test",
-    to: "/simple-stealth-test",
-    icon: <Eye className="h-4 w-4" />,
-    page: <SimpleStealthTest />,
   },
 ];
