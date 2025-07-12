@@ -7,6 +7,7 @@ import AdminToolsDropdown from "@/components/admin/AdminToolsDropdown";
 import AdminQuickActions from "@/components/admin/AdminQuickActions";
 import AdminTabsContent from "@/components/admin/AdminTabsContent";
 import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
+import UserImpersonation from "@/components/admin/UserImpersonation";
 import { AdminStats } from "@/types/admin";
 
 const AdminDashboard = () => {
@@ -42,6 +43,8 @@ const AdminDashboard = () => {
           <AdminToolsDropdown onShowAIInsights={handleShowAIInsights} />
           <AdminQuickActions onShowAIInsights={handleShowAIInsights} />
         </div>
+
+        <UserImpersonation />
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 bg-gray-800">
