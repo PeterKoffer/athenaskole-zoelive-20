@@ -38,8 +38,6 @@ const App = () => (
                   <Route path="/curriculum/:subject" element={<DailyUniversePage />} />
                   <Route path="/curriculum/:subject/:grade" element={<DailyUniversePage />} />
                   <Route path="/curriculum/:subject/:grade/:topic" element={<DailyUniversePage />} />
-                  {/* Catch-all route */}
-                  <Route path="*" element={<DailyUniversePage />} />
                 </Routes>
                 
                 {/* Test component for profile service */}
