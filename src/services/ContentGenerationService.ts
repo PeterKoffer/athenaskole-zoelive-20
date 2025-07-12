@@ -1,8 +1,27 @@
+
 import curriculumIndex from '../data/unified-curriculum-index.json';
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 
 class ContentGenerationService {
   private curriculum: { [key: string]: CurriculumNode } = curriculumIndex;
+
+import curriculumIndex from '../data/unified-curriculum-index.json';
+import { CurriculumNode, CurriculumNodeType } from '../types/curriculum/CurriculumNode';
+
+class ContentGenerationService {
+  private curriculum: { [key: string]: CurriculumNode } = {};
+
+  constructor() {
+    // Convert the imported JSON data to proper CurriculumNode objects
+    this.curriculum = Object.keys(curriculumIndex).reduce((acc, key) => {
+      const rawNode = curriculumIndex[key as keyof typeof curriculumIndex];
+      acc[key] = {
+        ...rawNode,
+        nodeType: rawNode.nodeType as CurriculumNodeType
+      } as CurriculumNode;
+      return acc;
+    }, {} as { [key: string]: CurriculumNode });
+  }
 
   public getCurriculumNodeById(id: string): CurriculumNode | undefined {
     return this.curriculum[id];
@@ -29,6 +48,9 @@ class ContentGenerationService {
       ...teacherPrefs?.subject_weights,
       ...teacherPrefs?.weekly_emphasis,
     };
+  public generateDailyUniverse(studentProfile: any): any {
+    // This is a placeholder for the more complex logic to be implemented.
+    // For now, let's just grab a few random learning objectives.
 
     const learningObjectives = Object.values(this.curriculum).filter(
       node => node.nodeType === 'learning_objective'
@@ -48,6 +70,14 @@ class ContentGenerationService {
       title: "A Personalized Day of Adventure!",
       description: "Today, you'll embark on a journey of learning and discovery, tailored to your school's and teacher's focus. Complete these tasks to help your community and earn rewards!",
       objectives: selectedObjectives,
+    const randomObjectives = learningObjectives
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 3);
+
+    return {
+      title: "A Day of Adventure!",
+      description: "Today, you'll embark on a journey of learning and discovery. Complete these tasks to help your community and earn rewards!",
+      objectives: randomObjectives,
     };
   }
 }

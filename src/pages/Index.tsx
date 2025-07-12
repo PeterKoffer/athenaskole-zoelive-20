@@ -16,7 +16,7 @@ const Index = () => {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate('/daily-program');
+      navigate('/daily-universe');
     } else {
       setShowAuthModal(true);
     }
@@ -24,7 +24,7 @@ const Index = () => {
 
   const handleLogin = () => {
     setShowAuthModal(false);
-    navigate('/daily-program');
+    navigate('/daily-universe');
   };
 
   return (
@@ -47,10 +47,10 @@ const Index = () => {
             </span>
           </h1>
           <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-            NELIE adapts to every student's learning style, providing real-time feedback 
+            NELIE adapts to every student's learning style, providing real-time feedback
             and personalized educational experiences that help students excel.
           </p>
-          <Button 
+          <Button
             onClick={handleGetStarted}
             size="lg"
             className="bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold text-lg px-8 py-4 border-none"
@@ -119,28 +119,35 @@ const Index = () => {
 
         {/* Quick Access Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mt-12">
-          <Button 
+          <Button
+            onClick={() => navigate('/daily-universe')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Daily Universe
+          </Button>
+          <Button
             onClick={() => navigate('/test')}
             variant="outline"
             className="border-white/20 text-white hover:bg-white/10"
           >
             Test Page
           </Button>
-          <Button 
+          <Button
             onClick={() => navigate('/stealth-assessment-test')}
             variant="outline"
             className="border-white/20 text-white hover:bg-white/10"
           >
             Stealth Assessment Test
           </Button>
-          <Button 
+          <Button
             onClick={() => navigate('/simple-stealth-test')}
             variant="outline"
             className="border-white/20 text-white hover:bg-white/10"
           >
             Simple Stealth Test
           </Button>
-          <Button 
+          <Button
             onClick={() => navigate('/auth')}
             variant="outline"
             className="border-white/20 text-white hover:bg-white/10"
@@ -152,7 +159,7 @@ const Index = () => {
 
       {/* Auth Modal */}
       {showAuthModal && (
-        <AuthModal 
+        <AuthModal
           onClose={() => setShowAuthModal(false)}
           onLogin={handleLogin}
         />
