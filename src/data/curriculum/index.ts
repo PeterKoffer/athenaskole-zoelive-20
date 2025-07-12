@@ -12,6 +12,8 @@ import { usMusicCurriculumData } from './us/usMusicData'; // Import US Music
 import { usScienceCurriculumData } from './us/usScienceData';
 import { usGeographyCurriculumData } from './us/usGeographyData';
 import { usHistoryCurriculumData } from './us/usHistoryData';
+import { usPECurriculumData } from './us/usPEData';
+import { usSpanishCurriculumData } from './us/usSpanishData';
 import { dkCurriculumNodes } from './dk/dkData';
 import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData';
 import { dkComputerScienceCurriculumData } from './dk/dkComputerScienceData';
@@ -31,6 +33,8 @@ export const mockCurriculumData: CurriculumNode[] = [
   ...usScienceCurriculumData,
   ...usHistoryCurriculumData,
   ...usGeographyCurriculumData,
+  ...usPECurriculumData,
+  ...usSpanishCurriculumData,
   ...dkCurriculumNodes,
   ...dkLifeEssentialsCurriculumData,
   ...dkComputerScienceCurriculumData,

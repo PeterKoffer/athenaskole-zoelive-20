@@ -190,9 +190,9 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 | Subject                 | Status         | Notes                                  |
 |-------------------------|----------------|----------------------------------------|
 | Science (DK)            | ❌ Not Started | No Danish Science data found           |
-| Social Studies (US, DK) | ❌ Not Started | No Social Studies data found           |
-| Physical Education      | ❌ Not Started | No Physical Education data found       |
-| Other Languages (US)    | ❌ Not Started | No 'Other Languages' data for US found |
+| Social Studies (US, DK) | 🟠 In Progress | US K-5 structure added, DK not started |
+| Physical Education      | 🟡 Basic Structure | US K-5 structure added, DK not started |
+| World Languages         | 🟡 Basic Structure | US K-5 Spanish structure added, DK not started |
 | Mental Wellness (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Life Essentials (DK)    | 🟡 Basic Structure | Root subject node exists, needs LOs    |
 | Computer Science (DK)   | 🟡 Basic Structure | Root subject node exists, needs LOs    |

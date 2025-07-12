@@ -394,6 +394,114 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
     tags: ['informational_text', 'questioning', 'key_details']
   },
   {
+  },
+  // K ELA: Reading Literature (RL) Domain
+  {
+    id: 'k-ela-rl',
+    parentId: 'us-k-ela',
+    nodeType: 'domain',
+    name: 'Reading: Literature (RL)',
+    description: 'Key Ideas and Details, Craft and Structure, Integration of Knowledge and Ideas for Kindergarten literature.',
+    educationalLevel: 'K',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'literature', 'kindergarten']
+  },
+  // K ELA: Reading Informational Text (RI) Domain
+  {
+    id: 'k-ela-ri',
+    parentId: 'us-k-ela',
+    nodeType: 'domain',
+    name: 'Reading: Informational Text (RI)',
+    description: 'Key Ideas and Details, Craft and Structure, Integration of Knowledge and Ideas for Kindergarten informational text.',
+    educationalLevel: 'K',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['reading', 'informational_text', 'kindergarten']
+  },
+  // K ELA: Writing (W) Domain
+  {
+    id: 'k-ela-w',
+    parentId: 'us-k-ela',
+    nodeType: 'domain',
+    name: 'Writing (W)',
+    description: 'Text Types and Purposes, Production and Distribution of Writing, Research to Build and Present Knowledge for Kindergarten.',
+    educationalLevel: 'K',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['writing', 'composition', 'kindergarten']
+  },
+  // K ELA: Speaking & Listening (SL) Domain
+  {
+    id: 'k-ela-sl',
+    parentId: 'us-k-ela',
+    nodeType: 'domain',
+    name: 'Speaking & Listening (SL)',
+    description: 'Comprehension and Collaboration, Presentation of Knowledge and Ideas for Kindergarten.',
+    educationalLevel: 'K',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['speaking', 'listening', 'communication', 'kindergarten']
+  },
+  // K ELA: Language (L) Domain
+  {
+    id: 'k-ela-l',
+    parentId: 'us-k-ela',
+    nodeType: 'domain',
+    name: 'Language (L)',
+    description: 'Conventions of Standard English, Knowledge of Language, Vocabulary Acquisition and Use for Kindergarten.',
+    educationalLevel: 'K',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['language', 'grammar', 'vocabulary', 'kindergarten']
+  },
+  // K LOs for RL
+  {
+    id: 'k-ela-rl-lo1',
+    parentId: 'k-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'With prompting and support, ask and answer questions about key details in a text. (RL.K.1)',
+    description: 'With prompting and support, ask and answer questions about key details in a text.',
+    educationalLevel: 'K',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.K.1',
+    tags: ['reading_comprehension', 'questioning', 'key_details']
+  },
+  {
+    id: 'k-ela-rl-lo2',
+    parentId: 'k-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'With prompting and support, retell familiar stories. (RL.K.2)',
+    description: 'With prompting and support, retell familiar stories, including key details.',
+    educationalLevel: 'K',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.K.2',
+    tags: ['story_retelling', 'key_details']
+  },
+  {
+    id: 'k-ela-rl-lo3',
+    parentId: 'k-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Identify characters, settings, and major events. (RL.K.3)',
+    description: 'With prompting and support, identify characters, settings, and major events in a story.',
+    educationalLevel: 'K',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.K.3',
+    tags: ['story_elements', 'characters', 'settings', 'events']
+  },
+  // K LOs for RI
+  {
+    id: 'k-ela-ri-lo1',
+    parentId: 'k-ela-ri',
+    nodeType: 'learning_objective',
+    name: 'Ask and answer questions about key details in an informational text. (RI.K.1)',
+    description: 'With prompting and support, ask and answer questions about key details in a text.',
+    educationalLevel: 'K',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RI.K.1',
+    tags: ['informational_text', 'questioning', 'key_details']
+  },
+  {
     id: 'k-ela-ri-lo2',
     parentId: 'k-ela-ri',
     nodeType: 'learning_objective',
@@ -617,6 +725,88 @@ export const usElaCurriculumNodes: CurriculumNode[] = [
     tags: ['reading', 'phonics', 'fluency', 'grade1']
   },
    // G1 ELA: Writing (W) Domain
+  {
+    id: 'g1-ela-w',
+    parentId: 'us-1-ela',
+    nodeType: 'domain',
+    name: 'Writing (W)',
+    description: 'Text Types and Purposes, Production and Distribution of Writing, Research to Build and Present Knowledge for Grade 1.',
+    educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['writing', 'composition', 'grade1']
+  },
+  // G1 ELA: Speaking & Listening (SL) Domain
+  {
+    id: 'g1-ela-sl',
+    parentId: 'us-1-ela',
+    nodeType: 'domain',
+    name: 'Speaking & Listening (SL)',
+    description: 'Comprehension and Collaboration, Presentation of Knowledge and Ideas for Grade 1.',
+    educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['speaking', 'listening', 'communication', 'grade1']
+  },
+  // G1 ELA: Language (L) Domain
+  {
+    id: 'g1-ela-l',
+    parentId: 'us-1-ela',
+    nodeType: 'domain',
+    name: 'Language (L)',
+    description: 'Conventions of Standard English, Knowledge of Language, Vocabulary Acquisition and Use for Grade 1.',
+    educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
+    tags: ['language', 'grammar', 'vocabulary', 'grade1']
+  },
+  // G1 LOs for RL
+  {
+    id: 'g1-ela-rl-lo1',
+    parentId: 'g1-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Ask and answer questions about key details in a text. (RL.1.1)',
+    description: 'Ask and answer questions about key details in a text.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.1.1',
+    tags: ['reading_comprehension', 'questioning', 'key_details']
+  },
+  {
+    id: 'g1-ela-rl-lo2',
+    parentId: 'g1-ela-rl',
+    nodeType: 'learning_objective',
+    name: 'Retell stories, including key details (RL.1.2)',
+    description: 'Retell stories, including key details, and demonstrate understanding of their central message or lesson.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RL.1.2',
+    tags: ['story_retelling', 'central_message']
+  },
+  // G1 LOs for RI
+  {
+    id: 'g1-ela-ri-lo1',
+    parentId: 'g1-ela-ri',
+    nodeType: 'learning_objective',
+    name: 'Ask and answer questions about key details in an informational text. (RI.1.1)',
+    description: 'Ask and answer questions about key details in a text.',
+    educationalLevel: '1',
+    subject: NELIESubject.ENGLISH,
+    sourceIdentifier: 'CCSS.ELA-Literacy.RI.1.1',
+    tags: ['informational_text', 'questioning', 'key_details']
+  },
+  // G1 LOs for RF (adding to existing 1-rf-1)
+  {
+    id: '1-rf-1', // Existing LO
+    parentId: '1-rf',
+    nodeType: 'learning_objective',
+    name: 'Demonstrate understanding of spoken words, syllables, and sounds (phonemes). (RF.1.2)',
+    description: 'Demonstrate understanding of spoken words, syllables, and sounds (phonemes).',
+    countryCode: 'US',
+    languageCode: 'en',
+    educationalLevel: '1',
+    subjectName: 'English Language Arts',
+    subject: NELIESubject.ENGLISH,
   {
     id: 'g1-ela-w',
     parentId: 'us-1-ela',

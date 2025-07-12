@@ -217,6 +217,17 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'k-cc-4',
     parentId: 'k-cc',
     nodeType: 'learning_objective',
+    name: 'Write numbers from 0 to 20. Represent objects with numerals 0-20 (K.CC.A.3)',
+    description: 'Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.CC.A.3',
+    tags: ['number_writing', 'numerals', 'object_counting']
+  },
+  {
+    id: 'k-cc-4',
+    parentId: 'k-cc',
+    nodeType: 'learning_objective',
     name: 'Understand relationship between numbers and quantities (K.CC.B.4)',
     description: 'Understand the relationship between numbers and quantities; connect counting to cardinality.',
     educationalLevel: 'K',
@@ -405,6 +416,17 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     id: 'k-oa-2',
     parentId: 'k-oa',
     nodeType: 'learning_objective',
+    name: 'Represent addition and subtraction in various ways (K.OA.A.1)',
+    description: 'Represent addition and subtraction with objects, fingers, mental images, drawings, sounds (e.g., claps), acting out situations, verbal explanations, expressions, or equations.',
+    educationalLevel: 'K',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.K.OA.A.1',
+    tags: ['addition_representation', 'subtraction_representation']
+  },
+  {
+    id: 'k-oa-2',
+    parentId: 'k-oa',
+    nodeType: 'learning_objective',
     name: 'Solve addition and subtraction word problems within 10 (K.OA.A.2)',
     description: 'Solve addition and subtraction word problems, and add and subtract within 10, e.g., by using objects or drawings to represent the problem.',
     educationalLevel: 'K',
@@ -568,6 +590,7 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     languageCode: 'en',
     estimatedDuration: 40,
     tags: ['place_value', 'multi_digit', 'arithmetic', 'grade_3'],
+
   },
   {
     id: 'us-math-3-fractions',
@@ -587,6 +610,7 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     tags: ['elementary', 'foundational', 'grade1'] // Added grade1 tag
     estimatedDuration: 35,
     tags: ['fractions', 'number_line', 'equivalent_fractions', 'grade_3'],
+
   },
   {
     id: '1-oa',
@@ -601,6 +625,10 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     tags: ['operations', 'problem_solving', 'equations_grade1']
   },
   // 1.OA LOs (expanding existing)
+  {
+    id: '1-oa-1',
+    parentId: '1-oa',
+    nodeType: 'learning_objective',
     educationalLevel: '1',
     subjectName: 'Mathematics', // Retaining for now
     subject: NELIESubject.MATH, // Added
@@ -630,6 +658,7 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
     subject: NELIESubject.MATH,
     sourceIdentifier: 'CCSS.Math.Content.1.OA.A.1',
     tags: ['word_problems', 'addition_within_20', 'subtraction_within_20']
+  },
     name: 'Geometry',
     description: 'Reason with shapes and their attributes.',
     educationalLevel: '3',
@@ -671,6 +700,17 @@ export const usMathCurriculumNodes: CurriculumNode[] = [
   {
     id: 'us-math-4-base-ten',
     parentId: 'us-math',
+    nodeType: 'learning_objective',
+    name: 'Solve word problems with three whole numbers (sum <= 20) (1.OA.A.2)',
+    description: 'Solve word problems that call for addition of three whole numbers whose sum is less than or equal to 20, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.',
+    educationalLevel: '1',
+    subject: NELIESubject.MATH,
+    sourceIdentifier: 'CCSS.Math.Content.1.OA.A.2',
+    tags: ['three_addends', 'word_problems_addition']
+  },
+  {
+    id: '1-oa-6',
+    parentId: '1-oa',
     nodeType: 'learning_objective',
     name: 'Solve word problems with three whole numbers (sum <= 20) (1.OA.A.2)',
     description: 'Solve word problems that call for addition of three whole numbers whose sum is less than or equal to 20, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.',
