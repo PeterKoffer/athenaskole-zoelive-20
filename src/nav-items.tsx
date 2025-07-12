@@ -9,6 +9,8 @@ import DailyUniversePage from "./pages/DailyUniversePage";
 import PreferencesPage from "./pages/PreferencesPage";
 import MathPage from "./pages/MathPage";
 
+console.log('PreferencesPage component:', PreferencesPage);
+
 export const navItems = [
   {
     title: "Home",
