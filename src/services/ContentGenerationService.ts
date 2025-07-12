@@ -1,8 +1,21 @@
+
 import curriculumIndex from '../data/unified-curriculum-index.json';
-import { CurriculumNode } from '../types/curriculum/CurriculumNode';
+import { CurriculumNode, CurriculumNodeType } from '../types/curriculum/CurriculumNode';
 
 class ContentGenerationService {
-  private curriculum: { [key: string]: CurriculumNode } = curriculumIndex;
+  private curriculum: { [key: string]: CurriculumNode } = {};
+
+  constructor() {
+    // Convert the imported JSON data to proper CurriculumNode objects
+    this.curriculum = Object.keys(curriculumIndex).reduce((acc, key) => {
+      const rawNode = curriculumIndex[key as keyof typeof curriculumIndex];
+      acc[key] = {
+        ...rawNode,
+        nodeType: rawNode.nodeType as CurriculumNodeType
+      } as CurriculumNode;
+      return acc;
+    }, {} as { [key: string]: CurriculumNode });
+  }
 
   public getCurriculumNodeById(id: string): CurriculumNode | undefined {
     return this.curriculum[id];
