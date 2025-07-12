@@ -61,10 +61,4 @@ export const navItems = [
     icon: <Eye className="h-4 w-4" />,
     page: <SimpleStealthTest />,
   },
-  {
-    title: "Preferences",
-    to: "/preferences",
-    icon: <Settings className="h-4 w-4" />,
-    page: <PreferencesPage />,
-  },
 ];

@@ -35,19 +35,9 @@ const App = () => (
                 <Route path="/universe" element={<DailyUniversePage />} />
               </Routes>
               
-              {/* Main content */}
-              <div className="container mx-auto p-4">
-                <Routes>
-                  {navItems.map(({ to, page }) => (
-                    <Route key={to} path={to} element={page} />
-                  ))}
-                  
-                </Routes>
-                
-                {/* Test component for profile service */}
-                <div className="mt-8">
-                  <ProfileServiceTest />
-                </div>
+              {/* Test component for profile service */}
+              <div className="mt-8">
+                <ProfileServiceTest />
               </div>
             </div>
           </BrowserRouter>
