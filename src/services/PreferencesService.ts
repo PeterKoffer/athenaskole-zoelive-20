@@ -1,3 +1,4 @@
+
 import { supabase } from '../integrations/supabase/client';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
@@ -9,72 +10,99 @@ export interface SchoolPreferences {
   id?: string;
   school_id: string;
   subject_weights: SubjectWeights;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface TeacherPreferences extends SchoolPreferences {
+export interface TeacherPreferences {
+  id?: string;
   teacher_id: string;
+  school_id: string;
+  subject_weights: SubjectWeights;
   weekly_emphasis?: SubjectWeights;
+  created_at?: string;
+  updated_at?: string;
 }
 
 class PreferencesService {
   async getSchoolPreferences(schoolId: string): Promise<SchoolPreferences | null> {
-    const { data, error } = await supabase
-      .from('school_preferences')
-      .select('*')
-      .eq('school_id', schoolId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('school_preferences')
+        .select('*')
+        .eq('school_id', schoolId)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error fetching school preferences:', error);
+      if (error) {
+        console.error('Error fetching school preferences:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getSchoolPreferences:', error);
       return null;
     }
-
-    return data;
   }
 
   async updateSchoolPreferences(preferences: SchoolPreferences): Promise<SchoolPreferences | null> {
-    const { data, error } = await supabase
-      .from('school_preferences')
-      .upsert(preferences, { onConflict: 'school_id' })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('school_preferences')
+        .upsert(preferences, { onConflict: 'school_id' })
+        .select()
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error updating school preferences:', error);
+      if (error) {
+        console.error('Error updating school preferences:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in updateSchoolPreferences:', error);
       return null;
     }
-
-    return data;
   }
 
   async getTeacherPreferences(teacherId: string): Promise<TeacherPreferences | null> {
-    const { data, error } = await supabase
-      .from('teacher_preferences')
-      .select('*')
-      .eq('teacher_id', teacherId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('teacher_preferences')
+        .select('*')
+        .eq('teacher_id', teacherId)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error fetching teacher preferences:', error);
+      if (error) {
+        console.error('Error fetching teacher preferences:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getTeacherPreferences:', error);
       return null;
     }
-
-    return data;
   }
 
   async updateTeacherPreferences(preferences: TeacherPreferences): Promise<TeacherPreferences | null> {
-    const { data, error } = await supabase
-      .from('teacher_preferences')
-      .upsert(preferences, { onConflict: 'teacher_id' })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('teacher_preferences')
+        .upsert(preferences, { onConflict: 'teacher_id' })
+        .select()
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error updating teacher preferences:', error);
+      if (error) {
+        console.error('Error updating teacher preferences:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in updateTeacherPreferences:', error);
       return null;
     }
-
-    return data;
   }
 }
 
