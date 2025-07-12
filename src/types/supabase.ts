@@ -62,6 +62,58 @@ export interface Database {
           created_at?: string
         }
       }
+      school_preferences: {
+        Row: {
+          id: string
+          school_id: string
+          subject_weights: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          school_id: string
+          subject_weights?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          school_id?: string
+          subject_weights?: Json
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      teacher_preferences: {
+        Row: {
+          id: string
+          teacher_id: string
+          school_id: string
+          subject_weights: Json
+          weekly_emphasis: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          teacher_id: string
+          school_id: string
+          subject_weights?: Json
+          weekly_emphasis?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          teacher_id?: string
+          school_id?: string
+          subject_weights?: Json
+          weekly_emphasis?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

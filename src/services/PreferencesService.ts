@@ -6,26 +6,8 @@ export type SubjectWeights = {
   [key in NELIESubject]?: number;
 };
 
-export interface SchoolPreferences {
-  id?: string;
-  school_id: string;
-  subject_weights: SubjectWeights;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface TeacherPreferences {
-  id?: string;
-  teacher_id: string;
-  school_id: string;
-  subject_weights: SubjectWeights;
-  weekly_emphasis?: SubjectWeights;
-  created_at?: string;
-  updated_at?: string;
-}
-
 class PreferencesService {
-  async getSchoolPreferences(schoolId: string): Promise<SchoolPreferences | null> {
+  async getSchoolPreferences(schoolId: string) {
     try {
       const { data, error } = await supabase
         .from('school_preferences')
@@ -45,7 +27,11 @@ class PreferencesService {
     }
   }
 
-  async updateSchoolPreferences(preferences: SchoolPreferences): Promise<SchoolPreferences | null> {
+  async updateSchoolPreferences(preferences: {
+    school_id: string;
+    subject_weights: SubjectWeights;
+    id?: string;
+  }) {
     try {
       const { data, error } = await supabase
         .from('school_preferences')
@@ -65,7 +51,7 @@ class PreferencesService {
     }
   }
 
-  async getTeacherPreferences(teacherId: string): Promise<TeacherPreferences | null> {
+  async getTeacherPreferences(teacherId: string) {
     try {
       const { data, error } = await supabase
         .from('teacher_preferences')
@@ -85,7 +71,13 @@ class PreferencesService {
     }
   }
 
-  async updateTeacherPreferences(preferences: TeacherPreferences): Promise<TeacherPreferences | null> {
+  async updateTeacherPreferences(preferences: {
+    teacher_id: string;
+    school_id: string;
+    subject_weights: SubjectWeights;
+    weekly_emphasis?: SubjectWeights;
+    id?: string;
+  }) {
     try {
       const { data, error } = await supabase
         .from('teacher_preferences')
