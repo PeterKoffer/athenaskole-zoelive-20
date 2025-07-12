@@ -10,8 +10,16 @@ import { ThemeProvider } from "./components/theme-provider";
 import ProfileServiceTest from "./components/ProfileServiceTest";
 import ProfileDebugButton from "./components/ProfileDebugButton";
 import DailyUniversePage from "./pages/DailyUniversePage";
+import { crossOriginHandler, debugCrossOriginIssues } from "./utils/CrossOriginHandler";
+import { RequireAuth } from "./components/AuthHandler";
 
 const queryClient = new QueryClient();
+
+// Initialize cross-origin handler and debug utilities in development
+if (import.meta.env.DEV) {
+  console.log('🔧 Development mode: Cross-origin handler initialized');
+  debugCrossOriginIssues();
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -32,9 +40,15 @@ const App = () => (
               <div className="container mx-auto p-4">
                 <Routes>
                   {navItems.map(({ to, page }) => (
-                    <Route key={to} path={to} element={page} />
+                    <Route key={to} path={to} element={<RequireAuth>{page}</RequireAuth>} />
                   ))}
-                  <Route path="/universe" element={<DailyUniversePage />} />
+                  <Route path="/universe" element={<RequireAuth><DailyUniversePage /></RequireAuth>} />
+                  <Route path="/universe/*" element={<RequireAuth><DailyUniversePage /></RequireAuth>} />
+                  <Route path="/curriculum/:subject" element={<RequireAuth><DailyUniversePage /></RequireAuth>} />
+                  <Route path="/curriculum/:subject/:grade" element={<RequireAuth><DailyUniversePage /></RequireAuth>} />
+                  <Route path="/curriculum/:subject/:grade/:topic" element={<RequireAuth><DailyUniversePage /></RequireAuth>} />
+                  {/* Catch-all route */}
+                  <Route path="*" element={<RequireAuth><DailyUniversePage /></RequireAuth>} />
                 </Routes>
                 
                 {/* Test component for profile service */}
