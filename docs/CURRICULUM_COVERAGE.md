@@ -51,6 +51,65 @@ This document tracks the status of curriculum data across all NELIE subjects, co
 |-----------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|---------------------------------|----------------------------------------------------|
 | Geography | K-5   | Spatial Terms, Places & Regions, Human Systems                             | 🟠 In Progress (Course, 2 LOs per grade)                     | NatGeo / State Standards        | Detail Domains, add more LOs and KCs               |
 | Geography | 6-12  | (Various)                                                                  | ❌ Not Started                                               | NatGeo / State Standards        | Expand Geography to Middle & High School           |
+## United States (US) - Mental Wellness
+
+| Subject         | Grade | Focus Area                                                                 | Status                                              | Primary Sources   | Notes/Next Steps                                     |
+|-----------------|-------|----------------------------------------------------------------------------|-----------------------------------------------------|-------------------|------------------------------------------------------|
+| Mental Wellness | K     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 1     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 2     | Emotional Awareness, Self-Regulation, Social Connection, Resilience Building | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 3     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 4     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 5     | Emotional Intelligence, Stress Management, Healthy Relationships, Growth Mindset | 🟠 In Progress (Course, Domains, 4 LOs per domain)  | User Guidelines | Add KCs, expand LO details                           |
+| Mental Wellness | 6-12  | (Various)                                                                  | ❌ Not Started                                      | User Guidelines | Expand Mental Wellness to Middle & High School |
+
+## United States (US) - Life Essentials
+
+| Subject         | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                     |
+|-----------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|------------------------------------------------------|
+| Life Essentials | K     | Personal Care & Health, Safety & Emergency Skills, Money Basics, Social Skills & Relationships | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 1     | Personal Care & Health, Safety & Emergency Skills, Money Basics, Social Skills & Relationships | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 2     | Personal Care & Health, Safety & Emergency Skills, Money Basics, Social Skills & Relationships | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 3     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 4     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 5     | Health & Body Awareness, Safety & Emergency Response, Money & Consumer Skills, Life Skills | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                           |
+| Life Essentials | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Life Essentials to Middle & High School     |
+
+## United States (US) - Computer Science
+
+| Subject          | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                       |
+|------------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|--------------------------------------------------------|
+| Computer Science | K     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 1     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 2     | Computer Basics, Internet & Digital Citizenship, Computational Thinking, Creative Computing | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 3     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 4     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 5     | Hardware & Software, Internet & Networks, Programming Fundamentals, Data & Information, Digital Creation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                             |
+| Computer Science | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Computer Science to Middle & High School grades |
+
+## United States (US) - Creative Arts
+
+| Subject       | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                   |
+|---------------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|----------------------------------------------------|
+| Creative Arts | K     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 1     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 2     | Visual Elements, Art Materials & Techniques, Creative Expression, Art Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 3     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 4     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 5     | Visual Design Principles, Advanced Techniques, Digital Arts Introduction, Cultural Arts, Creative Problem Solving | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                         |
+| Creative Arts | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Creative Arts to Middle & High School grades |
+
+## United States (US) - Music
+
+| Subject | Grade | Focus Area                                                                 | Status                                                       | Primary Sources   | Notes/Next Steps                                |
+|---------|-------|----------------------------------------------------------------------------|--------------------------------------------------------------|-------------------|-------------------------------------------------|
+| Music   | K     | Musical Elements, Singing & Vocal Development, Instrument Exploration, Music & Movement, Music Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 1     | Musical Elements, Singing & Vocal Development, Instrument Exploration, Music & Movement, Music Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 2     | Musical Elements, Singing & Vocal Development, Instrument Exploration, Music & Movement, Music Appreciation | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 3     | Music Theory Foundations, Instrumental Skills, Vocal Development, Music Creation, Cultural Music Studies | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 4     | Music Theory Foundations, Instrumental Skills, Vocal Development, Music Creation, Cultural Music Studies | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 5     | Music Theory Foundations, Instrumental Skills, Vocal Development, Music Creation, Cultural Music Studies | 🟠 In Progress (Key LOs populated based on User Guidelines)  | User Guidelines | Add KCs, expand LO details                      |
+| Music   | 6-12  | (Various)                                                                  | ❌ Not Started                                               | User Guidelines | Expand Music to Middle & High School grades |
 
 ## United States (US) - Mental Wellness
 

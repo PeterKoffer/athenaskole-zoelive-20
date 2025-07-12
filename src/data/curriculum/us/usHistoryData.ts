@@ -42,6 +42,47 @@ export const usHistoryCurriculumData: CurriculumNode[] = [
   {
     id: 'us-k-history-history-lo1', parentId: 'us-k-history-history', nodeType: 'learning_objective', name: 'Distinguish between events that happened long ago and today.',
     educationalLevel: 'K', subject: NELIESubject.HISTORY_RELIGION, tags: ['time_continuity_change', 'chronology_basics'],
+    countryCode: 'US',
+    languageCode: 'en',
+    tags: ['kindergarten', 'community', 'self_awareness'],
+  },
+  // K Domains
+  {
+    id: 'us-k-history-civics',
+    parentId: 'us-k-history',
+    nodeType: 'domain',
+    name: 'Civics & Governance',
+    educationalLevel: 'K',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['rules', 'citizenship_basics'],
+  },
+  {
+    id: 'us-k-history-history',
+    parentId: 'us-k-history',
+    nodeType: 'domain',
+    name: 'History',
+    educationalLevel: 'K',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['past_present', 'family_history'],
+  },
+  // K LOs
+  {
+    id: 'us-k-history-civics-lo1',
+    parentId: 'us-k-history-civics',
+    nodeType: 'learning_objective',
+    name: 'Follow rules in school and community.',
+    educationalLevel: 'K',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['rules', 'community_living', 'civic_ideals'],
+  },
+  {
+    id: 'us-k-history-history-lo1',
+    parentId: 'us-k-history-history',
+    nodeType: 'learning_objective',
+    name: 'Distinguish between events that happened long ago and today.',
+    educationalLevel: 'K',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['time_continuity_change', 'chronology_basics'],
   },
 
   // --- Grade 1: My Community ---
@@ -61,6 +102,35 @@ export const usHistoryCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g1-history-geo-lo1', parentId: 'us-g1-history', nodeType: 'learning_objective', name: 'Describe the location of places in the community.',
     educationalLevel: '1', subject: NELIESubject.HISTORY_RELIGION, tags: ['local_geography', 'people_places_environments'],
+    id: 'us-g1-history',
+    parentId: 'us-history',
+    nodeType: 'course',
+    name: 'Grade 1 Social Studies',
+    description: 'Focus on the local community, its people, and its history.',
+    educationalLevel: '1',
+    subject: NELIESubject.HISTORY_RELIGION,
+    countryCode: 'US',
+    languageCode: 'en',
+    tags: ['grade1', 'local_community', 'community_helpers'],
+  },
+  // G1 LOs
+  {
+    id: 'us-g1-history-civics-lo1',
+    parentId: 'us-g1-history', // Assuming domain nodes will be added later
+    nodeType: 'learning_objective',
+    name: 'Identify the roles of community helpers.',
+    educationalLevel: '1',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['community_roles', 'civics', 'individuals_groups_institutions'],
+  },
+  {
+    id: 'us-g1-history-geo-lo1',
+    parentId: 'us-g1-history',
+    nodeType: 'learning_objective',
+    name: 'Describe the location of places in the community.',
+    educationalLevel: '1',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['local_geography', 'people_places_environments'],
   },
 
   // --- Grade 2: Our World ---
@@ -80,6 +150,35 @@ export const usHistoryCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g2-history-culture-lo1', parentId: 'us-g2-history', nodeType: 'learning_objective', name: 'Compare family life in different cultures.',
     educationalLevel: '2', subject: NELIESubject.HISTORY_RELIGION, tags: ['culture', 'global_connections', 'family_life'],
+    id: 'us-g2-history',
+    parentId: 'us-history',
+    nodeType: 'course',
+    name: 'Grade 2 Social Studies',
+    description: 'Expanding understanding to the broader world, including different cultures and historical figures.',
+    educationalLevel: '2',
+    subject: NELIESubject.HISTORY_RELIGION,
+    countryCode: 'US',
+    languageCode: 'en',
+    tags: ['grade2', 'world_cultures', 'historical_figures'],
+  },
+  // G2 LOs
+  {
+    id: 'us-g2-history-history-lo1',
+    parentId: 'us-g2-history',
+    nodeType: 'learning_objective',
+    name: 'Describe the contributions of historical figures.',
+    educationalLevel: '2',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['biographies', 'us_history', 'time_continuity_change'],
+  },
+  {
+    id: 'us-g2-history-culture-lo1',
+    parentId: 'us-g2-history',
+    nodeType: 'learning_objective',
+    name: 'Compare family life in different cultures.',
+    educationalLevel: '2',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['culture', 'global_connections', 'family_life'],
   },
 
   // --- Grade 3: Our State & Region ---
@@ -103,6 +202,35 @@ export const usHistoryCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g3-history-gov-lo1', parentId: 'us-g3-history-gov', nodeType: 'learning_objective', name: 'Explain the basic functions of local government.',
     educationalLevel: '3', subject: NELIESubject.HISTORY_RELIGION, tags: ['local_government', 'civics', 'power_authority_governance'],
+    id: 'us-g3-history',
+    parentId: 'us-history',
+    nodeType: 'course',
+    name: 'Grade 3 Social Studies',
+    description: 'Focus on the history, geography, and government of the local state and region.',
+    educationalLevel: '3',
+    subject: NELIESubject.HISTORY_RELIGION,
+    countryCode: 'US',
+    languageCode: 'en',
+    tags: ['grade3', 'state_history', 'regional_geography'],
+  },
+  // G3 LOs
+  {
+    id: 'us-g3-history-history-lo1',
+    parentId: 'us-g3-history',
+    nodeType: 'learning_objective',
+    name: 'Describe the history of the local state or region.',
+    educationalLevel: '3',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['local_history', 'state_studies', 'time_continuity_change'],
+  },
+  {
+    id: 'us-g3-history-gov-lo1',
+    parentId: 'us-g3-history',
+    nodeType: 'learning_objective',
+    name: 'Explain the basic functions of local government.',
+    educationalLevel: '3',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['local_government', 'civics', 'power_authority_governance'],
   },
 
   // --- Grade 4: U.S. Regions ---
@@ -126,6 +254,35 @@ export const usHistoryCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g4-history-econ-lo1', parentId: 'us-g4-history-econ', nodeType: 'learning_objective', name: 'Describe the economic activities of different U.S. regions.',
     educationalLevel: '4', subject: NELIESubject.HISTORY_RELIGION, tags: ['us_economy', 'regional_economy', 'production_distribution_consumption'],
+    id: 'us-g4-history',
+    parentId: 'us-history',
+    nodeType: 'course',
+    name: 'Grade 4 Social Studies',
+    description: 'Study of the different regions of the United States.',
+    educationalLevel: '4',
+    subject: NELIESubject.HISTORY_RELIGION,
+    countryCode: 'US',
+    languageCode: 'en',
+    tags: ['grade4', 'us_regions', 'regional_studies'],
+  },
+  // G4 LOs
+  {
+    id: 'us-g4-history-geo-lo1',
+    parentId: 'us-g4-history',
+    nodeType: 'learning_objective',
+    name: 'Identify the major geographic features of different U.S. regions.',
+    educationalLevel: '4',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['us_geography', 'regions', 'people_places_environments'],
+  },
+  {
+    id: 'us-g4-history-econ-lo1',
+    parentId: 'us-g4-history',
+    nodeType: 'learning_objective',
+    name: 'Describe the economic activities of different U.S. regions.',
+    educationalLevel: '4',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['us_economy', 'regional_economy', 'production_distribution_consumption'],
   },
 
   // --- Grade 5: U.S. History and Government ---
@@ -149,5 +306,34 @@ export const usHistoryCurriculumData: CurriculumNode[] = [
   {
     id: 'us-g5-history-civics-lo1', parentId: 'us-g5-history-civics', nodeType: 'learning_objective', name: 'Explain the key principles of the U.S. Constitution.',
     educationalLevel: '5', subject: NELIESubject.HISTORY_RELIGION, tags: ['us_constitution', 'civics', 'power_authority_governance'],
+    id: 'us-g5-history',
+    parentId: 'us-history',
+    nodeType: 'course',
+    name: 'Grade 5 Social Studies',
+    description: 'Early U.S. history from pre-colonial times through the American Revolution.',
+    educationalLevel: '5',
+    subject: NELIESubject.HISTORY_RELIGION,
+    countryCode: 'US',
+    languageCode: 'en',
+    tags: ['grade5', 'us_history_early', 'american_revolution'],
+  },
+  // G5 LOs
+  {
+    id: 'us-g5-history-history-lo1',
+    parentId: 'us-g5-history',
+    nodeType: 'learning_objective',
+    name: 'Describe the motivations of early European explorers.',
+    educationalLevel: '5',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['age_of_exploration', 'us_history_colonial', 'time_continuity_change'],
+  },
+  {
+    id: 'us-g5-history-civics-lo1',
+    parentId: 'us-g5-history',
+    nodeType: 'learning_objective',
+    name: 'Explain the key principles of the U.S. Constitution.',
+    educationalLevel: '5',
+    subject: NELIESubject.HISTORY_RELIGION,
+    tags: ['us_constitution', 'civics', 'power_authority_governance'],
   }
 ];
