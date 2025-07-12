@@ -8,6 +8,7 @@ import { navItems } from "./nav-items";
 import { AuthProvider } from "./hooks/useAuth";
 import ProfileServiceTest from "./components/ProfileServiceTest";
 import ProfileDebugButton from "./components/ProfileDebugButton";
+import DailyUniversePage from "./pages/DailyUniversePage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
                 {navItems.map(({ to, page }) => (
                   <Route key={to} path={to} element={page} />
                 ))}
+                <Route path="/universe" element={<DailyUniversePage />} />
               </Routes>
               
               {/* Test component for profile service */}
