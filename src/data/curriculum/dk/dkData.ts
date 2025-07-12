@@ -1,5 +1,6 @@
 
 import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
+import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 export const dkCurriculumNodes: CurriculumNode[] = [
   // Denmark Root
@@ -24,6 +25,7 @@ export const dkCurriculumNodes: CurriculumNode[] = [
     countryCode: 'DK',
     languageCode: 'da',
     subjectName: 'Mathematics',
+    subject: NELIESubject.MATH,
     tags: ['core_subject', 'stem']
   },
 
@@ -35,7 +37,8 @@ export const dkCurriculumNodes: CurriculumNode[] = [
     description: 'Fundamental arithmetic: addition, subtraction, multiplication, and division',
     countryCode: 'DK',
     languageCode: 'da',
-    subjectName: 'Mathematics',
+    subjectName: 'Mathematics', // Retaining for potential display purposes
+    subject: NELIESubject.MATH,
     estimatedDuration: 60,
     tags: ['arithmetic', 'foundational']
   },
@@ -49,8 +52,9 @@ export const dkCurriculumNodes: CurriculumNode[] = [
     description: 'Danish language and literature curriculum',
     countryCode: 'DK',
     languageCode: 'da',
-    subjectName: 'Danish Language',
-    tags: ['core_subject', 'language']
+    subjectName: 'Danish Language', // Retaining for potential display purposes
+    subject: NELIESubject.WORLD_LANGUAGES, // Or a more specific 'DANISH' if added to enum
+    tags: ['core_subject', 'language', 'native_language']
   },
 
   {
@@ -61,7 +65,8 @@ export const dkCurriculumNodes: CurriculumNode[] = [
     description: 'Developing reading skills and text comprehension in Danish',
     countryCode: 'DK',
     languageCode: 'da',
-    subjectName: 'Danish Language',
+    subjectName: 'Danish Language', // Retaining for potential display purposes
+    subject: NELIESubject.WORLD_LANGUAGES, // Or a more specific 'DANISH'
     estimatedDuration: 45,
     tags: ['reading', 'comprehension']
   }
