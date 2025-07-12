@@ -23,6 +23,7 @@ import StealthAssessmentTest from "./pages/StealthAssessmentTest";
 import AuthPage from "./pages/AuthPage";
 import EducationalSimulatorPage from "./pages/EducationalSimulatorPage";
 import DailyUniversePage from "./pages/DailyUniversePage";
+import SimulatorPage from "./pages/SimulatorPage";
 
 // Import other components
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -64,6 +65,7 @@ root.render(
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/universe" element={<DailyUniversePage />} />
+              <Route path="/simulator" element={<SimulatorPage />} />
               <Route path="/test" element={<TestPage />} />
               <Route path="/stealth-assessment-test" element={<StealthAssessmentTest />} />
               <Route path="/simple-stealth-test" element={<SimpleStealthTest />} />
