@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User } from "lucide-react";
 import AvatarUpload from "./AvatarUpload";
 import ProfileForm from "./ProfileForm";
-import { ProfileData } from "./hooks/types";
+import { LearnerProfile } from "@/types/learnerProfile";
 
 interface ProfileCardProps {
-  profileData: ProfileData;
+  profileData: LearnerProfile;
   loading: boolean;
   uploading: boolean;
-  onDataChange: (data: ProfileData) => void;
+  onDataChange: (data: Partial<LearnerProfile>) => void;
   onSubmit: (e: React.FormEvent) => void;
   onAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -22,6 +22,14 @@ const ProfileCard = ({
   onSubmit, 
   onAvatarUpload 
 }: ProfileCardProps) => {
+  if (loading) {
+    return <div>Loading profile...</div>;
+  }
+
+  if (!profileData) {
+    return <div>No profile data found.</div>
+  }
+
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
@@ -32,11 +40,11 @@ const ProfileCard = ({
       </CardHeader>
       <CardContent>
         <AvatarUpload
-          avatarUrl={profileData.avatar_url}
+          avatarUrl={profileData.avatarUrl}
           name={profileData.name}
           uploading={uploading}
           onUpload={onAvatarUpload}
-          avatarColor={profileData.avatar_color}
+          avatarColor={profileData.avatarColor}
         />
         <ProfileForm
           profileData={profileData}
