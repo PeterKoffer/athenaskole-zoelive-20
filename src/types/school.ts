@@ -79,4 +79,5 @@ export interface TeachingPerspectiveSettings {
   wishes?: string;  // Wishes, requests, or topics to emphasize
   avoid?: string;   // Topics or themes to avoid
   lastUpdated?: string;
+  subjectWeights?: { [subjectId: string]: number };
 }

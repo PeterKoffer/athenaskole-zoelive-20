@@ -20,6 +20,14 @@ const perspectiveOptions: { label: string, value: TeachingPerspectiveType }[] = 
   { label: "Custom", value: "custom" },
 ];
 
+const subjects = [
+    { id: 'math', name: 'Mathematics' },
+    { id: 'science', name: 'Science' },
+    { id: 'history', name: 'History' },
+    { id: 'english', name: 'English' },
+    { id: 'art', name: 'Art' },
+];
+
 export default function TeachingPerspectiveSettingsPanel() {
   // Call ALL hooks first, before any conditional logic
   const { userRole } = useRoleAccess();
@@ -41,6 +49,16 @@ export default function TeachingPerspectiveSettingsPanel() {
     setForm(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleSubjectWeightChange = (subjectId: string, weight: number) => {
+    setForm((prev) => ({
+      ...prev,
+      subjectWeights: {
+        ...prev.subjectWeights,
+        [subjectId]: weight,
+      },
     }));
   };
 
@@ -107,6 +125,25 @@ export default function TeachingPerspectiveSettingsPanel() {
             className="bg-gray-700 text-white border-gray-600"
             placeholder="Are there things you'd like to avoid, e.g. sensitive topics?"
           />
+        </div>
+        <div className="mb-4">
+            <label className="block mb-2 text-gray-200">Subject Weights</label>
+            {subjects.map((subject) => (
+                <div key={subject.id} className="mb-2">
+                <label className="block mb-1 text-gray-400">{subject.name}</label>
+                <Slider
+                    value={[form.subjectWeights?.[subject.id] ?? 1]}
+                    min={0.5}
+                    max={2}
+                    step={0.1}
+                    onValueChange={(value) => handleSubjectWeightChange(subject.id, value[0])}
+                    className="mb-2"
+                />
+                <div className="text-xs text-gray-400">
+                    Weight: {form.subjectWeights?.[subject.id] ?? 1}
+                </div>
+                </div>
+            ))}
         </div>
         <Button 
           onClick={handleSave}
