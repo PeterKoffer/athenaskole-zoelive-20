@@ -48,7 +48,7 @@ export const useSimpleProfile = () => {
             user_id: user.id,
             name: user.user_metadata?.name || '',
             email: user.email || '',
-            preferences: defaultPreferences
+            preferences: defaultPreferences as any // Cast to any for Supabase Json compatibility
           };
 
           const { data: createdProfile, error: createError } = await supabase
@@ -74,7 +74,7 @@ export const useSimpleProfile = () => {
             overall_mastery: createdProfile.overall_mastery || 0,
             kc_masteries: [],
             kcMasteryMap: {},
-            preferences: (createdProfile.preferences as LearnerPreferences) || defaultPreferences,
+            preferences: (createdProfile.preferences as unknown as LearnerPreferences) || defaultPreferences,
             created_at: createdProfile.created_at,
             updated_at: createdProfile.updated_at,
             recentPerformance: Array.isArray(createdProfile.recent_performance) 
@@ -112,7 +112,7 @@ export const useSimpleProfile = () => {
             overall_mastery: profileData.overall_mastery || 0,
             kc_masteries: [],
             kcMasteryMap: {},
-            preferences: (profileData.preferences as LearnerPreferences) || defaultPreferences,
+            preferences: (profileData.preferences as unknown as LearnerPreferences) || defaultPreferences,
             created_at: profileData.created_at,
             updated_at: profileData.updated_at,
             recentPerformance: Array.isArray(profileData.recent_performance) 
