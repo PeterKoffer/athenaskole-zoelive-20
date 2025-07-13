@@ -5,6 +5,7 @@ import DailyUniversePage from "./pages/DailyUniversePage";
 import ProfilePage from "./pages/ProfilePage";
 import PreferencesPage from "./pages/PreferencesPage";
 import Auth from "./pages/Auth";
+import ParentDashboard from "./pages/ParentDashboard";
 
 export const navItems = [
   {
@@ -36,5 +37,11 @@ export const navItems = [
     to: "/auth",
     icon: <User className="h-4 w-4" />,
     page: <Auth />,
+  },
+  {
+    title: "Parent Dashboard",
+    to: "/parent-dashboard",
+    icon: <Users className="h-4 w-4" />,
+    page: <ParentDashboard />,
   },
 ];
