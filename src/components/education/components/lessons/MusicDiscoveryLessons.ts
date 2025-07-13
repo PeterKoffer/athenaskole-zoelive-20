@@ -163,7 +163,7 @@ export const createMusicDiscoveryLesson = (skillArea: string, gradeLevel: number
       gradeLevel: gradeLevel
     },
     content: {
-      gameScenario: isElementary 
+      scenario: isElementary 
         ? 'Help Nelie identify different musical sounds and create simple rhythms!'
         : isMiddle
         ? 'Join Nelie in creating musical patterns and exploring world music!'
