@@ -1,39 +1,14 @@
 {
   "nodes": [
     {
-      "id": "dk-computer-science",
-      "parentId": "dk-root",
-      "nodeType": "subject",
-      "name": "Datalogi",
-      "description": "Curriculum for Datalogi (Computer Science) in Denmark, focusing on computational thinking, digital citizenship, programming, and technology understanding, adapted for Danish context.",
-      "educationalLevel": "Grundskole-Gymnasium",
-      "subject": "Computer Science",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "tags": [
-        "datalogi",
-        "it",
-        "teknologiforståelse",
-        "kodning",
-        "danmark"
-      ]
-    },
-    {
-      "id": "dk-creative-arts",
-      "parentId": "dk-root",
-      "nodeType": "subject",
-      "name": "Billedkunst",
-      "description": "Curriculum for Billedkunst (Visual Arts) in Denmark, adapted for the Danish context, focusing on creative expression, materials, and cultural understanding.",
-      "educationalLevel": "Grundskole-Gymnasium",
-      "subject": "Art",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "tags": [
-        "billedkunst",
-        "kreative_fag",
-        "visuel_kultur",
-        "danmark"
-      ]
+      "id": "us",
+      "parentId": null,
+      "nodeType": "country",
+      "name": "United States",
+      "description": "United States K-12 education system",
+      "countryCode": "US",
+      "languageCode": "en",
+      "tags": ["country", "north_america"]
     },
     {
       "id": "dk",
@@ -43,107 +18,7 @@
       "description": "Danish education system curriculum",
       "countryCode": "DK",
       "languageCode": "da",
-      "tags": [
-        "country",
-        "european"
-      ]
-    },
-    {
-      "id": "dk-math",
-      "parentId": "dk",
-      "nodeType": "subject",
-      "name": "Matematik",
-      "description": "Danish mathematics curriculum for primary and secondary education",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "subjectName": "Mathematics",
-      "subject": "Mathematics",
-      "tags": [
-        "core_subject",
-        "stem"
-      ]
-    },
-    {
-      "id": "dk-math-basic-arithmetic",
-      "parentId": "dk-math",
-      "nodeType": "learning_objective",
-      "name": "Basic Arithmetic Operations",
-      "description": "Fundamental arithmetic: addition, subtraction, multiplication, and division",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "subjectName": "Mathematics",
-      "subject": "Mathematics",
-      "estimatedDuration": 60,
-      "tags": [
-        "arithmetic",
-        "foundational"
-      ]
-    },
-    {
-      "id": "dk-danish",
-      "parentId": "dk",
-      "nodeType": "subject",
-      "name": "Dansk",
-      "description": "Danish language and literature curriculum",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "subjectName": "Danish Language",
-      "subject": "World Languages",
-      "tags": [
-        "core_subject",
-        "language",
-        "native_language"
-      ]
-    },
-    {
-      "id": "dk-danish-reading",
-      "parentId": "dk-danish",
-      "nodeType": "learning_objective",
-      "name": "Reading Comprehension",
-      "description": "Developing reading skills and text comprehension in Danish",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "subjectName": "Danish Language",
-      "subject": "World Languages",
-      "estimatedDuration": 45,
-      "tags": [
-        "reading",
-        "comprehension"
-      ]
-    },
-    {
-      "id": "dk-life-essentials",
-      "parentId": "dk-root",
-      "nodeType": "subject",
-      "name": "Livsfærdigheder",
-      "description": "Curriculum for Livsfærdigheder (Life Essentials) in Denmark, covering practical skills for independent living, financial literacy, health/safety, and relationship navigation, adapted for Danish context.",
-      "educationalLevel": "K-12",
-      "subject": "Life Essentials",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "tags": [
-        "livsfærdigheder",
-        "praktiske_færdigheder",
-        "selvstændighed",
-        "danmark"
-      ]
-    },
-    {
-      "id": "dk-music",
-      "parentId": "dk-root",
-      "nodeType": "subject",
-      "name": "Musik",
-      "description": "Curriculum for Musik (Music) in Denmark, adapted for the Danish context, focusing on musical exploration, performance, creation, and cultural understanding.",
-      "educationalLevel": "Grundskole-Gymnasium",
-      "subject": "Music",
-      "countryCode": "DK",
-      "languageCode": "da",
-      "tags": [
-        "musik",
-        "musikkultur",
-        "kreative_fag",
-        "danmark"
-      ]
+      "tags": ["country", "european"]
     },
     {
       "id": "us-computer-science",
@@ -152,16 +27,10 @@
       "name": "Computer Science",
       "description": "Curriculum for K-12 Computer Science in the United States, focusing on computational thinking, digital citizenship, programming, data analysis, and AI literacy.",
       "educationalLevel": "K-12",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "computer_science",
-        "stem",
-        "digital_literacy",
-        "coding",
-        "usa"
-      ]
+      "tags": ["computer_science", "stem", "digital_literacy", "coding", "usa"]
     },
     {
       "id": "us-k-cs",
@@ -170,14 +39,10 @@
       "name": "Kindergarten Computer Science",
       "description": "Foundational digital skills and computational thinking for Kindergarten.",
       "educationalLevel": "K",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "digital_literacy",
-        "computational_thinking_basics"
-      ]
+      "tags": ["kindergarten", "digital_literacy", "computational_thinking_basics"]
     },
     {
       "id": "us-k-cs-cb",
@@ -185,11 +50,8 @@
       "nodeType": "domain",
       "name": "Computer Basics",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "device_operation",
-        "hardware_interaction"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["device_operation", "hardware_interaction"]
     },
     {
       "id": "us-k-cs-idc",
@@ -197,11 +59,8 @@
       "nodeType": "domain",
       "name": "Internet & Digital Citizenship",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "online_awareness",
-        "basic_safety"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["online_awareness", "basic_safety"]
     },
     {
       "id": "us-k-cs-ct",
@@ -209,11 +68,8 @@
       "nodeType": "domain",
       "name": "Computational Thinking",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "problem_solving_foundations",
-        "algorithmic_thinking"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["problem_solving_foundations", "algorithmic_thinking"]
     },
     {
       "id": "us-k-cs-cc",
@@ -221,11 +77,8 @@
       "nodeType": "domain",
       "name": "Creative Computing",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "digital_art",
-        "creative_expression_tech"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["digital_art", "creative_expression_tech"]
     },
     {
       "id": "us-k-cs-cb-lo1",
@@ -233,11 +86,8 @@
       "nodeType": "learning_objective",
       "name": "Basic device operation (mouse, keyboard, touchscreen)",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "input_devices",
-        "dexterity"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["input_devices", "dexterity"]
     },
     {
       "id": "us-k-cs-idc-lo1",
@@ -245,11 +95,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding that computers can connect to other computers",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "connectivity_concept",
-        "networks_intro"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["connectivity_concept", "networks_intro"]
     },
     {
       "id": "us-k-cs-ct-lo1",
@@ -257,11 +104,8 @@
       "nodeType": "learning_objective",
       "name": "Following step-by-step instructions (algorithms)",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "algorithms",
-        "sequencing"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["algorithms", "sequencing"]
     },
     {
       "id": "us-k-cs-cc-lo1",
@@ -269,11 +113,8 @@
       "nodeType": "learning_objective",
       "name": "Digital drawing and basic creative apps",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "digital_art_tools",
-        "creative_software"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["digital_art_tools", "creative_software"]
     },
     {
       "id": "us-k-cs-idc-lo2",
@@ -282,12 +123,8 @@
       "name": "Recognize that some technology can \"learn\" (AI Awareness)",
       "description": "Understanding that some technology can \"learn\" and make decisions (e.g., a game character that gets smarter).",
       "educationalLevel": "K",
-      "subject": "Computer Science",
-      "tags": [
-        "ai_awareness",
-        "smart_technology",
-        "digital_citizenship"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["ai_awareness", "smart_technology", "digital_citizenship"]
     },
     {
       "id": "us-g1-cs",
@@ -296,14 +133,10 @@
       "name": "Grade 1 Computer Science",
       "description": "Building on digital foundations for Grade 1.",
       "educationalLevel": "1",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade1",
-        "digital_skills",
-        "online_safety"
-      ]
+      "tags": ["grade1", "digital_skills", "online_safety"]
     },
     {
       "id": "us-g1-cs-cb",
@@ -311,11 +144,8 @@
       "nodeType": "domain",
       "name": "Computer Basics",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "file_management",
-        "saving_work"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["file_management", "saving_work"]
     },
     {
       "id": "us-g1-cs-idc",
@@ -323,11 +153,8 @@
       "nodeType": "domain",
       "name": "Internet & Digital Citizenship",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "online_safety",
-        "personal_information"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["online_safety", "personal_information"]
     },
     {
       "id": "us-g1-cs-ct",
@@ -335,11 +162,8 @@
       "nodeType": "domain",
       "name": "Computational Thinking",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "decomposition",
-        "problem_breakdown"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["decomposition", "problem_breakdown"]
     },
     {
       "id": "us-g1-cs-cc",
@@ -347,11 +171,8 @@
       "nodeType": "domain",
       "name": "Creative Computing",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "multimedia_creation",
-        "digital_storytelling_tools"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["multimedia_creation", "digital_storytelling_tools"]
     },
     {
       "id": "us-g1-cs-cb-lo1",
@@ -359,11 +180,8 @@
       "nodeType": "learning_objective",
       "name": "File organization and saving work",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "digital_organization",
-        "saving_files"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["digital_organization", "saving_files"]
     },
     {
       "id": "us-g1-cs-idc-lo1",
@@ -371,11 +189,8 @@
       "nodeType": "learning_objective",
       "name": "Basic online safety (never share personal information)",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "privacy",
-        "online_security_basics"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["privacy", "online_security_basics"]
     },
     {
       "id": "us-g1-cs-ct-lo1",
@@ -383,11 +198,8 @@
       "nodeType": "learning_objective",
       "name": "Breaking big tasks into smaller steps (decomposition)",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "problem_solving_strategies",
-        "decomposition_skill"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["problem_solving_strategies", "decomposition_skill"]
     },
     {
       "id": "us-g1-cs-cc-lo1",
@@ -395,11 +207,8 @@
       "nodeType": "learning_objective",
       "name": "Recording audio/video with adult supervision",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "digital_media",
-        "content_creation"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["digital_media", "content_creation"]
     },
     {
       "id": "us-g1-cs-idc-lo2",
@@ -408,12 +217,8 @@
       "name": "Recognizing AI in everyday life (AI Awareness)",
       "description": "Recognizing AI in everyday life (voice assistants, recommendations on kids platforms).",
       "educationalLevel": "1",
-      "subject": "Computer Science",
-      "tags": [
-        "ai_awareness",
-        "everyday_ai",
-        "digital_citizenship"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["ai_awareness", "everyday_ai", "digital_citizenship"]
     },
     {
       "id": "us-g2-cs",
@@ -422,14 +227,10 @@
       "name": "Grade 2 Computer Science",
       "description": "Further digital foundations and introduction to programming for Grade 2.",
       "educationalLevel": "2",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade2",
-        "inputs_outputs",
-        "drag_and_drop_programming"
-      ]
+      "tags": ["grade2", "inputs_outputs", "drag_and_drop_programming"]
     },
     {
       "id": "us-g2-cs-cb",
@@ -437,11 +238,8 @@
       "nodeType": "domain",
       "name": "Computer Basics",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "input_output_devices",
-        "computer_processes_intro"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["input_output_devices", "computer_processes_intro"]
     },
     {
       "id": "us-g2-cs-idc",
@@ -449,11 +247,8 @@
       "nodeType": "domain",
       "name": "Internet & Digital Citizenship",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "online_offline_distinction",
-        "digital_world_basics"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["online_offline_distinction", "digital_world_basics"]
     },
     {
       "id": "us-g2-cs-ct",
@@ -461,11 +256,8 @@
       "nodeType": "domain",
       "name": "Computational Thinking",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "pattern_recognition",
-        "prediction_skills"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["pattern_recognition", "prediction_skills"]
     },
     {
       "id": "us-g2-cs-cc",
@@ -473,12 +265,8 @@
       "nodeType": "domain",
       "name": "Creative Computing",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "block_programming",
-        "scratchjr",
-        "animation_basics"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["block_programming", "scratchjr", "animation_basics"]
     },
     {
       "id": "us-g2-cs-cb-lo1",
@@ -486,11 +274,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding inputs and outputs (keyboard→screen, mic→speaker)",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "input_output_mapping",
-        "how_computers_work"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["input_output_mapping", "how_computers_work"]
     },
     {
       "id": "us-g2-cs-idc-lo1",
@@ -498,11 +283,8 @@
       "nodeType": "learning_objective",
       "name": "Distinguishing between online and offline activities",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "digital_awareness",
-        "online_world"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["digital_awareness", "online_world"]
     },
     {
       "id": "us-g2-cs-ct-lo1",
@@ -510,11 +292,8 @@
       "nodeType": "learning_objective",
       "name": "Finding patterns and making predictions",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "pattern_matching",
-        "predictive_thinking"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["pattern_matching", "predictive_thinking"]
     },
     {
       "id": "us-g2-cs-cc-lo1",
@@ -522,12 +301,8 @@
       "nodeType": "learning_objective",
       "name": "Simple drag-and-drop programming (ScratchJr)",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "visual_programming",
-        "coding_basics",
-        "scratchjr"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["visual_programming", "coding_basics", "scratchjr"]
     },
     {
       "id": "us-g2-cs-ct-lo2",
@@ -536,12 +311,8 @@
       "name": "Understand that AI needs data to work (AI Awareness)",
       "description": "Basic understanding that AI needs data to learn/work (e.g., a photo app needs many cat pictures to recognize a cat).",
       "educationalLevel": "2",
-      "subject": "Computer Science",
-      "tags": [
-        "ai_awareness",
-        "data_for_ai",
-        "computational_thinking"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["ai_awareness", "data_for_ai", "computational_thinking"]
     },
     {
       "id": "us-g3-cs",
@@ -550,14 +321,10 @@
       "name": "Grade 3 Computer Science",
       "description": "Building skills in hardware, software, internet, programming, and data for Grade 3.",
       "educationalLevel": "3",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade3",
-        "programming_basics",
-        "data_organization"
-      ]
+      "tags": ["grade3", "programming_basics", "data_organization"]
     },
     {
       "id": "us-g3-cs-hs",
@@ -565,11 +332,8 @@
       "nodeType": "domain",
       "name": "Hardware & Software",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "computer_parts",
-        "software_types_intro"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["computer_parts", "software_types_intro"]
     },
     {
       "id": "us-g3-cs-in",
@@ -577,11 +341,8 @@
       "nodeType": "domain",
       "name": "Internet & Networks",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "internet_connectivity",
-        "global_networks"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["internet_connectivity", "global_networks"]
     },
     {
       "id": "us-g3-cs-pf",
@@ -589,12 +350,8 @@
       "nodeType": "domain",
       "name": "Programming Fundamentals",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "visual_programming",
-        "scratch",
-        "sequences_loops"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["visual_programming", "scratch", "sequences_loops"]
     },
     {
       "id": "us-g3-cs-di",
@@ -602,12 +359,8 @@
       "nodeType": "domain",
       "name": "Data & Information",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "data_collection",
-        "data_organization",
-        "charts"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["data_collection", "data_organization", "charts"]
     },
     {
       "id": "us-g3-cs-dc",
@@ -615,11 +368,8 @@
       "nodeType": "domain",
       "name": "Digital Creation",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "presentations",
-        "digital_storytelling"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["presentations", "digital_storytelling"]
     },
     {
       "id": "us-g3-cs-hs-lo1",
@@ -627,11 +377,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding computer parts (CPU, memory, storage)",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "hardware_components",
-        "computer_anatomy"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["hardware_components", "computer_anatomy"]
     },
     {
       "id": "us-g3-cs-in-lo1",
@@ -639,11 +386,8 @@
       "nodeType": "learning_objective",
       "name": "How the internet connects computers worldwide",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "internet_basics",
-        "network_concepts"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["internet_basics", "network_concepts"]
     },
     {
       "id": "us-g3-cs-pf-lo1",
@@ -651,12 +395,8 @@
       "nodeType": "learning_objective",
       "name": "Visual programming with Scratch (sequences, loops)",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "scratch",
-        "coding_sequences",
-        "loops"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["scratch", "coding_sequences", "loops"]
     },
     {
       "id": "us-g3-cs-di-lo1",
@@ -664,12 +404,8 @@
       "nodeType": "learning_objective",
       "name": "Collecting and organizing data (surveys, charts)",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "data_handling",
-        "surveys",
-        "charting"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["data_handling", "surveys", "charting"]
     },
     {
       "id": "us-g3-cs-dc-lo1",
@@ -677,11 +413,8 @@
       "nodeType": "learning_objective",
       "name": "Creating presentations and digital stories",
       "educationalLevel": "3",
-      "subject": "Computer Science",
-      "tags": [
-        "digital_presentations",
-        "multimedia_storytelling"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["digital_presentations", "multimedia_storytelling"]
     },
     {
       "id": "us-g4-cs",
@@ -690,14 +423,10 @@
       "name": "Grade 4 Computer Science",
       "description": "Developing skills in software, networks, programming, and data for Grade 4.",
       "educationalLevel": "4",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade4",
-        "conditional_logic",
-        "data_storage"
-      ]
+      "tags": ["grade4", "conditional_logic", "data_storage"]
     },
     {
       "id": "us-g4-cs-hs",
@@ -705,11 +434,8 @@
       "nodeType": "domain",
       "name": "Hardware & Software",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "software_categories",
-        "application_types"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["software_categories", "application_types"]
     },
     {
       "id": "us-g4-cs-in",
@@ -717,12 +443,8 @@
       "nodeType": "domain",
       "name": "Internet & Networks",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "websites",
-        "search_engines",
-        "digital_libraries"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["websites", "search_engines", "digital_libraries"]
     },
     {
       "id": "us-g4-cs-pf",
@@ -730,11 +452,8 @@
       "nodeType": "domain",
       "name": "Programming Fundamentals",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "conditional_statements",
-        "problem_solving_code"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["conditional_statements", "problem_solving_code"]
     },
     {
       "id": "us-g4-cs-di",
@@ -742,11 +461,8 @@
       "nodeType": "domain",
       "name": "Data & Information",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "data_storage_concepts",
-        "information_representation"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["data_storage_concepts", "information_representation"]
     },
     {
       "id": "us-g4-cs-dc",
@@ -754,12 +470,8 @@
       "nodeType": "domain",
       "name": "Digital Creation",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "photo_editing",
-        "video_editing",
-        "digital_art_creation"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["photo_editing", "video_editing", "digital_art_creation"]
     },
     {
       "id": "us-g4-cs-hs-lo1",
@@ -767,11 +479,8 @@
       "nodeType": "learning_objective",
       "name": "Different types of software (apps, games, tools)",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "software_understanding",
-        "tool_identification"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["software_understanding", "tool_identification"]
     },
     {
       "id": "us-g4-cs-in-lo1",
@@ -779,11 +488,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding websites, search engines, and digital libraries",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "web_literacy",
-        "information_retrieval"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["web_literacy", "information_retrieval"]
     },
     {
       "id": "us-g4-cs-pf-lo1",
@@ -791,12 +497,8 @@
       "nodeType": "learning_objective",
       "name": "Conditional statements and problem-solving",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "coding_logic",
-        "if_then_else",
-        "problem_decomposition_code"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["coding_logic", "if_then_else", "problem_decomposition_code"]
     },
     {
       "id": "us-g4-cs-di-lo1",
@@ -804,11 +506,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding that computers store information as data",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "data_concepts",
-        "digital_information"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["data_concepts", "digital_information"]
     },
     {
       "id": "us-g4-cs-dc-lo1",
@@ -816,11 +515,8 @@
       "nodeType": "learning_objective",
       "name": "Basic photo/video editing and digital art",
       "educationalLevel": "4",
-      "subject": "Computer Science",
-      "tags": [
-        "multimedia_editing",
-        "creative_software_use"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["multimedia_editing", "creative_software_use"]
     },
     {
       "id": "us-g5-cs",
@@ -829,14 +525,10 @@
       "name": "Grade 5 Computer Science",
       "description": "Advancing skills in information processing, communication, programming, and data analysis for Grade 5.",
       "educationalLevel": "5",
-      "subject": "Computer Science",
+      "subject": "COMPUTER_SCIENCE",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade5",
-        "variables_functions",
-        "data_visualization"
-      ]
+      "tags": ["grade5", "variables_functions", "data_visualization"]
     },
     {
       "id": "us-g5-cs-hs",
@@ -844,11 +536,8 @@
       "nodeType": "domain",
       "name": "Hardware & Software",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "information_processing_cycle",
-        "computer_functionality"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["information_processing_cycle", "computer_functionality"]
     },
     {
       "id": "us-g5-cs-in",
@@ -856,11 +545,8 @@
       "nodeType": "domain",
       "name": "Internet & Networks",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "email_basics",
-        "digital_communication_etiquette"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["email_basics", "digital_communication_etiquette"]
     },
     {
       "id": "us-g5-cs-pf",
@@ -868,12 +554,8 @@
       "nodeType": "domain",
       "name": "Programming Fundamentals",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "variables",
-        "functions",
-        "debugging_strategies"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["variables", "functions", "debugging_strategies"]
     },
     {
       "id": "us-g5-cs-di",
@@ -881,11 +563,8 @@
       "nodeType": "domain",
       "name": "Data & Information",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "data_analysis_basics",
-        "data_visualization_tools"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["data_analysis_basics", "data_visualization_tools"]
     },
     {
       "id": "us-g5-cs-dc",
@@ -893,11 +572,8 @@
       "nodeType": "domain",
       "name": "Digital Creation",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "website_creation_basics",
-        "digital_portfolios"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["website_creation_basics", "digital_portfolios"]
     },
     {
       "id": "us-g5-cs-hs-lo1",
@@ -905,11 +581,8 @@
       "nodeType": "learning_objective",
       "name": "How computers process information (input→processing→output)",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "ipo_model",
-        "computer_operations"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["ipo_model", "computer_operations"]
     },
     {
       "id": "us-g5-cs-in-lo1",
@@ -917,11 +590,8 @@
       "nodeType": "learning_objective",
       "name": "Email basics and digital communication etiquette",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "email_communication",
-        "netiquette"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["email_communication", "netiquette"]
     },
     {
       "id": "us-g5-cs-pf-lo1",
@@ -929,11 +599,8 @@
       "nodeType": "learning_objective",
       "name": "Variables, functions, and debugging",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "programming_concepts",
-        "code_debugging"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["programming_concepts", "code_debugging"]
     },
     {
       "id": "us-g5-cs-di-lo1",
@@ -941,11 +608,8 @@
       "nodeType": "learning_objective",
       "name": "Basic data analysis and visualization",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "data_interpretation",
-        "graphing_data"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["data_interpretation", "graphing_data"]
     },
     {
       "id": "us-g5-cs-di-lo2",
@@ -954,12 +618,8 @@
       "name": "Basic understanding that AI needs data to work (AI Awareness)",
       "description": "Understand that AI systems are trained on data and their performance depends on that data.",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "ai_awareness",
-        "data_for_ai",
-        "machine_learning_intro"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["ai_awareness", "data_for_ai", "machine_learning_intro"]
     },
     {
       "id": "us-g5-cs-dc-lo1",
@@ -967,11 +627,8 @@
       "nodeType": "learning_objective",
       "name": "Building simple websites or digital portfolios",
       "educationalLevel": "5",
-      "subject": "Computer Science",
-      "tags": [
-        "web_development_intro",
-        "digital_showcase"
-      ]
+      "subject": "COMPUTER_SCIENCE",
+      "tags": ["web_development_intro", "digital_showcase"]
     },
     {
       "id": "us-creative-arts",
@@ -980,16 +637,10 @@
       "name": "Creative Arts",
       "description": "Curriculum for K-12 Creative Arts in the United States, encompassing visual arts, digital media, and creative expression.",
       "educationalLevel": "K-12",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "creative_arts",
-        "visual_arts",
-        "digital_arts",
-        "expression",
-        "usa"
-      ]
+      "tags": ["creative_arts", "visual_arts", "digital_arts", "expression", "usa"]
     },
     {
       "id": "us-k-ca",
@@ -998,14 +649,10 @@
       "name": "Kindergarten Creative Arts",
       "description": "Exploration and play with basic art elements and materials for Kindergarten.",
       "educationalLevel": "K",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "art_exploration",
-        "creative_play"
-      ]
+      "tags": ["kindergarten", "art_exploration", "creative_play"]
     },
     {
       "id": "us-k-ca-ve",
@@ -1013,12 +660,8 @@
       "nodeType": "domain",
       "name": "Visual Elements",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "colors",
-        "shapes",
-        "lines"
-      ]
+      "subject": "ART",
+      "tags": ["colors", "shapes", "lines"]
     },
     {
       "id": "us-k-ca-amt",
@@ -1026,11 +669,8 @@
       "nodeType": "domain",
       "name": "Art Materials & Techniques",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "art_supplies",
-        "safe_use"
-      ]
+      "subject": "ART",
+      "tags": ["art_supplies", "safe_use"]
     },
     {
       "id": "us-k-ca-ce",
@@ -1038,11 +678,8 @@
       "nodeType": "domain",
       "name": "Creative Expression",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "imagination",
-        "observation_drawing"
-      ]
+      "subject": "ART",
+      "tags": ["imagination", "observation_drawing"]
     },
     {
       "id": "us-k-ca-aa",
@@ -1050,11 +687,8 @@
       "nodeType": "domain",
       "name": "Art Appreciation",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "artwork_discussion",
-        "art_awareness"
-      ]
+      "subject": "ART",
+      "tags": ["artwork_discussion", "art_awareness"]
     },
     {
       "id": "us-k-ca-ve-lo1",
@@ -1062,12 +696,8 @@
       "nodeType": "learning_objective",
       "name": "Basic colors, shapes, and lines through play",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "color_recognition",
-        "shape_identification",
-        "line_play"
-      ]
+      "subject": "ART",
+      "tags": ["color_recognition", "shape_identification", "line_play"]
     },
     {
       "id": "us-k-ca-amt-lo1",
@@ -1075,11 +705,8 @@
       "nodeType": "learning_objective",
       "name": "Safe use of crayons, markers, and paint",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "art_material_safety",
-        "tool_handling"
-      ]
+      "subject": "ART",
+      "tags": ["art_material_safety", "tool_handling"]
     },
     {
       "id": "us-k-ca-ce-lo1",
@@ -1087,11 +714,8 @@
       "nodeType": "learning_objective",
       "name": "Drawing from imagination and observation",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "imaginative_drawing",
-        "observational_skills"
-      ]
+      "subject": "ART",
+      "tags": ["imaginative_drawing", "observational_skills"]
     },
     {
       "id": "us-k-ca-aa-lo1",
@@ -1099,11 +723,8 @@
       "nodeType": "learning_objective",
       "name": "Looking at and talking about artwork",
       "educationalLevel": "K",
-      "subject": "Art",
-      "tags": [
-        "art_viewing",
-        "art_discussion_basics"
-      ]
+      "subject": "ART",
+      "tags": ["art_viewing", "art_discussion_basics"]
     },
     {
       "id": "us-g1-ca",
@@ -1112,14 +733,10 @@
       "name": "Grade 1 Creative Arts",
       "description": "Further exploration of textures, materials, and storytelling through art for Grade 1.",
       "educationalLevel": "1",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade1",
-        "texture_art",
-        "storytelling_art"
-      ]
+      "tags": ["grade1", "texture_art", "storytelling_art"]
     },
     {
       "id": "us-g1-ca-ve",
@@ -1127,11 +744,8 @@
       "nodeType": "domain",
       "name": "Visual Elements",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "texture",
-        "sensory_exploration"
-      ]
+      "subject": "ART",
+      "tags": ["texture", "sensory_exploration"]
     },
     {
       "id": "us-g1-ca-amt",
@@ -1139,12 +753,8 @@
       "nodeType": "domain",
       "name": "Art Materials & Techniques",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "cutting_skills",
-        "gluing_techniques",
-        "collage_art"
-      ]
+      "subject": "ART",
+      "tags": ["cutting_skills", "gluing_techniques", "collage_art"]
     },
     {
       "id": "us-g1-ca-ce",
@@ -1152,11 +762,8 @@
       "nodeType": "domain",
       "name": "Creative Expression",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "visual_storytelling",
-        "picture_narratives"
-      ]
+      "subject": "ART",
+      "tags": ["visual_storytelling", "picture_narratives"]
     },
     {
       "id": "us-g1-ca-aa",
@@ -1164,11 +771,8 @@
       "nodeType": "domain",
       "name": "Art Appreciation",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "global_art_awareness",
-        "art_in_community"
-      ]
+      "subject": "ART",
+      "tags": ["global_art_awareness", "art_in_community"]
     },
     {
       "id": "us-g1-ca-ve-lo1",
@@ -1176,11 +780,8 @@
       "nodeType": "learning_objective",
       "name": "Texture exploration (rough, smooth, bumpy) in art",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "tactile_art",
-        "texture_vocabulary"
-      ]
+      "subject": "ART",
+      "tags": ["tactile_art", "texture_vocabulary"]
     },
     {
       "id": "us-g1-ca-amt-lo1",
@@ -1188,11 +789,8 @@
       "nodeType": "learning_objective",
       "name": "Cutting, gluing, and simple collage techniques",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "fine_motor_skills",
-        "collage_creation"
-      ]
+      "subject": "ART",
+      "tags": ["fine_motor_skills", "collage_creation"]
     },
     {
       "id": "us-g1-ca-ce-lo1",
@@ -1200,11 +798,8 @@
       "nodeType": "learning_objective",
       "name": "Telling stories through pictures",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "narrative_art",
-        "sequential_art_basics"
-      ]
+      "subject": "ART",
+      "tags": ["narrative_art", "sequential_art_basics"]
     },
     {
       "id": "us-g1-ca-aa-lo1",
@@ -1212,11 +807,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding that people create art everywhere",
       "educationalLevel": "1",
-      "subject": "Art",
-      "tags": [
-        "art_universality",
-        "cultural_art_forms"
-      ]
+      "subject": "ART",
+      "tags": ["art_universality", "cultural_art_forms"]
     },
     {
       "id": "us-g2-ca",
@@ -1225,15 +817,10 @@
       "name": "Grade 2 Creative Arts",
       "description": "Understanding visual elements, basic sculpture, and expressing feelings through art for Grade 2.",
       "educationalLevel": "2",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade2",
-        "light_dark_art",
-        "basic_sculpture",
-        "emotional_expression_art"
-      ]
+      "tags": ["grade2", "light_dark_art", "basic_sculpture", "emotional_expression_art"]
     },
     {
       "id": "us-g2-ca-ve",
@@ -1241,11 +828,8 @@
       "nodeType": "domain",
       "name": "Visual Elements",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "light_dark",
-        "scale_proportion_basics"
-      ]
+      "subject": "ART",
+      "tags": ["light_dark", "scale_proportion_basics"]
     },
     {
       "id": "us-g2-ca-amt",
@@ -1253,11 +837,8 @@
       "nodeType": "domain",
       "name": "Art Materials & Techniques",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "clay_manipulation",
-        "playdough_sculpture"
-      ]
+      "subject": "ART",
+      "tags": ["clay_manipulation", "playdough_sculpture"]
     },
     {
       "id": "us-g2-ca-ce",
@@ -1265,11 +846,8 @@
       "nodeType": "domain",
       "name": "Creative Expression",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "art_and_feelings",
-        "experiential_art"
-      ]
+      "subject": "ART",
+      "tags": ["art_and_feelings", "experiential_art"]
     },
     {
       "id": "us-g2-ca-aa",
@@ -1277,13 +855,8 @@
       "nodeType": "domain",
       "name": "Art Appreciation",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "art_types_recognition",
-        "painting",
-        "sculpture",
-        "crafts"
-      ]
+      "subject": "ART",
+      "tags": ["art_types_recognition", "painting", "sculpture", "crafts"]
     },
     {
       "id": "us-g2-ca-ve-lo1",
@@ -1291,11 +864,8 @@
       "nodeType": "learning_objective",
       "name": "Understanding light and dark, big and small",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "value_contrast",
-        "scale_in_art"
-      ]
+      "subject": "ART",
+      "tags": ["value_contrast", "scale_in_art"]
     },
     {
       "id": "us-g2-ca-amt-lo1",
@@ -1303,11 +873,8 @@
       "nodeType": "learning_objective",
       "name": "Clay/playdough manipulation and basic sculpture",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "3d_art_basics",
-        "modeling_materials"
-      ]
+      "subject": "ART",
+      "tags": ["3d_art_basics", "modeling_materials"]
     },
     {
       "id": "us-g2-ca-ce-lo1",
@@ -1315,11 +882,8 @@
       "nodeType": "learning_objective",
       "name": "Creating art about feelings and experiences",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "expressive_art",
-        "personal_narrative_art"
-      ]
+      "subject": "ART",
+      "tags": ["expressive_art", "personal_narrative_art"]
     },
     {
       "id": "us-g2-ca-aa-lo1",
@@ -1327,11 +891,8 @@
       "nodeType": "learning_objective",
       "name": "Recognizing different types of art (painting, sculpture, crafts)",
       "educationalLevel": "2",
-      "subject": "Art",
-      "tags": [
-        "art_classification",
-        "art_mediums"
-      ]
+      "subject": "ART",
+      "tags": ["art_classification", "art_mediums"]
     },
     {
       "id": "us-g3-ca",
@@ -1340,14 +901,10 @@
       "name": "Grade 3 Creative Arts",
       "description": "Skill building in visual design, techniques, digital arts, and cultural arts for Grade 3.",
       "educationalLevel": "3",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade3",
-        "art_skill_building",
-        "digital_art_intro"
-      ]
+      "tags": ["grade3", "art_skill_building", "digital_art_intro"]
     },
     {
       "id": "us-g3-ca-vdp",
@@ -1355,12 +912,8 @@
       "nodeType": "domain",
       "name": "Visual Design Principles",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "pattern",
-        "rhythm",
-        "repetition"
-      ]
+      "subject": "ART",
+      "tags": ["pattern", "rhythm", "repetition"]
     },
     {
       "id": "us-g3-ca-at",
@@ -1368,11 +921,8 @@
       "nodeType": "domain",
       "name": "Advanced Techniques",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "watercolor",
-        "mixed_media"
-      ]
+      "subject": "ART",
+      "tags": ["watercolor", "mixed_media"]
     },
     {
       "id": "us-g3-ca-dai",
@@ -1380,11 +930,8 @@
       "nodeType": "domain",
       "name": "Digital Arts Introduction",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "digital_drawing_apps",
-        "digital_painting_apps"
-      ]
+      "subject": "ART",
+      "tags": ["digital_drawing_apps", "digital_painting_apps"]
     },
     {
       "id": "us-g3-ca-ca",
@@ -1392,11 +939,8 @@
       "nodeType": "domain",
       "name": "Cultural Arts",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "art_history_intro",
-        "multicultural_art"
-      ]
+      "subject": "ART",
+      "tags": ["art_history_intro", "multicultural_art"]
     },
     {
       "id": "us-g3-ca-cps",
@@ -1404,11 +948,8 @@
       "nodeType": "domain",
       "name": "Creative Problem Solving",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "design_thinking_art",
-        "art_for_solutions"
-      ]
+      "subject": "ART",
+      "tags": ["design_thinking_art", "art_for_solutions"]
     },
     {
       "id": "us-g3-ca-vdp-lo1",
@@ -1416,11 +957,8 @@
       "nodeType": "learning_objective",
       "name": "Pattern, rhythm, and repetition in art",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "design_principles",
-        "visual_flow"
-      ]
+      "subject": "ART",
+      "tags": ["design_principles", "visual_flow"]
     },
     {
       "id": "us-g3-ca-at-lo1",
@@ -1428,11 +966,8 @@
       "nodeType": "learning_objective",
       "name": "Watercolor and mixed media exploration",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "painting_techniques",
-        "media_combination"
-      ]
+      "subject": "ART",
+      "tags": ["painting_techniques", "media_combination"]
     },
     {
       "id": "us-g3-ca-dai-lo1",
@@ -1440,11 +975,8 @@
       "nodeType": "learning_objective",
       "name": "Digital drawing and painting apps",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "digital_art_tools_usage",
-        "basic_digital_creation"
-      ]
+      "subject": "ART",
+      "tags": ["digital_art_tools_usage", "basic_digital_creation"]
     },
     {
       "id": "us-g3-ca-ca-lo1",
@@ -1452,11 +984,8 @@
       "nodeType": "learning_objective",
       "name": "Art from different cultures and time periods",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "global_art_history",
-        "cultural_perspectives_art"
-      ]
+      "subject": "ART",
+      "tags": ["global_art_history", "cultural_perspectives_art"]
     },
     {
       "id": "us-g3-ca-cps-lo1",
@@ -1464,11 +993,8 @@
       "nodeType": "learning_objective",
       "name": "Using art to solve design problems",
       "educationalLevel": "3",
-      "subject": "Art",
-      "tags": [
-        "artistic_problem_solving",
-        "design_challenges"
-      ]
+      "subject": "ART",
+      "tags": ["artistic_problem_solving", "design_challenges"]
     },
     {
       "id": "us-g4-ca",
@@ -1477,15 +1003,10 @@
       "name": "Grade 4 Creative Arts",
       "description": "Developing skills in balance, printmaking, digital photography, and collaborative art for Grade 4.",
       "educationalLevel": "4",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade4",
-        "art_composition",
-        "printmaking_intro",
-        "digital_photography_basics"
-      ]
+      "tags": ["grade4", "art_composition", "printmaking_intro", "digital_photography_basics"]
     },
     {
       "id": "us-g4-ca-vdp",
@@ -1493,11 +1014,8 @@
       "nodeType": "domain",
       "name": "Visual Design Principles",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "balance_art",
-        "symmetry_art"
-      ]
+      "subject": "ART",
+      "tags": ["balance_art", "symmetry_art"]
     },
     {
       "id": "us-g4-ca-at",
@@ -1505,11 +1023,8 @@
       "nodeType": "domain",
       "name": "Advanced Techniques",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "printmaking",
-        "stamping_techniques"
-      ]
+      "subject": "ART",
+      "tags": ["printmaking", "stamping_techniques"]
     },
     {
       "id": "us-g4-ca-dai",
@@ -1517,11 +1032,8 @@
       "nodeType": "domain",
       "name": "Digital Arts Introduction",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "digital_photography",
-        "basic_photo_editing"
-      ]
+      "subject": "ART",
+      "tags": ["digital_photography", "basic_photo_editing"]
     },
     {
       "id": "us-g4-ca-ca",
@@ -1529,11 +1041,8 @@
       "nodeType": "domain",
       "name": "Cultural Arts",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "local_artists",
-        "community_art_projects"
-      ]
+      "subject": "ART",
+      "tags": ["local_artists", "community_art_projects"]
     },
     {
       "id": "us-g4-ca-cps",
@@ -1541,11 +1050,8 @@
       "nodeType": "domain",
       "name": "Creative Problem Solving",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "collaborative_art",
-        "group_projects_art"
-      ]
+      "subject": "ART",
+      "tags": ["collaborative_art", "group_projects_art"]
     },
     {
       "id": "us-g4-ca-vdp-lo1",
@@ -1553,11 +1059,8 @@
       "nodeType": "learning_objective",
       "name": "Balance and symmetry in compositions",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "composition_principles",
-        "visual_balance"
-      ]
+      "subject": "ART",
+      "tags": ["composition_principles", "visual_balance"]
     },
     {
       "id": "us-g4-ca-at-lo1",
@@ -1565,11 +1068,8 @@
       "nodeType": "learning_objective",
       "name": "Printmaking and stamping techniques",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "printmaking_basics",
-        "pattern_creation"
-      ]
+      "subject": "ART",
+      "tags": ["printmaking_basics", "pattern_creation"]
     },
     {
       "id": "us-g4-ca-dai-lo1",
@@ -1577,11 +1077,8 @@
       "nodeType": "learning_objective",
       "name": "Digital photography and basic editing",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "photography_basics",
-        "image_manipulation_intro"
-      ]
+      "subject": "ART",
+      "tags": ["photography_basics", "image_manipulation_intro"]
     },
     {
       "id": "us-g4-ca-ca-lo1",
@@ -1589,11 +1086,8 @@
       "nodeType": "learning_objective",
       "name": "Local artists and community art",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "community_engagement_art",
-        "local_art_appreciation"
-      ]
+      "subject": "ART",
+      "tags": ["community_engagement_art", "local_art_appreciation"]
     },
     {
       "id": "us-g4-ca-cps-lo1",
@@ -1601,11 +1095,8 @@
       "nodeType": "learning_objective",
       "name": "Collaborative art projects",
       "educationalLevel": "4",
-      "subject": "Art",
-      "tags": [
-        "teamwork_art",
-        "group_art_creation"
-      ]
+      "subject": "ART",
+      "tags": ["teamwork_art", "group_art_creation"]
     },
     {
       "id": "us-g5-ca",
@@ -1614,15 +1105,10 @@
       "name": "Grade 5 Creative Arts",
       "description": "Focusing on movement, drawing techniques, animation, and art as communication for Grade 5.",
       "educationalLevel": "5",
-      "subject": "Art",
+      "subject": "ART",
       "countryCode": "US",
       "languageCode": "en",
-      "tags": [
-        "grade5",
-        "art_communication",
-        "animation_basics",
-        "drawing_perspective"
-      ]
+      "tags": ["grade5", "art_communication", "animation_basics", "drawing_perspective"]
     },
     {
       "id": "us-g5-ca-vdp",
@@ -1630,11 +1116,8 @@
       "nodeType": "domain",
       "name": "Visual Design Principles",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "movement_art",
-        "emphasis_art"
-      ]
+      "subject": "ART",
+      "tags": ["movement_art", "emphasis_art"]
     },
     {
       "id": "us-g5-ca-at",
@@ -1642,11 +1125,8 @@
       "nodeType": "domain",
       "name": "Advanced Techniques",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "perspective_drawing",
-        "proportion_drawing"
-      ]
+      "subject": "ART",
+      "tags": ["perspective_drawing", "proportion_drawing"]
     },
     {
       "id": "us-g5-ca-dai",
@@ -1654,11 +1134,8 @@
       "nodeType": "domain",
       "name": "Digital Arts Introduction",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "animation_principles",
-        "stop_motion_animation"
-      ]
+      "subject": "ART",
+      "tags": ["animation_principles", "stop_motion_animation"]
     },
     {
       "id": "us-g5-ca-ca",
@@ -1666,11 +1143,8 @@
       "nodeType": "domain",
       "name": "Cultural Arts",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "art_and_culture",
-        "cultural_reflection_art"
-      ]
+      "subject": "ART",
+      "tags": ["art_and_culture", "cultural_reflection_art"]
     },
     {
       "id": "us-g5-ca-cps",
@@ -1678,11 +1152,8 @@
       "nodeType": "domain",
       "name": "Creative Problem Solving",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "art_as_advocacy",
-        "communicating_ideas_art"
-      ]
+      "subject": "ART",
+      "tags": ["art_as_advocacy", "communicating_ideas_art"]
     },
     {
       "id": "us-g5-ca-vdp-lo1",
@@ -1690,11 +1161,8 @@
       "nodeType": "learning_objective",
       "name": "Movement and emphasis in artwork",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "visual_dynamics",
-        "focal_point_art"
-      ]
+      "subject": "ART",
+      "tags": ["visual_dynamics", "focal_point_art"]
     },
     {
       "id": "us-g5-ca-at-lo1",
@@ -1702,11 +1170,8 @@
       "nodeType": "learning_objective",
       "name": "Beginning drawing techniques (perspective, proportion)",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "drawing_fundamentals",
-        "representational_art"
-      ]
+      "subject": "ART",
+      "tags": ["drawing_fundamentals", "representational_art"]
     },
     {
       "id": "us-g5-ca-dai-lo1",
@@ -1714,11 +1179,8 @@
       "nodeType": "learning_objective",
       "name": "Animation basics and stop-motion",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "animation_intro",
-        "storytelling_animation"
-      ]
+      "subject": "ART",
+      "tags": ["animation_intro", "storytelling_animation"]
     },
     {
       "id": "us-g5-ca-ca-lo1",
@@ -1726,11 +1188,8 @@
       "nodeType": "learning_objective",
       "name": "How art reflects and shapes culture",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "art_sociology",
-        "cultural_impact_art"
-      ]
+      "subject": "ART",
+      "tags": ["art_sociology", "cultural_impact_art"]
     },
     {
       "id": "us-g5-ca-cps-lo1",
@@ -1738,4696 +1197,8 @@
       "nodeType": "learning_objective",
       "name": "Art as communication and advocacy",
       "educationalLevel": "5",
-      "subject": "Art",
-      "tags": [
-        "social_commentary_art",
-        "visual_communication"
-      ]
-    },
-    {
-      "id": "us-ela",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "English Language Arts",
-      "description": "US K-5 English Language Arts curriculum based on Common Core State Standards",
-      "educationalLevel": "K-5",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "ccss",
-        "language_arts",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-k-ela",
-      "parentId": "us-ela",
-      "nodeType": "grade_level",
-      "name": "Kindergarten English Language Arts",
-      "description": "Foundational literacy skills for kindergarten students",
-      "educationalLevel": "K",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "foundational_literacy"
-      ]
-    },
-    {
-      "id": "us-k-ela-rf",
-      "parentId": "us-k-ela",
-      "nodeType": "domain",
-      "name": "Reading: Foundational Skills",
-      "description": "Print concepts, phonological awareness, phonics and word recognition, fluency",
-      "educationalLevel": "K",
-      "subject": "English Language Arts",
-      "tags": [
-        "phonics",
-        "phonological_awareness",
-        "print_concepts"
-      ]
-    },
-    {
-      "id": "us-k-ela-rf-1",
-      "parentId": "us-k-ela-rf",
-      "nodeType": "learning_objective",
-      "name": "Demonstrate understanding of print concepts",
-      "description": "Demonstrate understanding of the organization and basic features of print",
-      "educationalLevel": "K",
-      "subject": "English Language Arts",
-      "estimatedDuration": 30,
-      "tags": [
-        "print_concepts",
-        "reading_direction"
-      ]
-    },
-    {
-      "id": "us-k-ela-rf-2",
-      "parentId": "us-k-ela-rf",
-      "nodeType": "learning_objective",
-      "name": "Demonstrate understanding of phonological awareness",
-      "description": "Demonstrate understanding of spoken words, syllables, and sounds (phonemes)",
-      "educationalLevel": "K",
-      "subject": "English Language Arts",
-      "estimatedDuration": 35,
-      "tags": [
-        "phonological_awareness",
-        "phonemes",
-        "syllables"
-      ]
-    },
-    {
-      "id": "us-k-ela-sl",
-      "parentId": "us-k-ela",
-      "nodeType": "domain",
-      "name": "Speaking and Listening",
-      "description": "Comprehension and collaboration, presentation of knowledge and ideas",
-      "educationalLevel": "K",
-      "subject": "English Language Arts",
-      "tags": [
-        "oral_communication",
-        "listening_skills"
-      ]
-    },
-    {
-      "id": "us-k-ela-sl-1",
-      "parentId": "us-k-ela-sl",
-      "nodeType": "learning_objective",
-      "name": "Participate in collaborative conversations",
-      "description": "Participate in collaborative conversations with diverse partners about kindergarten topics",
-      "educationalLevel": "K",
-      "subject": "English Language Arts",
-      "estimatedDuration": 25,
-      "tags": [
-        "conversation",
-        "collaboration",
-        "turn_taking"
-      ]
-    },
-    {
-      "id": "us-g1-ela",
-      "parentId": "us-ela",
-      "nodeType": "grade_level",
-      "name": "Grade 1 English Language Arts",
-      "description": "First grade English Language Arts curriculum",
-      "educationalLevel": "1",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g1-ela-rf",
-      "parentId": "us-g1-ela",
-      "nodeType": "domain",
-      "name": "Reading: Foundational Skills",
-      "description": "Print concepts, phonological awareness, phonics and word recognition, fluency",
-      "educationalLevel": "1",
-      "subject": "English Language Arts",
-      "tags": [
-        "phonics",
-        "decoding",
-        "fluency"
-      ]
-    },
-    {
-      "id": "us-g1-ela-rf-1",
-      "parentId": "us-g1-ela-rf",
-      "nodeType": "learning_objective",
-      "name": "Demonstrate understanding of print organization",
-      "description": "Demonstrate understanding of the organization and basic features of print",
-      "educationalLevel": "1",
-      "subject": "English Language Arts",
-      "estimatedDuration": 30,
-      "tags": [
-        "print_concepts",
-        "capitalization",
-        "punctuation"
-      ]
-    },
-    {
-      "id": "us-g1-ela-rl",
-      "parentId": "us-g1-ela",
-      "nodeType": "domain",
-      "name": "Reading: Literature",
-      "description": "Key ideas and details, craft and structure, integration of knowledge and ideas",
-      "educationalLevel": "1",
-      "subject": "English Language Arts",
-      "tags": [
-        "literature",
-        "comprehension",
-        "story_elements"
-      ]
-    },
-    {
-      "id": "us-g1-ela-rl-1",
-      "parentId": "us-g1-ela-rl",
-      "nodeType": "learning_objective",
-      "name": "Ask and answer questions about key details",
-      "description": "Ask and answer questions about key details in a text",
-      "educationalLevel": "1",
-      "subject": "English Language Arts",
-      "estimatedDuration": 40,
-      "tags": [
-        "questioning",
-        "key_details",
-        "comprehension"
-      ]
-    },
-    {
-      "id": "us-g2-ela",
-      "parentId": "us-ela",
-      "nodeType": "grade_level",
-      "name": "Grade 2 English Language Arts",
-      "description": "Second grade English Language Arts curriculum",
-      "educationalLevel": "2",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g2-ela-rl",
-      "parentId": "us-g2-ela",
-      "nodeType": "domain",
-      "name": "Reading: Literature",
-      "description": "Key ideas and details, craft and structure, integration of knowledge and ideas",
-      "educationalLevel": "2",
-      "subject": "English Language Arts",
-      "tags": [
-        "literature",
-        "story_elements",
-        "comprehension"
-      ]
-    },
-    {
-      "id": "us-g2-ela-rl-1",
-      "parentId": "us-g2-ela-rl",
-      "nodeType": "learning_objective",
-      "name": "Ask and answer questions for comprehension",
-      "description": "Ask and answer such questions as who, what, where, when, why, and how to demonstrate understanding",
-      "educationalLevel": "2",
-      "subject": "English Language Arts",
-      "estimatedDuration": 45,
-      "tags": [
-        "5w1h_questions",
-        "comprehension",
-        "understanding"
-      ]
-    },
-    {
-      "id": "us-g2-ela-w",
-      "parentId": "us-g2-ela",
-      "nodeType": "domain",
-      "name": "Writing",
-      "description": "Text types and purposes, production and distribution of writing, research to build knowledge",
-      "educationalLevel": "2",
-      "subject": "English Language Arts",
-      "tags": [
-        "writing",
-        "text_types",
-        "composition"
-      ]
-    },
-    {
-      "id": "us-g2-ela-w-1",
-      "parentId": "us-g2-ela-w",
-      "nodeType": "learning_objective",
-      "name": "Write opinion pieces",
-      "description": "Write opinion pieces in which they introduce the topic, state an opinion, and provide reasons",
-      "educationalLevel": "2",
-      "subject": "English Language Arts",
-      "estimatedDuration": 50,
-      "tags": [
-        "opinion_writing",
-        "supporting_reasons",
-        "text_structure"
-      ]
-    },
-    {
-      "id": "us-g3-ela",
-      "parentId": "us-ela",
-      "nodeType": "grade_level",
-      "name": "Grade 3 English Language Arts",
-      "description": "Third grade English Language Arts curriculum",
-      "educationalLevel": "3",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g3-ela-rl",
-      "parentId": "us-g3-ela",
-      "nodeType": "domain",
-      "name": "Reading: Literature",
-      "description": "Key ideas and details, craft and structure, integration of knowledge and ideas",
-      "educationalLevel": "3",
-      "subject": "English Language Arts",
-      "tags": [
-        "literature",
-        "theme",
-        "character_analysis"
-      ]
-    },
-    {
-      "id": "us-g3-ela-rl-1",
-      "parentId": "us-g3-ela-rl",
-      "nodeType": "learning_objective",
-      "name": "Ask and answer questions about texts",
-      "description": "Ask and answer questions to demonstrate understanding of a text, referring explicitly to the text",
-      "educationalLevel": "3",
-      "subject": "English Language Arts",
-      "estimatedDuration": 45,
-      "tags": [
-        "text_evidence",
-        "explicit_reference",
-        "comprehension"
-      ]
-    },
-    {
-      "id": "us-g3-ela-w",
-      "parentId": "us-g3-ela",
-      "nodeType": "domain",
-      "name": "Writing",
-      "description": "Text types and purposes, production and distribution of writing, research to build knowledge",
-      "educationalLevel": "3",
-      "subject": "English Language Arts",
-      "tags": [
-        "writing",
-        "narrative",
-        "informative"
-      ]
-    },
-    {
-      "id": "us-g3-ela-w-1",
-      "parentId": "us-g3-ela-w",
-      "nodeType": "learning_objective",
-      "name": "Write opinion pieces with supporting details",
-      "description": "Write opinion pieces on topics or texts, supporting a point of view with reasons",
-      "educationalLevel": "3",
-      "subject": "English Language Arts",
-      "estimatedDuration": 60,
-      "tags": [
-        "opinion_writing",
-        "supporting_details",
-        "point_of_view"
-      ]
-    },
-    {
-      "id": "us-g4-ela",
-      "parentId": "us-ela",
-      "nodeType": "grade_level",
-      "name": "Grade 4 English Language Arts",
-      "description": "Fourth grade English Language Arts curriculum",
-      "educationalLevel": "4",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g4-ela-rl",
-      "parentId": "us-g4-ela",
-      "nodeType": "domain",
-      "name": "Reading: Literature",
-      "description": "Key ideas and details, craft and structure, integration of knowledge and ideas",
-      "educationalLevel": "4",
-      "subject": "English Language Arts",
-      "tags": [
-        "literature",
-        "theme",
-        "inference"
-      ]
-    },
-    {
-      "id": "us-g4-ela-rl-1",
-      "parentId": "us-g4-ela-rl",
-      "nodeType": "learning_objective",
-      "name": "Refer to details and examples when explaining text",
-      "description": "Refer to details and examples in a text when explaining what the text says explicitly and when drawing inferences",
-      "educationalLevel": "4",
-      "subject": "English Language Arts",
-      "estimatedDuration": 50,
-      "tags": [
-        "inference",
-        "text_evidence",
-        "explicit_meaning"
-      ]
-    },
-    {
-      "id": "us-g4-ela-w",
-      "parentId": "us-g4-ela",
-      "nodeType": "domain",
-      "name": "Writing",
-      "description": "Text types and purposes, production and distribution of writing, research to build knowledge",
-      "educationalLevel": "4",
-      "subject": "English Language Arts",
-      "tags": [
-        "writing",
-        "research",
-        "revision"
-      ]
-    },
-    {
-      "id": "us-g4-ela-w-1",
-      "parentId": "us-g4-ela-w",
-      "nodeType": "learning_objective",
-      "name": "Write opinion pieces with organized reasons",
-      "description": "Write opinion pieces on topics or texts, supporting a point of view with reasons and information",
-      "educationalLevel": "4",
-      "subject": "English Language Arts",
-      "estimatedDuration": 60,
-      "tags": [
-        "opinion_writing",
-        "organization",
-        "supporting_information"
-      ]
-    },
-    {
-      "id": "us-g5-ela",
-      "parentId": "us-ela",
-      "nodeType": "grade_level",
-      "name": "Grade 5 English Language Arts",
-      "description": "Fifth grade English Language Arts curriculum",
-      "educationalLevel": "5",
-      "subject": "English Language Arts",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g5-ela-rl",
-      "parentId": "us-g5-ela",
-      "nodeType": "domain",
-      "name": "Reading: Literature",
-      "description": "Key ideas and details, craft and structure, integration of knowledge and ideas",
-      "educationalLevel": "5",
-      "subject": "English Language Arts",
-      "tags": [
-        "literature",
-        "theme",
-        "character_development"
-      ]
-    },
-    {
-      "id": "us-g5-ela-rl-1",
-      "parentId": "us-g5-ela-rl",
-      "nodeType": "learning_objective",
-      "name": "Quote accurately from text when explaining",
-      "description": "Quote accurately from a text when explaining what the text says explicitly and when drawing inferences",
-      "educationalLevel": "5",
-      "subject": "English Language Arts",
-      "estimatedDuration": 50,
-      "tags": [
-        "quoting",
-        "text_evidence",
-        "inference"
-      ]
-    },
-    {
-      "id": "us-g5-ela-w",
-      "parentId": "us-g5-ela",
-      "nodeType": "domain",
-      "name": "Writing",
-      "description": "Text types and purposes, production and distribution of writing, research to build knowledge",
-      "educationalLevel": "5",
-      "subject": "English Language Arts",
-      "tags": [
-        "writing",
-        "research",
-        "multimedia"
-      ]
-    },
-    {
-      "id": "us-g5-ela-w-1",
-      "parentId": "us-g5-ela-w",
-      "nodeType": "learning_objective",
-      "name": "Write opinion pieces with logically ordered reasons",
-      "description": "Write opinion pieces on topics or texts, supporting a point of view with reasons and information",
-      "educationalLevel": "5",
-      "subject": "English Language Arts",
-      "estimatedDuration": 60,
-      "tags": [
-        "opinion_writing",
-        "logical_order",
-        "supporting_evidence"
-      ]
-    },
-    {
-      "id": "us-geography",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Geography",
-      "description": "Curriculum for K-12 Geography in the United States, covering spatial thinking, places and regions, physical systems, human systems, and environment-society interactions.",
-      "educationalLevel": "K-12",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "geography",
-        "social_studies",
-        "spatial_thinking",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-geo",
-      "parentId": "us-geography",
-      "nodeType": "course",
-      "name": "Kindergarten Geography",
-      "description": "Introduction to geography, focusing on maps, personal location, and the immediate environment.",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "kindergarten",
-        "maps_basics",
-        "personal_location"
-      ]
-    },
-    {
-      "id": "us-k-geo-spatial",
-      "parentId": "us-k-geo",
-      "nodeType": "domain",
-      "name": "The World in Spatial Terms",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "maps",
-        "globes",
-        "location"
-      ]
-    },
-    {
-      "id": "us-k-geo-lo1",
-      "parentId": "us-k-geo-spatial",
-      "nodeType": "learning_objective",
-      "name": "Identify a map and a globe as representations of Earth.",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "maps",
-        "globes",
-        "spatial_thinking"
-      ]
-    },
-    {
-      "id": "us-k-geo-lo2",
-      "parentId": "us-k-geo-spatial",
-      "nodeType": "learning_objective",
-      "name": "Describe the location of self and objects in the classroom.",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "relative_location",
-        "classroom_geography"
-      ]
-    },
-    {
-      "id": "us-g1-geo",
-      "parentId": "us-geography",
-      "nodeType": "course",
-      "name": "Grade 1 Geography",
-      "description": "Focus on the geography of the local community.",
-      "educationalLevel": "1",
-      "subject": "Social Studies",
-      "tags": [
-        "grade1",
-        "community_geography",
-        "local_maps"
-      ]
-    },
-    {
-      "id": "us-g1-geo-places",
-      "parentId": "us-g1-geo",
-      "nodeType": "domain",
-      "name": "Places and Regions",
-      "educationalLevel": "1",
-      "subject": "Social Studies",
-      "tags": [
-        "community_features",
-        "local_places"
-      ]
-    },
-    {
-      "id": "us-g1-geo-lo1",
-      "parentId": "us-g1-geo-places",
-      "nodeType": "learning_objective",
-      "name": "Create and use simple maps of the classroom and school.",
-      "educationalLevel": "1",
-      "subject": "Social Studies",
-      "tags": [
-        "map_making",
-        "school_map",
-        "classroom_map"
-      ]
-    },
-    {
-      "id": "us-g1-geo-lo2",
-      "parentId": "us-g1-geo-places",
-      "nodeType": "learning_objective",
-      "name": "Identify natural and human-made features in the community.",
-      "educationalLevel": "1",
-      "subject": "Social Studies",
-      "tags": [
-        "physical_features",
-        "human_features",
-        "community_places"
-      ]
-    },
-    {
-      "id": "us-g2-geo",
-      "parentId": "us-geography",
-      "nodeType": "course",
-      "name": "Grade 2 Geography",
-      "description": "Expanding to understand continents, oceans, and different environments.",
-      "educationalLevel": "2",
-      "subject": "Social Studies",
-      "tags": [
-        "grade2",
-        "world_geography",
-        "continents_oceans"
-      ]
-    },
-    {
-      "id": "us-g2-geo-world",
-      "parentId": "us-g2-geo",
-      "nodeType": "domain",
-      "name": "The World",
-      "educationalLevel": "2",
-      "subject": "Social Studies",
-      "tags": [
-        "continents",
-        "oceans",
-        "world_map"
-      ]
-    },
-    {
-      "id": "us-g2-geo-lo1",
-      "parentId": "us-g2-geo-world",
-      "nodeType": "learning_objective",
-      "name": "Locate and name the seven continents and five oceans.",
-      "educationalLevel": "2",
-      "subject": "Social Studies",
-      "tags": [
-        "continents",
-        "oceans",
-        "world_map"
-      ]
-    },
-    {
-      "id": "us-g2-geo-lo2",
-      "parentId": "us-g2-geo-world",
-      "nodeType": "learning_objective",
-      "name": "Compare different kinds of communities (urban, suburban, rural).",
-      "educationalLevel": "2",
-      "subject": "Social Studies",
-      "tags": [
-        "community_types",
-        "urban",
-        "suburban",
-        "rural"
-      ]
-    },
-    {
-      "id": "us-g3-geo",
-      "parentId": "us-geography",
-      "nodeType": "course",
-      "name": "Grade 3 Geography",
-      "description": "Focus on the geography of the local state and region.",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "grade3",
-        "state_geography",
-        "regional_landforms"
-      ]
-    },
-    {
-      "id": "us-g3-geo-state",
-      "parentId": "us-g3-geo",
-      "nodeType": "domain",
-      "name": "State & Regional Geography",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "state_maps",
-        "human_environment_interaction"
-      ]
-    },
-    {
-      "id": "us-g3-geo-lo1",
-      "parentId": "us-g3-geo-state",
-      "nodeType": "learning_objective",
-      "name": "Use maps to identify major cities, rivers, and landforms in their state.",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "state_maps",
-        "physical_geography",
-        "human_geography"
-      ]
-    },
-    {
-      "id": "us-g3-geo-lo2",
-      "parentId": "us-g3-geo-state",
-      "nodeType": "learning_objective",
-      "name": "Explain how the environment affects human activity in their region.",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "human_environment_interaction",
-        "regional_adaptation"
-      ]
-    },
-    {
-      "id": "us-g4-geo",
-      "parentId": "us-geography",
-      "nodeType": "course",
-      "name": "Grade 4 Geography",
-      "description": "Study of the physical and human geography of the different regions of the United States.",
-      "educationalLevel": "4",
-      "subject": "Social Studies",
-      "tags": [
-        "grade4",
-        "us_regions",
-        "regional_geography"
-      ]
-    },
-    {
-      "id": "us-g4-geo-regions",
-      "parentId": "us-g4-geo",
-      "nodeType": "domain",
-      "name": "U.S. Regions",
-      "educationalLevel": "4",
-      "subject": "Social Studies",
-      "tags": [
-        "us_regions_map",
-        "regional_comparison"
-      ]
-    },
-    {
-      "id": "us-g4-geo-lo1",
-      "parentId": "us-g4-geo-regions",
-      "nodeType": "learning_objective",
-      "name": "Locate the major regions of the United States and identify their states.",
-      "educationalLevel": "4",
-      "subject": "Social Studies",
-      "tags": [
-        "us_regions_map",
-        "state_identification"
-      ]
-    },
-    {
-      "id": "us-g4-geo-lo2",
-      "parentId": "us-g4-geo-regions",
-      "nodeType": "learning_objective",
-      "name": "Compare the climate, landforms, and natural resources of different U.S. regions.",
-      "educationalLevel": "4",
-      "subject": "Social Studies",
-      "tags": [
-        "regional_comparison",
-        "physical_systems",
-        "natural_resources"
-      ]
-    },
-    {
-      "id": "us-g5-geo",
-      "parentId": "us-geography",
-      "nodeType": "course",
-      "name": "Grade 5 Geography",
-      "description": "Focus on the geography of the United States in relation to the Western Hemisphere.",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "grade5",
-        "western_hemisphere",
-        "us_geography_context"
-      ]
-    },
-    {
-      "id": "us-g5-geo-hemisphere",
-      "parentId": "us-g5-geo",
-      "nodeType": "domain",
-      "name": "The Western Hemisphere",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "map_skills",
-        "human_settlement"
-      ]
-    },
-    {
-      "id": "us-g5-geo-lo1",
-      "parentId": "us-g5-geo-hemisphere",
-      "nodeType": "learning_objective",
-      "name": "Use latitude and longitude to locate places in the Western Hemisphere.",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "latitude_longitude",
-        "coordinate_system",
-        "map_skills"
-      ]
-    },
-    {
-      "id": "us-g5-geo-lo2",
-      "parentId": "us-g5-geo-hemisphere",
-      "nodeType": "learning_objective",
-      "name": "Describe major patterns of human settlement in the Americas.",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "human_settlement",
-        "population_distribution",
-        "americas"
-      ]
-    },
-    {
-      "id": "us-history",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "History",
-      "description": "Curriculum for K-12 History in the United States, covering American history, world history, civics, and cultural understanding.",
-      "educationalLevel": "K-12",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "history",
-        "social_studies",
-        "american_history",
-        "world_history",
-        "civics",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-history",
-      "parentId": "us-history",
-      "nodeType": "course",
-      "name": "Kindergarten History",
-      "description": "Introduction to history focusing on personal identity, family, and community.",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "family_history",
-        "community",
-        "personal_identity"
-      ]
-    },
-    {
-      "id": "us-k-history-identity",
-      "parentId": "us-k-history",
-      "nodeType": "domain",
-      "name": "Personal and Family Identity",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "personal_identity",
-        "family_traditions",
-        "cultural_heritage"
-      ]
-    },
-    {
-      "id": "us-k-history-lo1",
-      "parentId": "us-k-history-identity",
-      "nodeType": "learning_objective",
-      "name": "Describe personal characteristics and family traditions.",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "family_traditions",
-        "personal_characteristics",
-        "cultural_identity"
-      ]
-    },
-    {
-      "id": "us-k-history-lo2",
-      "parentId": "us-k-history-identity",
-      "nodeType": "learning_objective",
-      "name": "Identify how we learn about the past through family stories and photographs.",
-      "educationalLevel": "K",
-      "subject": "Social Studies",
-      "tags": [
-        "historical_sources",
-        "family_stories",
-        "photographs",
-        "past_present"
-      ]
-    },
-    {
-      "id": "us-g1-history",
-      "parentId": "us-history",
-      "nodeType": "course",
-      "name": "Grade 1 History",
-      "description": "Focus on family history, school traditions, and community helpers.",
-      "educationalLevel": "1",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "family_history",
-        "school_traditions",
-        "community_helpers"
-      ]
-    },
-    {
-      "id": "us-g2-history",
-      "parentId": "us-history",
-      "nodeType": "course",
-      "name": "Grade 2 History",
-      "description": "Introduction to community history and American symbols.",
-      "educationalLevel": "2",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "community_history",
-        "american_symbols",
-        "local_history"
-      ]
-    },
-    {
-      "id": "us-g3-history",
-      "parentId": "us-history",
-      "nodeType": "course",
-      "name": "Grade 3 History",
-      "description": "Focus on local history, Native American cultures, and early explorers.",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "local_history",
-        "native_americans",
-        "explorers",
-        "indigenous_cultures"
-      ]
-    },
-    {
-      "id": "us-g3-history-native",
-      "parentId": "us-g3-history",
-      "nodeType": "domain",
-      "name": "Native American Cultures",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "native_americans",
-        "indigenous_cultures",
-        "tribal_societies"
-      ]
-    },
-    {
-      "id": "us-g3-history-lo1",
-      "parentId": "us-g3-history-native",
-      "nodeType": "learning_objective",
-      "name": "Compare and contrast different Native American cultural groups.",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "native_americans",
-        "cultural_comparison",
-        "tribal_diversity"
-      ]
-    },
-    {
-      "id": "us-g3-history-lo2",
-      "parentId": "us-g3-history-native",
-      "nodeType": "learning_objective",
-      "name": "Describe how Native Americans adapted to their environments.",
-      "educationalLevel": "3",
-      "subject": "Social Studies",
-      "tags": [
-        "environmental_adaptation",
-        "native_americans",
-        "cultural_geography"
-      ]
-    },
-    {
-      "id": "us-g4-history",
-      "parentId": "us-history",
-      "nodeType": "course",
-      "name": "Grade 4 History",
-      "description": "Study of state history, including settlement, development, and key historical figures.",
-      "educationalLevel": "4",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "state_history",
-        "settlement",
-        "historical_figures"
-      ]
-    },
-    {
-      "id": "us-g5-history",
-      "parentId": "us-history",
-      "nodeType": "course",
-      "name": "Grade 5 History",
-      "description": "Focus on early American history including exploration, colonization, and the Revolutionary War.",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "american_history",
-        "colonial_period",
-        "revolutionary_war",
-        "exploration"
-      ]
-    },
-    {
-      "id": "us-g5-history-colonial",
-      "parentId": "us-g5-history",
-      "nodeType": "domain",
-      "name": "Colonial America",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "colonial_period",
-        "thirteen_colonies",
-        "european_settlement"
-      ]
-    },
-    {
-      "id": "us-g5-history-lo1",
-      "parentId": "us-g5-history-colonial",
-      "nodeType": "learning_objective",
-      "name": "Describe the reasons for European exploration and colonization of North America.",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "european_exploration",
-        "colonization",
-        "motives",
-        "age_of_exploration"
-      ]
-    },
-    {
-      "id": "us-g5-history-lo2",
-      "parentId": "us-g5-history-colonial",
-      "nodeType": "learning_objective",
-      "name": "Compare the different colonial regions and their characteristics.",
-      "educationalLevel": "5",
-      "subject": "Social Studies",
-      "tags": [
-        "colonial_regions",
-        "new_england",
-        "middle_colonies",
-        "southern_colonies"
-      ]
-    },
-    {
-      "id": "us-life-essentials",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Life Essentials",
-      "description": "Curriculum for Life Essentials in the United States, covering practical skills for independent living, financial literacy, health/safety, and relationship navigation.",
-      "educationalLevel": "K-12",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "life_skills",
-        "practical_skills",
-        "independent_living",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-le",
-      "parentId": "us-life-essentials",
-      "nodeType": "course",
-      "name": "Kindergarten Life Essentials",
-      "description": "Basic self-care and safety skills for Kindergarten.",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "self_care",
-        "safety_basics"
-      ]
-    },
-    {
-      "id": "us-k-le-pch",
-      "parentId": "us-k-le",
-      "nodeType": "domain",
-      "name": "Personal Care & Health",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "personal_hygiene",
-        "health_habits"
-      ]
-    },
-    {
-      "id": "us-k-le-ses",
-      "parentId": "us-k-le",
-      "nodeType": "domain",
-      "name": "Safety & Emergency Skills",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "safety_rules",
-        "emergency_awareness"
-      ]
-    },
-    {
-      "id": "us-k-le-mb",
-      "parentId": "us-k-le",
-      "nodeType": "domain",
-      "name": "Money Basics",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "financial_literacy_foundations",
-        "money_identification"
-      ]
-    },
-    {
-      "id": "us-k-le-ssr",
-      "parentId": "us-k-le",
-      "nodeType": "domain",
-      "name": "Social Skills & Relationships",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "social_development",
-        "family_roles"
-      ]
-    },
-    {
-      "id": "us-k-le-pch-lo1",
-      "parentId": "us-k-le-pch",
-      "nodeType": "learning_objective",
-      "name": "Basic hygiene (brushing teeth, washing hands, dressing)",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "hygiene",
-        "self_dressing"
-      ]
-    },
-    {
-      "id": "us-k-le-ses-lo1",
-      "parentId": "us-k-le-ses",
-      "nodeType": "learning_objective",
-      "name": "Home safety rules and identifying trusted adults",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "home_safety",
-        "trusted_adults"
-      ]
-    },
-    {
-      "id": "us-k-le-mb-lo1",
-      "parentId": "us-k-le-mb",
-      "nodeType": "learning_objective",
-      "name": "Identify coins and bills, understand \"buying\" things",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "money_identification",
-        "concept_of_buying"
-      ]
-    },
-    {
-      "id": "us-k-le-ssr-lo1",
-      "parentId": "us-k-le-ssr",
-      "nodeType": "learning_objective",
-      "name": "Family roles and responsibilities",
-      "educationalLevel": "K",
-      "subject": "Life Essentials",
-      "tags": [
-        "family_structure",
-        "responsibilities"
-      ]
-    },
-    {
-      "id": "us-g1-le",
-      "parentId": "us-life-essentials",
-      "nodeType": "course",
-      "name": "Grade 1 Life Essentials",
-      "description": "Expanding on basic self-care and safety for Grade 1.",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "self_care",
-        "safety_skills"
-      ]
-    },
-    {
-      "id": "us-g1-le-pch",
-      "parentId": "us-g1-le",
-      "nodeType": "domain",
-      "name": "Personal Care & Health",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "healthy_eating",
-        "food_safety"
-      ]
-    },
-    {
-      "id": "us-g1-le-ses",
-      "parentId": "us-g1-le",
-      "nodeType": "domain",
-      "name": "Safety & Emergency Skills",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "first_aid_basics",
-        "help_seeking"
-      ]
-    },
-    {
-      "id": "us-g1-le-mb",
-      "parentId": "us-g1-le",
-      "nodeType": "domain",
-      "name": "Money Basics",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "needs_vs_wants",
-        "financial_choices"
-      ]
-    },
-    {
-      "id": "us-g1-le-ssr",
-      "parentId": "us-g1-le",
-      "nodeType": "domain",
-      "name": "Social Skills & Relationships",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "friendship",
-        "kindness"
-      ]
-    },
-    {
-      "id": "us-g1-le-pch-lo1",
-      "parentId": "us-g1-le-pch",
-      "nodeType": "learning_objective",
-      "name": "Healthy eating choices and food safety basics",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "nutrition",
-        "food_groups",
-        "safe_food_handling"
-      ]
-    },
-    {
-      "id": "us-g1-le-ses-lo1",
-      "parentId": "us-g1-le-ses",
-      "nodeType": "learning_objective",
-      "name": "Basic first aid (cleaning cuts, getting help)",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "first_aid",
-        "minor_injuries"
-      ]
-    },
-    {
-      "id": "us-g1-le-mb-lo1",
-      "parentId": "us-g1-le-mb",
-      "nodeType": "learning_objective",
-      "name": "Distinguish between needs and wants",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "needs",
-        "wants",
-        "decision_making"
-      ]
-    },
-    {
-      "id": "us-g1-le-ssr-lo1",
-      "parentId": "us-g1-le-ssr",
-      "nodeType": "learning_objective",
-      "name": "Friendship basics and treating others kindly",
-      "educationalLevel": "1",
-      "subject": "Life Essentials",
-      "tags": [
-        "friendship_skills",
-        "kindness",
-        "empathy"
-      ]
-    },
-    {
-      "id": "us-g2-le",
-      "parentId": "us-life-essentials",
-      "nodeType": "course",
-      "name": "Grade 2 Life Essentials",
-      "description": "Further development of self-care and safety for Grade 2.",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "body_awareness",
-        "emergency_preparedness"
-      ]
-    },
-    {
-      "id": "us-g2-le-pch",
-      "parentId": "us-g2-le",
-      "nodeType": "domain",
-      "name": "Personal Care & Health",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "body_privacy",
-        "appropriate_touch"
-      ]
-    },
-    {
-      "id": "us-g2-le-ses",
-      "parentId": "us-g2-le",
-      "nodeType": "domain",
-      "name": "Safety & Emergency Skills",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "emergency_info",
-        "calling_911"
-      ]
-    },
-    {
-      "id": "us-g2-le-mb",
-      "parentId": "us-g2-le",
-      "nodeType": "domain",
-      "name": "Money Basics",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "saving_money",
-        "delayed_gratification"
-      ]
-    },
-    {
-      "id": "us-g2-le-ssr",
-      "parentId": "us-g2-le",
-      "nodeType": "domain",
-      "name": "Social Skills & Relationships",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "family_diversity",
-        "understanding_families"
-      ]
-    },
-    {
-      "id": "us-g2-le-pch-lo1",
-      "parentId": "us-g2-le-pch",
-      "nodeType": "learning_objective",
-      "name": "Understanding body parts, privacy, and appropriate touch",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "personal_safety",
-        "body_boundaries"
-      ]
-    },
-    {
-      "id": "us-g2-le-ses-lo1",
-      "parentId": "us-g2-le-ses",
-      "nodeType": "learning_objective",
-      "name": "Emergency information (address, phone number, 911)",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "emergency_contacts",
-        "911_use"
-      ]
-    },
-    {
-      "id": "us-g2-le-mb-lo1",
-      "parentId": "us-g2-le-mb",
-      "nodeType": "learning_objective",
-      "name": "Simple saving concepts (piggy bank, delayed gratification)",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "saving_habits",
-        "financial_planning_basics"
-      ]
-    },
-    {
-      "id": "us-g2-le-ssr-lo1",
-      "parentId": "us-g2-le-ssr",
-      "nodeType": "learning_objective",
-      "name": "Understanding different family structures",
-      "educationalLevel": "2",
-      "subject": "Life Essentials",
-      "tags": [
-        "family_types",
-        "diversity_awareness"
-      ]
-    },
-    {
-      "id": "us-g3-le",
-      "parentId": "us-life-essentials",
-      "nodeType": "course",
-      "name": "Grade 3 Life Essentials",
-      "description": "Expanding independence for Grade 3.",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "independence",
-        "practical_skills"
-      ]
-    },
-    {
-      "id": "us-g3-le-hba",
-      "parentId": "us-g3-le",
-      "nodeType": "domain",
-      "name": "Health & Body Awareness",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "nutrition",
-        "balanced_meals"
-      ]
-    },
-    {
-      "id": "us-g3-le-ser",
-      "parentId": "us-g3-le",
-      "nodeType": "domain",
-      "name": "Safety & Emergency Response",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "home_alone_safety",
-        "emergency_contacts"
-      ]
-    },
-    {
-      "id": "us-g3-le-mcs",
-      "parentId": "us-g3-le",
-      "nodeType": "domain",
-      "name": "Money & Consumer Skills",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "money_management",
-        "budgeting_basics"
-      ]
-    },
-    {
-      "id": "us-g3-le-ls",
-      "parentId": "us-g3-le",
-      "nodeType": "domain",
-      "name": "Life Skills",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "cooking_safety",
-        "simple_recipes"
-      ]
-    },
-    {
-      "id": "us-g3-le-hba-lo1",
-      "parentId": "us-g3-le-hba",
-      "nodeType": "learning_objective",
-      "name": "Nutrition labels and balanced meals",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "nutrition_labels",
-        "meal_planning"
-      ]
-    },
-    {
-      "id": "us-g3-le-ser-lo1",
-      "parentId": "us-g3-le-ser",
-      "nodeType": "learning_objective",
-      "name": "Home alone safety rules and emergency contacts",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "safety_at_home",
-        "emergency_procedures"
-      ]
-    },
-    {
-      "id": "us-g3-le-mcs-lo1",
-      "parentId": "us-g3-le-mcs",
-      "nodeType": "learning_objective",
-      "name": "Counting money, making change, simple budgeting",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "financial_calculations",
-        "budgeting"
-      ]
-    },
-    {
-      "id": "us-g3-le-ls-lo1",
-      "parentId": "us-g3-le-ls",
-      "nodeType": "learning_objective",
-      "name": "Basic cooking safety and simple recipes",
-      "educationalLevel": "3",
-      "subject": "Life Essentials",
-      "tags": [
-        "kitchen_safety",
-        "basic_cooking"
-      ]
-    },
-    {
-      "id": "us-g4-le",
-      "parentId": "us-life-essentials",
-      "nodeType": "course",
-      "name": "Grade 4 Life Essentials",
-      "description": "Further expanding independence for Grade 4.",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "independence",
-        "daily_living_skills"
-      ]
-    },
-    {
-      "id": "us-g4-le-hba",
-      "parentId": "us-g4-le",
-      "nodeType": "domain",
-      "name": "Health & Body Awareness",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "anatomy_basics",
-        "body_changes"
-      ]
-    },
-    {
-      "id": "us-g4-le-ser",
-      "parentId": "us-g4-le",
-      "nodeType": "domain",
-      "name": "Safety & Emergency Response",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "first_aid_intermediate",
-        "calling_for_help"
-      ]
-    },
-    {
-      "id": "us-g4-le-mcs",
-      "parentId": "us-g4-le",
-      "nodeType": "domain",
-      "name": "Money & Consumer Skills",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "comparison_shopping",
-        "advertising_literacy"
-      ]
-    },
-    {
-      "id": "us-g4-le-ls",
-      "parentId": "us-g4-le",
-      "nodeType": "domain",
-      "name": "Life Skills",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "laundry_basics",
-        "personal_belongings_care"
-      ]
-    },
-    {
-      "id": "us-g4-le-hba-lo1",
-      "parentId": "us-g4-le-hba",
-      "nodeType": "learning_objective",
-      "name": "Basic anatomy and how bodies grow/change",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "human_body",
-        "growth_development"
-      ]
-    },
-    {
-      "id": "us-g4-le-ser-lo1",
-      "parentId": "us-g4-le-ser",
-      "nodeType": "learning_objective",
-      "name": "Basic first aid (bandages, ice, when to call adults)",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "first_aid_application",
-        "emergency_response"
-      ]
-    },
-    {
-      "id": "us-g4-le-mcs-lo1",
-      "parentId": "us-g4-le-mcs",
-      "nodeType": "learning_objective",
-      "name": "Comparison shopping and understanding advertisements",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "consumer_skills",
-        "media_literacy"
-      ]
-    },
-    {
-      "id": "us-g4-le-ls-lo1",
-      "parentId": "us-g4-le-ls",
-      "nodeType": "learning_objective",
-      "name": "Laundry basics and taking care of belongings",
-      "educationalLevel": "4",
-      "subject": "Life Essentials",
-      "tags": [
-        "household_chores",
-        "responsibility"
-      ]
-    },
-    {
-      "id": "us-g5-le",
-      "parentId": "us-life-essentials",
-      "nodeType": "course",
-      "name": "Grade 5 Life Essentials",
-      "description": "Consolidating independence skills for Grade 5.",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "independence",
-        "self_management"
-      ]
-    },
-    {
-      "id": "us-g5-le-hba",
-      "parentId": "us-g5-le",
-      "nodeType": "domain",
-      "name": "Health & Body Awareness",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "puberty_introduction",
-        "body_changes_awareness"
-      ]
-    },
-    {
-      "id": "us-g5-le-ser",
-      "parentId": "us-g5-le",
-      "nodeType": "domain",
-      "name": "Safety & Emergency Response",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "fire_safety",
-        "natural_disaster_preparedness"
-      ]
-    },
-    {
-      "id": "us-g5-le-mcs",
-      "parentId": "us-g5-le",
-      "nodeType": "domain",
-      "name": "Money & Consumer Skills",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "earning_money",
-        "allowance_management"
-      ]
-    },
-    {
-      "id": "us-g5-le-ls",
-      "parentId": "us-g5-le",
-      "nodeType": "domain",
-      "name": "Life Skills",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "time_management",
-        "organization_skills"
-      ]
-    },
-    {
-      "id": "us-g5-le-hba-lo1",
-      "parentId": "us-g5-le-hba",
-      "nodeType": "learning_objective",
-      "name": "Introduction to puberty and body changes",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "puberty",
-        "adolescence_preparation"
-      ]
-    },
-    {
-      "id": "us-g5-le-ser-lo1",
-      "parentId": "us-g5-le-ser",
-      "nodeType": "learning_objective",
-      "name": "Fire safety, natural disaster preparedness",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "emergency_planning",
-        "disaster_response"
-      ]
-    },
-    {
-      "id": "us-g5-le-mcs-lo1",
-      "parentId": "us-g5-le-mcs",
-      "nodeType": "learning_objective",
-      "name": "Introduction to earning money (chores, allowance)",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "income_basics",
-        "work_ethic"
-      ]
-    },
-    {
-      "id": "us-g5-le-ls-lo1",
-      "parentId": "us-g5-le-ls",
-      "nodeType": "learning_objective",
-      "name": "Time management and organization skills",
-      "educationalLevel": "5",
-      "subject": "Life Essentials",
-      "tags": [
-        "planning",
-        "productivity",
-        "study_skills"
-      ]
-    },
-    {
-      "id": "us-math",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Mathematics",
-      "description": "US K-5 Mathematics curriculum based on Common Core State Standards",
-      "educationalLevel": "K-5",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "ccss",
-        "mathematics",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-k-math",
-      "parentId": "us-math",
-      "nodeType": "grade_level",
-      "name": "Kindergarten Mathematics",
-      "description": "Foundational math skills for kindergarten students",
-      "educationalLevel": "K",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "foundational"
-      ]
-    },
-    {
-      "id": "us-k-math-cc",
-      "parentId": "us-k-math",
-      "nodeType": "domain",
-      "name": "Counting and Cardinality",
-      "description": "Know number names and the count sequence",
-      "educationalLevel": "K",
-      "subject": "Mathematics",
-      "tags": [
-        "counting",
-        "numbers"
-      ]
-    },
-    {
-      "id": "us-k-math-cc-1",
-      "parentId": "us-k-math-cc",
-      "nodeType": "learning_objective",
-      "name": "Count to 100 by ones and by tens",
-      "description": "Count to 100 by ones and by tens",
-      "educationalLevel": "K",
-      "subject": "Mathematics",
-      "estimatedDuration": 30,
-      "tags": [
-        "counting",
-        "sequence"
-      ]
-    },
-    {
-      "id": "us-k-math-cc-2",
-      "parentId": "us-k-math-cc",
-      "nodeType": "learning_objective",
-      "name": "Count forward beginning from a given number",
-      "description": "Count forward beginning from a given number within the known sequence",
-      "educationalLevel": "K",
-      "subject": "Mathematics",
-      "estimatedDuration": 25,
-      "tags": [
-        "counting",
-        "sequence"
-      ]
-    },
-    {
-      "id": "us-g1-math",
-      "parentId": "us-math",
-      "nodeType": "grade_level",
-      "name": "Grade 1 Mathematics",
-      "description": "First grade mathematics curriculum",
-      "educationalLevel": "1",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g1-math-oa",
-      "parentId": "us-g1-math",
-      "nodeType": "domain",
-      "name": "Operations and Algebraic Thinking",
-      "description": "Represent and solve problems involving addition and subtraction",
-      "educationalLevel": "1",
-      "subject": "Mathematics",
-      "tags": [
-        "operations",
-        "addition",
-        "subtraction"
-      ]
-    },
-    {
-      "id": "us-g1-math-oa-1",
-      "parentId": "us-g1-math-oa",
-      "nodeType": "learning_objective",
-      "name": "Use addition and subtraction within 20",
-      "description": "Use addition and subtraction within 20 to solve word problems",
-      "educationalLevel": "1",
-      "subject": "Mathematics",
-      "estimatedDuration": 45,
-      "tags": [
-        "word_problems",
-        "addition",
-        "subtraction"
-      ]
-    },
-    {
-      "id": "us-g2-math",
-      "parentId": "us-math",
-      "nodeType": "grade_level",
-      "name": "Grade 2 Mathematics",
-      "description": "Second grade mathematics curriculum",
-      "educationalLevel": "2",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g2-math-oa",
-      "parentId": "us-g2-math",
-      "nodeType": "domain",
-      "name": "Operations and Algebraic Thinking",
-      "description": "Represent and solve problems involving addition and subtraction",
-      "educationalLevel": "2",
-      "subject": "Mathematics",
-      "tags": [
-        "operations",
-        "addition",
-        "subtraction"
-      ]
-    },
-    {
-      "id": "us-g2-math-oa-1",
-      "parentId": "us-g2-math-oa",
-      "nodeType": "learning_objective",
-      "name": "Use addition and subtraction within 100",
-      "description": "Use addition and subtraction within 100 to solve one- and two-step word problems",
-      "educationalLevel": "2",
-      "subject": "Mathematics",
-      "estimatedDuration": 50,
-      "tags": [
-        "word_problems",
-        "addition",
-        "subtraction",
-        "two_step"
-      ]
-    },
-    {
-      "id": "us-g3-math",
-      "parentId": "us-math",
-      "nodeType": "grade_level",
-      "name": "Grade 3 Mathematics",
-      "description": "Third grade mathematics curriculum",
-      "educationalLevel": "3",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g3-math-oa",
-      "parentId": "us-g3-math",
-      "nodeType": "domain",
-      "name": "Operations and Algebraic Thinking",
-      "description": "Represent and solve problems involving multiplication and division",
-      "educationalLevel": "3",
-      "subject": "Mathematics",
-      "tags": [
-        "operations",
-        "multiplication",
-        "division"
-      ]
-    },
-    {
-      "id": "us-g3-math-oa-1",
-      "parentId": "us-g3-math-oa",
-      "nodeType": "learning_objective",
-      "name": "Interpret products of whole numbers",
-      "description": "Interpret products of whole numbers as equal groups",
-      "educationalLevel": "3",
-      "subject": "Mathematics",
-      "estimatedDuration": 40,
-      "tags": [
-        "multiplication",
-        "equal_groups"
-      ]
-    },
-    {
-      "id": "us-g3-math-oa-2",
-      "parentId": "us-g3-math-oa",
-      "nodeType": "learning_objective",
-      "name": "Interpret whole-number quotients",
-      "description": "Interpret whole-number quotients of whole numbers",
-      "educationalLevel": "3",
-      "subject": "Mathematics",
-      "estimatedDuration": 40,
-      "tags": [
-        "division",
-        "equal_shares"
-      ]
-    },
-    {
-      "id": "us-g3-math-nf",
-      "parentId": "us-g3-math",
-      "nodeType": "domain",
-      "name": "Number and Operations—Fractions",
-      "description": "Develop understanding of fractions as numbers",
-      "educationalLevel": "3",
-      "subject": "Mathematics",
-      "tags": [
-        "fractions",
-        "number_line"
-      ]
-    },
-    {
-      "id": "us-g3-math-nf-1",
-      "parentId": "us-g3-math-nf",
-      "nodeType": "learning_objective",
-      "name": "Understand a fraction as a number",
-      "description": "Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts",
-      "educationalLevel": "3",
-      "subject": "Mathematics",
-      "estimatedDuration": 45,
-      "tags": [
-        "unit_fractions",
-        "partitioning"
-      ]
-    },
-    {
-      "id": "us-g4-math",
-      "parentId": "us-math",
-      "nodeType": "grade_level",
-      "name": "Grade 4 Mathematics",
-      "description": "Fourth grade mathematics curriculum",
-      "educationalLevel": "4",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g4-math-oa",
-      "parentId": "us-g4-math",
-      "nodeType": "domain",
-      "name": "Operations and Algebraic Thinking",
-      "description": "Use the four operations with whole numbers to solve problems",
-      "educationalLevel": "4",
-      "subject": "Mathematics",
-      "tags": [
-        "operations",
-        "problem_solving"
-      ]
-    },
-    {
-      "id": "us-g4-math-oa-1",
-      "parentId": "us-g4-math-oa",
-      "nodeType": "learning_objective",
-      "name": "Interpret multiplication equations as comparisons",
-      "description": "Interpret a multiplication equation as a comparison",
-      "educationalLevel": "4",
-      "subject": "Mathematics",
-      "estimatedDuration": 40,
-      "tags": [
-        "multiplication",
-        "comparison"
-      ]
-    },
-    {
-      "id": "us-g4-math-nf",
-      "parentId": "us-g4-math",
-      "nodeType": "domain",
-      "name": "Number and Operations—Fractions",
-      "description": "Extend understanding of fraction equivalence and ordering",
-      "educationalLevel": "4",
-      "subject": "Mathematics",
-      "tags": [
-        "fractions",
-        "equivalence"
-      ]
-    },
-    {
-      "id": "us-g4-math-nf-1",
-      "parentId": "us-g4-math-nf",
-      "nodeType": "learning_objective",
-      "name": "Explain why fractions are equivalent",
-      "description": "Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b)",
-      "educationalLevel": "4",
-      "subject": "Mathematics",
-      "estimatedDuration": 50,
-      "tags": [
-        "equivalent_fractions",
-        "multiplication"
-      ]
-    },
-    {
-      "id": "us-g5-math",
-      "parentId": "us-math",
-      "nodeType": "grade_level",
-      "name": "Grade 5 Mathematics",
-      "description": "Fifth grade mathematics curriculum",
-      "educationalLevel": "5",
-      "subject": "Mathematics",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "elementary"
-      ]
-    },
-    {
-      "id": "us-g5-math-oa",
-      "parentId": "us-g5-math",
-      "nodeType": "domain",
-      "name": "Operations and Algebraic Thinking",
-      "description": "Write and interpret numerical expressions",
-      "educationalLevel": "5",
-      "subject": "Mathematics",
-      "tags": [
-        "expressions",
-        "patterns"
-      ]
-    },
-    {
-      "id": "us-g5-math-oa-1",
-      "parentId": "us-g5-math-oa",
-      "nodeType": "learning_objective",
-      "name": "Use parentheses and brackets in expressions",
-      "description": "Use parentheses, brackets, or braces in numerical expressions",
-      "educationalLevel": "5",
-      "subject": "Mathematics",
-      "estimatedDuration": 45,
-      "tags": [
-        "order_of_operations",
-        "grouping_symbols"
-      ]
-    },
-    {
-      "id": "us-g5-math-nf",
-      "parentId": "us-g5-math",
-      "nodeType": "domain",
-      "name": "Number and Operations—Fractions",
-      "description": "Use equivalent fractions as a strategy to add and subtract fractions",
-      "educationalLevel": "5",
-      "subject": "Mathematics",
-      "tags": [
-        "fractions",
-        "operations"
-      ]
-    },
-    {
-      "id": "us-g5-math-nf-1",
-      "parentId": "us-g5-math-nf",
-      "nodeType": "learning_objective",
-      "name": "Add and subtract fractions with unlike denominators",
-      "description": "Add and subtract fractions with unlike denominators by replacing given fractions with equivalent fractions",
-      "educationalLevel": "5",
-      "subject": "Mathematics",
-      "estimatedDuration": 60,
-      "tags": [
-        "fraction_addition",
-        "fraction_subtraction",
-        "unlike_denominators"
-      ]
-    },
-    {
-      "id": "us-mental-wellness",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Mental Wellness",
-      "description": "Curriculum for Mental Wellness in the United States, focusing on emotional literacy, self-regulation, social skills, resilience, and mental health awareness across K-12.",
-      "educationalLevel": "K-12",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "mental_health",
-        "social_emotional_learning",
-        "wellbeing",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-mw",
-      "parentId": "us-mental-wellness",
-      "nodeType": "course",
-      "name": "Kindergarten Mental Wellness",
-      "description": "Foundational mental wellness concepts for Kindergarten.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "mental_wellness",
-        "foundation"
-      ]
-    },
-    {
-      "id": "us-k-mw-ea",
-      "parentId": "us-k-mw",
-      "nodeType": "domain",
-      "name": "Emotional Awareness",
-      "description": "Understanding basic emotions.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotions",
-        "awareness"
-      ]
-    },
-    {
-      "id": "us-k-mw-sr",
-      "parentId": "us-k-mw",
-      "nodeType": "domain",
-      "name": "Self-Regulation",
-      "description": "Learning to manage responses.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "self_regulation",
-        "coping"
-      ]
-    },
-    {
-      "id": "us-k-mw-sc",
-      "parentId": "us-k-mw",
-      "nodeType": "domain",
-      "name": "Social Connection",
-      "description": "Building positive social interactions.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "social_skills",
-        "relationships"
-      ]
-    },
-    {
-      "id": "us-k-mw-rb",
-      "parentId": "us-k-mw",
-      "nodeType": "domain",
-      "name": "Resilience Building",
-      "description": "Learning from challenges.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "resilience",
-        "growth_mindset"
-      ]
-    },
-    {
-      "id": "us-k-mw-ea-lo1",
-      "parentId": "us-k-mw-ea",
-      "nodeType": "learning_objective",
-      "name": "Identify basic emotions (happy, sad, mad, scared)",
-      "description": "Students will be able to identify and name basic emotions like happy, sad, mad, and scared in themselves and others.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_literacy",
-        "feelings"
-      ]
-    },
-    {
-      "id": "us-k-mw-sr-lo1",
-      "parentId": "us-k-mw-sr",
-      "nodeType": "learning_objective",
-      "name": "Use \"calm down\" strategies (counting, deep breaths)",
-      "description": "Students will learn and practice simple \"calm down\" strategies such as counting or taking deep breaths.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "coping_skills",
-        "calming_techniques"
-      ]
-    },
-    {
-      "id": "us-k-mw-sc-lo1",
-      "parentId": "us-k-mw-sc",
-      "nodeType": "learning_objective",
-      "name": "Identify trusted adults and safe spaces",
-      "description": "Students will be able to identify trusted adults in their lives and safe spaces at school and home.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "safety",
-        "trust",
-        "help-seeking"
-      ]
-    },
-    {
-      "id": "us-k-mw-rb-lo1",
-      "parentId": "us-k-mw-rb",
-      "nodeType": "learning_objective",
-      "name": "Understand that mistakes help us learn",
-      "description": "Students will understand that making mistakes is a normal part of learning and growth.",
-      "educationalLevel": "K",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "growth-mindset",
-        "learning_from_mistakes"
-      ]
-    },
-    {
-      "id": "us-g1-mw",
-      "parentId": "us-mental-wellness",
-      "nodeType": "course",
-      "name": "Grade 1 Mental Wellness",
-      "description": "Continuing foundational mental wellness for Grade 1.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "mental_wellness",
-        "foundation"
-      ]
-    },
-    {
-      "id": "us-g1-mw-ea",
-      "parentId": "us-g1-mw",
-      "nodeType": "domain",
-      "name": "Emotional Awareness",
-      "description": "Expanding understanding of emotions.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotions",
-        "awareness"
-      ]
-    },
-    {
-      "id": "us-g1-mw-sr",
-      "parentId": "us-g1-mw",
-      "nodeType": "domain",
-      "name": "Self-Regulation",
-      "description": "Practicing self-management techniques.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "self_regulation",
-        "coping"
-      ]
-    },
-    {
-      "id": "us-g1-mw-sc",
-      "parentId": "us-g1-mw",
-      "nodeType": "domain",
-      "name": "Social Connection",
-      "description": "Developing kind communication and empathy.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "social_skills",
-        "communication",
-        "empathy"
-      ]
-    },
-    {
-      "id": "us-g1-mw-rb",
-      "parentId": "us-g1-mw",
-      "nodeType": "domain",
-      "name": "Resilience Building",
-      "description": "Learning to persevere through challenges.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "resilience",
-        "perseverance"
-      ]
-    },
-    {
-      "id": "us-g1-mw-ea-lo1",
-      "parentId": "us-g1-mw-ea",
-      "nodeType": "learning_objective",
-      "name": "Name 6-8 emotions and describe what causes them",
-      "description": "Students will be able to name 6-8 different emotions and describe situations or triggers that might cause them.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_literacy",
-        "feelings",
-        "causation"
-      ]
-    },
-    {
-      "id": "us-g1-mw-sr-lo1",
-      "parentId": "us-g1-mw-sr",
-      "nodeType": "learning_objective",
-      "name": "Practice simple mindfulness (5-4-3-2-1 sensory technique)",
-      "description": "Students will practice a simple mindfulness technique like the 5-4-3-2-1 sensory grounding exercise.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "mindfulness",
-        "sensory_grounding",
-        "coping_skills"
-      ]
-    },
-    {
-      "id": "us-g1-mw-sc-lo1",
-      "parentId": "us-g1-mw-sc",
-      "nodeType": "learning_objective",
-      "name": "Practice kind communication (\"I feel...\" statements)",
-      "description": "Students will practice using \"I feel...\" statements to communicate their emotions kindly and respectfully.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "communication_skills",
-        "i_statements",
-        "empathy"
-      ]
-    },
-    {
-      "id": "us-g1-mw-rb-lo1",
-      "parentId": "us-g1-mw-rb",
-      "nodeType": "learning_objective",
-      "name": "Try again after setbacks with adult support",
-      "description": "Students will learn to try again after experiencing a setback, with support from an adult.",
-      "educationalLevel": "1",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "perseverance",
-        "help_seeking",
-        "growth_mindset"
-      ]
-    },
-    {
-      "id": "us-g2-mw",
-      "parentId": "us-mental-wellness",
-      "nodeType": "course",
-      "name": "Grade 2 Mental Wellness",
-      "description": "Further foundational mental wellness for Grade 2.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "mental_wellness",
-        "foundation"
-      ]
-    },
-    {
-      "id": "us-g2-mw-ea",
-      "parentId": "us-g2-mw",
-      "nodeType": "domain",
-      "name": "Emotional Awareness",
-      "description": "Understanding the nature of emotions.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotions",
-        "self_awareness"
-      ]
-    },
-    {
-      "id": "us-g2-mw-sr",
-      "parentId": "us-g2-mw",
-      "nodeType": "domain",
-      "name": "Self-Regulation",
-      "description": "Choosing appropriate coping strategies.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "self_regulation",
-        "coping_strategies"
-      ]
-    },
-    {
-      "id": "us-g2-mw-sc",
-      "parentId": "us-g2-mw",
-      "nodeType": "domain",
-      "name": "Social Connection",
-      "description": "Demonstrating empathy and helpfulness.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "social_skills",
-        "empathy",
-        "helping"
-      ]
-    },
-    {
-      "id": "us-g2-mw-rb",
-      "parentId": "us-g2-mw",
-      "nodeType": "domain",
-      "name": "Resilience Building",
-      "description": "Focusing on effort and learning.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "resilience",
-        "effort",
-        "growth_mindset"
-      ]
-    },
-    {
-      "id": "us-g2-mw-ea-lo1",
-      "parentId": "us-g2-mw-ea",
-      "nodeType": "learning_objective",
-      "name": "Recognize that emotions change and are temporary",
-      "description": "Students will recognize that emotions can change over time and are often temporary states.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_regulation",
-        "impermanence_of_emotions"
-      ]
-    },
-    {
-      "id": "us-g2-mw-sr-lo1",
-      "parentId": "us-g2-mw-sr",
-      "nodeType": "learning_objective",
-      "name": "Choose appropriate coping strategies for different situations",
-      "description": "Students will learn to choose and apply appropriate coping strategies for different challenging situations.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "problem_solving",
-        "decision_making",
-        "coping_skills"
-      ]
-    },
-    {
-      "id": "us-g2-mw-sc-lo1",
-      "parentId": "us-g2-mw-sc",
-      "nodeType": "learning_objective",
-      "name": "Show empathy through listening and helping",
-      "description": "Students will practice showing empathy by actively listening to others and offering help when appropriate.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "active_listening",
-        "prosocial_behavior",
-        "empathy"
-      ]
-    },
-    {
-      "id": "us-g2-mw-rb-lo1",
-      "parentId": "us-g2-mw-rb",
-      "nodeType": "learning_objective",
-      "name": "Celebrate effort, not just outcomes",
-      "description": "Students will learn to celebrate their effort and the process of learning, not just the final outcome.",
-      "educationalLevel": "2",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "process_over_product",
-        "intrinsic_motivation",
-        "growth_mindset"
-      ]
-    },
-    {
-      "id": "us-g3-mw",
-      "parentId": "us-mental-wellness",
-      "nodeType": "course",
-      "name": "Grade 3 Mental Wellness",
-      "description": "Mental wellness skill development for Grade 3.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "mental_wellness",
-        "skill_development"
-      ]
-    },
-    {
-      "id": "us-g3-mw-ei",
-      "parentId": "us-g3-mw",
-      "nodeType": "domain",
-      "name": "Emotional Intelligence",
-      "description": "Understanding and managing emotions effectively.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_intelligence",
-        "self_awareness"
-      ]
-    },
-    {
-      "id": "us-g3-mw-sm",
-      "parentId": "us-g3-mw",
-      "nodeType": "domain",
-      "name": "Stress Management",
-      "description": "Developing healthy ways to cope with stress.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "stress_management",
-        "coping_skills"
-      ]
-    },
-    {
-      "id": "us-g3-mw-hr",
-      "parentId": "us-g3-mw",
-      "nodeType": "domain",
-      "name": "Healthy Relationships",
-      "description": "Building and maintaining positive relationships.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "relationships",
-        "social_skills",
-        "communication"
-      ]
-    },
-    {
-      "id": "us-g3-mw-gm",
-      "parentId": "us-g3-mw",
-      "nodeType": "domain",
-      "name": "Growth Mindset",
-      "description": "Fostering a belief in the ability to learn and grow.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "growth_mindset",
-        "resilience",
-        "learning"
-      ]
-    },
-    {
-      "id": "us-g3-mw-ei-lo1",
-      "parentId": "us-g3-mw-ei",
-      "nodeType": "learning_objective",
-      "name": "Understand emotion intensity (a little mad vs. very angry)",
-      "description": "Students will understand that emotions can vary in intensity (e.g., a little mad vs. very angry).",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_spectrum",
-        "intensity_levels"
-      ]
-    },
-    {
-      "id": "us-g3-mw-sm-lo1",
-      "parentId": "us-g3-mw-sm",
-      "nodeType": "learning_objective",
-      "name": "Identify what stress feels like in the body",
-      "description": "Students will be able to identify physical sensations associated with stress.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "somatic_awareness",
-        "stress_symptoms"
-      ]
-    },
-    {
-      "id": "us-g3-mw-hr-lo1",
-      "parentId": "us-g3-mw-hr",
-      "nodeType": "learning_objective",
-      "name": "Understand friendship qualities and boundaries",
-      "description": "Students will understand qualities of healthy friendships and the importance of personal boundaries.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "friendship_skills",
-        "personal_boundaries"
-      ]
-    },
-    {
-      "id": "us-g3-mw-gm-lo1",
-      "parentId": "us-g3-mw-gm",
-      "nodeType": "learning_objective",
-      "name": "Understand that brains can grow and change",
-      "description": "Students will understand the concept of neuroplasticity – that their brains can grow and change with effort.",
-      "educationalLevel": "3",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "neuroplasticity",
-        "effortful_learning"
-      ]
-    },
-    {
-      "id": "us-g4-mw",
-      "parentId": "us-mental-wellness",
-      "nodeType": "course",
-      "name": "Grade 4 Mental Wellness",
-      "description": "Mental wellness skill development for Grade 4.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "mental_wellness",
-        "skill_development"
-      ]
-    },
-    {
-      "id": "us-g4-mw-ei",
-      "parentId": "us-g4-mw",
-      "nodeType": "domain",
-      "name": "Emotional Intelligence",
-      "description": "Understanding and managing emotions effectively.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_intelligence",
-        "self_awareness"
-      ]
-    },
-    {
-      "id": "us-g4-mw-sm",
-      "parentId": "us-g4-mw",
-      "nodeType": "domain",
-      "name": "Stress Management",
-      "description": "Developing healthy ways to cope with stress.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "stress_management",
-        "coping_skills"
-      ]
-    },
-    {
-      "id": "us-g4-mw-hr",
-      "parentId": "us-g4-mw",
-      "nodeType": "domain",
-      "name": "Healthy Relationships",
-      "description": "Building and maintaining positive relationships.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "relationships",
-        "social_skills",
-        "communication"
-      ]
-    },
-    {
-      "id": "us-g4-mw-gm",
-      "parentId": "us-g4-mw",
-      "nodeType": "domain",
-      "name": "Growth Mindset",
-      "description": "Fostering a belief in the ability to learn and grow.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "growth_mindset",
-        "resilience",
-        "learning"
-      ]
-    },
-    {
-      "id": "us-g4-mw-ei-lo1",
-      "parentId": "us-g4-mw-ei",
-      "nodeType": "learning_objective",
-      "name": "Recognize emotional triggers and early warning signs",
-      "description": "Students will be able to recognize personal emotional triggers and early warning signs of escalating emotions.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_triggers",
-        "early_warning_signs",
-        "self_monitoring"
-      ]
-    },
-    {
-      "id": "us-g4-mw-sm-lo1",
-      "parentId": "us-g4-mw-sm",
-      "nodeType": "learning_objective",
-      "name": "Practice multiple calming techniques (breathing, movement, visualization)",
-      "description": "Students will practice and identify effectiveness of multiple calming techniques (e.g., breathing exercises, physical movement, visualization).",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "calming_strategies",
-        "stress_reduction_techniques"
-      ]
-    },
-    {
-      "id": "us-g4-mw-hr-lo1",
-      "parentId": "us-g4-mw-hr",
-      "nodeType": "learning_objective",
-      "name": "Practice conflict resolution with peer mediation",
-      "description": "Students will practice conflict resolution skills, potentially with peer mediation support.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "conflict_resolution_skills",
-        "peer_mediation"
-      ]
-    },
-    {
-      "id": "us-g4-mw-gm-lo1",
-      "parentId": "us-g4-mw-gm",
-      "nodeType": "learning_objective",
-      "name": "Set realistic goals and track progress",
-      "description": "Students will learn to set realistic short-term goals and track their progress towards them.",
-      "educationalLevel": "4",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "goal_setting",
-        "progress_monitoring",
-        "self_management"
-      ]
-    },
-    {
-      "id": "us-g5-mw",
-      "parentId": "us-mental-wellness",
-      "nodeType": "course",
-      "name": "Grade 5 Mental Wellness",
-      "description": "Mental wellness skill development for Grade 5.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "mental_wellness",
-        "skill_development"
-      ]
-    },
-    {
-      "id": "us-g5-mw-ei",
-      "parentId": "us-g5-mw",
-      "nodeType": "domain",
-      "name": "Emotional Intelligence",
-      "description": "Understanding and managing emotions effectively.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "emotional_intelligence",
-        "self_awareness"
-      ]
-    },
-    {
-      "id": "us-g5-mw-sm",
-      "parentId": "us-g5-mw",
-      "nodeType": "domain",
-      "name": "Stress Management",
-      "description": "Developing healthy ways to cope with stress.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "stress_management",
-        "coping_skills"
-      ]
-    },
-    {
-      "id": "us-g5-mw-hr",
-      "parentId": "us-g5-mw",
-      "nodeType": "domain",
-      "name": "Healthy Relationships",
-      "description": "Building and maintaining positive relationships.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "relationships",
-        "social_skills",
-        "communication"
-      ]
-    },
-    {
-      "id": "us-g5-mw-gm",
-      "parentId": "us-g5-mw",
-      "nodeType": "domain",
-      "name": "Growth Mindset",
-      "description": "Fostering a belief in the ability to learn and grow.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "growth_mindset",
-        "resilience",
-        "learning"
-      ]
-    },
-    {
-      "id": "us-g5-mw-ei-lo1",
-      "parentId": "us-g5-mw-ei",
-      "nodeType": "learning_objective",
-      "name": "Develop emotional vocabulary (frustrated, disappointed, anxious)",
-      "description": "Students will develop a richer emotional vocabulary to describe nuanced feelings (e.g., frustrated, disappointed, anxious).",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "nuanced_emotions",
-        "emotional_expression",
-        "vocabulary_development"
-      ]
-    },
-    {
-      "id": "us-g5-mw-sm-lo1",
-      "parentId": "us-g5-mw-sm",
-      "nodeType": "learning_objective",
-      "name": "Create personal stress management toolkit",
-      "description": "Students will create a personal toolkit of effective stress management strategies.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "personalized_coping",
-        "stress_toolkit",
-        "self_help_strategies"
-      ]
-    },
-    {
-      "id": "us-g5-mw-hr-lo1",
-      "parentId": "us-g5-mw-hr",
-      "nodeType": "learning_objective",
-      "name": "Recognize and report unhealthy relationship patterns",
-      "description": "Students will learn to recognize signs of unhealthy relationship patterns and understand how to report them or seek help.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "relationship_safety",
-        "reporting_mechanisms",
-        "help_seeking_behaviors"
-      ]
-    },
-    {
-      "id": "us-g5-mw-gm-lo1",
-      "parentId": "us-g5-mw-gm",
-      "nodeType": "learning_objective",
-      "name": "Learn from failure and seek feedback",
-      "description": "Students will learn to view failure as a learning opportunity and actively seek constructive feedback.",
-      "educationalLevel": "5",
-      "subject": "Mental Wellness",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "constructive_criticism",
-        "learning_from_failure",
-        "seeking_feedback"
-      ]
-    },
-    {
-      "id": "us-music",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Music",
-      "description": "Curriculum for K-12 Music education in the United States, covering musical literacy, creative expression, performance, and cultural understanding.",
-      "educationalLevel": "K-12",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "music",
-        "performing_arts",
-        "music_education",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-music",
-      "parentId": "us-music",
-      "nodeType": "course",
-      "name": "Kindergarten Music",
-      "description": "Musical exploration focusing on basic elements, singing, rhythm instruments, movement, and listening for Kindergarten.",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "music_exploration",
-        "early_childhood_music"
-      ]
-    },
-    {
-      "id": "us-k-music-me",
-      "parentId": "us-k-music",
-      "nodeType": "domain",
-      "name": "Musical Elements",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "tempo",
-        "dynamics",
-        "pitch_basics"
-      ]
-    },
-    {
-      "id": "us-k-music-svd",
-      "parentId": "us-k-music",
-      "nodeType": "domain",
-      "name": "Singing & Vocal Development",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "singing",
-        "chants",
-        "vocal_play"
-      ]
-    },
-    {
-      "id": "us-k-music-ie",
-      "parentId": "us-k-music",
-      "nodeType": "domain",
-      "name": "Instrument Exploration",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "rhythm_instruments",
-        "percussion"
-      ]
-    },
-    {
-      "id": "us-k-music-mm",
-      "parentId": "us-k-music",
-      "nodeType": "domain",
-      "name": "Music & Movement",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "creative_movement",
-        "dance_music"
-      ]
-    },
-    {
-      "id": "us-k-music-ma",
-      "parentId": "us-k-music",
-      "nodeType": "domain",
-      "name": "Music Appreciation",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "listening_skills",
-        "music_diversity_intro"
-      ]
-    },
-    {
-      "id": "us-k-music-me-lo1",
-      "parentId": "us-k-music-me",
-      "nodeType": "learning_objective",
-      "name": "Explore fast/slow, loud/soft, high/low sounds",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "tempo_dynamics_pitch",
-        "sound_exploration"
-      ]
-    },
-    {
-      "id": "us-k-music-svd-lo1",
-      "parentId": "us-k-music-svd",
-      "nodeType": "learning_objective",
-      "name": "Singing simple songs and chants",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "group_singing",
-        "rote_learning_songs"
-      ]
-    },
-    {
-      "id": "us-k-music-ie-lo1",
-      "parentId": "us-k-music-ie",
-      "nodeType": "learning_objective",
-      "name": "Explore rhythm instruments (shakers, drums, bells)",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "percussion_play",
-        "instrument_handling"
-      ]
-    },
-    {
-      "id": "us-k-music-mm-lo1",
-      "parentId": "us-k-music-mm",
-      "nodeType": "learning_objective",
-      "name": "Dancing and moving to music",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "kinesthetic_response_music",
-        "expressive_movement"
-      ]
-    },
-    {
-      "id": "us-k-music-ma-lo1",
-      "parentId": "us-k-music-ma",
-      "nodeType": "learning_objective",
-      "name": "Listening to different types of music",
-      "educationalLevel": "K",
-      "subject": "Music",
-      "tags": [
-        "active_listening",
-        "music_exposure"
-      ]
-    },
-    {
-      "id": "us-g1-music",
-      "parentId": "us-music",
-      "nodeType": "course",
-      "name": "Grade 1 Music",
-      "description": "Developing understanding of beat, rhythm, pitch matching, and cultural music for Grade 1.",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "rhythm_beat",
-        "pitch_matching",
-        "cultural_music_intro"
-      ]
-    },
-    {
-      "id": "us-g1-music-me",
-      "parentId": "us-g1-music",
-      "nodeType": "domain",
-      "name": "Musical Elements",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "beat_rhythm",
-        "movement_coordination"
-      ]
-    },
-    {
-      "id": "us-g1-music-svd",
-      "parentId": "us-g1-music",
-      "nodeType": "domain",
-      "name": "Singing & Vocal Development",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "pitch_accuracy",
-        "singing_in_tune"
-      ]
-    },
-    {
-      "id": "us-g1-music-ie",
-      "parentId": "us-g1-music",
-      "nodeType": "domain",
-      "name": "Instrument Exploration",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "classroom_instruments",
-        "instrument_technique_basics"
-      ]
-    },
-    {
-      "id": "us-g1-music-mm",
-      "parentId": "us-g1-music",
-      "nodeType": "domain",
-      "name": "Music & Movement",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "musical_storytelling",
-        "song_dramatization"
-      ]
-    },
-    {
-      "id": "us-g1-music-ma",
-      "parentId": "us-g1-music",
-      "nodeType": "domain",
-      "name": "Music Appreciation",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "world_music",
-        "cultural_context_music"
-      ]
-    },
-    {
-      "id": "us-g1-music-me-lo1",
-      "parentId": "us-g1-music-me",
-      "nodeType": "learning_objective",
-      "name": "Explore beat and rhythm through movement",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "steady_beat",
-        "rhythmic_patterns"
-      ]
-    },
-    {
-      "id": "us-g1-music-svd-lo1",
-      "parentId": "us-g1-music-svd",
-      "nodeType": "learning_objective",
-      "name": "Matching pitch and singing in tune",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "vocal_accuracy",
-        "pitch_development"
-      ]
-    },
-    {
-      "id": "us-g1-music-ie-lo1",
-      "parentId": "us-g1-music-ie",
-      "nodeType": "learning_objective",
-      "name": "Explore classroom instruments and proper technique",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "instrument_families_classroom",
-        "playing_techniques"
-      ]
-    },
-    {
-      "id": "us-g1-music-mm-lo1",
-      "parentId": "us-g1-music-mm",
-      "nodeType": "learning_objective",
-      "name": "Acting out songs and musical stories",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "dramatic_play_music",
-        "narrative_movement"
-      ]
-    },
-    {
-      "id": "us-g1-music-ma-lo1",
-      "parentId": "us-g1-music-ma",
-      "nodeType": "learning_objective",
-      "name": "Explore music from different cultures and places",
-      "educationalLevel": "1",
-      "subject": "Music",
-      "tags": [
-        "global_music_styles",
-        "cultural_appreciation_music"
-      ]
-    },
-    {
-      "id": "us-g2-music",
-      "parentId": "us-music",
-      "nodeType": "course",
-      "name": "Grade 2 Music",
-      "description": "Introduction to melody, part-singing, keyboard/recorder, and instrument recognition for Grade 2.",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "melody_basics",
-        "part_singing_intro",
-        "instrument_recognition"
-      ]
-    },
-    {
-      "id": "us-g2-music-me",
-      "parentId": "us-g2-music",
-      "nodeType": "domain",
-      "name": "Musical Elements",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "melody",
-        "pitch_patterns"
-      ]
-    },
-    {
-      "id": "us-g2-music-svd",
-      "parentId": "us-g2-music",
-      "nodeType": "domain",
-      "name": "Singing & Vocal Development",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "part_singing",
-        "call_and_response_songs"
-      ]
-    },
-    {
-      "id": "us-g2-music-ie",
-      "parentId": "us-g2-music",
-      "nodeType": "domain",
-      "name": "Instrument Exploration",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "keyboard_basics",
-        "recorder_basics"
-      ]
-    },
-    {
-      "id": "us-g2-music-mm",
-      "parentId": "us-g2-music",
-      "nodeType": "domain",
-      "name": "Music & Movement",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "coordinated_movement_music",
-        "musical_expression_movement"
-      ]
-    },
-    {
-      "id": "us-g2-music-ma",
-      "parentId": "us-g2-music",
-      "nodeType": "domain",
-      "name": "Music Appreciation",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "instrument_timbres",
-        "aural_recognition"
-      ]
-    },
-    {
-      "id": "us-g2-music-me-lo1",
-      "parentId": "us-g2-music-me",
-      "nodeType": "learning_objective",
-      "name": "Explore melody and simple pitch patterns",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "melodic_contour",
-        "pitch_direction"
-      ]
-    },
-    {
-      "id": "us-g2-music-svd-lo1",
-      "parentId": "us-g2-music-svd",
-      "nodeType": "learning_objective",
-      "name": "Beginning part-singing and call-and-response",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "harmony_basics",
-        "choral_skills_intro"
-      ]
-    },
-    {
-      "id": "us-g2-music-ie-lo1",
-      "parentId": "us-g2-music-ie",
-      "nodeType": "learning_objective",
-      "name": "Introduction to keyboard/recorder",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "melodic_instruments_intro",
-        "basic_instrumental_skills"
-      ]
-    },
-    {
-      "id": "us-g2-music-mm-lo1",
-      "parentId": "us-g2-music-mm",
-      "nodeType": "learning_objective",
-      "name": "Coordinating movement with musical elements",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "rhythmic_coordination",
-        "expressive_dance"
-      ]
-    },
-    {
-      "id": "us-g2-music-ma-lo1",
-      "parentId": "us-g2-music-ma",
-      "nodeType": "learning_objective",
-      "name": "Recognizing different instruments by sound",
-      "educationalLevel": "2",
-      "subject": "Music",
-      "tags": [
-        "timbre_identification",
-        "instrument_families_sound"
-      ]
-    },
-    {
-      "id": "us-g3-music",
-      "parentId": "us-music",
-      "nodeType": "course",
-      "name": "Grade 3 Music",
-      "description": "Skill development in music theory, instrumental skills, vocal development, music creation, and cultural music studies for Grade 3.",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "music_theory_basics",
-        "instrumental_skills_recorder"
-      ]
-    },
-    {
-      "id": "us-g3-music-mtf",
-      "parentId": "us-g3-music",
-      "nodeType": "domain",
-      "name": "Music Theory Foundations",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "music_notation",
-        "rhythm_reading"
-      ]
-    },
-    {
-      "id": "us-g3-music-is",
-      "parentId": "us-g3-music",
-      "nodeType": "domain",
-      "name": "Instrumental Skills",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "recorder",
-        "instrumental_technique"
-      ]
-    },
-    {
-      "id": "us-g3-music-vd",
-      "parentId": "us-g3-music",
-      "nodeType": "domain",
-      "name": "Vocal Development",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "singing_posture",
-        "breathing_singing"
-      ]
-    },
-    {
-      "id": "us-g3-music-mc",
-      "parentId": "us-g3-music",
-      "nodeType": "domain",
-      "name": "Music Creation",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "composition_basics",
-        "melody_creation"
-      ]
-    },
-    {
-      "id": "us-g3-music-cms",
-      "parentId": "us-g3-music",
-      "nodeType": "domain",
-      "name": "Cultural Music Studies",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "world_music_traditions",
-        "music_and_culture"
-      ]
-    },
-    {
-      "id": "us-g3-music-mtf-lo1",
-      "parentId": "us-g3-music-mtf",
-      "nodeType": "learning_objective",
-      "name": "Reading simple notation and rhythms",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "music_reading",
-        "rhythmic_notation"
-      ]
-    },
-    {
-      "id": "us-g3-music-is-lo1",
-      "parentId": "us-g3-music-is",
-      "nodeType": "learning_objective",
-      "name": "Recorder technique and simple melodies",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "recorder_playing",
-        "melodic_performance"
-      ]
-    },
-    {
-      "id": "us-g3-music-vd-lo1",
-      "parentId": "us-g3-music-vd",
-      "nodeType": "learning_objective",
-      "name": "Proper breathing and posture for singing",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "vocal_technique",
-        "singing_health"
-      ]
-    },
-    {
-      "id": "us-g3-music-mc-lo1",
-      "parentId": "us-g3-music-mc",
-      "nodeType": "learning_objective",
-      "name": "Composing simple rhythms and melodies",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "music_composition",
-        "creative_music_making"
-      ]
-    },
-    {
-      "id": "us-g3-music-cms-lo1",
-      "parentId": "us-g3-music-cms",
-      "nodeType": "learning_objective",
-      "name": "Traditional music from around the world",
-      "educationalLevel": "3",
-      "subject": "Music",
-      "tags": [
-        "ethnomusicology_intro",
-        "global_music_awareness"
-      ]
-    },
-    {
-      "id": "us-g4-music",
-      "parentId": "us-music",
-      "nodeType": "course",
-      "name": "Grade 4 Music",
-      "description": "Developing skills in scales, instrumental introduction, harmony, and music technology for Grade 4.",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "music_scales",
-        "ensemble_intro",
-        "music_technology_basics"
-      ]
-    },
-    {
-      "id": "us-g4-music-mtf",
-      "parentId": "us-g4-music",
-      "nodeType": "domain",
-      "name": "Music Theory Foundations",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "major_scales",
-        "key_signatures_basics"
-      ]
-    },
-    {
-      "id": "us-g4-music-is",
-      "parentId": "us-g4-music",
-      "nodeType": "domain",
-      "name": "Instrumental Skills",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "band_instruments_intro",
-        "orchestra_instruments_intro"
-      ]
-    },
-    {
-      "id": "us-g4-music-vd",
-      "parentId": "us-g4-music",
-      "nodeType": "domain",
-      "name": "Vocal Development",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "two_part_singing",
-        "harmony_singing"
-      ]
-    },
-    {
-      "id": "us-g4-music-mc",
-      "parentId": "us-g4-music",
-      "nodeType": "domain",
-      "name": "Music Creation",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "digital_music_creation",
-        "music_software_intro"
-      ]
-    },
-    {
-      "id": "us-g4-music-cms",
-      "parentId": "us-g4-music",
-      "nodeType": "domain",
-      "name": "Cultural Music Studies",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "music_and_culture_relationship",
-        "cultural_expression_music"
-      ]
-    },
-    {
-      "id": "us-g4-music-mtf-lo1",
-      "parentId": "us-g4-music-mtf",
-      "nodeType": "learning_objective",
-      "name": "Major scales and basic key signatures",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "scales_theory",
-        "key_signature_recognition"
-      ]
-    },
-    {
-      "id": "us-g4-music-is-lo1",
-      "parentId": "us-g4-music-is",
-      "nodeType": "learning_objective",
-      "name": "Introduction to band/orchestra instruments",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "instrument_exploration_band_orchestra",
-        "timbre_recognition"
-      ]
-    },
-    {
-      "id": "us-g4-music-vd-lo1",
-      "parentId": "us-g4-music-vd",
-      "nodeType": "learning_objective",
-      "name": "Two-part singing and harmony",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "choral_harmony",
-        "part_singing_skills"
-      ]
-    },
-    {
-      "id": "us-g4-music-mc-lo1",
-      "parentId": "us-g4-music-mc",
-      "nodeType": "learning_objective",
-      "name": "Using technology for music creation",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "music_software",
-        "digital_composition_tools"
-      ]
-    },
-    {
-      "id": "us-g4-music-cms-lo1",
-      "parentId": "us-g4-music-cms",
-      "nodeType": "learning_objective",
-      "name": "How music reflects different cultures",
-      "educationalLevel": "4",
-      "subject": "Music",
-      "tags": [
-        "music_sociology",
-        "cultural_identity_music"
-      ]
-    },
-    {
-      "id": "us-g5-music",
-      "parentId": "us-music",
-      "nodeType": "course",
-      "name": "Grade 5 Music",
-      "description": "Focusing on harmony, ensemble playing, vocal confidence, arranging, and musical styles for Grade 5.",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "harmony_basics",
-        "ensemble_skills",
-        "music_arrangement"
-      ]
-    },
-    {
-      "id": "us-g5-music-mtf",
-      "parentId": "us-g5-music",
-      "nodeType": "domain",
-      "name": "Music Theory Foundations",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "intervals",
-        "chords_basics",
-        "harmony_theory"
-      ]
-    },
-    {
-      "id": "us-g5-music-is",
-      "parentId": "us-g5-music",
-      "nodeType": "domain",
-      "name": "Instrumental Skills",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "ensemble_playing",
-        "group_performance"
-      ]
-    },
-    {
-      "id": "us-g5-music-vd",
-      "parentId": "us-g5-music",
-      "nodeType": "domain",
-      "name": "Vocal Development",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "solo_singing",
-        "vocal_confidence_building"
-      ]
-    },
-    {
-      "id": "us-g5-music-mc",
-      "parentId": "us-g5-music",
-      "nodeType": "domain",
-      "name": "Music Creation",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "music_arranging",
-        "song_adaptation"
-      ]
-    },
-    {
-      "id": "us-g5-music-cms",
-      "parentId": "us-g5-music",
-      "nodeType": "domain",
-      "name": "Cultural Music Studies",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "music_history_periods",
-        "musical_styles_overview"
-      ]
-    },
-    {
-      "id": "us-g5-music-mtf-lo1",
-      "parentId": "us-g5-music-mtf",
-      "nodeType": "learning_objective",
-      "name": "Intervals, chords, and harmony basics",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "music_theory_harmony",
-        "chord_structure"
-      ]
-    },
-    {
-      "id": "us-g5-music-is-lo1",
-      "parentId": "us-g5-music-is",
-      "nodeType": "learning_objective",
-      "name": "Beginning ensemble playing",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "group_instrumental_performance",
-        "ensemble_coordination"
-      ]
-    },
-    {
-      "id": "us-g5-music-vd-lo1",
-      "parentId": "us-g5-music-vd",
-      "nodeType": "learning_objective",
-      "name": "Solo singing and vocal confidence",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "solo_performance_vocal",
-        "stage_presence_singing"
-      ]
-    },
-    {
-      "id": "us-g5-music-mc-lo1",
-      "parentId": "us-g5-music-mc",
-      "nodeType": "learning_objective",
-      "name": "Arranging and adapting songs",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "music_arrangement_skills",
-        "creative_interpretation_music"
-      ]
-    },
-    {
-      "id": "us-g5-music-cms-lo1",
-      "parentId": "us-g5-music-cms",
-      "nodeType": "learning_objective",
-      "name": "Historical periods and musical styles",
-      "educationalLevel": "5",
-      "subject": "Music",
-      "tags": [
-        "music_history_survey",
-        "style_recognition_music"
-      ]
-    },
-    {
-      "id": "us-pe",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Physical Education",
-      "description": "Curriculum for K-12 Physical Education in the United States, focusing on motor skills, health-related fitness, and personal and social responsibility.",
-      "educationalLevel": "K-12",
-      "subject": "Physical Education",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "physical_education",
-        "health",
-        "fitness",
-        "motor_skills",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-pe",
-      "parentId": "us-pe",
-      "nodeType": "course",
-      "name": "Kindergarten Physical Education",
-      "description": "Introduction to basic motor skills, movement concepts, and cooperative play.",
-      "educationalLevel": "K",
-      "subject": "Physical Education",
-      "tags": [
-        "kindergarten",
-        "movement_foundations"
-      ]
-    },
-    {
-      "id": "us-k-pe-ms",
-      "parentId": "us-k-pe",
-      "nodeType": "domain",
-      "name": "Movement Skills & Concepts",
-      "educationalLevel": "K",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-k-pe-ms-lo1",
-      "parentId": "us-k-pe-ms",
-      "nodeType": "learning_objective",
-      "name": "Demonstrate basic locomotor skills (running, jumping, hopping).",
-      "educationalLevel": "K",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g1-pe",
-      "parentId": "us-pe",
-      "nodeType": "course",
-      "name": "Grade 1 Physical Education",
-      "description": "Refining locomotor skills and introducing object control.",
-      "educationalLevel": "1",
-      "subject": "Physical Education",
-      "tags": [
-        "grade1",
-        "skill_refinement"
-      ]
-    },
-    {
-      "id": "us-g1-pe-oc",
-      "parentId": "us-g1-pe",
-      "nodeType": "domain",
-      "name": "Object Control Skills",
-      "educationalLevel": "1",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g1-pe-oc-lo1",
-      "parentId": "us-g1-pe-oc",
-      "nodeType": "learning_objective",
-      "name": "Toss and catch a large ball with two hands.",
-      "educationalLevel": "1",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g2-pe",
-      "parentId": "us-pe",
-      "nodeType": "course",
-      "name": "Grade 2 Physical Education",
-      "description": "Combining motor skills and applying them in simple games.",
-      "educationalLevel": "2",
-      "subject": "Physical Education",
-      "tags": [
-        "grade2",
-        "skill_combination"
-      ]
-    },
-    {
-      "id": "us-g2-pe-hf",
-      "parentId": "us-g2-pe",
-      "nodeType": "domain",
-      "name": "Health-Related Fitness",
-      "educationalLevel": "2",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g2-pe-hf-lo1",
-      "parentId": "us-g2-pe-hf",
-      "nodeType": "learning_objective",
-      "name": "Identify activities that increase heart rate.",
-      "educationalLevel": "2",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g3-pe",
-      "parentId": "us-pe",
-      "nodeType": "course",
-      "name": "Grade 3 Physical Education",
-      "description": "Focus on cooperative games and applying skills with partners.",
-      "educationalLevel": "3",
-      "subject": "Physical Education",
-      "tags": [
-        "grade3",
-        "cooperative_play"
-      ]
-    },
-    {
-      "id": "us-g3-pe-psr",
-      "parentId": "us-g3-pe",
-      "nodeType": "domain",
-      "name": "Personal & Social Responsibility",
-      "educationalLevel": "3",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g3-pe-psr-lo1",
-      "parentId": "us-g3-pe-psr",
-      "nodeType": "learning_objective",
-      "name": "Work cooperatively with a partner or small group.",
-      "educationalLevel": "3",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g4-pe",
-      "parentId": "us-pe",
-      "nodeType": "course",
-      "name": "Grade 4 Physical Education",
-      "description": "Introduction to fitness concepts and simple game tactics.",
-      "educationalLevel": "4",
-      "subject": "Physical Education",
-      "tags": [
-        "grade4",
-        "fitness_concepts"
-      ]
-    },
-    {
-      "id": "us-g4-pe-hf",
-      "parentId": "us-g4-pe",
-      "nodeType": "domain",
-      "name": "Health-Related Fitness",
-      "educationalLevel": "4",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g4-pe-hf-lo1",
-      "parentId": "us-g4-pe-hf",
-      "nodeType": "learning_objective",
-      "name": "Describe the components of fitness (cardio, strength, flexibility).",
-      "educationalLevel": "4",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g5-pe",
-      "parentId": "us-pe",
-      "nodeType": "course",
-      "name": "Grade 5 Physical Education",
-      "description": "Applying skills to modified sports and lifetime activities.",
-      "educationalLevel": "5",
-      "subject": "Physical Education",
-      "tags": [
-        "grade5",
-        "sports_skills"
-      ]
-    },
-    {
-      "id": "us-g5-pe-sa",
-      "parentId": "us-g5-pe",
-      "nodeType": "domain",
-      "name": "Specialized Activity Skills",
-      "educationalLevel": "5",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us-g5-pe-sa-lo1",
-      "parentId": "us-g5-pe-sa",
-      "nodeType": "learning_objective",
-      "name": "Demonstrate mature form for skills in a modified sport (e.g., dribbling in basketball).",
-      "educationalLevel": "5",
-      "subject": "Physical Education"
-    },
-    {
-      "id": "us",
-      "parentId": null,
-      "nodeType": "country",
-      "name": "United States",
-      "description": "United States K-12 education system",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "country",
-        "north_america"
-      ]
-    },
-    {
-      "id": "us-science",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "Science",
-      "description": "Curriculum for K-12 Science in the United States, based on the Next Generation Science Standards (NGSS).",
-      "educationalLevel": "K-12",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "science",
-        "ngss",
-        "stem",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k-science",
-      "parentId": "us-science",
-      "nodeType": "course",
-      "name": "Kindergarten Science",
-      "description": "Introduction to scientific concepts for Kindergarten, focusing on forces, organisms, and weather.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "kindergarten",
-        "science_foundations"
-      ]
-    },
-    {
-      "id": "us-k-ps",
-      "parentId": "us-k-science",
-      "nodeType": "domain",
-      "name": "Physical Sciences (PS)",
-      "description": "Motion and Stability: Forces and Interactions.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-PS",
-      "tags": [
-        "physical_science",
-        "forces",
-        "motion"
-      ]
-    },
-    {
-      "id": "us-k-ls",
-      "parentId": "us-k-science",
-      "nodeType": "domain",
-      "name": "Life Sciences (LS)",
-      "description": "From Molecules to Organisms: Structures and Processes.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-LS",
-      "tags": [
-        "life_science",
-        "organisms",
-        "survival"
-      ]
-    },
-    {
-      "id": "us-k-ess",
-      "parentId": "us-k-science",
-      "nodeType": "domain",
-      "name": "Earth and Space Sciences (ESS)",
-      "description": "Earth's Systems and Earth and Human Activity.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-ESS",
-      "tags": [
-        "earth_science",
-        "weather",
-        "environment"
-      ]
-    },
-    {
-      "id": "us-k-ps2-1",
-      "parentId": "us-k-ps",
-      "nodeType": "learning_objective",
-      "name": "Plan and conduct an investigation to compare the effects of pushes and pulls on the motion of an object. (K-PS2-1)",
-      "description": "Plan and conduct an investigation to compare the effects of different strengths or different directions of pushes and pulls on the motion of an object.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-PS2-1",
-      "tags": [
-        "investigation",
-        "forces",
-        "pushes_pulls",
-        "motion_effects"
-      ]
-    },
-    {
-      "id": "us-k-ls1-1",
-      "parentId": "us-k-ls",
-      "nodeType": "learning_objective",
-      "name": "Use observations to describe patterns of what plants and animals need to survive. (K-LS1-1)",
-      "description": "Use observations to describe patterns of what plants and animals (including humans) need to survive.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-LS1-1",
-      "tags": [
-        "observation",
-        "patterns",
-        "survival_needs",
-        "plants_animals"
-      ]
-    },
-    {
-      "id": "us-k-ess2-1",
-      "parentId": "us-k-ess",
-      "nodeType": "learning_objective",
-      "name": "Use and share observations of local weather conditions to describe patterns over time. (K-ESS2-1)",
-      "description": "Use and share observations of local weather conditions to describe patterns over time.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-ESS2-1",
-      "tags": [
-        "weather_patterns",
-        "observation",
-        "data_sharing"
-      ]
-    },
-    {
-      "id": "us-k-ess3-3",
-      "parentId": "us-k-ess",
-      "nodeType": "learning_objective",
-      "name": "Communicate solutions that will reduce the impact of humans on the local environment. (K-ESS3-3)",
-      "description": "Communicate solutions that will reduce the impact of humans on the land, water, air, and/or other living things in the local environment.",
-      "educationalLevel": "K",
-      "subject": "Science",
-      "sourceIdentifier": "K-ESS3-3",
-      "tags": [
-        "human_impact",
-        "environmental_solutions",
-        "communication"
-      ]
-    },
-    {
-      "id": "us-g1-science",
-      "parentId": "us-science",
-      "nodeType": "course",
-      "name": "Grade 1 Science",
-      "description": "Exploring waves, structures and functions of organisms, and space systems for Grade 1.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade1",
-        "waves",
-        "life_science",
-        "space_science"
-      ]
-    },
-    {
-      "id": "us-g1-ps",
-      "parentId": "us-g1-science",
-      "nodeType": "domain",
-      "name": "Physical Sciences (PS)",
-      "description": "Waves and Their Applications in Technologies for Information Transfer.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "sourceIdentifier": "1-PS",
-      "tags": [
-        "physical_science",
-        "waves",
-        "sound",
-        "light"
-      ]
-    },
-    {
-      "id": "us-g1-ls",
-      "parentId": "us-g1-science",
-      "nodeType": "domain",
-      "name": "Life Sciences (LS)",
-      "description": "From Molecules to Organisms: Structures and Processes; Heredity: Inheritance and Variation of Traits.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "sourceIdentifier": "1-LS",
-      "tags": [
-        "life_science",
-        "organism_structure",
-        "heredity_basics"
-      ]
-    },
-    {
-      "id": "us-g1-ess",
-      "parentId": "us-g1-science",
-      "nodeType": "domain",
-      "name": "Earth and Space Sciences (ESS)",
-      "description": "Earth's Place in the Universe.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "sourceIdentifier": "1-ESS",
-      "tags": [
-        "earth_science",
-        "space_systems",
-        "patterns_cycles"
-      ]
-    },
-    {
-      "id": "us-g1-ps4-1",
-      "parentId": "us-g1-ps",
-      "nodeType": "learning_objective",
-      "name": "Plan and conduct investigations about sound and vibrating materials. (1-PS4-1)",
-      "description": "Plan and conduct investigations to provide evidence that vibrating materials can make sound and that sound can make materials vibrate.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "sourceIdentifier": "1-PS4-1",
-      "tags": [
-        "sound_vibration",
-        "investigation",
-        "cause_effect"
-      ]
-    },
-    {
-      "id": "us-g1-ls1-1",
-      "parentId": "us-g1-ls",
-      "nodeType": "learning_objective",
-      "name": "Use materials to design a solution to a human problem by mimicking how plants and/or animals use their external parts. (1-LS1-1)",
-      "description": "Use materials to design a solution to a human problem by mimicking how plants and/or animals use their external parts to help them survive, grow, and meet their needs.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "sourceIdentifier": "1-LS1-1",
-      "tags": [
-        "biomimicry",
-        "engineering_design",
-        "structure_function"
-      ]
-    },
-    {
-      "id": "us-g1-ess1-1",
-      "parentId": "us-g1-ess",
-      "nodeType": "learning_objective",
-      "name": "Use observations of the sun, moon, and stars to describe patterns that can be predicted. (1-ESS1-1)",
-      "description": "Use observations of the sun, moon, and stars to describe patterns that can be predicted.",
-      "educationalLevel": "1",
-      "subject": "Science",
-      "sourceIdentifier": "1-ESS1-1",
-      "tags": [
-        "astronomy_patterns",
-        "sun_moon_stars",
-        "predictable_cycles"
-      ]
-    },
-    {
-      "id": "us-g2-science",
-      "parentId": "us-science",
-      "nodeType": "course",
-      "name": "Grade 2 Science",
-      "description": "Investigating properties of matter, ecosystems, and Earth's systems for Grade 2.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade2",
-        "matter",
-        "ecosystems",
-        "earth_science"
-      ]
-    },
-    {
-      "id": "us-g2-ps",
-      "parentId": "us-g2-science",
-      "nodeType": "domain",
-      "name": "Physical Sciences (PS)",
-      "description": "Structure and Properties of Matter.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "sourceIdentifier": "2-PS",
-      "tags": [
-        "physical_science",
-        "matter_properties"
-      ]
-    },
-    {
-      "id": "us-g2-ls",
-      "parentId": "us-g2-science",
-      "nodeType": "domain",
-      "name": "Life Sciences (LS)",
-      "description": "Ecosystems: Interactions, Energy, and Dynamics.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "sourceIdentifier": "2-LS",
-      "tags": [
-        "life_science",
-        "ecosystems",
-        "interdependence"
-      ]
-    },
-    {
-      "id": "us-g2-ess",
-      "parentId": "us-g2-science",
-      "nodeType": "domain",
-      "name": "Earth and Space Sciences (ESS)",
-      "description": "Earth's Systems: Processes that Shape the Earth.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "sourceIdentifier": "2-ESS",
-      "tags": [
-        "earth_science",
-        "geology_basics",
-        "earth_processes"
-      ]
-    },
-    {
-      "id": "us-g2-ps1-1",
-      "parentId": "us-g2-ps",
-      "nodeType": "learning_objective",
-      "name": "Plan and conduct an investigation to describe and classify different kinds of materials by their observable properties. (2-PS1-1)",
-      "description": "Plan and conduct an investigation to describe and classify different kinds of materials by their observable properties.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "sourceIdentifier": "2-PS1-1",
-      "tags": [
-        "materials_science",
-        "classification",
-        "observable_properties"
-      ]
-    },
-    {
-      "id": "us-g2-ls2-2",
-      "parentId": "us-g2-ls",
-      "nodeType": "learning_objective",
-      "name": "Develop a simple model that mimics the function of an animal in dispersing seeds or pollinating plants. (2-LS2-2)",
-      "description": "Develop a simple model that mimics the function of an animal in dispersing seeds or pollinating plants.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "sourceIdentifier": "2-LS2-2",
-      "tags": [
-        "modeling",
-        "pollination",
-        "seed_dispersal",
-        "interdependence"
-      ]
-    },
-    {
-      "id": "us-g2-ess2-1",
-      "parentId": "us-g2-ess",
-      "nodeType": "learning_objective",
-      "name": "Compare multiple solutions designed to slow or prevent wind or water from changing the shape of the land. (2-ESS2-1)",
-      "description": "Compare multiple solutions designed to slow or prevent wind or water from changing the shape of the land.",
-      "educationalLevel": "2",
-      "subject": "Science",
-      "sourceIdentifier": "2-ESS2-1",
-      "tags": [
-        "erosion",
-        "engineering_solutions",
-        "earth_changes"
-      ]
-    },
-    {
-      "id": "us-g3-science",
-      "parentId": "us-science",
-      "nodeType": "course",
-      "name": "Grade 3 Science",
-      "description": "Investigating forces, life cycles, ecosystems, and weather for Grade 3.",
-      "educationalLevel": "3",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade3",
-        "forces_interactions",
-        "life_cycles",
-        "weather_climate"
-      ]
-    },
-    {
-      "id": "us-g3-ps2-1",
-      "parentId": "us-g3-science",
-      "nodeType": "learning_objective",
-      "name": "Plan and conduct an investigation to provide evidence of the effects of balanced and unbalanced forces on the motion of an object. (3-PS2-1)",
-      "educationalLevel": "3",
-      "subject": "Science",
-      "sourceIdentifier": "3-PS2-1",
-      "tags": [
-        "forces",
-        "motion",
-        "investigation",
-        "balanced_forces",
-        "unbalanced_forces"
-      ]
-    },
-    {
-      "id": "us-g3-ls1-1",
-      "parentId": "us-g3-science",
-      "nodeType": "learning_objective",
-      "name": "Develop models to describe that organisms have unique and diverse life cycles but all have in common birth, growth, reproduction, and death. (3-LS1-1)",
-      "educationalLevel": "3",
-      "subject": "Science",
-      "sourceIdentifier": "3-LS1-1",
-      "tags": [
-        "life_cycles",
-        "organism_development",
-        "modeling"
-      ]
-    },
-    {
-      "id": "us-g3-ess2-1",
-      "parentId": "us-g3-science",
-      "nodeType": "learning_objective",
-      "name": "Represent data in tables and graphical displays to describe typical weather conditions expected in a particular season. (3-ESS2-1)",
-      "educationalLevel": "3",
-      "subject": "Science",
-      "sourceIdentifier": "3-ESS2-1",
-      "tags": [
-        "weather",
-        "seasons",
-        "data_representation",
-        "graphing"
-      ]
-    },
-    {
-      "id": "us-g4-science",
-      "parentId": "us-science",
-      "nodeType": "course",
-      "name": "Grade 4 Science",
-      "description": "Exploring energy, waves, organism structures, and Earth processes for Grade 4.",
-      "educationalLevel": "4",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade4",
-        "energy",
-        "waves",
-        "earth_systems"
-      ]
-    },
-    {
-      "id": "us-g4-ps3-1",
-      "parentId": "us-g4-science",
-      "nodeType": "learning_objective",
-      "name": "Use evidence to construct an explanation relating the speed of an object to the energy of that object. (4-PS3-1)",
-      "educationalLevel": "4",
-      "subject": "Science",
-      "sourceIdentifier": "4-PS3-1",
-      "tags": [
-        "energy",
-        "speed",
-        "motion",
-        "explanation_construction"
-      ]
-    },
-    {
-      "id": "us-g4-ls1-1",
-      "parentId": "us-g4-science",
-      "nodeType": "learning_objective",
-      "name": "Construct an argument that plants and animals have internal and external structures that function to support survival, growth, behavior, and reproduction. (4-LS1-1)",
-      "educationalLevel": "4",
-      "subject": "Science",
-      "sourceIdentifier": "4-LS1-1",
-      "tags": [
-        "structure_function",
-        "adaptation",
-        "survival",
-        "argument_construction"
-      ]
-    },
-    {
-      "id": "us-g4-ess1-1",
-      "parentId": "us-g4-science",
-      "nodeType": "learning_objective",
-      "name": "Identify evidence from patterns in rock formations and fossils in rock layers to explain changes in a landscape over time. (4-ESS1-1)",
-      "educationalLevel": "4",
-      "subject": "Science",
-      "sourceIdentifier": "4-ESS1-1",
-      "tags": [
-        "geology",
-        "fossils",
-        "rock_layers",
-        "landscape_changes"
-      ]
-    },
-    {
-      "id": "us-g5-science",
-      "parentId": "us-science",
-      "nodeType": "course",
-      "name": "Grade 5 Science",
-      "description": "Investigating matter, energy flow in ecosystems, and Earth's systems for Grade 5.",
-      "educationalLevel": "5",
-      "subject": "Science",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "grade5",
-        "matter_cycles",
-        "ecosystems",
-        "space_systems"
-      ]
-    },
-    {
-      "id": "us-g5-ps1-1",
-      "parentId": "us-g5-science",
-      "nodeType": "learning_objective",
-      "name": "Develop a model to describe that matter is made of particles too small to be seen. (5-PS1-1)",
-      "educationalLevel": "5",
-      "subject": "Science",
-      "sourceIdentifier": "5-PS1-1",
-      "tags": [
-        "matter",
-        "particles",
-        "atomic_theory_intro",
-        "modeling"
-      ]
-    },
-    {
-      "id": "us-g5-ls2-1",
-      "parentId": "us-g5-science",
-      "nodeType": "learning_objective",
-      "name": "Develop a model to describe the movement of matter among plants, animals, decomposers, and the environment. (5-LS2-1)",
-      "educationalLevel": "5",
-      "subject": "Science",
-      "sourceIdentifier": "5-LS2-1",
-      "tags": [
-        "ecosystems",
-        "matter_cycles",
-        "food_webs",
-        "modeling"
-      ]
-    },
-    {
-      "id": "us-g5-ess1-2",
-      "parentId": "us-g5-science",
-      "nodeType": "learning_objective",
-      "name": "Represent data in graphical displays to reveal patterns of daily changes in length and direction of shadows, day and night, and the seasonal appearance of some stars in the night sky. (5-ESS1-2)",
-      "educationalLevel": "5",
-      "subject": "Science",
-      "sourceIdentifier": "5-ESS1-2",
-      "tags": [
-        "earth_rotation",
-        "shadows",
-        "day_night_cycle",
-        "seasonal_stars",
-        "data_representation"
-      ]
-    },
-    {
-      "id": "us-spanish",
-      "parentId": "us-root",
-      "nodeType": "subject",
-      "name": "World Languages: Spanish",
-      "description": "Curriculum for K-12 Spanish as a World Language in the United States, focusing on the 5 C's: Communication, Cultures, Connections, Comparisons, and Communities.",
-      "educationalLevel": "K-12",
-      "subject": "World Languages",
-      "countryCode": "US",
-      "languageCode": "en",
-      "tags": [
-        "spanish",
-        "world_languages",
-        "second_language",
-        "usa"
-      ]
-    },
-    {
-      "id": "us-k2-spanish",
-      "parentId": "us-spanish",
-      "nodeType": "course",
-      "name": "K-2 Spanish (Novice-Low)",
-      "description": "Introduction to Spanish for early elementary, focusing on basic vocabulary, greetings, and cultural awareness.",
-      "educationalLevel": "K-2",
-      "subject": "World Languages",
-      "tags": [
-        "kindergarten",
-        "grade1",
-        "grade2",
-        "novice_low"
-      ]
-    },
-    {
-      "id": "us-k2-spanish-comm",
-      "parentId": "us-k2-spanish",
-      "nodeType": "domain",
-      "name": "Communication",
-      "educationalLevel": "K-2",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-k2-spanish-cult",
-      "parentId": "us-k2-spanish",
-      "nodeType": "domain",
-      "name": "Cultures",
-      "educationalLevel": "K-2",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-k2-spanish-comm-lo1",
-      "parentId": "us-k2-spanish-comm",
-      "nodeType": "learning_objective",
-      "name": "Use basic greetings and leave-takings.",
-      "educationalLevel": "K-2",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-k2-spanish-cult-lo1",
-      "parentId": "us-k2-spanish-cult",
-      "nodeType": "learning_objective",
-      "name": "Identify some products and practices of Spanish-speaking cultures (e.g., foods, holidays).",
-      "educationalLevel": "K-2",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-g35-spanish",
-      "parentId": "us-spanish",
-      "nodeType": "course",
-      "name": "Grades 3-5 Spanish (Novice-Mid)",
-      "description": "Building on foundations with more complex sentences, questions, and cultural comparisons.",
-      "educationalLevel": "3-5",
-      "subject": "World Languages",
-      "tags": [
-        "grade3",
-        "grade4",
-        "grade5",
-        "novice_mid"
-      ]
-    },
-    {
-      "id": "us-g35-spanish-comm",
-      "parentId": "us-g35-spanish",
-      "nodeType": "domain",
-      "name": "Communication",
-      "educationalLevel": "3-5",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-g35-spanish-conn",
-      "parentId": "us-g35-spanish",
-      "nodeType": "domain",
-      "name": "Connections",
-      "educationalLevel": "3-5",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-g35-spanish-comp",
-      "parentId": "us-g35-spanish",
-      "nodeType": "domain",
-      "name": "Comparisons",
-      "educationalLevel": "3-5",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-g35-spanish-comm-lo1",
-      "parentId": "us-g35-spanish-comm",
-      "nodeType": "learning_objective",
-      "name": "Ask and answer simple questions about self and family.",
-      "educationalLevel": "3-5",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-g35-spanish-conn-lo1",
-      "parentId": "us-g35-spanish-conn",
-      "nodeType": "learning_objective",
-      "name": "Connect Spanish vocabulary to other subjects (e.g., numbers in Math, animals in Science).",
-      "educationalLevel": "3-5",
-      "subject": "World Languages"
-    },
-    {
-      "id": "us-g35-spanish-comp-lo1",
-      "parentId": "us-g35-spanish-comp",
-      "nodeType": "learning_objective",
-      "name": "Compare patterns of politeness between own culture and Spanish-speaking cultures.",
-      "educationalLevel": "3-5",
-      "subject": "World Languages"
+      "subject": "ART",
+      "tags": ["social_commentary_art", "visual_communication"]
     }
   ]
 }
