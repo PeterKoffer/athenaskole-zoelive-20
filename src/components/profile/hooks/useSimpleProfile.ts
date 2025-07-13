@@ -63,7 +63,7 @@ export const useSimpleProfile = () => {
 
           const newProfile = {
             user_id: user.id,
-            name: user.user_metadata?.name || '',
+            name: user.user_metadata?.name || user.email?.split('@')[0] || 'New User',
             email: user.email || '',
             preferences: defaultPreferences as unknown as Json
           };
