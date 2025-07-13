@@ -1,4 +1,17 @@
 
 {
-  "nodes": []
+  "nodes": [
+    {
+      "id": "us-music-discovery-root",
+      "parentId": "us-subjects-root",
+      "nodeType": "subject_area",
+      "name": "Music Discovery",
+      "description": "Comprehensive K-12 music education nurturing creativity, listening skills, cultural understanding, and emotional expression",
+      "countryCode": "US",
+      "subject": "MUSIC",
+      "subjectName": "Music Discovery",
+      "educationalLevel": "K-12",
+      "tags": ["music", "creativity", "cultural_appreciation", "performance", "composition"]
+    }
+  ]
 }

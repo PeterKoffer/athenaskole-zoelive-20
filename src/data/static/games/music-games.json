@@ -1,3 +1,4 @@
+
 [
   {
     "id": "music-rhythm-maker",
@@ -15,10 +16,164 @@
       "Learn musical notation basics",
       "Express creativity through music"
     ],
-    "status": "coming-soon",
+    "status": "available",
     "rewards": {
       "coins": 180,
       "badges": ["Music Maker", "Rhythm Master"]
+    }
+  },
+  {
+    "id": "pitch-perfect-adventure",
+    "title": "Pitch Perfect Adventure",
+    "description": "Journey through musical landscapes identifying high and low notes, learning pitch recognition!",
+    "emoji": "🎼",
+    "subject": "Music",
+    "gradeLevel": [1, 2, 3],
+    "difficulty": "beginner",
+    "interactionType": "audio",
+    "timeEstimate": "15-20 min",
+    "skillAreas": ["pitch_recognition", "listening_skills", "aural_awareness"],
+    "learningObjectives": [
+      "Distinguish between high and low pitches",
+      "Develop active listening skills",
+      "Recognize melodic patterns"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 150,
+      "badges": ["Pitch Detective", "Sound Explorer"]
+    }
+  },
+  {
+    "id": "cultural-music-explorer",
+    "title": "Cultural Music Explorer",
+    "description": "Discover music traditions from around the world and learn about different cultural sounds!",
+    "emoji": "🌍",
+    "subject": "Music",
+    "gradeLevel": [4, 5, 6, 7],
+    "difficulty": "intermediate",
+    "interactionType": "exploration",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["cultural_awareness", "world_music", "instrument_identification"],
+    "learningObjectives": [
+      "Explore music from different cultures",
+      "Identify traditional instruments",
+      "Appreciate musical diversity"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 200,
+      "badges": ["World Music Explorer", "Cultural Ambassador"]
+    }
+  },
+  {
+    "id": "instrument-orchestra",
+    "title": "Virtual Instrument Orchestra",
+    "description": "Build your own orchestra by learning about different instruments and their sounds!",
+    "emoji": "🎺",
+    "subject": "Music",
+    "gradeLevel": [3, 4, 5, 6],
+    "difficulty": "intermediate",
+    "interactionType": "simulation",
+    "timeEstimate": "20-25 min",
+    "skillAreas": ["instrument_families", "ensemble_skills", "listening_analysis"],
+    "learningObjectives": [
+      "Identify instrument families",
+      "Understand ensemble roles",
+      "Develop musical listening skills"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 175,
+      "badges": ["Orchestra Conductor", "Instrument Expert"]
+    }
+  },
+  {
+    "id": "melody-composer",
+    "title": "Melody Composer Workshop",
+    "description": "Learn to compose your own melodies using digital tools and music theory basics!",
+    "emoji": "🎹",
+    "subject": "Music",
+    "gradeLevel": [6, 7, 8, 9],
+    "difficulty": "intermediate",
+    "interactionType": "creation",
+    "timeEstimate": "30-35 min",
+    "skillAreas": ["composition", "music_theory", "digital_music"],
+    "learningObjectives": [
+      "Create original melodies",
+      "Apply basic music theory",
+      "Use digital composition tools"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 225,
+      "badges": ["Melody Maker", "Young Composer"]
+    }
+  },
+  {
+    "id": "harmony-builder",
+    "title": "Harmony Builder Challenge",
+    "description": "Master chord progressions and harmony by building musical foundations!",
+    "emoji": "🎶",
+    "subject": "Music",
+    "gradeLevel": [8, 9, 10, 11],
+    "difficulty": "advanced",
+    "interactionType": "puzzle",
+    "timeEstimate": "25-30 min",
+    "skillAreas": ["harmony", "chord_progressions", "music_theory"],
+    "learningObjectives": [
+      "Understand chord relationships",
+      "Build harmonic progressions",
+      "Apply advanced music theory"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 250,
+      "badges": ["Harmony Master", "Theory Expert"]
+    }
+  },
+  {
+    "id": "music-technology-lab",
+    "title": "Music Technology Lab",
+    "description": "Explore digital audio workstations and modern music production techniques!",
+    "emoji": "🎚️",
+    "subject": "Music",
+    "gradeLevel": [9, 10, 11, 12],
+    "difficulty": "advanced",
+    "interactionType": "simulation",
+    "timeEstimate": "35-40 min",
+    "skillAreas": ["digital_production", "music_technology", "recording"],
+    "learningObjectives": [
+      "Navigate digital audio workstations",
+      "Apply production techniques",
+      "Create digital music projects"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 300,
+      "badges": ["Tech Producer", "Digital Music Master"]
+    }
+  },
+  {
+    "id": "performance-stage",
+    "title": "Virtual Performance Stage",
+    "description": "Practice performance skills and stage presence in a supportive virtual environment!",
+    "emoji": "🎤",
+    "subject": "Music",
+    "gradeLevel": [6, 7, 8, 9, 10],
+    "difficulty": "intermediate",
+    "interactionType": "performance",
+    "timeEstimate": "20-25 min",
+    "skillAreas": ["performance_skills", "stage_presence", "confidence_building"],
+    "learningObjectives": [
+      "Develop performance confidence",
+      "Practice stage presence",
+      "Build musical expression"
+    ],
+    "status": "available",
+    "rewards": {
+      "coins": 200,
+      "badges": ["Stage Star", "Confident Performer"]
     }
   }
 ]
