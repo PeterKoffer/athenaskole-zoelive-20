@@ -12,6 +12,29 @@ test.describe('School Dashboard Features', () => {
     await expect(bodyElement).toBeVisible();
   });
 
+  test('should display school management dropdown and open settings modal', async ({ page }) => {
+    await page.goto('/school-dashboard');
+
+    // Check if the School Management dropdown is visible
+    const dropdownTrigger = page.locator('button:has-text("School Management Suite")');
+    await expect(dropdownTrigger).toBeVisible();
+
+    // Click the dropdown trigger
+    await dropdownTrigger.click();
+
+    // Click the "System Settings" sub-trigger
+    const systemSettingsTrigger = page.locator('div[role="menuitem"]:has-text("System Settings")');
+    await systemSettingsTrigger.click();
+
+    // Click the "Teaching Perspective Settings" menu item
+    const teachingSettingsItem = page.locator('div[role="menuitem"]:has-text("Teaching Perspective Settings")');
+    await teachingSettingsItem.click();
+
+    // Check if the modal is visible
+    const modalTitle = page.locator('h2:has-text("Teaching Perspective Settings")');
+    await expect(modalTitle).toBeVisible();
+  });
+
   test('should navigate to simple school dashboard', async ({ page }) => {
     await page.goto('/simple-school-dashboard');
     
