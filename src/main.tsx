@@ -65,6 +65,7 @@ root.render(
                       <Route path="/curriculum/:subject" element={<DailyUniversePage />} />
                       <Route path="/curriculum/:subject/:grade" element={<DailyUniversePage />} />
                       <Route path="/curriculum/:subject/:grade/:topic" element={<DailyUniversePage />} />
+                      <Route path="/parent-dashboard" element={<ParentDashboard />} />
                     </Routes>
                   </div>
                 </div>
