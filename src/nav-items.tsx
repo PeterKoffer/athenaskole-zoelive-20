@@ -15,6 +15,12 @@ export const navItems = [
     page: <HomePage />,
   },
   {
+    title: "HomePage",
+    to: "/home",
+    icon: <Home className="h-4 w-4" />,
+    page: <HomePage />,
+  },
+  {
     title: "Daily Universe",
     to: "/daily-universe",
     icon: <Calendar className="h-4 w-4" />,
