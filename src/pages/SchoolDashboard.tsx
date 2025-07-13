@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,7 +57,10 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Manage student records, enrollment, and academic progress.
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => navigate('/student-management')}
+              >
                 View Students
               </Button>
             </CardContent>
@@ -73,7 +77,10 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Monitor teacher performance and staff assignments.
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => navigate('/staff-management')}
+              >
                 Manage Staff
               </Button>
             </CardContent>
@@ -90,7 +97,10 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 View school performance metrics and reports.
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => navigate('/school-analytics')}
+              >
                 View Reports
               </Button>
             </CardContent>
@@ -107,7 +117,10 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Manage class schedules and school calendar.
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => navigate('/schedule-management')}
+              >
                 View Schedule
               </Button>
             </CardContent>

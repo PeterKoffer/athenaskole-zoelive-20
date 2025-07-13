@@ -39,9 +39,15 @@ export default function TeachingPerspectiveSettingsPanel() {
     console.log("Settings loaded:", settings);
   }, [settings]);
 
-  // Now do the conditional rendering AFTER all hooks are called
+  // Now do the conditional rendering AFTER all hooks are called - only school leaders and admins
   if (userRole !== "admin" && userRole !== "school_leader") {
-    return null;
+    return (
+      <div className="text-center p-8">
+        <div className="text-6xl mb-4">🏫</div>
+        <h2 className="text-xl font-bold text-white mb-2">School Leader Access Required</h2>
+        <p className="text-gray-400">Only school leaders can access teaching perspective settings.</p>
+      </div>
+    );
   }
 
   const handleChange = (field: keyof TeachingPerspectiveSettings, value: any) => {

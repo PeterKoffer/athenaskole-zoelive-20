@@ -54,8 +54,8 @@ const SchoolDashboardAccessControl = ({ children }: AccessControlProps) => {
     );
   }
 
-  // Check access permissions - allow school_leader, admin, and school_staff
-  const allowedRoles = ['admin', 'school_leader', 'school_staff'];
+  // Check access permissions - only allow school_leader and admin
+  const allowedRoles = ['admin', 'school_leader'];
   const hasAccess = userRole && allowedRoles.includes(userRole);
   
   console.log('[SchoolDashboardAccessControl] Access check:', { 
@@ -72,8 +72,8 @@ const SchoolDashboardAccessControl = ({ children }: AccessControlProps) => {
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🏫</div>
-          <h1 className="text-2xl font-bold mb-4">School Dashboard Access Required</h1>
-          <p className="text-gray-400 mb-2">You need administrator, school leader, or staff privileges to access this dashboard.</p>
+          <h1 className="text-2xl font-bold mb-4">School Leader Access Required</h1>
+          <p className="text-gray-400 mb-2">You need school leader or administrator privileges to access this dashboard.</p>
           <p className="text-gray-400 mb-4">Current role: {userRole || 'None assigned'}</p>
           <Button 
             onClick={() => navigate('/auth')}

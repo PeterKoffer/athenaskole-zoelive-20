@@ -11,6 +11,10 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import DailyProgramPage from "./pages/DailyProgramPage";
+import StudentManagementPage from "./pages/StudentManagementPage";
+import StaffManagementPage from "./pages/StaffManagementPage";
+import SchoolAnalyticsPage from "./pages/SchoolAnalyticsPage";
+import ScheduleManagementPage from "./pages/ScheduleManagementPage";
 
 export const navItems = [
   {
@@ -78,5 +82,29 @@ export const navItems = [
     to: "/daily-program",
     icon: <Calendar className="h-4 w-4" />,
     page: <DailyProgramPage />,
+  },
+  {
+    title: "Student Management",
+    to: "/student-management",
+    icon: <Users className="h-4 w-4" />,
+    page: <StudentManagementPage />,
+  },
+  {
+    title: "Staff Management",
+    to: "/staff-management",
+    icon: <Users className="h-4 w-4" />,
+    page: <StaffManagementPage />,
+  },
+  {
+    title: "School Analytics",
+    to: "/school-analytics",
+    icon: <BookOpen className="h-4 w-4" />,
+    page: <SchoolAnalyticsPage />,
+  },
+  {
+    title: "Schedule Management",
+    to: "/schedule-management",
+    icon: <Calendar className="h-4 w-4" />,
+    page: <ScheduleManagementPage />,
   },
 ];
