@@ -1,5 +1,4 @@
-
-import { Home, BookOpen, Calendar, User, Settings, Users } from "lucide-react";
+import { Home, BookOpen, Calendar, User, Settings, Calculator, TestTube } from "lucide-react";
 import Index from "./pages/Index";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import ProfilePage from "./pages/ProfilePage";
@@ -13,7 +12,7 @@ export const navItems = [
     title: "Home",
     to: "/",
     icon: <Home className="h-4 w-4" />,
-    page: <Index />,
+    page: <HomePage />,
   },
   {
     title: "HomePage",
