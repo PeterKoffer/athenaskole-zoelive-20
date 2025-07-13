@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { LearnerProfile } from '@/types/learnerProfile';
+import { LearnerProfile, LearnerPreferences } from '@/types/learnerProfile';
 
 export const useSimpleProfile = () => {
   const { user } = useAuth();
@@ -37,16 +37,18 @@ export const useSimpleProfile = () => {
         if (!profileData) {
           // Create initial profile if none exists
           console.log('Creating initial profile for user:', user.id);
+          const defaultPreferences: LearnerPreferences = {
+            preferredSubjects: [],
+            learningStyle: 'visual',
+            difficultyPreference: 3,
+            sessionLength: 30
+          };
+
           const newProfile = {
             user_id: user.id,
             name: user.user_metadata?.name || '',
             email: user.email || '',
-            preferences: {
-              preferredSubjects: [],
-              learningStyle: 'visual',
-              difficultyPreference: 3,
-              sessionLength: 30
-            }
+            preferences: defaultPreferences
           };
 
           const { data: createdProfile, error: createError } = await supabase
@@ -72,15 +74,12 @@ export const useSimpleProfile = () => {
             overall_mastery: createdProfile.overall_mastery || 0,
             kc_masteries: [],
             kcMasteryMap: {},
-            preferences: createdProfile.preferences || {
-              preferredSubjects: [],
-              learningStyle: 'visual',
-              difficultyPreference: 3,
-              sessionLength: 30
-            },
+            preferences: (createdProfile.preferences as LearnerPreferences) || defaultPreferences,
             created_at: createdProfile.created_at,
             updated_at: createdProfile.updated_at,
-            recentPerformance: createdProfile.recent_performance || [],
+            recentPerformance: Array.isArray(createdProfile.recent_performance) 
+              ? createdProfile.recent_performance 
+              : [],
             overallMastery: createdProfile.overall_mastery || 0,
             lastUpdatedTimestamp: Date.now(),
             createdAt: Date.now(),
@@ -93,6 +92,13 @@ export const useSimpleProfile = () => {
 
           setProfile(learnerProfile);
         } else {
+          const defaultPreferences: LearnerPreferences = {
+            preferredSubjects: [],
+            learningStyle: 'visual',
+            difficultyPreference: 3,
+            sessionLength: 30
+          };
+
           const learnerProfile: LearnerProfile = {
             userId: profileData.user_id,
             name: profileData.name || '',
@@ -106,15 +112,12 @@ export const useSimpleProfile = () => {
             overall_mastery: profileData.overall_mastery || 0,
             kc_masteries: [],
             kcMasteryMap: {},
-            preferences: profileData.preferences || {
-              preferredSubjects: [],
-              learningStyle: 'visual',
-              difficultyPreference: 3,
-              sessionLength: 30
-            },
+            preferences: (profileData.preferences as LearnerPreferences) || defaultPreferences,
             created_at: profileData.created_at,
             updated_at: profileData.updated_at,
-            recentPerformance: profileData.recent_performance || [],
+            recentPerformance: Array.isArray(profileData.recent_performance) 
+              ? profileData.recent_performance 
+              : [],
             overallMastery: profileData.overall_mastery || 0,
             lastUpdatedTimestamp: Date.now(),
             createdAt: Date.now(),
@@ -153,7 +156,7 @@ export const useSimpleProfile = () => {
           address: updates.address,
           grade: updates.grade,
           school: updates.school,
-          preferences: updates.preferences,
+          preferences: updates.preferences as any,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', user.id);
