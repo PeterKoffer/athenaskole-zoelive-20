@@ -168,7 +168,7 @@ export const createMusicDiscoveryLesson = (skillArea: string, gradeLevel: number
         : isMiddle
         ? 'Join Nelie in creating musical patterns and exploring world music!'
         : 'Collaborate with Nelie to compose and analyze complex musical pieces!',
-      challenge: `Use your ${skillArea} skills to complete musical challenges!`,
+      explorationTask: `Use your ${skillArea} skills to complete musical challenges!`,
       interactionType: isElementary ? 'sound_identification' : isMiddle ? 'pattern_creation' : 'composition_analysis'
     }
   });
