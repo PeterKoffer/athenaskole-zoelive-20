@@ -23,7 +23,8 @@ const ProfileContainer = () => {
     authLoading, 
     profileLoading, 
     profile: profile?.name,
-    error 
+    error,
+    hasProfile: !!profile
   });
 
   // Scroll to top when page loads
@@ -33,11 +34,12 @@ const ProfileContainer = () => {
 
   // If auth is still loading, show loading state
   if (authLoading) {
+    console.log('Auth loading...');
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
+          <p>Loading authentication...</p>
         </div>
       </div>
     );
@@ -45,9 +47,12 @@ const ProfileContainer = () => {
 
   // If user is not authenticated, redirect to auth
   if (!user) {
+    console.log('No user, redirecting to auth');
     navigate('/auth');
     return null;
   }
+
+  console.log('User authenticated:', user.email);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -75,8 +80,12 @@ const ProfileContainer = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile) return;
+    if (!profile) {
+      console.error('No profile data to submit');
+      return;
+    }
 
+    console.log('Submitting profile update...');
     const success = await updateProfile(profile);
     if (success) {
       toast({
@@ -93,11 +102,12 @@ const ProfileContainer = () => {
   };
 
   const handleDataChange = (data: Partial<LearnerProfile>) => {
-    // This will be handled by the form components
     console.log('Profile data change:', data);
+    // This will be handled by the form components directly
   };
 
   if (error) {
+    console.error('Profile error:', error);
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -131,6 +141,7 @@ const ProfileContainer = () => {
             {profileLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="ml-4">Loading profile...</p>
               </div>
             ) : profile ? (
               <ProfileCard
@@ -143,10 +154,14 @@ const ProfileContainer = () => {
               />
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-400">No profile data found.</p>
+                <p className="text-gray-400 mb-4">No profile data found.</p>
+                <div className="text-sm text-gray-500 mb-4">
+                  User ID: {user.id}<br/>
+                  Email: {user.email}
+                </div>
                 <button 
                   onClick={() => window.location.reload()} 
-                  className="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
+                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
                 >
                   Retry Loading Profile
                 </button>
