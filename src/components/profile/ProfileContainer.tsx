@@ -12,16 +12,42 @@ import { toast } from "@/hooks/use-toast";
 
 const ProfileContainer = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [uploading, setUploading] = useState(false);
   
-  const { profile, loading, error, updateProfile } = useSimpleProfile();
+  const { profile, loading: profileLoading, error, updateProfile } = useSimpleProfile();
+
+  console.log('ProfileContainer render:', { 
+    user: user?.email, 
+    authLoading, 
+    profileLoading, 
+    profile: profile?.name,
+    error 
+  });
 
   // Scroll to top when page loads
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // If auth is still loading, show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is not authenticated, redirect to auth
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -71,11 +97,6 @@ const ProfileContainer = () => {
     console.log('Profile data change:', data);
   };
 
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
-
   if (error) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -107,7 +128,7 @@ const ProfileContainer = () => {
 
         {activeTab === "profile" && (
           <div>
-            {loading ? (
+            {profileLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
@@ -123,6 +144,12 @@ const ProfileContainer = () => {
             ) : (
               <div className="text-center py-12">
                 <p className="text-gray-400">No profile data found.</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
+                >
+                  Retry Loading Profile
+                </button>
               </div>
             )}
           </div>
