@@ -4,11 +4,7 @@ export {
   mockCurriculumData,
   getCurriculumByCountry,
   getCurriculumBySubject,
-  getCurriculumByGrade,
-  usRootCurriculumNodes,
-  usMathCurriculumNodes,
-  usElaCurriculumNodes,
-  dkCurriculumNodes
+  getCurriculumByGrade
 } from './curriculum';
 
 // Import the data for default export

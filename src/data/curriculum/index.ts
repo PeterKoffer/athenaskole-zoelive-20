@@ -1,8 +1,21 @@
+
 import { UnifiedCurriculumNode } from '@/types/curriculum/UnifiedCurriculumNode';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
-import unifiedCurriculum from '../../../public/data/unified-curriculum.json';
 
-export const mockCurriculumData: UnifiedCurriculumNode[] = unifiedCurriculum;
+// Mock curriculum data - in a real app this would come from your API/database
+export const mockCurriculumData: UnifiedCurriculumNode[] = [
+  {
+    id: 'us-root',
+    parentId: null,
+    name: 'United States Education System',
+    nodeType: 'country',
+    countryCode: 'US',
+    educationalLevel: 'K-12',
+    subject: NELIESubject.MATH,
+    subjectName: 'Mathematics',
+    children: []
+  }
+];
 
 // Helper function to flatten the nested structure
 const flattenNodes = (nodes: UnifiedCurriculumNode[]): UnifiedCurriculumNode[] => {

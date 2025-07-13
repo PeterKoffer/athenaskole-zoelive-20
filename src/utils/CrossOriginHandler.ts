@@ -1,4 +1,3 @@
-
 // Safe postMessage handler for cross-origin communication
 export class CrossOriginHandler {
   private allowedOrigins: string[];
@@ -32,7 +31,7 @@ export class CrossOriginHandler {
 
   // Safe message receiver
   private setupMessageListener() {
-    window.addEventListener('message', (event) => {
+    window.addEventListener('message', (event: MessageEvent) => {
       // Always verify the origin for security
       if (!this.allowedOrigins.includes(event.origin) && event.origin !== window.location.origin) {
         console.warn(`🚫 Blocked message from untrusted origin: ${event.origin}`);
@@ -40,18 +39,18 @@ export class CrossOriginHandler {
       }
 
       // Process trusted messages
-      this.handleMessage(event.data, event.origin);
+      this.handleMessage(event.data, event.origin, event);
     });
   }
 
   // Override this method to handle specific messages
-  handleMessage(data: any, origin: string) {
+  handleMessage(data: any, origin: string, event?: MessageEvent) {
     console.log(`📨 Received message from ${origin}:`, data);
     
     // Handle Jules-specific messages
     switch (data.type) {
       case 'JULES_HANDSHAKE':
-        this.handleJulesHandshake(data, origin);
+        this.handleJulesHandshake(data, origin, event);
         break;
       case 'JULES_CODE_REQUEST':
         this.handleJulesCodeRequest(data, origin);
@@ -73,7 +72,7 @@ export class CrossOriginHandler {
     }
   }
 
-  private handleJulesHandshake(data: any, origin: string) {
+  private handleJulesHandshake(data: any, origin: string, event?: MessageEvent) {
     console.log('🤖 Jules handshake received from:', origin);
     
     // Send back confirmation with app info
@@ -93,7 +92,7 @@ export class CrossOriginHandler {
     if (window.parent !== window) {
       this.sendMessage(window.parent, response, origin);
     }
-    if (event.source && event.source !== window) {
+    if (event?.source && event.source !== window) {
       this.sendMessage(event.source as Window, response, origin);
     }
   }
