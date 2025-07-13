@@ -1,25 +1,52 @@
-
 // Cross-origin handler for Jules AI integration
 class CrossOriginHandler {
-  public allowedOrigins = [
-    'https://aistudio.google.com',
-    'https://gemini.google.com',
-    'https://makersuite.google.com',
-    'https://ai.google.dev',
-    'https://developers.google.com',
-    'https://accounts.google.com',
-    'https://oauth2.googleapis.com',
-    'https://www.googleapis.com',
-    'https://lovable.dev',
-    'https://app.lovable.dev',
-    'https://preview.lovable.dev'
-  ];
+  public allowedOrigins: string[] = [];
 
   private messageHandlers = new Map<string, (data: any) => void>();
 
   constructor() {
+    this.initializeAllowedOrigins();
     this.initializeHandlers();
     console.log('🔧 CrossOriginHandler initialized with allowed origins:', this.allowedOrigins);
+  }
+
+  private initializeAllowedOrigins() {
+    // Static allowed origins
+    const staticOrigins = [
+      'https://aistudio.google.com',
+      'https://gemini.google.com',
+      'https://makersuite.google.com',
+      'https://ai.google.dev',
+      'https://developers.google.com',
+      'https://accounts.google.com',
+      'https://oauth2.googleapis.com',
+      'https://www.googleapis.com',
+      'https://lovable.dev',
+      'https://app.lovable.dev',
+      'https://preview.lovable.dev'
+    ];
+
+    // Add current origin
+    const currentOrigin = window.location.origin;
+    
+    // Add Lovable preview domain patterns
+    const lovablePreviewPattern = /^https:\/\/.*\.lovable\.app$/;
+    const lovableIdPreviewPattern = /^https:\/\/id-preview--.*\.lovable\.app$/;
+    
+    this.allowedOrigins = [...staticOrigins];
+    
+    // Always add current origin
+    if (!this.allowedOrigins.includes(currentOrigin)) {
+      this.allowedOrigins.push(currentOrigin);
+      console.log('✅ Added current origin to allowed list:', currentOrigin);
+    }
+
+    // Add common Lovable patterns if they match
+    if (lovablePreviewPattern.test(currentOrigin) || lovableIdPreviewPattern.test(currentOrigin)) {
+      // Extract base domain patterns
+      const baseDomain = currentOrigin.replace(/^https:\/\/[^.]+/, 'https://*');
+      console.log('✅ Detected Lovable preview environment, added pattern:', baseDomain);
+    }
   }
 
   private initializeHandlers() {
@@ -43,11 +70,40 @@ class CrossOriginHandler {
   }
 
   private isOriginAllowed(origin: string): boolean {
-    const isAllowed = this.allowedOrigins.some(allowed => 
+    // Check exact matches first
+    const exactMatch = this.allowedOrigins.some(allowed => origin === allowed);
+    
+    if (exactMatch) {
+      console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (exact match)`);
+      return true;
+    }
+
+    // Check Lovable domain patterns
+    const lovablePatterns = [
+      /^https:\/\/.*\.lovable\.app$/,
+      /^https:\/\/id-preview--.*\.lovable\.app$/,
+      /^https:\/\/.*\.lovable\.dev$/
+    ];
+
+    for (const pattern of lovablePatterns) {
+      if (pattern.test(origin)) {
+        console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (pattern match)`);
+        return true;
+      }
+    }
+
+    // Check if origin ends with any allowed domain
+    const domainMatch = this.allowedOrigins.some(allowed => 
       origin === allowed || origin.endsWith(allowed.replace('https://', ''))
     );
-    console.log(`🔍 Origin check: ${origin} -> ${isAllowed ? '✅ ALLOWED' : '❌ BLOCKED'}`);
-    return isAllowed;
+
+    if (domainMatch) {
+      console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (domain match)`);
+      return true;
+    }
+
+    console.log(`🔍 Origin check: ${origin} -> ❌ BLOCKED`);
+    return false;
   }
 
   public handleMessage = (event: MessageEvent) => {
@@ -184,6 +240,19 @@ class CrossOriginHandler {
           console.log(`ℹ️ Could not send message to ${origin}:`, error.message);
         }
       });
+      
+      // Also try sending to current origin if it's different
+      const currentOrigin = window.location.origin;
+      if (!julesOrigins.includes(currentOrigin)) {
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage(message, '*');
+            console.log(`✅ Message sent to parent with wildcard`);
+          }
+        } catch (error) {
+          console.log(`ℹ️ Could not send wildcard message:`, error.message);
+        }
+      }
       
     } catch (error) {
       console.error('❌ Error sending message to Jules:', error);
