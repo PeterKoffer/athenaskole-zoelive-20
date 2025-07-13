@@ -4,7 +4,16 @@ import { mockCurriculumData } from '@/data/mockCurriculumData';
 import { CurriculumService } from './types';
 
 class MockCurriculumServiceImpl implements CurriculumService {
-  private data: CurriculumNode[] = mockCurriculumData;
+  private data: CurriculumNode[];
+
+  constructor() {
+    // Convert UnifiedCurriculumNode to CurriculumNode format
+    this.data = mockCurriculumData.map(node => ({
+      ...node,
+      // Ensure all required CurriculumNode properties are present
+      nodeType: node.nodeType as CurriculumNode['nodeType'],
+    }));
+  }
 
   async getNodes(filters?: CurriculumNodeFilters): Promise<CurriculumNode[]> {
     if (!filters || Object.keys(filters).length === 0) {

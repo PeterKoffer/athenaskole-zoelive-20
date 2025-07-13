@@ -2,24 +2,38 @@
 /**
  * Defines the type of a node in the curriculum hierarchy.
  * - country: Root node for a country's curriculum system.
- * - region: A sub-division within a country if applicable (e.g., state, province).
+ * - state_province: A sub-division within a country (e.g., state, province).
+ * - district_region: A district or regional subdivision.
+ * - school: Individual school level.
  * - grade_level: Specific grade (e.g., K, 1, 5, 10).
- * - subject: A broad subject area (e.g., Math, Science, English).
+ * - subject_area: A broad subject area (e.g., Math, Science, English).
+ * - curriculum_standard: Curriculum standards or frameworks.
+ * - learning_objective: A specific skill or understanding students should achieve.
+ * - skill_component: Specific skill components within learning objectives.
+ * - assessment_item: Assessment or evaluation items.
+ * - region: Legacy support for regional nodes.
+ * - subject: Legacy support for subject nodes.
  * - course: A specific course within a subject for a grade (e.g., Algebra I, Grade 9 English).
  * - domain: A major strand or domain within a subject/course (e.g., "Number Sense", "Reading Comprehension").
  * - topic: A more specific topic area within a domain (e.g., "Fractions", "Identifying Main Idea").
- * - learning_objective: A specific skill or understanding students should achieve (often corresponds to a standard).
  * - kc: Knowledge Component - the most granular, teachable/assessable unit of knowledge or skill.
  */
 export type CurriculumNodeType =
   | 'country'
-  | 'region' // Optional, for countries with regional curricula (e.g., US states, Canadian provinces)
+  | 'state_province' 
+  | 'district_region'
+  | 'school'
   | 'grade_level'
+  | 'subject_area'
+  | 'curriculum_standard'
+  | 'learning_objective'
+  | 'skill_component'
+  | 'assessment_item'
+  | 'region' // Optional, for countries with regional curricula (e.g., US states, Canadian provinces)
   | 'subject'
   | 'course' // e.g., "Algebra 1" as distinct from general "Math" for a grade
   | 'domain' // e.g., "Ratios and Proportional Relationships" in Math
   | 'topic' // e.g., "Understanding Unit Rates"
-  | 'learning_objective' // Specific standard or objective, e.g., "Understand the concept of a unit rate a/b associated with a ratio a:b with b != 0"
   | 'kc'; // Knowledge Component, e.g., "Define unit rate", "Calculate unit rate from ratio"
 
 export interface CurriculumNode {
@@ -34,6 +48,9 @@ export interface CurriculumNode {
   countryCode?: string; // ISO 3166-1 alpha-2 country code (e.g., "US", "DK", "CA"). Relevant for country/region nodes, can be inherited.
   languageCode?: string; // ISO 639-1 language code (e.g., "en", "da"). Relevant for country/region nodes, can be inherited.
   regionCode?: string; // Optional, for states/provinces if nodeType is 'region' or below within a region.
+  stateProvinceCode?: string; // State/province code for unified curriculum nodes
+  districtCode?: string; // District code for unified curriculum nodes
+  schoolCode?: string; // School code for unified curriculum nodes
 
   educationalLevel?: string; // e.g., "K", "1", "2", ..., "12" (especially for 'grade_level' type or content nodes)
   subjectName?: string; // Standardized subject name (e.g., "Mathematics", "Language Arts", "Physical Science"). Useful for filtering.
@@ -58,10 +75,17 @@ export interface CurriculumNode {
   // Time and pacing
   estimatedDuration?: number; // In minutes
   prerequisites?: string[]; // IDs of prerequisite nodes
+  estimatedTime?: number; // Unified curriculum support
   
   // Engagement and pedagogy
   preferredTeachingMethods?: string[]; // ["hands_on", "discussion", "lecture", "project_based", "collaborative"]
   engagementStrategies?: string[]; // ["gamification", "storytelling", "real_world_connections", "technology_integration"]
+
+  // Unified curriculum support
+  children?: CurriculumNode[];
+  metadata?: Record<string, any>;
+  standardsCode?: string;
+  difficultyLevel?: number;
 
   // For KCs, could include IRT parameters in the future, or links to "Content Atoms"
   // For Learning Objectives, could link to KCs that comprise it.
