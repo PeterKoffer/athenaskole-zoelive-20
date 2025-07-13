@@ -65,6 +65,5 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     description: "Monitor child's progress and communicate with school",
     allowedRoutes: ['/parent-dashboard', '/profile'],
     dashboardRoute: '/parent-dashboard',
-    restrictedFrom: ['admin', 'school_leader', 'school_staff', 'teacher', 'student'],
   },
 };

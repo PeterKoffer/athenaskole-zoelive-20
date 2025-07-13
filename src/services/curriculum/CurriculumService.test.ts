@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { CurriculumService } from './CurriculumService';
 import { mockCurriculumData } from '@/data/mockCurriculumData';
 import { CurriculumNodeFilters } from '@/types/curriculum/CurriculumFilters';
+import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 describe('CurriculumService', () => {
   let service: CurriculumService;
@@ -13,10 +14,10 @@ describe('CurriculumService', () => {
   describe('getNodeById', () => {
     it('should return a node if found', async () => {
       // Using an existing ID from usMathData.ts
-      const node = await service.getNodeById('k-cc-1');
+      const node = await service.getNodeById('us-k-math-cc-1');
       expect(node).toBeDefined();
-      expect(node!.id).toBe('k-cc-1');
-      expect(node!.name).toBe('Count to 100 by ones and by tens (K.CC.A.1)');
+      expect(node!.id).toBe('us-k-math-cc-1');
+      expect(node!.name).toBe('Count to 100 by ones and by tens');
     });
 
     it('should return undefined if node not found', async () => {
@@ -27,17 +28,16 @@ describe('CurriculumService', () => {
 
   describe('getChildren', () => {
     it('should return direct children of a parent node', async () => {
-      // Using 'k-cc' (Kindergarten Counting & Cardinality domain) which has LOs as children
-      const children = await service.getChildren('k-cc');
+      // Using 'us-k-math-cc' (Kindergarten Counting & Cardinality domain) which has LOs as children
+      const children = await service.getChildren('us-k-math-cc');
       expect(children.length).toBeGreaterThan(0); // Expecting at least one child LO
-      expect(children.some(c => c.id === 'k-cc-1')).toBe(true);
-      expect(children.some(c => c.id === 'k-cc-2')).toBe(true);
-      expect(children.some(c => c.id === 'k-cc-3')).toBe(true);
+      expect(children.some(c => c.id === 'us-k-math-cc-1')).toBe(true);
+      expect(children.some(c => c.id === 'us-k-math-cc-2')).toBe(true);
     });
 
     it('should return empty array if parent has no children', async () => {
-      // 'k-cc-1' is a learning_objective, likely has no children in current mock data
-      const children = await service.getChildren('k-cc-1');
+      // 'us-k-math-cc-1' is a learning_objective, likely has no children in current mock data
+      const children = await service.getChildren('us-k-math-cc-1');
       expect(children).toHaveLength(0);
     });
   });
@@ -50,9 +50,6 @@ describe('CurriculumService', () => {
       
       expect(descendants.some(d => d.nodeType === 'domain')).toBe(true);
       expect(descendants.some(d => d.nodeType === 'learning_objective')).toBe(true);
-      // KCs are not currently in usMathData, so this check might fail or need adjustment
-      // For now, let's assume no KCs for this test based on current data.
-      // expect(descendants.some(d => d.nodeType === 'kc')).toBe(true);
     });
   });
 
@@ -99,22 +96,22 @@ describe('CurriculumService', () => {
       });
     });
 
-    it('should filter by subjectName', async () => {
-      const filters: CurriculumNodeFilters = { subjectName: 'Mathematics' };
+    it('should filter by subject', async () => {
+      const filters: CurriculumNodeFilters = { subject: NELIESubject.MATH };
       const nodes = await service.getNodes(filters);
       expect(nodes.length).toBeGreaterThan(0);
       nodes.forEach(node => {
-        expect(node.subjectName).toBe('Mathematics');
+        expect(node.subject).toBe(NELIESubject.MATH);
       });
     });
 
     it('should filter by parentId', async () => {
-      // Using 'k-cc' (domain) as parent, expecting its LO children
-      const filters: CurriculumNodeFilters = { parentId: 'k-cc' };
+      // Using 'us-k-math-cc' (domain) as parent, expecting its LO children
+      const filters: CurriculumNodeFilters = { parentId: 'us-k-math-cc' };
       const nodes = await service.getNodes(filters);
       expect(nodes.length).toBeGreaterThan(0);
       nodes.forEach(node => {
-        expect(node.parentId).toBe('k-cc');
+        expect(node.parentId).toBe('us-k-math-cc');
       });
     });
 
@@ -129,7 +126,7 @@ describe('CurriculumService', () => {
     });
 
     it('should filter by tags', async () => {
-      // Using 'foundational' tag present in K-Math and G1-Math
+      // Using 'foundational' tag present in K-Math
       const filters: CurriculumNodeFilters = { tags: ['foundational'] };
       const nodes = await service.getNodes(filters);
       expect(nodes.length).toBeGreaterThan(0);
@@ -142,7 +139,7 @@ describe('CurriculumService', () => {
       const filters: CurriculumNodeFilters = {
         countryCode: 'US',
         nodeType: 'learning_objective',
-        educationalLevel: 'K' // Changed from '3' to 'K'
+        educationalLevel: 'K'
       };
       const nodes = await service.getNodes(filters);
       expect(nodes.length).toBeGreaterThan(0);
@@ -162,12 +159,12 @@ describe('CurriculumService', () => {
 
   describe('generateAIContextForNode', () => {
     it('should generate context for a node', async () => {
-      // Using 'k-oa-1' (K Math LO)
-      const context = await service.generateAIContextForNode('k-oa-1');
-      expect(context).toContain('LEARNING_OBJECTIVE'); // Type is string literal now
-      expect(context).toContain('Represent addition and subtraction'); // Name of k-oa-1
-      expect(context).toContain('Grade Level: K'); // Educational level of k-oa-1
-      expect(context).toContain('Subject: Mathematics'); // SubjectName of k-oa-1
+      // Using 'us-g1-math-oa-1' (Grade 1 Math LO)
+      const context = await service.generateAIContextForNode('us-g1-math-oa-1');
+      expect(context).toContain('LEARNING_OBJECTIVE');
+      expect(context).toContain('Use addition and subtraction within 20');
+      expect(context).toContain('Grade Level: 1');
+      expect(context).toContain(`Subject: ${NELIESubject.MATH}`);
     });
 
     it('should return error message for non-existent node', async () => {
@@ -178,12 +175,12 @@ describe('CurriculumService', () => {
 
   describe('getNodePath', () => {
     it('should return path from root to node', async () => {
-      // Using 'k-cc-1' (K Math LO)
-      const path = await service.getNodePath('k-cc-1');
-      expect(path.length).toBeGreaterThan(2); // Path: us (country) -> us-math (subject) -> us-k-math (course) -> k-cc (domain) -> k-cc-1 (LO)
-      expect(path[0].nodeType).toBe('country');
+      // Using 'us-k-math-cc-1' (K Math LO)
+      const path = await service.getNodePath('us-k-math-cc-1');
+      expect(path.length).toBeGreaterThan(2); // Path: us-root -> us-math -> us-k-math -> us-k-math-cc -> us-k-math-cc-1
+      expect(path[0].nodeType).toBe('subject');
       expect(path[path.length - 1].nodeType).toBe('learning_objective');
-      expect(path[path.length - 1].id).toBe('k-cc-1');
+      expect(path[path.length - 1].id).toBe('us-k-math-cc-1');
     });
   });
 
@@ -194,7 +191,7 @@ describe('CurriculumService', () => {
       expect(stats.nodesByType).toBeDefined();
       expect(stats.nodesByCountry).toBeDefined();
       expect(stats.nodesBySubject).toBeDefined();
-      expect(stats.nodesByType.country).toBeGreaterThan(0);
+      expect(stats.nodesByType.subject).toBeGreaterThan(0);
       expect(stats.nodesByCountry.US).toBeGreaterThan(0);
     });
   });
