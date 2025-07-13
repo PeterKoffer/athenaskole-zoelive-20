@@ -1,63 +1,128 @@
-
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-import AdminNavbar from "@/components/admin/AdminNavbar";
-import AdminStatsCards from "@/components/admin/AdminStatsCards";
-import AdminToolsDropdown from "@/components/admin/AdminToolsDropdown";
-import AdminQuickActions from "@/components/admin/AdminQuickActions";
-import AdminTabsContent from "@/components/admin/AdminTabsContent";
-import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
-import UserImpersonation from "@/components/admin/UserImpersonation";
-import { AdminStats } from "@/types/admin";
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Shield, Users, Settings, BarChart3, School } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const [showAIInsights, setShowAIInsights] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-  const stats: AdminStats = {
-    totalSchools: 12,
-    totalUsers: 1250,
-    totalStudents: 5432,
-    systemUptime: 99.8
-  };
-
-  const handleShowAIInsights = () => {
-    setShowAIInsights(true);
-  };
-
-  const handleCloseAIInsights = () => {
-    setShowAIInsights(false);
-  };
-
-  if (showAIInsights) {
-    return <AIInsightsDashboard onClose={handleCloseAIInsights} />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <AdminNavbar />
-
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <AdminStatsCards stats={stats} />
-
-        <div className="flex gap-4 mb-6">
-          <AdminToolsDropdown onShowAIInsights={handleShowAIInsights} />
-          <AdminQuickActions onShowAIInsights={handleShowAIInsights} />
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="text-muted-foreground hover:text-foreground mr-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Full system management and administration</p>
+          </div>
         </div>
 
-        <UserImpersonation />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <School className="w-5 h-5 mr-2 text-primary" />
+                School Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Manage schools, districts, and organizational structure.
+              </p>
+              <Button className="w-full">
+                Manage Schools
+              </Button>
+            </CardContent>
+          </Card>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-800">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-gray-700">Users</TabsTrigger>
-            <TabsTrigger value="schools" className="data-[state=active]:bg-gray-700">Schools</TabsTrigger>
-            <TabsTrigger value="lesson-coverage" className="data-[state=active]:bg-gray-700">Lesson Coverage</TabsTrigger>
-            <TabsTrigger value="system" className="data-[state=active]:bg-gray-700">System</TabsTrigger>
-            <TabsTrigger value="ai-insights" className="data-[state=active]:bg-purple-700 data-[state=active]:text-white">AI Insights</TabsTrigger>
-          </TabsList>
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <Users className="w-5 h-5 mr-2 text-primary" />
+                User Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Manage users, roles, and permissions across the system.
+              </p>
+              <Button className="w-full">
+                Manage Users
+              </Button>
+            </CardContent>
+          </Card>
 
-          <AdminTabsContent onShowAIInsights={handleShowAIInsights} />
-        </Tabs>
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+                System Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                View system-wide performance and usage analytics.
+              </p>
+              <Button className="w-full">
+                View Analytics
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <Settings className="w-5 h-5 mr-2 text-primary" />
+                System Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Configure system settings and global preferences.
+              </p>
+              <Button className="w-full">
+                System Config
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-primary" />
+                Security & Compliance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Monitor security, compliance, and audit logs.
+              </p>
+              <Button className="w-full">
+                Security Center
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

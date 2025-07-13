@@ -8,8 +8,11 @@ class ContentGenerationService {
   constructor() {
     // Convert the imported JSON data to proper CurriculumNode objects
     this.curriculum = Object.keys(curriculumIndex).reduce((acc, key) => {
-      const rawNode = curriculumIndex[key as keyof typeof curriculumIndex];
+      const rawNode = curriculumIndex[key as keyof typeof curriculumIndex] as any;
       acc[key] = {
+        id: key,
+        parentId: rawNode.parentId || null,
+        name: rawNode.name || 'Unnamed Node',
         ...rawNode,
         nodeType: rawNode.nodeType as CurriculumNodeType
       } as CurriculumNode;

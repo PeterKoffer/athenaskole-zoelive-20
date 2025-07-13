@@ -15,6 +15,7 @@ export interface CurriculumNodeFilters {
   // Educational filters
   educationalLevel?: string | string[];
   subjectName?: string | string[];
+  subject?: import('./NELIESubjects').NELIESubject | import('./NELIESubjects').NELIESubject[];
   
   // Search filters
   nameContains?: string;

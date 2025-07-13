@@ -7,6 +7,10 @@ import PreferencesPage from "./pages/PreferencesPage";
 import Auth from "./pages/Auth";
 import ParentDashboard from "./pages/ParentDashboard";
 import HomePage from "./pages/HomePage";
+import SchoolDashboard from "./pages/SchoolDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import DailyProgramPage from "./pages/DailyProgramPage";
 
 export const navItems = [
   {
@@ -50,5 +54,29 @@ export const navItems = [
     to: "/parent-dashboard",
     icon: <Users className="h-4 w-4" />,
     page: <ParentDashboard />,
+  },
+  {
+    title: "School Dashboard",
+    to: "/school-dashboard",
+    icon: <Users className="h-4 w-4" />,
+    page: <SchoolDashboard />,
+  },
+  {
+    title: "Teacher Dashboard", 
+    to: "/teacher-dashboard",
+    icon: <User className="h-4 w-4" />,
+    page: <TeacherDashboard />,
+  },
+  {
+    title: "Admin Dashboard",
+    to: "/admin-dashboard", 
+    icon: <Settings className="h-4 w-4" />,
+    page: <AdminDashboard />,
+  },
+  {
+    title: "Daily Program",
+    to: "/daily-program",
+    icon: <Calendar className="h-4 w-4" />,
+    page: <DailyProgramPage />,
   },
 ];

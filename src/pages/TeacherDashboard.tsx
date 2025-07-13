@@ -1,175 +1,111 @@
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Users, ClipboardList, MessageSquare, ChevronDown, BarChart3, Settings, GraduationCap, Menu } from "lucide-react";
-import TeacherNavbar from "@/components/teacher/TeacherNavbar";
-import TeacherStatsCards from "@/components/teacher/TeacherStatsCards";
-import TeacherOverviewTab from "@/components/teacher/TeacherOverviewTab";
-import ClassroomManagement from "@/components/teacher/ClassroomManagement";
-import CommunicationCenter from "@/components/communication/CommunicationCenter";
-import { TeacherStats } from "@/types/teacher";
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, GraduationCap, BookOpen, Users, Calendar } from 'lucide-react';
 
 const TeacherDashboard = () => {
-  const stats: TeacherStats = {
-    totalStudents: 28,
-    activeClasses: 3,
-    completedLessons: 45,
-    averageGrade: 8.2
-  };
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading teacher dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <TeacherNavbar />
-
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <TeacherStatsCards stats={stats} />
-
-        {/* Unified Teacher Tools and Analytics Dropdown Menu */}
-        <div className="flex gap-4 mb-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-gray-600 text-slate-950 bg-slate-50">
-                <Menu className="w-4 h-4 mr-2" />
-                Teacher Tools & Analytics
-                <ChevronDown className="w-4 h-4 ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64">
-              {/* Student Analytics Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Student Analytics
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <GraduationCap className="w-4 h-4 mr-2" />
-                    Grade Reports
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Progress Tracking
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Users className="w-4 h-4 mr-2" />
-                    Attendance Reports
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <ClipboardList className="w-4 h-4 mr-2" />
-                    Assignment Statistics
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Teaching Tools Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Teaching Tools
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Lesson Planning
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <ClipboardList className="w-4 h-4 mr-2" />
-                    Assignment Creation
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Class Settings
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Communication Tools */}
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Communication Center
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Class Management */}
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <Users className="w-4 h-4 mr-2" />
-                Manage Classes
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="text-muted-foreground hover:text-foreground mr-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Teacher Dashboard</h1>
+            <p className="text-muted-foreground">Manage your classes and student progress</p>
+          </div>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-800">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">Overview</TabsTrigger>
-            <TabsTrigger value="classes" className="data-[state=active]:bg-gray-700">Classes</TabsTrigger>
-            <TabsTrigger value="students" className="data-[state=active]:bg-gray-700">Students</TabsTrigger>
-            <TabsTrigger value="lessons" className="data-[state=active]:bg-gray-700">Lessons</TabsTrigger>
-            <TabsTrigger value="communication" className="data-[state=active]:bg-gray-700">Communication</TabsTrigger>
-            <TabsTrigger value="legacy-communication" className="data-[state=active]:bg-gray-700">Legacy</TabsTrigger>
-          </TabsList>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <Users className="w-5 h-5 mr-2 text-primary" />
+                My Classes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                View and manage your assigned classes and students.
+              </p>
+              <Button className="w-full">
+                View Classes
+              </Button>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="overview" className="space-y-6">
-            <TeacherOverviewTab />
-          </TabsContent>
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <BookOpen className="w-5 h-5 mr-2 text-primary" />
+                Lesson Plans
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Create and manage your lesson plans and materials.
+              </p>
+              <Button className="w-full">
+                Manage Lessons
+              </Button>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="classes" className="space-y-6">
-            <ClassroomManagement />
-          </TabsContent>
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <GraduationCap className="w-5 h-5 mr-2 text-primary" />
+                Student Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Track individual student performance and growth.
+              </p>
+              <Button className="w-full">
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="students" className="space-y-6">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Users className="w-5 h-5 mr-2" />
-                  Student Progress
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">Student progress tracking coming soon...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="lessons" className="space-y-6">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  Lesson Planning
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">Lesson planning tools coming soon...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="communication" className="space-y-6">
-            <CommunicationCenter />
-          </TabsContent>
-
-          <TabsContent value="legacy-communication" className="space-y-6">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <MessageSquare className="w-5 h-5 mr-2" />
-                  Communication
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">Communication tools coming soon...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-primary" />
+                Schedule
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                View your teaching schedule and upcoming events.
+              </p>
+              <Button className="w-full">
+                View Schedule
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

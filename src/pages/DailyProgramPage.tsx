@@ -2,9 +2,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, School, Users, BarChart3, Calendar } from 'lucide-react';
+import { ArrowLeft, Target, BookOpen, Award, Play } from 'lucide-react';
 
-const SchoolDashboard = () => {
+const DailyProgramPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ const SchoolDashboard = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading school dashboard...</p>
+          <p>Loading your daily program...</p>
         </div>
       </div>
     );
@@ -32,8 +32,8 @@ const SchoolDashboard = () => {
             Back
           </Button>
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">School Dashboard</h1>
-            <p className="text-muted-foreground">Manage school operations and view analytics</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Daily Learning Program</h1>
+            <p className="text-muted-foreground">Your personalized daily learning journey</p>
           </div>
         </div>
 
@@ -41,16 +41,16 @@ const SchoolDashboard = () => {
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center">
-                <Users className="w-5 h-5 mr-2 text-primary" />
-                Student Management
+                <Target className="w-5 h-5 mr-2 text-primary" />
+                Today's Goals
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                Manage student records, enrollment, and academic progress.
+                Complete 3 learning activities and earn achievements.
               </p>
               <Button className="w-full">
-                View Students
+                Start Learning
               </Button>
             </CardContent>
           </Card>
@@ -58,16 +58,19 @@ const SchoolDashboard = () => {
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center">
-                <School className="w-5 h-5 mr-2 text-primary" />
-                Staff Overview
+                <BookOpen className="w-5 h-5 mr-2 text-primary" />
+                Learning Activities
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                Monitor teacher performance and staff assignments.
+                Interactive lessons tailored to your learning style.
               </p>
-              <Button className="w-full">
-                Manage Staff
+              <Button 
+                className="w-full"
+                onClick={() => navigate('/daily-universe')}
+              >
+                Explore Universe
               </Button>
             </CardContent>
           </Card>
@@ -75,16 +78,16 @@ const SchoolDashboard = () => {
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center">
-                <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-                Analytics
+                <Award className="w-5 h-5 mr-2 text-primary" />
+                Progress & Rewards
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                View school performance metrics and reports.
+                Track your progress and unlock new achievements.
               </p>
               <Button className="w-full">
-                View Reports
+                View Progress
               </Button>
             </CardContent>
           </Card>
@@ -92,16 +95,16 @@ const SchoolDashboard = () => {
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center">
-                <Calendar className="w-5 h-5 mr-2 text-primary" />
-                Schedule Management
+                <Play className="w-5 h-5 mr-2 text-primary" />
+                Quick Practice
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                Manage class schedules and school calendar.
+                Quick 5-minute exercises to reinforce learning.
               </p>
               <Button className="w-full">
-                View Schedule
+                Quick Practice
               </Button>
             </CardContent>
           </Card>
@@ -111,4 +114,4 @@ const SchoolDashboard = () => {
   );
 };
 
-export default SchoolDashboard;
+export default DailyProgramPage;

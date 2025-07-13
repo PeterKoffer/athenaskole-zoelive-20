@@ -15,7 +15,7 @@ export interface ICurriculumService {
 
 export class CurriculumService extends CurriculumServiceBase implements ICurriculumService {
   constructor() {
-    super(curriculumData.nodes);
+    super(curriculumData.nodes as CurriculumNode[]);
   }
 
   async getNodes(filters?: CurriculumNodeFilters): Promise<CurriculumNode[]> {
