@@ -1,3 +1,4 @@
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -12,7 +13,6 @@ import stealthAssessmentService from "@/services/stealthAssessment/StealthAssess
 import { mockProfileService } from "@/services/learnerProfile/MockProfileService";
 import { SupabaseProfileService } from "@/services/learnerProfile/SupabaseProfileService";
 import ProfileDebugButton from "./components/ProfileDebugButton";
-import DailyUniversePage from "./pages/DailyUniversePage";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "./index.css";
 
@@ -55,19 +55,11 @@ root.render(
                   <div className="fixed top-4 right-4 z-50 flex gap-2">
                     <ProfileDebugButton />
                   </div>
-                  <div className="container mx-auto p-4">
-                    <Routes>
-                      {navItems.map(({ to, page }) => (
-                        <Route key={to} path={to} element={page} />
-                      ))}
-                      <Route path="/universe" element={<DailyUniversePage />} />
-                      <Route path="/universe/*" element={<DailyUniversePage />} />
-                      <Route path="/curriculum/:subject" element={<DailyUniversePage />} />
-                      <Route path="/curriculum/:subject/:grade" element={<DailyUniversePage />} />
-                      <Route path="/curriculum/:subject/:grade/:topic" element={<DailyUniversePage />} />
-                      <Route path="/parent-dashboard" element={<ParentDashboard />} />
-                    </Routes>
-                  </div>
+                  <Routes>
+                    {navItems.map(({ to, page }) => (
+                      <Route key={to} path={to} element={page} />
+                    ))}
+                  </Routes>
                 </div>
                 <Toaster />
               </ErrorBoundary>

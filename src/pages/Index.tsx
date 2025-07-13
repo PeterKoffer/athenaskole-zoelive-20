@@ -5,26 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, BookOpen, Users, BarChart3, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import AuthModal from "@/components/AuthModal";
-import AuthTestHelper from "@/components/auth/AuthTestHelper";
-import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  console.log('Index page render:', { user: user?.email });
 
   const handleGetStarted = () => {
     if (user) {
-      navigate('/daily-universe');
+      navigate('/home');
     } else {
-      setShowAuthModal(true);
+      navigate('/auth');
     }
-  };
-
-  const handleLogin = () => {
-    setShowAuthModal(false);
-    navigate('/daily-universe');
   };
 
   return (
@@ -34,7 +27,26 @@ const Index = () => {
         <div className="text-2xl font-bold text-white">
           NELIE
         </div>
-        <NavbarUserMenu user={user} onGetStarted={handleGetStarted} />
+        <div className="flex items-center space-x-4">
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-white">Welcome, {user.email}</span>
+              <Button
+                onClick={() => navigate('/home')}
+                className="bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold"
+              >
+                Dashboard
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleGetStarted}
+              className="bg-gradient-to-r from-lime-400 to-lime-600 hover:opacity-90 text-gray-900 font-semibold"
+            >
+              Get Started
+            </Button>
+          )}
+        </div>
       </nav>
 
       {/* Hero Section */}
@@ -110,13 +122,6 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Development Helper - Only show in development */}
-        {import.meta.env.DEV && (
-          <div className="max-w-md mx-auto">
-            <AuthTestHelper />
-          </div>
-        )}
-
         {/* Quick Access Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mt-12">
           <Button
@@ -127,43 +132,21 @@ const Index = () => {
             Daily Universe
           </Button>
           <Button
-            onClick={() => navigate('/test')}
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            Test Page
-          </Button>
-          <Button
-            onClick={() => navigate('/stealth-assessment-test')}
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            Stealth Assessment Test
-          </Button>
-          <Button
-            onClick={() => navigate('/simple-stealth-test')}
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            Simple Stealth Test
-          </Button>
-          <Button
             onClick={() => navigate('/auth')}
             variant="outline"
             className="border-white/20 text-white hover:bg-white/10"
           >
-            Auth Page
+            Authentication
+          </Button>
+          <Button
+            onClick={() => navigate('/home')}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Home Dashboard
           </Button>
         </div>
       </main>
-
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          onLogin={handleLogin}
-        />
-      )}
     </div>
   );
 };

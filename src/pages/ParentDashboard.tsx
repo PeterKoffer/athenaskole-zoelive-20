@@ -1,164 +1,119 @@
 
-import ParentNavbar from "@/components/parent/ParentNavbar";
-import ChildSelector from "@/components/parent/ChildSelector";
-import WeeklyProgressSection from "@/components/parent/WeeklyProgressSection";
-import ParentTabsContent from "@/components/parent/ParentTabsContent";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { 
-  Menu, 
-  ChevronDown, 
-  BarChart3, 
-  MessageSquare, 
-  Calendar, 
-  Settings, 
-  BookOpen,
-  Bell,
-  Users,
-  FileText,
-  Clock
-} from "lucide-react";
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Users, ArrowLeft, BarChart3, Calendar, Settings } from 'lucide-react';
 
 const ParentDashboard = () => {
-  const children = [
-    {
-      id: 1,
-      name: "Emma",
-      class: "3.A",
-      avatar: "👧",
-      subjects: {
-        mathematics: { progress: 85, recentActivity: "Completed fractions lesson" },
-        danish: { progress: 92, recentActivity: "Read H.C. Andersen fairy tale" },
-        english: { progress: 78, recentActivity: "Practiced colors and numbers" }
-      },
-      weeklyGoal: 120,
-      weeklyProgress: 95,
-      streak: 5
-    }
-  ];
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-  const selectedChild = children[0];
+  console.log('ParentDashboard render:', { user: user?.email, loading });
 
-  const recentMessages = [
-    { from: "Teacher Hansen", subject: "Emma is doing really well", time: "2 hours ago", unread: true },
-    { from: "School", subject: "Parent meeting next week", time: "1 day ago", unread: false },
-    { from: "Teacher Andersen", subject: "Mathematics progress", time: "3 days ago", unread: false }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <ParentNavbar />
-
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
-        <ChildSelector selectedChild={selectedChild} />
-        
-        {/* Unified Parent Tools Dropdown Menu */}
-        <div className="flex gap-4 mb-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-white border-gray-600 hover:bg-gray-700">
-                <Menu className="w-4 h-4 mr-2" />
-                Parent Tools & Reports
-                <ChevronDown className="w-4 h-4 ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64">
-              {/* Progress & Analytics Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Progress & Analytics
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Weekly Reports
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Subject Progress
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Clock className="w-4 h-4 mr-2" />
-                    Study Time Analytics
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Grade Reports
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Communication Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Communication
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Message Teachers
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Users className="w-4 h-4 mr-2" />
-                    Parent-Teacher Meetings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Bell className="w-4 h-4 mr-2" />
-                    Notifications Settings
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* School Calendar & Events */}
-              <DropdownMenuItem className="hover:bg-gray-700">
-                <Calendar className="w-4 h-4 mr-2" />
-                School Calendar
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Settings & Support */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-gray-700">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings & Support
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Account Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <Bell className="w-4 h-4 mr-2" />
-                    Notification Preferences
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-gray-700">
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Help & Support
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="min-h-screen bg-gray-900 p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8 flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="text-gray-400 hover:text-white mr-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Parent Dashboard
+            </h1>
+            <p className="text-gray-400">Monitor your child's learning progress</p>
+          </div>
         </div>
 
-        <WeeklyProgressSection selectedChild={selectedChild} />
-        <ParentTabsContent selectedChild={selectedChild} recentMessages={recentMessages} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-white flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-blue-400" />
+                Progress Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 text-sm">
+                Track your child's learning progress across all subjects
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-white flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-green-400" />
+                Activity Timeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 text-sm">
+                View recent learning activities and achievements
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-white flex items-center">
+                <Settings className="w-5 h-5 mr-2 text-purple-400" />
+                Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 text-sm">
+                Manage parental controls and learning preferences
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mt-8">
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Welcome to the Parent Dashboard</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 mb-4">
+                This dashboard will help you stay connected with your child's learning journey. 
+                Features will be available soon to track progress, view achievements, and manage settings.
+              </p>
+              <div className="flex space-x-4">
+                <Button 
+                  onClick={() => navigate('/home')}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  Go to Home
+                </Button>
+                <Button 
+                  onClick={() => navigate('/daily-universe')}
+                  variant="outline"
+                  className="text-white border-gray-600 hover:bg-gray-700"
+                >
+                  View Learning Content
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
