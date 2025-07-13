@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, School, Users, BarChart3, Calendar } from 'lucide-react';
+import SchoolManagementDropdown from '@/components/school/SchoolManagementDropdown';
+import TeachingSettingsModal from '@/components/school/TeachingSettingsModal';
 
 const SchoolDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [showTeachingSettings, setShowTeachingSettings] = useState(false);
 
   if (loading) {
     return (
@@ -22,19 +26,24 @@ const SchoolDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex items-center">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="text-muted-foreground hover:text-foreground mr-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">School Dashboard</h1>
-            <p className="text-muted-foreground">Manage school operations and view analytics</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="text-muted-foreground hover:text-foreground mr-4"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <div>
+              <h1 className="text-4xl font-bold text-foreground mb-2">School Dashboard</h1>
+              <p className="text-muted-foreground">Manage school operations and view analytics</p>
+            </div>
           </div>
+          <SchoolManagementDropdown 
+            onShowTeachingSettings={() => setShowTeachingSettings(true)}
+          />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -107,6 +116,11 @@ const SchoolDashboard = () => {
           </Card>
         </div>
       </div>
+      
+      <TeachingSettingsModal 
+        isOpen={showTeachingSettings}
+        onClose={() => setShowTeachingSettings(false)}
+      />
     </div>
   );
 };
