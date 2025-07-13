@@ -14,7 +14,19 @@ class CrossOriginHandler {
     this.messenger = new JulesMessenger(this.originChecker.getAllowedOrigins());
     this.messageHandlers = new MessageHandlers(this.messenger);
     
-    console.log('🔧 CrossOriginHandler initialized with allowed origins:', this.originChecker.getAllowedOrigins());
+    console.log('🔧 CrossOriginHandler initialized');
+    console.log('🌐 Environment type:', this.getEnvironmentType());
+    console.log('🎯 Allowed origins:', this.originChecker.getAllowedOrigins());
+  }
+
+  private getEnvironmentType(): string {
+    if (this.originChecker.isInLovableEditor()) {
+      return 'Lovable Editor';
+    }
+    if (window.location.origin.includes('lovable')) {
+      return 'Lovable Preview';
+    }
+    return 'Unknown';
   }
 
   public get allowedOrigins(): string[] {
@@ -52,21 +64,24 @@ class CrossOriginHandler {
 
   public initialize() {
     console.log('🚀 Initializing CrossOriginHandler...');
+    console.log('🏠 Running in:', this.getEnvironmentType());
     
     // Add message event listener
     window.addEventListener('message', this.handleMessage);
     console.log('👂 Message event listener added');
     
-    // Send ready signal to potential Jules instances
+    // Send ready signal with appropriate delay
     setTimeout(() => {
       this.messenger.sendMessageToJules({
         type: 'lovableReady',
         timestamp: new Date().toISOString(),
         data: {
-          capabilities: ['codeModification', 'projectAccess', 'realTimeUpdates']
+          capabilities: ['codeModification', 'projectAccess', 'realTimeUpdates'],
+          environment: this.getEnvironmentType(),
+          origin: window.location.origin
         }
       });
-      console.log('📡 Ready signal sent to Jules');
+      console.log('📡 Ready signal sent');
     }, 1000);
   }
 
@@ -105,7 +120,17 @@ export const debugCrossOriginIssues = () => {
   console.log('🖼️ Frame Information:');
   console.log('  - Is in iframe:', window !== window.parent);
   console.log('  - Has opener:', !!window.opener);
-  console.log('  - Parent origin:', window.parent !== window ? 'Available' : 'Same window');
+  console.log('  - Parent origin available:', window.parent !== window ? 'Yes' : 'Same window');
+  
+  // Try to detect parent origin safely
+  try {
+    if (window.parent !== window) {
+      console.log('  - Parent domain accessible:', 'Checking...');
+      // This will fail due to CORS, but that's expected
+    }
+  } catch (e) {
+    console.log('  - Parent domain accessible:', 'No (CORS blocked - normal)');
+  }
   
   console.log('🔐 Security Information:');
   console.log('  - Protocol:', window.location.protocol);

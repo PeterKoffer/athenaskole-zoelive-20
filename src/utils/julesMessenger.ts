@@ -12,15 +12,29 @@ export class JulesMessenger {
 
   public sendMessageToJules(message: JulesMessage) {
     try {
-      // Try to find Jules window
+      console.log('📤 Attempting to send message to Jules:', message);
+      
+      // Check if we're in Lovable editor first
+      const isInLovableEditor = window.parent !== window;
+      
+      if (isInLovableEditor) {
+        // Try to send to Lovable editor first
+        try {
+          window.parent.postMessage(message, 'https://lovable.dev');
+          console.log('✅ Message sent to Lovable editor');
+        } catch (error) {
+          console.log('ℹ️ Could not send message to Lovable editor:', error.message);
+        }
+      }
+
+      // Try Jules-specific origins
       const julesOrigins = this.allowedOrigins.filter(origin => 
         origin.includes('google') || origin.includes('gemini')
       );
       
-      console.log('📤 Attempting to send message to Jules:', message);
-      console.log('🎯 Target origins:', julesOrigins);
+      console.log('🎯 Jules target origins:', julesOrigins);
       
-      // Post message to all potential Jules origins
+      // Post message to potential Jules origins
       julesOrigins.forEach(origin => {
         try {
           if (window.parent && window.parent !== window) {
@@ -37,17 +51,14 @@ export class JulesMessenger {
         }
       });
       
-      // Also try sending to current origin if it's different
-      const currentOrigin = window.location.origin;
-      if (!julesOrigins.includes(currentOrigin)) {
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage(message, '*');
-            console.log(`✅ Message sent to parent with wildcard`);
-          }
-        } catch (error) {
-          console.log(`ℹ️ Could not send wildcard message:`, error.message);
+      // Fallback: try wildcard for current environment
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage(message, '*');
+          console.log(`✅ Message sent to parent with wildcard`);
         }
+      } catch (error) {
+        console.log(`ℹ️ Could not send wildcard message:`, error.message);
       }
       
     } catch (error) {
@@ -58,6 +69,13 @@ export class JulesMessenger {
   public testCommunication() {
     console.log('🧪 Testing Jules communication...');
     
+    // First, test basic environment info
+    console.log('🏠 Environment check:');
+    console.log('  - Current origin:', window.location.origin);
+    console.log('  - Has parent:', window.parent !== window);
+    console.log('  - Has opener:', !!window.opener);
+    
+    // Test message
     this.sendMessageToJules({
       type: 'testMessage',
       data: 'Hello from Lovable!',

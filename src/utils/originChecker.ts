@@ -9,8 +9,8 @@ export class OriginChecker {
   }
 
   private initializeAllowedOrigins() {
-    // Static allowed origins
-    const staticOrigins = [
+    // Static allowed origins for Jules AI
+    const julesOrigins = [
       'https://aistudio.google.com',
       'https://gemini.google.com',
       'https://makersuite.google.com',
@@ -18,20 +18,21 @@ export class OriginChecker {
       'https://developers.google.com',
       'https://accounts.google.com',
       'https://oauth2.googleapis.com',
-      'https://www.googleapis.com',
+      'https://www.googleapis.com'
+    ];
+
+    // Lovable editor and platform origins
+    const lovableOrigins = [
       'https://lovable.dev',
       'https://app.lovable.dev',
       'https://preview.lovable.dev'
     ];
 
-    // Add current origin
+    // Get current origin
     const currentOrigin = window.location.origin;
     
-    // Add Lovable preview domain patterns
-    const lovablePreviewPattern = /^https:\/\/.*\.lovable\.app$/;
-    const lovableIdPreviewPattern = /^https:\/\/id-preview--.*\.lovable\.app$/;
-    
-    this.allowedOrigins = [...staticOrigins];
+    // Initialize with static origins
+    this.allowedOrigins = [...julesOrigins, ...lovableOrigins];
     
     // Always add current origin
     if (!this.allowedOrigins.includes(currentOrigin)) {
@@ -39,12 +40,30 @@ export class OriginChecker {
       console.log('✅ Added current origin to allowed list:', currentOrigin);
     }
 
-    // Add common Lovable patterns if they match
-    if (lovablePreviewPattern.test(currentOrigin) || lovableIdPreviewPattern.test(currentOrigin)) {
-      // Extract base domain patterns
-      const baseDomain = currentOrigin.replace(/^https:\/\/[^.]+/, 'https://*');
-      console.log('✅ Detected Lovable preview environment, added pattern:', baseDomain);
+    // Check if we're in a Lovable preview environment
+    const isLovablePreview = this.isLovablePreviewEnvironment(currentOrigin);
+    if (isLovablePreview) {
+      console.log('✅ Detected Lovable preview environment');
+      // Add additional Lovable patterns
+      const additionalLovablePatterns = [
+        'https://*.lovable.app',
+        'https://*.lovableproject.com'
+      ];
+      // Note: These are pattern strings, not actual origins
+      console.log('📝 Lovable preview patterns recognized:', additionalLovablePatterns);
     }
+
+    console.log('🎯 Final allowed origins:', this.allowedOrigins);
+  }
+
+  private isLovablePreviewEnvironment(origin: string): boolean {
+    const lovablePatterns = [
+      /^https:\/\/.*\.lovable\.app$/,
+      /^https:\/\/.*\.lovableproject\.com$/,
+      /^https:\/\/id-preview--.*\.lovable\.app$/
+    ];
+
+    return lovablePatterns.some(pattern => pattern.test(origin));
   }
 
   public isOriginAllowed(origin: string): boolean {
@@ -59,25 +78,30 @@ export class OriginChecker {
     // Check Lovable domain patterns
     const lovablePatterns = [
       /^https:\/\/.*\.lovable\.app$/,
+      /^https:\/\/.*\.lovableproject\.com$/,
       /^https:\/\/id-preview--.*\.lovable\.app$/,
       /^https:\/\/.*\.lovable\.dev$/
     ];
 
     for (const pattern of lovablePatterns) {
       if (pattern.test(origin)) {
-        console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (pattern match)`);
+        console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (Lovable pattern match)`);
         return true;
       }
     }
 
-    // Check if origin ends with any allowed domain
-    const domainMatch = this.allowedOrigins.some(allowed => 
-      origin === allowed || origin.endsWith(allowed.replace('https://', ''))
-    );
+    // Check Google/Jules domain patterns
+    const googlePatterns = [
+      /^https:\/\/.*\.google\.com$/,
+      /^https:\/\/.*\.googleapis\.com$/,
+      /^https:\/\/.*\.google\.dev$/
+    ];
 
-    if (domainMatch) {
-      console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (domain match)`);
-      return true;
+    for (const pattern of googlePatterns) {
+      if (pattern.test(origin)) {
+        console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (Google pattern match)`);
+        return true;
+      }
     }
 
     console.log(`🔍 Origin check: ${origin} -> ❌ BLOCKED`);
@@ -86,5 +110,11 @@ export class OriginChecker {
 
   public getAllowedOrigins(): string[] {
     return [...this.allowedOrigins];
+  }
+
+  public isInLovableEditor(): boolean {
+    // Check if we're running inside the Lovable editor
+    return window.parent !== window && 
+           window.parent.location?.origin === 'https://lovable.dev';
   }
 }
