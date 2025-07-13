@@ -1,8 +1,7 @@
 
-import { School, Users, User, BookOpen, GraduationCap, UserCheck } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserRole, ROLE_CONFIGS } from "@/types/auth";
-import { restrictedRoles } from "./roleConstants";
-import RoleCard from "./RoleCard";
+import { roleIcons, roleColors } from "./roleConstants";
 
 interface RoleGridProps {
   availableRoles: [string, any][];
@@ -10,44 +9,32 @@ interface RoleGridProps {
 }
 
 const RoleGrid = ({ availableRoles, onRoleClick }: RoleGridProps) => {
-  const getRoleConfig = (role: UserRole) => {
-    switch (role) {
-      case 'admin':
-        return { icon: UserCheck, color: 'bg-red-500' };
-      case 'school_leader':
-        return { icon: School, color: 'bg-orange-500' };
-      case 'school_staff':
-        return { icon: Users, color: 'bg-teal-500' };
-      case 'teacher':
-        return { icon: BookOpen, color: 'bg-purple-500' };
-      case 'student':
-        return { icon: GraduationCap, color: 'bg-blue-500' };
-      case 'parent':
-        return { icon: User, color: 'bg-green-500' };
-      default:
-        return { icon: User, color: 'bg-gray-500' };
-    }
-  };
-
+  console.log('[RoleGrid] Available roles:', availableRoles.map(([role]) => role));
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      {availableRoles.map(([role, roleConfig]) => {
-        const config = getRoleConfig(role as UserRole);
-        const isRestricted = restrictedRoles.includes(role as UserRole);
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {availableRoles.map(([role, config]) => {
+        const Icon = roleIcons[role as UserRole];
+        const colorClass = roleColors[role as UserRole];
         
         return (
-          <RoleCard
+          <Card
             key={role}
-            role={role as UserRole}
-            config={{
-              title: roleConfig.title,
-              description: roleConfig.description,
-              icon: config.icon,
-              color: config.color
-            }}
-            isRestricted={isRestricted}
+            className="bg-gray-700 border-gray-600 hover:bg-gray-600 cursor-pointer transition-colors"
             onClick={() => onRoleClick(role as UserRole)}
-          />
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-white text-lg flex items-center">
+                <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${colorClass} flex items-center justify-center mr-3`}>
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
+                {config.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 text-sm">{config.description}</p>
+            </CardContent>
+          </Card>
         );
       })}
     </div>

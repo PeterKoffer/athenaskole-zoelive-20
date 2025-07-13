@@ -8,7 +8,7 @@ export const roleIcons: Record<UserRole, React.ComponentType<any>> = {
   school_staff: UserCheck,
   teacher: BookOpen,
   student: GraduationCap,
-  parent: Users,
+  parent: Users, // Make sure parent is included
 };
 
 export const roleColors: Record<UserRole, string> = {
@@ -17,7 +17,7 @@ export const roleColors: Record<UserRole, string> = {
   school_staff: "from-teal-500 to-teal-600",
   teacher: "from-purple-500 to-purple-600",
   student: "from-blue-500 to-blue-600",
-  parent: "from-green-500 to-green-600",
+  parent: "from-green-500 to-green-600", // Make sure parent is included
 };
 
 export const restrictedRoles: UserRole[] = ['admin', 'school_leader', 'school_staff'];
