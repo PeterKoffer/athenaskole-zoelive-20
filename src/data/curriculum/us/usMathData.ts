@@ -1,4 +1,3 @@
-
 import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 

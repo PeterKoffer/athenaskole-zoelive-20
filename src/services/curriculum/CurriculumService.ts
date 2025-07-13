@@ -1,10 +1,9 @@
-
 import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
-import { mockCurriculumData } from '@/data/mockCurriculumData';
 import { CurriculumServiceBase } from './core/CurriculumServiceBase';
 import { CurriculumFilter } from './core/CurriculumFilter';
 import { CurriculumStats } from './core/CurriculumStats';
 import { CurriculumAIContext } from './core/CurriculumAIContext';
+import curriculumData from '@/data/unified-curriculum-index.json';
 
 export interface ICurriculumService {
   getNodeById(id: string): Promise<CurriculumNode | undefined>;
@@ -16,7 +15,7 @@ export interface ICurriculumService {
 
 export class CurriculumService extends CurriculumServiceBase implements ICurriculumService {
   constructor() {
-    super(mockCurriculumData);
+    super(curriculumData.nodes);
   }
 
   async getNodes(filters?: CurriculumNodeFilters): Promise<CurriculumNode[]> {

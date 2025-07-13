@@ -41,10 +41,10 @@ export class CurriculumFilter {
       match = match && node.educationalLevel !== undefined && levels.includes(node.educationalLevel);
     }
 
-    // Handle subject name filter (single or array)
-    if (filters.subjectName) {
-      const subjects = Array.isArray(filters.subjectName) ? filters.subjectName : [filters.subjectName];
-      match = match && node.subjectName !== undefined && subjects.includes(node.subjectName);
+    // Handle subject enum filter (single or array)
+    if (filters.subject) {
+      const subjects = Array.isArray(filters.subject) ? filters.subject : [filters.subject];
+      match = match && node.subject !== undefined && subjects.includes(node.subject);
     }
 
     // Handle tags filter (match any)

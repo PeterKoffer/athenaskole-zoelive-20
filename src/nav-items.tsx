@@ -1,17 +1,18 @@
-
 import { Home, BookOpen, Calendar, User, Settings, Calculator, TestTube } from "lucide-react";
 import Index from "./pages/Index";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import ProfilePage from "./pages/ProfilePage";
 import PreferencesPage from "./pages/PreferencesPage";
 import Auth from "./pages/Auth";
+import ParentDashboard from "./pages/ParentDashboard";
+import HomePage from "./pages/HomePage";
 
 export const navItems = [
   {
     title: "Home",
     to: "/",
     icon: <Home className="h-4 w-4" />,
-    page: <Index />,
+    page: <HomePage />,
   },
   {
     title: "Daily Universe",
@@ -36,5 +37,11 @@ export const navItems = [
     to: "/auth",
     icon: <User className="h-4 w-4" />,
     page: <Auth />,
+  },
+  {
+    title: "Parent Dashboard",
+    to: "/parent-dashboard",
+    icon: <Users className="h-4 w-4" />,
+    page: <ParentDashboard />,
   },
 ];
