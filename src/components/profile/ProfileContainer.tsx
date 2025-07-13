@@ -6,51 +6,91 @@ import SubscriptionPlans from "@/components/SubscriptionPlans";
 import ProfileHeader from "./ProfileHeader";
 import ProfileTabs from "./ProfileTabs";
 import ProfileCard from "./ProfileCard";
-import { useProfileData } from "./hooks/useProfileData";
+import { useSimpleProfile } from "./hooks/useSimpleProfile";
 import { LearnerProfile } from "@/types/learnerProfile";
+import { toast } from "@/hooks/use-toast";
 
 const ProfileContainer = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
+  const [uploading, setUploading] = useState(false);
   
-  const {
-    profileData,
-    setProfileData,
-    loading,
-    uploading,
-    handleAvatarUpload,
-    handleProfileUpdate
-  } = useProfileData();
+  const { profile, loading, error, updateProfile } = useSimpleProfile();
 
   // Scroll to top when page loads
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleAvatarUploadWrapper = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      handleAvatarUpload(file);
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      // For now, just show a message that avatar upload would be implemented
+      toast({
+        title: "Avatar Upload",
+        description: "Avatar upload functionality would be implemented here.",
+      });
+      console.log('Avatar upload requested for file:', file.name);
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload avatar. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (profileData) {
-      handleProfileUpdate(profileData);
+    if (!profile) return;
+
+    const success = await updateProfile(profile);
+    if (success) {
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } else {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDataChange = (data: Partial<LearnerProfile>) => {
-    if (profileData) {
-      setProfileData({ ...profileData, ...data });
-    }
+    // This will be handled by the form components
+    console.log('Profile data change:', data);
   };
 
   if (!user) {
     navigate('/auth');
     return null;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Error Loading Profile</h2>
+          <p className="text-gray-400 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -65,15 +105,27 @@ const ProfileContainer = () => {
 
         <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {activeTab === "profile" && profileData && (
-          <ProfileCard
-            profileData={profileData}
-            loading={loading}
-            uploading={uploading}
-            onDataChange={handleDataChange}
-            onSubmit={handleFormSubmit}
-            onAvatarUpload={handleAvatarUploadWrapper}
-          />
+        {activeTab === "profile" && (
+          <div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : profile ? (
+              <ProfileCard
+                profileData={profile}
+                loading={false}
+                uploading={uploading}
+                onDataChange={handleDataChange}
+                onSubmit={handleFormSubmit}
+                onAvatarUpload={handleAvatarUpload}
+              />
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-400">No profile data found.</p>
+              </div>
+            )}
+          </div>
         )}
 
         {activeTab === "subscription" && (

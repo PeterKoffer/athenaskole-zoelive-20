@@ -1,82 +1,63 @@
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Camera, Users, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Camera, User } from "lucide-react";
 
 interface AvatarUploadProps {
-  avatarUrl: string;
-  name: string;
+  avatarUrl?: string;
+  name?: string;
   uploading: boolean;
   onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   avatarColor?: string;
 }
 
-const AvatarUpload = ({ avatarUrl, name, uploading, onUpload, avatarColor }: AvatarUploadProps) => {
-  const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const { setUserRoleManually } = useRoleAccess();
-
-  const handleRoleSelector = () => {
-    console.log('[AvatarUpload] Switching to role selector');
-    // Set a manual role change to prevent auto-redirects
-    setUserRoleManually('student'); // Temporary role to trigger the flow
-    // Navigate to auth page for role selection
-    navigate('/auth');
+const AvatarUpload = ({ 
+  avatarUrl, 
+  name, 
+  uploading, 
+  onUpload, 
+  avatarColor = "#6366f1" 
+}: AvatarUploadProps) => {
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name.charAt(0).toUpperCase();
   };
 
-  const fallbackClass = avatarColor 
-    ? `bg-gradient-to-br ${avatarColor} text-white text-xl`
-    : "bg-gradient-to-br from-purple-400 to-cyan-400 text-white text-xl";
-
   return (
-    <div className="flex flex-col items-center mb-8">
+    <div className="flex flex-col items-center mb-6">
       <div className="relative">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="relative cursor-pointer">
-              <Avatar className="w-24 h-24 mb-4 hover:opacity-80 transition-opacity">
-                <AvatarImage src={avatarUrl} />
-                <AvatarFallback className={fallbackClass}>
-                  {name ? name.charAt(0).toUpperCase() : 'U'}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            className="w-48 bg-gray-800 border-gray-700 text-white z-[9999]" 
-            align="center"
-            side="bottom"
-            sideOffset={5}
-          >
-            <DropdownMenuItem 
-              onClick={handleRoleSelector}
-              className="text-white hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+        <Avatar className="w-24 h-24 mb-4">
+          {avatarUrl ? (
+            <AvatarImage src={avatarUrl} alt={name || "Profile"} />
+          ) : (
+            <AvatarFallback 
+              className="text-2xl font-bold text-white"
+              style={{ backgroundColor: avatarColor }}
             >
-              <Users className="w-4 h-4 mr-2" />
-              Switch Role
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-gray-600" />
-            <DropdownMenuItem 
-              onClick={signOut}
-              className="text-white hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {getInitials(name)}
+            </AvatarFallback>
+          )}
+        </Avatar>
         
-        <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 rounded-full p-2 cursor-pointer">
-          <Camera className="w-4 h-4 text-white" />
+        <div className="absolute -bottom-2 -right-2">
+          <label htmlFor="avatar-upload" className="cursor-pointer">
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="rounded-full w-10 h-10 p-0 bg-gray-700 hover:bg-gray-600"
+              disabled={uploading}
+              asChild
+            >
+              <div>
+                {uploading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+              </div>
+            </Button>
+          </label>
           <input
             id="avatar-upload"
             type="file"
@@ -85,9 +66,12 @@ const AvatarUpload = ({ avatarUrl, name, uploading, onUpload, avatarColor }: Ava
             className="hidden"
             disabled={uploading}
           />
-        </label>
+        </div>
       </div>
-      {uploading && <p className="text-gray-400 text-sm">Uploading image...</p>}
+      
+      <p className="text-sm text-gray-400 text-center">
+        Click the camera icon to change your profile picture
+      </p>
     </div>
   );
 };

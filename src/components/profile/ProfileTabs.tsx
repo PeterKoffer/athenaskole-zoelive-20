@@ -1,6 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { User, Badge } from "lucide-react";
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -8,24 +7,27 @@ interface ProfileTabsProps {
 }
 
 const ProfileTabs = ({ activeTab, onTabChange }: ProfileTabsProps) => {
+  const tabs = [
+    { id: "profile", label: "Profile" },
+    { id: "subscription", label: "Subscription" }
+  ];
+
   return (
-    <div className="flex space-x-1 mb-8 bg-gray-800 p-1 rounded-lg">
-      <Button
-        variant={activeTab === "profile" ? "default" : "ghost"}
-        onClick={() => onTabChange("profile")}
-        className={`flex-1 ${activeTab === "profile" ? "bg-gradient-to-r from-purple-400 to-cyan-400 text-white" : "text-gray-300 hover:text-white hover:bg-gray-700"}`}
-      >
-        <User className="w-4 h-4 mr-2" />
-        Profile
-      </Button>
-      <Button
-        variant={activeTab === "subscription" ? "default" : "ghost"}
-        onClick={() => onTabChange("subscription")}
-        className={`flex-1 ${activeTab === "subscription" ? "bg-gradient-to-r from-purple-400 to-cyan-400 text-white" : "text-gray-300 hover:text-white hover:bg-gray-700"}`}
-      >
-        <Badge className="w-4 h-4 mr-2" />
-        Subscription
-      </Button>
+    <div className="flex space-x-1 mb-6 bg-gray-800 p-1 rounded-lg">
+      {tabs.map((tab) => (
+        <Button
+          key={tab.id}
+          variant={activeTab === tab.id ? "default" : "ghost"}
+          onClick={() => onTabChange(tab.id)}
+          className={`flex-1 ${
+            activeTab === tab.id
+              ? "bg-purple-600 text-white hover:bg-purple-700"
+              : "text-gray-400 hover:text-white hover:bg-gray-700"
+          }`}
+        >
+          {tab.label}
+        </Button>
+      ))}
     </div>
   );
 };

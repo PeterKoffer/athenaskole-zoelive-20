@@ -8,14 +8,23 @@ interface ProfileFormActionsProps {
 
 const ProfileFormActions = ({ loading }: ProfileFormActionsProps) => {
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-end space-x-4 pt-6 border-t border-gray-700">
       <Button
         type="submit"
         disabled={loading}
-        className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white hover:from-purple-500 hover:to-cyan-500"
+        className="bg-purple-600 hover:bg-purple-700 text-white px-6"
       >
-        <Save className="w-4 h-4 mr-2" />
-        {loading ? 'Saving...' : 'Save Changes'}
+        {loading ? (
+          <div className="flex items-center">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+            Saving...
+          </div>
+        ) : (
+          <div className="flex items-center">
+            <Save className="w-4 h-4 mr-2" />
+            Save Changes
+          </div>
+        )}
       </Button>
     </div>
   );
