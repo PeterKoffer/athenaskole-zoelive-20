@@ -3,6 +3,22 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { LearnerProfile, LearnerPreferences } from '@/types/learnerProfile';
+import { Json } from '@/integrations/supabase/types';
+
+// Type guard function to check if data conforms to LearnerPreferences interface
+function isLearnerPreferences(obj: any): obj is LearnerPreferences {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+  
+  // Check for required properties and their types
+  const hasPreferredSubjects = 'preferredSubjects' in obj ? Array.isArray(obj.preferredSubjects) : true;
+  const hasLearningStyle = 'learningStyle' in obj ? typeof obj.learningStyle === 'string' : true;
+  const hasDifficultyPreference = 'difficultyPreference' in obj ? typeof obj.difficultyPreference === 'number' : true;
+  const hasSessionLength = 'sessionLength' in obj ? typeof obj.sessionLength === 'number' : true;
+
+  return hasPreferredSubjects && hasLearningStyle && hasDifficultyPreference && hasSessionLength;
+}
 
 export const useSimpleProfile = () => {
   const { user } = useAuth();
@@ -34,21 +50,22 @@ export const useSimpleProfile = () => {
           throw profileError;
         }
 
+        const defaultPreferences: LearnerPreferences = {
+          preferredSubjects: [],
+          learningStyle: 'visual',
+          difficultyPreference: 3,
+          sessionLength: 30
+        };
+
         if (!profileData) {
           // Create initial profile if none exists
           console.log('Creating initial profile for user:', user.id);
-          const defaultPreferences: LearnerPreferences = {
-            preferredSubjects: [],
-            learningStyle: 'visual',
-            difficultyPreference: 3,
-            sessionLength: 30
-          };
 
           const newProfile = {
             user_id: user.id,
             name: user.user_metadata?.name || '',
             email: user.email || '',
-            preferences: defaultPreferences as any // Cast to any for Supabase Json compatibility
+            preferences: defaultPreferences as unknown as Json
           };
 
           const { data: createdProfile, error: createError } = await supabase
@@ -74,7 +91,9 @@ export const useSimpleProfile = () => {
             overall_mastery: createdProfile.overall_mastery || 0,
             kc_masteries: [],
             kcMasteryMap: {},
-            preferences: (createdProfile.preferences as unknown as LearnerPreferences) || defaultPreferences,
+            preferences: isLearnerPreferences(createdProfile.preferences) 
+              ? createdProfile.preferences 
+              : defaultPreferences,
             created_at: createdProfile.created_at,
             updated_at: createdProfile.updated_at,
             recentPerformance: Array.isArray(createdProfile.recent_performance) 
@@ -92,13 +111,6 @@ export const useSimpleProfile = () => {
 
           setProfile(learnerProfile);
         } else {
-          const defaultPreferences: LearnerPreferences = {
-            preferredSubjects: [],
-            learningStyle: 'visual',
-            difficultyPreference: 3,
-            sessionLength: 30
-          };
-
           const learnerProfile: LearnerProfile = {
             userId: profileData.user_id,
             name: profileData.name || '',
@@ -112,7 +124,9 @@ export const useSimpleProfile = () => {
             overall_mastery: profileData.overall_mastery || 0,
             kc_masteries: [],
             kcMasteryMap: {},
-            preferences: (profileData.preferences as unknown as LearnerPreferences) || defaultPreferences,
+            preferences: isLearnerPreferences(profileData.preferences) 
+              ? profileData.preferences 
+              : defaultPreferences,
             created_at: profileData.created_at,
             updated_at: profileData.updated_at,
             recentPerformance: Array.isArray(profileData.recent_performance) 
@@ -156,7 +170,7 @@ export const useSimpleProfile = () => {
           address: updates.address,
           grade: updates.grade,
           school: updates.school,
-          preferences: updates.preferences as any,
+          preferences: updates.preferences ? updates.preferences as unknown as Json : undefined,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', user.id);
