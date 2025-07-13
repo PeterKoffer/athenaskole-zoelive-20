@@ -102,9 +102,9 @@ export class MockCurriculumService implements ICurriculumService {
           match = false;
         }
       }
-      if (filters.subjectName) {
-        const subjectsToFilter = Array.isArray(filters.subjectName) ? filters.subjectName : [filters.subjectName];
-        if (!node.subjectName || !subjectsToFilter.includes(node.subjectName)) {
+      if (filters.subject) {
+        const subjectsToFilter = Array.isArray(filters.subject) ? filters.subject : [filters.subject];
+        if (!node.subject || !subjectsToFilter.includes(node.subject)) {
           match = false;
         }
       }

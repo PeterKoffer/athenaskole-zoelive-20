@@ -1,4 +1,3 @@
-
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MockCurriculumService } from './MockCurriculumService';
 import { mockCurriculumData } from '@/data/mockCurriculumData';
@@ -14,11 +13,11 @@ describe('MockCurriculumService', () => {
 
   describe('getNodeById', () => {
     it('should return a node if found', async () => {
-      // Using an existing ID from usMathData.ts k-cc (domain)
-      const node = await service.getNodeById('k-cc-1');
+      // Using an existing ID from usMathData.ts
+      const node = await service.getNodeById('us-k-math-cc-1');
       expect(node).toBeDefined();
-      expect(node!.id).toBe('k-cc-1');
-      expect(node!.name).toBe('Count to 100 by ones and by tens (K.CC.A.1)');
+      expect(node!.id).toBe('us-k-math-cc-1');
+      expect(node!.name).toBe('Count to 100 by ones and by tens');
     });
 
     it('should return undefined if node not found', async () => {
@@ -29,19 +28,16 @@ describe('MockCurriculumService', () => {
 
   describe('getChildrenOfNode', () => {
     it('should return direct children of a parent node', async () => {
-      // Using 'k-cc' (domain) which has 'k-cc-1', 'k-cc-2', 'k-cc-3', 'k-cc-4', 'k-cc-5'
-      const children = await service.getChildrenOfNode('k-cc');
-      expect(children).toHaveLength(5); // k-cc now has 5 LOs
-      expect(children.some(c => c.id === 'k-cc-1')).toBe(true);
-      expect(children.some(c => c.id === 'k-cc-2')).toBe(true);
-      expect(children.some(c => c.id === 'k-cc-3')).toBe(true);
-      expect(children.some(c => c.id === 'k-cc-4')).toBe(true);
-      expect(children.some(c => c.id === 'k-cc-5')).toBe(true);
+      // Using 'us-k-math-cc' (domain) which has 'us-k-math-cc-1', 'us-k-math-cc-2'
+      const children = await service.getChildrenOfNode('us-k-math-cc');
+      expect(children).toHaveLength(2);
+      expect(children.some(c => c.id === 'us-k-math-cc-1')).toBe(true);
+      expect(children.some(c => c.id === 'us-k-math-cc-2')).toBe(true);
     });
 
     it('should return an empty array if parent has no children', async () => {
-      // 'k-cc-1' is a learning_objective, no children in mock data
-      const children = await service.getChildrenOfNode('k-cc-1');
+      // 'us-k-math-cc-1' is a learning_objective, no children in mock data
+      const children = await service.getChildrenOfNode('us-k-math-cc-1');
       expect(children).toHaveLength(0);
     });
 
@@ -58,37 +54,33 @@ describe('MockCurriculumService', () => {
     });
 
     it('should filter by nodeType', async () => {
-      const filters: CurriculumNodeFilters = { nodeType: 'country' };
+      const filters: CurriculumNodeFilters = { nodeType: 'subject' };
       const nodes = await service.getNodes(filters);
       expect(nodes.length).toBeGreaterThan(0);
       nodes.forEach(node => {
-        expect(node.nodeType).toBe('country');
+        expect(node.nodeType).toBe('subject');
       });
-      expect(nodes.some(n => n.id === 'us')).toBe(true);
-      expect(nodes.some(n => n.id === 'dk')).toBe(true);
+      expect(nodes.some(n => n.id === 'us-math')).toBe(true);
     });
 
     it('should filter by countryCode', async () => {
-      const filters: CurriculumNodeFilters = { countryCode: 'DK' };
+      const filters: CurriculumNodeFilters = { countryCode: 'US' };
       const nodes = await service.getNodes(filters);
       expect(nodes.length).toBeGreaterThan(0);
       nodes.forEach(node => {
-        expect(node.countryCode).toBe('DK');
+        expect(node.countryCode).toBe('US');
       });
-      // Expecting 'dk-math' or 'dk-danish' (subject nodes under 'dk')
-      expect(nodes.some(n => n.id === 'dk-math' || n.id === 'dk-danish' || n.id === 'dk')).toBe(true);
+      expect(nodes.some(n => n.id === 'us-math')).toBe(true);
     });
 
-    it('should filter by subjectName', async () => {
-      const filters: CurriculumNodeFilters = { subjectName: 'Mathematics' };
-      const nodes = await service.getNodes(filters);
-      expect(nodes.length).toBeGreaterThan(0);
-      nodes.forEach(node => {
-        expect(node.subjectName).toBe('Mathematics');
+    it('should filter by subject', async () => {
+        const filters: CurriculumNodeFilters = { subject: NELIESubject.MATH };
+        const nodes = await service.getNodes(filters);
+        expect(nodes.length).toBeGreaterThan(0);
+        nodes.forEach(node => {
+          expect(node.subject).toBe(NELIESubject.MATH);
+        });
+        expect(nodes.some(n => n.id === 'us-math')).toBe(true);
       });
-      // Expecting 'us-math' (subject) or 'dk-math' (subject)
-      expect(nodes.some(n => n.id === 'us-math')).toBe(true);
-      expect(nodes.some(n => n.id === 'dk-math')).toBe(true);
-    });
   });
 });
