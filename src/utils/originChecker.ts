@@ -113,8 +113,42 @@ export class OriginChecker {
   }
 
   public isInLovableEditor(): boolean {
-    // Check if we're running inside the Lovable editor
-    return window.parent !== window && 
-           window.parent.location?.origin === 'https://lovable.dev';
+    // Safe detection without accessing parent.location directly
+    try {
+      // Check if we're in an iframe
+      const isInIframe = window.parent !== window;
+      
+      if (!isInIframe) {
+        return false;
+      }
+
+      // Check current URL patterns to determine if this is likely a Lovable preview
+      const currentOrigin = window.location.origin;
+      const isLovablePreview = this.isLovablePreviewEnvironment(currentOrigin);
+      
+      // If we're in a Lovable preview environment and in an iframe, 
+      // it's likely we're in the Lovable editor
+      if (isLovablePreview) {
+        console.log('✅ Detected Lovable editor environment (safe detection)');
+        return true;
+      }
+
+      // Additional check: look for Lovable-specific URL parameters or patterns
+      const searchParams = new URLSearchParams(window.location.search);
+      const hasLovableParams = searchParams.has('lovable') || 
+                              window.location.href.includes('lovable') ||
+                              window.location.hostname.includes('lovable');
+
+      if (isInIframe && hasLovableParams) {
+        console.log('✅ Detected Lovable editor environment (URL indicators)');
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      // If any error occurs, safely assume we're not in the Lovable editor
+      console.log('⚠️ Could not determine Lovable editor status safely:', error.message);
+      return false;
+    }
   }
 }
