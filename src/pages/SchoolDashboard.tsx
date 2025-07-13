@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, School, Users, BarChart3, Calendar, Menu, ChevronDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import SchoolManagementDropdown from '@/components/school/SchoolManagementDropdown';
 
 const SchoolDashboard = () => {
   const { user, loading } = useAuth();
@@ -40,20 +41,7 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground">Manage school operations and view analytics</p>
             </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-border">
-                <Menu className="w-4 h-4 mr-2" />
-                School Management
-                <ChevronDown className="w-4 h-4 ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setShowTeachingSettings(true)}>
-                Teaching Perspective Settings
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SchoolManagementDropdown onShowTeachingSettings={() => setShowTeachingSettings(true)} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

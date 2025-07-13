@@ -4,18 +4,24 @@ export class CrossOriginHandler {
 
   constructor(allowedOrigins: string[] = []) {
     this.allowedOrigins = allowedOrigins;
+    if (window.location.origin !== 'null') {
+      this.addAllowedOrigin(window.location.origin);
+    }
     this.setupMessageListener();
+    console.log('CrossOriginHandler initialized with allowed origins:', this.allowedOrigins);
   }
 
   // Add trusted origins
   addAllowedOrigin(origin: string) {
     if (!this.allowedOrigins.includes(origin)) {
       this.allowedOrigins.push(origin);
+      console.log('Added allowed origin:', origin);
     }
   }
 
   // Safe postMessage sender
   sendMessage(targetWindow: Window, message: any, targetOrigin: string) {
+    console.log(`Attempting to send message to ${targetOrigin}:`, message);
     // Always specify the exact target origin
     if (this.allowedOrigins.includes(targetOrigin)) {
       try {
@@ -32,6 +38,7 @@ export class CrossOriginHandler {
   // Safe message receiver
   private setupMessageListener() {
     window.addEventListener('message', (event) => {
+      console.log('Received message event:', event);
       // Always verify the origin
       if (!this.allowedOrigins.includes(event.origin)) {
         console.warn(`🚫 Blocked message from untrusted origin: ${event.origin}`);
@@ -90,7 +97,11 @@ export const crossOriginHandler = new CrossOriginHandler([
   'https://gptengineer.app',
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://localhost:8080'
+  'http://localhost:8080',
+  'https://*.google.com',
+  'https://*.ai.google.dev',
+  'https://bard.google.com',
+  'https://gemini.google.com',
 ]);
 
 // Example: Send message to GPT Engineer
