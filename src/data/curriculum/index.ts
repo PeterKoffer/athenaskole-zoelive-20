@@ -1,73 +1,32 @@
+import { UnifiedCurriculumNode } from '@/types/curriculum/UnifiedCurriculumNode';
+import { NELIESubject } from '@/types/curriculum/NELIESubjects';
+import unifiedCurriculum from '../../../public/data/unified-curriculum.json';
 
-import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
-import { NELIESubject } from '@/types/curriculum/NELIESubjects'; // Added for the helper
-import { usRootCurriculumNodes } from './us/usRootData';
-import { usMathCurriculumNodes } from './us/usMathData';
-import { usElaCurriculumNodes } from './us/usElaData';
-import { usMentalWellnessCurriculumData } from './us/usMentalWellnessData';
-import { usLifeEssentialsCurriculumData } from './us/usLifeEssentialsData';
-import { usComputerScienceCurriculumData } from './us/usComputerScienceData';
-import { usCreativeArtsCurriculumData } from './us/usCreativeArtsData';
-import { usMusicCurriculumData } from './us/usMusicData'; // Import US Music
-import { usScienceCurriculumData } from './us/usScienceData';
-import { usGeographyCurriculumData } from './us/usGeographyData';
-import { usHistoryCurriculumData } from './us/usHistoryData';
-import { usPECurriculumData } from './us/usPEData';
-import { usSpanishCurriculumData } from './us/usSpanishData';
-import { dkCurriculumNodes } from './dk/dkData';
-import { dkLifeEssentialsCurriculumData } from './dk/dkLifeEssentialsData';
-import { dkComputerScienceCurriculumData } from './dk/dkComputerScienceData';
-import { dkCreativeArtsCurriculumData } from './dk/dkCreativeArtsData';
-import { dkMusicCurriculumData } from './dk/dkMusicData'; // Import DK Music
+export const mockCurriculumData: UnifiedCurriculumNode[] = unifiedCurriculum;
 
-// Combine all curriculum data from different countries and subjects
-export const mockCurriculumData: CurriculumNode[] = [
-  ...usRootCurriculumNodes,
-  ...usMathCurriculumNodes,
-  ...usElaCurriculumNodes,
-  ...usMentalWellnessCurriculumData,
-  ...usLifeEssentialsCurriculumData,
-  ...usComputerScienceCurriculumData,
-  ...usCreativeArtsCurriculumData,
-  ...usMusicCurriculumData, // Add US Music
-  ...usScienceCurriculumData,
-  ...usHistoryCurriculumData,
-  ...usGeographyCurriculumData,
-  ...usPECurriculumData,
-  ...usSpanishCurriculumData,
-  ...dkCurriculumNodes,
-  ...dkLifeEssentialsCurriculumData,
-  ...dkComputerScienceCurriculumData,
-  ...dkCreativeArtsCurriculumData,
-  ...dkMusicCurriculumData // Add DK Music
-];
-
-// Export individual country/subject data for specific use cases
-export {
-  usRootCurriculumNodes,
-  usMathCurriculumNodes,
-  usElaCurriculumNodes,
-  usMentalWellnessCurriculumData,
-  usLifeEssentialsCurriculumData,
-  usComputerScienceCurriculumData,
-  usCreativeArtsCurriculumData,
-  usMusicCurriculumData, // Export US Music
-  dkCurriculumNodes,
-  dkLifeEssentialsCurriculumData,
-  dkComputerScienceCurriculumData,
-  dkCreativeArtsCurriculumData,
-  dkMusicCurriculumData // Export DK Music
+// Helper function to flatten the nested structure
+const flattenNodes = (nodes: UnifiedCurriculumNode[]): UnifiedCurriculumNode[] => {
+  const flattened: UnifiedCurriculumNode[] = [];
+  const traverse = (node: UnifiedCurriculumNode) => {
+    flattened.push(node);
+    if (node.children) {
+      node.children.forEach(traverse);
+    }
+  };
+  nodes.forEach(traverse);
+  return flattened;
 };
 
-// Helper functions for filtering data
-export const getCurriculumByCountry = (countryCode: string): CurriculumNode[] => {
-  return mockCurriculumData.filter(node => node.countryCode === countryCode);
+const allNodes = flattenNodes(mockCurriculumData);
+
+export const getCurriculumByCountry = (countryCode: string): UnifiedCurriculumNode[] => {
+  return allNodes.filter(node => node.countryCode === countryCode);
 };
 
-export const getCurriculumBySubject = (subject: NELIESubject): CurriculumNode[] => { // Changed parameter to NELIESubject
-  return mockCurriculumData.filter(node => node.subject === subject); // Changed to filter by subject enum
+export const getCurriculumBySubject = (subject: NELIESubject): UnifiedCurriculumNode[] => {
+  return allNodes.filter(node => node.subject === subject);
 };
 
-export const getCurriculumByGrade = (educationalLevel: string): CurriculumNode[] => {
-  return mockCurriculumData.filter(node => node.educationalLevel === educationalLevel);
+export const getCurriculumByGrade = (educationalLevel: string): UnifiedCurriculumNode[] => {
+  return allNodes.filter(node => node.educationalLevel === educationalLevel);
 };
