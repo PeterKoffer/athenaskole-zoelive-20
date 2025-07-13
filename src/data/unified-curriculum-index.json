@@ -12,6 +12,18 @@
       "subjectName": "Music Discovery",
       "educationalLevel": "K-12",
       "tags": ["music", "creativity", "cultural_appreciation", "performance", "composition"]
+    },
+    {
+      "id": "us-native-language-root",
+      "parentId": "us-subjects-root",
+      "nodeType": "subject_area",
+      "name": "Native Language Arts",
+      "description": "Comprehensive K-12 native language education from phonics to advanced literary analysis, fostering reading, writing, speaking, and critical thinking skills",
+      "countryCode": "US",
+      "subject": "NATIVE_LANGUAGE",
+      "subjectName": "Native Language Arts",
+      "educationalLevel": "K-12",
+      "tags": ["reading", "writing", "literature", "communication", "critical_thinking", "cultural_literacy"]
     }
   ]
 }
