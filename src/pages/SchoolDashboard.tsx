@@ -3,9 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, School, Users, BarChart3, Calendar } from 'lucide-react';
-import SchoolManagementDropdown from '@/components/school/SchoolManagementDropdown';
-import TeachingSettingsModal from '@/components/school/TeachingSettingsModal';
+import { ArrowLeft, School, Users, BarChart3, Calendar, Menu, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const SchoolDashboard = () => {
   const { user, loading } = useAuth();
@@ -41,9 +40,20 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground">Manage school operations and view analytics</p>
             </div>
           </div>
-          <SchoolManagementDropdown 
-            onShowTeachingSettings={() => setShowTeachingSettings(true)}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="border-border">
+                <Menu className="w-4 h-4 mr-2" />
+                School Management
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setShowTeachingSettings(true)}>
+                Teaching Perspective Settings
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -117,10 +127,36 @@ const SchoolDashboard = () => {
         </div>
       </div>
       
-      <TeachingSettingsModal 
-        isOpen={showTeachingSettings}
-        onClose={() => setShowTeachingSettings(false)}
-      />
+      {showTeachingSettings && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Teaching Perspective Settings</h2>
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowTeachingSettings(false)}
+              >
+                ×
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">School Direction</label>
+                <select className="w-full p-2 border rounded">
+                  <option value="none">None</option>
+                  <option value="mild-christian">Mild Christian</option>
+                  <option value="strong-christian">Strong Christian</option>
+                  <option value="secular">Secular</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <Button onClick={() => setShowTeachingSettings(false)}>
+                Save Settings
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
