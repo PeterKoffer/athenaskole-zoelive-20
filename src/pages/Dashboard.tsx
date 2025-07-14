@@ -1,12 +1,11 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Users, Calendar } from "lucide-react";
+import { BookOpen, Users, Calendar, Settings, BarChart2 } from "lucide-react";
 
-// This is the home page for authenticated users.
-// It provides a dashboard with links to the main features of the application.
-const HomePage = () => {
+// This is the main dashboard for authenticated users.
+// It provides a comprehensive overview of the application and serves as the main entry point.
+const Dashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -16,9 +15,9 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <WelcomeHeader user={user} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <DashboardCard
             icon={<BookOpen className="w-5 h-5 mr-2 text-blue-400" />}
             title="Daily Universe"
@@ -36,6 +35,18 @@ const HomePage = () => {
             title="Preferences"
             description="Customize your learning experience and settings"
             onClick={() => navigate("/preferences")}
+          />
+          <DashboardCard
+            icon={<BarChart2 className="w-5 h-5 mr-2 text-yellow-400" />}
+            title="Progress"
+            description="Track your learning progress and achievements"
+            onClick={() => navigate("/progress")}
+          />
+          <DashboardCard
+            icon={<Settings className="w-5 h-5 mr-2 text-red-400" />}
+            title="Settings"
+            description="Manage your account and notification settings"
+            onClick={() => navigate("/settings")}
           />
         </div>
       </div>
@@ -60,7 +71,7 @@ const WelcomeHeader = ({ user }) => (
       Welcome back{user?.email ? `, ${user.email.split("@")[0]}` : "!"}
     </h1>
     <p className="text-gray-400">
-      Ready to continue your learning journey?
+      Here's a quick overview of your learning journey.
     </p>
   </div>
 );
@@ -83,4 +94,4 @@ const DashboardCard = ({ icon, title, description, onClick }) => (
   </Card>
 );
 
-export default HomePage;
+export default Dashboard;
