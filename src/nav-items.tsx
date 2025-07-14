@@ -1,12 +1,12 @@
 
-import { Home, BookOpen, Calendar, User, Settings, Users } from "lucide-react";
+import { Home, BookOpen, Calendar, User, Settings, Users, Info } from "lucide-react";
 import Index from "./pages/Index";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import ProfilePage from "./pages/ProfilePage";
 import PreferencesPage from "./pages/PreferencesPage";
 import Auth from "./pages/Auth";
 import ParentDashboard from "./pages/ParentDashboard";
-import HomePage from "./pages/HomePage";
+import Dashboard from "./pages/Dashboard";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -15,6 +15,7 @@ import StudentManagementPage from "./pages/StudentManagementPage";
 import StaffManagementPage from "./pages/StaffManagementPage";
 import SchoolAnalyticsPage from "./pages/SchoolAnalyticsPage";
 import ScheduleManagementPage from "./pages/ScheduleManagementPage";
+import AboutPage from "./pages/AboutPage";
 
 export const navItems = [
   {
@@ -24,10 +25,10 @@ export const navItems = [
     page: <Index />,
   },
   {
-    title: "Home",
-    to: "/home",
+    title: "Dashboard",
+    to: "/dashboard",
     icon: <Home className="h-4 w-4" />,
-    page: <HomePage />,
+    page: <Dashboard />,
   },
   {
     title: "Daily Universe",
@@ -66,14 +67,14 @@ export const navItems = [
     page: <SchoolDashboard />,
   },
   {
-    title: "Teacher Dashboard", 
+    title: "Teacher Dashboard",
     to: "/teacher-dashboard",
     icon: <User className="h-4 w-4" />,
     page: <TeacherDashboard />,
   },
   {
     title: "Admin Dashboard",
-    to: "/admin-dashboard", 
+    to: "/admin-dashboard",
     icon: <Settings className="h-4 w-4" />,
     page: <AdminDashboard />,
   },
@@ -106,5 +107,11 @@ export const navItems = [
     to: "/schedule-management",
     icon: <Calendar className="h-4 w-4" />,
     page: <ScheduleManagementPage />,
+  },
+  {
+    title: "About",
+    to: "/about",
+    icon: <Info className="h-4 w-4" />,
+    page: <AboutPage />,
   },
 ];
