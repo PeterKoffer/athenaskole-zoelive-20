@@ -12,7 +12,6 @@ import { navItems } from "./nav-items";
 import stealthAssessmentService from "@/services/stealthAssessment/StealthAssessmentService";
 import { mockProfileService } from "@/services/learnerProfile/MockProfileService";
 import { SupabaseProfileService } from "@/services/learnerProfile/SupabaseProfileService";
-import ProfileDebugButton from "./components/ProfileDebugButton";
 import ErrorBoundary from "./components/ErrorBoundary";
 import JulesIntegration from "./components/JulesIntegration";
 import "./index.css";
@@ -55,9 +54,6 @@ root.render(
                 <div className="min-h-screen bg-background">
                   {/* Jules Integration Component */}
                   <JulesIntegration />
-                  <div className="fixed top-4 right-4 z-50 flex gap-2">
-                    <ProfileDebugButton />
-                  </div>
                   <Routes>
                     {navItems.map(({ to, page }) => (
                       <Route key={to} path={to} element={page} />
