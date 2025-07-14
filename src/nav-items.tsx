@@ -16,6 +16,7 @@ import StaffManagementPage from "./pages/StaffManagementPage";
 import SchoolAnalyticsPage from "./pages/SchoolAnalyticsPage";
 import ScheduleManagementPage from "./pages/ScheduleManagementPage";
 import AboutPage from "./pages/AboutPage";
+import UniversePage from "./pages/UniversePage";
 
 export const navItems = [
   {
@@ -113,5 +114,11 @@ export const navItems = [
     to: "/about",
     icon: <Info className="h-4 w-4" />,
     page: <AboutPage />,
+  },
+  {
+    title: "Universe",
+    to: "/universe",
+    icon: <BookOpen className="h-4 w-4" />,
+    page: <UniversePage />,
   },
 ];
