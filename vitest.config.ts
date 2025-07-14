@@ -14,7 +14,7 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./src/test/setup.ts'],
+      setupFiles: ['./src/test/setup.ts', '@testing-library/jest-dom'],
       include: [
         'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
         'src/**/__tests__/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',

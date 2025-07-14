@@ -4,6 +4,7 @@ import { Universe } from '../services/UniverseGenerator';
 import { PersonalizationEngine } from '../services/PersonalizationEngine';
 import { StudentProfile } from '../types/student';
 import { CurriculumMapper, CurriculumStandard } from '../services/CurriculumMapper';
+import CurriculumStandardCard from '../components/CurriculumStandardCard';
 
 const UniversePage: React.FC = () => {
     const [universe, setUniverse] = useState<Universe | null>(null);
@@ -45,11 +46,11 @@ const UniversePage: React.FC = () => {
                 <>
                     <UniversePlayer universe={universe} />
                     <h2>Curriculum Standards</h2>
-                    <ul>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {standards.map(standard => (
-                            <li key={standard.id}>{standard.description}</li>
+                            <CurriculumStandardCard key={standard.id} standard={standard} />
                         ))}
-                    </ul>
+                    </div>
                 </>
             ) : (
                 <p>Loading...</p>
