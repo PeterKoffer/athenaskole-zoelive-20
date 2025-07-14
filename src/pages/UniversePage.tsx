@@ -4,9 +4,11 @@ import UniversePlayer from '../components/UniversePlayer';
 import { Universe } from '../services/UniverseGenerator';
 import { PersonalizationEngine } from '../services/PersonalizationEngine';
 import { StudentProfile } from '../types/student';
+import { CurriculumMapper, CurriculumStandard } from '../services/CurriculumMapper';
 
 const UniversePage: React.FC = () => {
     const [universe, setUniverse] = useState<Universe | null>(null);
+    const [standards, setStandards] = useState<CurriculumStandard[]>([]);
 
     useEffect(() => {
         const generateUniverse = async () => {
@@ -29,6 +31,9 @@ const UniversePage: React.FC = () => {
             };
             const newUniverse = await PersonalizationEngine.personalizeUniverse(initialUniverse, student);
             setUniverse(newUniverse);
+
+            const relevantStandards = CurriculumMapper.getStandardsForUniverse(newUniverse);
+            setStandards(relevantStandards);
         };
 
         generateUniverse();
@@ -37,7 +42,19 @@ const UniversePage: React.FC = () => {
     return (
         <div>
             <h1>Universe Page</h1>
-            {universe ? <UniversePlayer universe={universe} /> : <p>Loading...</p>}
+            {universe ? (
+                <>
+                    <UniversePlayer universe={universe} />
+                    <h2>Curriculum Standards</h2>
+                    <ul>
+                        {standards.map(standard => (
+                            <li key={standard.id}>{standard.description}</li>
+                        ))}
+                    </ul>
+                </>
+            ) : (
+                <p>Loading...</p>
+            )}
         </div>
     );
 };
