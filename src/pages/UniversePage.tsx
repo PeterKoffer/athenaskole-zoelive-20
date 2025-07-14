@@ -2,12 +2,11 @@ import React from 'react';
 import UniversePlayer from '../components/UniversePlayer';
 import { UniverseGenerator } from '../services/UniverseGenerator';
 import { CurriculumMapper } from '../services/CurriculumMapper';
-import { PersonalizationEngine, UserPreferences } from '../services/PersonalizationEngine';
+import { PersonalizationEngine, UserPreferences } from '../services/PersonalizationEngine'
 
 const UniversePage: React.FC = () => {
     const universes = UniverseGenerator.getUniverses();
     const universe = universes[0]; // For now, just display the first universe
-
     const standards = CurriculumMapper.getStandardsForUniverse(universe);
 
     const preferences: UserPreferences = {
@@ -27,7 +26,6 @@ const UniversePage: React.FC = () => {
                     <li key={standard.id}>{standard.description}</li>
                 ))}
             </ul>
-        </div>
     );
 };
 
