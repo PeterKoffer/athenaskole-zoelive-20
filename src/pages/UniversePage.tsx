@@ -15,6 +15,7 @@ const UniversePage: React.FC = () => {
         generateUniverse();
     }, []);
 
+
     return (
         <div>
             <h1>Universe Page</h1>
