@@ -1,51 +1,28 @@
-import { generateEnhancedLesson } from './EnhancedLessonGenerator';
+
+import { generateEnhancedLesson } from '../components/education/components/utils/EnhancedLessonGenerator';
 
 const generateMathLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson({
-        gradeLevel,
-        learningStyle,
-        subject: 'mathematics'
-    });
+    return generateEnhancedLesson('mathematics', 'math-skills', gradeLevel);
 };
 
 const generateEnglishLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson({
-        gradeLevel,
-        learningStyle,
-        subject: 'english'
-    });
+    return generateEnhancedLesson('english', 'language-arts', gradeLevel);
 };
 
 const generateScienceLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson({
-        gradeLevel,
-        learningStyle,
-        subject: 'science'
-    });
+    return generateEnhancedLesson('science', 'scientific-method', gradeLevel);
 };
 
 const generateMusicLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson({
-        gradeLevel,
-        learningStyle,
-        subject: 'music'
-    });
+    return generateEnhancedLesson('music', 'musical-concepts', gradeLevel);
 };
 
 const generateComputerScienceLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson({
-        gradeLevel,
-        learningStyle,
-        subject: 'computerScience'
-    });
+    return generateEnhancedLesson('computerScience', 'computational-thinking', gradeLevel);
 };
 
 const generateCreativeArtsLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson({
-        gradeLevel,
-        learningStyle,
-        subject: 'creativeArts'
-    });
+    return generateEnhancedLesson('creativeArts', 'artistic-expression', gradeLevel);
 };
 
 export const EnhancedSubjectLessonFactory = {
