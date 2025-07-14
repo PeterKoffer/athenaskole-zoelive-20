@@ -13,7 +13,7 @@ export const AIUniverseGenerator = {
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a creative and engaging storyteller for children. Your task is to generate a short, one-paragraph story that can be used as a "Universe" in an educational application. The story should be imaginative, age-appropriate, and have a clear theme or problem that can be used as a basis for educational activities. The story should have a title and a description. The output should be a JSON object with the following format: {"title": "...", "description": "..."}'
+                    content: 'You are a creative and engaging storyteller for children. Your task is to generate a short, one-paragraph story that can be used as a "Universe" in an educational application. The story should be imaginative, age-appropriate, and have a clear theme or problem that can be used as a basis for educational activities. The story should have a title, a description, a list of characters, a list of locations, and a list of activities. The output should be a JSON object with the following format: {"title": "...", "description": "...", "characters": ["...", "..."], "locations": ["...", "..."], "activities": ["...", "..."]}'
                 },
                 {
                     role: 'user',
