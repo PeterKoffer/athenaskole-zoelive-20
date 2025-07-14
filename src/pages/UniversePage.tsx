@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import UniversePlayer from '../components/UniversePlayer';
-import { AIUniverseGenerator } from '../services/AIUniverseGenerator';
 import { Universe } from '../services/UniverseGenerator';
 import { PersonalizationEngine } from '../services/PersonalizationEngine';
 import { StudentProfile } from '../types/student';
@@ -22,7 +21,10 @@ const UniversePage: React.FC = () => {
             const initialUniverse: Universe = {
                 id: '1',
                 title: 'Travel to China',
-                description: 'You have to travel to China to help a man in his store.'
+                description: 'You have to travel to China to help a man in his store.',
+                characters: ['You', 'The Shopkeeper'],
+                locations: ['A store in China'],
+                activities: ['Help the shopkeeper count his money', 'Learn some Chinese phrases']
             };
             const newUniverse = await PersonalizationEngine.personalizeUniverse(initialUniverse, student);
             setUniverse(newUniverse);
