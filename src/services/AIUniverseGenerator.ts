@@ -1,37 +1,23 @@
-import OpenAI from 'openai';
-import { Universe } from './UniverseGenerator';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || (() => { throw new Error('OPENAI_API_KEY is not defined in the environment variables'); })(),
-    dangerouslyAllowBrowser: true
-});
+import { Universe } from './UniverseGenerator';
 
 export const AIUniverseGenerator = {
     generateUniverse: async (prompt: string): Promise<Universe> => {
-        const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are a creative and engaging storyteller for children. Your task is to generate a short, one-paragraph story that can be used as a "Universe" in an educational application. The story should be imaginative, age-appropriate, and have a clear theme or problem that can be used as a basis for educational activities. The story should have a title, a description, a list of characters, a list of locations, and a list of activities. The output should be a JSON object with the following format: {"title": "...", "description": "...", "characters": ["...", "..."], "locations": ["...", "..."], "activities": ["...", "..."]}'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ]
-        });
-
-        const content = response.choices[0].message.content;
-        if (!content) {
-            throw new Error('No content returned from the API');
-        }
-
-        const universeData = JSON.parse(content);
-
-        return {
-            id: `ai-${Date.now()}`,
-            ...universeData
+        // Mock AI generation - in a real implementation, this would call an AI service
+        // For now, return a personalized version based on the prompt
+        
+        const baseUniverse: Universe = {
+            id: Math.random().toString(36).substr(2, 9),
+            title: 'AI Generated Adventure',
+            description: prompt,
+            characters: ['You', 'AI Generated Character'],
+            locations: ['Generated Location'],
+            activities: ['AI suggested activity based on interests']
         };
+
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        return baseUniverse;
     }
 };

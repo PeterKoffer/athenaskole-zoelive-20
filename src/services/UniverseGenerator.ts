@@ -1,3 +1,4 @@
+
 export interface Universe {
     id: string;
     title: string;
@@ -22,7 +23,7 @@ const universes: Universe[] = [
         description: 'All power is out in your home, we have some fixing to do.',
         characters: ['You', 'Your Family'],
         locations: ['Your Home'],
-        activities: ['Find a flashlight', 'Play a board game'
+        activities: ['Find a flashlight', 'Play a board game']
     },
     {
         id: '3',
