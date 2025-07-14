@@ -20,5 +20,6 @@ describe('PersonalizationEngine', () => {
         expect(personalizedUniverse.id).toBeDefined();
         expect(personalizedUniverse.title).toBeDefined();
         expect(personalizedUniverse.description).toBeDefined();
+        expect(personalizedUniverse.id).toBe(universe.id);
     });
 });
