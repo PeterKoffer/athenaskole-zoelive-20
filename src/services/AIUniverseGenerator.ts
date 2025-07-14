@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { Universe } from './UniverseGenerator';
 
 const openai = new OpenAI({
-    apiKey: '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',
+    apiKey: process.env.OPENAI_API_KEY || (() => { throw new Error('OPENAI_API_KEY is not defined in the environment variables'); })(),
     dangerouslyAllowBrowser: true
 });
 
