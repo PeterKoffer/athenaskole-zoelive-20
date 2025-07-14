@@ -21,9 +21,9 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <DashboardCard
             icon={<BookOpen className="w-5 h-5 mr-2 text-blue-400" />}
-            title="Daily Universe"
+            title="Daily Program"
             description="Explore your personalized learning content for today"
-            onClick={() => navigate("/daily-universe")}
+            onClick={() => navigate("/daily-program")}
           />
           <DashboardCard
             icon={<Users className="w-5 h-5 mr-2 text-green-400" />}
