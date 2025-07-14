@@ -1,32 +1,26 @@
 
 import { Universe } from './UniverseGenerator';
+import curriculum from '../data/curriculum.json';
+import Fuse from 'fuse.js';
 
-interface CurriculumStandard {
+export interface CurriculumStandard {
     id: string;
-    name: string;
-    description: string;
     subject: string;
     gradeLevel: number;
+    description: string;
+    keywords: string[];
 }
+
+const fuse = new Fuse(curriculum, {
+    keys: ['keywords']
+});
 
 export const CurriculumMapper = {
     getStandardsForUniverse: (universe: Universe): CurriculumStandard[] => {
-        // Mock curriculum standards for testing
-        return [
-            {
-                id: '1',
-                name: 'Math Standard 1',
-                description: 'Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.',
-                subject: 'mathematics',
-                gradeLevel: 6
-            },
-            {
-                id: '2',
-                name: 'Geometry Standard 1',
-                description: 'Know precise definitions of angle, circle, perpendicular line, parallel line, and line segment, based on the undefined notions of point, line, distance along a line, and distance around a circular arc.',
-                subject: 'mathematics',
-                gradeLevel: 6
-            }
-        ];
+        const universeKeywords = [...universe.title.toLowerCase().split(' '), ...universe.description.toLowerCase().split(' ')];
+        const relevantStandards = universeKeywords.flatMap(keyword => {
+            return fuse.search(keyword).map(result => result.item);
+        });
+        return [...new Set(relevantStandards)]; // Remove duplicates
     }
 };
