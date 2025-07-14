@@ -1,20 +1,22 @@
-export const validateEnhancedLesson = (lesson: any): any => {
-    return {
-        isValid: true,
-        qualityScore: 100,
-        errors: [],
-        warnings: []
-    };
-};
 
-export const generateEnhancedLesson = (config: any): any => {
+interface LessonValidation {
+    isValid: boolean;
+    qualityScore: number;
+}
+
+interface EnhancedLesson {
+    lesson: {
+        totalDuration: number;
+    };
+    activities: any[];
+    validation: {
+        qualityScore: number;
+    };
+}
+
+export const validateEnhancedLesson = (lesson: EnhancedLesson): LessonValidation => {
     return {
-        lesson: {
-            totalDuration: 1200
-        },
-        activities: [],
-        validation: {
-            qualityScore: 100
-        }
+        isValid: lesson.lesson.totalDuration > 0,
+        qualityScore: lesson.validation.qualityScore
     };
 };

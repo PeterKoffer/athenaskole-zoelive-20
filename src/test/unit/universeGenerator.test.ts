@@ -1,3 +1,5 @@
+
+import { describe, it, expect } from 'vitest';
 import { UniverseGenerator } from '../../services/UniverseGenerator';
 
 describe('UniverseGenerator', () => {

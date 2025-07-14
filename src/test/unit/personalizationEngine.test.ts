@@ -1,3 +1,5 @@
+
+import { describe, it, expect } from 'vitest';
 import { PersonalizationEngine } from '../../services/PersonalizationEngine';
 import { UniverseGenerator } from '../../services/UniverseGenerator';
 import { StudentProfile } from '../../types/student';
