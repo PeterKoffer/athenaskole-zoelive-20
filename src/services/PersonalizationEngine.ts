@@ -1,14 +1,11 @@
 import { Universe } from './UniverseGenerator';
-
-export interface UserPreferences {
-    learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
-    difficulty: 'easy' | 'medium' | 'hard';
-}
+import { StudentProfile } from '../types/student';
+import { AIUniverseGenerator } from './AIUniverseGenerator';
 
 export const PersonalizationEngine = {
-    personalizeUniverse: (universe: Universe, preferences: UserPreferences): Universe => {
-        // For now, just return the original universe.
-        // In the future, this method will tailor the universe to the user's preferences.
-        return universe;
+    personalizeUniverse: async (universe: Universe, student: StudentProfile): Promise<Universe> => {
+        const prompt = `${universe.description} The story should incorporate the following interests: ${student.interests.join(', ')}.`;
+        const personalizedUniverse = await AIUniverseGenerator.generateUniverse(prompt);
+        return personalizedUniverse;
     }
 };

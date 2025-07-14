@@ -1,16 +1,25 @@
-import { PersonalizationEngine, UserPreferences } from '../../services/PersonalizationEngine';
+import { PersonalizationEngine } from '../../services/PersonalizationEngine';
 import { UniverseGenerator } from '../../services/UniverseGenerator';
+import { StudentProfile } from '../../types/student';
 
 describe('PersonalizationEngine', () => {
-    it('should return a personalized universe', () => {
+    it('should return a personalized universe', async () => {
         const universes = UniverseGenerator.getUniverses();
         const universe = universes[0];
-        const preferences: UserPreferences = {
-            learningStyle: 'visual',
-            difficulty: 'easy'
+        const student: StudentProfile = {
+            id: '1',
+            name: 'John Doe',
+            gradeLevel: 6,
+            interests: ['space', 'dinosaurs'],
+            abilities: {
+                math: 'intermediate'
+            }
         };
-        const personalizedUniverse = PersonalizationEngine.personalizeUniverse(universe, preferences);
+        const personalizedUniverse = await PersonalizationEngine.personalizeUniverse(universe, student);
         expect(personalizedUniverse).toBeDefined();
+        expect(personalizedUniverse.id).toBeDefined();
+        expect(personalizedUniverse.title).toBeDefined();
+        expect(personalizedUniverse.description).toBeDefined();
         expect(personalizedUniverse.id).toBe(universe.id);
     });
 });
