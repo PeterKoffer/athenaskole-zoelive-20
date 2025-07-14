@@ -1,0 +1,129 @@
+{
+  "subjects": [
+    {
+      "id": "counting-and-cardinality",
+      "name": "Counting and Cardinality",
+      "grades": {}
+    },
+    {
+      "id": "operations-and-algebraic-thinking",
+      "name": "Operations and Algebraic Thinking",
+      "grades": {}
+    },
+    {
+      "id": "mathematics-(matematik)",
+      "name": "Mathematics (Matematik)",
+      "grades": {}
+    },
+    {
+      "id": "danish-language-(dansk)",
+      "name": "Danish Language (Dansk)",
+      "grades": {}
+    },
+    {
+      "id": "number-and-operations-in-base-ten",
+      "name": "Number and Operations in Base Ten",
+      "grades": {}
+    },
+    {
+      "id": "english-(engelsk)",
+      "name": "English (Engelsk)",
+      "grades": {}
+    },
+    {
+      "id": "science-(natur/teknik)",
+      "name": "Science (Natur/teknik)",
+      "grades": {}
+    },
+    {
+      "id": "number-and-operations—fractions",
+      "name": "Number and Operations—Fractions",
+      "grades": {}
+    },
+    {
+      "id": "mathematics",
+      "name": "Mathematics",
+      "grades": {}
+    },
+    {
+      "id": "ratios-and-proportional-relationships",
+      "name": "Ratios and Proportional Relationships",
+      "grades": {}
+    },
+    {
+      "id": "the-number-system",
+      "name": "The Number System",
+      "grades": {}
+    },
+    {
+      "id": "science",
+      "name": "Science",
+      "grades": {}
+    },
+    {
+      "id": "digital-skills",
+      "name": "Digital Skills",
+      "grades": {}
+    },
+    {
+      "id": "expressions-and-equations",
+      "name": "Expressions and Equations",
+      "grades": {}
+    },
+    {
+      "id": "functions",
+      "name": "Functions",
+      "grades": {}
+    },
+    {
+      "id": "seeing-structure-in-expressions",
+      "name": "Seeing Structure in Expressions",
+      "grades": {}
+    },
+    {
+      "id": "interpreting-categorical-and-quantitative-data",
+      "name": "Interpreting Categorical and Quantitative Data",
+      "grades": {}
+    },
+    {
+      "id": "making-inferences-and-justifying-conclusions",
+      "name": "Making Inferences and Justifying Conclusions",
+      "grades": {}
+    },
+    {
+      "id": "interdisciplinary-project",
+      "name": "Interdisciplinary Project",
+      "grades": {}
+    },
+    {
+      "id": "vocational-exploration",
+      "name": "Vocational Exploration",
+      "grades": {}
+    },
+    {
+      "id": "professional-english",
+      "name": "Professional English",
+      "grades": {}
+    },
+    {
+      "id": "innovation-project",
+      "name": "Innovation Project",
+      "grades": {}
+    },
+    {
+      "id": "building-functions",
+      "name": "Building Functions",
+      "grades": {}
+    },
+    {
+      "id": "MUSIC",
+      "name": "Music Discovery",
+      "grades": {}
+    },
+    {
+      "id": "NATIVE_LANGUAGE",
+      "name": "Native Language Arts",
+      "grades": {}
+    }
+  ]
+}

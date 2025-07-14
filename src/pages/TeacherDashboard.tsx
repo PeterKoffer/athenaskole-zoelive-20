@@ -1,12 +1,44 @@
-import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, GraduationCap, BookOpen, Users, Calendar } from 'lucide-react';
+import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  GraduationCap,
+  BookOpen,
+  Users,
+  Calendar,
+} from "lucide-react";
+import SubjectWeighting from "@/components/teacher/SubjectWeighting";
+import { useState, useEffect } from "react";
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [subjects, setSubjects] = useState([]);
+
+  useEffect(() => {
+    // Fetch the subjects from the AI curriculum data.
+    const fetchSubjects = async () => {
+      try {
+        const response = await fetch("/src/data/ai-curriculum.json");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setSubjects(data.subjects);
+      } catch (error) {
+        console.error("Failed to fetch subjects:", error);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
+  const handleSaveWeights = (weights) => {
+    // TODO: Save the weights to the database.
+    console.log("Saving weights:", weights);
+  };
 
   if (loading) {
     return (
@@ -32,8 +64,12 @@ const TeacherDashboard = () => {
             Back
           </Button>
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Teacher Dashboard</h1>
-            <p className="text-muted-foreground">Manage your classes and student progress</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              Teacher Dashboard
+            </h1>
+            <p className="text-muted-foreground">
+              Manage your classes and student progress
+            </p>
           </div>
         </div>
 
@@ -49,9 +85,7 @@ const TeacherDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 View and manage your assigned classes and students.
               </p>
-              <Button className="w-full">
-                View Classes
-              </Button>
+              <Button className="w-full">View Classes</Button>
             </CardContent>
           </Card>
 
@@ -66,9 +100,7 @@ const TeacherDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Create and manage your lesson plans and materials.
               </p>
-              <Button className="w-full">
-                Manage Lessons
-              </Button>
+              <Button className="w-full">Manage Lessons</Button>
             </CardContent>
           </Card>
 
@@ -83,9 +115,7 @@ const TeacherDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Track individual student performance and growth.
               </p>
-              <Button className="w-full">
-                View Progress
-              </Button>
+              <Button className="w-full">View Progress</Button>
             </CardContent>
           </Card>
 
@@ -100,11 +130,12 @@ const TeacherDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 View your teaching schedule and upcoming events.
               </p>
-              <Button className="w-full">
-                View Schedule
-              </Button>
+              <Button className="w-full">View Schedule</Button>
             </CardContent>
           </Card>
+        </div>
+        <div className="mt-6">
+          <SubjectWeighting subjects={subjects} onSave={handleSaveWeights} />
         </div>
       </div>
     </div>
