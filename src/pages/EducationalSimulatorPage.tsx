@@ -19,10 +19,32 @@ import {
 } from 'lucide-react';
 import SimulatorInterface from '@/components/simulator/SimulatorInterface';
 import { SimulatorAnalytics } from '@/types/simulator/SimulatorTypes';
+import { studentProfileService } from '@/services/StudentProfileService';
+import { StudentProfile } from '@/types/studentProfile';
+import { useState, useEffect } from 'react';
 
 const EducationalSimulatorPage: React.FC = () => {
   const [currentView, setCurrentView] = useState<'overview' | 'simulation' | 'analytics'>('overview');
   const [simulationAnalytics, setSimulationAnalytics] = useState<SimulatorAnalytics | null>(null);
+  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
+
+  useEffect(() => {
+    // In a real application, we would get the student's ID from the URL or from the authentication context.
+    const studentId = 'student1';
+    let profile = studentProfileService.getProfile(studentId);
+    if (!profile) {
+      profile = {
+        id: studentId,
+        name: 'John Doe',
+        gradeLevel: 4,
+        learningStyle: 'mixed',
+        interests: [],
+        progress: {},
+      };
+      studentProfileService.createProfile(profile);
+    }
+    setStudentProfile(profile);
+  }, []);
 
   const handleStartSimulation = () => {
     setCurrentView('simulation');
@@ -40,8 +62,8 @@ const EducationalSimulatorPage: React.FC = () => {
 
   if (currentView === 'simulation') {
     return (
-      <SimulatorInterface
-        studentProfile={{}}
+      <SimulatorInterfa
+        studentProfile={studentProfile}
         onComplete={handleSimulationComplete}
         onExit={handleBackToOverview}
       />
