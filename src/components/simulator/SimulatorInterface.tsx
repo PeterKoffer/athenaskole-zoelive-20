@@ -66,8 +66,12 @@ const SimulatorInterface: React.FC<SimulatorInterfaceProps> = ({
     setActiveLesson(lesson);
   };
 
+  const handleLessonComplete = () => {
+    setActiveLesson(null);
+  };
+
   if (activeLesson) {
-    return <LessonPlayer lesson={activeLesson} />;
+    return <LessonPlayer lesson={activeLesson} onComplete={handleLessonComplete} />;
   }
 
   if (!session || !universe) {
