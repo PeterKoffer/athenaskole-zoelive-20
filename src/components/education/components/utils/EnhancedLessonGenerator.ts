@@ -78,6 +78,61 @@ function getGamesForSubject(subject: string) {
     }
 }
 
+function getContentForPhase(phase: string, subject: string, skillArea: string) {
+    // In a real application, this would fetch content from a database.
+    // For now, we'll just return some sample content.
+    switch (phase) {
+        case 'introduction':
+            return [
+                {
+                    type: 'text',
+                    value: `Welcome to this lesson on ${skillArea}! In this lesson, we'll be learning about...`,
+                },
+            ];
+        case 'contentDelivery':
+            return [
+                {
+                    type: 'video',
+                    value: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                },
+                {
+                    type: 'text',
+                    value: 'This is the main content of the lesson. We\'ll be covering...',
+                },
+            ];
+        case 'interactiveGame':
+            return [
+                {
+                    type: 'text',
+                    value: 'Now it\'s time to play a game!',
+                },
+            ];
+        case 'application':
+            return [
+                {
+                    type: 'text',
+                    value: 'Now it\'s time to apply what you\'ve learned.',
+                },
+            ];
+        case 'creativeExploration':
+            return [
+                {
+                    type: 'text',
+                    value: 'Now it\'s time to get creative!',
+                },
+            ];
+        case 'summary':
+            return [
+                {
+                    type: 'text',
+                    value: 'In this lesson, we learned about...',
+                },
+            ];
+        default:
+            return [];
+    }
+}
+
 export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed'): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
     const adaptation = LEARNING_STYLE_ADAPTATIONS[learningStyle];
@@ -90,7 +145,7 @@ export function generateEnhancedLesson(subject: string, skillArea: string, grade
             duration: baseSeconds + adaptation.extraDuration / Object.keys(ENHANCED_LESSON_PHASES).length,
             phaseDescription: `This is the ${phase} phase.`,
             metadata: { subject, skillArea },
-            content: { text: `Content for the ${phase} phase.` }
+            content: getContentForPhase(phase, subject, skillArea),
         };
 
         if (phase === 'interactiveGame') {
