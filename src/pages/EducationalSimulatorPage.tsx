@@ -41,8 +41,7 @@ const EducationalSimulatorPage: React.FC = () => {
   if (currentView === 'simulation') {
     return (
       <SimulatorInterface
-        scenarioId="sample_crisis_management"
-        userId="demo_user_123"
+        studentProfile={{}}
         onComplete={handleSimulationComplete}
         onExit={handleBackToOverview}
       />
