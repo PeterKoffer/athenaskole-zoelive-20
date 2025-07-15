@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
-import { screen } from '@testing-library/dom';
+import { render, screen } from '@testing-library/react';
 import UniversePage from '../../pages/UniversePage';
 
 describe('UniversePage', () => {
