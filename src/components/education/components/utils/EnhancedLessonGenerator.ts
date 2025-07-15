@@ -53,19 +53,52 @@ export const K12_CURRICULUM_STANDARDS = {
   }
 };
 
+function getGamesForSubject(subject: string) {
+    // In a real application, this would fetch games from a database.
+    // For now, we'll just return some sample games.
+    switch (subject) {
+        case 'mathematics':
+            return [
+                {
+                    name: 'Math Blaster',
+                    description: 'Blast your way through math problems!',
+                    url: 'https://www.coolmathgames.com/0-math-blaster',
+                },
+            ];
+        case 'english':
+            return [
+                {
+                    name: 'Word Wipe',
+                    description: 'Wipe away words in this fast-paced word game!',
+                    url: 'https://www.coolmathgames.com/0-word-wipe',
+                },
+            ];
+        default:
+            return [];
+    }
+}
+
 export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed'): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
     const adaptation = LEARNING_STYLE_ADAPTATIONS[learningStyle];
-    const phases: LessonActivity[] = Object.entries(ENHANCED_LESSON_PHASES).map(([phase, { baseSeconds }]) => ({
-        id: `${subject}-${phase}`,
-        type: phase,
-        phase: phase,
-        title: `${phase.charAt(0).toUpperCase() + phase.slice(1)}`,
-        duration: baseSeconds + adaptation.extraDuration / Object.keys(ENHANCED_LESSON_PHASES).length,
-        phaseDescription: `This is the ${phase} phase.`,
-        metadata: { subject, skillArea },
-        content: { text: `Content for the ${phase} phase.` }
-    }));
+    const phases: LessonActivity[] = Object.entries(ENHANCED_LESSON_PHASES).map(([phase, { baseSeconds }]) => {
+        const activity: LessonActivity = {
+            id: `${subject}-${phase}`,
+            type: phase as any,
+            phase: phase as any,
+            title: `${phase.charAt(0).toUpperCase() + phase.slice(1)}`,
+            duration: baseSeconds + adaptation.extraDuration / Object.keys(ENHANCED_LESSON_PHASES).length,
+            phaseDescription: `This is the ${phase} phase.`,
+            metadata: { subject, skillArea },
+            content: { text: `Content for the ${phase} phase.` }
+        };
+
+        if (phase === 'interactiveGame') {
+            activity.games = getGamesForSubject(subject);
+        }
+
+        return activity;
+    });
 
     const totalDuration = phases.reduce((acc, phase) => acc + phase.duration, 0);
 
