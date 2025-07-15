@@ -170,6 +170,7 @@ export interface LessonActivity {
   content: LessonActivityContent;
   duration: number;
   phaseDescription?: string;
+  games?: any[];
   metadata?: {
     subject?: string;
     skillArea?: string;
