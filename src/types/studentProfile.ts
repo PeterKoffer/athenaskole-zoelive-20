@@ -9,4 +9,6 @@ export interface StudentProfile {
       [skill: string]: number;
     };
   };
+  avatarUrl?: string;
+  avatarColor?: string;
 }

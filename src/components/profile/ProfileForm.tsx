@@ -3,6 +3,8 @@ import { StudentProfile } from "@/types/studentProfile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
 interface ProfileFormProps {
   profileData: StudentProfile;
@@ -12,6 +14,20 @@ interface ProfileFormProps {
 }
 
 const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFormProps) => {
+  const handleInterestChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && e.currentTarget.value) {
+      e.preventDefault();
+      const newInterests = [...(profileData.interests || []), e.currentTarget.value];
+      onDataChange({ interests: newInterests });
+      e.currentTarget.value = '';
+    }
+  };
+
+  const removeInterest = (interestToRemove: string) => {
+    const newInterests = (profileData.interests || []).filter(interest => interest !== interestToRemove);
+    onDataChange({ interests: newInterests });
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-8 mt-6">
        <div className="space-y-2">
@@ -36,7 +52,7 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
           </div>
           <div className="space-y-2">
             <label htmlFor="learningStyle" className="text-gray-300">Learning Style</label>
-            <Select onValueChange={(value) => onDataChange({ learningStyle: value as any })}>
+            <Select onValueChange={(value) => onDataChange({ learningStyle: value as any })} value={profileData.learningStyle}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Learning Style" />
               </SelectTrigger>
@@ -47,6 +63,26 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
                 <SelectItem value="mixed">Mixed</SelectItem>
               </SelectContent>
             </Select>
+      </div>
+          <div className="space-y-2">
+            <label htmlFor="interests" className="text-gray-300">Interests</label>
+            <Input
+              id="interests"
+              type="text"
+              onKeyDown={handleInterestChange}
+              placeholder="Type an interest and press Enter"
+              className="bg-gray-700 text-white border-gray-600"
+            />
+            <div className="flex flex-wrap gap-2 mt-2">
+              {(profileData.interests || []).map(interest => (
+                <Badge key={interest} variant="secondary" className="flex items-center">
+                  {interest}
+                  <button onClick={() => removeInterest(interest)} className="ml-2">
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
           </div>
           <Button type="submit" disabled={loading}>
             {loading ? 'Saving...' : 'Save'}

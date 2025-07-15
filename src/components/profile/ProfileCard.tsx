@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User } from "lucide-react";
 import AvatarUpload from "./AvatarUpload";
 import ProfileForm from "./ProfileForm";
-import { LearnerProfile } from "@/types/learnerProfile";
+import { StudentProfile } from "@/types/studentProfile";
+import AvatarColorPicker from "./AvatarColorPicker";
 
 interface ProfileCardProps {
-  profileData: LearnerProfile;
+  profileData: StudentProfile;
   loading: boolean;
   uploading: boolean;
-  onDataChange: (data: Partial<LearnerProfile>) => void;
+  onDataChange: (data: Partial<StudentProfile>) => void;
   onSubmit: (e: React.FormEvent) => void;
   onAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -22,8 +23,6 @@ const ProfileCard = ({
   onSubmit, 
   onAvatarUpload 
 }: ProfileCardProps) => {
-  console.log('ProfileCard render:', { profileData: !!profileData, loading, uploading });
-
   if (loading) {
     return (
       <Card className="bg-gray-800 border-gray-700">
@@ -54,13 +53,19 @@ const ProfileCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <AvatarUpload
-          avatarUrl={profileData.avatarUrl || ''}
-          name={profileData.name || 'User'}
-          uploading={uploading}
-          onUpload={onAvatarUpload}
-          avatarColor={profileData.avatarColor || '#6366f1'}
-        />
+        <div className="flex items-center space-x-4">
+          <AvatarUpload
+            avatarUrl={profileData.avatarUrl || ''}
+            name={profileData.name || 'User'}
+            uploading={uploading}
+            onUpload={onAvatarUpload}
+            avatarColor={profileData.avatarColor || '#6366f1'}
+          />
+          <AvatarColorPicker
+            currentColor={profileData.avatarColor || '#6366f1'}
+            onColorChange={(color) => onDataChange({ avatarColor: color })}
+          />
+        </div>
         <ProfileForm
           profileData={profileData}
           loading={loading}
