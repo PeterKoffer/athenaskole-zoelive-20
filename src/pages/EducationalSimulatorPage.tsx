@@ -62,7 +62,7 @@ const EducationalSimulatorPage: React.FC = () => {
 
   if (currentView === 'simulation') {
     return (
-      <SimulatorInterface
+      <SimulatorInterfa
         studentProfile={studentProfile}
         onComplete={handleSimulationComplete}
         onExit={handleBackToOverview}

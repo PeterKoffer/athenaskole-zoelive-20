@@ -4,8 +4,7 @@ import { StudentProfile } from '@/types/studentProfile';
 
 class NELIEEngine {
   private currentSession: any | null = null;
-  private currentUniverse: DailyUniverse | null = null;
-
+  private currentUniverse: DailyUniverse | null = null
   public async startSession(studentProfile: StudentProfile): Promise<any> {
     const sessionConfig = {
       gradeLevel: studentProfile.gradeLevel,
