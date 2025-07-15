@@ -1,31 +1,28 @@
 import React from 'react';
 import Game from './Game';
+import { Content } from '../education/components/types/LessonTypes';
 
 interface ContentRendererProps {
-  content: any;
+  content: Content[];
 }
 
 const ContentRenderer: React.FC<ContentRendererProps> = ({ content }) => {
-  if (content.games) {
-    return (
-      <div>
-        {content.games.map((game: any, index: number) => (
-          <Game key={index} game={game} />
-        ))}
-      </div>
-    );
-  }
-
-  switch (content.type) {
-    case 'video':
-      return <video src={content.url} controls />;
-    case 'image':
-      return <img src={content.url} alt={content.alt} />;
-    case 'text':
-      return <p>{content.text}</p>;
-    default:
-      return null;
-  }
+  return (
+    <div>
+      {content.map((item, index) => {
+        switch (item.type) {
+          case 'video':
+            return <video key={index} src={item.value} controls />;
+          case 'image':
+            return <img key={index} src={item.value} alt="" />;
+          case 'text':
+            return <p key={index}>{item.value}</p>;
+          default:
+            return null;
+        }
+      })}
+    </div>
+  );
 };
 
 export default ContentRenderer;
