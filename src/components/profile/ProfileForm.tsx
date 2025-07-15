@@ -63,7 +63,7 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
                 <SelectItem value="mixed">Mixed</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+      </div>
           <div className="space-y-2">
             <label htmlFor="interests" className="text-gray-300">Interests</label>
             <Input
