@@ -7,6 +7,7 @@ interface NELIESession {
         totalDuration: number;
         qualityScores: Record<string, number>;
     };
+    lessons: any[];
 }
 
 interface SessionConfig {
@@ -20,6 +21,7 @@ const NELIESessionGenerator = {
     generateSession: async (config: SessionConfig): Promise<NELIESession> => {
         const qualityScores: Record<string, number> = {};
         let totalDuration = 0;
+        const lessons: any[] = [];
 
         for (const subject of config.subjects) {
             let lesson;
@@ -48,6 +50,7 @@ const NELIESessionGenerator = {
             const validation = validateEnhancedLesson(lesson);
             qualityScores[subject] = validation.qualityScore;
             totalDuration += lesson.estimatedTotalDuration;
+            lessons.push(lesson);
         }
 
         return {
@@ -55,7 +58,8 @@ const NELIESessionGenerator = {
             metadata: {
                 totalDuration,
                 qualityScores
-            }
+            },
+            lessons,
         };
     },
 
