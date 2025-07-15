@@ -15,6 +15,7 @@ interface SessionConfig {
     preferredLearningStyle: string;
     subjects: string[];
     enableUniqueness: boolean;
+    difficulty?: number;
 }
 
 const NELIESessionGenerator = {
@@ -27,22 +28,22 @@ const NELIESessionGenerator = {
             let lesson;
             switch (subject) {
                 case 'mathematics':
-                    lesson = await EnhancedSubjectLessonFactory.generateMathLesson(config.gradeLevel, config.preferredLearningStyle);
+                    lesson = await EnhancedSubjectLessonFactory.generateMathLesson(config.gradeLevel, config.preferredLearningStyle, config.difficulty);
                     break;
                 case 'english':
-                    lesson = await EnhancedSubjectLessonFactory.generateEnglishLesson(config.gradeLevel, config.preferredLearningStyle);
+                    lesson = await EnhancedSubjectLessonFactory.generateEnglishLesson(config.gradeLevel, config.preferredLearningStyle, config.difficulty);
                     break;
                 case 'science':
-                    lesson = await EnhancedSubjectLessonFactory.generateScienceLesson(config.gradeLevel, config.preferredLearningStyle);
+                    lesson = await EnhancedSubjectLessonFactory.generateScienceLesson(config.gradeLevel, config.preferredLearningStyle, config.difficulty);
                     break;
                 case 'music':
-                    lesson = await EnhancedSubjectLessonFactory.generateMusicLesson(config.gradeLevel, config.preferredLearningStyle);
+                    lesson = await EnhancedSubjectLessonFactory.generateMusicLesson(config.gradeLevel, config.preferredLearningStyle, config.difficulty);
                     break;
                 case 'computerScience':
-                    lesson = await EnhancedSubjectLessonFactory.generateComputerScienceLesson(config.gradeLevel, config.preferredLearningStyle);
+                    lesson = await EnhancedSubjectLessonFactory.generateComputerScienceLesson(config.gradeLevel, config.preferredLearningStyle, config.difficulty);
                     break;
                 case 'creativeArts':
-                    lesson = await EnhancedSubjectLessonFactory.generateCreativeArtsLesson(config.gradeLevel, config.preferredLearningStyle);
+                    lesson = await EnhancedSubjectLessonFactory.generateCreativeArtsLesson(config.gradeLevel, config.preferredLearningStyle, config.difficulty);
                     break;
                 default:
                     throw new Error(`Unknown subject: ${subject}`);

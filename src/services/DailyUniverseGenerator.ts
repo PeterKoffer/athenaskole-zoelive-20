@@ -11,15 +11,62 @@ interface StudentProfile {
 }
 
 class DailyUniverseGenerator {
+  private getSubjectsForInterests(interests: string[]): string[] {
+    // In a real application, this would be a more sophisticated mapping.
+    const subjectMap = {
+      'space': ['science', 'mathematics'],
+      'dinosaurs': ['science', 'history'],
+      'art': ['creativeArts'],
+      'music': ['music'],
+      'sports': ['physicalEducation'],
+      'coding': ['computerScience'],
+    };
+
+    const subjects = new Set<string>();
+    for (const interest of interests) {
+      const mappedSubjects = subjectMap[interest];
+      if (mappedSubjects) {
+        for (const subject of mappedSubjects) {
+          subjects.add(subject);
+        }
+      }
+    }
+
+    // If no interests match, return a default set of subjects.
+    if (subjects.size === 0) {
+      return ['mathematics', 'english', 'science'];
+    }
+
+    return Array.from(subjects);
+  }
+
+  private getDifficultyForSubject(subject: string, progress: any): number {
+    // In a real application, this would be a more sophisticated calculation.
+    const subjectProgress = progress[subject];
+    if (subjectProgress) {
+      const skillLevels = Object.values(subjectProgress) as number[];
+      const averageSkillLevel = skillLevels.reduce((a, b) => a + b, 0) / skillLevels.length;
+      if (averageSkillLevel > 0.8) {
+        return 3; // Hard
+      } else if (averageSkillLevel > 0.5) {
+        return 2; // Medium
+      }
+    }
+    return 1; // Easy
+  }
+
   public async generate(studentProfile: StudentProfile): Promise<DailyUniverse> {
     const gradeLevel = studentProfile.gradeLevel || 4; // Default to grade 4 if not specified
     const preferredLearningStyle = studentProfile.preferredLearningStyle || 'mixed';
+    const subjects = this.getSubjectsForInterests(studentProfile.interests || []);
+    const difficulty = this.getDifficultyForSubject(subjects[0], studentProfile.progress || {});
 
     const session = await NELIESessionGenerator.generateSession({
         gradeLevel,
         preferredLearningStyle,
-        subjects: ['mathematics', 'english', 'science'],
+        subjects,
         enableUniqueness: true,
+        difficulty,
     });
 
     const objectives = this.extractObjectivesFromSession(session);

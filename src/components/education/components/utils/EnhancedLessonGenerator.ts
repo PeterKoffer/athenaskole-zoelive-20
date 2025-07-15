@@ -133,7 +133,7 @@ function getContentForPhase(phase: string, subject: string, skillArea: string) {
     }
 }
 
-export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed'): Promise<EnhancedLessonConfig> {
+export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed', difficulty: number = 2): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
     const adaptation = LEARNING_STYLE_ADAPTATIONS[learningStyle];
     const phases: LessonActivity[] = Object.entries(ENHANCED_LESSON_PHASES).map(([phase, { baseSeconds }]) => {
@@ -177,7 +177,7 @@ export function generateEnhancedLesson(subject: string, skillArea: string, grade
       // Required additional properties
       estimatedDuration: totalDuration,
       objectives: learningObjectives,
-      difficulty: 3,
+      difficulty,
       prerequisites: [],
       assessmentCriteria: ['Understanding of concepts'],
       extensions: ['Practice exercises']
