@@ -1,39 +1,23 @@
-import { StudentProfile } from '../types/studentProfile';
+import { supabaseStudentProfileService } from './SupabaseStudentProfileService';
 
-class StudentProfileService {
-  private static readonly STORAGE_KEY = 'student-profiles';
+// Re-export the Supabase service as the main service
+export const studentProfileService = supabaseStudentProfileService;
 
-  public getProfile(id: string): StudentProfile | null {
-    const profiles = this.getProfiles();
-    return profiles[id] || null;
+// Keep the class for backward compatibility
+export class StudentProfileService {
+  public async getProfile(userId: string) {
+    return await supabaseStudentProfileService.getProfile(userId);
   }
 
-  public createProfile(profile: StudentProfile): void {
-    const profiles = this.getProfiles();
-    profiles[profile.id] = profile;
-    this.saveProfiles(profiles);
+  public async createProfile(userId: string, profile: any) {
+    return await supabaseStudentProfileService.createProfile(userId, profile);
   }
 
-  public updateProfile(profile: StudentProfile): void {
-    const profiles = this.getProfiles();
-    profiles[profile.id] = profile;
-    this.saveProfiles(profiles);
+  public async updateProfile(userId: string, updates: any) {
+    return await supabaseStudentProfileService.updateProfile(userId, updates);
   }
 
-  public deleteProfile(id: string): void {
-    const profiles = this.getProfiles();
-    delete profiles[id];
-    this.saveProfiles(profiles);
-  }
-
-  private getProfiles(): { [id: string]: StudentProfile } {
-    const profilesJson = localStorage.getItem(StudentProfileService.STORAGE_KEY);
-    return profilesJson ? JSON.parse(profilesJson) : {};
-  }
-
-  private saveProfiles(profiles: { [id: string]: StudentProfile }): void {
-    localStorage.setItem(StudentProfileService.STORAGE_KEY, JSON.stringify(profiles));
+  public async deleteProfile(userId: string) {
+    return await supabaseStudentProfileService.deleteProfile(userId);
   }
 }
-
-export const studentProfileService = new StudentProfileService();
