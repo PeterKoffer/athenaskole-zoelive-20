@@ -1,4 +1,3 @@
-
 import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
 
 export interface EnhancedLessonConfig {
@@ -56,9 +55,19 @@ export const K12_CURRICULUM_STANDARDS = {
 
 export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
-    const baseDuration = ENHANCED_LESSON_PHASES.introduction.baseSeconds;
-    
-    // Generate a basic lesson structure
+    const phases: LessonActivity[] = Object.entries(ENHANCED_LESSON_PHASES).map(([phase, { baseSeconds }]) => ({
+        id: `${subject}-${phase}`,
+        type: phase,
+        phase: phase,
+        title: `${phase.charAt(0).toUpperCase() + phase.slice(1)}`,
+        duration: baseSeconds,
+        phaseDescription: `This is the ${phase} phase.`,
+        metadata: { subject, skillArea },
+        content: { text: `Content for the ${phase} phase.` }
+    }));
+
+    const totalDuration = phases.reduce((acc, phase) => acc + phase.duration, 0);
+
     const lessonConfig: EnhancedLessonConfig = {
       subject,
       skillArea,
@@ -67,25 +76,14 @@ export function generateEnhancedLesson(subject: string, skillArea: string, grade
       sessionId: `session_${subject}_${Date.now()}`,
       title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} - ${skillArea}`,
       overview: `Interactive ${subject} lesson focusing on ${skillArea}`,
-      phases: [
-        {
-          id: `${subject}-intro`,
-          type: 'introduction',
-          phase: 'introduction',
-          title: `Welcome to ${subject.charAt(0).toUpperCase() + subject.slice(1)}`,
-          duration: baseDuration,
-          phaseDescription: 'Introduction to the lesson',
-          metadata: { subject, skillArea },
-          content: { text: `Welcome to an exciting ${subject} lesson!` }
-        }
-      ],
-      estimatedTotalDuration: baseDuration,
+      phases,
+      estimatedTotalDuration: totalDuration,
       learningObjectives: [`Learn ${skillArea} concepts`],
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: [subject, skillArea],
       // Required additional properties
-      estimatedDuration: baseDuration,
+      estimatedDuration: totalDuration,
       objectives: [`Learn ${skillArea} concepts`],
       difficulty: 3,
       prerequisites: [],
@@ -103,10 +101,19 @@ export function validateEnhancedLesson(lesson: SubjectLessonPlan): {
   errors: string[];
   warnings: string[];
 } {
+    const errors: string[] = [];
+    if (lesson.phases.length !== 6) {
+        errors.push("Lesson must have exactly 6 phases.");
+    }
+    const totalDuration = lesson.phases.reduce((acc, phase) => acc + phase.duration, 0);
+    if (totalDuration < 1140 || totalDuration > 1260) {
+        errors.push("Total duration must be between 1140 and 1260 seconds (19-21 minutes).");
+    }
+
   return {
-    qualityScore: 85,
-    isValid: true,
-    errors: [],
+    qualityScore: errors.length > 0 ? 50 : 95,
+    isValid: errors.length === 0,
+    errors,
     warnings: []
   };
 }
