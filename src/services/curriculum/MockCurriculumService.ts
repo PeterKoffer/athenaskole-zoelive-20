@@ -1,7 +1,6 @@
-
 import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
 import { ICurriculumService } from './types';
-import { mockCurriculumData } from '@/data/mockCurriculumData';
+import { mockCurriculumData } from '@/data/curriculum';
 
 export class MockCurriculumService implements ICurriculumService {
   private data: CurriculumNode[];

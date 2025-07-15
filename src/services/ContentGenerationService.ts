@@ -1,6 +1,6 @@
-
 import curriculumIndex from '../data/unified-curriculum-index.json';
 import { CurriculumNode, CurriculumNodeType } from '../types/curriculum/CurriculumNode';
+import { dailyUniverseGenerator } from './DailyUniverseGenerator';
 
 class ContentGenerationService {
   private curriculum: { [key: string]: CurriculumNode } = {};
@@ -33,23 +33,7 @@ class ContentGenerationService {
   }
 
   public generateDailyUniverse(studentProfile: any): any {
-    // This is a placeholder for the more complex logic to be implemented.
-    // For now, let's just grab a few random learning objectives.
-
-    const learningObjectives = Object.values(this.curriculum).filter(
-      node => node.nodeType === 'learning_objective'
-    );
-
-    // This is a simplified weighting algorithm. A real implementation would be more complex.
-    const randomObjectives = learningObjectives
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 3);
-
-    return {
-      title: "A Day of Adventure!",
-      description: "Today, you'll embark on a journey of learning and discovery. Complete these tasks to help your community and earn rewards!",
-      objectives: randomObjectives,
-    };
+    return dailyUniverseGenerator.generate(studentProfile);
   }
 }
 

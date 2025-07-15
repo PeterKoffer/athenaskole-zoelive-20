@@ -1,48 +1,78 @@
-import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
-import { CurriculumServiceBase } from './core/CurriculumServiceBase';
-import { CurriculumFilter } from './core/CurriculumFilter';
-import { CurriculumStats } from './core/CurriculumStats';
-import { CurriculumAIContext } from './core/CurriculumAIContext';
-import curriculumData from '@/data/unified-curriculum-index.json';
+import { CurriculumNode, CurriculumNodeFilters, NELIESubject, ICurriculumService } from '@/types/curriculum/index';
+import { mockCurriculumData } from '@/data/curriculum';
+import { MockCurriculumService } from './MockCurriculumService';
 
-export interface ICurriculumService {
-  getNodeById(id: string): Promise<CurriculumNode | undefined>;
-  getNodes(filters?: CurriculumNodeFilters): Promise<CurriculumNode[]>;
-  getChildren(parentId: string): Promise<CurriculumNode[]>;
-  getDescendants(parentId: string): Promise<CurriculumNode[]>;
-  generateAIContextForNode(nodeId: string): Promise<string>;
-}
+export class CurriculumService implements ICurriculumService {
+  private service: ICurriculumService;
 
-export class CurriculumService extends CurriculumServiceBase implements ICurriculumService {
   constructor() {
-    super(curriculumData.nodes as CurriculumNode[]);
+    if (process.env.NODE_ENV === 'test') {
+      this.service = new MockCurriculumService();
+    } else {
+      // In a real application, you would initialize a different service
+      // that fetches data from a database or API.
+      this.service = new MockCurriculumService();
+    }
   }
 
-  async getNodes(filters?: CurriculumNodeFilters): Promise<CurriculumNode[]> {
-    return CurriculumFilter.applyFilters(this.data, filters);
+  async getNodeById(id: string): Promise<CurriculumNode | undefined> {
+    return this.service.getNodeById(id);
+  }
+
+  async getChildren(parentId: string): Promise<CurriculumNode[]> {
+    return this.service.getChildren(parentId);
+  }
+
+  async getChildrenOfNode(parentId: string): Promise<CurriculumNode[]> {
+    return this.service.getChildrenOfNode(parentId);
+    }
+
+  async getDescendants(parentId: string): Promise<CurriculumNode[]> {
+    return this.service.getDescendants(parentId);
   }
 
   async generateAIContextForNode(nodeId: string): Promise<string> {
-    const node = await this.getNodeById(nodeId);
-    if (!node) {
-      return `Node with ID ${nodeId} not found.`;
+    return this.service.generateAIContextForNode(nodeId);
+  }
+
+  async getNodes(filters: CurriculumNodeFilters = {}): Promise<CurriculumNode[]> {
+    return this.service.getNodes(filters);
+  }
+
+    async getNodePath(nodeId: string): Promise<CurriculumNode[]> {
+        const path: CurriculumNode[] = [];
+        let currentNode = await this.getNodeById(nodeId);
+
+        while (currentNode) {
+        path.unshift(currentNode);
+        if (currentNode.parentId) {
+            currentNode = await this.getNodeById(currentNode.parentId);
+        } else {
+            currentNode = undefined;
+        }
+        }
+
+        return path;
     }
 
-    return CurriculumAIContext.generateContextForNode(
-      node,
-      this.getNodeById.bind(this),
-      this.getChildren.bind(this)
-    );
-  }
+    async getStats(): Promise<any> {
+        const nodes = await this.getNodes();
+        const nodesByType = nodes.reduce((acc, node) => {
+            acc[node.nodeType] = (acc[node.nodeType] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
 
-  /**
-   * Get curriculum statistics
-   */
-  async getStats() {
-    return CurriculumStats.generateStats(this.data);
-  }
+        const nodesByCountry = nodes.reduce((acc, node) => {
+            if (node.countryCode) {
+                acc[node.countryCode] = (acc[node.countryCode] || 0) + 1;
+            }
+            return acc;
+        }, {} as Record<string, number>);
+
+        return {
+            totalNodes: nodes.length,
+            nodesByType,
+            nodesByCountry,
+        };
+    }
 }
-
-// Export singleton instance
-export const curriculumService = new CurriculumService();
-export default curriculumService;

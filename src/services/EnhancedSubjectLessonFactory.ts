@@ -1,4 +1,3 @@
-
 import { generateEnhancedLesson } from '../components/education/components/utils/EnhancedLessonGenerator';
 
 const generateMathLesson = (gradeLevel: number, learningStyle: string) => {
