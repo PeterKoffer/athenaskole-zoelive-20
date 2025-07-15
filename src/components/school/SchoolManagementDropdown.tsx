@@ -21,14 +21,26 @@ const SchoolManagementDropdown = ({ onShowTeachingSettings }: SchoolManagementDr
             <ChevronDown className="w-4 h-4 ml-2" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white w-64">
+        <DropdownMenuContent 
+          className="bg-gray-800 border-gray-700 text-white w-64 max-h-[80vh] overflow-y-auto z-[100]"
+          align="start"
+          side="bottom"
+          sideOffset={4}
+          avoidCollisions={true}
+          collisionPadding={8}
+        >
           {/* Student Management Submenu */}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="hover:bg-gray-700">
               <Users className="w-4 h-4 mr-2" />
               Student Management
             </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+            <DropdownMenuSubContent 
+              className="bg-gray-800 border-gray-700 text-white z-[101]"
+              alignOffset={-4}
+              avoidCollisions={true}
+              collisionPadding={8}
+            >
               <DropdownMenuItem 
                 className="hover:bg-gray-700"
                 onClick={() => navigate('/school-dashboard')}
@@ -61,7 +73,12 @@ const SchoolManagementDropdown = ({ onShowTeachingSettings }: SchoolManagementDr
               <BarChart3 className="w-4 h-4 mr-2" />
               Analytics & Reports
             </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+            <DropdownMenuSubContent 
+              className="bg-gray-800 border-gray-700 text-white z-[101]"
+              alignOffset={-4}
+              avoidCollisions={true}
+              collisionPadding={8}
+            >
               <DropdownMenuItem 
                 className="hover:bg-gray-700"
                 onClick={() => navigate('/school-dashboard')}
@@ -112,7 +129,12 @@ const SchoolManagementDropdown = ({ onShowTeachingSettings }: SchoolManagementDr
               <MessageSquare className="w-4 h-4 mr-2" />
               Communication
             </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+            <DropdownMenuSubContent 
+              className="bg-gray-800 border-gray-700 text-white z-[101]"
+              alignOffset={-4}
+              avoidCollisions={true}
+              collisionPadding={8}
+            >
               <DropdownMenuItem 
                 className="hover:bg-gray-700"
                 onClick={() => navigate('/school-dashboard')}
@@ -145,7 +167,12 @@ const SchoolManagementDropdown = ({ onShowTeachingSettings }: SchoolManagementDr
               <Settings className="w-4 h-4 mr-2" />
               System Settings
             </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+            <DropdownMenuSubContent 
+              className="bg-gray-800 border-gray-700 text-white z-[101]"
+              alignOffset={-4}
+              avoidCollisions={true}
+              collisionPadding={8}
+            >
               <DropdownMenuItem 
                 className="hover:bg-gray-700"
                 onClick={onShowTeachingSettings}
