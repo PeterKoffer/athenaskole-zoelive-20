@@ -67,6 +67,7 @@ const NELIESessionGenerator = {
                     break;
                 case 'creativeArts':
                     lesson = await EnhancedSubjectLessonFactory.generateCreativeArtsLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+
                     break;
                 default:
                     throw new Error(`Unknown subject: ${subject}`);

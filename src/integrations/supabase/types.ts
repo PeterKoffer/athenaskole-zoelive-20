@@ -578,6 +578,42 @@ export type Database = {
         }
         Relationships: []
       }
+      student_profiles: {
+        Row: {
+          created_at: string | null
+          grade_level: number
+          id: string
+          interests: string[] | null
+          learning_style: string
+          name: string
+          progress: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          grade_level: number
+          id?: string
+          interests?: string[] | null
+          learning_style: string
+          name: string
+          progress?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          grade_level?: number
+          id?: string
+          interests?: string[] | null
+          learning_style?: string
+          name?: string
+          progress?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       teacher_preferences: {
         Row: {
           created_at: string
