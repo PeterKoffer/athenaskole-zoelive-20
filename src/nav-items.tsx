@@ -17,6 +17,7 @@ import SchoolAnalyticsPage from "./pages/SchoolAnalyticsPage";
 import ScheduleManagementPage from "./pages/ScheduleManagementPage";
 import AboutPage from "./pages/AboutPage";
 import UniversePage from "./pages/UniversePage";
+import CurriculumEditorPage from "./pages/CurriculumEditorPage";
 
 export const navItems = [
   {
@@ -120,5 +121,11 @@ export const navItems = [
     to: "/universe",
     icon: <BookOpen className="h-4 w-4" />,
     page: <UniversePage />,
+  },
+  {
+    title: "Curriculum Editor",
+    to: "/curriculum-editor",
+    icon: <BookOpen className="h-4 w-4" />,
+    page: <CurriculumEditorPage />,
   },
 ];

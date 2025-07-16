@@ -162,14 +162,20 @@ export interface LessonActivityContent {
   missionBriefing?: string;
 }
 
+export interface Content {
+  type: 'text' | 'video' | 'image';
+  value: string;
+}
+
 export interface LessonActivity {
   id: string;
   type: ActivityType;
   phase?: ActivityPhase;
   title: string;
-  content: LessonActivityContent;
+  content: Content[];
   duration: number;
   phaseDescription?: string;
+  games?: any[];
   metadata?: {
     subject?: string;
     skillArea?: string;
