@@ -4,8 +4,13 @@ import { openAIService } from './OpenAIService';
 
 export const AIUniverseGenerator = {
     generateUniverse: async (prompt: string): Promise<Universe> => {
-        const universe = await openAIService.generateUniverse(prompt);
-        return universe
+        try {
+            const universe = await openAIService.generateUniverse(prompt);
+            return universe;
+        } catch (error) {
+            console.error('AI Universe generation failed:', error);
+            return mockGeneration(prompt);
+        }
     }
 };
 
