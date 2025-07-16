@@ -7,20 +7,22 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { BookOpen, Target, Award } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const DailyUniversePage: React.FC = () => {
   const [universe, setUniverse] = useState<any>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchUniverse = async () => {
       // In a real application, we would pass the student's profile here.
-      const studentProfile = {};
+      const studentProfile = user || {};
       const dailyUniverse = await dailyUniverseGenerator.generate(studentProfile);
       setUniverse(dailyUniverse);
     };
     fetchUniverse();
-  }, []);
+  }, [user]);
 
   const handleStartTask = (objective: CurriculumNode) => {
     console.log('Starting task for objective:', objective.name);
