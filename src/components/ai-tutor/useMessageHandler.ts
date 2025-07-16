@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Message, LearningOption } from "./types";
 import { predefinedResponses, learningOptionResponses } from "./predefinedResponses";
 import { nlpService } from "@/services/NlpService";
+import { personality } from "./personality";
 
 interface UseMessageHandlerProps {
   user?: any;
@@ -33,15 +34,15 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
     setMessages(prev => [...prev, userMessage]);
 
     setTimeout(() => {
-      const intent = nlpService.getIntent(message);
+      const { intent, entities } = nlpService.getIntentAndEntities(message);
       let response;
 
       switch (intent) {
         case 'help':
-          response = "It sounds like you're asking for help. I'm here for you! What do you need help with?";
+          response = personality.responses.help[Math.floor(Math.random() * personality.responses.help.length)];
           break;
         case 'question':
-          response = "That's a great question! Let me see if I can find the answer for you.";
+          response = `That's a great question about ${entities.question}! Let me see if I can find the answer for you.`;
           break;
         case 'joke':
           response = "Why did the scarecrow win an award? Because he was outstanding in his field!";
