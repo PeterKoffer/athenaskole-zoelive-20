@@ -11,14 +11,12 @@ import ChatInput from "./ai-tutor/ChatInput";
 import LanguageSelector from "./ai-tutor/LanguageSelector";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
 import { speechService } from "@/services/SpeechService";
-
 import { speechRecognitionService } from "@/services/SpeechRecognitionService";
 import { Volume2, VolumeX } from "lucide-react";
 
 const AITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-
   const [speechEnabled, setSpeechEnabled] = useState(true);
   const [currentSubject, setCurrentSubject] = useState("math");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
@@ -66,7 +64,6 @@ const AITutor = ({ user }) => {
   const stopSpeaking = () => {
     speechService.cancel();
     setIsSpeaking(false);
-
   };
 
   const handleStartRecording = () => {
@@ -81,7 +78,6 @@ const AITutor = ({ user }) => {
   const handleStopRecording = () => {
     setIsRecording(false);
     speechRecognitionService.stop();
-
   };
 
   if (showLanguageSelection) {
