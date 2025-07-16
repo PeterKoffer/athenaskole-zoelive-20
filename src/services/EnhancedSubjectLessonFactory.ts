@@ -1,27 +1,27 @@
 import { generateEnhancedLesson } from '../components/education/components/utils/EnhancedLessonGenerator';
 
-const generateMathLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson('mathematics', 'math-skills', gradeLevel);
+const generateMathLesson = (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic', difficulty?: number) => {
+    return generateEnhancedLesson('mathematics', 'math-skills', gradeLevel, learningStyle, difficulty);
 };
 
-const generateEnglishLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson('english', 'language-arts', gradeLevel);
+const generateEnglishLesson = (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic', difficulty?: number) => {
+    return generateEnhancedLesson('english', 'language-arts', gradeLevel, learningStyle, difficulty);
 };
 
-const generateScienceLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson('science', 'scientific-method', gradeLevel);
+const generateScienceLesson = (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic', difficulty?: number) => {
+    return generateEnhancedLesson('science', 'scientific-method', gradeLevel, learningStyle, difficulty);
 };
 
-const generateMusicLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson('music', 'musical-concepts', gradeLevel);
+const generateMusicLesson = (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic', difficulty?: number) => {
+    return generateEnhancedLesson('music', 'musical-concepts', gradeLevel, learningStyle, difficulty);
 };
 
-const generateComputerScienceLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson('computerScience', 'computational-thinking', gradeLevel);
+const generateComputerScienceLesson = (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic', difficulty?: number) => {
+    return generateEnhancedLesson('computerScience', 'computational-thinking', gradeLevel, learningStyle, difficulty);
 };
 
-const generateCreativeArtsLesson = (gradeLevel: number, learningStyle: string) => {
-    return generateEnhancedLesson('creativeArts', 'artistic-expression', gradeLevel);
+const generateCreativeArtsLesson = (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic', difficulty?: number) => {
+    return generateEnhancedLesson('creativeArts', 'artistic-expression', gradeLevel, learningStyle, difficulty);
 };
 
 export const EnhancedSubjectLessonFactory = {

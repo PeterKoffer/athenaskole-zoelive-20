@@ -1,23 +1,26 @@
 
 import { Universe } from './UniverseGenerator';
+import { openAIService } from './OpenAIService';
 
-export const AIUniverseGenerator = {
-    generateUniverse: async (prompt: string): Promise<Universe> => {
-        // Mock AI generation - in a real implementation, this would call an AI service
-        // For now, return a personalized version based on the prompt
-        
-        const baseUniverse: Universe = {
-            id: Math.random().toString(36).substr(2, 9),
-            title: 'AI Generated Adventure',
-            description: prompt,
-            characters: ['You', 'AI Generated Character'],
-            locations: ['Generated Location'],
-            activities: ['AI suggested activity based on interests']
-        };
+class AIUniverseGenerator {
+    public loading: boolean = false;
 
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        return baseUniverse;
+    public async generateUniverse(prompt: string, signal?: AbortSignal): Promise<Universe | null> {
+        this.loading = true;
+        try {
+            const universe = await openAIService.generateUniverse(prompt, signal);
+            return universe;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log('Universe generation aborted');
+                return null;
+            }
+            console.error('Error generating universe:', error);
+            return null;
+        } finally {
+            this.loading = false;
+        }
     }
-};
+}
+
+export const aiUniverseGenerator = new AIUniverseGenerator();
