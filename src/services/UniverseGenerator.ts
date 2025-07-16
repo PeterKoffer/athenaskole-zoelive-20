@@ -40,11 +40,53 @@ const universes: Universe[] = [
         characters: ['You', 'The Police Officer'],
         locations: ['The Street'],
         activities: ['Interview the witnesses', 'Draw a map of the crash scene']
+    },
+    {
+        id: '5',
+        title: 'Space Mission Control',
+        description: 'You are a mission controller helping astronauts solve problems in space.',
+        characters: ['You', 'The Astronaut', 'Mission Commander'],
+        locations: ['Mission Control Center', 'International Space Station'],
+        activities: ['Calculate orbital trajectories', 'Monitor life support systems', 'Plan spacewalk activities']
+    },
+    {
+        id: '6',
+        title: 'Dinosaur Discovery',
+        description: 'You are a paleontologist who has just discovered a new dinosaur fossil site.',
+        characters: ['You', 'Field Assistant', 'Museum Director'],
+        locations: ['Excavation Site', 'Research Lab', 'Natural History Museum'],
+        activities: ['Carefully excavate fossils', 'Identify dinosaur species', 'Create museum exhibit']
     }
 ];
 
 export const UniverseGenerator = {
     getUniverses: (): Universe[] => {
         return universes;
+    },
+
+    getUniverseById: (id: string): Universe | undefined => {
+        return universes.find(universe => universe.id === id);
+    },
+
+    getRandomUniverse: (): Universe => {
+        const randomIndex = Math.floor(Math.random() * universes.length);
+        return universes[randomIndex];
+    },
+
+    searchUniverses: (query: string): Universe[] => {
+        const lowercaseQuery = query.toLowerCase();
+        return universes.filter(universe => 
+            universe.title.toLowerCase().includes(lowercaseQuery) ||
+            universe.description.toLowerCase().includes(lowercaseQuery) ||
+            universe.activities.some(activity => activity.toLowerCase().includes(lowercaseQuery))
+        );
+    },
+
+    getUniversesByTheme: (theme: string): Universe[] => {
+        const lowercaseTheme = theme.toLowerCase();
+        return universes.filter(universe => 
+            universe.title.toLowerCase().includes(lowercaseTheme) ||
+            universe.description.toLowerCase().includes(lowercaseTheme)
+        );
     }
 };

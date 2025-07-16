@@ -56,6 +56,7 @@ class DailyUniverseGenerator {
   }
 
   public async generate(studentProfile: any): Promise<DailyUniverse> {
+
     const gradeLevel = studentProfile.gradeLevel || 4; // Default to grade 4 if not specified
     const preferredLearningStyle = studentProfile.preferredLearningStyle || 'mixed';
     const subjects = this.getSubjectsForInterests(studentProfile.interests || []);
@@ -70,6 +71,7 @@ class DailyUniverseGenerator {
         userId: studentProfile.id,
         schoolId: studentProfile.schoolId,
         teacherId: studentProfile.teacherId,
+
     });
 
     const objectives = this.extractObjectivesFromSession(session);
