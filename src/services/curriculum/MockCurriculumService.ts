@@ -58,6 +58,11 @@ export class MockCurriculumService implements ICurriculumService {
 
   async getTopics(subjectId: string): Promise<CurriculumTopic[]> {
     const topics: Record<string, CurriculumTopic[]> = {
+      '1': [
+        { id: 'numbers', name: 'Numbers and Operations', description: 'Basic number concepts', subjectId },
+        { id: 'algebra', name: 'Algebra', description: 'Algebraic thinking', subjectId },
+        { id: 'geometry', name: 'Geometry', description: 'Shapes and spatial reasoning', subjectId }
+      ],
       math: [
         { id: 'numbers', name: 'Numbers and Operations', description: 'Basic number concepts', subjectId },
         { id: 'algebra', name: 'Algebra', description: 'Algebraic thinking', subjectId },
