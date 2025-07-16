@@ -1,22 +1,24 @@
 
 import OpenAI from "openai";
 import { Universe } from './UniverseGenerator';
+import { supabase } from "@/integrations/supabase/client";
 
 class OpenAIService {
   private openai: OpenAI | null = null;
 
   private async getOpenAI(): Promise<OpenAI> {
     if (!this.openai) {
-      // In production with Supabase, we'll get the API key from edge functions
-      // For now, we'll use a placeholder that shows the proper error
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY || 'placeholder';
-      
-      if (apiKey === 'placeholder') {
-        throw new Error('OpenAI API key not configured. Please set up the OPENAI_API_KEY in Supabase secrets.');
+      const { data, error } = await supabase.functions.invoke('elevenlabs-proxy', {
+        method: 'POST',
+        body: { action: 'get-openai-key' }
+      });
+
+      if (error) {
+        throw new Error(`Failed to get OpenAI API key: ${error.message}`);
       }
 
       this.openai = new OpenAI({
-        apiKey: apiKey,
+        apiKey: data.apiKey,
         dangerouslyAllowBrowser: true
       });
     }

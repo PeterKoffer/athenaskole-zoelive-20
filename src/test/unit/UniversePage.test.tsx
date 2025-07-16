@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DailyUniversePage from '../../pages/DailyUniversePage';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 // Mock the daily universe generator
 vi.mock('../../services/DailyUniverseGenerator', () => ({
@@ -44,7 +45,9 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <DailyUniversePage />
+                <AuthProvider>
+                    <DailyUniversePage />
+                </AuthProvider>
             </BrowserRouter>
         );
 
@@ -71,7 +74,9 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <DailyUniversePage />
+                <AuthProvider>
+                    <DailyUniversePage />
+                </AuthProvider>
             </BrowserRouter>
         );
 

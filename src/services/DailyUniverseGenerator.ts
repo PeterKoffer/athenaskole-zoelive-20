@@ -1,5 +1,5 @@
-
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
+import { OpenAIService } from './OpenAIService';
 
 interface DailyUniverse {
     title: string;
@@ -9,12 +9,10 @@ interface DailyUniverse {
 
 class DailyUniverseGeneratorService {
     async generate(studentProfile: any): Promise<DailyUniverse> {
-        // Mock implementation for now
-        return {
-            title: 'Daily Learning Adventure',
-            description: 'Explore new concepts through interactive learning',
-            objectives: []
-        };
+        const openAIService = OpenAIService.getInstance();
+        const prompt = `Generate a daily universe for a student with the following profile: ${JSON.stringify(studentProfile)}. The universe should have a title, a description, and a list of three learning objectives. The learning objectives should be in the following format: { "id": "string", "nodeType": "learning_objective", "name": "string", "description": "string", "subjectName": "string", "educationalLevel": "string" }`;
+        const universe = await openAIService.generateUniverse(prompt);
+        return universe;
     }
 }
 
