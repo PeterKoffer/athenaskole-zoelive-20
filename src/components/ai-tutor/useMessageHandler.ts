@@ -47,7 +47,6 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
           } else {
             response = "That's a great question! Let me see if I can find the answer for you.";
           }
-
           break;
         case 'joke':
           response = "Why did the scarecrow win an award? Because he was outstanding in his field!";

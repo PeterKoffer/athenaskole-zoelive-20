@@ -25,7 +25,6 @@ const EducationalSimulatorPage: React.FC = () => {
     if (scenario) {
       setSelectedScenario(scenario);
     }
-
   };
 
   const handleComplete = () => {
@@ -44,7 +43,6 @@ const EducationalSimulatorPage: React.FC = () => {
         scenario={selectedScenario}
         onComplete={handleComplete}
         onExit={handleExit}
-
       />
     );
   }
