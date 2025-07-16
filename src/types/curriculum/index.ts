@@ -1,8 +1,44 @@
 
-// Re-export all types and utilities from the modular structure
-export type { CurriculumNodeType, CurriculumNode } from './CurriculumNode';
-export type { SubjectSpecificMetadata } from './SubjectMetadata';
-export type { CurriculumNodeFilters } from './CurriculumFilters';
-export { CurriculumValidation } from './CurriculumValidation';
-export { NELIE_SUBJECTS, type NelieSubject } from './SubjectConstants';
-export { NELIESubject } from './NELIESubjects';
+// Core curriculum types
+export interface CurriculumNode {
+  id: string;
+  nodeType: 'level' | 'subject' | 'topic' | 'subtopic';
+  name: string;
+  description?: string;
+  countryCode?: string;
+  subjectName?: string;
+  parentId?: string;
+  children?: CurriculumNode[];
+  metadata?: Record<string, any>;
+}
+
+export interface CurriculumLevel {
+  id: string;
+  name: string;
+  description?: string;
+  countryCode: string;
+  subjects: CurriculumSubject[];
+}
+
+export interface CurriculumSubject {
+  id: string;
+  name: string;
+  description?: string;
+  levelId: string;
+  topics: CurriculumTopic[];
+}
+
+export interface CurriculumTopic {
+  id: string;
+  name: string;
+  description?: string;
+  subjectId: string;
+  subtopics?: CurriculumTopic[];
+}
+
+export interface CurriculumStats {
+  totalNodes: number;
+  nodesByType: Record<string, number>;
+  nodesByCountry: Record<string, number>;
+  nodesBySubject: Record<string, number>;
+}

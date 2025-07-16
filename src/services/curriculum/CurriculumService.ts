@@ -1,78 +1,153 @@
-import { CurriculumNode, CurriculumNodeFilters, NELIESubject, ICurriculumService } from '@/types/curriculum/index';
-import { mockCurriculumData } from '@/data/curriculum';
-import { MockCurriculumService } from './MockCurriculumService';
+
+import { CurriculumNode, CurriculumLevel, CurriculumSubject, CurriculumTopic } from '@/types/curriculum/index';
+import { CurriculumStats } from './core/CurriculumStats';
+
+export interface ICurriculumService {
+  getLevels(): Promise<CurriculumLevel[]>;
+  getSubjects(levelId: string): Promise<CurriculumSubject[]>;
+  getTopics(subjectId: string): Promise<CurriculumTopic[]>;
+  getAllNodes(): Promise<CurriculumNode[]>;
+  getStats(): Promise<any>;
+}
 
 export class CurriculumService implements ICurriculumService {
-  private service: ICurriculumService;
+  private static instance: CurriculumService;
 
-  constructor() {
-    if (process.env.NODE_ENV === 'test') {
-      this.service = new MockCurriculumService();
-    } else {
-      // In a real application, you would initialize a different service
-      // that fetches data from a database or API.
-      this.service = new MockCurriculumService();
+  public static getInstance(): CurriculumService {
+    if (!CurriculumService.instance) {
+      CurriculumService.instance = new CurriculumService();
+    }
+    return CurriculumService.instance;
+  }
+
+  async getLevels(): Promise<CurriculumLevel[]> {
+    // Mock data for now
+    return [
+      {
+        id: '1',
+        name: 'Primary School',
+        description: 'Elementary education',
+        countryCode: 'US',
+        subjects: []
+      },
+      {
+        id: '2',
+        name: 'Middle School',
+        description: 'Middle school education',
+        countryCode: 'US',
+        subjects: []
+      },
+      {
+        id: '3',
+        name: 'High School',
+        description: 'Secondary education',
+        countryCode: 'US',
+        subjects: []
+      }
+    ];
+  }
+
+  async getSubjects(levelId: string): Promise<CurriculumSubject[]> {
+    // Mock data for now
+    return [
+      {
+        id: '1',
+        name: 'Mathematics',
+        description: 'Math curriculum',
+        levelId,
+        topics: []
+      },
+      {
+        id: '2',
+        name: 'Science',
+        description: 'Science curriculum',
+        levelId,
+        topics: []
+      },
+      {
+        id: '3',
+        name: 'English',
+        description: 'English curriculum',
+        levelId,
+        topics: []
+      }
+    ];
+  }
+
+  async getTopics(subjectId: string): Promise<CurriculumTopic[]> {
+    // Mock data for now
+    const mathTopics = [
+      { id: '1', name: 'Algebra', description: 'Basic algebra', subjectId },
+      { id: '2', name: 'Geometry', description: 'Basic geometry', subjectId },
+      { id: '3', name: 'Statistics', description: 'Basic statistics', subjectId }
+    ];
+
+    const scienceTopics = [
+      { id: '4', name: 'Biology', description: 'Life sciences', subjectId },
+      { id: '5', name: 'Chemistry', description: 'Chemical sciences', subjectId },
+      { id: '6', name: 'Physics', description: 'Physical sciences', subjectId }
+    ];
+
+    const englishTopics = [
+      { id: '7', name: 'Reading', description: 'Reading comprehension', subjectId },
+      { id: '8', name: 'Writing', description: 'Creative and academic writing', subjectId },
+      { id: '9', name: 'Grammar', description: 'English grammar', subjectId }
+    ];
+
+    switch (subjectId) {
+      case '1': return mathTopics;
+      case '2': return scienceTopics;
+      case '3': return englishTopics;
+      default: return [];
     }
   }
 
-  async getNodeById(id: string): Promise<CurriculumNode | undefined> {
-    return this.service.getNodeById(id);
-  }
+  async getAllNodes(): Promise<CurriculumNode[]> {
+    const levels = await this.getLevels();
+    const nodes: CurriculumNode[] = [];
 
-  async getChildren(parentId: string): Promise<CurriculumNode[]> {
-    return this.service.getChildren(parentId);
-  }
+    for (const level of levels) {
+      nodes.push({
+        id: level.id,
+        nodeType: 'level',
+        name: level.name,
+        description: level.description,
+        countryCode: level.countryCode
+      });
 
-  async getChildrenOfNode(parentId: string): Promise<CurriculumNode[]> {
-    return this.service.getChildrenOfNode(parentId);
-    }
+      const subjects = await this.getSubjects(level.id);
+      for (const subject of subjects) {
+        nodes.push({
+          id: subject.id,
+          nodeType: 'subject',
+          name: subject.name,
+          description: subject.description,
+          subjectName: subject.name,
+          parentId: level.id
+        });
 
-  async getDescendants(parentId: string): Promise<CurriculumNode[]> {
-    return this.service.getDescendants(parentId);
-  }
-
-  async generateAIContextForNode(nodeId: string): Promise<string> {
-    return this.service.generateAIContextForNode(nodeId);
-  }
-
-  async getNodes(filters: CurriculumNodeFilters = {}): Promise<CurriculumNode[]> {
-    return this.service.getNodes(filters);
-  }
-
-    async getNodePath(nodeId: string): Promise<CurriculumNode[]> {
-        const path: CurriculumNode[] = [];
-        let currentNode = await this.getNodeById(nodeId);
-
-        while (currentNode) {
-        path.unshift(currentNode);
-        if (currentNode.parentId) {
-            currentNode = await this.getNodeById(currentNode.parentId);
-        } else {
-            currentNode = undefined;
+        const topics = await this.getTopics(subject.id);
+        for (const topic of topics) {
+          nodes.push({
+            id: topic.id,
+            nodeType: 'topic',
+            name: topic.name,
+            description: topic.description,
+            subjectName: subject.name,
+            parentId: subject.id
+          });
         }
-        }
-
-        return path;
+      }
     }
 
-    async getStats(): Promise<any> {
-        const nodes = await this.getNodes();
-        const nodesByType = nodes.reduce((acc, node) => {
-            acc[node.nodeType] = (acc[node.nodeType] || 0) + 1;
-            return acc;
-        }, {} as Record<string, number>);
+    return nodes;
+  }
 
-        const nodesByCountry = nodes.reduce((acc, node) => {
-            if (node.countryCode) {
-                acc[node.countryCode] = (acc[node.countryCode] || 0) + 1;
-            }
-            return acc;
-        }, {} as Record<string, number>);
-
-        return {
-            totalNodes: nodes.length,
-            nodesByType,
-            nodesByCountry,
-        };
-    }
+  async getStats(): Promise<any> {
+    const nodes = await this.getAllNodes();
+    return CurriculumStats.generateStats(nodes);
+  }
 }
+
+// Export singleton instance
+export const curriculumService = CurriculumService.getInstance();

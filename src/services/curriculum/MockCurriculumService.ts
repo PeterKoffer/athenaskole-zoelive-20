@@ -1,137 +1,126 @@
-import { CurriculumNode, CurriculumNodeFilters } from '@/types/curriculum/index';
-import { ICurriculumService } from './types';
-import { mockCurriculumData } from '@/data/curriculum';
+
+import { ICurriculumService } from './CurriculumService';
+import { CurriculumLevel, CurriculumSubject, CurriculumTopic, CurriculumNode } from '@/types/curriculum/index';
+import { CurriculumStats } from './core/CurriculumStats';
 
 export class MockCurriculumService implements ICurriculumService {
-  private data: CurriculumNode[];
-
-  constructor() {
-    // In a real scenario, data might be fetched or initialized differently.
-    // For mock, we can deep clone to prevent accidental modification of the source mock data during filtering.
-    this.data = JSON.parse(JSON.stringify(mockCurriculumData));
-  }
-
-  async getNodeById(id: string): Promise<CurriculumNode | undefined> {
-    return this.data.find(node => node.id === id);
-  }
-
-  async getChildren(parentId: string): Promise<CurriculumNode[]> {
-    return this.data.filter(node => node.parentId === parentId);
-  }
-
-  async getChildrenOfNode(parentId: string): Promise<CurriculumNode[]> {
-    return this.getChildren(parentId);
-  }
-
-  async getDescendants(parentId: string): Promise<CurriculumNode[]> {
-    const results: CurriculumNode[] = [];
-    const queue: string[] = [parentId];
-    const visited: Set<string> = new Set();
-
-    while (queue.length > 0) {
-      const currentParentId = queue.shift()!;
-      
-      if (visited.has(currentParentId) && currentParentId !== parentId) {
-        continue;
+  async getLevels(): Promise<CurriculumLevel[]> {
+    return [
+      {
+        id: 'elementary',
+        name: 'Elementary School',
+        description: 'Grades K-5',
+        countryCode: 'US',
+        subjects: []
+      },
+      {
+        id: 'middle',
+        name: 'Middle School', 
+        description: 'Grades 6-8',
+        countryCode: 'US',
+        subjects: []
+      },
+      {
+        id: 'high',
+        name: 'High School',
+        description: 'Grades 9-12',
+        countryCode: 'US',
+        subjects: []
       }
-      visited.add(currentParentId);
-
-      const children = await this.getChildren(currentParentId);
-      for (const child of children) {
-        results.push(child);
-        queue.push(child.id);
-      }
-    }
-
-    return results;
+    ];
   }
 
-  async generateAIContextForNode(nodeId: string): Promise<string> {
-    const node = await this.getNodeById(nodeId);
-    if (!node) {
-      return `Node with ID ${nodeId} not found.`;
-    }
-
-    let context = `**${node.nodeType.toUpperCase()}: ${node.name}**\n`;
-    
-    if (node.description) {
-      context += `Description: ${node.description}\n`;
-    }
-
-    if (node.countryCode) {
-      context += `Country: ${node.countryCode}\n`;
-    }
-
-    if (node.educationalLevel) {
-      context += `Grade Level: ${node.educationalLevel}\n`;
-    }
-
-    if (node.subjectName) {
-      context += `Subject: ${node.subjectName}\n`;
-    }
-
-    return context.trim();
+  async getSubjects(levelId: string): Promise<CurriculumSubject[]> {
+    return [
+      {
+        id: 'math',
+        name: 'Mathematics',
+        description: 'Mathematical concepts and problem solving',
+        levelId,
+        topics: []
+      },
+      {
+        id: 'science',
+        name: 'Science',
+        description: 'Scientific inquiry and understanding',
+        levelId,
+        topics: []
+      },
+      {
+        id: 'english',
+        name: 'English Language Arts',
+        description: 'Reading, writing, speaking, and listening',
+        levelId,
+        topics: []
+      }
+    ];
   }
 
-  async getNodes(filters: CurriculumNodeFilters): Promise<CurriculumNode[]> {
-    return this.data.filter(node => {
-      let match = true;
+  async getTopics(subjectId: string): Promise<CurriculumTopic[]> {
+    const topics: Record<string, CurriculumTopic[]> = {
+      math: [
+        { id: 'numbers', name: 'Numbers and Operations', description: 'Basic number concepts', subjectId },
+        { id: 'algebra', name: 'Algebra', description: 'Algebraic thinking', subjectId },
+        { id: 'geometry', name: 'Geometry', description: 'Shapes and spatial reasoning', subjectId }
+      ],
+      science: [
+        { id: 'earth', name: 'Earth Science', description: 'Earth and space systems', subjectId },
+        { id: 'life', name: 'Life Science', description: 'Living organisms', subjectId },
+        { id: 'physical', name: 'Physical Science', description: 'Matter and energy', subjectId }
+      ],
+      english: [
+        { id: 'reading', name: 'Reading', description: 'Reading comprehension', subjectId },
+        { id: 'writing', name: 'Writing', description: 'Written communication', subjectId },
+        { id: 'speaking', name: 'Speaking & Listening', description: 'Oral communication', subjectId }
+      ]
+    };
 
-      if (filters.parentId !== undefined && node.parentId !== filters.parentId) {
-        match = false;
-      }
-      if (filters.nodeType) {
-        const typesToFilter = Array.isArray(filters.nodeType) ? filters.nodeType : [filters.nodeType];
-        if (!typesToFilter.includes(node.nodeType)) {
-          match = false;
+    return topics[subjectId] || [];
+  }
+
+  async getAllNodes(): Promise<CurriculumNode[]> {
+    const levels = await this.getLevels();
+    const nodes: CurriculumNode[] = [];
+
+    for (const level of levels) {
+      nodes.push({
+        id: level.id,
+        nodeType: 'level',
+        name: level.name,
+        description: level.description,
+        countryCode: level.countryCode
+      });
+
+      const subjects = await this.getSubjects(level.id);
+      for (const subject of subjects) {
+        nodes.push({
+          id: subject.id,
+          nodeType: 'subject',
+          name: subject.name,
+          description: subject.description,
+          subjectName: subject.name,
+          parentId: level.id
+        });
+
+        const topics = await this.getTopics(subject.id);
+        for (const topic of topics) {
+          nodes.push({
+            id: topic.id,
+            nodeType: 'topic',
+            name: topic.name,
+            description: topic.description,
+            subjectName: subject.name,
+            parentId: subject.id
+          });
         }
       }
-      if (filters.countryCode && node.countryCode !== filters.countryCode) {
-        match = false;
-      }
-      if (filters.languageCode && node.languageCode !== filters.languageCode) {
-        match = false;
-      }
-      if (filters.regionCode && node.regionCode !== filters.regionCode) {
-        match = false;
-      }
-      if (filters.educationalLevel) {
-        const levelsToFilter = Array.isArray(filters.educationalLevel) ? filters.educationalLevel : [filters.educationalLevel];
-        if (!node.educationalLevel || !levelsToFilter.includes(node.educationalLevel)) {
-          match = false;
-        }
-      }
-      if (filters.subject) {
-        const subjects = Array.isArray(filters.subject) ? filters.subject : [filters.subject];
-        if (!node.subject || !subjects.includes(node.subject)) {
-          match = false;
-        }
-      }
-      if (filters.tags && filters.tags.length > 0) {
-        if (!node.tags || !filters.tags.some(tag => node.tags!.includes(tag))) {
-          match = false;
-        }
-      }
-      if (filters.nameContains && (!node.name || !node.name.toLowerCase().includes(filters.nameContains.toLowerCase()))) {
-        match = false;
-      }
+    }
 
-      if (filters.subjectSpecificFilters) {
-        if (!node.subjectSpecific) {
-          match = false;
-        } else {
-          for (const key in filters.subjectSpecificFilters) {
-            const filterValue = filters.subjectSpecificFilters[key as keyof typeof filters.subjectSpecificFilters];
-            const nodeValue = node.subjectSpecific[key as keyof typeof node.subjectSpecific];
-            if (nodeValue !== filterValue) {
-              match = false;
-              break;
-            }
-          }
-        }
-      }
+    return nodes;
+  }
 
-      return match;
-    });
+  async getStats(): Promise<any> {
+    const nodes = await this.getAllNodes();
+    return CurriculumStats.generateStats(nodes);
   }
 }
