@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import SubjectWeighting from "@/components/teacher/SubjectWeighting";
 import { useState, useEffect } from "react";
+import CurriculumEditorModal from "@/components/curriculum/CurriculumEditorModal";
+import CurriculumEditorModal from "@/components/curriculum/CurriculumEditorModal";
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
@@ -85,7 +87,7 @@ const TeacherDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 View and manage your assigned classes and students.
               </p>
-              <Button className="w-full">View Classes</Button>
+              <CurriculumEditorModal />
             </CardContent>
           </Card>
 
@@ -100,7 +102,7 @@ const TeacherDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Create and manage your lesson plans and materials.
               </p>
-              <Button className="w-full">Manage Lessons</Button>
+              <CurriculumEditorModal />
             </CardContent>
           </Card>
 

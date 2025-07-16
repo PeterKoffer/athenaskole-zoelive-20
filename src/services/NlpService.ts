@@ -1,24 +1,22 @@
-import natural from 'natural';
+import nlp from 'compromise';
 
 class NlpService {
-  private classifier: natural.BayesClassifier;
+  public getIntentAndEntities(text: string): { intent: string; entities: any } {
+    const doc = nlp(text);
+    let intent = 'unknown';
+    const entities = {};
 
-  constructor() {
-    this.classifier = new natural.BayesClassifier();
+    if (doc.has('help')) {
+      intent = 'help';
+    } else if (doc.has('what is')) {
+      intent = 'question';
+      const question = doc.match('what is .*').text();
+      entities['question'] = question;
+    } else if (doc.has('joke')) {
+      intent = 'joke';
+    }
 
-    this.classifier.addDocument('I need help', 'help');
-    this.classifier.addDocument('I don\'t understand', 'help');
-    this.classifier.addDocument('Can you explain that again?', 'help');
-    this.classifier.addDocument('What is a noun?', 'question');
-    this.classifier.addDocument('What is the capital of France?', 'question');
-    this.classifier.addDocument('Tell me a joke', 'joke');
-    this.classifier.addDocument('Tell me something funny', 'joke');
-
-    this.classifier.train();
-  }
-
-  public getIntent(text: string): string {
-    return this.classifier.classify(text);
+    return { intent, entities };
   }
 }
 
