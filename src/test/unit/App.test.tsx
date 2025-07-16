@@ -1,7 +1,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import Index from '@/pages/Index';
@@ -40,6 +39,15 @@ vi.mock('@/components/speech/UnifiedSpeechSystem', () => ({
   },
 }));
 
+// Mock react-router-dom to avoid router conflicts
+vi.mock('react-router-dom', () => ({
+  ...vi.importActual('react-router-dom'),
+  BrowserRouter: ({ children }: { children: React.ReactNode }) => <div data-testid="mock-router">{children}</div>,
+  useNavigate: () => vi.fn(),
+  useLocation: () => ({ pathname: '/' }),
+  useSearchParams: () => [new URLSearchParams()],
+}));
+
 describe('App Component Tests', () => {
   let queryClient: QueryClient;
 
@@ -53,33 +61,28 @@ describe('App Component Tests', () => {
   });
 
   it('renders Index page without crashing', () => {
-    render(
+    const { container } = render(
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <MemoryRouter initialEntries={['/']}>
-            <Index />
-          </MemoryRouter>
+          <Index />
         </TooltipProvider>
       </QueryClientProvider>
     );
     
     // Basic smoke test - the component should render without throwing
-    expect(document.body).toBeDefined();
+    expect(container).toBeDefined();
   });
 
-  it('renders the main app structure with router', () => {
-    render(
+  it('renders the main app structure', () => {
+    const { getByTestId } = render(
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <MemoryRouter initialEntries={['/']}>
-            <Index />
-          </MemoryRouter>
+          <Index />
         </TooltipProvider>
       </QueryClientProvider>
     );
     
-    // The app should render without throwing errors
-    // This is a basic smoke test for the routing structure
-    expect(document.body).toBeDefined();
+    // Check that the mock router is rendered
+    expect(getByTestId('mock-router')).toBeInTheDocument();
   });
 });
