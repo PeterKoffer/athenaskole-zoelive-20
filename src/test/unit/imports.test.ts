@@ -1,8 +1,12 @@
 
 import { describe, it, expect } from 'vitest';
 
-describe('Imports', () => {
-    it('should pass basic test', () => {
-        expect(true).toBe(true);
-    });
+describe('Basic functionality', () => {
+  it('should pass a simple test', () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  it('should handle string operations', () => {
+    expect('hello'.toUpperCase()).toBe('HELLO');
+  });
 });
