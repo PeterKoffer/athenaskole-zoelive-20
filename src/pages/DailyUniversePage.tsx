@@ -19,6 +19,7 @@ const DailyUniversePage: React.FC = () => {
       // In a real application, we would pass the student's profile here.
       const studentProfile = user || {};
       const dailyUniverse = await dailyUniverseGenerator.generate(studentProfile);
+      console.log('Daily Universe:', dailyUniverse);
       setUniverse(dailyUniverse);
     };
     fetchUniverse();

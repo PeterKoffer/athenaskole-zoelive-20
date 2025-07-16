@@ -1,4 +1,5 @@
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
+import { OpenAIService } from './OpenAIService';
 
 interface DailyUniverse {
     title: string;
@@ -8,37 +9,10 @@ interface DailyUniverse {
 
 class DailyUniverseGeneratorService {
     async generate(studentProfile: any): Promise<DailyUniverse> {
-        // Mock implementation for now
-        return {
-            title: 'Daily Learning Adventure',
-            description: 'Explore new concepts through interactive learning',
-            objectives: [
-                {
-                    id: '1',
-                    nodeType: 'learning_objective',
-                    name: 'Introduction to Algebra',
-                    description: 'Learn the basics of algebraic expressions and equations.',
-                    subjectName: 'Mathematics',
-                    educationalLevel: 'Grade 7',
-                },
-                {
-                    id: '2',
-                    nodeType: 'learning_objective',
-                    name: 'The Solar System',
-                    description: 'Explore the planets, moons, and other celestial bodies in our solar system.',
-                    subjectName: 'Science',
-                    educationalLevel: 'Grade 6',
-                },
-                {
-                    id: '3',
-                    nodeType: 'learning_objective',
-                    name: 'Creative Writing',
-                    description: 'Learn how to write engaging stories and poems.',
-                    subjectName: 'English',
-                    educationalLevel: 'Grade 8',
-                },
-            ]
-        };
+        const openAIService = OpenAIService.getInstance();
+        const prompt = `Generate a daily universe for a student with the following profile: ${JSON.stringify(studentProfile)}. The universe should have a title, a description, and a list of three learning objectives. The learning objectives should be in the following format: { "id": "string", "nodeType": "learning_objective", "name": "string", "description": "string", "subjectName": "string", "educationalLevel": "string" }`;
+        const universe = await openAIService.generateUniverse(prompt);
+        return universe;
     }
     return 1; // Easy
   }
