@@ -1,3 +1,4 @@
+
 import nlp from 'compromise';
 
 class NlpService {
