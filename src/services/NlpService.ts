@@ -4,7 +4,11 @@ class NlpService {
   public getIntentAndEntities(text: string): { intent: string; entities: any } {
     const doc = nlp(text);
     let intent = 'unknown';
-    const entities = {};
+    const entities = {
+      nouns: doc.nouns().out('array'),
+      verbs: doc.verbs().out('array'),
+      adjectives: doc.adjectives().out('array'),
+    };
 
     if (doc.has('help')) {
       intent = 'help';
