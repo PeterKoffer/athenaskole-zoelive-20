@@ -1,38 +1,21 @@
+import OpenAI from "openai";
+import { Universe } from './UniverseGenerator';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 class OpenAIService {
-  private apiKey: string;
+  public async generateUniverse(prompt: string, signal?: AbortSignal): Promise<Universe> {
+    const response = await openai.completions.create({
+      model: "text-davinci-003",
+      prompt: prompt,
+      max_tokens: 2048,
+      temperature: 0.7,
+    }, { signal });
 
-  constructor() {
-    // In a real application, this would come from environment variables
-    // For now, we'll use a placeholder that can be set via environment
-    this.apiKey = process.env.OPENAI_API_KEY || '';
-  }
-
-  public async generateUniverse(prompt: string): Promise<any> {
-    if (!this.apiKey) {
-      console.warn('OpenAI API key not configured, using mock generation');
-      return this.mockGeneration(prompt);
-    }
-
-    try {
-      // This would be the actual OpenAI API call
-      // For now, return mock data since we don't have API integration set up
-      return this.mockGeneration(prompt);
-    } catch (error) {
-      console.error('OpenAI generation failed:', error);
-      return this.mockGeneration(prompt);
-    }
-  }
-
-  private mockGeneration(prompt: string): any {
-    return {
-      id: Math.random().toString(36).substr(2, 9),
-      title: 'Generated Adventure',
-      description: prompt || 'An exciting learning adventure awaits!',
-      characters: ['You', 'Adventure Guide'],
-      locations: ['Learning Hub'],
-      activities: ['Interactive challenges', 'Knowledge exploration']
-    };
+    const universe = JSON.parse(response.choices[0].text);
+    return universe;
   }
 }
 

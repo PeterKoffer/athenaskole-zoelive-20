@@ -2,15 +2,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Volume2, VolumeX } from "lucide-react";
+import { Send, Mic, MicOff, VolumeX } from "lucide-react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isSpeaking?: boolean;
   onStopSpeaking?: () => void;
+  onStartRecording?: () => void;
+  onStopRecording?: () => void;
+  isRecording?: boolean;
 }
 
-const ChatInput = ({ onSendMessage, isSpeaking = false, onStopSpeaking }: ChatInputProps) => {
+const ChatInput = ({
+  onSendMessage,
+  isSpeaking = false,
+  onStopSpeaking,
+  onStartRecording,
+  onStopRecording,
+  isRecording = false
+}: ChatInputProps) => {
   const [inputMessage, setInputMessage] = useState("");
 
   const handleSendMessage = () => {
@@ -37,17 +47,25 @@ const ChatInput = ({ onSendMessage, isSpeaking = false, onStopSpeaking }: ChatIn
       {isSpeaking && onStopSpeaking && (
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
           onClick={onStopSpeaking}
-          className="bg-red-600 text-white border-red-600 hover:bg-red-700 flex items-center justify-center min-w-[40px]"
+          className="bg-red-600 text-white border-red-600 hover:bg-red-700"
         >
           <VolumeX className="w-4 h-4" />
         </Button>
       )}
+      <Button
+        onClick={isRecording ? onStopRecording : onStartRecording}
+        size="icon"
+        variant="outline"
+        className="border-gray-600 text-white bg-gray-800 hover:bg-gray-700"
+      >
+        {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+      </Button>
       <Button 
         onClick={handleSendMessage} 
-        size="sm" 
-        className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white flex items-center justify-center min-w-[40px]"
+        size="icon"
+        className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
       >
         <Send className="w-4 h-4" />
       </Button>

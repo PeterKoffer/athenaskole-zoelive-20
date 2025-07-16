@@ -42,7 +42,12 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
           response = personality.responses.help[Math.floor(Math.random() * personality.responses.help.length)];
           break;
         case 'question':
-          response = `That's a great question about ${entities.question}! Let me see if I can find the answer for you.`;
+          if (entities.question) {
+            response = `That's a great question about ${entities.question}! Let me see if I can find the answer for you.`;
+          } else {
+            response = "That's a great question! Let me see if I can find the answer for you.";
+          }
+
           break;
         case 'joke':
           response = "Why did the scarecrow win an award? Because he was outstanding in his field!";
