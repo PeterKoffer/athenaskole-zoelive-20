@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { contentGenerationService } from '../services/ContentGenerationService';
+import { dailyUniverseGenerator } from '../services/DailyUniverseGenerator';
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,10 +13,13 @@ const DailyUniversePage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // In a real application, we would pass the student's profile here.
-    const studentProfile = {};
-    const dailyUniverse = contentGenerationService.generateDailyUniverse(studentProfile);
-    setUniverse(dailyUniverse);
+    const fetchUniverse = async () => {
+      // In a real application, we would pass the student's profile here.
+      const studentProfile = {};
+      const dailyUniverse = await dailyUniverseGenerator.generate(studentProfile);
+      setUniverse(dailyUniverse);
+    };
+    fetchUniverse();
   }, []);
 
   const handleStartTask = (objective: CurriculumNode) => {

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Message, LearningOption } from "./types";
 import { predefinedResponses, learningOptionResponses } from "./predefinedResponses";
+import { nlpService } from "@/services/NlpService";
 
 interface UseMessageHandlerProps {
   user?: any;
@@ -32,18 +33,34 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
     setMessages(prev => [...prev, userMessage]);
 
     setTimeout(() => {
-      const responses = predefinedResponses[currentSubject] || predefinedResponses.math;
-      let randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      const intent = nlpService.getIntent(message);
+      let response;
+
+      switch (intent) {
+        case 'help':
+          response = "It sounds like you're asking for help. I'm here for you! What do you need help with?";
+          break;
+        case 'question':
+          response = "That's a great question! Let me see if I can find the answer for you.";
+          break;
+        case 'joke':
+          response = "Why did the scarecrow win an award? Because he was outstanding in his field!";
+          break;
+        default:
+          const encouragement = personality.responses.encouragement[Math.floor(Math.random() * personality.responses.encouragement.length)];
+          const responses = predefinedResponses[currentSubject] || predefinedResponses.math;
+          response = `${encouragement} ${responses[Math.floor(Math.random() * responses.length)]}`;
+      }
       
       // Replace any full name references with first name
       if (user?.user_metadata?.name) {
         const fullName = user.user_metadata.name;
-        randomResponse = randomResponse.replace(new RegExp(fullName, 'g'), firstName);
+        response = response.replace(new RegExp(fullName, 'g'), firstName);
       }
       
       const aiResponse: Message = {
         role: "assistant" as const,
-        content: randomResponse,
+        content: response,
         timestamp: new Date(),
         showOptions: false
       };
@@ -52,7 +69,7 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
       
       if ('speechSynthesis' in window) {
         setIsSpeaking(true);
-        const utterance = new SpeechSynthesisUtterance(randomResponse);
+        const utterance = new SpeechSynthesisUtterance(response);
         utterance.lang = 'en-US';
         utterance.rate = 0.8;
         utterance.pitch = 1.2; // Higher pitch for female voice

@@ -53,39 +53,131 @@ export const K12_CURRICULUM_STANDARDS = {
   }
 };
 
-export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6): Promise<EnhancedLessonConfig> {
+function getGamesForSubject(subject: string) {
+    // In a real application, this would fetch games from a database.
+    // For now, we'll just return some sample games.
+    switch (subject) {
+        case 'mathematics':
+            return [
+                {
+                    name: 'Math Blaster',
+                    description: 'Blast your way through math problems!',
+                    url: 'https://www.coolmathgames.com/0-math-blaster',
+                },
+            ];
+        case 'english':
+            return [
+                {
+                    name: 'Word Wipe',
+                    description: 'Wipe away words in this fast-paced word game!',
+                    url: 'https://www.coolmathgames.com/0-word-wipe',
+                },
+            ];
+        default:
+            return [];
+    }
+}
+
+function getContentForPhase(phase: string, subject: string, skillArea: string) {
+    // In a real application, this would fetch content from a database.
+    // For now, we'll just return some sample content.
+    switch (phase) {
+        case 'introduction':
+            return [
+                {
+                    type: 'text',
+                    value: `Welcome to this lesson on ${skillArea}! In this lesson, we'll be learning about...`,
+                },
+            ];
+        case 'contentDelivery':
+            return [
+                {
+                    type: 'video',
+                    value: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                },
+                {
+                    type: 'text',
+                    value: 'This is the main content of the lesson. We\'ll be covering...',
+                },
+            ];
+        case 'interactiveGame':
+            return [
+                {
+                    type: 'text',
+                    value: 'Now it\'s time to play a game!',
+                },
+            ];
+        case 'application':
+            return [
+                {
+                    type: 'text',
+                    value: 'Now it\'s time to apply what you\'ve learned.',
+                },
+            ];
+        case 'creativeExploration':
+            return [
+                {
+                    type: 'text',
+                    value: 'Now it\'s time to get creative!',
+                },
+            ];
+        case 'summary':
+            return [
+                {
+                    type: 'text',
+                    value: 'In this lesson, we learned about...',
+                },
+            ];
+        default:
+            return [];
+    }
+}
+
+export function generateEnhancedLesson(subject: string, skillArea: string, gradeLevel: number = 6, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic' = 'mixed', difficulty: number = 2): Promise<EnhancedLessonConfig> {
   return new Promise((resolve) => {
-    const phases: LessonActivity[] = Object.entries(ENHANCED_LESSON_PHASES).map(([phase, { baseSeconds }]) => ({
-        id: `${subject}-${phase}`,
-        type: phase,
-        phase: phase,
-        title: `${phase.charAt(0).toUpperCase() + phase.slice(1)}`,
-        duration: baseSeconds,
-        phaseDescription: `This is the ${phase} phase.`,
-        metadata: { subject, skillArea },
-        content: { text: `Content for the ${phase} phase.` }
-    }));
+    const adaptation = LEARNING_STYLE_ADAPTATIONS[learningStyle];
+    const phases: LessonActivity[] = Object.entries(ENHANCED_LESSON_PHASES).map(([phase, { baseSeconds }]) => {
+        const activity: LessonActivity = {
+            id: `${subject}-${phase}`,
+            type: phase as any,
+            phase: phase as any,
+            title: `${phase.charAt(0).toUpperCase() + phase.slice(1)}`,
+            duration: baseSeconds + adaptation.extraDuration / Object.keys(ENHANCED_LESSON_PHASES).length,
+            phaseDescription: `This is the ${phase} phase.`,
+            metadata: { subject, skillArea },
+            content: getContentForPhase(phase, subject, skillArea),
+        };
+
+        if (phase === 'interactiveGame') {
+            activity.games = getGamesForSubject(subject);
+        }
+
+        return activity;
+    });
 
     const totalDuration = phases.reduce((acc, phase) => acc + phase.duration, 0);
+
+    const gradeRange = gradeLevel <= 5 ? 'elementary' : gradeLevel <= 8 ? 'middle' : 'high';
+    const learningObjectives = K12_CURRICULUM_STANDARDS[subject]?.[gradeRange] || [`Learn ${skillArea} concepts`];
 
     const lessonConfig: EnhancedLessonConfig = {
       subject,
       skillArea,
       gradeLevel,
-      learningStyle: 'mixed',
+      learningStyle,
       sessionId: `session_${subject}_${Date.now()}`,
       title: `${subject.charAt(0).toUpperCase() + subject.slice(1)} - ${skillArea}`,
       overview: `Interactive ${subject} lesson focusing on ${skillArea}`,
       phases,
       estimatedTotalDuration: totalDuration,
-      learningObjectives: [`Learn ${skillArea} concepts`],
+      learningObjectives,
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: [subject, skillArea],
       // Required additional properties
       estimatedDuration: totalDuration,
-      objectives: [`Learn ${skillArea} concepts`],
-      difficulty: 3,
+      objectives: learningObjectives,
+      difficulty,
       prerequisites: [],
       assessmentCriteria: ['Understanding of concepts'],
       extensions: ['Practice exercises']
@@ -106,8 +198,17 @@ export function validateEnhancedLesson(lesson: SubjectLessonPlan): {
         errors.push("Lesson must have exactly 6 phases.");
     }
     const totalDuration = lesson.phases.reduce((acc, phase) => acc + phase.duration, 0);
-    if (totalDuration < 1140 || totalDuration > 1260) {
-        errors.push("Total duration must be between 1140 and 1260 seconds (19-21 minutes).");
+    if (totalDuration < 1140 || totalDuration > 1500) {
+        errors.push("Total duration must be between 1140 and 1500 seconds (19-25 minutes).");
+    }
+    if (!lesson.learningObjectives || lesson.learningObjectives.length === 0) {
+        errors.push("Lesson must have at least one learning objective.");
+    }
+    if (!lesson.title || lesson.title.length === 0) {
+        errors.push("Lesson must have a title.");
+    }
+    if (!lesson.overview || lesson.overview.length === 0) {
+        errors.push("Lesson must have an overview.");
     }
 
   return {
