@@ -26,7 +26,7 @@ function encodeBase64Chunked(buffer: ArrayBuffer): string {
 }
 
 serve(async (req) => {
-  console.log("[ElevenLabs] Function invoked at", new Date().toISOString());
+  console.log("[Function] Invoked at", new Date().toISOString());
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -40,54 +40,25 @@ serve(async (req) => {
       });
     }
 
-    // Use hardcoded API key - no authentication validation needed
-    const apiKey = ELEVENLABS_API_KEY;
-    console.log("[ElevenLabs] Using hardcoded API key for immediate functionality");
-
     const payload = await req.json();
-    const type = payload.type || "";
-    console.log(`[ElevenLabs] Processing request type: ${type}`);
+    const action = payload.action || "";
+    console.log(`[Function] Processing action: ${action}`);
 
-    if (type === "check-availability") {
-      console.log("[ElevenLabs] Checking ElevenLabs API availability");
-      
-      try {
-        const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", {
-          headers: { "xi-api-key": apiKey }
-        });
-        
-        if (!voicesRes.ok) {
-          const errorText = await voicesRes.text();
-          console.error("[ElevenLabs] API error:", voicesRes.status, errorText);
-          return new Response(JSON.stringify({ 
-            error: `ElevenLabs API error: ${voicesRes.status}`,
-            details: errorText
-          }), {
-            status: 200, // Return 200 so client can handle gracefully
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        
-        const voices = await voicesRes.json();
-        console.log("[ElevenLabs] Successfully retrieved", voices.voices?.length || 0, "voices");
-        
-        return new Response(JSON.stringify(voices), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      } catch (error) {
-        console.error("[ElevenLabs] Availability check failed:", error);
-        return new Response(JSON.stringify({ 
-          error: "Failed to check ElevenLabs availability",
-          details: error.message
-        }), {
-          status: 200, // Return 200 so client can handle gracefully
+    if (action === "get-openai-key") {
+      const apiKey = Deno.env.get("OPENAI_API_KEY");
+      if (!apiKey) {
+        return new Response(JSON.stringify({ error: "OPENAI_API_KEY not set" }), {
+          status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      return new Response(JSON.stringify({ apiKey }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    if (type === "generate-speech") {
+    if (action === "generate-speech") {
       const { text, voiceId, model } = payload;
       
       if (!text || !voiceId || !model) {
