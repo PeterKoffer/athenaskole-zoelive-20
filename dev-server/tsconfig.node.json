@@ -8,7 +8,10 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "target": "ES2020",
-    "noEmit": true
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist"
   },
   "include": ["vite.config.ts"],
   "exclude": ["node_modules"]
