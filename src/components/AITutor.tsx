@@ -10,9 +10,14 @@ import LearningOptions from "./ai-tutor/LearningOptions";
 import ChatInput from "./ai-tutor/ChatInput";
 import LanguageSelector from "./ai-tutor/LanguageSelector";
 import { useMessageHandler } from "./ai-tutor/useMessageHandler";
+import { speechService } from "@/services/SpeechService";
+import { speechRecognitionService } from "@/services/SpeechRecognitionService";
+import { Volume2, VolumeX } from "lucide-react";
 
 const AITutor = ({ user }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [speechEnabled, setSpeechEnabled] = useState(true);
   const [currentSubject, setCurrentSubject] = useState("math");
   const [showLanguageLearning, setShowLanguageLearning] = useState(false);
   const [showLanguageSelection, setShowLanguageSelection] = useState(false);
@@ -33,6 +38,15 @@ const AITutor = ({ user }) => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (speechEnabled && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.sender === 'ai') {
+        speechService.speak(lastMessage.text);
+      }
+    }
+  }, [messages, speechEnabled]);
+
   const handleLearningOptionWithLanguageCheck = (option) => {
     if (option.id === "language") {
       setShowLanguageSelection(true);
@@ -48,10 +62,22 @@ const AITutor = ({ user }) => {
   };
 
   const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
+    speechService.cancel();
+    setIsSpeaking(false);
+  };
+
+  const handleStartRecording = () => {
+    setIsRecording(true);
+    speechRecognitionService.start();
+    speechRecognitionService.onResult((result) => {
+      handleSendMessage(result);
+      setIsRecording(false);
+    });
+  };
+
+  const handleStopRecording = () => {
+    setIsRecording(false);
+    speechRecognitionService.stop();
   };
 
   if (showLanguageSelection) {
@@ -90,9 +116,14 @@ const AITutor = ({ user }) => {
               <span className="text-2xl">🎓</span>
               <span>AI Tutor - Your Personal Athena</span>
             </span>
-            <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
-              GPT-4o + ElevenLabs English
-            </Badge>
+            <div className="flex items-center space-x-2">
+              <Button onClick={() => setSpeechEnabled(!speechEnabled)} size="icon" variant="ghost">
+                {speechEnabled ? <Volume2 /> : <VolumeX />}
+              </Button>
+              <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
+                GPT-4o + ElevenLabs English
+              </Badge>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -124,6 +155,9 @@ const AITutor = ({ user }) => {
             onSendMessage={handleSendMessage}
             isSpeaking={isSpeaking}
             onStopSpeaking={stopSpeaking}
+            onStartRecording={handleStartRecording}
+            onStopRecording={handleStopRecording}
+            isRecording={isRecording}
           />
         </CardContent>
       </Card>

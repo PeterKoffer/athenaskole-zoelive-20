@@ -1,48 +1,74 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import UniversePlayer from '../components/UniversePlayer';
 import { Universe } from '../services/UniverseGenerator';
-import { PersonalizationEngine } from '../services/PersonalizationEngine';
+import { aiUniverseGenerator } from '../services/AIUniverseGenerator';
 import { StudentProfile } from '../types/student';
 import { CurriculumMapper, CurriculumStandard } from '../services/CurriculumMapper';
+import { Button } from '@/components/ui/button';
 
 const UniversePage: React.FC = () => {
     const [universe, setUniverse] = useState<Universe | null>(null);
     const [standards, setStandards] = useState<CurriculumStandard[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
         const generateUniverse = async () => {
-            const student: StudentProfile = {
-                id: '1',
-                name: 'John Doe',
-                gradeLevel: 6,
-                interests: ['space', 'dinosaurs'],
-                abilities: {
-                    math: 'intermediate'
+            abortControllerRef.current = new AbortController();
+            setLoading(true);
+            setError(null);
+            try {
+                const student: StudentProfile = {
+                    id: '1',
+                    name: 'John Doe',
+                    gradeLevel: 6,
+                    interests: ['space', 'dinosaurs'],
+                    abilities: {
+                        math: 'intermediate'
+                    }
+                };
+                const prompt = `Generate a universe for a grade ${student.gradeLevel} student who is interested in ${student.interests.join(', ')}.`;
+                const newUniverse = await aiUniverseGenerator.generateUniverse(prompt, abortControllerRef.current.signal);
+                if (newUniverse) {
+                    setUniverse(newUniverse);
+                    const relevantStandards = CurriculumMapper.getStandardsForUniverse(newUniverse);
+                    setStandards(relevantStandards);
+                } else {
+                    setError('Failed to generate universe.');
                 }
-            };
-            const initialUniverse: Universe = {
-                id: '1',
-                title: 'Travel to China',
-                description: 'You have to travel to China to help a man in his store.',
-                characters: ['You', 'The Shopkeeper'],
-                locations: ['A store in China'],
-                activities: ['Help the shopkeeper count his money', 'Learn some Chinese phrases']
-            };
-            const newUniverse = await PersonalizationEngine.personalizeUniverse(initialUniverse, student);
-            setUniverse(newUniverse);
-
-            const relevantStandards = CurriculumMapper.getStandardsForUniverse(newUniverse);
-            setStandards(relevantStandards);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    setError('An unexpected error occurred.');
+                }
+            } finally {
+                setLoading(false);
+            }
         };
 
         generateUniverse();
+
+        return () => {
+            abortControllerRef.current?.abort();
+        };
     }, []);
+
+    const handleCancel = () => {
+        abortControllerRef.current?.abort();
+    };
 
     return (
         <div>
             <h1>Universe Page</h1>
-            {universe ? (
+            {loading ? (
+                <div>
+                    <p>Loading...</p>
+                    <Button onClick={handleCancel}>Cancel</Button>
+                </div>
+            ) : error ? (
+                <p>Error: {error}</p>
+            ) : universe ? (
                 <>
                     <UniversePlayer universe={universe} />
                     <h2>Curriculum Standards</h2>
@@ -53,7 +79,7 @@ const UniversePage: React.FC = () => {
                     </ul>
                 </>
             ) : (
-                <p>Loading...</p>
+                <p>No universe generated.</p>
             )}
         </div>
     );
