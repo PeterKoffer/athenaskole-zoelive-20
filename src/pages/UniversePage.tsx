@@ -47,7 +47,6 @@ const UniversePage: React.FC = () => {
             }
         };
 
-    useEffect(() => {
         generateUniverse();
 
         return () => {
