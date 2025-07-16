@@ -1,73 +1,59 @@
 
 [
-    {
-        "id": "MATH.CONTENT.6.EE.B.7",
-        "subject": "Math",
-        "gradeLevel": 6,
-        "description": "Solve real-world and mathematical problems by writing and solving equations of the form x + p = q for cases in which p, q and x are all nonnegative rational numbers.",
-        "keywords": ["math", "equations", "problems", "numbers"]
-    },
-    {
-        "id": "GEO.G.CO.A.1",
-        "subject": "Math",
-        "gradeLevel": 9,
-        "description": "Know precise definitions of angle, circle, perpendicular line, parallel line, and line segment, based on the undefined notions of point, line, distance along a line, and distance around a circular arc.",
-        "keywords": ["math", "angle", "circle", "line"]
-    },
-    {
-        "id": "SCI.PS3.B.1",
-        "subject": "Science",
-        "gradeLevel": 8,
-        "description": "Moving objects have kinetic energy and objects may have potential energy due to their relative positions.",
-        "keywords": ["science", "energy", "objects"]
-    },
-    {
-        "id": "SCI.PS3.B.2",
-        "subject": "Science",
-        "gradeLevel": 8,
-        "description": "The expression for the kinetic energy of an object is 1/2mv^2.",
-        "keywords": ["science", "energy", "expression"]
-    },
-    {
-        "id": "BUS.AD.A.1",
-        "subject": "Business",
-        "gradeLevel": 10,
-        "description": "Analyze the role of business in the economic system.",
-        "keywords": ["business", "economic", "system"]
-    },
-    {
-        "id": "BUS.AD.A.2",
-        "subject": "Business",
-        "gradeLevel": 10,
-        "description": "Describe the functions of business.",
-        "keywords": ["business", "functions"]
-    },
-    {
-        "id": "LAW.CR.A.1",
-        "subject": "Law",
-        "gradeLevel": 11,
-        "description": "Understand the elements of a crime.",
-        "keywords": ["law", "crime", "elements"]
-    },
-    {
-        "id": "LAW.CR.A.2",
-        "subject": "Law",
-        "gradeLevel": 11,
-        "description": "Understand the criminal investigation process.",
-        "keywords": ["law", "criminal", "investigation", "process"]
-    },
-    {
-        "id": "ENG.LANG.K.1.A",
-        "subject": "English",
-        "gradeLevel": 0,
-        "description": "Print many upper- and lowercase letters.",
-        "keywords": ["english", "letters", "print"]
-    },
-    {
-        "id": "ENG.LANG.K.1.B",
-        "subject": "English",
-        "gradeLevel": 0,
-        "description": "Use frequently occurring nouns and verbs.",
-        "keywords": ["english", "nouns", "verbs"]
-    }
+  {
+    "id": "1",
+    "subject": "Mathematics",
+    "gradeLevel": 6,
+    "description": "Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.",
+    "keywords": ["equations", "algebra", "solve", "math", "problems", "real-world"]
+  },
+  {
+    "id": "2",
+    "subject": "Mathematics",
+    "gradeLevel": 6,
+    "description": "Know precise definitions of angle, circle, perpendicular line, parallel line, and line segment, based on the undefined notions of point, line, distance along a line, and distance around a circular arc.",
+    "keywords": ["geometry", "angle", "circle", "line", "definitions", "math"]
+  },
+  {
+    "id": "3",
+    "subject": "Science",
+    "gradeLevel": 6,
+    "description": "Develop and use a model to describe how unequal heating and rotation of the Earth cause patterns of atmospheric and oceanic circulation.",
+    "keywords": ["earth", "atmosphere", "ocean", "circulation", "heating", "science", "model"]
+  },
+  {
+    "id": "4",
+    "subject": "English",
+    "gradeLevel": 6,
+    "description": "Determine or clarify the meaning of unknown and multiple-meaning words and phrases.",
+    "keywords": ["vocabulary", "meaning", "words", "phrases", "language", "english"]
+  },
+  {
+    "id": "5",
+    "subject": "Social Studies",
+    "gradeLevel": 6,
+    "description": "Explain how cultural patterns and economic decisions influence environments and the daily lives of people.",
+    "keywords": ["culture", "economy", "environment", "society", "patterns", "china", "travel"]
+  },
+  {
+    "id": "6",
+    "subject": "Mathematics",
+    "gradeLevel": 5,
+    "description": "Convert like measurement units within a given measurement system.",
+    "keywords": ["measurement", "units", "convert", "math", "system"]
+  },
+  {
+    "id": "7",
+    "subject": "Science",
+    "gradeLevel": 5,
+    "description": "Use models to describe that energy in animals' food was once energy from the sun.",
+    "keywords": ["energy", "food", "sun", "animals", "models", "science"]
+  },
+  {
+    "id": "8",
+    "subject": "English",
+    "gradeLevel": 5,
+    "description": "Quote accurately from a text when explaining what the text says explicitly.",
+    "keywords": ["quote", "text", "explain", "reading", "comprehension", "english"]
+  }
 ]
