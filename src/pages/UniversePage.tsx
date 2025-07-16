@@ -1,87 +1,117 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import UniversePlayer from '../components/UniversePlayer';
-import { Universe } from '../services/UniverseGenerator';
+import React, { useState, useEffect } from 'react';
 import { aiUniverseGenerator } from '../services/AIUniverseGenerator';
-import { StudentProfile } from '../types/student';
-import { CurriculumMapper, CurriculumStandard } from '../services/CurriculumMapper';
-import { Button } from '@/components/ui/button';
+import { Universe } from '../services/UniverseGenerator';
 
 const UniversePage: React.FC = () => {
     const [universe, setUniverse] = useState<Universe | null>(null);
-    const [standards, setStandards] = useState<CurriculumStandard[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const abortControllerRef = useRef<AbortController | null>(null);
 
-    useEffect(() => {
-        const generateUniverse = async () => {
-            abortControllerRef.current = new AbortController();
-            setLoading(true);
-            setError(null);
-            try {
-                const student: StudentProfile = {
-                    id: '1',
-                    name: 'John Doe',
-                    gradeLevel: 6,
-                    interests: ['space', 'dinosaurs'],
-                    abilities: {
-                        math: 'intermediate'
-                    }
-                };
-                const prompt = `Generate a universe for a grade ${student.gradeLevel} student who is interested in ${student.interests.join(', ')}.`;
-                const newUniverse = await aiUniverseGenerator.generateUniverse(prompt, abortControllerRef.current.signal);
-                if (newUniverse) {
-                    setUniverse(newUniverse);
-                    const relevantStandards = CurriculumMapper.getStandardsForUniverse(newUniverse);
-                    setStandards(relevantStandards);
-                } else {
-                    setError('Failed to generate universe.');
-                }
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    setError('An unexpected error occurred.');
-                }
-            } finally {
-                setLoading(false);
+    const generateUniverse = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const result = await aiUniverseGenerator.generateUniverse(
+                "A magical world where students learn through adventure and discovery"
+            );
+            if (result) {
+                setUniverse(result);
             }
-        };
+        } catch (err) {
+            console.error('Universe generation error:', err);
+            setError(err instanceof Error ? err.message : 'Failed to generate universe');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         generateUniverse();
-
-        return () => {
-            abortControllerRef.current?.abort();
-        };
     }, []);
 
-    const handleCancel = () => {
-        abortControllerRef.current?.abort();
-    };
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p>Generating your learning universe...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center text-red-600">
+                    <p className="mb-4">Error: {error}</p>
+                    <button 
+                        onClick={generateUniverse}
+                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!universe) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <p>No universe generated yet.</p>
+            </div>
+        );
+    }
 
     return (
-        <div>
-            <h1>Universe Page</h1>
-            {loading ? (
-                <div>
-                    <p>Loading...</p>
-                    <Button onClick={handleCancel}>Cancel</Button>
+        <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-6">{universe.title}</h1>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-card rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-3">Description</h2>
+                    <p className="text-muted-foreground">{universe.description}</p>
                 </div>
-            ) : error ? (
-                <p>Error: {error}</p>
-            ) : universe ? (
-                <>
-                    <UniversePlayer universe={universe} />
-                    <h2>Curriculum Standards</h2>
-                    <ul>
-                        {standards.map(standard => (
-                            <li key={standard.id}>{standard.description}</li>
+
+                <div className="bg-card rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-3">Characters</h2>
+                    <ul className="space-y-2">
+                        {universe.characters?.map((character, index) => (
+                            <li key={index} className="text-muted-foreground">• {character}</li>
                         ))}
                     </ul>
-                </>
-            ) : (
-                <p>No universe generated.</p>
-            )}
+                </div>
+
+                <div className="bg-card rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-3">Locations</h2>
+                    <ul className="space-y-2">
+                        {universe.locations?.map((location, index) => (
+                            <li key={index} className="text-muted-foreground">• {location}</li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div className="bg-card rounded-lg p-6 md:col-span-2 lg:col-span-3">
+                    <h2 className="text-xl font-semibold mb-3">Activities</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {universe.activities?.map((activity, index) => (
+                            <div key={index} className="text-muted-foreground">• {activity}</div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-8 text-center">
+                <button 
+                    onClick={generateUniverse}
+                    className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                    Generate New Universe
+                </button>
+            </div>
         </div>
     );
 };

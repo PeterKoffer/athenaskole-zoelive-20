@@ -1,56 +1,44 @@
-import { DailyUniverse } from '@/types/learning';
-import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
-import NELIESessionGenerator from './NELIESessionGenerator';
+import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 
-// Placeholder for student profile type
-interface StudentProfile {
-  gradeLevel?: number;
-  learningPreferences?: string[];
-  interests?: string[];
-  preferredLearningStyle?: string;
+interface DailyUniverse {
+    title: string;
+    description: string;
+    objectives: CurriculumNode[];
 }
 
-class DailyUniverseGenerator {
-  private getSubjectsForInterests(interests: string[]): string[] {
-    // In a real application, this would be a more sophisticated mapping.
-    const subjectMap = {
-      'space': ['science', 'mathematics'],
-      'dinosaurs': ['science', 'history'],
-      'art': ['creativeArts'],
-      'music': ['music'],
-      'sports': ['physicalEducation'],
-      'coding': ['computerScience'],
-    };
-
-    const subjects = new Set<string>();
-    for (const interest of interests) {
-      const mappedSubjects = subjectMap[interest];
-      if (mappedSubjects) {
-        for (const subject of mappedSubjects) {
-          subjects.add(subject);
-        }
-      }
-    }
-
-    // If no interests match, return a default set of subjects.
-    if (subjects.size === 0) {
-      return ['mathematics', 'english', 'science'];
-    }
-
-    return Array.from(subjects);
-  }
-
-  private getDifficultyForSubject(subject: string, progress: any): number {
-    // In a real application, this would be a more sophisticated calculation.
-    const subjectProgress = progress[subject];
-    if (subjectProgress) {
-      const skillLevels = Object.values(subjectProgress) as number[];
-      const averageSkillLevel = skillLevels.reduce((a, b) => a + b, 0) / skillLevels.length;
-      if (averageSkillLevel > 0.8) {
-        return 3; // Hard
-      } else if (averageSkillLevel > 0.5) {
-        return 2; // Medium
-      }
+class DailyUniverseGeneratorService {
+    async generate(studentProfile: any): Promise<DailyUniverse> {
+        // Mock implementation for now
+        return {
+            title: 'Daily Learning Adventure',
+            description: 'Explore new concepts through interactive learning',
+            objectives: [
+                {
+                    id: '1',
+                    nodeType: 'learning_objective',
+                    name: 'Introduction to Algebra',
+                    description: 'Learn the basics of algebraic expressions and equations.',
+                    subjectName: 'Mathematics',
+                    educationalLevel: 'Grade 7',
+                },
+                {
+                    id: '2',
+                    nodeType: 'learning_objective',
+                    name: 'The Solar System',
+                    description: 'Explore the planets, moons, and other celestial bodies in our solar system.',
+                    subjectName: 'Science',
+                    educationalLevel: 'Grade 6',
+                },
+                {
+                    id: '3',
+                    nodeType: 'learning_objective',
+                    name: 'Creative Writing',
+                    description: 'Learn how to write engaging stories and poems.',
+                    subjectName: 'English',
+                    educationalLevel: 'Grade 8',
+                },
+            ]
+        };
     }
     return 1; // Easy
   }
@@ -99,4 +87,4 @@ class DailyUniverseGenerator {
   }
 }
 
-export const dailyUniverseGenerator = new DailyUniverseGenerator();
+export const dailyUniverseGenerator = new DailyUniverseGeneratorService();

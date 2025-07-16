@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,6 @@ import {
 import SubjectWeighting from "@/components/teacher/SubjectWeighting";
 import { useState, useEffect } from "react";
 import CurriculumEditorModal from "@/components/curriculum/CurriculumEditorModal";
-import CurriculumEditorModal from "@/components/curriculum/CurriculumEditorModal";
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
@@ -20,21 +20,35 @@ const TeacherDashboard = () => {
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
-    // Fetch the subjects from the AI curriculum data.
-    const fetchSubjects = async () => {
-      try {
-        const response = await fetch("/src/data/ai-curriculum.json");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setSubjects(data.subjects);
-      } catch (error) {
-        console.error("Failed to fetch subjects:", error);
+    // Create mock subjects data instead of fetching from file
+    const mockSubjects = [
+      {
+        id: '1',
+        name: 'Mathematics',
+        description: 'Core mathematical concepts and problem solving',
+        weight: 25
+      },
+      {
+        id: '2', 
+        name: 'Science',
+        description: 'Scientific inquiry and understanding',
+        weight: 25
+      },
+      {
+        id: '3',
+        name: 'English Language Arts',
+        description: 'Reading, writing, and communication skills',
+        weight: 25
+      },
+      {
+        id: '4',
+        name: 'Social Studies',
+        description: 'History, geography, and civic understanding',
+        weight: 25
       }
-    };
-
-    fetchSubjects();
+    ];
+    
+    setSubjects(mockSubjects);
   }, []);
 
   const handleSaveWeights = (weights) => {
