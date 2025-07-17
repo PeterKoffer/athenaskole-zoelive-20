@@ -13,25 +13,62 @@ const DailyUniversePage: React.FC = () => {
   const [universe, setUniverse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>({});
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
+    console.log('🚀 DailyUniversePage: Component mounted - NEW VERSION');
+    console.log('📅 Current timestamp:', new Date().toISOString());
+    console.log('👤 User:', user);
+    
     const fetchUniverse = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // In a real application, we would pass the student's profile here.
+        console.log('🌟 DailyUniversePage: Starting universe generation...');
+        
+        // Add debug information
+        const debugData = {
+          timestamp: new Date().toISOString(),
+          userExists: !!user,
+          serviceExists: !!universeGenerationService,
+          serviceType: typeof universeGenerationService,
+          serviceMethods: universeGenerationService ? Object.getOwnPropertyNames(Object.getPrototypeOf(universeGenerationService)) : []
+        };
+        
+        console.log('🔍 Debug info:', debugData);
+        setDebugInfo(debugData);
+        
         const studentProfile = user || {};
+        console.log('📝 Student profile for universe generation:', studentProfile);
+        
+        if (!universeGenerationService) {
+          throw new Error('Universe generation service not available');
+        }
+        
         const dailyUniverse = await universeGenerationService.generate(studentProfile);
-        console.log('Daily Universe:', dailyUniverse);
+        console.log('🌌 Generated Daily Universe:', dailyUniverse);
+        
+        if (!dailyUniverse) {
+          throw new Error('No universe generated');
+        }
+        
         setUniverse(dailyUniverse);
+        console.log('✅ DailyUniversePage: Universe set successfully');
+        
       } catch (err) {
-        console.error('Error fetching universe:', err);
-        setError('Failed to load your daily universe. Please try again.');
+        console.error('❌ Error fetching universe:', err);
+        console.error('📊 Error details:', {
+          message: err.message,
+          stack: err.stack,
+          name: err.name
+        });
+        setError(`Failed to load your daily universe: ${err.message}`);
       } finally {
         setLoading(false);
+        console.log('🏁 DailyUniversePage: Loading completed');
       }
     };
     
@@ -39,7 +76,7 @@ const DailyUniversePage: React.FC = () => {
   }, [user]);
 
   const handleStartTask = (objective: CurriculumNode) => {
-    console.log('Starting task for objective:', objective.name);
+    console.log('🎯 Starting task for objective:', objective.name);
     toast.success(`Starting: ${objective.name}`, {
       description: 'Loading your personalized learning experience...'
     });
@@ -62,7 +99,11 @@ const DailyUniversePage: React.FC = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-lg text-muted-foreground">Loading your daily universe...</p>
+          <p className="text-lg text-muted-foreground">Loading your daily universe... (NEW VERSION)</p>
+          <div className="text-xs text-muted-foreground mt-4">
+            <p>Debug: {new Date().toISOString()}</p>
+            <p>Service: {debugInfo.serviceExists ? 'Available' : 'Missing'}</p>
+          </div>
         </div>
       </div>
     );
@@ -71,8 +112,12 @@ const DailyUniversePage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-lg">
           <p className="text-lg text-destructive">{error}</p>
+          <div className="text-xs bg-muted p-4 rounded">
+            <p><strong>Debug Information:</strong></p>
+            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+          </div>
           <Button onClick={() => window.location.reload()}>
             Try Again
           </Button>
@@ -85,7 +130,7 @@ const DailyUniversePage: React.FC = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-lg text-muted-foreground">No universe available</p>
+          <p className="text-lg text-muted-foreground">No universe available (NEW VERSION)</p>
           <Button onClick={() => window.location.reload()}>
             Reload
           </Button>
@@ -99,12 +144,21 @@ const DailyUniversePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto p-6 space-y-8">
+        {/* Debug Header - Remove this once issue is resolved */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
+          <p><strong>🔧 DEBUG MODE - NEW VERSION LOADED</strong></p>
+          <p>Timestamp: {new Date().toISOString()}</p>
+          <p>Service Available: {debugInfo.serviceExists ? 'Yes' : 'No'}</p>
+          <p>Universe Title: {universe.title}</p>
+          <p>Objectives Count: {objectives.length}</p>
+        </div>
+
         {/* Header Section */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Target className="h-8 w-8 text-primary" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {universe.title || 'Your Learning Universe'}
+              {universe.title || 'Your Learning Universe'} (NEW VERSION)
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
