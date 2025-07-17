@@ -1,12 +1,14 @@
+
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 import { openAIService } from './OpenAIService';
 
 interface DailyUniverse {
     id: string;
-    theme: string;
-    learningAtoms: any[];
     title?: string;
     description?: string;
+    theme: string;
+    objectives: CurriculumNode[];
+    learningAtoms: any[];
 }
 
 class DailyUniverseGeneratorService {
@@ -19,6 +21,32 @@ class DailyUniverseGeneratorService {
 
     private getDifficultyForSubject(subject: string, progress: any): number {
         return progress[subject] || 1; // Default to level 1
+    }
+
+    private createMockObjectives(): CurriculumNode[] {
+        return [
+            {
+                id: '1',
+                name: 'Mathematical Problem Solving',
+                description: 'Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.',
+                subjectName: 'Math',
+                educationalLevel: 'Grade 6',
+            },
+            {
+                id: '2',
+                name: 'Reading Comprehension',
+                description: 'Analyze literary texts to understand character development, theme, and plot structure.',
+                subjectName: 'Language Arts',
+                educationalLevel: 'Grade 6',
+            },
+            {
+                id: '3',
+                name: 'Scientific Method',
+                description: 'Apply the scientific method to design and conduct experiments, analyze data, and draw conclusions.',
+                subjectName: 'Science',
+                educationalLevel: 'Grade 6',
+            }
+        ];
     }
 
     public async generate(studentProfile: any): Promise<DailyUniverse> {
@@ -35,9 +63,10 @@ class DailyUniverseGeneratorService {
 
             const universe: DailyUniverse = {
                 id: `universe-${Date.now()}`,
-                title: aiResponse.title || 'A Day of Discovery',
-                description: aiResponse.description || 'Explore a variety of subjects and challenges to expand your knowledge.',
+                title: aiResponse?.title || 'A Day of Discovery',
+                description: aiResponse?.description || 'Explore a variety of subjects and challenges to expand your knowledge.',
                 theme: 'interdisciplinary',
+                objectives: this.createMockObjectives(),
                 learningAtoms: [],
             };
 
@@ -55,6 +84,7 @@ class DailyUniverseGeneratorService {
             title: 'Learning Adventure',
             description: 'Embark on an educational journey across multiple subjects.',
             theme: 'adventure',
+            objectives: this.createMockObjectives(),
             learningAtoms: [],
         };
     }
