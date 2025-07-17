@@ -1,5 +1,5 @@
 
-import { Home, BookOpen, Calendar, User, Settings, Users, Info } from "lucide-react";
+import { Home, BookOpen, Calendar, User, Settings, Users, Info, TestTube } from "lucide-react";
 import Index from "./pages/Index";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import ProfilePage from "./pages/ProfilePage";
@@ -18,6 +18,7 @@ import ScheduleManagementPage from "./pages/ScheduleManagementPage";
 import AboutPage from "./pages/AboutPage";
 import UniversePage from "./pages/UniversePage";
 import CurriculumEditorPage from "./pages/CurriculumEditorPage";
+import SimulatorPage from "./pages/EducationalSimulatorPage";
 
 export const navItems = [
   {
@@ -127,5 +128,11 @@ export const navItems = [
     to: "/curriculum-editor",
     icon: <BookOpen className="h-4 w-4" />,
     page: <CurriculumEditorPage />,
+  },
+  {
+    title: "Simulator",
+    to: "/simulator",
+    icon: <TestTube className="h-4 w-4" />,
+    page: <SimulatorPage />,
   },
 ];
