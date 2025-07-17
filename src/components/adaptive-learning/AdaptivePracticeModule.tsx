@@ -1,9 +1,8 @@
 
-import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Brain, CheckCircle, XCircle, Lightbulb, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Brain, XCircle, Lightbulb, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useAdaptivePracticeLogic } from './hooks/useAdaptivePracticeLogic';
@@ -20,7 +19,6 @@ const AdaptivePracticeModule = ({ onBack }: AdaptivePracticeModuleProps) => {
   const { toast } = useToast();
   const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
   const { state, handleNextAtom, handleQuestionAnswer, handleRetry } = useAdaptivePracticeLogic();
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
 
   console.log('🔍 AdaptivePracticeModule state:', {
     isLoading: state.isLoading,

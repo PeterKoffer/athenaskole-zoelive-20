@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Clock, Brain } from 'lucide-react';
 import { ContentAtom } from '@/types/content';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 import { SpeakableCard } from '@/components/ui/speakable-card';
 
 interface ContentAtomRendererProps {
@@ -17,7 +16,7 @@ const ContentAtomRenderer: React.FC<ContentAtomRendererProps> = ({ atom, onCompl
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime] = useState(Date.now());
-  const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
+  const { speakAsNelie } = useUnifiedSpeech();
 
   // Auto-read content when atom changes
   useEffect(() => {

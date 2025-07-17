@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { initializeJulesIntegration, crossOriginHandler, debugCrossOriginIssues } from '@/utils/CrossOriginHandler';
+import { initializeJulesIntegration, debugCrossOriginIssues } from '@/utils/CrossOriginHandler';
 
 export function JulesIntegration() {
   useEffect(() => {
