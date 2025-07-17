@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DailyUniversePage from '../../pages/DailyUniversePage';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { universeGenerationService } from '../../services/UniverseGenerationService';
 
-// Mock the daily universe generator
-vi.mock('../../services/DailyUniverseGenerator', () => ({
-    dailyUniverseGenerator: {
+// Mock the universe generation service
+vi.mock('../../services/UniverseGenerationService', () => ({
+    universeGenerationService: {
         generate: vi.fn()
     }
 }));
@@ -29,7 +28,14 @@ vi.mock('sonner', () => ({
     }
 }));
 
-import { dailyUniverseGenerator } from '../../services/DailyUniverseGenerator';
+// Mock useAuth hook
+vi.mock('@/hooks/useAuth', () => ({
+    useAuth: () => ({
+        user: { uid: 'test-user' },
+        loading: false,
+    }),
+}));
+
 
 describe('DailyUniversePage', () => {
     beforeEach(() => {
@@ -37,7 +43,7 @@ describe('DailyUniversePage', () => {
     });
 
     it('should render the universe title and description', async () => {
-        (dailyUniverseGenerator.generate as any).mockResolvedValue({
+        (universeGenerationService.generate as any).mockResolvedValue({
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [],
@@ -45,9 +51,7 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <AuthProvider>
-                    <DailyUniversePage />
-                </AuthProvider>
+                <DailyUniversePage />
             </BrowserRouter>
         );
 
@@ -58,7 +62,7 @@ describe('DailyUniversePage', () => {
     });
 
     it('should render the curriculum standards', async () => {
-        (dailyUniverseGenerator.generate as any).mockResolvedValue({
+        (universeGenerationService.generate as any).mockResolvedValue({
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [
@@ -74,9 +78,7 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <AuthProvider>
-                    <DailyUniversePage />
-                </AuthProvider>
+                <DailyUniversePage />
             </BrowserRouter>
         );
 

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { dailyUniverseGenerator } from '../services/DailyUniverseGenerator';
+import { universeGenerationService } from '../services/UniverseGenerationService';
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ const DailyUniversePage: React.FC = () => {
         
         // In a real application, we would pass the student's profile here.
         const studentProfile = user || {};
-        const dailyUniverse = await dailyUniverseGenerator.generate(studentProfile);
+        const dailyUniverse = await universeGenerationService.generate(studentProfile);
         console.log('Daily Universe:', dailyUniverse);
         setUniverse(dailyUniverse);
       } catch (err) {
