@@ -6,14 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const EnhancedAITutor: React.FC = () => {
   const [activeTab, setActiveTab] = useState('chat');
 
-  const handleCompleteChallenge = (challengeId: string) => {
-    console.log('Challenge completed:', challengeId);
-  };
-
-  const handleEarnReward = (rewardId: string) => {
-    console.log('Reward earned:', rewardId);
-  };
-
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <Card className="bg-gray-900 border-gray-800">

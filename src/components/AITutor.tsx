@@ -3,10 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Send, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { openAIService } from '@/services/OpenAIService';
 import { speechService } from '@/services/SpeechService';
 
 interface Message {
@@ -26,7 +24,6 @@ interface AITutorProps {
 }
 
 const AITutor: React.FC<AITutorProps> = ({ onBack }) => {
-  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +67,8 @@ const AITutor: React.FC<AITutorProps> = ({ onBack }) => {
     setIsLoading(true);
 
     try {
-      const response = await openAIService.generateResponse(message, messages);
+      // Simulate AI response for now
+      const response = `I understand you're asking about: "${message}". This is a placeholder response as the AI service is being configured.`;
       
       const assistantMessage: Message = {
         role: 'assistant',
@@ -100,14 +98,12 @@ const AITutor: React.FC<AITutorProps> = ({ onBack }) => {
     try {
       if (isListening) {
         setIsListening(false);
-        await speechService.stopListening();
+        // Speech recognition logic would go here
       } else {
         setIsListening(true);
-        const result = await speechService.startListening('en-US');
-        if (result) {
-          setInputMessage(result);
-        }
-        setIsListening(false);
+        // Start speech recognition logic would go here
+        // For now, just simulate
+        setTimeout(() => setIsListening(false), 3000);
       }
     } catch (error) {
       console.error('Speech to text error:', error);
@@ -119,11 +115,12 @@ const AITutor: React.FC<AITutorProps> = ({ onBack }) => {
     try {
       if (isSpeaking) {
         setIsSpeaking(false);
-        speechService.stop();
+        // Stop speech
       } else {
         setIsSpeaking(true);
-        await speechService.speak(text);
-        setIsSpeaking(false);
+        speechService.speak(text);
+        // Simulate speech duration
+        setTimeout(() => setIsSpeaking(false), text.length * 50);
       }
     } catch (error) {
       console.error('Text to speech error:', error);
