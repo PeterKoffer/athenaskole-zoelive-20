@@ -1,7 +1,7 @@
 
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
-import { openAIService } from './OpenAIService';
 import { NELIESubject } from '../types/curriculum/NELIESubjects';
+import { openAIService } from './OpenAIService';
 
 interface DailyUniverse {
     id: string;
@@ -15,6 +15,29 @@ interface DailyUniverse {
 import curriculumSteps from '../../public/data/curriculum-steps.json';
 
 class EnhancedUniverseGenerationService {
+    private enhancedThemes = [
+        {
+            narrative: "You discover an ancient map that leads to a treasure hidden somewhere in China. To find it, you must learn about Chinese culture, navigate using math, and communicate with locals.",
+            subjects: [NELIESubject.GEOGRAPHY, NELIESubject.WORLD_LANGUAGES, NELIESubject.MATH],
+            context: "treasure hunting adventure"
+        },
+        {
+            narrative: "A mysterious blackout has hit your neighborhood! You become the neighborhood detective, using science to understand electricity, math to calculate power needs, and practical skills to help restore power safely.",
+            subjects: [NELIESubject.SCIENCE, NELIESubject.MATH, NELIESubject.LIFE_ESSENTIALS],
+            context: "mystery solving mission"
+        },
+        {
+            narrative: "The local mall wants YOU to design and open the coolest sporting goods store ever! You'll need math for business planning, creativity for store design, and sports knowledge to stock the perfect equipment.",
+            subjects: [NELIESubject.MATH, NELIESubject.CREATIVE_ARTS, NELIESubject.PHYSICAL_EDUCATION],
+            context: "entrepreneurship adventure"
+        },
+        {
+            narrative: "Two cars crashed outside your house and you're the first on the scene! Use your science knowledge to understand what happened, math to analyze the evidence, and life skills to help the police investigation.",
+            subjects: [NELIESubject.SCIENCE, NELIESubject.MATH, NELIESubject.LIFE_ESSENTIALS],
+            context: "detective investigation"
+        }
+    ];
+
     private getCurriculumObjectives(gradeLevel: number, subjects: NELIESubject[]): CurriculumNode[] {
         const gradeMap = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
@@ -24,7 +47,7 @@ class EnhancedUniverseGenerationService {
 
         const relevantStep = curriculumSteps.find(step => step.id === stepId);
         if (!relevantStep) {
-            return [];
+            return this.createFallbackObjectives(gradeLevel);
         }
 
         return relevantStep.curriculums
@@ -38,173 +61,90 @@ class EnhancedUniverseGenerationService {
             }));
     }
 
-    private async generateAIObjectives(gradeLevel: number, universeContext: any, baseObjectives: CurriculumNode[]): Promise<CurriculumNode[]> {
-        if (baseObjectives.length === 0) return [];
-
-        const prompt = `
-            Create engaging, contextual learning objectives for a grade ${gradeLevel} student based on this universe:
-            
-            Title: ${universeContext.title}
-            Theme: ${universeContext.theme}
-            Setting: ${universeContext.setting}
-            Main Character: ${universeContext.mainCharacter}
-            Conflict: ${universeContext.conflict}
-            
-            Transform these base curriculum objectives into exciting, story-driven challenges:
-            ${baseObjectives.map((obj, i) => `${i + 1}. ${obj.name} (${obj.subjectName}): ${obj.description}`).join('\n')}
-            
-            For each objective, create:
-            - A thrilling, story-based title that connects to the universe
-            - An engaging description that makes learning feel like an adventure
-            - Keep the same subject and educational level
-            
-            Return as JSON array with this structure:
-            [
-              {
-                "id": "original_id",
-                "name": "Exciting story-based title",
-                "description": "Adventure description that incorporates learning",
-                "subjectName": "original_subject",
-                "educationalLevel": "Grade X"
-              }
-            ]
-        `;
-
-        try {
-            const response = await openAIService.generateUniverse(prompt);
-            if (Array.isArray(response)) {
-                return response.map(obj => ({
-                    ...obj,
-                    id: obj.id || `enhanced-${Date.now()}-${Math.random().toString(36).substring(7)}`
-                }));
+    private createFallbackObjectives(gradeLevel: number): CurriculumNode[] {
+        return [
+            {
+                id: 'fallback-math',
+                name: 'Problem Solving Adventures',
+                description: 'Use mathematical thinking to solve real-world puzzles and challenges.',
+                subjectName: 'Mathematics',
+                educationalLevel: `Grade ${gradeLevel}`
+            },
+            {
+                id: 'fallback-science',
+                name: 'Science Detective Work',
+                description: 'Investigate natural phenomena and discover how things work around us.',
+                subjectName: 'Science',
+                educationalLevel: `Grade ${gradeLevel}`
+            },
+            {
+                id: 'fallback-english',
+                name: 'Story Creation Workshop',
+                description: 'Express yourself through creative writing and storytelling adventures.',
+                subjectName: 'English Language Arts',
+                educationalLevel: `Grade ${gradeLevel}`
             }
-            return baseObjectives;
-        } catch (error) {
-            console.error('Error generating AI objectives:', error);
-            return baseObjectives;
-        }
+        ];
     }
 
     public async generate(studentProfile: any): Promise<DailyUniverse> {
+        console.log('🌟 Enhanced Universe Generation Service: Starting generation...');
+        
+        const themeData = this.enhancedThemes[Math.floor(Math.random() * this.enhancedThemes.length)];
+        const { narrative, subjects, context } = themeData;
         const gradeLevel = studentProfile.gradeLevel || 4;
         const preferredLearningStyle = studentProfile.preferredLearningStyle || 'mixed';
-        
-        // Step 1: Generate a completely unique universe with AI
-        const universePrompt = `
-            Create a completely unique and engaging learning universe for a grade ${gradeLevel} student.
-            Learning style preference: ${preferredLearningStyle}
+        const objectives = this.getCurriculumObjectives(gradeLevel, subjects);
+
+        console.log('🎯 Selected theme:', context);
+        console.log('📚 Found objectives:', objectives.length);
+
+        const prompt = `
+            Create an engaging daily learning universe for a grade ${gradeLevel} student.
+            Theme: "${narrative}"
+            Context: ${context}
+            Learning style: ${preferredLearningStyle}
             
-            Generate a fresh, original adventure scenario that hasn't been used before. Include:
+            Generate an exciting title and immersive description that makes learning feel like an adventure.
+            The universe should weave together these learning objectives naturally:
+            ${objectives.map(obj => `- ${obj.name}: ${obj.description}`).join('\n')}
             
-            1. A captivating title that sounds like an exciting adventure
-            2. An immersive setting (could be fantasy, sci-fi, historical, modern-day, etc.)
-            3. A main character the student can relate to
-            4. An interesting conflict or challenge that needs solving
-            5. A theme that naturally incorporates learning opportunities
-            6. An engaging description that makes the student excited to participate
-            
-            Make it feel like the beginning of an epic story where learning happens naturally through adventure.
-            Avoid common clichés like "save the world" or "magical kingdom" unless you can make them truly unique.
-            
-            Return as JSON with this exact structure:
-            {
-              "title": "Adventure title",
-              "theme": "Brief theme description", 
-              "setting": "Detailed setting description",
-              "mainCharacter": "Character description",
-              "conflict": "Main challenge/conflict",
-              "description": "Immersive adventure description that excites students",
-              "subjects": ["Mathematics", "Science", "Geography"]
-            }
+            Make it feel like the student is the hero of their own learning story!
         `;
 
         try {
-            console.log('🎯 Generating completely AI-driven universe...');
-            const aiUniverse = await openAIService.generateUniverse(universePrompt);
-            
-            // Step 2: Get relevant subjects from AI response
-            const subjects = (aiUniverse.subjects || ['Mathematics', 'Science']).map(subject => {
-                // Map to NELIE subjects
-                const subjectMap = {
-                    'Mathematics': NELIESubject.MATH,
-                    'Math': NELIESubject.MATH,
-                    'Science': NELIESubject.SCIENCE,
-                    'Geography': NELIESubject.GEOGRAPHY,
-                    'English': NELIESubject.ENGLISH,
-                    'Language': NELIESubject.ENGLISH,
-                    'Arts': NELIESubject.CREATIVE_ARTS,
-                    'Physical Education': NELIESubject.PHYSICAL_EDUCATION,
-                    'Life Skills': NELIESubject.LIFE_ESSENTIALS
-                };
-                return subjectMap[subject] || NELIESubject.MATH;
-            });
-
-            // Step 3: Get base curriculum objectives
-            const baseObjectives = this.getCurriculumObjectives(gradeLevel, subjects.slice(0, 3));
-            
-            // Step 4: Transform objectives with AI to match the universe
-            const enhancedObjectives = await this.generateAIObjectives(gradeLevel, aiUniverse, baseObjectives);
+            console.log('🤖 Calling OpenAI service...');
+            const aiResponse = await openAIService.generateUniverse(prompt);
+            console.log('✅ AI response received');
 
             const universe: DailyUniverse = {
-                id: `ai-universe-${Date.now()}`,
-                title: aiUniverse.title || 'Your AI-Generated Adventure',
-                description: aiUniverse.description || 'Embark on a completely unique learning adventure!',
-                theme: aiUniverse.theme || 'AI-Generated Learning Quest',
-                objectives: enhancedObjectives,
+                id: `enhanced-universe-${Date.now()}`,
+                title: aiResponse?.title || `${context.charAt(0).toUpperCase() + context.slice(1)} Awaits!`,
+                description: aiResponse?.description || `Embark on an exciting ${context} where every challenge teaches you something new!`,
+                theme: narrative,
+                objectives: objectives,
                 learningAtoms: [],
             };
 
-            console.log('✨ AI-Generated Universe Created:', {
-                title: universe.title,
-                theme: universe.theme,
-                objectiveCount: enhancedObjectives.length,
-                setting: aiUniverse.setting,
-                conflict: aiUniverse.conflict
-            });
-
+            console.log('🎉 Enhanced universe generated successfully:', universe.title);
             return universe;
-
         } catch (error) {
-            console.error('Error generating AI universe:', error);
-            // Return a completely AI-generated fallback
-            return this.createAIFallbackUniverse(gradeLevel);
+            console.error('❌ Error in enhanced universe generation:', error);
+            return this.createEnhancedFallbackUniverse(narrative, objectives, context);
         }
     }
 
-    private async createAIFallbackUniverse(gradeLevel: number): Promise<DailyUniverse> {
-        const fallbackPrompt = `
-            Create a simple but engaging learning adventure for grade ${gradeLevel} students.
-            Make it creative and fun, avoiding common educational clichés.
-            
-            Return as JSON:
-            {
-              "title": "Creative adventure title",
-              "description": "Fun adventure description",
-              "theme": "Adventure theme"
-            }
-        `;
-
-        try {
-            const fallbackUniverse = await openAIService.generateUniverse(fallbackPrompt);
-            return {
-                id: `ai-fallback-${Date.now()}`,
-                title: fallbackUniverse.title || 'The Mystery Learning Quest',
-                description: fallbackUniverse.description || 'Join an exciting adventure where every challenge teaches you something amazing!',
-                theme: fallbackUniverse.theme || 'Educational Adventure',
-                objectives: [],
-                learningAtoms: [],
-            };
-        } catch (error) {
-            // Absolute fallback if AI fails completely
-            return {
-                id: `final-fallback-${Date.now()}`,
-                title: 'The Great Learning Adventure',
-                description: 'Embark on an exciting journey where every challenge is a chance to learn something new and amazing!',
-                theme: 'Learning Quest',
-                objectives: [],
-                learningAtoms: [],
-            };
-        }
+    private createEnhancedFallbackUniverse(theme: string, objectives: CurriculumNode[], context: string): DailyUniverse {
+        console.log('🔄 Creating enhanced fallback universe...');
+        
+        return {
+            id: `enhanced-fallback-${Date.now()}`,
+            title: `Your ${context.charAt(0).toUpperCase() + context.slice(1)} Begins!`,
+            description: `Ready for an amazing learning adventure? Dive into challenges that will test your skills and expand your knowledge!`,
+            theme: theme,
+            objectives: objectives.length > 0 ? objectives : this.createFallbackObjectives(4),
+            learningAtoms: [],
+        };
     }
 }
 

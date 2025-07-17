@@ -1,5 +1,4 @@
 
-import React from 'react';
 import ImprovedLearningSession from './components/ImprovedLearningSession';
 
 interface AILearningModuleProps {

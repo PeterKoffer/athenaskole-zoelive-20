@@ -1,540 +1,68 @@
+
 [
   {
-    "id": "1",
-    "stepNumber": 1,
-    "title": "Foundation Basics",
-    "description": "Learn the fundamental concepts and basic skills",
-    "isCompleted": false,
-    "isLocked": false,
-    "estimatedTime": 45,
-    "difficulty": "easy",
+    "id": "4",
+    "grade": 4,
     "curriculums": [
       {
-        "id": "k-cc-1",
-        "stepId": "1",
-        "title": "Count to 100 by ones and tens",
-        "description": "Count forward beginning from any given number",
-        "subject": "Counting and Cardinality",
-        "content": "Description: Count forward beginning from any given number. Standards: K.CC.1.",
-        "duration": 15,
-        "isCompleted": false,
-        "order": 1
+        "id": "math-grade4-fractions",
+        "title": "Understanding Fractions",
+        "description": "Learn about parts of a whole through visual fraction models and real-world examples.",
+        "subject": "Mathematics"
       },
       {
-        "id": "k-cc-2",
-        "stepId": "1",
-        "title": "Count objects and understand cardinality",
-        "description": "Count to tell the number of objects",
-        "subject": "Counting and Cardinality",
-        "content": "Description: Count to tell the number of objects. Standards: K.CC.4, K.CC.5.",
-        "duration": 20,
-        "isCompleted": false,
-        "order": 2
+        "id": "science-grade4-states",
+        "title": "States of Matter",
+        "description": "Explore solids, liquids, and gases through hands-on experiments and observations.",
+        "subject": "Science"
       },
       {
-        "id": "k-oa-1",
-        "stepId": "1",
-        "title": "Addition and subtraction within 5",
-        "description": "Represent addition and subtraction with objects",
-        "subject": "Operations and Algebraic Thinking",
-        "content": "Description: Represent addition and subtraction with objects. Standards: K.OA.1, K.OA.2.",
-        "duration": 25,
-        "isCompleted": false,
-        "order": 3
+        "id": "english-grade4-writing",
+        "title": "Creative Writing Adventures",
+        "description": "Develop storytelling skills through creative writing exercises and narrative techniques.",
+        "subject": "English Language Arts"
       },
       {
-        "id": "dk-math-basic-arithmetic",
-        "stepId": "1",
-        "title": "Basic Arithmetic (Grundlæggende regning)",
-        "description": "Addition, subtraction, multiplication and division with focus on understanding",
-        "subject": "Mathematics (Matematik)",
-        "content": "Description: Addition, subtraction, multiplication and division with focus on understanding. Standards: DK-MATH-FOLK-BASIC.",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 4
-      },
-      {
-        "id": "dk-danish-reading",
-        "stepId": "1",
-        "title": "Reading Comprehension (Læseforståelse)",
-        "description": "Developing reading skills and text comprehension",
-        "subject": "Danish Language (Dansk)",
-        "content": "Description: Developing reading skills and text comprehension. Standards: DK-DANSK-READ.",
-        "duration": 35,
-        "isCompleted": false,
-        "order": 5
-      }
-    ]
-  },
-  {
-    "id": "2",
-    "stepNumber": 2,
-    "title": "Building Blocks",
-    "description": "Understand core principles and building blocks",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 60,
-    "difficulty": "easy",
-    "curriculums": [
-      {
-        "id": "1-oa-1",
-        "stepId": "2",
-        "title": "Addition and subtraction within 20",
-        "description": "Use strategies to add and subtract within 20",
-        "subject": "Operations and Algebraic Thinking",
-        "content": "Description: Use strategies to add and subtract within 20. Standards: 1.OA.1, 1.OA.2.",
-        "duration": 30,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "1-nbt-1",
-        "stepId": "2",
-        "title": "Count to 120",
-        "description": "Count to 120, starting at any number",
-        "subject": "Number and Operations in Base Ten",
-        "content": "Description: Count to 120, starting at any number. Standards: 1.NBT.1.",
-        "duration": 25,
-        "isCompleted": false,
-        "order": 2
-      },
-      {
-        "id": "dk-english-basic",
-        "stepId": "2",
-        "title": "Basic English Communication",
-        "description": "Fundamental English speaking and listening skills",
-        "subject": "English (Engelsk)",
-        "content": "Description: Fundamental English speaking and listening skills. Standards: DK-ENG-BASIC.",
-        "duration": 40,
-        "isCompleted": false,
-        "order": 3
+        "id": "geography-grade4-maps",
+        "title": "Map Reading Skills",
+        "description": "Learn to read and interpret different types of maps and understand basic geography.",
+        "subject": "Geography"
       }
     ]
   },
   {
     "id": "3",
-    "stepNumber": 3,
-    "title": "Essential Skills",
-    "description": "Develop essential skills for progression",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 75,
-    "difficulty": "medium",
+    "grade": 3,
     "curriculums": [
       {
-        "id": "2-oa-1",
-        "stepId": "3",
-        "title": "Addition and subtraction within 100",
-        "description": "Use strategies to solve word problems",
-        "subject": "Operations and Algebraic Thinking",
-        "content": "Description: Use strategies to solve word problems. Standards: 2.OA.1.",
-        "duration": 35,
-        "isCompleted": false,
-        "order": 1
+        "id": "math-grade3-addition",
+        "title": "Addition and Subtraction",
+        "description": "Master basic arithmetic operations with fun games and practical problems.",
+        "subject": "Mathematics"
       },
       {
-        "id": "dk-science-nature",
-        "stepId": "3",
-        "title": "Nature Studies (Naturstudier)",
-        "description": "Understanding the natural world through observation and experimentation",
-        "subject": "Science (Natur/teknik)",
-        "content": "Description: Understanding the natural world through observation and experimentation. Standards: DK-NT-NATURE.",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 2
-      }
-    ]
-  },
-  {
-    "id": "4",
-    "stepNumber": 4,
-    "title": "Intermediate Concepts",
-    "description": "Explore intermediate level concepts",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 90,
-    "difficulty": "medium",
-    "curriculums": [
-      {
-        "id": "3-oa-1",
-        "stepId": "4",
-        "title": "Multiplication and division",
-        "description": "Understand multiplication and division concepts",
-        "subject": "Operations and Algebraic Thinking",
-        "content": "Description: Understand multiplication and division concepts. Standards: 3.OA.1, 3.OA.2.",
-        "duration": 40,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "3-nf-1",
-        "stepId": "4",
-        "title": "Understanding fractions",
-        "description": "Understand fractions as numbers",
-        "subject": "Number and Operations—Fractions",
-        "content": "Description: Understand fractions as numbers. Standards: 3.NF.1, 3.NF.2.",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 2
-      },
-      {
-        "id": "4-oa-1",
-        "stepId": "4",
-        "title": "Multi-step word problems",
-        "description": "Solve multi-step word problems with whole numbers",
-        "subject": "Operations and Algebraic Thinking",
-        "content": "Description: Solve multi-step word problems with whole numbers. Standards: 4.OA.1, 4.OA.2.",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 3
-      },
-      {
-        "id": "4-nf-1",
-        "stepId": "4",
-        "title": "Fraction equivalence",
-        "description": "Understand fraction equivalence and comparison",
-        "subject": "Number and Operations—Fractions",
-        "content": "Description: Understand fraction equivalence and comparison. Standards: 4.NF.1, 4.NF.2.",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 4
-      },
-      {
-        "id": "ccss-math-k-cc-1",
-        "stepId": "4",
-        "title": "Count to 100 by ones and tens",
-        "description": "Count to 100 by ones and by tens",
-        "subject": "Mathematics",
-        "content": "Description: Count to 100 by ones and by tens. Standards: CCSS.MATH.CONTENT.K.CC.A.1.",
-        "duration": 30,
-        "isCompleted": false,
-        "order": 5
+        "id": "science-grade3-plants",
+        "title": "Plant Life Cycles",
+        "description": "Discover how plants grow and change through observation and experiments.",
+        "subject": "Science"
       }
     ]
   },
   {
     "id": "5",
-    "stepNumber": 5,
-    "title": "Advanced Foundations",
-    "description": "Master advanced foundational knowledge",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 105,
-    "difficulty": "medium",
+    "grade": 5,
     "curriculums": [
       {
-        "id": "5-nbt-1",
-        "stepId": "5",
-        "title": "Decimal place value",
-        "description": "Understand decimal place value system",
-        "subject": "Number and Operations in Base Ten",
-        "content": "Description: Understand decimal place value system. Standards: 5.NBT.1, 5.NBT.3.",
-        "duration": 40,
-        "isCompleted": false,
-        "order": 1
+        "id": "math-grade5-decimals",
+        "title": "Working with Decimals",
+        "description": "Understand decimal numbers and their relationship to fractions and percentages.",
+        "subject": "Mathematics"
       },
       {
-        "id": "5-nf-1",
-        "stepId": "5",
-        "title": "Adding and subtracting fractions",
-        "description": "Add and subtract fractions with unlike denominators",
-        "subject": "Number and Operations—Fractions",
-        "content": "Description: Add and subtract fractions with unlike denominators. Standards: 5.NF.1, 5.NF.2.",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 2
-      },
-      {
-        "id": "6-rp-1",
-        "stepId": "5",
-        "title": "Ratios and rates",
-        "description": "Understand ratio concepts and use ratio language",
-        "subject": "Ratios and Proportional Relationships",
-        "content": "Description: Understand ratio concepts and use ratio language. Standards: 6.RP.1, 6.RP.2.",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 3
-      },
-      {
-        "id": "6-ns-1",
-        "stepId": "5",
-        "title": "Negative numbers",
-        "description": "Understand and use positive and negative numbers",
-        "subject": "The Number System",
-        "content": "Description: Understand and use positive and negative numbers. Standards: 6.NS.5, 6.NS.6.",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 4
-      },
-      {
-        "id": "unesco-science-inquiry",
-        "stepId": "5",
-        "title": "Intro: Scientific Inquiry",
-        "description": "Investigation, experimentation, and evidence-based reasoning",
-        "subject": "Science",
-        "content": "Competency: Scientific Inquiry. Description: Investigation, experimentation, and evidence-based reasoning. Goal: SDG 4.7 - Education for Sustainable Development",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 5
-      }
-    ]
-  },
-  {
-    "id": "6",
-    "stepNumber": 6,
-    "title": "Complex Applications",
-    "description": "Apply knowledge to complex scenarios",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 120,
-    "difficulty": "hard",
-    "curriculums": [
-      {
-        "id": "6-rp-1",
-        "stepId": "6",
-        "title": "Ratios and rates",
-        "description": "Understand ratio concepts and use ratio language",
-        "subject": "Ratios and Proportional Relationships",
-        "content": "Description: Understand ratio concepts and use ratio language. Standards: 6.RP.1, 6.RP.2.",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "6-ns-1",
-        "stepId": "6",
-        "title": "Negative numbers",
-        "description": "Understand and use positive and negative numbers",
-        "subject": "The Number System",
-        "content": "Description: Understand and use positive and negative numbers. Standards: 6.NS.5, 6.NS.6.",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 2
-      },
-      {
-        "id": "7-rp-1",
-        "stepId": "6",
-        "title": "Proportional relationships",
-        "description": "Compute unit rates and analyze proportional relationships",
-        "subject": "Ratios and Proportional Relationships",
-        "content": "Description: Compute unit rates and analyze proportional relationships. Standards: 7.RP.1, 7.RP.2.",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 3
-      },
-      {
-        "id": "7-ns-1",
-        "stepId": "6",
-        "title": "Operations with rational numbers",
-        "description": "Apply properties of operations with rational numbers",
-        "subject": "The Number System",
-        "content": "Description: Apply properties of operations with rational numbers. Standards: 7.NS.1, 7.NS.2.",
-        "duration": 55,
-        "isCompleted": false,
-        "order": 4
-      },
-      {
-        "id": "unesco-digital-literacy",
-        "stepId": "6",
-        "title": "Digital Literacy",
-        "description": "Critical evaluation of digital information and responsible technology use",
-        "subject": "Digital Skills",
-        "content": "Competency: Digital Literacy. Description: Critical evaluation of digital information and responsible technology use. Goal: SDG 4.4 - Technical and Vocational Skills",
-        "duration": 50,
-        "isCompleted": false,
-        "order": 5
-      }
-    ]
-  },
-  {
-    "id": "7",
-    "stepNumber": 7,
-    "title": "Specialized Topics",
-    "description": "Dive into specialized areas of study",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 135,
-    "difficulty": "hard",
-    "curriculums": [
-      {
-        "id": "8-ee-1",
-        "stepId": "7",
-        "title": "Exponents and scientific notation",
-        "description": "Work with integer exponents and scientific notation",
-        "subject": "Expressions and Equations",
-        "content": "Description: Work with integer exponents and scientific notation. Standards: 8.EE.1, 8.EE.3.",
-        "duration": 55,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "8-f-1",
-        "stepId": "7",
-        "title": "Functions",
-        "description": "Understand functions and function notation",
-        "subject": "Functions",
-        "content": "Description: Understand functions and function notation. Standards: 8.F.1, 8.F.2.",
-        "duration": 60,
-        "isCompleted": false,
-        "order": 2
-      },
-      {
-        "id": "hs-sse-1",
-        "stepId": "7",
-        "title": "Structure of expressions",
-        "description": "Interpret expressions that represent a quantity",
-        "subject": "Seeing Structure in Expressions",
-        "content": "Description: Interpret expressions that represent a quantity. Standards: A-SSE.1, A-SSE.2.",
-        "duration": 55,
-        "isCompleted": false,
-        "order": 3
-      }
-    ]
-  },
-  {
-    "id": "8",
-    "stepNumber": 8,
-    "title": "Expert Level",
-    "description": "Reach expert-level understanding",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 150,
-    "difficulty": "hard",
-    "curriculums": []
-  },
-  {
-    "id": "9",
-    "stepNumber": 9,
-    "title": "Mastery Phase",
-    "description": "Achieve mastery of all concepts",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 165,
-    "difficulty": "hard",
-    "curriculums": [
-      {
-        "id": "unesco-digital-literacy-mastery",
-        "stepId": "9",
-        "title": "Advanced: Digital Literacy",
-        "description": "Critical evaluation of digital information and responsible technology use",
-        "subject": "Digital Skills",
-        "content": "Competency: Digital Literacy. Description: Critical evaluation of digital information and responsible technology use. Goal: SDG 4.4 - Technical and Vocational Skills",
-        "duration": 60,
-        "isCompleted": false,
-        "order": 1
-      }
-    ]
-  },
-  {
-    "id": "10",
-    "stepNumber": 10,
-    "title": "Integration Skills",
-    "description": "Integrate all learned skills effectively",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 180,
-    "difficulty": "hard",
-    "curriculums": [
-      {
-        "id": "hs-id-1",
-        "stepId": "10",
-        "title": "Data interpretation",
-        "description": "Represent data with plots on the real number line",
-        "subject": "Interpreting Categorical and Quantitative Data",
-        "content": "Description: Represent data with plots on the real number line. Standards: S-ID.1, S-ID.2.",
-        "duration": 45,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "hs-ic-1",
-        "stepId": "10",
-        "title": "Statistical inferences",
-        "description": "Understand statistics as a process for making inferences",
-        "subject": "Making Inferences and Justifying Conclusions",
-        "content": "Description: Understand statistics as a process for making inferences. Standards: S-IC.1, S-IC.2.",
-        "duration": 55,
-        "isCompleted": false,
-        "order": 2
-      },
-      {
-        "id": "unesco-science-inquiry-integration",
-        "stepId": "10",
-        "title": "Project: Scientific Inquiry & Sustainability",
-        "description": "Integrate knowledge to explore Investigation, experimentation, and evidence-based reasoning",
-        "subject": "Interdisciplinary Project",
-        "content": "Standard: UNESCO_SDG4 - Scientific Inquiry. Goal: SDG 4.7 - Education for Sustainable Development. Apply multiple skills.",
-        "duration": 120,
-        "isCompleted": false,
-        "order": 3
-      }
-    ]
-  },
-  {
-    "id": "11",
-    "stepNumber": 11,
-    "title": "Professional Application",
-    "description": "Apply skills in professional contexts",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 195,
-    "difficulty": "hard",
-    "curriculums": [
-      {
-        "id": "unesco-digital-literacy-pro",
-        "stepId": "11",
-        "title": "Application: Digital Literacy",
-        "description": "Real-world application of Critical evaluation of digital information and responsible technology use",
-        "subject": "Vocational Exploration",
-        "content": "Standard: UNESCO_SDG4 - Digital Literacy. Goal: SDG 4.4 - Technical and Vocational Skills. Case studies and practical skills.",
-        "duration": 90,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "dk-english-basic",
-        "stepId": "11",
-        "title": "Basic English Communication",
-        "description": "Fundamental English speaking and listening skills",
-        "subject": "Professional English",
-        "content": "Description: Fundamental English speaking and listening skills. Standards: DK-ENG-BASIC.",
-        "duration": 40,
-        "isCompleted": false,
-        "order": 2
-      }
-    ]
-  },
-  {
-    "id": "12",
-    "stepNumber": 12,
-    "title": "Excellence & Innovation",
-    "description": "Achieve excellence and drive innovation",
-    "isCompleted": false,
-    "isLocked": true,
-    "estimatedTime": 210,
-    "difficulty": "hard",
-    "curriculums": [
-      {
-        "id": "unesco-science-inquiry-excellence",
-        "stepId": "12",
-        "title": "Innovation Challenge: Science",
-        "description": "Design an innovative solution related to Scientific Inquiry",
-        "subject": "Innovation Project",
-        "content": "Challenge based on UNESCO_SDG4 - Scientific Inquiry. Goal: SDG 4.7 - Education for Sustainable Development. Develop a creative project.",
-        "duration": 150,
-        "isCompleted": false,
-        "order": 1
-      },
-      {
-        "id": "hs-bf-1",
-        "stepId": "12",
-        "title": "Building functions",
-        "description": "Write a function that describes a relationship",
-        "subject": "Building Functions",
-        "content": "Description: Write a function that describes a relationship. Standards: F-BF.1, F-BF.3.",
-        "duration": 60,
-        "isCompleted": false,
-        "order": 2
+        "id": "science-grade5-weather",
+        "title": "Weather and Climate",
+        "description": "Study weather patterns and climate systems around the world.",
+        "subject": "Science"
       }
     ]
   }

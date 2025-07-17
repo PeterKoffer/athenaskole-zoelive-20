@@ -8,6 +8,7 @@ import { AuthProvider } from './components/AuthProvider';
 import LandingPage from './pages/LandingPage';
 import DailyUniversePage from './pages/DailyUniversePage';
 import SimulatorPage from './pages/SimulatorPage';
+import Auth from './pages/Auth';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -28,6 +29,7 @@ function App() {
             <div className="min-h-screen bg-background">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="/daily-universe" element={<DailyUniversePage />} />
                 <Route path="/simulator" element={<SimulatorPage />} />
               </Routes>
