@@ -19,6 +19,7 @@ import AboutPage from "./pages/AboutPage";
 import UniversePage from "./pages/UniversePage";
 import CurriculumEditorPage from "./pages/CurriculumEditorPage";
 import SimulatorPage from "./pages/EducationalSimulatorPage";
+import TestingPage from "./pages/TestingPage";
 
 export const navItems = [
   {
@@ -134,5 +135,11 @@ export const navItems = [
     to: "/simulator",
     icon: <TestTube className="h-4 w-4" />,
     page: <SimulatorPage />,
+  },
+  {
+    title: "Testing",
+    to: "/testing",
+    icon: <TestTube className="h-4 w-4" />,
+    page: <TestingPage />,
   },
 ];
