@@ -84,22 +84,33 @@ export class FallbackContentService {
     }
   };
 
-  createFallbackContent(subject: string, skillArea: string, difficultyLevel: number): AdaptiveContentRecord {
-    const defaultOptions = ['Option A', 'Option B', 'Option C', 'Option D'];
-    const subjectQuestions = this.fallbackQuestions[subject as keyof typeof this.fallbackQuestions];
-    const questions = subjectQuestions?.[skillArea as keyof typeof subjectQuestions] ||
+  private getRandomInt(max: number): number {
+    const randomBuffer = new Uint32Array(1);
+    crypto.getRandomValues(randomBuffer);
+    return randomBuffer[0] % max;
+  }
+
+  private getQuestion(subject: string, skillArea: string): string {
+    const questions = this.fallbackQuestions[subject as keyof typeof this.fallbackQuestions]?.[skillArea as keyof typeof subjectQuestions] ||
                     [`Sample question for ${subject} - ${skillArea}`];
 
-    let question = questions[Math.floor(Math.random() * questions.length)];
+    let question = questions[this.getRandomInt(questions.length)];
 
     if (this.usedQuestions.has(question)) {
       const availableQuestions = questions.filter(q => !this.usedQuestions.has(q));
       if (availableQuestions.length > 0) {
-        question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+        question = availableQuestions[this.getRandomInt(availableQuestions.length)];
       }
     }
 
     this.usedQuestions.add(question);
+    return question;
+  }
+
+  createFallbackContent(subject: string, skillArea: string, difficultyLevel: number): AdaptiveContentRecord {
+    const question = this.getQuestion(subject, skillArea);
+    const defaultOptions = ['Option A', 'Option B', 'Option C', 'Option D'];
+
 
     const contentData = {
       question,
