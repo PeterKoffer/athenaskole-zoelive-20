@@ -1,170 +1,44 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface StableMultipleChoiceRendererProps {
-  atom: any;
-  onComplete: (result: { isCorrect: boolean; selectedAnswer: number; timeSpent: number }) => void;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  onAnswerSelect: (index: number) => void;
+  selectedAnswer: number | null;
 }
 
-const StableMultipleChoiceRenderer = ({ atom, onComplete }: StableMultipleChoiceRendererProps) => {
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [startTime] = useState(Date.now());
-  const [isCompleted, setIsCompleted] = useState(false);
-
-  console.log('🎯 StableMultipleChoiceRenderer received atom:', {
-    atomId: atom?.atom_id,
-    atomType: atom?.atom_type,
-    hasContent: !!atom?.content,
-    contentKeys: atom?.content ? Object.keys(atom.content) : [],
-    content: atom?.content
-  });
-
-  const handleAnswerSelect = useCallback((answerIndex: number) => {
-    if (showResult || isCompleted) return;
-    
-    console.log('👆 Answer selected:', {
-      answerIndex,
-      atomId: atom?.atom_id,
-      question: atom?.content?.question
-    });
-    
-    setSelectedAnswer(answerIndex);
-    setShowResult(true);
-  }, [showResult, isCompleted, atom]);
-
-  const handleContinueClick = useCallback(() => {
-    if (isCompleted || selectedAnswer === null) {
-      console.log('⚠️ Continue blocked:', { isCompleted, selectedAnswer });
-      return;
-    }
-    
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    const correctAnswer = atom.content.correctAnswer ?? atom.content.correct ?? 0;
-    const isCorrect = selectedAnswer === correctAnswer;
-    
-    console.log('✅ Question completed:', {
-      selectedAnswer,
-      correctAnswer,
-      isCorrect,
-      timeSpent,
-      atomId: atom.atom_id
-    });
-    
-    setIsCompleted(true);
-    onComplete({ isCorrect, selectedAnswer, timeSpent });
-  }, [selectedAnswer, atom, startTime, onComplete, isCompleted]);
-
-  if (!atom?.content) {
-    console.error('❌ StableMultipleChoiceRenderer: No content in atom:', atom);
-    return (
-      <Card className="bg-red-900/20 border-red-700">
-        <CardContent className="p-4">
-          <p className="text-red-400">Error: Invalid question data</p>
-          <pre className="text-xs text-red-300 mt-2">{JSON.stringify(atom, null, 2)}</pre>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const correctAnswer = atom.content.correctAnswer ?? atom.content.correct ?? 0;
-  const options = atom.content.options || [];
-
-  if (!options.length) {
-    console.error('❌ StableMultipleChoiceRenderer: No options found:', atom.content);
-    return (
-      <Card className="bg-red-900/20 border-red-700">
-        <CardContent className="p-4">
-          <p className="text-red-400">Error: No answer options available</p>
-          <pre className="text-xs text-red-300 mt-2">{JSON.stringify(atom.content, null, 2)}</pre>
-        </CardContent>
-      </Card>
-    );
-  }
-
+const StableMultipleChoiceRenderer = ({
+  question,
+  options,
+  correctAnswer,
+  onAnswerSelect,
+  selectedAnswer
+}: StableMultipleChoiceRendererProps) => {
   return (
     <Card className="bg-gray-800 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center justify-between">
-          <span>Grade 5 Math Question</span>
-          <Clock className="w-5 h-5 text-blue-400" />
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="text-xl font-semibold text-white mb-6">
-          {atom.content.question}
+      <CardContent className="p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">{question}</h3>
+        <div className="space-y-3">
+          {options.map((option, index) => (
+            <Button
+              key={index}
+              onClick={() => onAnswerSelect(index)}
+              variant={selectedAnswer === index ? "default" : "outline"}
+              className={`w-full text-left justify-start p-4 h-auto ${
+                selectedAnswer === index 
+                  ? "bg-blue-600 hover:bg-blue-700" 
+                  : "bg-gray-700 hover:bg-gray-600 border-gray-600"
+              }`}
+            >
+              <span className="font-semibold mr-3">{String.fromCharCode(65 + index)}.</span>
+              {option}
+            </Button>
+          ))}
         </div>
-
-        <div className="grid gap-3">
-          {options.map((option: string, index: number) => {
-            const isSelected = selectedAnswer === index;
-            const isCorrect = index === correctAnswer;
-            const showCorrect = showResult && isCorrect;
-            const showIncorrect = showResult && isSelected && !isCorrect;
-
-            return (
-              <Button
-                key={index}
-                variant="outline"
-                onClick={() => handleAnswerSelect(index)}
-                disabled={showResult || isCompleted}
-                className={`
-                  p-4 text-left justify-start h-auto whitespace-normal
-                  ${showCorrect ? 'bg-green-600 border-green-500 text-white' : ''}
-                  ${showIncorrect ? 'bg-red-600 border-red-500 text-white' : ''}
-                  ${!showResult ? 'hover:bg-gray-700 border-gray-600' : ''}
-                  ${isSelected && !showResult ? 'bg-blue-600 border-blue-500' : ''}
-                `}
-              >
-                <div className="flex items-center space-x-3 w-full">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-sm font-bold">
-                    {String.fromCharCode(65 + index)}
-                  </span>
-                  <span className="flex-1">{option}</span>
-                  {showCorrect && <CheckCircle className="w-5 h-5 text-green-200" />}
-                  {showIncorrect && <XCircle className="w-5 h-5 text-red-200" />}
-                </div>
-              </Button>
-            );
-          })}
-        </div>
-
-        {showResult && (
-          <>
-            {atom.content.explanation && (
-              <Card className={selectedAnswer === correctAnswer ? 'bg-green-900/30 border-green-700' : 'bg-red-900/30 border-red-700'}>
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-3">
-                    {selectedAnswer === correctAnswer ? (
-                      <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
-                    )}
-                    <div>
-                      <h4 className="font-semibold mb-2 text-white">
-                        {selectedAnswer === correctAnswer ? 'Correct!' : 'Not quite right'}
-                      </h4>
-                      <p className="text-gray-300">{atom.content.explanation}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            
-            <div className="flex justify-center pt-4">
-              <Button
-                onClick={handleContinueClick}
-                disabled={isCompleted}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-8 text-lg"
-              >
-                {isCompleted ? 'Processing...' : 'Continue'}
-              </Button>
-            </div>
-          </>
-        )}
       </CardContent>
     </Card>
   );

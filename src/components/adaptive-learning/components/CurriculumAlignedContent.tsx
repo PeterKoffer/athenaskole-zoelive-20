@@ -69,12 +69,12 @@ const CurriculumAlignedContent = ({ subject, onObjectiveSelect }: CurriculumAlig
         return;
       }
 
-      const formattedObjectives = data.map(item => ({
+      const formattedObjectives: LearningObjective[] = data.map(item => ({
         id: item.id,
         title: item.title,
-        description: item.description,
+        description: item.description || '',
         difficulty_level: item.difficulty_level,
-        estimated_time_minutes: item.estimated_time_minutes,
+        estimated_time_minutes: item.estimated_time_minutes || 0,
         curriculum_standard: Array.isArray(item.curriculum_standards) 
           ? item.curriculum_standards[0] 
           : item.curriculum_standards
