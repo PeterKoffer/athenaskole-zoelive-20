@@ -25,7 +25,7 @@ class OpenAIService {
     return this.openai;
   }
 
-  public async generateUniverse(prompt: string, signal?: AbortSignal): Promise<Universe> {
+  public async generateUniverse(prompt: string, signal?: AbortSignal): Promise<any> {
     try {
       const openai = await this.getOpenAI();
       
@@ -34,7 +34,7 @@ class OpenAIService {
         messages: [
           {
             role: "system",
-            content: "You are a creative universe generator. Generate a detailed universe based on the user's prompt. Return only valid JSON with the structure: {title: string, description: string, characters: string[], locations: string[], activities: string[]}"
+            content: "You are a creative educational content generator. Always return valid JSON that matches the requested structure exactly. Be creative, engaging, and educational. Avoid repetitive themes and create truly unique content each time."
           },
           {
             role: "user",
@@ -42,7 +42,7 @@ class OpenAIService {
           }
         ],
         max_tokens: 2048,
-        temperature: 0.7,
+        temperature: 0.9, // Higher temperature for more creativity
       }, { signal });
 
       const universeText = response.choices[0].message.content;
@@ -51,10 +51,13 @@ class OpenAIService {
       }
 
       try {
-        const universe = JSON.parse(universeText);
+        // Clean the response to ensure it's valid JSON
+        const cleanedText = universeText.replace(/```json\n?|\n?```/g, '').trim();
+        const universe = JSON.parse(cleanedText);
         return universe;
-      } catch (error) {
+      } catch (parseError) {
         console.error('Failed to parse OpenAI response as JSON:', universeText);
+        console.error('Parse error:', parseError);
         throw new Error('Failed to parse universe data');
       }
     } catch (error) {

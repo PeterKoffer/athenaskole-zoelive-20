@@ -15,94 +15,6 @@ interface DailyUniverse {
 import curriculumSteps from '../../public/data/curriculum-steps.json';
 
 class EnhancedUniverseGenerationService {
-    private themes = [
-        {
-            narrative: "You have to travel to China to help a man in his store.",
-            subjects: [NELIESubject.GEOGRAPHY, NELIESubject.WORLD_LANGUAGES, NELIESubject.MATH]
-        },
-        {
-            narrative: "All the power is out in your home, and you need to fix it.",
-            subjects: [NELIESubject.SCIENCE, NELIESubject.MATH, NELIESubject.LIFE_ESSENTIALS]
-        },
-        {
-            narrative: "Your local mall needs a sporting goods store, and you will open it.",
-            subjects: [NELIESubject.MATH, NELIESubject.CREATIVE_ARTS, NELIESubject.PHYSICAL_EDUCATION]
-        },
-        {
-            narrative: "Two cars crashed outside your house this morning, and you need to help the police with the investigation.",
-            subjects: [NELIESubject.SCIENCE, NELIESubject.MATH, NELIESubject.LIFE_ESSENTIALS]
-        }
-    ];
-
-    private enhanceObjectiveWithTheme(objective: CurriculumNode, theme: string, narrative: string): CurriculumNode {
-        const themeEnhancements = {
-            "You have to travel to China to help a man in his store.": {
-                math: {
-                    counting: "Help Mr. Li count inventory in his Chinese market using traditional counting methods",
-                    addition: "Calculate the total cost of items in Mr. Li's store using Chinese currency",
-                    patterns: "Discover number patterns in ancient Chinese mathematics"
-                }
-            },
-            "All the power is out in your home, and you need to fix it.": {
-                math: {
-                    counting: "Count electrical components needed to restore power to your house",
-                    addition: "Add up the voltage requirements for different appliances",
-                    patterns: "Find patterns in electrical circuit configurations"
-                },
-                science: {
-                    electricity: "Investigate how electrical circuits work in your home",
-                    energy: "Explore different types of energy sources to power your house"
-                }
-            },
-            "Your local mall needs a sporting goods store, and you will open it.": {
-                math: {
-                    counting: "Count sports equipment inventory for your new store",
-                    addition: "Calculate total costs and profits for your sporting goods business",
-                    patterns: "Analyze sales patterns to stock your sports store effectively"
-                }
-            },
-            "Two cars crashed outside your house this morning, and you need to help the police with the investigation.": {
-                math: {
-                    counting: "Count evidence pieces and measure distances at the crash scene",
-                    addition: "Calculate speed and impact forces from the car crash data",
-                    patterns: "Analyze traffic patterns to understand how the crash happened"
-                },
-                science: {
-                    physics: "Investigate the physics of motion and forces in car crashes",
-                    measurement: "Use scientific tools to measure and analyze the crash scene"
-                }
-            }
-        };
-
-        const enhancements = themeEnhancements[narrative];
-        if (!enhancements) return objective;
-
-        const subject = objective.subjectName.toLowerCase();
-        const subjectEnhancements = enhancements[subject];
-        if (!subjectEnhancements) return objective;
-
-        // Find the best enhancement based on the objective content
-        let enhancedName = objective.name;
-        let enhancedDescription = objective.description;
-
-        if (objective.name.toLowerCase().includes('count') && subjectEnhancements.counting) {
-            enhancedName = subjectEnhancements.counting;
-            enhancedDescription = `Use counting skills in a real-world scenario: ${subjectEnhancements.counting.toLowerCase()}`;
-        } else if (objective.name.toLowerCase().includes('add') && subjectEnhancements.addition) {
-            enhancedName = subjectEnhancements.addition;
-            enhancedDescription = `Apply addition skills to solve problems: ${subjectEnhancements.addition.toLowerCase()}`;
-        } else if (objective.name.toLowerCase().includes('pattern') && subjectEnhancements.patterns) {
-            enhancedName = subjectEnhancements.patterns;
-            enhancedDescription = `Discover and use patterns: ${subjectEnhancements.patterns.toLowerCase()}`;
-        }
-
-        return {
-            ...objective,
-            name: enhancedName,
-            description: enhancedDescription
-        };
-    }
-
     private getCurriculumObjectives(gradeLevel: number, subjects: NELIESubject[]): CurriculumNode[] {
         const gradeMap = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
@@ -126,80 +38,173 @@ class EnhancedUniverseGenerationService {
             }));
     }
 
-    public async generate(studentProfile: any): Promise<DailyUniverse> {
-        const themeData = this.themes[Math.floor(Math.random() * this.themes.length)];
-        const { narrative, subjects } = themeData;
-        const gradeLevel = studentProfile.gradeLevel || 4;
-        const preferredLearningStyle = studentProfile.preferredLearningStyle || 'mixed';
-        
-        // Get base curriculum objectives
-        const baseObjectives = this.getCurriculumObjectives(gradeLevel, subjects);
-        
-        // Enhance objectives with theme context
-        const enhancedObjectives = baseObjectives.map(obj => 
-            this.enhanceObjectiveWithTheme(obj, themeData.narrative, narrative)
-        );
+    private async generateAIObjectives(gradeLevel: number, universeContext: any, baseObjectives: CurriculumNode[]): Promise<CurriculumNode[]> {
+        if (baseObjectives.length === 0) return [];
 
         const prompt = `
-            Generate a daily learning universe for a grade ${gradeLevel} student.
-            The theme of the universe is: "${narrative}".
-            The student's preferred learning style is ${preferredLearningStyle}.
-            Create a compelling title and engaging description that makes learning feel like an adventure.
+            Create engaging, contextual learning objectives for a grade ${gradeLevel} student based on this universe:
             
-            Make the title feel exciting and adventurous, not like a textbook.
-            Make the description immersive and engaging, focusing on the story and adventure.
+            Title: ${universeContext.title}
+            Theme: ${universeContext.theme}
+            Setting: ${universeContext.setting}
+            Main Character: ${universeContext.mainCharacter}
+            Conflict: ${universeContext.conflict}
             
-            The universe should feel like a real adventure where learning happens naturally through solving problems and helping characters.
+            Transform these base curriculum objectives into exciting, story-driven challenges:
+            ${baseObjectives.map((obj, i) => `${i + 1}. ${obj.name} (${obj.subjectName}): ${obj.description}`).join('\n')}
+            
+            For each objective, create:
+            - A thrilling, story-based title that connects to the universe
+            - An engaging description that makes learning feel like an adventure
+            - Keep the same subject and educational level
+            
+            Return as JSON array with this structure:
+            [
+              {
+                "id": "original_id",
+                "name": "Exciting story-based title",
+                "description": "Adventure description that incorporates learning",
+                "subjectName": "original_subject",
+                "educationalLevel": "Grade X"
+              }
+            ]
         `;
 
         try {
-            const aiResponse = await openAIService.generateUniverse(prompt);
+            const response = await openAIService.generateUniverse(prompt);
+            if (Array.isArray(response)) {
+                return response.map(obj => ({
+                    ...obj,
+                    id: obj.id || `enhanced-${Date.now()}-${Math.random().toString(36).substring(7)}`
+                }));
+            }
+            return baseObjectives;
+        } catch (error) {
+            console.error('Error generating AI objectives:', error);
+            return baseObjectives;
+        }
+    }
+
+    public async generate(studentProfile: any): Promise<DailyUniverse> {
+        const gradeLevel = studentProfile.gradeLevel || 4;
+        const preferredLearningStyle = studentProfile.preferredLearningStyle || 'mixed';
+        
+        // Step 1: Generate a completely unique universe with AI
+        const universePrompt = `
+            Create a completely unique and engaging learning universe for a grade ${gradeLevel} student.
+            Learning style preference: ${preferredLearningStyle}
+            
+            Generate a fresh, original adventure scenario that hasn't been used before. Include:
+            
+            1. A captivating title that sounds like an exciting adventure
+            2. An immersive setting (could be fantasy, sci-fi, historical, modern-day, etc.)
+            3. A main character the student can relate to
+            4. An interesting conflict or challenge that needs solving
+            5. A theme that naturally incorporates learning opportunities
+            6. An engaging description that makes the student excited to participate
+            
+            Make it feel like the beginning of an epic story where learning happens naturally through adventure.
+            Avoid common clichés like "save the world" or "magical kingdom" unless you can make them truly unique.
+            
+            Return as JSON with this exact structure:
+            {
+              "title": "Adventure title",
+              "theme": "Brief theme description", 
+              "setting": "Detailed setting description",
+              "mainCharacter": "Character description",
+              "conflict": "Main challenge/conflict",
+              "description": "Immersive adventure description that excites students",
+              "subjects": ["Mathematics", "Science", "Geography"]
+            }
+        `;
+
+        try {
+            console.log('🎯 Generating completely AI-driven universe...');
+            const aiUniverse = await openAIService.generateUniverse(universePrompt);
+            
+            // Step 2: Get relevant subjects from AI response
+            const subjects = (aiUniverse.subjects || ['Mathematics', 'Science']).map(subject => {
+                // Map to NELIE subjects
+                const subjectMap = {
+                    'Mathematics': NELIESubject.MATH,
+                    'Math': NELIESubject.MATH,
+                    'Science': NELIESubject.SCIENCE,
+                    'Geography': NELIESubject.GEOGRAPHY,
+                    'English': NELIESubject.ENGLISH,
+                    'Language': NELIESubject.ENGLISH,
+                    'Arts': NELIESubject.CREATIVE_ARTS,
+                    'Physical Education': NELIESubject.PHYSICAL_EDUCATION,
+                    'Life Skills': NELIESubject.LIFE_ESSENTIALS
+                };
+                return subjectMap[subject] || NELIESubject.MATH;
+            });
+
+            // Step 3: Get base curriculum objectives
+            const baseObjectives = this.getCurriculumObjectives(gradeLevel, subjects.slice(0, 3));
+            
+            // Step 4: Transform objectives with AI to match the universe
+            const enhancedObjectives = await this.generateAIObjectives(gradeLevel, aiUniverse, baseObjectives);
 
             const universe: DailyUniverse = {
-                id: `universe-${Date.now()}`,
-                title: aiResponse?.title || 'Your Adventure Awaits',
-                description: aiResponse?.description || 'Embark on an exciting learning adventure with real-world challenges.',
-                theme: narrative,
+                id: `ai-universe-${Date.now()}`,
+                title: aiUniverse.title || 'Your AI-Generated Adventure',
+                description: aiUniverse.description || 'Embark on a completely unique learning adventure!',
+                theme: aiUniverse.theme || 'AI-Generated Learning Quest',
                 objectives: enhancedObjectives,
                 learningAtoms: [],
             };
 
-            console.log('🎯 Enhanced Universe Generated:', {
+            console.log('✨ AI-Generated Universe Created:', {
                 title: universe.title,
+                theme: universe.theme,
                 objectiveCount: enhancedObjectives.length,
-                enhancedObjectives: enhancedObjectives.map(obj => ({
-                    original: obj.name,
-                    enhanced: obj.description
-                }))
+                setting: aiUniverse.setting,
+                conflict: aiUniverse.conflict
             });
 
             return universe;
+
         } catch (error) {
-            console.error('Error generating enhanced universe:', error);
-            // Return enhanced fallback universe
-            return this.createEnhancedFallbackUniverse(narrative, enhancedObjectives);
+            console.error('Error generating AI universe:', error);
+            // Return a completely AI-generated fallback
+            return this.createAIFallbackUniverse(gradeLevel);
         }
     }
 
-    private createEnhancedFallbackUniverse(theme: string, objectives: CurriculumNode[]): DailyUniverse {
-        const adventureTitles = [
-            'The Great Learning Quest',
-            'Mystery of the Missing Knowledge',
-            'Adventure in Learning Land',
-            'The Educational Expedition',
-            'Mission: Learn and Discover'
-        ];
+    private async createAIFallbackUniverse(gradeLevel: number): Promise<DailyUniverse> {
+        const fallbackPrompt = `
+            Create a simple but engaging learning adventure for grade ${gradeLevel} students.
+            Make it creative and fun, avoiding common educational clichés.
+            
+            Return as JSON:
+            {
+              "title": "Creative adventure title",
+              "description": "Fun adventure description",
+              "theme": "Adventure theme"
+            }
+        `;
 
-        const randomTitle = adventureTitles[Math.floor(Math.random() * adventureTitles.length)];
-
-        return {
-            id: `enhanced-fallback-universe-${Date.now()}`,
-            title: randomTitle,
-            description: 'Join an exciting adventure where every challenge you face teaches you something new. Solve real-world problems and help interesting characters while building your skills!',
-            theme: theme,
-            objectives: objectives,
-            learningAtoms: [],
-        };
+        try {
+            const fallbackUniverse = await openAIService.generateUniverse(fallbackPrompt);
+            return {
+                id: `ai-fallback-${Date.now()}`,
+                title: fallbackUniverse.title || 'The Mystery Learning Quest',
+                description: fallbackUniverse.description || 'Join an exciting adventure where every challenge teaches you something amazing!',
+                theme: fallbackUniverse.theme || 'Educational Adventure',
+                objectives: [],
+                learningAtoms: [],
+            };
+        } catch (error) {
+            // Absolute fallback if AI fails completely
+            return {
+                id: `final-fallback-${Date.now()}`,
+                title: 'The Great Learning Adventure',
+                description: 'Embark on an exciting journey where every challenge is a chance to learn something new and amazing!',
+                theme: 'Learning Quest',
+                objectives: [],
+                learningAtoms: [],
+            };
+        }
     }
 }
 
