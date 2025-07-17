@@ -1,37 +1,43 @@
 
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import LanguageLearning from "./LanguageLearning";
-import SubjectSelector from "./ai-tutor/SubjectSelector";
-import ChatMessage from "./ai-tutor/ChatMessage";
-import LearningOptions from "./ai-tutor/LearningOptions";
-import ChatInput from "./ai-tutor/ChatInput";
-import LanguageSelector from "./ai-tutor/LanguageSelector";
-import { useMessageHandler } from "./ai-tutor/useMessageHandler";
-import { speechService } from "@/services/SpeechService";
-import { speechRecognitionService } from "@/services/SpeechRecognitionService";
-import { Volume2, VolumeX } from "lucide-react";
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Send, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { openAIService } from '@/services/OpenAIService';
+import { speechService } from '@/services/SpeechService';
 
-const AITutor = ({ user }) => {
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+interface LearningOption {
+  id: string;
+  title: string;
+  description: string;
+}
+
+interface AITutorProps {
+  onBack?: () => void;
+}
+
+const AITutor: React.FC<AITutorProps> = ({ onBack }) => {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [speechEnabled, setSpeechEnabled] = useState(true);
-  const [currentSubject, setCurrentSubject] = useState("math");
-  const [showLanguageLearning, setShowLanguageLearning] = useState(false);
-  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("");
-  const messagesEndRef = useRef(null);
-
-  const { messages, handleSendMessage, handleLearningOption } = useMessageHandler({
-    user,
-    currentSubject,
-    setIsSpeaking
-  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
@@ -39,126 +45,203 @@ const AITutor = ({ user }) => {
   }, [messages]);
 
   useEffect(() => {
-    if (speechEnabled && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.sender === 'ai') {
-        speechService.speak(lastMessage.text);
+    // Welcome message
+    if (messages.length === 0) {
+      const welcomeMessage: Message = {
+        role: 'assistant',
+        content: 'Hello! I\'m your AI tutor. How can I help you learn today?',
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, []);
+
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      role: 'user',
+      content: message,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      const response = await openAIService.generateResponse(message, messages);
+      
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: response,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error. Please try again.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLearningOptionSelect = (option: LearningOption) => {
+    handleSendMessage(`I'd like to learn about: ${option.title}`);
+  };
+
+  const handleSpeechToText = async () => {
+    try {
+      if (isListening) {
+        setIsListening(false);
+        await speechService.stopListening();
+      } else {
+        setIsListening(true);
+        const result = await speechService.startListening('en-US');
+        if (result) {
+          setInputMessage(result);
+        }
+        setIsListening(false);
       }
+    } catch (error) {
+      console.error('Speech to text error:', error);
+      setIsListening(false);
     }
-  }, [messages, speechEnabled]);
+  };
 
-  const handleLearningOptionWithLanguageCheck = (option) => {
-    if (option.id === "language") {
-      setShowLanguageSelection(true);
-      return;
+  const handleTextToSpeech = async (text: string) => {
+    try {
+      if (isSpeaking) {
+        setIsSpeaking(false);
+        speechService.stop();
+      } else {
+        setIsSpeaking(true);
+        await speechService.speak(text);
+        setIsSpeaking(false);
+      }
+    } catch (error) {
+      console.error('Text to speech error:', error);
+      setIsSpeaking(false);
     }
-    handleLearningOption(option);
   };
 
-  const handleLanguageSelect = (languageCode) => {
-    setSelectedLanguage(languageCode);
-    setShowLanguageSelection(false);
-    setShowLanguageLearning(true);
-  };
-
-  const stopSpeaking = () => {
-    speechService.cancel();
-    setIsSpeaking(false);
-  };
-
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    speechRecognitionService.start();
-    speechRecognitionService.onResult((result) => {
-      handleSendMessage(result);
-      setIsRecording(false);
-    });
-  };
-
-  const handleStopRecording = () => {
-    setIsRecording(false);
-    speechRecognitionService.stop();
-  };
-
-  if (showLanguageSelection) {
-    return (
-      <LanguageSelector
-        onLanguageSelect={handleLanguageSelect}
-        onBack={() => setShowLanguageSelection(false)}
-      />
-    );
-  }
-
-  if (showLanguageLearning) {
-    return (
-      <div className="space-y-6">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setShowLanguageLearning(false);
-            setSelectedLanguage("");
-          }}
-          className="text-white border-gray-600 hover:bg-gray-700"
-        >
-          ← Back to AI Tutor
-        </Button>
-        <LanguageLearning initialLanguage={selectedLanguage} />
-      </div>
-    );
-  }
+  const learningOptions: LearningOption[] = [
+    { id: '1', title: 'Mathematics', description: 'Algebra, geometry, calculus' },
+    { id: '2', title: 'Science', description: 'Physics, chemistry, biology' },
+    { id: '3', title: 'Language Arts', description: 'Reading, writing, grammar' },
+    { id: '4', title: 'History', description: 'World history, civilizations' }
+  ];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center space-x-2 text-white">
-              <span className="text-2xl">🎓</span>
-              <span>AI Tutor - Your Personal Athena</span>
-            </span>
-            <div className="flex items-center space-x-2">
-              <Button onClick={() => setSpeechEnabled(!speechEnabled)} size="icon" variant="ghost">
-                {speechEnabled ? <Volume2 /> : <VolumeX />}
-              </Button>
-              <Badge variant="outline" className="bg-gradient-to-r from-purple-400 to-cyan-400 text-white border-purple-400">
-                GPT-4o + ElevenLabs English
-              </Badge>
-            </div>
-          </CardTitle>
+          <CardTitle className="text-white text-center">AI Tutor Chat</CardTitle>
+          {onBack && (
+            <Button variant="outline" onClick={onBack} className="w-fit">
+              Back
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
-          <SubjectSelector
-            currentSubject={currentSubject}
-            onSubjectChange={setCurrentSubject}
-            onLanguageSelect={() => setShowLanguageSelection(true)}
-          />
-        </CardContent>
-      </Card>
-
-      <Card className="h-96 bg-gray-900 border-gray-800">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-white">Chat with your AI tutor</CardTitle>
-        </CardHeader>
-        <CardContent className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+          {/* Messages */}
+          <div className="h-96 overflow-y-auto space-y-4 mb-4 p-4 bg-gray-800 rounded-lg">
             {messages.map((message, index) => (
-              <ChatMessage key={index} message={message}>
-                {message.showOptions && (
-                  <LearningOptions onOptionSelect={handleLearningOptionWithLanguageCheck} />
-                )}
-              </ChatMessage>
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative ${
+                    message.role === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-100'
+                  }`}
+                >
+                  {message.role === 'assistant' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleTextToSpeech(message.content)}
+                      className="absolute top-1 right-1 p-1 h-6 w-6"
+                    >
+                      {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                    </Button>
+                  )}
+                  <p className="text-sm pr-6">{message.content}</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {message.timestamp.toLocaleTimeString()}
+                  </p>
+                </div>
+              </div>
             ))}
+            
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-700 text-gray-100 px-4 py-2 rounded-lg">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            isSpeaking={isSpeaking}
-            onStopSpeaking={stopSpeaking}
-            onStartRecording={handleStartRecording}
-            onStopRecording={handleStopRecording}
-            isRecording={isRecording}
-          />
+          {/* Input */}
+          <div className="flex space-x-2">
+            <Input
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Ask me anything..."
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputMessage)}
+              className="flex-1 bg-gray-800 border-gray-600 text-white"
+            />
+            <Button
+              onClick={handleSpeechToText}
+              variant={isListening ? 'destructive' : 'outline'}
+              size="icon"
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </Button>
+            <Button 
+              onClick={() => handleSendMessage(inputMessage)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Learning Options */}
+      <Card className="bg-gray-900 border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-white">Quick Learning Topics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {learningOptions.map((option) => (
+              <Card 
+                key={option.id} 
+                className="bg-gray-800 border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors"
+                onClick={() => handleLearningOptionSelect(option)}
+              >
+                <CardContent className="p-4">
+                  <h3 className="text-white font-semibold mb-2">{option.title}</h3>
+                  <p className="text-gray-300 text-sm">{option.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

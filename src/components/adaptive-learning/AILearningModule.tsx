@@ -3,13 +3,17 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { User, UserMetadata } from '@/types/auth'; // Import our augmented User and UserMetadata
 import { useNavigate } from 'react-router-dom';
 import { Brain, ArrowLeft, LogIn } from 'lucide-react';
 import ImprovedLearningSession from './components/ImprovedLearningSession';
 import MathematicsWelcome from '@/components/education/components/welcome/MathematicsWelcome';
 import ClassroomEnvironment from '@/components/education/components/shared/ClassroomEnvironment';
 import { getClassroomConfig } from '@/components/education/components/shared/classroomConfigs';
+
+interface UserMetadata {
+  first_name?: string;
+  last_name?: string;
+}
 
 interface AILearningModuleProps {
   subject: string;
@@ -68,7 +72,6 @@ const AILearningModule = ({
 
   // Show mathematics welcome screen
   if (showWelcome && subject === 'mathematics') {
-    // Safely access user_metadata with type assertion
     const studentName = (user?.user_metadata as UserMetadata)?.first_name || 'Student';
     return (
       <ClassroomEnvironment config={classroomConfig}>

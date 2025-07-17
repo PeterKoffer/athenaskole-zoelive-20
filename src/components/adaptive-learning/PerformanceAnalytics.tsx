@@ -1,128 +1,131 @@
-
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TrendingUp, Award, Target, Brain } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Calendar, TrendingUp, Target, Clock } from 'lucide-react';
 
 interface PerformanceData {
-  subject: string;
-  skill_area: string;
-  current_level: number;
   accuracy_rate: number;
   attempts_count: number;
   completion_time_avg: number;
-  last_assessment: string;
-}
-
-interface LearningSession {
-  id: string;
-  subject: string;
-  skill_area: string;
-  difficulty_level: number;
-  score: number;
-  time_spent: number;
+  correct_answers: number;
   created_at: string;
+  current_level: number;
+  id: string;
+  last_assessment: string | null;
+  skill_area: string;
+  subject: string;
+  total_questions: number;
+  updated_at: string;
+  user_id: string;
 }
 
-const PerformanceAnalytics = () => {
+interface SessionData {
+  ai_adjustments: any;
+  completed: boolean | null;
+  content_id: string | null;
+  created_at: string;
+  difficulty_level: number;
+  end_time: string | null;
+  id: string;
+  score: number | null;
+  skill_area: string;
+  start_time: string;
+  subject: string;
+  time_spent: number | null;
+  user_feedback: any;
+  user_id: string;
+}
+
+const PerformanceAnalytics: React.FC = () => {
   const { user } = useAuth();
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
-  const [recentSessions, setRecentSessions] = useState<LearningSession[]>([]);
+  const [sessionData, setSessionData] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week');
 
   useEffect(() => {
     if (user) {
-      loadPerformanceData();
-      loadRecentSessions();
+      fetchAnalytics();
     }
-  }, [user]);
+  }, [user, timeRange]);
 
-  const loadPerformanceData = async () => {
+  const fetchAnalytics = async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+      
+      // Calculate date range
+      const now = new Date();
+      let startDate = new Date();
+      
+      switch (timeRange) {
+        case 'week':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        default:
+          startDate = new Date('2020-01-01');
+      }
+
+      // Fetch performance data
+      const { data: performance, error: perfError } = await supabase
         .from('user_performance')
         .select('*')
         .eq('user_id', user.id)
-        .order('accuracy_rate', { ascending: false });
+        .gte('updated_at', startDate.toISOString());
 
-      if (error) {
-        console.error('Error loading performance data:', error);
-        return;
-      }
+      if (perfError) throw perfError;
+      
+      // Process performance data to handle null values
+      const processedPerformance = (performance || []).map(item => ({
+        ...item,
+        completion_time_avg: item.completion_time_avg || 0
+      }));
+      
+      setPerformanceData(processedPerformance);
 
-      setPerformanceData(data || []);
-    } catch (error) {
-      console.error('Error loading performance data:', error);
-    }
-  };
-
-  const loadRecentSessions = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
+      // Fetch session data
+      const { data: sessions, error: sessError } = await supabase
         .from('learning_sessions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('completed', true)
-        .order('created_at', { ascending: false })
-        .limit(10);
+        .gte('created_at', startDate.toISOString())
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error loading recent sessions:', error);
-        return;
-      }
+      if (sessError) throw sessError;
+      setSessionData(sessions || []);
 
-      setRecentSessions(data || []);
     } catch (error) {
-      console.error('Error loading recent sessions:', error);
+      console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getProgressColor = (accuracy: number) => {
-    if (accuracy >= 85) return 'bg-green-500';
-    if (accuracy >= 70) return 'bg-lime-500';
-    if (accuracy >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
-  const getSkillBadgeColor = (level: number) => {
-    if (level >= 8) return 'bg-purple-500 text-white';
-    if (level >= 6) return 'bg-blue-500 text-white';
-    if (level >= 4) return 'bg-lime-500 text-black';
-    return 'bg-gray-500 text-white';
-  };
-
-  const chartData = performanceData.map(item => ({
-    name: `${item.subject} - ${item.skill_area}`,
-    accuracy: item.accuracy_rate,
-    level: item.current_level,
-    attempts: item.attempts_count
-  }));
-
-  const sessionChartData = recentSessions.slice(0, 7).reverse().map((session, index) => ({
-    session: `Session ${index + 1}`,
-    score: session.score,
-    time: Math.round(session.time_spent / 60), // Convert to minutes
-    difficulty: session.difficulty_level
-  }));
+  if (!user) {
+    return (
+      <Card className="bg-yellow-900 border-yellow-700">
+        <CardContent className="p-6 text-center text-white">
+          <Target className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Login Required</h3>
+          <p className="text-yellow-300">Please log in to view your performance analytics.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (loading) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <Brain className="w-6 h-6 text-lime-400 animate-pulse mr-2" />
-            <span className="text-white">Indlæser analyse...</span>
-          </div>
+      <Card className="bg-gray-800 border-gray-700">
+        <CardContent className="p-6 text-center text-white">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading analytics...</p>
         </CardContent>
       </Card>
     );
@@ -130,171 +133,144 @@ const PerformanceAnalytics = () => {
 
   return (
     <div className="space-y-6">
-      {/* Overall Performance Overview */}
-      <Card className="bg-gray-900 border-gray-800">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <TrendingUp className="w-5 h-5 text-lime-400" />
-            <span>Overordnet Præstation</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {performanceData.map((item, index) => (
-              <Card key={index} className="bg-gray-800 border-gray-700">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold capitalize text-white text-sm">
-                      {item.subject}
-                    </h3>
-                    <Badge className={getSkillBadgeColor(item.current_level)}>
-                      Niveau {item.current_level}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-400 mb-3 capitalize">{item.skill_area}</p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">Nøjagtighed</span>
-                      <span className="text-white font-medium">{item.accuracy_rate.toFixed(1)}%</span>
-                    </div>
-                    <Progress 
-                      value={item.accuracy_rate} 
-                      className={`h-2 ${getProgressColor(item.accuracy_rate)}`}
-                    />
-                    <div className="flex justify-between text-xs text-gray-400">
-                      <span>{item.attempts_count} forsøg</span>
-                      <span>{item.completion_time_avg || 0}s ⌀</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-white">Performance Analytics</h2>
+        <div className="flex gap-2">
+          {(['week', 'month', 'all'] as const).map((range) => (
+            <Button
+              key={range}
+              variant={timeRange === range ? 'default' : 'outline'}
+              onClick={() => setTimeRange(range)}
+              className="capitalize"
+            >
+              {range === 'all' ? 'All Time' : `Last ${range}`}
+            </Button>
+          ))}
+        </div>
+      </div>
 
-      {/* Performance Chart */}
-      {chartData.length > 0 && (
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Award className="w-5 h-5 text-lime-400" />
-              <span>Færdighedsniveau vs Nøjagtighed</span>
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <Target className="w-4 h-4 mr-2" />
+              Overall Accuracy
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#9CA3AF"
-                    fontSize={12}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis stroke="#9CA3AF" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '6px',
-                      color: '#F3F4F6'
-                    }}
-                  />
-                  <Bar dataKey="accuracy" fill="#84cc16" name="Nøjagtighed %" />
-                  <Bar dataKey="level" fill="#3B82F6" name="Niveau" />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="text-2xl font-bold text-white">
+              {performanceData.length > 0 
+                ? Math.round(performanceData.reduce((acc, p) => acc + p.accuracy_rate, 0) / performanceData.length)
+                : 0}%
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Recent Sessions Trend */}
-      {sessionChartData.length > 0 && (
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Target className="w-5 h-5 text-lime-400" />
-              <span>Seneste Sessioner</span>
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Total Sessions
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={sessionChartData}>
+            <div className="text-2xl font-bold text-white">{sessionData.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <Clock className="w-4 h-4 mr-2" />
+              Time Spent
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {Math.round(sessionData.reduce((acc, s) => acc + (s.time_spent || 0), 0) / 60)} min
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <Calendar className="w-4 h-4 mr-2" />
+              Active Days
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {new Set(sessionData.map(s => s.created_at.split('T')[0])).size}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts */}
+      {performanceData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Accuracy by Subject</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={performanceData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="session" stroke="#9CA3AF" />
+                  <XAxis dataKey="subject" stroke="#9CA3AF" />
                   <YAxis stroke="#9CA3AF" />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: '#1F2937', 
                       border: '1px solid #374151',
-                      borderRadius: '6px',
-                      color: '#F3F4F6'
+                      borderRadius: '8px',
+                      color: '#F9FAFB'
+                    }} 
+                  />
+                  <Bar dataKey="accuracy_rate" fill="#10B981" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Progress Over Time</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={sessionData.slice(-10)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis 
+                    dataKey="created_at" 
+                    stroke="#9CA3AF"
+                    tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                  />
+                  <YAxis stroke="#9CA3AF" />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1F2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '8px',
+                      color: '#F9FAFB'
                     }}
+                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#84cc16" 
+                    stroke="#3B82F6" 
                     strokeWidth={2}
-                    name="Score %"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="time" 
-                    stroke="#F59E0B" 
-                    strokeWidth={2}
-                    name="Tid (min)"
+                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
-
-      {/* Recent Sessions List */}
-      <Card className="bg-gray-900 border-gray-800">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <Brain className="w-5 h-5 text-lime-400" />
-            <span>Seneste Aktivitet</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {recentSessions.slice(0, 5).map((session) => (
-              <div key={session.id} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="flex items-center space-x-3">
-                  <Badge variant="outline" className="capitalize">
-                    {session.subject}
-                  </Badge>
-                  <span className="text-white text-sm capitalize">{session.skill_area}</span>
-                  <Badge className={getSkillBadgeColor(session.difficulty_level)}>
-                    Niveau {session.difficulty_level}
-                  </Badge>
-                </div>
-                <div className="flex items-center space-x-4 text-sm">
-                  <span className={`font-medium ${session.score >= 80 ? 'text-green-400' : session.score >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
-                    {session.score}%
-                  </span>
-                  <span className="text-gray-400">
-                    {Math.round(session.time_spent / 60)}m
-                  </span>
-                  <span className="text-gray-500 text-xs">
-                    {new Date(session.created_at).toLocaleDateString('da-DK')}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

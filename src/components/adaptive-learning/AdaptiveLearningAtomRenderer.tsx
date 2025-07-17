@@ -1,299 +1,251 @@
 
 import React, { useState, useEffect } from 'react';
-import { LearningAtom } from '@/types/learning';
-import { useAdaptiveLearningSession } from '@/hooks/useAdaptiveLearningSession';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Brain, TrendingUp, TrendingDown } from 'lucide-react';
-import stealthAssessmentService from '@/services/stealthAssessmentService';
+import { Progress } from '@/components/ui/progress';
+import { CheckCircle, XCircle, Lightbulb, Target, Clock, Brain } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
-import { InteractionEventType, InteractionEventContext } from '@/types/stealthAssessment'; // Assuming InteractionEventContext is here
-import { v4 as uuidv4 } from 'uuid'; // For generating eventId if not handled by service's createFullEvent
+interface LearningAtom {
+  id: string;
+  title: string;
+  content: any;
+  difficulty: 'easy' | 'medium' | 'hard';
+  estimatedTime: number;
+  learningObjectives: string[];
+  interactionType: 'multiple-choice' | 'text-input' | 'drag-drop';
+}
 
 interface AdaptiveLearningAtomRendererProps {
   atom: LearningAtom;
-  eventContext?: InteractionEventContext; // Allow context to be passed in
-  onComplete: (performance: any) => void;
+  onComplete: (success: boolean, timeSpent: number) => void;
 }
 
 const AdaptiveLearningAtomRenderer: React.FC<AdaptiveLearningAtomRendererProps> = ({
   atom,
   onComplete
 }) => {
-  const {
-    currentAtom,
-    isAdapting,
-    adaptationReason,
-    currentAttempt,
-    sessionDurationSeconds,
-    recordResponse,
-    completeSession,
-    getSessionMetrics
-  } = useAdaptiveLearningSession(atom);
+  const { user } = useAuth();
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [startTime] = useState(Date.now());
+  const [progress, setProgress] = useState(0);
+  const [currentHint, setCurrentHint] = useState(0);
+  const [showHints, setShowHints] = useState(false);
 
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [hintsUsed, setHintsUsed] = useState(0);
-  const [questionLoadTime, setQuestionLoadTime] = useState<number>(0);
-
-  useEffect(() => {
-    if (currentAtom) {
-      setQuestionLoadTime(Date.now());
-      stealthAssessmentService.logContentView({
-        contentAtomId: currentAtom.id,
-
-        knowledgeComponentIds: currentAtom.knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_load'],
-
-        contentType: 'LEARNING_ATOM_QUESTION_LOADED',
-        // eventContext can be passed as a prop or defaulted
-      }, `AdaptiveLearningAtomRenderer-Load-${currentAtom.id}`);
-    }
-  }, [currentAtom?.id]); // Trigger when currentAtom or its ID changes
-
-
-  // Mock question data - in real implementation, this would come from the atom's content
-  const mockQuestions = {
+  // Sample content structure
+  const questionData = {
     easy: {
-      question: "What is 2 + 3?",
-      options: ["4", "5", "6", "7"],
+      question: "What is 2 + 2?",
+      options: ["3", "4", "5", "6"],
       correct: 1,
-      hints: ["Think about counting on your fingers", "Start with 2 and add 3 more"]
+      hints: ["Think about counting", "Add one more to 3"]
     },
     medium: {
-      question: "What is 12 + 8?",
-      options: ["18", "20", "22", "24"],
-      correct: 1,
-      hints: ["Break it down: 12 + 8 = 12 + 10 - 2", "Think about making 10 first"]
+      question: "What is 15 × 8?",
+      options: ["120", "125", "115", "130"],
+      correct: 0,
+      hints: ["Break it down: 15 × 8 = 15 × 10 - 15 × 2", "10 × 15 = 150, 2 × 15 = 30"]
     },
     hard: {
-      question: "What is 347 + 258?",
-      options: ["595", "605", "615", "625"],
+      question: "Solve: 3x + 7 = 22",
+      options: ["x = 4", "x = 5", "x = 6", "x = 7"],
       correct: 1,
-      hints: ["Start with the ones place", "Don't forget to carry over"]
+      hints: ["Subtract 7 from both sides first", "Then divide by 3"]
     }
   };
 
-  const currentQuestion = currentAtom ? mockQuestions[currentAtom.difficulty] : mockQuestions.medium;
+  const currentQuestion = questionData[atom.difficulty as keyof typeof questionData];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress(prev => Math.min(prev + 1, 100));
+    }, (atom.estimatedTime * 1000) / 100);
+
+    return () => clearInterval(timer);
+  }, [atom.estimatedTime]);
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showFeedback) return;
+    if (showResult) return;
     
-    setSelectedAnswer(answerIndex.toString());
+    setSelectedAnswer(answerIndex);
+    setShowResult(true);
+    
     const isCorrect = answerIndex === currentQuestion.correct;
+    const timeSpent = Date.now() - startTime;
     
-    recordResponse(isCorrect, hintsUsed); // This hook likely handles internal state for attempts, etc.
-    setShowFeedback(true);
-
-    const timeTakenMs = Date.now() - questionLoadTime;
-
-    stealthAssessmentService.logQuestionAttempt({
-      questionId: currentAtom?.id || 'unknown_question', // Use currentAtom.id as questionId
-      knowledgeComponentIds: currentAtom?.knowledgeComponentIds || [currentAtom?.curriculumObjectiveId || 'unknown_kc_atom_answer'],
-
-      answerGiven: currentQuestion.options[answerIndex],
-      isCorrect: isCorrect,
-      attemptsMade: currentAttempt, // from useAdaptiveLearningSession hook
-      timeTakenMs: timeTakenMs,
-      // eventContext can be passed as a prop or defaulted
-    }, `AdaptiveLearningAtomRenderer-Submit-${currentAtom?.id}`);
-
-
     if (isCorrect) {
-      setTimeout(() => {
-        const performance = completeSession();
-        if (performance) {
-          onComplete(performance);
-        }
-      }, 2000);
+      toast.success("Correct! Well done!");
     } else {
-      // Allow retry or show feedback longer before next action
-      setTimeout(() => {
-        setShowFeedback(false);
-        setSelectedAnswer(null);
-        // Potentially log a "retry_initiated" or similar if applicable
-      }, 3000); // Increased time for feedback visibility on wrong answer
+      toast.error("Not quite right. Let's learn from this!");
+    }
+
+    // Save interaction event
+    if (user) {
+      saveInteractionEvent(isCorrect, timeSpent);
+    }
+
+    setTimeout(() => {
+      onComplete(isCorrect, timeSpent);
+    }, 2000);
+  };
+
+  const saveInteractionEvent = async (isCorrect: boolean, timeSpent: number) => {
+    if (!user) return;
+
+    try {
+      await supabase.from('ai_interactions').insert({
+        user_id: user.id,
+        interaction_type: 'learning_atom_completion',
+        ai_service: 'adaptive_learning',
+        success: isCorrect,
+        processing_time_ms: timeSpent,
+        response_data: {
+          atom_id: atom.id,
+          difficulty: atom.difficulty,
+          selected_answer: selectedAnswer,
+          correct_answer: currentQuestion.correct,
+          time_spent: timeSpent
+        }
+      });
+    } catch (error) {
+      console.error('Error saving interaction event:', error);
     }
   };
 
-  const handleHintRequest = () => {
-    const newHintsUsed = hintsUsed + 1;
-    setHintsUsed(newHintsUsed);
+  const toggleHints = () => {
+    setShowHints(!showHints);
+  };
 
-    if (currentAtom && currentQuestion.hints[newHintsUsed -1]) {
-      stealthAssessmentService.logHintUsage({
-        questionId: currentAtom.id,
-        knowledgeComponentIds: currentAtom.knowledgeComponentIds || [currentAtom.curriculumObjectiveId || 'unknown_kc_atom_hint'],
-        hintId: `hint_${newHintsUsed}`, // Or actual hint text/ID if available
-        hintLevel: newHintsUsed,
-        // eventContext can be passed as a prop or defaulted
-      }, `AdaptiveLearningAtomRenderer-Hint-${currentAtom.id}`);
+  const nextHint = () => {
+    if (currentHint < currentQuestion.hints.length - 1) {
+      setCurrentHint(currentHint + 1);
     }
   };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'hard': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getAdaptationIcon = (reason: string | null) => {
-    if (!reason) return null;
-    if (reason.includes('struggle')) return <TrendingDown className="w-4 h-4 text-blue-500" />;
-    if (reason.includes('mastery')) return <TrendingUp className="w-4 h-4 text-green-500" />;
-    return <Brain className="w-4 h-4 text-purple-500" />;
-  };
-
-  if (!currentAtom) {
-    return <div>Loading atom...</div>;
-  }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4">
-      {/* Adaptation Status */}
-      {isAdapting && (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-              <span className="text-blue-700 font-medium">Adapting to your learning style...</span>
-            </div>
-            {adaptationReason && (
-              <p className="text-sm text-blue-600 mt-2">{adaptationReason}</p>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Main Question Card */}
-      <Card>
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-700">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{currentAtom.content.title}</CardTitle>
-            <div className="flex items-center space-x-2">
-              {getAdaptationIcon(adaptationReason)}
-              <Badge className={getDifficultyColor(currentAtom.difficulty)}>
-                {currentAtom.difficulty}
-              </Badge>
-              {currentAtom.variantId && (
-                <Badge variant="outline" className="text-xs">
-                  Adapted
-                </Badge>
-              )}
+            <CardTitle className="text-white flex items-center">
+              <Brain className="w-5 h-5 mr-2" />
+              {atom.title}
+            </CardTitle>
+            <Badge variant="secondary" className="bg-blue-100 text-blue-900">
+              {atom.difficulty}
+            </Badge>
+          </div>
+          <div className="flex items-center space-x-4 text-blue-200">
+            <div className="flex items-center">
+              <Clock className="w-4 h-4 mr-1" />
+              <span className="text-sm">{atom.estimatedTime}min</span>
+            </div>
+            <div className="flex items-center">
+              <Target className="w-4 h-4 mr-1" />
+              <span className="text-sm">{atom.learningObjectives.length} objectives</span>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Narrative Context */}
-          <div className="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
-            <p className="text-purple-800 text-sm italic">{currentAtom.narrativeContext}</p>
+      </Card>
+
+      {/* Progress */}
+      <Card className="bg-gray-800 border-gray-700">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">Progress</span>
+            <span className="text-sm text-gray-300">{Math.round(progress)}%</span>
           </div>
-
-          {/* Adaptive Instructions */}
-          {currentAtom.content.data?.adaptiveModifications?.simplifiedInstructions && (
-            <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-              <p className="text-green-800 text-sm">
-                💡 {currentAtom.content.data.adaptiveModifications.simplifiedInstructions}
-              </p>
-            </div>
-          )}
-
-          {/* Question */}
-          <div className="text-lg font-medium mb-4">
-            {currentQuestion.question}
-          </div>
-
-          {/* Answer Options */}
-          <div className="grid grid-cols-2 gap-2">
-            {currentQuestion.options.map((option, index) => (
-              <Button
-                key={index}
-                variant={selectedAnswer === index.toString() ? "default" : "outline"}
-                className={`p-4 h-auto ${
-                  showFeedback && selectedAnswer === index.toString()
-                    ? index === currentQuestion.correct
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-red-500 hover:bg-red-600"
-                    : ""
-                }`}
-                onClick={() => handleAnswerSelect(index)}
-                disabled={showFeedback || isAdapting}
-              >
-                {option}
-              </Button>
-            ))}
-          </div>
-
-          {/* Hints */}
-          {hintsUsed < currentQuestion.hints.length && !showFeedback && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleHintRequest}
-              className="text-blue-600 hover:text-blue-800"
-            >
-              💡 Need a hint? ({hintsUsed}/{currentQuestion.hints.length} used)
-            </Button>
-          )}
-
-          {/* Show Hints */}
-          {hintsUsed > 0 && (
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="text-blue-800 text-sm">
-                <strong>Hint:</strong> {currentQuestion.hints[hintsUsed - 1]}
-              </p>
-            </div>
-          )}
-
-          {/* Feedback */}
-          {showFeedback && (
-            <div className={`p-3 rounded-lg ${
-              selectedAnswer === currentQuestion.correct.toString()
-                ? "bg-green-50 border border-green-200"
-                : "bg-red-50 border border-red-200"
-            }`}>
-              <p className={`font-medium ${
-                selectedAnswer === currentQuestion.correct.toString()
-                  ? "text-green-800"
-                  : "text-red-800"
-              }`}>
-                {selectedAnswer === currentQuestion.correct.toString()
-                  ? "🎉 Correct! Great job!"
-                  : "Not quite. Let's try again!"}
-              </p>
-            </div>
-          )}
-
-          {/* Advanced Challenges (for hard difficulty) */}
-          {currentAtom.content.data?.adaptiveModifications?.advancedChallenges && (
-            <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-              <p className="text-orange-800 text-sm">
-                <strong>🏆 Bonus Challenge:</strong> {currentAtom.content.data.adaptiveModifications.advancedChallenges[0]}
-              </p>
-            </div>
-          )}
+          <Progress value={progress} className="w-full" />
         </CardContent>
       </Card>
 
-      {/* Session Stats */}
-      <Card className="bg-gray-50">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-gray-700">{currentAttempt}</div>
-              <div className="text-xs text-gray-500">Attempts</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-700">{Math.round(sessionDurationSeconds)}s</div>
-              <div className="text-xs text-gray-500">Time</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-700">{hintsUsed}</div>
-              <div className="text-xs text-gray-500">Hints Used</div>
-            </div>
+      {/* Question */}
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white">{currentQuestion.question}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {currentQuestion.options.map((option: string, index: number) => (
+            <Button
+              key={index}
+              variant="outline"
+              className={`w-full text-left justify-start p-4 h-auto ${
+                selectedAnswer === index
+                  ? showResult
+                    ? selectedAnswer === currentQuestion.correct
+                      ? 'bg-green-600 border-green-500 text-white'
+                      : 'bg-red-600 border-red-500 text-white'
+                    : 'bg-blue-600 border-blue-500 text-white'
+                  : showResult && index === currentQuestion.correct
+                  ? 'bg-green-600 border-green-500 text-white'
+                  : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+              }`}
+              onClick={() => handleAnswerSelect(index)}
+              disabled={showResult}
+            >
+              <span className="mr-3 font-semibold">
+                {String.fromCharCode(65 + index)}.
+              </span>
+              {option}
+              {showResult && index === currentQuestion.correct && (
+                <CheckCircle className="w-5 h-5 ml-auto text-green-400" />
+              )}
+              {showResult && selectedAnswer === index && index !== currentQuestion.correct && (
+                <XCircle className="w-5 h-5 ml-auto text-red-400" />
+              )}
+            </Button>
+          ))}
+
+          {/* Hints */}
+          <div className="mt-4">
+            <Button
+              variant="outline"
+              onClick={toggleHints}
+              className="text-yellow-300 border-yellow-600 hover:bg-yellow-900"
+            >
+              <Lightbulb className="w-4 h-4 mr-2" />
+              {showHints ? 'Hide Hints' : 'Show Hints'}
+            </Button>
+
+            {showHints && (
+              <div className="mt-3 p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
+                <p className="text-yellow-100 mb-2">{currentQuestion.hints[currentHint]}</p>
+                {currentHint < currentQuestion.hints.length - 1 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={nextHint}
+                    className="text-yellow-300 border-yellow-600"
+                  >
+                    Next Hint
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Learning Objectives */}
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <Target className="w-5 h-5 mr-2" />
+            Learning Objectives
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {atom.learningObjectives.map((objective, index) => (
+              <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-900">
+                {objective}
+              </Badge>
+            ))}
           </div>
         </CardContent>
       </Card>
