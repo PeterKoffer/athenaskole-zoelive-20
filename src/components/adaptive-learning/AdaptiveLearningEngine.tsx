@@ -19,7 +19,6 @@ interface AdaptiveLearningEngineProps {
 const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLearningEngineProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [sessionData, setSessionData] = useState<any>(null);
 
   const {
     currentSession,
@@ -35,25 +34,11 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
   } = useSessionStateManager({
     subject,
     skillArea,
-    onSessionReady: (data) => setSessionData(data)
+    onSessionReady: () => {}
   });
 
   const handleModuleBack = () => {
     window.history.back();
-  };
-
-  const handleCompleteWithToast = async () => {
-    const finalScore = await handleSessionComplete();
-    
-    if (onComplete) {
-      onComplete(finalScore);
-    }
-
-    toast({
-      title: "Session Completed! 🎓",
-      description: `Du gennemførte ${questionsCompleted} spørgsmål med en gennemsnitsscore på ${finalScore}%`,
-      duration: 5000
-    });
   };
 
   const handleRetrySession = () => {
