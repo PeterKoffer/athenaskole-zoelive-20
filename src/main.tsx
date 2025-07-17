@@ -55,8 +55,8 @@ root.render(
                   {/* Jules Integration Component */}
                   <JulesIntegration />
                   <Routes>
-                    {navItems.map(({ to, page }) => (
-                      <Route key={to} path={to} element={page} />
+                    {navItems.map(({ to, page: PageComponent }) => (
+                      <Route key={to} path={to} element={<PageComponent />} />
                     ))}
                   </Routes>
                 </div>
