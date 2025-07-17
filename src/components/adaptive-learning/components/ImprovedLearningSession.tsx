@@ -2,230 +2,176 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Brain, AlertCircle, RefreshCw } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { useQuestionGeneration, Question } from '../hooks/useQuestionGeneration';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+
+interface Question {
+  id: string;
+  text: string;
+  options: string[];
+  correctAnswer: number;
+}
 
 interface ImprovedLearningSessionProps {
   subject: string;
   skillArea: string;
-  difficultyLevel: number;
-  onBack: () => void;
+  onComplete: (results: any) => void;
 }
 
-const ImprovedLearningSession = ({
-  subject,
-  skillArea,
-  difficultyLevel,
-  onBack
-}: ImprovedLearningSessionProps) => {
-  const { user } = useAuth();
+const ImprovedLearningSession = ({ subject, skillArea, onComplete }: ImprovedLearningSessionProps) => {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
+  const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
-  const [questionCount, setQuestionCount] = useState(0);
-  const [apiError, setApiError] = useState<string | null>(null);
+  const [questionNumber, setQuestionNumber] = useState(1);
+  const [timeElapsed, setTimeElapsed] = useState(0);
 
-  const { generateQuestion, isGenerating, error } = useQuestionGeneration({
-    subject,
-    skillArea,
-    difficultyLevel,
-    userId: user?.id || 'anonymous'
-  });
-
-  console.log('📚 ImprovedLearningSession initialized:', {
-    subject,
-    skillArea,
-    difficultyLevel,
-    hasUser: !!user,
-    timestamp: new Date().toISOString()
-  });
-
-  // Generate first question on mount
   useEffect(() => {
-    if (user?.id) {
-      console.log('🚀 Attempting to generate first question...');
-      handleGenerateQuestion();
-    }
-  }, [user?.id]);
+    generateQuestion();
+    const timer = setInterval(() => {
+      setTimeElapsed(prev => prev + 1);
+    }, 1000);
 
-  const handleGenerateQuestion = async () => {
-    try {
-      setApiError(null);
-      console.log('📝 Generating question via API...');
-      const question = await generateQuestion([]);
-      
-      if (question) {
-        setCurrentQuestion(question);
-        console.log('✅ API question generated successfully');
-      } else {
-        throw new Error('No question generated from API');
-      }
-    } catch (error) {
-      console.error('❌ API generation failed:', error);
-      setApiError(error.message || 'Failed to generate question');
-      setCurrentQuestion(null);
-    }
+    return () => clearInterval(timer);
+  }, []);
+
+  const generateQuestion = () => {
+    const sampleQuestion: Question = {
+      id: `q-${Date.now()}`,
+      text: `Sample ${skillArea} question for ${subject}?`,
+      options: [
+        'Option A - Correct answer',
+        'Option B - Incorrect',
+        'Option C - Incorrect',
+        'Option D - Incorrect'
+      ],
+      correctAnswer: 0
+    };
+    
+    setCurrentQuestion(sampleQuestion);
+    setSelectedAnswer(null);
+    setShowResult(false);
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showExplanation) return;
     setSelectedAnswer(answerIndex);
   };
 
-  const handleSubmitAnswer = () => {
+  const handleSubmit = () => {
     if (selectedAnswer === null || !currentQuestion) return;
     
-    const isCorrect = selectedAnswer === currentQuestion.correct;
-    if (isCorrect) {
-      setScore(score + 1);
+    setShowResult(true);
+    
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+      setScore(prev => prev + 10);
     }
-    setShowExplanation(true);
   };
 
-  const handleNextQuestion = () => {
-    setSelectedAnswer(null);
-    setShowExplanation(false);
-    setQuestionCount(questionCount + 1);
-    handleGenerateQuestion();
+  const handleNext = () => {
+    if (questionNumber >= 5) {
+      const results = {
+        subject,
+        skillArea,
+        score,
+        totalQuestions: 5,
+        timeElapsed,
+        accuracy: (score / (questionNumber * 10)) * 100
+      };
+      onComplete(results);
+    } else {
+      setQuestionNumber(prev => prev + 1);
+      generateQuestion();
+    }
   };
 
-  if (!user) {
+  const handleSessionError = (errorMessage: string) => {
+    console.error('Session error:', errorMessage);
+  };
+
+  if (!currentQuestion) {
     return (
-      <Card className="bg-red-900 border-red-700 max-w-md mx-auto">
+      <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h3 className="text-white text-lg font-semibold mb-2">Login Required</h3>
-          <p className="text-red-300 mb-4">Please log in to start your lesson.</p>
-          <Button onClick={onBack} className="bg-red-600 hover:bg-red-700">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Go Back
-          </Button>
+          <div className="text-white">Loading question...</div>
         </CardContent>
       </Card>
     );
   }
 
-  // Show API error state
-  if (apiError) {
-    return (
-      <Card className="bg-red-900 border-red-700 max-w-md mx-auto">
-        <CardContent className="p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h3 className="text-white text-lg font-semibold mb-2">API Error</h3>
-          <p className="text-red-300 mb-4">{apiError}</p>
-          <div className="space-y-2">
-            <Button onClick={handleGenerateQuestion} className="w-full bg-blue-600 hover:bg-blue-700">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Retry Question Generation
-            </Button>
-            <Button onClick={onBack} variant="outline" className="w-full border-gray-600">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Program
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (isGenerating || !currentQuestion) {
-    return (
-      <Card className="bg-gray-900 border-gray-800 max-w-md mx-auto">
-        <CardContent className="p-6 text-center">
-          <Brain className="w-12 h-12 text-blue-400 animate-pulse mx-auto mb-4" />
-          <h3 className="text-white text-lg font-semibold mb-2">
-            {isGenerating ? 'Generating AI Question...' : 'Loading...'}
-          </h3>
-          <p className="text-gray-300 mb-4">
-            Creating your personalized {subject} question with AI
-          </p>
-          <Button onClick={onBack} variant="outline" className="border-gray-600">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Program
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button onClick={onBack} variant="outline" className="border-gray-600">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Program
-        </Button>
-        <div className="text-white">
-          Question {questionCount + 1} | Score: {score}/{questionCount + 1}
-        </div>
-      </div>
-
-      {/* Question Card */}
-      <Card className="bg-gray-900 border-gray-800">
-        <CardHeader>
-          <CardTitle className="text-white text-xl">
-            {currentQuestion.question}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Answer Options */}
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center justify-between">
+          <span>{subject} - {skillArea}</span>
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center">
+              <Clock className="w-4 h-4 mr-1" />
+              {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}
+            </div>
+            <div>Question {questionNumber}/5</div>
+            <div>Score: {score}</div>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="bg-gray-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-white mb-4">
+            {currentQuestion.text}
+          </h3>
+          
           <div className="space-y-2">
             {currentQuestion.options.map((option, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => handleAnswerSelect(index)}
-                disabled={showExplanation}
-                className={`w-full p-3 text-left rounded-lg border-2 transition-colors ${
-                  selectedAnswer === index
-                    ? showExplanation
-                      ? index === currentQuestion.correct
-                        ? 'bg-green-900 border-green-600 text-green-100'
-                        : 'bg-red-900 border-red-600 text-red-100'
-                      : 'bg-blue-900 border-blue-600 text-blue-100'
-                    : showExplanation && index === currentQuestion.correct
-                    ? 'bg-green-900 border-green-600 text-green-100'
-                    : 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700'
+                variant={selectedAnswer === index ? "default" : "outline"}
+                className={`w-full text-left justify-start p-4 h-auto ${
+                  selectedAnswer === index 
+                    ? "bg-blue-600 hover:bg-blue-700" 
+                    : "bg-gray-600 hover:bg-gray-500 border-gray-500"
                 }`}
+                disabled={showResult}
               >
+                <span className="font-semibold mr-3">{String.fromCharCode(65 + index)}.</span>
                 {option}
-              </button>
+              </Button>
             ))}
           </div>
+        </div>
 
-          {/* Explanation */}
-          {showExplanation && (
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <h4 className="text-white font-semibold mb-2">Explanation:</h4>
-              <p className="text-gray-300">{currentQuestion.explanation}</p>
-            </div>
+        {showResult && (
+          <Alert className={`${isCorrect ? 'border-green-600' : 'border-red-600'}`}>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription className="flex items-center">
+              {isCorrect ? (
+                <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 mr-2 text-red-400" />
+              )}
+              {isCorrect ? 'Correct! Well done.' : 'Incorrect. The correct answer was A.'}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="flex justify-center">
+          {!showResult ? (
+            <Button 
+              onClick={handleSubmit}
+              disabled={selectedAnswer === null}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Submit Answer
+            </Button>
+          ) : (
+            <Button onClick={handleNext} className="bg-green-600 hover:bg-green-700">
+              {questionNumber >= 5 ? 'Complete Session' : 'Next Question'}
+            </Button>
           )}
-
-          {/* Action Buttons */}
-          <div className="flex justify-center space-x-4">
-            {!showExplanation ? (
-              <Button
-                onClick={handleSubmitAnswer}
-                disabled={selectedAnswer === null}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Submit Answer
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNextQuestion}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Next Question
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

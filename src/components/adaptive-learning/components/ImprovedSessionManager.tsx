@@ -1,274 +1,134 @@
+
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { useSoundEffects } from '@/hooks/useSoundEffects';
-import { useDiverseQuestionGeneration } from '../hooks/useDiverseQuestionGeneration';
-import { useGradeLevelContent } from '@/hooks/useGradeLevelContent';
-import { userProgressService, UserProgress } from '@/services/userProgressService';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Clock, Play, Pause, Square } from 'lucide-react';
+
+interface SessionData {
+  id: string;
+  subject: string;
+  startTime: Date;
+  endTime?: Date;
+  score: number;
+  questionsAnswered: number;
+}
 
 interface ImprovedSessionManagerProps {
   subject: string;
-  skillArea: string;
-  difficultyLevel: number;
-  gradeContentConfig: any;
-  children: (sessionData: any) => React.ReactNode;
+  onSessionComplete: (data: SessionData) => void;
 }
 
-const ImprovedSessionManager = ({
-  subject,
-  skillArea,
-  difficultyLevel,
-  gradeContentConfig,
-  children
-}: ImprovedSessionManagerProps) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const { gradeConfig } = useGradeLevelContent(subject);
-  const { playCorrectAnswerSound, playWrongAnswerSound } = useSoundEffects();
+const ImprovedSessionManager = ({ subject, onSessionComplete }: ImprovedSessionManagerProps) => {
+  const [isActive, setIsActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [score, setScore] = useState(0);
+  const [questionsAnswered, setQuestionsAnswered] = useState(0);
 
-  // --- State for the session's activity list ---
-  const [activityList, setActivityList] = useState<any[]>([]);
-  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
-  const [isActivityListLoading, setIsActivityListLoading] = useState(true);
-  
-  // --- State for individual activity (question or game) ---
-  // currentActivity is now derived: const currentActivity = activityList[currentActivityIndex];
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null); // Specific to questions
-  const [showResult, setShowResult] = useState(false); // Specific to questions
-  const [correctAnswers, setCorrectAnswers] = useState(0); // For UI display of current session correct count
-  const [sessionStartTime] = useState(new Date());
-  const [activityStartTime, setActivityStartTime] = useState(new Date());
-  
-  // --- State for session summary for persistence ---
-  const [sessionQuestionsAttempted, setSessionQuestionsAttempted] = useState(0);
-  const [sessionCorrectAnswers, setSessionCorrectAnswers] = useState(0);
-  // const [sessionGamesCompleted, setSessionGamesCompleted] = useState(0); // Optional
-
-  const TOTAL_ACTIVITIES_PER_SESSION = 6; // Configurable total activities
-  
-  // Use grade-appropriate difficulty if available
-  const adjustedDifficulty = gradeConfig 
-    ? Math.max(gradeConfig.difficultyRange[0], Math.min(gradeConfig.difficultyRange[1], difficultyLevel))
-    : difficultyLevel;
-  
-  // Hook for question generation (will be used for question slots)
-  const {
-    isGenerating: isQuestionGenerating, // Renamed
-    generateDiverseQuestion,
-    saveQuestionHistory
-  } = useDiverseQuestionGeneration({
-    subject,
-    skillArea,
-    difficultyLevel: adjustedDifficulty,
-    userId: user?.id || '',
-    gradeLevel: gradeConfig?.userGrade,
-    standardsAlignment: gradeContentConfig?.standard
-  });
-
-  // --- Daily Activity List Generation ---
   useEffect(() => {
-    const generateActivityListForSession = async () => {
-      if (!user?.id || !gradeContentConfig) return; // Ensure dependencies are ready
-
-      setIsActivityListLoading(true);
-      const today = new Date().toISOString().split('T')[0];
-      const cacheKey = `activityList_${user.id}_${subject}_${skillArea}_${adjustedDifficulty}_${gradeConfig?.userGrade || 'anyGrade'}_${today}`;
-      
-      const cachedData = localStorage.getItem(cacheKey);
-      if (cachedData) {
-        setActivityList(JSON.parse(cachedData));
-        setIsActivityListLoading(false);
-        console.log('📋 Loaded activity list from cache');
-        return;
-      }
-
-      console.log('🔄 Generating new activity list for the day...');
-      const newActivityList = [];
-      const activityPattern = ['Q', 'Q', 'G', 'Q', 'Q', 'G']; // Example: Q=Question, G=Game
-
-      // Simulated game data (replace with actual fetch from /data/games/SUBJECT-games.json and filter)
-      let gameToUse = null;
-      if (subject.toLowerCase() === 'mathematics') { // Only for math for this example
-         gameToUse = {
-          id: "math-addition-castle", title: "Addition Castle Quest", description: "Solve addition problems!", emoji: "🏰", subject: "Mathematics", gradeLevel: [1,2,3], difficulty: "beginner", interactionType: "drag-drop", timeEstimate:"10m", skillAreas:["addition"], learningObjectives:["Add numbers"], status:"available", rewards:{coins:10, badges:["Adder"]}
-        };
-      }
-
-      for (let i = 0; i < TOTAL_ACTIVITIES_PER_SESSION; i++) {
-        const activityTypeDesignation = activityPattern[i % activityPattern.length];
-        let activity = null;
-
-        if (activityTypeDesignation === 'G' && gameToUse) {
-          activity = { type: 'interactive-game', gameData: { ...gameToUse, id: `${gameToUse.id}-${i}` }, uniqueId: `${gameToUse.id}-${Date.now()}-${i}` };
-          console.log(`🎲 Added game to list: ${gameToUse.title}`);
-        } else {
-          try {
-            const questionContext = gradeContentConfig ? { gradeLevel: gradeContentConfig.gradeLevel, standard: gradeContentConfig.standard, contentPrompt: gradeContentConfig.contentPrompt } : undefined;
-            const question = await generateDiverseQuestion(questionContext);
-            activity = { type: 'interactive-question', ...question, uniqueId: `q-${Date.now()}-${i}` };
-            console.log(`📝 Added question to list: ${question.question.substring(0,30)}...`);
-          } catch (e) {
-            console.error("Failed to generate a question for activity list, adding placeholder:", e);
-            activity = { type: 'error', message: 'Failed to load activity.', uniqueId: `err-${Date.now()}-${i}`, question: "Error loading activity." };
-          }
-        }
-        if (activity) newActivityList.push(activity);
-      }
-      
-      setActivityList(newActivityList);
-      if (newActivityList.length > 0) {
-        localStorage.setItem(cacheKey, JSON.stringify(newActivityList));
-      }
-      setIsActivityListLoading(false);
-      console.log('✅ Generated new activity list and cached.');
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (isActive && !isPaused) {
+      interval = setInterval(() => {
+        setElapsedTime(time => time + 1);
+      }, 1000);
+    } else if (interval) {
+      clearInterval(interval);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
     };
+  }, [isActive, isPaused]);
 
-    generateActivityListForSession();
-  }, [user?.id, subject, skillArea, adjustedDifficulty, gradeConfig, gradeContentConfig, generateDiverseQuestion, toast]); // Added toast
-
-  const currentActivity = activityList[currentActivityIndex];
-
-  const loadNextActivity = () => { // Renamed from loadNextQuestion
-    if (currentActivityIndex < activityList.length - 1) {
-      setCurrentActivityIndex(prev => prev + 1);
-      // activityStartTime, selectedAnswer, showResult are reset in the useEffect below for currentActivity
-    } else {
-      // All activities complete - End of Session
-      // Note: The actual number of correct answers for the *last* activity is updated in handleAnswerSelect/handleGameComplete
-      // So, we use the state `sessionCorrectAnswers` and `sessionQuestionsAttempted` which are updated before loadNextActivity is called.
-      const finalAttempted = sessionQuestionsAttempted; // This already includes the last question attempt
-      const finalCorrect = sessionCorrectAnswers; // This already includes the last question's correctness
-
-      toast({
-        title: "Session Complete! 🎓",
-        description: `You've completed all ${activityList.length} activities! Questions: ${finalCorrect}/${finalAttempted} correct.`,
-        duration: 5000,
-      });
-
-      // Persist progress
-      if (user?.id && finalAttempted > 0) { // Only save if questions were attempted
-        const progressData: Partial<UserProgress> = {
-          user_id: user.id,
-          subject: subject,
-          skill_area: skillArea,
-          // This simplified version sets progress based on THIS session only.
-          // A robust version would fetch existing progress and merge.
-          attempts_count: finalAttempted,
-          accuracy_rate: finalAttempted > 0 ? (finalCorrect / finalAttempted) * 100 : 0,
-          // To properly update overall accuracy, we'd need existing total_correct and total_attempted.
-          // For now, this reflects session accuracy.
-          current_level: adjustedDifficulty,
-          last_assessment: new Date().toISOString(),
-        };
-        console.log("📊 Saving session progress:", progressData);
-        userProgressService.updateUserProgress(progressData)
-          .then(success => {
-            if (success) {
-              toast({ title: "Progress Saved!", duration: 2000 });
-            } else {
-              toast({ title: "Failed to Save Progress", variant: "destructive", duration: 2000 });
-            }
-          });
-      } else if (user?.id && finalAttempted === 0 && activityList.filter(a => a.type === 'interactive-game').length > 0) {
-        // Handle session with only games (no questions attempted) - e.g. log completion
-         const progressData: Partial<UserProgress> = {
-          user_id: user.id,
-          subject: subject,
-          skill_area: skillArea,
-          attempts_count: 0, // No questions
-          accuracy_rate: 0,  // No questions
-          current_level: adjustedDifficulty,
-          last_assessment: new Date().toISOString(),
-          // Could add a field like 'games_completed_count' if UserProgress supports it
-        };
-        console.log("📊 Saving game session completion (no questions):", progressData);
-        userProgressService.updateUserProgress(progressData); // Save at least that the session was touched
-      }
-    }
+  const handleStart = () => {
+    setIsActive(true);
+    setIsPaused(false);
+    setElapsedTime(0);
+    setScore(0);
+    setQuestionsAnswered(0);
   };
 
-  // Effect to set activity start time when activity becomes current
-  useEffect(() => {
-    if (currentActivity) {
-        setActivityStartTime(new Date());
-    }
-  }, [currentActivity]);
-
-  const handleAnswerSelect = async (answerIndex: number) => {
-    if (showResult || selectedAnswer !== null || !currentActivity || currentActivity.type !== 'interactive-question') return;
-    
-    console.log('🎯 Answer Selection Debug:', {
-      answerIndex,
-      correctAnswer: currentActivity.correct,
-      question: currentActivity.question,
-      options: currentActivity.options
-    });
-    
-    setSessionQuestionsAttempted(prev => prev + 1); // Track attempt for persistence
-    setSelectedAnswer(answerIndex);
-    const isCorrect = answerIndex === currentActivity.correct;
-    const responseTime = Date.now() - activityStartTime.getTime();
-    setShowResult(true);
-    
-    console.log('🔍 Answer Validation:', {
-      selectedIndex: answerIndex,
-      correctIndex: currentActivity.correct,
-      isCorrect,
-      selectedOption: currentActivity.options[answerIndex],
-      correctOption: currentActivity.options[currentActivity.correct]
-    });
-    
-    if (isCorrect) {
-      setCorrectAnswers(prev => prev + 1); // For UI display
-      setSessionCorrectAnswers(prev => prev + 1); // For persistence
-      playCorrectAnswerSound();
-      toast({
-        title: "Correct! 🎉",
-        description: "Well done!",
-        duration: 2000,
-      });
-    } else {
-      playWrongAnswerSound();
-      toast({
-        title: "Incorrect",
-        description: currentActivity.explanation || `The correct answer was: ${currentActivity.options[currentActivity.correct]}`,
-        duration: 3000,
-        variant: "destructive"
-      });
-    }
-
-    await saveQuestionHistory(currentActivity, answerIndex, isCorrect, responseTime, {
-      gradeLevel: gradeConfig?.userGrade,
-      standardCode: gradeContentConfig?.standard?.code
-    });
-
-    setTimeout(loadNextActivity, 3000);
+  const handlePause = () => {
+    setIsPaused(!isPaused);
   };
 
-  const handleGameComplete = (gameScore: number) => {
-    console.log(`🎮 Game completed with score: ${gameScore}`);
-    playCorrectAnswerSound();
-    // If games should count towards attempts/correctness for UserProgress:
-    // setSessionQuestionsAttempted(prev => prev + 1);
-    // setSessionCorrectAnswers(prev => prev + 1); // Assuming game completion is "correct"
-    loadNextActivity();
+  const handleStop = () => {
+    const sessionData: SessionData = {
+      id: `session-${Date.now()}`,
+      subject,
+      startTime: new Date(Date.now() - elapsedTime * 1000),
+      endTime: new Date(),
+      score,
+      questionsAnswered
+    };
+    
+    setIsActive(false);
+    setIsPaused(false);
+    setElapsedTime(0);
+    onSessionComplete(sessionData);
   };
 
-  const sessionData = {
-    currentActivity,
-    selectedAnswer,
-    showResult,
-    activityNumber: currentActivityIndex + 1, // Updated
-    totalActivities: activityList.length,    // Updated
-    correctAnswers,
-    isGenerating: isQuestionGenerating || isActivityListLoading, // Updated
-    gradeLevel: gradeConfig?.userGrade,
-    loadNextActivity, // Updated
-    handleAnswerSelect, // For questions
-    handleGameComplete // For games
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  return <>{children(sessionData)}</>;
+  return (
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center">
+          <Clock className="w-5 h-5 mr-2" />
+          Session Manager - {subject}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="text-center">
+          <div className="text-3xl font-mono text-white mb-2">
+            {formatTime(elapsedTime)}
+          </div>
+          <div className="text-gray-400">
+            Score: {score} | Questions: {questionsAnswered}
+          </div>
+        </div>
+
+        <div className="flex justify-center space-x-2">
+          {!isActive ? (
+            <Button onClick={handleStart} className="bg-green-600 hover:bg-green-700">
+              <Play className="w-4 h-4 mr-2" />
+              Start Session
+            </Button>
+          ) : (
+            <>
+              <Button onClick={handlePause} variant="outline" className="border-gray-600">
+                <Pause className="w-4 h-4 mr-2" />
+                {isPaused ? 'Resume' : 'Pause'}
+              </Button>
+              <Button onClick={handleStop} className="bg-red-600 hover:bg-red-700">
+                <Square className="w-4 h-4 mr-2" />
+                Stop
+              </Button>
+            </>
+          )}
+        </div>
+
+        {isActive && (
+          <div className="text-center">
+            <Button 
+              onClick={() => {
+                setScore(prev => prev + 10);
+                setQuestionsAnswered(prev => prev + 1);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Simulate Correct Answer (+10 points)
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 };
 
 export default ImprovedSessionManager;
