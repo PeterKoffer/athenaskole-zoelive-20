@@ -1,6 +1,6 @@
 import curriculumIndex from '../data/unified-curriculum-index.json';
 import { CurriculumNode, CurriculumNodeType } from '../types/curriculum/CurriculumNode';
-import { dailyUniverseGenerator } from './DailyUniverseGenerator';
+import { universeGenerationService } from './UniverseGenerationService';
 
 class ContentGenerationService {
   private curriculum: { [key: string]: CurriculumNode } = {};
@@ -33,7 +33,7 @@ class ContentGenerationService {
   }
 
   public generateDailyUniverse(studentProfile: any): any {
-    return dailyUniverseGenerator.generate(studentProfile);
+    return universeGenerationService.generate(studentProfile);
   }
 }
 

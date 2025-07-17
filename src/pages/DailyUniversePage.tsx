@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { dailyUniverseGenerator } from '../services/DailyUniverseGenerator';
+import { universeGenerationService } from '../services/UniverseGenerationService';
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,13 +21,10 @@ const DailyUniversePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // In a real application, we would pass the student's profile here.
         const studentProfile = user || {};
-        const dailyUniverse = await dailyUniverseGenerator.generate(studentProfile);
-        console.log('Daily Universe:', dailyUniverse);
+        const dailyUniverse = await universeGenerationService.generate(studentProfile);
         setUniverse(dailyUniverse);
       } catch (err) {
-        console.error('Error fetching universe:', err);
         setError('Failed to load your daily universe. Please try again.');
       } finally {
         setLoading(false);
@@ -44,7 +40,6 @@ const DailyUniversePage: React.FC = () => {
       description: 'Loading your personalized learning experience...'
     });
     
-    // Navigate to the learning interface with the objective
     setTimeout(() => {
       navigate('/simulator', { 
         state: { 
