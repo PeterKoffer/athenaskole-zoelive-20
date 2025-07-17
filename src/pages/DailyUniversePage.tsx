@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { universeGenerationService } from '../services/UniverseGenerationService';
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
@@ -27,45 +26,13 @@ const DailyUniversePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        console.log('🌟 DailyUniversePage: Starting universe generation...');
-        
-        // Add debug information
-        const debugData = {
-          timestamp: new Date().toISOString(),
-          userExists: !!user,
-          serviceExists: !!universeGenerationService,
-          serviceType: typeof universeGenerationService,
-          serviceMethods: universeGenerationService ? Object.getOwnPropertyNames(Object.getPrototypeOf(universeGenerationService)) : []
-        };
-        
-        console.log('🔍 Debug info:', debugData);
-        setDebugInfo(debugData);
-        
         const studentProfile = user || {};
-        console.log('📝 Student profile for universe generation:', studentProfile);
-        
-        if (!universeGenerationService) {
-          throw new Error('Universe generation service not available');
-        }
-        
         const dailyUniverse = await universeGenerationService.generate(studentProfile);
-        console.log('🌌 Generated Daily Universe:', dailyUniverse);
-        
-        if (!dailyUniverse) {
-          throw new Error('No universe generated');
-        }
-        
         setUniverse(dailyUniverse);
         console.log('✅ DailyUniversePage: Universe set successfully');
         
       } catch (err) {
-        console.error('❌ Error fetching universe:', err);
-        console.error('📊 Error details:', {
-          message: err.message,
-          stack: err.stack,
-          name: err.name
-        });
-        setError(`Failed to load your daily universe: ${err.message}`);
+        setError('Failed to load your daily universe. Please try again.');
       } finally {
         setLoading(false);
         console.log('🏁 DailyUniversePage: Loading completed');
@@ -81,7 +48,6 @@ const DailyUniversePage: React.FC = () => {
       description: 'Loading your personalized learning experience...'
     });
     
-    // Navigate to the learning interface with the objective
     setTimeout(() => {
       navigate('/simulator', { 
         state: { 

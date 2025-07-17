@@ -6,7 +6,7 @@ import { UserMetadata } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import DailyUniverseGenerator from '@/services/DailyUniverseGenerator';
+import { universeGenerationService } from '@/services/UniverseGenerationService';
 import UniverseSessionManager from '@/services/UniverseSessionManager';
 import { LearningAtom, DailyUniverse } from '@/types/learning';
 import AdaptiveLearningAtomRenderer from '@/components/adaptive-learning/AdaptiveLearningAtomRenderer';
@@ -35,18 +35,37 @@ const EnhancedDailyProgram: React.FC = () => {
     
     setIsGenerating(true);
     try {
-      const universe = await DailyUniverseGenerator.generateUniverse({
+      const universe = await universeGenerationService.generate({
         userId: user.id,
-        studentAge: studentAge
+        gradeLevel: metadata?.gradeLevel || 4,
+        preferredLearningStyle: metadata?.preferredLearningStyle || 'mixed',
+        interests: metadata?.interests || [],
       });
       
       if (universe) {
-        setDailyUniverse(universe);
+        // The new service returns a DailyUniverse object directly
+        const dailyUniverse: DailyUniverse = {
+          ...universe,
+          storylineIntro: universe.description || '',
+          estimatedTotalMinutes: 45, // Placeholder
+          learningAtoms: universe.objectives.map((obj, index) => ({
+            id: obj.id,
+            title: obj.name,
+            subject: obj.subjectName,
+            difficulty: 'medium', // Placeholder
+            type: 'video', // Placeholder
+            content: obj.description,
+            order: index,
+            isCompleted: false,
+          })),
+          storylineOutro: 'Congratulations on completing your learning journey!', // Placeholder
+        };
+        setDailyUniverse(dailyUniverse);
         setCurrentAtomIndex(0);
         setCompletedAtoms([]);
         
         // Initialize UniverseSessionManager with the new universe
-        await UniverseSessionManager.startSession(user.id, universe);
+        await UniverseSessionManager.startSession(user.id, dailyUniverse);
         console.log('[EnhancedDailyProgram] Started UniverseSessionManager session');
       }
     } catch (error) {
