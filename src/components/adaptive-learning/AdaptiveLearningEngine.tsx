@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
@@ -16,7 +15,7 @@ interface AdaptiveLearningEngineProps {
   onComplete?: (score: number) => void;
 }
 
-const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLearningEngineProps) => {
+const AdaptiveLearningEngine = ({ subject, skillArea }: AdaptiveLearningEngineProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -29,7 +28,6 @@ const AdaptiveLearningEngine = ({ subject, skillArea, onComplete }: AdaptiveLear
     difficulty,
     performanceMetrics,
     isLoading,
-    handleSessionComplete,
     handleRetry
   } = useSessionStateManager({
     subject,

@@ -50,7 +50,7 @@ const AITutor: React.FC<AITutorProps> = ({ onBack }) => {
       };
       setMessages([welcomeMessage]);
     }
-  }, []);
+  }, [messages.length]);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim() || isLoading) return;
