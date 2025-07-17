@@ -1,16 +1,15 @@
-
 export enum NELIESubject {
   MATH = 'Mathematics',
-  ENGLISH = 'English Language Arts',
+  ENGLISH = 'English',
+  WORLD_LANGUAGES = 'Other Languages',
   SCIENCE = 'Science',
-  SOCIAL_STUDIES = 'Social Studies',
-  PHYSICAL_EDUCATION = 'Physical Education',
-  ART = 'Art',
-  MUSIC = 'Music',
-  WORLD_LANGUAGES = 'World Languages',
-  COMPUTER_SCIENCE = 'Computer Science',
-  HEALTH = 'Health',
   MENTAL_WELLNESS = 'Mental Wellness',
+  COMPUTER_SCIENCE = 'Computer Science',
+  CREATIVE_ARTS = 'Creative Arts',
+  MUSIC = 'Music',
+  HISTORY_RELIGION = 'History & Religion',
+  GEOGRAPHY = 'Geography',
+  PHYSICAL_EDUCATION = 'Body Lab (Physical Education)',
   LIFE_ESSENTIALS = 'Life Essentials'
 }
 
