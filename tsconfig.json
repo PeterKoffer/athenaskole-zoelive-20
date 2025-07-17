@@ -26,5 +26,4 @@
     }
   },
   "include": ["src", "supabase/functions", "scripts", "vitest.config.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
 }
