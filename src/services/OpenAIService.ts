@@ -2,25 +2,34 @@
 import OpenAI from 'openai';
 import { Universe } from './UniverseGenerator';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true
-});
+// Don't instantiate OpenAI client immediately to avoid initialization errors
+let openaiClient: OpenAI | null = null;
+
+const getOpenAIClient = (): OpenAI => {
+  if (!openaiClient) {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error('OpenAI API key not configured. Please add VITE_OPENAI_API_KEY to your environment variables.');
+    }
+
+    openaiClient = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true
+    });
+  }
+  
+  return openaiClient;
+};
 
 export const openAIService = {
   async generateUniverse(prompt: string, signal?: AbortSignal): Promise<Universe> {
     console.log('🤖 OpenAI Service: Generating universe with prompt:', typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : prompt);
     
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    
-    if (!apiKey) {
-      console.error('❌ OpenAI API key not found in environment variables');
-      throw new Error('OpenAI API key not configured. Please add VITE_OPENAI_API_KEY to your environment variables.');
-    }
-
-    console.log('🔑 OpenAI API key found, length:', apiKey.length);
-
     try {
+      const openai = getOpenAIClient();
+      console.log('🔑 OpenAI client initialized successfully');
+
       const systemPrompt = `You are an expert educational content creator. Generate a themed learning universe for students based on their profile. Always respond with valid JSON only.
 
 The response must follow this exact structure:
@@ -93,7 +102,7 @@ The response must follow this exact structure:
         throw error;
       }
       
-      // Re-throw the error instead of using fallback
+      // Re-throw the error with a clear message
       throw new Error(`OpenAI universe generation failed: ${error.message}`);
     }
   },

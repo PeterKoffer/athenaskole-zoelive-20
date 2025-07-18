@@ -1,46 +1,63 @@
+
 export interface Universe {
   id: string;
   title: string;
   description: string;
   theme?: string;
-  objectives?: any[];
-  learningAtoms?: any[];
+  characters?: string[];
+  locations?: string[];
+  activities?: string[];
+  objectives?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    subjectName: string;
+    educationalLevel: string;
+  }>;
 }
 
-const universes: Universe[] = [
-  {
-    id: '1',
-    title: 'Travel to China',
-    description: 'You have to travel to China to help a friend.',
-  },
-  {
-    id: '2',
-    title: 'The Mystery of the Missing Cat',
-    description: 'A cat is missing in your neighborhood. You have to find it.',
-  },
-  {
-    id: '3',
-    title: 'The Great Wall of China',
-    description: 'You are visiting the Great Wall of China.',
-  },
-  {
-    id: '4',
-    title: 'The Amazon Rainforest',
-    description: 'You are exploring the Amazon rainforest.',
-  },
-  {
-    id: '5',
-    title: 'The Lost City of Atlantis',
-    description: 'You have discovered the lost city of Atlantis.',
-  },
-  {
-    id: '6',
-    title: 'The International Space Station',
-    description: 'You are on a mission to the International Space Station.',
-  },
-];
+export class UniverseGenerator {
+  generateUniverse(theme: string): Universe {
+    // Fallback implementation for when AI generation fails
+    return {
+      id: `universe-${Date.now()}`,
+      title: `Learning Universe: ${theme}`,
+      description: `An educational journey exploring ${theme} through interactive experiences and discovery.`,
+      theme: theme,
+      characters: [
+        "Professor Explorer - Your knowledgeable guide",
+        "Curious Sam - A fellow learner on the journey",
+        "Wise Owl - Provides helpful hints and tips"
+      ],
+      locations: [
+        "The Discovery Library - Where knowledge begins", 
+        "Practice Plaza - Where skills are honed",
+        "Achievement Academy - Where progress is celebrated"
+      ],
+      activities: [
+        "Interactive lessons with guided exploration",
+        "Hands-on practice exercises",
+        "Creative projects and experiments",
+        "Collaborative learning challenges"
+      ],
+      objectives: [
+        {
+          id: `obj-1-${Date.now()}`,
+          name: "Foundation Knowledge",
+          description: `Build core understanding of ${theme} concepts`,
+          subjectName: "General Learning",
+          educationalLevel: "Elementary"
+        },
+        {
+          id: `obj-2-${Date.now()}`,
+          name: "Practical Application", 
+          description: `Apply ${theme} knowledge to real-world scenarios`,
+          subjectName: "General Learning",
+          educationalLevel: "Elementary"
+        }
+      ]
+    };
+  }
+}
 
-export const UniverseGenerator = {
-  getUniverses: () => universes,
-  getUniverseById: (id: string) => universes.find((u) => u.id === id),
-};
+export const universeGenerator = new UniverseGenerator();
