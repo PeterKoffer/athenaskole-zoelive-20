@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { enhancedUniverseGenerationService } from '../services/EnhancedUniverseGenerationService';
+import { aiUniverseGenerator } from '../services/AIUniverseGenerator';
 import { CurriculumNode } from '../types/curriculum/CurriculumNode';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,30 +17,32 @@ const DailyUniversePage: React.FC = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    console.log('🚀 DailyUniversePage: Component mounted with Enhanced Universe Generation');
-    console.log('📅 Current timestamp:', new Date().toISOString());
-    console.log('👤 User:', user);
-    console.log('🔧 Enhanced Service available:', !!enhancedUniverseGenerationService);
-    
     const fetchUniverse = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        console.log('📡 Calling enhanced universe generation service...');
-        const studentProfile = user || { gradeLevel: 4, preferredLearningStyle: 'mixed' };
-        const dailyUniverse = await enhancedUniverseGenerationService.generate(studentProfile);
+        console.log('📡 Calling AI universe generation service...');
+        const studentProfile = user || {
+          name: 'Student',
+          gradeLevel: 4,
+          interests: ['space', 'dinosaurs'],
+          abilities: { math: 'beginner' },
+        };
+        const dailyUniverse = await aiUniverseGenerator.generateUniverse(studentProfile);
         
-        console.log('🎯 Generated enhanced universe:', dailyUniverse);
-        setUniverse(dailyUniverse);
-        console.log('✅ DailyUniversePage: Enhanced universe set successfully');
+        try {
+          setUniverse(JSON.parse(dailyUniverse));
+        } catch (parseError) {
+          console.error('❌ Error parsing daily universe JSON:', parseError);
+          setError('Failed to process the daily universe data. Please try again.');
+        }
         
       } catch (err) {
         console.error('❌ Error generating enhanced universe:', err);
         setError('Failed to load your daily universe. Please try again.');
       } finally {
         setLoading(false);
-        console.log('🏁 DailyUniversePage: Loading completed');
       }
     };
     
