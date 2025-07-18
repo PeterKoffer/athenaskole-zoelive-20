@@ -5,7 +5,6 @@ import { Toaster } from 'sonner';
 import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { ThemeProvider } from './components/ThemeProvider';
 import { AuthProvider } from './hooks/useAuth';
-import LandingPage from './pages/LandingPage';
 import DailyUniversePage from './pages/DailyUniversePage';
 import SimulatorPage from './pages/SimulatorPage';
 import Auth from './pages/Auth';
