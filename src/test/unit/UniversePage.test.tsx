@@ -3,11 +3,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DailyUniversePage from '../../pages/DailyUniversePage';
 import { BrowserRouter } from 'react-router-dom';
-import { universeGenerationService } from '../../services/UniverseGenerationService';
+import { enhancedUniverseGenerationService } from '../../services/EnhancedUniverseGenerationService';
 
 // Mock the universe generation service
-vi.mock('../../services/UniverseGenerationService', () => ({
-    universeGenerationService: {
+vi.mock('../../services/EnhancedUniverseGenerationService', () => ({
+    enhancedUniverseGenerationService: {
         generate: vi.fn()
     }
 }));
@@ -43,7 +43,7 @@ describe('DailyUniversePage', () => {
     });
 
     it('should render the universe title and description', async () => {
-        (universeGenerationService.generate as any).mockResolvedValue({
+        (enhancedUniverseGenerationService.generate as any).mockResolvedValue({
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [],
@@ -62,7 +62,7 @@ describe('DailyUniversePage', () => {
     });
 
     it('should render the curriculum standards', async () => {
-        (universeGenerationService.generate as any).mockResolvedValue({
+        (enhancedUniverseGenerationService.generate as any).mockResolvedValue({
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [
