@@ -25,25 +25,8 @@ export const useUnifiedQuestionGeneration = (userId: string) => {
     }
   }, [userId]);
 
-  const generateBatchQuestions = useCallback(async (count: number, metadata: QuestionMetadata) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      const questions = await unifiedQuestionGenerationService.generateBatchQuestions(userId, count, metadata);
-      return questions;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMessage);
-      return [];
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [userId]);
-
   return {
     generateQuestion,
-    generateBatchQuestions,
     generateUniqueQuestion: generateQuestion,
     saveQuestionHistory: async () => {},
     generationStats: { total: 0, unique: 0 },

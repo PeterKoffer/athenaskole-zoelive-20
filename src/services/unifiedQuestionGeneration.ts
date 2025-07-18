@@ -1,43 +1,27 @@
-
-// Unified Question Generation Service
-
+import { aiUniverseGenerator } from './AIUniverseGenerator';
 import { globalQuestionUniquenessService, QuestionMetadata } from './globalQuestionUniquenessService';
+import { StudentProfile } from '../types/student';
 
 export class UnifiedQuestionGenerationService {
   async generateQuestion(userId: string, metadata: QuestionMetadata): Promise<any> {
     console.log('🔄 Generating unified question for user:', userId);
     
+    const studentProfile: StudentProfile = {
+      name: 'Student',
+      gradeLevel: metadata.gradeLevel || 4,
+      interests: metadata.interests || ['space', 'dinosaurs'],
+      abilities: { math: 'beginner' },
+    };
+
+    const universe = await aiUniverseGenerator.generateUniverse(studentProfile);
+    const question = universe.objectives[0];
+
     const questionId = globalQuestionUniquenessService.generateUniqueQuestion(userId, metadata);
     
     return {
       id: questionId,
-      question: `Sample question for ${metadata.subject}`,
-      options: ['Option A', 'Option B', 'Option C', 'Option D'],
-      correct: 0,
-      explanation: 'This is a sample explanation.'
+      ...question
     };
-  }
-
-  async generateBatchQuestions(userId: string, count: number, metadata: QuestionMetadata): Promise<any[]> {
-    console.log('🔄 Generating batch questions:', count);
-    
-    const questions = [];
-    for (let i = 0; i < count; i++) {
-      const questionId = globalQuestionUniquenessService.generateUniqueQuestion(userId, {
-        ...metadata,
-        batchIndex: i
-      });
-      
-      questions.push({
-        id: questionId,
-        question: `Batch question ${i + 1}`,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        correct: Math.floor(Math.random() * 4),
-        explanation: `Explanation for question ${i + 1}.`
-      });
-    }
-    
-    return questions;
   }
 
   async saveQuestionHistory(userId: string, questionId: string, metadata: QuestionMetadata): Promise<void> {
