@@ -1,252 +1,243 @@
 
-import React, { useEffect, useState } from 'react';
-import { aiUniverseGenerator } from '../services/AIUniverseGenerator';
-import { CurriculumNode } from '../types/curriculum/CurriculumNode';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { BookOpen, Target, Award, Sparkles, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { Loader2, Sparkles, Users, MapPin, Target } from 'lucide-react';
+import { Universe } from '@/services/UniverseGenerator';
 
-const DailyUniversePage: React.FC = () => {
-  const [universe, setUniverse] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+const DailyUniversePage = () => {
   const { user } = useAuth();
+  const [universe, setUniverse] = useState<Universe | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUniverse = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        console.log('📡 DailyUniversePage: Starting AI universe generation...');
-        
-        const studentProfile = user || {
-          name: 'Student',
-          gradeLevel: 4,
-          interests: ['space', 'dinosaurs'],
-          abilities: { math: 'beginner' },
-        };
-        
-        console.log('👤 Student profile:', studentProfile);
-        
-        const generatedUniverse = await aiUniverseGenerator.generateUniverse(studentProfile);
-        
-        if (!generatedUniverse) {
-          throw new Error('No universe was generated');
-        }
-        
-        console.log('🎯 Generated universe:', generatedUniverse);
+  const generateUniverse = async () => {
+    if (!user) return;
+
+    console.log('📡 DailyUniversePage: Starting AI universe generation...');
+    console.log('👤 Student profile:', user);
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const generatedUniverse = await aiUniverseGenerator.generateUniverse(user);
+      console.log('🎯 Generated universe:', generatedUniverse);
+      
+      if (generatedUniverse) {
         setUniverse(generatedUniverse);
-        
-        toast.success('AI Universe Generated!', {
-          description: `Welcome to "${generatedUniverse.title}"`
-        });
-        
-      } catch (err) {
-        console.error('❌ Error generating AI universe:', err);
-        const errorMessage = err.message || 'Failed to load your daily universe. Please try again.';
-        setError(errorMessage);
-        
-        toast.error('Failed to Generate Universe', {
-          description: errorMessage
-        });
-      } finally {
-        setLoading(false);
+      } else {
+        setError('Failed to generate universe - no content returned');
       }
-    };
-    
-    fetchUniverse();
-  }, [user]);
-
-  const handleStartTask = (objective: CurriculumNode) => {
-    console.log('🎯 Starting enhanced task for objective:', objective.name);
-    toast.success(`Starting: ${objective.name}`, {
-      description: 'Loading your personalized learning adventure...'
-    });
-    
-    setTimeout(() => {
-      navigate('/simulator', { 
-        state: { 
-          objective,
-          kcId: objective.id,
-          subject: objective.subjectName,
-          skillArea: objective.name
-        } 
-      });
-    }, 1000);
+    } catch (err) {
+      console.error('❌ Universe generation error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to generate universe');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) {
+  useEffect(() => {
+    if (user && !universe && !loading) {
+      generateUniverse();
+    }
+  }, [user]);
+
+  if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-lg text-muted-foreground">Creating your AI-powered learning adventure...</p>
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Sparkles className="h-4 w-4" />
-            <span>OpenAI is generating personalized content just for you</span>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">Please sign in to access your daily learning universe.</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4 max-w-2xl mx-auto p-6">
-          <Card className="bg-destructive/10 border-destructive/20">
-            <CardContent className="p-6 text-center">
-              <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-destructive mb-2">AI Generation Failed</h3>
-              <p className="text-muted-foreground mb-4">{error}</p>
-              {error.includes('API key') && (
-                <div className="bg-muted p-4 rounded-lg text-left space-y-2">
-                  <p className="text-sm font-medium">To fix this issue:</p>
-                  <ol className="text-sm text-muted-foreground list-decimal list-inside space-y-1">
-                    <li>Get an OpenAI API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">platform.openai.com</a></li>
-                    <li>Add it as VITE_OPENAI_API_KEY in your environment variables</li>
-                    <li>Restart your development server</li>
-                  </ol>
-                </div>
-              )}
-              <Button onClick={() => window.location.reload()} className="mt-4">
-                Try Again
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (!universe) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-lg text-muted-foreground">No universe available</p>
-          <Button onClick={() => window.location.reload()}>
-            Reload
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const objectives = universe.objectives || [];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Header Section */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-primary animate-pulse" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {universe.title}
-            </h1>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-4 pt-8">
+          <div className="flex items-center justify-center gap-2">
+            <Sparkles className="w-8 h-8 text-yellow-400" />
+            <h1 className="text-4xl md:text-5xl font-bold text-white">Daily Learning Universe</h1>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {universe.description}
-          </p>
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
-            <Target className="h-4 w-4" />
-            AI-Generated Theme: {universe.theme || 'Personalized Learning Quest'}
-          </div>
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-            ✨ Powered by OpenAI
-          </div>
+          <p className="text-xl text-purple-200">Your personalized AI-generated learning adventure</p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <BookOpen className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-foreground">{objectives.length}</div>
-              <div className="text-sm text-muted-foreground">AI-Generated Challenges</div>
+        {/* Loading State */}
+        {loading && (
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="flex items-center justify-center py-12">
+              <div className="text-center space-y-4">
+                <Loader2 className="w-12 h-12 animate-spin text-blue-400 mx-auto" />
+                <div className="space-y-2">
+                  <p className="text-white text-lg font-medium">Nelie is creating your universe...</p>
+                  <p className="text-gray-300">This may take a moment</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <Target className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-foreground">~45</div>
-              <div className="text-sm text-muted-foreground">Minutes of Fun</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <Award className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-foreground">3</div>
-              <div className="text-sm text-muted-foreground">Achievements</div>
-            </CardContent>
-          </Card>
-        </div>
+        )}
 
-        {/* Learning Objectives Grid */}
-        {objectives.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            {objectives.map((objective: CurriculumNode, index: number) => (
-              <Card key={objective.id} className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg font-semibold text-foreground leading-tight">
-                      {objective.name}
-                    </CardTitle>
-                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full ml-2 flex-shrink-0 flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      {objective.subjectName}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {objective.description}
-                  </p>
-                  
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="bg-muted px-2 py-1 rounded">
-                      {objective.educationalLevel || 'Grade 4'}
-                    </span>
-                    <span className="bg-muted px-2 py-1 rounded">
-                      ~15 min
-                    </span>
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
-                      AI-Generated
-                    </span>
-                  </div>
+        {/* Error State */}
+        {error && (
+          <Card className="bg-red-900/20 border-red-700">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <p className="text-red-300 text-lg">Error generating universe: {error}</p>
+                <Button onClick={generateUniverse} variant="outline" className="text-white border-white hover:bg-white hover:text-black">
+                  Try Again
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-                  <Button 
-                    onClick={() => handleStartTask(objective)}
-                    className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
-                    size="sm"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Begin AI Adventure
-                  </Button>
+        {/* Universe Content */}
+        {universe && !loading && (
+          <div className="space-y-6">
+            {/* Main Universe Card */}
+            <Card className="bg-gray-800/50 border-gray-700 text-white">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Sparkles className="w-6 h-6 text-yellow-400" />
+                  <CardTitle className="text-3xl font-bold">{universe.title}</CardTitle>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-green-400">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span>AI-Generated Theme: {universe.theme || 'Learning Adventure'}</span>
+                  <span className="px-2 py-1 bg-green-600 text-white rounded text-xs">Powered by Nelie</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 text-lg leading-relaxed text-center">
+                  {universe.description}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-gray-800/50 border-gray-700 text-white text-center">
+                <CardContent className="pt-6">
+                  <Target className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+                  <div className="text-2xl font-bold text-blue-400">{universe.activities?.length || 0}</div>
+                  <div className="text-gray-400">AI-Generated Challenges</div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              No learning adventures available at the moment.
-            </p>
+              
+              <Card className="bg-gray-800/50 border-gray-700 text-white text-center">
+                <CardContent className="pt-6">
+                  <Users className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+                  <div className="text-2xl font-bold text-purple-400">~45</div>
+                  <div className="text-gray-400">Minutes of Fun</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gray-800/50 border-gray-700 text-white text-center">
+                <CardContent className="pt-6">
+                  <Sparkles className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                  <div className="text-2xl font-bold text-yellow-400">{universe.characters?.length || 0}</div>
+                  <div className="text-gray-400">Achievements</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Universe Details */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Characters */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Users className="w-5 h-5 text-purple-400" />
+                    Characters
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {universe.characters?.map((character, index) => (
+                      <div key={index} className="bg-gray-700/50 p-3 rounded-lg">
+                        <p className="text-white text-sm">{character}</p>
+                      </div>
+                    )) || <p className="text-gray-400">No characters available</p>}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Locations */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-blue-400" />
+                    Locations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {universe.locations?.map((location, index) => (
+                      <div key={index} className="bg-gray-700/50 p-3 rounded-lg">
+                        <p className="text-white text-sm">{location}</p>
+                      </div>
+                    )) || <p className="text-gray-400">No locations available</p>}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Activities */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Target className="w-5 h-5 text-green-400" />
+                    Activities
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {universe.activities?.map((activity, index) => (
+                      <div key={index} className="bg-gray-700/50 p-3 rounded-lg">
+                        <p className="text-white text-sm">{activity}</p>
+                      </div>
+                    )) || <p className="text-gray-400">No activities available</p>}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="text-center space-y-4">
+              <Button 
+                onClick={generateUniverse}
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3"
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                Generate New Universe
+              </Button>
+              <p className="text-gray-400 text-sm">
+                Powered by Nelie AI - Your personalized learning companion
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Footer Message */}
-        <div className="text-center py-8">
-          <p className="text-muted-foreground flex items-center justify-center gap-2">
-            <Sparkles className="h-4 w-4" />
-            Complete all AI-generated adventures to unlock special achievements!
-          </p>
-        </div>
+        {/* Default message when no universe */}
+        {!universe && !loading && !error && (
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="text-center py-12">
+              <Sparkles className="w-16 h-16 mx-auto mb-4 text-purple-400" />
+              <h3 className="text-xl font-semibold text-white mb-2">Ready to explore?</h3>
+              <p className="text-gray-300 mb-6">Let Nelie create your personalized learning universe!</p>
+              <Button onClick={generateUniverse} size="lg" className="bg-purple-600 hover:bg-purple-700">
+                Generate My Universe
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
