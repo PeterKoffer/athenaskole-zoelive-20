@@ -31,7 +31,12 @@ const DailyUniversePage: React.FC = () => {
         };
         const dailyUniverse = await aiUniverseGenerator.generateUniverse(studentProfile);
         
-        setUniverse(JSON.parse(dailyUniverse));
+        try {
+          setUniverse(JSON.parse(dailyUniverse));
+        } catch (parseError) {
+          console.error('❌ Error parsing daily universe JSON:', parseError);
+          setError('Failed to process the daily universe data. Please try again.');
+        }
         
       } catch (err) {
         console.error('❌ Error generating enhanced universe:', err);
