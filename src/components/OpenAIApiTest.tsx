@@ -31,9 +31,9 @@ const OpenAIApiTest = () => {
           details: {
             title: universe.title,
             description: universe.description?.substring(0, 100) + '...',
-            hasCharacters: universe.characters?.length > 0,
-            hasLocations: universe.locations?.length > 0,
-            hasActivities: universe.activities?.length > 0
+            hasCharacters: (universe.characters?.length || 0) > 0,
+            hasLocations: (universe.locations?.length || 0) > 0,
+            hasActivities: (universe.activities?.length || 0) > 0
           }
         });
         console.log('✅ OpenAI API test successful:', universe);

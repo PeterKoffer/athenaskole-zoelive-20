@@ -34,7 +34,7 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                     </CardHeader>
                     <CardContent>
                         <ul className="list-disc list-inside space-y-1">
-                            {universe.characters.map((character, index) => (
+                            {(universe.characters || []).map((character, index) => (
                                 <li key={index} className="text-sm">
                                     {character}
                                 </li>
@@ -51,7 +51,7 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                     </CardHeader>
                     <CardContent>
                         <ul className="list-disc list-inside space-y-1">
-                            {universe.locations.map((location, index) => (
+                            {(universe.locations || []).map((location, index) => (
                                 <li key={index} className="text-sm">
                                     {location}
                                 </li>
@@ -68,7 +68,7 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                     </CardHeader>
                     <CardContent>
                         <ul className="list-disc list-inside space-y-1">
-                            {universe.activities.map((activity, index) => (
+                            {(universe.activities || []).map((activity, index) => (
                                 <li key={index} className="text-sm">
                                     {activity}
                                 </li>

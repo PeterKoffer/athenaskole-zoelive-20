@@ -1,7 +1,7 @@
 
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { Clock, Star } from 'lucide-react';
 
 interface LearningGoal {
   id: string;
@@ -9,6 +9,8 @@ interface LearningGoal {
   description: string;
   difficulty: number;
   estimatedTime: number;
+  prerequisites: string[];
+  completed: boolean;
   priority: 'high' | 'medium' | 'low';
 }
 
@@ -21,67 +23,55 @@ interface GoalCardProps {
 const GoalCard = ({ goal, isRecommended = false, onSelect }: GoalCardProps) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
+      case 'high': return 'text-red-400';
+      case 'medium': return 'text-yellow-400';
+      case 'low': return 'text-green-400';
+      default: return 'text-gray-400';
     }
   };
 
   const getDifficultyStars = (difficulty: number) => {
-    return '★'.repeat(difficulty) + '☆'.repeat(5 - difficulty);
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-3 h-3 ${
+          i < difficulty ? 'text-yellow-400 fill-current' : 'text-gray-600'
+        }`}
+      />
+    ));
   };
 
-  const cardClass = isRecommended 
-    ? "bg-purple-900/20 border border-purple-700 rounded-lg p-4"
-    : "bg-gray-700 rounded-lg p-3";
-
   return (
-    <div className={cardClass}>
-      <div className="flex items-start justify-between mb-2">
-        <h5 className={`font-medium flex-1 ${isRecommended ? 'text-purple-200' : 'text-white text-sm'}`}>
-          {goal.title}
-        </h5>
-        {isRecommended && (
-          <Badge className={`${getPriorityColor(goal.priority)} text-white ml-2 flex-shrink-0`}>
-            Recommended
-          </Badge>
-        )}
-      </div>
-      
-      <p className={`text-sm mb-3 ${isRecommended ? 'text-gray-300' : 'text-gray-400 text-xs'}`}>
-        {goal.description}
-      </p>
-      
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4 text-sm text-gray-400">
-          <span>{getDifficultyStars(goal.difficulty)}</span>
-          <span>{goal.estimatedTime} min</span>
+    <Card className={`bg-gray-700 border-gray-600 ${isRecommended ? 'ring-2 ring-purple-400' : ''}`}>
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-2">
+          <h5 className="font-medium text-white">{goal.title}</h5>
+          <span className={`text-xs font-semibold ${getPriorityColor(goal.priority)}`}>
+            {goal.priority.toUpperCase()}
+          </span>
         </div>
         
-        {isRecommended ? (
-          <Button
-            onClick={() => onSelect(goal)}
-            size="sm"
-            className="bg-purple-500 hover:bg-purple-600 text-white"
-          >
-            Start Learning
-            <ArrowRight className="w-4 h-4 ml-1" />
-          </Button>
-        ) : (
-          !isRecommended && (
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-xs">
-                {goal.estimatedTime}m
-              </Badge>
-              <span className="text-xs text-gray-400">
-                {getDifficultyStars(goal.difficulty)}
-              </span>
-            </div>
-          )
-        )}
-      </div>
-    </div>
+        <p className="text-gray-300 text-sm mb-3">{goal.description}</p>
+        
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-1">
+            {getDifficultyStars(goal.difficulty)}
+          </div>
+          <div className="flex items-center text-gray-400 text-xs">
+            <Clock className="w-3 h-3 mr-1" />
+            {goal.estimatedTime}min
+          </div>
+        </div>
+        
+        <Button
+          onClick={() => onSelect(goal)}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          size="sm"
+        >
+          {isRecommended ? 'Start Learning' : 'Select Goal'}
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
 
