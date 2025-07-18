@@ -3,12 +3,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DailyUniversePage from '../../pages/DailyUniversePage';
 import { BrowserRouter } from 'react-router-dom';
-import { universeGenerationService } from '../../services/UniverseGenerationService';
+import { aiUniverseGenerator } from '../../services/AIUniverseGenerator';
 
 // Mock the universe generation service
-vi.mock('../../services/UniverseGenerationService', () => ({
-    universeGenerationService: {
-        generate: vi.fn()
+vi.mock('../../services/AIUniverseGenerator', () => ({
+    aiUniverseGenerator: {
+        generateUniverse: vi.fn()
     }
 }));
 
@@ -43,11 +43,11 @@ describe('DailyUniversePage', () => {
     });
 
     it('should render the universe title and description', async () => {
-        (universeGenerationService.generate as any).mockResolvedValue({
+        (aiUniverseGenerator.generateUniverse as any).mockResolvedValue(JSON.stringify({
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [],
-        });
+        }));
 
         render(
             <BrowserRouter>
@@ -62,7 +62,7 @@ describe('DailyUniversePage', () => {
     });
 
     it('should render the curriculum standards', async () => {
-        (universeGenerationService.generate as any).mockResolvedValue({
+        (aiUniverseGenerator.generateUniverse as any).mockResolvedValue(JSON.stringify({
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [
@@ -74,7 +74,7 @@ describe('DailyUniversePage', () => {
                     educationalLevel: 'Grade 6',
                 },
             ],
-        });
+        }));
 
         render(
             <BrowserRouter>
