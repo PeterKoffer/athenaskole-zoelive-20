@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { BookOpen, Target, Award, Sparkles } from 'lucide-react';
+import { BookOpen, Target, Award, Sparkles, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const DailyUniversePage: React.FC = () => {
@@ -22,20 +22,38 @@ const DailyUniversePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        console.log('📡 Calling AI universe generation service...');
+        console.log('📡 DailyUniversePage: Starting AI universe generation...');
+        
         const studentProfile = user || {
           name: 'Student',
           gradeLevel: 4,
           interests: ['space', 'dinosaurs'],
           abilities: { math: 'beginner' },
         };
-        const dailyUniverse = await aiUniverseGenerator.generateUniverse(studentProfile);
         
-        setUniverse(JSON.parse(dailyUniverse));
+        console.log('👤 Student profile:', studentProfile);
+        
+        const generatedUniverse = await aiUniverseGenerator.generateUniverse(studentProfile);
+        
+        if (!generatedUniverse) {
+          throw new Error('No universe was generated');
+        }
+        
+        console.log('🎯 Generated universe:', generatedUniverse);
+        setUniverse(generatedUniverse);
+        
+        toast.success('AI Universe Generated!', {
+          description: `Welcome to "${generatedUniverse.title}"`
+        });
         
       } catch (err) {
-        console.error('❌ Error generating enhanced universe:', err);
-        setError('Failed to load your daily universe. Please try again.');
+        console.error('❌ Error generating AI universe:', err);
+        const errorMessage = err.message || 'Failed to load your daily universe. Please try again.';
+        setError(errorMessage);
+        
+        toast.error('Failed to Generate Universe', {
+          description: errorMessage
+        });
       } finally {
         setLoading(false);
       }
@@ -67,10 +85,10 @@ const DailyUniversePage: React.FC = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-lg text-muted-foreground">Creating your personalized learning adventure...</p>
+          <p className="text-lg text-muted-foreground">Creating your AI-powered learning adventure...</p>
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <Sparkles className="h-4 w-4" />
-            <span>Generating themed challenges just for you</span>
+            <span>OpenAI is generating personalized content just for you</span>
           </div>
         </div>
       </div>
@@ -80,11 +98,27 @@ const DailyUniversePage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4 max-w-lg">
-          <p className="text-lg text-destructive">{error}</p>
-          <Button onClick={() => window.location.reload()}>
-            Try Again
-          </Button>
+        <div className="text-center space-y-4 max-w-2xl mx-auto p-6">
+          <Card className="bg-destructive/10 border-destructive/20">
+            <CardContent className="p-6 text-center">
+              <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-destructive mb-2">AI Generation Failed</h3>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              {error.includes('API key') && (
+                <div className="bg-muted p-4 rounded-lg text-left space-y-2">
+                  <p className="text-sm font-medium">To fix this issue:</p>
+                  <ol className="text-sm text-muted-foreground list-decimal list-inside space-y-1">
+                    <li>Get an OpenAI API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">platform.openai.com</a></li>
+                    <li>Add it as VITE_OPENAI_API_KEY in your environment variables</li>
+                    <li>Restart your development server</li>
+                  </ol>
+                </div>
+              )}
+              <Button onClick={() => window.location.reload()} className="mt-4">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -113,15 +147,18 @@ const DailyUniversePage: React.FC = () => {
           <div className="flex items-center justify-center gap-2 mb-4">
             <Sparkles className="h-8 w-8 text-primary animate-pulse" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {universe.title || 'Your Learning Adventure'}
+              {universe.title}
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {universe.description || 'Explore exciting learning opportunities tailored just for you!'}
+            {universe.description}
           </p>
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
             <Target className="h-4 w-4" />
-            Adventure Theme: {universe.theme || 'Learning Quest'}
+            AI-Generated Theme: {universe.theme || 'Personalized Learning Quest'}
+          </div>
+          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+            ✨ Powered by OpenAI
           </div>
         </div>
 
@@ -131,7 +168,7 @@ const DailyUniversePage: React.FC = () => {
             <CardContent className="p-4 text-center">
               <BookOpen className="h-6 w-6 text-primary mx-auto mb-2" />
               <div className="text-2xl font-bold text-foreground">{objectives.length}</div>
-              <div className="text-sm text-muted-foreground">Adventure Challenges</div>
+              <div className="text-sm text-muted-foreground">AI-Generated Challenges</div>
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
@@ -179,7 +216,7 @@ const DailyUniversePage: React.FC = () => {
                       ~15 min
                     </span>
                     <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
-                      Adventure Ready
+                      AI-Generated
                     </span>
                   </div>
 
@@ -189,7 +226,7 @@ const DailyUniversePage: React.FC = () => {
                     size="sm"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Begin Adventure
+                    Begin AI Adventure
                   </Button>
                 </CardContent>
               </Card>
@@ -207,7 +244,7 @@ const DailyUniversePage: React.FC = () => {
         <div className="text-center py-8">
           <p className="text-muted-foreground flex items-center justify-center gap-2">
             <Sparkles className="h-4 w-4" />
-            Complete all adventures to unlock special achievements and continue your learning journey!
+            Complete all AI-generated adventures to unlock special achievements!
           </p>
         </div>
       </div>
