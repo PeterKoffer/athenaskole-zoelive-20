@@ -1,14 +1,13 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "./components/theme-provider";
-import { AuthProvider } from "./contexts/AuthContext";
-import { navItems } from "./nav-items";
+import { AuthProvider } from "./hooks/useAuth";
+import App from "./App";
 import stealthAssessmentService from "@/services/stealthAssessment/StealthAssessmentService";
 import { mockProfileService } from "@/services/learnerProfile/MockProfileService";
 import { SupabaseProfileService } from "@/services/learnerProfile/SupabaseProfileService";
@@ -49,20 +48,13 @@ root.render(
       <ThemeProvider>
         <AuthProvider>
           <TooltipProvider>
-            <BrowserRouter>
-              <ErrorBoundary>
-                <div className="min-h-screen bg-background">
-                  {/* Jules Integration Component */}
-                  <JulesIntegration />
-                  <Routes>
-                    {navItems.map(({ to, page: PageComponent }) => (
-                      <Route key={to} path={to} element={<PageComponent />} />
-                    ))}
-                  </Routes>
-                </div>
-                <Toaster />
-              </ErrorBoundary>
-            </BrowserRouter>
+            <ErrorBoundary>
+              <div className="min-h-screen bg-background">
+                <JulesIntegration />
+                <App />
+              </div>
+              <Toaster />
+            </ErrorBoundary>
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

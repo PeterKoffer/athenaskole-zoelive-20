@@ -1,10 +1,10 @@
 
-import { useAuth } from '@/hooks/useAuth';
+import { AuthProvider as BaseAuthProvider } from '@/hooks/useAuth';
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  return <>{children}</>;
+  return <BaseAuthProvider>{children}</BaseAuthProvider>;
 };
