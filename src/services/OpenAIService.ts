@@ -1,109 +1,110 @@
 
-import OpenAI from 'openai';
+import { supabase } from '@/integrations/supabase/client';
 import { Universe } from './UniverseGenerator';
-
-// Don't instantiate OpenAI client immediately to avoid initialization errors
-let openaiClient: OpenAI | null = null;
-
-const getOpenAIClient = (): OpenAI => {
-  if (!openaiClient) {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    
-    if (!apiKey) {
-      throw new Error('OpenAI API key not configured. Please add VITE_OPENAI_API_KEY to your environment variables.');
-    }
-
-    openaiClient = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
-    });
-  }
-  
-  return openaiClient;
-};
 
 export const openAIService = {
   async generateUniverse(prompt: string, signal?: AbortSignal): Promise<Universe> {
-    console.log('🤖 OpenAI Service: Generating universe with prompt:', typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : prompt);
+    console.log('🤖 OpenAI Service: Generating universe via Supabase Edge Function');
+    console.log('📋 Prompt:', typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : prompt);
     
     try {
-      const openai = getOpenAIClient();
-      console.log('🔑 OpenAI client initialized successfully');
+      const requestData = {
+        prompt: typeof prompt === 'string' ? prompt : JSON.stringify(prompt),
+        type: 'universe_generation'
+      };
 
-      const systemPrompt = `You are an expert educational content creator. Generate a themed learning universe for students based on their profile. Always respond with valid JSON only.
-
-The response must follow this exact structure:
-{
-  "id": "unique-id",
-  "title": "Universe Title",
-  "description": "Engaging description",
-  "theme": "Detailed theme description",
-  "objectives": [
-    {
-      "id": "unique-objective-id",
-      "name": "Objective Name",
-      "description": "What students will learn",
-      "subjectName": "Subject",
-      "educationalLevel": "Grade Level"
-    }
-  ]
-}`;
-
-      const userPrompt = typeof prompt === 'string' 
-        ? `Create a learning universe with this theme: ${prompt}`
-        : `Create a learning universe for this student profile: ${JSON.stringify(prompt)}. Include 2-3 learning objectives appropriate for their grade level and interests.`;
-
-      console.log('📤 Sending request to OpenAI API...');
-
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.8,
-        max_tokens: 1000
-      }, {
-        signal
+      console.log('📞 Calling generate-adaptive-content edge function for universe generation');
+      
+      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
+        body: requestData
       });
 
-      console.log('📥 Received response from OpenAI API');
+      console.log('📨 Edge function response:', { data, error });
 
-      const content = completion.choices[0].message.content;
-      if (!content) {
-        throw new Error('No content received from OpenAI');
+      if (error) {
+        console.error('❌ Edge function error:', error);
+        throw new Error(`Edge function error: ${error.message}`);
       }
 
-      console.log('📝 Raw OpenAI response:', content.substring(0, 200) + '...');
-
-      // Clean and parse JSON response
-      const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-      const parsedUniverse = JSON.parse(cleanedContent);
-
-      // Validate the response structure
-      if (!parsedUniverse.title || !parsedUniverse.description) {
-        throw new Error('Invalid universe structure received from OpenAI');
+      if (!data || !data.success) {
+        console.error('❌ Edge function returned error:', data?.error);
+        // Instead of throwing, return a fallback universe
+        return this.createFallbackUniverse(prompt);
       }
 
-      // Ensure objectives array exists
-      if (!parsedUniverse.objectives) {
-        parsedUniverse.objectives = [];
+      // If we have generated content, try to parse it as a universe
+      if (data.generatedContent) {
+        console.log('✅ Successfully received generated content');
+        
+        // Try to extract universe data from the generated content
+        const universe: Universe = {
+          id: `universe-${Date.now()}`,
+          title: data.generatedContent.title || 'Generated Learning Universe',
+          description: data.generatedContent.description || data.generatedContent.question || 'An exciting learning adventure awaits!',
+          theme: typeof prompt === 'string' ? prompt : 'Learning Adventure',
+          characters: data.generatedContent.characters || [
+            "The Learning Guide - Your helpful companion",
+            "Curious Explorer - A fellow student",
+            "Wisdom Keeper - Provides hints and encouragement"
+          ],
+          locations: data.generatedContent.locations || [
+            "Discovery Hall - Where new concepts are introduced",
+            "Practice Grounds - Where skills are developed", 
+            "Achievement Center - Where progress is celebrated"
+          ],
+          activities: data.generatedContent.activities || [
+            "Interactive lessons and guided exploration",
+            "Hands-on practice with immediate feedback",
+            "Creative challenges and problem-solving",
+            "Collaborative learning experiences"
+          ]
+        };
+
+        console.log('✅ Successfully created universe:', universe.title);
+        return universe;
       }
 
-      console.log('✅ Successfully generated universe:', parsedUniverse.title);
+      // Fallback if no content was generated
+      return this.createFallbackUniverse(prompt);
 
-      return parsedUniverse;
-
-    } catch (error) {
-      console.error('❌ OpenAI API call failed:', error);
+    } catch (error: any) {
+      console.error('❌ Universe generation failed:', error);
       
       if (error.name === 'AbortError') {
         console.log('🛑 Request was aborted');
         throw error;
       }
       
-      // Re-throw the error with a clear message
-      throw new Error(`OpenAI universe generation failed: ${error.message}`);
+      // Return fallback instead of throwing
+      console.log('🔄 Returning fallback universe due to error');
+      return this.createFallbackUniverse(prompt);
     }
   },
+
+  createFallbackUniverse(prompt: string | any): Universe {
+    const themeText = typeof prompt === 'string' ? prompt : 'learning adventure';
+    
+    return {
+      id: `fallback-universe-${Date.now()}`,
+      title: `Learning Universe: ${themeText}`,
+      description: `An educational journey exploring ${themeText} through interactive experiences and discovery.`,
+      theme: themeText,
+      characters: [
+        "Professor Explorer - Your knowledgeable guide",
+        "Curious Sam - A fellow learner on the journey", 
+        "Wise Owl - Provides helpful hints and tips"
+      ],
+      locations: [
+        "The Discovery Library - Where knowledge begins",
+        "Practice Plaza - Where skills are honed",
+        "Achievement Academy - Where progress is celebrated"
+      ],
+      activities: [
+        "Interactive lessons with guided exploration",
+        "Hands-on practice exercises", 
+        "Creative projects and experiments",
+        "Collaborative learning challenges"
+      ]
+    };
+  }
 };

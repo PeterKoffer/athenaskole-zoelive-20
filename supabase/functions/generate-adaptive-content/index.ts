@@ -18,9 +18,11 @@ serve(async (req) => {
   try {
     const requestData = await req.json();
     console.log('📋 Request data received:', {
+      type: requestData.type,
       subject: requestData.subject,
       skillArea: requestData.skillArea,
       difficultyLevel: requestData.difficultyLevel,
+      hasPrompt: !!requestData.prompt,
       userId: requestData.userId?.substring(0, 8) + '...',
       hasGradeLevel: !!requestData.gradeLevel,
       hasPreviousQuestions: Array.isArray(requestData.previousQuestions) && requestData.previousQuestions.length > 0
@@ -51,7 +53,41 @@ serve(async (req) => {
       });
     }
 
-    // Try OpenAI first, then fallback to DeepSeek
+    // Handle universe generation requests
+    if (requestData.type === 'universe_generation') {
+      console.log('🌌 Processing universe generation request');
+      
+      try {
+        const universeContent = await generateUniverseContent(requestData, openaiKey, deepSeekKey);
+        
+        return new Response(JSON.stringify({
+          success: true,
+          generatedContent: universeContent,
+          debug: {
+            timestamp: new Date().toISOString(),
+            type: 'universe_generation'
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        console.error('❌ Universe generation failed:', error);
+        
+        return new Response(JSON.stringify({
+          success: false,
+          error: `Universe generation failed: ${error.message}`,
+          debug: {
+            errorName: error.name,
+            timestamp: new Date().toISOString()
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        });
+      }
+    }
+
+    // Handle regular content generation (existing logic)
     let generatedContent = null;
     let apiUsed = 'none';
 
@@ -139,3 +175,90 @@ serve(async (req) => {
     });
   }
 });
+
+async function generateUniverseContent(requestData: any, openaiKey?: string, deepSeekKey?: string) {
+  const prompt = `Create a detailed learning universe based on this theme: "${requestData.prompt}".
+  
+  Return a JSON object with:
+  {
+    "title": "Universe title",
+    "description": "Engaging description of the universe",
+    "characters": ["Character 1", "Character 2", "Character 3"],
+    "locations": ["Location 1", "Location 2", "Location 3"],
+    "activities": ["Activity 1", "Activity 2", "Activity 3", "Activity 4"]
+  }`;
+
+  if (openaiKey) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert educational content creator. Generate engaging learning universes for students. Always return valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 800
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    // Clean and parse JSON
+    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
+    return JSON.parse(cleanedContent);
+  }
+  
+  if (deepSeekKey) {
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${deepSeekKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert educational content creator. Generate engaging learning universes for students. Always return valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 800
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`DeepSeek API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    // Clean and parse JSON
+    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
+    return JSON.parse(cleanedContent);
+  }
+  
+  throw new Error('No API keys available');
+}
