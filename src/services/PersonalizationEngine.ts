@@ -7,7 +7,8 @@ export const PersonalizationEngine = {
         // Enhanced personalization logic
         const personalizedUniverse: Universe = {
             ...universe,
-            description: `${universe.description} This adventure is specially designed for ${student.name}, who loves ${student.interests.join(' and ')}.`
+            description: `${universe.description} This adventure is specially designed for ${student.name}, who loves ${student.interests.join(' and ')}.`,
+            activities: [],
         };
 
         // Add personalized activities based on interests

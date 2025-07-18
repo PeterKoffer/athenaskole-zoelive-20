@@ -12,6 +12,6 @@ describe('App Component Tests', () => {
         </AuthProvider>
       </MemoryRouter>
     );
-    expect(screen.getByText(/Personalized Learning/i)).toBeInTheDocument();
+    expect(screen.getByText(/Welcome to NELIE/i)).toBeInTheDocument();
   });
 });
