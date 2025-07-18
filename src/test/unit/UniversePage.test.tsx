@@ -44,6 +44,7 @@ describe('DailyUniversePage', () => {
 
     it('should render the universe title and description', async () => {
         (aiUniverseGenerator.generateUniverse as any).mockResolvedValue(JSON.stringify({
+
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [],
