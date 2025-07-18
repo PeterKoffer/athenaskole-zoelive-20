@@ -1,90 +1,148 @@
 
-// Game Assignment Service - Stub implementation
-// Note: This service requires the game_assignments table to be created in the database
-
-export interface GameAssignment {
-  id: string;
-  teacher_id: string;
-  game_id: string;
-  subject: string; // Add missing property
-  skill_area?: string; // Add missing property
-  learning_objective?: string; // Add missing property
-  assigned_to_class?: string; // Add missing property
-  due_date?: string; // Add missing property
-  created_at: string;
-  updated_at: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { type GameAssignment, type GameSession } from '@/types/database';
 
 export const gameAssignmentService = {
-  async createAssignment(assignment: Omit<GameAssignment, 'id' | 'created_at' | 'updated_at'>): Promise<GameAssignment> {
-    console.log('🎮 Game assignment service (stub implementation) - table does not exist yet');
+  // Teacher-facing methods
+  async createAssignment(assignment: Omit<GameAssignment, 'id' | 'created_at' | 'updated_at' | 'is_active'>): Promise<GameAssignment> {
+    const { data, error } = await supabase
+      .from('game_assignments')
+      .insert(assignment)
+      .select()
+      .single();
     
-    // Mock implementation since table doesn't exist
-    return {
-      id: `mock-assignment-${Date.now()}`,
-      teacher_id: assignment.teacher_id,
-      game_id: assignment.game_id,
-      subject: assignment.subject,
-      skill_area: assignment.skill_area,
-      learning_objective: assignment.learning_objective,
-      assigned_to_class: assignment.assigned_to_class,
-      due_date: assignment.due_date,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-  },
-
-  async getAssignments(teacherId: string): Promise<GameAssignment[]> {
-    console.log('📚 Getting game assignments (stub implementation)');
-    return [];
+    if (error) throw new Error(`Error creating assignment: ${error.message}`);
+    return data;
   },
 
   async getTeacherAssignments(teacherId: string): Promise<GameAssignment[]> {
-    console.log('👨‍🏫 Getting teacher assignments (stub implementation)');
-    return [];
-  },
+    const { data, error } = await supabase
+      .from('game_assignments')
+      .select('*')
+      .eq('teacher_id', teacherId);
 
-  async getStudentAssignments(studentId: string): Promise<GameAssignment[]> {
-    console.log('🎓 Getting student assignments (stub implementation)');
-    return [];
-  },
-
-  async getStudentProgress(studentId: string, gameId: string): Promise<any> {
-    console.log('📊 Getting student progress (stub implementation)');
-    return {
-      completedSessions: 0,
-      averageScore: 0,
-      bestScore: 0,
-      totalTimeSpent: 0
-    };
+    if (error) throw new Error(`Error fetching teacher assignments: ${error.message}`);
+    return data || [];
   },
 
   async deleteAssignment(assignmentId: string): Promise<boolean> {
-    console.log('🗑️ Deleting assignment (stub implementation)');
+    const { error } = await supabase
+      .from('game_assignments')
+      .delete()
+      .eq('id', assignmentId);
+
+    if (error) throw new Error(`Error deleting assignment: ${error.message}`);
     return true;
   },
 
-  async startGameSession(sessionData: any): Promise<string | null> {
-    console.log('🎯 Starting game session (stub implementation)');
-    return `session_${Date.now()}`;
+  // Student-facing methods
+  async getStudentAssignments(studentId: string): Promise<GameAssignment[]> {
+    const { data, error } = await supabase
+      .from('game_assignments')
+      .select('*')
+      .contains('assigned_to_students', [studentId])
+      .eq('is_active', true);
+
+    if (error) throw new Error(`Error fetching student assignments: ${error.message}`);
+    return data || [];
   },
 
-  async endGameSession(sessionId: string, finalScore: number, achievements: string[], metrics: any, additionalData: any): Promise<boolean> {
-    console.log('🏁 Ending game session (stub implementation)');
+  async getStudentProgress(studentId: string, gameId: string): Promise<any> {
+    const { data, error } = await supabase
+      .from('game_sessions')
+      .select('score, duration_seconds')
+      .eq('user_id', studentId)
+      .eq('game_id', gameId)
+      .eq('completion_status', 'completed');
+
+    if (error) throw new Error(`Error fetching student progress: ${error.message}`);
+
+    if (!data || data.length === 0) {
+      return {
+        completedSessions: 0,
+        averageScore: 0,
+        bestScore: 0,
+        totalTimeSpent: 0,
+      };
+    }
+
+    const completedSessions = data.length;
+    const totalScore = data.reduce((sum, session) => sum + (session.score || 0), 0);
+    const bestScore = Math.max(...data.map(session => session.score || 0));
+    const totalTimeSpent = data.reduce((sum, session) => sum + (session.duration_seconds || 0), 0);
+
+    return {
+      completedSessions,
+      averageScore: completedSessions > 0 ? Math.round(totalScore / completedSessions) : 0,
+      bestScore,
+      totalTimeSpent,
+    };
+  },
+
+  // Game session tracking
+  async startGameSession(sessionData: Partial<GameSession>): Promise<string | null> {
+    const { data, error } = await supabase
+      .from('game_sessions')
+      .insert(sessionData)
+      .select('id')
+      .single();
+
+    if (error) throw new Error(`Error starting game session: ${error.message}`);
+    return data?.id || null;
+  },
+
+  async endGameSession(sessionId: string, finalScore: number, objectivesMet: string[], metrics: any, performanceData: any): Promise<boolean> {
+    const { error } = await supabase
+      .from('game_sessions')
+      .update({
+        end_time: new Date().toISOString(),
+        score: finalScore,
+        completion_status: 'completed',
+        learning_objectives_met: objectivesMet,
+        engagement_metrics: metrics,
+        performance_data: performanceData
+      })
+      .eq('id', sessionId);
+
+    if (error) throw new Error(`Error ending game session: ${error.message}`);
     return true;
   },
 
   async abandonGameSession(sessionId: string): Promise<boolean> {
-    console.log('❌ Abandoning game session (stub implementation)');
+    const { error } = await supabase
+      .from('game_sessions')
+      .update({
+        end_time: new Date().toISOString(),
+        completion_status: 'abandoned'
+      })
+      .eq('id', sessionId);
+
+    if (error) throw new Error(`Error abandoning game session: ${error.message}`);
     return true;
   },
 
+  // Analytics
   async getGameAnalytics(teacherId: string): Promise<any> {
-    console.log('📈 Getting game analytics (stub implementation)');
+    const { data: assignments, error: assignmentsError } = await this.getTeacherAssignments(teacherId);
+    if (assignmentsError) throw new Error(`Error in analytics: ${assignmentsError}`);
+
+    const assignmentIds = assignments.map(a => a.id);
+
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('game_sessions')
+      .select('assignment_id, score, completion_status')
+      .in('assignment_id', assignmentIds);
+
+    if (sessionsError) throw new Error(`Error fetching sessions for analytics: ${sessionsError.message}`);
+
+    const totalAssignments = assignments.length;
+    const completedAssignments = sessions?.filter(s => s.completion_status === 'completed').length || 0;
+    const totalScore = sessions?.reduce((sum, s) => sum + (s.score || 0), 0) || 0;
+
     return {
-      totalAssignments: 0,
-      completionRate: 0,
-      averageScore: 0
+      totalAssignments,
+      completionRate: totalAssignments > 0 ? (completedAssignments / totalAssignments) * 100 : 0,
+      averageScore: completedAssignments > 0 ? totalScore / completedAssignments : 0,
     };
   }
 };
