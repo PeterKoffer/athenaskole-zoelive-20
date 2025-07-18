@@ -1,54 +1,101 @@
 
-import LessonComplete from "./LessonComplete";
-import ConceptMasteryTracker from "./ConceptMasteryTracker";
-import { SessionQuestion, SessionAnswer } from '../types/SessionTypes';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Trophy, Star, TrendingUp, RefreshCw } from 'lucide-react';
 
-export interface SessionCompleteProps {
-  subject: string;
-  skillArea: string;
-  answers: SessionAnswer[] | number[]; // Support both new and legacy formats
-  sessionQuestions: SessionQuestion[] | any[]; // Support both new and legacy formats
+interface SessionCompleteProps {
+  score: number;
   totalQuestions: number;
-  onRetry: () => void;
-  onBack: () => void;
+  subject: string;
+  onRestart: () => void;
+  onContinue: () => void;
 }
 
-const SessionComplete = ({
-  subject,
-  skillArea,
-  answers,
-  sessionQuestions,
-  totalQuestions,
-  onRetry,
-  onBack
+const SessionComplete = ({ 
+  score, 
+  totalQuestions, 
+  subject, 
+  onRestart, 
+  onContinue 
 }: SessionCompleteProps) => {
-  // Handle both new SessionAnswer[] format and legacy number[] format
-  const correctAnswers = Array.isArray(answers) && answers.length > 0
-    ? typeof answers[0] === 'object'
-      ? (answers as SessionAnswer[]).reduce((count, answer) => count + (answer.isCorrect ? 1 : 0), 0)
-      : (answers as number[]).reduce((count, answer, index) => {
-          const question = sessionQuestions[index];
-          const correctAnswer = question?.correct ?? question?.correctAnswer ?? 0;
-          return count + (answer === correctAnswer ? 1 : 0);
-        }, 0)
-    : 0;
+  const percentage = Math.round((score / totalQuestions) * 100);
+  
+  const getScoreColor = () => {
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 60) return 'text-yellow-600';
+    return 'text-red-600';
+  };
 
-  const score = Math.round((correctAnswers / totalQuestions) * 100);
+  const getPerformanceMessage = () => {
+    if (percentage >= 90) return 'Excellent work!';
+    if (percentage >= 80) return 'Great job!';
+    if (percentage >= 70) return 'Good effort!';
+    if (percentage >= 60) return 'Keep practicing!';
+    return 'Let\'s try again!';
+  };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <LessonComplete
-        score={score}
-        totalQuestions={totalQuestions}
-        onRetry={onRetry}
-        onBack={onBack}
-      />
-      
-      {/* Show concept mastery tracking after completion */}
-      <ConceptMasteryTracker 
-        subject={subject} 
-        skillArea={skillArea}
-      />
+    <div className="max-w-2xl mx-auto space-y-6">
+      <Card className="text-center">
+        <CardHeader>
+          <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
+          <CardTitle className="text-2xl">Session Complete!</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className={`text-4xl font-bold ${getScoreColor()}`}>
+            {score}/{totalQuestions}
+          </div>
+          <div className={`text-2xl ${getScoreColor()}`}>
+            {percentage}%
+          </div>
+          <p className="text-lg text-muted-foreground">
+            {getPerformanceMessage()}
+          </p>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="text-center">
+            <Star className="w-8 h-8 mx-auto text-yellow-500" />
+            <CardTitle className="text-sm">Score</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="text-xl font-bold">{percentage}%</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="text-center">
+            <TrendingUp className="w-8 h-8 mx-auto text-blue-500" />
+            <CardTitle className="text-sm">Progress</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="text-xl font-bold">+{Math.floor(percentage / 10)} XP</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="text-center">
+            <Trophy className="w-8 h-8 mx-auto text-green-500" />
+            <CardTitle className="text-sm">Subject</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="text-sm font-bold">{subject}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex gap-4 justify-center">
+        <Button onClick={onRestart} variant="outline" className="flex items-center gap-2">
+          <RefreshCw className="w-4 h-4" />
+          Try Again
+        </Button>
+        <Button onClick={onContinue} className="flex items-center gap-2">
+          Continue Learning
+        </Button>
+      </div>
     </div>
   );
 };

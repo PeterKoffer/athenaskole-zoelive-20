@@ -1,72 +1,71 @@
 
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import CurriculumAlignedContent from './CurriculumAlignedContent';
-import CurriculumLearningPath from './CurriculumLearningPath';
-import EnhancedLearningSession from './EnhancedLearningSession';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { BookOpen, Target, Award, TrendingUp } from 'lucide-react';
 
 interface CurriculumDashboardProps {
   subject: string;
-  skillArea: string;
-  difficultyLevel: number;
-  onBack: () => void;
+  gradeLevel: number;
 }
 
-const CurriculumDashboard = ({ subject, skillArea, difficultyLevel, onBack }: CurriculumDashboardProps) => {
-  const [selectedObjective, setSelectedObjective] = useState<{
-    id: string;
-    title: string;
-    description: string;
-    difficulty_level: number;
-  } | null>(null);
-
-  if (selectedObjective) {
-    return (
-      <EnhancedLearningSession
-        subject={subject}
-        skillArea={skillArea}
-        difficultyLevel={selectedObjective.difficulty_level}
-        onBack={() => setSelectedObjective(null)}
-        learningObjective={selectedObjective}
-      />
-    );
-  }
-
+const CurriculumDashboard = ({ 
+  subject, 
+  gradeLevel
+}: CurriculumDashboardProps) => {
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-white mb-2">
-          Curriculum-Aligned Learning
-        </h1>
-        <p className="text-gray-400">
-          Follow structured learning paths aligned with educational standards for {subject}
-        </p>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Current Level</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">Grade {gradeLevel}</div>
+            <p className="text-xs text-muted-foreground">{subject}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Progress</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">75%</div>
+            <p className="text-xs text-muted-foreground">Current unit</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Lessons</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">Completed this week</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Achievements</CardTitle>
+            <Award className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-muted-foreground">Badges earned</p>
+          </CardContent>
+        </Card>
       </div>
 
-      <Tabs defaultValue="objectives" className="space-y-4">
-        <TabsList className="bg-gray-800 border-gray-700">
-          <TabsTrigger value="objectives" className="data-[state=active]:bg-lime-500">
-            Learning Objectives
-          </TabsTrigger>
-          <TabsTrigger value="paths" className="data-[state=active]:bg-lime-500">
-            Learning Paths
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="objectives">
-          <CurriculumAlignedContent
-            subject={subject}
-            onObjectiveSelect={setSelectedObjective}
-          />
-        </TabsContent>
-
-        <TabsContent value="paths">
-          <CurriculumLearningPath
-            subject={subject}
-            onStartObjective={setSelectedObjective}
-          />
-        </TabsContent>
-      </Tabs>
+      <div className="text-center">
+        <Button size="lg" className="bg-primary hover:bg-primary/90">
+          Start Learning Session
+        </Button>
+      </div>
     </div>
   );
 };

@@ -8,6 +8,10 @@ import { AuthProvider } from './hooks/useAuth';
 import DailyUniversePage from './pages/DailyUniversePage';
 import SimulatorPage from './pages/SimulatorPage';
 import Auth from './pages/Auth';
+import AuthPage from './pages/AuthPage';
+import DailyProgram from './pages/DailyProgram';
+import DailyProgramPage from './pages/DailyProgramPage';
+import UniversePage from './pages/UniversePage';
 import Index from './pages/Index';
 import './App.css';
 
@@ -30,8 +34,12 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth-page" element={<AuthPage />} />
                 <Route path="/daily-universe" element={<DailyUniversePage />} />
                 <Route path="/simulator" element={<SimulatorPage />} />
+                <Route path="/daily-program" element={<DailyProgram />} />
+                <Route path="/daily-program-page" element={<DailyProgramPage />} />
+                <Route path="/universe" element={<UniversePage />} />
               </Routes>
             </div>
           </Router>
