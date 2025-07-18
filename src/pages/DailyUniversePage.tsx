@@ -32,7 +32,6 @@ const DailyUniversePage: React.FC = () => {
         const dailyUniverse = await aiUniverseGenerator.generateUniverse(studentProfile);
         
         setUniverse(JSON.parse(dailyUniverse));
-
         
       } catch (err) {
         console.error('❌ Error generating enhanced universe:', err);
