@@ -40,6 +40,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/daily-universe" element={<DailyUniversePage />} />
                 <Route path="/simulator" element={<ConsolidatedSimulatorPage />} />
+                <Route path="/educational-simulator" element={<ConsolidatedSimulatorPage />} />
                 <Route path="/daily-program" element={<DailyProgram />} />
                 <Route path="/daily-program-page" element={<DailyProgramPage />} />
                 <Route path="/training-ground" element={<TrainingGround />} />
