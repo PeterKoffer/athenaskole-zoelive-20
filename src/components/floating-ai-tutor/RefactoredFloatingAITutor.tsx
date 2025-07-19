@@ -26,11 +26,8 @@ const RefactoredFloatingAITutor = () => {
     return null;
   }
 
-  // Hide the floating tutor if it should be hidden
-  if (shouldHide) {
-    console.log('🚫 Hiding floating tutor to prevent duplicates');
-    return null;
-  }
+  // Don't hide the floating tutor - always show it for logged in users
+  console.log('✅ Showing floating tutor for logged in user');
 
   const handleSendMessage = async (inputText: string) => {
     addUserMessage(inputText);
@@ -67,7 +64,10 @@ const RefactoredFloatingAITutor = () => {
     return (
       <div ref={dragRef}>
         <FloatingButton
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            console.log('🎯 Opening floating tutor');
+            setIsOpen(true);
+          }}
           onMouseDown={handleMouseDown}
           position={position}
           isDragging={isDragging}
@@ -93,7 +93,10 @@ const RefactoredFloatingAITutor = () => {
       <Card className="w-full h-full bg-gray-900 border-blue-600 shadow-2xl">
         <ChatHeader
           onMouseDown={handleMouseDown}
-          onClose={() => setIsOpen(false)}
+          onClose={() => {
+            console.log('🎯 Closing floating tutor');
+            setIsOpen(false);
+          }}
           isListening={isListening}
           onVoiceToggle={handleVoiceToggle}
           isSpeaking={isSpeaking}

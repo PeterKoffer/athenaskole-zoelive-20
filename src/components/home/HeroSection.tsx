@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
@@ -9,7 +10,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { User, BookOpen, GraduationCap, ChevronDown, UserPlus, TestTube } from "lucide-react";
+import { User, GraduationCap, ChevronDown, UserPlus, TestTube } from "lucide-react";
 import { useAuth } from '@/hooks/useAuth';
 
 interface HeroSectionProps {
@@ -39,7 +40,6 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
     if (user) {
       navigate('/profile');
     } else {
-      // If not logged in, redirect to auth page
       navigate('/auth');
     }
   };
@@ -101,7 +101,6 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                   View Daily Program
                 </Button>
 
-                {/* Dropdown Menu positioned right after the main buttons */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
@@ -151,9 +150,13 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             </div>
           </TextWithSpeaker>
 
-          {/* Nelie Avatar */}
+          {/* Nelie Avatar - Make it more prominent */}
           <div className="flex justify-center lg:justify-end">
-            <NelieAvatarDisplay isSpeaking={false} onStopSpeech={() => {}} />
+            <div className="relative">
+              <NelieAvatarDisplay isSpeaking={false} onStopSpeech={() => {}} />
+              {/* Add a subtle glow effect to make Nelie more visible */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl -z-10"></div>
+            </div>
           </div>
         </div>
       </div>

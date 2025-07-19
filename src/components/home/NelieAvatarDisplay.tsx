@@ -8,12 +8,17 @@ interface NelieAvatarDisplayProps {
 
 const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
   return (
-    <div className="flex items-center space-x-4">
-      <RobotAvatar 
-        size="xl" 
-        isActive={true} 
-        isSpeaking={isSpeaking}
-      />
+    <div className="flex items-center justify-center">
+      <div className="relative transform hover:scale-105 transition-transform duration-300">
+        <RobotAvatar 
+          size="4xl" 
+          isActive={true} 
+          isSpeaking={isSpeaking}
+          className="drop-shadow-2xl"
+        />
+        {/* Add animated ring when active */}
+        <div className="absolute inset-0 rounded-full border-2 border-blue-400/30 animate-pulse -z-10"></div>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Message } from '../types';
@@ -16,8 +16,8 @@ export const useFloatingTutorState = () => {
     }
   ]);
   
-  // Simplified visibility logic - show for all authenticated users
-  const shouldHide = false; // Always show the floating tutor when user is logged in
+  // Always show the floating tutor for authenticated users - don't hide it
+  const shouldHide = !user; // Only hide if no user is logged in
 
   console.log('🎯 FloatingTutorState:', {
     pathname: location.pathname,
