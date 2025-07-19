@@ -112,11 +112,15 @@ const DailyUniversePage = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {universe.characters?.map((character, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {character}
-                      </li>
-                    )) || <li className="text-sm text-muted-foreground">No characters available</li>}
+                    {universe.characters?.length > 0 ? (
+                      universe.characters.map((character, index) => (
+                        <li key={index} className="text-sm text-muted-foreground">
+                          • {character}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-sm text-muted-foreground">No characters available</li>
+                    )}
                   </ul>
                 </CardContent>
               </Card>
@@ -129,11 +133,15 @@ const DailyUniversePage = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {universe.locations?.map((location, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {location}
-                      </li>
-                    )) || <li className="text-sm text-muted-foreground">No locations available</li>}
+                    {universe.locations?.length > 0 ? (
+                      universe.locations.map((location, index) => (
+                        <li key={index} className="text-sm text-muted-foreground">
+                          • {location}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-sm text-muted-foreground">No locations available</li>
+                    )}
                   </ul>
                 </CardContent>
               </Card>
@@ -146,11 +154,15 @@ const DailyUniversePage = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {universe.activities?.map((activity, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {activity}
-                      </li>
-                    )) || <li className="text-sm text-muted-foreground">No activities available</li>}
+                    {universe.activities?.length > 0 ? (
+                      universe.activities.map((activity, index) => (
+                        <li key={index} className="text-sm text-muted-foreground">
+                          • {activity}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-sm text-muted-foreground">No activities available</li>
+                    )}
                   </ul>
                 </CardContent>
               </Card>

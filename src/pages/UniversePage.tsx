@@ -81,7 +81,7 @@ const UniversePage: React.FC = () => {
                     <ul className="space-y-2">
                         {universe.characters?.map((character, index) => (
                             <li key={index} className="text-muted-foreground">• {character}</li>
-                        ))}
+                        )) || <li className="text-muted-foreground">No characters available</li>}
                     </ul>
                 </div>
 
@@ -90,7 +90,7 @@ const UniversePage: React.FC = () => {
                     <ul className="space-y-2">
                         {universe.locations?.map((location, index) => (
                             <li key={index} className="text-muted-foreground">• {location}</li>
-                        ))}
+                        )) || <li className="text-muted-foreground">No locations available</li>}
                     </ul>
                 </div>
 
@@ -99,7 +99,7 @@ const UniversePage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {universe.activities?.map((activity, index) => (
                             <div key={index} className="text-muted-foreground">• {activity}</div>
-                        ))}
+                        )) || <div className="text-muted-foreground">No activities available</div>}
                     </div>
                 </div>
             </div>
