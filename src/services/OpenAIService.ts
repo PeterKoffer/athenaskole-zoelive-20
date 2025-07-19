@@ -36,28 +36,46 @@ export const openAIService = {
       if (data.generatedContent) {
         console.log('✅ Successfully received generated content');
         
-        // Try to extract universe data from the generated content
+        // Convert the complex objects to simple strings for compatibility
+        const characters = Array.isArray(data.generatedContent.characters) 
+          ? data.generatedContent.characters.map(char => 
+              typeof char === 'string' ? char : `${char.name || 'Character'} - ${char.description || char.role || 'A helpful character'}`
+            )
+          : [
+              "The Learning Guide - Your helpful companion",
+              "Curious Explorer - A fellow student",
+              "Wisdom Keeper - Provides hints and encouragement"
+            ];
+
+        const locations = Array.isArray(data.generatedContent.locations) 
+          ? data.generatedContent.locations.map(loc => 
+              typeof loc === 'string' ? loc : `${loc.name || 'Location'} - ${loc.description || 'An interesting place to explore'}`
+            )
+          : [
+              "Discovery Hall - Where new concepts are introduced",
+              "Practice Grounds - Where skills are developed", 
+              "Achievement Center - Where progress is celebrated"
+            ];
+
+        const activities = Array.isArray(data.generatedContent.activities) 
+          ? data.generatedContent.activities.map(act => 
+              typeof act === 'string' ? act : `${act.name || 'Activity'} - ${act.description || 'An engaging learning experience'}`
+            )
+          : [
+              "Interactive lessons and guided exploration",
+              "Hands-on practice with immediate feedback",
+              "Creative challenges and problem-solving",
+              "Collaborative learning experiences"
+            ];
+
         const universe: Universe = {
           id: `universe-${Date.now()}`,
           title: data.generatedContent.title || 'Generated Learning Universe',
-          description: data.generatedContent.description || data.generatedContent.question || 'An exciting learning adventure awaits!',
+          description: data.generatedContent.description || 'An exciting learning adventure awaits!',
           theme: typeof prompt === 'string' ? prompt : 'Learning Adventure',
-          characters: data.generatedContent.characters || [
-            "The Learning Guide - Your helpful companion",
-            "Curious Explorer - A fellow student",
-            "Wisdom Keeper - Provides hints and encouragement"
-          ],
-          locations: data.generatedContent.locations || [
-            "Discovery Hall - Where new concepts are introduced",
-            "Practice Grounds - Where skills are developed", 
-            "Achievement Center - Where progress is celebrated"
-          ],
-          activities: data.generatedContent.activities || [
-            "Interactive lessons and guided exploration",
-            "Hands-on practice with immediate feedback",
-            "Creative challenges and problem-solving",
-            "Collaborative learning experiences"
-          ]
+          characters,
+          locations,
+          activities
         };
 
         console.log('✅ Successfully created universe:', universe.title);
