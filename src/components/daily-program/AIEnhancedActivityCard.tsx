@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LucideIcon, Clock, Star } from "lucide-react";
+import { LucideIcon, Star } from "lucide-react";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import CustomSpeakerIcon from '@/components/ui/custom-speaker-icon';
 
@@ -76,10 +76,6 @@ const AIEnhancedActivityCard = ({ activity, onStartActivity }: AIEnhancedActivit
             <div>
               <h3 className="font-bold text-white text-lg">{activity.title}</h3>
             </div>
-          </div>
-          <div className="flex items-center text-white/80 text-sm">
-            <Clock className="w-4 h-4 mr-1" />
-            {activity.duration}
           </div>
         </div>
         
