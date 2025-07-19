@@ -16,21 +16,21 @@ import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 
-// Import all learning components
-import MathematicsLearning from "./components/education/MathematicsLearning";
-import EnglishLearning from "./components/education/EnglishLearning";
-import ScienceLearning from "./components/education/ScienceLearning";
-import ComputerScienceLearning from "./components/education/ComputerScienceLearning";
-import CreativeArtsLearning from "./components/education/CreativeArtsLearning";
-import MusicLearning from "./components/education/MusicLearning";
-import MentalWellnessLearning from "./components/education/MentalWellnessLearning";
-import LanguageLabLearning from "./components/education/LanguageLabLearning";
-import HistoryReligionLearning from "./components/education/HistoryReligionLearning";
-import GeographyLearning from "./components/education/GeographyLearning";
-import BodyLabLearning from "./components/education/BodyLabLearning";
-import LifeEssentialsLearning from "./components/education/LifeEssentialsLearning";
-import GlobalGeographyLearning from "./components/education/GlobalGeographyLearning";
-import WorldHistoryReligionsLearning from "./components/education/WorldHistoryReligionsLearning";
+// Import all learning components from new organized structure
+import MathematicsLearning from "./components/subjects/mathematics/MathematicsLearning";
+import EnglishLearning from "./components/subjects/english/EnglishLearning";
+import ScienceLearning from "./components/subjects/science/ScienceLearning";
+import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
+import CreativeArtsLearning from "./components/subjects/creative-arts/CreativeArtsLearning";
+import MusicLearning from "./components/subjects/music/MusicLearning";
+import MentalWellnessLearning from "./components/subjects/mental-wellness/MentalWellnessLearning";
+import LanguageLabLearning from "./components/subjects/language-lab/LanguageLabLearning";
+import HistoryReligionLearning from "./components/subjects/history-religion/HistoryReligionLearning";
+import GeographyLearning from "./components/subjects/geography/GeographyLearning";
+import BodyLabLearning from "./components/subjects/body-lab/BodyLabLearning";
+import LifeEssentialsLearning from "./components/subjects/life-essentials/LifeEssentialsLearning";
+import GlobalGeographyLearning from "./components/subjects/global-geography/GlobalGeographyLearning";
+import WorldHistoryReligionsLearning from "./components/subjects/world-history-religions/WorldHistoryReligionsLearning";
 
 const queryClient = new QueryClient();
 
@@ -93,7 +93,7 @@ const App = () => (
               }
             />
             
-            {/* Learning Routes - All subjects from Training Ground */}
+            {/* Learning Routes - All subjects organized by folder structure */}
             <Route 
               path="/learn/mathematics" 
               element={

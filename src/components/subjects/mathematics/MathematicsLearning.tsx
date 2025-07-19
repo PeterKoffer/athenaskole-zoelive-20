@@ -3,9 +3,9 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import FullyFunctionalMathLearning from "./components/math/FullyFunctionalMathLearning";
-import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
-import { getClassroomConfig } from "./components/shared/classroomConfigs";
+import FullyFunctionalMathLearning from "../../education/components/math/FullyFunctionalMathLearning";
+import ClassroomEnvironment from "../../education/components/shared/ClassroomEnvironment";
+import { getClassroomConfig } from "../../education/components/shared/classroomConfigs";
 
 const MathematicsLearning = () => {
   const { user, loading } = useAuth();
