@@ -13,6 +13,7 @@ import DailyProgramPage from "./pages/DailyProgramPage";
 import DailyUniversePage from "./pages/DailyUniversePage";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import ProfilePage from "./pages/ProfilePage";
+import SiteMapPage from "./pages/SiteMapPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/site-map" element={<SiteMapPage />} />
             <Route 
               path="/auth" 
               element={
