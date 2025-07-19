@@ -1,40 +1,29 @@
 
 import { useState, useEffect } from 'react';
 import { UserRole } from '@/types/auth';
+import { useAuth } from './useAuth';
 
-interface RoleAccessState {
-  userRole: UserRole | null;
-  setUserRoleManually: (role: UserRole) => void;
-  clearRole: () => void;
-}
-
-export const useRoleAccess = (): RoleAccessState => {
+export const useRoleAccess = () => {
+  const { user } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      // Default to student role if none specified
+      const role = user.user_metadata?.role || 'student';
+      setUserRole(role as UserRole);
+    } else {
+      setUserRole(null);
+    }
+  }, [user]);
 
   const setUserRoleManually = (role: UserRole) => {
     console.log('[useRoleAccess] Setting role manually:', role);
     setUserRole(role);
-    localStorage.setItem('selectedRole', role);
   };
-
-  const clearRole = () => {
-    console.log('[useRoleAccess] Clearing role');
-    setUserRole(null);
-    localStorage.removeItem('selectedRole');
-  };
-
-  useEffect(() => {
-    // Check for stored role on mount
-    const storedRole = localStorage.getItem('selectedRole') as UserRole;
-    if (storedRole) {
-      console.log('[useRoleAccess] Found stored role:', storedRole);
-      setUserRole(storedRole);
-    }
-  }, []);
 
   return {
     userRole,
-    setUserRoleManually,
-    clearRole
+    setUserRoleManually
   };
 };
