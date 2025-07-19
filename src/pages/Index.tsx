@@ -12,11 +12,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    if (user) {
-      navigate('/daily-program');
-    } else {
-      navigate('/auth');
-    }
+    navigate('/training-ground');
   };
 
   return (
