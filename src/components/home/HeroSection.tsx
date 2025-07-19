@@ -31,24 +31,42 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
         </div>
 
         {/* Welcome Text */}
-        <div className="space-y-4">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-            Hi! I'm Nelie, your AI learning companion
+        <div className="space-y-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-white">
+            Welcome to the <br />
+            Future of <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Learning</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-purple-200 max-w-2xl mx-auto">
-            Ready to explore the universe of knowledge together? Let's make learning an adventure!
+            Meet <span className="text-cyan-400 font-semibold">Nelie</span>, your AI-powered learning companion. Experience personalized education that adapts to your unique learning style, making every lesson engaging and effective.
           </p>
         </div>
 
         {/* Call to Action */}
-        <div className="pt-8">
+        <div className="pt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
           <Button
             onClick={handleGetStarted}
             size="lg"
-            className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
           >
-            {user ? "Continue Learning" : "Get Started"}
+            Start Learning Now
+          </Button>
+          
+          <Button
+            onClick={() => navigate('/daily-program')}
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+          >
+            View Daily Program
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+          >
+            More Options
           </Button>
         </div>
       </div>
