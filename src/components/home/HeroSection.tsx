@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import NelieAvatarDisplay from "./NelieAvatarDisplay";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, LogIn, User } from "lucide-react";
 
 interface HeroSectionProps {
   onGetStarted?: () => void;
@@ -61,13 +68,28 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             View Daily Program
           </Button>
           
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
-          >
-            More Options
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+              >
+                More Options
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuItem onClick={() => navigate('/auth')}>
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </section>

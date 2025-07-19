@@ -16,8 +16,6 @@ const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
           isSpeaking={isSpeaking}
           className="drop-shadow-2xl"
         />
-        {/* Add animated ring when active */}
-        <div className="absolute inset-0 rounded-full border-2 border-cyan-400/30 animate-pulse -z-10 scale-110"></div>
       </div>
     </div>
   );
