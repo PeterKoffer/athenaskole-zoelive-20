@@ -7,6 +7,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { AuthProvider } from './hooks/useAuth';
 import DailyUniversePage from './pages/DailyUniversePage';
 import SimulatorPage from './pages/SimulatorPage';
+import EducationalSimulatorPage from './pages/EducationalSimulatorPage';
 import Auth from './pages/Auth';
 import AuthPage from './pages/AuthPage';
 import DailyProgram from './pages/DailyProgram';
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/auth-page" element={<AuthPage />} />
                 <Route path="/daily-universe" element={<DailyUniversePage />} />
                 <Route path="/simulator" element={<SimulatorPage />} />
+                <Route path="/educational-simulator" element={<EducationalSimulatorPage />} />
                 <Route path="/daily-program" element={<DailyProgram />} />
                 <Route path="/daily-program-page" element={<DailyProgramPage />} />
                 <Route path="/training-ground" element={<TrainingGround />} />
