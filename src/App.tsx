@@ -8,7 +8,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import TrainingGround from "./pages/TrainingGround";
-import TodaysProgram from "./pages/TodaysProgram";
+import DailyProgramPage from "./pages/DailyProgramPage";
+import DailyUniversePage from "./pages/DailyUniversePage";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/training-ground" element={<TrainingGround />} />
-            <Route path="/daily-program" element={<TodaysProgram />} />
+            <Route path="/daily-program" element={<DailyProgramPage />} />
+            <Route path="/daily-universe" element={<DailyUniversePage />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
