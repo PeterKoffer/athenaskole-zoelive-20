@@ -27,7 +27,7 @@ const ExplanationCard = ({
   subject,
   skillArea = 'general',
   isVisible,
-  onSpeechEnd,
+  
   isCorrect = true,
   correctAnswer,
   questionData,

@@ -5,6 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  optimizeDeps: {
+    include: ['react', 'react-dom']
+  },
   server: {
     host: "127.0.0.1",
     port: 8080,
@@ -20,10 +23,21 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      onwarn: (warning, warn) => {
+        if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
+        warn(warning);
+      },
+    },
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
+  define: {
+    global: 'globalThis',
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
