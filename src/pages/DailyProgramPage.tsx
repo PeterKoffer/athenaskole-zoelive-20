@@ -68,9 +68,9 @@ const DailyProgramPage = () => {
               </p>
               <Button 
                 className="w-full"
-                onClick={() => navigate('/daily-universe')}
+                onClick={() => navigate('/simulator')}
               >
-                Explore Universe
+                Start Simulator
               </Button>
             </CardContent>
           </Card>
