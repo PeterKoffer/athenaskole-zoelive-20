@@ -1,59 +1,36 @@
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import TrainingGround from "./pages/TrainingGround";
+import TodaysProgram from "./pages/TodaysProgram";
+import Learn from "./pages/Learn";
+import LanguageLearning from "./pages/LanguageLearning";
+import AdaptiveLearningSession from "./pages/AdaptiveLearningSession";
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
-import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
-import { ThemeProvider } from './components/ThemeProvider';
-import { AuthProvider } from './hooks/useAuth';
-import DailyUniversePage from './pages/DailyUniversePage';
-import ConsolidatedSimulatorPage from './pages/ConsolidatedSimulatorPage';
-import Auth from './pages/Auth';
-import AuthPage from './pages/AuthPage';
-import DailyProgram from './pages/DailyProgram';
-import DailyProgramPage from './pages/DailyProgramPage';
-import UniversePage from './pages/UniversePage';
-import TrainingGround from './pages/TrainingGround';
-import Profile from './pages/Profile';
-import Index from './pages/Index';
-import './App.css';
+const queryClient = new QueryClient();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <AuthProvider>
-          <Router>
-            <div className="min-h-screen bg-background">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth-page" element={<AuthPage />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/daily-universe" element={<DailyUniversePage />} />
-                <Route path="/simulator" element={<ConsolidatedSimulatorPage />} />
-                <Route path="/educational-simulator" element={<ConsolidatedSimulatorPage />} />
-                <Route path="/daily-program" element={<DailyProgram />} />
-                <Route path="/daily-program-page" element={<DailyProgramPage />} />
-                <Route path="/training-ground" element={<TrainingGround />} />
-                <Route path="/universe" element={<UniversePage />} />
-              </Routes>
-            </div>
-          </Router>
-          <Toaster />
-          <ShadcnToaster />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
-}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/training-ground" element={<TrainingGround />} />
+          <Route path="/daily-program" element={<TodaysProgram />} />
+          <Route path="/learn/:activityId" element={<Learn />} />
+          <Route path="/language-learning" element={<LanguageLearning />} />
+          <Route path="/adaptive-learning/:subject/:skillArea/:difficultyLevel" element={<AdaptiveLearningSession />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
