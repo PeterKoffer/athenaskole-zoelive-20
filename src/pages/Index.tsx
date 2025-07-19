@@ -1,9 +1,13 @@
 
 import React from 'react';
-import LandingPage from './LandingPage';
+import HeroSection from '@/components/home/HeroSection';
 
 const Index = () => {
-  return <LandingPage />;
+  return (
+    <div className="min-h-screen bg-background">
+      <HeroSection />
+    </div>
+  );
 };
 
 export default Index;
