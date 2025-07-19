@@ -12,6 +12,11 @@ export const useScenarioSession = (scenario: ScenarioDefinition) => {
 
   // Initialize session
   useEffect(() => {
+    if (!scenario || !scenario.nodes || !scenario.entryNodeId) {
+      console.error('❌ Invalid scenario provided to useScenarioSession');
+      return;
+    }
+
     const newSession: ScenarioSession = {
       sessionId: `session-${Date.now()}`,
       scenarioId: scenario.id,

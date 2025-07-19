@@ -5,43 +5,88 @@ export interface ScenarioDefinition {
   description: string;
   educational: {
     subject: string;
-    gradeLevel: string;
-    learningObjectives: string[];
+    gradeLevel: string | number;
+    difficulty?: number;
+    estimatedDuration?: number;
+    learningObjectives?: string[];
+    learningOutcomes?: string[];
+    prerequisites?: string[];
   };
-  initialContext: {
+  initialContext?: {
     setting: string;
     situation: string;
     character: string;
   };
-  states: ScenarioState[];
-}
-
-export interface ScenarioState {
-  id: string;
-  type: 'narrative' | 'question' | 'interactive';
-  content: {
-    text: string;
-    character?: string;
-    backgroundImage?: string;
-    question?: {
-      id: string;
-      type: 'multiple-choice' | 'text-input' | 'drag-drop';
-      options?: {
-        id: string;
-        text: string;
-        isCorrect: boolean;
-      }[];
-      explanation?: string;
+  nodes: ScenarioNode[];
+  entryNodeId: string;
+  exitNodeIds?: string[];
+  config?: {
+    allowRevisit?: boolean;
+    autoSave?: boolean;
+    maxDuration?: number;
+    passingCriteria?: {
+      minScore: number;
+      requiredNodes?: string[];
     };
   };
-  transitions: ScenarioTransition[];
 }
 
-export interface ScenarioTransition {
+export interface ScenarioNode {
+  id: string;
+  type: 'explanation' | 'question' | 'interactive' | 'narrative';
+  title?: string;
+  content: string;
+  educational?: {
+    subject: string;
+    skillArea?: string;
+    difficultyLevel?: number;
+    estimatedDuration?: number;
+    learningObjectives?: string[];
+  };
+  connections?: {
+    next?: string;
+    correct?: string;
+    incorrect?: string;
+    [key: string]: string | undefined;
+  };
+  config?: {
+    required?: boolean;
+    allowHints?: boolean;
+  };
+  question?: {
+    id: string;
+    type: 'multiple-choice' | 'text-input' | 'drag-drop';
+    options?: ScenarioQuestionOption[];
+    correctAnswer?: string;
+    explanation?: string;
+  };
+  character?: string;
+  backgroundImage?: string;
+}
+
+export interface ScenarioQuestionOption {
   id: string;
   text: string;
-  targetState: string;
-  condition?: {
-    type: 'answer-correct' | 'answer-incorrect' | 'always';
+  isCorrect: boolean;
+}
+
+export interface ScenarioSession {
+  sessionId: string;
+  scenarioId: string;
+  userId: string;
+  currentNodeId: string;
+  visitedNodes: string[];
+  responses: Record<string, any>;
+  timestamps: {
+    startedAt: Date;
+    lastActiveAt: Date;
+    completedAt?: Date;
+  };
+  status: 'active' | 'completed' | 'abandoned';
+  progress: {
+    percentComplete: number;
+    nodesCompleted: number;
+    totalNodes: number;
+    score: number;
   };
 }
