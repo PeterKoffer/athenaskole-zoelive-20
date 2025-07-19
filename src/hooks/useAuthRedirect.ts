@@ -16,7 +16,7 @@ export const useAuthRedirect = () => {
     // Only redirect if user is on auth page and is authenticated
     const currentPath = window.location.pathname;
     if (user && userRole && currentPath === '/auth') {
-      console.log('[useAuthRedirect] Redirecting authenticated user from auth page');
+      console.log('[useAuthRedirect] Redirecting authenticated user from auth page', { userRole });
       
       // Define target paths for each role
       const targetPaths: Record<string, string> = {
@@ -30,7 +30,7 @@ export const useAuthRedirect = () => {
       
       const targetPath = targetPaths[userRole] || '/profile';
       
-      console.log('[useAuthRedirect] Redirecting to', targetPath);
+      console.log('[useAuthRedirect] Redirecting to', targetPath, 'for role', userRole);
       navigate(targetPath, { replace: true });
     }
   }, [user, userRole, loading, navigate]);

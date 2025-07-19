@@ -24,16 +24,27 @@ const Auth = () => {
   // Handle automatic redirect after successful auth
   useAuthRedirect();
 
-  // Clear any existing role when entering auth page for role switching
+  // Redirect authenticated users immediately based on their role
   useEffect(() => {
-    console.log('[Auth] Entering auth page, current role:', userRole);
-    
-    // If we're coming here to switch roles, clear the manual role change flag after a delay
-    // to allow the user to select a new role
-    if (userRole) {
-      console.log('[Auth] User has existing role, allowing role switching');
+    if (user && userRole) {
+      console.log('[Auth] User is authenticated, redirecting based on role:', userRole);
+      
+      // Define target paths for each role
+      const targetPaths: Record<string, string> = {
+        'admin': '/school-dashboard',
+        'school_leader': '/school-dashboard',
+        'school_staff': '/school-dashboard',
+        'teacher': '/teacher-dashboard',
+        'parent': '/parent-dashboard',
+        'student': '/daily-program'
+      };
+      
+      const targetPath = targetPaths[userRole] || '/profile';
+      console.log('[Auth] Redirecting authenticated user to:', targetPath);
+      navigate(targetPath, { replace: true });
+      return;
     }
-  }, [userRole]);
+  }, [user, userRole, navigate]);
 
   const handleRoleSelect = (role: UserRole) => {
     console.log('[Auth] Role selected:', role);
@@ -41,31 +52,20 @@ const Auth = () => {
     // Set the role manually to trigger the role change process
     setUserRoleManually(role);
     
-    // If user is already authenticated, just redirect to appropriate dashboard
+    // If user is already authenticated, redirect immediately
     if (user) {
-      console.log('[Auth] User is authenticated, redirecting to dashboard');
-      // Redirect based on the new role
-      switch (role) {
-        case 'admin':
-          navigate('/admin-dashboard');
-          break;
-        case 'school_leader':
-        case 'school_staff':
-          navigate('/school-dashboard');
-          break;
-        case 'teacher':
-          navigate('/teacher-dashboard');
-          break;
-        case 'parent':
-          navigate('/parent-dashboard');
-          break;
-        case 'student':
-          navigate('/daily-program');
-          break;
-        default:
-          navigate('/');
-          break;
-      }
+      console.log('[Auth] User is authenticated, redirecting to dashboard for role:', role);
+      const targetPaths: Record<string, string> = {
+        'admin': '/school-dashboard',
+        'school_leader': '/school-dashboard',
+        'school_staff': '/school-dashboard',
+        'teacher': '/teacher-dashboard',
+        'parent': '/parent-dashboard',
+        'student': '/daily-program'
+      };
+      
+      const targetPath = targetPaths[role] || '/profile';
+      navigate(targetPath, { replace: true });
     }
   };
 
@@ -85,7 +85,7 @@ const Auth = () => {
     );
   }
 
-  // If user is authenticated and has selected a role, redirect them
+  // If user is authenticated and has selected a role, they should already be redirected
   if (user && selectedRole) {
     return null; // Will redirect via useEffect above
   }

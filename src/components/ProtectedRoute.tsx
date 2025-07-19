@@ -45,16 +45,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // If user is logged in but trying to access auth page, redirect based on role
-  if (!requireAuth && user && location.pathname === '/auth') {
-    console.log('[ProtectedRoute] User logged in, redirecting from auth page');
-    // Redirect based on user role
-    if (userRole === 'school_leader' || userRole === 'admin') {
-      return <Navigate to="/school-dashboard" replace />;
-    } else if (userRole === 'student') {
-      return <Navigate to="/daily-program" replace />;
-    } else {
-      return <Navigate to="/profile" replace />;
-    }
+  if (!requireAuth && user && userRole && location.pathname === '/auth') {
+    console.log('[ProtectedRoute] User logged in, redirecting from auth page to dashboard for role:', userRole);
+    
+    // Define target paths for each role
+    const targetPaths: Record<string, string> = {
+      'admin': '/school-dashboard',
+      'school_leader': '/school-dashboard',
+      'school_staff': '/school-dashboard',
+      'teacher': '/teacher-dashboard',
+      'parent': '/parent-dashboard',
+      'student': '/daily-program'
+    };
+    
+    const targetPath = targetPaths[userRole] || '/profile';
+    console.log('[ProtectedRoute] Redirecting to:', targetPath);
+    return <Navigate to={targetPath} replace />;
   }
 
   // Check role-based access
