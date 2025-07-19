@@ -1,12 +1,11 @@
 
-import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { UserMetadata } from "@/types/auth";
-import { useNavigate } from "react-router-dom";
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import UnifiedLessonManager from "./components/UnifiedLessonManager";
-import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
-import { getClassroomConfig } from "./components/shared/classroomConfigs";
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { UserMetadata } from '@/types/auth';
+import { useNavigate } from 'react-router-dom';
+import UniversalLearningIntroduction from './components/universal/UniversalLearningIntroduction';
+import UniversalLearningLoading from './components/universal/UniversalLearningLoading';
+import UnifiedLessonManager from './components/UnifiedLessonManager';
 
 interface UniversalLearningProps {
   subject: string;
@@ -16,69 +15,62 @@ interface UniversalLearningProps {
 const UniversalLearning = ({ subject, skillArea }: UniversalLearningProps) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { forceStopAll } = useUnifiedSpeech();
-  
-  // Get classroom config based on subject, fallback to default
-  const classroomConfig = getClassroomConfig(subject) || getClassroomConfig("default");
+  const [showIntroduction, setShowIntroduction] = useState(true);
+  const [isStartingLesson, setIsStartingLesson] = useState(false);
 
-  console.log('🎯 UniversalLearning component state:', {
-    user: !!user,
-    userId: user?.id,
-    loading,
-    subject,
-    skillArea
-  });
+  console.log('🎓 UniversalLearning:', { subject, skillArea, showIntroduction, user: !!user });
 
-  // Redirect to auth if not logged in
-  useEffect(() => {
-    if (!loading && !user) {
-      console.log("🚪 User not authenticated in UniversalLearning, redirecting to auth");
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
+  const metadata = user?.user_metadata as UserMetadata | undefined;
+  const studentName = metadata?.first_name || metadata?.name?.split(' ')[0] || 'Student';
 
-  // Stop speech when component unmounts
-  useEffect(() => {
-    return () => {
-      console.log('🔇 Stopping Nelie speech due to navigation away from universal learning lesson');
-      forceStopAll();
-    };
-  }, [forceStopAll]);
+  const handleIntroductionComplete = () => {
+    console.log('✅ Introduction completed, starting lesson');
+    setIsStartingLesson(true);
+    
+    // Small delay to show loading state, then proceed to lesson
+    setTimeout(() => {
+      setShowIntroduction(false);
+      setIsStartingLesson(false);
+    }, 1500);
+  };
 
-  const handleBackToProgram = () => {
-    console.log('🔇 Stopping Nelie speech before navigating back to training ground');
-    forceStopAll();
+  const handleBackToTrainingGround = () => {
+    console.log('🔙 Navigating back to Training Ground');
     navigate('/training-ground');
   };
 
   if (loading) {
-    return (
-      <ClassroomEnvironment config={classroomConfig}>
-        <div className="min-h-screen flex items-center justify-center text-white">
-          <div className="text-center">
-            <div className="text-4xl mb-4">🎯</div>
-            <p className="text-lg">Loading your {subject} lesson...</p>
-          </div>
-        </div>
-      </ClassroomEnvironment>
-    );
+    return <UniversalLearningLoading subject={subject} studentName={studentName} />;
   }
 
   if (!user) {
+    navigate('/auth');
     return null;
   }
 
+  // Show introduction page first (like in the screenshot)
+  if (showIntroduction) {
+    if (isStartingLesson) {
+      return <UniversalLearningLoading subject={subject} studentName={studentName} />;
+    }
+    
+    return (
+      <UniversalLearningIntroduction
+        subject={subject}
+        skillArea={skillArea}
+        onIntroductionComplete={handleIntroductionComplete}
+      />
+    );
+  }
+
+  // After introduction, show the actual learning content
   return (
-    <ClassroomEnvironment config={classroomConfig}>
-      <div className="min-h-screen py-10 px-2 flex items-center justify-center">
-        <UnifiedLessonManager
-          subject={subject}
-          skillArea={skillArea}
-          studentName={(user.user_metadata as UserMetadata)?.first_name || 'Student'}
-          onBackToProgram={handleBackToProgram}
-        />
-      </div>
-    </ClassroomEnvironment>
+    <UnifiedLessonManager
+      subject={subject}
+      skillArea={skillArea}
+      studentName={studentName}
+      onBackToProgram={handleBackToTrainingGround}
+    />
   );
 };
 

@@ -1,260 +1,188 @@
 
-export interface ClassroomConfig {
-  subjectName: string;
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
-  loadingIcon?: string;
-  loadingMessage?: string;
-  backgroundImage: string;
-  subjectColor: string;
-  overlayOpacity: number;
-  environmentDescription: string; // Made required
-}
+import { ClassroomConfig } from './ClassroomEnvironment';
 
 export const getClassroomConfig = (subject: string): ClassroomConfig => {
   const configs: Record<string, ClassroomConfig> = {
     mathematics: {
-      subjectName: "Mathematics",
-      primaryColor: "#4CAF50",
-      secondaryColor: "#81C784",
-      accentColor: "#388E3C",
-      backgroundImage: "/lovable-uploads/4cc17a8b-1d30-4146-993f-7b97b7e6be5b.png", // Mathematics classroom
-      subjectColor: "#4CAF50",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern mathematics classroom with interactive whiteboard and mathematical tools"
-    },
-    languageArts: {
-      subjectName: "Language Arts",
-      primaryColor: "#FF9800",
-      secondaryColor: "#FFB74D",
-      accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/c4321823-91d4-4b19-8f72-b00613b2603a.png", // English/Language Arts classroom
-      subjectColor: "#FF9800",
-      overlayOpacity: 0.7,
-      environmentDescription: "A warm English classroom with books and educational materials"
+      subjectName: 'Mathematics',
+      primaryColor: '#3B82F6',
+      secondaryColor: '#1E40AF',
+      accentColor: '#60A5FA',
+      loadingIcon: '🔢',
+      loadingMessage: 'Preparing your mathematics lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#3B82F6',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Modern mathematics classroom with digital displays and learning tools'
     },
     english: {
-      subjectName: "English",
-      primaryColor: "#FF9800",
-      secondaryColor: "#FFB74D",
-      accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/c4321823-91d4-4b19-8f72-b00613b2603a.png", // English classroom
-      subjectColor: "#FF9800",
-      overlayOpacity: 0.7,
-      environmentDescription: "A warm English classroom with books and educational materials"
+      subjectName: 'English',
+      primaryColor: '#10B981',
+      secondaryColor: '#047857',
+      accentColor: '#34D399',
+      loadingIcon: '📚',
+      loadingMessage: 'Preparing your English lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#10B981',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Cozy English classroom filled with books and literature'
     },
     science: {
-      subjectName: "Science",
-      primaryColor: "#2196F3",
-      secondaryColor: "#64B5F6",
-      accentColor: "#1976D2",
-      backgroundImage: "/lovable-uploads/4f04a56b-d49f-4093-b974-e56c182dbefd.png", // Science laboratory
-      subjectColor: "#2196F3",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern science laboratory with equipment and experimental setups"
-    },
-    computer_science: {
-      subjectName: "Computer Science",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/6cd62bdc-48a0-49e9-bcd0-aba0c756a278.png", // Computer lab
-      subjectColor: "#9C27B0",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern tech classroom with computers and digital learning tools"
+      subjectName: 'Science',
+      primaryColor: '#8B5CF6',
+      secondaryColor: '#7C3AED',
+      accentColor: '#A78BFA',
+      loadingIcon: '🔬',
+      loadingMessage: 'Preparing your science lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#8B5CF6',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Advanced science laboratory with modern equipment'
     },
     'computer-science': {
-      subjectName: "Computer Science",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/6cd62bdc-48a0-49e9-bcd0-aba0c756a278.png", // Computer lab
-      subjectColor: "#9C27B0",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern tech classroom with computers and digital learning tools"
-    },
-    music: {
-      subjectName: "Music",
-      primaryColor: "#E91E63",
-      secondaryColor: "#F06292",
-      accentColor: "#C2185B",
-      backgroundImage: "/lovable-uploads/94aa529a-ae27-4300-b5f0-f414268f6785.png", // Music classroom
-      subjectColor: "#E91E63",
-      overlayOpacity: 0.7,
-      environmentDescription: "A vibrant music classroom with instruments and musical notation"
-    },
-    creative_arts: {
-      subjectName: "Creative Arts",
-      primaryColor: "#FF5722",
-      secondaryColor: "#FF8A65",
-      accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/8c823620-22c3-424b-a10f-c9dbef745b76.png", // Art classroom
-      subjectColor: "#FF5722",
-      overlayOpacity: 0.7,
-      environmentDescription: "A colorful art classroom with creative supplies and student artwork"
+      subjectName: 'Computer Science',
+      primaryColor: '#F59E0B',
+      secondaryColor: '#D97706',
+      accentColor: '#FBBF24',
+      loadingIcon: '💻',
+      loadingMessage: 'Preparing your computer science lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#F59E0B',
+      overlayOpacity: 0.3,
+      environmentDescription: 'High-tech computer lab with multiple workstations'
     },
     'creative-arts': {
-      subjectName: "Creative Arts",
-      primaryColor: "#FF5722",
-      secondaryColor: "#FF8A65",
-      accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/8c823620-22c3-424b-a10f-c9dbef745b76.png", // Art classroom
-      subjectColor: "#FF5722",
-      overlayOpacity: 0.7,
-      environmentDescription: "A colorful art classroom with creative supplies and student artwork"
+      subjectName: 'Creative Arts',
+      primaryColor: '#EC4899',
+      secondaryColor: '#DB2777',
+      accentColor: '#F472B6',
+      loadingIcon: '🎨',
+      loadingMessage: 'Preparing your creative arts lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#EC4899',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Bright art studio with easels and creative supplies'
     },
-    'fine-arts': {
-      subjectName: "Fine Arts",
-      primaryColor: "#FF5722",
-      secondaryColor: "#FF8A65",
-      accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/2c1a716d-f174-46e7-ba77-85b334751f7f.png", // Fine arts studio
-      subjectColor: "#FF5722",
-      overlayOpacity: 0.7,
-      environmentDescription: "A professional art studio with easels, canvases, and artistic materials"
-    },
-    'world-history': {
-      subjectName: "World History",
-      primaryColor: "#8D6E63",
-      secondaryColor: "#A1887F",
-      accentColor: "#6D4C41",
-      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png", // History classroom
-      subjectColor: "#8D6E63",
-      overlayOpacity: 0.7,
-      environmentDescription: "A traditional classroom with historical maps and educational materials"
-    },
-    'world-history-religions': {
-      subjectName: "World History & Religions",
-      primaryColor: "#8D6E63",
-      secondaryColor: "#A1887F",
-      accentColor: "#6D4C41",
-      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png", // History classroom
-      subjectColor: "#8D6E63",
-      overlayOpacity: 0.7,
-      environmentDescription: "A traditional classroom with historical maps and educational materials"
-    },
-    history_religion: {
-      subjectName: "History & Religion",
-      primaryColor: "#8D6E63",
-      secondaryColor: "#A1887F",
-      accentColor: "#6D4C41",
-      backgroundImage: "/lovable-uploads/58a2af6c-6ad5-44f3-afc2-5da54b215e02.png", // History classroom
-      subjectColor: "#8D6E63",
-      overlayOpacity: 0.7,
-      environmentDescription: "A traditional classroom with historical maps and educational materials"
-    },
-    geography: {
-      subjectName: "Geography",
-      primaryColor: "#4CAF50",
-      secondaryColor: "#81C784",
-      accentColor: "#388E3C",
-      backgroundImage: "/lovable-uploads/9f597860-f509-47db-9bea-9ba445e633ec.png", // Geography classroom
-      subjectColor: "#4CAF50",
-      overlayOpacity: 0.7,
-      environmentDescription: "A geography classroom with world maps, globes, and geographical resources"
-    },
-    'global-geography': {
-      subjectName: "Global Geography",
-      primaryColor: "#4CAF50",
-      secondaryColor: "#81C784",
-      accentColor: "#388E3C",
-      backgroundImage: "/lovable-uploads/9f597860-f509-47db-9bea-9ba445e633ec.png", // Geography classroom
-      subjectColor: "#4CAF50",
-      overlayOpacity: 0.7,
-      environmentDescription: "A geography classroom with world maps, globes, and geographical resources"
-    },
-    'life-essentials': {
-      subjectName: "Life Essentials",
-      primaryColor: "#607D8B",
-      secondaryColor: "#90A4AE",
-      accentColor: "#455A64",
-      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png", // Life skills classroom
-      subjectColor: "#607D8B",
-      overlayOpacity: 0.7,
-      environmentDescription: "A clean, modern classroom focused on practical life skills education"
-    },
-    life_essentials: {
-      subjectName: "Life Essentials",
-      primaryColor: "#607D8B",
-      secondaryColor: "#90A4AE",
-      accentColor: "#455A64",
-      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png", // Life skills classroom
-      subjectColor: "#607D8B",
-      overlayOpacity: 0.7,
-      environmentDescription: "A clean, modern classroom focused on practical life skills education"
+    music: {
+      subjectName: 'Music',
+      primaryColor: '#8B5CF6',
+      secondaryColor: '#7C3AED',
+      accentColor: '#A78BFA',
+      loadingIcon: '🎵',
+      loadingMessage: 'Preparing your music lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#8B5CF6',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Music room with instruments and acoustic panels'
     },
     'mental-wellness': {
-      subjectName: "Mental Wellness",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/5f9c6e95-d949-47f5-bb3a-08f0c1c84d72.png", // Wellness classroom
-      subjectColor: "#9C27B0",
-      overlayOpacity: 0.7,
-      environmentDescription: "A calming wellness classroom designed for mindfulness and emotional learning"
-    },
-    mental_wellness: {
-      subjectName: "Mental Wellness",
-      primaryColor: "#9C27B0",
-      secondaryColor: "#BA68C8",
-      accentColor: "#7B1FA2",
-      backgroundImage: "/lovable-uploads/5f9c6e95-d949-47f5-bb3a-08f0c1c84d72.png", // Wellness classroom
-      subjectColor: "#9C27B0",
-      overlayOpacity: 0.7,
-      environmentDescription: "A calming wellness classroom designed for mindfulness and emotional learning"
-    },
-    'body-lab': {
-      subjectName: "BodyLab",
-      primaryColor: "#FF5722",
-      secondaryColor: "#FF8A65",
-      accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png", // Health/fitness lab
-      subjectColor: "#FF5722",
-      overlayOpacity: 0.7,
-      environmentDescription: "A health and wellness laboratory for learning about the human body"
-    },
-    body_lab: {
-      subjectName: "BodyLab",
-      primaryColor: "#FF5722",
-      secondaryColor: "#FF8A65",
-      accentColor: "#D84315",
-      backgroundImage: "/lovable-uploads/aa5d1c92-da37-4dc9-b296-97e3a8959445.png", // Health/fitness lab
-      subjectColor: "#FF5722",
-      overlayOpacity: 0.7,
-      environmentDescription: "A health and wellness laboratory for learning about the human body"
+      subjectName: 'Mental Wellness',
+      primaryColor: '#06B6D4',
+      secondaryColor: '#0891B2',
+      accentColor: '#22D3EE',
+      loadingIcon: '🧠',
+      loadingMessage: 'Preparing your mental wellness lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#06B6D4',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Calm and peaceful wellness room with soft lighting'
     },
     'language-lab': {
-      subjectName: "Language Lab",
-      primaryColor: "#FF9800",
-      secondaryColor: "#FFB74D",
-      accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/ab7502b0-78bd-4d20-8254-3e5a2c355bfd.png", // Language lab
-      subjectColor: "#FF9800",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern language laboratory with audio-visual learning equipment"
+      subjectName: 'Language Lab',
+      primaryColor: '#EF4444',
+      secondaryColor: '#DC2626',
+      accentColor: '#F87171',
+      loadingIcon: '🌍',
+      loadingMessage: 'Preparing your language lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#EF4444',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Interactive language laboratory with audio-visual equipment'
     },
-    language_lab: {
-      subjectName: "Language Lab",
-      primaryColor: "#FF9800",
-      secondaryColor: "#FFB74D",
-      accentColor: "#F57C00",
-      backgroundImage: "/lovable-uploads/ab7502b0-78bd-4d20-8254-3e5a2c355bfd.png", // Language lab
-      subjectColor: "#FF9800",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern language laboratory with audio-visual learning equipment"
+    'history-religion': {
+      subjectName: 'History & Religion',
+      primaryColor: '#92400E',
+      secondaryColor: '#78350F',
+      accentColor: '#A16207',
+      loadingIcon: '📜',
+      loadingMessage: 'Preparing your history lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#92400E',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Classic history classroom with historical artifacts and maps'
     },
-    default: {
-      subjectName: "Learning",
-      primaryColor: "#607D8B",
-      secondaryColor: "#90A4AE",
-      accentColor: "#455A64",
-      backgroundImage: "/lovable-uploads/9a45857a-4de9-4a4f-a5a4-24150e41914a.png", // General classroom
-      subjectColor: "#607D8B",
-      overlayOpacity: 0.7,
-      environmentDescription: "A modern learning environment with educational tools"
+    geography: {
+      subjectName: 'Geography',
+      primaryColor: '#059669',
+      secondaryColor: '#047857',
+      accentColor: '#10B981',
+      loadingIcon: '🗺️',
+      loadingMessage: 'Preparing your geography lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#059669',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Geography classroom with globes, maps, and geographical models'
+    },
+    'body-lab': {
+      subjectName: 'Body Lab',
+      primaryColor: '#DC2626',
+      secondaryColor: '#B91C1C',
+      accentColor: '#EF4444',
+      loadingIcon: '💪',
+      loadingMessage: 'Preparing your body lab lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#DC2626',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Health and fitness laboratory with exercise equipment'
+    },
+    'life-essentials': {
+      subjectName: 'Life Essentials',
+      primaryColor: '#7C2D12',
+      secondaryColor: '#6B2B0C',
+      accentColor: '#92400E',
+      loadingIcon: '📋',
+      loadingMessage: 'Preparing your life essentials lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#7C2D12',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Practical life skills classroom with real-world tools'
+    },
+    'global-geography': {
+      subjectName: 'Global Geography',
+      primaryColor: '#0891B2',
+      secondaryColor: '#0E7490',
+      accentColor: '#06B6D4',
+      loadingIcon: '🌍',
+      loadingMessage: 'Preparing your global geography lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#0891B2',
+      overlayOpacity: 0.3,
+      environmentDescription: 'International geography center with world maps and cultural displays'
+    },
+    'world-history-religions': {
+      subjectName: 'World History & Religions',
+      primaryColor: '#7C2D12',
+      secondaryColor: '#6B2B0C',
+      accentColor: '#92400E',
+      loadingIcon: '🏛️',
+      loadingMessage: 'Preparing your world history lesson...',
+      backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+      subjectColor: '#7C2D12',
+      overlayOpacity: 0.3,
+      environmentDescription: 'Historical hall with artifacts from world civilizations'
     }
   };
 
-  return configs[subject] || configs.default;
+  return configs[subject] || {
+    subjectName: subject.charAt(0).toUpperCase() + subject.slice(1),
+    primaryColor: '#6366F1',
+    secondaryColor: '#4F46E5',
+    accentColor: '#818CF8',
+    loadingIcon: '📖',
+    loadingMessage: 'Preparing your lesson...',
+    backgroundImage: '/lovable-uploads/4d3c531b-4f81-4d98-a776-79a7d1d92dca.png',
+    subjectColor: '#6366F1',
+    overlayOpacity: 0.3,
+    environmentDescription: 'Modern learning environment designed for interactive education'
+  };
 };
