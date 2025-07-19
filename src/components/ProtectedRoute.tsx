@@ -2,6 +2,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useRoleAccess } from '@/hooks/useRoleAccess';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface ProtectedRouteProps {
@@ -15,11 +16,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requiredRole
 }) => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { userRole } = useRoleAccess();
   const location = useLocation();
 
+  console.log('[ProtectedRoute]', { 
+    user: user?.email, 
+    userRole, 
+    requireAuth, 
+    requiredRole, 
+    authLoading,
+    pathname: location.pathname 
+  });
+
   // Show loading spinner while checking authentication
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <LoadingSpinner />
@@ -29,18 +40,32 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If authentication is required but user is not logged in, redirect to auth
   if (requireAuth && !user) {
+    console.log('[ProtectedRoute] Redirecting to auth - no user');
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // If user is logged in but trying to access auth page, redirect to home
+  // If user is logged in but trying to access auth page, redirect based on role
   if (!requireAuth && user && location.pathname === '/auth') {
-    return <Navigate to="/" replace />;
+    console.log('[ProtectedRoute] User logged in, redirecting from auth page');
+    // Redirect based on user role
+    if (userRole === 'school_leader' || userRole === 'admin') {
+      return <Navigate to="/school-dashboard" replace />;
+    } else if (userRole === 'student') {
+      return <Navigate to="/daily-program" replace />;
+    } else {
+      return <Navigate to="/profile" replace />;
+    }
   }
 
-  // Check role-based access (simplified - in a real app you'd check against user roles)
-  if (requiredRole && user) {
-    // For now, just allow access - role checking would be implemented with proper user roles
-    console.log(`Role-based access check for: ${requiredRole}`);
+  // Check role-based access
+  if (requiredRole && user && userRole) {
+    const hasRequiredRole = userRole === requiredRole || 
+                           (requiredRole === 'school_leader' && userRole === 'admin');
+    
+    if (!hasRequiredRole) {
+      console.log('[ProtectedRoute] Access denied - insufficient role');
+      return <Navigate to="/auth" replace />;
+    }
   }
 
   return <>{children}</>;

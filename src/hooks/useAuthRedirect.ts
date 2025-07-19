@@ -6,19 +6,21 @@ import { useRoleAccess } from './useRoleAccess';
 
 export const useAuthRedirect = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { userRole } = useRoleAccess();
 
   useEffect(() => {
-    if (user && userRole) {
-      console.log('[useAuthRedirect] Checking redirect for authenticated user with role:', userRole);
-      
-      // Get current path to avoid unnecessary redirects
-      const currentPath = window.location.pathname;
+    // Don't redirect while still loading
+    if (loading) return;
+
+    // Only redirect if user is on auth page and is authenticated
+    const currentPath = window.location.pathname;
+    if (user && userRole && currentPath === '/auth') {
+      console.log('[useAuthRedirect] Redirecting authenticated user from auth page');
       
       // Define target paths for each role
       const targetPaths: Record<string, string> = {
-        'admin': '/admin-dashboard',
+        'admin': '/school-dashboard',
         'school_leader': '/school-dashboard',
         'school_staff': '/school-dashboard',
         'teacher': '/teacher-dashboard',
@@ -26,15 +28,10 @@ export const useAuthRedirect = () => {
         'student': '/daily-program'
       };
       
-      const targetPath = targetPaths[userRole] || '/';
+      const targetPath = targetPaths[userRole] || '/profile';
       
-      // Only redirect if user is not already on the correct page
-      if (currentPath !== targetPath) {
-        console.log('[useAuthRedirect] Redirecting from', currentPath, 'to', targetPath);
-        navigate(targetPath);
-      } else {
-        console.log('[useAuthRedirect] User already on correct page:', currentPath);
-      }
+      console.log('[useAuthRedirect] Redirecting to', targetPath);
+      navigate(targetPath, { replace: true });
     }
-  }, [user, userRole, navigate]);
+  }, [user, userRole, loading, navigate]);
 };

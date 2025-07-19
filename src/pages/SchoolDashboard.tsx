@@ -1,17 +1,20 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, School, Users, BarChart3, Calendar, Menu, ChevronDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import SchoolManagementDropdown from '@/components/school/SchoolManagementDropdown';
 
 const SchoolDashboard = () => {
   const { user, loading } = useAuth();
+  const { userRole } = useRoleAccess();
   const navigate = useNavigate();
   const [showTeachingSettings, setShowTeachingSettings] = useState(false);
+
+  console.log('[SchoolDashboard] Rendering:', { user: user?.email, userRole, loading });
 
   if (loading) {
     return (
@@ -31,7 +34,7 @@ const SchoolDashboard = () => {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
               className="text-muted-foreground hover:text-foreground mr-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -39,10 +42,27 @@ const SchoolDashboard = () => {
             </Button>
             <div>
               <h1 className="text-4xl font-bold text-foreground mb-2">School Dashboard</h1>
-              <p className="text-muted-foreground">Manage school operations and view analytics</p>
+              <p className="text-muted-foreground">Welcome back, {user?.email}</p>
+              <p className="text-muted-foreground">Role: {userRole}</p>
             </div>
           </div>
-          <SchoolManagementDropdown onShowTeachingSettings={() => setShowTeachingSettings(true)} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Menu className="w-4 h-4 mr-2" />
+                Settings
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setShowTeachingSettings(true)}>
+                Teaching Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                Profile
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -57,10 +77,7 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Manage student records, enrollment, and academic progress.
               </p>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/student-management')}
-              >
+              <Button className="w-full">
                 View Students
               </Button>
             </CardContent>
@@ -77,10 +94,7 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Monitor teacher performance and staff assignments.
               </p>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/staff-management')}
-              >
+              <Button className="w-full">
                 Manage Staff
               </Button>
             </CardContent>
@@ -97,10 +111,7 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 View school performance metrics and reports.
               </p>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/school-analytics')}
-              >
+              <Button className="w-full">
                 View Reports
               </Button>
             </CardContent>
@@ -117,10 +128,7 @@ const SchoolDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Manage class schedules and school calendar.
               </p>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/schedule-management')}
-              >
+              <Button className="w-full">
                 View Schedule
               </Button>
             </CardContent>
