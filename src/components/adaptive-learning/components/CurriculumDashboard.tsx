@@ -1,70 +1,94 @@
 
-import React from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Target, Award, TrendingUp } from 'lucide-react';
+import { BookOpen, Users, Settings, BarChart3 } from 'lucide-react';
 
-interface CurriculumDashboardProps {
-  subject: string;
-  gradeLevel: number;
-}
+const CurriculumDashboard = () => {
+  const [activeTab, setActiveTab] = useState('curriculum');
 
-const CurriculumDashboard = ({ 
-  subject, 
-  gradeLevel
-}: CurriculumDashboardProps) => {
+  const tabs = [
+    { id: 'curriculum', label: 'Curriculum', icon: BookOpen },
+    { id: 'students', label: 'Students', icon: Users },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Current Level</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Grade {gradeLevel}</div>
-            <p className="text-xs text-muted-foreground">{subject}</p>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">Curriculum Dashboard</h1>
+        
+        <div className="flex space-x-1 mb-8">
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon;
+            return (
+              <Button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                variant={activeTab === tab.id ? "default" : "ghost"}
+                className="flex items-center gap-2"
+              >
+                <IconComponent className="w-4 h-4" />
+                {tab.label}
+              </Button>
+            );
+          })}
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Progress</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">75%</div>
-            <p className="text-xs text-muted-foreground">Current unit</p>
-          </CardContent>
-        </Card>
+        <div className="grid gap-6">
+          {activeTab === 'curriculum' && (
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle>Curriculum Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Manage curriculum standards, learning objectives, and educational content.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lessons</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">Completed this week</p>
-          </CardContent>
-        </Card>
+          {activeTab === 'students' && (
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle>Student Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Track student progress, performance analytics, and individual learning paths.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Achievements</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Badges earned</p>
-          </CardContent>
-        </Card>
-      </div>
+          {activeTab === 'analytics' && (
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle>Learning Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  View comprehensive analytics on learning outcomes and student engagement.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-      <div className="text-center">
-        <Button size="lg" className="bg-primary hover:bg-primary/90">
-          Start Learning Session
-        </Button>
+          {activeTab === 'settings' && (
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle>System Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Configure system preferences, integrations, and administrative settings.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
