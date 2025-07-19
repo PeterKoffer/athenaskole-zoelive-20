@@ -20,13 +20,8 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   const { user } = useAuth();
 
   const handleGetStarted = () => {
-    if (onGetStarted) {
-      onGetStarted();
-    } else if (user) {
-      navigate('/daily-program');
-    } else {
-      navigate('/auth');
-    }
+    // Always redirect to training ground regardless of authentication status
+    navigate('/training-ground');
   };
 
   return (
