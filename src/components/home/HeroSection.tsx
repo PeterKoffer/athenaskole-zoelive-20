@@ -73,18 +73,18 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+                className="w-full sm:w-auto border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
               >
                 More Options
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48">
-              <DropdownMenuItem onClick={() => navigate('/auth')}>
+            <DropdownMenuContent className="w-48 bg-gray-800 border-gray-700 text-white">
+              <DropdownMenuItem onClick={() => navigate('/auth')} className="hover:bg-gray-700">
                 <LogIn className="mr-2 h-4 w-4" />
                 Login
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <DropdownMenuItem onClick={() => navigate('/profile')} className="hover:bg-gray-700">
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
