@@ -114,7 +114,7 @@ const TrainingGround = () => {
             </div>
           </div>
 
-          {/* Training Activities Grid */}
+          {/* Training Activities Grid - removed the Today's Program heading */}
           <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
         </div>
       </div>
