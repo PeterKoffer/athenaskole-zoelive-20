@@ -1,24 +1,27 @@
 
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, TrendingUp, RefreshCw } from 'lucide-react';
 
 interface SessionCompleteProps {
-  score: number;
-  totalQuestions: number;
   subject: string;
-  onRestart: () => void;
-  onContinue: () => void;
+  skillArea: string;
+  answers: number[];
+  sessionQuestions: any[];
+  totalQuestions: number;
+  onRetry: () => void;
+  onBack: () => void;
 }
 
 const SessionComplete = ({ 
-  score, 
-  totalQuestions, 
-  subject, 
-  onRestart, 
-  onContinue 
+  subject,
+  skillArea,
+  answers,
+  totalQuestions,
+  onRetry,
+  onBack
 }: SessionCompleteProps) => {
+  const score = answers.reduce((sum, answer) => sum + answer, 0);
   const percentage = Math.round((score / totalQuestions) * 100);
   
   const getScoreColor = () => {
@@ -82,17 +85,17 @@ const SessionComplete = ({
             <CardTitle className="text-sm">Subject</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <div className="text-sm font-bold">{subject}</div>
+            <div className="text-sm font-bold">{subject} - {skillArea}</div>
           </CardContent>
         </Card>
       </div>
 
       <div className="flex gap-4 justify-center">
-        <Button onClick={onRestart} variant="outline" className="flex items-center gap-2">
+        <Button onClick={onRetry} variant="outline" className="flex items-center gap-2">
           <RefreshCw className="w-4 h-4" />
           Try Again
         </Button>
-        <Button onClick={onContinue} className="flex items-center gap-2">
+        <Button onClick={onBack} className="flex items-center gap-2">
           Continue Learning
         </Button>
       </div>

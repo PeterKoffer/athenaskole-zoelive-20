@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CurriculumAlignedContent from './CurriculumAlignedContent';
-import CurriculumLearningPath from './CurriculumLearningPath';
 import EnhancedLearningSession from './EnhancedLearningSession';
 import AdvancedAnalytics from './AdvancedAnalytics';
 import SmartRecommendations from './SmartRecommendations';
@@ -22,7 +21,6 @@ interface EnhancedCurriculumDashboardProps {
 const EnhancedCurriculumDashboard = ({ 
   subject, 
   skillArea, 
-  difficultyLevel, 
   onBack 
 }: EnhancedCurriculumDashboardProps) => {
   const [selectedObjective, setSelectedObjective] = useState<{
@@ -150,7 +148,7 @@ const EnhancedCurriculumDashboard = ({
         </TabsContent>
 
         <TabsContent value="analytics">
-          <AdvancedAnalytics subject={subject} />
+          <AdvancedAnalytics subject={subject} userId="user-placeholder" />
         </TabsContent>
 
         <TabsContent value="insights">
