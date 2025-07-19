@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import UnifiedLessonManager from "./components/UnifiedLessonManager";
+import FullyFunctionalMathLearning from "./components/math/FullyFunctionalMathLearning";
 import ClassroomEnvironment from "./components/shared/ClassroomEnvironment";
 import { getClassroomConfig } from "./components/shared/classroomConfigs";
 
@@ -61,15 +61,10 @@ const MathematicsLearning = () => {
     return null;
   }
 
-  console.log('🎯 MathematicsLearning rendering UnifiedLessonManager with welcome screen');
+  console.log('🎯 MathematicsLearning rendering FullyFunctionalMathLearning');
 
   return (
-    <UnifiedLessonManager
-      subject="mathematics"
-      skillArea="general_mathematics"
-      studentName={user.user_metadata?.first_name || 'Student'}
-      onBackToProgram={handleBackToProgram}
-    />
+    <FullyFunctionalMathLearning onBackToProgram={handleBackToProgram} />
   );
 };
 
