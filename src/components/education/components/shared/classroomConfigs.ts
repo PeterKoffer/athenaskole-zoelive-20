@@ -122,8 +122,83 @@ export const getClassroomConfig = (subject: string): ClassroomConfig => {
       subjectColor: "blue",
       overlayOpacity: 0.6,
       environmentDescription: "A modern language learning classroom with interactive displays and comfortable seating, perfect for multilingual communication and cultural exchange."
+    },
+    // NEW SUBJECTS WITH NEW CLASSROOM IMAGES
+    life_essentials: {
+      subjectName: "Life Essentials",
+      primaryColor: "hsl(150, 70%, 50%)",
+      secondaryColor: "hsl(200, 80%, 60%)",
+      accentColor: "hsl(40, 100%, 70%)",
+      loadingIcon: "📋",
+      loadingMessage: "Preparing your life skills classroom...",
+      backgroundImage: "/lovable-uploads/6232624b-13d6-4143-9d9e-9c8547e75813.png", // Bright blue classroom with educational displays
+      subjectColor: "teal",
+      overlayOpacity: 0.6,
+      environmentDescription: "A bright and engaging classroom with colorful educational displays and interactive learning materials, perfect for developing essential life skills."
+    },
+    mental_wellness: {
+      subjectName: "Mental Wellness",
+      primaryColor: "hsl(180, 60%, 50%)",
+      secondaryColor: "hsl(260, 70%, 60%)",
+      accentColor: "hsl(45, 100%, 70%)",
+      loadingIcon: "🧠",
+      loadingMessage: "Creating your wellness space...",
+      backgroundImage: "/lovable-uploads/e8710ce3-7429-4bd5-8afd-1ea5c702cd37.png", // Bright traditional classroom with natural lighting
+      subjectColor: "cyan",
+      overlayOpacity: 0.5,
+      environmentDescription: "A peaceful and well-lit classroom environment with natural sunlight and calming atmosphere, ideal for mental wellness and mindfulness activities."
+    },
+    // ADDITIONAL SUBJECTS USING REMAINING NEW IMAGES
+    globalGeography: {
+      subjectName: "Global Geography",
+      primaryColor: "hsl(120, 60%, 50%)",
+      secondaryColor: "hsl(200, 80%, 60%)",
+      accentColor: "hsl(60, 100%, 70%)",
+      loadingIcon: "🌍",
+      loadingMessage: "Exploring global landscapes...",
+      backgroundImage: "/lovable-uploads/ecc25da6-5334-42af-917d-a43f4166d0a0.png", // Classical classroom with teacher at blackboard
+      subjectColor: "green",
+      overlayOpacity: 0.6,
+      environmentDescription: "A classic educational environment with traditional blackboard and global learning materials, fostering comprehensive geographical understanding."
+    },
+    worldHistoryReligions: {
+      subjectName: "World History & Religions",
+      primaryColor: "hsl(30, 100%, 60%)",
+      secondaryColor: "hsl(200, 80%, 60%)",
+      accentColor: "hsl(350, 100%, 70%)",
+      loadingIcon: "📜",
+      loadingMessage: "Exploring world cultures and history...",
+      backgroundImage: "/lovable-uploads/61df25b8-d3b4-4d74-b20d-04d871a8171e.png", // Modern classroom with mathematical displays
+      subjectColor: "orange",
+      overlayOpacity: 0.6,
+      environmentDescription: "A modern classroom setting with comprehensive educational displays and excellent natural lighting, perfect for exploring world history and religious studies."
+    },
+    // FALLBACK SUBJECTS USING EXISTING IMAGES
+    history_religion: {
+      subjectName: "History & Religion",
+      primaryColor: "hsl(30, 100%, 60%)",
+      secondaryColor: "hsl(200, 80%, 60%)",
+      accentColor: "hsl(350, 100%, 70%)",
+      loadingIcon: "📜",
+      loadingMessage: "Exploring history and religion...",
+      backgroundImage: "/lovable-uploads/53e02987-6fd2-4421-913f-50192f47250c.png", // History classroom
+      subjectColor: "orange",
+      overlayOpacity: 0.6,
+      environmentDescription: "A cozy history classroom filled with books, historical artifacts, and educational displays that bring the past to life."
+    },
+    default: {
+      subjectName: "Learning",
+      primaryColor: "hsl(200, 90%, 60%)",
+      secondaryColor: "hsl(280, 70%, 60%)",
+      accentColor: "hsl(120, 80%, 70%)",
+      loadingIcon: "📖",
+      loadingMessage: "Preparing your classroom...",
+      backgroundImage: "/lovable-uploads/8e1166ab-d511-401c-9a58-99afe4508cfd.png", // Default to math classroom
+      subjectColor: "blue",
+      overlayOpacity: 0.7,
+      environmentDescription: "A welcoming learning environment designed to inspire curiosity and educational growth."
     }
   };
 
-  return configs[subject.toLowerCase().replace('-', '_')] || configs.mathematics;
+  return configs[subject.toLowerCase().replace('-', '_')] || configs.default;
 };
