@@ -43,17 +43,20 @@ const AIGeneratedMathQuestion = ({
     setShowResult(false);
 
     try {
-      console.log('🤖 Generating AI math question for grade', studentGrade);
+      console.log('🤖 Generating AI math question for grade', studentGrade, 'question', questionNumber);
       
+      // Enhanced request with more variety parameters
       const { data, error } = await supabase.functions.invoke('generate-question', {
         body: {
           subject: 'mathematics',
-          skillArea: 'basic_arithmetic',
+          skillArea: getSkillAreaForQuestion(questionNumber),
           difficultyLevel: studentGrade,
           gradeLevel: studentGrade,
           userId: 'student',
           questionIndex: questionNumber - 1,
-          promptVariation: 'basic'
+          promptVariation: getPromptVariation(questionNumber),
+          topicFocus: getTopicFocus(questionNumber),
+          questionType: getQuestionType(questionNumber)
         }
       });
 
@@ -62,7 +65,7 @@ const AIGeneratedMathQuestion = ({
       }
 
       if (data) {
-        console.log('✅ Generated question:', data.question);
+        console.log('✅ Generated diverse question:', data.question.substring(0, 50) + '...');
         setQuestion(data);
       } else {
         throw new Error('No question data received');
@@ -70,21 +73,88 @@ const AIGeneratedMathQuestion = ({
     } catch (err: any) {
       console.error('❌ Error generating question:', err);
       setError(err.message);
-      // Fallback question
-      setQuestion({
-        question: `What is ${5 + questionNumber} + ${3 + questionNumber}?`,
-        options: [
-          `${8 + (questionNumber * 2)}`,
-          `${9 + (questionNumber * 2)}`,
-          `${7 + (questionNumber * 2)}`,
-          `${10 + (questionNumber * 2)}`
-        ],
-        correct: 0,
-        explanation: `Adding ${5 + questionNumber} + ${3 + questionNumber} gives us ${8 + (questionNumber * 2)}.`
-      });
+      // Enhanced fallback questions with more variety
+      setQuestion(createDiverseFallbackQuestion(questionNumber, studentGrade));
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getSkillAreaForQuestion = (questionNum: number) => {
+    const skillAreas = [
+      'basic_arithmetic',
+      'word_problems',
+      'geometry_basics',
+      'measurement',
+      'fractions',
+      'time_and_money'
+    ];
+    return skillAreas[(questionNum - 1) % skillAreas.length];
+  };
+
+  const getPromptVariation = (questionNum: number) => {
+    const variations = ['basic', 'story', 'visual', 'practical', 'creative', 'challenge'];
+    return variations[(questionNum - 1) % variations.length];
+  };
+
+  const getTopicFocus = (questionNum: number) => {
+    const topics = ['addition', 'subtraction', 'multiplication', 'division', 'shapes', 'patterns'];
+    return topics[(questionNum - 1) % topics.length];
+  };
+
+  const getQuestionType = (questionNum: number) => {
+    const types = ['multiple_choice', 'word_problem', 'visual_math', 'real_world', 'logic_puzzle', 'number_sense'];
+    return types[(questionNum - 1) % types.length];
+  };
+
+  const createDiverseFallbackQuestion = (questionNum: number, grade: number): MathQuestion => {
+    const questionTypes = [
+      {
+        question: `A bakery has ${10 + questionNum} cupcakes. They sell ${3 + questionNum} cupcakes. How many cupcakes are left?`,
+        options: [`${7 + questionNum}`, `${6 + questionNum}`, `${8 + questionNum}`, `${9 + questionNum}`],
+        correct: 0,
+        explanation: `${10 + questionNum} - ${3 + questionNum} = ${7 + questionNum} cupcakes left.`
+      },
+      {
+        question: `If you have ${2 + questionNum} boxes with ${4} toys each, how many toys do you have in total?`,
+        options: [`${(2 + questionNum) * 4}`, `${(2 + questionNum) * 3}`, `${(2 + questionNum) * 5}`, `${(2 + questionNum) * 2}`],
+        correct: 0,
+        explanation: `${2 + questionNum} × 4 = ${(2 + questionNum) * 4} toys.`
+      },
+      {
+        question: `What is the next number in this pattern: ${questionNum}, ${questionNum + 2}, ${questionNum + 4}, ?`,
+        options: [`${questionNum + 6}`, `${questionNum + 5}`, `${questionNum + 7}`, `${questionNum + 8}`],
+        correct: 0,
+        explanation: `The pattern increases by 2 each time: ${questionNum + 6}.`
+      },
+      {
+        question: `A pizza is cut into ${4 + questionNum} equal pieces. If you eat ${2} pieces, what fraction did you eat?`,
+        options: [`2/${4 + questionNum}`, `${2}/${3 + questionNum}`, `${3}/${4 + questionNum}`, `1/${2 + questionNum}`],
+        correct: 0,
+        explanation: `You ate 2 out of ${4 + questionNum} pieces, which is 2/${4 + questionNum}.`
+      },
+      {
+        question: `How many minutes are in ${1 + Math.floor(questionNum/2)} hour(s)?`,
+        options: [`${(1 + Math.floor(questionNum/2)) * 60}`, `${(1 + Math.floor(questionNum/2)) * 50}`, `${(1 + Math.floor(questionNum/2)) * 70}`, `${(1 + Math.floor(questionNum/2)) * 30}`],
+        correct: 0,
+        explanation: `There are 60 minutes in 1 hour, so ${1 + Math.floor(questionNum/2)} hour(s) = ${(1 + Math.floor(questionNum/2)) * 60} minutes.`
+      },
+      {
+        question: `A rectangle has a length of ${6 + questionNum} cm and width of ${3 + questionNum} cm. What is its area?`,
+        options: [`${(6 + questionNum) * (3 + questionNum)}`, `${(6 + questionNum) + (3 + questionNum)}`, `${(6 + questionNum) * 2}`, `${(3 + questionNum) * 2}`],
+        correct: 0,
+        explanation: `Area = length × width = ${6 + questionNum} × ${3 + questionNum} = ${(6 + questionNum) * (3 + questionNum)} cm².`
+      }
+    ];
+
+    const selectedQuestion = questionTypes[(questionNum - 1) % questionTypes.length];
+    return {
+      ...selectedQuestion,
+      question: selectedQuestion.question,
+      options: selectedQuestion.options,
+      correct: selectedQuestion.correct,
+      explanation: selectedQuestion.explanation
+    };
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
@@ -110,7 +180,7 @@ const AIGeneratedMathQuestion = ({
       <Card className="bg-black/50 border-purple-400/50 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-purple-400 mx-auto mb-4" />
-          <p className="text-white text-lg">Nelie is preparing your math question...</p>
+          <p className="text-white text-lg">Nelie is preparing your unique math question...</p>
         </CardContent>
       </Card>
     );
@@ -202,7 +272,7 @@ const AIGeneratedMathQuestion = ({
                 <XCircle className="w-6 h-6 text-red-400 mr-3" />
               )}
               <span className="text-lg font-semibold text-white">
-                {selectedAnswer === question.correct ? 'Correct!' : 'Not quite right'}
+                {selectedAnswer === question.correct ? 'Excellent work!' : 'Good try! Let me explain:'}
               </span>
             </div>
             <p className="text-gray-300 text-base leading-relaxed">
