@@ -14,6 +14,7 @@ import DailyProgram from './pages/DailyProgram';
 import DailyProgramPage from './pages/DailyProgramPage';
 import UniversePage from './pages/UniversePage';
 import TrainingGround from './pages/TrainingGround';
+import Profile from './pages/Profile';
 import Index from './pages/Index';
 import './App.css';
 
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth-page" element={<AuthPage />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/daily-universe" element={<DailyUniversePage />} />
                 <Route path="/simulator" element={<SimulatorPage />} />
                 <Route path="/educational-simulator" element={<EducationalSimulatorPage />} />
