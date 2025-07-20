@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DailyUniversePage from '../../pages/DailyUniversePage';
+import DailyProgramPage from '../../pages/DailyProgramPage';
 import { BrowserRouter } from 'react-router-dom';
 import { aiUniverseGenerator } from '../../services/AIUniverseGenerator';
 
@@ -37,7 +38,7 @@ vi.mock('@/hooks/useAuth', () => ({
 }));
 
 
-describe('DailyUniversePage', () => {
+describe('DailyProgramPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -51,13 +52,18 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <DailyUniversePage />
+                <DailyProgramPage />
             </BrowserRouter>
         );
+
+        const startBtn = screen.getByRole('button', { name: /start/i });
+        userEvent.click(startBtn);
 
         await waitFor(() => {
             expect(screen.getByText('Travel to China')).toBeInTheDocument();
             expect(screen.getByText('You have to travel to China to help a man in his store')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
         });
     });
 
@@ -78,12 +84,17 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <DailyUniversePage />
+                <DailyProgramPage />
             </BrowserRouter>
         );
 
+        const startBtn = screen.getByRole('button', { name: /start/i });
+        userEvent.click(startBtn);
+
         await waitFor(() => {
             expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
         });
     });
 });
