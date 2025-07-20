@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,7 @@ const DailyProgramPage = () => {
   const [universe, setUniverse] = useState<Universe | null>(null);
   const [loadingUniverse, setLoadingUniverse] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const universeRef = useRef<HTMLDivElement | null>(null);
 
   if (loading) {
     return (
@@ -33,10 +33,23 @@ const DailyProgramPage = () => {
     try {
       const prompt =
         'Create an engaging daily learning universe for students with interactive activities, interesting characters, and educational adventures.';
-      const result = await aiUniverseGenerator.generateUniverse(prompt);
+      let result = await aiUniverseGenerator.generateUniverse(prompt);
+
+      if (typeof result === 'string') {
+        try {
+          result = JSON.parse(result);
+        } catch {
+          result = null;
+        }
+      }
 
       if (result) {
         setUniverse(result);
+        // After setting the universe scroll to the details section
+        setTimeout(() => {
+          universeRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 0);
+Universe(result);
       } else {
         setError('Failed to generate universe');
       }
@@ -161,7 +174,7 @@ const DailyProgramPage = () => {
           )}
 
           {universe && (
-            <div className="space-y-6">
+            <div className="space-y-6" ref={universeRef}>
               <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
                 <CardHeader>
                   <CardTitle className="text-2xl">{universe.title}</CardTitle>
