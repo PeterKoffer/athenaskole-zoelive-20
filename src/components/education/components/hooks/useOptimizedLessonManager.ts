@@ -1,133 +1,111 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import { useTimerManager } from '../../hooks/useTimerManager';
-import { useEnhancedTeachingEngine } from './useEnhancedTeachingEngine';
 import { LessonActivity } from '../types/LessonTypes';
-
-import { useLessonActivitiesInitializer } from './useLessonActivitiesInitializer';
-import { useActivityNavigation } from './useActivityNavigation';
-import { useLessonScore } from './useLessonScore';
-import { useSpeechHandler } from './useSpeechHandler';
+import { UniversalContentGenerator } from '../utils/universalContentGenerator';
 
 interface UseOptimizedLessonManagerProps {
   subject: string;
   skillArea: string;
   onLessonComplete: () => void;
-  manualActivityIndex?: number | null;
 }
 
 export const useOptimizedLessonManager = ({
   subject,
   skillArea,
-  onLessonComplete,
-  manualActivityIndex
+  onLessonComplete
 }: UseOptimizedLessonManagerProps) => {
-  // --- Initialization/Activity Generation ---
-  const { timeElapsed, startTimer } = useTimerManager({ autoStart: false });
-  const { allActivities, isInitializing, lessonStartTime } = useLessonActivitiesInitializer(subject, skillArea, startTimer);
-
-  // --- State ---
+  const [activities, setActivities] = useState<LessonActivity[]>([]);
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
-  const [completedActivities, setCompletedActivities] = useState<Set<number>>(new Set());
+  const [score, setScore] = useState(0);
+  const [correctStreak, setCorrectStreak] = useState(0);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [isInitializing, setIsInitializing] = useState(true);
+  
+  const { speak, isSpeaking, stop } = useUnifiedSpeech();
+  
+  const targetLessonLength = 20 * 60; // 20 minutes in seconds
 
-  const { score, setScore, correctStreak, setCorrectStreak } = useLessonScore();
+  // Initialize lesson activities
+  useEffect(() => {
+    const initializeLesson = async () => {
+      console.log(`🎯 Initializing optimized lesson for ${subject} - ${skillArea}`);
+      setIsInitializing(true);
+      
+      try {
+        // Generate activities using the universal content generator
+        const generatedActivities = UniversalContentGenerator.generateEngagingLesson(subject, skillArea, 3);
+        setActivities(generatedActivities);
+        console.log(`✅ Generated ${generatedActivities.length} activities for ${subject}`);
+      } catch (error) {
+        console.error('❌ Error generating lesson activities:', error);
+        // Fallback to basic activities if generation fails
+        const fallbackActivities: LessonActivity[] = [
+          {
+            id: 'intro-1',
+            type: 'introduction',
+            title: `Welcome to ${subject}`,
+            duration: 120,
+            content: {
+              text: `Welcome to your ${subject} learning session! Today we'll explore ${skillArea} through interactive activities and engaging content.`
+            },
+            subject,
+            skillArea
+          }
+        ];
+        setActivities(fallbackActivities);
+      }
+      
+      setIsInitializing(false);
+    };
 
-  // --- Unified speech ---
-  const {
-    isEnabled: autoReadEnabled,
-    isSpeaking,
-    hasUserInteracted,
-    toggleEnabled: toggleMute
-  } = useUnifiedSpeech();
+    initializeLesson();
+  }, [subject, skillArea]);
 
-  // --- Teaching engine ---
-  const teachingEngine = useEnhancedTeachingEngine({
-    subject,
-    timeElapsed,
-    correctStreak,
-    score,
-    lessonStartTime: lessonStartTime.current
-  });
+  // Timer for lesson duration
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeElapsed(prev => prev + 1);
+    }, 1000);
 
-  // --- Manual navigation logic ---
-  useActivityNavigation({
-    manualActivityIndex,
-    currentActivityIndex,
-    completedActivities,
-    setCurrentActivityIndex
-  });
+    return () => clearInterval(timer);
+  }, []);
 
-  // Use activities directly - no filtering (they're already clean from initializer)
-  const filteredActivities = allActivities;
+  const currentActivity = activities[currentActivityIndex] || null;
+  const totalRealActivities = activities.length;
 
-  // --- Current Activity / Progress ---
-  const currentActivity = filteredActivities[currentActivityIndex] || null;
-  const totalRealActivities = filteredActivities.length;
-  const targetLessonLength = 20; // 20 minutes
-
-  // --- Activity completion logic ---
-  const handleActivityComplete = (wasCorrect?: boolean) => {
-    console.log('🎯 Activity completion triggered:', {
-      currentActivityIndex,
-      wasCorrect,
-      totalActivities: filteredActivities.length,
-      activityId: currentActivity?.id
-    });
-
-    // Mark current activity as completed
-    setCompletedActivities(prev => new Set([...prev, currentActivityIndex]));
-
-    // Update score and streak based on correctness
-    if (wasCorrect === true) {
-      setScore(prev => prev + 15);
+  const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
+    console.log(`📝 Activity completed: ${currentActivity?.title}, correct: ${wasCorrect}`);
+    
+    if (wasCorrect) {
+      setScore(prev => prev + 10);
       setCorrectStreak(prev => prev + 1);
-      console.log('✅ Correct answer - score and streak updated');
-    } else if (wasCorrect === false) {
+    } else {
       setCorrectStreak(0);
-      console.log('❌ Incorrect answer - streak reset');
     }
 
-    // Small delay before advancing to next activity
-    setTimeout(() => {
-      if (currentActivityIndex < filteredActivities.length - 1) {
-        console.log('➡️ Advancing to next activity:', currentActivityIndex + 1);
-        setCurrentActivityIndex(prev => prev + 1);
-      } else {
-        console.log('🏁 All activities completed - ending lesson');
-        setTimeout(() => {
-          onLessonComplete();
-        }, 2000);
-      }
-    }, 1500);
-  };
+    // Move to next activity or complete lesson
+    if (currentActivityIndex < activities.length - 1) {
+      setCurrentActivityIndex(prev => prev + 1);
+    } else {
+      console.log('🎉 Lesson completed!');
+      onLessonComplete();
+    }
+  }, [currentActivity, currentActivityIndex, activities.length, onLessonComplete]);
 
-  // --- Speech/Read request logic ---
-  const handleReadRequest = useSpeechHandler({
-    currentActivity,
-    teachingEngine
-  });
+  const handleReadRequest = useCallback((text: string) => {
+    console.log('🔊 Read request:', text.substring(0, 50) + '...');
+    speak(text);
+  }, [speak]);
 
-  // --- Completion status/navigation state ---
-  const isCurrentActivityCompleted = completedActivities.has(currentActivityIndex);
-  const canNavigateForward = currentActivityIndex < totalRealActivities - 1 && isCurrentActivityCompleted;
-  const canNavigateBack = currentActivityIndex > 0;
-
-  // --- Debug ---
-  useEffect(() => {
-    console.log('[OptimizedLessonManager] Debug Info:', {
-      currentActivityIndex,
-      totalActivities: totalRealActivities,
-      isInitializing,
-      hasCurrentActivity: !!currentActivity,
-      currentActivityId: currentActivity?.id,
-      activitiesCount: allActivities.length
-    });
-  }, [currentActivityIndex, totalRealActivities, isInitializing, currentActivity, allActivities.length]);
+  const toggleMute = useCallback(() => {
+    if (isSpeaking) {
+      stop();
+    }
+  }, [isSpeaking, stop]);
 
   return {
     currentActivityIndex,
-    setCurrentActivityIndex,
     currentActivity,
     totalRealActivities,
     timeElapsed,
@@ -135,16 +113,9 @@ export const useOptimizedLessonManager = ({
     correctStreak,
     targetLessonLength,
     isInitializing,
-    completedActivities,
-    isCurrentActivityCompleted,
-    canNavigateForward,
-    canNavigateBack,
     handleActivityComplete,
     handleReadRequest,
     isSpeaking,
-    toggleMute,
-    autoReadEnabled,
-    hasUserInteracted,
-    teachingEngine
+    toggleMute
   };
 };

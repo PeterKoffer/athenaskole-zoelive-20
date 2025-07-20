@@ -4,11 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import UniversalLearning from "../../education/UniversalLearning";
+import ClassroomEnvironment from "../../education/components/shared/ClassroomEnvironment";
+import { getClassroomConfig } from "../../education/components/shared/classroomConfigs";
 
 const ScienceLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { forceStopAll } = useUnifiedSpeech();
+  const classroomConfig = getClassroomConfig("science");
 
   console.log('🔬 ScienceLearning component state:', {
     user: !!user,
@@ -43,12 +46,14 @@ const ScienceLearning = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 via-green-800 to-emerald-900">
-        <div className="text-center text-white">
-          <div className="text-4xl mb-4">🔬</div>
-          <p className="text-lg">Loading your Science lesson...</p>
+      <ClassroomEnvironment config={classroomConfig}>
+        <div className="min-h-screen flex items-center justify-center text-white">
+          <div className="text-center">
+            <div className="text-4xl mb-4">🔬</div>
+            <p className="text-lg">Loading your Science lesson...</p>
+          </div>
         </div>
-      </div>
+      </ClassroomEnvironment>
     );
   }
 
