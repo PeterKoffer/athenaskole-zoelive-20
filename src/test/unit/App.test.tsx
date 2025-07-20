@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Index from '@/pages/Index';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/hooks/useAuth';
 
 describe('App Component Tests', () => {
   it('renders Index page without crashing', () => {

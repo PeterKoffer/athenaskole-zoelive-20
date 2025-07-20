@@ -6,8 +6,7 @@ import { StudentProfile } from '../../types/student';
 
 describe('PersonalizationEngine', () => {
     it('should return a personalized universe', async () => {
-        const universes = UniverseGenerator.getUniverses();
-        const universe = universes[0];
+        const universe = UniverseGenerator.getUniverseById('u1')!;
         const student: StudentProfile = {
             id: '1',
             name: 'John Doe',

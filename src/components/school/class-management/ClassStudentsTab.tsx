@@ -121,7 +121,7 @@ const ClassStudentsTab = ({ currentClass, selectedClass, classes, onUpdateClasse
                 className="bg-gray-600 text-white border-gray-500"
               />
               <Input
-                placeholder="Email adresse"
+                placeholder="E-mailadresse"
                 type="email"
                 value={newStudentEmail}
                 onChange={(e) => setNewStudentEmail(e.target.value)}

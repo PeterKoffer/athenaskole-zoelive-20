@@ -14,7 +14,8 @@ export class UnifiedQuestionGenerationService {
     };
 
     const universe = await aiUniverseGenerator.generateUniverse(studentProfile);
-    const question = universe.objectives[0];
+    const activity = universe?.activities[0];
+    const question = typeof activity === 'string' ? { question: activity } : activity;
 
     const questionId = globalQuestionUniquenessService.generateUniqueQuestion(userId, metadata);
     
