@@ -13,36 +13,17 @@ const ScienceLearning = () => {
   const { forceStopAll } = useUnifiedSpeech();
   const classroomConfig = getClassroomConfig("science");
 
-  console.log('🔬 ScienceLearning component state:', {
-    user: !!user,
-    userId: user?.id,
-    loading,
-    subject: 'science',
-    skillArea: 'general_science'
-  });
-
-  // Redirect to auth if not logged in
   useEffect(() => {
-    console.log('[ScienceLearning] Auth Check: Loading:', loading, 'User:', user?.id);
     if (!loading && !user) {
-      console.warn('[ScienceLearning] Redirecting to /auth');
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  // Stop speech when component unmounts
   useEffect(() => {
     return () => {
-      console.log('🔇 Stopping speech due to navigation away from science lesson');
       forceStopAll();
     };
   }, [forceStopAll]);
-
-  const handleBackToProgram = () => {
-    console.log('🔇 Stopping speech before navigating back to program');
-    forceStopAll();
-    navigate('/daily-program');
-  };
 
   if (loading) {
     return (

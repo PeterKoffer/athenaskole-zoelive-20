@@ -13,27 +13,14 @@ const ComputerScienceLearning = () => {
   const { forceStopAll } = useUnifiedSpeech();
   const classroomConfig = getClassroomConfig("computer-science");
 
-  console.log('💻 ComputerScienceLearning component state:', {
-    user: !!user,
-    userId: user?.id,
-    loading,
-    subject: 'computer-science',
-    skillArea: 'general_programming'
-  });
-
-  // Redirect to auth if not logged in
   useEffect(() => {
-    console.log('[ComputerScienceLearning] Auth Check: Loading:', loading, 'User:', user?.id);
     if (!loading && !user) {
-      console.warn('[ComputerScienceLearning] Redirecting to /auth');
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  // Stop speech when component unmounts
   useEffect(() => {
     return () => {
-      console.log('🔇 Stopping speech due to navigation away from computer science lesson');
       forceStopAll();
     };
   }, [forceStopAll]);
@@ -58,7 +45,7 @@ const ComputerScienceLearning = () => {
   return (
     <UniversalLearning 
       subject="computer-science" 
-      skillArea="general_programming"
+      skillArea="general_computer_science"
     />
   );
 };
