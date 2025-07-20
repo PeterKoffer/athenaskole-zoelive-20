@@ -1,13 +1,33 @@
 
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, BookOpen, Play } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, Play, Loader2 } from 'lucide-react';
+import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
+import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
+import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
+import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [universe, setUniverse] = useState<Universe | null>(null);
+  const [loadingUniverse, setLoadingUniverse] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lessonActivities, setLessonActivities] = useState<LessonActivity[] | null>(null);
+  const [loadingLesson, setLoadingLesson] = useState(false);
+  const [lessonError, setLessonError] = useState<string | null>(null);
+  const universeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Automatically generate a universe when the page first loads
+    if (!universe && !loadingUniverse) {
+      generateUniverse();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -20,8 +40,88 @@ const DailyProgramPage = () => {
     );
   }
 
-  const handleStartUniverse = () => {
-    navigate('/daily-universe');
+  const generateUniverse = async () => {
+    setLoadingUniverse(true);
+    setError(null);
+
+    try {
+      const prompt =
+        'Create an engaging daily learning universe for students with interactive activities, interesting characters, and educational adventures.';
+      let result = await aiUniverseGenerator.generateUniverse(prompt);
+
+      if (!result) {
+        // Fallback to a built-in sample if generation fails completely
+        result = UniverseGenerator.getUniverses()[0];
+      }
+
+      if (typeof result === 'string') {
+        try {
+          result = JSON.parse(result);
+        } catch {
+          result = UniverseGenerator.getUniverses()[0];
+        }
+      }
+
+      setUniverse(result);
+
+      // Generate today's lesson activities based on the universe theme
+      if (result) {
+        await generateLessonFromUniverse(result as Universe);
+      }
+
+      // After setting the universe scroll to the details section
+      setTimeout(() => {
+        universeRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate universe');
+      // Show a sample universe so the user still sees content
+      setUniverse(UniverseGenerator.getUniverses()[0]);
+    } finally {
+      setLoadingUniverse(false);
+    }
+  };
+
+  const generateLessonFromUniverse = async (u: Universe) => {
+    if (!user) return;
+
+    setLoadingLesson(true);
+    setLessonError(null);
+
+    try {
+      const grade = 6;
+      const currentDate = new Date().toISOString().split('T')[0];
+      const activities = await dailyLessonGenerator.generateDailyLesson({
+        subject: u.theme || 'general',
+        skillArea: 'general',
+        userId: user.id,
+        gradeLevel: grade,
+        currentDate
+      });
+
+      setLessonActivities(activities);
+    } catch (err) {
+      setLessonError(err instanceof Error ? err.message : 'Failed to generate lesson');
+    } finally {
+      setLoadingLesson(false);
+    }
+  };
+
+  const handleStartLearning = () => {
+    if (!universe) return;
+
+    const theme = universe.theme?.toLowerCase();
+    const themeToPath: Record<string, string> = {
+      mathematics: '/learn/mathematics',
+      science: '/learn/science',
+      history: '/learn/history-religion',
+      languages: '/learn/language-lab',
+      arts: '/learn/creative-arts',
+      technology: '/learn/computer-science'
+    };
+
+    const path = (theme && themeToPath[theme]) || '/training-ground';
+    navigate(path);
   };
 
   return (
@@ -87,15 +187,23 @@ const DailyProgramPage = () => {
                 </div>
               </div>
               
-              <Button 
-                onClick={handleStartUniverse}
-                size="lg" 
+              <Button
+                onClick={generateUniverse}
+                size="lg"
+                disabled={loadingUniverse}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
               >
-                <Play className="w-5 h-5 mr-2" />
-                Start Today's Learning Universe
+                {loadingUniverse ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5 mr-2" /> Start Your Adventure
+                  </>
+                )}
               </Button>
-            </CardContent>
+          </CardContent>
           </Card>
 
           <Card className="bg-card border-border">
@@ -113,8 +221,128 @@ const DailyProgramPage = () => {
               >
                 Go to Training Ground
               </Button>
-            </CardContent>
+          </CardContent>
           </Card>
+
+          {error && (
+            <Card className="border-destructive">
+              <CardContent className="pt-6">
+                <div className="text-center text-destructive">
+                  <p className="mb-4">❌ {error}</p>
+                  <Button onClick={generateUniverse} variant="outline">
+                    Try Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {universe && (
+            <div className="space-y-6" ref={universeRef}>
+              <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
+                <CardHeader>
+                  <CardTitle className="text-2xl">{universe.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-lg text-muted-foreground">{universe.description}</p>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">🎭 Characters</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {universe.characters?.length ? (
+                        universe.characters.map((character, index) => (
+                          <li key={index} className="text-sm text-muted-foreground">• {character}</li>
+                        ))
+                      ) : (
+                        <li className="text-sm text-muted-foreground">No characters available</li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">🌍 Locations</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {universe.locations?.length ? (
+                        universe.locations.map((location, index) => (
+                          <li key={index} className="text-sm text-muted-foreground">• {location}</li>
+                        ))
+                      ) : (
+                        <li className="text-sm text-muted-foreground">No locations available</li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">🎯 Activities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {universe.activities?.length ? (
+                        universe.activities.map((activity, index) => (
+                          <li key={index} className="text-sm text-muted-foreground">• {activity}</li>
+                        ))
+                      ) : (
+                        <li className="text-sm text-muted-foreground">No activities available</li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+            </div>
+          )}
+
+          {loadingLesson && (
+            <Card>
+              <CardContent className="py-6 text-center">
+                <Loader2 className="w-5 h-5 mr-2 animate-spin inline-block" /> Generating lesson...
+              </CardContent>
+            </Card>
+          )}
+
+          {lessonError && (
+            <Card className="border-destructive">
+              <CardContent className="pt-6">
+                <div className="text-center text-destructive">❌ {lessonError}</div>
+              </CardContent>
+            </Card>
+          )}
+
+          {lessonActivities && lessonActivities.length > 0 && (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-foreground">Today's Lesson Plan</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc pl-5 space-y-1">
+                  {lessonActivities.map((act, idx) => (
+                    <li key={act.id} className="text-sm text-muted-foreground">
+                      {idx + 1}. {act.title}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  onClick={handleStartLearning}
+                  size="lg"
+                  className="mt-4 w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  <Play className="w-5 h-5 mr-2" /> Start Learning Session
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
