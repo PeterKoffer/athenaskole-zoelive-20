@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { universeGenerationService } from '@/services/UniverseGenerationService';
 import UniverseSessionManager from '@/services/UniverseSessionManager';
 import { LearningAtom, DailyUniverse } from '@/types/learning';
-import AdaptiveLearningAtomRenderer from '@/components/adaptive-learning/AdaptiveLearningAtomRenderer';
+// Removed adaptive learning components
 import { ArrowLeft, RefreshCw, Brain, Sparkles } from 'lucide-react';
 
 const EnhancedDailyProgram: React.FC = () => {
@@ -37,9 +37,9 @@ const EnhancedDailyProgram: React.FC = () => {
     try {
       const universe = await universeGenerationService.generate({
         userId: user.id,
-        gradeLevel: metadata?.gradeLevel || 4,
-        preferredLearningStyle: metadata?.preferredLearningStyle || 'mixed',
-        interests: metadata?.interests || [],
+        gradeLevel: metadata?.grade_level || 4,
+        preferredLearningStyle: 'mixed',
+        interests: [],
       });
       
       if (universe) {
@@ -50,13 +50,13 @@ const EnhancedDailyProgram: React.FC = () => {
           estimatedTotalMinutes: 45, // Placeholder
           learningAtoms: universe.objectives.map((obj, index) => ({
             id: obj.id,
-            title: obj.name,
+            curriculumObjectiveTitle: obj.name,
             subject: obj.subjectName,
-            difficulty: 'medium', // Placeholder
-            type: 'video', // Placeholder
+            difficulty: 'medium',
+            type: 'video',
             content: obj.description,
-            order: index,
             isCompleted: false,
+            estimatedMinutes: 10
           })),
           storylineOutro: 'Congratulations on completing your learning journey!', // Placeholder
         };
@@ -239,11 +239,13 @@ const EnhancedDailyProgram: React.FC = () => {
             </CardContent>
           </Card>
         ) : !isAllComplete && currentAtom ? (
-          <div className="bg-white rounded-lg">
-            <AdaptiveLearningAtomRenderer
-              atom={currentAtom}
-              onComplete={handleAtomComplete}
-            />
+          <div className="bg-white rounded-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">{currentAtom.curriculumObjectiveTitle || currentAtom.id}</h3>
+            <p className="text-gray-600 mb-4">{currentAtom.content}</p>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Subject: {currentAtom.subject}</span>
+              <Button onClick={() => handleAtomComplete({})}>Complete</Button>
+            </div>
           </div>
         ) : isAllComplete ? (
           <Card className="bg-white/5 border-white/10">

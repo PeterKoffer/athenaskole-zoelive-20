@@ -8,140 +8,140 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     primaryColor: '#3B82F6',
     secondaryColor: '#1E40AF',
     accentColor: '#60A5FA',
-    backgroundImage: 'https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/f383fae8-87d7-4989-88d6-5d18fcb88434.png',
     subjectColor: '#3B82F6',
     overlayOpacity: 0.7,
-    environmentDescription: 'Bright and organized classroom environment perfect for mathematical learning and problem-solving'
+    environmentDescription: 'Bright mathematics classroom with mathematical equations on the blackboard'
   },
   'science': {
     subjectName: 'Science',
     primaryColor: '#10B981',
     secondaryColor: '#059669',
     accentColor: '#34D399',
-    backgroundImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/45a59c89-07f2-4a70-8f9c-ccb921503ca8.png',
     subjectColor: '#10B981',
     overlayOpacity: 0.6,
-    environmentDescription: 'Natural mountain summit environment inspiring exploration and discovery in earth sciences'
+    environmentDescription: 'Modern science classroom with laboratory equipment and scientific displays'
   },
   'history-religion': {
     subjectName: 'History & Religion',
     primaryColor: '#F59E0B',
     secondaryColor: '#D97706',
     accentColor: '#FBBF24',
-    backgroundImage: 'https://images.unsplash.com/photo-1473177104440-ffee2f376098?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/5533306d-0f97-4375-b7ef-14fc095edef3.png',
     subjectColor: '#F59E0B',
     overlayOpacity: 0.5,
-    environmentDescription: 'Sacred cathedral interior providing a contemplative atmosphere for studying history and religious traditions'
+    environmentDescription: 'Classic history classroom with historical artifacts and world maps'
   },
   'world-history-religions': {
     subjectName: 'World History & Religions',
     primaryColor: '#F59E0B',
     secondaryColor: '#D97706',
     accentColor: '#FBBF24',
-    backgroundImage: 'https://images.unsplash.com/photo-1473177104440-ffee2f376098?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/5533306d-0f97-4375-b7ef-14fc095edef3.png',
     subjectColor: '#F59E0B',
     overlayOpacity: 0.5,
-    environmentDescription: 'Majestic cathedral setting perfect for exploring world religions and historical traditions'
+    environmentDescription: 'Traditional history classroom with world maps and historical displays'
   },
   'english': {
     subjectName: 'English',
     primaryColor: '#8B5CF6',
     secondaryColor: '#7C3AED',
     accentColor: '#A78BFA',
-    backgroundImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/58ffa4c0-eb2a-4fae-b767-033618be64fb.png',
     subjectColor: '#8B5CF6',
     overlayOpacity: 0.6,
-    environmentDescription: 'Clean architectural environment fostering clear thinking and structured language learning'
+    environmentDescription: 'Traditional academic classroom with wooden desks and educational materials'
   },
   'language-lab': {
     subjectName: 'Language Lab',
     primaryColor: '#F97316',
     secondaryColor: '#EA580C',
     accentColor: '#FB923C',
-    backgroundImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/9d6652ab-9a6c-41b4-b243-88ec0f5add86.png',
     subjectColor: '#F97316',
     overlayOpacity: 0.6,
-    environmentDescription: 'Modern architectural space designed for immersive language learning experiences'
+    environmentDescription: 'Modern language classroom with interactive learning environment'
   },
   'geography': {
     subjectName: 'Geography',
     primaryColor: '#059669',
     secondaryColor: '#047857',
     accentColor: '#10B981',
-    backgroundImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/93c21ec1-4014-4170-ba94-cc79740fb673.png',
     subjectColor: '#059669',
     overlayOpacity: 0.6,
-    environmentDescription: 'Stunning mountain landscape perfect for studying geographical formations and natural environments'
+    environmentDescription: 'Geography classroom with world map and geographical learning materials'
   },
   'global-geography': {
     subjectName: 'Global Geography',
     primaryColor: '#0891B2',
     secondaryColor: '#0E7490',
     accentColor: '#06B6D4',
-    backgroundImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/93c21ec1-4014-4170-ba94-cc79740fb673.png',
     subjectColor: '#0891B2',
     overlayOpacity: 0.6,
-    environmentDescription: 'Expansive mountain vista representing the vastness of global geographical study'
+    environmentDescription: 'Global geography classroom with world maps and geographical displays'
   },
   'computer-science': {
     subjectName: 'Computer Science',
     primaryColor: '#6366F1',
     secondaryColor: '#4F46E5',
     accentColor: '#818CF8',
-    backgroundImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/4c90f5aa-c148-41b5-bfdd-789cc603c470.png',
     subjectColor: '#6366F1',
     overlayOpacity: 0.7,
-    environmentDescription: 'High-tech programming environment with Java code display, perfect for computer science learning'
+    environmentDescription: 'Modern computer science classroom with coding displays and technology'
   },
   'creative-arts': {
     subjectName: 'Creative Arts',
     primaryColor: '#EC4899',
     secondaryColor: '#DB2777',
     accentColor: '#F472B6',
-    backgroundImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/21d261a5-4b71-4ced-a38c-416551e6cd98.png',
     subjectColor: '#EC4899',
     overlayOpacity: 0.5,
-    environmentDescription: 'Clean, minimalist architectural space inspiring creativity and artistic expression'
+    environmentDescription: 'Art studio classroom with easels, paints, and creative materials'
   },
   'music': {
     subjectName: 'Music',
     primaryColor: '#8B5CF6',
     secondaryColor: '#7C3AED',
     accentColor: '#A78BFA',
-    backgroundImage: 'https://images.unsplash.com/photo-1473177104440-ffee2f376098?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/408db6c6-e5cd-429a-bc22-2f64f8292f91.png',
     subjectColor: '#8B5CF6',
     overlayOpacity: 0.4,
-    environmentDescription: 'Resonant cathedral interior with excellent acoustics for musical education and appreciation'
+    environmentDescription: 'Music classroom with instruments, musical notes and performance space'
   },
   'body-lab': {
     subjectName: 'Body Lab',
     primaryColor: '#DC2626',
     secondaryColor: '#B91C1C',
     accentColor: '#EF4444',
-    backgroundImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/ad6b4ccb-090c-4c29-844f-cc5f14e30695.png',
     subjectColor: '#DC2626',
     overlayOpacity: 0.6,
-    environmentDescription: 'Clinical architectural environment perfect for studying human anatomy and physiology'
+    environmentDescription: 'Physical education and body lab classroom with exercise equipment'
   },
   'mental-wellness': {
     subjectName: 'Mental Wellness',
     primaryColor: '#06B6D4',
     secondaryColor: '#0891B2',
     accentColor: '#22D3EE',
-    backgroundImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/58ffa4c0-eb2a-4fae-b767-033618be64fb.png',
     subjectColor: '#06B6D4',
     overlayOpacity: 0.5,
-    environmentDescription: 'Peaceful mountain environment promoting mental clarity and wellness practices'
+    environmentDescription: 'Calm and peaceful classroom environment for mental wellness activities'
   },
   'life-essentials': {
     subjectName: 'Life Essentials',
     primaryColor: '#64748B',
     secondaryColor: '#475569',
     accentColor: '#94A3B8',
-    backgroundImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: '/lovable-uploads/58ffa4c0-eb2a-4fae-b767-033618be64fb.png',
     subjectColor: '#64748B',
     overlayOpacity: 0.6,
-    environmentDescription: 'Practical architectural setting ideal for learning essential life skills and daily living'
+    environmentDescription: 'Practical classroom setting for learning essential life skills'
   }
 };
 
