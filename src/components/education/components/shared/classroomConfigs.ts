@@ -8,20 +8,20 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     primaryColor: '#3B82F6',
     secondaryColor: '#1E40AF',
     accentColor: '#60A5FA',
-    backgroundImage: '/lovable-uploads/f383fae8-87d7-4989-88d6-5d18fcb88434.png',
+    backgroundImage: '/lovable-uploads/e8c77180-c952-401c-9f41-7bfb74d94967.png',
     subjectColor: '#3B82F6',
     overlayOpacity: 0.7,
-    environmentDescription: 'Bright mathematics classroom with mathematical equations on the blackboard'
+    environmentDescription: 'Bright mathematics classroom with blue walls and math equations on blackboard'
   },
   'science': {
     subjectName: 'Science',
     primaryColor: '#10B981',
     secondaryColor: '#059669',
     accentColor: '#34D399',
-    backgroundImage: '/lovable-uploads/45a59c89-07f2-4a70-8f9c-ccb921503ca8.png',
+    backgroundImage: '/lovable-uploads/3e7290ac-38f6-419d-af42-91ed54e26b77.png',
     subjectColor: '#10B981',
     overlayOpacity: 0.6,
-    environmentDescription: 'Modern science classroom with laboratory equipment and scientific displays'
+    environmentDescription: 'Clean classroom with green blackboard perfect for science learning'
   },
   'history-religion': {
     subjectName: 'History & Religion',
@@ -48,10 +48,10 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     primaryColor: '#8B5CF6',
     secondaryColor: '#7C3AED',
     accentColor: '#A78BFA',
-    backgroundImage: '/lovable-uploads/58ffa4c0-eb2a-4fae-b767-033618be64fb.png',
+    backgroundImage: '/lovable-uploads/d584a37f-9a21-40b7-b3b3-e22ce9b91e5a.png',
     subjectColor: '#8B5CF6',
     overlayOpacity: 0.6,
-    environmentDescription: 'Traditional academic classroom with wooden desks and educational materials'
+    environmentDescription: 'Classic classroom with teacher and beautiful lighting perfect for language learning'
   },
   'language-lab': {
     subjectName: 'Language Lab',
@@ -88,10 +88,10 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     primaryColor: '#6366F1',
     secondaryColor: '#4F46E5',
     accentColor: '#818CF8',
-    backgroundImage: '/lovable-uploads/4c90f5aa-c148-41b5-bfdd-789cc603c470.png',
+    backgroundImage: '/lovable-uploads/d6dd5b62-fafb-483a-be80-1fb5d88c9b3a.png',
     subjectColor: '#6366F1',
     overlayOpacity: 0.7,
-    environmentDescription: 'Modern computer science classroom with coding displays and technology'
+    environmentDescription: 'Modern neutral classroom with mathematical displays perfect for computer science'
   },
   'creative-arts': {
     subjectName: 'Creative Arts',

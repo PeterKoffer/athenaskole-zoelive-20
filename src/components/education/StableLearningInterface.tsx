@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import AdaptiveEducationSession from './AdaptiveEducationSession';
+// import AdaptiveEducationSession from './AdaptiveEducationSession'; // Temporarily disabled
 
 // Update the props interface
 interface StableLearningInterfaceProps {
@@ -38,12 +38,10 @@ const StableLearningInterface = ({
           Subject: {subject}, Skill Area: {skillArea}
         </p>
       
-      <AdaptiveEducationSession
-        subject={subject}
-        skillArea={skillArea}
-        onComplete={onComplete}
-        onBack={onBack}
-      />
+        <div className="bg-gray-800 rounded-lg p-6 text-center">
+          <p className="text-gray-300">Learning interface coming soon...</p>
+          <Button onClick={onComplete} className="mt-4">Complete Session</Button>
+        </div>
     </div>
   </div>
   );

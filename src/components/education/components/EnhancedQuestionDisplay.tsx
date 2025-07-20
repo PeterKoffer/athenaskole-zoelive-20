@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, Star, Lightbulb } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
-import { useDiverseQuestionGeneration } from '@/components/adaptive-learning/hooks/useDiverseQuestionGeneration';
+// import { useDiverseQuestionGeneration } from '@/components/adaptive-learning/hooks/useDiverseQuestionGeneration'; // Temporarily disabled
 import { useAuth } from '@/hooks/useAuth';
 
 interface EnhancedQuestionDisplayProps {
@@ -33,14 +33,16 @@ const EnhancedQuestionDisplay = ({
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const { generateDiverseQuestion, isGenerating } = useDiverseQuestionGeneration({
-    subject,
-    skillArea,
-    difficultyLevel: 2,
-    userId: user?.id || '',
-    gradeLevel: 6,
-    standardsAlignment: null
+  // Temporary stub for question generation
+  const generateDiverseQuestion = async () => ({
+    question: "What is 2 + 2?",
+    options: ["3", "4", "5", "6"],
+    correct: 1,
+    explanation: "2 + 2 equals 4 because when you add two and two together, you get four.",
+    hint: "Think about counting on your fingers!"
   });
+
+  const isGenerating = false;
 
   useEffect(() => {
     const loadQuestion = async () => {

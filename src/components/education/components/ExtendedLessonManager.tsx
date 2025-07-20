@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
-import { useNelieVoice } from '@/components/adaptive-learning/hooks/useNelieVoice';
+// import { useNelieVoice } from '@/components/adaptive-learning/hooks/useNelieVoice'; // Temporarily disabled
 import NelieAvatarSection from './NelieAvatarSection';
 import LessonProgressHeader from './LessonProgressHeader';
 import LessonControlsFooter from './LessonControlsFooter';
@@ -26,14 +26,13 @@ const ExtendedLessonManager = ({
   const [lessonStartTime] = useState(Date.now());
   const [score, setScore] = useState(0);
 
-  const {
-    isSpeaking,
-    autoReadEnabled,
-    isReady,
-    speakText,
-    toggleMute,
-    testSpeech
-  } = useNelieVoice();
+  // Temporary stub for voice functionality
+  const isSpeaking = false;
+  const autoReadEnabled = true;
+  const isReady = true;
+  const speakText = (text: string, priority?: boolean) => console.log('Would speak:', text, priority ? '(priority)' : '');
+  const toggleMute = () => console.log('Toggle mute');
+  const testSpeech = () => console.log('Test speech');
 
   // Generate lesson activities
   const [lessonActivities] = useState<LessonActivity[]>(() => {
