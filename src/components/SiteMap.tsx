@@ -20,7 +20,6 @@ const SiteMap = () => {
         { name: "Home", path: "/", description: "Welcome page and overview" },
         { name: "Training Ground", path: "/training-ground", description: "Subject-focused learning" },
         { name: "Daily Program", path: "/daily-program", description: "Structured daily activities" },
-        { name: "Daily Universe", path: "/daily-universe", description: "Explore the universe of knowledge" },
       ]
     },
     {

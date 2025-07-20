@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DailyUniversePage from '../../pages/DailyUniversePage';
+import DailyProgramPage from '../../pages/DailyProgramPage';
 import { BrowserRouter } from 'react-router-dom';
 import { aiUniverseGenerator } from '../../services/AIUniverseGenerator';
 
@@ -37,7 +38,7 @@ vi.mock('@/hooks/useAuth', () => ({
 }));
 
 
-describe('DailyUniversePage', () => {
+describe('DailyProgramPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -51,9 +52,11 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <DailyUniversePage />
+                <DailyProgramPage />
             </BrowserRouter>
         );
+
+        userEvent.click(screen.getByRole('button', { name: /start/i }));
 
         await waitFor(() => {
             expect(screen.getByText('Travel to China')).toBeInTheDocument();
@@ -78,9 +81,11 @@ describe('DailyUniversePage', () => {
 
         render(
             <BrowserRouter>
-                <DailyUniversePage />
+                <DailyProgramPage />
             </BrowserRouter>
         );
+
+        userEvent.click(screen.getByRole('button', { name: /start/i }));
 
         await waitFor(() => {
             expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
