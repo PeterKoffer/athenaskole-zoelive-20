@@ -61,6 +61,7 @@ describe('DailyProgramPage', () => {
         await waitFor(() => {
             expect(screen.getByText('Travel to China')).toBeInTheDocument();
             expect(screen.getByText('You have to travel to China to help a man in his store')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
         });
     });
 
@@ -89,6 +90,7 @@ describe('DailyProgramPage', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
         });
     });
 });

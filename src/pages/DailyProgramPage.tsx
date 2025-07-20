@@ -105,6 +105,23 @@ const DailyProgramPage = () => {
     }
   };
 
+  const handleStartLearning = () => {
+    if (!universe) return;
+
+    const theme = universe.theme?.toLowerCase();
+    const themeToPath: Record<string, string> = {
+      mathematics: '/learn/mathematics',
+      science: '/learn/science',
+      history: '/learn/history-religion',
+      languages: '/learn/language-lab',
+      arts: '/learn/creative-arts',
+      technology: '/learn/computer-science'
+    };
+
+    const path = (theme && themeToPath[theme]) || '/training-ground';
+    navigate(path);
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
@@ -314,6 +331,13 @@ const DailyProgramPage = () => {
                     </li>
                   ))}
                 </ul>
+                <Button
+                  onClick={handleStartLearning}
+                  size="lg"
+                  className="mt-4 w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  <Play className="w-5 h-5 mr-2" /> Start Learning Session
+                </Button>
               </CardContent>
             </Card>
           )}
