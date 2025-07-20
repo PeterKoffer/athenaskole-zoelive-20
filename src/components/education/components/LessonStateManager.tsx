@@ -27,7 +27,7 @@ export const useLessonStateManager = () => {
     currentSegment: 0,
     totalSegments: 6, // Standard lesson structure: 6 phases
     score: 0,
-    totalLessonTime: 1200, // 20 minutes standard
+    totalLessonTime: 1200, // default lesson duration
     phaseProgress: 0
   });
 

@@ -37,7 +37,7 @@
     "gradeLevel": [3, 4, 5, 6],
     "difficulty": "beginner",
     "interactionType": "simulation",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["fractions", "division", "practical_math", "problem_solving"],
     "learningObjectives": [
       "Understand fraction concepts",

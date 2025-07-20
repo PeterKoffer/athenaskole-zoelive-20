@@ -4,6 +4,7 @@ import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import LessonActivityManager from './LessonActivityManager';
 import LessonCompletedView from './LessonCompletedView';
 import LessonActivitySpeechManager from './LessonActivitySpeechManager';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 import LessonLoadingState from './lessonManager/LessonLoadingState';
 import LessonPreparationState from './lessonManager/LessonPreparationState';
 import LessonProgressDisplay from './lessonManager/LessonProgressDisplay';
@@ -76,8 +77,8 @@ const EnhancedLessonManager = ({
     );
   }
 
-  // Target lesson length is 20 minutes (1200 seconds)
-  const targetLessonLength = 1200;
+  // Target lesson length
+  const targetLessonLength = DEFAULT_LESSON_SECONDS;
 
   const handleManualRead = async () => {
     if (currentActivity) {

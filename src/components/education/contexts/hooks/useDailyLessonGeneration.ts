@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { LessonActivity } from '../../components/types/LessonTypes';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { dynamicLessonExtender } from '@/services/dynamicLessonExtender';
+import { DEFAULT_LESSON_MINUTES } from '@/constants/lesson';
 
 interface DynamicContentRequest {
   subject: string;
@@ -36,8 +37,8 @@ export const useDailyLessonGeneration = ({
   const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
   const [isExtending, setIsExtending] = useState(false);
 
-  // Target lesson duration in minutes (20 minutes)
-  const TARGET_LESSON_DURATION = 20;
+  // Target lesson duration in minutes
+  const TARGET_LESSON_DURATION = DEFAULT_LESSON_MINUTES;
 
   // Get today's date for lesson generation
   const getCurrentDate = () => new Date().toISOString().split('T')[0];

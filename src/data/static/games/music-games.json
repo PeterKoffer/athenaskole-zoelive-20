@@ -9,7 +9,7 @@
     "gradeLevel": [2, 3, 4, 5],
     "difficulty": "beginner",
     "interactionType": "drawing",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["rhythm_recognition", "musical_notation", "creativity"],
     "learningObjectives": [
       "Understand basic rhythm patterns",
@@ -75,7 +75,7 @@
     "gradeLevel": [3, 4, 5, 6],
     "difficulty": "intermediate",
     "interactionType": "simulation",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["instrument_families", "ensemble_skills", "listening_analysis"],
     "learningObjectives": [
       "Identify instrument families",
@@ -163,7 +163,7 @@
     "gradeLevel": [6, 7, 8, 9, 10],
     "difficulty": "intermediate",
     "interactionType": "performance",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["performance_skills", "stage_presence", "confidence_building"],
     "learningObjectives": [
       "Develop performance confidence",
