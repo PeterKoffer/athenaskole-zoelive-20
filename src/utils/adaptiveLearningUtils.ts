@@ -1,7 +1,5 @@
-
 import { UserProgress } from '@/services/progressPersistence';
 import { DEFAULT_TRAINING_MINUTES } from '@/constants/lesson';
-
 export const calculateRecommendedSessionTime = (userProgress: UserProgress | null): number => {
   if (!userProgress) return DEFAULT_TRAINING_MINUTES;
 

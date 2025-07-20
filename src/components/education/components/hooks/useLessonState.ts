@@ -1,7 +1,6 @@
 
 import { useState, useRef } from 'react';
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
-
 export const useLessonState = () => {
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [score, setScore] = useState(0);
