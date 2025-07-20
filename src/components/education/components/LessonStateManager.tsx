@@ -4,6 +4,7 @@
 // Please use UnifiedLessonProvider and useUnifiedLesson instead
 
 import { useState, useCallback } from 'react';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export type LessonPhase = 'introduction' | 'lesson' | 'paused' | 'completed';
 export type StandardLessonPhase = 'introduction' | 'content-delivery' | 'interactive-game' | 'application' | 'creative-exploration' | 'summary';
@@ -17,7 +18,7 @@ export interface LessonState {
   // Enhanced tracking for standardized lessons
   currentActivityPhase?: StandardLessonPhase;
   phaseProgress?: number; // Percentage completion of current phase
-  totalLessonTime?: number; // Total lesson duration in seconds (should be 1200 for standard lessons)
+  totalLessonTime?: number; // Total lesson duration in seconds
 }
 
 export const useLessonStateManager = () => {
@@ -27,7 +28,7 @@ export const useLessonStateManager = () => {
     currentSegment: 0,
     totalSegments: 6, // Standard lesson structure: 6 phases
     score: 0,
-    totalLessonTime: 1200, // default lesson duration
+    totalLessonTime: DEFAULT_DAILY_UNIVERSE_SECONDS,
     phaseProgress: 0
   });
 

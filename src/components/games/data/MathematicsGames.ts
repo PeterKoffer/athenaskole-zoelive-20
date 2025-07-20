@@ -13,7 +13,7 @@ const fallbackMathematicsGames: CurriculumGame[] = [
     gradeLevel: [1, 2, 3],
     difficulty: "beginner",
     interactionType: "click-sequence",
-    timeEstimate: "15-20 min",
+    timeEstimate: "~15 min",
     skillAreas: ["basic_addition", "number_recognition", "problem_solving"],
     learningObjectives: [
       "Master single-digit addition",

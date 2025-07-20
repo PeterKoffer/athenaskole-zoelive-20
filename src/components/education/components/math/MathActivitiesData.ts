@@ -1,12 +1,11 @@
 
 import { LessonActivity } from '../types/LessonTypes';
 import { mathBattleArenaActivity } from './MathBattleArenaActivity';
-
-// Diverse math activities with proper timing (total ~default duration = 1200 seconds)
+// Diverse math activities with flexible timing
+th activities with proper timing (total ~default duration = 1200 seconds)
 export const mathActivities: LessonActivity[] = [
   // Start with the exciting Math Battle Arena
   mathBattleArenaActivity,
-  
   // COUNTING & BASIC OPERATIONS (3 minutes)
   {
     id: 'math-counting-1',

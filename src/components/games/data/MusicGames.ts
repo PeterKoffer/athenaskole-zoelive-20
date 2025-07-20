@@ -13,7 +13,7 @@ const fallbackMusicGames: CurriculumGame[] = [
     gradeLevel: [2, 3, 4, 5],
     difficulty: "beginner",
     interactionType: "drawing",
-    timeEstimate: "20-25 min",
+    timeEstimate: "~25 min",
     skillAreas: ["rhythm_recognition", "musical_notation", "creativity"],
     learningObjectives: [
       "Understand basic rhythm patterns",

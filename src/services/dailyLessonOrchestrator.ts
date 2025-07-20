@@ -1,7 +1,7 @@
 // Daily Lesson Orchestrator - Creates targeted learning experiences
 import { CurriculumManager, LearningUnit } from './curriculumManager';
 import { UserLearningProfileService } from './userLearningProfileService';
-import { DEFAULT_LESSON_MINUTES } from '@/constants/lesson';
+import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 
 export interface DailyLessonPlan {
   date: string;
@@ -37,7 +37,8 @@ export interface DailyActivity {
 }
 
 export class DailyLessonOrchestrator {
-  private static readonly TARGET_DAILY_MINUTES = DEFAULT_LESSON_MINUTES; // configurable lesson length
+  // Target length for a full daily learning universe
+  private static readonly TARGET_DAILY_MINUTES = DEFAULT_DAILY_UNIVERSE_MINUTES;
   private static readonly ACTIVITY_TYPES_DISTRIBUTION = {
     instruction: 0.30,     // 30% - Learning new concepts
     practice: 0.40,       // 40% - Practicing skills  
@@ -334,7 +335,7 @@ export class DailyLessonOrchestrator {
       notes.push('Uses visual representations and diagrams for concept explanation');
     }
     
-    if (studentProfile.attention_span_minutes < DEFAULT_LESSON_MINUTES) {
+    if (studentProfile.attention_span_minutes < DEFAULT_DAILY_UNIVERSE_MINUTES) {
       notes.push('Optimized for focused learning sessions');
     }
     

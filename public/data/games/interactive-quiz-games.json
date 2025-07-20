@@ -75,7 +75,7 @@
     "gradeLevel": [3, 4, 5, 6, 7, 8],
     "difficulty": "intermediate",
     "interactionType": "multiple-choice",
-    "timeEstimate": "15-20 min",
+    "timeEstimate": "~15 min",
     "skillAreas": ["quick_thinking", "general_knowledge", "time_management", "competitive_learning"],
     "learningObjectives": [
       "Test knowledge across subjects",

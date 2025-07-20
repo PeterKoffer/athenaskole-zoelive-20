@@ -38,6 +38,18 @@ This enhanced lesson system provides **flexible, high-quality content** for each
 - Real-world application scenarios
 - Creative exploration opportunities
 - Immediate feedback and encouragement
+
+## 🗺️ Two Paths of Learning
+
+1. **Daily Learning Universe**
+   - Multi-subject adventures lasting around **2–3 hours**
+   - Adapted to school and teacher settings as well as each student's skills
+   - Can span a single day or continue across a week for deeper projects
+
+2. **Training Ground**
+   - Focused practice on a single subject
+   - Sessions generated on demand and can run as long as needed
+   - Ideal for rehearsing specific skills or catching up on missed concepts
 - Celebration of student growth
 
 ## 🏗️ System Architecture

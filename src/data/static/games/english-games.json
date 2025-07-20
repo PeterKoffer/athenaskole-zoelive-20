@@ -30,7 +30,7 @@
     "gradeLevel": [1, 2],
     "difficulty": "beginner",
     "interactionType": "click-sequence",
-    "timeEstimate": "15-20 min",
+    "timeEstimate": "~15 min",
     "skillAreas": ["phonics", "letter_sounds", "reading_basics", "decoding"],
     "learningObjectives": [
       "Recognize letter sounds",

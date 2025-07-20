@@ -31,7 +31,7 @@
     "gradeLevel": [1, 2, 3],
     "difficulty": "beginner",
     "interactionType": "audio",
-    "timeEstimate": "15-20 min",
+    "timeEstimate": "~15 min",
     "skillAreas": ["pitch_recognition", "listening_skills", "aural_awareness"],
     "learningObjectives": [
       "Distinguish between high and low pitches",

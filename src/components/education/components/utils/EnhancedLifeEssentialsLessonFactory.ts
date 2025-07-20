@@ -1,6 +1,7 @@
 
 import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export const generateLifeEssentialsLesson = (
   gradeLevel: number,
@@ -34,12 +35,12 @@ export const generateLifeEssentialsLesson = (
     title: 'Life Essentials: Navigating Adulthood',
     overview: 'Interactive life skills lesson',
     phases,
-    estimatedTotalDuration: 1200,
+    estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     learningObjectives: ['Learn essential life skills'],
     materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
     keywords: ['life skills', 'adulthood'],
-    estimatedDuration: 1200,
+    estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     objectives: ['Learn essential life skills'],
     difficulty: 3,
     prerequisites: [],

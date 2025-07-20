@@ -1,6 +1,7 @@
 
 import { LessonActivity } from '../types/LessonTypes';
 import { generateEnhancedLesson, EnhancedLessonConfig } from './EnhancedLessonGenerator';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export interface NELIESessionConfig {
   subject: string;
@@ -87,7 +88,7 @@ class NELIESessionGenerator {
         explanationStyle: config.preferredLearningStyle || 'mixed'
       },
       subjects: config.subjects?.reduce((acc: any, subject: string) => {
-        acc[subject] = { lesson: { totalDuration: 1200 } };
+        acc[subject] = { lesson: { totalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS } };
         return acc;
       }, {}),
       metadata: {
@@ -223,7 +224,7 @@ class NELIESessionGenerator {
 export const NELIEHelpers = {
   generateMathLesson: (gradeLevel: number, learningStyle: string) => ({
     lesson: {
-      totalDuration: 1200,
+      totalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       metadata: { skillArea: 'mathematics' },
       phases: [{
         content: {
@@ -257,12 +258,12 @@ export const NELIEHelpers = {
         metadata: { subject: 'bodyLab', skillArea: 'health' },
         content: { text: 'Welcome to your healthy living lesson!' }
       }],
-      estimatedTotalDuration: 1200,
+      estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       learningObjectives: ['Learn about healthy living'],
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: ['health', 'wellness'],
-      estimatedDuration: 1200,
+      estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       objectives: ['Learn about healthy living'],
       difficulty: 2,
       prerequisites: [],
@@ -290,12 +291,12 @@ export const NELIEHelpers = {
         metadata: { subject: 'globalGeography', skillArea: 'geography' },
         content: { text: 'Welcome to your geography lesson!' }
       }],
-      estimatedTotalDuration: 1200,
+      estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       learningObjectives: ['Learn about world geography'],
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: ['geography', 'world'],
-      estimatedDuration: 1200,
+      estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       objectives: ['Learn about world geography'],
       difficulty: 2,
       prerequisites: [],
@@ -323,12 +324,12 @@ export const NELIEHelpers = {
         metadata: { subject: 'lifeEssentials', skillArea: 'lifeskills' },
         content: { text: 'Welcome to your life skills lesson!' }
       }],
-      estimatedTotalDuration: 1200,
+      estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       learningObjectives: ['Learn essential life skills'],
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: ['life skills', 'adulthood'],
-      estimatedDuration: 1200,
+      estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       objectives: ['Learn essential life skills'],
       difficulty: 3,
       prerequisites: [],
@@ -356,12 +357,12 @@ export const NELIEHelpers = {
         metadata: { subject: 'worldHistoryReligions', skillArea: 'history' },
         content: { text: 'Welcome to your history lesson!' }
       }],
-      estimatedTotalDuration: 1200,
+      estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       learningObjectives: ['Learn about world history'],
       materials: ['Interactive content'],
       assessmentMethods: ['Interactive exercises'],
       keywords: ['history', 'religion'],
-      estimatedDuration: 1200,
+      estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
       objectives: ['Learn about world history'],
       difficulty: 3,
       prerequisites: [],

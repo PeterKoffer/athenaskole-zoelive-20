@@ -1,6 +1,7 @@
 
 import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export const generateBodyLabLesson = (
   gradeLevel: number,
@@ -34,12 +35,12 @@ export const generateBodyLabLesson = (
     title: 'BodyLab: Healthy Living',
     overview: 'Interactive health and wellness lesson',
     phases,
-    estimatedTotalDuration: 1200,
+    estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     learningObjectives: ['Learn about healthy living'],
     materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
     keywords: ['health', 'wellness'],
-    estimatedDuration: 1200,
+    estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     objectives: ['Learn about healthy living'],
     difficulty: 2,
     prerequisites: [],

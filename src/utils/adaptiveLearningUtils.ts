@@ -1,14 +1,12 @@
-
 import { UserProgress } from '@/services/progressPersistence';
-import { DEFAULT_LESSON_MINUTES } from '@/constants/lesson';
-
+import { DEFAULT_TRAINING_MINUTES } from '@/constants/lesson';
 export const calculateRecommendedSessionTime = (userProgress: UserProgress | null): number => {
-  if (!userProgress) return DEFAULT_LESSON_MINUTES;
+  if (!userProgress) return DEFAULT_TRAINING_MINUTES;
 
   const { accuracy_rate, attempts_count } = userProgress;
   
   // Base time on past performance
-  let recommendedTime = DEFAULT_LESSON_MINUTES;
+  let recommendedTime = DEFAULT_TRAINING_MINUTES;
 
   // Adjust based on accuracy
   if (accuracy_rate > 80) {

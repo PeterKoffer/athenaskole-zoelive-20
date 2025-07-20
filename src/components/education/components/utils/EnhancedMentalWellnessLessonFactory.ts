@@ -1,6 +1,7 @@
 
 import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export const generateMentalWellnessLesson = (
   gradeLevel: number,
@@ -34,12 +35,12 @@ export const generateMentalWellnessLesson = (
     title: 'Mental Wellness & Mindfulness',
     overview: 'Interactive mental wellness lesson',
     phases,
-    estimatedTotalDuration: 1200,
+    estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     learningObjectives: ['Learn about mental wellness'],
     materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
     keywords: ['wellness', 'mindfulness'],
-    estimatedDuration: 1200,
+    estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     objectives: ['Learn about mental wellness'],
     difficulty: 2,
     prerequisites: [],

@@ -55,7 +55,7 @@ export class DailyLessonGenerator {
     // Determine skill focus based on weaknesses and grade level
     const focusAreas = CurriculumService.determineFocusAreas(subject, gradeLevel, studentProgress);
     
-    // Generate 6-8 activities for a complete lesson (20-25 minutes)
+    // Generate multiple activities for a complete lesson
     for (let i = 0; i < 7; i++) {
       const activityType = this.getActivityTypeForIndex(i);
       const focusArea = focusAreas[i % focusAreas.length];
