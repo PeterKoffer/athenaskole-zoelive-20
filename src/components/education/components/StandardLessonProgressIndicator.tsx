@@ -5,7 +5,7 @@ import { StandardLessonPhase } from './LessonStateManager';
 interface StandardLessonProgressIndicatorProps {
   currentPhase: StandardLessonPhase;
   timeElapsed: number; // in seconds
-  totalDuration?: number; // in seconds, defaults to 1200 (20 minutes)
+  totalDuration?: number; // in seconds, defaults to 1200
   phaseProgress?: number; // percentage of current phase completed
 }
 

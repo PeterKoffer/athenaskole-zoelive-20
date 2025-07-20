@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLessonTimer } from '../../hooks/useLessonTimer';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { LessonActivity } from '../types/LessonTypes';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 interface UseStableLessonManagerProps {
   subject: string;
@@ -17,7 +18,7 @@ const generateTemplateBasedActivities = (subject: string): LessonActivity[] => {
   const activities: LessonActivity[] = [];
   const lessonId = `lesson-${Date.now()}`;
 
-  // Follow the established 20-minute lesson template structure
+  // Follow the established lesson template structure
   
   // 1. Engaging Introduction (2-3 minutes)
   activities.push({
@@ -177,7 +178,7 @@ export const useStableLessonManager = ({
   const { sessionTimer, startTimer, stopTimer } = useLessonTimer();
   const { speakAsNelie, isSpeaking, isEnabled, toggleEnabled, forceStopAll } = useUnifiedSpeech();
 
-  const targetLessonLength = 1200; // 20 minutes as per template
+  const targetLessonLength = DEFAULT_LESSON_SECONDS; // default lesson length
   const currentActivity = allActivities[currentActivityIndex] || null;
 
   // Use manual index if provided

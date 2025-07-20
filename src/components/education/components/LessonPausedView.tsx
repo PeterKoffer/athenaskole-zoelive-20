@@ -15,7 +15,7 @@ const LessonPausedView = ({ onResume, onBackToProgram }: LessonPausedViewProps) 
         <Pause className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-4">Lesson Paused</h2>
         <p className="text-yellow-200 mb-6">
-          Your progress has been saved. You can resume this 20-minute lesson anytime.
+          Your progress has been saved. You can resume this lesson anytime.
         </p>
         <div className="flex justify-center space-x-4">
           <Button onClick={onResume} className="bg-green-600 hover:bg-green-700">

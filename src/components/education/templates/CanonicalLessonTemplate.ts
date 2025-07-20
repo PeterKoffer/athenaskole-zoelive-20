@@ -1,4 +1,5 @@
 import { LessonActivity, SubjectLessonPlan } from '../components/types/LessonTypes';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 export interface CanonicalLessonConfig {
   subject: string;
@@ -160,7 +161,7 @@ export const generateQuickCanonicalLesson = (
     subject,
     skillArea,
     gradeLevel,
-    sessionDuration: 1200, // 20 minutes
+    sessionDuration: DEFAULT_LESSON_SECONDS,
     learningObjectives: [
       `Understand ${skillArea} fundamentals`,
       `Apply ${skillArea} concepts`,

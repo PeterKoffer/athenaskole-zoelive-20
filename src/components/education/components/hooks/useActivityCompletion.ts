@@ -1,5 +1,6 @@
 
 import { useCallback } from 'react';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 type UseActivityCompletionProps = {
   currentActivityIndex: number;
@@ -52,7 +53,7 @@ export const useActivityCompletion = ({
 
     const nextIndex = currentActivityIndex + 1;
     const hasMoreActivities = nextIndex < allActivitiesLength;
-    const hasReachedTimeLimit = timeElapsed >= 1200; // 20 minutes
+    const hasReachedTimeLimit = timeElapsed >= DEFAULT_LESSON_SECONDS; // time limit
 
     console.log('🔍 Checking progression:', {
       nextIndex,
