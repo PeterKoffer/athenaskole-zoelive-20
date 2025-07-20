@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import UniversalLearningIntroduction from './components/universal/UniversalLearningIntroduction';
 import UniversalLearningLoading from './components/universal/UniversalLearningLoading';
 import UnifiedLessonManager from './components/UnifiedLessonManager';
+import ClassroomEnvironment from './components/shared/ClassroomEnvironment';
+import { getClassroomConfig } from './components/shared/classroomConfigs';
 
 interface UniversalLearningProps {
   subject: string;
@@ -17,6 +19,7 @@ const UniversalLearning = ({ subject, skillArea }: UniversalLearningProps) => {
   const navigate = useNavigate();
   const [showIntroduction, setShowIntroduction] = useState(true);
   const [isStartingLesson, setIsStartingLesson] = useState(false);
+  const classroomConfig = getClassroomConfig(subject);
 
   console.log('🎓 UniversalLearning:', { subject, skillArea, showIntroduction, user: !!user });
 
@@ -55,22 +58,26 @@ const UniversalLearning = ({ subject, skillArea }: UniversalLearningProps) => {
     }
     
     return (
-      <UniversalLearningIntroduction
-        subject={subject}
-        skillArea={skillArea}
-        onIntroductionComplete={handleIntroductionComplete}
-      />
+      <ClassroomEnvironment config={classroomConfig}>
+        <UniversalLearningIntroduction
+          subject={subject}
+          skillArea={skillArea}
+          onIntroductionComplete={handleIntroductionComplete}
+        />
+      </ClassroomEnvironment>
     );
   }
 
   // After introduction, show the actual learning content
   return (
-    <UnifiedLessonManager
-      subject={subject}
-      skillArea={skillArea}
-      studentName={studentName}
-      onBackToProgram={handleBackToTrainingGround}
-    />
+    <ClassroomEnvironment config={classroomConfig}>
+      <UnifiedLessonManager
+        subject={subject}
+        skillArea={skillArea}
+        studentName={studentName}
+        onBackToProgram={handleBackToTrainingGround}
+      />
+    </ClassroomEnvironment>
   );
 };
 

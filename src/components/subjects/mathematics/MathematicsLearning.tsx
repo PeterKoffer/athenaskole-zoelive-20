@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import FullyFunctionalMathLearning from "../../education/components/math/FullyFunctionalMathLearning";
+import UniversalLearning from "../../education/UniversalLearning";
 import ClassroomEnvironment from "../../education/components/shared/ClassroomEnvironment";
 import { getClassroomConfig } from "../../education/components/shared/classroomConfigs";
 
@@ -38,12 +38,6 @@ const MathematicsLearning = () => {
     };
   }, [forceStopAll]);
 
-  const handleBackToProgram = () => {
-    console.log('🔇 Stopping Nelie speech before navigating back to program');
-    forceStopAll();
-    navigate('/daily-program');
-  };
-
   if (loading) {
     return (
       <ClassroomEnvironment config={classroomConfig}>
@@ -61,10 +55,13 @@ const MathematicsLearning = () => {
     return null;
   }
 
-  console.log('🎯 MathematicsLearning rendering FullyFunctionalMathLearning');
+  console.log('🎯 MathematicsLearning rendering UniversalLearning');
 
   return (
-    <FullyFunctionalMathLearning onBackToProgram={handleBackToProgram} />
+    <UniversalLearning 
+      subject="mathematics" 
+      skillArea="general_mathematics"
+    />
   );
 };
 

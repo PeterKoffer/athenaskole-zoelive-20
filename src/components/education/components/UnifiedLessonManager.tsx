@@ -1,23 +1,7 @@
 
-import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { UserMetadata } from '@/types/auth'; // Import UserMetadata
-import ClassroomEnvironment from './shared/ClassroomEnvironment';
-import { getClassroomConfig } from './shared/classroomConfigs';
-import MathematicsWelcome from './welcome/MathematicsWelcome';
-import { EnglishWelcome } from './welcome/EnglishWelcome';
-import { ScienceWelcome } from './welcome/ScienceWelcome';
-import { ComputerScienceWelcome } from './welcome/ComputerScienceWelcome';
-import { MusicWelcome } from './welcome/MusicWelcome';
-import { CreativeArtsWelcome } from './welcome/CreativeArtsWelcome';
-import { BodyLabWelcome } from './welcome/BodyLabWelcome';
-import { MentalWellnessWelcome } from './welcome/MentalWellnessWelcome';
-import { LanguageLabWelcome } from './welcome/LanguageLabWelcome';
-import { HistoryReligionWelcome } from './welcome/HistoryReligionWelcome';
-import { GeographyWelcome } from './welcome/GeographyWelcome';
-import { LifeEssentialsWelcome } from './welcome/LifeEssentialsWelcome';
-import ImprovedLearningSession from '@/components/adaptive-learning/components/ImprovedLearningSession';
-import MathLessonHeader from './math/MathLessonHeader';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 
 interface UnifiedLessonManagerProps {
   subject: string;
@@ -26,119 +10,63 @@ interface UnifiedLessonManagerProps {
   onBackToProgram: () => void;
 }
 
-const UnifiedLessonManager = ({ subject, skillArea, studentName, onBackToProgram }: UnifiedLessonManagerProps) => {
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [timeElapsed, setTimeElapsed] = useState(0);
-  const [score, setScore] = useState(0);
-  const [correctStreak, setCorrectStreak] = useState(0);
-  const { user } = useAuth();
-  const classroomConfig = getClassroomConfig(subject);
+const UnifiedLessonManager = ({
+  subject,
+  skillArea,
+  studentName,
+  onBackToProgram
+}: UnifiedLessonManagerProps) => {
+  const subjectName = subject.charAt(0).toUpperCase() + subject.slice(1).replace('-', ' ');
 
-  console.log('🎓 UnifiedLessonManager state:', {
-    subject,
-    skillArea,
-    showWelcome,
-    studentName: (user?.user_metadata as UserMetadata)?.first_name || studentName,
-    timestamp: new Date().toISOString()
-  });
-
-  const handleStartLesson = () => {
-    console.log('🚀 Starting lesson - transitioning from welcome to main content');
-    setShowWelcome(false);
-  };
-
-  const renderWelcome = () => {
-    const welcomeProps = {
-      onStartLesson: handleStartLesson,
-      studentName: (user?.user_metadata as UserMetadata)?.first_name || studentName
-    };
-
-    console.log('📝 Rendering welcome for subject:', subject.toLowerCase());
-
-    switch (subject.toLowerCase()) {
-      case 'mathematics':
-      case 'math':
-        return <MathematicsWelcome {...welcomeProps} />;
-      case 'english':
-        return <EnglishWelcome {...welcomeProps} />;
-      case 'science':
-        return <ScienceWelcome {...welcomeProps} />;
-      case 'computer_science':
-      case 'computer-science':
-        return <ComputerScienceWelcome {...welcomeProps} />;
-      case 'music':
-        return <MusicWelcome {...welcomeProps} />;
-      case 'creative_arts':
-      case 'creative-arts':
-        return <CreativeArtsWelcome {...welcomeProps} />;
-      case 'body_lab':
-      case 'body-lab':
-        return <BodyLabWelcome {...welcomeProps} />;
-      case 'mental_wellness':
-      case 'mental-wellness':
-        return <MentalWellnessWelcome {...welcomeProps} />;
-      case 'language_lab':
-      case 'language-lab':
-        return <LanguageLabWelcome {...welcomeProps} />;
-      case 'history_religion':
-      case 'history-religion':
-        return <HistoryReligionWelcome {...welcomeProps} />;
-      case 'geography':
-        return <GeographyWelcome {...welcomeProps} />;
-      case 'life_essentials':
-      case 'life-essentials':
-        return <LifeEssentialsWelcome {...welcomeProps} />;
-      default:
-        console.log('⚠️ Unknown subject, defaulting to MathematicsWelcome for:', subject);
-        return <MathematicsWelcome {...welcomeProps} />;
-    }
-  };
-
-  // Always show welcome screen first
-  if (showWelcome) {
-    console.log('👋 Displaying welcome screen for', subject, 'at', new Date().toISOString());
-    return (
-      <ClassroomEnvironment config={classroomConfig}>
-        <div className="min-h-screen flex items-center justify-center">
-          {renderWelcome()}
-        </div>
-      </ClassroomEnvironment>
-    );
-  }
-
-  // Show main lesson content with proper scoreboard for mathematics
-  console.log('📚 Displaying main lesson content for', subject, 'at', new Date().toISOString());
   return (
-    <ClassroomEnvironment config={classroomConfig}>
-      <div className="min-h-screen py-4 px-2">
-        {/* Add MathLessonHeader with scoreboard for mathematics */}
-        {subject.toLowerCase() === 'mathematics' && (
-          <MathLessonHeader
-            studentName={(user?.user_metadata as UserMetadata)?.first_name || studentName}
-            timeElapsed={timeElapsed}
-            targetLessonLength={20}
-            score={score}
-            currentActivityIndex={0}
-            totalRealActivities={6}
-            correctStreak={correctStreak}
-            onBackToProgram={onBackToProgram}
-            canNavigateBack={false}
-            canNavigateForward={true}
-            currentActivityType="interactive-question"
-            currentActivityPhase="active"
-          />
-        )}
-        
-        <div className="flex items-center justify-center">
-          <ImprovedLearningSession
-            subject={subject}
-            skillArea={skillArea}
-            difficultyLevel={2}
-            onBack={onBackToProgram}
-          />
+    <div className="min-h-screen p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            onClick={onBackToProgram}
+            variant="outline"
+            className="bg-white/90 border-gray-300 text-gray-700 hover:bg-white"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Training Ground
+          </Button>
+          
+          <div className="text-white text-right">
+            <h1 className="text-2xl font-bold">Hello, {studentName}!</h1>
+            <p className="text-white/80">Learning {subjectName}</p>
+          </div>
         </div>
+
+        {/* Main Content */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center text-2xl text-gray-800">
+              <BookOpen className="w-6 h-6 mr-3" />
+              {subjectName} Lesson
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            <div className="text-center py-12">
+              <div className="text-6xl mb-6">📚</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Your {subjectName} lesson is loading...
+              </h2>
+              <p className="text-gray-600 mb-6">
+                We're preparing an interactive learning experience for {skillArea.replace('_', ' ')}.
+              </p>
+              
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-75"></div>
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-150"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </ClassroomEnvironment>
+    </div>
   );
 };
 
