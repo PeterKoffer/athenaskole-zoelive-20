@@ -8,10 +8,10 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     primaryColor: '#3B82F6',
     secondaryColor: '#1E40AF',
     accentColor: '#60A5FA',
-    backgroundImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    backgroundImage: 'https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
     subjectColor: '#3B82F6',
     overlayOpacity: 0.7,
-    environmentDescription: 'Modern technology-focused learning environment perfect for mathematical computations and programming logic'
+    environmentDescription: 'Bright and organized classroom environment perfect for mathematical learning and problem-solving'
   },
   'science': {
     subjectName: 'Science',
