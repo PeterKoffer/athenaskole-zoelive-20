@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLessonTimer } from '../../hooks/useLessonTimer';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useLessonActivityGenerator } from './useLessonActivityGenerator';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 interface UseUnifiedLessonTemplateProps {
   subject: string;
@@ -33,7 +34,7 @@ export const useUnifiedLessonTemplate = ({
   const { sessionTimer, startTimer, stopTimer } = useLessonTimer();
   const { speakAsNelie, isSpeaking, isEnabled, toggleEnabled, forceStopAll } = useUnifiedSpeech();
 
-  const targetLessonLength = 1200; // 20 minutes
+  const targetLessonLength = DEFAULT_LESSON_SECONDS; // default lesson length
   const currentActivity = allActivities[currentActivityIndex] || null;
 
   // Debug current activity

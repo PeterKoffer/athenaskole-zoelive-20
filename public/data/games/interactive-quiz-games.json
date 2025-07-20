@@ -9,7 +9,7 @@
     "gradeLevel": [3, 4, 5, 6, 7],
     "difficulty": "intermediate",
     "interactionType": "click-sequence",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["error_analysis", "problem_solving", "mathematical_reasoning", "attention_to_detail"],
     "learningObjectives": [
       "Identify common mathematical errors",
@@ -53,7 +53,7 @@
     "gradeLevel": [2, 3, 4, 5, 6],
     "difficulty": "beginner",
     "interactionType": "click-sequence",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["vocabulary", "word_recognition", "pattern_recognition", "reading_skills"],
     "learningObjectives": [
       "Expand vocabulary knowledge",
@@ -75,7 +75,7 @@
     "gradeLevel": [3, 4, 5, 6, 7, 8],
     "difficulty": "intermediate",
     "interactionType": "multiple-choice",
-    "timeEstimate": "15-20 min",
+    "timeEstimate": "~15 min",
     "skillAreas": ["quick_thinking", "general_knowledge", "time_management", "competitive_learning"],
     "learningObjectives": [
       "Test knowledge across subjects",

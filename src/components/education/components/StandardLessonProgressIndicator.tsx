@@ -1,11 +1,12 @@
 import { Progress } from '@/components/ui/progress';
 import { Clock, CheckCircle, Play } from 'lucide-react';
 import { StandardLessonPhase } from './LessonStateManager';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 interface StandardLessonProgressIndicatorProps {
   currentPhase: StandardLessonPhase;
   timeElapsed: number; // in seconds
-  totalDuration?: number; // in seconds, defaults to 1200 (20 minutes)
+  totalDuration?: number; // in seconds
   phaseProgress?: number; // percentage of current phase completed
 }
 
@@ -57,7 +58,7 @@ const PHASE_INFO = {
 const StandardLessonProgressIndicator = ({
   currentPhase,
   timeElapsed,
-  totalDuration = 1200,
+  totalDuration = DEFAULT_DAILY_UNIVERSE_SECONDS,
   phaseProgress = 0
 }: StandardLessonProgressIndicatorProps) => {
   const overallProgress = (timeElapsed / totalDuration) * 100;

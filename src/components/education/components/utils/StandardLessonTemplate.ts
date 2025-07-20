@@ -1,7 +1,8 @@
 import { LessonActivity, SubjectLessonPlan, GrandChallenge } from '../types/LessonTypes';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 /**
- * ENGAGING 20-MINUTE LESSON STRUCTURE
+ * ENGAGING LESSON STRUCTURE
  * Transform boring lessons into interactive adventures!
  */
 
@@ -204,10 +205,10 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
     subject: config.subject,
     skillArea: config.skillArea,
     gradeLevel: config.gradeLevel,
-    totalDuration: 1200, // 20 minutes
+    totalDuration: DEFAULT_LESSON_SECONDS, // default lesson length
     phases: activities,
     activities: activities, // Required property
-    estimatedDuration: 1200, // Required property
+    estimatedDuration: DEFAULT_LESSON_SECONDS, // Required property
     objectives: config.missionObjectives, // Required property
     learningObjectives: config.missionObjectives,
     difficulty: config.gradeLevel <= 3 ? 1 : config.gradeLevel <= 6 ? 2 : config.gradeLevel <= 9 ? 3 : 4, // Required property
@@ -511,12 +512,12 @@ export function validateStandardLesson(lesson: SubjectLessonPlan): {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Check total duration (should be 20 minutes = 1200 seconds)
-  if (lesson.totalDuration && lesson.totalDuration !== 1200) {
+  // Check total duration (should match configured length)
+  if (lesson.totalDuration && lesson.totalDuration !== DEFAULT_LESSON_SECONDS) {
     if (lesson.totalDuration < 1140 || lesson.totalDuration > 1260) {
-      errors.push(`Total duration ${lesson.totalDuration}s is outside acceptable range (1140-1260s for 19-21 minutes)`);
+      errors.push(`Total duration ${lesson.totalDuration}s is outside acceptable range (1140-1260s)`);
     } else {
-      warnings.push(`Total duration ${lesson.totalDuration}s is close but not exactly 20 minutes (1200s)`);
+      warnings.push(`Total duration ${lesson.totalDuration}s is close to the expected value (${DEFAULT_LESSON_SECONDS}s)`);
     }
   }
 

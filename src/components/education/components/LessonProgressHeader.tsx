@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Star } from 'lucide-react';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 interface LessonProgressHeaderProps {
   timeElapsed: number;
@@ -19,7 +20,7 @@ const LessonProgressHeader = ({
   score,
   currentActivityIndex,
   totalActivities,
-  targetLessonLength = 1200, // 20 minutes in seconds
+  targetLessonLength = DEFAULT_LESSON_SECONDS,
   correctStreak,
   engagementLevel,
   questionsGenerated

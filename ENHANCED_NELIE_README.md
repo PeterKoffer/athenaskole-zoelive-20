@@ -1,6 +1,6 @@
 # Enhanced NELIE Lesson System
 
-This enhanced lesson system provides **20-25 minutes of unique, high-quality content** for each class across all 6 subjects, with dynamic adaptation to student learning preferences and comprehensive K-12 curriculum alignment.
+This enhanced lesson system provides **flexible, high-quality content** for each class across all 6 subjects, with dynamic adaptation to student learning preferences and comprehensive K-12 curriculum alignment.
 
 ## 🎯 Key Features
 
@@ -12,9 +12,9 @@ This enhanced lesson system provides **20-25 minutes of unique, high-quality con
 - **Computer Science**: Computational thinking, algorithms, programming
 - **Creative Arts**: Visual arts, expression, creativity
 
-### ✅ Enhanced Lesson Duration (20-25 Minutes)
-- Flexible timing based on learning style and grade level
-- Optimal attention span for K-12 students
+### ✅ Flexible Lesson Duration
+- Timing adjusts based on learning style and grade level
+- Supports varying attention spans for K-12 students
 - Adaptive phase distribution for effective pacing
 
 ### ✅ Learning Style Adaptations
@@ -38,6 +38,18 @@ This enhanced lesson system provides **20-25 minutes of unique, high-quality con
 - Real-world application scenarios
 - Creative exploration opportunities
 - Immediate feedback and encouragement
+
+## 🗺️ Two Paths of Learning
+
+1. **Daily Learning Universe**
+   - Multi-subject adventures lasting around **2–3 hours**
+   - Adapted to school and teacher settings as well as each student's skills
+   - Can span a single day or continue across a week for deeper projects
+
+2. **Training Ground**
+   - Focused practice on a single subject
+   - Sessions generated on demand and can run as long as needed
+   - Ideal for rehearsing specific skills or catching up on missed concepts
 - Celebration of student growth
 
 ## 🏗️ System Architecture
@@ -45,7 +57,7 @@ This enhanced lesson system provides **20-25 minutes of unique, high-quality con
 ### Core Components
 
 #### 1. `EnhancedLessonGenerator.ts`
-- **Enhanced lesson duration system** (20-25 minutes)
+- **Flexible lesson duration system**
 - **Content uniqueness tracking** 
 - **Learning style adaptation engine**
 - **K-12 curriculum standards**
@@ -82,7 +94,7 @@ const session = NELIESessionGenerator.generateSession({
   enableUniqueness: true
 });
 
-// Result: 6 subjects × 20-25 minutes each = 2.5-3 hours total content
+// Result: 6 subjects with adaptable timing per session
 console.log(`Total duration: ${session.metadata.totalDuration / 60} minutes`);
 console.log(`Quality score: ${Object.values(session.metadata.qualityScores).reduce((a,b) => a+b) / 6}/100`);
 ```
@@ -115,7 +127,7 @@ console.log('Session 2 ID:', session2.sessionId);
 The system includes comprehensive quality validation:
 
 ### Quality Metrics (0-100 points)
-- **Duration Validation** (25 points): 20-25 minute target
+- **Duration Validation** (25 points): configurable target
 - **Content Uniqueness** (20 points): Session ID and tracking
 - **Learning Style Adaptation** (25 points): Style-specific content
 - **Curriculum Alignment** (20 points): Grade-appropriate standards
@@ -142,8 +154,8 @@ Comprehensive test suite covering all enhanced features:
 npm run test:unit src/test/unit/enhancedLessonSystem.test.ts
 ```
 
-### Test Coverage
-- **Enhanced Lesson Duration**: 20-25 minute validation
+-### Test Coverage
+- **Flexible Lesson Duration**: timing validation
 - **Content Uniqueness System**: Session tracking and uniqueness
 - **Learning Style Adaptations**: All 4 learning styles
 - **K-12 Curriculum Alignment**: Grade-appropriate content
@@ -188,8 +200,8 @@ function MyApp() {
 
 ### ✅ Problem Statement Requirements Met
 
-1. **20-25 minutes of unique, high-quality content** ✓
-   - Flexible duration system with learning style adjustments
+1. **Flexible, high-quality content** ✓
+   - Duration adapts to learning style and grade level
    - Quality validation ensuring 70%+ scores
 
 2. **All 6 subjects covered** ✓

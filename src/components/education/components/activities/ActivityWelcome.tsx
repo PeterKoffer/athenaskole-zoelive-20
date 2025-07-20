@@ -139,7 +139,7 @@ const ActivityWelcome = ({ activity, timeRemaining, isNelieReady }: ActivityWelc
           )}
           
           <div className="text-purple-300 mb-6">
-            20-minute enhanced lesson starting in {timeRemaining} seconds...
+            Lesson starting in {timeRemaining} seconds...
           </div>
 
           {/* Fixed button alignment with proper responsive layout */}

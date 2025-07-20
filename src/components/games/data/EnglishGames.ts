@@ -13,7 +13,7 @@ const fallbackEnglishGames: CurriculumGame[] = [
     gradeLevel: [2, 3, 4],
     difficulty: "beginner",
     interactionType: "multiple-choice",
-    timeEstimate: "20-25 min",
+    timeEstimate: "~25 min",
     skillAreas: ["reading_comprehension", "vocabulary", "inference"],
     learningObjectives: [
       "Improve reading fluency",

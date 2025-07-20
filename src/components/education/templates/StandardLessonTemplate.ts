@@ -1,7 +1,8 @@
 import { LessonActivity, SubjectLessonPlan } from '../components/types/LessonTypes';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 /**
- * ENGAGING 20-MINUTE LESSON STRUCTURE
+ * FLEXIBLE LESSON STRUCTURE
  * Transform boring lessons into interactive adventures!
  */
 
@@ -162,10 +163,10 @@ export function createEngagingLesson(config: EngagingLessonConfig): SubjectLesso
     subject: config.subject,
     skillArea: config.skillArea,
     gradeLevel: config.gradeLevel,
-    totalDuration: 1200,
+    totalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     phases: activities,
     activities,
-    estimatedDuration: 1200,
+    estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     objectives: config.missionObjectives,
     learningObjectives: config.missionObjectives,
     difficulty: config.gradeLevel <= 3 ? 1 : config.gradeLevel <= 6 ? 2 : config.gradeLevel <= 9 ? 3 : 4,

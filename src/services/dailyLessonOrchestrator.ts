@@ -1,6 +1,7 @@
-// Daily Lesson Orchestrator - Creates 20-minute targeted learning experiences
+// Daily Lesson Orchestrator - Creates targeted learning experiences
 import { CurriculumManager, LearningUnit } from './curriculumManager';
 import { UserLearningProfileService } from './userLearningProfileService';
+import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 
 export interface DailyLessonPlan {
   date: string;
@@ -36,7 +37,8 @@ export interface DailyActivity {
 }
 
 export class DailyLessonOrchestrator {
-  private static readonly TARGET_DAILY_MINUTES = 20; // 20-minute targeted lessons
+  // Target length for a full daily learning universe
+  private static readonly TARGET_DAILY_MINUTES = DEFAULT_DAILY_UNIVERSE_MINUTES;
   private static readonly ACTIVITY_TYPES_DISTRIBUTION = {
     instruction: 0.30,     // 30% - Learning new concepts
     practice: 0.40,       // 40% - Practicing skills  
@@ -49,7 +51,7 @@ export class DailyLessonOrchestrator {
     gradeLevel: number, 
     subject: string = 'mathematics'
   ): Promise<DailyLessonPlan> {
-    console.log(`🎯 Generating 20-minute lesson for Grade ${gradeLevel} ${subject}`);
+    console.log(`🎯 Generating lesson for Grade ${gradeLevel} ${subject}`);
     
     // Get student learning profile
     const studentProfile = await UserLearningProfileService.getLearningProfile(
@@ -64,8 +66,8 @@ export class DailyLessonOrchestrator {
     // Select appropriate units based on student readiness
     const selectedUnits = this.selectLearningUnits(availableUnits, studentProfile);
     
-    // Create activity sequence for 20-minute learning experience
-    const activitySequence = await this.createTwentyMinuteSequence(selectedUnits, studentProfile);
+    // Create activity sequence for targeted learning experience
+    const activitySequence = await this.createTimedSequence(selectedUnits, studentProfile);
     
     const lessonPlan: DailyLessonPlan = {
       date: new Date().toISOString().split('T')[0],
@@ -82,12 +84,12 @@ export class DailyLessonOrchestrator {
       }
     };
 
-    console.log(`✅ Generated 20-minute lesson with ${activitySequence.length} activities`);
+    console.log(`✅ Generated lesson with ${activitySequence.length} activities`);
     return lessonPlan;
   }
 
   private static selectLearningUnits(availableUnits: LearningUnit[], studentProfile: any): LearningUnit[] {
-    // For 20-minute lessons, focus on 1-2 learning units max
+    // For short lessons, focus on 1-2 learning units max
     const readinessScores = availableUnits.map(unit => ({
       unit,
       readiness: CurriculumManager.estimateStudentReadiness(studentProfile, unit)
@@ -96,13 +98,13 @@ export class DailyLessonOrchestrator {
     const suitableUnits = readinessScores
       .filter(item => item.readiness >= 60)
       .sort((a, b) => b.readiness - a.readiness)
-      .slice(0, 2) // Max 2 units for focused 20-minute lesson
+      .slice(0, 2) // Max 2 units for concise lesson
       .map(item => item.unit);
 
     return suitableUnits.length > 0 ? suitableUnits : [availableUnits[0]];
   }
 
-  private static async createTwentyMinuteSequence(units: LearningUnit[], studentProfile: any): Promise<DailyActivity[]> {
+  private static async createTimedSequence(units: LearningUnit[], studentProfile: any): Promise<DailyActivity[]> {
     const activities: DailyActivity[] = [];
     const targetMinutes = this.TARGET_DAILY_MINUTES;
     let currentMinutes = 0;
@@ -131,14 +133,14 @@ export class DailyLessonOrchestrator {
     activities.push(finalActivity);
     currentMinutes += finalActivity.duration_minutes;
 
-    // Adjust timing to exactly hit 20 minutes
-    this.adjustTimingTo20Minutes(activities, targetMinutes);
+    // Adjust timing to match target duration
+    this.adjustTimingToTargetMinutes(activities, targetMinutes);
 
-    console.log(`📋 Created 20-minute sequence: ${activities.length} activities, ${currentMinutes} minutes`);
+    console.log(`📋 Created sequence: ${activities.length} activities, ${currentMinutes} minutes`);
     return activities;
   }
 
-  private static adjustTimingTo20Minutes(activities: DailyActivity[], targetMinutes: number): void {
+  private static adjustTimingToTargetMinutes(activities: DailyActivity[], targetMinutes: number): void {
     const currentTotal = activities.reduce((sum, activity) => sum + activity.duration_minutes, 0);
     
     if (currentTotal !== targetMinutes) {
@@ -313,7 +315,7 @@ export class DailyLessonOrchestrator {
           "Take a moment to consider..."
         ],
         encouragement_messages: [
-          "You've learned so much in 20 minutes!",
+          "Great progress in this short lesson!",
           "Your understanding is growing!",
           "Ready for tomorrow's adventure!"
         ]
@@ -333,8 +335,8 @@ export class DailyLessonOrchestrator {
       notes.push('Uses visual representations and diagrams for concept explanation');
     }
     
-    if (studentProfile.attention_span_minutes < 20) {
-      notes.push('Optimized for 20-minute focused learning sessions');
+    if (studentProfile.attention_span_minutes < DEFAULT_DAILY_UNIVERSE_MINUTES) {
+      notes.push('Optimized for focused learning sessions');
     }
     
     if (studentProfile.overall_accuracy < 70) {
@@ -342,7 +344,7 @@ export class DailyLessonOrchestrator {
     }
     
     notes.push(`Adjusted for ${studentProfile.preferred_pace} learning pace`);
-    notes.push('Designed for exactly 20 minutes of engaged learning');
+    notes.push('Designed for optimal engaged learning duration');
     
     return notes;
   }

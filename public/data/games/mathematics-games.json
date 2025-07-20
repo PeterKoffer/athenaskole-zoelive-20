@@ -9,7 +9,7 @@
     "gradeLevel": [1, 2, 3],
     "difficulty": "beginner",
     "interactionType": "drag-drop",
-    "timeEstimate": "15-20 min",
+    "timeEstimate": "~15 min",
     "skillAreas": ["basic_addition", "number_recognition", "problem_solving"],
     "learningObjectives": [
       "Master single-digit addition",
@@ -31,7 +31,7 @@
     "gradeLevel": [4, 5, 6],
     "difficulty": "intermediate",
     "interactionType": "drag-drop",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["geometric_shapes", "spatial_reasoning", "measurement"],
     "learningObjectives": [
       "Identify geometric shapes",
@@ -53,7 +53,7 @@
     "gradeLevel": [1, 2],
     "difficulty": "beginner",
     "interactionType": "drag-drop",
-    "timeEstimate": "15-20 min",
+    "timeEstimate": "~15 min",
     "skillAreas": ["counting", "basic_addition", "basic_subtraction", "number_recognition"],
     "learningObjectives": [
       "Count objects from 1-100",
@@ -75,7 +75,7 @@
     "gradeLevel": [3, 4, 5],
     "difficulty": "intermediate",
     "interactionType": "click-sequence",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["multiplication", "times_tables", "problem_solving"],
     "learningObjectives": [
       "Memorize multiplication tables 1-12",
@@ -119,7 +119,7 @@
     "gradeLevel": [4, 5, 6],
     "difficulty": "intermediate",
     "interactionType": "click-sequence",
-    "timeEstimate": "20-25 min",
+    "timeEstimate": "25-30 min",
     "skillAreas": ["decimals", "place_value", "decimal_operations"],
     "learningObjectives": [
       "Understand decimal place value",

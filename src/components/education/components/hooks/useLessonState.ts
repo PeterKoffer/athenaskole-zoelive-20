@@ -1,5 +1,6 @@
 
 import { useState, useRef } from 'react';
+import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 
 export const useLessonState = () => {
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
@@ -7,7 +8,7 @@ export const useLessonState = () => {
   const [correctStreak, setCorrectStreak] = useState(0);
   const [lastResponseTime, setLastResponseTime] = useState<Date | null>(null);
   const lessonStartTime = useRef(Date.now());
-  const targetLessonLength = 20; // 20 minutes
+  const targetLessonLength = DEFAULT_DAILY_UNIVERSE_MINUTES;
 
   const timeElapsed = Math.floor((Date.now() - lessonStartTime.current) / 1000 / 60);
 

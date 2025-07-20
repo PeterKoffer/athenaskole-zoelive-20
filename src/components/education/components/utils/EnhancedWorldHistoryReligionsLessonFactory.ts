@@ -1,6 +1,7 @@
 
 import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export const generateWorldHistoryReligionsLesson = (
   gradeLevel: number,
@@ -34,12 +35,12 @@ export const generateWorldHistoryReligionsLesson = (
     title: 'World History & Global Religions',
     overview: 'Interactive history and religions lesson',
     phases,
-    estimatedTotalDuration: 1200,
+    estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     learningObjectives: ['Learn about world history'],
     materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
     keywords: ['history', 'religion'],
-    estimatedDuration: 1200,
+    estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     objectives: ['Learn about world history'],
     difficulty: 3,
     prerequisites: [],

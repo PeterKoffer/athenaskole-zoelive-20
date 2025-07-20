@@ -1,6 +1,7 @@
 
 import { EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { LessonActivity } from '../types/LessonTypes';
+import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 
 export const generateGlobalGeographyLesson = (
   gradeLevel: number,
@@ -34,12 +35,12 @@ export const generateGlobalGeographyLesson = (
     title: 'Global Geography Explorer',
     overview: 'Interactive geography lesson',
     phases,
-    estimatedTotalDuration: 1200,
+    estimatedTotalDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     learningObjectives: ['Learn about world geography'],
     materials: ['Interactive content'],
     assessmentMethods: ['Interactive exercises'],
     keywords: ['geography', 'world'],
-    estimatedDuration: 1200,
+    estimatedDuration: DEFAULT_DAILY_UNIVERSE_SECONDS,
     objectives: ['Learn about world geography'],
     difficulty: 2,
     prerequisites: [],

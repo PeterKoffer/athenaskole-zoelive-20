@@ -52,7 +52,7 @@ const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearn
               <div className="animate-spin w-8 h-8 border-4 border-lime-400 border-t-transparent rounded-full mx-auto mb-4"></div>
               <h2 className="text-2xl font-bold text-white mb-2">Preparing Your Mathematics Lesson</h2>
               <p className="text-gray-300 mb-4">
-                Creating a personalized 20-minute lesson with diverse activities...
+                Creating a personalized lesson with diverse activities...
               </p>
               <div className="text-sm text-gray-400">
                 Session ID: {sessionId}

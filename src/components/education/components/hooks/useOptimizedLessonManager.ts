@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { LessonActivity } from '../types/LessonTypes';
 import { UniversalContentGenerator } from '../utils/universalContentGenerator';
+import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 
 interface UseOptimizedLessonManagerProps {
   subject: string;
@@ -24,7 +25,7 @@ export const useOptimizedLessonManager = ({
   
   const { speak, isSpeaking, stop } = useUnifiedSpeech();
   
-  const targetLessonLength = 20 * 60; // 20 minutes in seconds
+  const targetLessonLength = DEFAULT_LESSON_SECONDS; // default lesson length in seconds
 
   // Initialize lesson activities
   useEffect(() => {
