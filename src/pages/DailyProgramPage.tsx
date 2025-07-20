@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +49,7 @@ const DailyProgramPage = () => {
         setTimeout(() => {
           universeRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 0);
+Universe(result);
       } else {
         setError('Failed to generate universe');
       }
