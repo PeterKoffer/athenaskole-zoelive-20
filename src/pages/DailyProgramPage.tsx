@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, BookOpen, Play, Loader2 } from 'lucide-react';
 import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
+import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
+import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -13,6 +15,9 @@ const DailyProgramPage = () => {
   const [universe, setUniverse] = useState<Universe | null>(null);
   const [loadingUniverse, setLoadingUniverse] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lessonActivities, setLessonActivities] = useState<LessonActivity[] | null>(null);
+  const [loadingLesson, setLoadingLesson] = useState(false);
+  const [lessonError, setLessonError] = useState<string | null>(null);
   const universeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -57,6 +62,11 @@ const DailyProgramPage = () => {
 
       setUniverse(result);
 
+      // Generate today's lesson activities based on the universe theme
+      if (result) {
+        await generateLessonFromUniverse(result as Universe);
+      }
+
       // After setting the universe scroll to the details section
       setTimeout(() => {
         universeRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,6 +77,31 @@ const DailyProgramPage = () => {
       setUniverse(UniverseGenerator.getUniverses()[0]);
     } finally {
       setLoadingUniverse(false);
+    }
+  };
+
+  const generateLessonFromUniverse = async (u: Universe) => {
+    if (!user) return;
+
+    setLoadingLesson(true);
+    setLessonError(null);
+
+    try {
+      const grade = 6;
+      const currentDate = new Date().toISOString().split('T')[0];
+      const activities = await dailyLessonGenerator.generateDailyLesson({
+        subject: u.theme || 'general',
+        skillArea: 'general',
+        userId: user.id,
+        gradeLevel: grade,
+        currentDate
+      });
+
+      setLessonActivities(activities);
+    } catch (err) {
+      setLessonError(err instanceof Error ? err.message : 'Failed to generate lesson');
+    } finally {
+      setLoadingLesson(false);
     }
   };
 
@@ -248,6 +283,39 @@ const DailyProgramPage = () => {
               </div>
 
             </div>
+          )}
+
+          {loadingLesson && (
+            <Card>
+              <CardContent className="py-6 text-center">
+                <Loader2 className="w-5 h-5 mr-2 animate-spin inline-block" /> Generating lesson...
+              </CardContent>
+            </Card>
+          )}
+
+          {lessonError && (
+            <Card className="border-destructive">
+              <CardContent className="pt-6">
+                <div className="text-center text-destructive">❌ {lessonError}</div>
+              </CardContent>
+            </Card>
+          )}
+
+          {lessonActivities && lessonActivities.length > 0 && (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-foreground">Today's Lesson Plan</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc pl-5 space-y-1">
+                  {lessonActivities.map((act, idx) => (
+                    <li key={act.id} className="text-sm text-muted-foreground">
+                      {idx + 1}. {act.title}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
