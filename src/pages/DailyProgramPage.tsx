@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, BookOpen, Play, Loader2 } from 'lucide-react';
 import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
-import { Universe } from '@/services/UniverseGenerator';
+import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -14,6 +14,14 @@ const DailyProgramPage = () => {
   const [loadingUniverse, setLoadingUniverse] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const universeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Automatically generate a universe when the page first loads
+    if (!universe && !loadingUniverse) {
+      generateUniverse();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -34,27 +42,29 @@ const DailyProgramPage = () => {
       const prompt =
         'Create an engaging daily learning universe for students with interactive activities, interesting characters, and educational adventures.';
       let result = await aiUniverseGenerator.generateUniverse(prompt);
+      if (!result) {
+        // Fallback to a built-in sample if generation fails completely
+        result = UniverseGenerator.getUniverses()[0];
+      }
 
       if (typeof result === 'string') {
         try {
           result = JSON.parse(result);
         } catch {
-          result = null;
+          result = UniverseGenerator.getUniverses()[0];
         }
       }
 
-      if (result) {
-        setUniverse(result);
-        // After setting the universe scroll to the details section
-        setTimeout(() => {
-          universeRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 0);
-Universe(result);
-      } else {
-        setError('Failed to generate universe');
-      }
+      setUniverse(result);
+
+      // After setting the universe scroll to the details section
+      setTimeout(() => {
+        universeRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate universe');
+      // Show a sample universe so the user still sees content
+      setUniverse(UniverseGenerator.getUniverses()[0]);
     } finally {
       setLoadingUniverse(false);
     }
