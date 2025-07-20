@@ -46,26 +46,26 @@ const UniversalLearningIntroduction = ({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
+      <Card className="w-full max-w-2xl bg-black/30 backdrop-blur-md border border-white/20 shadow-2xl animate-fade-in">
         <CardHeader className="text-center pb-4">
           <div className="text-8xl mb-4">
             {getSubjectEmoji(subject)}
           </div>
-          <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
+          <CardTitle className="text-3xl font-bold text-white mb-2">
             Welcome to {subjectName}
           </CardTitle>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-200">
             Ready to explore {skillArea.replace('_', ' ')} with interactive lessons?
           </p>
         </CardHeader>
         
         <CardContent className="text-center space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-center space-x-2 text-gray-700">
+            <div className="flex items-center justify-center space-x-2 text-gray-200">
               <BookOpen className="w-5 h-5" />
               <span>Interactive lessons designed just for you</span>
             </div>
-            <div className="flex items-center justify-center space-x-2 text-gray-700">
+            <div className="flex items-center justify-center space-x-2 text-gray-200">
               <Play className="w-5 h-5" />
               <span>Engaging activities and real-time feedback</span>
             </div>
@@ -74,7 +74,7 @@ const UniversalLearningIntroduction = ({
           <Button
             onClick={handleStart}
             disabled={isStarting}
-            className="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full h-12 text-lg font-semibold bg-blue-600/80 hover:bg-blue-700/90 text-white backdrop-blur-sm border border-blue-400/30 transition-all duration-300 hover-scale"
           >
             {isStarting ? (
               <div className="flex items-center space-x-2">

@@ -10,7 +10,7 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     accentColor: '#60A5FA',
     backgroundImage: '/lovable-uploads/e8c77180-c952-401c-9f41-7bfb74d94967.png',
     subjectColor: '#3B82F6',
-    overlayOpacity: 0.7,
+    overlayOpacity: 0.3,
     environmentDescription: 'Bright mathematics classroom with blue walls and math equations on blackboard'
   },
   'science': {
@@ -20,7 +20,7 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     accentColor: '#34D399',
     backgroundImage: '/lovable-uploads/3e7290ac-38f6-419d-af42-91ed54e26b77.png',
     subjectColor: '#10B981',
-    overlayOpacity: 0.6,
+    overlayOpacity: 0.3,
     environmentDescription: 'Clean classroom with green blackboard perfect for science learning'
   },
   'history-religion': {
@@ -50,7 +50,7 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     accentColor: '#A78BFA',
     backgroundImage: '/lovable-uploads/d584a37f-9a21-40b7-b3b3-e22ce9b91e5a.png',
     subjectColor: '#8B5CF6',
-    overlayOpacity: 0.6,
+    overlayOpacity: 0.3,
     environmentDescription: 'Classic classroom with teacher and beautiful lighting perfect for language learning'
   },
   'language-lab': {
@@ -90,7 +90,7 @@ const classroomConfigs: Record<string, ClassroomConfig> = {
     accentColor: '#818CF8',
     backgroundImage: '/lovable-uploads/d6dd5b62-fafb-483a-be80-1fb5d88c9b3a.png',
     subjectColor: '#6366F1',
-    overlayOpacity: 0.7,
+    overlayOpacity: 0.3,
     environmentDescription: 'Modern neutral classroom with mathematical displays perfect for computer science'
   },
   'creative-arts': {
