@@ -103,8 +103,8 @@ const ParentDashboard = () => {
                 >
                   Go to Home
                 </Button>
-                <Button 
-                  onClick={() => navigate('/daily-universe')}
+                <Button
+                  onClick={() => navigate('/daily-program')}
                   variant="outline"
                   className="text-white border-gray-600 hover:bg-gray-700"
                 >
