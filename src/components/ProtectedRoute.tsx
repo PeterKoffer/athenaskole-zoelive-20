@@ -69,7 +69,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     let hasRequiredRole = false;
     
     if (requiredRole === 'teacher') {
-      hasRequiredRole = userRole === 'teacher' || userRole === 'admin';
+      hasRequiredRole = userRole === 'teacher' || userRole === 'admin' || userRole === 'school_leader';
     } else if (requiredRole === 'school_leader') {
       hasRequiredRole = userRole === 'school_leader' || userRole === 'admin';
     } else {
