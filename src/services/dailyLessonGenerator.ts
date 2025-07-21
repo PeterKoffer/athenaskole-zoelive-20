@@ -5,6 +5,7 @@ import { StudentProgressService } from './dailyLessonGenerator/studentProgressSe
 import { CurriculumService } from './dailyLessonGenerator/curriculumService';
 import { ActivityContentGenerator } from './dailyLessonGenerator/activityContentGenerator';
 import { CacheService } from './dailyLessonGenerator/cacheService';
+import { calendarService } from './CalendarService';
 
 export class DailyLessonGenerator {
   /**
@@ -24,6 +25,9 @@ export class DailyLessonGenerator {
 
     // Get student's current progress and abilities
     const studentProgress = await StudentProgressService.getStudentProgress(userId, subject, skillArea);
+
+    const activeKeywords = await calendarService.getActiveKeywords(currentDate, gradeLevel, []);
+    console.log('📅 Active keywords for lesson:', activeKeywords.join(', '));
     
     // Generate curriculum-aligned activities based on student's current level
     const activities = await this.generateCurriculumBasedActivities(

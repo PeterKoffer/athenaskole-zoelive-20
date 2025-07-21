@@ -63,9 +63,16 @@ const UnifiedNavigationDropdown = ({
       icon: Calendar,
       show: true
     },
+    {
+      title: "Calendar",
+      href: "/calendar",
+      description: "View upcoming events and keyword schedules",
+      icon: Calendar,
+      show: true
+    },
     ...(canAccessSchoolDashboard() ? [{
       title: "School Dashboard",
-      href: "/school-dashboard", 
+      href: "/school-dashboard",
       description: "Manage school operations and view analytics",
       icon: School,
       show: true
