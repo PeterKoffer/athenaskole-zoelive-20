@@ -5,7 +5,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, School, Users, BarChart3, Calendar, Menu, ChevronDown } from 'lucide-react';
+import { ArrowLeft, School, Users, BarChart3, Calendar, Menu, ChevronDown, GraduationCap } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const SchoolDashboard = () => {
@@ -55,6 +55,10 @@ const SchoolDashboard = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard')}>
+                <GraduationCap className="w-4 h-4 mr-2" />
+                Teacher Dashboard
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setShowTeachingSettings(true)}>
                 Teaching Settings
               </DropdownMenuItem>
