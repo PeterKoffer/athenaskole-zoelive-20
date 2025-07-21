@@ -22,14 +22,24 @@ const RoleSwitcher = () => {
     try {
       await updateUserRole(selectedRole);
       toast({
-        title: "Role Updated",
-        description: `Your role has been changed to ${selectedRole}. Please refresh the page.`,
+        title: "Role Updated Successfully!",
+        description: `You are now logged in as a ${selectedRole}. Redirecting...`,
       });
       
-      // Refresh the page to ensure all components pick up the new role
+      // Wait a bit, then redirect to the appropriate dashboard
       setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+        const targetPaths: Record<string, string> = {
+          'admin': '/school-dashboard',
+          'school_leader': '/school-dashboard', 
+          'school_staff': '/school-dashboard',
+          'teacher': '/teacher-dashboard',
+          'parent': '/parent-dashboard',
+          'student': '/daily-program'
+        };
+        
+        const targetPath = targetPaths[selectedRole] || '/profile';
+        window.location.href = targetPath; // Force full page navigation
+      }, 1500);
     } catch (error) {
       console.error('Failed to update role:', error);
       toast({
