@@ -133,7 +133,7 @@ export interface Database {
           title: string
           description?: string | null
           visibility?: Json | null
-          editable_by?: Json | null
+          editable_by?: Json | nul
           created_at?: string
           updated_at?: string
         }
@@ -195,7 +195,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      calendar_layer: 'birthday' | 'holiday' | 'general' | 'league' | 'internal' | 'keyword'
     }
     CompositeTypes: {
       [_ in never]: never
