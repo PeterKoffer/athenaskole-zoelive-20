@@ -12,7 +12,10 @@ interface UniversePlayerProps {
 const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
     return (
         <div className="space-y-6">
-            <Card>
+            <Card className="overflow-hidden">
+                {universe.image && (
+                    <img src={universe.image} alt="Universe" className="w-full h-48 object-cover" />
+                )}
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
                         {universe.title}

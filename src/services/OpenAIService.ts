@@ -73,6 +73,7 @@ export const openAIService = {
           title: data.generatedContent.title || 'Generated Learning Universe',
           description: data.generatedContent.description || 'An exciting learning adventure awaits!',
           theme: typeof prompt === 'string' ? prompt : 'Learning Adventure',
+          image: data.generatedContent.image || '/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png',
           characters,
           locations,
           activities
@@ -101,15 +102,16 @@ export const openAIService = {
 
   createFallbackUniverse(prompt: string | any): Universe {
     const themeText = typeof prompt === 'string' ? prompt : 'learning adventure';
-    
+
     return {
       id: `fallback-universe-${Date.now()}`,
       title: `Learning Universe: ${themeText}`,
       description: `An educational journey exploring ${themeText} through interactive experiences and discovery.`,
       theme: themeText,
+      image: '/lovable-uploads/07757147-84dc-4515-8288-c8150519c3bf.png',
       characters: [
         "Professor Explorer - Your knowledgeable guide",
-        "Curious Sam - A fellow learner on the journey", 
+        "Curious Sam - A fellow learner on the journey",
         "Wise Owl - Provides helpful hints and tips"
       ],
       locations: [

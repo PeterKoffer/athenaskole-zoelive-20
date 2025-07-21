@@ -102,8 +102,6 @@ const DailyProgramPage = () => {
     if (lessonActivities && lessonActivities.length > 0) {
       const firstSubject = lessonActivities[0].subject || 'mathematics';
       navigate(`/learn/${firstSubject}`);
-    } else {
-      navigate('/daily-learning-session');
     }
   };
 
@@ -223,7 +221,10 @@ const DailyProgramPage = () => {
 
           {universe && (
             <div className="space-y-6" ref={universeRef}>
-              <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
+              <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 overflow-hidden">
+                {universe.image && (
+                  <img src={universe.image} alt="Universe" className="w-full h-48 object-cover" />
+                )}
                 <CardHeader>
                   <CardTitle className="text-2xl">{universe.title}</CardTitle>
                 </CardHeader>
@@ -305,26 +306,16 @@ const DailyProgramPage = () => {
           )}
 
           {lessonActivities && lessonActivities.length > 0 && (
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-foreground">Today's Lesson Plan</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 space-y-1">
-                  {lessonActivities.map((act, idx) => (
-                    <li key={act.id} className="text-sm text-muted-foreground">
-                      {idx + 1}. {act.title}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  onClick={handleStartLearning}
-                  size="lg"
-                  className="mt-4 w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                >
-                  <Play className="w-5 h-5 mr-2" /> Start Learning Session
-                </Button>
-              </CardContent>
+            <div className="text-center">
+              <Button
+                onClick={handleStartLearning}
+                size="lg"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                <Play className="w-5 h-5 mr-2" /> Start Learning Session
+              </Button>
+            </div>
+
             </Card>
           )}
         </div>

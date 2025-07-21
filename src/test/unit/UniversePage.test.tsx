@@ -65,6 +65,7 @@ describe('DailyProgramPage', () => {
             title: 'Travel to China',
             description: 'You have to travel to China to help a man in his store',
             objectives: [],
+            image: '/example.png'
         }));
 
         render(
@@ -101,6 +102,7 @@ describe('DailyProgramPage', () => {
                     educationalLevel: 'Grade 6',
                 },
             ],
+            image: '/example.png'
         }));
 
         render(

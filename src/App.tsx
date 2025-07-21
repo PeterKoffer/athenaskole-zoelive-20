@@ -69,14 +69,6 @@ const App = () => (
               }
             />
             <Route
-              path="/daily-learning-session"
-              element={
-                <ProtectedRoute>
-                  <DailyLearningSessionPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/school-dashboard"
               element={
                 <ProtectedRoute requiredRole="school_leader">
