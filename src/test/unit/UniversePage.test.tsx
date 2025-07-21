@@ -99,6 +99,7 @@ describe('DailyProgramPage', () => {
         await waitFor(() => {
             expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
+
             expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
         });
 
