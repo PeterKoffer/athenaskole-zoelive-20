@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { CalendarEvent, KeywordEvent, CalendarLayer, KeywordScopeType } from '@/types/calendar';
 
@@ -21,43 +21,87 @@ export interface CreateKeywordEvent {
   created_by?: number;
 }
 
+const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+
 class CalendarService {
+  private async authHeader() {
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   async listEvents(start: string, end: string) {
-    const { data, error } = await supabase
-      .from('calendar_event')
-      .select('*')
-      .gte('date', start)
-      .lte('date', end);
-    if (error) {
-      console.error('Error fetching calendar events', error);
+    const headers = await this.authHeader();
+    const res = await fetch(`${FUNCTIONS_URL}/calendar-events?start=${start}&end=${end}`, { headers });
+    if (!res.ok) {
+      console.error('Error fetching calendar events');
       return [];
     }
-    return data as CalendarEvent[];
+    return (await res.json()) as CalendarEvent[];
   }
 
   async createEvent(event: CreateCalendarEvent) {
-    const { data, error } = await supabase
-      .from('calendar_event')
-      .insert(event)
-      .select()
-      .single();
-    if (error) {
-      console.error('Error creating calendar event', error);
+    const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const res = await fetch(`${FUNCTIONS_URL}/calendar-events`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(event)
+    });
+    if (!res.ok) {
+      console.error('Error creating calendar event');
       return null;
     }
-    return data as CalendarEvent;
+    return (await res.json()) as CalendarEvent;
   }
 
   async createKeywordEvent(event: CreateKeywordEvent) {
-    const { data, error } = await supabase
-      .from('keyword_event')
-      .insert(event)
-      .select()
-      .single();
-    if (error) {
-      console.error('Error creating keyword event', error);
+    const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const res = await fetch(`${FUNCTIONS_URL}/keyword-events`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(event)
+    });
+    if (!res.ok) {
+      console.error('Error creating keyword event');
       return null;
     }
+    return (await res.json()) as KeywordEvent;
+  }
+
+  async updateKeywordEvent(id: number, updates: Partial<CreateKeywordEvent>) {
+    const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const res = await fetch(`${FUNCTIONS_URL}/keyword-events/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) {
+      console.error('Error updating keyword event');
+      return null;
+    }
+    return (await res.json()) as KeywordEvent;
+  }
+
+  async deleteKeywordEvent(id: number) {
+    const headers = await this.authHeader();
+    const res = await fetch(`${FUNCTIONS_URL}/keyword-events/${id}`, {
+      method: 'DELETE',
+      headers
+    });
+    if (!res.ok) {
+      console.error('Error deleting keyword event');
+      return false;
+    }
+    return true;
+  }
+
+  async getKeywordEventForCalendar(eventId: number) {
+    const { data, error } = await supabase
+      .from('keyword_event')
+      .select('*')
+      .eq('calendar_event_id', eventId)
+      .single();
+    if (error) return null;
     return data as KeywordEvent;
   }
 

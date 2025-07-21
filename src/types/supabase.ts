@@ -133,7 +133,8 @@ export interface Database {
           title: string
           description?: string | null
           visibility?: Json | null
-          editable_by?: Json | nul
+          editable_by?: Json | null
+
           created_at?: string
           updated_at?: string
         }
