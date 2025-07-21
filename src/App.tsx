@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import TrainingGround from "./pages/TrainingGround";
 import DailyProgramPage from "./pages/DailyProgramPage";
 import SchoolDashboard from "./pages/SchoolDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
@@ -68,6 +69,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="school_leader">
                 <SchoolDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher-dashboard"
+            element={
+              <ProtectedRoute requiredRole="teacher">
+                <TeacherDashboard />
               </ProtectedRoute>
             }
           />
