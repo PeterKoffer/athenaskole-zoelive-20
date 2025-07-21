@@ -30,3 +30,28 @@ export interface GameSession {
   performance_data?: any;
   created_at: string;
 }
+
+export interface CalendarEventRecord {
+  id: number;
+  date: string;
+  layer: string;
+  title: string;
+  description?: string | null;
+  visibility?: any;
+  editable_by?: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface KeywordEventRecord {
+  id: number;
+  calendar_event_id: number;
+  keyword: string;
+  date_start: string;
+  date_end: string;
+  scope_type: 'school' | 'year' | 'class' | 'custom';
+  scope_target?: any;
+  created_by?: number | null;
+  created_at: string;
+  updated_at: string;
+}
