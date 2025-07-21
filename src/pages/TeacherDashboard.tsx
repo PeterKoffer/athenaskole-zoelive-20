@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Users, BarChart3, Calendar, Menu, ChevronDown, GraduationCap } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import TeacherSubjectWeighting from '@/components/teacher/TeacherSubjectWeighting';
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
@@ -206,6 +207,11 @@ const TeacherDashboard = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Subject Weighting Section */}
+        <div className="mb-8">
+          <TeacherSubjectWeighting />
         </div>
 
         {/* Recent Activity and Upcoming Events */}
