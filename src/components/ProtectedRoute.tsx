@@ -65,11 +65,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check role-based access
   if (requiredRole && user && userRole) {
-    const hasRequiredRole = userRole === requiredRole || 
-                           (requiredRole === 'school_leader' && userRole === 'admin');
+    let hasRequiredRole = false;
+    
+    if (requiredRole === 'teacher') {
+      hasRequiredRole = userRole === 'teacher' || userRole === 'admin';
+    } else if (requiredRole === 'school_leader') {
+      hasRequiredRole = userRole === 'school_leader' || userRole === 'admin';
+    } else {
+      hasRequiredRole = userRole === requiredRole || userRole === 'admin';
+    }
     
     if (!hasRequiredRole) {
-      console.log('[ProtectedRoute] Access denied - insufficient role');
+      console.log('[ProtectedRoute] Access denied - insufficient role. User role:', userRole, 'Required:', requiredRole);
       return <Navigate to="/auth" replace />;
     }
   }
