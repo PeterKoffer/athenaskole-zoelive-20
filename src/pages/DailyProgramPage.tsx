@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,7 +40,6 @@ const DailyProgramPage = () => {
       const prompt =
         'Create an engaging daily learning universe for students with interactive activities, interesting characters, and educational adventures.';
       let result = await aiUniverseGenerator.generateUniverse(prompt);
-
       if (!result) {
         // Fallback to a built-in sample if generation fails completely
         result = UniverseGenerator.getUniverses()[0];
@@ -169,7 +167,6 @@ const DailyProgramPage = () => {
                   </p>
                 </div>
               </div>
-              
               {!universe && (
                 <Button
                   onClick={generateUniverse}
@@ -318,6 +315,8 @@ const DailyProgramPage = () => {
                 <Play className="w-5 h-5 mr-2" /> Start Learning Session
               </Button>
             </div>
+
+            </Card>
           )}
         </div>
       </div>

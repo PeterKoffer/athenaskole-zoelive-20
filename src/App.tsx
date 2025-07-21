@@ -14,6 +14,7 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
+import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 
 // Import all learning components from new organized structure
 import MathematicsLearning from "./components/subjects/mathematics/MathematicsLearning";
