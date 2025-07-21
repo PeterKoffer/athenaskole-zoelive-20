@@ -9,6 +9,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, metadata?: { name?: string; age?: string }) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUserRole: (newRole: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -98,8 +99,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('Sign out successful');
   };
 
+  const updateUserRole = async (newRole: string) => {
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+    
+    console.log('Updating user role from', user.user_metadata?.role, 'to', newRole);
+    
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        ...user.user_metadata,
+        role: newRole
+      }
+    });
+    
+    if (error) {
+      console.error('Update user role error:', error);
+      throw error;
+    }
+    
+    console.log('User role updated successfully:', data.user?.user_metadata?.role);
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateUserRole }}>
       {children}
     </AuthContext.Provider>
   );
