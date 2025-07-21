@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import MobileMenu from "./MobileMenu";
 import NavbarLogo from "./NavbarLogo";
-import NavbarUserMenu from "./NavbarUserMenu";
+import UserMenu from "./UserMenu";
 import NavbarButton from "./NavbarButton";
 import UnifiedNavigationDropdown from "./UnifiedNavigationDropdown";
 import { Button } from "@/components/ui/button";
@@ -84,7 +84,7 @@ const Navbar = ({
               <UserRoleDisplay role={userRole} className="ml-2" />
             )}
 
-            <NavbarUserMenu user={user} onGetStarted={onGetStarted} />
+            <UserMenu />
           </div>
 
           {/* Mobile menu button */}

@@ -22,8 +22,18 @@ export const useRoleAccess = () => {
     setUserRole(role);
   };
 
+  const canAccessSchoolDashboard = () => {
+    return userRole === 'admin' || userRole === 'school_leader' || userRole === 'school_staff';
+  };
+
+  const canAccessAIInsights = () => {
+    return userRole === 'admin' || userRole === 'school_leader';
+  };
+
   return {
     userRole,
-    setUserRoleManually
+    setUserRoleManually,
+    canAccessSchoolDashboard,
+    canAccessAIInsights
   };
 };
