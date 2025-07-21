@@ -114,6 +114,50 @@ export interface Database {
           updated_at?: string
         }
       }
+      calendar_events: {
+        Row: {
+          id: string
+          layer: Database["public"]["Enums"]["calendar_layer"]
+          title: string
+          description: string | null
+          start_date: string
+          end_date: string
+          keywords: string[] | null
+          scope_type: 'school' | 'year' | 'class' | 'custom'
+          scope_target: string[] | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          layer: Database["public"]["Enums"]["calendar_layer"]
+          title: string
+          description?: string | null
+          start_date: string
+          end_date: string
+          keywords?: string[] | null
+          scope_type?: 'school' | 'year' | 'class' | 'custom'
+          scope_target?: string[] | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          layer?: Database["public"]["Enums"]["calendar_layer"]
+          title?: string
+          description?: string | null
+          start_date?: string
+          end_date?: string
+          keywords?: string[] | null
+          scope_type?: 'school' | 'year' | 'class' | 'custom'
+          scope_target?: string[] | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -122,7 +166,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      calendar_layer: 'birthday' | 'holiday' | 'general' | 'league' | 'internal' | 'keyword'
     }
     CompositeTypes: {
       [_ in never]: never

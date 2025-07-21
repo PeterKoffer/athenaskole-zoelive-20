@@ -30,3 +30,18 @@ export interface GameSession {
   performance_data?: any;
   created_at: string;
 }
+
+export interface CalendarEventRecord {
+  id: string;
+  layer: 'birthday' | 'holiday' | 'general' | 'league' | 'internal' | 'keyword';
+  title: string;
+  description?: string | null;
+  start_date: string;
+  end_date: string;
+  keywords?: string[] | null;
+  scope_type: 'school' | 'year' | 'class' | 'custom';
+  scope_target?: string[] | null;
+  created_by?: string | null;
+  created_at: string;
+  updated_at: string;
+}
