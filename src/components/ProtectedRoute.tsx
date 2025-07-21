@@ -20,13 +20,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { userRole } = useRoleAccess();
   const location = useLocation();
 
-  console.log('[ProtectedRoute]', { 
+  console.log('[ProtectedRoute] DEBUG:', { 
     user: user?.email, 
     userRole, 
     requireAuth, 
     requiredRole, 
     authLoading,
-    pathname: location.pathname 
+    pathname: location.pathname,
+    userMetadata: user?.user_metadata
   });
 
   // Show loading spinner while checking authentication
