@@ -114,6 +114,79 @@ export interface Database {
           updated_at?: string
         }
       }
+      calendar_event: {
+        Row: {
+          id: number
+          date: string
+          layer: string
+          title: string
+          description: string | null
+          visibility: Json | null
+          editable_by: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          date: string
+          layer: string
+          title: string
+          description?: string | null
+          visibility?: Json | null
+          editable_by?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          date?: string
+          layer?: string
+          title?: string
+          description?: string | null
+          visibility?: Json | null
+          editable_by?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      keyword_event: {
+        Row: {
+          id: number
+          calendar_event_id: number
+          keyword: string
+          date_start: string
+          date_end: string
+          scope_type: 'school' | 'year' | 'class' | 'custom'
+          scope_target: Json | null
+          created_by: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          calendar_event_id: number
+          keyword: string
+          date_start: string
+          date_end: string
+          scope_type: 'school' | 'year' | 'class' | 'custom'
+          scope_target?: Json | null
+          created_by?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          calendar_event_id?: number
+          keyword?: string
+          date_start?: string
+          date_end?: string
+          scope_type?: 'school' | 'year' | 'class' | 'custom'
+          scope_target?: Json | null
+          created_by?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

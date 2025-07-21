@@ -1,21 +1,11 @@
+import MultiLayerCalendar from '@/components/calendar/MultiLayerCalendar';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-const CalendarPage = () => {
+export default function CalendarPage() {
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
-      <div className="max-w-4xl mx-auto">
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Calendar</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300">Manage your learning schedule.</p>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen p-6 bg-background">
+      <div className="max-w-5xl mx-auto">
+        <MultiLayerCalendar />
       </div>
     </div>
   );
-};
-
-export default CalendarPage;
+}

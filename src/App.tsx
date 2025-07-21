@@ -12,6 +12,7 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
+import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 
@@ -61,6 +62,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DailyProgramPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <CalendarPage />
               </ProtectedRoute>
             }
           />
