@@ -134,6 +134,7 @@ export interface Database {
           description?: string | null
           visibility?: Json | null
           editable_by?: Json | null
+
           created_at?: string
           updated_at?: string
         }
@@ -195,7 +196,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      calendar_layer: 'birthday' | 'holiday' | 'general' | 'league' | 'internal' | 'keyword'
     }
     CompositeTypes: {
       [_ in never]: never
