@@ -38,6 +38,22 @@ vi.mock('@/hooks/useAuth', () => ({
     }),
 }));
 
+// Mock daily lesson generator to return a simple plan
+vi.mock('../../services/dailyLessonGenerator', () => ({
+    dailyLessonGenerator: {
+        generateDailyLesson: vi.fn().mockResolvedValue([
+            {
+                id: 'a1',
+                type: 'introduction',
+                title: 'Intro',
+                duration: 60,
+                content: {},
+                subject: 'mathematics',
+                skillArea: 'general'
+            }
+        ])
+    }
+}));
 
 describe('DailyProgramPage', () => {
     beforeEach(() => {
@@ -69,7 +85,7 @@ describe('DailyProgramPage', () => {
 
         const learnBtn = screen.getByRole('button', { name: /start learning session/i });
         userEvent.click(learnBtn);
-        expect(mockNavigate).toHaveBeenCalledWith('/daily-learning-session');
+        expect(mockNavigate).toHaveBeenCalledWith('/learn/mathematics');
     });
 
     it('should render the curriculum standards', async () => {
@@ -99,12 +115,11 @@ describe('DailyProgramPage', () => {
         await waitFor(() => {
             expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
-
             expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
         });
 
         const learnBtn = screen.getByRole('button', { name: /start learning session/i });
         userEvent.click(learnBtn);
-        expect(mockNavigate).toHaveBeenCalledWith('/daily-learning-session');
+        expect(mockNavigate).toHaveBeenCalledWith('/learn/mathematics');
     });
 });

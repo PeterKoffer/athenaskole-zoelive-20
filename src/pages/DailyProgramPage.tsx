@@ -99,7 +99,12 @@ const DailyProgramPage = () => {
   };
 
   const handleStartLearning = () => {
-    navigate('/daily-learning-session');
+    if (lessonActivities && lessonActivities.length > 0) {
+      const firstSubject = lessonActivities[0].subject || 'mathematics';
+      navigate(`/learn/${firstSubject}`);
+    } else {
+      navigate('/daily-learning-session');
+    }
   };
 
   return (
@@ -164,7 +169,6 @@ const DailyProgramPage = () => {
                   </p>
                 </div>
               </div>
-
               {!universe && (
                 <Button
                   onClick={generateUniverse}
