@@ -10,7 +10,6 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import TrainingGround from "./pages/TrainingGround";
 import DailyProgramPage from "./pages/DailyProgramPage";
-import DailyUniversePage from "./pages/DailyUniversePage";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
@@ -60,24 +59,16 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/daily-program" 
+            <Route
+              path="/daily-program"
               element={
                 <ProtectedRoute>
                   <DailyProgramPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/daily-universe" 
-              element={
-                <ProtectedRoute>
-                  <DailyUniversePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route 
-              path="/school-dashboard" 
+            <Route
+              path="/school-dashboard"
               element={
                 <ProtectedRoute requiredRole="school_leader">
                   <SchoolDashboard />

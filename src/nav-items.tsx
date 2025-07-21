@@ -1,7 +1,7 @@
 
 import { Home, Calendar, BookOpen, Gamepad2, Users, Settings, GraduationCap, Music, Palette, Calculator, Globe2, Brain, Sparkles } from "lucide-react";
 import Index from "./pages/Index";
-import DailyUniversePage from "./pages/DailyUniversePage";
+import DailyProgramPage from "./pages/DailyProgramPage";
 import SimulatorPage from "./pages/SimulatorPage";
 
 export const navItems = [
@@ -12,10 +12,10 @@ export const navItems = [
     page: Index,
   },
   {
-    title: "Daily Universe",
-    to: "/daily-universe",
+    title: "Daily Program",
+    to: "/daily-program",
     icon: <Sparkles className="h-4 w-4" />,
-    page: DailyUniversePage,
+    page: DailyProgramPage,
   },
   {
     title: "Simulator",

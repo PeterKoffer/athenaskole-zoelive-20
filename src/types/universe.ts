@@ -4,6 +4,7 @@ export interface Universe {
   description: string;
   theme: string;
   setting: string;
+  image?: string;
   characters: Array<{
     name: string;
     role: string;
