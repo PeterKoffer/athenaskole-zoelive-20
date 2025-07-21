@@ -1,25 +1,33 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
-import { CalendarEvent, CalendarLayer, KeywordScopeType } from '@/types/calendar';
+import { CalendarEvent, KeywordEvent, CalendarLayer, KeywordScopeType } from '@/types/calendar';
 
 export interface CreateCalendarEvent {
+  date: string;
   layer: CalendarLayer;
   title: string;
   description?: string | null;
-  start_date: string;
-  end_date: string;
-  keywords?: string[] | null;
-  scope_type?: KeywordScopeType;
-  scope_target?: string[] | null;
+  visibility?: any;
+  editable_by?: any;
+}
+
+export interface CreateKeywordEvent {
+  calendar_event_id: number;
+  keyword: string;
+  date_start: string;
+  date_end: string;
+  scope_type: KeywordScopeType;
+  scope_target?: any;
+  created_by?: number;
 }
 
 class CalendarService {
   async listEvents(start: string, end: string) {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('calendar_event')
       .select('*')
-      .lte('start_date', end)
-      .gte('end_date', start);
+      .gte('date', start)
+      .lte('date', end);
     if (error) {
       console.error('Error fetching calendar events', error);
       return [];
@@ -29,7 +37,7 @@ class CalendarService {
 
   async createEvent(event: CreateCalendarEvent) {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('calendar_event')
       .insert(event)
       .select()
       .single();
@@ -40,9 +48,22 @@ class CalendarService {
     return data as CalendarEvent;
   }
 
-  async updateEvent(id: string, updates: Partial<CreateCalendarEvent>) {
+  async createKeywordEvent(event: CreateKeywordEvent) {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('keyword_event')
+      .insert(event)
+      .select()
+      .single();
+    if (error) {
+      console.error('Error creating keyword event', error);
+      return null;
+    }
+    return data as KeywordEvent;
+  }
+
+  async updateEvent(id: number, updates: Partial<CreateCalendarEvent>) {
+    const { data, error } = await supabase
+      .from('calendar_event')
       .update(updates)
       .eq('id', id)
       .select()
@@ -54,9 +75,9 @@ class CalendarService {
     return data as CalendarEvent;
   }
 
-  async deleteEvent(id: string) {
+  async deleteEvent(id: number) {
     const { error } = await supabase
-      .from('calendar_events')
+      .from('calendar_event')
       .delete()
       .eq('id', id);
     if (error) {
@@ -68,36 +89,35 @@ class CalendarService {
 
   async getActiveKeywords(date: string, grade: number, classes: string[]) {
     const { data, error } = await supabase
-      .from('calendar_events')
-      .select('keywords, scope_type, scope_target')
-      .eq('layer', 'keyword')
-      .lte('start_date', date)
-      .gte('end_date', date);
+      .from('keyword_event')
+      .select('*')
+      .lte('date_start', date)
+      .gte('date_end', date);
     if (error || !data) {
       console.error('Error fetching keyword events', error);
       return [] as string[];
     }
     const keywords: string[] = [];
     data.forEach((row) => {
-      const { keywords: k, scope_type, scope_target } = row as Database['public']['Tables']['calendar_events']['Row'];
-      if (!k) return;
+      const { keyword, scope_type, scope_target } = row as Database['public']['Tables']['keyword_event']['Row'];
       switch (scope_type as KeywordScopeType) {
         case 'school':
-          keywords.push(...k);
+          keywords.push(keyword);
           break;
         case 'year':
-          if (scope_target && scope_target.includes(String(grade))) {
-            keywords.push(...k);
+          if (scope_target && (scope_target as string[]).includes(String(grade))) {
+            keywords.push(keyword);
           }
           break;
         case 'class':
-          if (scope_target && classes.some((c) => scope_target.includes(c))) {
-            keywords.push(...k);
+          if (scope_target && (scope_target as string[]).some((c) => classes.includes(c))) {
+            keywords.push(keyword);
           }
           break;
         case 'custom':
-          if (scope_target && classes.some((c) => scope_target.includes(c))) {
-            keywords.push(...k);
+          if (scope_target && (scope_target as string[]).some((c) => classes.includes(c))) {
+            keywords.push(keyword);
+
           }
           break;
       }

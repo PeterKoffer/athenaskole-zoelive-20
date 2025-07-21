@@ -114,46 +114,75 @@ export interface Database {
           updated_at?: string
         }
       }
-      calendar_events: {
+      calendar_event: {
         Row: {
-          id: string
-          layer: Database["public"]["Enums"]["calendar_layer"]
+          id: number
+          date: string
+          layer: string
           title: string
           description: string | null
-          start_date: string
-          end_date: string
-          keywords: string[] | null
-          scope_type: 'school' | 'year' | 'class' | 'custom'
-          scope_target: string[] | null
-          created_by: string | null
+          visibility: Json | null
+          editable_by: Json | null
           created_at: string
           updated_at: string
         }
         Insert: {
-          id?: string
-          layer: Database["public"]["Enums"]["calendar_layer"]
+          id?: number
+          date: string
+          layer: string
           title: string
           description?: string | null
-          start_date: string
-          end_date: string
-          keywords?: string[] | null
-          scope_type?: 'school' | 'year' | 'class' | 'custom'
-          scope_target?: string[] | null
-          created_by?: string | null
+          visibility?: Json | null
+          editable_by?: Json | nul
           created_at?: string
           updated_at?: string
         }
         Update: {
-          id?: string
-          layer?: Database["public"]["Enums"]["calendar_layer"]
+          id?: number
+          date?: string
+          layer?: string
           title?: string
           description?: string | null
-          start_date?: string
-          end_date?: string
-          keywords?: string[] | null
+          visibility?: Json | null
+          editable_by?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      keyword_event: {
+        Row: {
+          id: number
+          calendar_event_id: number
+          keyword: string
+          date_start: string
+          date_end: string
+          scope_type: 'school' | 'year' | 'class' | 'custom'
+          scope_target: Json | null
+          created_by: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          calendar_event_id: number
+          keyword: string
+          date_start: string
+          date_end: string
+          scope_type: 'school' | 'year' | 'class' | 'custom'
+          scope_target?: Json | null
+          created_by?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          calendar_event_id?: number
+          keyword?: string
+          date_start?: string
+          date_end?: string
           scope_type?: 'school' | 'year' | 'class' | 'custom'
-          scope_target?: string[] | null
-          created_by?: string | null
+          scope_target?: Json | null
+          created_by?: number | null
           created_at?: string
           updated_at?: string
         }

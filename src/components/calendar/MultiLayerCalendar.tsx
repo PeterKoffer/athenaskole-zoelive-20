@@ -72,7 +72,6 @@ export default function MultiLayerCalendar() {
                 <Badge>{ev.layer}</Badge>
               </div>
               {ev.description && <p className="text-sm">{ev.description}</p>}
-              {ev.keywords && <p className="text-xs mt-1 text-muted-foreground">Keywords: {ev.keywords.join(', ')}</p>}
             </div>
           ))}
         </CardContent>
