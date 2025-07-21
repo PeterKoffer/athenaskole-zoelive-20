@@ -99,20 +99,7 @@ const DailyProgramPage = () => {
   };
 
   const handleStartLearning = () => {
-    if (!universe) return;
-
-    const theme = universe.theme?.toLowerCase();
-    const themeToPath: Record<string, string> = {
-      mathematics: '/learn/mathematics',
-      science: '/learn/science',
-      history: '/learn/history-religion',
-      languages: '/learn/language-lab',
-      arts: '/learn/creative-arts',
-      technology: '/learn/computer-science'
-    };
-
-    const path = (theme && themeToPath[theme]) || '/training-ground';
-    navigate(path);
+    navigate('/daily-learning-session');
   };
 
   return (
@@ -177,6 +164,7 @@ const DailyProgramPage = () => {
                   </p>
                 </div>
               </div>
+
               {!universe && (
                 <Button
                   onClick={generateUniverse}

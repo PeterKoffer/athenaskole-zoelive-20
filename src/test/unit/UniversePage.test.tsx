@@ -14,11 +14,12 @@ vi.mock('../../services/AIUniverseGenerator', () => ({
 }));
 
 // Mock react-router-dom navigate
+const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return {
         ...actual,
-        useNavigate: () => vi.fn(),
+        useNavigate: () => mockNavigate,
     };
 });
 
@@ -65,6 +66,10 @@ describe('DailyProgramPage', () => {
             expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
             expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
         });
+
+        const learnBtn = screen.getByRole('button', { name: /start learning session/i });
+        userEvent.click(learnBtn);
+        expect(mockNavigate).toHaveBeenCalledWith('/daily-learning-session');
     });
 
     it('should render the curriculum standards', async () => {
@@ -88,15 +93,18 @@ describe('DailyProgramPage', () => {
             </BrowserRouter>
         );
 
-
         const startBtn = screen.getByRole('button', { name: /start/i });
         userEvent.click(startBtn);
 
-
         await waitFor(() => {
             expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();v
+            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
+
             expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
         });
+
+        const learnBtn = screen.getByRole('button', { name: /start learning session/i });
+        userEvent.click(learnBtn);
+        expect(mockNavigate).toHaveBeenCalledWith('/daily-learning-session');
     });
 });
