@@ -55,7 +55,6 @@ vi.mock('../../services/dailyLessonGenerator', () => ({
     }
 }));
 
-
 describe('DailyProgramPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
