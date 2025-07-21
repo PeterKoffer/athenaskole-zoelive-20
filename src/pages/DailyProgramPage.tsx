@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,13 +20,6 @@ const DailyProgramPage = () => {
   const [lessonError, setLessonError] = useState<string | null>(null);
   const universeRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    // Automatically generate a universe when the page first loads
-    if (!universe && !loadingUniverse) {
-      generateUniverse();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (loading) {
     return (
@@ -184,23 +177,24 @@ const DailyProgramPage = () => {
                   </p>
                 </div>
               </div>
-              
-              <Button
-                onClick={generateUniverse}
-                size="lg"
-                disabled={loadingUniverse}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                {loadingUniverse ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-5 h-5 mr-2" /> Start Your Adventure
-                  </>
-                )}
-              </Button>
+              {!universe && (
+                <Button
+                  onClick={generateUniverse}
+                  size="lg"
+                  disabled={loadingUniverse}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  {loadingUniverse ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5 mr-2" /> Start Your Adventure
+                    </>
+                  )}
+                </Button>
+              )}
           </CardContent>
           </Card>
 
