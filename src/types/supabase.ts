@@ -195,7 +195,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      calendar_layer: 'birthday' | 'holiday' | 'general' | 'league' | 'internal' | 'keyword'
     }
     CompositeTypes: {
       [_ in never]: never
