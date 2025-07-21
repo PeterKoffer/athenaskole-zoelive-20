@@ -161,7 +161,6 @@ class CalendarService {
         case 'custom':
           if (scope_target && (scope_target as string[]).some((c) => classes.includes(c))) {
             keywords.push(keyword);
-
           }
           break;
       }
