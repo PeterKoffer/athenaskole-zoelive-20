@@ -101,19 +101,18 @@ export default function TeachingPerspectiveSettingsPanel() {
           <Slider
             value={[form.strength]}
             min={1}
-            max={5}
+            max={10}
             step={1}
             onValueChange={v => handleChange('strength', v[0])}
             className="mb-2"
           />
           <div className="text-xs text-gray-400">
-            {form.strength === 1 && "Very little influence"}
-            {form.strength === 2 && "Low influence"}
-            {form.strength === 3 && "Moderate influence"}
-            {form.strength === 4 && "Strong influence"}
-            {form.strength === 5 && "Extremely strong influence"}
+            {form.strength <= 3 && "Very little influence"}
+            {form.strength > 3 && form.strength <= 6 && "Moderate influence"}
+            {form.strength > 6 && "Strong influence"}
           </div>
         </div>
+
         <div className="mb-4">
           <label className="block mb-1 text-gray-200">Special wishes for teaching</label>
           <Textarea 
