@@ -11,24 +11,24 @@ const Index = () => {
   const { userRole } = useRoleAccess();
   const navigate = useNavigate();
 
+  const targetPaths: Record<string, string> = {
+    'admin': '/school-dashboard',
+    'school_leader': '/school-dashboard',
+    'school_staff': '/school-dashboard',
+    'teacher': '/teacher-dashboard',
+    'parent': '/parent-dashboard',
+    'student': '/daily-program'
+  };
+
   useEffect(() => {
     if (user && userRole) {
       const targetPath = targetPaths[userRole] || '/profile';
       navigate(targetPath, { replace: true });
     }
-  }, [user, userRole, navigate]);
+  }, [user, userRole, navigate, targetPaths]);
 
   const handleGetStarted = () => {
     if (user && userRole) {
-      const targetPaths: Record<string, string> = {
-        'admin': '/school-dashboard',
-        'school_leader': '/school-dashboard',
-        'school_staff': '/school-dashboard',
-        'teacher': '/teacher-dashboard',
-        'parent': '/parent-dashboard',
-        'student': '/daily-program'
-      };
-
       const targetPath = targetPaths[userRole] || '/profile';
       navigate(targetPath);
     } else if (user) {
