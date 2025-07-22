@@ -22,6 +22,15 @@ const Index = () => {
 
   useEffect(() => {
     if (user && userRole) {
+      const targetPaths: Record<string, string> = {
+        'admin': '/school-dashboard',
+        'school_leader': '/school-dashboard',
+        'school_staff': '/school-dashboard',
+        'teacher': '/teacher-dashboard',
+        'parent': '/parent-dashboard',
+        'student': '/daily-program'
+      };
+
       const targetPath = targetPaths[userRole] || '/profile';
       navigate(targetPath, { replace: true });
     }

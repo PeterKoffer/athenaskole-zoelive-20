@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
 export interface ClassLessonDurations {
-  [classId: string]: number; // minutes 1-600 (1-10 hours)
+  [classId: string]: number; // minutes 1-10
 }
 
 export function useClassLessonDurations() {
