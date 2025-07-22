@@ -129,9 +129,17 @@ const ProfileContainer = () => {
       <ProfileHeader onSignOut={signOut} />
 
       <div className="max-w-4xl mx-auto p-6 pb-24">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-          <p className="text-gray-400">Manage your information and subscription</p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+            <p className="text-gray-400">Manage your information and subscription</p>
+          </div>
+          <button
+            onClick={() => navigate('/auth')}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Switch Role
+          </button>
         </div>
 
         <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />

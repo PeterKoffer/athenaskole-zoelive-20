@@ -24,9 +24,9 @@ const Auth = () => {
   // Handle automatic redirect after successful auth
   useAuthRedirect();
 
-  // Redirect authenticated users immediately based on their role
+  // Only redirect if coming from a protected route, not if directly accessing auth for role switching
   useEffect(() => {
-    if (user && userRole) {
+    if (user && userRole && searchParams.get('redirect') === 'true') {
       console.log('[Auth] User is authenticated, redirecting based on role:', userRole);
       
       // Define target paths for each role
@@ -44,7 +44,7 @@ const Auth = () => {
       navigate(targetPath, { replace: true });
       return;
     }
-  }, [user, userRole, navigate]);
+  }, [user, userRole, navigate, searchParams]);
 
   const handleRoleSelect = (role: UserRole) => {
     console.log('[Auth] Role selected:', role);
