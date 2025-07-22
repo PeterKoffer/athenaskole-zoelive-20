@@ -5,6 +5,7 @@ import { generateQuestionWithOpenAI } from './openaiClient.ts';
 import { validateQuestionStructure } from './validator.ts';
 import { validateMathAnswer } from './mathValidator.ts';
 import { validateForEquivalentAnswers } from './equivalentAnswerValidator.ts';
+import { createSubjectPrompt } from '../prompts/index.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -68,35 +69,13 @@ serve(async (req) => {
     console.log(`🎓 Educational context:`, JSON.stringify(educationalContext, null, 2));
 
     // Construct the prompt
-    const prompt = `Generate a Grade ${gradeLevel} ${subject} question about "${skillArea}".
-
-CRITICAL REQUIREMENTS:
-1. The math MUST be correct - double-check all calculations
-2. For fraction problems, verify the arithmetic is accurate
-3. Ensure the correct answer index points to the mathematically correct option
-4. Use age-appropriate language for Grade ${gradeLevel}
-5. Create engaging, real-world scenarios
-
-Question Context: ${specificContext}
-Difficulty Level: ${difficultyLevel}/10
-Learning Style: ${educationalContext.learningStyle}
-
-${hasTeacherRequirements ? `Teacher Focus Areas: ${teacherRequirements?.focusAreas?.join(', ') || 'problem solving'}` : ''}
-${hasSchoolStandards ? `Curriculum: ${schoolStandards?.curriculum || 'common_core'}` : ''}
-${hasStudentAdaptation ? `Student Engagement: ${studentAdaptation?.engagementLevel || 'medium'}` : ''}
-
-FORMAT - Return ONLY this JSON structure:
-{
-  "question": "Grade ${gradeLevel} appropriate question with real-world context",
-  "options": ["option A", "option B", "option C", "option D"],
-  "correct": 0,
-  "explanation": "Clear explanation suitable for Grade ${gradeLevel}",
-  "educationalNotes": {
-    "gradeAlignment": "How this meets Grade ${gradeLevel} standards",
-    "skillFocus": "Primary skill being assessed",
-    "learningObjective": "What student should learn"
-  }
-}`;
+    const prompt = createSubjectPrompt(
+      subject,
+      skillArea,
+      gradeLevel,
+      ['QUESTION_MULTIPLE_CHOICE'],
+      1
+    );
 
     console.log(`📝 Educational prompt length: ${prompt.length} characters`);
     console.log(`🤖 Calling OpenAI with personalized K-12 prompt for Grade ${gradeLevel}`);
