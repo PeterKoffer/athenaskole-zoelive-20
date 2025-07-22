@@ -15,6 +15,7 @@ import SiteMapPage from "./pages/SiteMapPage";
 import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
+import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
 // Import all learning components from new organized structure
 import MathematicsLearning from "./components/subjects/mathematics/MathematicsLearning";
@@ -213,11 +214,20 @@ const App = () => (
           />
 
           {/* Daily learning session route */}
-          <Route 
-            path="/daily-session" 
+          <Route
+            path="/daily-session"
             element={
               <ProtectedRoute>
                 <DailyLearningSessionPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/daily-universe-lesson"
+            element={
+              <ProtectedRoute>
+                <DailyUniverseLessonPage />
               </ProtectedRoute>
             }
           />
