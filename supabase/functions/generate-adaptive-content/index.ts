@@ -2,6 +2,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
+import { createDailyProgramPrompt } from '../prompts/index.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -177,16 +178,11 @@ serve(async (req) => {
 });
 
 async function generateUniverseContent(requestData: any, openaiKey?: string, deepSeekKey?: string) {
-  const prompt = `Create a detailed learning universe based on this theme: "${requestData.prompt}".
-  
-  Return a JSON object with:
-  {
-    "title": "Universe title",
-    "description": "Engaging description of the universe",
-    "characters": ["Character 1", "Character 2", "Character 3"],
-    "locations": ["Location 1", "Location 2", "Location 3"],
-    "activities": ["Activity 1", "Activity 2", "Activity 3", "Activity 4"]
-  }`;
+  const prompt = createDailyProgramPrompt(
+    requestData.prompt,
+    requestData.gradeLevel || 4,
+    requestData.learningStyle || 'mixed'
+  );
 
   if (openaiKey) {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

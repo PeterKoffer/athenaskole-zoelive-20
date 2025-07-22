@@ -1,7 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createMathPrompt } from './prompt_generator.ts';
+import { createSubjectPrompt } from '../prompts/index.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -39,10 +39,11 @@ serve(async (req) => {
       });
     }
 
-    // Generate enhanced curriculum-aware prompt
-    const enhancedPrompt = createMathPrompt(
+    // Generate unified training ground prompt
+    const enhancedPrompt = createSubjectPrompt(
+      requestData.subject || 'mathematics',
       requestData.kcId,
-      requestData.userId,
+      requestData.gradeLevel || 4,
       requestData.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE'],
       requestData.maxAtoms || 3
     );
