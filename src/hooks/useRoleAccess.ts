@@ -6,23 +6,31 @@ import { useAuth } from './useAuth';
 export const useRoleAccess = () => {
   const { user } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [manualRole, setManualRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     if (user) {
-      // Normalize role value from metadata
-      const rawRole = user.user_metadata?.role || 'student';
-      const normalized =
-        typeof rawRole === 'string'
-          ? (rawRole.toLowerCase().trim() as UserRole)
-          : 'student';
-      setUserRole(normalized);
+      // If there's a manually set role, use that instead of metadata
+      if (manualRole) {
+        setUserRole(manualRole);
+      } else {
+        // Normalize role value from metadata
+        const rawRole = user.user_metadata?.role || 'student';
+        const normalized =
+          typeof rawRole === 'string'
+            ? (rawRole.toLowerCase().trim() as UserRole)
+            : 'student';
+        setUserRole(normalized);
+      }
     } else {
       setUserRole(null);
+      setManualRole(null);
     }
-  }, [user]);
+  }, [user, manualRole]);
 
   const setUserRoleManually = (role: UserRole) => {
     console.log('[useRoleAccess] Setting role manually:', role);
+    setManualRole(role);
     setUserRole(role);
   };
 
