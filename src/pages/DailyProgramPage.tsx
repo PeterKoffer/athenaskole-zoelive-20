@@ -99,9 +99,9 @@ const DailyProgramPage = () => {
   };
 
   const handleStartLearning = () => {
-    if (lessonActivities && lessonActivities.length > 0) {
-      const firstSubject = lessonActivities[0].subject || 'mathematics';
-      navigate(`/learn/${firstSubject}`);
+    if (universe) {
+      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      navigate('/daily-universe-lesson', { state: { universe, gradeLevel: grade } });
     }
   };
 
