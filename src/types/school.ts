@@ -75,7 +75,7 @@ export type TeachingPerspectiveType = "none" | "mild-christian" | "strong-christ
 
 export interface TeachingPerspectiveSettings {
   perspective: TeachingPerspectiveType;
-  strength: number; // 1-5, how much the perspective influences teaching
+  strength: number; // 1-10, how much the perspective influences teaching
   wishes?: string;  // Wishes, requests, or topics to emphasize
   avoid?: string;   // Topics or themes to avoid
   lastUpdated?: string;

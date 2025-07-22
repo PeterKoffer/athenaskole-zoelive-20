@@ -9,9 +9,13 @@ export const useRoleAccess = () => {
 
   useEffect(() => {
     if (user) {
-      // Default to student role if none specified
-      const role = user.user_metadata?.role || 'student';
-      setUserRole(role as UserRole);
+      // Normalize role value from metadata
+      const rawRole = user.user_metadata?.role || 'student';
+      const normalized =
+        typeof rawRole === 'string'
+          ? (rawRole.toLowerCase().trim() as UserRole)
+          : 'student';
+      setUserRole(normalized);
     } else {
       setUserRole(null);
     }
