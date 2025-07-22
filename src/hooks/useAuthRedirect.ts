@@ -13,10 +13,16 @@ export const useAuthRedirect = () => {
     // Don't redirect while still loading
     if (loading) return;
 
-    // Only redirect if user is on auth page and is authenticated
+    // Don't redirect from auth page - allow users to change roles
     const currentPath = window.location.pathname;
-    if (user && userRole && currentPath === '/auth') {
-      console.log('[useAuthRedirect] Redirecting authenticated user from auth page', { userRole });
+    if (currentPath === '/auth') {
+      console.log('[useAuthRedirect] Not redirecting from auth page - allowing role selection');
+      return;
+    }
+
+    // Only redirect if user is authenticated and on a page that should redirect
+    if (user && userRole && currentPath !== '/auth') {
+      console.log('[useAuthRedirect] User authenticated, checking if redirect needed', { userRole, currentPath });
       
       // Define target paths for each role
       const targetPaths: Record<string, string> = {
@@ -30,8 +36,11 @@ export const useAuthRedirect = () => {
       
       const targetPath = targetPaths[userRole] || '/profile';
       
-      console.log('[useAuthRedirect] Redirecting to', targetPath, 'for role', userRole);
-      navigate(targetPath, { replace: true });
+      // Only redirect if current path doesn't match the expected role path
+      if (currentPath !== targetPath && currentPath === '/') {
+        console.log('[useAuthRedirect] Redirecting to', targetPath, 'for role', userRole);
+        navigate(targetPath, { replace: true });
+      }
     }
   }, [user, userRole, loading, navigate]);
 };

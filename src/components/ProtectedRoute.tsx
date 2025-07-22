@@ -45,8 +45,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // If user is logged in but trying to access auth page, redirect based on role
-  if (!requireAuth && user && userRole && location.pathname === '/auth') {
+  // Allow authenticated users to access auth page for role switching
+  // Only redirect if they came from somewhere other than direct navigation
+  if (!requireAuth && user && userRole && location.pathname === '/auth' && location.state?.from) {
     console.log('[ProtectedRoute] User logged in, redirecting from auth page to dashboard for role:', userRole);
     
     // Define target paths for each role
