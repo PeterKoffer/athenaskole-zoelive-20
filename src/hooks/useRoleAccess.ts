@@ -42,10 +42,15 @@ export const useRoleAccess = () => {
     return userRole === 'admin' || userRole === 'school_leader';
   };
 
+  const isManualRoleChange = () => {
+    return manualRole !== null;
+  };
+
   return {
     userRole,
     setUserRoleManually,
     canAccessSchoolDashboard,
-    canAccessAIInsights
+    canAccessAIInsights,
+    isManualRoleChange
   };
 };

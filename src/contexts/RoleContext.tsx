@@ -1,11 +1,13 @@
 
 import React, { createContext, useContext } from 'react';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
+import { UserRole } from '@/types/auth';
 
 interface RoleContextType {
-  userRole: string | null;
-  setUserRoleManually: (role: string) => void;
-  isManualRoleChange: () => boolean;
+  userRole: UserRole | null;
+  setUserRoleManually: (role: UserRole) => void;
+  canAccessSchoolDashboard: () => boolean;
+  canAccessAIInsights: () => boolean;
 }
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
