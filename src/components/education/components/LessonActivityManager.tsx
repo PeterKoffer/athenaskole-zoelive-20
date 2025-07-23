@@ -13,9 +13,7 @@ interface LessonActivityManagerProps {
 const LessonActivityManager = ({
   activities,
   currentActivityIndex,
-  score,
-  onActivityComplete,
-  onScoreUpdate
+  onActivityComplete
 }: LessonActivityManagerProps) => {
   const currentActivity = activities[currentActivityIndex];
 

@@ -10,7 +10,7 @@ interface WelcomeCardProps {
   activityCount?: number;
 }
 
-const WelcomeCard = ({ firstName, todaysDate, activityCount = 6 }: WelcomeCardProps) => {
+const WelcomeCard = ({ todaysDate, activityCount = 6 }: WelcomeCardProps) => {
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
 
   const handleSpeakWelcome = async () => {

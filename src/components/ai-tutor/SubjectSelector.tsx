@@ -13,7 +13,7 @@ export interface SubjectSelectorProps {
   onLanguageSelect?: () => void;
 }
 
-const SubjectSelector = ({ onSubjectSelect, selectedMode, currentSubject, onSubjectChange, onLanguageSelect }: SubjectSelectorProps) => {
+const SubjectSelector = ({ onSubjectSelect, selectedMode }: SubjectSelectorProps) => {
   const navigate = useNavigate();
 
   const subjects = [
