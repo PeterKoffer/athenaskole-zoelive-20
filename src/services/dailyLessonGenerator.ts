@@ -4,7 +4,7 @@ import { DailyLessonConfig } from './dailyLessonGenerator/types';
 import { StudentProgressService } from './dailyLessonGenerator/studentProgressService';
 import { CurriculumService } from './dailyLessonGenerator/curriculumService';
 import { CacheService } from './dailyLessonGenerator/cacheService';
-import { calendarService } from '../CalendarService';
+import { calendarService } from './CalendarService';
 import { aiContentGenerator } from '../content/aiContentGenerator';
 import learnerProfileService from '../learnerProfile/LearnerProfileService';
 
