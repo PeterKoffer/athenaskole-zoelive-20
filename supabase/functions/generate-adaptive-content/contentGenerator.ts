@@ -1,5 +1,59 @@
 
-import { createGradeAlignedPrompt } from './promptBuilder.ts';
+import { createGradeAlignedPrompt, createTrainingGroundPrompt } from './promptBuilder.ts';
+
+export async function generateContentWithTrainingGroundPrompt(requestData: any) {
+  const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
+  if (!openaiKey) {
+    throw new Error('OpenAI API key not found');
+  }
+
+  try {
+    const prompt = createTrainingGroundPrompt(requestData);
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert educational content creator. Generate age-appropriate, engaging questions for K-12 students. Always respond with valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 800
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.choices[0].message.content;
+
+    const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedContent = JSON.parse(cleanedResponse);
+
+    if (!parsedContent.question || !parsedContent.options || !Array.isArray(parsedContent.options)) {
+      throw new Error('Invalid response format from OpenAI');
+    }
+
+    return parsedContent;
+  } catch (error) {
+    console.error('❌ OpenAI generation failed:', error);
+    throw error;
+  }
+}
 
 export async function generateContentWithOpenAI(requestData: any) {
   const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
