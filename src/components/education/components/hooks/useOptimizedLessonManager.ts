@@ -2,8 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { LessonActivity } from '../types/LessonTypes';
-import { UniversalContentGenerator } from '../utils/universalContentGenerator';
+import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UseOptimizedLessonManagerProps {
   subject: string;
@@ -24,22 +25,34 @@ export const useOptimizedLessonManager = ({
   const [isInitializing, setIsInitializing] = useState(true);
   
   const { speak, isSpeaking, stop } = useUnifiedSpeech();
+  const { user } = useAuth();
   
   const targetLessonLength = DEFAULT_LESSON_SECONDS; // default lesson length in seconds
 
-  // Initialize lesson activities
+  // Initialize lesson activities using the new AI prompt template system
   useEffect(() => {
     const initializeLesson = async () => {
-      console.log(`🎯 Initializing optimized lesson for ${subject} - ${skillArea}`);
+      console.log(`🤖 Initializing AI-powered lesson for ${subject} - ${skillArea}`);
       setIsInitializing(true);
       
       try {
-        // Generate activities using the universal content generator
-        const generatedActivities = UniversalContentGenerator.generateEngagingLesson(subject, skillArea, 3);
+        if (!user?.id) {
+          throw new Error('User not authenticated');
+        }
+
+        // Use the daily lesson generator with new AI prompt template system
+        const generatedActivities = await dailyLessonGenerator.generateDailyLesson({
+          subject,
+          skillArea,
+          userId: user.id,
+          gradeLevel: 3, // Default grade level
+          currentDate: new Date().toISOString().split('T')[0]
+        });
+        
         setActivities(generatedActivities);
-        console.log(`✅ Generated ${generatedActivities.length} activities for ${subject}`);
+        console.log(`✅ Generated ${generatedActivities.length} AI-powered activities for ${subject}`);
       } catch (error) {
-        console.error('❌ Error generating lesson activities:', error);
+        console.error('❌ Error generating AI lesson activities:', error);
         // Fallback to basic activities if generation fails
         const fallbackActivities: LessonActivity[] = [
           {
@@ -61,7 +74,7 @@ export const useOptimizedLessonManager = ({
     };
 
     initializeLesson();
-  }, [subject, skillArea]);
+  }, [subject, skillArea, user?.id]);
 
   // Timer for lesson duration
   useEffect(() => {
