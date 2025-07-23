@@ -38,7 +38,7 @@ const EnhancedLifeEssentialsLearning: React.FC = () => {
     });
   }, []);
 
-  if (isLoading) return <div className="flex justify-center items-center h-screen bg-gray-900/50"><div className="text-center p-10 bg-gray-800 rounded-lg shadow-xl"><LoadingSpinner size="lg" /><p className="mt-4 text-white">Loading Life Essentials Lesson...</p></div></div>;
+  if (isLoading) return <div className="flex justify-center items-center h-screen bg-gray-900/50"><div className="text-center p-10 bg-gray-800 rounded-lg shadow-xl"><LoadingSpinner /><p className="mt-4 text-white">Loading Life Essentials Lesson...</p></div></div>;
   if (error) return <div className="text-red-400 text-center p-10 bg-gray-800 rounded-lg shadow-xl">{error}</div>;
   if (!lesson || !lesson.phases || lesson.phases.length === 0) return <div className="text-center p-10 text-white bg-gray-800 rounded-lg shadow-xl">No lesson data available for Life Essentials.</div>;
 
