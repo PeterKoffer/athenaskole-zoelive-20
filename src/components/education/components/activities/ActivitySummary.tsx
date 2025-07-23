@@ -86,7 +86,7 @@ const ActivitySummary = ({ activity, timeRemaining, onContinue, onAnswerSubmit }
       <CardContent className="p-4 sm:p-8">
         <SummaryHeader
           title={activity.title}
-          phaseDescription={activity.phaseDescription}
+          phaseDescription={activity.phaseDescription || ''}
           onNelieRead={handleNelieRead}
           isSpeaking={simpleSpeech.isSpeaking}
           isEnabled={simpleSpeech.isEnabled}

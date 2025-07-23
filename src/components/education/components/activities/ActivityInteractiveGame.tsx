@@ -148,7 +148,7 @@ const ActivityInteractiveGame = ({ activity, onActivityComplete }: ActivityInter
             </div>
             <p className="text-gray-300">
               {activity.content.explanation || 
-               `The correct answer is: ${activity.content.options?.[correctAnswerIndex] || 'Not available'}`}
+               `The correct answer is: ${activity.content.options?.[correctAnswerIndex as number] || 'Not available'}`}
             </p>
           </div>
         )}
