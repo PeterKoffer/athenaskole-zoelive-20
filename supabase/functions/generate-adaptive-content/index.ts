@@ -1,7 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
+import { generateContentWithTrainingGroundPrompt, generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
 import { createDailyProgramPrompt } from '../prompts/index.ts';
 
 const corsHeaders = {
@@ -94,8 +94,8 @@ serve(async (req) => {
 
     if (openaiKey) {
       try {
-        console.log('🤖 Attempting OpenAI content generation...');
-        generatedContent = await generateContentWithOpenAI(requestData);
+        console.log('🤖 Attempting OpenAI content generation with new prompt...');
+        generatedContent = await generateContentWithTrainingGroundPrompt(requestData);
         apiUsed = 'openai';
       } catch (error) {
         console.error('❌ OpenAI generation failed:', error);

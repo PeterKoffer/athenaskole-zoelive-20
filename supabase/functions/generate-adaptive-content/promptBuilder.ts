@@ -1,4 +1,34 @@
 
+export function createTrainingGroundPrompt(requestData: any): string {
+  const {
+    subject,
+    gradeLevel,
+    curriculumStandards,
+    teachingPerspective,
+    lessonDuration,
+    subjectWeight,
+    calendarKeywords,
+    calendarDuration,
+    studentAbilities,
+    learningStyle,
+    studentInterests,
+  } = requestData;
+
+  const prompt = `You are a world-class ${subject} teacher creating a lesson for a ${gradeLevel} student. Develop a lesson aligned with ${curriculumStandards || 'general academic focus'} and incorporate the school’s ${teachingPerspective || 'neutral, evidence-based'} approach. The lesson should be designed for about ${lessonDuration || '30-45 minutes'} of learning. Since ${subject} is a ${subjectWeight || 'medium'} priority subject in our curriculum, adjust the depth accordingly. Consider the context of ${calendarKeywords || 'general context'} over the next ${calendarDuration || 'one-week unit'} in the lesson content. Tailor the material to the student’s skill level – ${studentAbilities || 'average mixed-ability classroom'}, providing support or extension as needed. Use a ${learningStyle || 'multi-modal'} approach and connect to the student’s interest in ${studentInterests || 'generally relatable examples'} to make the lesson engaging. Include interactive activities or a game, and end with a brief quiz or test to assess understanding.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "question": "What is 1/2 + 1/4?",
+  "options": ["1/6", "2/6", "3/4", "3/6"],
+  "correct": 2,
+  "explanation": "To add fractions, find a common denominator. 1/2 = 2/4, so 2/4 + 1/4 = 3/4",
+  "learningObjectives": ["Adding fractions with different denominators", "Finding common denominators"]
+}
+`;
+
+  return prompt;
+}
+
 export function createGradeAlignedPrompt(requestData: any): string {
   const { subject, skillArea, difficultyLevel, gradeLevel, questionContext } = requestData;
   
