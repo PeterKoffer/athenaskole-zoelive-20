@@ -28,11 +28,17 @@ export class OriginChecker {
       'https://preview.lovable.dev'
     ];
 
+    // GPT Engineer integration origins
+    const gptEngineerOrigins = [
+      'https://gptengineer.app',
+      'https://www.gptengineer.app'
+    ];
+
     // Get current origin
     const currentOrigin = window.location.origin;
     
     // Initialize with static origins
-    this.allowedOrigins = [...julesOrigins, ...lovableOrigins];
+    this.allowedOrigins = [...julesOrigins, ...lovableOrigins, ...gptEngineerOrigins];
     
     // Always add current origin
     if (!this.allowedOrigins.includes(currentOrigin)) {
@@ -97,9 +103,19 @@ export class OriginChecker {
       /^https:\/\/.*\.google\.dev$/
     ];
 
+    // GPT Engineer patterns
+    const gptEngineerPatterns = [/^https:\/\/.*\.gptengineer\.app$/];
+
     for (const pattern of googlePatterns) {
       if (pattern.test(origin)) {
         console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (Google pattern match)`);
+        return true;
+      }
+    }
+
+    for (const pattern of gptEngineerPatterns) {
+      if (pattern.test(origin)) {
+        console.log(`🔍 Origin check: ${origin} -> ✅ ALLOWED (GPT Engineer pattern match)`);
         return true;
       }
     }

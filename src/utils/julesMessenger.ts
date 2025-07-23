@@ -18,12 +18,18 @@ export class JulesMessenger {
       const isInLovableEditor = window.parent !== window;
       
       if (isInLovableEditor) {
-        // Try to send to Lovable editor first
+        // Attempt to use the referrer origin if available
         try {
-          window.parent.postMessage(message, 'https://lovable.dev');
-          console.log('✅ Message sent to Lovable editor');
+          const referrerOrigin = new URL(document.referrer).origin;
+          window.parent.postMessage(message, referrerOrigin);
+          console.log(`✅ Message sent to parent at ${referrerOrigin}`);
         } catch (error) {
-          console.log('ℹ️ Could not send message to Lovable editor:', error.message);
+          console.log('ℹ️ Could not determine referrer origin, using wildcard');
+          try {
+            window.parent.postMessage(message, '*');
+          } catch (err) {
+            console.log('ℹ️ Could not send wildcard message to parent:', err.message);
+          }
         }
       }
 
