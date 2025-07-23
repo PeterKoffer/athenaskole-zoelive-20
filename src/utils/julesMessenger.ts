@@ -13,54 +13,37 @@ export class JulesMessenger {
   public sendMessageToJules(message: JulesMessage) {
     try {
       console.log('📤 Attempting to send message to Jules:', message);
-      
-      // Check if we're in Lovable editor first
-      const isInLovableEditor = window.parent !== window;
-      
-      if (isInLovableEditor) {
-        // Try to send to Lovable editor first
+
+      const hasParent = window.parent && window.parent !== window;
+      const hasOpener = !!window.opener;
+
+      const getReferrerOrigin = () => {
         try {
-          window.parent.postMessage(message, 'https://lovable.dev');
-          console.log('✅ Message sent to Lovable editor');
+          return new URL(document.referrer).origin;
+        } catch {
+          return undefined;
+        }
+      };
+
+      const targetOrigin = getReferrerOrigin() || '*';
+
+      if (hasParent) {
+        try {
+          window.parent.postMessage(message, targetOrigin);
+          console.log(`✅ Message sent to parent at ${targetOrigin}`);
         } catch (error) {
-          console.log('ℹ️ Could not send message to Lovable editor:', error.message);
+          console.log('ℹ️ Could not post message to parent:', (error as Error).message);
         }
       }
 
-      // Try Jules-specific origins
-      const julesOrigins = this.allowedOrigins.filter(origin => 
-        origin.includes('google') || origin.includes('gemini')
-      );
-      
-      console.log('🎯 Jules target origins:', julesOrigins);
-      
-      // Post message to potential Jules origins
-      julesOrigins.forEach(origin => {
+      if (hasOpener) {
         try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage(message, origin);
-            console.log(`✅ Message sent to parent at ${origin}`);
-          }
-          
-          if (window.opener) {
-            window.opener.postMessage(message, origin);
-            console.log(`✅ Message sent to opener at ${origin}`);
-          }
+          window.opener.postMessage(message, targetOrigin);
+          console.log(`✅ Message sent to opener at ${targetOrigin}`);
         } catch (error) {
-          console.log(`ℹ️ Could not send message to ${origin}:`, error.message);
+          console.log('ℹ️ Could not post message to opener:', (error as Error).message);
         }
-      });
-      
-      // Fallback: try wildcard for current environment
-      try {
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage(message, '*');
-          console.log(`✅ Message sent to parent with wildcard`);
-        }
-      } catch (error) {
-        console.log(`ℹ️ Could not send wildcard message:`, error.message);
       }
-      
     } catch (error) {
       console.error('❌ Error sending message to Jules:', error);
     }
