@@ -77,3 +77,4 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 Additional guides and references can be found in the `docs` folder. A new prompt template for generating Training Ground lessons is available here:
 
 - [Training Ground Prompt Template](docs/TRAINING_GROUND_PROMPT_TEMPLATE.md)
+- [Curriculum Coverage](docs/CURRICULUM_COVERAGE.md)
