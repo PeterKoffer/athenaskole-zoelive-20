@@ -1,17 +1,36 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes';
+import { generateTrainingGroundPrompt, buildContextFromAppData, TrainingGroundConfig } from './trainingGroundPromptGenerator';
 
 export class AIContentGenerator {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
-    console.log('🤖 AIContentGenerator: Starting generation with DeepSeek');
+    console.log('🤖 AIContentGenerator: Starting generation with unified prompt system');
     console.log('📋 Request:', request);
 
     try {
-      console.log('📞 Calling edge function: generate-adaptive-content (using DeepSeek)');
+      // Build Training Ground prompt using the new unified system
+      const promptConfig: TrainingGroundConfig = {
+        subject: request.subject,
+        gradeLevel: request.gradeLevel?.toString(),
+        learningStyle: request.learningStyle,
+        studentInterests: request.studentInterests,
+        lessonDurationMinutes: request.estimatedTime || 30,
+        calendarKeywords: request.calendarKeywords,
+        studentAbilities: this.determineAbilityFromRequest(request)
+      };
+
+      const promptResult = generateTrainingGroundPrompt(promptConfig);
+      console.log('🎯 Generated unified prompt with metadata:', promptResult.metadata);
+
+      console.log('📞 Calling edge function: generate-adaptive-content (using unified prompt)');
       
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-        body: request
+        body: {
+          ...request,
+          customPrompt: promptResult.prompt,
+          promptMetadata: promptResult.metadata
+        }
       });
 
       console.log('📨 Function response:', { data, error });
@@ -58,9 +77,18 @@ export class AIContentGenerator {
       return validatedContent;
 
     } catch (error: any) {
-      console.error('💥 AI generation error with DeepSeek:', error);
-      throw new Error(`DeepSeek AI generation failed: ${error.message}`);
+      console.error('💥 AI generation error with unified prompt system:', error);
+      throw new Error(`AI generation failed: ${error.message}`);
     }
+  }
+
+  private determineAbilityFromRequest(request: GenerateContentRequest): 'below' | 'average' | 'above' {
+    if (request.studentAbilities?.accuracy) {
+      const accuracy = request.studentAbilities.accuracy;
+      if (accuracy < 0.7) return 'below';
+      if (accuracy > 0.85) return 'above';
+    }
+    return 'average';
   }
 }
 
