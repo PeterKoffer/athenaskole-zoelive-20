@@ -20,7 +20,7 @@ interface InteractiveLessonSessionProps {
 
 const InteractiveLessonSession = ({
   subject,
-  skillArea,
+  
   lessonState,
   onStateUpdate,
   onLessonComplete

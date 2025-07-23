@@ -15,7 +15,7 @@ interface StableLearningInterfaceProps {
 const StableLearningInterface = ({ 
   subject, 
   skillArea, 
-  studentName, 
+   
   onComplete, 
   onBack 
 }: StableLearningInterfaceProps) => {

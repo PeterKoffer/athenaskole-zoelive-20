@@ -18,7 +18,7 @@ interface LessonPhaseRendererProps {
 const LessonPhaseRenderer = ({
   lessonState,
   onLessonStart,
-  onLessonComplete,
+  
   onLessonResume,
   onBackToProgram,
   subject,
