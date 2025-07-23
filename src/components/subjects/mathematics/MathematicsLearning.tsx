@@ -42,7 +42,7 @@ const MathematicsLearning = () => {
     return (
       <ClassroomEnvironment config={classroomConfig}>
         <div className="min-h-screen flex items-center justify-center text-white">
-          <div className="text-center">
+          <div className="text-center bg-gray-800/50 backdrop-blur-sm p-8 rounded-lg border border-gray-700">
             <div className="text-4xl mb-4">🔢</div>
             <p className="text-lg">Loading your Mathematics lesson...</p>
           </div>

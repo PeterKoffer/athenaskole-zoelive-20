@@ -58,7 +58,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             onClick={() => navigate('/daily-program')}
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+            className="w-full sm:w-auto border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-gray-900 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
           >
             View Daily Program
           </Button>
@@ -68,7 +68,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+                className="w-full sm:w-auto border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-gray-900 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
               >
                 More Options
                 <ChevronDown className="ml-2 h-4 w-4" />

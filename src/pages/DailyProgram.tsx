@@ -100,7 +100,7 @@ const DailyProgram = () => {
             <Button 
               variant="ghost" 
             onClick={() => navigate('/')} 
-            className="flex items-center gap-2 text-white hover:text-gray-300"
+            className="flex items-center gap-2 text-white hover:text-blue-300"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
