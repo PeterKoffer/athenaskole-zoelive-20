@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, updateUserRole } = useAuth();
   const { userRole, setUserRoleManually } = useRoleAccess();
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(
     (searchParams.get('role') as UserRole) || null
@@ -46,26 +46,36 @@ const Auth = () => {
     }
   }, [user, userRole, navigate, searchParams]);
 
-  const handleRoleSelect = (role: UserRole) => {
+  const handleRoleSelect = async (role: UserRole) => {
     console.log('[Auth] Role selected:', role);
     setSelectedRole(role);
-    // Set the role manually to trigger the role change process
-    setUserRoleManually(role);
     
-    // If user is already authenticated, redirect immediately
+    // If user is already authenticated, update their role in Supabase
     if (user) {
-      console.log('[Auth] User is authenticated, redirecting to dashboard for role:', role);
-      const targetPaths: Record<string, string> = {
-        'admin': '/school-dashboard',
-        'school_leader': '/school-dashboard',
-        'school_staff': '/school-dashboard',
-        'teacher': '/teacher-dashboard',
-        'parent': '/parent-dashboard',
-        'student': '/daily-program'
-      };
-      
-      const targetPath = targetPaths[role] || '/profile';
-      navigate(targetPath, { replace: true });
+      try {
+        console.log('[Auth] Updating user role in Supabase to:', role);
+        await updateUserRole(role);
+        console.log('[Auth] Role updated successfully, redirecting to dashboard for role:', role);
+        
+        const targetPaths: Record<string, string> = {
+          'admin': '/school-dashboard',
+          'school_leader': '/school-dashboard',
+          'school_staff': '/school-dashboard',
+          'teacher': '/teacher-dashboard',
+          'parent': '/parent-dashboard',
+          'student': '/daily-program'
+        };
+        
+        const targetPath = targetPaths[role] || '/profile';
+        navigate(targetPath, { replace: true });
+      } catch (error) {
+        console.error('[Auth] Failed to update user role:', error);
+        // Fallback to manual role change for UI purposes
+        setUserRoleManually(role);
+      }
+    } else {
+      // For non-authenticated users, just set the selected role for the form
+      setUserRoleManually(role);
     }
   };
 
