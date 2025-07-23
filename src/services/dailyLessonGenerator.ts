@@ -58,17 +58,19 @@ export class DailyLessonGenerator {
       try {
         const aiContent = await aiContentGenerator.generateAdaptiveContent({
           subject,
-          skillArea,
+          skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
           gradeLevel,
           activityType: this.getActivityTypeForIndex(i),
-          difficulty: gradeLevel,
+          difficulty: gradeLevel + this.getDifficultyVariation(i),
           learningStyle: learnerProfile?.learning_style_preference || 'mixed',
           studentInterests: learnerProfile?.interests,
           studentAbilities: studentProgress,
           calendarKeywords: activeKeywords,
           metadata: {
             activityIndex: i,
-            studentProgress
+            studentProgress,
+            varietyPrompt: this.getVarietyPrompt(i),
+            diversityLevel: Math.floor(i / 2) + 1
           }
         });
 
@@ -130,8 +132,34 @@ export class DailyLessonGenerator {
   }
 
   private static getActivityTypeForIndex(index: number): string {
-    const types = ['content-delivery', 'interactive-game', 'application', 'interactive-game', 'content-delivery', 'interactive-game', 'application'];
+    const types = ['content-delivery', 'interactive-game', 'application', 'problem-solving', 'creative-exercise', 'real-world-application', 'critical-thinking'];
     return types[index % types.length];
+  }
+
+  private static getVariedSkillAreaForIndex(baseSkillArea: string, index: number): string {
+    if (baseSkillArea === 'general_mathematics') {
+      const mathAreas = ['arithmetic', 'problem_solving', 'geometry_basics', 'measurement', 'data_handling', 'patterns', 'number_sense'];
+      return mathAreas[index % mathAreas.length];
+    }
+    return baseSkillArea;
+  }
+
+  private static getDifficultyVariation(index: number): number {
+    // Slight difficulty variation: -1, 0, +1
+    return (index % 3) - 1;
+  }
+
+  private static getVarietyPrompt(index: number): string {
+    const prompts = [
+      'Use real-world scenarios',
+      'Include visual/spatial elements', 
+      'Focus on word problems',
+      'Incorporate games or puzzles',
+      'Use creative storytelling',
+      'Apply practical examples',
+      'Challenge critical thinking'
+    ];
+    return prompts[index % prompts.length];
   }
 
   /**
