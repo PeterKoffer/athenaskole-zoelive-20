@@ -18,7 +18,6 @@ interface EnhancedLessonManagerProps {
 
 const EnhancedLessonManager = ({ 
   subject, 
-  skillArea, 
   onBackToProgram 
 }: EnhancedLessonManagerProps) => {
   const {
@@ -29,9 +28,7 @@ const EnhancedLessonManager = ({
     score,
     correctStreak,
     phase,
-    isTimerActive,
     handleActivityComplete,
-    handleLessonStart,
     isLoadingActivities,
     regenerateLesson
   } = useUnifiedLesson();

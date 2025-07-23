@@ -16,9 +16,7 @@ interface EnhancedActivityRendererProps {
 const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   activity,
   onComplete,
-  onActivityComplete,
-  score = 0,
-  isNelieReady = true
+  onActivityComplete
 }) => {
   const [selectedAnswer, setSelectedAnswer] = React.useState<number | null>(null);
   const [showResult, setShowResult] = React.useState(false);

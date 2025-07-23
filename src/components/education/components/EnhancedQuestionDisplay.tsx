@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2, Star, Lightbulb } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 // import { useDiverseQuestionGeneration } from '@/components/adaptive-learning/hooks/useDiverseQuestionGeneration'; // Temporarily disabled
-import { useAuth } from '@/hooks/useAuth';
+
 
 interface EnhancedQuestionDisplayProps {
   subject: string;
@@ -18,15 +18,12 @@ interface EnhancedQuestionDisplayProps {
 }
 
 const EnhancedQuestionDisplay = ({
-  subject,
-  skillArea,
   questionNumber,
   totalQuestions,
   isGameMode,
   onQuestionComplete,
   showNelieGuidance
 }: EnhancedQuestionDisplayProps) => {
-  const { user } = useAuth();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showHint, setShowHint] = useState(false);

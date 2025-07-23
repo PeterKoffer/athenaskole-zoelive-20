@@ -14,9 +14,7 @@ const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearn
   const {
     currentActivityIndex,
     lessonActivities,
-    currentActivity,
     timeElapsed,
-    totalEstimatedTime,
     score,
     correctStreak,
     questionsGenerated,
@@ -28,12 +26,9 @@ const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearn
     autoReadEnabled,
     hasUserInteracted,
     isReady,
-    speakText,
-    stopSpeaking,
     toggleMute,
     handleActivityComplete,
     handleReadRequest,
-    resetProgress,
     refreshWithNewQuestions,
     sessionId
   } = useExtendedLessonManager({
@@ -178,7 +173,7 @@ const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearn
           currentActivityIndex={currentActivityIndex}
           score={score}
           onActivityComplete={handleActivityComplete}
-          onScoreUpdate={(newScore) => {}}
+          onScoreUpdate={() => {}}
         />
 
         {/* Footer stats */}

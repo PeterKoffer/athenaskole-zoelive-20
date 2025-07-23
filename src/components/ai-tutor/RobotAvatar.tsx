@@ -10,7 +10,6 @@ interface RobotAvatarProps {
 
 const RobotAvatar = ({ 
   size = "md", 
-  isActive = false, 
   isSpeaking = false, 
   className = "" 
 }: RobotAvatarProps) => {

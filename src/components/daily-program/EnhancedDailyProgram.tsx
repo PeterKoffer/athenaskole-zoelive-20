@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { universeGenerationService } from '@/services/UniverseGenerationService';
 import UniverseSessionManager from '@/services/UniverseSessionManager';
-import { LearningAtom, DailyUniverse } from '@/types/learning';
+import { DailyUniverse } from '@/types/learning';
 // Removed adaptive learning components
 import { ArrowLeft, RefreshCw, Brain, Sparkles } from 'lucide-react';
 
@@ -21,8 +21,6 @@ const EnhancedDailyProgram: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const metadata = user?.user_metadata as UserMetadata | undefined;
-  const firstName = metadata?.name?.split(' ')[0] || metadata?.first_name || 'Student';
-  const studentAge = metadata?.age || 10;
 
   useEffect(() => {
     if (user) {
@@ -48,7 +46,7 @@ const EnhancedDailyProgram: React.FC = () => {
           ...universe,
           storylineIntro: universe.description || '',
           estimatedTotalMinutes: 45, // Placeholder
-          learningAtoms: universe.objectives.map((obj, index) => ({
+          learningAtoms: universe.objectives.map((obj) => ({
             id: obj.id,
             curriculumObjectiveTitle: obj.name,
             subject: obj.subjectName,
@@ -177,7 +175,7 @@ const EnhancedDailyProgram: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="flex space-x-2 mb-4">
-                {dailyUniverse.learningAtoms.map((atom, index) => (
+                {dailyUniverse.learningAtoms.map((_, index) => (
                   <div
                     key={index}
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
