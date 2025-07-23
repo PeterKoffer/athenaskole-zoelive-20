@@ -4,8 +4,9 @@ import { DailyLessonConfig } from './dailyLessonGenerator/types';
 import { StudentProgressService } from './dailyLessonGenerator/studentProgressService';
 import { CurriculumService } from './dailyLessonGenerator/curriculumService';
 import { CacheService } from './dailyLessonGenerator/cacheService';
-import { calendarService } from './CalendarService';
-import { aiContentGenerator } from './content/aiContentGenerator';
+import { calendarService } from '../CalendarService';
+import { aiContentGenerator } from '../content/aiContentGenerator';
+import learnerProfileService from '../learnerProfile/LearnerProfileService';
 
 export class DailyLessonGenerator {
   /**
@@ -16,16 +17,9 @@ export class DailyLessonGenerator {
     
     console.log(`🎯 Generating NEW daily lesson for ${subject} - ${currentDate}`);
     
-    // Temporarily disable caching to ensure fresh AI content each session
-    // const existingLesson = CacheService.getTodaysLesson(userId, subject, currentDate);
-    // if (existingLesson) {
-    //   console.log('📚 Found existing lesson for today, using cached version');
-    //   return existingLesson;
-    // }
-
     // Get student's current progress and abilities
     const studentProgress = await StudentProgressService.getStudentProgress(userId, subject, skillArea);
-
+    const learnerProfile = await learnerProfileService.getProfile(userId);
     const activeKeywords = await calendarService.getActiveKeywords(currentDate, gradeLevel, []);
     console.log('📅 Active keywords for lesson:', activeKeywords.join(', '));
     
@@ -34,11 +28,10 @@ export class DailyLessonGenerator {
       subject,
       skillArea,
       gradeLevel,
-      studentProgress
+      studentProgress,
+      learnerProfile,
+      activeKeywords,
     );
-
-    // Temporarily disable caching to ensure fresh content
-    // CacheService.cacheTodaysLesson(userId, subject, currentDate, activities);
     
     console.log(`✅ Generated ${activities.length} AI-powered activities for ${subject}`);
     return activities;
@@ -51,7 +44,9 @@ export class DailyLessonGenerator {
     subject: string,
     skillArea: string,
     gradeLevel: number,
-    studentProgress: any
+    studentProgress: any,
+    learnerProfile: any,
+    activeKeywords: string[],
   ): Promise<LessonActivity[]> {
     const activities: LessonActivity[] = [];
     const lessonId = `lesson-${Date.now()}`;
@@ -67,7 +62,10 @@ export class DailyLessonGenerator {
           gradeLevel,
           activityType: this.getActivityTypeForIndex(i),
           difficulty: gradeLevel,
-          learningStyle: 'mixed',
+          learningStyle: learnerProfile?.learning_style_preference || 'mixed',
+          studentInterests: learnerProfile?.interests,
+          studentAbilities: studentProgress,
+          calendarKeywords: activeKeywords,
           metadata: {
             activityIndex: i,
             studentProgress
