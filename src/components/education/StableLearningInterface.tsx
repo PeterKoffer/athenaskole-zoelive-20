@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 // import AdaptiveEducationSession from './AdaptiveEducationSession'; // Temporarily disabled

@@ -68,7 +68,7 @@ const OptimizedQuestionActivity = ({
         
         if (question) {
           setCurrentQuestion(question);
-          console.log('✅ Initial question generated:', question.content.question.substring(0, 50) + '...');
+          console.log('✅ Initial question generated:', question.content.question?.substring(0, 50) + '...' || 'Question generated');
         }
       }
     };

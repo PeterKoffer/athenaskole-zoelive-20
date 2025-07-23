@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, ArrowRight, CheckCircle } from 'lucide-react';
 import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
-import { useSpeechSynthesis } from '@/components/adaptive-learning/hooks/useSpeechSynthesis';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 interface NelieExplanationDemoProps {
   subject: string;
@@ -12,10 +12,10 @@ interface NelieExplanationDemoProps {
   onDemoComplete: () => void;
 }
 
-const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExplanationDemoProps) => {
+const NelieExplanationDemo = ({ onDemoComplete }: NelieExplanationDemoProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
-  const { isSpeaking, autoReadEnabled, speakText, stopSpeaking } = useSpeechSynthesis();
+  const { isSpeaking, speakAsNelie, forceStopAll, isEnabled } = useUnifiedSpeech();
 
   const demoQuestion = {
     question: "What is 15 + 27?",
@@ -32,9 +32,9 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
   };
 
   useEffect(() => {
-    if (currentStep < demoQuestion.explanation.length && autoReadEnabled) {
+    if (currentStep < demoQuestion.explanation.length && isEnabled) {
       const timer = setTimeout(() => {
-        speakText(demoQuestion.explanation[currentStep]);
+        speakAsNelie(demoQuestion.explanation[currentStep]);
         setCurrentStep(prev => prev + 1);
       }, currentStep === 0 ? 2000 : 5000); // Longer delays to prevent overlap
       
@@ -43,23 +43,23 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
       // Show Nelie "clicking" the correct answer
       setTimeout(() => {
         setShowAnswer(true);
-        if (autoReadEnabled) {
-          speakText("Perfect! That's how we solve addition problems step by step. Now you understand the process!");
+        if (isEnabled) {
+          speakAsNelie("Perfect! That's how we solve addition problems step by step. Now you understand the process!");
         }
       }, 3000);
     }
-  }, [currentStep, showAnswer, autoReadEnabled, speakText]);
+  }, [currentStep, showAnswer, isEnabled, speakAsNelie]);
 
   const handleContinue = () => {
-    stopSpeaking();
+    forceStopAll();
     onDemoComplete();
   };
 
   const handleManualRead = () => {
     if (isSpeaking) {
-      stopSpeaking();
+      forceStopAll();
     } else if (currentStep > 0) {
-      speakText(demoQuestion.explanation[currentStep - 1] || "Let me explain this step by step!");
+      speakAsNelie(demoQuestion.explanation[currentStep - 1] || "Let me explain this step by step!");
     }
   };
 
@@ -113,7 +113,7 @@ const NelieExplanationDemo = ({ subject, skillArea, onDemoComplete }: NelieExpla
                     size="sm" 
                     onClick={handleManualRead}
                     className="text-slate-950"
-                    disabled={!autoReadEnabled}
+                    disabled={!isEnabled}
                   >
                     <Volume2 className="w-4 h-4 mr-1" />
                     {isSpeaking ? 'Stop' : 'Repeat'}

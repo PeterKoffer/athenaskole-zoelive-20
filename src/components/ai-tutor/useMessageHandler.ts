@@ -53,7 +53,7 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
           break;
         default:
           const encouragement = personality.responses.encouragement[Math.floor(Math.random() * personality.responses.encouragement.length)];
-          const responses = predefinedResponses[currentSubject] || predefinedResponses.math;
+          const responses = (predefinedResponses as any)[currentSubject] || predefinedResponses.math;
           response = `${encouragement} ${responses[Math.floor(Math.random() * responses.length)]}`;
       }
       
@@ -111,7 +111,7 @@ export const useMessageHandler = ({ user, currentSubject, setIsSpeaking }: UseMe
     setMessages(prev => [...prev, optionMessage]);
 
     setTimeout(() => {
-      let response = learningOptionResponses[option.id] || learningOptionResponses.default;
+      let response = (learningOptionResponses as any)[option.id] || learningOptionResponses.default;
       
       // Replace any name references with first name
       if (user?.user_metadata?.name) {
