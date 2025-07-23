@@ -106,23 +106,23 @@ const DailyProgramPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center">
           <Button
             variant="ghost"
-            onClick={() => navigate(-1)}
-            className="text-muted-foreground hover:text-foreground mr-4"
+            onClick={() => navigate('/')}
+            className="text-white hover:text-gray-300 mr-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2 flex items-center">
-              <Sparkles className="w-8 h-8 mr-3 text-primary" />
+            <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
+              <Sparkles className="w-8 h-8 mr-3 text-purple-400" />
               Today's Program
             </h1>
-            <p className="text-muted-foreground">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
+            <p className="text-gray-300">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
           </div>
         </div>
 

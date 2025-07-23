@@ -99,8 +99,8 @@ const DailyProgram = () => {
           <div className="flex items-center justify-between mb-8">
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/')} 
-              className="flex items-center gap-2 text-white hover:text-gray-300"
+            onClick={() => navigate('/')} 
+            className="flex items-center gap-2 text-white hover:text-gray-300"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
