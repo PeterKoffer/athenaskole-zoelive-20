@@ -3,9 +3,9 @@ import { LessonActivity } from '@/components/education/components/types/LessonTy
 import { DailyLessonConfig } from './dailyLessonGenerator/types';
 import { StudentProgressService } from './dailyLessonGenerator/studentProgressService';
 import { CurriculumService } from './dailyLessonGenerator/curriculumService';
-import { ActivityContentGenerator } from './dailyLessonGenerator/activityContentGenerator';
 import { CacheService } from './dailyLessonGenerator/cacheService';
 import { calendarService } from './CalendarService';
+import { aiContentGenerator } from './content/aiContentGenerator';
 
 export class DailyLessonGenerator {
   /**
@@ -16,12 +16,12 @@ export class DailyLessonGenerator {
     
     console.log(`🎯 Generating NEW daily lesson for ${subject} - ${currentDate}`);
     
-    // Check if we have a lesson for today
-    const existingLesson = CacheService.getTodaysLesson(userId, subject, currentDate);
-    if (existingLesson) {
-      console.log('📚 Found existing lesson for today, using cached version');
-      return existingLesson;
-    }
+    // Temporarily disable caching to ensure fresh AI content each session
+    // const existingLesson = CacheService.getTodaysLesson(userId, subject, currentDate);
+    // if (existingLesson) {
+    //   console.log('📚 Found existing lesson for today, using cached version');
+    //   return existingLesson;
+    // }
 
     // Get student's current progress and abilities
     const studentProgress = await StudentProgressService.getStudentProgress(userId, subject, skillArea);
@@ -29,25 +29,25 @@ export class DailyLessonGenerator {
     const activeKeywords = await calendarService.getActiveKeywords(currentDate, gradeLevel, []);
     console.log('📅 Active keywords for lesson:', activeKeywords.join(', '));
     
-    // Generate curriculum-aligned activities based on student's current level
-    const activities = await this.generateCurriculumBasedActivities(
+    // Generate AI-powered curriculum activities using the new prompt template
+    const activities = await this.generateAIPoweredActivities(
       subject,
       skillArea,
       gradeLevel,
       studentProgress
     );
 
-    // Cache the lesson for today
-    CacheService.cacheTodaysLesson(userId, subject, currentDate, activities);
+    // Temporarily disable caching to ensure fresh content
+    // CacheService.cacheTodaysLesson(userId, subject, currentDate, activities);
     
-    console.log(`✅ Generated ${activities.length} new activities for ${subject}`);
+    console.log(`✅ Generated ${activities.length} AI-powered activities for ${subject}`);
     return activities;
   }
 
   /**
-   * Generate curriculum-based activities tailored to student's level
+   * Generate AI-powered activities using the new prompt template system
    */
-  private static async generateCurriculumBasedActivities(
+  private static async generateAIPoweredActivities(
     subject: string,
     skillArea: string,
     gradeLevel: number,
@@ -56,29 +56,79 @@ export class DailyLessonGenerator {
     const activities: LessonActivity[] = [];
     const lessonId = `lesson-${Date.now()}`;
 
-    // Determine skill focus based on weaknesses and grade level
-    const focusAreas = CurriculumService.determineFocusAreas(subject, gradeLevel, studentProgress);
-    
-    // Generate multiple activities for a complete lesson
+    console.log('🤖 Using AI content generation with new prompt template');
+
+    // Generate 7 diverse activities using AI
     for (let i = 0; i < 7; i++) {
-      const activityType = this.getActivityTypeForIndex(i);
-      const focusArea = focusAreas[i % focusAreas.length];
-      
-      const activity = await ActivityContentGenerator.createCurriculumActivity(
-        lessonId,
-        i,
-        subject,
-        skillArea,
-        focusArea,
-        gradeLevel,
-        studentProgress,
-        activityType
-      );
-      
-      activities.push(activity);
+      try {
+        const aiContent = await aiContentGenerator.generateAdaptiveContent({
+          subject,
+          skillArea,
+          gradeLevel,
+          activityType: this.getActivityTypeForIndex(i),
+          difficulty: gradeLevel,
+          learningStyle: 'mixed',
+          metadata: {
+            activityIndex: i,
+            studentProgress
+          }
+        });
+
+        const activity: LessonActivity = {
+          id: `${lessonId}-activity-${i}`,
+          title: this.generateActivityTitle(subject, skillArea, i),
+          type: 'quiz',
+          phase: 'quiz',
+          duration: 180,
+          content: {
+            question: aiContent.question,
+            options: aiContent.options,
+            correctAnswer: aiContent.correct,
+            explanation: aiContent.explanation
+          },
+          subject,
+          skillArea,
+          phaseDescription: `Activity ${i + 1}: ${skillArea.replace(/_/g, ' ')}`
+        };
+
+        activities.push(activity);
+        console.log(`✅ Generated AI activity ${i + 1}: ${activity.title}`);
+      } catch (error) {
+        console.error(`❌ Failed to generate AI activity ${i}:`, error);
+        // Fallback to basic activity
+        const fallbackActivity: LessonActivity = {
+          id: `${lessonId}-fallback-${i}`,
+          title: `${subject} Challenge ${i + 1}`,
+          type: 'quiz',
+          phase: 'quiz',
+          duration: 180,
+          content: {
+            question: `What is an important concept in ${subject}?`,
+            options: ['Option A', 'Option B', 'Option C', 'Option D'],
+            correctAnswer: 0,
+            explanation: `This helps build understanding in ${subject}.`
+          },
+          subject,
+          skillArea
+        };
+        activities.push(fallbackActivity);
+      }
     }
 
     return activities;
+  }
+
+  private static generateActivityTitle(subject: string, skillArea: string, index: number): string {
+    const titles = [
+      `${subject} Fundamentals`,
+      `${skillArea.replace(/_/g, ' ')} Challenge`,
+      `Problem Solving in ${subject}`,
+      `${subject} Application`,
+      `Critical Thinking`,
+      `Advanced ${skillArea.replace(/_/g, ' ')}`,
+      `${subject} Mastery`
+    ];
+    return titles[index % titles.length];
   }
 
   private static getActivityTypeForIndex(index: number): string {
