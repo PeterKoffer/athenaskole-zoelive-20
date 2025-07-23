@@ -11,7 +11,7 @@ const ClassLessonDurationSettings = () => {
   const [form, setForm] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     CLASS_OPTIONS.forEach(opt => {
-      initial[opt.value] = durations[opt.value] ?? 10;
+      initial[opt.value] = durations[opt.value] ?? 1.5;
     });
     return initial;
   });
@@ -32,7 +32,7 @@ const ClassLessonDurationSettings = () => {
           Lesson Duration per Class
         </CardTitle>
         <p className="text-sm text-muted-foreground mt-1">
-          Set preferred daily lesson length (in minutes) for each class
+          Set preferred daily lesson length (in hours) for each class
         </p>
       </CardHeader>
       <CardContent>
@@ -44,13 +44,13 @@ const ClassLessonDurationSettings = () => {
                   {cls.label}
                 </label>
                 <span className="text-sm font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
-                  {form[cls.value]} min
+                  {form[cls.value]} hr
                 </span>
               </div>
               <Slider
-                min={1}
-                max={10}
-                step={1}
+                min={0.5}
+                max={4}
+                step={0.5}
                 value={[form[cls.value]]}
                 onValueChange={v => handleChange(cls.value, v[0])}
               />
