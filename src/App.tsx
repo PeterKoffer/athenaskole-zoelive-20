@@ -100,7 +100,7 @@ const App = () => (
           
           {/* Learning Routes - All subjects organized by folder structure */}
           <Route 
-            path="/learn/mathematics" 
+            path="/learn/:subject" 
             element={
               <ProtectedRoute>
                 <SubjectLearningPage />
