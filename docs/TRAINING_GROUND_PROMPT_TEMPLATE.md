@@ -4,41 +4,41 @@ Training Ground is an educational AI platform dedicated to delivering world-clas
 
 ## Key Parameters for Tailored Lessons
 
-### Subject (Content Area)
-Specify the subject so the AI can match the lesson style and activities. **Fallback:** use a neutral academic focus.
+### 1. Subject (Content Area)
+Specify the subject so the AI can match the lesson style and activities. **Fallback:** use a general academic focus if not provided.
 
-### Student Grade Level
-Indicate the grade or K–12 level to keep the language and concepts age‑appropriate. **Fallback:** assume a middle-school proficiency level.
+### 2. Student Grade Level
+Indicate the grade or K–12 level to keep the language and concepts age‑appropriate. **Fallback:** assume middle school level if not stated.
 
-### Curriculum Alignment
-Include national or state standards or specific objectives so the lesson meets official requirements. **Fallback:** rely on broadly accepted topics and skills for that grade.
+### 3. Curriculum Alignment
+Include national or state standards or specific objectives so the lesson meets official requirements. **Fallback:** use broadly accepted topics and skills for that grade.
 
-### School/Teaching Perspective
-Reference your school philosophy or teaching approach, such as Montessori or project‑based learning. **Fallback:** use a balanced, evidence‑based style.
+### 4. School/Teaching Perspective
+Reference your school philosophy or teaching approach, such as Montessori or project‑based learning. **Fallback:** default to a balanced, evidence‑based style.
 
-### Lesson Duration
-State how long the lesson should run (e.g. 30 minutes). **Fallback:** plan for a standard 30–45 minute class.
+### 5. Lesson Duration
+State how long the lesson should run (e.g. 30 minutes). **Fallback:** use 30–45 minutes if unspecified.
 
-### Subject Weight (Content Emphasis)
+### 6. Subject Weight (Content Emphasis)
 If some subjects have higher priority, mention it so depth can be adjusted. **Fallback:** treat all subjects equally.
 
-### Calendar Context (Keywords)
-Note seasonal themes, holidays, or events to make content timely. **Fallback:** omit time‑specific context.
+### 7. Calendar Context (Keywords)
+Note seasonal themes, holidays, or events to make content timely. **Fallback:** omit time‑specific references.
 
-### Calendar Duration
-Describe the broader timeframe or unit the lesson belongs to. **Fallback:** treat the lesson as a stand‑alone session.
+### 8. Calendar Duration
+Describe the broader timeframe or unit the lesson belongs to. **Fallback:** treat the lesson as a standalone session.
 
-### Student Abilities and Proficiency
-Outline prior knowledge or performance so the AI can scaffold or extend appropriately. **Fallback:** assume a mixed‑ability class with both support and challenge.
+### 9. Student Abilities and Proficiency
+Outline prior knowledge or performance so the AI can scaffold or extend appropriately. **Fallback:** assume mixed ability and include both support and challenges.
 
-### Learning Style Preferences
-Share whether students prefer visual, auditory, kinesthetic, or other modes. **Fallback:** present information in multiple ways.
+### 10. Learning Style Preferences
+Share whether students prefer visual, auditory, kinesthetic, or other modes. **Fallback:** use a multimodal approach.
 
-### Student Interests
+### 11. Student Interests
 Mention hobbies or topics students enjoy to boost engagement. **Fallback:** use generally relatable examples.
 
-### Interactive & Assessment Elements
-Request interactive activities or gamified practice along with a short quiz to check understanding. **Fallback:** include at least one activity and a few review questions.
+### 12. Interactive & Assessment Elements
+Request interactive activities or gamified practice along with a brief quiz to check understanding. **Fallback:** include at least one activity and a few review questions.
 
 ## Example Prompt Template
 

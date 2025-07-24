@@ -4,67 +4,89 @@
 // ============================================
 
 export interface PromptContext {
+  // Core parameters
   subject: string;
   gradeLevel: number;
-  performanceLevel?: 'below' | 'average' | 'above';
+  
+  // Extended Training Ground parameters
+  curriculumStandards?: string;
+  teachingPerspective?: string;
+  lessonDuration?: number; // in minutes
+  subjectWeight?: 'high' | 'medium' | 'low';
+  calendarKeywords?: string[];
+  calendarDuration?: string;
+  studentAbilities?: string;
   learningStyle?: string;
+  studentInterests?: string[];
+  
+  // Legacy support
+  performanceLevel?: 'below' | 'average' | 'above';
   interests?: string[];
   schoolPhilosophy?: string;
-  calendarKeywords?: string[];
 }
 
 // ============================================
 // 1. TRAINING GROUND PROMPT - Creative Activities
 // ============================================
 export function createTrainingGroundPrompt(context: PromptContext): string {
+  // Extract all 12 parameters with fallbacks as specified
   const {
     subject,
     gradeLevel,
-    performanceLevel = 'average',
-    learningStyle = 'mixed',
+    curriculumStandards = 'broadly accepted topics and skills for that grade',
+    teachingPerspective = 'balanced, evidence-based style',
+    lessonDuration = 35, // 30-45 minute fallback
+    subjectWeight = 'medium',
+    calendarKeywords = [],
+    calendarDuration = 'standalone session',
+    studentAbilities = 'mixed ability with both support and challenges',
+    learningStyle = 'multimodal approach',
+    studentInterests = [],
+    
+    // Legacy support mappings
+    performanceLevel,
     interests = [],
-    schoolPhilosophy = 'Experiential & creative learning',
-    calendarKeywords = []
+    schoolPhilosophy
   } = context;
 
-  return `You are a highly creative AI educator working in a modern, playful learning simulator.
+  // Map legacy fields to new system
+  const finalTeachingPerspective = teachingPerspective || schoolPhilosophy || 'balanced, evidence-based style';
+  const finalStudentInterests = studentInterests.length > 0 ? studentInterests : 
+    (interests.length > 0 ? interests : ['generally relatable examples']);
+  const finalStudentAbilities = studentAbilities || 
+    (performanceLevel ? `${performanceLevel} grade level performance` : 'mixed ability with both support and challenges');
+
+  return `You are a world-class ${subject} teacher creating a lesson for a Grade ${gradeLevel} student. Develop a lesson aligned with ${curriculumStandards} and incorporate the school's ${finalTeachingPerspective} approach. The lesson should be designed for about ${lessonDuration} minutes of learning. Since ${subject} is a ${subjectWeight} priority subject in our curriculum, adjust the depth accordingly. ${calendarKeywords.length > 0 ? `Consider the context of ${calendarKeywords.join(', ')} over the next ${calendarDuration} in the lesson content.` : ''} Tailor the material to the student's skill level – ${finalStudentAbilities}, providing support or extension as needed. Use a ${learningStyle} approach and connect to the student's interest in ${finalStudentInterests.join(', ')} to make the lesson engaging. Include interactive activities or a game, and end with a brief quiz or test to assess understanding.
 
 🚫 FORBIDDEN (DO NOT CREATE):
-- No quizzes or tests
-- No "What is..." or "Which of the following..." formats  
-- No math word problems like "Sarah has 8 apples..."
-- No boring scenarios about buying things or counting objects
+- No traditional quizzes or tests as the main activity
+- No "What is..." or "Which of the following..." formats as primary content
+- No boring word problems like "Sarah has 8 apples..."
+- No generic scenarios about buying things or counting objects
 
 ✅ REQUIRED (MUST CREATE):
 - Imaginative, engaging activities that feel like games
-- Use themed learning: CookingGame, ScienceExperiment, ArtChallenge, MusicComposer, StoryBuilder
-- Make it feel like an adventure or exploration, NOT schoolwork
-
-📋 STUDENT PROFILE:
-- Subject: ${subject}
-- Grade: ${gradeLevel}
-- Performance: ${performanceLevel}
-- Learning Style: ${learningStyle}
-- Interests: ${interests.join(', ') || 'general exploration'}
-- School Philosophy: ${schoolPhilosophy}
-- Calendar Context: ${calendarKeywords.join(', ') || 'none'}
+- Use themed learning: CookingGame, ScienceExperiment, ArtChallenge, MusicComposer, StoryBuilder, PuzzleSolver
+- Make it feel like an adventure or exploration, NOT traditional schoolwork
+- Include at least one interactive activity and a brief assessment element
 
 🎨 MANDATORY OUTPUT FORMAT:
 Return EXACTLY this JSON structure:
 {
   "title": "Creative activity title with action words",
   "objective": "What the student will learn through this activity",
-  "explanation": "Brief explanation in simple terms",
+  "explanation": "Brief explanation in simple terms for Grade ${gradeLevel}",
   "activity": {
     "type": "CookingGame|ScienceExperiment|ArtChallenge|MusicComposer|StoryBuilder|PuzzleSolver",
-    "instructions": "Step-by-step hands-on instructions"
+    "instructions": "Step-by-step hands-on instructions adapted for ${learningStyle} learners"
   },
   "optionalExtension": "Additional creative challenge for advanced learners",
-  "studentSkillTargeted": "Specific skill being developed",
-  "learningStyleAdaptation": "How this adapts to their learning style"
+  "studentSkillTargeted": "Specific ${subject} skill being developed",
+  "learningStyleAdaptation": "How this specifically adapts to ${learningStyle} learning preferences",
+  "assessmentElement": "Brief interactive way to check understanding (not a traditional quiz)"
 }
 
-REMEMBER: No quizzes allowed. Create an immersive learning adventure!`;
+REMEMBER: Create an immersive learning adventure that incorporates all the contextual parameters provided!`;
 }
 
 // ============================================
