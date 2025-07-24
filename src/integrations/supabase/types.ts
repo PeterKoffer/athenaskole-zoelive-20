@@ -59,6 +59,30 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_cache: {
+        Row: {
+          created_at: string
+          id: string
+          json: Json
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          json: Json
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          json?: Json
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_interactions: {
         Row: {
           ai_service: string
