@@ -78,3 +78,8 @@ Additional guides and references can be found in the `docs` folder. A new prompt
 
 - [Training Ground Prompt Template](docs/TRAINING_GROUND_PROMPT_TEMPLATE.md)
 - [Curriculum Coverage](docs/CURRICULUM_COVERAGE.md)
+
+## Environment variables
+
+Set `OPENAI_MODEL` to specify the model used when calling OpenAI. If omitted,
+`gpt-3.5-turbo` will be used.

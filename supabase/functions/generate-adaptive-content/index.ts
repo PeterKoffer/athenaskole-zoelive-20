@@ -3,6 +3,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateContentWithTrainingGroundPrompt, generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
 import { createDailyProgramPrompt } from '../prompts/index.ts';
+import { OPENAI_MODEL } from './config.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -227,7 +228,7 @@ async function generateUniverseContent(requestData: any, openaiKey?: string, dee
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: OPENAI_MODEL,
         messages: [
           {
             role: 'system',
@@ -343,13 +344,9 @@ MANDATORY JSON FORMAT - RETURN EXACTLY THIS STRUCTURE:
         'Authorization': `Bearer ${openaiKey}`,
         'Content-Type': 'application/json',
       },
-        body: JSON.stringify({
-        model: 'gpt-4o-mini',
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
         messages: [
-          {
-            role: 'system',
-            content: 'You are a creative educational activity designer who NEVER creates quizzes or multiple choice questions. You design hands-on, interactive, and imaginative learning experiences that feel like games and adventures. You must follow the user\'s format requirements exactly and avoid any quiz-style content.'
-          },
           {
             role: 'user',
             content: restrictivePrompt
