@@ -5,7 +5,7 @@ import { UserMetadata } from '@/types/auth';
 import { useNavigate } from 'react-router-dom';
 import UniversalLearningIntroduction from './components/universal/UniversalLearningIntroduction';
 import UniversalLearningLoading from './components/universal/UniversalLearningLoading';
-import UnifiedLessonManager from './components/UnifiedLessonManager';
+// import UnifiedLessonManager from './components/UnifiedLessonManager';
 import ClassroomEnvironment from './components/shared/ClassroomEnvironment';
 import { getClassroomConfig } from './components/shared/classroomConfigs';
 
@@ -72,12 +72,10 @@ const UniversalLearning = ({ subject, skillArea }: UniversalLearningProps) => {
   // After introduction, show the actual learning content
   return (
     <ClassroomEnvironment config={classroomConfig}>
-      <UnifiedLessonManager
-        subject={subject}
-        skillArea={skillArea}
-        studentName={studentName}
-        onBackToProgram={handleBackToTrainingGround}
-      />
+      <div className="text-white text-center p-8">
+        <h2 className="text-2xl mb-4">Learning content temporarily disabled</h2>
+        <p>Use the working mathematics page instead</p>
+      </div>
     </ClassroomEnvironment>
   );
 };
