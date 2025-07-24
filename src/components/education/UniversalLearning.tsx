@@ -38,6 +38,7 @@ const UniversalLearning = ({ subject, skillArea }: UniversalLearningProps) => {
     }, 1500);
   };
 
+  // Function to handle navigation back to training ground
   const handleBackToTrainingGround = () => {
     console.log('🔙 Navigating back to Training Ground');
     navigate('/training-ground');
