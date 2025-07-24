@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 console.log('🔥 DEBUGGING: MathematicsLearningPage loaded');
 
 const MathematicsLearningPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(29);
@@ -12,30 +15,87 @@ const MathematicsLearningPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [totalQuestions] = useState(5); // Generate 5 AI questions
 
   console.log('🔥 DEBUGGING: Component state:', { currentQuestion, hasStarted, score });
 
-  // Grade 3 math questions - REAL INTERACTIVE CONTENT
-  const questions = [
-    {
-      question: "Emma has 24 stickers. She wants to share them equally among her 4 friends. How many stickers will each friend get?",
-      options: ["5 stickers", "6 stickers", "7 stickers", "8 stickers"],
-      correct: 1,
-      explanation: "24 ÷ 4 = 6. Each friend gets 6 stickers!"
-    },
-    {
-      question: "What is 15 + 27?",
-      options: ["41", "42", "43", "44"],
-      correct: 1,
-      explanation: "15 + 27 = 42. Great addition!"
-    },
-    {
-      question: "Jake has 3 boxes of crayons. Each box has 8 crayons. How many crayons does Jake have in total?",
-      options: ["21", "22", "23", "24"],
-      correct: 3,
-      explanation: "3 × 8 = 24. Jake has 24 crayons!"
+  // Generate AI questions using your existing system
+  const generateAIQuestions = async () => {
+    setIsGenerating(true);
+    console.log('🤖 Starting AI question generation for mathematics...');
+    
+    try {
+      const generatedQuestions = [];
+      
+      for (let i = 0; i < totalQuestions; i++) {
+        console.log(`🤖 Generating question ${i + 1} of ${totalQuestions}...`);
+        
+        const { data, error } = await supabase.functions.invoke('generate-question', {
+          body: {
+            subject: 'mathematics',
+            skillArea: i < 2 ? 'basic_arithmetic' : 'word_problems',
+            difficultyLevel: 3, // Grade 3 level
+            gradeLevel: 3,
+            userId: 'student',
+            questionIndex: i,
+            promptVariation: i < 2 ? 'basic' : 'story',
+            topicFocus: i % 2 === 0 ? 'addition' : 'subtraction',
+            questionType: 'multiple_choice'
+          }
+        });
+
+        if (error) {
+          console.error(`❌ AI question ${i + 1} generation error:`, error);
+          throw error;
+        }
+
+        if (data?.question) {
+          const aiQuestion = {
+            question: data.question,
+            options: data.options || ['A', 'B', 'C', 'D'],
+            correct: data.correct || 0,
+            explanation: data.explanation || 'Great job!'
+          };
+          
+          generatedQuestions.push(aiQuestion);
+          console.log(`✅ Generated AI question ${i + 1}: ${aiQuestion.question.substring(0, 50)}...`);
+        } else {
+          throw new Error(`No question data received for question ${i + 1}`);
+        }
+      }
+      
+      setQuestions(generatedQuestions);
+      console.log(`🎉 Successfully generated ${generatedQuestions.length} AI math questions!`);
+      
+    } catch (error) {
+      console.error('❌ Failed to generate AI questions:', error);
+      toast({
+        title: "AI Generation Failed",
+        description: "Using fallback questions for now",
+        variant: "destructive"
+      });
+      
+      // Fallback to ensure the lesson can still work
+      setQuestions([
+        {
+          question: "What is 15 + 27?",
+          options: ["40", "41", "42", "43"],
+          correct: 2,
+          explanation: "15 + 27 = 42"
+        }
+      ]);
+    } finally {
+      setIsGenerating(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    if (hasStarted && questions.length === 0) {
+      generateAIQuestions();
+    }
+  }, [hasStarted]);
 
   useEffect(() => {
     if (hasStarted) {
@@ -57,7 +117,7 @@ const MathematicsLearningPage = () => {
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult) return;
+    if (showResult || questions.length === 0) return;
     
     console.log('🔥 DEBUGGING: Answer selected:', answerIndex);
     setSelectedAnswer(answerIndex);
@@ -78,7 +138,7 @@ const MathematicsLearningPage = () => {
       setSelectedAnswer(null);
       setShowResult(false);
     } else {
-      alert(`Congratulations! You completed the lesson with ${score} points!`);
+      alert(`Congratulations! You completed ${questions.length} AI-generated questions with ${score} points!`);
       navigate('/training-ground');
     }
   };
@@ -104,7 +164,7 @@ const MathematicsLearningPage = () => {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-4">🔥 DEBUG: Peter's Mathematics Session (WORKING!)</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">🤖 AI-Generated Mathematics Session</h1>
           
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="text-center">
@@ -138,18 +198,30 @@ const MathematicsLearningPage = () => {
         {!hasStarted ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">🔥 REAL Interactive Mathematics (NOT AI Generated!)</h2>
+              <h2 className="text-white text-xl font-bold">🤖 AI-Generated Mathematics Questions</h2>
             </div>
             <div className="p-8">
               <p className="text-gray-300 text-lg mb-6">
-                This is the NEW working mathematics content! Click below to start 3 interactive math questions with real feedback.
+                Click below to start {totalQuestions} AI-generated mathematics questions tailored to your level with personalized feedback.
               </p>
               <button
                 onClick={handleStartLearning}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
-                🚀 START REAL MATH LEARNING
+                🤖 START AI MATH GENERATION
               </button>
+            </div>
+          </div>
+        ) : isGenerating ? (
+          <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
+            <div className="bg-gradient-to-r from-orange-600 to-yellow-600 p-4 rounded-t-lg">
+              <h2 className="text-white text-xl font-bold">🤖 Generating AI Questions...</h2>
+            </div>
+            <div className="p-8 text-center">
+              <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-300 text-lg">
+                Creating personalized mathematics questions using AI...
+              </p>
             </div>
           </div>
         ) : (
