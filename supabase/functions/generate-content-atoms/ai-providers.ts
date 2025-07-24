@@ -131,8 +131,8 @@ export async function generateWithEnhancedRetry(
         console.log(`🎯 OpenAI Generation - Attempt ${attempt}/${maxAttempts}`);
         const atoms = await generateWithAI(
           OPENAI_API_KEY, 
-          OPENAI_ENDPOINT,
-          Deno.env.get('OPENAI_MODEL') || 'gpt-3.5-turbo',
+          OPENAI_ENDPOINT, 
+          "gpt-4o-mini", 
           kcId, 
           userId, 
           contentTypes, 

@@ -86,11 +86,11 @@ serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: Deno.env.get('OPENAI_MODEL') || 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             messages: [
-              {
-                role: 'system',
-                content: 'You are an expert K-12 curriculum designer and educational content creator. You specialize in creating engaging, standards-aligned math content that connects to real-world applications and student interests.'
+              { 
+                role: 'system', 
+                content: 'You are an expert K-12 curriculum designer and educational content creator. You specialize in creating engaging, standards-aligned math content that connects to real-world applications and student interests.' 
               },
               { role: 'user', content: finalPrompt }
             ],

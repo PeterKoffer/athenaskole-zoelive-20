@@ -1,8 +1,6 @@
 
-export const OPENAI_MODEL = Deno.env.get('OPENAI_MODEL') || 'gpt-3.5-turbo';
-
 export const OPENAI_CONFIG = {
-  model: OPENAI_MODEL,
+  model: 'gpt-4o-mini',
   temperature: 0.7,
   maxTokens: 1000,
 } as const;

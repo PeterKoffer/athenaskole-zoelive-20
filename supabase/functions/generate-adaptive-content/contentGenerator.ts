@@ -4,7 +4,6 @@
 
 import { getPromptForContext, type PromptContext } from '../../../src/services/prompt-system/index.ts';
 import { mapAppDataToPromptContext, type AppDataSources, validateDataSources } from '../../../src/services/prompt-system/dataMapping.ts';
-import { OPENAI_MODEL } from './config.ts';
 
 export async function generateContentWithTrainingGroundPrompt(requestData: any) {
   const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
@@ -69,8 +68,12 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: OPENAI_MODEL,
+        model: 'gpt-4o-mini',
         messages: [
+          {
+            role: 'system',
+            content: 'You are a creative educational activity designer who NEVER creates quizzes or multiple choice questions. You design hands-on, interactive, and imaginative learning experiences that feel like games and adventures. You must follow the user\'s format requirements exactly and avoid any quiz-style content.'
+          },
           {
             role: 'user',
             content: prompt
@@ -155,7 +158,7 @@ export async function generateContentWithOpenAI(requestData: any) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: OPENAI_MODEL,
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
