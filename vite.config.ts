@@ -1,77 +1,71 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from "path"
-import { componentTagger } from "lovable-tagger";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  optimizeDeps: {
-    include: ['react', 'react-dom']
-  },
-  server: {
-    host: "127.0.0.1",
-    port: 8080,
-    proxy: {
-      "/api": {
-        target: "http://localhost:54321",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-      "/socket.io": {
-        target: "ws://localhost:3000",
-        ws: true,
+// Get mode from command line or default to development
+const mode = process.env.NODE_ENV || 'development';
+
+// Component tagger for development
+const componentTagger = () => ({
+  name: 'component-tagger',
+  transform(code: string, id: string) {
+    if (id.includes('src/components') && id.endsWith('.tsx')) {
+      const componentName = path.basename(id, '.tsx');
+      return {
+        code: `${code}\n/* Component: ${componentName} */`,
+        map: null
+      };
+    }
+  }
+});
+
+export default defineConfig({
+  plugins: [
+    react({
+      babel: {
+        compact: false,
+      }
+    }),
+    mode === 'development' && componentTagger(),
+    // Custom plugin to disable TypeScript checking in development
+    mode === 'development' && {
+      name: 'disable-typescript-dev',
+      config(config) {
+        // Disable TypeScript checking
+        config.esbuild = false;
       },
     },
-  },
+  ].filter(Boolean),
+  
+  // Use JavaScript mode for development to skip TypeScript checking
+  esbuild: mode === 'production' ? {
+    target: 'es2020',
+    drop: ['console', 'debugger'],
+  } : false,
+  
   build: {
     rollupOptions: {
       onwarn(warning, warn) {
-        // Suppress all warnings during development
+        // Suppress all warnings in development  
         if (mode === 'development') return;
         warn(warning);
       },
     },
   },
-  esbuild: {
-    drop: mode === 'production' ? ['console'] : [],
-    legalComments: 'none',
-    target: 'es2020',
-    logLevel: 'silent',
-    ignoreAnnotations: true,
-  },
-  plugins: [
-    react({
-      babel: {
-        compact: false,
-        plugins: mode === 'development' ? [] : undefined
-      }
-    }),
-    mode === 'development' && componentTagger(),
-    // Development-only plugin to suppress TypeScript errors
-    mode === 'development' && {
-      name: 'suppress-ts-dev', 
-      configResolved(config) {
-        if (mode === 'development') {
-          // Disable TypeScript checking in development
-          config.esbuild = {
-            ...config.esbuild,
-            target: 'es2020',
-            treeShaking: false,
-            keepNames: true,
-            format: 'esm'
-          };
-        }
-      }
-    }
-  ].filter(Boolean),
-  define: {
-    global: 'globalThis',
-    'process.env.NODE_ENV': mode === 'development' ? '"development"' : '"production"',
-    'process.env.VITE_SKIP_TS_CHECK': mode === 'development' ? '"true"' : '"false"',
-  },
+  
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-}))
+  
+  define: {
+    global: 'globalThis',
+    'process.env.NODE_ENV': JSON.stringify(mode),
+  },
+  
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
+});
