@@ -120,10 +120,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <WelcomeContent userName={actualUserName} />
-          <NelieAvatarDisplay 
-            isSpeaking={isSpeaking}
-            onStopSpeech={handleStopSpeech}
-          />
+          <NelieAvatarDisplay />
         </div>
       </CardContent>
     </Card>

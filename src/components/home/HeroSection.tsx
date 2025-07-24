@@ -29,7 +29,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
       <div className="max-w-4xl mx-auto text-center space-y-8">
         {/* Nelie Avatar Display */}
         <div className="mb-8">
-          <NelieAvatarDisplay isSpeaking={false} onStopSpeech={() => {}} />
+          <NelieAvatarDisplay />
         </div>
 
         {/* Welcome Text */}

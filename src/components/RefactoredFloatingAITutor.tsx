@@ -45,7 +45,7 @@ export default function RefactoredFloatingAITutor() {
       style={{
         left: pos.x,
         top: pos.y,
-        backgroundImage: "url('/nelie.png')",
+        backgroundImage: "url('/lovable-uploads/5f017352-b893-4428-97c9-83b514c5839c.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
