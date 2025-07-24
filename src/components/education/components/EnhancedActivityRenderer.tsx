@@ -20,9 +20,10 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
 }) => {
   const [selectedAnswer, setSelectedAnswer] = React.useState<number | null>(null);
   const [showResult, setShowResult] = React.useState(false);
+  const [isCompleted, setIsCompleted] = React.useState(false);
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult) return;
+    if (showResult || isCompleted) return;
     
     setSelectedAnswer(answerIndex);
     setShowResult(true);
@@ -30,7 +31,11 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
     const isCorrect = answerIndex === activity.content.correctAnswer;
     const points = isCorrect ? 10 : 0;
     
+    // Show result immediately, then auto-advance after delay
     setTimeout(() => {
+      if (isCompleted) return; // Prevent double completion
+      
+      setIsCompleted(true);
       if (onComplete) {
         onComplete(points);
       }
@@ -41,6 +46,9 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   };
 
   const handleContinue = () => {
+    if (isCompleted) return; // Prevent double completion
+    
+    setIsCompleted(true);
     if (onComplete) {
       onComplete(0);
     }
@@ -111,10 +119,17 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
             </div>
 
             {showResult && (
-              <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+              <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4">
                 <p className="text-gray-300">
                   {activity.content.explanation}
                 </p>
+                <Button 
+                  onClick={handleContinue}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={isCompleted}
+                >
+                  Continue to Next Activity
+                </Button>
               </div>
             )}
           </div>
