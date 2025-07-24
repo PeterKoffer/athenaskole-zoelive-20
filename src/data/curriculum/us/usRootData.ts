@@ -1,5 +1,5 @@
 
-import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
+import { CurriculumNode } from '@/types/curriculum';
 
 export const usRootCurriculumNodes: CurriculumNode[] = [
   // United States Root

@@ -1,5 +1,5 @@
 
-import { UnifiedCurriculumNode } from '@/types/curriculum/UnifiedCurriculumNode';
+import type { UnifiedCurriculumNode } from '@/types/curriculum';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 // Mock curriculum data - in a real app this would come from your API/database

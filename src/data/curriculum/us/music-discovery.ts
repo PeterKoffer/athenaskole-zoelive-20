@@ -1,5 +1,5 @@
 
-import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
+import { CurriculumNode } from '@/types/curriculum';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 export const musicDiscoveryCurriculum: CurriculumNode[] = [
