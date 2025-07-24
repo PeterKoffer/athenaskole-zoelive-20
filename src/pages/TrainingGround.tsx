@@ -7,6 +7,7 @@ import { UserMetadata } from "@/types/auth";
 import { ArrowLeft, Target, Dumbbell } from "lucide-react";
 import TodaysProgramGrid from "@/components/daily-program/TodaysProgramGrid";
 import { dailyActivities } from "@/components/daily-program/dailyActivitiesData";
+import LessonStream from "@/components/LessonStream";
 
 const TrainingGround = () => {
   const navigate = useNavigate();
@@ -114,7 +115,13 @@ const TrainingGround = () => {
             </div>
           </div>
 
-          {/* Training Activities Grid - removed the Today's Program heading */}
+          {/* AI Streaming Test Section */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">🧪 AI Streaming Test</h2>
+            <LessonStream />
+          </div>
+
+          {/* Training Activities Grid */}
           <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
         </div>
       </div>

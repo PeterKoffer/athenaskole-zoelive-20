@@ -14,6 +14,8 @@ Returner KUN valid JSON, der matcher skemaet:
   "materials": string[],
   "reflectionPrompts": string[]
 }
+
+VIGTIGT: Generer KORTFATTET for hurtig respons. Max 2-3 aktiviteter.
 `;
 
   const user = `
