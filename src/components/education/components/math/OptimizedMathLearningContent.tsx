@@ -1,4 +1,4 @@
-import SimpleMathLearningContent from './SimpleMathLearningContent';
+import CleanMathLearning from './CleanMathLearning';
 
 interface OptimizedMathLearningContentProps {
   onBackToProgram: () => void;
@@ -8,7 +8,7 @@ const OptimizedMathLearningContent = ({
   onBackToProgram
 }: OptimizedMathLearningContentProps) => {
   return (
-    <SimpleMathLearningContent
+    <CleanMathLearning
       onBackToProgram={onBackToProgram}
     />
   );
