@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
+import NELIEAvatar from "@/components/ai-tutor/NELIEAvatar";
 
 interface CollapsedButtonProps {
   onExpand: () => void;
@@ -58,7 +58,7 @@ const CollapsedButton = ({
           touchAction: 'none',
         }}
       >
-        <RobotAvatar 
+        <NELIEAvatar 
           size="3xl" 
           isActive={true} 
           isSpeaking={isSpeaking}

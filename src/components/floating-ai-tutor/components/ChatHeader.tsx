@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '../../ui/button';
 import { X, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import RobotAvatar from '../../ai-tutor/RobotAvatar';
+import NELIEAvatar from '@/components/ai-tutor/NELIEAvatar';
 
 interface ChatHeaderProps {
   onMouseDown: (e: React.MouseEvent) => void;
@@ -57,7 +57,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
       
       <div className="flex justify-center">
-        <RobotAvatar 
+        <NELIEAvatar 
           size="2xl" 
           isActive={true} 
           isSpeaking={isSpeaking}

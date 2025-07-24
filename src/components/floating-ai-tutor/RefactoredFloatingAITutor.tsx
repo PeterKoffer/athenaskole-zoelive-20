@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useDragBehavior } from './hooks/useDragBehavior';
@@ -18,7 +18,7 @@ const RefactoredFloatingAITutor = () => {
   const { isDragging, position, dragRef, handleMouseDown, hasMoved } = useDragBehavior();
   const { messages, addUserMessage, addNelieMessage } = useFloatingTutorMessages();
   const { speakAsNelie, isSpeaking, stop } = useUnifiedSpeech();
-  const { isOpen, setIsOpen, shouldHide } = useFloatingTutorState();
+  const { isOpen, setIsOpen } = useFloatingTutorState();
 
   // Don't show if user is not logged in
   if (!user) {

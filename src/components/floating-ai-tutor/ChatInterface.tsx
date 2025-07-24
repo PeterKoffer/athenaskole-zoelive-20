@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Send, X, Volume2, VolumeX } from "lucide-react";
-import RobotAvatar from "@/components/ai-tutor/RobotAvatar";
+import NELIEAvatar from "@/components/ai-tutor/NELIEAvatar";
 import VoiceControls from "./VoiceControls";
 import { Message } from "./types";
 
@@ -100,7 +100,7 @@ const ChatInterface = ({
         
         {/* Large Nelie Avatar */}
         <div className="flex justify-center">
-          <RobotAvatar 
+          <NELIEAvatar 
             size="2xl" 
             isActive={true} 
             isSpeaking={isSpeaking}
