@@ -1,7 +1,7 @@
 
 export interface LessonActivity {
   id: string;
-  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'quiz' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'educational-game';
+  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'quiz' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'educational-game' | 'training-ground-activity';
   title: string;
   duration: number; // in seconds
   phase?: string; // Add phase property for backward compatibility
@@ -86,6 +86,20 @@ export interface LessonActivity {
     guidance?: string; // For guidance-based activities
     title?: string; // For activities with titles
     activityId?: string; // For activity identification
+    // Training Ground specific data
+    trainingGroundData?: {
+      title: string;
+      objective: string;
+      explanation: string;
+      activity: {
+        type: string;
+        instructions: string;
+      };
+      assessmentElement?: string;
+      optionalExtension?: string;
+      studentSkillTargeted?: string;
+      learningStyleAdaptation?: string;
+    };
   };
   difficulty?: 'easy' | 'medium' | 'hard';
   subject?: string;

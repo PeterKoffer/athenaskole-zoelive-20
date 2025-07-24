@@ -7,6 +7,7 @@ import { CacheService } from './dailyLessonGenerator/cacheService';
 import { calendarService } from './CalendarService';
 import { aiContentGenerator } from './content/aiContentGenerator'; // Fixed import path
 import learnerProfileService from './learnerProfile/LearnerProfileService';
+import { supabase } from '@/integrations/supabase/client';
 
 export class DailyLessonGenerator {
   /**
@@ -62,47 +63,69 @@ export class DailyLessonGenerator {
       
       while (!uniqueContent && attempts < 3) {
         try {
-          const aiContent = await aiContentGenerator.generateAdaptiveContent({
-            subject,
-            skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
-            gradeLevel,
-            activityType: this.getActivityTypeForIndex(i),
-            difficulty: gradeLevel + this.getDifficultyVariation(i),
-            learningStyle: learnerProfile?.learning_style_preference || 'mixed',
-            studentInterests: learnerProfile?.interests,
-            studentAbilities: studentProgress,
-            calendarKeywords: activeKeywords,
-            metadata: {
-              activityIndex: i,
-              studentProgress,
-              varietyPrompt: this.getVarietyPrompt(i),
-              diversityLevel: Math.floor(i / 2) + 1,
-              sessionId,
-              uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
+          // Use the new Training Ground prompt system via edge function
+          const { data: aiContent, error } = await supabase.functions.invoke('generate-adaptive-content', {
+            body: {
+              activityType: 'training-ground',
+              subject,
+              gradeLevel,
+              learningStyle: learnerProfile?.learning_style_preference || 'multimodal approach',
+              interests: learnerProfile?.interests || [],
+              studentInterests: learnerProfile?.interests || [],
+              studentAbilities: studentProgress?.abilities_assessment || 'mixed ability with both support and challenges',
+              teachingPerspective: 'balanced, evidence-based style',
+              curriculumStandards: 'broadly accepted topics and skills for that grade',
+              lessonDuration: 35,
+              subjectWeight: 'medium',
+              calendarKeywords: activeKeywords,
+              calendarDuration: 'standalone session',
+              performanceData: {
+                accuracy: studentProgress?.accuracy_rate || 0.75,
+                engagement: studentProgress?.engagement_level || 'moderate'
+              },
+              metadata: {
+                activityIndex: i,
+                sessionId,
+                varietyPrompt: this.getVarietyPrompt(i),
+                diversityLevel: Math.floor(i / 2) + 1,
+                uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
+              }
             }
           });
 
-          // Check for uniqueness
-          const questionKey = aiContent.question.toLowerCase().trim();
+          if (error) {
+            console.error('❌ Training Ground generation error:', error);
+            throw error;
+          }
+
+          // Check for uniqueness - Training Ground activities have different structure
+          const questionKey = aiContent.title?.toLowerCase().trim() || 
+                             aiContent.objective?.toLowerCase().trim() || 
+                             `activity-${i}`;
           if (!usedQuestions.has(questionKey)) {
             usedQuestions.add(questionKey);
             uniqueContent = true;
             
             const activity: LessonActivity = {
               id: `${sessionId}-activity-${i}`,
-              title: this.generateActivityTitle(subject, skillArea, i),
-              type: 'quiz',
-              phase: 'quiz',
+              title: aiContent.title || this.generateActivityTitle(subject, skillArea, i),
+              type: 'training-ground-activity',
+              phase: 'activity',
               duration: 180,
               content: {
-                question: aiContent.question,
-                options: aiContent.options,
-                correctAnswer: aiContent.correct,
-                explanation: aiContent.explanation
+                trainingGroundData: aiContent, // Store the full Training Ground activity
+                explanation: aiContent.explanation,
+                activity: aiContent.activity,
+                objective: aiContent.objective,
+                assessmentElement: aiContent.assessmentElement
               },
-              subject,
-              skillArea,
-              phaseDescription: `Activity ${i + 1}: ${skillArea.replace(/_/g, ' ')}`
+              difficulty: gradeLevel + this.getDifficultyVariation(i),
+              metadata: {
+                generatedBy: 'training-ground-prompt',
+                sessionId,
+                activityIndex: i,
+                isTrainingGroundActivity: true
+              }
             };
 
             activities.push(activity);
