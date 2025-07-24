@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,6 +12,9 @@ const TrainingGround = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const categories = Array.from(new Set(dailyActivities.map(a => a.subject)));
   
   console.log('🏋️ TrainingGround component rendered:', {
     userExists: !!user,
@@ -37,6 +40,10 @@ const TrainingGround = () => {
     
     // Navigate to AI-generated educational content for the specific subject
     navigate(`/learn/${activityId}`);
+  };
+
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
   };
 
   // Show loading state while authentication is being checked
@@ -77,6 +84,15 @@ const TrainingGround = () => {
     activitiesCount: dailyActivities.length
   });
 
+  let activitiesToDisplay = dailyActivities;
+  if (selectedCategory === 'mixed') {
+    activitiesToDisplay = [...dailyActivities].sort(() => Math.random() - 0.5);
+  } else if (selectedCategory !== 'all') {
+    activitiesToDisplay = dailyActivities.filter(
+      a => a.subject === selectedCategory
+    );
+  }
+
   // Main content for authenticated users
   if (user) {
     return (
@@ -114,8 +130,27 @@ const TrainingGround = () => {
             </div>
           </div>
 
-          {/* Training Activities Grid - removed the Today's Program heading */}
-          <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
+          {/* Category Selector */}
+          <div className="mb-6">
+            <label className="mr-2" htmlFor="category-select">Choose focus:</label>
+            <select
+              id="category-select"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              className="text-black rounded px-2 py-1"
+            >
+              <option value="all">All Subjects</option>
+              <option value="mixed">Mix it Up</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>
+                  {cat.replace('_', ' ')}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Training Activities Grid */}
+          <TodaysProgramGrid activities={activitiesToDisplay} onStartActivity={handleStartActivity} />
         </div>
       </div>
     );
@@ -140,7 +175,26 @@ const TrainingGround = () => {
           </Button>
         </div>
         
-        <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
+        {/* Category Selector */}
+        <div className="mb-6 text-center">
+          <label className="mr-2" htmlFor="category-select-guest">Choose focus:</label>
+          <select
+            id="category-select-guest"
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+            className="text-black rounded px-2 py-1"
+          >
+            <option value="all">All Subjects</option>
+            <option value="mixed">Mix it Up</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>
+                {cat.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <TodaysProgramGrid activities={activitiesToDisplay} onStartActivity={handleStartActivity} />
         
         <div className="mt-8 text-center">
           <Button variant="outline" onClick={() => navigate('/')} className="border-gray-600 text-slate-950 bg-sky-50">
