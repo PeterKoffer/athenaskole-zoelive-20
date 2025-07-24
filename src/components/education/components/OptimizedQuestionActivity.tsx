@@ -36,7 +36,6 @@ const OptimizedQuestionActivity = ({
   const [hasAnswered, setHasAnswered] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
-  const [questionAttempts, setQuestionAttempts] = useState(0);
   
   const startTime = useState(() => Date.now())[0];
 
@@ -108,7 +107,6 @@ const OptimizedQuestionActivity = ({
     setSelectedAnswer(null);
     setShowResult(false);
     setHasAnswered(false);
-    setQuestionAttempts(prev => prev + 1);
     
     // Generate a new question
     const newQuestion = await generateQuestion();

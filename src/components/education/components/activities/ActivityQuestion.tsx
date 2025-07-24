@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Trophy, BookOpen } from 'lucide-react';
+import { CheckCircle, XCircle, BookOpen } from 'lucide-react';
 import { LessonActivity } from '../EnhancedLessonContent';
 
 interface ActivityQuestionProps {

@@ -12,7 +12,6 @@ interface UseSubjectSpecificQuestionsProps {
 export const useSubjectSpecificQuestions = ({
   subject,
   skillArea,
-  usedQuestionIds,
   onQuestionUsed
 }: UseSubjectSpecificQuestionsProps) => {
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
@@ -47,7 +46,7 @@ export const useSubjectSpecificQuestions = ({
       
       console.log('✅ Generated unique question:', {
         id: uniqueQuestion.id,
-        question: uniqueQuestion.content.question.substring(0, 50) + '...',
+        question: uniqueQuestion.content.question?.substring(0, 50) + '...' || 'Question generated',
         questionNumber: questionCount + 1
       });
       

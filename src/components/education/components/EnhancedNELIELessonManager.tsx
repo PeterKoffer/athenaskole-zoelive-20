@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen, Play, Pause, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/hooks/useAuth';
+
 import { generateEnhancedLesson, EnhancedLessonConfig } from './utils/EnhancedLessonGenerator';
 
 interface EnhancedNELIELessonManagerProps {
@@ -14,7 +14,6 @@ interface EnhancedNELIELessonManagerProps {
 }
 
 const EnhancedNELIELessonManager = ({ subject, skillArea, onBack }: EnhancedNELIELessonManagerProps) => {
-  const { user } = useAuth();
   const [lesson, setLesson] = useState<EnhancedLessonConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);

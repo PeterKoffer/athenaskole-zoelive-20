@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useIntroductionLogic } from './introduction/hooks/useIntroductionLogic';
 import { getSubjectIntroduction } from './utils/subjectIntroductions';
 import ClassroomEnvironment from './shared/ClassroomEnvironment';
@@ -22,10 +22,9 @@ const UnifiedClassIntroduction = ({
   subject,
   skillArea,
   userLevel,
-  onIntroductionComplete,
-  isAdvancing
+  onIntroductionComplete
 }: UnifiedClassIntroductionProps) => {
-  const [userName, setUserName] = useState('Student');
+  const [userName] = useState('Student');
   
   // Get subject-specific introduction content
   const introduction = getSubjectIntroduction(subject, skillArea, userLevel, userName);
@@ -38,7 +37,6 @@ const UnifiedClassIntroduction = ({
     isComplete,
     isSpeaking,
     isEnabled,
-    hasUserInteracted,
     handleManualStart,
     handleManualRead,
     handleSkip,

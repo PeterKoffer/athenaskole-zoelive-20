@@ -1,10 +1,10 @@
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLessonState } from './useLessonState';
 import { useDynamicActivityGeneration } from './useDynamicActivityGeneration';
 import { useLessonProgression } from './useLessonProgression';
-import { useLessonContentGeneration } from './useLessonContentGeneration';
+
 import { useLessonProgressManager } from './useLessonProgressManager';
 import { useVariedLessonGenerator } from './useVariedLessonGenerator';
 
@@ -20,7 +20,7 @@ export const useExtendedLessonManager = ({
   onLessonComplete
 }: UseExtendedLessonManagerProps) => {
   const { user } = useAuth();
-  const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
+  
 
   // Use the smaller, focused hooks
   const {
@@ -31,17 +31,11 @@ export const useExtendedLessonManager = ({
     setScore,
     correctStreak,
     setCorrectStreak,
-    lastResponseTime,
     setLastResponseTime,
     targetLessonLength,
     timeElapsed
   } = useLessonState();
 
-  const {
-    generateIntroductionActivity,
-    generateContentDeliveryActivity,
-    generateSummaryActivity
-  } = useLessonContentGeneration(subject, skillArea);
 
   // Use the new varied lesson generator
   const { generateVariedLessonActivities } = useVariedLessonGenerator({
@@ -56,26 +50,18 @@ export const useExtendedLessonManager = ({
   // Initialize progress manager
   const {
     isLoadingProgress,
-    usedQuestionIds,
     saveProgress,
     completeLessonProgress,
-    generateSubjectQuestion,
     resetProgress
   } = useLessonProgressManager(subject);
 
   const {
-    dynamicActivities,
-    setDynamicActivities,
-    questionsGenerated,
-    isGeneratingQuestion,
-    generateDynamicActivity,
-    forceFreshSession,
     sessionId
   } = useDynamicActivityGeneration({
     subject,
     skillArea,
     timeElapsed,
-    usedQuestionIds,
+    usedQuestionIds: [],
     onQuestionUsed: () => {}
   });
 

@@ -20,10 +20,7 @@ const LessonProgressHeader = ({
   score,
   currentActivityIndex,
   totalActivities,
-  targetLessonLength = DEFAULT_LESSON_SECONDS,
-  correctStreak,
-  engagementLevel,
-  questionsGenerated
+  targetLessonLength = DEFAULT_LESSON_SECONDS
 }: LessonProgressHeaderProps) => {
   // Convert timeElapsed (seconds) to minutes for display
   const timeElapsedMinutes = Math.floor(timeElapsed / 60);
