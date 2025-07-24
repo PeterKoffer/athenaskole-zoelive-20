@@ -150,7 +150,7 @@ const TrainingGround = () => {
             >
               {subjectOptions.map((s) => (
                 <option key={s} value={s}>
-                  {subjectsData[s].name}
+                  {subjectsData.find(subject => subject.id === s)?.name || s}
                 </option>
               ))}
             </select>
@@ -211,7 +211,7 @@ const TrainingGround = () => {
           >
             {subjectOptions.map((s) => (
               <option key={s} value={s}>
-                {s.replace('_', ' ')}
+                {subjectsData.find(subject => subject.id === s)?.name || s}
               </option>
             ))}
           </select>
