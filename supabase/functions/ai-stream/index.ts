@@ -24,7 +24,7 @@ function hashKey(obj: unknown): string {
   return btoa(JSON.stringify(obj));
 }
 
-const PROMPT_VERSION = 1;
+const PROMPT_VERSION = 2;
 
 function buildPrompt(req: any) {
   const system = `
@@ -67,10 +67,16 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const startTime = Date.now();
     const body = await req.json();
     const key = hashKey({ body, v: PROMPT_VERSION });
 
-    console.log('Checking cache for key:', key);
+    console.log('[ai-stream] Request received:', {
+      mode: body.mode,
+      subject: body.subject,
+      gradeLevel: body.gradeLevel,
+      key: key.slice(0, 12) + '...'
+    });
 
     // Check cache first
     const { data: cached } = await supabase
@@ -80,7 +86,16 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (cached?.json) {
-      console.log('Cache hit, returning cached content');
+      console.log('[ai-stream] Cache hit for key:', key.slice(0, 12) + '...');
+      
+      // Log metrics for cache hit
+      await supabase.from("ai_metrics").insert({
+        key: key.slice(0, 32),
+        duration_ms: Date.now() - startTime,
+        model: "cached",
+        status: "success"
+      });
+
       return new Response(JSON.stringify(cached.json), { 
         headers: { 
           ...corsHeaders,
@@ -89,7 +104,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log('Cache miss, generating new content');
+    console.log('[ai-stream] Cache miss, generating new content');
 
     const { system, user } = buildPrompt(body);
 
@@ -101,7 +116,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4.1-2025-04-14",
         temperature: 0.4,
         stream: true,
         messages: [
@@ -112,10 +127,25 @@ Deno.serve(async (req) => {
     });
 
     if (!response.ok) {
+      // Log error metrics
+      await supabase.from("ai_metrics").insert({
+        key: key.slice(0, 32),
+        duration_ms: Date.now() - startTime,
+        model: "gpt-4.1-2025-04-14",
+        status: "error",
+        error_message: `OpenAI API error: ${response.status}`
+      });
       throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     if (!response.body) {
+      await supabase.from("ai_metrics").insert({
+        key: key.slice(0, 32),
+        duration_ms: Date.now() - startTime,
+        model: "gpt-4.1-2025-04-14",
+        status: "error",
+        error_message: "No response body from OpenAI"
+      });
       throw new Error('No response body from OpenAI');
     }
 
@@ -132,16 +162,34 @@ Deno.serve(async (req) => {
             const { done, value } = await reader.read();
             
             if (done) {
-              console.log('Stream complete, saving to cache');
+              console.log('[ai-stream] Stream complete, saving to cache');
               controller.enqueue(encoder.encode(`event: done\ndata: end\n\n`));
               
               // Try to parse and cache the complete response
               try {
                 const json = JSON.parse(fullContent);
                 await supabase.from("ai_cache").upsert({ key, json });
-                console.log('Content cached successfully');
+                
+                // Log success metrics
+                await supabase.from("ai_metrics").insert({
+                  key: key.slice(0, 32),
+                  duration_ms: Date.now() - startTime,
+                  model: "gpt-4.1-2025-04-14",
+                  status: "success"
+                });
+                
+                console.log('[ai-stream] Content cached successfully');
               } catch (parseError) {
-                console.error('Failed to parse or cache content:', parseError);
+                console.error('[ai-stream] Failed to parse or cache content:', parseError);
+                
+                // Log parse error metrics
+                await supabase.from("ai_metrics").insert({
+                  key: key.slice(0, 32),
+                  duration_ms: Date.now() - startTime,
+                  model: "gpt-4.1-2025-04-14",
+                  status: "error",
+                  error_message: `Parse error: ${parseError.message}`
+                });
               }
               
               controller.close();
@@ -175,7 +223,17 @@ Deno.serve(async (req) => {
             }
           }
         } catch (error) {
-          console.error('Stream error:', error);
+          console.error('[ai-stream] Stream error:', error);
+          
+          // Log stream error metrics
+          await supabase.from("ai_metrics").insert({
+            key: key.slice(0, 32),
+            duration_ms: Date.now() - startTime,
+            model: "gpt-4.1-2025-04-14",
+            status: "error",
+            error_message: `Stream error: ${error.message}`
+          });
+          
           controller.enqueue(encoder.encode(`event: error\ndata: ${error.message}\n\n`));
           controller.close();
         }

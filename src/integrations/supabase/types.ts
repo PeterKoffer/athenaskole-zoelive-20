@@ -128,6 +128,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_metrics: {
+        Row: {
+          created_at: string | null
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          key: string
+          model: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          key: string
+          model?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          key?: string
+          model?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       calendar_context: {
         Row: {
           active_themes: string[] | null
