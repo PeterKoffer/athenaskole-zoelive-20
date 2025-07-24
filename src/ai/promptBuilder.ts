@@ -1,6 +1,6 @@
 import { LessonRequest } from "./types";
 
-export const PROMPT_VERSION = 1 as const;
+export const PROMPT_VERSION = 2 as const;
 
 export function buildPrompt(req: LessonRequest) {
   const system = `
