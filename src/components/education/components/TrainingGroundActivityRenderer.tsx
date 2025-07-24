@@ -61,7 +61,9 @@ const TrainingGroundActivityRenderer = ({ activity, onComplete }: TrainingGround
     }, 1500);
   };
 
-  const getActivityTypeIcon = (type: string) => {
+  const getActivityTypeIcon = (type?: string) => {
+    if (!type) return '🎯'; // Default icon if type is undefined
+    
     const icons = {
       'CookingGame': '👨‍🍳',
       'ScienceExperiment': '🔬',
@@ -78,7 +80,7 @@ const TrainingGroundActivityRenderer = ({ activity, onComplete }: TrainingGround
       <Card className="bg-gradient-to-br from-blue-900 to-cyan-900 border-blue-400 text-white">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-2xl">
-            <span className="text-4xl">{getActivityTypeIcon(trainingData.activity.type)}</span>
+            <span className="text-4xl">{getActivityTypeIcon(trainingData.activity?.type)}</span>
             {trainingData.title}
           </CardTitle>
         </CardHeader>
@@ -116,15 +118,15 @@ const TrainingGroundActivityRenderer = ({ activity, onComplete }: TrainingGround
       <Card className="bg-gradient-to-br from-green-900 to-emerald-900 border-green-400 text-white">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-xl">
-            <span className="text-3xl">{getActivityTypeIcon(trainingData.activity.type)}</span>
-            {trainingData.activity.type.replace(/([A-Z])/g, ' $1').trim()}
+            <span className="text-3xl">{getActivityTypeIcon(trainingData.activity?.type)}</span>
+            {trainingData.activity?.type?.replace(/([A-Z])/g, ' $1').trim() || 'Activity'}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="bg-green-800/50 p-4 rounded-lg">
             <h3 className="font-semibold text-green-200 mb-3">🚀 Your Mission</h3>
             <div className="prose prose-invert prose-green max-w-none">
-              <div className="whitespace-pre-wrap text-green-100">{trainingData.activity.instructions}</div>
+              <div className="whitespace-pre-wrap text-green-100">{trainingData.activity?.instructions || 'Complete the learning activity'}</div>
             </div>
           </div>
 
