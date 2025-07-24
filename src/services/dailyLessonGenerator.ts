@@ -6,7 +6,7 @@ import { CurriculumService } from './dailyLessonGenerator/curriculumService';
 import { CacheService } from './dailyLessonGenerator/cacheService';
 import { calendarService } from './CalendarService';
 import { aiContentGenerator } from './content/aiContentGenerator'; // Fixed import path
-import learnerProfileService from '../learnerProfile/LearnerProfileService';
+import learnerProfileService from './learnerProfile/LearnerProfileService';
 
 export class DailyLessonGenerator {
   /**
