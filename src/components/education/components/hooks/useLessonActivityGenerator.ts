@@ -63,7 +63,7 @@ export const useLessonActivityGenerator = ({ subject, skillArea, sessionId }: Us
           
           // Make sure we have all required properties
           activityId: `${lessonId}_question_${index + 1}`,
-          questionText: topic.question
+          
         }
       };
       

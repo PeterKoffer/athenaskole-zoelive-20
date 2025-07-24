@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserRole, ROLE_CONFIGS } from "@/types/auth";
+import { UserRole } from "@/types/auth";
 import { roleIcons, roleColors } from "./roleConstants";
 
 interface RoleGridProps {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useOptimizedLessonManager } from '../hooks/useOptimizedLessonManager';
-import { useStudentName } from '../math/hooks/useStudentName';
+
 import { useSpeechCleanup } from '../math/hooks/useSpeechCleanup';
 import EnglishLearningIntroduction from './EnglishLearningIntroduction';
 import EnglishLearningLoading from './EnglishLearningLoading';
@@ -92,7 +92,7 @@ const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLe
       isSpeaking={isSpeaking}
       onBackToProgram={handleBackToProgram}
       onToggleMute={toggleMute}
-      onReadRequest={handleReadRequest}
+      onReadRequest={() => handleReadRequest('')}
       onStopSpeaking={() => {
         console.log('🔇 [EnglishLearning] Stop speaking button - force stopping');
         forceStopAll();
