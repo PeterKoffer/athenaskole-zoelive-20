@@ -388,29 +388,44 @@ MANDATORY JSON FORMAT - RETURN EXACTLY THIS STRUCTURE:
 function buildDefaultTrainingGroundPrompt(requestData: any): string {
   const subject = requestData.subject || 'general learning';
   const gradeLevel = requestData.gradeLevel || 5;
-  
-  return `You are designing a creative, hands-on learning activity for ${subject} for a Grade ${gradeLevel} student.
+  const performance = requestData.performanceLevel || 'average';
+  const learningStyle = requestData.learningStyle || 'mixed';
+  const interests = requestData.interests?.join(', ') || 'general topics';
+  const schoolPhilosophy = requestData.schoolPhilosophy || 'Experiential & creative learning';
+  const emphasis = requestData.emphasis || 5;
+  const calendarKeywords = requestData.calendarKeywords?.join(', ') || 'none';
 
-STUDENT CONTEXT:
-- Subject: ${subject}
-- Grade Level: ${gradeLevel} 
-- Learning Goal: Explore ${subject} concepts through interactive play
+  return `You are a highly creative AI educator working in a modern, playful learning simulator.
 
-CREATE AN ENGAGING ACTIVITY:
-Design a creative, interactive activity that teaches ${subject} concepts through:
-- Hands-on exploration
-- Creative problem-solving  
-- Visual or kinesthetic learning
-- Game-like mechanics
-- Real-world applications
+🚫 Forbidden:
+- No quizzes or tests
+- No "What is..." or "Which of the following..." formats
+- No math word problems like "Lily has 12 apples"
 
-EXAMPLES OF GOOD ACTIVITY TYPES:
-- CookingGame: "Make fraction pizzas by combining slices"
-- SpaceExploration: "Navigate asteroid fields using coordinate geometry"
-- ArtChallenge: "Create symmetrical paintings to learn about reflection"
-- ScienceExperiment: "Build towers to explore engineering principles"
-- MusicComposer: "Create rhythm patterns to understand mathematical sequences"
-- StoryBuilder: "Write adventure stories using vocabulary words"
+✅ Required:
+- Imaginative, engaging activities
+- Use themed learning (e.g. cooking, art, music, science)
+- Tailor the activity to a student in grade ${gradeLevel} with a ${performance} performance level.
+- Adapt to their preferred learning style: ${learningStyle}
+- Consider their interests: ${interests}
+- Use the school's teaching philosophy: ${schoolPhilosophy}
+- Apply emphasis level ${emphasis} for the subject of ${subject}.
+- If relevant, integrate calendar theme: ${calendarKeywords}
 
-The activity should feel like an adventure or creative challenge, NOT like schoolwork or a test.`;
+🎨 Output Format:
+Return only structured JSON like this:
+{
+  "title": "...",
+  "objective": "...",
+  "explanation": "...",
+  "activity": {
+    "type": "CookingGame" | "Puzzle" | "StoryBuilder" | "ScienceExperiment",
+    "instructions": "..."
+  },
+  "optionalExtension": "...",
+  "studentSkillTargeted": "...",
+  "learningStyleAdaptation": "..."
+}
+
+You are not allowed to return any quizzes or boring scenarios. Make it engaging and immersive.`;
 }
