@@ -9,28 +9,18 @@ interface FloatingAvatarButtonProps {
   onToggleOpen: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onTouchStart: (e: React.TouchEvent) => void;
-  onResetToHome: () => void;
-  onEnableNelie: () => void;
   isDragging: boolean;
   hasMoved: boolean;
   isSpeaking: boolean;
-  showEnableButton: boolean;
-  hasUserInteracted: boolean;
-  isOnHomepage: boolean;
 }
 
 const FloatingAvatarButton = ({
   onToggleOpen,
   onMouseDown,
   onTouchStart,
-  onResetToHome,
-  onEnableNelie,
   isDragging,
   hasMoved,
-  isSpeaking,
-  showEnableButton,
-  hasUserInteracted,
-  isOnHomepage
+  isSpeaking
 }: FloatingAvatarButtonProps) => {
   const { isEnabled, toggleEnabled, repeatSpeech } = useUnifiedSpeech();
 

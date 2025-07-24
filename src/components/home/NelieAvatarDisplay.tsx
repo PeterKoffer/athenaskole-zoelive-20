@@ -1,12 +1,12 @@
 
-import RefactoredFloatingAITutor from "@/components/floating-ai-tutor/RefactoredFloatingAITutor";
+import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
 
 interface NelieAvatarDisplayProps {
   isSpeaking: boolean;
   onStopSpeech: () => void;
 }
 
-const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
+const NelieAvatarDisplay = () => {
   return (
     <>
       <RefactoredFloatingAITutor />
