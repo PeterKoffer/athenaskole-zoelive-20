@@ -1,5 +1,6 @@
 
 import { OpenAIResponse, GeneratedContent } from './types.ts';
+import { OPENAI_MODEL } from './config.ts';
 
 export interface APICallResult {
   success: boolean;
@@ -11,7 +12,7 @@ export interface APICallResult {
 export async function callOpenAI(apiKey: string, prompt: string): Promise<APICallResult> {
   console.log('🤖 Making request to OpenAI API...');
   console.log('🌐 Using endpoint: https://api.openai.com/v1/chat/completions');
-  console.log('🎯 Using model: gpt-4o-mini');
+  console.log(`🎯 Using model: ${OPENAI_MODEL}`);
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -21,7 +22,7 @@ export async function callOpenAI(apiKey: string, prompt: string): Promise<APICal
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: OPENAI_MODEL,
         messages: [
           {
             role: 'system',
