@@ -1,5 +1,5 @@
 
-import UnifiedLessonManager from '../UnifiedLessonManager';
+import EnhancedMathematicsLearningWithTemplate from '../EnhancedMathematicsLearningWithTemplate';
 
 interface OptimizedMathLearningContentProps {
   onBackToProgram: () => void;
@@ -9,10 +9,7 @@ const OptimizedMathLearningContent = ({
   onBackToProgram
 }: OptimizedMathLearningContentProps) => {
   return (
-    <UnifiedLessonManager
-      subject="mathematics"
-      skillArea="general_math"
-      studentName="Student"
+    <EnhancedMathematicsLearningWithTemplate
       onBackToProgram={onBackToProgram}
     />
   );

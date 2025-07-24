@@ -63,33 +63,26 @@ export class DailyLessonGenerator {
       
       while (!uniqueContent && attempts < 3) {
         try {
-          // Use the new Training Ground prompt system via edge function
+          // Use standard lesson generation for daily lessons, not Training Ground
           const { data: aiContent, error } = await supabase.functions.invoke('generate-adaptive-content', {
             body: {
-              activityType: 'training-ground',
+              type: 'lesson-activity',
               subject,
+              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
               gradeLevel,
-              learningStyle: learnerProfile?.learning_style_preference || 'multimodal approach',
+              difficultyLevel: gradeLevel + this.getDifficultyVariation(i),
+              activityType: this.getActivityTypeForIndex(i),
+              learningStyle: learnerProfile?.learning_style_preference || 'balanced',
               interests: learnerProfile?.interests || [],
-              studentInterests: learnerProfile?.interests || [],
-              studentAbilities: studentProgress?.abilities_assessment || 'mixed ability with both support and challenges',
-              teachingPerspective: 'balanced, evidence-based style',
-              curriculumStandards: 'broadly accepted topics and skills for that grade',
-              lessonDuration: 35,
-              subjectWeight: 'medium',
-              calendarKeywords: activeKeywords,
-              calendarDuration: 'standalone session',
               performanceData: {
                 accuracy: studentProgress?.accuracy_rate || 0.75,
                 engagement: studentProgress?.engagement_level || 'moderate'
               },
-              metadata: {
-                activityIndex: i,
-                sessionId,
-                varietyPrompt: this.getVarietyPrompt(i),
-                diversityLevel: Math.floor(i / 2) + 1,
-                uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
-              }
+              calendarKeywords: activeKeywords,
+              sessionId,
+              activityIndex: i,
+              varietyPrompt: this.getVarietyPrompt(i),
+              uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
             }
           });
 
@@ -98,10 +91,10 @@ export class DailyLessonGenerator {
             throw error;
           }
 
-          // Check for uniqueness - Training Ground activities have different structure
-          const questionKey = aiContent.title?.toLowerCase().trim() || 
-                             aiContent.objective?.toLowerCase().trim() || 
-                             `activity-${i}`;
+          // Check for uniqueness - standard lesson activities
+          const questionKey = aiContent.question?.toLowerCase().trim() || 
+                              aiContent.title?.toLowerCase().trim() || 
+                              `activity-${i}`;
           if (!usedQuestions.has(questionKey)) {
             usedQuestions.add(questionKey);
             uniqueContent = true;
@@ -109,34 +102,26 @@ export class DailyLessonGenerator {
             const activity: LessonActivity = {
               id: `${sessionId}-activity-${i}`,
               title: aiContent.title || this.generateActivityTitle(subject, skillArea, i),
-              type: 'training-ground-activity',
-              phase: 'activity',
+              type: this.getActivityTypeForIndex(i) as any,
+              phase: this.getActivityTypeForIndex(i) as any,
               duration: 180,
               content: {
-                trainingGroundData: {
-                  title: aiContent.title || this.generateActivityTitle(subject, skillArea, i),
-                  objective: aiContent.objective || `Learn ${subject} concepts`,
-                  explanation: aiContent.explanation || `Explore ${subject} through interactive activities`,
-                  activity: {
-                    type: aiContent.activityType || 'PuzzleSolver',
-                    instructions: aiContent.instructions || aiContent.activity?.instructions || 'Complete the learning activity'
-                  },
-                  assessmentElement: aiContent.assessmentElement,
-                  optionalExtension: aiContent.optionalExtension,
-                  studentSkillTargeted: aiContent.studentSkillTargeted,
-                  learningStyleAdaptation: aiContent.learningStyleAdaptation
-                },
+                question: aiContent.question,
+                options: aiContent.options,
+                correctAnswer: aiContent.correct || aiContent.correctAnswer,
                 explanation: aiContent.explanation,
-                activity: aiContent.activity,
-                objective: aiContent.objective,
-                assessmentElement: aiContent.assessmentElement
+                text: aiContent.explanation,
+                hook: aiContent.hook,
+                scenario: aiContent.scenario,
+                creativePrompt: aiContent.creativePrompt
               },
               difficulty: gradeLevel + this.getDifficultyVariation(i),
+              subject,
+              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
               metadata: {
-                generatedBy: 'training-ground-prompt',
+                generatedBy: 'daily-lesson-ai',
                 sessionId,
-                activityIndex: i,
-                isTrainingGroundActivity: true
+                activityIndex: i
               }
             };
 
