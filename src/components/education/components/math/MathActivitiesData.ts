@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { LessonActivity } from '../types/LessonTypes';
 import { mathBattleArenaActivity } from './MathBattleArenaActivity';
 

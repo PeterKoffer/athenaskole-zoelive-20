@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';

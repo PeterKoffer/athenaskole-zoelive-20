@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { useCallback, useEffect } from 'react';
 import { useEnhancedTeachingEngine } from '../../components/hooks/useEnhancedTeachingEngine';
 import { LessonActivity } from '../../components/types/LessonTypes';

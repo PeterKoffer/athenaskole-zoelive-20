@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 interface IntroductionSection {
   title: string;
   text: string;

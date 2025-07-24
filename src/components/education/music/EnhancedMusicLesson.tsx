@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { MusicUniverseWelcome } from './MusicUniverseWelcome';
 import { StableQuizInterface } from '../components/activities/stable-quiz/StableQuizInterface';

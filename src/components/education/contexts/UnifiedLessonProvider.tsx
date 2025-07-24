@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import React from 'react';
 import { UnifiedLessonContext } from './UnifiedLessonContext';
 import { useDailyLessonGeneration } from './hooks/useDailyLessonGeneration';

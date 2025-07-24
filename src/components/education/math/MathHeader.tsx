@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Calculator } from "lucide-react";

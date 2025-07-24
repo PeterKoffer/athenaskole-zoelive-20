@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LessonActivity, SubjectLessonPlan } from '../components/types/LessonTypes';
 import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';
 

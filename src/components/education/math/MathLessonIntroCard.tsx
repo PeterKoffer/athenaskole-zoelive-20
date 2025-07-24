@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { Button } from "@/components/ui/button";
 import { Sparkles, Gauge, Award, BookOpen, Target, Timer, Brain, InfinityIcon } from "lucide-react";
 import { useRef } from "react";

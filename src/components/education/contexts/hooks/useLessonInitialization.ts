@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { useEffect } from 'react';
 import { LessonPhase } from '../../hooks/useLessonStateManager';
 

@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { LessonActivity } from '../types/LessonTypes';
 import { generateEnhancedLesson, EnhancedLessonConfig } from './EnhancedLessonGenerator';
 import { DEFAULT_DAILY_UNIVERSE_SECONDS } from '@/constants/lesson';

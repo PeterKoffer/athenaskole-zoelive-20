@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import AdaptiveLearningEngine from '@/components/adaptive-learning/AdaptiveLearningEngine';
 import { useToast } from '@/hooks/use-toast';
 

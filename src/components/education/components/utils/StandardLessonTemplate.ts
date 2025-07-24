@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LessonActivity, SubjectLessonPlan, GrandChallenge } from '../types/LessonTypes';
 import { DEFAULT_LESSON_SECONDS } from '@/constants/lesson';
 

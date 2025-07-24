@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';

@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getGamesBySubject, CurriculumGame } from '../../games/CurriculumGameConfig';

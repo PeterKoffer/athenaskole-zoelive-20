@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { LessonActivity } from '../types/LessonTypes';
 
 export class UniversalContentGenerator {

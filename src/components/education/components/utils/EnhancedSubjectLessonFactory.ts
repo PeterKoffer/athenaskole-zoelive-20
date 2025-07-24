@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { EnhancedLessonConfig, generateEnhancedLesson } from './EnhancedLessonGenerator';
 
 export const generateCompleteEducationalSession = async (

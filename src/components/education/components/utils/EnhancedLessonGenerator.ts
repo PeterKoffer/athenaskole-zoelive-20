@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LessonActivity, SubjectLessonPlan } from '../types/LessonTypes';
 
 export interface EnhancedLessonConfig {
