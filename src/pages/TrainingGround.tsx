@@ -7,14 +7,18 @@ import { UserMetadata } from "@/types/auth";
 import { ArrowLeft, Target, Dumbbell } from "lucide-react";
 import TodaysProgramGrid from "@/components/daily-program/TodaysProgramGrid";
 import { dailyActivities } from "@/components/daily-program/dailyActivitiesData";
+import { subjectsData } from "@/data/subjectSkillData";
 
 const TrainingGround = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedSubject, setSelectedSubject] = useState<string>(subjectsData[0].id);
+  const [selectedSkillArea, setSelectedSkillArea] = useState<string>('mixed');
 
-  const categories = Array.from(new Set(dailyActivities.map(a => a.subject)));
+  const subjectOptions = subjectsData.map(s => s.id);
+  const skillAreas =
+    subjectsData.find((s) => s.id === selectedSubject)?.skillAreas || [];
   
   console.log('🏋️ TrainingGround component rendered:', {
     userExists: !!user,
@@ -42,8 +46,13 @@ const TrainingGround = () => {
     navigate(`/learn/${activityId}`);
   };
 
-  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
+  const handleSubjectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubject(e.target.value);
+    setSelectedSkillArea('mixed');
+  };
+
+  const handleSkillAreaChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSkillArea(e.target.value);
   };
 
   // Show loading state while authentication is being checked
@@ -84,12 +93,12 @@ const TrainingGround = () => {
     activitiesCount: dailyActivities.length
   });
 
-  let activitiesToDisplay = dailyActivities;
-  if (selectedCategory === 'mixed') {
-    activitiesToDisplay = [...dailyActivities].sort(() => Math.random() - 0.5);
-  } else if (selectedCategory !== 'all') {
-    activitiesToDisplay = dailyActivities.filter(
-      a => a.subject === selectedCategory
+  let activitiesToDisplay = dailyActivities.filter(
+    (a) => a.subject === selectedSubject
+  );
+  if (selectedSkillArea !== 'mixed') {
+    activitiesToDisplay = activitiesToDisplay.filter(
+      (a) => a.skillArea === selectedSkillArea
     );
   }
 
@@ -130,20 +139,36 @@ const TrainingGround = () => {
             </div>
           </div>
 
-          {/* Category Selector */}
-          <div className="mb-6">
-            <label className="mr-2" htmlFor="category-select">Choose focus:</label>
+          {/* Subject Selector */}
+          <div className="mb-4">
+            <label className="mr-2" htmlFor="subject-select">Subject:</label>
             <select
-              id="category-select"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
+              id="subject-select"
+              value={selectedSubject}
+              onChange={handleSubjectChange}
               className="text-black rounded px-2 py-1"
             >
-              <option value="all">All Subjects</option>
-              <option value="mixed">Mix it Up</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat.replace('_', ' ')}
+              {subjectOptions.map((s) => (
+                <option key={s} value={s}>
+                  {subjectsData[s].name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Skill Area Selector */}
+          <div className="mb-6">
+            <label className="mr-2" htmlFor="skill-select">Focus Area:</label>
+            <select
+              id="skill-select"
+              value={selectedSkillArea}
+              onChange={handleSkillAreaChange}
+              className="text-black rounded px-2 py-1"
+            >
+              <option value="mixed">Mixed Practice</option>
+              {skillAreas.map((sa) => (
+                <option key={sa.id} value={sa.id}>
+                  {sa.name}
                 </option>
               ))}
             </select>
@@ -175,20 +200,36 @@ const TrainingGround = () => {
           </Button>
         </div>
         
-        {/* Category Selector */}
-        <div className="mb-6 text-center">
-          <label className="mr-2" htmlFor="category-select-guest">Choose focus:</label>
+        {/* Subject Selector */}
+        <div className="mb-4 text-center">
+          <label className="mr-2" htmlFor="subject-select-guest">Subject:</label>
           <select
-            id="category-select-guest"
-            value={selectedCategory}
-            onChange={handleCategoryChange}
+            id="subject-select-guest"
+            value={selectedSubject}
+            onChange={handleSubjectChange}
             className="text-black rounded px-2 py-1"
           >
-            <option value="all">All Subjects</option>
-            <option value="mixed">Mix it Up</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>
-                {cat.replace('_', ' ')}
+            {subjectOptions.map((s) => (
+              <option key={s} value={s}>
+                {s.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Skill Area Selector */}
+        <div className="mb-6 text-center">
+          <label className="mr-2" htmlFor="skill-select-guest">Focus Area:</label>
+          <select
+            id="skill-select-guest"
+            value={selectedSkillArea}
+            onChange={handleSkillAreaChange}
+            className="text-black rounded px-2 py-1"
+          >
+            <option value="mixed">Mixed Practice</option>
+            {skillAreas.map((sa) => (
+              <option key={sa.id} value={sa.id}>
+                {sa.name}
               </option>
             ))}
           </select>
