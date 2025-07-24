@@ -238,13 +238,15 @@ const SimpleMathematicsLearningPage = () => {
 
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-white">🤖 NELIE Mathematics Learning</h1>
-            <button
+            <div
               onClick={() => handleSpeak("Welcome to your mathematics lesson! I'm NELIE, your virtual robot teacher.")}
-              className="text-blue-300 hover:text-blue-100 transition-colors"
-              disabled={!isNelieReady}
+              className="text-blue-300 hover:text-blue-100 transition-colors cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label="Read welcome message aloud"
             >
               <Volume2 className="w-6 h-6" />
-            </button>
+            </div>
           </div>
           
           <div className="grid grid-cols-3 gap-6 mb-6">
@@ -281,13 +283,15 @@ const SimpleMathematicsLearningPage = () => {
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <h2 className="text-white text-xl font-bold">🤖 NELIE Mathematics Questions</h2>
-                <button
+                <div
                   onClick={() => handleSpeak("Start with 2 questions that load instantly, then more questions generate in the background!")}
-                  className="text-purple-200 hover:text-white transition-colors"
-                  disabled={!isNelieReady}
+                  className="text-purple-200 hover:text-white transition-colors cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Read lesson description aloud"
                 >
                   <Volume2 className="w-5 h-5" />
-                </button>
+                </div>
               </div>
             </div>
             <div className="p-8 relative">
@@ -295,13 +299,15 @@ const SimpleMathematicsLearningPage = () => {
                 <p className="text-gray-300 text-lg">
                   Start with 2 questions that load instantly, then more questions generate in the background!
                 </p>
-                <button
+                <div
                   onClick={() => handleSpeak("Start with 2 questions that load instantly, then more questions generate in the background!")}
-                  className="text-purple-300 hover:text-purple-100 transition-colors absolute top-2 right-2"
-                  disabled={!isNelieReady}
+                  className="text-purple-300 hover:text-purple-100 transition-colors absolute top-2 right-2 cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Read lesson description aloud"
                 >
                   <Volume2 className="w-5 h-5" />
-                </button>
+                </div>
               </div>
               <button
                 onClick={handleStartLearning}
@@ -328,13 +334,15 @@ const SimpleMathematicsLearningPage = () => {
             <div className="bg-gradient-to-r from-green-600 to-blue-600 p-4 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <h2 className="text-white text-xl font-bold">Question {currentQuestion + 1} of {questions.length}</h2>
-                <button
+                <div
                   onClick={() => handleSpeak(`Question ${currentQuestion + 1} of ${questions.length}`)}
-                  className="text-green-200 hover:text-white transition-colors"
-                  disabled={!isNelieReady}
+                  className="text-green-200 hover:text-white transition-colors cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Read question aloud"
                 >
                   <Volume2 className="w-5 h-5" />
-                </button>
+                </div>
               </div>
               {isGeneratingMore && (
                 <p className="text-sm text-blue-200 mt-1">🤖 NELIE is generating more questions in background...</p>
@@ -346,13 +354,15 @@ const SimpleMathematicsLearningPage = () => {
                   <h3 className="text-lg text-white mb-6 leading-relaxed flex-1 pr-4">
                     {questions[currentQuestion].question}
                   </h3>
-                  <button
+                  <div
                     onClick={() => handleSpeak(questions[currentQuestion].question)}
-                    className="text-blue-300 hover:text-blue-100 transition-colors mt-1"
-                    disabled={!isNelieReady}
+                    className="text-blue-300 hover:text-blue-100 transition-colors mt-1 cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Read question aloud"
                   >
                     <Volume2 className="w-5 h-5" />
-                  </button>
+                  </div>
                 </div>
                 
                 <div className="grid gap-3">
@@ -377,17 +387,19 @@ const SimpleMathematicsLearningPage = () => {
                         <div className="flex-1">
                           <span className="mr-4 font-bold text-lg">{String.fromCharCode(65 + index)}.</span>
                           {option}
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSpeak(`Option ${String.fromCharCode(65 + index)}: ${option}`);
-                          }}
-                          className="text-gray-400 hover:text-white transition-colors ml-2"
-                          disabled={!isNelieReady}
-                        >
-                          <Volume2 className="w-4 h-4" />
-                        </button>
+                      </div>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSpeak(`Option ${String.fromCharCode(65 + index)}: ${option}`);
+                        }}
+                        className="text-gray-400 hover:text-white transition-colors ml-2 cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Read option ${String.fromCharCode(65 + index)} aloud`}
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </div>
                       </div>
                     </button>
                   ))}
@@ -399,13 +411,15 @@ const SimpleMathematicsLearningPage = () => {
                       <p className="text-green-200 mb-4 text-base flex-1 pr-4">
                         {questions[currentQuestion].explanation}
                       </p>
-                      <button
+                      <div
                         onClick={() => handleSpeak(questions[currentQuestion].explanation)}
-                        className="text-green-300 hover:text-green-100 transition-colors"
-                        disabled={!isNelieReady}
+                        className="text-green-300 hover:text-green-100 transition-colors cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Read explanation aloud"
                       >
                         <Volume2 className="w-4 h-4" />
-                      </button>
+                      </div>
                     </div>
                     <button 
                       onClick={handleNext}
