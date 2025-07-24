@@ -20,15 +20,15 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
         messages: [
           {
             role: 'system',
-            content: 'You are an expert educational content creator. Generate age-appropriate, engaging questions for K-12 students. Always respond with valid JSON only.'
+            content: 'You are a creative educational activity designer who NEVER creates quizzes or multiple choice questions. You design hands-on, interactive, and imaginative learning experiences that feel like games and adventures. You must follow the user\'s format requirements exactly and avoid any quiz-style content.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.8,
-        max_tokens: 800
+        temperature: 0.9,
+        max_tokens: 1200
       }),
     });
 
@@ -41,16 +41,25 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
+    console.log('📝 Raw Training Ground response:', generatedText.substring(0, 200) + '...');
+
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
     const parsedContent = JSON.parse(cleanedResponse);
 
-    if (!parsedContent.question || !parsedContent.options || !Array.isArray(parsedContent.options)) {
-      throw new Error('Invalid response format from OpenAI');
+    // Validate Training Ground activity format
+    if (!parsedContent.title || !parsedContent.activity || !parsedContent.activity.type) {
+      throw new Error('Invalid Training Ground activity format from OpenAI');
     }
+
+    console.log('✅ Training Ground activity generated:', {
+      hasTitle: !!parsedContent.title,
+      hasActivity: !!parsedContent.activity,
+      activityType: parsedContent.activity?.type
+    });
 
     return parsedContent;
   } catch (error) {
-    console.error('❌ OpenAI generation failed:', error);
+    console.error('❌ Training Ground generation failed:', error);
     throw error;
   }
 }

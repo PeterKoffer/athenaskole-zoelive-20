@@ -1,32 +1,46 @@
-
 export function createTrainingGroundPrompt(requestData: any): string {
-  const {
-    subject,
-    gradeLevel,
-    curriculumStandards,
-    teachingPerspective,
-    lessonDuration,
-    subjectWeight,
-    calendarKeywords,
-    calendarDuration,
-    studentAbilities,
-    learningStyle,
-    studentInterests,
-  } = requestData;
+  const subject = requestData.subject || 'general learning';
+  const gradeLevel = requestData.gradeLevel || 5;
+  const performance = requestData.performanceLevel || 'average';
+  const learningStyle = requestData.learningStyle || 'mixed';
+  const interests = requestData.interests?.join(', ') || 'general topics';
+  const schoolPhilosophy = requestData.schoolPhilosophy || 'Experiential & creative learning';
+  const emphasis = requestData.emphasis || 5;
+  const calendarKeywords = requestData.calendarKeywords?.join(', ') || 'none';
 
-  const prompt = `You are a world-class ${subject} teacher creating a lesson for a ${gradeLevel} student. Develop a lesson aligned with ${curriculumStandards || 'general academic focus'} and incorporate the school’s ${teachingPerspective || 'neutral, evidence-based'} approach. The lesson should be designed for about ${lessonDuration || '30-45 minutes'} of learning. Since ${subject} is a ${subjectWeight || 'medium'} priority subject in our curriculum, adjust the depth accordingly. Consider the context of ${calendarKeywords || 'general context'} over the next ${calendarDuration || 'one-week unit'} in the lesson content. Tailor the material to the student’s skill level – ${studentAbilities || 'average mixed-ability classroom'}, providing support or extension as needed. Use a ${learningStyle || 'multi-modal'} approach and connect to the student’s interest in ${studentInterests || 'generally relatable examples'} to make the lesson engaging. Include interactive activities or a game, and end with a brief quiz or test to assess understanding.
+  return `You are a highly creative AI educator working in a modern, playful learning simulator.
 
-Return ONLY a valid JSON object with this exact structure:
+🚫 Forbidden:
+- No quizzes or tests
+- No "What is..." or "Which of the following..." formats
+- No math word problems like "Lily has 12 apples"
+
+✅ Required:
+- Imaginative, engaging activities
+- Use themed learning (e.g. cooking, art, music, science)
+- Tailor the activity to a student in grade ${gradeLevel} with a ${performance} performance level.
+- Adapt to their preferred learning style: ${learningStyle}
+- Consider their interests: ${interests}
+- Use the school's teaching philosophy: ${schoolPhilosophy}
+- Apply emphasis level ${emphasis} for the subject of ${subject}.
+- If relevant, integrate calendar theme: ${calendarKeywords}
+
+🎨 Output Format:
+Return only structured JSON like this:
 {
-  "question": "What is 1/2 + 1/4?",
-  "options": ["1/6", "2/6", "3/4", "3/6"],
-  "correct": 2,
-  "explanation": "To add fractions, find a common denominator. 1/2 = 2/4, so 2/4 + 1/4 = 3/4",
-  "learningObjectives": ["Adding fractions with different denominators", "Finding common denominators"]
+  "title": "...",
+  "objective": "...",
+  "explanation": "...",
+  "activity": {
+    "type": "CookingGame" | "Puzzle" | "StoryBuilder" | "ScienceExperiment",
+    "instructions": "..."
+  },
+  "optionalExtension": "...",
+  "studentSkillTargeted": "...",
+  "learningStyleAdaptation": "..."
 }
-`;
 
-  return prompt;
+You are not allowed to return any quizzes or boring scenarios. Make it engaging and immersive.`;
 }
 
 export function createGradeAlignedPrompt(requestData: any): string {
