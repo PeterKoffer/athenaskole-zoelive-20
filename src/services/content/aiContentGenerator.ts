@@ -21,6 +21,7 @@ export class AIContentGenerator {
       };
 
       const promptResult = generateTrainingGroundPrompt(promptConfig);
+      console.log('🔥 Prompt sent to AI:', promptResult.prompt);
       console.log('🎯 Generated unified prompt with metadata:', promptResult.metadata);
 
       console.log('📞 Calling edge function: generate-adaptive-content (using unified prompt)');
@@ -56,6 +57,7 @@ export class AIContentGenerator {
       }
 
       const content = data.generatedContent;
+      console.log('🎁 Response from AI:', content);
       console.log('🎯 Generated content with DeepSeek:', content);
 
       // Validate structure
