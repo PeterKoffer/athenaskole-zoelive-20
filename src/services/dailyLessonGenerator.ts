@@ -113,7 +113,19 @@ export class DailyLessonGenerator {
               phase: 'activity',
               duration: 180,
               content: {
-                trainingGroundData: aiContent, // Store the full Training Ground activity
+                trainingGroundData: {
+                  title: aiContent.title || this.generateActivityTitle(subject, skillArea, i),
+                  objective: aiContent.objective || `Learn ${subject} concepts`,
+                  explanation: aiContent.explanation || `Explore ${subject} through interactive activities`,
+                  activity: {
+                    type: aiContent.activityType || 'PuzzleSolver',
+                    instructions: aiContent.instructions || aiContent.activity?.instructions || 'Complete the learning activity'
+                  },
+                  assessmentElement: aiContent.assessmentElement,
+                  optionalExtension: aiContent.optionalExtension,
+                  studentSkillTargeted: aiContent.studentSkillTargeted,
+                  learningStyleAdaptation: aiContent.learningStyleAdaptation
+                },
                 explanation: aiContent.explanation,
                 activity: aiContent.activity,
                 objective: aiContent.objective,
