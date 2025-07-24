@@ -5,7 +5,6 @@ import { UserMetadata } from '@/types/auth'; // Import UserMetadata
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import WelcomeContent from './WelcomeContent';
-import NelieAvatarDisplay from './NelieAvatarDisplay';
 
 interface HomepageWelcomeProps {
   userName: string;
@@ -120,7 +119,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <WelcomeContent userName={actualUserName} />
-          <NelieAvatarDisplay />
         </div>
       </CardContent>
     </Card>

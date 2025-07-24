@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import NelieAvatarDisplay from "./NelieAvatarDisplay";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +26,6 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white px-4">
       <div className="max-w-4xl mx-auto text-center space-y-8">
-        {/* Nelie Avatar Display */}
-        <div className="mb-8">
-          <NelieAvatarDisplay />
-        </div>
 
         {/* Welcome Text */}
         <div className="space-y-6">
