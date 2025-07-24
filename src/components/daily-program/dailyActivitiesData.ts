@@ -28,30 +28,6 @@ export const dailyActivities = [
     skillArea: "general_mathematics"
   },
   {
-    id: "math-fractions",
-    title: "Fractions Practice",
-    description: "Work on adding, subtracting, and comparing fractions.",
-    icon: Calculator,
-    duration: "30 min",
-    level: "Adaptive",
-    color: "bg-gradient-to-br from-orange-500 to-red-600",
-    aiEnhanced: true,
-    subject: "mathematics",
-    skillArea: "fractions"
-  },
-  {
-    id: "math-algebra",
-    title: "Algebra Basics",
-    description: "Solve equations and explore variables and expressions.",
-    icon: Calculator,
-    duration: "35 min",
-    level: "Adaptive",
-    color: "bg-gradient-to-br from-orange-500 to-red-600",
-    aiEnhanced: true,
-    subject: "mathematics",
-    skillArea: "algebra"
-  },
-  {
     id: "english",
     title: "English Language Arts",
     description: "Develop exceptional reading, writing, and communication skills through immersive storytelling and creative expression projects.",

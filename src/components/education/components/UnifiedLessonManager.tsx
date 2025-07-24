@@ -1,5 +1,7 @@
 
-import SimplifiedLessonManager from './simplified/SimplifiedLessonManager';
+import { useOptimizedLessonManager } from './hooks/useOptimizedLessonManager';
+import UniversalLearningMainContent from './universal/UniversalLearningMainContent';
+import UniversalLearningLoading from './universal/UniversalLearningLoading';
 
 interface UnifiedLessonManagerProps {
   subject: string;
@@ -14,15 +16,47 @@ const UnifiedLessonManager = ({
   studentName,
   onBackToProgram
 }: UnifiedLessonManagerProps) => {
-  
-  console.log('🎯 Using simplified lesson manager to fix training ground');
-  
+  const {
+    currentActivityIndex,
+    currentActivity,
+    totalRealActivities,
+    timeElapsed,
+    score,
+    correctStreak,
+    targetLessonLength,
+    isInitializing,
+    handleActivityComplete,
+    handleReadRequest,
+    isSpeaking,
+    toggleMute
+  } = useOptimizedLessonManager({
+    subject,
+    skillArea,
+    onLessonComplete: onBackToProgram
+  });
+
+  if (isInitializing) {
+    return <UniversalLearningLoading subject={subject} studentName={studentName} />;
+  }
+
   return (
-    <SimplifiedLessonManager
+    <UniversalLearningMainContent
       subject={subject}
       skillArea={skillArea}
       studentName={studentName}
+      timeElapsed={timeElapsed}
+      targetLessonLength={targetLessonLength}
+      score={score}
+      currentActivityIndex={currentActivityIndex}
+      totalRealActivities={totalRealActivities}
+      correctStreak={correctStreak}
+      currentActivity={currentActivity}
+      isSpeaking={isSpeaking}
       onBackToProgram={onBackToProgram}
+      onToggleMute={toggleMute}
+      onReadRequest={handleReadRequest}
+      onStopSpeaking={toggleMute}
+      onActivityComplete={handleActivityComplete}
     />
   );
 };

@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
 
 interface LessonActivity {
   id: string;
@@ -15,9 +15,14 @@ export const useActivitySpeech = (
   currentActivityIndex: number,
   activityCompleted: boolean
 ) => {
-  const { speak: speakText, stop: stopSpeaking, isSpeaking } = useUnifiedSpeech();
-  const autoReadEnabled = true; // Default to true for now
-  const isReady = true; // Default to true for now
+  const {
+    autoReadEnabled,
+    speakText,
+    stopSpeaking,
+    isReady,
+    testSpeech,
+    isSpeaking
+  } = useSimplifiedSpeech();
 
   const lastSpokenActivityRef = useRef<string | null>(null);
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
