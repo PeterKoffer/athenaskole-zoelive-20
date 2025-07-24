@@ -3,6 +3,7 @@
 // ============================================
 
 import { getPromptForContext, type PromptContext } from '../../../src/services/prompt-system/index.ts';
+import { mapAppDataToPromptContext, type AppDataSources, validateDataSources } from '../../../src/services/prompt-system/dataMapping.ts';
 
 export async function generateContentWithTrainingGroundPrompt(requestData: any) {
   const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
@@ -11,16 +12,52 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
   }
 
   try {
-    // Build context from request data
-    const context: PromptContext = {
-      subject: requestData.subject || 'general learning',
-      gradeLevel: requestData.gradeLevel || 5,
-      performanceLevel: requestData.performanceLevel || 'average',
-      learningStyle: requestData.learningStyle || 'mixed',
-      interests: requestData.interests || [],
-      schoolPhilosophy: requestData.schoolPhilosophy || 'Experiential & creative learning',
-      calendarKeywords: requestData.calendarKeywords || []
+    // Map request data to standardized app data structure
+    const dataSources: AppDataSources = {
+      lessonContext: {
+        subject: requestData.subject || 'Mathematics',
+        requested_duration: requestData.lessonDuration
+      },
+      studentProfile: {
+        grade_level: requestData.gradeLevel,
+        learning_style_preference: requestData.learningStyle,
+        interests: requestData.interests || requestData.studentInterests,
+        performance_data: requestData.performanceData ? {
+          accuracy: requestData.performanceData.accuracy || 0.75,
+          engagement_level: requestData.performanceData.engagement || 'moderate'
+        } : undefined,
+        abilities_assessment: requestData.studentAbilities
+      },
+      teacherSettings: {
+        teaching_approach: requestData.teachingPerspective || requestData.schoolPhilosophy,
+        curriculum_alignment: requestData.curriculumStandards,
+        lesson_duration_minutes: requestData.lessonDuration,
+        subject_priorities: requestData.subjectPriorities
+      },
+      schoolConfig: {
+        pedagogy: requestData.schoolPhilosophy,
+        curriculum_standards: requestData.curriculumStandards,
+        default_lesson_duration: 35
+      },
+      calendarData: {
+        active_themes: requestData.calendarKeywords,
+        seasonal_keywords: requestData.seasonalKeywords,
+        current_unit_duration: requestData.calendarDuration,
+        unit_timeframe: requestData.unitTimeframe
+      }
     };
+
+    // Validate we have sufficient data
+    const validation = validateDataSources(dataSources);
+    if (!validation.isValid) {
+      console.warn('Missing required data for Training Ground prompt:', validation.missing);
+    }
+    if (validation.warnings.length > 0) {
+      console.info('Training Ground prompt warnings:', validation.warnings);
+    }
+
+    // Build comprehensive context using the 12-parameter system
+    const context: PromptContext = mapAppDataToPromptContext(dataSources);
 
     const prompt = getPromptForContext('training-ground', context);
     
