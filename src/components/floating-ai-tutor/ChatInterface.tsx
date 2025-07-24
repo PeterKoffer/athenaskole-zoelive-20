@@ -1,10 +1,9 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent } from "@/components/ui/card";
-import { Send, X, Volume2, VolumeX } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Send, X } from "lucide-react";
 import NELIEAvatar from "@/components/ai-tutor/NELIEAvatar";
 import VoiceControls from "./VoiceControls";
 import { Message } from "./types";
@@ -15,12 +14,9 @@ interface ChatInterfaceProps {
   onClose: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onTouchStart: (e: React.TouchEvent) => void;
-  onResetToHome: () => void;
   isSpeaking: boolean;
   onStopSpeaking: () => void;
   isDragging?: boolean;
-  autoReadEnabled?: boolean;
-  onMuteToggle?: () => void;
 }
 
 const ChatInterface = ({
@@ -29,12 +25,9 @@ const ChatInterface = ({
   onClose,
   onMouseDown,
   onTouchStart,
-  onResetToHome,
   isSpeaking,
   onStopSpeaking,
-  isDragging,
-  autoReadEnabled = true,
-  onMuteToggle
+  isDragging
 }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -135,7 +128,7 @@ const ChatInterface = ({
           <div ref={messagesEndRef} />
         </ScrollArea>
 
-        {/* Input Area - Now properly contained within the chat box */}
+        {/* Input Area */}
         <div className="border-t border-gray-700 p-4 bg-gray-900">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex space-x-2">

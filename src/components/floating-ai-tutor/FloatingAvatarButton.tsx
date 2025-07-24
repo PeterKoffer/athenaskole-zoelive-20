@@ -45,7 +45,6 @@ const FloatingAvatarButton = ({
         onExpand={onToggleOpen}
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
-        onResetToHome={onResetToHome}
         isDragging={isDragging}
         hasMoved={hasMoved}
         isSpeaking={isSpeaking}

@@ -1,12 +1,9 @@
-
-import { Button } from "@/components/ui/button";
 import NELIEAvatar from "@/components/ai-tutor/NELIEAvatar";
 
 interface CollapsedButtonProps {
   onExpand: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onTouchStart: (e: React.TouchEvent) => void;
-  onResetToHome: () => void;
   isDragging?: boolean;
   hasMoved?: boolean;
   isSpeaking?: boolean;
@@ -16,7 +13,6 @@ const CollapsedButton = ({
   onExpand, 
   onMouseDown, 
   onTouchStart, 
-  onResetToHome, 
   isDragging, 
   hasMoved,
   isSpeaking = false
@@ -42,8 +38,6 @@ const CollapsedButton = ({
     onTouchStart(e);
   };
 
-  console.log('🎯 CollapsedButton rendering, isDragging:', isDragging, 'hasMoved:', hasMoved);
-  
   return (
     <div className="relative select-none flex items-center space-x-1">      
       <div
