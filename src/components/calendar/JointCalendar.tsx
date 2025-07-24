@@ -79,15 +79,6 @@ const JointCalendar = () => {
     return matchesDate && matchesClass && matchesSubject;
   });
 
-  const getEventTypeColor = (type: string) => {
-    switch (type) {
-      case 'lesson': return 'bg-blue-500';
-      case 'exam': return 'bg-red-500';
-      case 'event': return 'bg-green-500';
-      case 'meeting': return 'bg-purple-500';
-      default: return 'bg-gray-500';
-    }
-  };
 
   const getEventTypeBadgeColor = (type: string) => {
     switch (type) {

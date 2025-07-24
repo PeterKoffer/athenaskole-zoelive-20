@@ -11,7 +11,7 @@ interface ActivityRendererProps {
   timeRemaining: number;
 }
 
-const ActivityRenderer = ({ activity, onComplete, timeRemaining }: ActivityRendererProps) => {
+const ActivityRenderer = ({ activity, onComplete }: ActivityRendererProps) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime] = useState(Date.now());
