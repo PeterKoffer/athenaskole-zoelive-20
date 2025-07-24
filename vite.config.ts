@@ -31,6 +31,10 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
+  esbuild: {
+    drop: ['console'],
+    legalComments: 'none',
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),

@@ -16,7 +16,7 @@ interface RoleCardProps {
   onClick: () => void;
 }
 
-const RoleCard = ({ role, config, isRestricted, onClick }: RoleCardProps) => {
+const RoleCard = ({ config, isRestricted, onClick }: RoleCardProps) => {
   const Icon = config.icon;
 
   return (
