@@ -101,7 +101,7 @@ const StandardLessonProgressIndicator = ({
         {phases.map(([phaseKey, phaseInfo], index) => {
           const isCompleted = index < currentPhaseIndex;
           const isCurrent = phaseKey === currentPhase;
-          const isUpcoming = index > currentPhaseIndex;
+          // const isUpcoming = index > currentPhaseIndex;
           
           return (
             <div
