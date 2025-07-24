@@ -1,10 +1,11 @@
 // @ts-nocheck
-// Training Ground component with AI integration
+// Training Ground component with AI integration and beautiful ActivityRenderer
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw, BookOpen, Target } from 'lucide-react';
 import { useTrainingGroundContent } from '@/services/useTrainingGroundContent';
+import { ActivityRenderer } from './activities/ActivityRenderer';
 
 const SUBJECTS = [
   { id: 'math', name: 'Mathematics', icon: '🔢' },
@@ -102,59 +103,14 @@ export default function TrainingGroundMain() {
               )}
 
               {activity && !loading && (
-                <div className="space-y-6">
-                  {/* Activity Title & Objective */}
-                  <div className="text-center space-y-2">
-                    <h3 className="text-2xl font-bold text-primary">{activity.title}</h3>
-                    <p className="text-lg text-muted-foreground">{activity.objective}</p>
-                  </div>
-
-                  {/* Explanation */}
-                  <Card className="bg-secondary/20">
-                    <CardContent className="pt-6">
-                      <h4 className="font-semibold mb-2">📝 Understanding the Concept</h4>
-                      <p className="text-sm leading-relaxed">{activity.explanation}</p>
-                    </CardContent>
-                  </Card>
-
-                  {/* Main Activity */}
-                  <Card className="bg-primary/5 border-primary/20">
-                    <CardContent className="pt-6">
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
-                        🎯 {activity.activity.type}
-                      </h4>
-                      <div className="bg-background rounded-lg p-4">
-                        <p className="leading-relaxed">{activity.activity.instructions}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Extension & Adaptations */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {activity.optionalExtension && (
-                      <Card className="bg-accent/20">
-                        <CardContent className="pt-6">
-                          <h4 className="font-semibold mb-2">🚀 Challenge Extension</h4>
-                          <p className="text-sm">{activity.optionalExtension}</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                    
-                    <Card className="bg-secondary/20">
-                      <CardContent className="pt-6">
-                        <h4 className="font-semibold mb-2">🎨 Learning Style</h4>
-                        <p className="text-sm">{activity.learningStyleAdaptation}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Skill Targeted */}
-                  <div className="text-center py-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      🎯 Skill Focus: <span className="text-primary">{activity.studentSkillTargeted}</span>
-                    </p>
-                  </div>
-                </div>
+                <ActivityRenderer 
+                  activity={activity}
+                  onComplete={() => {
+                    console.log('🎉 Student completed activity:', activity.title);
+                    // TODO: Track completion, update progress, show celebration
+                  }}
+                  onRegenerate={regenerate}
+                />
               )}
             </CardContent>
           </Card>
