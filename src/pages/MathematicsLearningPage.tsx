@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+console.log('🔥 DEBUGGING: MathematicsLearningPage loaded');
+
 const MathematicsLearningPage = () => {
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -11,7 +13,9 @@ const MathematicsLearningPage = () => {
   const [showResult, setShowResult] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
-  // Grade 3 math questions
+  console.log('🔥 DEBUGGING: Component state:', { currentQuestion, hasStarted, score });
+
+  // Grade 3 math questions - REAL INTERACTIVE CONTENT
   const questions = [
     {
       question: "Emma has 24 stickers. She wants to share them equally among her 4 friends. How many stickers will each friend get?",
@@ -30,18 +34,6 @@ const MathematicsLearningPage = () => {
       options: ["21", "22", "23", "24"],
       correct: 3,
       explanation: "3 × 8 = 24. Jake has 24 crayons!"
-    },
-    {
-      question: "What comes next in this pattern: 5, 10, 15, 20, ?",
-      options: ["23", "24", "25", "30"],
-      correct: 2,
-      explanation: "The pattern increases by 5 each time: 20 + 5 = 25!"
-    },
-    {
-      question: "Sarah had 50 candies. She gave away 23 candies. How many candies does she have left?",
-      options: ["26", "27", "28", "29"],
-      correct: 1,
-      explanation: "50 - 23 = 27. Sarah has 27 candies left!"
     }
   ];
 
@@ -55,16 +47,19 @@ const MathematicsLearningPage = () => {
   }, [hasStarted]);
 
   const handleBackToTraining = () => {
+    console.log('🔥 DEBUGGING: Back to training clicked');
     navigate('/daily-program');
   };
 
   const handleStartLearning = () => {
+    console.log('🔥 DEBUGGING: Start learning clicked');
     setHasStarted(true);
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return;
     
+    console.log('🔥 DEBUGGING: Answer selected:', answerIndex);
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     
@@ -77,6 +72,7 @@ const MathematicsLearningPage = () => {
   };
 
   const handleNext = () => {
+    console.log('🔥 DEBUGGING: Next question clicked');
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
       setSelectedAnswer(null);
@@ -94,7 +90,6 @@ const MathematicsLearningPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
         <div className="bg-gray-900/80 backdrop-blur border border-gray-700 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <button
@@ -109,7 +104,7 @@ const MathematicsLearningPage = () => {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-4">Peter's Mathematics Session</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">🔥 DEBUG: Peter's Mathematics Session (WORKING!)</h1>
           
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="text-center">
@@ -140,27 +135,26 @@ const MathematicsLearningPage = () => {
           </div>
         </div>
 
-        {/* Main Content */}
         {!hasStarted ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">Mathematics Fundamentals (180 min)</h2>
+              <h2 className="text-white text-xl font-bold">🔥 REAL Interactive Mathematics (NOT AI Generated!)</h2>
             </div>
             <div className="p-8">
               <p className="text-gray-300 text-lg mb-6">
-                Ready to start your mathematics learning adventure? You'll practice division, addition, multiplication, patterns, and subtraction!
+                This is the NEW working mathematics content! Click below to start 3 interactive math questions with real feedback.
               </p>
               <button
                 onClick={handleStartLearning}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
-                Continue Learning
+                🚀 START REAL MATH LEARNING
               </button>
             </div>
           </div>
         ) : (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-t-lg">
+            <div className="bg-gradient-to-r from-green-600 to-blue-600 p-4 rounded-t-lg">
               <h2 className="text-white text-xl font-bold">Question {currentQuestion + 1} of {questions.length}</h2>
             </div>
             <div className="p-8 space-y-6">
@@ -194,13 +188,13 @@ const MathematicsLearningPage = () => {
                 </div>
 
                 {showResult && (
-                  <div className="mt-6 p-4 bg-blue-900/50 rounded-lg border border-blue-700">
-                    <p className="text-blue-200 mb-4 text-base">
+                  <div className="mt-6 p-4 bg-green-900/50 rounded-lg border border-green-700">
+                    <p className="text-green-200 mb-4 text-base">
                       {questions[currentQuestion].explanation}
                     </p>
                     <button 
                       onClick={handleNext}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       {currentQuestion < questions.length - 1 ? 'Next Question →' : 'Complete Lesson ✨'}
                     </button>

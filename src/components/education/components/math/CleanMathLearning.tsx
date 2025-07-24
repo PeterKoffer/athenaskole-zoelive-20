@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, Trophy, Target, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, Sparkles } from 'lucide-react';
 
 interface CleanMathLearningProps {
   onBackToProgram: () => void;
