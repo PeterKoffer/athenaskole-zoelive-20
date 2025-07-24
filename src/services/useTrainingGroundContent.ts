@@ -1,6 +1,7 @@
 // Training Ground AI Integration Hook
 import { useState, useEffect } from 'react';
 import { buildTrainingGroundPrompt } from './content/trainingGroundPromptBuilder';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TrainingGroundActivity {
   title: string;
@@ -54,37 +55,37 @@ export function useTrainingGroundContent({ subject, enabled = true }: UseTrainin
         }
       });
 
-      // Call AI service with the generated prompt
-      const response = await fetch('/api/functions/v1/generate-adaptive-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Call AI service with the generated prompt using Supabase client
+      console.log('🚀 Sending Training Ground prompt to AI:', prompt);
+      
+      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
+        body: {
           subject,
           skillArea: 'training_ground',
           customPrompt: prompt,
-          responseFormat: 'training_ground_activity'
-        })
+          responseFormat: 'training_ground_activity',
+          activityType: 'training-ground'
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate training content');
+      console.log('📨 Training Ground AI response:', { data, error });
+
+      if (error) {
+        throw new Error(`AI service error: ${error.message}`);
       }
 
-      const data = await response.json();
+      if (!data?.success) {
+        throw new Error(data?.error || 'AI generation failed');
+      }
+
+      // Parse the Training Ground specific response
+      const activityData = data.trainingGroundActivity || data.generatedContent;
+      console.log('🎯 Parsed Training Ground activity:', activityData);
       
-      // Parse the AI response
-      if (data.generatedText) {
-        try {
-          const parsed = JSON.parse(data.generatedText);
-          setActivity(parsed);
-        } catch (parseError) {
-          console.error('Failed to parse AI response:', parseError);
-          setError('Failed to parse activity content');
-        }
+      if (activityData) {
+        setActivity(activityData);
       } else {
-        throw new Error('No content generated');
+        throw new Error('No Training Ground activity generated');
       }
 
     } catch (err) {

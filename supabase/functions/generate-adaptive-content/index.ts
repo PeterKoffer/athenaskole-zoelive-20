@@ -88,6 +88,41 @@ serve(async (req) => {
       }
     }
 
+    // Handle Training Ground specific content generation
+    if (requestData.activityType === 'training-ground' || requestData.skillArea === 'training_ground') {
+      console.log('🏋️ Processing Training Ground activity request');
+      
+      try {
+        const trainingGroundActivity = await generateTrainingGroundActivity(requestData, openaiKey, deepSeekKey);
+        
+        return new Response(JSON.stringify({
+          success: true,
+          trainingGroundActivity: trainingGroundActivity,
+          debug: {
+            timestamp: new Date().toISOString(),
+            type: 'training_ground',
+            apiUsed: openaiKey ? 'openai' : 'deepseek'
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        console.error('❌ Training Ground generation failed:', error);
+        
+        return new Response(JSON.stringify({
+          success: false,
+          error: `Training Ground generation failed: ${error.message}`,
+          debug: {
+            errorName: error.name,
+            timestamp: new Date().toISOString()
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        });
+      }
+    }
+
     // Handle regular content generation (existing logic)
     let generatedContent = null;
     let apiUsed = 'none';
@@ -257,4 +292,74 @@ async function generateUniverseContent(requestData: any, openaiKey?: string, dee
   }
   
   throw new Error('No API keys available');
+}
+
+async function generateTrainingGroundActivity(requestData: any, openaiKey?: string, deepSeekKey?: string) {
+  console.log('🎯 Generating Training Ground activity with custom prompt');
+  
+  const prompt = requestData.customPrompt || `Generate an engaging educational activity for ${requestData.subject}. 
+Return a JSON object with this structure:
+{
+  "title": "Activity title",
+  "objective": "Learning objective", 
+  "explanation": "Brief explanation",
+  "activity": {
+    "type": "Activity type",
+    "instructions": "Step-by-step instructions"
+  },
+  "optionalExtension": "Extension activity",
+  "studentSkillTargeted": "Target skill",
+  "learningStyleAdaptation": "Learning style adaptation"
+}`;
+
+  console.log('📝 Training Ground prompt:', prompt.substring(0, 200) + '...');
+
+  if (openaiKey) {
+    console.log('🤖 Using OpenAI for Training Ground activity');
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert educational activity designer. Create engaging, interactive learning activities. Always return valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 1000
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    console.log('📨 Raw OpenAI Training Ground response:', content.substring(0, 200) + '...');
+    
+    // Clean and parse JSON
+    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
+    const parsed = JSON.parse(cleanedContent);
+    
+    console.log('✅ Parsed Training Ground activity:', {
+      hasTitle: !!parsed.title,
+      hasActivity: !!parsed.activity,
+      activityType: parsed.activity?.type
+    });
+    
+    return parsed;
+  }
+  
+  throw new Error('No OpenAI API key available for Training Ground generation');
 }

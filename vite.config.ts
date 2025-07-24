@@ -25,14 +25,15 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
-      onwarn: (warning, warn) => {
+      onwarn(warning, warn) {
+        // Suppress unused variable warnings
         if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
         warn(warning);
       },
     },
   },
   esbuild: {
-    drop: ['console'],
+    drop: mode === 'production' ? ['console'] : [],
     legalComments: 'none',
   },
   plugins: [
@@ -41,6 +42,7 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   define: {
     global: 'globalThis',
+    'process.env.NODE_ENV': mode === 'development' ? '"development"' : '"production"',
   },
   resolve: {
     alias: {
