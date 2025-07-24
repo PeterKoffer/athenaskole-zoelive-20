@@ -13,7 +13,10 @@ apt-get update
 apt-get install -y git curl build-essential
 
 # Install additional libraries commonly required by Playwright and other tools
-apt-get install -y libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libdrm2 libxcomposite1 libgbm1 libasound2 ca-certificates
+apt-get install -y libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libdrm2 libxcomposite1 libgbm1 ca-certificates
+
+# Handle renamed audio library package on newer Ubuntu versions
+apt-get install -y libasound2t64 || apt-get install -y libasound2 || true
 
 # Install Node.js if not present
 if ! command -v node >/dev/null 2>&1; then
