@@ -18,7 +18,6 @@ import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
 // Import all learning components from new organized structure
-import SimpleMathematicsLearning from "./components/subjects/mathematics/SimpleMathematicsLearning";
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
 import ScienceLearning from "./components/subjects/science/ScienceLearning";
 import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
@@ -104,7 +103,7 @@ const App = () => (
             path="/learn/mathematics" 
             element={
               <ProtectedRoute>
-                <SimpleMathematicsLearning />
+                <SubjectLearningPage />
               </ProtectedRoute>
             }
           />

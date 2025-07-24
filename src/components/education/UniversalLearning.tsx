@@ -22,6 +22,7 @@ const UniversalLearning = ({ subject, skillArea }: UniversalLearningProps) => {
   const classroomConfig = getClassroomConfig(subject);
 
   console.log('🎓 UniversalLearning:', { subject, skillArea, showIntroduction, user: !!user });
+  console.log('🔍 UniversalLearning component rendered at:', new Date().toISOString());
 
   const metadata = user?.user_metadata as UserMetadata | undefined;
   const studentName = metadata?.first_name || metadata?.name?.split(' ')[0] || 'Student';
