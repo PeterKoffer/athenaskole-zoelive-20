@@ -5,9 +5,6 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   
-  // Disable TypeScript checking completely
-  esbuild: false,
-  
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

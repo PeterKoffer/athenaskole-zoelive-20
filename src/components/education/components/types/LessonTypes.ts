@@ -6,6 +6,13 @@ export interface LessonActivity {
   duration: number; // in seconds
   phase?: string; // Add phase property for backward compatibility
   phaseDescription?: string; // Add phaseDescription property for backward compatibility
+  metadata?: {
+    subject?: string;
+    skillArea?: string;
+    templateId?: string;
+    isIntroduction?: boolean;
+    [key: string]: any;
+  };
   content: {
     text?: string;
     hook?: string;
@@ -75,6 +82,8 @@ export interface LessonActivity {
     nextTopicSuggestion?: string; // For enhanced activity renderer
     uniqueActivity?: string; // For stable activity quiz
     difficulty?: 'easy' | 'medium' | 'hard'; // For puzzle quest difficulty
+    choices?: string[]; // For multiple choice questions
+    guidance?: string; // For guidance-based activities
   };
   difficulty?: 'easy' | 'medium' | 'hard';
   subject?: string;

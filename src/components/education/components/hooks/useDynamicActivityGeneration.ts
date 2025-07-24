@@ -50,7 +50,7 @@ export const useDynamicActivityGeneration = ({
       setQuestionsGenerated(prev => prev + 1);
       console.log(`✅ Generated FRESH ${subject} activity #${questionsGenerated + 1}:`, {
         id: newQuestion.id,
-        question: newQuestion.content.question.substring(0, 50) + '...',
+        question: newQuestion.content.question?.substring(0, 50) + '...',
         sessionId
       });
       return newQuestion;

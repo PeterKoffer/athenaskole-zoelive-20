@@ -125,7 +125,7 @@ export const useEnhancedTeachingEngine = (config: TeachingEngineConfig) => {
       
       const randomElement = patientElements[Math.floor(Math.random() * patientElements.length)];
       if (enhanced.content.segments?.[0]?.explanation) {
-        enhanced.content.segments[0].explanation = `${randomElement} ${activity.content.segments[0].explanation}`;
+        enhanced.content.segments[0].explanation = `${randomElement} ${activity.content.segments?.[0]?.explanation}`;
       } else if (enhanced.content.text) {
         enhanced.content.text = `${randomElement} ${activity.content.text}`;
       }
