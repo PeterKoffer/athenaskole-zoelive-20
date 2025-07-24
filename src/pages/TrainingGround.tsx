@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,11 +7,18 @@ import { UserMetadata } from "@/types/auth";
 import { ArrowLeft, Target, Dumbbell } from "lucide-react";
 import TodaysProgramGrid from "@/components/daily-program/TodaysProgramGrid";
 import { dailyActivities } from "@/components/daily-program/dailyActivitiesData";
+import { subjectsData } from "@/data/subjectSkillData";
 
 const TrainingGround = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string>(subjectsData[0].id);
+  const [selectedSkillArea, setSelectedSkillArea] = useState<string>('mixed');
+
+  const subjectOptions = subjectsData.map(s => s.id);
+  const skillAreas =
+    subjectsData.find((s) => s.id === selectedSubject)?.skillAreas || [];
   
   console.log('🏋️ TrainingGround component rendered:', {
     userExists: !!user,
@@ -37,6 +44,15 @@ const TrainingGround = () => {
     
     // Navigate to AI-generated educational content for the specific subject
     navigate(`/learn/${activityId}`);
+  };
+
+  const handleSubjectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubject(e.target.value);
+    setSelectedSkillArea('mixed');
+  };
+
+  const handleSkillAreaChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSkillArea(e.target.value);
   };
 
   // Show loading state while authentication is being checked
@@ -77,6 +93,15 @@ const TrainingGround = () => {
     activitiesCount: dailyActivities.length
   });
 
+  let activitiesToDisplay = dailyActivities.filter(
+    (a) => a.subject === selectedSubject
+  );
+  if (selectedSkillArea !== 'mixed') {
+    activitiesToDisplay = activitiesToDisplay.filter(
+      (a) => a.skillArea === selectedSkillArea
+    );
+  }
+
   // Main content for authenticated users
   if (user) {
     return (
@@ -114,8 +139,43 @@ const TrainingGround = () => {
             </div>
           </div>
 
-          {/* Training Activities Grid - removed the Today's Program heading */}
-          <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
+          {/* Subject Selector */}
+          <div className="mb-4">
+            <label className="mr-2" htmlFor="subject-select">Subject:</label>
+            <select
+              id="subject-select"
+              value={selectedSubject}
+              onChange={handleSubjectChange}
+              className="text-black rounded px-2 py-1"
+            >
+              {subjectOptions.map((s) => (
+                <option key={s} value={s}>
+                  {s.replace('_', ' ')}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Skill Area Selector */}
+          <div className="mb-6">
+            <label className="mr-2" htmlFor="skill-select">Focus Area:</label>
+            <select
+              id="skill-select"
+              value={selectedSkillArea}
+              onChange={handleSkillAreaChange}
+              className="text-black rounded px-2 py-1"
+            >
+              <option value="mixed">Mixed Practice</option>
+              {skillAreas.map((sa) => (
+                <option key={sa.id} value={sa.id}>
+                  {sa.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Training Activities Grid */}
+          <TodaysProgramGrid activities={activitiesToDisplay} onStartActivity={handleStartActivity} />
         </div>
       </div>
     );
@@ -140,7 +200,42 @@ const TrainingGround = () => {
           </Button>
         </div>
         
-        <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
+        {/* Subject Selector */}
+        <div className="mb-4 text-center">
+          <label className="mr-2" htmlFor="subject-select-guest">Subject:</label>
+          <select
+            id="subject-select-guest"
+            value={selectedSubject}
+            onChange={handleSubjectChange}
+            className="text-black rounded px-2 py-1"
+          >
+            {subjectOptions.map((s) => (
+              <option key={s} value={s}>
+                {s.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Skill Area Selector */}
+        <div className="mb-6 text-center">
+          <label className="mr-2" htmlFor="skill-select-guest">Focus Area:</label>
+          <select
+            id="skill-select-guest"
+            value={selectedSkillArea}
+            onChange={handleSkillAreaChange}
+            className="text-black rounded px-2 py-1"
+          >
+            <option value="mixed">Mixed Practice</option>
+            {skillAreas.map((sa) => (
+              <option key={sa.id} value={sa.id}>
+                {sa.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <TodaysProgramGrid activities={activitiesToDisplay} onStartActivity={handleStartActivity} />
         
         <div className="mt-8 text-center">
           <Button variant="outline" onClick={() => navigate('/')} className="border-gray-600 text-slate-950 bg-sky-50">
