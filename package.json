@@ -16,7 +16,8 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "populate:curriculum": "tsx scripts/populate-global-curriculum.ts",
-    "transform:curriculum": "tsx scripts/transform-curriculum.ts"
+    "transform:curriculum": "tsx scripts/transform-curriculum.ts",
+    "fix:nelie": "ts-node scripts/point-nelie.ts"
   },
   "dependencies": {
     "@11labs/react": "^0.1.4",
