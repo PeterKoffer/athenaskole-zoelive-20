@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import MathematicsLearningPage from './MathematicsLearningPage';
+import SimpleMathematicsLearningPage from './SimpleMathematicsLearningPage';
 
 const SubjectLearningPage: React.FC = () => {
   const { subject } = useParams<{ subject: string }>();
@@ -10,9 +10,8 @@ const SubjectLearningPage: React.FC = () => {
     return <div>Subject not found</div>;
   }
 
-  // For now, use the working mathematics page for all subjects
-  // This fixes the blank page issue while we resolve the complex architecture
-  return <MathematicsLearningPage />;
+  // Use the simple mathematics page for fast loading
+  return <SimpleMathematicsLearningPage />;
 };
 
 export default SubjectLearningPage;

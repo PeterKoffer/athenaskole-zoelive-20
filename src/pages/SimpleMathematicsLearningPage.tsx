@@ -3,24 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-console.log('🔥 DEBUGGING: MathematicsLearningPage loaded');
+interface Question {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+}
 
-const MathematicsLearningPage = () => {
+const SimpleMathematicsLearningPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
-  const [timeElapsed, setTimeElapsed] = useState(29);
+  const [timeElapsed, setTimeElapsed] = useState(0);
   const [streak, setStreak] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [totalQuestions] = useState(10); // Total target questions
   const [isGeneratingMore, setIsGeneratingMore] = useState(false);
-
-  console.log('🔥 DEBUGGING: Component state:', { currentQuestion, hasStarted, score, questionsLength: questions.length });
 
   // Generate initial 2 questions for fast start
   const generateInitialQuestions = async () => {
@@ -28,7 +30,7 @@ const MathematicsLearningPage = () => {
     console.log('🤖 Starting initial AI question generation (2 questions)...');
     
     try {
-      const generatedQuestions = [];
+      const generatedQuestions: Question[] = [];
       
       // Generate only 2 questions initially for fast start
       for (let i = 0; i < 2; i++) {
@@ -49,7 +51,7 @@ const MathematicsLearningPage = () => {
         }
 
         if (data?.question) {
-          const aiQuestion = {
+          const aiQuestion: Question = {
             question: data.question,
             options: data.options || ['A', 'B', 'C', 'D'],
             correct: data.correct || 0,
@@ -97,7 +99,7 @@ const MathematicsLearningPage = () => {
     console.log('🤖 Generating additional questions in background...');
     
     try {
-      const additionalQuestions = [];
+      const additionalQuestions: Question[] = [];
       
       // Generate 3 more questions to reach 5 total
       for (let i = 2; i < 5; i++) {
@@ -118,7 +120,7 @@ const MathematicsLearningPage = () => {
         }
 
         if (data?.question) {
-          const aiQuestion = {
+          const aiQuestion: Question = {
             question: data.question,
             options: data.options || ['A', 'B', 'C', 'D'],
             correct: data.correct || 0,
@@ -157,19 +159,16 @@ const MathematicsLearningPage = () => {
   }, [hasStarted]);
 
   const handleBackToTraining = () => {
-    console.log('🔥 DEBUGGING: Back to training clicked');
     navigate('/training-ground');
   };
 
   const handleStartLearning = () => {
-    console.log('🔥 DEBUGGING: Start learning clicked');
     setHasStarted(true);
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult || questions.length === 0) return;
+    if (showResult || questions.length === 0 || !questions[currentQuestion]) return;
     
-    console.log('🔥 DEBUGGING: Answer selected:', answerIndex);
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     
@@ -182,7 +181,6 @@ const MathematicsLearningPage = () => {
   };
 
   const handleNext = () => {
-    console.log('🔥 DEBUGGING: Next question clicked');
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
       setSelectedAnswer(null);
@@ -195,7 +193,7 @@ const MathematicsLearningPage = () => {
 
   const timeInMinutes = Math.floor(timeElapsed / 60);
   const timeInSeconds = timeElapsed % 60;
-  const progressPercentage = hasStarted ? ((currentQuestion + 1) / questions.length) * 100 : 0;
+  const progressPercentage = hasStarted && questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4">
@@ -214,16 +212,16 @@ const MathematicsLearningPage = () => {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-4">🤖 AI-Generated Mathematics Session</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">🤖 AI Mathematics Learning</h1>
           
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-white">{hasStarted ? currentQuestion + 1 : 1}</div>
-              <div className="text-gray-400">Activity</div>
+              <div className="text-gray-400">Question</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-white">{questions.length}</div>
-              <div className="text-gray-400">Total Activities</div>
+              <div className="text-gray-400">Total Questions</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-white">{streak}</div>
@@ -248,29 +246,29 @@ const MathematicsLearningPage = () => {
         {!hasStarted ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">🤖 AI-Generated Mathematics Questions</h2>
+              <h2 className="text-white text-xl font-bold">🤖 AI Mathematics Questions</h2>
             </div>
             <div className="p-8">
               <p className="text-gray-300 text-lg mb-6">
-                Click below to start {totalQuestions} AI-generated mathematics questions tailored to your level with personalized feedback.
+                Start with 2 questions that load instantly, then more questions generate in the background!
               </p>
               <button
                 onClick={handleStartLearning}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
-                🤖 START AI MATH GENERATION
+                🚀 START LEARNING (Fast!)
               </button>
             </div>
           </div>
         ) : isGenerating ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-orange-600 to-yellow-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">🤖 Generating AI Questions...</h2>
+              <h2 className="text-white text-xl font-bold">🤖 Generating Questions...</h2>
             </div>
             <div className="p-8 text-center">
               <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-300 text-lg">
-                Creating personalized mathematics questions using AI...
+                Creating your first 2 questions...
               </p>
             </div>
           </div>
@@ -355,4 +353,4 @@ const MathematicsLearningPage = () => {
   );
 };
 
-export default MathematicsLearningPage;
+export default SimpleMathematicsLearningPage;
