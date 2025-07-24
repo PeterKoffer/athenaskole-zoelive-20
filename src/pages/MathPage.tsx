@@ -18,6 +18,9 @@ const MathPage = () => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
+
+        console.log('Fetching questions...');
+
         const { data, error } = await supabase.functions.invoke('generate-question', {
           body: {
             subject: 'mathematics',
@@ -27,11 +30,16 @@ const MathPage = () => {
         });
 
         if (error) {
+
+          console.error('Error fetching questions:', error);
           throw new Error(error.message);
         }
 
-        setQuestions(data ? [data] : []);
+        console.log('Questions data:', data);
+        setQuestions(data ? data.questions : []);
       } catch (err: any) {
+        console.error('An error occurred:', err);
+
         setError(err.message);
       } finally {
         setLoading(false);
