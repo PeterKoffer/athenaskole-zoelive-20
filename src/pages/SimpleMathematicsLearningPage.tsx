@@ -282,7 +282,7 @@ const SimpleMathematicsLearningPage = () => {
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg relative">
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-t-lg">
               <div className="flex items-center justify-between">
-                <h2 className="text-white text-xl font-bold">🤖 NELIE Mathematics Questions</h2>
+                <h2 className="text-white text-xl font-bold">🤖 Mathematics Questions</h2>
                 <div
                   onClick={() => handleSpeak("Start with 2 questions that load instantly, then more questions generate in the background!")}
                   className="text-purple-200 hover:text-white transition-colors cursor-pointer"

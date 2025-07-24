@@ -8,7 +8,7 @@ import { getClassroomConfig } from '../shared/classroomConfigs';
 import FunctionalMathScoreboard from './FunctionalMathScoreboard';
 import AIGeneratedMathQuestion from './AIGeneratedMathQuestion';
 import MathWelcomeMessage from './MathWelcomeMessage';
-import NelieAvatarTutor from './NelieAvatarTutor';
+
 
 interface FullyFunctionalMathLearningProps {
   onBackToProgram: () => void;
@@ -171,17 +171,6 @@ const FullyFunctionalMathLearning = ({ onBackToProgram }: FullyFunctionalMathLea
           onBackToProgram={handleBackToProgram}
         />
 
-        {/* Nelie AI Tutor */}
-        <div className="flex justify-center mt-4 mb-6">
-          <div className="w-full max-w-4xl">
-            <NelieAvatarTutor
-              currentQuestion={currentQuestionIndex + 1}
-              totalQuestions={totalQuestions}
-              score={score}
-              streak={correctStreak}
-            />
-          </div>
-        </div>
 
         {/* AI Generated Math Content */}
         <div className="flex items-center justify-center">
