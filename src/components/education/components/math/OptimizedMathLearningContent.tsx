@@ -1,5 +1,4 @@
-
-import UnifiedLessonManager from '../UnifiedLessonManager';
+import CleanMathLearning from './CleanMathLearning';
 
 interface OptimizedMathLearningContentProps {
   onBackToProgram: () => void;
@@ -9,10 +8,7 @@ const OptimizedMathLearningContent = ({
   onBackToProgram
 }: OptimizedMathLearningContentProps) => {
   return (
-    <UnifiedLessonManager
-      subject="mathematics"
-      skillArea="general_math"
-      studentName="Student"
+    <CleanMathLearning
       onBackToProgram={onBackToProgram}
     />
   );

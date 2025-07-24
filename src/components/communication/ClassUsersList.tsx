@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, GraduationCap, BookOpen, Heart } from "lucide-react";
+import { GraduationCap, BookOpen, Heart } from "lucide-react";
 import { Participant } from "@/types/communication";
 import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
 
@@ -85,14 +85,6 @@ const ClassUsersList = ({ onUserSelect, selectedUsers, maxUsers = 2 }: ClassUser
   const isUserSelected = (user: Participant) => 
     selectedUsers.some(u => u.id === user.id);
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'student': return GraduationCap;
-      case 'teacher': return BookOpen;
-      case 'parent': return Heart;
-      default: return Users;
-    }
-  };
 
   const UserGroup = ({ title, users, icon: Icon }: { title: string, users: Participant[], icon: any }) => (
     <div className="space-y-2">

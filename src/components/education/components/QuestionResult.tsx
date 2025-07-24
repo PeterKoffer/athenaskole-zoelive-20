@@ -11,8 +11,7 @@ interface QuestionResultProps {
 const QuestionResult = ({
   showResult,
   isCorrect,
-  explanation,
-  isLastQuestion
+  explanation
 }: QuestionResultProps) => {
   if (!showResult) return null;
 

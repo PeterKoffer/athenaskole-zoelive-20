@@ -7,6 +7,7 @@ import { CacheService } from './dailyLessonGenerator/cacheService';
 import { calendarService } from './CalendarService';
 import { aiContentGenerator } from './content/aiContentGenerator'; // Fixed import path
 import learnerProfileService from './learnerProfile/LearnerProfileService';
+import { supabase } from '@/integrations/supabase/client';
 
 export class DailyLessonGenerator {
   /**
@@ -62,47 +63,66 @@ export class DailyLessonGenerator {
       
       while (!uniqueContent && attempts < 3) {
         try {
-          const aiContent = await aiContentGenerator.generateAdaptiveContent({
-            subject,
-            skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
-            gradeLevel,
-            activityType: this.getActivityTypeForIndex(i),
-            difficulty: gradeLevel + this.getDifficultyVariation(i),
-            learningStyle: learnerProfile?.learning_style_preference || 'mixed',
-            studentInterests: learnerProfile?.interests,
-            studentAbilities: studentProgress,
-            calendarKeywords: activeKeywords,
-            metadata: {
-              activityIndex: i,
-              studentProgress,
-              varietyPrompt: this.getVarietyPrompt(i),
-              diversityLevel: Math.floor(i / 2) + 1,
+          // Use standard lesson generation for daily lessons, not Training Ground
+          const { data: aiContent, error } = await supabase.functions.invoke('generate-adaptive-content', {
+            body: {
+              type: 'lesson-activity',
+              subject,
+              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
+              gradeLevel,
+              difficultyLevel: gradeLevel + this.getDifficultyVariation(i),
+              activityType: this.getActivityTypeForIndex(i),
+              learningStyle: learnerProfile?.learning_style_preference || 'balanced',
+              interests: learnerProfile?.interests || [],
+              performanceData: {
+                accuracy: studentProgress?.accuracy_rate || 0.75,
+                engagement: studentProgress?.engagement_level || 'moderate'
+              },
+              calendarKeywords: activeKeywords,
               sessionId,
+              activityIndex: i,
+              varietyPrompt: this.getVarietyPrompt(i),
               uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
             }
           });
 
-          // Check for uniqueness
-          const questionKey = aiContent.question.toLowerCase().trim();
+          if (error) {
+            console.error('❌ Training Ground generation error:', error);
+            throw error;
+          }
+
+          // Check for uniqueness - standard lesson activities
+          const questionKey = aiContent.question?.toLowerCase().trim() || 
+                              aiContent.title?.toLowerCase().trim() || 
+                              `activity-${i}`;
           if (!usedQuestions.has(questionKey)) {
             usedQuestions.add(questionKey);
             uniqueContent = true;
             
             const activity: LessonActivity = {
               id: `${sessionId}-activity-${i}`,
-              title: this.generateActivityTitle(subject, skillArea, i),
-              type: 'quiz',
-              phase: 'quiz',
+              title: aiContent.title || this.generateActivityTitle(subject, skillArea, i),
+              type: this.getActivityTypeForIndex(i) as any,
+              phase: this.getActivityTypeForIndex(i) as any,
               duration: 180,
               content: {
                 question: aiContent.question,
                 options: aiContent.options,
-                correctAnswer: aiContent.correct,
-                explanation: aiContent.explanation
+                correctAnswer: aiContent.correct || aiContent.correctAnswer,
+                explanation: aiContent.explanation,
+                text: aiContent.explanation,
+                hook: aiContent.hook,
+                scenario: aiContent.scenario,
+                creativePrompt: aiContent.creativePrompt
               },
+              difficulty: gradeLevel + this.getDifficultyVariation(i),
               subject,
-              skillArea,
-              phaseDescription: `Activity ${i + 1}: ${skillArea.replace(/_/g, ' ')}`
+              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
+              metadata: {
+                generatedBy: 'daily-lesson-ai',
+                sessionId,
+                activityIndex: i
+              }
             };
 
             activities.push(activity);

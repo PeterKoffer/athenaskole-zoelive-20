@@ -1,5 +1,5 @@
 
-import UnifiedClassIntroduction from './UnifiedClassIntroduction';
+// import UnifiedClassIntroduction from './UnifiedClassIntroduction';
 
 interface NelieIntroductionProps {
   subject: string;
@@ -11,19 +11,21 @@ interface NelieIntroductionProps {
 const NelieIntroduction = ({
   subject,
   skillArea,
-  onIntroductionComplete,
-  isAdvancing
+  onIntroductionComplete
 }: NelieIntroductionProps) => {
+  console.log('Nelie Introduction props:', { subject, skillArea });
   console.log('🎭 NelieIntroduction using unified system:', { subject, skillArea });
 
   return (
-    <UnifiedClassIntroduction
-      subject={subject}
-      skillArea={skillArea}
-      userLevel="beginner"
-      onIntroductionComplete={onIntroductionComplete}
-      isAdvancing={isAdvancing}
-    />
+    <div className="text-white text-center p-8">
+      <h2 className="text-2xl mb-4">Introduction temporarily disabled</h2>
+      <button 
+        onClick={onIntroductionComplete}
+        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
+      >
+        Continue to Lesson
+      </button>
+    </div>
   );
 };
 

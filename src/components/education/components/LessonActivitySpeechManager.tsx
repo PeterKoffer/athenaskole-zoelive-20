@@ -13,11 +13,9 @@ interface LessonActivitySpeechManagerProps {
 
 const LessonActivitySpeechManager = ({
   currentActivity,
-  currentActivityIndex,
   autoReadEnabled,
   isReady,
-  speakText,
-  stopSpeaking
+  speakText
 }: LessonActivitySpeechManagerProps) => {
   const lastActivityId = useRef<string>('');
   const hasAutoSpoken = useRef<boolean>(false);

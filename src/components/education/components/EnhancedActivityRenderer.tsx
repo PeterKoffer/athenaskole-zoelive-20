@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Play, Brain, Target } from 'lucide-react';
 import { LessonActivity } from './types/LessonTypes';
+import TrainingGroundActivityRenderer from './TrainingGroundActivityRenderer';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -18,6 +19,24 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   onComplete,
   onActivityComplete
 }) => {
+  // Handle Training Ground activities first
+  if (activity.type === 'training-ground-activity' && activity.content.trainingGroundData) {
+    return (
+      <TrainingGroundActivityRenderer
+        activity={activity as any} // Type assertion for Training Ground specific type
+        onComplete={(success) => {
+          if (onActivityComplete) {
+            onActivityComplete(success);
+          }
+          if (onComplete) {
+            onComplete(success ? 10 : 0);
+          }
+        }}
+      />
+    );
+  }
+
+  // Handle regular activities
   const [selectedAnswer, setSelectedAnswer] = React.useState<number | null>(null);
   const [showResult, setShowResult] = React.useState(false);
   const [isCompleted, setIsCompleted] = React.useState(false);

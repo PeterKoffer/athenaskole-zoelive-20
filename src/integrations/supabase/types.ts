@@ -104,6 +104,53 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_context: {
+        Row: {
+          active_themes: string[] | null
+          created_at: string | null
+          current_unit_duration: string | null
+          end_date: string | null
+          id: string
+          school_id: string | null
+          seasonal_keywords: string[] | null
+          start_date: string | null
+          unit_timeframe: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active_themes?: string[] | null
+          created_at?: string | null
+          current_unit_duration?: string | null
+          end_date?: string | null
+          id?: string
+          school_id?: string | null
+          seasonal_keywords?: string[] | null
+          start_date?: string | null
+          unit_timeframe?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active_themes?: string[] | null
+          created_at?: string | null
+          current_unit_duration?: string | null
+          end_date?: string | null
+          id?: string
+          school_id?: string | null
+          seasonal_keywords?: string[] | null
+          start_date?: string | null
+          unit_timeframe?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_context_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "school_settings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concept_mastery: {
         Row: {
           concept_name: string
@@ -209,6 +256,45 @@ export type Database = {
           subjects_studied?: Json | null
           total_session_time?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      enhanced_student_profiles: {
+        Row: {
+          abilities_assessment: string | null
+          created_at: string | null
+          engagement_level: string | null
+          grade_level: number | null
+          id: string
+          interests: string[] | null
+          learning_style_preference: string | null
+          performance_accuracy: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          abilities_assessment?: string | null
+          created_at?: string | null
+          engagement_level?: string | null
+          grade_level?: number | null
+          id?: string
+          interests?: string[] | null
+          learning_style_preference?: string | null
+          performance_accuracy?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          abilities_assessment?: string | null
+          created_at?: string | null
+          engagement_level?: string | null
+          grade_level?: number | null
+          id?: string
+          interests?: string[] | null
+          learning_style_preference?: string | null
+          performance_accuracy?: number | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -578,6 +664,36 @@ export type Database = {
         }
         Relationships: []
       }
+      school_settings: {
+        Row: {
+          created_at: string | null
+          curriculum_standards: string | null
+          default_lesson_duration: number | null
+          id: string
+          pedagogy: string | null
+          school_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          curriculum_standards?: string | null
+          default_lesson_duration?: number | null
+          id?: string
+          pedagogy?: string | null
+          school_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          curriculum_standards?: string | null
+          default_lesson_duration?: number | null
+          id?: string
+          pedagogy?: string | null
+          school_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       student_profiles: {
         Row: {
           created_at: string | null
@@ -641,6 +757,89 @@ export type Database = {
           teacher_id?: string
           updated_at?: string
           weekly_emphasis?: Json | null
+        }
+        Relationships: []
+      }
+      teacher_settings: {
+        Row: {
+          created_at: string | null
+          curriculum_alignment: string | null
+          id: string
+          lesson_duration_minutes: number | null
+          school_id: string | null
+          subject_priorities: Json | null
+          teacher_id: string | null
+          teaching_approach: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          curriculum_alignment?: string | null
+          id?: string
+          lesson_duration_minutes?: number | null
+          school_id?: string | null
+          subject_priorities?: Json | null
+          teacher_id?: string | null
+          teaching_approach?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          curriculum_alignment?: string | null
+          id?: string
+          lesson_duration_minutes?: number | null
+          school_id?: string | null
+          subject_priorities?: Json | null
+          teacher_id?: string | null
+          teaching_approach?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_settings_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "school_settings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_ground_content: {
+        Row: {
+          completion_time_seconds: number | null
+          context_parameters: Json
+          generated_content: Json
+          generation_timestamp: string | null
+          grade_level: number
+          id: string
+          student_id: string | null
+          student_rating: number | null
+          subject: string
+          was_completed: boolean | null
+        }
+        Insert: {
+          completion_time_seconds?: number | null
+          context_parameters: Json
+          generated_content: Json
+          generation_timestamp?: string | null
+          grade_level: number
+          id?: string
+          student_id?: string | null
+          student_rating?: number | null
+          subject: string
+          was_completed?: boolean | null
+        }
+        Update: {
+          completion_time_seconds?: number | null
+          context_parameters?: Json
+          generated_content?: Json
+          generation_timestamp?: string | null
+          grade_level?: number
+          id?: string
+          student_id?: string | null
+          student_rating?: number | null
+          subject?: string
+          was_completed?: boolean | null
         }
         Relationships: []
       }
