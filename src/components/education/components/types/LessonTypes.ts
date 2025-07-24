@@ -84,6 +84,8 @@ export interface LessonActivity {
     difficulty?: 'easy' | 'medium' | 'hard'; // For puzzle quest difficulty
     choices?: string[]; // For multiple choice questions
     guidance?: string; // For guidance-based activities
+    title?: string; // For activities with titles
+    activityId?: string; // For activity identification
   };
   difficulty?: 'easy' | 'medium' | 'hard';
   subject?: string;

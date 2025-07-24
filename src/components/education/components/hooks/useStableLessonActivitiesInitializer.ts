@@ -43,18 +43,18 @@ export const useStableLessonActivitiesInitializer = (
               metadata: {
                 subject: subject,
                 skillArea: skillArea,
-                templateId: uniqueQuestion.metadata.templateId
+                templateId: uniqueQuestion.metadata?.templateId
               },
               content: {
                 question: uniqueQuestion.content.question,
-                options: [...uniqueQuestion.content.options], // Convert readonly to mutable
+                options: uniqueQuestion.content.options ? [...uniqueQuestion.content.options] : [], // Convert readonly to mutable
                 correctAnswer: uniqueQuestion.content.correctAnswer,
                 explanation: uniqueQuestion.content.explanation
               }
             };
             
             uniqueActivities.push(activity);
-            console.log(`✅ Generated question ${i + 1}: ${uniqueQuestion.content.question.substring(0, 30)}...`);
+            console.log(`✅ Generated question ${i + 1}: ${uniqueQuestion.content.question?.substring(0, 30) || 'Question'}...`);
           } catch (error) {
             console.error(`❌ Error generating question ${i + 1}:`, error);
             

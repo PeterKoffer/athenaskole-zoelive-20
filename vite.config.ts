@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     strictPort: true,
   },
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
