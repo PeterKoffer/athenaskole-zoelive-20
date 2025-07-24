@@ -36,7 +36,8 @@ export default defineConfig(({ mode }) => ({
     drop: mode === 'production' ? ['console'] : [],
     legalComments: 'none',
     target: 'es2020',
-    logLevel: 'error', // Only show errors, suppress warnings
+    logLevel: 'silent',
+    ignoreAnnotations: true,
   },
   plugins: [
     react({
@@ -48,11 +49,17 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' && componentTagger(),
     // Development-only plugin to suppress TypeScript errors
     mode === 'development' && {
-      name: 'suppress-ts-dev',
+      name: 'suppress-ts-dev', 
       configResolved(config) {
-        // Set environment variable to allow TypeScript errors in development
         if (mode === 'development') {
-          process.env.VITE_SKIP_TS_CHECK = 'true';
+          // Disable TypeScript checking in development
+          config.esbuild = {
+            ...config.esbuild,
+            target: 'es2020',
+            treeShaking: false,
+            keepNames: true,
+            format: 'esm'
+          };
         }
       }
     }

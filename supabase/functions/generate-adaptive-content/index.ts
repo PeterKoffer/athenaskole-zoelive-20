@@ -295,24 +295,45 @@ async function generateUniverseContent(requestData: any, openaiKey?: string, dee
 }
 
 async function generateTrainingGroundActivity(requestData: any, openaiKey?: string, deepSeekKey?: string) {
-  console.log('🎯 Generating Training Ground activity with custom prompt');
+  console.log('🎯 Generating Training Ground activity with CREATIVE prompt');
   
-  const prompt = requestData.customPrompt || `Generate an engaging educational activity for ${requestData.subject}. 
-Return a JSON object with this structure:
+  // FORCE CREATIVE CONTENT - NO QUIZ MODE ALLOWED
+  const basePrompt = requestData.customPrompt || buildDefaultTrainingGroundPrompt(requestData);
+  
+  // Add EXPLICIT restrictions to prevent quiz content
+  const restrictivePrompt = `${basePrompt}
+
+🚫 CRITICAL RESTRICTIONS - DO NOT VIOLATE:
+- DO NOT create multiple choice questions
+- DO NOT create quiz-style content  
+- DO NOT use phrases like "What is..." or "Which of the following..."
+- DO NOT include answer options A, B, C, D
+- DO NOT create word problems about buying things or counting objects
+- DO NOT make boring content like "Lily has 12 apples..."
+
+✅ REQUIRED CREATIVE ELEMENTS:
+- Use games, simulations, interactive challenges, or hands-on activities
+- Include visual or kinesthetic learning elements
+- Create scenarios that feel like adventures or explorations
+- Use creative activity types like: CookingGame, SpaceExploration, ArtChallenge, ScienceExperiment, MusicComposer, StoryBuilder, PuzzleSolver
+- Make it feel like play-based learning, not a test
+
+MANDATORY JSON FORMAT - RETURN EXACTLY THIS STRUCTURE:
 {
-  "title": "Activity title",
-  "objective": "Learning objective", 
-  "explanation": "Brief explanation",
+  "title": "Creative activity title with action words",
+  "objective": "What the student will learn through this activity", 
+  "explanation": "Brief explanation of the concept in simple terms",
   "activity": {
-    "type": "Activity type",
-    "instructions": "Step-by-step instructions"
+    "type": "CreativeActivityType (not Quiz or Question)",
+    "instructions": "Step-by-step creative instructions for hands-on activity"
   },
-  "optionalExtension": "Extension activity",
-  "studentSkillTargeted": "Target skill",
-  "learningStyleAdaptation": "Learning style adaptation"
+  "optionalExtension": "Additional creative challenge for advanced learners",
+  "studentSkillTargeted": "Specific skill being developed through this activity",
+  "learningStyleAdaptation": "How this activity adapts to different learning styles"
 }`;
 
-  console.log('📝 Training Ground prompt:', prompt.substring(0, 200) + '...');
+  console.log('📝 RESTRICTIVE Training Ground prompt length:', restrictivePrompt.length);
+  console.log('📝 Training Ground prompt preview:', restrictivePrompt.substring(0, 300) + '...');
 
   if (openaiKey) {
     console.log('🤖 Using OpenAI for Training Ground activity');
@@ -322,20 +343,20 @@ Return a JSON object with this structure:
         'Authorization': `Bearer ${openaiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+        body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert educational activity designer. Create engaging, interactive learning activities. Always return valid JSON only.'
+            content: 'You are a creative educational activity designer who NEVER creates quizzes or multiple choice questions. You design hands-on, interactive, and imaginative learning experiences that feel like games and adventures. You must follow the user\'s format requirements exactly and avoid any quiz-style content.'
           },
           {
             role: 'user',
-            content: prompt
+            content: restrictivePrompt
           }
         ],
-        temperature: 0.8,
-        max_tokens: 1000
+        temperature: 0.9,
+        max_tokens: 1200
       }),
     });
 
@@ -362,4 +383,34 @@ Return a JSON object with this structure:
   }
   
   throw new Error('No OpenAI API key available for Training Ground generation');
+}
+
+function buildDefaultTrainingGroundPrompt(requestData: any): string {
+  const subject = requestData.subject || 'general learning';
+  const gradeLevel = requestData.gradeLevel || 5;
+  
+  return `You are designing a creative, hands-on learning activity for ${subject} for a Grade ${gradeLevel} student.
+
+STUDENT CONTEXT:
+- Subject: ${subject}
+- Grade Level: ${gradeLevel} 
+- Learning Goal: Explore ${subject} concepts through interactive play
+
+CREATE AN ENGAGING ACTIVITY:
+Design a creative, interactive activity that teaches ${subject} concepts through:
+- Hands-on exploration
+- Creative problem-solving  
+- Visual or kinesthetic learning
+- Game-like mechanics
+- Real-world applications
+
+EXAMPLES OF GOOD ACTIVITY TYPES:
+- CookingGame: "Make fraction pizzas by combining slices"
+- SpaceExploration: "Navigate asteroid fields using coordinate geometry"
+- ArtChallenge: "Create symmetrical paintings to learn about reflection"
+- ScienceExperiment: "Build towers to explore engineering principles"
+- MusicComposer: "Create rhythm patterns to understand mathematical sequences"
+- StoryBuilder: "Write adventure stories using vocabulary words"
+
+The activity should feel like an adventure or creative challenge, NOT like schoolwork or a test.`;
 }

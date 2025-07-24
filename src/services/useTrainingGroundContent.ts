@@ -58,13 +58,16 @@ export function useTrainingGroundContent({ subject, enabled = true }: UseTrainin
       // Call AI service with the generated prompt using Supabase client
       console.log('🚀 Sending Training Ground prompt to AI:', prompt);
       
+      // 🎯 FORCE Training Ground mode with explicit parameters
       const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
         body: {
           subject,
-          skillArea: 'training_ground',
+          skillArea: 'training_ground',  // This triggers TG mode
+          activityType: 'training-ground', // This triggers TG mode  
           customPrompt: prompt,
           responseFormat: 'training_ground_activity',
-          activityType: 'training-ground'
+          gradeLevel: 5,
+          type: 'training_ground_activity'
         }
       });
 

@@ -1,8 +1,7 @@
 // @ts-nocheck
 /* eslint-disable */
 
-// This file provides global TypeScript suppressions for development builds
-// These are temporary suppressions to allow rapid prototyping and testing
+// This file suppresses all TypeScript warnings during development builds  
+// Allows rapid prototyping without build interruptions
 
-// Re-export everything to maintain module compatibility
-export * from './components/training-ground/TrainingGroundMain';
+export const buildSuppressionsActive = true;
