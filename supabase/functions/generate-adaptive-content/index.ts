@@ -129,8 +129,8 @@ serve(async (req) => {
 
     if (openaiKey) {
       try {
-        console.log('🤖 Attempting OpenAI content generation with new prompt...');
-        generatedContent = await generateContentWithTrainingGroundPrompt(requestData);
+        console.log('🤖 Attempting OpenAI content generation for daily lessons...');
+        generatedContent = await generateContentWithOpenAI(requestData);
         apiUsed = 'openai';
       } catch (error) {
         console.error('❌ OpenAI generation failed:', error);
@@ -386,46 +386,21 @@ MANDATORY JSON FORMAT - RETURN EXACTLY THIS STRUCTURE:
 }
 
 function buildDefaultTrainingGroundPrompt(requestData: any): string {
-  const subject = requestData.subject || 'general learning';
-  const gradeLevel = requestData.gradeLevel || 5;
-  const performance = requestData.performanceLevel || 'average';
-  const learningStyle = requestData.learningStyle || 'mixed';
-  const interests = requestData.interests?.join(', ') || 'general topics';
-  const schoolPhilosophy = requestData.schoolPhilosophy || 'Experiential & creative learning';
-  const emphasis = requestData.emphasis || 5;
-  const calendarKeywords = requestData.calendarKeywords?.join(', ') || 'none';
+  // This function is now deprecated - use the unified prompt system instead
+  // Kept for backward compatibility but will redirect to new system
+  
+  console.log('⚠️ Using deprecated prompt function - should migrate to unified system');
+  
+  return `You are a highly creative AI educator. Create an engaging, hands-on learning activity.
 
-  return `You are a highly creative AI educator working in a modern, playful learning simulator.
+FORBIDDEN:
+- No quizzes or multiple choice questions
+- No word problems like "Sarah has 8 apples..."
 
-🚫 Forbidden:
-- No quizzes or tests
-- No "What is..." or "Which of the following..." formats
-- No math word problems like "Lily has 12 apples"
+REQUIRED:
+- Creative, themed activities (cooking, art, science experiments)
+- Return JSON with title, objective, explanation, activity, optionalExtension, studentSkillTargeted, learningStyleAdaptation
 
-✅ Required:
-- Imaginative, engaging activities
-- Use themed learning (e.g. cooking, art, music, science)
-- Tailor the activity to a student in grade ${gradeLevel} with a ${performance} performance level.
-- Adapt to their preferred learning style: ${learningStyle}
-- Consider their interests: ${interests}
-- Use the school's teaching philosophy: ${schoolPhilosophy}
-- Apply emphasis level ${emphasis} for the subject of ${subject}.
-- If relevant, integrate calendar theme: ${calendarKeywords}
-
-🎨 Output Format:
-Return only structured JSON like this:
-{
-  "title": "...",
-  "objective": "...",
-  "explanation": "...",
-  "activity": {
-    "type": "CookingGame" | "Puzzle" | "StoryBuilder" | "ScienceExperiment",
-    "instructions": "..."
-  },
-  "optionalExtension": "...",
-  "studentSkillTargeted": "...",
-  "learningStyleAdaptation": "..."
-}
-
-You are not allowed to return any quizzes or boring scenarios. Make it engaging and immersive.`;
+Subject: ${requestData.subject || 'general learning'}
+Grade: ${requestData.gradeLevel || 5}`;
 }

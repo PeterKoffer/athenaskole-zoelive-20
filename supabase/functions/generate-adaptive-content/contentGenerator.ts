@@ -1,5 +1,8 @@
+// ============================================
+// CONTENT GENERATOR - Uses unified prompt system
+// ============================================
 
-import { createGradeAlignedPrompt, createTrainingGroundPrompt } from './promptBuilder.ts';
+import { getPromptForContext, type PromptContext } from '../../../src/services/prompt-system/index.ts';
 
 export async function generateContentWithTrainingGroundPrompt(requestData: any) {
   const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
@@ -8,7 +11,19 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
   }
 
   try {
-    const prompt = createTrainingGroundPrompt(requestData);
+    // Build context from request data
+    const context: PromptContext = {
+      subject: requestData.subject || 'general learning',
+      gradeLevel: requestData.gradeLevel || 5,
+      performanceLevel: requestData.performanceLevel || 'average',
+      learningStyle: requestData.learningStyle || 'mixed',
+      interests: requestData.interests || [],
+      schoolPhilosophy: requestData.schoolPhilosophy || 'Experiential & creative learning',
+      calendarKeywords: requestData.calendarKeywords || []
+    };
+
+    const prompt = getPromptForContext('training-ground', context);
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -86,7 +101,18 @@ export async function generateContentWithOpenAI(requestData: any) {
   });
 
   try {
-    const prompt = createGradeAlignedPrompt(requestData);
+    // Build context for daily lesson
+    const context: PromptContext = {
+      subject: requestData.subject || 'general learning',
+      gradeLevel: requestData.gradeLevel || 5,
+      performanceLevel: requestData.performanceLevel || 'average',
+      learningStyle: requestData.learningStyle || 'mixed',
+      interests: requestData.interests || [],
+      schoolPhilosophy: requestData.schoolPhilosophy,
+      calendarKeywords: requestData.calendarKeywords || []
+    };
+
+    const prompt = getPromptForContext('daily-lesson', context);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -162,7 +188,18 @@ export async function generateContentWithDeepSeek(requestData: any) {
   });
 
   try {
-    const prompt = createGradeAlignedPrompt(requestData);
+    // Build context for daily lesson
+    const context: PromptContext = {
+      subject: requestData.subject || 'general learning',
+      gradeLevel: requestData.gradeLevel || 5,
+      performanceLevel: requestData.performanceLevel || 'average',
+      learningStyle: requestData.learningStyle || 'mixed',
+      interests: requestData.interests || [],
+      schoolPhilosophy: requestData.schoolPhilosophy,
+      calendarKeywords: requestData.calendarKeywords || []
+    };
+
+    const prompt = getPromptForContext('daily-lesson', context);
 
     const response = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
