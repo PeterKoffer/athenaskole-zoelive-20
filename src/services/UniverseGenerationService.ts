@@ -1,4 +1,4 @@
-import { CurriculumNode } from '../types/curriculum/CurriculumNode';
+import type { CurriculumNode } from '../types/curriculum';
 import { openAIService } from './OpenAIService';
 import { NELIESubject } from '../types/curriculum/NELIESubjects';
 
