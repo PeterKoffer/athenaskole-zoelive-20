@@ -211,13 +211,13 @@ const SimpleMathematicsLearningPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4 relative">
-      {/* NELIE Floating Teacher */}
+      {/* NELIE Floating Robot */}
       <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-white rounded-full p-4 shadow-2xl border-4 border-purple-300 animate-bounce">
-          <div className="text-4xl">👩‍🏫</div>
+        <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-full p-4 shadow-2xl border-4 border-blue-300 animate-bounce">
+          <div className="text-4xl">🤖</div>
         </div>
         <div className="text-center mt-2">
-          <span className="text-white text-sm font-bold bg-purple-600 px-2 py-1 rounded">NELIE</span>
+          <span className="text-white text-sm font-bold bg-blue-600 px-2 py-1 rounded">NELIE</span>
         </div>
       </div>
 
@@ -237,10 +237,10 @@ const SimpleMathematicsLearningPage = () => {
           </div>
 
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-white">👩‍🏫 NELIE Mathematics Learning</h1>
+            <h1 className="text-2xl font-bold text-white">🤖 NELIE Mathematics Learning</h1>
             <button
-              onClick={() => handleSpeak("Welcome to your mathematics lesson! I'm NELIE, your virtual teacher.")}
-              className="text-purple-300 hover:text-purple-100 transition-colors"
+              onClick={() => handleSpeak("Welcome to your mathematics lesson! I'm NELIE, your virtual robot teacher.")}
+              className="text-blue-300 hover:text-blue-100 transition-colors"
               disabled={!isNelieReady}
             >
               <Volume2 className="w-6 h-6" />
@@ -280,7 +280,7 @@ const SimpleMathematicsLearningPage = () => {
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg relative">
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-t-lg">
               <div className="flex items-center justify-between">
-                <h2 className="text-white text-xl font-bold">👩‍🏫 NELIE Mathematics Questions</h2>
+                <h2 className="text-white text-xl font-bold">🤖 NELIE Mathematics Questions</h2>
                 <button
                   onClick={() => handleSpeak("Start with 2 questions that load instantly, then more questions generate in the background!")}
                   className="text-purple-200 hover:text-white transition-colors"
@@ -314,7 +314,7 @@ const SimpleMathematicsLearningPage = () => {
         ) : isGenerating ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-orange-600 to-yellow-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">👩‍🏫 NELIE is Generating Questions...</h2>
+              <h2 className="text-white text-xl font-bold">🤖 NELIE is Generating Questions...</h2>
             </div>
             <div className="p-8 text-center">
               <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -337,7 +337,7 @@ const SimpleMathematicsLearningPage = () => {
                 </button>
               </div>
               {isGeneratingMore && (
-                <p className="text-sm text-blue-200 mt-1">👩‍🏫 NELIE is generating more questions in background...</p>
+                <p className="text-sm text-blue-200 mt-1">🤖 NELIE is generating more questions in background...</p>
               )}
             </div>
             <div className="p-8 space-y-6">
