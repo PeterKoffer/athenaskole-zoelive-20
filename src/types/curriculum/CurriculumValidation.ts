@@ -1,5 +1,5 @@
 
-import { CurriculumNode } from './CurriculumNode';
+import type { CurriculumNode } from './index';
 
 export class CurriculumValidation {
   /**

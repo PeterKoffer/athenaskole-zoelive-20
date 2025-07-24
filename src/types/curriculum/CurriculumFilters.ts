@@ -1,5 +1,5 @@
 
-import { CurriculumNodeType } from './CurriculumNode';
+import type { CurriculumNodeType } from './index';
 import { SubjectSpecificMetadata } from './SubjectMetadata';
 
 export interface CurriculumNodeFilters {

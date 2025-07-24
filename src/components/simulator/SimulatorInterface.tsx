@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { nelieEngine } from '@/services/NELIEEngine';
 import { DailyUniverse } from '@/types/learning';
-import { CurriculumNode } from '@/types/curriculum/CurriculumNode';
+import type { CurriculumNode } from '@/types/curriculum';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

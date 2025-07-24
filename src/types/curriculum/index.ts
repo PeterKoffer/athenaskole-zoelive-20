@@ -1,16 +1,10 @@
 
 // Core curriculum types
-export interface CurriculumNode {
-  id: string;
-  nodeType: 'level' | 'subject' | 'topic' | 'subtopic';
-  name: string;
-  description?: string;
-  countryCode?: string;
-  subjectName?: string;
-  parentId?: string;
-  children?: CurriculumNode[];
-  metadata?: Record<string, any>;
-}
+export type {
+  UnifiedCurriculumNode,
+  UnifiedCurriculumNode as CurriculumNode,
+  CurriculumNodeType
+} from './UnifiedCurriculumNode';
 
 export interface CurriculumLevel {
   id: string;

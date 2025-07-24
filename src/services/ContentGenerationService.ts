@@ -1,5 +1,5 @@
 import curriculumIndex from '../data/unified-curriculum-index.json';
-import { CurriculumNode, CurriculumNodeType } from '../types/curriculum/CurriculumNode';
+import type { CurriculumNode, CurriculumNodeType } from '../types/curriculum';
 import { universeGenerationService } from './UniverseGenerationService';
 
 class ContentGenerationService {
