@@ -48,7 +48,7 @@ const MathematicsLearningPage = () => {
 
   const handleBackToTraining = () => {
     console.log('🔥 DEBUGGING: Back to training clicked');
-    navigate('/daily-program');
+    navigate('/training-ground');
   };
 
   const handleStartLearning = () => {
@@ -79,7 +79,7 @@ const MathematicsLearningPage = () => {
       setShowResult(false);
     } else {
       alert(`Congratulations! You completed the lesson with ${score} points!`);
-      navigate('/daily-program');
+      navigate('/training-ground');
     }
   };
 
