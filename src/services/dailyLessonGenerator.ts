@@ -49,69 +49,98 @@ export class DailyLessonGenerator {
     activeKeywords: string[],
   ): Promise<LessonActivity[]> {
     const activities: LessonActivity[] = [];
-    const lessonId = `lesson-${Date.now()}`;
+    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const usedQuestions = new Set<string>(); // Track used questions to prevent duplicates
 
     console.log('🤖 Using AI content generation with new prompt template');
+    console.log(`🎯 Session ID: ${sessionId} - Generating unique content`);
 
-    // Generate 7 diverse activities using AI
+    // Generate 7 diverse activities using AI with enhanced variety
     for (let i = 0; i < 7; i++) {
-      try {
-        const aiContent = await aiContentGenerator.generateAdaptiveContent({
-          subject,
-          skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
-          gradeLevel,
-          activityType: this.getActivityTypeForIndex(i),
-          difficulty: gradeLevel + this.getDifficultyVariation(i),
-          learningStyle: learnerProfile?.learning_style_preference || 'mixed',
-          studentInterests: learnerProfile?.interests,
-          studentAbilities: studentProgress,
-          calendarKeywords: activeKeywords,
-          metadata: {
-            activityIndex: i,
-            studentProgress,
-            varietyPrompt: this.getVarietyPrompt(i),
-            diversityLevel: Math.floor(i / 2) + 1
+      let attempts = 0;
+      let uniqueContent = false;
+      
+      while (!uniqueContent && attempts < 3) {
+        try {
+          const aiContent = await aiContentGenerator.generateAdaptiveContent({
+            subject,
+            skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
+            gradeLevel,
+            activityType: this.getActivityTypeForIndex(i),
+            difficulty: gradeLevel + this.getDifficultyVariation(i),
+            learningStyle: learnerProfile?.learning_style_preference || 'mixed',
+            studentInterests: learnerProfile?.interests,
+            studentAbilities: studentProgress,
+            calendarKeywords: activeKeywords,
+            metadata: {
+              activityIndex: i,
+              studentProgress,
+              varietyPrompt: this.getVarietyPrompt(i),
+              diversityLevel: Math.floor(i / 2) + 1,
+              sessionId,
+              uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
+            }
+          });
+
+          // Check for uniqueness
+          const questionKey = aiContent.question.toLowerCase().trim();
+          if (!usedQuestions.has(questionKey)) {
+            usedQuestions.add(questionKey);
+            uniqueContent = true;
+            
+            const activity: LessonActivity = {
+              id: `${sessionId}-activity-${i}`,
+              title: this.generateActivityTitle(subject, skillArea, i),
+              type: 'quiz',
+              phase: 'quiz',
+              duration: 180,
+              content: {
+                question: aiContent.question,
+                options: aiContent.options,
+                correctAnswer: aiContent.correct,
+                explanation: aiContent.explanation
+              },
+              subject,
+              skillArea,
+              phaseDescription: `Activity ${i + 1}: ${skillArea.replace(/_/g, ' ')}`
+            };
+
+            activities.push(activity);
+            console.log(`✅ Generated UNIQUE AI activity ${i + 1}: ${activity.title}`);
+          } else {
+            console.log(`🔄 Duplicate detected for activity ${i + 1}, retrying...`);
+            attempts++;
           }
-        });
-
-        const activity: LessonActivity = {
-          id: `${lessonId}-activity-${i}`,
-          title: this.generateActivityTitle(subject, skillArea, i),
-          type: 'quiz',
-          phase: 'quiz',
-          duration: 180,
-          content: {
-            question: aiContent.question,
-            options: aiContent.options,
-            correctAnswer: aiContent.correct,
-            explanation: aiContent.explanation
-          },
-          subject,
-          skillArea,
-          phaseDescription: `Activity ${i + 1}: ${skillArea.replace(/_/g, ' ')}`
-        };
-
-        activities.push(activity);
-        console.log(`✅ Generated AI activity ${i + 1}: ${activity.title}`);
-      } catch (error) {
-        console.error(`❌ Failed to generate AI activity ${i}:`, error);
-        // Fallback to basic activity
+        } catch (error) {
+          console.error(`❌ Failed to generate AI activity ${i} (attempt ${attempts + 1}):`, error);
+          attempts++;
+        }
+      }
+      
+      // If we couldn't generate unique content, create fallback
+      if (!uniqueContent) {
         const fallbackActivity: LessonActivity = {
-          id: `${lessonId}-fallback-${i}`,
+          id: `${sessionId}-fallback-${i}`,
           title: `${subject} Challenge ${i + 1}`,
           type: 'quiz',
           phase: 'quiz',
           duration: 180,
           content: {
-            question: `What is an important concept in ${subject}?`,
-            options: ['Option A', 'Option B', 'Option C', 'Option D'],
-            correctAnswer: 0,
-            explanation: `This helps build understanding in ${subject}.`
+            question: `Challenge ${i + 1}: What mathematical principle applies here? (Scenario ${i + 1})`,
+            options: [
+              `Approach A for scenario ${i + 1}`,
+              `Approach B for scenario ${i + 1}`,
+              `Approach C for scenario ${i + 1}`,
+              `Approach D for scenario ${i + 1}`
+            ],
+            correctAnswer: i % 4,
+            explanation: `This scenario helps build understanding of ${subject} concepts through practical application.`
           },
           subject,
           skillArea
         };
         activities.push(fallbackActivity);
+        console.log(`⚠️ Using fallback activity ${i + 1}`);
       }
     }
 
@@ -160,6 +189,25 @@ export class DailyLessonGenerator {
       'Challenge critical thinking'
     ];
     return prompts[index % prompts.length];
+  }
+
+  private static getUniquenessSeeds(index: number, attempt: number): string[] {
+    const baseSeeds = [
+      `variation-${index}-${attempt}`,
+      `timestamp-${Date.now()}`,
+      `random-${Math.random().toString(36).substr(2, 9)}`
+    ];
+    
+    const contextualSeeds = [
+      'different-character-names',
+      'alternative-scenarios',
+      'varied-number-sets',
+      'unique-situations',
+      'diverse-contexts',
+      'fresh-perspectives'
+    ];
+    
+    return [...baseSeeds, contextualSeeds[index % contextualSeeds.length]];
   }
 
   /**

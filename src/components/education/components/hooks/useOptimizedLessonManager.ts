@@ -90,6 +90,7 @@ export const useOptimizedLessonManager = ({
 
   const handleActivityComplete = useCallback((wasCorrect?: boolean) => {
     console.log(`📝 Activity completed: ${currentActivity?.title}, correct: ${wasCorrect}`);
+    console.log(`📊 Progress: ${currentActivityIndex + 1}/${activities.length} activities`);
     
     if (wasCorrect) {
       setScore(prev => prev + 10);
@@ -100,7 +101,9 @@ export const useOptimizedLessonManager = ({
 
     // Move to next activity or complete lesson
     if (currentActivityIndex < activities.length - 1) {
-      setCurrentActivityIndex(prev => prev + 1);
+      const nextIndex = currentActivityIndex + 1;
+      console.log(`➡️ Moving to next activity: ${nextIndex + 1}/${activities.length}`);
+      setCurrentActivityIndex(nextIndex);
     } else {
       console.log('🎉 Lesson completed!');
       onLessonComplete();
