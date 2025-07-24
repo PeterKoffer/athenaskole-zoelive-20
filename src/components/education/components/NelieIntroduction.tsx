@@ -11,9 +11,9 @@ interface NelieIntroductionProps {
 const NelieIntroduction = ({
   subject,
   skillArea,
-  onIntroductionComplete,
-  isAdvancing
+  onIntroductionComplete
 }: NelieIntroductionProps) => {
+  console.log('Nelie Introduction props:', { subject, skillArea });
   console.log('🎭 NelieIntroduction using unified system:', { subject, skillArea });
 
   return (
