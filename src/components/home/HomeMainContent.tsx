@@ -3,7 +3,7 @@ import HeroSection from "@/components/home/HeroSection";
 import SubjectsSection from "@/components/home/SubjectsSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import CTASection from "@/components/home/CTASection";
-import RefactoredFloatingAITutor from "@/components/floating-ai-tutor/RefactoredFloatingAITutor";
+import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
 
 interface HomeMainContentProps {
   user?: any;
