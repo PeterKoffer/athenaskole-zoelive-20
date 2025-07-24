@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import SimpleMathLearning from '@/components/education/SimpleMathLearning';
+import UniversalLearning from '@/components/education/UniversalLearning';
 
 const SubjectLearningPage: React.FC = () => {
   const { subject } = useParams<{ subject: string }>();
@@ -10,8 +10,7 @@ const SubjectLearningPage: React.FC = () => {
     return <div>Subject not found</div>;
   }
 
-  // For now, show simple math learning for all subjects
-  return <SimpleMathLearning />;
+  return <UniversalLearning subject={subject} skillArea="general" />;
 };
 
 export default SubjectLearningPage;

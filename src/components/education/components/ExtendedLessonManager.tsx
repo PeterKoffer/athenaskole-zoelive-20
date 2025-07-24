@@ -19,7 +19,8 @@ interface ExtendedLessonManagerProps {
 const ExtendedLessonManager = ({
   subject,
   skillArea,
-  onLessonComplete
+  onLessonComplete,
+  onBack
 }: ExtendedLessonManagerProps) => {
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [lessonStartTime] = useState(Date.now());

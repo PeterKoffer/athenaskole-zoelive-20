@@ -38,7 +38,7 @@ export class DailyLessonGenerator {
   }
 
   /**
-   * Generate AI-powered activities using the new prompt template system - ENHANCED FOR ENGAGEMENT
+   * Generate AI-powered activities using the new prompt template system
    */
   private static async generateAIPoweredActivities(
     subject: string,
@@ -52,10 +52,10 @@ export class DailyLessonGenerator {
     const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const usedQuestions = new Set<string>(); // Track used questions to prevent duplicates
 
-    console.log('🤖 Using ENHANCED AI content generation with creative prompt templates');
-    console.log(`🎯 Session ID: ${sessionId} - Generating ENGAGING unique content`);
+    console.log('🤖 Using AI content generation with new prompt template');
+    console.log(`🎯 Session ID: ${sessionId} - Generating unique content`);
 
-    // Generate 7 SUPER ENGAGING activities using AI with maximum creativity
+    // Generate 7 diverse activities using AI with enhanced variety
     for (let i = 0; i < 7; i++) {
       let attempts = 0;
       let uniqueContent = false;
@@ -72,17 +72,13 @@ export class DailyLessonGenerator {
             studentInterests: learnerProfile?.interests,
             studentAbilities: studentProgress,
             calendarKeywords: activeKeywords,
-            estimatedTime: 180,
             metadata: {
               activityIndex: i,
               studentProgress,
-              varietyPrompt: this.getEngagingVarietyPrompt(i),
-              creativityLevel: Math.floor(i / 2) + 1,
+              varietyPrompt: this.getVarietyPrompt(i),
+              diversityLevel: Math.floor(i / 2) + 1,
               sessionId,
-              uniquenessSeeds: this.getUniquenessSeeds(i, attempts),
-              engagementMode: 'maximum',
-              storytellingTheme: this.getStorytellingTheme(i),
-              interactivityLevel: 'high'
+              uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
             }
           });
 
@@ -94,18 +90,15 @@ export class DailyLessonGenerator {
             
             const activity: LessonActivity = {
               id: `${sessionId}-activity-${i}`,
-              title: this.generateEngagingActivityTitle(subject, skillArea, i),
-              type: this.getEngagingActivityType(i),
-              phase: 'interactive',
+              title: this.generateActivityTitle(subject, skillArea, i),
+              type: 'quiz',
+              phase: 'quiz',
               duration: 180,
               content: {
                 question: aiContent.question,
                 options: aiContent.options,
                 correctAnswer: aiContent.correct,
-                explanation: aiContent.explanation,
-                hook: this.generateEngagingHook(i),
-                visualCue: this.generateVisualCue(subject, i),
-                encouragement: this.generateEncouragement(i)
+                explanation: aiContent.explanation
               },
               subject,
               skillArea,
@@ -185,95 +178,17 @@ export class DailyLessonGenerator {
     return (index % 3) - 1;
   }
 
-  private static getEngagingVarietyPrompt(index: number): string {
+  private static getVarietyPrompt(index: number): string {
     const prompts = [
-      'Create an exciting adventure story with math challenges',
-      'Design a fun game scenario with visual elements', 
-      'Build a mystery that requires problem-solving',
-      'Create a superhero scenario with mathematical powers',
-      'Design an exploration mission with calculations',
-      'Build a creative challenge with real-world applications',
-      'Create an interactive puzzle with storytelling elements'
+      'Use real-world scenarios',
+      'Include visual/spatial elements', 
+      'Focus on word problems',
+      'Incorporate games or puzzles',
+      'Use creative storytelling',
+      'Apply practical examples',
+      'Challenge critical thinking'
     ];
     return prompts[index % prompts.length];
-  }
-
-  private static getStorytellingTheme(index: number): string {
-    const themes = [
-      'space_adventure',
-      'underwater_exploration',
-      'magical_kingdom',
-      'superhero_mission',
-      'jungle_expedition',
-      'time_travel',
-      'robot_factory'
-    ];
-    return themes[index % themes.length];
-  }
-
-  private static generateEngagingActivityTitle(subject: string, skillArea: string, index: number): string {
-    const titles = [
-      `🚀 Space Math Adventure`,
-      `🌊 Underwater Challenge`,
-      `🏰 Magical Problem Solving`,
-      `🦸 Superhero Math Mission`,
-      `🌴 Jungle Expedition`,
-      `⏰ Time Travel Challenge`,
-      `🤖 Robot Factory Puzzle`
-    ];
-    return titles[index % titles.length];
-  }
-
-  private static getEngagingActivityType(index: number): string {
-    const types = [
-      'adventure_quiz',
-      'story_problem',
-      'interactive_puzzle',
-      'mystery_challenge',
-      'creative_game',
-      'exploration_task',
-      'superhero_mission'
-    ];
-    return types[index % types.length];
-  }
-
-  private static generateEngagingHook(index: number): string {
-    const hooks = [
-      "🚀 Captain, we need your math skills to navigate through space!",
-      "🌊 Dive deep and solve this underwater mystery!",
-      "🏰 The magical kingdom needs your problem-solving powers!",
-      "🦸 Hero, use your mathematical superpowers to save the day!",
-      "🌴 Explorer, can you solve this jungle puzzle?",
-      "⏰ Time traveler, calculate your way through history!",
-      "🤖 Engineer, help us build the perfect robot!"
-    ];
-    return hooks[index % hooks.length];
-  }
-
-  private static generateVisualCue(subject: string, index: number): string {
-    const cues = [
-      "🌟 Imagine stars twinkling with numbers",
-      "🐠 Picture colorful fish swimming with equations",
-      "✨ Visualize magical spells creating math problems",
-      "⚡ See lightning bolts carrying mathematical power",
-      "🌺 Imagine jungle flowers blooming with solutions",
-      "🌀 Picture time spirals filled with calculations",
-      "🔧 Visualize gears turning with mathematical precision"
-    ];
-    return cues[index % cues.length];
-  }
-
-  private static generateEncouragement(index: number): string {
-    const encouragements = [
-      "You're doing amazing! Keep exploring!",
-      "Fantastic work, young mathematician!",
-      "You're getting stronger with each challenge!",
-      "Incredible problem-solving skills!",
-      "You're becoming a math superstar!",
-      "Outstanding thinking! You've got this!",
-      "Brilliant work! You're unstoppable!"
-    ];
-    return encouragements[index % encouragements.length];
   }
 
   private static getUniquenessSeeds(index: number, attempt: number): string[] {
