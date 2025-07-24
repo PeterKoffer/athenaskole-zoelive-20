@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mic, MicOff, Volume2, RotateCcw } from "lucide-react";
-import RobotAvatar from "./RobotAvatar";
+import NELIEAvatar from "./NELIEAvatar";
 import { usePronunciationPractice } from "./hooks/usePronunciationPractice";
 import { PronunciationFeedbackBadge } from "./PronunciationFeedbackBadge";
 
@@ -38,7 +38,7 @@ const SpeechRecognition = ({
       <CardContent className="p-6 space-y-4">
         <div className="text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <RobotAvatar
+            <NELIEAvatar
               size="lg"
               isActive={isListening || isPlayingExample}
               isSpeaking={isPlayingExample}

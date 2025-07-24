@@ -1,6 +1,5 @@
 
 import React from 'react';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
 
 interface FloatingButtonProps {
   onClick: () => void;
@@ -47,12 +46,13 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
       onMouseDown={handleMouseDown}
       onClick={handleClick}
     >
-      <RobotAvatar 
-        size="3xl" 
-        isActive={true} 
-        isSpeaking={false}
-        className="pointer-events-none drop-shadow-2xl transition-transform duration-200 hover:scale-105"
-      />
+      <div className="w-20 h-20 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:scale-105 transition animate-float shadow-2xl">
+        <img
+          src="/nelie.png"
+          alt="NELIE"
+          className="w-16 h-16 object-contain pointer-events-none"
+        />
+      </div>
     </div>
   );
 };

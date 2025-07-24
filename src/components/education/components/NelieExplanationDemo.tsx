@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, ArrowRight, CheckCircle } from 'lucide-react';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import NELIEAvatar from '@/components/ai-tutor/NELIEAvatar';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 
 interface NelieExplanationDemoProps {
@@ -68,7 +68,7 @@ const NelieExplanationDemo = ({ onDemoComplete }: NelieExplanationDemoProps) => 
       <CardContent className="p-6">
         <div className="text-center mb-6">
           {/* Use the same RobotAvatar component with chest animation */}
-          <RobotAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
+          <NELIEAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
           <h3 className="text-xl font-bold text-white mt-4">Watch Nelie Solve This Problem</h3>
           <p className="text-gray-400">Learn by watching Nelie's step-by-step demonstration</p>
         </div>

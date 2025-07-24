@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, MessageCircle, Lightbulb, RotateCcw } from 'lucide-react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import NELIEAvatar from '@/components/ai-tutor/NELIEAvatar';
 
 interface NelieAvatarTutorProps {
   currentQuestion: number;
@@ -103,7 +103,7 @@ const NelieAvatarTutor = ({
           <div className="flex items-center space-x-4">
             {/* Nelie Avatar */}
             <div className="relative">
-              <RobotAvatar 
+              <NELIEAvatar 
                 size="lg" 
                 isActive={true} 
                 isSpeaking={isSpeaking}

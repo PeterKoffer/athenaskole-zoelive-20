@@ -1,5 +1,5 @@
 
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import NELIEAvatar from '@/components/ai-tutor/NELIEAvatar';
 
 interface IntroductionHeaderProps {
   subject: string;
@@ -10,7 +10,7 @@ const IntroductionHeader = ({ subject, isSpeaking }: IntroductionHeaderProps) =>
   return (
     <div className="text-center">
       <div className="mb-6">
-        <RobotAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
+        <NELIEAvatar size="4xl" isActive={true} isSpeaking={isSpeaking} />
       </div>
       
       <h1 className="text-3xl font-bold text-white mb-4">

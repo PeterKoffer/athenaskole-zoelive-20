@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, Star, Lightbulb } from 'lucide-react';
-import RobotAvatar from '@/components/ai-tutor/RobotAvatar';
+import NELIEAvatar from '@/components/ai-tutor/NELIEAvatar';
 // import { useDiverseQuestionGeneration } from '@/components/adaptive-learning/hooks/useDiverseQuestionGeneration'; // Temporarily disabled
 
 
@@ -108,7 +108,7 @@ const EnhancedQuestionDisplay = ({
     return (
       <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-8 text-center">
-          <RobotAvatar size="md" isActive={true} isSpeaking={false} />
+          <NELIEAvatar size="md" isActive={true} isSpeaking={false} />
           <p className="text-white mt-4">Nelie is preparing your next question...</p>
         </CardContent>
       </Card>
@@ -122,7 +122,7 @@ const EnhancedQuestionDisplay = ({
         <Card className="bg-purple-900 border-purple-600">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              <RobotAvatar size="sm" isActive={true} isSpeaking={isSpeaking} />
+              <NELIEAvatar size="sm" isActive={true} isSpeaking={isSpeaking} />
               <div className="flex-1">
                 <p className="text-purple-200">
                   {isGameMode 
