@@ -14,8 +14,8 @@ interface OptimizedEnglishLearningContentProps {
 
 const OptimizedEnglishLearningContent = ({ onBackToProgram }: OptimizedEnglishLearningContentProps) => {
   const [showIntroduction, setShowIntroduction] = useState(true);
-  const studentName = useStudentName();
-  const { stop: stopSpeaking, forceStopAll } = useUnifiedSpeech();
+  const { forceStopAll } = useUnifiedSpeech();
+  const studentName = 'Student'; // Default student name
 
   // Enhanced speech cleanup for all navigation scenarios
   useSpeechCleanup(() => {
