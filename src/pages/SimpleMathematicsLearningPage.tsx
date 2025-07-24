@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
+import { Volume2 } from 'lucide-react';
 
 interface Question {
   question: string;
@@ -13,6 +15,7 @@ interface Question {
 const SimpleMathematicsLearningPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { speakText, isNelieReady } = useUnifiedSpeech();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -24,17 +27,24 @@ const SimpleMathematicsLearningPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingMore, setIsGeneratingMore] = useState(false);
 
+  // Text-to-speech helper
+  const handleSpeak = (text: string) => {
+    if (isNelieReady) {
+      speakText(text);
+    }
+  };
+
   // Generate initial 2 questions for fast start
   const generateInitialQuestions = async () => {
     setIsGenerating(true);
-    console.log('🤖 Starting initial AI question generation (2 questions)...');
+    console.log('📚 NELIE: Starting initial question generation (2 questions)...');
     
     try {
       const generatedQuestions: Question[] = [];
       
       // Generate only 2 questions initially for fast start
       for (let i = 0; i < 2; i++) {
-        console.log(`🤖 Generating initial question ${i + 1} of 2...`);
+        console.log(`📚 NELIE: Generating initial question ${i + 1} of 2...`);
         
         const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
           body: {
@@ -46,7 +56,7 @@ const SimpleMathematicsLearningPage = () => {
         });
 
         if (error) {
-          console.error(`❌ AI question ${i + 1} generation error:`, error);
+          console.error(`❌ NELIE: Question ${i + 1} generation error:`, error);
           throw error;
         }
 
@@ -59,22 +69,22 @@ const SimpleMathematicsLearningPage = () => {
           };
           
           generatedQuestions.push(aiQuestion);
-          console.log(`✅ Generated initial question ${i + 1}: ${aiQuestion.question.substring(0, 50)}...`);
+          console.log(`✅ NELIE: Generated initial question ${i + 1}: ${aiQuestion.question.substring(0, 50)}...`);
         } else {
           throw new Error(`No question data received for question ${i + 1}`);
         }
       }
       
       setQuestions(generatedQuestions);
-      console.log(`🎉 Successfully generated ${generatedQuestions.length} initial AI math questions!`);
+      console.log(`🎉 NELIE: Successfully generated ${generatedQuestions.length} initial math questions!`);
       
       // Start generating more questions in the background
       generateMoreQuestions();
       
     } catch (error) {
-      console.error('❌ Failed to generate initial AI questions:', error);
+      console.error('❌ NELIE: Failed to generate initial questions:', error);
       toast({
-        title: "AI Generation Failed",
+        title: "NELIE Generation Failed",
         description: "Using fallback questions for now",
         variant: "destructive"
       });
@@ -96,14 +106,14 @@ const SimpleMathematicsLearningPage = () => {
   // Generate additional questions in the background
   const generateMoreQuestions = async () => {
     setIsGeneratingMore(true);
-    console.log('🤖 Generating additional questions in background...');
+    console.log('📚 NELIE: Generating additional questions in background...');
     
     try {
       const additionalQuestions: Question[] = [];
       
       // Generate 3 more questions to reach 5 total
       for (let i = 2; i < 5; i++) {
-        console.log(`🤖 Generating background question ${i + 1} of 5...`);
+        console.log(`📚 NELIE: Generating background question ${i + 1} of 5...`);
         
         const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
           body: {
@@ -115,7 +125,7 @@ const SimpleMathematicsLearningPage = () => {
         });
 
         if (error) {
-          console.error(`❌ Background question ${i + 1} generation error:`, error);
+          console.error(`❌ NELIE: Background question ${i + 1} generation error:`, error);
           continue; // Continue with other questions even if one fails
         }
 
@@ -128,16 +138,16 @@ const SimpleMathematicsLearningPage = () => {
           };
           
           additionalQuestions.push(aiQuestion);
-          console.log(`✅ Generated background question ${i + 1}: ${aiQuestion.question.substring(0, 50)}...`);
+          console.log(`✅ NELIE: Generated background question ${i + 1}: ${aiQuestion.question.substring(0, 50)}...`);
         }
       }
       
       // Add new questions to existing ones
       setQuestions(prev => [...prev, ...additionalQuestions]);
-      console.log(`🎉 Successfully generated ${additionalQuestions.length} additional AI math questions!`);
+      console.log(`🎉 NELIE: Successfully generated ${additionalQuestions.length} additional math questions!`);
       
     } catch (error) {
-      console.error('❌ Failed to generate additional AI questions:', error);
+      console.error('❌ NELIE: Failed to generate additional questions:', error);
     } finally {
       setIsGeneratingMore(false);
     }
@@ -164,6 +174,7 @@ const SimpleMathematicsLearningPage = () => {
 
   const handleStartLearning = () => {
     setHasStarted(true);
+    handleSpeak("Welcome to your mathematics lesson! Let's start with some questions.");
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
@@ -175,8 +186,10 @@ const SimpleMathematicsLearningPage = () => {
     if (answerIndex === questions[currentQuestion].correct) {
       setScore(prev => prev + 10);
       setStreak(prev => prev + 1);
+      handleSpeak("Excellent! That's correct.");
     } else {
       setStreak(0);
+      handleSpeak("Not quite right, but keep trying!");
     }
   };
 
@@ -185,8 +198,9 @@ const SimpleMathematicsLearningPage = () => {
       setCurrentQuestion(prev => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      handleSpeak("Let's move on to the next question.");
     } else {
-      alert(`Congratulations! You completed ${questions.length} AI-generated questions with ${score} points!`);
+      handleSpeak(`Congratulations! You completed ${questions.length} questions with ${score} points!`);
       navigate('/training-ground');
     }
   };
@@ -196,7 +210,17 @@ const SimpleMathematicsLearningPage = () => {
   const progressPercentage = hasStarted && questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4 relative">
+      {/* NELIE Floating Teacher */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-white rounded-full p-4 shadow-2xl border-4 border-purple-300 animate-bounce">
+          <div className="text-4xl">👩‍🏫</div>
+        </div>
+        <div className="text-center mt-2">
+          <span className="text-white text-sm font-bold bg-purple-600 px-2 py-1 rounded">NELIE</span>
+        </div>
+      </div>
+
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="bg-gray-900/80 backdrop-blur border border-gray-700 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
@@ -212,7 +236,16 @@ const SimpleMathematicsLearningPage = () => {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-4">🤖 AI Mathematics Learning</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-white">👩‍🏫 NELIE Mathematics Learning</h1>
+            <button
+              onClick={() => handleSpeak("Welcome to your mathematics lesson! I'm NELIE, your virtual teacher.")}
+              className="text-purple-300 hover:text-purple-100 transition-colors"
+              disabled={!isNelieReady}
+            >
+              <Volume2 className="w-6 h-6" />
+            </button>
+          </div>
           
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="text-center">
@@ -244,47 +277,83 @@ const SimpleMathematicsLearningPage = () => {
         </div>
 
         {!hasStarted ? (
-          <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">🤖 AI Mathematics Questions</h2>
+          <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg relative">
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <h2 className="text-white text-xl font-bold">👩‍🏫 NELIE Mathematics Questions</h2>
+                <button
+                  onClick={() => handleSpeak("Start with 2 questions that load instantly, then more questions generate in the background!")}
+                  className="text-purple-200 hover:text-white transition-colors"
+                  disabled={!isNelieReady}
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-            <div className="p-8">
-              <p className="text-gray-300 text-lg mb-6">
-                Start with 2 questions that load instantly, then more questions generate in the background!
-              </p>
+            <div className="p-8 relative">
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-gray-300 text-lg">
+                  Start with 2 questions that load instantly, then more questions generate in the background!
+                </p>
+                <button
+                  onClick={() => handleSpeak("Start with 2 questions that load instantly, then more questions generate in the background!")}
+                  className="text-purple-300 hover:text-purple-100 transition-colors absolute top-2 right-2"
+                  disabled={!isNelieReady}
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
+              </div>
               <button
                 onClick={handleStartLearning}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
-                🚀 START LEARNING (Fast!)
+                🚀 START LEARNING with NELIE!
               </button>
             </div>
           </div>
         ) : isGenerating ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-orange-600 to-yellow-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">🤖 Generating Questions...</h2>
+              <h2 className="text-white text-xl font-bold">👩‍🏫 NELIE is Generating Questions...</h2>
             </div>
             <div className="p-8 text-center">
-              <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-300 text-lg">
-                Creating your first 2 questions...
+                NELIE is creating your first 2 questions...
               </p>
             </div>
           </div>
         ) : questions.length > 0 && questions[currentQuestion] ? (
           <div className="bg-gray-900/90 backdrop-blur border border-gray-700 rounded-lg">
             <div className="bg-gradient-to-r from-green-600 to-blue-600 p-4 rounded-t-lg">
-              <h2 className="text-white text-xl font-bold">Question {currentQuestion + 1} of {questions.length}</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-white text-xl font-bold">Question {currentQuestion + 1} of {questions.length}</h2>
+                <button
+                  onClick={() => handleSpeak(`Question ${currentQuestion + 1} of ${questions.length}`)}
+                  className="text-green-200 hover:text-white transition-colors"
+                  disabled={!isNelieReady}
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
+              </div>
               {isGeneratingMore && (
-                <p className="text-sm text-blue-200 mt-1">🤖 Generating more questions in background...</p>
+                <p className="text-sm text-blue-200 mt-1">👩‍🏫 NELIE is generating more questions in background...</p>
               )}
             </div>
             <div className="p-8 space-y-6">
-              <div className="bg-gray-800 p-6 rounded-lg">
-                <h3 className="text-lg text-white mb-6 leading-relaxed">
-                  {questions[currentQuestion].question}
-                </h3>
+              <div className="bg-gray-800 p-6 rounded-lg relative">
+                <div className="flex items-start justify-between">
+                  <h3 className="text-lg text-white mb-6 leading-relaxed flex-1 pr-4">
+                    {questions[currentQuestion].question}
+                  </h3>
+                  <button
+                    onClick={() => handleSpeak(questions[currentQuestion].question)}
+                    className="text-blue-300 hover:text-blue-100 transition-colors mt-1"
+                    disabled={!isNelieReady}
+                  >
+                    <Volume2 className="w-5 h-5" />
+                  </button>
+                </div>
                 
                 <div className="grid gap-3">
                   {questions[currentQuestion].options.map((option, index) => (
@@ -292,7 +361,7 @@ const SimpleMathematicsLearningPage = () => {
                       key={index}
                       onClick={() => handleAnswerSelect(index)}
                       disabled={showResult}
-                      className={`p-4 text-left border rounded-lg text-base transition-all ${
+                      className={`p-4 text-left border rounded-lg text-base transition-all relative ${
                         showResult && index === questions[currentQuestion].correct
                           ? 'bg-green-600 border-green-500 text-white'
                           : showResult && selectedAnswer === index && index !== questions[currentQuestion].correct
@@ -304,17 +373,40 @@ const SimpleMathematicsLearningPage = () => {
                           : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
                       }`}
                     >
-                      <span className="mr-4 font-bold text-lg">{String.fromCharCode(65 + index)}.</span>
-                      {option}
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <span className="mr-4 font-bold text-lg">{String.fromCharCode(65 + index)}.</span>
+                          {option}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSpeak(`Option ${String.fromCharCode(65 + index)}: ${option}`);
+                          }}
+                          className="text-gray-400 hover:text-white transition-colors ml-2"
+                          disabled={!isNelieReady}
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </button>
                   ))}
                 </div>
 
                 {showResult && (
-                  <div className="mt-6 p-4 bg-green-900/50 rounded-lg border border-green-700">
-                    <p className="text-green-200 mb-4 text-base">
-                      {questions[currentQuestion].explanation}
-                    </p>
+                  <div className="mt-6 p-4 bg-green-900/50 rounded-lg border border-green-700 relative">
+                    <div className="flex items-start justify-between">
+                      <p className="text-green-200 mb-4 text-base flex-1 pr-4">
+                        {questions[currentQuestion].explanation}
+                      </p>
+                      <button
+                        onClick={() => handleSpeak(questions[currentQuestion].explanation)}
+                        className="text-green-300 hover:text-green-100 transition-colors"
+                        disabled={!isNelieReady}
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </button>
+                    </div>
                     <button 
                       onClick={handleNext}
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
