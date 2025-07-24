@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useSimplifiedSpeech } from '@/components/adaptive-learning/hooks/useSimplifiedSpeech';
+import { useSimplifiedSpeech } from '@/hooks/useSimplifiedSpeech';
 
 interface LessonActivity {
   id: string;
@@ -20,7 +20,6 @@ export const useActivitySpeech = (
     speakText,
     stopSpeaking,
     isReady,
-    testSpeech,
     isSpeaking
   } = useSimplifiedSpeech();
 
