@@ -1,5 +1,5 @@
 
-import NELIEFloating from "@/components/NELIEFloating";
+import RefactoredFloatingAITutor from "@/components/floating-ai-tutor/RefactoredFloatingAITutor";
 
 interface NelieAvatarDisplayProps {
   isSpeaking: boolean;
@@ -8,11 +8,9 @@ interface NelieAvatarDisplayProps {
 
 const NelieAvatarDisplay = ({ isSpeaking }: NelieAvatarDisplayProps) => {
   return (
-    <div className="flex items-center justify-center">
-      <div className="relative transform hover:scale-105 transition-transform duration-300">
-        <NELIEFloating />
-      </div>
-    </div>
+    <>
+      <RefactoredFloatingAITutor />
+    </>
   );
 };
 
