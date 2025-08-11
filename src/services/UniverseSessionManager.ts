@@ -1,5 +1,5 @@
 
-import { DailyUniverse, LearningAtom, LearningAtomPerformance } from '@/types/learning';
+import { DailyUniverse, LearningAtomPerformance } from '@/types/learning';
 import { mockUserProgressService } from './mockUserProgressService';
 import curriculumStepsData from '../../public/data/curriculum-steps.json';
 import { CurriculumStep } from '@/types/curriculum';
@@ -10,7 +10,7 @@ export class UniverseSessionManager {
   private currentUniverse: DailyUniverse | null = null;
   // Stores performance for current session atoms. Key: atomId
   private currentSessionAtomPerformance: Map<string, LearningAtomPerformance> = new Map();
-  private curriculumSteps: CurriculumStep[] = curriculumStepsData as CurriculumStep[];
+  private curriculumSteps: CurriculumStep[] = curriculumStepsData as unknown as CurriculumStep[];
 
   public async startSession(userId: string, universe: DailyUniverse): Promise<void> {
     this.currentUserId = userId;

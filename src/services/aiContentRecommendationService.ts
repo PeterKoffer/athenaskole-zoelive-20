@@ -11,7 +11,7 @@ export interface ContentRecommendation {
 
 export const aiContentRecommendationService = {
   async getRecommendations(
-    userId: string, 
+    _userId: string, 
     subject: string, 
     limit: number = 5
   ): Promise<ContentRecommendation[]> {

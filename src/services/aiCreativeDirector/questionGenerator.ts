@@ -1,7 +1,7 @@
 import type { EducationalContext, GeneratedQuestion } from './types';
 
 export class QuestionGenerator {
-  private questionCache = new Map<string, any[]>();
+  
   private usedQuestions = new Set<string>();
 
   async generatePersonalizedQuestions(
@@ -166,7 +166,7 @@ export class QuestionGenerator {
     };
   }
 
-  private createEnglishFallback(skillArea: string, gradeLevel: number, index: number): GeneratedQuestion {
+  private createEnglishFallback(_skillArea: string, _gradeLevel: number, index: number): GeneratedQuestion {
     const questions = [
       {
         question: "Which word is a noun?", 
@@ -197,7 +197,7 @@ export class QuestionGenerator {
     };
   }
 
-  private createScienceFallback(skillArea: string, gradeLevel: number, index: number): GeneratedQuestion {
+  private createScienceFallback(_skillArea: string, _gradeLevel: number, index: number): GeneratedQuestion {
     const questions = [
       {
         question: "What do plants need to grow?", 
@@ -228,7 +228,7 @@ export class QuestionGenerator {
     };
   }
 
-  private createComputerScienceFallback(skillArea: string, gradeLevel: number, index: number): GeneratedQuestion {
+  private createComputerScienceFallback(_skillArea: string, _gradeLevel: number, index: number): GeneratedQuestion {
     const questions = [
       {
         question: "What is an algorithm?", 
@@ -259,7 +259,7 @@ export class QuestionGenerator {
     };
   }
 
-  private createMusicFallback(skillArea: string, gradeLevel: number, index: number): GeneratedQuestion {
+  private createMusicFallback(_skillArea: string, _gradeLevel: number, index: number): GeneratedQuestion {
     const questions = [
       {
         question: "How many beats are in a whole note?", 
@@ -290,7 +290,7 @@ export class QuestionGenerator {
     };
   }
 
-  private createCreativeArtsFallback(skillArea: string, gradeLevel: number, index: number): GeneratedQuestion {
+  private createCreativeArtsFallback(_skillArea: string, _gradeLevel: number, index: number): GeneratedQuestion {
     const questions = [
       {
         question: "What are the primary colors?", 

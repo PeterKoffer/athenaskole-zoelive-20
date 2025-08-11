@@ -35,12 +35,12 @@ export const aiInteractionService = {
     return `mock-interaction-${Date.now()}`;
   },
 
-  async getInteractionHistory(userId: string, limit?: number): Promise<AIInteraction[]> {
+  async getInteractionHistory(_userId: string, _limit?: number): Promise<AIInteraction[]> {
     console.log('📚 Getting interaction history (stub implementation)');
     return [];
   },
 
-  async getInteractionStats(userId: string): Promise<InteractionStats> {
+  async getInteractionStats(_userId: string): Promise<InteractionStats> {
     console.log('📊 Getting interaction stats (stub implementation)');
     return {
       totalInteractions: 0,

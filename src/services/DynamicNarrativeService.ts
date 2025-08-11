@@ -32,6 +32,7 @@ const FALLBACK_THEMES = [
 
 
 import { DifficultyLevel } from './AdaptiveDifficultyEngine'; // Import DifficultyLevel
+import { openaiContentService } from './openaiContentService';
 
 export interface LearningObjectiveInput {
   objectiveId: string;
@@ -99,12 +100,12 @@ class DynamicNarrativeService {
     themeName: string,
     studentAge: number, // or gradeLevel
     learningObjectives: LearningObjectiveInput[],
-    desiredAtomCount: number
+    _desiredAtomCount: number
   ): Promise<DynamicNarrativeComponents> {
     console.log(`[DynamicNarrativeService] Generating narrative for theme: ${themeName}, age: ${studentAge}, objectives: ${learningObjectives.length}`);
 
-    const gradeLevel = Math.max(1, studentAge - 5); // Example conversion
-    const formattedObjectives = this.formatObjectivesForPrompt(learningObjectives);
+    const _gradeLevel = Math.max(1, studentAge - 5); // Example conversion
+    const _formattedObjectives = this.formatObjectivesForPrompt(learningObjectives);
 
 
     try {
