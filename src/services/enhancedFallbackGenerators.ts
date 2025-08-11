@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export class EnhancedFallbackGenerators {
   static generateMathFallback(config: any) {

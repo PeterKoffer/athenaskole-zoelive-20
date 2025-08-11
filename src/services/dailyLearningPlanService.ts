@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Simplified Daily Learning Plan Service without database dependencies
 

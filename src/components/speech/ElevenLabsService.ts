@@ -14,6 +14,8 @@ class ElevenLabsService {
   constructor() {
     this.config = {
       apiKey: ELEVENLABS_API_KEY,
+      voiceId: FENA_VOICE_ID,
+      model: DEFAULT_MODEL_ID,
     };
     this.voiceManager = new ElevenLabsVoiceManager();
     this.audioPlayer = new ElevenLabsAudioPlayer();

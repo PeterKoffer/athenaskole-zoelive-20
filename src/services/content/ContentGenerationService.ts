@@ -194,7 +194,7 @@ class ContentGenerationService {
     };
   }
 
-  private getMathExplanationForKc(kc: any, _seed: number) {
+  private getMathExplanationForKc(_kc: any, _seed: number) {
     return `This mathematical concept helps us solve real-world problems and builds important thinking skills.`;
   }
 

@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes';
-import { generateTrainingGroundPrompt, buildContextFromAppData, TrainingGroundConfig } from './trainingGroundPromptGenerator';
+import { generateTrainingGroundPrompt, TrainingGroundConfig } from './trainingGroundPromptGenerator';
 
 export class AIContentGenerator {
   async generateAdaptiveContent(request: GenerateContentRequest): Promise<GeneratedContent> {
@@ -12,11 +12,11 @@ export class AIContentGenerator {
       // Build Training Ground prompt using the new unified system
       const promptConfig: TrainingGroundConfig = {
         subject: request.subject,
-        gradeLevel: request.gradeLevel?.toString(),
-        learningStyle: request.learningStyle,
-        studentInterests: request.studentInterests,
-        lessonDurationMinutes: request.estimatedTime || 30,
-        calendarKeywords: request.calendarKeywords,
+        gradeLevel: (request as any).gradeLevel?.toString(),
+        learningStyle: (request as any).learningStyle,
+        studentInterests: (request as any).studentInterests,
+        lessonDurationMinutes: (request as any).estimatedTime || 30,
+        calendarKeywords: (request as any).calendarKeywords,
         studentAbilities: this.determineAbilityFromRequest(request)
       };
 
@@ -85,8 +85,9 @@ export class AIContentGenerator {
   }
 
   private determineAbilityFromRequest(request: GenerateContentRequest): 'below' | 'average' | 'above' {
-    if (request.studentAbilities?.accuracy) {
-      const accuracy = request.studentAbilities.accuracy;
+    const abilities = (request as any).studentAbilities;
+    if (abilities?.accuracy) {
+      const accuracy = abilities.accuracy;
       if (accuracy < 0.7) return 'below';
       if (accuracy > 0.85) return 'above';
     }

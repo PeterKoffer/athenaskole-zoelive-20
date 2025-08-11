@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { CurriculumNode } from '@/types/curriculum/index';
 

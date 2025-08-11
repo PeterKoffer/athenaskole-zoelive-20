@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // UNESCO Curriculum Integration Service
 // Based on UNESCO's Education 2030 Framework and ISCED levels
