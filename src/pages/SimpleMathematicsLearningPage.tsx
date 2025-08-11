@@ -15,7 +15,7 @@ interface Question {
 const SimpleMathematicsLearningPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { speakText, isNelieReady } = useUnifiedSpeech();
+  const { speakText, isReady } = useUnifiedSpeech();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -29,7 +29,7 @@ const SimpleMathematicsLearningPage = () => {
 
   // Text-to-speech helper
   const handleSpeak = (text: string) => {
-    if (isNelieReady) {
+    if (isReady) {
       speakText(text);
     }
   };

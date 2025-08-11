@@ -48,7 +48,7 @@ export const useLearningSession = (subject: string, activityType: string) => {
     return await progressPersistence.updateSession(currentSession, updates);
   }, [currentSession]);
 
-  const endSession = useCallback(async (finalScore: number, accuracy: number) => {
+  const endSession = useCallback(async (finalScore: number, _accuracy: number) => {
     if (!currentSession || !sessionStartTime || !user) return false;
 
     const duration = Math.round((new Date().getTime() - sessionStartTime.getTime()) / 1000 / 60);

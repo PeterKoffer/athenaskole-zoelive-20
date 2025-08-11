@@ -1,14 +1,24 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { SupabaseProfileService } from '@/services/learnerProfile/SupabaseProfileService';
 
 const profileService = new SupabaseProfileService();
 
+interface UserProfile {
+  userId: string;
+  knowledgeLevel: string;
+  preferredSubjects: string[];
+}
+
+interface Preferences {
+  learningStyle: string;
+  difficulty: string;
+}
+
 export const useLearningProfile = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState(null);
-  const [preferences, setPreferences] = useState(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,23 +28,19 @@ export const useLearningProfile = () => {
 
       setLoading(true);
       setError(null);
-      
       try {
-        console.log('📊 LearningProfile: Loading profile from Supabase');
         const learnerProfile = await profileService.getProfile(user.id);
-        
         if (learnerProfile) {
           setProfile({
             userId: learnerProfile.userId,
-            knowledgeLevel: 'beginner', // TODO: derive from mastery data
+            knowledgeLevel: 'beginner',
             preferredSubjects: learnerProfile.preferences?.preferredSubjects || []
           });
           setPreferences({
             learningStyle: learnerProfile.preferences?.learningStyle || 'visual',
-            difficulty: 'medium' // TODO: derive from preferences
+            difficulty: 'medium'
           });
         } else {
-          // Create initial profile if none exists
           const newProfile = await profileService.createInitialProfile(user.id);
           setProfile({
             userId: newProfile.userId,
@@ -57,52 +63,42 @@ export const useLearningProfile = () => {
     loadProfile();
   }, [user]);
 
-  const updateProfile = async (updates: any) => {
+  const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return false;
-    
     try {
-      console.log('📊 LearningProfile: updateProfile called');
       const currentProfile = await profileService.getProfile(user.id);
       if (currentProfile) {
-        const updatedProfile = { ...currentProfile, ...updates };
+        const updatedProfile = { ...currentProfile, ...updates } as any;
         await profileService.updateProfile(updatedProfile);
-        setProfile(prev => ({ ...prev, ...updates }));
+        setProfile(prev => (prev ? { ...prev, ...updates } as UserProfile : prev));
       }
       return true;
-    } catch (error) {
-      console.error('Error updating profile:', error);
+    } catch (err) {
+      console.error('Error updating profile:', err);
       setError('Failed to update profile');
       return false;
     }
   };
 
-  const updatePreferences = async (updates: any) => {
+  const updatePreferences = async (updates: Partial<Preferences>) => {
     if (!user) return false;
-    
     try {
-      console.log('📊 LearningProfile: updatePreferences called');
       await profileService.updatePreferences(user.id, updates);
-      setPreferences(prev => ({ ...prev, ...updates }));
+      setPreferences(prev => (prev ? { ...prev, ...updates } as Preferences : prev));
       return true;
-    } catch (error) {
-      console.error('Error updating preferences:', error);
+    } catch (err) {
+      console.error('Error updating preferences:', err);
       setError('Failed to update preferences');
       return false;
     }
   };
 
-  const getRecommendedDifficulty = (subject: string, skillArea: string) => {
-    console.log('📊 LearningProfile: getRecommendedDifficulty called (stub implementation)');
-    return 3; // Default difficulty
+  const getRecommendedDifficulty = (_subject: string, _skillArea: string) => {
+    return 3;
   };
 
-  const getPersonalizedSettings = (subject: string, skillArea: string) => {
-    console.log('📊 LearningProfile: getPersonalizedSettings called (stub implementation)');
-    return {
-      preferredStyle: 'visual',
-      pacing: 'medium',
-      hints: true
-    };
+  const getPersonalizedSettings = (_subject: string, _skillArea: string) => {
+    return { preferredStyle: 'visual', pacing: 'medium', hints: true };
   };
 
   return {

@@ -42,7 +42,8 @@ const AboutPage = () => {
 };
 
 // A reusable component for displaying an information card.
-const InfoCard = ({ icon, title, description }) => (
+interface InfoCardProps { icon: React.ReactNode; title: string; description: string }
+const InfoCard = ({ icon, title, description }: InfoCardProps) => (
   <Card className="bg-gray-800 border-gray-700">
     <CardHeader className="flex flex-row items-center gap-4">
       {icon}

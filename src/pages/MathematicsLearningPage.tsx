@@ -97,7 +97,7 @@ const MathematicsLearningPage = () => {
     console.log('🤖 Generating additional questions in background...');
     
     try {
-      const additionalQuestions = [];
+      const additionalQuestions: any[] = [];
       
       // Generate 3 more questions to reach 5 total
       for (let i = 2; i < 5; i++) {
@@ -289,7 +289,7 @@ const MathematicsLearningPage = () => {
                 </h3>
                 
                 <div className="grid gap-3">
-                  {questions[currentQuestion].options.map((option, index) => (
+                  {questions[currentQuestion].options.map((option: string, index: number) => (
                     <button
                       key={index}
                       onClick={() => handleAnswerSelect(index)}

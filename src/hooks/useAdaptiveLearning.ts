@@ -5,7 +5,7 @@ import { progressPersistence, UserProgress } from '@/services/progressPersistenc
 import { useToast } from '@/hooks/use-toast';
 import { usePerformanceMetrics } from './usePerformanceMetrics';
 import { useLearningSession } from './useLearningSession';
-import { calculateRecommendedSessionTime, shouldAdjustDifficulty } from '@/utils/adaptiveLearningUtils';
+import { calculateRecommendedSessionTime } from '@/utils/adaptiveLearningUtils';
 
 interface AdaptiveLearningState {
   difficulty: number;

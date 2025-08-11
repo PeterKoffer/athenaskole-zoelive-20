@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Message, Conversation, Participant, MessageGroup } from '@/types/communication';
-import { UserRole } from '@/types/auth';
+import { Message, Conversation, MessageGroup } from '@/types/communication';
 
 export const useCommunication = () => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, _setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const [messageGroups, setMessageGroups] = useState<MessageGroup[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, _setLoading] = useState(false);
 
   // Mock data for demonstration
   useEffect(() => {

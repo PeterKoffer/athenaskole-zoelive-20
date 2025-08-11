@@ -1,8 +1,8 @@
 
-import { Home, Calendar, BookOpen, Gamepad2, Users, Settings, GraduationCap, Music, Palette, Calculator, Globe2, Brain, Sparkles } from "lucide-react";
+import { Home, Brain, Sparkles } from "lucide-react";
 import Index from "./pages/Index";
 import DailyProgramPage from "./pages/DailyProgramPage";
-import SimulatorPage from "./pages/SimulatorPage";
+import ConsolidatedSimulatorPage from "./pages/ConsolidatedSimulatorPage";
 
 export const navItems = [
   {
@@ -21,6 +21,6 @@ export const navItems = [
     title: "Simulator",
     to: "/simulator",
     icon: <Brain className="h-4 w-4" />,
-    page: SimulatorPage,
+    page: ConsolidatedSimulatorPage,
   },
 ];
