@@ -29,6 +29,7 @@ export interface ScenarioDefinition {
       requiredNodes?: string[];
     };
   };
+  metadata?: Record<string, any>;
 }
 
 export interface ScenarioNode {

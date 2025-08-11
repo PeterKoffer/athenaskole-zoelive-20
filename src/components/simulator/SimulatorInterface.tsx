@@ -4,29 +4,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Clock, 
-  Users, 
-  DollarSign, 
-  AlertTriangle, 
-  Target, 
-  Brain,
-  TrendingUp,
-  MessageSquare,
-  CheckCircle2
-} from 'lucide-react';
+import { BookOpen, Target } from 'lucide-react';
 import { nelieEngine } from '@/services/NELIEEngine';
 import { DailyUniverse } from '@/types/learning';
-import type { CurriculumNode } from '@/types/curriculum';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { BookOpen, Target, Award } from 'lucide-react';
 import LessonPlayer from './LessonPlayer';
-import { useState, useEffect } from 'react';
 
 interface SimulatorInterfaceProps {
   studentProfile: any;

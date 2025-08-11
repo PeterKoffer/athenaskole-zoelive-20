@@ -15,7 +15,7 @@ export const useScenarioEventLogging = ({
   scenario,
   session,
   currentNode,
-  score
+  score: _score
 }: UseScenarioEventLoggingProps) => {
   
   // Log scenario start when component mounts
@@ -60,7 +60,7 @@ export const useScenarioEventLogging = ({
     }, 'ScenarioPlayer');
   };
 
-  const logSessionEnd = (reason: 'COMPLETION' | 'USER_INITIATED', _session: ScenarioSession) => {
+  const logSessionEnd = (_reason: 'COMPLETION' | 'USER_INITIATED', _session: ScenarioSession) => {
     console.log('📊 Logging SESSION_END event');
     stealthAssessmentService.logEvent({
       type: InteractionEventType.SESSION_END
