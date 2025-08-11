@@ -72,7 +72,7 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
         messages: [
           {
             role: 'system',
-            content: 'You are a creative educational activity designer who NEVER creates quizzes or multiple choice questions. You design hands-on, interactive, and imaginative learning experiences that feel like games and adventures. You must follow the user\'s format requirements exactly and avoid any quiz-style content.'
+            content: 'You are an expert educational content creator. Always respond with valid JSON only. Follow the user\'s format exactly and do not include any text outside the JSON.'
           },
           {
             role: 'user',
@@ -98,15 +98,15 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
     const parsedContent = JSON.parse(cleanedResponse);
 
-    // Validate Training Ground activity format
-    if (!parsedContent.title || !parsedContent.activity || !parsedContent.activity.type) {
-      throw new Error('Invalid Training Ground activity format from OpenAI');
+    // Validate Interactive Adventure format
+    if (!parsedContent.title || !parsedContent.scenario || !Array.isArray(parsedContent.stages) || parsedContent.stages.length === 0) {
+      throw new Error('Invalid Interactive Adventure format from OpenAI');
     }
 
-    console.log('✅ Training Ground activity generated:', {
+    console.log('✅ Interactive Adventure generated:', {
       hasTitle: !!parsedContent.title,
-      hasActivity: !!parsedContent.activity,
-      activityType: parsedContent.activity?.type
+      stagesCount: parsedContent.stages?.length,
+      firstActivityType: parsedContent.stages?.[0]?.activityType
     });
 
     return parsedContent;
