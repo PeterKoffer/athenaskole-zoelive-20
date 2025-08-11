@@ -24,7 +24,7 @@ const DailyProgramPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p>Loading your daily program...</p>
@@ -107,7 +107,7 @@ const DailyProgramPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6">
+    <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center">
           <Button
@@ -127,15 +127,15 @@ const DailyProgramPage = () => {
               context="daily-program-header"
               position="inline"
             >
-              <p className="text-muted-foreground">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
+              <p className="text-blue-200">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
             </TextWithSpeaker>
           </div>
         </div>
 
         <div className="space-y-6">
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+          <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-400 text-white">
             <CardHeader>
-              <CardTitle className="text-2xl text-foreground flex items-center">
+              <CardTitle className="text-2xl text-white flex items-center">
                 <BookOpen className="w-6 h-6 mr-3 text-primary" />
                 Your AI-Generated Learning Universe
               </CardTitle>
@@ -145,7 +145,7 @@ const DailyProgramPage = () => {
                 text="Today's learning adventure is uniquely crafted just for you! Dive into an immersive, AI-generated educational universe filled with interactive content, engaging storylines, and personalized challenges that adapt to your learning style."
                 context="daily-program-intro"
               >
-                <p className="text-lg text-muted-foreground mb-6">
+                <p className="text-lg text-blue-200 mb-6">
                   {"Today's learning adventure is uniquely crafted just for you! Dive into an immersive, AI-generated educational universe filled with interactive content, engaging storylines, and personalized challenges that adapt to your learning style."}
                 </p>
               </TextWithSpeaker>
@@ -156,9 +156,9 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-personalized"
                   className="group"
                 >
-                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
-                    <h4 className="font-semibold text-foreground mb-2">Personalized Content</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="bg-gradient-to-br from-orange-500 to-red-600 p-4 rounded-lg border-2 border-white/20 relative text-white shadow-sm">
+                    <h4 className="font-semibold text-white mb-2">Personalized Content</h4>
+                    <p className="text-sm text-white/90">
                       AI-crafted lessons that adapt to your progress and interests
                     </p>
                   </div>
@@ -168,9 +168,9 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-interactive"
                   className="group"
                 >
-                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
-                    <h4 className="font-semibold text-foreground mb-2">Interactive Universe</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-4 rounded-lg border-2 border-white/20 relative text-white shadow-sm">
+                    <h4 className="font-semibold text-white mb-2">Interactive Universe</h4>
+                    <p className="text-sm text-white/90">
                       Explore characters, locations, and activities in your learning world
                     </p>
                   </div>
@@ -180,9 +180,9 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-dynamic"
                   className="group"
                 >
-                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
-                    <h4 className="font-semibold text-foreground mb-2">Dynamic Learning</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-4 rounded-lg border-2 border-white/20 relative text-white shadow-sm">
+                    <h4 className="font-semibold text-white mb-2">Dynamic Learning</h4>
+                    <p className="text-sm text-white/90">
                       Content that evolves based on your performance and engagement
                     </p>
                   </div>
@@ -192,9 +192,9 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-gamified"
                   className="group"
                 >
-                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
-                    <h4 className="font-semibold text-foreground mb-2">Gamified Experience</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="bg-gradient-to-br from-fuchsia-500 to-pink-600 p-4 rounded-lg border-2 border-white/20 relative text-white shadow-sm">
+                    <h4 className="font-semibold text-white mb-2">Gamified Experience</h4>
+                    <p className="text-sm text-white/90">
                       Learn through engaging activities and achievement systems
                     </p>
                   </div>
@@ -221,23 +221,23 @@ const DailyProgramPage = () => {
           </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+          <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-400 text-white">
             <CardHeader>
-              <CardTitle className="text-foreground">Need More Practice?</CardTitle>
+              <CardTitle className="text-white">Need More Practice?</CardTitle>
             </CardHeader>
             <CardContent>
               <TextWithSpeaker
                 text="Looking for specific subject practice? Visit the Training Ground for focused learning activities."
                 context="daily-program-practice"
               >
-                <p className="text-muted-foreground mb-4">
+                <p className="text-blue-200 mb-4">
                   Looking for specific subject practice? Visit the Training Ground for focused learning activities.
                 </p>
               </TextWithSpeaker>
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/training-ground')}
-                className="border-border text-foreground hover:bg-accent"
+                className="bg-white/20 hover:bg-white/30 text-white font-semibold backdrop-blur-sm border border-white/30 hover:border-white/50"
               >
                 Go to Training Ground
               </Button>
@@ -259,7 +259,7 @@ const DailyProgramPage = () => {
 
           {universe && (
             <div className="space-y-6" ref={universeRef}>
-              <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 overflow-hidden">
+              <Card className="bg-gradient-to-r from-blue-900 to-purple-900 overflow-hidden text-white">
                 {universe.image && (
                   <img src={universe.image} alt="Universe" className="w-full h-48 object-cover" />
                 )}
@@ -268,7 +268,7 @@ const DailyProgramPage = () => {
                 </CardHeader>
                 <CardContent>
                   <TextWithSpeaker text={universe.description || ''} context="universe-description">
-                    <p className="text-lg text-muted-foreground">{universe.description}</p>
+                    <p className="text-lg text-blue-200">{universe.description}</p>
                   </TextWithSpeaker>
                 </CardContent>
               </Card>
@@ -320,7 +320,7 @@ const DailyProgramPage = () => {
                   </TextWithSpeaker>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
                   <CardHeader>
                     <CardTitle className="flex items-center">🎯 Activities</CardTitle>
                   </CardHeader>
