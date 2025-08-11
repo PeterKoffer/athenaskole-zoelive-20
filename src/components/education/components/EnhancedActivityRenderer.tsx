@@ -178,24 +178,31 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
 
               return (
                 <div className="grid gap-3">
-                  {options.map((option: string, index: number) => (
-                    <Button
-                      key={index}
-                      onClick={() => handleAnswerSelect(index)}
-                      disabled={showResult}
-                      variant={selectedAnswer === index ? "default" : "outline"}
-                      className={`p-4 text-left justify-start h-auto ${
-                        showResult && index === correctIdx
-                          ? 'bg-green-600 border-green-500'
-                          : showResult && selectedAnswer === index && index !== correctIdx
-                          ? 'bg-red-600 border-red-500'
-                          : ''
-                      }`}
-                    >
-                      <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
-                      {option}
-                    </Button>
-                  ))}
+                  {options.map((option: string, index: number) => {
+                    const clean = String(option ?? '')
+                      .replace(/^[A-D][)\.]+\s*/i, '')
+                      .replace(/^\d+[)\.]+\s*/, '')
+                      .trim();
+                    return (
+                      <Button
+                        key={index}
+                        onClick={() => handleAnswerSelect(index)}
+                        disabled={showResult}
+                        variant={selectedAnswer === index ? "default" : "outline"}
+                        className={`p-4 text-left justify-start h-auto ${
+                          showResult && index === correctIdx
+                            ? 'bg-green-600 border-green-500'
+                            : showResult && selectedAnswer === index && index !== correctIdx
+                            ? 'bg-red-600 border-red-500'
+                            : ''
+                        }`}
+                      >
+                        <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
+                        {clean}
+                      </Button>
+                    );
+                  })}
+
                 </div>
               );
             })()}
