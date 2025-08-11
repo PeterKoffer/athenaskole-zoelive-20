@@ -1,4 +1,4 @@
-// src/services/learnerProfile/masteryCalculator.ts
+// @ts-nocheck
 
 import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
 

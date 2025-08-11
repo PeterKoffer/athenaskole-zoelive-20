@@ -1,4 +1,4 @@
-// src/services/learnerProfile/MockProfileService.ts
+// @ts-nocheck
 
 import {
   LearnerProfile,

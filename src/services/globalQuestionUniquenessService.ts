@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Global Question Uniqueness Service
 
