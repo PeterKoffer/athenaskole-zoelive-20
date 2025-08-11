@@ -39,7 +39,7 @@ const MathLearningMainContent = ({
   currentActivity,
   isSpeaking,
   onBackToProgram,
-  onToggleMute,
+  onToggleMute: _onToggleMute,
   onReadRequest,
   onStopSpeaking,
   onActivityComplete,

@@ -11,13 +11,12 @@ interface EnhancedMathLearningWithTemplateProps {
 
 const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearningWithTemplateProps) => {
   const { user } = useAuth();
-  const { userRole, isTeacher } = useRoleAccess();
+  const { userRole } = useRoleAccess();
   const [showTemplate, setShowTemplate] = useState(true);
   const [hasStartedLesson, setHasStartedLesson] = useState(false);
 
   // Only allow teachers and parents to see the template
-  const canViewTeachingTemplate =
-    isTeacher() || userRole === 'parent';
+  const canViewTeachingTemplate = userRole === 'teacher' || userRole === 'parent';
 
   const handleStartLesson = () => {
     console.log('🎯 Starting world-class math lesson');
@@ -25,10 +24,6 @@ const EnhancedMathLearningWithTemplate = ({ onBackToProgram }: EnhancedMathLearn
     setHasStartedLesson(true);
   };
 
-  const handleBackToTemplate = () => {
-    setShowTemplate(true);
-    setHasStartedLesson(false);
-  };
 
   if (!user) {
     return null;

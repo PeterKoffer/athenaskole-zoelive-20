@@ -16,7 +16,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
   const [showIntroduction, setShowIntroduction] = useState(true);
   const [manualActivityIndex, setManualActivityIndex] = useState<number | null>(null);
   const studentName = useStudentName();
-  const { stop: stopSpeaking, forceStopAll } = useUnifiedSpeech();
+  const { stop: _stopSpeaking, forceStopAll } = useUnifiedSpeech();
 
   // Enhanced speech cleanup for all navigation scenarios
   useSpeechCleanup(() => {
@@ -47,8 +47,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
     handleActivityComplete,
     handleReadRequest,
     isSpeaking,
-    toggleMute,
-    setCurrentActivityIndex
+    toggleMute
   } = useOptimizedLessonManager({
     subject: 'mathematics',
     skillArea: 'general_math',
@@ -57,7 +56,7 @@ const OptimizedMathLearningContent = ({ onBackToProgram }: OptimizedMathLearning
       forceStopAll();
       onBackToProgram();
     },
-    manualActivityIndex
+    manualActivityIndex: manualActivityIndex ?? undefined
   });
 
   const handleBackToProgram = () => {
