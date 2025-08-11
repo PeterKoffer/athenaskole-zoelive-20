@@ -29,7 +29,7 @@ const ParentNotifications = ({ childProgress, parentEmail }: ParentNotifications
   }, [childProgress]);
 
   const generateProgressNotifications = () => {
-    const newNotifications = [];
+    const newNotifications: any[] = [];
 
     // Streak milestone notification
     if (childProgress.streak > 0 && childProgress.streak % 7 === 0) {

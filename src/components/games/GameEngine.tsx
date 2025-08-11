@@ -77,10 +77,7 @@ const GameEngine = ({ gameConfig, assignmentId, onComplete, onBack, children }: 
   // Timer management
   const { 
     timeElapsed, 
-    isActive: isTimerActive,
-    startTimer,
-    stopTimer,
-    pauseTimer
+    stopTimer
   } = useTimerManager({ 
     autoStart: true,
     onTick: (time) => updateTimeElapsed(time)

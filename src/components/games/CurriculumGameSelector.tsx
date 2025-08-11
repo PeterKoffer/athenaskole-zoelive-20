@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { loadK12Games, getGamesByGrade, getGamesBySubject } from "./utils/GameDataLoader";
+import { loadK12Games } from "./utils/GameDataLoader";
 import { type CurriculumGame } from "./types/GameTypes";
 import GameCard from "./components/GameCard";
 import GameFilters from "./components/GameFilters";

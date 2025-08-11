@@ -10,7 +10,7 @@ interface HomeMainContentProps {
   onGetStarted: () => void;
 }
 
-const HomeMainContent = ({ user, onGetStarted }: HomeMainContentProps) => {
+const HomeMainContent = ({ user: _user, onGetStarted }: HomeMainContentProps) => {
   return (
     <>
       <HeroSection onGetStarted={onGetStarted} />

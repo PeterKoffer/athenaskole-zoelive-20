@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useMemo } from "react";
-import { LanguageLabLesson, ExerciseQuestion } from "../types";
+import { LanguageLabLesson } from "../types";
 
 export const useLessonState = (currentLesson: LanguageLabLesson | null) => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);

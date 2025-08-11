@@ -62,8 +62,9 @@ const ProfileCard = ({
             avatarColor={profileData.avatarColor || '#6366f1'}
           />
           <AvatarColorPicker
-            currentColor={profileData.avatarColor || '#6366f1'}
+            selectedColor={profileData.avatarColor || 'from-purple-400 to-cyan-400'}
             onColorChange={(color) => onDataChange({ avatarColor: color })}
+            userName={profileData.name || 'User'}
           />
         </div>
         <ProfileForm

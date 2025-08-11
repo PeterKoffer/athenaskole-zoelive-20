@@ -14,7 +14,7 @@ interface ResultCardProps {
 const ResultCard = ({ 
   isCorrect, 
   correctAnswer, 
-  userAnswer, 
+  userAnswer: _userAnswer, 
   feedback, 
   onNext, 
   isLastQuestion = false 

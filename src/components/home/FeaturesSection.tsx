@@ -1,6 +1,4 @@
 
-import { CardContent } from "@/components/ui/card";
-import { SpeakableCard } from "@/components/ui/speakable-card";
 import { BarChart3, BookOpen, Gamepad2, Sparkles, Volume2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';

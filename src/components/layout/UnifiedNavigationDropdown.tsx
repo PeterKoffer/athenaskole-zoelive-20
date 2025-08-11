@@ -16,8 +16,7 @@ import {
   Home, 
   School, 
   Calendar, 
-  Shield,
-  ChevronDown
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
@@ -184,7 +183,7 @@ const ListItem = forwardRef<
     className?: string;
     href?: string;
   }
->(({ className, title, children, icon: Icon, onClick, href, ...props }, ref) => {
+>(({ className, title, children, icon: Icon, onClick, href }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>

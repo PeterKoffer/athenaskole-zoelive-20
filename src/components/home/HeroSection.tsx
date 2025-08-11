@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +14,9 @@ interface HeroSectionProps {
   onGetStarted?: () => void;
 }
 
-const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
+const HeroSection = ({ onGetStarted: _onGetStarted }: HeroSectionProps) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  
 
   const handleGetStarted = () => {
     // Always redirect to training ground regardless of authentication status
