@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, BookOpen, Play, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, Loader2 } from 'lucide-react';
 import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
@@ -107,7 +107,7 @@ const DailyProgramPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6">
+    <div className="min-h-screen bg-gray-950 text-white p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center">
           <Button
@@ -119,8 +119,7 @@ const DailyProgramPage = () => {
             Back to Home
           </Button>
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
-              <Sparkles className="w-8 h-8 mr-3 text-purple-400" />
+            <h1 className="text-4xl font-bold text-white mb-2">
               Today's Program
             </h1>
             <TextWithSpeaker
@@ -222,7 +221,7 @@ const DailyProgramPage = () => {
           </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">Need More Practice?</CardTitle>
             </CardHeader>
@@ -275,7 +274,7 @@ const DailyProgramPage = () => {
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card>
+                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
                   <CardHeader>
                     <CardTitle className="flex items-center">🎭 Characters</CardTitle>
                   </CardHeader>
@@ -298,7 +297,7 @@ const DailyProgramPage = () => {
                   </TextWithSpeaker>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
                   <CardHeader>
                     <CardTitle className="flex items-center">🌍 Locations</CardTitle>
                   </CardHeader>
