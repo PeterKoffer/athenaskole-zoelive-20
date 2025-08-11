@@ -92,31 +92,46 @@ export class DailyLessonGenerator {
             throw error;
           }
 
-          // Check for uniqueness - standard lesson activities
-          const questionKey = aiContent.question?.toLowerCase().trim() || 
-                              aiContent.title?.toLowerCase().trim() || 
+          // Handle both envelope { generatedContent } and raw content objects from the edge function
+          const payload: any = (aiContent && (aiContent as any).generatedContent)
+            ? (aiContent as any).generatedContent
+            : aiContent || {};
+
+          // Basic validation: ensure we have at least a question/title or options
+          const questionText: string | undefined = payload.question || payload.prompt || payload.title;
+          const titleText: string = payload.title || this.generateActivityTitle(subject, skillArea, i);
+
+          // Uniqueness check uses normalized question/title text
+          const questionKey = (questionText?.toLowerCase().trim()) ||
+                              (titleText?.toLowerCase().trim()) ||
                               `activity-${i}`;
+
           if (!usedQuestions.has(questionKey)) {
             usedQuestions.add(questionKey);
             uniqueContent = true;
-            
+
+            const options = payload.options || payload.choices || [];
+            const correctAnswer = (typeof payload.correctIndex === 'number')
+              ? payload.correctIndex
+              : (typeof payload.correct === 'number'
+                  ? payload.correct
+                  : payload.correctAnswer);
+
             const activity: LessonActivity = {
               id: `${sessionId}-activity-${i}`,
-              title: aiContent.title || this.generateActivityTitle(subject, skillArea, i),
+              title: titleText,
               type: this.getActivityTypeForIndex(i) as any,
               phase: this.getActivityTypeForIndex(i) as any,
               duration: 180,
               content: {
-                question: aiContent.question,
-                options: aiContent.options || aiContent.choices,
-                correctAnswer: (typeof aiContent.correctIndex === 'number'
-                  ? aiContent.correctIndex
-                  : (typeof aiContent.correct === 'number' ? aiContent.correct : aiContent.correctAnswer)),
-                explanation: aiContent.explanation,
-                text: aiContent.explanation || aiContent.text,
-                hook: aiContent.hook,
-                scenario: aiContent.scenario,
-                creativePrompt: aiContent.creativePrompt
+                question: questionText,
+                options,
+                correctAnswer,
+                explanation: payload.explanation,
+                text: payload.explanation || payload.text,
+                hook: payload.hook,
+                scenario: payload.scenario,
+                creativePrompt: payload.creativePrompt
               },
               difficulty: gradeLevel + this.getDifficultyVariation(i),
               subject,
