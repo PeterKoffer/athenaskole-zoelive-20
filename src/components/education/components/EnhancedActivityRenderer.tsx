@@ -42,13 +42,27 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   const [showResult, setShowResult] = React.useState(false);
   const [isCompleted, setIsCompleted] = React.useState(false);
 
+  const getCorrectAnswer = React.useCallback(() => {
+    const c = (activity as any).content || {};
+    if (typeof c.correctAnswer === 'number') return c.correctAnswer;
+    if (typeof c.correctIndex === 'number') return c.correctIndex;
+    if (typeof c.correct === 'number') return c.correct;
+    return -1;
+  }, [activity]);
+
+  const getOptions = React.useCallback(() => {
+    const c = (activity as any).content || {};
+    return c.options || c.choices || [];
+  }, [activity]);
+
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult || isCompleted) return;
     
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     
-    const isCorrect = answerIndex === activity.content.correctAnswer;
+    const correctIdx = getCorrectAnswer();
+    const isCorrect = answerIndex === correctIdx;
     const points = isCorrect ? 10 : 0;
     
     // Show result immediately, then auto-advance after delay
@@ -141,26 +155,50 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               </h3>
             </TextWithSpeaker>
             
-            <div className="grid gap-3">
-              {activity.content.options?.map((option, index) => (
-                <Button
-                  key={index}
-                  onClick={() => handleAnswerSelect(index)}
-                  disabled={showResult}
-                  variant={selectedAnswer === index ? "default" : "outline"}
-                  className={`p-4 text-left justify-start h-auto ${
-                    showResult && index === activity.content.correctAnswer
-                      ? 'bg-green-600 border-green-500'
-                      : showResult && selectedAnswer === index && index !== activity.content.correctAnswer
-                      ? 'bg-red-600 border-red-500'
-                      : ''
-                  }`}
-                >
-                  <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
-                  {option}
-                </Button>
-              ))}
-            </div>
+            {(() => {
+              const options = getOptions();
+              const correctIdx = getCorrectAnswer();
+
+              if (!options || options.length === 0) {
+                return (
+                  <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4">
+                    <p className="text-gray-300">
+                      Content is preparing. Press continue to move on.
+                    </p>
+                    <Button 
+                      onClick={handleContinue}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      disabled={isCompleted}
+                    >
+                      Continue
+                    </Button>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid gap-3">
+                  {options.map((option: string, index: number) => (
+                    <Button
+                      key={index}
+                      onClick={() => handleAnswerSelect(index)}
+                      disabled={showResult}
+                      variant={selectedAnswer === index ? "default" : "outline"}
+                      className={`p-4 text-left justify-start h-auto ${
+                        showResult && index === correctIdx
+                          ? 'bg-green-600 border-green-500'
+                          : showResult && selectedAnswer === index && index !== correctIdx
+                          ? 'bg-red-600 border-red-500'
+                          : ''
+                      }`}
+                    >
+                      <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+              );
+            })()}
 
             {showResult && (
               <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4">

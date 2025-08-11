@@ -108,10 +108,12 @@ export class DailyLessonGenerator {
               duration: 180,
               content: {
                 question: aiContent.question,
-                options: aiContent.options,
-                correctAnswer: aiContent.correct || aiContent.correctAnswer,
+                options: aiContent.options || aiContent.choices,
+                correctAnswer: (typeof aiContent.correctIndex === 'number'
+                  ? aiContent.correctIndex
+                  : (typeof aiContent.correct === 'number' ? aiContent.correct : aiContent.correctAnswer)),
                 explanation: aiContent.explanation,
-                text: aiContent.explanation,
+                text: aiContent.explanation || aiContent.text,
                 hook: aiContent.hook,
                 scenario: aiContent.scenario,
                 creativePrompt: aiContent.creativePrompt
