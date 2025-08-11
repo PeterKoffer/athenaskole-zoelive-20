@@ -6,7 +6,7 @@ interface LessonLoadingStateProps {
   subject: string;
 }
 
-const LessonLoadingState = ({ subject }: LessonLoadingStateProps) => {
+const LessonLoadingState = ({ subject: _subject }: LessonLoadingStateProps) => {
   return (
     <Card className="bg-gray-900 border-gray-800">
       <CardContent className="p-8 text-center">
@@ -18,7 +18,7 @@ const LessonLoadingState = ({ subject }: LessonLoadingStateProps) => {
           </div>
           <div className="space-y-2">
             <h3 className="text-2xl font-bold text-white">
-              Generating Your Daily {subject.charAt(0).toUpperCase() + subject.slice(1)} Lesson
+              Generating Your Daily Lesson
             </h3>
             <p className="text-gray-400 text-lg">
               Creating a personalized lesson based on your progress and grade level...

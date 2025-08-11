@@ -10,7 +10,7 @@ interface LessonPreparationStateProps {
 }
 
 const LessonPreparationState = ({ 
-  subject, 
+  subject: _subject, 
   activitiesCount, 
   onRegenerate 
 }: LessonPreparationStateProps) => {
@@ -20,7 +20,7 @@ const LessonPreparationState = ({
         <div className="animate-pulse">
           <div className="w-16 h-16 bg-purple-600 rounded-full mx-auto mb-4"></div>
           <h3 className="text-xl font-semibold text-white mb-2">
-            Preparing your {subject} lesson...
+            Preparing your lesson...
           </h3>
           <p className="text-gray-400">
             Setting up {activitiesCount} personalized learning activities

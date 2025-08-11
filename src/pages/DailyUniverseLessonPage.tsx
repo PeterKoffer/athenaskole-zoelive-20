@@ -25,13 +25,13 @@ const DailyUniverseLessonPage: React.FC = () => {
 
   return (
     <UnifiedLessonProvider
-      subject={universe?.theme || 'adventure'}
+      subject={'adventure'}
       skillArea={'general'}
       gradeLevel={state?.gradeLevel}
       onLessonComplete={() => navigate('/daily-program')}
     >
       <EnhancedLessonManager
-        subject={universe?.theme || 'adventure'}
+        subject={'adventure'}
         skillArea="general"
         onBackToProgram={() => navigate('/daily-program')}
       />
