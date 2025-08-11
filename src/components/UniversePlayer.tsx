@@ -40,7 +40,7 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.characters || []).map((character, index) => (
                                 <li key={index} className="text-sm">
-                                    <TextWithSpeaker text={character} context={`universe-character-${index}`} position="inline" className="group">
+                                    <TextWithSpeaker text={character} context={`universe-character-${index}`} position="corner" className="group">
                                         <span>{character}</span>
                                     </TextWithSpeaker>
                                 </li>
@@ -59,7 +59,7 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.locations || []).map((location, index) => (
                                 <li key={index} className="text-sm">
-                                    <TextWithSpeaker text={location} context={`universe-location-${index}`} position="inline" className="group">
+                                    <TextWithSpeaker text={location} context={`universe-location-${index}`} position="corner" className="group">
                                         <span>{location}</span>
                                     </TextWithSpeaker>
                                 </li>
@@ -78,7 +78,7 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.activities || []).map((activity, index) => (
                                 <li key={index} className="text-sm">
-                                    <TextWithSpeaker text={activity} context={`universe-activity-${index}`} position="inline" className="group">
+                                    <TextWithSpeaker text={activity} context={`universe-activity-${index}`} position="corner" className="group">
                                         <span>{activity}</span>
                                     </TextWithSpeaker>
                                 </li>

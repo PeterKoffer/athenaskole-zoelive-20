@@ -125,7 +125,7 @@ const DailyProgramPage = () => {
             <TextWithSpeaker
               text="Welcome back! Here's your personalized AI-generated learning universe for today."
               context="daily-program-header"
-              position="inline"
+              position="corner"
             >
               <p className="text-blue-200">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
             </TextWithSpeaker>

@@ -128,7 +128,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
             <TextWithSpeaker
               text={activity.content.question || ''}
               context={`activity-${activity.id}-question`}
-              position="inline"
+              position="corner"
               className="group"
             >
               <h3 className="text-xl font-semibold text-white mb-4">
@@ -235,7 +235,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               {activity.content.keyTakeaways?.map((takeaway, index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                  <TextWithSpeaker text={takeaway} context={`activity-${activity.id}-takeaway-${index}`} position="inline" className="group">
+                  <TextWithSpeaker text={takeaway} context={`activity-${activity.id}-takeaway-${index}`} position="corner" className="group">
                     <p className="text-gray-300">{takeaway}</p>
                   </TextWithSpeaker>
                 </div>
