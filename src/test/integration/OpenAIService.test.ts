@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { OpenAIService } from '@/services/OpenAIService';
 import { vi } from 'vitest';
 

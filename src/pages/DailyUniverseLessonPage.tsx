@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Universe } from '@/services/UniverseGenerator';
 import { MathLearningContent } from '@/components/education/components/math/MathLearningContent';
-import { useAuth } from '@/hooks/useAuth';
+
 
 interface LocationState {
   universe?: Universe;

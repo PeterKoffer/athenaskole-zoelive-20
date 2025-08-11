@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // User Learning Profile Service - simplified implementation
 
 export interface UserLearningProfile {

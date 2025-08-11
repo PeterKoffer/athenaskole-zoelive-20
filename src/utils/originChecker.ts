@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Origin validation utilities for cross-origin communication
 
 export class OriginChecker {

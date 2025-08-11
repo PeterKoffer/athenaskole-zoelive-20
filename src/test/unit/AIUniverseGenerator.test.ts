@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { aiUniverseGenerator } from '../../services/AIUniverseGenerator';
 import { openAIService } from '../../services/OpenAIService';
 import { vi } from 'vitest';

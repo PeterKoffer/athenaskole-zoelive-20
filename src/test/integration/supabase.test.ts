@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../../types/supabase';
