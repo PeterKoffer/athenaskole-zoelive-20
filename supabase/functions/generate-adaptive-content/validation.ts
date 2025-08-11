@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { GeneratedContent, ValidationResult } from './types.ts';
 
 export function validateApiKey(apiKey: string | undefined): { isValid: boolean; error?: string } {

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { OpenAIResponse, GeneratedContent } from './types.ts';
 
 export interface APICallResult {

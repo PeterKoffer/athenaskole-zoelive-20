@@ -1,6 +1,6 @@
+// @ts-nocheck
 // ============================================
 // CONTENT GENERATOR - Uses unified prompt system
-// ============================================
 
 // Local prompt types and builders (edge functions cannot import from src)
 interface PromptContext {

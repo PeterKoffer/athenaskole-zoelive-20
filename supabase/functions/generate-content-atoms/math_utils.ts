@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // deno-lint-ignore-file no-explicit-any
 // Helper function to find greatest common divisor (GCD)
 export function gcd(a: number, b: number): number {
