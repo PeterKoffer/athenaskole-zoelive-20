@@ -13,7 +13,6 @@ import FocusedGrade3MultiplicationTest from '@/components/adaptive-learning/comp
 
 const AdaptivePracticeTestPage = () => {
   const navigate = useNavigate();
-  const navigate = useNavigate();
   const [showModule, setShowModule] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const [showGrade3Tests, setShowGrade3Tests] = useState(false);

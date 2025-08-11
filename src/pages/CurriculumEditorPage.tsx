@@ -3,35 +3,27 @@ import { Button } from '@/components/ui/button';
 import LessonForm from '../components/curriculum/LessonForm';
 import LessonList from '../components/curriculum/LessonList';
 
-interface SubjectLessonPlan {
+interface CurriculumLesson {
   id: string;
   title: string;
   subject: string;
   skillArea: string;
-  gradeLevel?: number;
-  activities: any[];
-  estimatedDuration?: number;
-  learningObjectives?: string[];
 }
 
 const CurriculumEditorPage = () => {
-  const [lessons, setLessons] = useState<SubjectLessonPlan[]>([]);
-  const [selectedLesson, setSelectedLesson] = useState<SubjectLessonPlan | null>(null);
+  const [lessons, setLessons] = useState<CurriculumLesson[]>([]);
+  const [selectedLesson, setSelectedLesson] = useState<CurriculumLesson | null>(null);
 
   const handleCreateLesson = () => {
     setSelectedLesson({
       id: `lesson-${Date.now()}`,
       title: 'New Lesson',
       subject: 'mathematics',
-      skillArea: 'addition',
-      gradeLevel: 1,
-      activities: [],
-      estimatedDuration: 600,
-      learningObjectives: [],
+      skillArea: 'addition'
     });
   };
 
-  const handleLessonChange = (newLesson: SubjectLessonPlan) => {
+  const handleLessonChange = (newLesson: CurriculumLesson) => {
     setSelectedLesson(newLesson);
   };
 
@@ -52,11 +44,11 @@ const CurriculumEditorPage = () => {
     }
   };
 
-  const handleEdit = (lesson: SubjectLessonPlan) => {
+  const handleEdit = (lesson: CurriculumLesson) => {
     setSelectedLesson(lesson);
   };
 
-  const handleDelete = (lessonToDelete: SubjectLessonPlan) => {
+  const handleDelete = (lessonToDelete: CurriculumLesson) => {
     setLessons(lessons.filter((lesson) => lesson.id !== lessonToDelete.id));
   };
 

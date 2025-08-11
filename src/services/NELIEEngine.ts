@@ -1,10 +1,9 @@
 import NELIESessionGenerator from './NELIESessionGenerator';
-import { DailyUniverse } from '@/types/learning';
 import { StudentProfile } from '@/types/studentProfile';
 
 class NELIEEngine {
   private currentSession: any | null = null;
-  private currentUniverse: DailyUniverse | null = null;
+  private currentUniverse: any | null = null;
 
   public async startSession(studentProfile: StudentProfile): Promise<any> {
     const sessionConfig = {
@@ -12,6 +11,8 @@ class NELIEEngine {
       preferredLearningStyle: studentProfile.learningStyle,
       subjects: ['mathematics', 'english', 'science'],
       enableUniqueness: true,
+      userId: 'anonymous',
+      schoolId: 'default-school',
     };
     this.currentUniverse = await NELIESessionGenerator.generateSession(sessionConfig);
     this.currentSession = {
@@ -23,7 +24,7 @@ class NELIEEngine {
     return this.currentSession;
   }
 
-  public getCurrentUniverse(): DailyUniverse | null {
+  public getCurrentUniverse(): any | null {
     return this.currentUniverse;
   }
 }

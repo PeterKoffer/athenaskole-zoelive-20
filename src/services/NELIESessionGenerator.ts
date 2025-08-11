@@ -31,7 +31,7 @@ const NELIESessionGenerator = {
         const lessons: any[] = [];
 
         // Get preferences and weights
-        const [schoolPreferences, teacherPreferences, conceptMastery, learningPath] = await Promise.all([
+        const [schoolPreferences, teacherPreferences, conceptMastery, _] = await Promise.all([
             preferencesService.getSchoolPreferences(config.schoolId),
             config.teacherId ? preferencesService.getTeacherPreferences(config.teacherId) : Promise.resolve(null),
             conceptMasteryService.getConceptMastery(config.userId),
@@ -39,14 +39,14 @@ const NELIESessionGenerator = {
         ]);
 
         const subjectWeights = {
-            ...schoolPreferences?.subject_weights,
-            ...teacherPreferences?.subject_weights,
-            ...teacherPreferences?.weekly_emphasis
+            ...(schoolPreferences?.subject_weights || {}),
+            ...(teacherPreferences?.subject_weights || {}),
+            ...(teacherPreferences?.weekly_emphasis || {})
         };
 
         for (const subject of config.subjects) {
             let lesson;
-            const subjectDifficulty = conceptMastery.find(c => c.subject === subject)?.masteryLevel || config.difficulty;
+            const subjectDifficulty = conceptMastery?.find(c => c.subject === subject)?.masteryLevel || config.difficulty;
             const weightedDifficulty = (subjectDifficulty || 1) * (subjectWeights[subject] || 1);
 
             switch (subject) {
@@ -73,7 +73,7 @@ const NELIESessionGenerator = {
             }
             const validation = validateEnhancedLesson(lesson);
             qualityScores[subject] = validation.qualityScore;
-            totalDuration += lesson.estimatedTotalDuration;
+            totalDuration += (lesson?.estimatedTotalDuration || 0);
             lessons.push(lesson);
         }
 
