@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Play, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target } from 'lucide-react';
 import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
@@ -274,9 +274,11 @@ const DailyProgramPage = () => {
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+                <Card className="bg-gradient-to-br from-sky-600 to-blue-700 border-white/20 text-white">
                   <CardHeader>
-                    <CardTitle className="flex items-center">🎭 Characters</CardTitle>
+                    <CardTitle className="flex items-center text-white">
+                      <Users className="w-5 h-5 mr-2 text-white/90" /> Characters
+                    </CardTitle>
                   </CardHeader>
                   <TextWithSpeaker
                     text={universe.characters?.length ? `Characters: ${universe.characters.join(', ')}` : 'No characters available'}
@@ -287,19 +289,21 @@ const DailyProgramPage = () => {
                       <ul className="space-y-2">
                         {universe.characters?.length ? (
                           universe.characters.map((character, index) => (
-                            <li key={index} className="text-sm text-muted-foreground">• {character}</li>
+                            <li key={index} className="text-sm text-white/90">• {character}</li>
                           ))
                         ) : (
-                          <li className="text-sm text-muted-foreground">No characters available</li>
+                          <li className="text-sm text-white/90">No characters available</li>
                         )}
                       </ul>
                     </CardContent>
                   </TextWithSpeaker>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+                <Card className="bg-gradient-to-br from-emerald-600 to-green-700 border-white/20 text-white">
                   <CardHeader>
-                    <CardTitle className="flex items-center">🌍 Locations</CardTitle>
+                    <CardTitle className="flex items-center text-white">
+                      <Map className="w-5 h-5 mr-2 text-white/90" /> Locations
+                    </CardTitle>
                   </CardHeader>
                   <TextWithSpeaker
                     text={universe.locations?.length ? `Locations: ${universe.locations.join(', ')}` : 'No locations available'}
@@ -310,19 +314,21 @@ const DailyProgramPage = () => {
                       <ul className="space-y-2">
                         {universe.locations?.length ? (
                           universe.locations.map((location, index) => (
-                            <li key={index} className="text-sm text-muted-foreground">• {location}</li>
+                            <li key={index} className="text-sm text-white/90">• {location}</li>
                           ))
                         ) : (
-                          <li className="text-sm text-muted-foreground">No locations available</li>
+                          <li className="text-sm text-white/90">No locations available</li>
                         )}
                       </ul>
                     </CardContent>
                   </TextWithSpeaker>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+                <Card className="bg-gradient-to-br from-fuchsia-600 to-pink-700 border-white/20 text-white">
                   <CardHeader>
-                    <CardTitle className="flex items-center">🎯 Activities</CardTitle>
+                    <CardTitle className="flex items-center text-white">
+                      <Target className="w-5 h-5 mr-2 text-white/90" /> Activities
+                    </CardTitle>
                   </CardHeader>
                   <TextWithSpeaker
                     text={universe.activities?.length ? `Activities: ${universe.activities.join(', ')}` : 'No activities available'}
@@ -333,10 +339,10 @@ const DailyProgramPage = () => {
                       <ul className="space-y-2">
                         {universe.activities?.length ? (
                           universe.activities.map((activity, index) => (
-                            <li key={index} className="text-sm text-muted-foreground">• {activity}</li>
+                            <li key={index} className="text-sm text-white/90">• {activity}</li>
                           ))
                         ) : (
-                          <li className="text-sm text-muted-foreground">No activities available</li>
+                          <li className="text-sm text-white/90">No activities available</li>
                         )}
                       </ul>
                     </CardContent>

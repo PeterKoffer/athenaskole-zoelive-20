@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Universe } from '@/services/UniverseGenerator';
 import { MathLearningContent } from '@/components/education/components/math/MathLearningContent';
+import { UnifiedLessonProvider } from '@/components/education/contexts/UnifiedLessonContext';
 
 
 interface LocationState {
@@ -23,9 +24,13 @@ const DailyUniverseLessonPage: React.FC = () => {
   }
 
   return (
-    <MathLearningContent
-      onBackToProgram={() => navigate('/daily-program')}
-    />
+    <UnifiedLessonProvider
+      subject={universe?.theme || 'general'}
+      gradeLevel={state?.gradeLevel}
+      onLessonComplete={() => navigate('/daily-program')}
+    >
+      <MathLearningContent onBackToProgram={() => navigate('/daily-program')} />
+    </UnifiedLessonProvider>
   );
 };
 
