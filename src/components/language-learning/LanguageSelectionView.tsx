@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, Trophy, ArrowLeft, BookOpen, Layers, FileText } from "lucide-react"; // Added icons
+import { Heart, Trophy, ArrowLeft, BookOpen, Layers, FileText } from "lucide-react"; // Added icons
 import { LanguageLabLanguage, LanguageLabCurriculum, CurriculumLevel, CurriculumUnit, CurriculumLessonLink } from "./types";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 

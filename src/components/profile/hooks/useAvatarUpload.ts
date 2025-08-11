@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
 
-export const useAvatarUpload = (profileData: any, setProfileData: (data: any) => void) => {
+export const useAvatarUpload = (_profileData: any, _setProfileData: (data: any) => void) => {
   const [uploading, setUploading] = useState(false);
 
-  const handleAvatarUpload = async (file: File) => {
+  const handleAvatarUpload = async (_file: File) => {
     setUploading(true);
     try {
       console.log('Avatar upload stub implementation');

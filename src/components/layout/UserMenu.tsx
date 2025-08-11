@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
@@ -18,7 +18,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   User, 
   LogOut, 
-  Settings, 
   UserCog,
   ChevronDown
 } from 'lucide-react';

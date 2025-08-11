@@ -25,7 +25,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     hasUserInteracted,
     isReady,
     speak,
-    stop,
     toggleEnabled,
   } = useUnifiedSpeech();
 

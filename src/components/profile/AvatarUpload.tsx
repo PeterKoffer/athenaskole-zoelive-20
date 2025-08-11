@@ -1,7 +1,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Camera, User } from "lucide-react";
+import { Camera } from "lucide-react";
 
 interface AvatarUploadProps {
   avatarUrl?: string;

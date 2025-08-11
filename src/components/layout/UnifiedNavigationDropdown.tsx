@@ -183,7 +183,7 @@ const ListItem = forwardRef<
     className?: string;
     href?: string;
   }
->(({ className, title, children, icon: Icon, onClick, href }, ref) => {
+>(({ className, title, children, icon: Icon, onClick }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>

@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Target } from 'lucide-react';
 import { CurriculumGame } from '../../types/GameTypes';
@@ -26,7 +26,7 @@ interface DropZone {
   acceptedItems: string[];
 }
 
-const generateDragDropData = (gameData: CurriculumGame, level: number) => {
+const generateDragDropData = (level: number) => {
   const items: DragItem[] = [
     { id: '1', content: '🔴 Circle', category: 'shapes', points: 10 },
     { id: '2', content: '⬜ Square', category: 'shapes', points: 10 },
@@ -45,7 +45,8 @@ const generateDragDropData = (gameData: CurriculumGame, level: number) => {
 };
 
 const DragDropGame = ({ level, onLevelComplete, gameData }: DragDropGameProps) => {
-  const [gameData2] = useState(() => generateDragDropData(gameData, level));
+  void gameData;
+  const [gameData2] = useState(() => generateDragDropData(level));
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
   const [droppedItems, setDroppedItems] = useState<{ [zoneId: string]: DragItem[] }>({});
   const [score, setScore] = useState(0);

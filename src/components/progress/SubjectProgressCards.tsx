@@ -45,11 +45,12 @@ const SubjectProgressCards = ({ userProgress }: SubjectProgressCardsProps) => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Object.entries(userProgress).map(([subject, score]) => {
             const performance = getPerformanceMessage(score);
+            const subjectLabel = (subjectNames as Record<string, string>)[subject] ?? subject;
             return (
               <Card key={subject} className="bg-gray-800 border-gray-700">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold capitalize text-white">{subjectNames[subject] || subject}</h3>
+                    <h3 className="font-semibold capitalize text-white">{subjectLabel}</h3>
                     <span className="text-2xl font-bold text-lime-400">{score}%</span>
                   </div>
                   <Progress value={score} className="h-3 mb-3 bg-gray-700" />

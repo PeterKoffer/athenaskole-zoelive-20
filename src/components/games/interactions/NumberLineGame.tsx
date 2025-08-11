@@ -25,6 +25,7 @@ const NumberLineGame = ({
   instruction, 
   onComplete 
 }: NumberLineGameProps) => {
+  void gameState;
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [attempts, setAttempts] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
