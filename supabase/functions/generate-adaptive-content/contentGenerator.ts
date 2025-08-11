@@ -162,7 +162,7 @@ export async function generateContentWithOpenAI(requestData: any) {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert educational content creator. Generate age-appropriate, engaging questions for K-12 students. Always respond with valid JSON only.'
+            content: 'You are an expert educational content creator. Always respond with valid JSON only. Follow the user\'s format exactly and do not include any text outside the JSON.'
           },
           {
             role: 'user',
@@ -189,12 +189,16 @@ export async function generateContentWithOpenAI(requestData: any) {
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
     const parsedContent = JSON.parse(cleanedResponse);
 
-    // Validate required fields
-    if (!parsedContent.question || !parsedContent.options || !Array.isArray(parsedContent.options)) {
-      throw new Error('Invalid response format from OpenAI');
+    // Validate Interactive Adventure format (Daily Program)
+    if (!parsedContent.title || !parsedContent.scenario || !Array.isArray(parsedContent.stages) || parsedContent.stages.length === 0) {
+      throw new Error('Invalid Interactive Adventure format from OpenAI');
     }
 
-    console.log('✅ OpenAI content generated successfully');
+    console.log('✅ Interactive Adventure generated (daily):', {
+      hasTitle: !!parsedContent.title,
+      stagesCount: parsedContent.stages?.length,
+      firstActivityType: parsedContent.stages?.[0]?.activityType
+    });
     return parsedContent;
 
   } catch (error) {
@@ -249,7 +253,7 @@ export async function generateContentWithDeepSeek(requestData: any) {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert educational content creator. Generate age-appropriate, engaging questions for K-12 students. Always respond with valid JSON only.'
+            content: 'You are an expert educational content creator. Always respond with valid JSON only. Follow the user\'s format exactly and do not include any text outside the JSON.'
           },
           {
             role: 'user',
@@ -276,12 +280,16 @@ export async function generateContentWithDeepSeek(requestData: any) {
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
     const parsedContent = JSON.parse(cleanedResponse);
 
-    // Validate required fields
-    if (!parsedContent.question || !parsedContent.options || !Array.isArray(parsedContent.options)) {
-      throw new Error('Invalid response format from DeepSeek');
+    // Validate Interactive Adventure format (Daily Program - DeepSeek)
+    if (!parsedContent.title || !parsedContent.scenario || !Array.isArray(parsedContent.stages) || parsedContent.stages.length === 0) {
+      throw new Error('Invalid Interactive Adventure format from DeepSeek');
     }
 
-    console.log('✅ DeepSeek content generated successfully');
+    console.log('✅ Interactive Adventure generated (daily, DeepSeek):', {
+      hasTitle: !!parsedContent.title,
+      stagesCount: parsedContent.stages?.length,
+      firstActivityType: parsedContent.stages?.[0]?.activityType
+    });
     return parsedContent;
 
   } catch (error) {

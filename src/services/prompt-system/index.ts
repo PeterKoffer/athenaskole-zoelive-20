@@ -142,37 +142,53 @@ export function createDailyLessonPrompt(context: PromptContext): string {
     learningStyle = 'mixed'
   } = context;
 
-  return `You are a world-class ${subject} teacher creating an engaging question for Grade ${gradeLevel}.
+  return `You are a world-class ${subject} teacher and imaginative storyteller creating an immersive, game-like lesson for Grade ${gradeLevel}.
 
-📋 STUDENT CONTEXT:
-- Grade Level: ${gradeLevel}
-- Performance: ${performanceLevel}
-- Learning Style: ${learningStyle}
-- Subject: ${subject}
+Design a dynamic, interactive learning adventure lasting about 35 minutes.
+Use age-appropriate language and adapt to the student's performance level (${performanceLevel}) and learning style (${learningStyle}).
 
-✅ REQUIREMENTS:
-- Create exactly 4 multiple choice options
-- Use age-appropriate language for Grade ${gradeLevel}
-- Make it educational and engaging (not boring)
-- Provide clear, encouraging explanation
-- Mark correct answer with index (0-3)
-
-🎯 QUALITY STANDARDS:
-- Avoid generic word problems
-- Use creative scenarios when possible
-- Focus on real-world applications
-- Make it relatable to ${gradeLevel}th graders
-
-📋 MANDATORY OUTPUT FORMAT:
-Return EXACTLY this JSON structure:
+Return ONLY JSON in this exact schema (no extra prose):
 {
-  "question": "Your engaging question here",
-  "options": ["Option A", "Option B", "Option C", "Option D"],
-  "correct": 0,
-  "explanation": "Clear explanation with encouraging feedback"
+  "title": "string",
+  "scenario": "string",
+  "stages": [
+    {
+      "story": "string",
+      "activityType": "multipleChoice | fillBlank | puzzle | matching | sequencing | experiment | creativeTask",
+      "activity": {
+        "question": "string",
+        "options": ["string", "string", "string", "string"],
+        "correct": 0,
+        "expectedAnswer": "string",
+        "rubric": "string",
+        "explanation": "string"
+      },
+      "imagePrompts": [
+        "string (describe an image to generate for this scene or concept)",
+        "string"
+      ]
+    }
+  ],
+  "bonusMissions": [
+    {
+      "story": "string",
+      "activityType": "multipleChoice | fillBlank | puzzle | matching | sequencing | experiment | creativeTask",
+      "activity": { "question": "string", "options": [], "expectedAnswer": "string", "rubric": "string", "explanation": "string" },
+      "imagePrompts": ["string"]
+    }
+  ],
+  "objectives": ["string", "string"],
+  "estimatedTime": 35
 }
 
-Generate one excellent question that students will find interesting and educational.`;
+Rules:
+- Keep story chunks short and energetic.
+- Each stage must include exactly one activity.
+- Activities must directly teach or practice ${subject} content suitable for Grade ${gradeLevel}.
+- Tailor wording and supports to ${performanceLevel} performance and ${learningStyle} learning style.
+- Provide 1–3 imagePrompts per stage for visuals.
+- Ensure exactly ONE correct answer for multipleChoice. Provide ` + "`expectedAnswer`" + ` for non-MC activities.
+- Do NOT include any text outside the JSON.`;
 }
 
 // ============================================
