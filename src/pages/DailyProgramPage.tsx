@@ -8,6 +8,7 @@ import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
+import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -106,7 +107,7 @@ const DailyProgramPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center">
           <Button
@@ -122,7 +123,13 @@ const DailyProgramPage = () => {
               <Sparkles className="w-8 h-8 mr-3 text-purple-400" />
               Today's Program
             </h1>
-            <p className="text-gray-300">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
+            <TextWithSpeaker
+              text="Welcome back! Here's your personalized AI-generated learning universe for today."
+              context="daily-program-header"
+              position="inline"
+            >
+              <p className="text-muted-foreground">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
+            </TextWithSpeaker>
           </div>
         </div>
 
@@ -135,37 +142,64 @@ const DailyProgramPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg text-muted-foreground mb-6">
-                Today's learning adventure is uniquely crafted just for you! Dive into an immersive, 
-                AI-generated educational universe filled with interactive content, engaging storylines, 
-                and personalized challenges that adapt to your learning style.
-              </p>
+              <TextWithSpeaker
+                text="Today's learning adventure is uniquely crafted just for you! Dive into an immersive, AI-generated educational universe filled with interactive content, engaging storylines, and personalized challenges that adapt to your learning style."
+                context="daily-program-intro"
+              >
+                <p className="text-lg text-muted-foreground mb-6">
+                  {"Today's learning adventure is uniquely crafted just for you! Dive into an immersive, AI-generated educational universe filled with interactive content, engaging storylines, and personalized challenges that adapt to your learning style."}
+                </p>
+              </TextWithSpeaker>
               
               <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div className="bg-card p-4 rounded-lg border">
-                  <h4 className="font-semibold text-foreground mb-2">🎯 Personalized Content</h4>
-                  <p className="text-sm text-muted-foreground">
-                    AI-crafted lessons that adapt to your progress and interests
-                  </p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border">
-                  <h4 className="font-semibold text-foreground mb-2">🌟 Interactive Universe</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Explore characters, locations, and activities in your learning world
-                  </p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border">
-                  <h4 className="font-semibold text-foreground mb-2">⚡ Dynamic Learning</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Content that evolves based on your performance and engagement
-                  </p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border">
-                  <h4 className="font-semibold text-foreground mb-2">🎮 Gamified Experience</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Learn through engaging activities and achievement systems
-                  </p>
-                </div>
+                <TextWithSpeaker
+                  text="Personalized Content. AI-crafted lessons that adapt to your progress and interests."
+                  context="daily-program-feature-personalized"
+                  className="group"
+                >
+                  <div className="bg-card p-4 rounded-lg border relative">
+                    <h4 className="font-semibold text-foreground mb-2">🎯 Personalized Content</h4>
+                    <p className="text-sm text-muted-foreground">
+                      AI-crafted lessons that adapt to your progress and interests
+                    </p>
+                  </div>
+                </TextWithSpeaker>
+                <TextWithSpeaker
+                  text="Interactive Universe. Explore characters, locations, and activities in your learning world."
+                  context="daily-program-feature-interactive"
+                  className="group"
+                >
+                  <div className="bg-card p-4 rounded-lg border relative">
+                    <h4 className="font-semibold text-foreground mb-2">🌟 Interactive Universe</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Explore characters, locations, and activities in your learning world
+                    </p>
+                  </div>
+                </TextWithSpeaker>
+                <TextWithSpeaker
+                  text="Dynamic Learning. Content that evolves based on your performance and engagement."
+                  context="daily-program-feature-dynamic"
+                  className="group"
+                >
+                  <div className="bg-card p-4 rounded-lg border relative">
+                    <h4 className="font-semibold text-foreground mb-2">⚡ Dynamic Learning</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Content that evolves based on your performance and engagement
+                    </p>
+                  </div>
+                </TextWithSpeaker>
+                <TextWithSpeaker
+                  text="Gamified Experience. Learn through engaging activities and achievement systems."
+                  context="daily-program-feature-gamified"
+                  className="group"
+                >
+                  <div className="bg-card p-4 rounded-lg border relative">
+                    <h4 className="font-semibold text-foreground mb-2">🎮 Gamified Experience</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Learn through engaging activities and achievement systems
+                    </p>
+                  </div>
+                </TextWithSpeaker>
               </div>
               {!universe && (
                 <Button
@@ -193,9 +227,14 @@ const DailyProgramPage = () => {
               <CardTitle className="text-foreground">Need More Practice?</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Looking for specific subject practice? Visit the Training Ground for focused learning activities.
-              </p>
+              <TextWithSpeaker
+                text="Looking for specific subject practice? Visit the Training Ground for focused learning activities."
+                context="daily-program-practice"
+              >
+                <p className="text-muted-foreground mb-4">
+                  Looking for specific subject practice? Visit the Training Ground for focused learning activities.
+                </p>
+              </TextWithSpeaker>
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/training-ground')}
@@ -229,7 +268,9 @@ const DailyProgramPage = () => {
                   <CardTitle className="text-2xl">{universe.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-lg text-muted-foreground">{universe.description}</p>
+                  <TextWithSpeaker text={universe.description || ''} context="universe-description">
+                    <p className="text-lg text-muted-foreground">{universe.description}</p>
+                  </TextWithSpeaker>
                 </CardContent>
               </Card>
 
@@ -238,51 +279,69 @@ const DailyProgramPage = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center">🎭 Characters</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {universe.characters?.length ? (
-                        universe.characters.map((character, index) => (
-                          <li key={index} className="text-sm text-muted-foreground">• {character}</li>
-                        ))
-                      ) : (
-                        <li className="text-sm text-muted-foreground">No characters available</li>
-                      )}
-                    </ul>
-                  </CardContent>
+                  <TextWithSpeaker
+                    text={universe.characters?.length ? `Characters: ${universe.characters.join(', ')}` : 'No characters available'}
+                    context="universe-characters"
+                    className="block"
+                  >
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {universe.characters?.length ? (
+                          universe.characters.map((character, index) => (
+                            <li key={index} className="text-sm text-muted-foreground">• {character}</li>
+                          ))
+                        ) : (
+                          <li className="text-sm text-muted-foreground">No characters available</li>
+                        )}
+                      </ul>
+                    </CardContent>
+                  </TextWithSpeaker>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">🌍 Locations</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {universe.locations?.length ? (
-                        universe.locations.map((location, index) => (
-                          <li key={index} className="text-sm text-muted-foreground">• {location}</li>
-                        ))
-                      ) : (
-                        <li className="text-sm text-muted-foreground">No locations available</li>
-                      )}
-                    </ul>
-                  </CardContent>
+                  <TextWithSpeaker
+                    text={universe.locations?.length ? `Locations: ${universe.locations.join(', ')}` : 'No locations available'}
+                    context="universe-locations"
+                    className="block"
+                  >
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {universe.locations?.length ? (
+                          universe.locations.map((location, index) => (
+                            <li key={index} className="text-sm text-muted-foreground">• {location}</li>
+                          ))
+                        ) : (
+                          <li className="text-sm text-muted-foreground">No locations available</li>
+                        )}
+                      </ul>
+                    </CardContent>
+                  </TextWithSpeaker>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">🎯 Activities</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {universe.activities?.length ? (
-                        universe.activities.map((activity, index) => (
-                          <li key={index} className="text-sm text-muted-foreground">• {activity}</li>
-                        ))
-                      ) : (
-                        <li className="text-sm text-muted-foreground">No activities available</li>
-                      )}
-                    </ul>
-                  </CardContent>
+                  <TextWithSpeaker
+                    text={universe.activities?.length ? `Activities: ${universe.activities.join(', ')}` : 'No activities available'}
+                    context="universe-activities"
+                    className="block"
+                  >
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {universe.activities?.length ? (
+                          universe.activities.map((activity, index) => (
+                            <li key={index} className="text-sm text-muted-foreground">• {activity}</li>
+                          ))
+                        ) : (
+                          <li className="text-sm text-muted-foreground">No activities available</li>
+                        )}
+                      </ul>
+                    </CardContent>
+                  </TextWithSpeaker>
                 </Card>
               </div>
 
