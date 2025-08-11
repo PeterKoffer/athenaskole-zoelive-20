@@ -194,11 +194,11 @@ class ContentGenerationService {
     };
   }
 
-  private getMathExplanationForKc(kc: any, seed: number) {
+  private getMathExplanationForKc(kc: any, _seed: number) {
     return `This mathematical concept helps us solve real-world problems and builds important thinking skills.`;
   }
 
-  private getMathExamplesForKc(kc: any, seed: number) {
+  private getMathExamplesForKc(kc: any, _seed: number) {
     return [`Practice helps you master ${kc.name}`];
   }
 }

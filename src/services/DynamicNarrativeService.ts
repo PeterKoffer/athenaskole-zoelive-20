@@ -64,11 +64,7 @@ interface AIResponseFormat {
 
 
 class DynamicNarrativeService {
-  private formatObjectivesForPrompt(objectives: LearningObjectiveInput[]): string {
-    return objectives.map((obj, index) =>
-      `${index + 1}. ID: "${obj.objectiveId}", Title: "${obj.objectiveTitle}", Subject: "${obj.subject}", Difficulty: "${obj.difficulty}"${obj.estimatedMinutes ? `, Duration: ${obj.estimatedMinutes} mins` : ''}`
-    ).join('\n');
-  }
+    // (removed unused helper formatObjectivesForPrompt to satisfy TS)
 
   private generateFallbackNarrative(
     themeName: string,

@@ -1,5 +1,5 @@
 
-import { EDGE_BASE } from "./ElevenLabsConfig";
+import { EDGE_BASE, DEFAULT_VOICE_SETTINGS } from "./ElevenLabsConfig";
 import { AudioResponse, ElevenLabsConfig } from "./ElevenLabsTypes";
 
 export class ElevenLabsSpeechGenerator {
@@ -68,13 +68,43 @@ export class ElevenLabsSpeechGenerator {
 
       return { audioContent: rawJson.audioContent };
     } catch (error) {
-      console.error("❌ ElevenLabs speech generation failed:", error);
-      return {
-        audioContent: "",
-        error: error instanceof Error
-          ? error.message
-          : "Speech generation failed",
-      };
+      console.error("❌ ElevenLabs speech generation via EDGE failed:", error);
+      // Fallback: direct ElevenLabs REST using API key
+      try {
+        if (!config.apiKey) throw new Error("Missing ElevenLabs API key");
+        const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${config.voiceId}`,{
+          method: "POST",
+          headers: {
+            "xi-api-key": config.apiKey,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text,
+            model_id: config.model,
+            voice_settings: DEFAULT_VOICE_SETTINGS
+          })
+        });
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error(`Direct TTS HTTP ${resp.status}: ${errText}`);
+        }
+        const buffer = await resp.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        let binary = "";
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+          binary += String.fromCharCode.apply(null, Array.from(chunk) as any);
+        }
+        const base64 = btoa(binary);
+        return { audioContent: base64 };
+      } catch (fallbackError) {
+        console.error("❌ ElevenLabs direct TTS failed:", fallbackError);
+        return {
+          audioContent: "",
+          error: fallbackError instanceof Error ? fallbackError.message : "Speech generation failed",
+        };
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 
 import { ElevenLabsConfig, AudioResponse } from "./ElevenLabsTypes";
-import { FENA_VOICE_ID, DEFAULT_MODEL_ID } from "./ElevenLabsConfig";
+import { FENA_VOICE_ID, DEFAULT_MODEL_ID, ELEVENLABS_API_KEY } from "./ElevenLabsConfig";
 import { ElevenLabsVoiceManager } from "./ElevenLabsVoiceManager";
 import { ElevenLabsAudioPlayer } from "./ElevenLabsAudioPlayer";
 import { ElevenLabsSpeechGenerator } from "./ElevenLabsSpeechGenerator";
@@ -13,9 +13,7 @@ class ElevenLabsService {
 
   constructor() {
     this.config = {
-      apiKey: "",
-      voiceId: FENA_VOICE_ID, // Explicitly use Fena
-      model: DEFAULT_MODEL_ID,
+      apiKey: ELEVENLABS_API_KEY,
     };
     this.voiceManager = new ElevenLabsVoiceManager();
     this.audioPlayer = new ElevenLabsAudioPlayer();

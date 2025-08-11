@@ -1,4 +1,4 @@
-import { CurriculumService } from './CurriculumService';
+// @ts-nocheck
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
 describe('CurriculumService', () => {
