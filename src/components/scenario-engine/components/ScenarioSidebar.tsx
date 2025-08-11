@@ -13,7 +13,7 @@ interface ScenarioSidebarProps {
 
 const ScenarioSidebar: React.FC<ScenarioSidebarProps> = ({
   currentNode,
-  isSpeaking
+  isSpeaking: _isSpeaking
 }) => {
   return (
     <div className="lg:col-span-1">

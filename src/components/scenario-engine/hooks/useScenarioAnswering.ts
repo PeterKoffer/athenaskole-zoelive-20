@@ -22,7 +22,7 @@ export const useScenarioAnswering = () => {
     if (selectedAnswer && selectedAnswer !== answer) {
       console.log('📊 Logging REVISION event for answer change');
       const revisionEvent = {
-        type: InteractionEventType.REVISION as const,
+        type: InteractionEventType.REVISION,
         originalAnswer: selectedAnswer,
         revisedAnswer: answer
       };
@@ -36,7 +36,7 @@ export const useScenarioAnswering = () => {
     onSessionUpdate: (updates: Partial<ScenarioSession>) => void,
     onScoreUpdate: (score: number) => void
   ) => {
-    const correctAnswer = currentNode.config.customProperties?.correctAnswer;
+    const correctAnswer = currentNode.config?.customProperties?.correctAnswer;
     const isAnswerCorrect = selectedAnswer === correctAnswer;
     
     setIsCorrect(isAnswerCorrect);

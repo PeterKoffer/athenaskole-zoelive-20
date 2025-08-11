@@ -1,7 +1,9 @@
 
-export interface AdminStats {
-  totalSchools: number;
-  totalUsers: number;
-  totalStudents: number;
-  systemUptime: number;
+export enum InteractionEventType {
+  SESSION_START = 'SESSION_START',
+  QUESTION_ATTEMPT = 'QUESTION_ATTEMPT',
+  REVISION = 'REVISION',
+  NAVIGATION = 'NAVIGATION',
+  SESSION_END = 'SESSION_END'
 }
+

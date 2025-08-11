@@ -15,7 +15,7 @@ interface LessonPlayerProps {
 const LessonPlayer: React.FC<LessonPlayerProps> = ({ lesson: initialLesson, onComplete }) => {
   const [lesson, setLesson] = useState(initialLesson);
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
-  const [progress, setProgress] = useState({});
+  const [progress, setProgress] = useState<Record<number, any>>({});
   const [completed, setCompleted] = useState(false);
 
   useEffect(() => {

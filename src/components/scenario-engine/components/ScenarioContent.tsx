@@ -42,11 +42,11 @@ const ScenarioContent: React.FC<ScenarioContentProps> = ({
           </div>
 
           {/* Question Options */}
-          {currentNode.type === 'question' && currentNode.config?.customProperties?.options && (
+          {currentNode.type === 'question' && (currentNode.config as any)?.customProperties?.options && (
             <div className="space-y-3">
               <h3 className="text-white font-medium">Choose your answer:</h3>
               <div className="grid grid-cols-1 gap-2">
-                {currentNode.config?.customProperties?.options.map((option: string, index: number) => (
+                {(currentNode.config as any)?.customProperties?.options.map((option: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => onAnswerSelect(option)}

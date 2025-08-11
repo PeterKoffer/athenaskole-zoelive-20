@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User } from "lucide-react";
 import AvatarUpload from "./AvatarUpload";
 import ProfileForm from "./ProfileForm";
-import { StudentProfile } from "@/types/studentProfile";
+import { LearnerProfile } from "@/types/learnerProfile";
 import AvatarColorPicker from "./AvatarColorPicker";
 
 interface ProfileCardProps {
-  profileData: StudentProfile;
+  profileData: LearnerProfile;
   loading: boolean;
   uploading: boolean;
-  onDataChange: (data: Partial<StudentProfile>) => void;
+  onDataChange: (data: Partial<LearnerProfile>) => void;
   onSubmit: (e: React.FormEvent) => void;
   onAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }

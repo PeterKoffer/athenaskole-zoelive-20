@@ -1,5 +1,5 @@
 
-import { StudentProfile } from "@/types/studentProfile";
+import { LearnerProfile } from "@/types/learnerProfile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
 interface ProfileFormProps {
-  profileData: StudentProfile;
+  profileData: LearnerProfile;
   loading: boolean;
-  onDataChange: (data: Partial<StudentProfile>) => void;
+  onDataChange: (data: Partial<LearnerProfile>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 

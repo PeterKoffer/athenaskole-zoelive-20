@@ -29,16 +29,15 @@ export const useScenarioNavigation = ({
     // Determine next node based on branching logic
     let nextNodeId: string | null = null;
     
-    if (currentNode.connections.branches) {
-      const branch = currentNode.connections.branches.find(b => 
+    if (currentNode.connections?.branches) {
+      const branch = currentNode.connections.branches.find((b: any) => 
         (b.condition === 'correct' && isCorrect) ||
         (b.condition === 'incorrect' && !isCorrect)
       );
-      nextNodeId = branch?.targetNodeId || currentNode.connections.fallback || null;
-      
+      nextNodeId = branch?.targetNodeId || currentNode.connections?.fallback || null;
       logNavigation(currentNode.id, nextNodeId);
     } else {
-      nextNodeId = currentNode.connections.next || null;
+      nextNodeId = currentNode.connections?.next || null;
     }
     
     if (nextNodeId) {

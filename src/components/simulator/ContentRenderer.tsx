@@ -1,6 +1,6 @@
 import React from 'react';
-import Game from './Game';
-import { Content } from '../education/components/types/LessonTypes';
+
+interface Content { type: 'video' | 'image' | 'text'; value: string };
 
 interface ContentRendererProps {
   content: Content[];
