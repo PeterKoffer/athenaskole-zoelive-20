@@ -34,6 +34,7 @@ const DailyUniverseLessonPage: React.FC = () => {
         subject={'adventure'}
         skillArea="general"
         onBackToProgram={() => navigate('/daily-program')}
+        hideActivityCount
       />
     </UnifiedLessonProvider>
   );

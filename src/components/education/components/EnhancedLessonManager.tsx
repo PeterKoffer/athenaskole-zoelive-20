@@ -14,11 +14,13 @@ interface EnhancedLessonManagerProps {
   subject: string;
   skillArea: string;
   onBackToProgram: () => void;
+  hideActivityCount?: boolean;
 }
 
 const EnhancedLessonManager = ({ 
   subject, 
-  onBackToProgram 
+  onBackToProgram, 
+  hideActivityCount
 }: EnhancedLessonManagerProps) => {
   const {
     currentActivityIndex,
@@ -121,6 +123,7 @@ const EnhancedLessonManager = ({
         score={score}
         correctStreak={correctStreak}
         onBackToProgram={onBackToProgram}
+        hideActivityCount={hideActivityCount}
       />
 
       <LessonActivityManager

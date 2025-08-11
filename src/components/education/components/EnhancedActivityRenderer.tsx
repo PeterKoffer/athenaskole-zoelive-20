@@ -84,13 +84,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || ''}
+              text={activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || activity.title || ''}
               context={`activity-${activity.id}-introduction`}
               position="corner"
               className="group"
             >
               <p className="text-gray-300 text-lg leading-relaxed">
-                {activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || 'Content is preparing...'}
+                {activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <Button 
@@ -106,13 +106,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              text={activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || activity.title || ''}
               context={`activity-${activity.id}-content`}
               position="corner"
               className="group"
             >
               <p className="text-gray-300 text-lg leading-relaxed">
-                {activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+                {activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <Button 
@@ -184,13 +184,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.creativePrompt || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              text={activity.content.creativePrompt || activity.content.text || activity.content.description || activity.content.instructions || activity.title || ''}
               context={`activity-${activity.id}-creative`}
               position="corner"
               className="group"
             >
               <p className="text-gray-300 text-lg">
-                {activity.content.creativePrompt || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+                {activity.content.creativePrompt || activity.content.text || activity.content.description || activity.content.instructions || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <div className="bg-gray-800 p-4 rounded-lg">
@@ -213,13 +213,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.scenario || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              text={activity.content.scenario || activity.content.text || activity.content.description || activity.content.instructions || activity.title || ''}
               context={`activity-${activity.id}-application`}
               position="corner"
               className="group"
             >
               <p className="text-gray-300 text-lg">
-                {activity.content.scenario || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+                {activity.content.scenario || activity.content.text || activity.content.description || activity.content.instructions || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <div className="bg-gray-800 p-4 rounded-lg">
@@ -263,13 +263,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.simulationDescription || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              text={activity.content.simulationDescription || activity.content.text || activity.content.description || activity.content.instructions || activity.title || ''}
               context={`activity-${activity.id}-simulation`}
               position="corner"
               className="group"
             >
               <p className="text-gray-300 text-lg">
-                {activity.content.simulationDescription || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+                {activity.content.simulationDescription || activity.content.text || activity.content.description || activity.content.instructions || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <div className="bg-gray-800 p-4 rounded-lg">
@@ -291,7 +291,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.text || activity.content.description || activity.content.instructions || 'Content not available'}
+              text={activity.content.text || activity.content.description || activity.content.instructions || activity.title || 'Content is preparing...'}
               context={`activity-${activity.id}-default`}
               position="corner"
               className="group"
@@ -314,9 +314,8 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   return (
     <Card className="bg-gray-900 border-gray-700">
       <CardHeader>
-        <CardTitle className="text-white flex items-center space-x-2">
-          <span>{activity.title}</span>
-          <span className="text-sm text-gray-400">({activity.duration} min)</span>
+        <CardTitle className="text-white">
+          {activity.title}
         </CardTitle>
       </CardHeader>
       <CardContent>
