@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Play, Brain, Target } from 'lucide-react';
 import { LessonActivity } from './types/LessonTypes';
 import TrainingGroundActivityRenderer from './TrainingGroundActivityRenderer';
+import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
@@ -81,9 +82,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       case 'introduction':
         return (
           <div className="space-y-4">
-            <p className="text-gray-300 text-lg leading-relaxed">
-              {activity.content.hook || activity.content.text}
-            </p>
+            <TextWithSpeaker
+              text={activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || ''}
+              context={`activity-${activity.id}-introduction`}
+              className="group"
+            >
+              <p className="text-gray-300 text-lg leading-relaxed">
+                {activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || 'Content is preparing...'}
+              </p>
+            </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
               className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -96,9 +103,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       case 'content-delivery':
         return (
           <div className="space-y-4">
-            <p className="text-gray-300 text-lg leading-relaxed">
-              {activity.content.segments?.[0]?.explanation || activity.content.text}
-            </p>
+            <TextWithSpeaker
+              text={activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              context={`activity-${activity.id}-content`}
+              className="group"
+            >
+              <p className="text-gray-300 text-lg leading-relaxed">
+                {activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+              </p>
+            </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
               className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -112,9 +125,16 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       case 'quiz':
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-white mb-4">
-              {activity.content.question}
-            </h3>
+            <TextWithSpeaker
+              text={activity.content.question || ''}
+              context={`activity-${activity.id}-question`}
+              position="inline"
+              className="group"
+            >
+              <h3 className="text-xl font-semibold text-white mb-4">
+                {activity.content.question || 'Answer the question'}
+              </h3>
+            </TextWithSpeaker>
             
             <div className="grid gap-3">
               {activity.content.options?.map((option, index) => (
@@ -157,9 +177,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       case 'creative-exploration':
         return (
           <div className="space-y-4">
-            <p className="text-gray-300 text-lg">
-              {activity.content.creativePrompt || activity.content.text}
-            </p>
+            <TextWithSpeaker
+              text={activity.content.creativePrompt || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              context={`activity-${activity.id}-creative`}
+              className="group"
+            >
+              <p className="text-gray-300 text-lg">
+                {activity.content.creativePrompt || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+              </p>
+            </TextWithSpeaker>
             <div className="bg-gray-800 p-4 rounded-lg">
               <p className="text-gray-400 italic">
                 Think about this scenario and be creative with your response!
@@ -178,9 +204,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       case 'application':
         return (
           <div className="space-y-4">
-            <p className="text-gray-300 text-lg">
-              {activity.content.scenario || activity.content.text}
-            </p>
+            <TextWithSpeaker
+              text={activity.content.scenario || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              context={`activity-${activity.id}-application`}
+              className="group"
+            >
+              <p className="text-gray-300 text-lg">
+                {activity.content.scenario || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+              </p>
+            </TextWithSpeaker>
             <div className="bg-gray-800 p-4 rounded-lg">
               <p className="text-gray-400">
                 Apply what you've learned to solve this real-world scenario.
@@ -203,7 +235,9 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               {activity.content.keyTakeaways?.map((takeaway, index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-300">{takeaway}</p>
+                  <TextWithSpeaker text={takeaway} context={`activity-${activity.id}-takeaway-${index}`} position="inline" className="group">
+                    <p className="text-gray-300">{takeaway}</p>
+                  </TextWithSpeaker>
                 </div>
               ))}
             </div>
@@ -219,9 +253,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       case 'simulation':
         return (
           <div className="space-y-4">
-            <p className="text-gray-300 text-lg">
-              {activity.content.simulationDescription || activity.content.text}
-            </p>
+            <TextWithSpeaker
+              text={activity.content.simulationDescription || activity.content.text || activity.content.description || activity.content.instructions || ''}
+              context={`activity-${activity.id}-simulation`}
+              className="group"
+            >
+              <p className="text-gray-300 text-lg">
+                {activity.content.simulationDescription || activity.content.text || activity.content.description || activity.content.instructions || 'Content is preparing...'}
+              </p>
+            </TextWithSpeaker>
             <div className="bg-gray-800 p-4 rounded-lg">
               <p className="text-gray-400 italic">
                 Interactive simulation experience
@@ -240,9 +280,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       default:
         return (
           <div className="space-y-4">
-            <p className="text-gray-300 text-lg">
-              {activity.content.text || 'Content not available'}
-            </p>
+            <TextWithSpeaker
+              text={activity.content.text || activity.content.description || activity.content.instructions || 'Content not available'}
+              context={`activity-${activity.id}-default`}
+              className="group"
+            >
+              <p className="text-gray-300 text-lg">
+                {activity.content.text || activity.content.description || activity.content.instructions || 'Content not available'}
+              </p>
+            </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
               className="bg-gray-600 hover:bg-gray-700 text-white"

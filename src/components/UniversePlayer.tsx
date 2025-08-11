@@ -3,6 +3,7 @@ import React from 'react';
 import { Universe } from '../services/UniverseGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CurriculumStandard } from '../services/CurriculumMapper';
+import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 
 interface UniversePlayerProps {
     universe: Universe;
@@ -39,7 +40,9 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.characters || []).map((character, index) => (
                                 <li key={index} className="text-sm">
-                                    {character}
+                                    <TextWithSpeaker text={character} context={`universe-character-${index}`} position="inline" className="group">
+                                        <span>{character}</span>
+                                    </TextWithSpeaker>
                                 </li>
                             ))}
                         </ul>
@@ -56,7 +59,9 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.locations || []).map((location, index) => (
                                 <li key={index} className="text-sm">
-                                    {location}
+                                    <TextWithSpeaker text={location} context={`universe-location-${index}`} position="inline" className="group">
+                                        <span>{location}</span>
+                                    </TextWithSpeaker>
                                 </li>
                             ))}
                         </ul>
@@ -73,7 +78,9 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.activities || []).map((activity, index) => (
                                 <li key={index} className="text-sm">
-                                    {activity}
+                                    <TextWithSpeaker text={activity} context={`universe-activity-${index}`} position="inline" className="group">
+                                        <span>{activity}</span>
+                                    </TextWithSpeaker>
                                 </li>
                             ))}
                         </ul>

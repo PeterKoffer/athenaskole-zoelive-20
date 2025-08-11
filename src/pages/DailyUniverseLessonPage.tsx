@@ -25,8 +25,8 @@ const DailyUniverseLessonPage: React.FC = () => {
 
   return (
     <UnifiedLessonProvider
-      subject={'mathematics'}
-      skillArea={'general_math'}
+      subject={universe?.theme || 'general'}
+      skillArea={'general'}
       gradeLevel={state?.gradeLevel}
       onLessonComplete={() => navigate('/daily-program')}
     >
