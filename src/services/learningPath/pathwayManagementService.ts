@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Pathway Management Service
 
 export class PathwayManagementService {

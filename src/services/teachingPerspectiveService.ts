@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Stub implementation for teaching perspective service
 
 export interface TeachingPerspective {

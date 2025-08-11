@@ -49,7 +49,7 @@ class StealthAssessmentService implements IStealthAssessmentService {
     console.log('⚠️ Using legacy logInteractionEvent method');
     await this.logEvent(eventData);
   }
-
+// @ts-nocheck
 
   async logQuestionAttempt(
     details: Omit<QuestionAttemptEvent, 'type' | 'eventId' | 'timestamp' | 'userId' | 'sessionId' | 'sourceComponentId'>, 

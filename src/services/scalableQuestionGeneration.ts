@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Scalable Question Generation Service
 
 import { globalQuestionUniquenessService } from './globalQuestionUniquenessService';

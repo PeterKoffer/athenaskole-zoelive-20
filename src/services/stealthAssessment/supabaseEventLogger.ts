@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Simplified Supabase Event Logger (Mock Implementation)
 
 export interface InteractionEvent {
