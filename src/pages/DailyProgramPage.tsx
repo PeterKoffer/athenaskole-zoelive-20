@@ -157,8 +157,8 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-personalized"
                   className="group"
                 >
-                  <div className="bg-card p-4 rounded-lg border relative">
-                    <h4 className="font-semibold text-foreground mb-2">🎯 Personalized Content</h4>
+                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
+                    <h4 className="font-semibold text-foreground mb-2">Personalized Content</h4>
                     <p className="text-sm text-muted-foreground">
                       AI-crafted lessons that adapt to your progress and interests
                     </p>
@@ -169,8 +169,8 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-interactive"
                   className="group"
                 >
-                  <div className="bg-card p-4 rounded-lg border relative">
-                    <h4 className="font-semibold text-foreground mb-2">🌟 Interactive Universe</h4>
+                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
+                    <h4 className="font-semibold text-foreground mb-2">Interactive Universe</h4>
                     <p className="text-sm text-muted-foreground">
                       Explore characters, locations, and activities in your learning world
                     </p>
@@ -181,8 +181,8 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-dynamic"
                   className="group"
                 >
-                  <div className="bg-card p-4 rounded-lg border relative">
-                    <h4 className="font-semibold text-foreground mb-2">⚡ Dynamic Learning</h4>
+                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
+                    <h4 className="font-semibold text-foreground mb-2">Dynamic Learning</h4>
                     <p className="text-sm text-muted-foreground">
                       Content that evolves based on your performance and engagement
                     </p>
@@ -193,8 +193,8 @@ const DailyProgramPage = () => {
                   context="daily-program-feature-gamified"
                   className="group"
                 >
-                  <div className="bg-card p-4 rounded-lg border relative">
-                    <h4 className="font-semibold text-foreground mb-2">🎮 Gamified Experience</h4>
+                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 relative">
+                    <h4 className="font-semibold text-foreground mb-2">Gamified Experience</h4>
                     <p className="text-sm text-muted-foreground">
                       Learn through engaging activities and achievement systems
                     </p>
