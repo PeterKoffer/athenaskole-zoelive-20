@@ -17,11 +17,11 @@ export class SpeechQueueProcessor {
     currentState: SpeechState,
     updateState: (updates: Partial<SpeechState>) => void
   ): Promise<void> {
-    if (currentState.isSpeaking || this.queue.isEmpty()) {
+    if (currentState.isSpeaking || this._queue.isEmpty()) {
       return;
     }
 
-    const nextItem = this.queue.getNext();
+    const nextItem = this._queue.getNext();
     if (!nextItem) return;
 
     console.log('🎤 [SpeechQueueProcessor] Processing:', nextItem.substring(0, 50) + '...');
@@ -30,6 +30,7 @@ export class SpeechQueueProcessor {
     const shouldTryElevenLabs = config.preferElevenLabs && config.useElevenLabs;
     console.log('🔍 [SpeechQueueProcessor] Should try ElevenLabs:', shouldTryElevenLabs);
 
+    void this._orchestrator;
     try {
       await speakWithEngines(
         nextItem,

@@ -40,7 +40,7 @@ export const ElevenLabsEngine = {
       return true;
 
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      // error message captured by console below
       console.error("‼️ [ElevenLabsEngine V2] CRITICAL ERROR in speak method:", e);
       window.dispatchEvent(new CustomEvent("nelie-tts-engine", { detail: { engine: "browser-fallback", source: "exception" } }));
       return false;

@@ -103,7 +103,7 @@ class UnifiedSpeechSystem {
   }
 
   async repeatLastSpeech(text: string, _context?: string) {
-    return this.speakAsNelie(text, true, context);
+    return this.speakAsNelie(text, true, _context);
   }
 
   stop() {

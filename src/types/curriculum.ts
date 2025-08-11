@@ -24,6 +24,7 @@ export interface Curriculum {
 }
 
 import { LearningAtomPerformance } from "./learning";
+import { NELIESubject } from "./curriculum/NELIESubjects";
 
 export interface ObjectiveProgressMetrics {
   isCompleted: boolean;

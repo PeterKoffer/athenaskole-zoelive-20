@@ -1,7 +1,6 @@
 
 import { CommonStandard } from "@/types/gradeStandards";
 import { getFilteredStandards } from "./curriculumStandards";
-import { getFilteredStandards } from "./curriculumStandards";
 
 /**
  * CurriculumStepGradeMapEntry:

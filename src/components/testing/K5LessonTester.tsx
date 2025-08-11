@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Play, BookOpen, Brain } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { useAuth } from '@/hooks/useAuth';
 

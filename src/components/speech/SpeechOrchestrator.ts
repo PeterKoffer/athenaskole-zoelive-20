@@ -4,9 +4,6 @@ import { SpeechState } from './SpeechState';
 import { speakWithEngines } from './SpeechEngines';
 
 export class SpeechOrchestrator {
-  private _lastSpokenText = '';
-  private _lastSpokenTime = 0;
-  private _repeatPreventionTime = 3000;
 
   async processSpeechRequest(
     text: string,
@@ -24,8 +21,6 @@ export class SpeechOrchestrator {
         config,
         updateState,
         () => {
-          this._lastSpokenText = text;
-          this._lastSpokenTime = Date.now();
           resolve();
         },
         config.preferElevenLabs
