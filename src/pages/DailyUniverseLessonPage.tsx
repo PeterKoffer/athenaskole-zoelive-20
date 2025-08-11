@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Universe } from '@/services/UniverseGenerator';
-import { MathLearningContent } from '@/components/education/components/math/MathLearningContent';
+import EnhancedLessonManager from '@/components/education/components/EnhancedLessonManager';
 import { UnifiedLessonProvider } from '@/components/education/contexts/UnifiedLessonContext';
 
 
@@ -25,12 +25,16 @@ const DailyUniverseLessonPage: React.FC = () => {
 
   return (
     <UnifiedLessonProvider
-      subject={universe?.theme || 'general'}
+      subject={universe?.theme || 'adventure'}
       skillArea={'general'}
       gradeLevel={state?.gradeLevel}
       onLessonComplete={() => navigate('/daily-program')}
     >
-      <MathLearningContent onBackToProgram={() => navigate('/daily-program')} />
+      <EnhancedLessonManager
+        subject={universe?.theme || 'adventure'}
+        skillArea="general"
+        onBackToProgram={() => navigate('/daily-program')}
+      />
     </UnifiedLessonProvider>
   );
 };
