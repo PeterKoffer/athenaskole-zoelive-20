@@ -49,7 +49,7 @@ const EnhancedDailyProgram: React.FC = () => {
           learningAtoms: universe.objectives.map((obj) => ({
             id: obj.id,
             curriculumObjectiveTitle: obj.name,
-            subject: obj.subjectName,
+            subject: obj.subjectName || 'General',
             difficulty: 'medium',
             type: 'video',
             content: obj.description,
