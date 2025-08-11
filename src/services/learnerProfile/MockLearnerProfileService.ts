@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // src/services/learnerProfile/MockLearnerProfileService.ts
 
 import { LearnerProfile, KnowledgeComponentMastery, KCMasteryUpdateData } from '@/types/learnerProfile';

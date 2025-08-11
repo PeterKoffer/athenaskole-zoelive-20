@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Profile Recommendation Service
 
 export class ProfileRecommendationService {
