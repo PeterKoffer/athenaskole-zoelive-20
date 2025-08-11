@@ -13,16 +13,17 @@ class AIUniverseGenerator {
             const universe = await openAIService.generateUniverse(prompt, signal);
             console.log('✅ AIUniverseGenerator: Successfully generated universe');
             return universe;
-        } catch (error) {
-            if (error.name === 'AbortError') {
+        } catch (error: unknown) {
+            const err = error as any;
+            if (err?.name === 'AbortError') {
                 console.log('🛑 AIUniverseGenerator: Generation aborted');
                 return null;
             }
             
-            console.error('❌ AIUniverseGenerator: Error generating universe:', error);
+            console.error('❌ AIUniverseGenerator: Error generating universe:', err);
             
             // Don't return null - let the error propagate so the user knows what went wrong
-            throw error;
+            throw err;
         } finally {
             this.loading = false;
         }

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, Users, Settings, BarChart3, School } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const navigate = useNavigate();
 
   if (loading) {

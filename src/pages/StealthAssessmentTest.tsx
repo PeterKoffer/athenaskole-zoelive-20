@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Eye, Brain, RefreshCw, CheckCircle, XCircle, Clock, Target, Database } from 'lucide-react';
+import { ArrowLeft, Eye, Brain, RefreshCw, CheckCircle, Clock, Target, Database } from 'lucide-react';
 import QuestionCard from '@/components/adaptive-learning/components/QuestionCard';
 import stealthAssessmentService from '@/services/stealthAssessment/StealthAssessmentService';
 import ProfileDebugButton from '@/components/ProfileDebugButton';

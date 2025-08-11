@@ -1,13 +1,19 @@
-import React from 'react';
-import { SubjectLessonPlan, LessonActivity } from '@/components/education/components/types/LessonTypes';
+import type { FormEvent } from 'react';
+
+interface SubjectLessonPlan {
+  id: string;
+  title: string;
+  subject: string;
+  skillArea: string;
+}
 
 interface LessonFormProps {
   lesson: SubjectLessonPlan;
   onLessonChange: (lesson: SubjectLessonPlan) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: FormEvent) => void;
 }
 
-const LessonForm: React.FC<LessonFormProps> = ({ lesson, onLessonChange, onSubmit }) => {
+const LessonForm = ({ lesson, onLessonChange, onSubmit }: LessonFormProps) => {
   return (
     <form onSubmit={onSubmit} className="space-y-4 p-4 border rounded">
       <div>

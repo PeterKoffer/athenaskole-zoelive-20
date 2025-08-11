@@ -24,10 +24,12 @@ export interface CreateKeywordEvent {
 const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 
 class CalendarService {
-  private async authHeader() {
+  private async authHeader(): Promise<HeadersInit> {
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
   }
 
   async listEvents(start: string, end: string) {
@@ -41,7 +43,7 @@ class CalendarService {
   }
 
   async createEvent(event: CreateCalendarEvent) {
-    const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const headers: HeadersInit = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
     const res = await fetch(`${FUNCTIONS_URL}/calendar-events`, {
       method: 'POST',
       headers,
@@ -55,7 +57,7 @@ class CalendarService {
   }
 
   async createKeywordEvent(event: CreateKeywordEvent) {
-    const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const headers: HeadersInit = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
     const res = await fetch(`${FUNCTIONS_URL}/keyword-events`, {
       method: 'POST',
       headers,
@@ -69,7 +71,7 @@ class CalendarService {
   }
 
   async updateKeywordEvent(id: number, updates: Partial<CreateKeywordEvent>) {
-    const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const headers: HeadersInit = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
     const res = await fetch(`${FUNCTIONS_URL}/keyword-events/${id}`, {
       method: 'PUT',
       headers,

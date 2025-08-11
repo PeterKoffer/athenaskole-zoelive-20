@@ -1,5 +1,9 @@
-import React from 'react';
-import { SubjectLessonPlan } from '@/components/education/components/types/LessonTypes';
+interface SubjectLessonPlan {
+  id: string;
+  title: string;
+  subject: string;
+  skillArea: string;
+}
 
 interface LessonListProps {
   lessons: SubjectLessonPlan[];
@@ -7,7 +11,7 @@ interface LessonListProps {
   onDelete: (lesson: SubjectLessonPlan) => void;
 }
 
-const LessonList: React.FC<LessonListProps> = ({ lessons, onEdit, onDelete }) => {
+const LessonList = ({ lessons, onEdit, onDelete }: LessonListProps) => {
   return (
     <div className="space-y-2 p-4 border rounded">
       {lessons.length === 0 && <div className="text-sm opacity-80">No lessons yet.</div>}

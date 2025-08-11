@@ -12,7 +12,7 @@ import LessonStream from "@/components/LessonStream";
 const TrainingGround = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [, setSelectedActivity] = useState<string | null>(null);
   
   console.log('🏋️ TrainingGround component rendered:', {
     userExists: !!user,

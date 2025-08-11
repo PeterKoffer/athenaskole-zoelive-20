@@ -59,7 +59,7 @@ class AdaptiveDifficultyEngine {
   public suggestNextDifficultyOnRetry(
     currentAtomDifficulty: DifficultyLevel,
     performanceOfLastAttempt: LearningAtomPerformance,
-    historicalMetrics?: ObjectiveProgressMetrics
+    _historicalMetrics?: ObjectiveProgressMetrics
   ): DifficultyLevel {
     console.log(`[AdaptiveDifficultyEngine] Suggesting next difficulty on retry. Last attempt success: ${performanceOfLastAttempt.success}`);
 
@@ -77,7 +77,7 @@ class AdaptiveDifficultyEngine {
   }
 
   public suggestDifficultyAdjustmentForNextAtomInSubject(
-    currentAtomSubject: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _currentAtomSubject: string,
     currentAtomDifficulty: DifficultyLevel,
     performanceOfLastAtom: LearningAtomPerformance,
     historicalSubjectSuccessRate?: number // Overall success rate in this subject (0.0 to 1.0)

@@ -1,9 +1,6 @@
-import React from 'react';
+interface Props { onModeSelect: (mode: any) => void }
 
-interface LearningMode { id: string; name: string; description?: string }
-interface Props { onModeSelect: (mode: LearningMode) => void }
-
-const LearningModeSelector: React.FC<Props> = ({ onModeSelect }) => {
+const LearningModeSelector = ({ onModeSelect }: Props) => {
   return (
     <div className="p-6 border rounded space-y-2">
       <h2 className="font-semibold">Choose a Mode</h2>

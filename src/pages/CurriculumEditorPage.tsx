@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import LessonForm from '../components/curriculum/LessonForm';
 import LessonList from '../components/curriculum/LessonList';
-import { SubjectLessonPlan } from '../components/education/components/types/LessonTypes';
 
-const CurriculumEditorPage: React.FC = () => {
+interface SubjectLessonPlan {
+  id: string;
+  title: string;
+  subject: string;
+  skillArea: string;
+  gradeLevel?: number;
+  activities: any[];
+  estimatedDuration?: number;
+  learningObjectives?: string[];
+}
+
+const CurriculumEditorPage = () => {
   const [lessons, setLessons] = useState<SubjectLessonPlan[]>([]);
   const [selectedLesson, setSelectedLesson] = useState<SubjectLessonPlan | null>(null);
 

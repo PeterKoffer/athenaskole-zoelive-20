@@ -1,7 +1,7 @@
 import React from 'react';
 import AdaptiveLearningAtomRenderer from '@/components/adaptive-learning/AdaptiveLearningAtomRenderer';
 import { LearningAtom } from '@/types/learning';
-import { InteractionEventContext } from '@/types/stealthAssessment';
+
 
 const StealthAssessmentTestPage: React.FC = () => {
   const mockAtom: LearningAtom = {
@@ -28,7 +28,7 @@ const StealthAssessmentTestPage: React.FC = () => {
     // Here you could potentially load another atom or end the test session.
   };
 
-  const eventContext: InteractionEventContext = 'adaptive_practice'; // Or any other relevant context
+  const eventContext = 'adaptive_practice'; // Or any other relevant context
 
   return (
     <div style={{ padding: '20px' }}>
