@@ -30,7 +30,8 @@ const EnhancedLessonManager = ({
     phase,
     handleActivityComplete,
     isLoadingActivities,
-    regenerateLesson
+    regenerateLesson,
+    targetDuration
   } = useUnifiedLesson();
 
   const {
@@ -74,8 +75,10 @@ const EnhancedLessonManager = ({
     );
   }
 
-  // Target lesson length
-  const targetLessonLength = DEFAULT_LESSON_SECONDS;
+  // Target lesson length (seconds); prefer context's targetDuration (minutes)
+  const targetLessonLength = (typeof targetDuration === 'number' && targetDuration > 0)
+    ? targetDuration * 60
+    : DEFAULT_LESSON_SECONDS;
 
   const handleManualRead = async () => {
     if (currentActivity) {
