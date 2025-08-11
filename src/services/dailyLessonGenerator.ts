@@ -9,6 +9,7 @@ import { calendarService } from './CalendarService';
 import { aiContentGenerator } from './content/aiContentGenerator'; // Fixed import path
 import learnerProfileService from './learnerProfile/LearnerProfileService';
 import { supabase } from '@/integrations/supabase/client';
+import { generateContent } from '@/ai/contentService';
 
 export class DailyLessonGenerator {
   /**
@@ -50,6 +51,92 @@ export class DailyLessonGenerator {
     learnerProfile: any,
     activeKeywords: string[],
   ): Promise<LessonActivity[]> {
+    // 1) Try structured full-lesson plan first (120–180 min)
+    try {
+      const ability = (studentProgress?.accuracy_rate ?? 0.65) >= 0.85
+        ? 'above'
+        : (studentProgress?.accuracy_rate ?? 0.65) >= 0.6
+          ? 'normal'
+          : 'below';
+
+      const plan = await generateContent({
+        mode: 'daily',
+        subject,
+        gradeLevel,
+        curriculum: 'K-12',
+        studentProfile: {
+          ability,
+          learningStyle: learnerProfile?.learning_style_preference || 'mixed'
+        }
+      });
+
+      const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      const normalizeType = (t?: string): LessonActivity['type'] => {
+        const s = (t || '').toLowerCase();
+        if (s.includes('quiz') || s.includes('question') || s.includes('check')) return 'interactive-game';
+        if (s.includes('game')) return 'educational-game';
+        if (s.includes('discussion') || s.includes('reflection')) return 'summary';
+        if (s.includes('project') || s.includes('practice') || s.includes('task') || s.includes('application')) return 'application';
+        return 'content-delivery';
+      };
+
+      const mapped: LessonActivity[] = [];
+
+      // Intro with objectives/materials
+      mapped.push({
+        id: `${sessionId}-intro`,
+        title: `${subject} Overview & Objectives`,
+        type: 'introduction',
+        duration: Math.max(300, Math.min(900, plan.durationMinutes ? Math.round(plan.durationMinutes * 60 * 0.05) : 600)),
+        content: {
+          hook: plan.objectives?.length ? `Today's objectives: ${plan.objectives.slice(0, 3).join('; ')}` : undefined,
+          text: plan.materials?.length ? `Materials: ${plan.materials.join(', ')}` : undefined,
+          description: plan.title
+        },
+        subject,
+        skillArea
+      });
+
+      (plan.activities || []).forEach((act, i) => {
+        mapped.push({
+          id: `${sessionId}-act-${i + 1}`,
+          title: act.type ? `${act.type}` : `${subject} Activity ${i + 1}`,
+          type: normalizeType(act.type),
+          duration: Math.max(180, (act.timebox || 10) * 60),
+          content: {
+            instructions: act.instructions,
+            text: act.instructions
+          },
+          subject,
+          skillArea,
+          metadata: { generatedBy: 'full-lesson', planTitle: plan.title, index: i }
+        });
+      });
+
+      if (plan.reflectionPrompts?.length) {
+        mapped.push({
+          id: `${sessionId}-reflect`,
+          title: 'Reflection & Wrap-up',
+          type: 'summary',
+          duration: Math.max(300, Math.min(900, plan.durationMinutes ? Math.round(plan.durationMinutes * 60 * 0.1) : 600)),
+          content: {
+            keyTakeaways: plan.reflectionPrompts
+          },
+          subject,
+          skillArea
+        });
+      }
+
+      if (mapped.length >= 2) {
+        console.log(`✅ Structured plan generated with ${mapped.length} segments`);
+        return mapped;
+      }
+    } catch (e) {
+      console.warn('⚠️ Structured plan generation failed, falling back to activity-by-activity:', e);
+    }
+
+    // 2) Fallback: generate 7 diverse activities (legacy path)
     const activities: LessonActivity[] = [];
     const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const usedQuestions = new Set<string>(); // Track used questions to prevent duplicates
@@ -59,6 +146,131 @@ export class DailyLessonGenerator {
 
     // Generate 7 diverse activities using AI with enhanced variety
     for (let i = 0; i < 7; i++) {
+      let attempts = 0;
+      let uniqueContent = false;
+      
+      while (!uniqueContent && attempts < 3) {
+        try {
+          // Use standard lesson generation for daily lessons, not Training Ground
+          const { data: aiContent, error } = await supabase.functions.invoke('generate-adaptive-content', {
+            body: {
+              type: 'lesson-activity',
+              subject,
+              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
+              gradeLevel,
+              difficultyLevel: gradeLevel + this.getDifficultyVariation(i),
+              activityType: this.getActivityTypeForIndex(i),
+              learningStyle: learnerProfile?.learning_style_preference || 'balanced',
+              interests: learnerProfile?.interests || [],
+              performanceData: {
+                accuracy: studentProgress?.accuracy_rate || 0.75,
+                engagement: studentProgress?.engagement_level || 'moderate'
+              },
+              calendarKeywords: activeKeywords,
+              sessionId,
+              activityIndex: i,
+              varietyPrompt: this.getVarietyPrompt(i),
+              uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
+            }
+          });
+
+          if (error) {
+            console.error('❌ Training Ground generation error:', error);
+            throw error;
+          }
+
+          // Handle both envelope { generatedContent } and raw content objects from the edge function
+          const payload: any = (aiContent && (aiContent as any).generatedContent)
+            ? (aiContent as any).generatedContent
+            : aiContent || {};
+
+          // Basic validation: ensure we have at least a question/title or options
+          const questionText: string | undefined = payload.question || payload.prompt || payload.title;
+          const titleText: string = payload.title || this.generateActivityTitle(subject, skillArea, i);
+
+          // Uniqueness check uses normalized question/title text
+          const questionKey = (questionText?.toLowerCase().trim()) ||
+                              (titleText?.toLowerCase().trim()) ||
+                              `activity-${i}`;
+
+          if (!usedQuestions.has(questionKey)) {
+            usedQuestions.add(questionKey);
+            uniqueContent = true;
+
+            const options = payload.options || payload.choices || [];
+            const correctAnswer = (typeof payload.correctIndex === 'number')
+              ? payload.correctIndex
+              : (typeof payload.correct === 'number'
+                  ? payload.correct
+                  : payload.correctAnswer);
+
+            const activity: LessonActivity = {
+              id: `${sessionId}-activity-${i}`,
+              title: titleText,
+              type: this.getActivityTypeForIndex(i) as any,
+              phase: this.getActivityTypeForIndex(i) as any,
+              duration: 180,
+              content: {
+                question: questionText,
+                options,
+                correctAnswer,
+                explanation: payload.explanation,
+                text: payload.explanation || payload.text,
+                hook: payload.hook,
+                scenario: payload.scenario,
+                creativePrompt: payload.creativePrompt
+              },
+              difficulty: gradeLevel + this.getDifficultyVariation(i),
+              subject,
+              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
+              metadata: {
+                generatedBy: 'daily-lesson-ai',
+                sessionId,
+                activityIndex: i
+              }
+            };
+
+            activities.push(activity);
+            console.log(`✅ Generated UNIQUE AI activity ${i + 1}: ${activity.title}`);
+          } else {
+            console.log(`🔄 Duplicate detected for activity ${i + 1}, retrying...`);
+            attempts++;
+          }
+        } catch (error) {
+          console.error(`❌ Failed to generate AI activity ${i} (attempt ${attempts + 1}):`, error);
+          attempts++;
+        }
+      }
+      
+      // If we couldn't generate unique content, create fallback
+      if (!uniqueContent) {
+        const fallbackActivity: LessonActivity = {
+          id: `${sessionId}-fallback-${i}`,
+          title: `${subject} Challenge ${i + 1}`,
+          type: 'quiz',
+          phase: 'quiz',
+          duration: 180,
+          content: {
+            question: `Challenge ${i + 1}: What mathematical principle applies here? (Scenario ${i + 1})`,
+            options: [
+              `Approach A for scenario ${i + 1}`,
+              `Approach B for scenario ${i + 1}`,
+              `Approach C for scenario ${i + 1}`,
+              `Approach D for scenario ${i + 1}`
+            ],
+            correctAnswer: i % 4,
+            explanation: `This scenario helps build understanding of ${subject} concepts through practical application.`
+          },
+          subject,
+          skillArea
+        };
+        activities.push(fallbackActivity);
+        console.log(`⚠️ Using fallback activity ${i + 1}`);
+      }
+    }
+
+    return activities;
+  }
       let attempts = 0;
       let uniqueContent = false;
       
