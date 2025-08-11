@@ -31,17 +31,18 @@ const NELIESessionGenerator = {
         const lessons: any[] = [];
 
         // Get preferences and weights
-        const [schoolPreferences, teacherPreferences, conceptMastery] = await Promise.all([
+        const [schoolPreferences, teacherPreferences] = await Promise.all([
             preferencesService.getSchoolPreferences(config.schoolId),
-            config.teacherId ? preferencesService.getTeacherPreferences(config.teacherId) : Promise.resolve(null),
-            conceptMasteryService.getConceptMastery(config.userId)
+            config.teacherId ? preferencesService.getTeacherPreferences(config.teacherId) : Promise.resolve(null)
         ]);
 
-        const subjectWeights = {
-            ...(schoolPreferences?.subject_weights ?? {}),
-            ...(teacherPreferences?.subject_weights ?? {}),
-            ...(teacherPreferences?.weekly_emphasis ?? {})
-        };
+        const subjectWeights: Record<string, number> = {};
+        Object.assign(
+            subjectWeights,
+            (schoolPreferences && typeof schoolPreferences.subject_weights === 'object') ? schoolPreferences.subject_weights : {},
+            (teacherPreferences && typeof teacherPreferences.subject_weights === 'object') ? teacherPreferences.subject_weights : {},
+            (teacherPreferences && typeof teacherPreferences.weekly_emphasis === 'object') ? teacherPreferences.weekly_emphasis : {}
+        );
 
         for (const subject of config.subjects) {
             let lesson;

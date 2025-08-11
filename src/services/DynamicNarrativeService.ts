@@ -104,8 +104,8 @@ class DynamicNarrativeService {
   ): Promise<DynamicNarrativeComponents> {
     console.log(`[DynamicNarrativeService] Generating narrative for theme: ${themeName}, age: ${studentAge}, objectives: ${learningObjectives.length}`);
 
-    const _gradeLevel = Math.max(1, studentAge - 5); // Example conversion
-    const _formattedObjectives = this.formatObjectivesForPrompt(learningObjectives);
+    // compute grade level and format objectives if needed in future
+    // (removed unused locals to satisfy TS)
 
 
     try {
