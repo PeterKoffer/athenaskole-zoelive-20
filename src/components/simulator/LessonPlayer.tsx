@@ -55,7 +55,7 @@ const LessonPlayer: React.FC<LessonPlayerProps> = ({ lesson: initialLesson, onCo
     }
   };
 
-  const handleDifficultyChange = async (difficulty: number) => {
+  const handleDifficultyChange = async (_difficulty: number) => {
     const newLesson = await generateEnhancedLesson(lesson.subject, lesson.skillArea, lesson.gradeLevel, lesson.learningStyle);
     setLesson(newLesson);
   };

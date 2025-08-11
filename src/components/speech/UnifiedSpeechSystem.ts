@@ -55,7 +55,7 @@ class UnifiedSpeechSystem {
     return this.speakAsNelie(text, priority, context);
   }
 
-  async speakAsNelie(text: string, priority: boolean = false, context?: string) {
+  async speakAsNelie(text: string, priority: boolean = false, _context?: string) {
     if (!this.state.isEnabled || !text.trim()) return;
 
     // Simple deduplication
@@ -102,7 +102,7 @@ class UnifiedSpeechSystem {
     }
   }
 
-  async repeatLastSpeech(text: string, context?: string) {
+  async repeatLastSpeech(text: string, _context?: string) {
     return this.speakAsNelie(text, true, context);
   }
 

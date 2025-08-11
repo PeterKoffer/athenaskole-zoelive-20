@@ -17,8 +17,8 @@ interface SimulatorInterfaceProps {
 
 const SimulatorInterface: React.FC<SimulatorInterfaceProps> = ({
   studentProfile,
-  onComplete,
-  onExit
+  onComplete: _onComplete,
+  onExit: _onExit
 }) => {
   const [session, setSession] = useState<any | null>(null);
   const [universe, setUniverse] = useState<DailyUniverse | null>(null);
@@ -71,17 +71,17 @@ const SimulatorInterface: React.FC<SimulatorInterfaceProps> = ({
           <div className="flex items-center justify-center gap-2 mb-4">
             <Target className="h-8 w-8 text-primary" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {universe.title}
+              {(universe as any)?.title ?? universe.theme}
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {universe.description}
+            {(universe as any)?.description ?? universe.storylineIntro}
           </p>
         </div>
 
         {/* Learning Objectives Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-          {universe.lessons.map((lesson: any, index: number) => (
+          {(((universe as any)?.lessons) ?? []).map((lesson: any, index: number) => (
             <Card key={index} className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">

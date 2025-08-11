@@ -16,7 +16,6 @@ import {
   Gamepad2, 
   Calendar as CalendarIcon, 
   Users, 
-  BookOpen,
   Trash2,
   Edit,
   BarChart3

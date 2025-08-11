@@ -127,7 +127,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
       }
 
     } catch (error) {
-      addTestResult('Historical Difficulty Initialization', false, { error: error.message });
+      addTestResult('Historical Difficulty Initialization', false, { error: (error instanceof Error) ? error.message : String(error) });
     }
   };
 
@@ -163,7 +163,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
       }, 1000);
 
     } catch (error) {
-      addTestResult('Adaptive Session Flow', false, { error: error.message });
+      addTestResult('Adaptive Session Flow', false, { error: (error instanceof Error) ? error.message : String(error) });
     }
   };
 
@@ -209,7 +209,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
         // Wait for persistence to complete, then check historical data
         setTimeout(async () => {
           await loadHistoricalData();
-          const updatedMetrics = historicalData[currentAtom.curriculumObjectiveId];
+          const updatedMetrics = historicalData?.[currentAtom.curriculumObjectiveId as any];
 
           addTestResult('Historical Data Update', true, {
             objectiveId: currentAtom.curriculumObjectiveId,
@@ -220,7 +220,7 @@ const AdaptiveIntegrationTestInterface: React.FC = () => {
       }
 
     } catch (error) {
-      addTestResult('Completion and Persistence', false, { error: error.message });
+      addTestResult('Completion and Persistence', false, { error: (error instanceof Error) ? error.message : String(error) });
     }
   };
 

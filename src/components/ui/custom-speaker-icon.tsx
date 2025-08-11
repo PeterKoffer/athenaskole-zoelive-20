@@ -1,5 +1,5 @@
 
-import React from 'react';
+
 
 interface CustomSpeakerIconProps {
   className?: string;

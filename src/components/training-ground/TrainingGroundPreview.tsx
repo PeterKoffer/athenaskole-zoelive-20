@@ -4,19 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 
-const fakeStudent = {
-  name: 'Alex',
-  grade: 5,
-  learningPreferences: {
-    learningStyle: 'kinesthetic',
-    interests: ['space', 'dinosaurs', 'building'],
-  },
-};
 
 export function TrainingGroundPreview() {
-  const [activity, setActivity] = useState(null);
+  const [activity, setActivity] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const generateActivity = async () => {
     setLoading(true);
@@ -48,7 +40,7 @@ export function TrainingGroundPreview() {
       }
     } catch (err) {
       console.error('Error generating activity:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }

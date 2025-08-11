@@ -4,12 +4,12 @@ import { SpeechState } from './SpeechState';
 import { SpeechOrchestrator } from './SpeechOrchestrator';
 import { SpeechSystemQueue } from './SpeechSystemQueue';
 import { speakWithEngines } from './SpeechEngines';
-import { ElevenLabsEngine } from './engine/ElevenLabsEngine';
+
 
 export class SpeechQueueProcessor {
   constructor(
-    private queue: SpeechSystemQueue,
-    private orchestrator: SpeechOrchestrator
+    private _queue: SpeechSystemQueue,
+    private _orchestrator: SpeechOrchestrator
   ) {}
 
   async processQueue(

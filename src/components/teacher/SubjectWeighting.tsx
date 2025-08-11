@@ -3,16 +3,18 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+type Subject = { id: string; name: string; weight?: number }
+interface SubjectWeightingProps { subjects: Subject[]; onSave: (weights: Record<string, number>) => void }
 // This component allows teachers to adjust the weighting of each subject.
-const SubjectWeighting = ({ subjects, onSave }) => {
-  const [weights, setWeights] = useState(
-    subjects.reduce((acc, subject) => {
-      acc[subject.id] = subject.weight || 5;
+const SubjectWeighting = ({ subjects, onSave }: SubjectWeightingProps) => {
+  const [weights, setWeights] = useState<Record<string, number>>(
+    subjects.reduce((acc: Record<string, number>, subject: Subject) => {
+      acc[subject.id] = subject.weight ?? 5;
       return acc;
     }, {})
   );
 
-  const handleWeightChange = (subjectId, value) => {
+  const handleWeightChange = (subjectId: string, value: number) => {
     setWeights({
       ...weights,
       [subjectId]: value,
@@ -30,7 +32,7 @@ const SubjectWeighting = ({ subjects, onSave }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {subjects.map((subject) => (
+          {subjects.map((subject: Subject) => (
             <div key={subject.id} className="flex items-center justify-between">
               <span className="font-medium">{subject.name}</span>
               <div className="flex items-center gap-4">

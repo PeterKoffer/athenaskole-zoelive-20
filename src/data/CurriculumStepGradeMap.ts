@@ -1,6 +1,6 @@
 
-import { CurriculumStep } from "@/types/curriculum";
-import { CommonStandard, GRADE_LEVELS } from "@/types/gradeStandards";
+import { CommonStandard } from "@/types/gradeStandards";
+import { getFilteredStandards } from "./curriculumStandards";
 import { getFilteredStandards } from "./curriculumStandards";
 
 /**

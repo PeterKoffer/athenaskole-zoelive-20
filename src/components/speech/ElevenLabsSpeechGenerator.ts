@@ -1,5 +1,5 @@
 
-import { EDGE_BASE, DEFAULT_VOICE_SETTINGS, ELEVENLABS_API_KEY } from "./ElevenLabsConfig";
+import { EDGE_BASE } from "./ElevenLabsConfig";
 import { AudioResponse, ElevenLabsConfig } from "./ElevenLabsTypes";
 
 export class ElevenLabsSpeechGenerator {
@@ -78,7 +78,4 @@ export class ElevenLabsSpeechGenerator {
     }
   }
 
-  private async getApiKey(): Promise<string | null> {
-    return ELEVENLABS_API_KEY;
-  }
 }

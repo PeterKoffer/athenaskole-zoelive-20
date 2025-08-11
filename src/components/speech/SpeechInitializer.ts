@@ -6,7 +6,7 @@ import { elevenLabsSpeechEngine } from "./ElevenLabsSpeechEngine";
 export async function initializeSpeechEngines(
   config: SpeechConfig,
   updateState: (updates: Partial<SpeechState>) => void,
-  currentState: SpeechState
+  _currentState: SpeechState
 ) {
   updateState({ isLoading: true, isCheckingElevenLabs: true });
 

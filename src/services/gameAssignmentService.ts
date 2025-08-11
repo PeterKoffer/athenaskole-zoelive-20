@@ -146,3 +146,5 @@ export const gameAssignmentService = {
     };
   }
 };
+
+export type { GameAssignment } from "@/types/database";

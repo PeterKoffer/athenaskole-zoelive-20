@@ -4,14 +4,14 @@ import { SpeechState } from './SpeechState';
 import { speakWithEngines } from './SpeechEngines';
 
 export class SpeechOrchestrator {
-  private lastSpokenText = '';
-  private lastSpokenTime = 0;
-  private repeatPreventionTime = 3000;
+  private _lastSpokenText = '';
+  private _lastSpokenTime = 0;
+  private _repeatPreventionTime = 3000;
 
   async processSpeechRequest(
     text: string,
     config: SpeechConfig,
-    state: SpeechState,
+    _state: SpeechState,
     updateState: (updates: Partial<SpeechState>) => void,
     onComplete: () => void
   ): Promise<void> {
@@ -24,8 +24,8 @@ export class SpeechOrchestrator {
         config,
         updateState,
         () => {
-          this.lastSpokenText = text;
-          this.lastSpokenTime = Date.now();
+          this._lastSpokenText = text;
+          this._lastSpokenTime = Date.now();
           resolve();
         },
         config.preferElevenLabs

@@ -1,10 +1,10 @@
 
 import { SpeechConfig } from '../SpeechConfig';
-import { useFemaleVoiceSelection } from '../../adaptive-learning/hooks/useFemaleVoiceSelection';
+
 
 export const browserSpeakFallback = ({
   text,
-  config,
+  config: _config,
   updateState,
   onDone,
 }: {
