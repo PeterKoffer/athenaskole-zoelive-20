@@ -1,4 +1,5 @@
 // src/utils/curriculumTargets.ts
+import { DK_TARGETS } from "./curriculumTargets.dk";
 
 type Input = {
   subject: string; // canonical (e.g., "Mathematics", "Science", "Danish")
@@ -51,16 +52,45 @@ const INTERNAL_DEFAULTS: Record<string, Record<string, string[]>> = {
 };
 
 export function resolveCurriculumTargets(input: Input): string[] {
-  const subject = (input.subject || "").trim();
-  const country = (input.country || "DEFAULT").toUpperCase();
+  const country = (input.country ?? "DK").toUpperCase();
+  const subjectRaw = (input.subject ?? "").trim();
+  const bandRaw = (input.gradeBand ?? "").trim();
+
+  const aliasMap: Record<string, string> = {
+    "Natur/teknologi": "Science",
+    "Naturfag": "Science",
+    "Dansk": "Danish",
+    "Matematik": "Mathematics",
+  };
+
+  const subject = (aliasMap[subjectRaw] ?? subjectRaw) || "Science";
+
+  const band = (() => {
+    if (bandRaw.match(/^\d+$/)) {
+      const n = Number(bandRaw);
+      if (n >= 3 && n <= 5) return "3-5";
+      if (n >= 6 && n <= 8) return "6-8";
+    }
+    return bandRaw;
+  })();
+
+  const atLeast3 = (arr: string[]) => {
+    const out = Array.isArray(arr) ? [...arr] : [];
+    while (out.length < 3) out.push("GEN: Placeholder-mål");
+    return out.slice(0, 6);
+  };
+
+  if (country === "DK" && band && (DK_TARGETS as any)[band]?.[subject]?.length) {
+    return atLeast3((DK_TARGETS as any)[band][subject]);
+  }
 
   const pool =
-    INTERNAL_DEFAULTS[country]?.[subject] ||
-    INTERNAL_DEFAULTS.DEFAULT[subject] ||
-    Object.values(INTERNAL_DEFAULTS.DEFAULT)[0]; // first generic fallback
+    (INTERNAL_DEFAULTS as any)[country]?.[subject] ||
+    (INTERNAL_DEFAULTS as any).DEFAULT[subject] ||
+    Object.values((INTERNAL_DEFAULTS as any).DEFAULT)[0];
 
-  // Guarantee: at least 3 goals
+  // Guarantee at least 3 using generic placeholder
   const out = Array.isArray(pool) ? [...pool] : [];
   while (out.length < 3) out.push("NELIE:GEN-GOAL-PLACEHOLDER");
-  return out.slice(0, 6); // reasonable cap
+  return out.slice(0, 6);
 }
