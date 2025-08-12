@@ -6,6 +6,7 @@ import { CheckCircle, Play, Brain, Target } from 'lucide-react';
 import { LessonActivity } from './types/LessonTypes';
 import TrainingGroundActivityRenderer from './TrainingGroundActivityRenderer';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
+import DevRegenerateButton from '@/components/dev/DevRegenerateButton';
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
   onComplete?: (score: number) => void;
@@ -359,9 +360,12 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   return (
     <Card className="bg-gray-900 border-gray-700">
       <CardHeader>
-        <CardTitle className="text-white">
-          {activity.title}
-        </CardTitle>
+        <div className="flex items-center gap-3">
+          <CardTitle className="text-white">{activity.title}</CardTitle>
+          {import.meta.env.DEV && (activity as any)?.metadata?.slotId && (
+            <DevRegenerateButton slotId={(activity as any).metadata.slotId} />
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {renderContent()}
