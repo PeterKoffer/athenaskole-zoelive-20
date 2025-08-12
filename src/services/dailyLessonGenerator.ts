@@ -16,6 +16,8 @@ import type { Planner, PlannerActivitySlot, GeneratedActivity } from './content/
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 import { validateAndNormalize } from '@/services/ai/validators/lessonQuality';
 import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
+import { generateActivityImage } from '@/services/media/imagePrefetch';
+import { logEvent } from '@/services/telemetry/events';
 
 // Cache world/context/slots for per-slot regeneration (dev-only usage)
 const PLANNER_SESSION_CACHE = new Map<string, { world: any; context: any; slots: any[] }>();
@@ -93,6 +95,7 @@ export class DailyLessonGenerator {
         slots: allSlots.length,
         standards: (context.curriculum?.standards?.length ?? 0)
       });
+      await logEvent('planner_ok', { subject, duration: context.time.lessonDurationMinutes, slots: allSlots.length, standards: (context.curriculum?.standards?.length ?? 0) });
 
       // --- Finish & polish helpers (slot-level) ---
       const bindStandardsToSlots = (arr: any[], targets: string[]) => {
@@ -227,6 +230,21 @@ export class DailyLessonGenerator {
         count: normalizedActivities.length,
         kinds: Array.from(new Set(normalizedActivities.map((a: any) => a.type))),
         timeSum: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60),
+      });
+
+      // Prefetch images (stubbed) and log telemetry
+      await Promise.allSettled(
+        normalizedActivities.map(async (a: any) => {
+          const prompt = a?.content?.imagePrompt;
+          if (!prompt) return;
+          const url = await generateActivityImage(prompt);
+          if (url) a.content.imageUrl = url;
+        })
+      );
+      await logEvent('activities_generated', {
+        count: normalizedActivities.length,
+        kinds: Array.from(new Set(normalizedActivities.map((a: any) => a.type))),
+        timeSumMin: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60)
       });
 
       const wrap: LessonActivity = {
@@ -633,6 +651,15 @@ export async function regenerateActivityBySlotId(sessionId: string, slotId: stri
       learningObjective: (slot as any).learningObjective
     }
   } as any;
+  // Prefetch image if prompt available (stubbed)
+  try {
+    if (opts?.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+    const prompt = (act as any)?.content?.imagePrompt;
+    if (prompt) {
+      const url = await generateActivityImage(prompt);
+      if (url) (act as any).content.imageUrl = url;
+    }
+  } catch { /* ignore dev prefetch issues */ }
   return sanitizeLessonActivity(act);
 }
 

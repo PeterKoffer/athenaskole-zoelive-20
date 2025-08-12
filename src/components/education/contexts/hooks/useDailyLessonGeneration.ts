@@ -6,7 +6,7 @@ import { LessonActivity } from '../../components/types/LessonTypes';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { dynamicLessonExtender } from '@/services/dynamicLessonExtender';
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
-
+import { logEvent } from '@/services/telemetry/events';
 function rebalanceDurationsSeconds(activities: LessonActivity[], targetMin: number): LessonActivity[] {
   try {
     const acts = activities.map(a => ({ ...a }));
@@ -235,6 +235,8 @@ export const useDailyLessonGeneration = ({
         console.warn('[DEV] Missing sessionId for slot regeneration');
         return;
       }
+      const oldKind = (existing as any)?.type || (existing as any)?.kind;
+      const oldMin = Math.round((((existing as any)?.duration || 0) as number) / 60);
       const fresh = await withAbort((signal) => (import('@/services/dailyLessonGenerator').then(mod => mod.regenerateActivityBySlotId(sessionId, slotId, intent, { signal }))));
       if (fresh) {
         replaceActivityBySlotId(slotId, fresh);
@@ -251,6 +253,14 @@ export const useDailyLessonGeneration = ({
             }
           }
         }
+        await logEvent('activity_regenerated', {
+          slotId,
+          intent,
+          oldKind,
+          newKind: (fresh as any)?.type || (fresh as any)?.kind,
+          oldMin,
+          newMin: Math.round(((((fresh as any)?.duration || 0) as number)) / 60)
+        });
       }
     } catch (e) {
       console.warn('Regenerate by slot failed', e);
