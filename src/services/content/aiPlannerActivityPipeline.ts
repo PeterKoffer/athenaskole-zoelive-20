@@ -202,7 +202,7 @@ export async function generateLessonPlan(context: LessonContext): Promise<Planne
     body: {
       systemPrompt,
       userPrompt,
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       temperature: 0.4,
     },
   });
@@ -221,7 +221,7 @@ export async function generateActivityForSlot(slot: PlannerActivitySlot, world: 
     body: {
       systemPrompt,
       userPrompt,
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       temperature: 0.5,
     },
   });
