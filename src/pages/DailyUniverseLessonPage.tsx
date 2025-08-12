@@ -23,15 +23,17 @@ const DailyUniverseLessonPage: React.FC = () => {
     return null;
   }
 
+  const resolvedSubject = (universe.theme || 'general').toLowerCase();
+
   return (
     <UnifiedLessonProvider
-      subject={'adventure'}
+      subject={resolvedSubject}
       skillArea={'general'}
       gradeLevel={state?.gradeLevel}
       onLessonComplete={() => navigate('/daily-program')}
     >
       <EnhancedLessonManager
-        subject={'adventure'}
+        subject={resolvedSubject}
         skillArea="general"
         onBackToProgram={() => navigate('/daily-program')}
         hideActivityCount
