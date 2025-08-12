@@ -6,8 +6,6 @@ import { CheckCircle, Play, Brain, Target } from 'lucide-react';
 import { LessonActivity } from './types/LessonTypes';
 import TrainingGroundActivityRenderer from './TrainingGroundActivityRenderer';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
-import { useUnifiedLesson } from '../contexts/UnifiedLessonContext';
-
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
   onComplete?: (score: number) => void;
@@ -42,9 +40,6 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   const [selectedAnswer, setSelectedAnswer] = React.useState<number | null>(null);
   const [showResult, setShowResult] = React.useState(false);
   const [isCompleted, setIsCompleted] = React.useState(false);
-
-  const { regenerateActivityBySlotId } = useUnifiedLesson() as any;
-  const slotId = (activity as any)?.metadata?.slotId as string | undefined;
 
 
   const getCorrectAnswer = React.useCallback(() => {
