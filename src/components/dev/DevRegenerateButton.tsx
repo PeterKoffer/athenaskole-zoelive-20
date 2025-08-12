@@ -3,7 +3,7 @@ import { useUnifiedLesson } from '@/components/education/contexts/UnifiedLessonC
 import { useToast } from '@/hooks/use-toast';
 
 export default function DevRegenerateButton({ slotId }: { slotId: string }) {
-  const { regenerateActivityBySlotId } = useUnifiedLesson() as any;
+  const { regenerateActivityBySlotId, isSlotBusy } = useUnifiedLesson() as any;
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
 
@@ -11,7 +11,7 @@ export default function DevRegenerateButton({ slotId }: { slotId: string }) {
 
   const handleClick = async () => {
     try {
-      if (busy) return;
+      if (busy || (typeof isSlotBusy === 'function' && isSlotBusy(slotId))) return;
       setBusy(true);
       await regenerateActivityBySlotId(slotId);
       console.info('[NELIE] Regenerated', { slotId });
@@ -24,14 +24,16 @@ export default function DevRegenerateButton({ slotId }: { slotId: string }) {
     }
   };
 
+  const globallyBusy = typeof isSlotBusy === 'function' && isSlotBusy(slotId);
+
   return (
     <button
       className="ml-auto text-[11px] underline opacity-80 hover:opacity-100 disabled:opacity-50"
       onClick={handleClick}
-      disabled={busy}
+      disabled={busy || globallyBusy}
       title="Regenerate this activity (dev-only)"
     >
-      {busy ? '…' : 'Regenerate (dev)'}
+      {busy || globallyBusy ? '…' : 'Regenerate (dev)'}
     </button>
   );
 }

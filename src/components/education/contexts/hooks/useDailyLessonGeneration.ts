@@ -37,6 +37,7 @@ export const useDailyLessonGeneration = ({
   const [lastGeneratedDate, setLastGeneratedDate] = useState<string>('');
   const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
   const [isExtending, setIsExtending] = useState(false);
+  const [busySlots, setBusySlots] = useState<Set<string>>(new Set());
 
   // Target lesson duration in minutes
   const TARGET_LESSON_DURATION = DEFAULT_DAILY_UNIVERSE_MINUTES;
@@ -181,6 +182,9 @@ export const useDailyLessonGeneration = ({
   // Dev-only: regenerate a single activity by slotId via service
   const regenerateActivityBySlotId = useCallback(async (slotId: string) => {
     try {
+      if (busySlots.has(slotId)) return;
+      setBusySlots((s) => new Set([...s, slotId]));
+
       const existing = allActivities.find(a => (a as any)?.metadata?.slotId === slotId);
       const sessionId = (existing as any)?.metadata?.sessionId;
       if (!sessionId) {
@@ -191,8 +195,13 @@ export const useDailyLessonGeneration = ({
       if (fresh) replaceActivityBySlotId(slotId, fresh);
     } catch (e) {
       console.warn('Regenerate by slot failed', e);
+    } finally {
+      setBusySlots((s) => { const n = new Set(s); n.delete(slotId); return n; });
     }
-  }, [allActivities, replaceActivityBySlotId]);
+  }, [allActivities, replaceActivityBySlotId, busySlots]);
+
+  const isSlotBusy = useCallback((slotId: string) => busySlots.has(slotId), [busySlots]);
+
 
   return {
     allActivities,
@@ -203,6 +212,7 @@ export const useDailyLessonGeneration = ({
     targetDuration: TARGET_LESSON_DURATION,
     usedQuestionIds: usedQuestionIds.length,
     replaceActivityBySlotId,
-    regenerateActivityBySlotId
+    regenerateActivityBySlotId,
+    isSlotBusy
   };
 };

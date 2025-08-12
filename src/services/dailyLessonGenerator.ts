@@ -542,6 +542,20 @@ export class DailyLessonGenerator {
   }
 }
 
+// Retry helper for resilience on 429/5xx
+async function withRetry(fn: () => Promise<any>, retries = 2) {
+  let delay = 500;
+  for (let i = 0; ; i++) {
+    try { return await fn(); }
+    catch (e: any) {
+      const code = e?.status || e?.response?.status;
+      if (i >= retries || !(code === 429 || code >= 500)) throw e;
+      await new Promise(r => setTimeout(r, delay));
+      delay *= 2;
+    }
+  }
+}
+
 // Option sanitizer + per-slot regeneration (dev utilities)
 function sanitizeLessonActivity(act: any): any {
   try {
@@ -587,7 +601,7 @@ export async function regenerateActivityBySlotId(sessionId: string, slotId: stri
     }
   };
 
-  const g = await generateActivityForSlot(slot as any, entry.world, entry.context);
+  const g = await withRetry(() => generateActivityForSlot(slot as any, entry.world, entry.context));
   const type = mapKindToLessonType((g as any).kind || (slot as any).type);
   const subject = (entry.context?.subject) || 'Subject';
   const skillArea = (entry.context?.skillArea) || 'general';

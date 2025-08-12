@@ -45,6 +45,7 @@ export interface UnifiedLessonContextType {
   // Dev-only QA/iteration helpers
   replaceActivityBySlotId?: (slotId: string, fresh: LessonActivity) => void;
   regenerateActivityBySlotId?: (slotId: string) => Promise<void>;
+  isSlotBusy?: (slotId: string) => boolean;
   
   // Dynamic extension properties
   targetDuration?: number;
