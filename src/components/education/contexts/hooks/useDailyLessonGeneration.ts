@@ -7,6 +7,7 @@ import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { dynamicLessonExtender } from '@/services/dynamicLessonExtender';
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 import { logEvent } from '@/services/telemetry/events';
+import { generateActivityImage } from '@/services/media/imagePrefetch';
 function rebalanceDurationsSeconds(activities: LessonActivity[], targetMin: number): LessonActivity[] {
   try {
     const acts = activities.map(a => ({ ...a }));
@@ -271,6 +272,25 @@ export const useDailyLessonGeneration = ({
 
   const isSlotBusy = useCallback((slotId: string) => busySlots.has(slotId), [busySlots]);
 
+  // Client-side idle prewarm for remaining images (after top-2 handled server-side)
+  useEffect(() => {
+    const acts = allActivities || [];
+    const rest = acts.slice(2).filter((a: any) => a?.content?.imagePrompt && !a?.content?.imageUrl);
+    if (!rest.length) return;
+    const run = () => {
+      rest.forEach((a: any) => {
+        generateActivityImage(a.content.imagePrompt)
+          .then((url) => {
+            if (!url) return;
+            setAllActivities((prev) => prev.map((x: any) => (x?.id === a.id ? { ...x, content: { ...x.content, imageUrl: url } } : x)));
+          })
+          .catch(() => {});
+      });
+    };
+    const ric = (window as any)?.requestIdleCallback;
+    if (typeof ric === 'function') ric(run, { timeout: 800 });
+    else setTimeout(run, 0);
+  }, [allActivities]);
 
   return {
     allActivities,

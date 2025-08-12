@@ -232,19 +232,19 @@ export class DailyLessonGenerator {
         timeSum: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60),
       });
 
-      // Prefetch images (stubbed) and log telemetry
+      // Prefetch images (top-2 sync) and log telemetry
+      const withImagePrompt = normalizedActivities.filter((a: any) => a?.content?.imagePrompt && !a?.content?.imageUrl);
       await Promise.allSettled(
-        normalizedActivities.map(async (a: any) => {
-          const prompt = a?.content?.imagePrompt;
-          if (!prompt) return;
-          const url = await generateActivityImage(prompt);
+        withImagePrompt.slice(0, 2).map(async (a: any) => {
+          const url = await generateActivityImage(a.content.imagePrompt);
           if (url) a.content.imageUrl = url;
         })
       );
       await logEvent('activities_generated', {
         count: normalizedActivities.length,
         kinds: Array.from(new Set(normalizedActivities.map((a: any) => a.type))),
-        timeSumMin: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60)
+        timeSumMin: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60),
+        imagesQueued: withImagePrompt.length
       });
 
       const wrap: LessonActivity = {
