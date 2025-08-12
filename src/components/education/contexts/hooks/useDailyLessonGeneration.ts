@@ -209,7 +209,7 @@ export const useDailyLessonGeneration = ({
   }, [TARGET_LESSON_DURATION]);
 
   // Dev-only: regenerate a single activity by slotId via service
-  const regenerateActivityBySlotId = useCallback(async (slotId: string) => {
+  const regenerateActivityBySlotId = useCallback(async (slotId: string, intent?: 'harder' | 'easier' | 'changeKind') => {
     try {
       if (busySlots.has(slotId)) return;
       setBusySlots((s) => new Set([...s, slotId]));
@@ -220,7 +220,7 @@ export const useDailyLessonGeneration = ({
         console.warn('[DEV] Missing sessionId for slot regeneration');
         return;
       }
-      const fresh = await (await import('@/services/dailyLessonGenerator')).regenerateActivityBySlotId(sessionId, slotId);
+      const fresh = await (await import('@/services/dailyLessonGenerator')).regenerateActivityBySlotId(sessionId, slotId, intent);
       if (fresh) replaceActivityBySlotId(slotId, fresh);
     } catch (e) {
       console.warn('Regenerate by slot failed', e);
