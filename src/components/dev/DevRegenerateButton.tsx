@@ -3,6 +3,7 @@ import { useUnifiedLesson } from '@/components/education/contexts/UnifiedLessonC
 import { useToast } from '@/hooks/use-toast';
 
 export default function DevRegenerateButton({ slotId }: { slotId: string }) {
+  if (!import.meta.env.DEV) return null;
   const { regenerateActivityBySlotId, isSlotBusy } = useUnifiedLesson() as any;
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);

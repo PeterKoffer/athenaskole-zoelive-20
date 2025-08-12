@@ -7,6 +7,32 @@ import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { dynamicLessonExtender } from '@/services/dynamicLessonExtender';
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 
+function rebalanceDurationsSeconds(activities: LessonActivity[], targetMin: number): LessonActivity[] {
+  try {
+    const acts = activities.map(a => ({ ...a }));
+    const mins = acts.map(a => Math.max(0, Math.round((a.duration || 0) / 60)));
+    const sum = mins.reduce((s, m) => s + m, 0);
+    const target = Math.max(3, Number(targetMin) || 150);
+    let diff = target - sum;
+    if (!acts.length || Math.abs(diff) <= 1) return acts;
+    const step = diff > 0 ? 1 : -1;
+    let i = 0;
+    while (diff !== 0 && acts.length > 0) {
+      const idx = i % acts.length;
+      const m = Math.max(3, mins[idx] + step);
+      mins[idx] = m;
+      acts[idx].duration = m * 60;
+      diff -= step;
+      i++;
+      if (i > 2000) break; // safety
+    }
+    return acts;
+  } catch {
+    return activities;
+  }
+}
+
+
 interface DynamicContentRequest {
   subject: string;
   skillArea: string;
@@ -176,8 +202,11 @@ export const useDailyLessonGeneration = ({
 
   // Dev-only: replace a single activity by slotId
   const replaceActivityBySlotId = useCallback((slotId: string, fresh: LessonActivity) => {
-    setAllActivities(prev => prev.map(a => (a?.metadata?.slotId === slotId ? fresh : a)));
-  }, []);
+    setAllActivities(prev => {
+      const updated = prev.map(a => (a?.metadata?.slotId === slotId ? fresh : a));
+      return rebalanceDurationsSeconds(updated, TARGET_LESSON_DURATION);
+    });
+  }, [TARGET_LESSON_DURATION]);
 
   // Dev-only: regenerate a single activity by slotId via service
   const regenerateActivityBySlotId = useCallback(async (slotId: string) => {

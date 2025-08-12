@@ -582,7 +582,7 @@ function sanitizeLessonActivity(act: any): any {
   return act;
 }
 
-export async function regenerateActivityBySlotId(sessionId: string, slotId: string): Promise<LessonActivity | null> {
+export async function regenerateActivityBySlotId(sessionId: string, slotId: string, intent?: 'harder' | 'easier' | 'changeKind'): Promise<LessonActivity | null> {
   const entry = PLANNER_SESSION_CACHE.get(sessionId);
   if (!entry) return null;
   const slot = (entry.slots || []).find((s: any) => s?.slotId === slotId || s?.id === slotId) || null;
@@ -601,7 +601,7 @@ export async function regenerateActivityBySlotId(sessionId: string, slotId: stri
     }
   };
 
-  const g = await withRetry(() => generateActivityForSlot(slot as any, entry.world, entry.context));
+  const g = await withRetry(() => generateActivityForSlot({ ...(slot as any), intent }, entry.world, { ...entry.context, regenerateIntent: intent }));
   const type = mapKindToLessonType((g as any).kind || (slot as any).type);
   const subject = (entry.context?.subject) || 'Subject';
   const skillArea = (entry.context?.skillArea) || 'general';
