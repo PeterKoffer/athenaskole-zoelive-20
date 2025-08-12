@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Universe } from '@/services/UniverseGenerator';
 import EnhancedLessonManager from '@/components/education/components/EnhancedLessonManager';
 import { UnifiedLessonProvider } from '@/components/education/contexts/UnifiedLessonContext';
+import { useUnifiedLesson } from '@/components/education/contexts/UnifiedLessonContext';
+import { DevLessonQA } from '@/components/dev/DevLessonQA';
 import { canonicalizeSubject } from '@/utils/subjectMap';
 
 interface LocationState {
@@ -25,6 +27,15 @@ const DailyUniverseLessonPage: React.FC = () => {
 
   const resolvedSubject = canonicalizeSubject(universe.theme);
 
+  // Dev-only: derive lesson object from context for QA panel
+  const DevQAFromContext: React.FC = () => {
+    const { allActivities, targetDuration } = useUnifiedLesson();
+    const lesson = React.useMemo(() => ({
+      activities: allActivities,
+      meta: { durationMin: targetDuration }
+    }), [allActivities, targetDuration]);
+    return import.meta.env.DEV ? <DevLessonQA lesson={lesson} /> : null;
+  };
   return (
     <UnifiedLessonProvider
       subject={resolvedSubject}
@@ -38,6 +49,7 @@ const DailyUniverseLessonPage: React.FC = () => {
             <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
               AI ✓ Planner→Activities — 150 min
             </span>
+            <DevQAFromContext />
           </div>
         )}
         <EnhancedLessonManager

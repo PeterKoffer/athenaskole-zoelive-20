@@ -182,7 +182,7 @@ export class DailyLessonGenerator {
             difficulty: ((g as any).finalDifficulty || (g as any).difficulty) as any,
             subject,
             skillArea,
-            metadata: { generatedBy: 'planner-activity', slotId: (slot as any).slotId }
+            metadata: { generatedBy: 'planner-activity', slotId: (slot as any).slotId, curriculumStandard: (slot as any).linkedCurriculumStandard, learningObjective: (slot as any).learningObjective }
           } as LessonActivity;
         })
       );
