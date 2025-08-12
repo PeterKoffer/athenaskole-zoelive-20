@@ -16,6 +16,10 @@ import type { Planner, PlannerActivitySlot, GeneratedActivity } from './content/
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 import { validateAndNormalize } from '@/services/ai/validators/lessonQuality';
 import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
+
+// Cache world/context/slots for per-slot regeneration (dev-only usage)
+const PLANNER_SESSION_CACHE = new Map<string, { world: any; context: any; slots: any[] }>();
+
 export class DailyLessonGenerator {
   /**
    * Generate a completely new lesson for the day based on student progress and curriculum
@@ -133,6 +137,8 @@ export class DailyLessonGenerator {
       ) as any;
 
       const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Store session context for dev regeneration
+      PLANNER_SESSION_CACHE.set(sessionId, { world, context, slots: preparedSlots as any[] });
 
       const mapKindToLessonType = (k: string): LessonActivity['type'] => {
         switch (k) {
@@ -165,7 +171,7 @@ export class DailyLessonGenerator {
         preparedSlots.map(async (slot, i) => {
           const g = await generateActivityForSlot(slot, world, context);
           const type = mapKindToLessonType((g as any).kind || (slot as any).type);
-          return {
+          const act = {
             id: `${sessionId}-act-${i + 1}`,
             title: (g as any).question || (g as any).narrative || `${subject} Activity ${i + 1}`,
             type,
@@ -182,8 +188,10 @@ export class DailyLessonGenerator {
             difficulty: ((g as any).finalDifficulty || (g as any).difficulty) as any,
             subject,
             skillArea,
-            metadata: { generatedBy: 'planner-activity', slotId: (slot as any).slotId, curriculumStandard: (slot as any).linkedCurriculumStandard, learningObjective: (slot as any).learningObjective }
+            curriculumStandard: (slot as any).linkedCurriculumStandard,
+            metadata: { generatedBy: 'planner-activity', slotId: (slot as any).slotId, sessionId, curriculumStandard: (slot as any).linkedCurriculumStandard, learningObjective: (slot as any).learningObjective }
           } as LessonActivity;
+          return sanitizeLessonActivity(act);
         })
       );
 
@@ -532,6 +540,84 @@ export class DailyLessonGenerator {
   static clearTodaysLesson(userId: string, subject: string, currentDate: string): void {
     CacheService.clearTodaysLesson(userId, subject, currentDate);
   }
+}
+
+// Option sanitizer + per-slot regeneration (dev utilities)
+function sanitizeLessonActivity(act: any): any {
+  try {
+    const c = act?.content || {};
+    if (Array.isArray(c.options) && c.options.length) {
+      const raw = c.options.map((s: any) => String(s ?? ''));
+      const trimmed = raw.map((s: string) => s.replace(/^[A-D][)\.]+\s*/i, '').replace(/^\d+[)\.]+\s*/, '').trim());
+      const seen = new Map<string, number>();
+      const unique: string[] = [];
+      let newCorrect = 0;
+      const oldCorrect = typeof c.correctAnswer === 'number' ? c.correctAnswer : -1;
+      trimmed.forEach((opt, i) => {
+        const key = opt.toLowerCase();
+        if (!seen.has(key)) {
+          seen.set(key, unique.length);
+          unique.push(opt);
+          if (i === oldCorrect) newCorrect = seen.get(key)!;
+        }
+      });
+      act.content.options = unique;
+      act.content.correctAnswer = Math.min(newCorrect, Math.max(0, unique.length - 1));
+    }
+  } catch {}
+  return act;
+}
+
+export async function regenerateActivityBySlotId(sessionId: string, slotId: string): Promise<LessonActivity | null> {
+  const entry = PLANNER_SESSION_CACHE.get(sessionId);
+  if (!entry) return null;
+  const slot = (entry.slots || []).find((s: any) => s?.slotId === slotId || s?.id === slotId) || null;
+  if (!slot) return null;
+
+  const mapKindToLessonType = (k: string): LessonActivity['type'] => {
+    switch (k) {
+      case 'diagnostic_mcq': return 'interactive-game';
+      case 'scenario_choice': return 'interactive-game';
+      case 'data_reading': return 'application';
+      case 'observe_image': return 'content-delivery';
+      case 'creative_task': return 'creative-exploration';
+      case 'sort_match': return 'interactive-game';
+      case 'puzzle': return 'interactive-game';
+      default: return 'content-delivery';
+    }
+  };
+
+  const g = await generateActivityForSlot(slot as any, entry.world, entry.context);
+  const type = mapKindToLessonType((g as any).kind || (slot as any).type);
+  const subject = (entry.context?.subject) || 'Subject';
+  const skillArea = (entry.context?.skillArea) || 'general';
+  const act: LessonActivity = {
+    id: `${sessionId}-act-regenerated-${Date.now()}`,
+    title: (g as any).question || (g as any).narrative || `${subject} Activity` ,
+    type,
+    duration: Math.max(120, (((g as any).estimatedTimeMin ?? (slot as any).timeMin ?? 5) * 60)),
+    content: {
+      question: (g as any).question,
+      options: (g as any).options,
+      correctAnswer: typeof (g as any).correctIndex === 'number' ? (g as any).correctIndex : undefined,
+      explanation: (g as any).explanation,
+      text: (g as any).narrative,
+      scenario: (g as any).narrative,
+      instructions: (g as any).narrative
+    },
+    difficulty: ((g as any).finalDifficulty || (g as any).difficulty) as any,
+    subject,
+    skillArea,
+    curriculumStandard: (slot as any).linkedCurriculumStandard,
+    metadata: {
+      generatedBy: 'planner-activity',
+      slotId: (slot as any).slotId,
+      sessionId,
+      curriculumStandard: (slot as any).linkedCurriculumStandard,
+      learningObjective: (slot as any).learningObjective
+    }
+  } as any;
+  return sanitizeLessonActivity(act);
 }
 
 export const dailyLessonGenerator = DailyLessonGenerator;

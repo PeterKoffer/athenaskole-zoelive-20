@@ -173,6 +173,27 @@ export const useDailyLessonGeneration = ({
     await generateDailyLesson(true);
   }, [generateDailyLesson]);
 
+  // Dev-only: replace a single activity by slotId
+  const replaceActivityBySlotId = useCallback((slotId: string, fresh: LessonActivity) => {
+    setAllActivities(prev => prev.map(a => (a?.metadata?.slotId === slotId ? fresh : a)));
+  }, []);
+
+  // Dev-only: regenerate a single activity by slotId via service
+  const regenerateActivityBySlotId = useCallback(async (slotId: string) => {
+    try {
+      const existing = allActivities.find(a => (a as any)?.metadata?.slotId === slotId);
+      const sessionId = (existing as any)?.metadata?.sessionId;
+      if (!sessionId) {
+        console.warn('[DEV] Missing sessionId for slot regeneration');
+        return;
+      }
+      const fresh = await (await import('@/services/dailyLessonGenerator')).regenerateActivityBySlotId(sessionId, slotId);
+      if (fresh) replaceActivityBySlotId(slotId, fresh);
+    } catch (e) {
+      console.warn('Regenerate by slot failed', e);
+    }
+  }, [allActivities, replaceActivityBySlotId]);
+
   return {
     allActivities,
     isLoadingActivities,
@@ -180,6 +201,8 @@ export const useDailyLessonGeneration = ({
     extendLessonDynamically,
     isExtending,
     targetDuration: TARGET_LESSON_DURATION,
-    usedQuestionIds: usedQuestionIds.length
+    usedQuestionIds: usedQuestionIds.length,
+    replaceActivityBySlotId,
+    regenerateActivityBySlotId
   };
 };
