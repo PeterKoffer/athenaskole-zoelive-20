@@ -14,6 +14,8 @@ import { buildLessonContext as buildUnifiedLessonContext } from './content/unifi
 import { generateLessonPlan, generateActivityForSlot } from './content/aiPlannerActivityPipeline';
 import type { Planner, PlannerActivitySlot, GeneratedActivity } from './content/aiPlannerActivityPipeline';
 import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
+import { validateAndNormalize } from '@/services/ai/validators/lessonQuality';
+import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
 export class DailyLessonGenerator {
   /**
    * Generate a completely new lesson for the day based on student progress and curriculum
@@ -88,6 +90,48 @@ export class DailyLessonGenerator {
         standards: (context.curriculum?.standards?.length ?? 0)
       });
 
+      // --- Finish & polish helpers (slot-level) ---
+      const bindStandardsToSlots = (arr: any[], targets: string[]) => {
+        if (!Array.isArray(arr) || !targets?.length) return arr;
+        return arr.map((s: any, i: number) => {
+          const std = (s as any).linkedCurriculumStandard || targets[i % targets.length];
+          const lo = (s as any).learningObjective || `Apply standard ${std}`;
+          return { ...s, linkedCurriculumStandard: std, learningObjective: lo };
+        });
+      };
+
+      const normalizePlannerTime = (arr: any[], targetMin = 150) => {
+        const sum = arr.reduce((a: number, s: any) => a + (s?.timeMin || s?.estimatedTimeMin || 0), 0);
+        const diff = targetMin - sum;
+        if (Math.abs(diff) <= 5 || !arr.length) return arr;
+        const per = Math.trunc(diff / arr.length);
+        return arr.map((s: any) => ({
+          ...s,
+          timeMin: Math.max(3, (s?.timeMin || s?.estimatedTimeMin || 0) + per),
+        }));
+      };
+
+      const enforceVariety = (arr: any[]) => {
+        const kinds = new Set(arr.map((s: any) => (s?.activityType || s?.type)));
+        if (kinds.size >= 3) return arr;
+        const upgrade = (s: any) => {
+          const t = s?.activityType || s?.type;
+          if (t === 'diagnostic_mcq') return { ...s, activityType: 'scenario_choice', type: 'scenario_choice' };
+          if (t === 'observation' || t === 'observe_image') return { ...s, activityType: 'short_constructed_response', type: 'short_constructed_response' };
+          return s;
+        };
+        return arr.map((s: any, i: number) => (i % 2 === 0 ? upgrade(s) : s));
+      };
+
+      // Prepare slots: bind standards, normalize time (~80% activities), and enforce variety
+      const slotsTargetMin = Math.round((context.time.lessonDurationMinutes || 45) * 0.8);
+      const preparedSlots: PlannerActivitySlot[] = enforceVariety(
+        normalizePlannerTime(
+          bindStandardsToSlots(allSlots as any[], (context as any)?.curriculum?.standards || []),
+          slotsTargetMin
+        )
+      ) as any;
+
       const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       const mapKindToLessonType = (k: string): LessonActivity['type'] => {
@@ -118,7 +162,7 @@ export class DailyLessonGenerator {
       };
 
       const generatedActivities: LessonActivity[] = await Promise.all(
-        allSlots.map(async (slot, i) => {
+        preparedSlots.map(async (slot, i) => {
           const g = await generateActivityForSlot(slot, world, context);
           const type = mapKindToLessonType((g as any).kind || (slot as any).type);
           return {
