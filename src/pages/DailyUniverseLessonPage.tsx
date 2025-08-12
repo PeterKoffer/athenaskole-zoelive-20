@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Universe } from '@/services/UniverseGenerator';
 import EnhancedLessonManager from '@/components/education/components/EnhancedLessonManager';
 import { UnifiedLessonProvider } from '@/components/education/contexts/UnifiedLessonContext';
-
+import { canonicalizeSubject } from '@/utils/subjectMap';
 
 interface LocationState {
   universe?: Universe;
@@ -23,7 +23,7 @@ const DailyUniverseLessonPage: React.FC = () => {
     return null;
   }
 
-  const resolvedSubject = (universe.theme || 'general').toLowerCase();
+  const resolvedSubject = canonicalizeSubject(universe.theme);
 
   return (
     <UnifiedLessonProvider

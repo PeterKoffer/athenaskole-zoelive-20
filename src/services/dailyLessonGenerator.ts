@@ -13,7 +13,7 @@ import { generateContent } from '@/ai/contentService';
 import { buildLessonContext as buildUnifiedLessonContext } from './content/unifiedLessonContext';
 import { generateLessonPlan, generateActivityForSlot } from './content/aiPlannerActivityPipeline';
 import type { Planner, PlannerActivitySlot, GeneratedActivity } from './content/aiPlannerActivityPipeline';
-
+import { DEFAULT_DAILY_UNIVERSE_MINUTES } from '@/constants/lesson';
 export class DailyLessonGenerator {
   /**
    * Generate a completely new lesson for the day based on student progress and curriculum
@@ -62,7 +62,7 @@ export class DailyLessonGenerator {
         activeKeywords,
         learnerProfile,
         studentProgress,
-        lessonDurationMinutes: 45,
+        lessonDurationMinutes: DEFAULT_DAILY_UNIVERSE_MINUTES,
       });
 
       const planner = await generateLessonPlan(context);
