@@ -59,6 +59,14 @@ export class DailyLessonGenerator {
     }
     // 0) Preferred: Planner → Activity pipeline (new)
     try {
+      const targets = resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel), country: 'DK' });
+      console.debug("[NELIE] Planner ctx", {
+        subject,
+        gradeBand: String(gradeLevel),
+        targets: targets.slice(0, 5),
+        calendar: activeKeywords
+      });
+
       const context = buildUnifiedLessonContext({
         subject,
         gradeLevel,
@@ -66,6 +74,7 @@ export class DailyLessonGenerator {
         learnerProfile,
         studentProgress,
         lessonDurationMinutes: DEFAULT_DAILY_UNIVERSE_MINUTES,
+        curriculumTargets: targets,
       });
 
       const planner = await generateLessonPlan(context);
@@ -134,6 +143,40 @@ export class DailyLessonGenerator {
         })
       );
 
+      // Mini-validator normalization focused on activity block (80% of total time)
+      const targetActivitiesMin = Math.round((context.time.lessonDurationMinutes || 45) * 0.8);
+      const validated = validateAndNormalize(
+        generatedActivities.map((a: any) => ({
+          question: a?.content?.question || a?.title,
+          options: a?.content?.options,
+          correctIndex: a?.content?.correctAnswer,
+          rubric: a?.content?.rubric,
+          hints: a?.content?.hints || (a?.content?.explanation ? [String(a.content.explanation).slice(0, 120)] : []),
+          estimatedTimeMin: Math.max(3, Math.round((a?.duration || 180) / 60)),
+          kind: a?.type,
+          __original: a,
+        })),
+        targetActivitiesMin
+      ) as any[];
+
+      if (!validated.length) {
+        throw new Error('[NELIE] No valid activities after validation (Planner→Activities)');
+      }
+
+      const normalizedActivities: LessonActivity[] = validated.map((v: any) => {
+        const orig = v.__original as LessonActivity;
+        return {
+          ...orig,
+          duration: Math.max(120, Number(v.estimatedTimeMin || Math.round((orig.duration || 180) / 60)) * 60),
+        };
+      });
+
+      console.debug('[NELIE] Activities summary', {
+        count: normalizedActivities.length,
+        kinds: Array.from(new Set(normalizedActivities.map((a: any) => a.type))),
+        timeSum: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60),
+      });
+
       const wrap: LessonActivity = {
         id: `${sessionId}-wrap`,
         title: 'Reflection & Wrap-up',
@@ -146,9 +189,9 @@ export class DailyLessonGenerator {
         skillArea
       };
 
-      const mapped = [intro, ...generatedActivities, wrap];
+      const mapped = [intro, ...normalizedActivities, wrap];
       if (mapped.length >= 2) {
-        console.log(`✅ Planner→Activity pipeline generated ${generatedActivities.length} activities`);
+        console.log(`✅ Planner→Activity pipeline generated ${normalizedActivities.length} activities`);
         return mapped;
       }
     } catch (e) {
