@@ -10,6 +10,9 @@ import { aiContentGenerator } from './content/aiContentGenerator'; // Fixed impo
 import learnerProfileService from './learnerProfile/LearnerProfileService';
 import { supabase } from '@/integrations/supabase/client';
 import { generateContent } from '@/ai/contentService';
+import { buildLessonContext as buildUnifiedLessonContext } from './content/unifiedLessonContext';
+import { generateLessonPlan, generateActivityForSlot } from './content/aiPlannerActivityPipeline';
+import type { Planner, PlannerActivitySlot, GeneratedActivity } from './content/aiPlannerActivityPipeline';
 
 export class DailyLessonGenerator {
   /**
@@ -51,6 +54,98 @@ export class DailyLessonGenerator {
     learnerProfile: any,
     activeKeywords: string[],
   ): Promise<LessonActivity[]> {
+    // 0) Preferred: Planner → Activity pipeline (new)
+    try {
+      const context = buildUnifiedLessonContext({
+        subject,
+        gradeLevel,
+        activeKeywords,
+        learnerProfile,
+        studentProgress,
+        lessonDurationMinutes: 45,
+      });
+
+      const planner = await generateLessonPlan(context);
+      const world = planner.world;
+      const slots: PlannerActivitySlot[] = (planner.scenes || []).flatMap(s => s.activities) as PlannerActivitySlot[];
+      const allSlots = planner.bonusActivity ? [...slots, planner.bonusActivity as PlannerActivitySlot] : slots;
+
+      const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      const mapKindToLessonType = (k: string): LessonActivity['type'] => {
+        switch (k) {
+          case 'diagnostic_mcq': return 'interactive-game';
+          case 'scenario_choice': return 'interactive-game';
+          case 'data_reading': return 'application';
+          case 'observe_image': return 'content-delivery';
+          case 'creative_task': return 'creative-exploration';
+          case 'sort_match': return 'interactive-game';
+          case 'puzzle': return 'interactive-game';
+          default: return 'content-delivery';
+        }
+      };
+
+      const intro: LessonActivity = {
+        id: `${sessionId}-intro`,
+        title: world?.title || `${subject} Adventure`,
+        type: 'introduction',
+        duration: Math.max(180, Math.round((context.time.lessonDurationMinutes || 45) * 60 * 0.1)),
+        content: {
+          hook: world?.tone,
+          text: (world as any)?.setting || (planner as any)?.world?.tone,
+          description: (planner as any)?.world?.title
+        },
+        subject,
+        skillArea
+      };
+
+      const generatedActivities: LessonActivity[] = await Promise.all(
+        allSlots.map(async (slot, i) => {
+          const g = await generateActivityForSlot(slot, world, context);
+          const type = mapKindToLessonType((g as any).kind || (slot as any).type);
+          return {
+            id: `${sessionId}-act-${i + 1}`,
+            title: (g as any).question || (g as any).narrative || `${subject} Activity ${i + 1}`,
+            type,
+            duration: Math.max(120, (((g as any).estimatedTimeMin ?? (slot as any).timeMin ?? 5) * 60)),
+            content: {
+              question: (g as any).question,
+              options: (g as any).options,
+              correctAnswer: typeof (g as any).correctIndex === 'number' ? (g as any).correctIndex : undefined,
+              explanation: (g as any).explanation,
+              text: (g as any).narrative,
+              scenario: (g as any).narrative,
+              instructions: (g as any).narrative
+            },
+            difficulty: ((g as any).finalDifficulty || (g as any).difficulty) as any,
+            subject,
+            skillArea,
+            metadata: { generatedBy: 'planner-activity', slotId: (slot as any).slotId }
+          } as LessonActivity;
+        })
+      );
+
+      const wrap: LessonActivity = {
+        id: `${sessionId}-wrap`,
+        title: 'Reflection & Wrap-up',
+        type: 'summary',
+        duration: Math.max(180, Math.round((context.time.lessonDurationMinutes || 45) * 60 * 0.1)),
+        content: {
+          keyTakeaways: ((planner as any)?.world?.learningObjectives) || []
+        },
+        subject,
+        skillArea
+      };
+
+      const mapped = [intro, ...generatedActivities, wrap];
+      if (mapped.length >= 2) {
+        console.log(`✅ Planner→Activity pipeline generated ${generatedActivities.length} activities`);
+        return mapped;
+      }
+    } catch (e) {
+      console.warn('⚠️ Planner→Activity pipeline failed, trying legacy structured plan:', e);
+    }
+
     // 1) Try structured full-lesson plan first (120–180 min)
     try {
       const ability = (studentProgress?.accuracy_rate ?? 0.65) >= 0.85
