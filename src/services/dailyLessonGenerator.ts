@@ -54,6 +54,9 @@ export class DailyLessonGenerator {
     learnerProfile: any,
     activeKeywords: string[],
   ): Promise<LessonActivity[]> {
+    if ((subject || '').toLowerCase() === 'general') {
+      throw new Error('Subject=general afvist: Planner kræver kanonisk fag.');
+    }
     // 0) Preferred: Planner → Activity pipeline (new)
     try {
       const context = buildUnifiedLessonContext({
@@ -69,6 +72,12 @@ export class DailyLessonGenerator {
       const world = planner.world;
       const slots: PlannerActivitySlot[] = (planner.scenes || []).flatMap(s => s.activities) as PlannerActivitySlot[];
       const allSlots = planner.bonusActivity ? [...slots, planner.bonusActivity as PlannerActivitySlot] : slots;
+      console.info("[NELIE] Planner OK", {
+        subject,
+        duration: context.time.lessonDurationMinutes,
+        slots: allSlots.length,
+        standards: (context.curriculum?.standards?.length ?? 0)
+      });
 
       const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 

@@ -32,12 +32,21 @@ const DailyUniverseLessonPage: React.FC = () => {
       gradeLevel={state?.gradeLevel}
       onLessonComplete={() => navigate('/daily-program')}
     >
-      <EnhancedLessonManager
-        subject={resolvedSubject}
-        skillArea="general"
-        onBackToProgram={() => navigate('/daily-program')}
-        hideActivityCount
-      />
+      <>
+        {import.meta.env.DEV && (
+          <div className="mb-2">
+            <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
+              AI ✓ Planner→Activities — 150 min
+            </span>
+          </div>
+        )}
+        <EnhancedLessonManager
+          subject={resolvedSubject}
+          skillArea="general"
+          onBackToProgram={() => navigate('/daily-program')}
+          hideActivityCount
+        />
+      </>
     </UnifiedLessonProvider>
   );
 };
