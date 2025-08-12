@@ -1,6 +1,6 @@
 
 // @ts-nocheck
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { LessonActivity } from '../../components/types/LessonTypes';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
@@ -64,6 +64,21 @@ export const useDailyLessonGeneration = ({
   const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
   const [isExtending, setIsExtending] = useState(false);
   const [busySlots, setBusySlots] = useState<Set<string>>(new Set());
+  const acRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      try { acRef.current?.abort(); } catch {}
+    };
+  }, []);
+
+  const withAbort = useCallback(async (fn: (signal: AbortSignal) => Promise<any>) => {
+    try { acRef.current?.abort(); } catch {}
+    const ac = new AbortController();
+    acRef.current = ac;
+    return fn(ac.signal);
+  }, []);
+
 
   // Target lesson duration in minutes
   const TARGET_LESSON_DURATION = DEFAULT_DAILY_UNIVERSE_MINUTES;
@@ -220,8 +235,23 @@ export const useDailyLessonGeneration = ({
         console.warn('[DEV] Missing sessionId for slot regeneration');
         return;
       }
-      const fresh = await (await import('@/services/dailyLessonGenerator')).regenerateActivityBySlotId(sessionId, slotId, intent);
-      if (fresh) replaceActivityBySlotId(slotId, fresh);
+      const fresh = await withAbort((signal) => (import('@/services/dailyLessonGenerator').then(mod => mod.regenerateActivityBySlotId(sessionId, slotId, intent, { signal }))));
+      if (fresh) {
+        replaceActivityBySlotId(slotId, fresh);
+        // Optional: auto-variety guard in dev
+        if (import.meta.env.DEV && intent !== 'changeKind') {
+          const candidate = allActivities.map(a => (a as any)?.metadata?.slotId === slotId ? fresh : a);
+          const kinds = new Set(candidate.map(a => (a as any)?.type || (a as any)?.kind).filter(Boolean));
+          if (kinds.size < Math.min(3, candidate.length)) {
+            const mcq = candidate.find(a => (a as any)?.type === 'interactive-game' && (a as any)?.metadata?.slotId);
+            const mcqSlotId = (mcq as any)?.metadata?.slotId as string | undefined;
+            if (mcqSlotId) {
+              // fire-and-forget; busy guard prevents collision
+              regenerateActivityBySlotId(mcqSlotId, 'changeKind');
+            }
+          }
+        }
+      }
     } catch (e) {
       console.warn('Regenerate by slot failed', e);
     } finally {

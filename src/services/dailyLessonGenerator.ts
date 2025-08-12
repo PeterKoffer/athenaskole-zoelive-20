@@ -582,7 +582,7 @@ function sanitizeLessonActivity(act: any): any {
   return act;
 }
 
-export async function regenerateActivityBySlotId(sessionId: string, slotId: string, intent?: 'harder' | 'easier' | 'changeKind'): Promise<LessonActivity | null> {
+export async function regenerateActivityBySlotId(sessionId: string, slotId: string, intent?: 'harder' | 'easier' | 'changeKind', opts?: { signal?: AbortSignal }): Promise<LessonActivity | null> {
   const entry = PLANNER_SESSION_CACHE.get(sessionId);
   if (!entry) return null;
   const slot = (entry.slots || []).find((s: any) => s?.slotId === slotId || s?.id === slotId) || null;
@@ -601,7 +601,9 @@ export async function regenerateActivityBySlotId(sessionId: string, slotId: stri
     }
   };
 
+  if (opts?.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   const g = await withRetry(() => generateActivityForSlot({ ...(slot as any), intent }, entry.world, { ...entry.context, regenerateIntent: intent }));
+  if (opts?.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   const type = mapKindToLessonType((g as any).kind || (slot as any).type);
   const subject = (entry.context?.subject) || 'Subject';
   const skillArea = (entry.context?.skillArea) || 'general';
