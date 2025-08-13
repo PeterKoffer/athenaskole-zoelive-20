@@ -438,7 +438,7 @@ export async function generateContentWithOpenAI(requestData: any) {
       console.error('❌ JSON Parse Error:', parseError.message);
       console.error('🔍 Raw response causing error:', generatedText);
       
-      // Try to fix common JSON issues
+      // Try to fix common JSON issues more aggressively
       let fixedResponse = cleanedResponse;
       
       // Fix unterminated strings by finding the last complete object
@@ -448,11 +448,38 @@ export async function generateContentWithOpenAI(requestData: any) {
         console.log('🔧 Attempting to fix truncated JSON...');
         
         try {
+          // Try to complete any unterminated strings
+          fixedResponse = fixedResponse.replace(/("[^"]*$)/, '$1"');
+          // Try to add missing closing brackets
+          const openBraces = (fixedResponse.match(/\{/g) || []).length;
+          const closeBraces = (fixedResponse.match(/\}/g) || []).length;
+          if (openBraces > closeBraces) {
+            fixedResponse += '}'.repeat(openBraces - closeBraces);
+          }
+          
           parsedContent = JSON.parse(fixedResponse);
           console.log('✅ Fixed JSON successfully');
         } catch (secondError) {
           console.error('❌ Could not fix JSON:', secondError.message);
-          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${generatedText}`);
+          // Return a fallback structure for daily lessons
+          parsedContent = {
+            title: "Math Adventure",
+            scenario: "Join a math quest to solve real-world challenges!",
+            stages: [
+              {
+                story: "You start your math adventure by solving basic problems.",
+                activityType: "multipleChoice",
+                activity: {
+                  question: "What is 2 + 2?",
+                  options: ["3", "4", "5", "6"],
+                  correct: 1,
+                  expectedAnswer: "4",
+                  explanation: "2 + 2 equals 4"
+                }
+              }
+            ]
+          };
+          console.log('🔄 Using fallback content due to JSON parsing failure');
         }
       } else {
         throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${generatedText}`);

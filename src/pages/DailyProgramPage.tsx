@@ -104,6 +104,10 @@ const DailyProgramPage = () => {
         }
       }
 
+      // Force re-render by clearing any cached universe data
+      setUniverse(null);
+      setLessonActivities(null);
+      
       setUniverse(result);
 
       // Generate today's lesson activities based on the universe theme
