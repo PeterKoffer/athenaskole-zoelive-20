@@ -13,13 +13,29 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { title, description, theme } = await req.json()
+    const { title, description, theme, prompt: directPrompt } = await req.json()
 
-    if (!title && !description && !theme) {
-      return new Response(
-        JSON.stringify({ error: 'At least one of title, description, or theme is required' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      )
+    // Use direct prompt if provided, otherwise build from title/description/theme
+    let prompt: string;
+    if (directPrompt) {
+      prompt = directPrompt;
+    } else {
+      if (!title && !description && !theme) {
+        return new Response(
+          JSON.stringify({ error: 'Either prompt or at least one of title, description, or theme is required' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        )
+      }
+
+      // Create a descriptive prompt for the learning universe
+      prompt = `Create a vibrant, educational illustration for a learning universe called "${title}". 
+      ${description ? `Description: ${description}.` : ''}
+      ${theme ? `Theme: ${theme}.` : ''}
+      
+      Style: Colorful, engaging, child-friendly, modern digital art. 
+      Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery.
+      Mood: Inspiring, fun, and educational. Perfect for students aged 8-16.
+      No text or letters in the image.`;
     }
 
     // @ts-ignore
@@ -27,16 +43,6 @@ serve(async (req: Request) => {
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY is not configured')
     }
-
-    // Create a descriptive prompt for the learning universe
-    const prompt = `Create a vibrant, educational illustration for a learning universe called "${title}". 
-    ${description ? `Description: ${description}.` : ''}
-    ${theme ? `Theme: ${theme}.` : ''}
-    
-    Style: Colorful, engaging, child-friendly, modern digital art. 
-    Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery.
-    Mood: Inspiring, fun, and educational. Perfect for students aged 8-16.
-    No text or letters in the image.`
 
     console.log('🎨 Generating image with prompt:', prompt)
 

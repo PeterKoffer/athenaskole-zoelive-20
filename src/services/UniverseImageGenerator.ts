@@ -13,7 +13,35 @@ export interface UniverseImageResponse {
   prompt?: string;
 }
 
-export class UniverseImageGenerator {
+export class UniverseImageGeneratorService {
+  async generate(prompt: string): Promise<string | null> {
+    try {
+      console.log('🎨 Generating universe image with prompt:', prompt);
+
+      const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+        body: { prompt }
+      });
+
+      if (error) {
+        console.error('❌ Universe image generation error:', error);
+        return null;
+      }
+
+      if (!data?.success || !data?.imageUrl) {
+        console.error('❌ Invalid response from image generation:', data);
+        return null;
+      }
+
+      console.log('✅ Universe image generated successfully:', data.imageUrl);
+      return data.imageUrl;
+
+    } catch (error) {
+      console.error('❌ Universe image generation failed:', error);
+      return null;
+    }
+  }
+
+  // Legacy method for backward compatibility
   static async generateImage(request: UniverseImageRequest): Promise<string | null> {
     try {
       console.log('🎨 Generating universe image for:', request);
@@ -42,4 +70,4 @@ export class UniverseImageGenerator {
   }
 }
 
-export const universeImageGenerator = new UniverseImageGenerator();
+export const UniverseImageGenerator = new UniverseImageGeneratorService();

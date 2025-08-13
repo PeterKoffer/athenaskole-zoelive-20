@@ -104,11 +104,9 @@ const DailyProgramPage = () => {
       if (result) {
         setGeneratingImage(true);
         try {
-          const generatedImageUrl = await UniverseImageGenerator.generateImage({
-            title: result.title || 'Learning Universe',
-            description: result.description,
-            theme: result.theme || 'education'
-          });
+          const generatedImageUrl = await UniverseImageGenerator.generate(
+            `Create a vibrant, educational illustration for "${result.title || 'Learning Universe'}". ${result.description ? `Description: ${result.description}.` : ''} Theme: ${result.theme || 'education'}. Style: Colorful, engaging, child-friendly, modern digital art. Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery. Mood: Inspiring, fun, and educational. Perfect for students aged 8-16. No text or letters in the image.`
+          );
           
           if (generatedImageUrl) {
             result.image = generatedImageUrl;
