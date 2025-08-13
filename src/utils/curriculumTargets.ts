@@ -52,7 +52,7 @@ const INTERNAL_DEFAULTS: Record<string, Record<string, string[]>> = {
 };
 
 export function resolveCurriculumTargets(input: Input): string[] {
-  const country = (input.country ?? "DK").toUpperCase();
+  const country = (input.country ?? "").toUpperCase();
   const subjectRaw = (input.subject ?? "").trim();
   const bandRaw = (input.gradeBand ?? "").trim();
 
