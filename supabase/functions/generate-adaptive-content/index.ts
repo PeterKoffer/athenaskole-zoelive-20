@@ -274,17 +274,6 @@ Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th 
 Subject Focus: ${resolvedSubject} - MUST create content specifically for this subject area
 Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
 
-IMPORTANT: The universe MUST be designed specifically for ${resolvedSubject} learning. Incorporate ${resolvedSubject} concepts, vocabulary, and activities throughout.
-
-// Pick 4-6 props from the subject-specific collection
-const propPool = SUBJECT_PROPS[${resolvedSubject}] || SUBJECT_PROPS['Mathematics'];
-const props = [...propPool].sort(() => Math.random() - 0.5).slice(0, 4 + Math.floor(Math.random() * 3));
-
-Use at least 2 of these real, tangible props in your universe: ${JSON.stringify(props)}
-Keep everything grounded in daily life (school, home, community).
-Return strict JSON; include "subject": "${resolvedSubject}".trim();
-Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
-
 IMPORTANT: The universe MUST be designed specifically for ${requestData.subject || 'science'} learning. Incorporate ${requestData.subject || 'science'} concepts, vocabulary, and activities throughout.
 
 Subject-specific requirements:
