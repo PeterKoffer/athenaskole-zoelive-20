@@ -1,3 +1,5 @@
+import type { TeachingPerspective } from "./prompts/dailyUniverse.v3";
+
 export type LessonRequest = {
   mode: "daily" | "training";
   subject: string;
@@ -10,6 +12,7 @@ export type LessonRequest = {
   teacherPreferences?: {
     subjectWeights?: Record<string, number>;
     lessonDurations?: Record<string, number>; // hours per class
+    teachingPerspective?: TeachingPerspective;
   };
 };
 

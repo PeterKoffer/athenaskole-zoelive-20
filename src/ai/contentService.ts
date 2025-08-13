@@ -15,16 +15,18 @@ export async function generateContent(req: LessonRequest): Promise<LessonRespons
       // Get current user to fetch their preferences
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const [teacherPrefs, classLessonDurations] = await Promise.all([
+        const [teacherPrefs, classLessonDurations, teachingPerspective] = await Promise.all([
           preferencesService.getTeacherPreferences(user.id),
-          getClassLessonDurations()
+          getClassLessonDurations(),
+          getTeachingPerspectiveSettings()
         ]);
 
         enrichedReq = {
           ...req,
           teacherPreferences: {
             subjectWeights: (teacherPrefs?.subject_weights as Record<string, number>) || {},
-            lessonDurations: classLessonDurations
+            lessonDurations: classLessonDurations,
+            teachingPerspective: teachingPerspective?.perspective || "project_based"
           }
         };
       }
@@ -90,4 +92,18 @@ function getClassLessonDurations(): Record<string, number> {
     }
   }
   return {};
+}
+
+function getTeachingPerspectiveSettings() {
+  if (typeof window !== "undefined") {
+    const raw = localStorage.getItem("schoolTeachingPerspectiveSettings");
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch (err) {
+        console.error("Failed to parse teaching perspective settings", err);
+      }
+    }
+  }
+  return { perspective: "project_based" };
 }

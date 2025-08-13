@@ -1,63 +1,62 @@
 import { LessonRequest } from "./types";
+import { buildDailyUniversePromptV3, PromptCtx, PROMPT_VERSION_V3 } from "./prompts/dailyUniverse.v3";
+import { normalizeSubject } from "@/utils/subjects";
 
-export const PROMPT_VERSION = 2 as const;
+export const PROMPT_VERSION = PROMPT_VERSION_V3;
 
 export function buildPrompt(req: LessonRequest) {
   // Default subject weights based on UI image
   const DEFAULT_SUBJECT_WEIGHTS: Record<string, number> = {
-    mathematics: 7,
-    science: 5,
-    english: 7,
-    history: 4,
-    art: 3,
-    music: 2,
-    'physical education': 3,
-    'foreign languages': 4
+    Mathematics: 7,
+    Science: 5,
+    English: 7,
+    "Social Studies": 4,
+    Arts: 3,
+    Music: 2,
+    PE: 3,
+    "Foreign Language": 4,
+    Technology: 5,
+    "Computer Science": 4,
+    Civics: 4,
+    "Life Skills": 3
   };
 
+  // Normalize subject and get weights
+  const normalizedSubject = normalizeSubject(req.subject);
+  const subjectWeights = { ...DEFAULT_SUBJECT_WEIGHTS, ...(req.teacherPreferences?.subjectWeights || {}) };
+  
   // Calculate target duration based on teacher preferences
   const targetDuration = req.teacherPreferences?.lessonDurations?.[req.gradeLevel.toString()] 
     ? Math.round(req.teacherPreferences.lessonDurations[req.gradeLevel.toString()] * 60) // convert hours to minutes
     : 150; // default: 2.5 hours
 
-  // Get subject emphasis from teacher preferences or defaults
-  const subjectKey = req.subject.toLowerCase();
-  const subjectEmphasis = req.teacherPreferences?.subjectWeights?.[subjectKey] || 
-                         DEFAULT_SUBJECT_WEIGHTS[subjectKey] || 5;
-  const emphasisText = subjectEmphasis >= 8 ? "høj prioritet" : 
-                      subjectEmphasis <= 3 ? "lav prioritet" : "normal prioritet";
+  // Map grade level to band
+  const gradeBand = req.gradeLevel <= 2 ? "K-2" as const :
+                   req.gradeLevel <= 5 ? "3-5" as const :
+                   req.gradeLevel <= 8 ? "6-8" as const :
+                   req.gradeLevel <= 10 ? "9-10" as const : "11-12" as const;
 
-  const system = `
-Du er en dygtig pædagogisk designer (K-12).
-Returner KUN valid JSON, der matcher skemaet:
-{
-  "title": string,
-  "durationMinutes": number,
-  "objectives": string[],
-  "activities": { "type": string, "timebox": number, "instructions": string }[],
-  "materials": string[],
-  "reflectionPrompts": string[]
-}
+  // Build v3 prompt context with all signals
+  const promptCtx: PromptCtx = {
+    subject: normalizedSubject,
+    gradeBand,
+    plannerMinutes: targetDuration,
+    timeScope: req.mode === "daily" ? "day" : "season",
+    studentInterests: [], // TODO: wire from student profile
+    subjectWeights,
+    teachingPerspective: req.teacherPreferences?.teachingPerspective || "project_based",
+    learningStyle: (req.studentProfile?.learningStyle as any) || "visual",
+    ability: {
+      readingLevel: req.studentProfile?.ability === "above" ? "above" : 
+                   req.studentProfile?.ability === "below" ? "below" : "on",
+      scaffolding: req.studentProfile?.ability === "below",
+      stretchGoals: req.studentProfile?.ability === "above"
+    },
+    calendarKeywords: [], // TODO: wire from calendar service
+    curriculum: {
+      standards: [req.curriculum]
+    }
+  };
 
-VIGTIGT: Target varighed er ${targetDuration} minutter. Tilpas antallet af aktiviteter herefter.
-LÆRER PRIORITET: Dette fag har ${emphasisText} (${subjectEmphasis}/10) - tilpas dybde og engagement.
-`;
-
-  const user = `
-[MODE]: ${req.mode}
-[SUBJECT]: ${req.subject}
-[GRADE]: ${req.gradeLevel}
-[CURRICULUM]: ${req.curriculum}
-[STUDENT_ABILITY]: ${req.studentProfile?.ability ?? 'normal'}
-[LEARNING_STYLE]: ${req.studentProfile?.learningStyle ?? 'mixed'}
-[TARGET_DURATION]: ${targetDuration} minutter
-[TEACHER_EMPHASIS]: ${subjectEmphasis}/10 (${emphasisText})
-
-Lav en lektion med ${targetDuration} minutters varighed. 
-${subjectEmphasis >= 8 ? 'Gør den ekstra engagerende og dybdegående.' : 
-  subjectEmphasis <= 3 ? 'Hold den lettilgængelig og grundlæggende.' : 
-  'Balancer engagement og læring passende.'}
-`;
-
-  return { system, user };
+  return buildDailyUniversePromptV3(promptCtx);
 }
