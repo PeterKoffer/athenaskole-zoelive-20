@@ -47,13 +47,15 @@ const DailyProgramPage = () => {
       // Emit interest signal for generating universe
       emitInterest('adventure', 1, 'universe_generation');
       
-      // Pick a subject based on user interests or default to mathematics
+      // Pick a random subject based on user interests or rotate through subjects
       const userInterests = topTags(3);
+      const availableSubjects = ['mathematics', 'science', 'language arts', 'history', 'arts', 'geography'];
+      
       const subjectMapping: Record<string, string> = {
         'mathematics': 'mathematics',
         'science': 'science', 
         'technology': 'science',
-        'coding': 'science',
+        'coding': 'computer science',
         'space': 'science',
         'nature': 'science',
         'animals': 'science',
@@ -63,16 +65,29 @@ const DailyProgramPage = () => {
         'languages': 'language arts',
         'art': 'arts',
         'music': 'arts',
-        'sports': 'physical education'
+        'sports': 'physical education',
+        'cooking': 'life skills',
+        'adventure': 'language arts',
+        'books': 'language arts',
+        'reading': 'language arts'
       };
       
-      let selectedSubject = 'mathematics'; // default
+      let selectedSubject = '';
+      
+      // First try to map from user interests
       for (const interest of userInterests) {
         if (subjectMapping[interest]) {
           selectedSubject = subjectMapping[interest];
           break;
         }
       }
+      
+      // If no mapping found, pick a random subject to ensure variety
+      if (!selectedSubject) {
+        selectedSubject = availableSubjects[Math.floor(Math.random() * availableSubjects.length)];
+      }
+      
+      console.log('🎯 Selected subject:', selectedSubject, 'from interests:', userInterests);
       
       // Use adaptive generation based on user interests
       const grade = (user?.user_metadata as any)?.grade_level || 6;
