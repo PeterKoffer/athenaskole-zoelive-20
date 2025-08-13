@@ -35,7 +35,18 @@ const DailyUniverseLessonPage: React.FC = () => {
     const next = (regenSeq ?? 0) + 1;
     setRegenSeq(next);
     if (typeof window !== 'undefined') window.localStorage.setItem(seqKey, String(next));
-    logEvent("dev_regenerate_clicked", { seq: next, throttleMs: 600, session_id: sessionId });
+    const requested = getDevCountryOverride() ?? "EN";
+    const resolved = resolveCountryFlag(requested) ?? 'EN';
+    const promptVersion = (import.meta as any)?.env?.VITE_PROMPT_VERSION ?? 'v1';
+    logEvent("dev_regenerate_clicked", {
+      seq: next,
+      throttleMs: 600,
+      session_id: sessionId,
+      reason: "manual",
+      requestedCountry: requested,
+      resolvedCountry: resolved,
+      promptVersion
+    });
     setDevRemountKey(k => k + 1);
   }), [regenSeq, seqKey, sessionId, throttle]);
 
@@ -92,12 +103,19 @@ const DailyUniverseLessonPage: React.FC = () => {
           {import.meta.env.DEV && (
             <a
               className="ml-2 text-[11px] underline opacity-80 hover:opacity-100"
-              href={`/dev/events?session=${encodeURIComponent(typeof window !== 'undefined' ? getSessionId() : '')}`}
+              href={`/dev/events?session=${encodeURIComponent(typeof window !== 'undefined' ? getSessionId() : '')}&q=dev_regenerate_clicked`}
               title="Open Dev Events"
             >
               events
             </a>
           )}
+          <button
+            className="ml-1 text-[11px] underline opacity-70 hover:opacity-100"
+            onClick={() => { if (typeof window !== 'undefined') { window.localStorage.removeItem(seqKey); } setRegenSeq(0); }}
+            title="DEV: Reset regenerate sequence counter"
+          >
+            reset seq
+          </button>
           <button
             className="text-[11px] border rounded px-2 py-0.5 hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onRegenerate}

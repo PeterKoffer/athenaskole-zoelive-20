@@ -6,8 +6,7 @@ export function useDevThrottleClick(ms = 600) {
   return (fn: () => void, onThrottled?: () => void) => () => {
     const now = Date.now();
     if (now - last.current < ms) {
-      // silent-ish dev note (no toast, no DB noise)
-      console.info("[DEV] regenerate throttled");
+      if (import.meta.env.DEV) console.info("[DEV] regenerate throttled");
       onThrottled?.();
       return;
     }
