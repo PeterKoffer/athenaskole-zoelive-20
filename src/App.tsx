@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,7 +18,7 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
-import DevEventsPage from "./pages/DevEventsPage";
+const DevEventsPage = React.lazy(() => import("./pages/DevEventsPage"));
 
  // Import all learning components from new organized structure
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
@@ -233,15 +234,18 @@ const App = () => (
             }
           />
 
-          {/* Dev: Events monitor */}
-          <Route 
-            path="/dev/events" 
-            element={
-              <ProtectedRoute>
-                <DevEventsPage />
-              </ProtectedRoute>
-            }
-          />
+          {import.meta.env.DEV && (
+            <Route
+              path="/dev/events"
+              element={
+                <ProtectedRoute>
+                  <React.Suspense fallback={null}>
+                    <DevEventsPage />
+                  </React.Suspense>
+                </ProtectedRoute>
+              }
+            />
+          )}
 
           {/* Generic subject learning route for any other subjects */}
           <Route 

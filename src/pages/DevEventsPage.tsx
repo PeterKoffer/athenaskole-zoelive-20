@@ -29,11 +29,11 @@ function toCSV(rows: EventRow[]) {
   const lines = rows.map((r) => {
     const payload = JSON.stringify(r.payload ?? {});
     const cells = [r.created_at, r.name, r.session_id ?? "", payload].map((v) =>
-      `"${String(v).replace(/\"/g, '""')}"`
+      `"${String(v).replace(/"/g, '""')}"`
     );
     return cells.join(",");
   });
-  return [header.join(","), ...lines].join("\n");
+  return "\uFEFF" + [header.join(","), ...lines].join("\r\n");
 }
 
 export default function DevEventsPage() {
@@ -43,9 +43,14 @@ export default function DevEventsPage() {
   const [rows, setRows] = React.useState<EventRow[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [raw, setRaw] = React.useState("");
   const [filter, setFilter] = React.useState("");
   const [autoRefresh, setAutoRefresh] = React.useState(true);
   const [lastRefresh, setLastRefresh] = React.useState<Date | null>(null);
+  const [limit] = React.useState(200);
+  const [sinceMin] = React.useState(30);
+  const fetching = React.useRef(false);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const thirtyMinAgoIso = React.useMemo(
     () => new Date(Date.now() - 30 * 60 * 1000).toISOString(),
@@ -58,14 +63,18 @@ export default function DevEventsPage() {
   }, []);
 
   const refresh = React.useCallback(async () => {
+    if (fetching.current) return;
+    fetching.current = true;
     try {
       setLoading(true);
       setError(null);
+      const sinceISO = new Date(Date.now() - sinceMin * 60_000).toISOString();
       const { data, error } = await (supabase as any)
         .from("events")
         .select("id, created_at, name, session_id, payload")
+        .gte("created_at", sinceISO)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(limit);
       if (error) throw error;
       setRows((data || []) as EventRow[]);
       setLastRefresh(new Date());
@@ -73,8 +82,9 @@ export default function DevEventsPage() {
       setError(e?.message ?? "Failed to load events");
     } finally {
       setLoading(false);
+      fetching.current = false;
     }
-  }, []);
+  }, [limit, sinceMin]);
 
   React.useEffect(() => {
     document.title = "Dev · Events";
@@ -87,8 +97,34 @@ export default function DevEventsPage() {
     return () => window.clearInterval(id);
   }, [autoRefresh, refresh]);
 
+  // Debounce filter input
+  React.useEffect(() => {
+    const t = window.setTimeout(() => setFilter(raw.trim().toLowerCase()), 250);
+    return () => window.clearTimeout(t);
+  }, [raw]);
+
+  // Hotkey: focus filter with '/'
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "/") { e.preventDefault(); inputRef.current?.focus(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Realtime inserts
+  React.useEffect(() => {
+    const channel = (supabase as any)
+      .channel("events-inserts")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "events" }, (payload: any) => {
+        setRows((prev) => [payload.new as EventRow, ...prev].slice(0, limit));
+      })
+      .subscribe();
+    return () => { (supabase as any).removeChannel(channel); };
+  }, [limit]);
+
   const filtered = React.useMemo(() => {
-    const q = filter.trim().toLowerCase();
+    const q = filter.trim();
     if (!q) return rows;
     return rows.filter((r) =>
       r.name.toLowerCase().includes(q) ||
@@ -194,8 +230,9 @@ export default function DevEventsPage() {
 
       <div className="mb-2 flex items-center gap-3">
         <input
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          ref={inputRef}
+          value={raw}
+          onChange={(e) => setRaw(e.target.value)}
           placeholder="Filter by name, session or payload…"
           className="w-full md:w-96 border rounded-xl px-3 py-2 text-sm bg-background"
         />
@@ -230,7 +267,7 @@ export default function DevEventsPage() {
                     </pre>
                     <button
                       className="mt-2 text-xs underline"
-                      onClick={() => navigator.clipboard.writeText(JSON.stringify(r.payload))}
+                      onClick={() => navigator.clipboard.writeText(JSON.stringify(r.payload, null, 2))}
                     >
                       copy JSON
                     </button>
