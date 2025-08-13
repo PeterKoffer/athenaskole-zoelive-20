@@ -1,3 +1,5 @@
+import { getEffectiveEduContext } from "@/services/edu/effectiveContext";
+import { loadStudentProfileEdu, loadTeacherOverrides, loadClassOverrides } from "@/services/edu/loadOverrides";
 import { EduContext } from "@/services/edu/locale";
 
 export type TeachingPerspective =
@@ -39,11 +41,27 @@ export type PromptCtx = {
   seed?: string;
   lastSeeds?: string[];
   
-  // Educational localization context
+  // Class identifier for educational context
+  classId?: string;
+  
+  // Educational localization context (deprecated in favor of effective context)
   edu?: EduContext;
 };
 
-export function buildDailyUniversePromptV3(ctx: PromptCtx): { system: string; user: string } {
+export async function buildDailyUniversePromptV3(ctx: PromptCtx): Promise<{ system: string; user: string }> {
+  const [studentProfile, teacherOverrides, classOverrides] = await Promise.all([
+    loadStudentProfileEdu(),
+    loadTeacherOverrides(),
+    loadClassOverrides(ctx.classId),
+  ]);
+
+  const edu = getEffectiveEduContext({
+    studentProfile,
+    teacherOverrides,
+    classOverrides,
+    cacheKey: `edu:${ctx.classId ?? "no-class"}`,
+  });
+
   const {
     subject,
     gradeBand,
@@ -55,28 +73,29 @@ export function buildDailyUniversePromptV3(ctx: PromptCtx): { system: string; us
     calendarKeywords = [],
     calendarWindow,
     studentInterests = [],
-    curriculum = {},
-    edu
+    curriculum = {}
   } = ctx;
 
   const system = `
 You are an expert K-12 curriculum designer. Generate a daily learning universe that integrates all educational signals.
 
-${edu ? `
-COUNTRY & LOCALE:
+COUNTRY & LOCALE (TEACHER-LED):
 - Country: ${edu.countryCode}
 - Curriculum: ${edu.curriculumCode}
 - Language: ${edu.language}
 - Locale: ${edu.locale}
 - Units: ${edu.measurement} (always use ${edu.measurement} units)
 - Currency: ${edu.currencyCode} (use symbol ${edu.currencySymbol})
+- Timezone: ${edu.timezone}
+
+STRICT RULE:
+- If any ambiguity arises, follow TEACHER choices above (class/teacher overrides) rather than student defaults.
 
 REQUIREMENTS:
 - Use native conventions (spelling, examples, measurements, currency).
 - Align activities to ${edu.curriculumCode}.
 - Write in ${edu.language}. Avoid mixing languages unless explicitly told.
 - Prefer context relevant to ${edu.countryCode} (history/civics examples can be local). International content is welcome but keep native framing.
-` : ''}
 
 Return ONLY valid JSON matching this schema:
 {
@@ -129,7 +148,7 @@ CRITICAL RULES:
 [STUDENT INTERESTS]: ${studentInterests.join(', ')}
 [SUBJECT WEIGHTS]: ${JSON.stringify(subjectWeights)}
 [CURRICULUM]: ${curriculum.standards?.join('; ') || 'Standard curriculum'}
-${edu ? `[LOCALIZATION]: ${edu.countryCode} | ${edu.language} | ${edu.measurement} units | ${edu.currencySymbol}` : ''}
+[LOCALIZATION]: ${edu.countryCode} | ${edu.language} | ${edu.measurement} units | ${edu.currencySymbol}
 
 Generate an engaging ${plannerMinutes}-minute learning experience that:
 1. Centers on ${subject} but connects to high-priority subjects from teacher weights

@@ -48,7 +48,7 @@ export async function generateContent(req: LessonRequest): Promise<LessonRespons
     return cached.json as LessonResponse;
   }
 
-  const { system, user } = buildPrompt(enrichedReq);
+  const { system, user } = await buildPrompt(enrichedReq);
 
   // 2. Call Supabase edge function for OpenAI
   const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {

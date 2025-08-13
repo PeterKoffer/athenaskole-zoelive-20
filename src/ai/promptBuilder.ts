@@ -1,11 +1,11 @@
 import { LessonRequest } from "./types";
 import { buildDailyUniversePromptV3, PromptCtx, PROMPT_VERSION_V3 } from "./prompts/dailyUniverse.v3";
 import { normalizeSubject } from "@/utils/subjects";
-import { resolveEduContext } from "@/services/edu/locale";
+
 
 export const PROMPT_VERSION = PROMPT_VERSION_V3;
 
-export function buildPrompt(req: LessonRequest) {
+export async function buildPrompt(req: LessonRequest) {
   // Default subject weights based on UI image
   const DEFAULT_SUBJECT_WEIGHTS: Record<string, number> = {
     Mathematics: 7,
@@ -37,16 +37,6 @@ export function buildPrompt(req: LessonRequest) {
                    req.gradeLevel <= 8 ? "6-8" as const :
                    req.gradeLevel <= 10 ? "9-10" as const : "11-12" as const;
 
-  // Resolve educational localization context
-  const edu = resolveEduContext({
-    countryCode: req.studentProfile?.countryCode,
-    locale: req.studentProfile?.locale,
-    currencyCode: req.studentProfile?.currencyCode,
-    measurement: req.studentProfile?.measurement as any,
-    curriculumCode: req.studentProfile?.curriculumCode,
-    timezone: req.studentProfile?.timezone,
-  });
-
   // Build v3 prompt context with all signals
   const promptCtx: PromptCtx = {
     subject: normalizedSubject,
@@ -67,9 +57,9 @@ export function buildPrompt(req: LessonRequest) {
     curriculum: {
       standards: [req.curriculum]
     },
-    // Educational localization context
-    edu
+    // Include classId for educational context (TODO: add to LessonRequest type)
+    classId: undefined
   };
 
-  return buildDailyUniversePromptV3(promptCtx);
+  return await buildDailyUniversePromptV3(promptCtx);
 }
