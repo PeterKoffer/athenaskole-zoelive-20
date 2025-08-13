@@ -22,6 +22,7 @@ const DevEventsPage = React.lazy(() => import("./pages/DevEventsPage"));
 const GamesPage = React.lazy(() => import("./pages/GamesPage"));
 const GamePage = React.lazy(() => import("./pages/GamePage"));
 const UniverseAdminPage = React.lazy(() => import("./pages/admin/UniverseAdminPage"));
+const UniverseQAPage = React.lazy(() => import("./pages/dev/UniverseQAPage"));
 
  // Import all learning components from new organized structure
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
@@ -256,6 +257,19 @@ const App = () => (
                 <ProtectedRoute>
                   <React.Suspense fallback={null}>
                     <DevEventsPage />
+                  </React.Suspense>
+                </ProtectedRoute>
+              }
+            />
+          )}
+
+          {import.meta.env.DEV && (
+            <Route
+              path="/dev/universe-qa"
+              element={
+                <ProtectedRoute>
+                  <React.Suspense fallback={null}>
+                    <UniverseQAPage />
                   </React.Suspense>
                 </ProtectedRoute>
               }
