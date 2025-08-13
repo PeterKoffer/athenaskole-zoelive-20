@@ -14,7 +14,14 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content }) => {
           case 'video':
             return <video key={index} src={item.value} controls />;
           case 'image':
-            return <img key={index} src={item.value} alt="" />;
+            return (
+              <img
+                key={index}
+                src={item.value || "/images/placeholder-16x9.png"}
+                alt=""
+                className="w-full aspect-video object-cover rounded-2xl bg-slate-100"
+              />
+            );
           case 'text':
             return <p key={index}>{item.value}</p>;
           default:

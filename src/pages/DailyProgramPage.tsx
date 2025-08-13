@@ -260,9 +260,7 @@ const DailyProgramPage = () => {
           {universe && (
             <div className="space-y-6" ref={universeRef}>
               <Card className="bg-gradient-to-r from-blue-900 to-purple-900 overflow-hidden text-white">
-                {universe.image && (
-                  <img src={universe.image} alt="Universe" className="w-full h-48 object-cover" />
-                )}
+                <img src={universe.image ?? "/images/placeholder-16x9.png"} alt="Universe" className="w-full aspect-video object-cover rounded-2xl bg-slate-100" />
                 <CardHeader>
                   <CardTitle className="text-2xl">{universe.title}</CardTitle>
                 </CardHeader>

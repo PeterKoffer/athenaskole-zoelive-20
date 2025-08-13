@@ -14,9 +14,11 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
     return (
         <div className="space-y-6">
             <Card className="overflow-hidden">
-                {universe.image && (
-                    <img src={universe.image} alt="Universe" className="w-full h-48 object-cover" />
-                )}
+                <img 
+                    src={universe.image ?? "/images/placeholder-16x9.png"} 
+                    alt="Universe"
+                    className="w-full aspect-video object-cover rounded-2xl bg-slate-100"
+                />
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
                         {universe.title}
