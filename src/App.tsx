@@ -17,7 +17,9 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
-// Import all learning components from new organized structure
+import DevEventsPage from "./pages/DevEventsPage";
+
+ // Import all learning components from new organized structure
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
 import ScienceLearning from "./components/subjects/science/ScienceLearning";
 import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
@@ -227,6 +229,16 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DailyUniverseLessonPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dev: Events monitor */}
+          <Route 
+            path="/dev/events" 
+            element={
+              <ProtectedRoute>
+                <DevEventsPage />
               </ProtectedRoute>
             }
           />
