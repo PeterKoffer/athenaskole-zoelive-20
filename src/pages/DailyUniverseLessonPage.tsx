@@ -11,6 +11,7 @@ import { getSessionId } from '@/utils/session';
 import { resolveCountryFlag } from '@/utils/country';
 import { getDevCountryOverride, setDevCountryOverride } from '@/utils/devCountry';
 import { logEvent } from '@/services/telemetry/events';
+import { useDevThrottleClick } from '@/hooks/useDevThrottleClick';
 
 interface LocationState {
   universe?: Universe;
@@ -25,6 +26,10 @@ const DailyUniverseLessonPage: React.FC = () => {
   const universe = state?.universe;
   // gradeLevel handled by lesson manager
   const [devRemountKey, setDevRemountKey] = React.useState(0);
+  const onRegenerate = React.useCallback(async () => {
+    setDevRemountKey(k => k + 1);
+    await logEvent("dev_regenerate_clicked", { reason: "manual" });
+  }, []);
 
   if (!universe) {
     navigate('/daily-program');
@@ -44,7 +49,7 @@ const DailyUniverseLessonPage: React.FC = () => {
   };
 
   // Dev-only: badge with duration, prompt version and first DK targets
-  const DevBadge: React.FC<{ subject: string; gradeLevel?: number; onRegenerate: () => void }> = ({ subject, gradeLevel, onRegenerate }) => {
+  const DevBadge: React.FC<{ subject: string; gradeLevel?: number; onRegenerate?: () => void | Promise<void> }> = ({ subject, gradeLevel, onRegenerate }) => {
     const { targetDuration } = useUnifiedLesson();
     const targets = React.useMemo(
       () => resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel ?? 6) }),
@@ -53,6 +58,8 @@ const DailyUniverseLessonPage: React.FC = () => {
     const ver = (import.meta as any)?.env?.VITE_PROMPT_VERSION || 'v1';
     const requestedOverride = getDevCountryOverride();
     const resolvedCountry = resolveCountryFlag(requestedOverride) ?? 'EN';
+    const throttle = useDevThrottleClick(600);
+    const handleClick = React.useMemo(() => (onRegenerate ? throttle(onRegenerate) : undefined), [onRegenerate, throttle]);
     return (
       <div className="mb-2">
         <div className="flex items-center gap-2">
@@ -86,10 +93,7 @@ const DailyUniverseLessonPage: React.FC = () => {
           )}
           <button
             className="text-[11px] border rounded px-2 py-0.5 hover:bg-primary/5"
-            onClick={async () => {
-              onRegenerate();
-              await logEvent("dev_regenerate_clicked", { reason: "manual", source: "badge" });
-            }}
+            onClick={handleClick}
             title="DEV: Remount lesson to force a fresh generation"
           >
             Regenerate
@@ -114,7 +118,7 @@ const DailyUniverseLessonPage: React.FC = () => {
       <>
         {import.meta.env.DEV && (
           <div className="mb-2">
-            <DevBadge subject={resolvedSubject} gradeLevel={state?.gradeLevel} onRegenerate={() => setDevRemountKey(k => k + 1)} />
+            <DevBadge subject={resolvedSubject} gradeLevel={state?.gradeLevel} onRegenerate={onRegenerate} />
             <DevQAFromContext />
           </div>
         )}
