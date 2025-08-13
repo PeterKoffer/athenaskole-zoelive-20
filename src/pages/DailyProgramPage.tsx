@@ -76,7 +76,7 @@ const DailyProgramPage = () => {
       
       // Use adaptive generation based on user interests
       const grade = (user?.user_metadata as any)?.grade_level || 6;
-      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse(selectedSubject, grade, user?.id, horizon);
+      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse(selectedSubject, grade, user?.id);
       
       if (!result) {
         // Fallback to a built-in sample if generation fails completely
@@ -104,11 +104,14 @@ const DailyProgramPage = () => {
         }
       }
 
-      // Force re-render by clearing any cached universe data
-      setUniverse(null);
-      setLessonActivities(null);
+      // Force refresh by adding timestamp to prevent caching
+      const freshResult = {
+        ...result,
+        _timestamp: Date.now(),
+        interests: userInterests || ['adventure'] // Ensure interests are always passed
+      };
       
-      setUniverse(result);
+      setUniverse(freshResult);
 
       // Generate today's lesson activities based on the universe theme
       if (result) {

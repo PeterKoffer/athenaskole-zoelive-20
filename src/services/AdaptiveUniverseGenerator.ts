@@ -1,19 +1,15 @@
 import { Universe } from './UniverseGenerator';
 import { topTags } from './interestProfile';
-import { createOrRefreshUniverse, simulateStep } from './universe/simulation';
-import { UniverseState, Horizon } from './universe/state';
-import { loadArc, saveArc } from './universe/persist';
-import { pickStandardsForToday, calculateEngagementSignals } from './universe/scheduler';
-import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
-import { resolveCountryFlag } from '@/utils/country';
+import { createOrRefreshUniverse } from './universe/simulation';
+import { UniverseState } from './universe/state';
+import { saveArc } from './universe/persist';
 
 export class AdaptiveUniverseGenerator {
   
   static async generatePersonalizedUniverse(
     subject: string = 'general',
     gradeLevel: number = 6,
-    userId?: string,
-    horizon: Horizon = 'day'
+    userId?: string
   ): Promise<Universe> {
     
     const gradeBand = gradeLevel <= 5 ? "3-5" : gradeLevel <= 8 ? "6-8" : "9-12";
@@ -23,26 +19,9 @@ export class AdaptiveUniverseGenerator {
       let universeState: UniverseState;
       
       if (userId) {
-        const existing = loadArc(userId);
-        if (existing && existing.subject === subject) {
-          // Advance the existing universe
-          const country = resolveCountryFlag();
-          const allStandards = resolveCurriculumTargets({ 
-            subject, 
-            gradeBand, 
-            country 
-          }).slice(0, 10);
-          
-          const todayStandards = pickStandardsForToday(allStandards, existing.metrics.mastery);
-          const signals = calculateEngagementSignals([]);
-          
-          universeState = await simulateStep(existing, horizon, todayStandards, signals);
-          saveArc(userId, universeState);
-        } else {
-          // Create new universe
-          universeState = await createOrRefreshUniverse(subject, gradeBand);
-          if (userId) saveArc(userId, universeState);
-        }
+        // Always create fresh universe to avoid repetitive content
+        universeState = await createOrRefreshUniverse(subject, gradeBand);
+        saveArc(userId, universeState);
       } else {
         // Guest user - create temporary universe
         universeState = await createOrRefreshUniverse(subject, gradeBand);
