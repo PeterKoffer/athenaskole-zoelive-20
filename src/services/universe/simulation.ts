@@ -6,12 +6,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { logEvent } from "@/services/telemetry/events";
 
 // Helper to call LLM and parse JSON response
-async function callLLMJson<T = any>(prompt: string): Promise<T> {
+async function callLLMJson<T = any>(
+  prompt: string, 
+  subject: string = 'mathematics', 
+  interests: string[] = []
+): Promise<T> {
   const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
     body: {
       type: 'universe_generation',
       prompt: prompt,
+      subject: subject,
       gradeLevel: 6, // Default grade level
+      studentInterests: interests,
       maxTokens: 400,
       temperature: 0.7
     }
@@ -57,9 +63,13 @@ export async function createOrRefreshUniverse(
   const tags = topTags(3);
   
   try {
-    const brief = await callLLMJson(UNIVERSE_BRIEF_PROMPT({
-      subject, gradeBand, interestsCSV: tags.join(", ")
-    }));
+    const brief = await callLLMJson(
+      UNIVERSE_BRIEF_PROMPT({
+        subject, gradeBand, interestsCSV: tags.join(", ")
+      }),
+      subject,
+      tags
+    );
     
     const state: UniverseState = {
       id: crypto.randomUUID(),
@@ -103,9 +113,13 @@ export async function simulateStep(
   signals: Array<{tag:string,delta:number}>
 ): Promise<UniverseState> {
   try {
-    const diff = await callLLMJson<UniverseDiff>(SIMULATE_STEP_PROMPT({
-      state, horizon, todayStandards: standardsToday, signals
-    }));
+    const diff = await callLLMJson<UniverseDiff>(
+      SIMULATE_STEP_PROMPT({
+        state, horizon, todayStandards: standardsToday, signals
+      }),
+      state.subject,
+      state.tags
+    );
     
     const next = applyDiff({ ...state, time: { ...state.time, horizon } }, diff);
     

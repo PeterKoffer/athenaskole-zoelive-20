@@ -237,15 +237,38 @@ async function generateUniverseContent(requestData: any, openaiKey?: string, dee
         messages: [
           {
             role: 'system',
-            content: 'You are an expert educational content creator. Generate engaging learning universes for students. Always return valid JSON only.'
+            content: `You are a creative educational universe designer. Create immersive, engaging learning worlds that blend education with student interests.
+
+Generate learning universes that:
+- Are grounded in real-world scenarios (no fantasy unless specifically requested)
+- Connect subject matter to student interests
+- Create compelling narratives with stakes and objectives
+- Include relatable characters and settings
+- Provide hands-on activities and challenges
+
+Always return valid JSON only with the exact format requested.`
           },
           {
             role: 'user',
-            content: prompt
+            content: `Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${requestData.subject || 'general subjects'}.
+
+Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
+
+Create a universe that feels like an adventure but is grounded in real school/home/community life. Make it compelling with clear objectives and engaging activities.
+
+Return this exact JSON format:
+{
+  "title": "Engaging title (max 6 words)",
+  "description": "2-3 sentences describing the learning adventure with concrete stakes and objectives",
+  "theme": "${requestData.subject || 'education'}",
+  "characters": ["Character 1", "Character 2", "Character 3"],
+  "locations": ["Location 1", "Location 2", "Location 3"],
+  "activities": ["Activity 1", "Activity 2", "Activity 3"]
+}`
           }
         ],
-        temperature: 0.8,
-        max_tokens: 800
+        temperature: 0.9,
+        max_tokens: 1000
       }),
     });
 
