@@ -45,11 +45,38 @@ const DailyProgramPage = () => {
 
     try {
       // Emit interest signal for generating universe
-      emitInterest('general', 1, 'universe_generation');
+      emitInterest('adventure', 1, 'universe_generation');
+      
+      // Pick a subject based on user interests or default to mathematics
+      const userInterests = topTags(3);
+      const subjectMapping: Record<string, string> = {
+        'mathematics': 'mathematics',
+        'science': 'science', 
+        'technology': 'science',
+        'coding': 'science',
+        'space': 'science',
+        'nature': 'science',
+        'animals': 'science',
+        'health': 'science',
+        'history': 'history',
+        'geography': 'geography',
+        'languages': 'language arts',
+        'art': 'arts',
+        'music': 'arts',
+        'sports': 'physical education'
+      };
+      
+      let selectedSubject = 'mathematics'; // default
+      for (const interest of userInterests) {
+        if (subjectMapping[interest]) {
+          selectedSubject = subjectMapping[interest];
+          break;
+        }
+      }
       
       // Use adaptive generation based on user interests
       const grade = (user?.user_metadata as any)?.grade_level || 6;
-      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse('general', grade, user?.id, horizon);
+      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse(selectedSubject, grade, user?.id, horizon);
       
       if (!result) {
         // Fallback to a built-in sample if generation fails completely
