@@ -3,6 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import HomeMainContent from "@/components/home/HomeMainContent";
 import RoleSwitcher from "@/components/RoleSwitcher";
 
@@ -10,6 +11,9 @@ const Index = () => {
   const { user } = useAuth();
   const { userRole } = useRoleAccess();
   const navigate = useNavigate();
+  
+  // Enable automatic redirect to appropriate dashboard based on role
+  useAuthRedirect();
 
   const targetPaths: Record<string, string> = {
     'admin': '/school-dashboard',
