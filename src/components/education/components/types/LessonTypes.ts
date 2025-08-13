@@ -1,7 +1,7 @@
 
 export interface LessonActivity {
   id: string;
-  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'quiz' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'educational-game' | 'training-ground-activity';
+  type: 'introduction' | 'content-delivery' | 'interactive-game' | 'quiz' | 'creative-exploration' | 'application' | 'summary' | 'simulation' | 'educational-game' | 'training-ground-activity' | 'game';
   title: string;
   duration: number; // in seconds
   phase?: string; // Add phase property for backward compatibility
@@ -87,6 +87,9 @@ export interface LessonActivity {
     title?: string; // For activities with titles
     activityId?: string; // For activity identification
     // Training Ground specific data
+    gameId?: string; // For game activities
+    params?: any; // Game parameters
+    // ... keep existing code
     trainingGroundData?: {
       title: string;
       objective: string;

@@ -8,6 +8,7 @@ import TrainingGroundActivityRenderer from './TrainingGroundActivityRenderer';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import DevRegenerateButton from '@/components/dev/DevRegenerateButton';
 import { emitInterest, InterestTag } from '@/services/interestSignals';
+import MicroGameHost from '@/games/components/MicroGameHost';
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
   onComplete?: (score: number) => void;
@@ -32,6 +33,24 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
           }
           if (onComplete) {
             onComplete(success ? 10 : 0);
+          }
+        }}
+      />
+    );
+  }
+
+  // Handle game activities
+  if (activity.type === 'game' && (activity as any).content?.gameId) {
+    return (
+      <MicroGameHost
+        gameId={(activity as any).content.gameId}
+        params={(activity as any).content.params || {}}
+        onComplete={(score) => {
+          if (onComplete) {
+            onComplete(score);
+          }
+          if (onActivityComplete) {
+            onActivityComplete(true);
           }
         }}
       />

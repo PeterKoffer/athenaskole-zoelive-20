@@ -775,6 +775,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scores: {
+        Row: {
+          country: string | null
+          created_at: string
+          game_id: string
+          meta: Json
+          period: string
+          school_id: string | null
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          game_id: string
+          meta?: Json
+          period?: string
+          school_id?: string | null
+          score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          game_id?: string
+          meta?: Json
+          period?: string
+          school_id?: string | null
+          score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_profiles: {
         Row: {
           created_at: string | null
@@ -1023,8 +1059,16 @@ export type Database = {
         Args: { uid: string; role: string }
         Returns: boolean
       }
+      jwt_claim: {
+        Args: { "": string }
+        Returns: string
+      }
       purge_old_events: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      submit_score: {
+        Args: { p_game_id: string; p_score: number; p_meta?: Json }
         Returns: undefined
       }
       update_concept_mastery: {
