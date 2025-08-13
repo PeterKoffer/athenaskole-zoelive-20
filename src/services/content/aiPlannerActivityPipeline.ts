@@ -128,6 +128,7 @@ export const ActivitySchema = z.object({
   curriculumStandard: z.string().optional().default(""),
   targetConcept: z.string().optional().default(""),
   rubric: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional().default([]),
 });
 
 export type GeneratedActivity = z.infer<typeof ActivitySchema>;
@@ -189,9 +190,13 @@ Output ONLY valid JSON matching the schema below.`;
 function buildActivityPrompts(slot: PlannerActivitySlot, world: Planner["world"], context: LessonContext) {
   const systemPrompt = `You generate student-ready interactive tasks from a slot plan. MUST use: subject, grade level, curriculum standard, school perspective, time budget, student abilities/learning styles/interests, accommodations. Output ONLY JSON matching the schema. Rules: One and only one correct option (if options exist). Provide explanation and at least one hint. Keep reading level ≈ studentGroup.readability. Include imagePrompt (and videoBeat if teacherPreferences.allowShortClips is true). If type is short_constructed_response, include a concise rubric (3 criteria). If adaptivity.difficultyPolicy is adjust_per_activity, tune difficulty to abilityProfile and mark finalDifficulty.`;
 
-  const schemaExcerpt = `Schema keys: slotId, kind, narrative, question, stimulus{type,content}, options[], correctIndex, explanation, hints[], imagePrompt, videoBeat{enabled,beatSheet[]}, estimatedTimeMin, difficulty, finalDifficulty, skills[], curriculumStandard, targetConcept, rubric[]`;
+  const schemaExcerpt = `Schema keys: slotId, kind, narrative, question, stimulus{type,content}, options[], correctIndex, explanation, hints[], imagePrompt, videoBeat{enabled,beatSheet[]}, estimatedTimeMin, difficulty, finalDifficulty, skills[], curriculumStandard, targetConcept, rubric[], tags[]`;
 
-  const userPrompt = `Generate the activity for this slot using the context and world. Ensure the content aligns to curriculumStandard and targetConcept. Reflect schoolPerspective.teachingApproach and studentGroup.learningStyles. If interests exist, weave them into narrative/stimulus. Respect accommodations (short instructions, optional read-aloud). Output valid JSON only.\n\n${JSON.stringify({ slot, world, context })}`;
+  const userPrompt = `Generate the activity for this slot using the context and world. Ensure the content aligns to curriculumStandard and targetConcept. Reflect schoolPerspective.teachingApproach and studentGroup.learningStyles. If interests exist, weave them into narrative/stimulus. Respect accommodations (short instructions, optional read-aloud). 
+
+IMPORTANT: Include a "tags" array with 2-4 interest tags from this list that best describe the activity content: ["sports", "music", "art", "cooking", "technology", "nature", "science", "history", "animals", "travel", "gaming", "health", "fashion", "cars", "finance", "mathematics", "languages", "geography", "weather", "space", "robots", "film", "food"].
+
+Output valid JSON only.\n\n${JSON.stringify({ slot, world, context })}`;
 
   return { systemPrompt, userPrompt: `${userPrompt}\n\n${schemaExcerpt}` };
 }

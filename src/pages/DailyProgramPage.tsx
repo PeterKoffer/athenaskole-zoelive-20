@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target } from 'lucide-react';
-import { aiUniverseGenerator } from '@/services/AIUniverseGenerator';
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
+import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
+import { emitInterest } from '@/services/interestSignals';
+import { topTags } from '@/services/interestProfile';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -40,20 +42,16 @@ const DailyProgramPage = () => {
     setError(null);
 
     try {
-      const prompt =
-        'Create an engaging daily learning universe for students with interactive activities, interesting characters, and educational adventures.';
-      let result = await aiUniverseGenerator.generateUniverse(prompt);
+      // Emit interest signal for generating universe
+      emitInterest('general', 1, 'universe_generation');
+      
+      // Use adaptive generation based on user interests
+      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse('general', grade);
+      
       if (!result) {
         // Fallback to a built-in sample if generation fails completely
         result = UniverseGenerator.getUniverses()[0];
-      }
-
-      if (typeof result === 'string') {
-        try {
-          result = JSON.parse(result);
-        } catch {
-          result = UniverseGenerator.getUniverses()[0];
-        }
       }
 
       // Generate AI image for the universe
@@ -165,11 +163,11 @@ const DailyProgramPage = () => {
             </CardHeader>
             <CardContent>
               <TextWithSpeaker
-                text="Today's learning adventure is uniquely crafted just for you! Dive into an immersive, AI-generated educational universe filled with interactive content, engaging storylines, and personalized challenges that adapt to your learning style."
+                text={`Today's learning adventure is uniquely crafted based on your interests: ${topTags(3).join(', ') || 'discovering new topics'}! Dive into an immersive, AI-generated educational universe that adapts to what you love learning about.`}
                 context="daily-program-intro"
               >
                 <p className="text-lg text-blue-200 mb-6">
-                  {"Today's learning adventure is uniquely crafted just for you! Dive into an immersive, AI-generated educational universe filled with interactive content, engaging storylines, and personalized challenges that adapt to your learning style."}
+                  {`Today's learning adventure is uniquely crafted based on your interests: ${topTags(3).join(', ') || 'discovering new topics'}! Dive into an immersive, AI-generated educational universe that adapts to what you love learning about.`}
                 </p>
               </TextWithSpeaker>
               
@@ -225,14 +223,17 @@ const DailyProgramPage = () => {
               </div>
               {!universe && (
                 <Button
-                  onClick={generateUniverse}
+                  onClick={() => {
+                    emitInterest('adventure', 1, 'start_button');
+                    generateUniverse();
+                  }}
                   size="lg"
                   disabled={loadingUniverse || generatingImage}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   {loadingUniverse ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating Universe...
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating Your Personalized Universe...
                     </>
                   ) : generatingImage ? (
                     <>
@@ -240,7 +241,7 @@ const DailyProgramPage = () => {
                     </>
                   ) : (
                     <>
-                      <Play className="w-5 h-5 mr-2" /> Start Your Adventure
+                      <Play className="w-5 h-5 mr-2" /> Start Your Personalized Adventure
                     </>
                   )}
                 </Button>

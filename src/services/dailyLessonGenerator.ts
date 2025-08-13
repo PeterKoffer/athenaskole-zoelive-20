@@ -185,15 +185,16 @@ export class DailyLessonGenerator {
             title: (g as any).question || (g as any).narrative || `${subject} Activity ${i + 1}`,
             type,
             duration: Math.max(120, (((g as any).estimatedTimeMin ?? (slot as any).timeMin ?? 5) * 60)),
-            content: {
-              question: (g as any).question,
-              options: (g as any).options,
-              correctAnswer: typeof (g as any).correctIndex === 'number' ? (g as any).correctIndex : undefined,
-              explanation: (g as any).explanation,
-              text: (g as any).narrative,
-              scenario: (g as any).narrative,
-              instructions: (g as any).narrative
-            },
+              content: {
+                question: (g as any).question,
+                options: (g as any).options,
+                correctAnswer: typeof (g as any).correctIndex === 'number' ? (g as any).correctIndex : undefined,
+                explanation: (g as any).explanation,
+                text: (g as any).narrative,
+                scenario: (g as any).narrative,
+                instructions: (g as any).narrative
+              },
+              tags: (g as any).tags || [],
             difficulty: ((g as any).finalDifficulty || (g as any).difficulty) as any,
             subject,
             skillArea,

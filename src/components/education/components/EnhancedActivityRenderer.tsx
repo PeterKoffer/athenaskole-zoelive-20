@@ -7,6 +7,7 @@ import { LessonActivity } from './types/LessonTypes';
 import TrainingGroundActivityRenderer from './TrainingGroundActivityRenderer';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import DevRegenerateButton from '@/components/dev/DevRegenerateButton';
+import { emitInterest, InterestTag } from '@/services/interestSignals';
 interface EnhancedActivityRendererProps {
   activity: LessonActivity;
   onComplete?: (score: number) => void;
@@ -71,6 +72,17 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
     const points = isCorrect ? 10 : 0;
     
     console.log('✅ Answer processed:', { answerIndex, correctIdx, isCorrect, points });
+    
+    // Emit interest signals based on engagement
+    const activityTags = (activity as any).tags || [];
+    if (activityTags.length > 0) {
+      const weight = isCorrect ? 2 : 1; // Higher weight for correct answers
+      activityTags.forEach((tag: string) => {
+        if (tag as InterestTag) {
+          emitInterest(tag as InterestTag, weight, 'answer');
+        }
+      });
+    }
     
     // Show result immediately, then auto-advance after delay
     setTimeout(() => {

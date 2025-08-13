@@ -1,4 +1,5 @@
 // Unified lesson context builder used by the Planner → Activity pipeline
+import { topTags } from '@/services/interestProfile';
 
 export type LessonContext = {
   subject: string;
@@ -86,7 +87,7 @@ export function buildLessonContext(params: {
       ].filter(Boolean),
       abilityProfile: ability,
       readability: 'US Grade 4–5',
-      interests: learnerProfile?.interests || [],
+      interests: [...(learnerProfile?.interests || []), ...topTags(3)],
       language: learnerProfile?.language || 'en',
       accommodations: ['short instructions', 'optional read-aloud'],
     },
