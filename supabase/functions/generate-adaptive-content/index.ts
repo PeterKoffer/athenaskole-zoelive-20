@@ -2,7 +2,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateContentWithTrainingGroundPrompt, generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
-import { createDailyProgramPrompt } from '../prompts/index.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -213,11 +212,18 @@ serve(async (req) => {
 });
 
 async function generateUniverseContent(requestData: any, openaiKey?: string, deepSeekKey?: string) {
-  const prompt = createDailyProgramPrompt(
-    requestData.prompt,
-    requestData.gradeLevel || 4,
-    requestData.learningStyle || 'mixed'
-  );
+  const prompt = `Create an engaging educational learning universe for grade ${requestData.gradeLevel || 4} students.
+  
+  Include:
+  - A creative title and theme
+  - Interesting characters students can relate to
+  - Educational locations or settings
+  - Interactive activities that teach the subject matter
+  - A compelling description that motivates learning
+  
+  Return valid JSON with: title, description, theme, characters, locations, activities
+  
+  Base prompt: ${requestData.prompt}`;
 
   if (openaiKey) {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

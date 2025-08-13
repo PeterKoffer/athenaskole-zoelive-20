@@ -6,7 +6,6 @@ import { generateQuestionWithOpenAI } from './openaiClient.ts';
 import { validateQuestionStructure } from './validator.ts';
 import { validateMathAnswer } from './mathValidator.ts';
 import { validateForEquivalentAnswers } from './equivalentAnswerValidator.ts';
-import { createSubjectPrompt } from '../prompts/index.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -70,13 +69,16 @@ serve(async (req) => {
     console.log(`🎓 Educational context:`, JSON.stringify(educationalContext, null, 2));
 
     // Construct the prompt
-    const prompt = createSubjectPrompt(
-      subject,
-      skillArea,
-      gradeLevel,
-      ['QUESTION_MULTIPLE_CHOICE'],
-      1
-    );
+    const prompt = `Create a multiple choice question for Grade ${gradeLevel} ${subject}/${skillArea}.
+    
+    Requirements:
+    - Age-appropriate for Grade ${gradeLevel}
+    - Difficulty level: ${difficultyLevel}
+    - Include 4 multiple choice options
+    - Provide clear explanation
+    - Return valid JSON format
+    
+    Context: ${specificContext}`;
 
     console.log(`📝 Educational prompt length: ${prompt.length} characters`);
     console.log(`🤖 Calling OpenAI with personalized K-12 prompt for Grade ${gradeLevel}`);

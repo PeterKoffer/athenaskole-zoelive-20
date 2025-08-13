@@ -110,13 +110,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               position="corner"
               className="group"
             >
-              <p className="text-foreground text-lg leading-relaxed">
+              <p className="text-gray-300 text-lg leading-relaxed">
                 {activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Continue Learning
             </Button>
@@ -146,13 +146,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               position="corner"
               className="group"
             >
-              <p className="text-foreground text-lg leading-relaxed">
+              <p className="text-gray-300 text-lg leading-relaxed">
                 {contentText}
               </p>
             </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Continue Learning
             </Button>
@@ -171,7 +171,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               position="corner"
               className="group"
             >
-              <h3 className="text-xl font-semibold text-foreground mb-4">
+              <h3 className="text-xl font-semibold text-white mb-4">
                 {activity.content.question || 'Answer the question'}
               </h3>
             </TextWithSpeaker>
@@ -183,13 +183,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               if (!options || options.length === 0) {
                 console.log('⚠️ No options found for interactive activity:', activity);
                 return (
-                  <div className="mt-4 p-4 bg-secondary/50 rounded-lg space-y-4">
-                    <p className="text-muted-foreground">
+                  <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4">
+                    <p className="text-gray-300">
                       No question options available. This might be an explanation that should appear after a question.
                     </p>
                     <Button 
                       onClick={handleContinue}
-                      className="bg-primary hover:bg-primary/90"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
                       disabled={isCompleted}
                     >
                       Continue
@@ -217,8 +217,8 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
                             : showResult && selectedAnswer === index && index !== correctIdx
                             ? 'bg-red-600 border-red-500 text-white'
                             : selectedAnswer === index
-                            ? 'bg-primary border-primary text-primary-foreground'
-                            : 'hover:bg-secondary hover:border-secondary-foreground/20'
+                            ? 'bg-blue-600 border-blue-500 text-white'
+                            : 'bg-gray-700 hover:bg-gray-600 text-gray-300 border-gray-600 hover:border-gray-500'
                         }`}
                       >
                         <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
@@ -232,7 +232,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
             })()}
 
             {showResult && (
-              <div className="mt-4 p-4 bg-secondary/50 rounded-lg space-y-4 border border-secondary">
+              <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4 border border-gray-700">
                 <div className="flex items-start gap-3">
                   {selectedAnswer === getCorrectAnswer() ? (
                     <div className="text-green-400 text-lg">✅</div>
@@ -240,17 +240,17 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
                     <div className="text-red-400 text-lg">❌</div>
                   )}
                   <div>
-                    <p className="font-medium text-foreground mb-2">
+                    <p className="font-medium text-white mb-2">
                       {selectedAnswer === getCorrectAnswer() ? 'Correct!' : 'Not quite right.'}
                     </p>
-                    <p className="text-muted-foreground">
+                    <p className="text-gray-300">
                       {activity.content.explanation || 'Good attempt! Let\'s move on to the next activity.'}
                     </p>
                   </div>
                 </div>
                 <Button 
                   onClick={handleContinue}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   disabled={isCompleted}
                 >
                   Continue to Next Activity
@@ -393,16 +393,16 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   };
 
   return (
-    <Card className="bg-card border-border shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10">
+    <Card className="bg-gray-900 border-gray-700 shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-700">
         <div className="flex items-center gap-3">
-          <CardTitle className="text-foreground text-xl">{activity.title}</CardTitle>
+          <CardTitle className="text-white text-xl">{activity.title}</CardTitle>
           {import.meta.env.DEV && (activity as any)?.metadata?.slotId && (
             <DevRegenerateButton slotId={(activity as any).metadata.slotId} />
           )}
         </div>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-6 bg-gray-900">
         {renderContent()}
       </CardContent>
     </Card>
