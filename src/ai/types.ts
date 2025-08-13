@@ -7,6 +7,10 @@ export type LessonRequest = {
     ability: string;
     learningStyle?: string;
   };
+  teacherPreferences?: {
+    subjectWeights?: Record<string, number>;
+    lessonDurations?: Record<string, number>; // hours per class
+  };
 };
 
 export type Activity = {
