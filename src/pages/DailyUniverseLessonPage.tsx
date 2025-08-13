@@ -24,6 +24,7 @@ const DailyUniverseLessonPage: React.FC = () => {
   const state = location.state as LocationState | null;
   const universe = state?.universe;
   // gradeLevel handled by lesson manager
+  const [devRemountKey, setDevRemountKey] = React.useState(0);
 
   if (!universe) {
     navigate('/daily-program');
@@ -43,7 +44,7 @@ const DailyUniverseLessonPage: React.FC = () => {
   };
 
   // Dev-only: badge with duration, prompt version and first DK targets
-  const DevBadge: React.FC<{ subject: string; gradeLevel?: number }> = ({ subject, gradeLevel }) => {
+  const DevBadge: React.FC<{ subject: string; gradeLevel?: number; onRegenerate: () => void }> = ({ subject, gradeLevel, onRegenerate }) => {
     const { targetDuration } = useUnifiedLesson();
     const targets = React.useMemo(
       () => resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel ?? 6) }),
@@ -83,6 +84,16 @@ const DailyUniverseLessonPage: React.FC = () => {
               events
             </a>
           )}
+          <button
+            className="text-[11px] border rounded px-2 py-0.5 hover:bg-primary/5"
+            onClick={async () => {
+              onRegenerate();
+              await logEvent("dev_regenerate_clicked", { reason: "manual", source: "badge" });
+            }}
+            title="DEV: Remount lesson to force a fresh generation"
+          >
+            Regenerate
+          </button>
         </div>
         {targets?.length ? (
           <div className="mt-1 text-[11px] text-muted-foreground">
@@ -103,11 +114,12 @@ const DailyUniverseLessonPage: React.FC = () => {
       <>
         {import.meta.env.DEV && (
           <div className="mb-2">
-            <DevBadge subject={resolvedSubject} gradeLevel={state?.gradeLevel} />
+            <DevBadge subject={resolvedSubject} gradeLevel={state?.gradeLevel} onRegenerate={() => setDevRemountKey(k => k + 1)} />
             <DevQAFromContext />
           </div>
         )}
         <EnhancedLessonManager
+          key={`dev-remount-${devRemountKey}`}
           subject={resolvedSubject}
           skillArea="general"
           onBackToProgram={() => navigate('/daily-program')}
