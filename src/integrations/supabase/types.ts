@@ -960,6 +960,36 @@ export type Database = {
         }
         Relationships: []
       }
+      universe_arcs: {
+        Row: {
+          class_id: string
+          created_at: string
+          date: string
+          pack_id: string
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          date: string
+          pack_id: string
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          date?: string
+          pack_id?: string
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_activity_sessions: {
         Row: {
           completion_status: string
