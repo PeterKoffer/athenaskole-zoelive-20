@@ -9,6 +9,7 @@ import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
+import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -19,6 +20,7 @@ const DailyProgramPage = () => {
   const [lessonActivities, setLessonActivities] = useState<LessonActivity[] | null>(null);
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
   const universeRef = useRef<HTMLDivElement | null>(null);
 
 
@@ -51,6 +53,27 @@ const DailyProgramPage = () => {
           result = JSON.parse(result);
         } catch {
           result = UniverseGenerator.getUniverses()[0];
+        }
+      }
+
+      // Generate AI image for the universe
+      if (result) {
+        setGeneratingImage(true);
+        try {
+          const generatedImageUrl = await UniverseImageGenerator.generateImage({
+            title: result.title || 'Learning Universe',
+            description: result.description,
+            theme: result.theme || 'education'
+          });
+          
+          if (generatedImageUrl) {
+            result.image = generatedImageUrl;
+            console.log('✅ Universe image generated:', generatedImageUrl);
+          }
+        } catch (imgError) {
+          console.warn('⚠️ Image generation failed, using placeholder:', imgError);
+        } finally {
+          setGeneratingImage(false);
         }
       }
 
@@ -204,12 +227,16 @@ const DailyProgramPage = () => {
                 <Button
                   onClick={generateUniverse}
                   size="lg"
-                  disabled={loadingUniverse}
+                  disabled={loadingUniverse || generatingImage}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   {loadingUniverse ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating...
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating Universe...
+                    </>
+                  ) : generatingImage ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Creating Visual...
                     </>
                   ) : (
                     <>
@@ -260,7 +287,21 @@ const DailyProgramPage = () => {
           {universe && (
             <div className="space-y-6" ref={universeRef}>
               <Card className="bg-gradient-to-r from-blue-900 to-purple-900 overflow-hidden text-white">
-                <img src={universe.image ?? "/images/placeholder-16x9.png"} alt="Universe" className="w-full aspect-video object-cover rounded-2xl bg-slate-100" />
+                <div className="relative">
+                  <img 
+                    src={universe.image ?? "/placeholder.svg"} 
+                    alt={`Learning universe: ${universe.title}`} 
+                    className="w-full aspect-video object-cover bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500" 
+                  />
+                  {generatingImage && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center gap-3">
+                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                        <span className="text-white text-sm">Generating universe image...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <CardHeader>
                   <CardTitle className="text-2xl">{universe.title}</CardTitle>
                 </CardHeader>
