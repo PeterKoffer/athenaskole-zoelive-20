@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,10 +9,11 @@ import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator'
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
-import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
+import { UniverseImageGenerator, UniverseImageGeneratorService } from '@/services/UniverseImageGenerator';
 import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
+import { buildDailyLesson } from '@/services/lesson/buildDailyLesson';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -27,6 +28,47 @@ const DailyProgramPage = () => {
   const [horizon, setHorizon] = useState<Horizon>('day');
   const [currentSelectedSubject, setCurrentSelectedSubject] = useState<string>('');
   const universeRef = useRef<HTMLDivElement | null>(null);
+  
+  // New lesson builder state
+  const [lesson, setLesson] = useState<any>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loadingDailyLesson, setLoadingDailyLesson] = useState(false);
+
+  // Build daily lesson on component mount
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    (async () => {
+      setLoadingDailyLesson(true);
+      try {
+        const grade = (user?.user_metadata as any)?.grade_level || 6;
+        const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
+        
+        const res = await buildDailyLesson({
+          userId: user.id,
+          gradeBand,
+          minutes: 150, // Default 2.5 hours
+          subject: currentSelectedSubject || undefined,
+          dateISO: new Date().toISOString().slice(0, 10),
+        });
+
+        setLesson(res);
+
+        // Generate/resolve image from pack.imagePrompt (or cached URL)
+        const prompt = res?.meta?.imagePrompt ?? res?.hero?.title ?? res?.__packId ?? "classroom project";
+        try {
+          const img = await UniverseImageGeneratorService.getOrCreate({ prompt, packId: res.__packId });
+          setImageUrl(img?.url ?? null);
+        } catch {
+          setImageUrl(null);
+        }
+      } catch (error) {
+        console.error("Failed to build daily lesson:", error);
+      } finally {
+        setLoadingDailyLesson(false);
+      }
+    })();
+  }, [user?.id, currentSelectedSubject]);
 
 
   if (loading) {
@@ -218,6 +260,60 @@ const DailyProgramPage = () => {
             </TextWithSpeaker>
           </div>
         </div>
+
+        {/* New Daily Lesson Section */}
+        {loadingDailyLesson ? (
+          <div className="p-6 text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p>Loading your daily lesson...</p>
+          </div>
+        ) : lesson ? (
+          <div className="mb-8">
+            {/* Source/Pack dev chip */}
+            {import.meta.env.DEV && (
+              <div className="text-xs mb-2 opacity-70">
+                Source: <span className="font-mono">{lesson.__source}</span>
+                {lesson.__packId && <> • pack <span className="font-mono">{lesson.__packId}</span></>}
+              </div>
+            )}
+
+            {/* Hero card */}
+            <div className="rounded-2xl overflow-hidden border border-neutral-800 bg-gradient-to-br from-indigo-700 to-blue-600">
+              <div className="aspect-video bg-neutral-900/40 flex items-center justify-center">
+                {imageUrl ? (
+                  <img src={imageUrl} alt={lesson.hero.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-neutral-400 text-sm">Generating image…</div>
+                )}
+              </div>
+              <div className="p-4 md:p-6 text-white">
+                <div className="flex items-center gap-2 text-sm opacity-90">
+                  <span className="px-2 py-0.5 rounded-full bg-white/15">{lesson.hero.subject}</span>
+                  <span>•</span>
+                  <span>Grade {lesson.hero.gradeBand}</span>
+                  <span>•</span>
+                  <span>{lesson.hero.minutes} min</span>
+                </div>
+                <h1 className="text-2xl md:text-3xl font-semibold mt-2">{lesson.hero.title}</h1>
+                <p className="mt-1 opacity-95">{lesson.hero.subtitle}</p>
+              </div>
+            </div>
+
+            {/* Activities section would go here */}
+            <div className="mt-6 space-y-4">
+              {lesson.activities?.map((activity: any, index: number) => (
+                <Card key={index} className="bg-gray-800 border-gray-700">
+                  <CardContent className="p-4">
+                    <div className="text-white">
+                      <h3 className="font-semibold mb-2">Activity {index + 1}</h3>
+                      <p className="text-gray-300">{JSON.stringify(activity, null, 2)}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="space-y-6">
           <Card className="bg-gradient-to-r from-blue-900 to-purple-900 border-blue-400 text-white">

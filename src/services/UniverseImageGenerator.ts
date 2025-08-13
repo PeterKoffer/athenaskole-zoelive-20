@@ -14,6 +14,8 @@ export interface UniverseImageResponse {
 }
 
 export class UniverseImageGeneratorService {
+  private static cache = new Map<string, string>();
+
   async generate(prompt: string): Promise<string | null> {
     try {
       console.log('🎨 Generating universe image with prompt:', prompt);
@@ -37,6 +39,32 @@ export class UniverseImageGeneratorService {
 
     } catch (error) {
       console.error('❌ Universe image generation failed:', error);
+      return null;
+    }
+  }
+
+  // New method for pack-based image generation with caching
+  static async getOrCreate(args: { prompt: string; packId?: string }): Promise<{ url: string; cached?: boolean } | null> {
+    const cacheKey = `img:${args.packId || args.prompt}`;
+    
+    // Check cache first
+    const cached = this.cache.get(cacheKey);
+    if (cached) {
+      return { url: cached, cached: true };
+    }
+
+    try {
+      const instance = new UniverseImageGeneratorService();
+      const url = await instance.generate(args.prompt);
+      
+      if (url) {
+        this.cache.set(cacheKey, url);
+        return { url, cached: false };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Failed to generate image:", error);
       return null;
     }
   }
