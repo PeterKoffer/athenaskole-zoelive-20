@@ -21,6 +21,7 @@ import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 const DevEventsPage = React.lazy(() => import("./pages/DevEventsPage"));
 const GamesPage = React.lazy(() => import("./pages/GamesPage"));
 const GamePage = React.lazy(() => import("./pages/GamePage"));
+const UniverseAdminPage = React.lazy(() => import("./pages/admin/UniverseAdminPage"));
 
  // Import all learning components from new organized structure
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
@@ -232,6 +233,18 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DailyUniverseLessonPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Universe Admin */}
+          <Route
+            path="/admin/universe"
+            element={
+              <ProtectedRoute requiredRole="teacher">
+                <React.Suspense fallback={null}>
+                  <UniverseAdminPage />
+                </React.Suspense>
               </ProtectedRoute>
             }
           />
