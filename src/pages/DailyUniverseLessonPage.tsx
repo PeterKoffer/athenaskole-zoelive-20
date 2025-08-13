@@ -8,6 +8,7 @@ import { DevLessonQA } from '@/components/dev/DevLessonQA';
 import { canonicalizeSubject } from '@/utils/subjectMap';
 import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
 import { getSessionId } from '@/utils/session';
+import { resolveCountryFlag } from '@/utils/country';
 
 interface LocationState {
   universe?: Universe;
@@ -47,11 +48,13 @@ const DailyUniverseLessonPage: React.FC = () => {
       [subject, gradeLevel]
     );
     const ver = (import.meta as any)?.env?.VITE_PROMPT_VERSION || 'v1';
+    const resolvedCountry = resolveCountryFlag(undefined) ?? 'EN';
     return (
       <div className="mb-2">
         <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
           AI ✓ Planner→Activities — {targetDuration ?? 150} min · v{ver}
           {" · s:"}{(typeof window !== 'undefined' ? getSessionId().slice(0, 8) : 'nosess')}
+          {" · "}{resolvedCountry}
         </span>
         {import.meta.env.DEV && (
           <a

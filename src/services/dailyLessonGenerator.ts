@@ -18,6 +18,7 @@ import { validateAndNormalize } from '@/services/ai/validators/lessonQuality';
 import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
 import { generateActivityImage } from '@/services/media/imagePrefetch';
 import { logEvent } from '@/services/telemetry/events';
+import { resolveCountryFlag } from '@/utils/country';
 
 // Cache world/context/slots for per-slot regeneration (dev-only usage)
 const PLANNER_SESSION_CACHE = new Map<string, { world: any; context: any; slots: any[] }>();
@@ -67,10 +68,13 @@ export class DailyLessonGenerator {
     }
     // 0) Preferred: Planner → Activity pipeline (new)
     try {
-      const targets = resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel) });
+      const requestedCountry = undefined; // TODO: wire from user prefs or UI when available
+      const resolvedCountry = resolveCountryFlag(requestedCountry);
+      const targets = resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel), country: resolvedCountry });
       console.debug("[NELIE] Planner ctx", {
         subject,
         gradeBand: String(gradeLevel),
+        country: resolvedCountry ?? 'EN',
         targets: targets.slice(0, 5),
         calendar: activeKeywords
       });
@@ -95,7 +99,7 @@ export class DailyLessonGenerator {
         slots: allSlots.length,
         standards: (context.curriculum?.standards?.length ?? 0)
       });
-      await logEvent('planner_ok', { subject, duration: context.time.lessonDurationMinutes, slots: allSlots.length, standards: (context.curriculum?.standards?.length ?? 0) });
+      await logEvent('planner_ok', { subject, gradeBand: String(gradeLevel), duration: context.time.lessonDurationMinutes, slots: allSlots.length, standards: (context.curriculum?.standards?.length ?? 0), targetsCount: targets.length, requestedCountry: requestedCountry ?? null, resolvedCountry: resolvedCountry ?? 'EN' });
 
       // --- Finish & polish helpers (slot-level) ---
       const bindStandardsToSlots = (arr: any[], targets: string[]) => {
