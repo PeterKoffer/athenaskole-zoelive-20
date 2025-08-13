@@ -267,11 +267,22 @@ Always return valid JSON only with the exact format requested.`
           },
           {
             role: 'user',
-        content: `You are writing for SUBJECT = ${requestData.subject || 'science'}. Do not switch or broaden the subject. Reject and return an error if the subject is missing.
+        content: `You are generating content for SUBJECT = ${resolvedSubject}. Do not broaden or switch subject. If asked, reject with an error.
 
-Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${requestData.subject || 'science'}.
+Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${resolvedSubject}.
 
-Subject Focus: ${requestData.subject || 'science'} - MUST create content specifically for this subject area
+Subject Focus: ${resolvedSubject} - MUST create content specifically for this subject area
+Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
+
+IMPORTANT: The universe MUST be designed specifically for ${resolvedSubject} learning. Incorporate ${resolvedSubject} concepts, vocabulary, and activities throughout.
+
+// Pick 4-6 props from the subject-specific collection
+const propPool = SUBJECT_PROPS[${resolvedSubject}] || SUBJECT_PROPS['Mathematics'];
+const props = [...propPool].sort(() => Math.random() - 0.5).slice(0, 4 + Math.floor(Math.random() * 3));
+
+Use at least 2 of these real, tangible props in your universe: ${JSON.stringify(props)}
+Keep everything grounded in daily life (school, home, community).
+Return strict JSON; include "subject": "${resolvedSubject}".trim();
 Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
 
 IMPORTANT: The universe MUST be designed specifically for ${requestData.subject || 'science'} learning. Incorporate ${requestData.subject || 'science'} concepts, vocabulary, and activities throughout.
@@ -288,12 +299,13 @@ Create a universe that feels like an adventure but is grounded in real school/ho
 
 Return this exact JSON format:
 {
-  "title": "Engaging ${requestData.subject || 'science'}-focused title (max 6 words)",
-  "description": "2-3 sentences describing the ${requestData.subject || 'science'} learning adventure with concrete stakes and objectives",
-  "theme": "${requestData.subject || 'science'}",
+  "title": "Engaging ${resolvedSubject}-focused title (max 6 words)",
+  "description": "2-3 sentences describing the ${resolvedSubject} learning adventure with concrete stakes and objectives",
+  "theme": "${resolvedSubject}",
+  "subject": "${resolvedSubject}",
   "characters": ["Character 1", "Character 2", "Character 3"],
   "locations": ["Location 1", "Location 2", "Location 3"],  
-  "activities": ["${requestData.subject || 'science'}-specific Activity 1", "${requestData.subject || 'science'}-specific Activity 2", "${requestData.subject || 'science'}-specific Activity 3"]
+  "activities": ["${resolvedSubject}-specific Activity 1", "${resolvedSubject}-specific Activity 2", "${resolvedSubject}-specific Activity 3"]
 }`
           }
         ],
