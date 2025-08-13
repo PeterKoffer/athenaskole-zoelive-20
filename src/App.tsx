@@ -19,6 +19,8 @@ import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
 const DevEventsPage = React.lazy(() => import("./pages/DevEventsPage"));
+const GamesPage = React.lazy(() => import("./pages/GamesPage"));
+const GamePage = React.lazy(() => import("./pages/GamePage"));
 
  // Import all learning components from new organized structure
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
@@ -246,6 +248,30 @@ const App = () => (
               }
             />
           )}
+
+          {/* Games catalog */}
+          <Route
+            path="/games"
+            element={
+              <ProtectedRoute>
+                <React.Suspense fallback={null}>
+                  <GamesPage />
+                </React.Suspense>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Individual game with leaderboards */}
+          <Route
+            path="/games/:gameId"
+            element={
+              <ProtectedRoute>
+                <React.Suspense fallback={null}>
+                  <GamePage />
+                </React.Suspense>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Generic subject learning route for any other subjects */}
           <Route 

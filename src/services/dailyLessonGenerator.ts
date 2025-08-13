@@ -233,10 +233,40 @@ export class DailyLessonGenerator {
         };
       });
 
+      // Maybe add a game activity (35% chance)
+      const maybeGame = Math.random() < 0.35;
+      if (maybeGame && subject.toLowerCase() === 'mathematics') {
+        const gameActivity: LessonActivity = {
+          id: `${sessionId}-game-${Date.now()}`,
+          title: "Fast-Facts Free Throws",
+          type: 'game' as any,
+          duration: 180, // 3 minutes
+          content: {
+            description: "Warm up with a 90-second math sprint.",
+            gameId: "fast-facts",
+            params: { 
+              ops: "+−×÷", 
+              seconds: 90, 
+              gradeBand: String(gradeLevel) 
+            }
+          },
+          subject,
+          skillArea,
+          curriculumStandard: context?.curriculum?.standards?.[0] || `Grade ${gradeLevel} Mathematics`,
+          metadata: { 
+            generatedBy: 'game-injection', 
+            sessionId,
+            estimatedMinutes: 3
+          }
+        };
+        normalizedActivities.splice(Math.floor(Math.random() * normalizedActivities.length), 0, gameActivity);
+      }
+
       console.debug('[NELIE] Activities summary', {
         count: normalizedActivities.length,
         kinds: Array.from(new Set(normalizedActivities.map((a: any) => a.type))),
         timeSum: Math.round(normalizedActivities.reduce((s: number, a: any) => s + (a.duration || 0), 0) / 60),
+        hasGame: normalizedActivities.some(a => a.type === 'game')
       });
 
       // Prefetch images (top-2 sync) and log telemetry
