@@ -412,8 +412,8 @@ export async function generateContentWithOpenAI(requestData: any) {
             content: prompt
           }
         ],
-        temperature: 0.8,
-        max_tokens: 800
+        temperature: 0.7,
+        max_tokens: 2000
       }),
     });
 
@@ -461,24 +461,53 @@ export async function generateContentWithOpenAI(requestData: any) {
           console.log('✅ Fixed JSON successfully');
         } catch (secondError) {
           console.error('❌ Could not fix JSON:', secondError.message);
-          // Return a fallback structure for daily lessons
-          parsedContent = {
-            title: "Math Adventure",
-            scenario: "Join a math quest to solve real-world challenges!",
-            stages: [
-              {
-                story: "You start your math adventure by solving basic problems.",
+          // Return a diverse fallback structure based on subject
+          const subject = requestData.subject || 'general';
+          const fallbacks = {
+            mathematics: {
+              title: "Math Explorer Mission",
+              scenario: "Navigate through number puzzles to unlock mathematical secrets!",
+              stages: [{
+                story: "You discover a magic calculator that needs your help.",
                 activityType: "multipleChoice",
                 activity: {
-                  question: "What is 2 + 2?",
-                  options: ["3", "4", "5", "6"],
+                  question: "What is 7 × 8?",
+                  options: ["54", "56", "58", "64"],
                   correct: 1,
-                  expectedAnswer: "4",
-                  explanation: "2 + 2 equals 4"
+                  explanation: "7 × 8 = 56"
                 }
-              }
-            ]
+              }]
+            },
+            science: {
+              title: "Lab Detective",
+              scenario: "Solve scientific mysteries using observation and experimentation!",
+              stages: [{
+                story: "A strange reaction occurred in the lab. What happened?",
+                activityType: "multipleChoice", 
+                activity: {
+                  question: "What happens when you mix baking soda and vinegar?",
+                  options: ["Nothing", "It fizzes", "It freezes", "It turns red"],
+                  correct: 1,
+                  explanation: "The reaction creates carbon dioxide gas, causing fizzing"
+                }
+              }]
+            },
+            english: {
+              title: "Story Builder Quest",
+              scenario: "Help characters tell their stories by mastering language!",
+              stages: [{
+                story: "A character needs help choosing the right words.",
+                activityType: "fillBlank",
+                activity: {
+                  question: "The brave knight __ the dragon.",
+                  expectedAnswer: "faced",
+                  explanation: "Faced means to confront or deal with something"
+                }
+              }]
+            }
           };
+          
+          parsedContent = fallbacks[subject.toLowerCase()] || fallbacks.mathematics;
           console.log('🔄 Using fallback content due to JSON parsing failure');
         }
       } else {
