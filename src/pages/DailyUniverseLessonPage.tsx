@@ -7,6 +7,7 @@ import { useUnifiedLesson } from '@/components/education/contexts/UnifiedLessonC
 import { DevLessonQA } from '@/components/dev/DevLessonQA';
 import { canonicalizeSubject } from '@/utils/subjectMap';
 import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
+import { getSessionId } from '@/utils/session';
 
 interface LocationState {
   universe?: Universe;
@@ -50,6 +51,7 @@ const DailyUniverseLessonPage: React.FC = () => {
       <div className="mb-2">
         <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
           AI ✓ Planner→Activities — {targetDuration ?? 150} min · v{ver}
+          {" · s:"}{(typeof window !== 'undefined' ? getSessionId().slice(0, 8) : 'nosess')}
         </span>
         {targets?.length ? (
           <div className="mt-1 text-[11px] text-muted-foreground">
