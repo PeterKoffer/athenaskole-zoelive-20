@@ -3,13 +3,27 @@ import { LessonRequest } from "./types";
 export const PROMPT_VERSION = 2 as const;
 
 export function buildPrompt(req: LessonRequest) {
+  // Default subject weights based on UI image
+  const DEFAULT_SUBJECT_WEIGHTS: Record<string, number> = {
+    mathematics: 7,
+    science: 5,
+    english: 7,
+    history: 4,
+    art: 3,
+    music: 2,
+    'physical education': 3,
+    'foreign languages': 4
+  };
+
   // Calculate target duration based on teacher preferences
   const targetDuration = req.teacherPreferences?.lessonDurations?.[req.gradeLevel.toString()] 
     ? Math.round(req.teacherPreferences.lessonDurations[req.gradeLevel.toString()] * 60) // convert hours to minutes
-    : req.mode === "daily" ? 150 : 45; // default: 2.5h for daily, 45min for training
+    : 150; // default: 2.5 hours
 
-  // Get subject emphasis from teacher preferences
-  const subjectEmphasis = req.teacherPreferences?.subjectWeights?.[req.subject] || 5;
+  // Get subject emphasis from teacher preferences or defaults
+  const subjectKey = req.subject.toLowerCase();
+  const subjectEmphasis = req.teacherPreferences?.subjectWeights?.[subjectKey] || 
+                         DEFAULT_SUBJECT_WEIGHTS[subjectKey] || 5;
   const emphasisText = subjectEmphasis >= 8 ? "høj prioritet" : 
                       subjectEmphasis <= 3 ? "lav prioritet" : "normal prioritet";
 
