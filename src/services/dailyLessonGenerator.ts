@@ -19,6 +19,7 @@ import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
 import { generateActivityImage } from '@/services/media/imagePrefetch';
 import { logEvent } from '@/services/telemetry/events';
 import { resolveCountryFlag } from '@/utils/country';
+import { getDevCountryOverride } from '@/utils/devCountry';
 
 // Cache world/context/slots for per-slot regeneration (dev-only usage)
 const PLANNER_SESSION_CACHE = new Map<string, { world: any; context: any; slots: any[] }>();
@@ -68,7 +69,8 @@ export class DailyLessonGenerator {
     }
     // 0) Preferred: Planner → Activity pipeline (new)
     try {
-      const requestedCountry = undefined; // TODO: wire from user prefs or UI when available
+      const devOverride = getDevCountryOverride(); // DEV-only or undefined
+      const requestedCountry = devOverride ?? undefined; // TODO: wire from user prefs or UI when available
       const resolvedCountry = resolveCountryFlag(requestedCountry);
       const targets = resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel), country: resolvedCountry });
       console.debug("[NELIE] Planner ctx", {

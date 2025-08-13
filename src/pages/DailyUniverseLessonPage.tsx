@@ -9,6 +9,8 @@ import { canonicalizeSubject } from '@/utils/subjectMap';
 import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
 import { getSessionId } from '@/utils/session';
 import { resolveCountryFlag } from '@/utils/country';
+import { getDevCountryOverride, setDevCountryOverride } from '@/utils/devCountry';
+import { logEvent } from '@/services/telemetry/events';
 
 interface LocationState {
   universe?: Universe;
@@ -48,23 +50,40 @@ const DailyUniverseLessonPage: React.FC = () => {
       [subject, gradeLevel]
     );
     const ver = (import.meta as any)?.env?.VITE_PROMPT_VERSION || 'v1';
-    const resolvedCountry = resolveCountryFlag(undefined) ?? 'EN';
+    const requestedOverride = getDevCountryOverride();
+    const resolvedCountry = resolveCountryFlag(requestedOverride) ?? 'EN';
     return (
       <div className="mb-2">
-        <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
-          AI ✓ Planner→Activities — {targetDuration ?? 150} min · v{ver}
-          {" · s:"}{(typeof window !== 'undefined' ? getSessionId().slice(0, 8) : 'nosess')}
-          {" · "}{resolvedCountry}
-        </span>
-        {import.meta.env.DEV && (
-          <a
-            className="ml-2 text-[11px] underline opacity-80 hover:opacity-100"
-            href={`/dev/events?session=${encodeURIComponent(typeof window !== 'undefined' ? getSessionId() : '')}`}
-            title="Open Dev Events"
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
+            AI ✓ Planner→Activities — {targetDuration ?? 150} min · v{ver}
+            {" · s:"}{(typeof window !== 'undefined' ? getSessionId().slice(0, 8) : 'nosess')}
+            {" · "}{resolvedCountry}
+          </span>
+          {/* DEV-only country toggle (per-session). EN = default (no override). */}
+          <select
+            className="text-[11px] border rounded px-1 py-0.5"
+            value={getDevCountryOverride() ?? ""}
+            onChange={async (e) => {
+              const v = (e.target.value || "") as "" | "DK";
+              setDevCountryOverride(v || undefined);
+              await logEvent("dev_country_override_set", { value: v || "EN" });
+            }}
+            title="DEV: Override country for this session"
           >
-            events
-          </a>
-        )}
+            <option value="">EN (default)</option>
+            <option value="DK">DK</option>
+          </select>
+          {import.meta.env.DEV && (
+            <a
+              className="ml-2 text-[11px] underline opacity-80 hover:opacity-100"
+              href={`/dev/events?session=${encodeURIComponent(typeof window !== 'undefined' ? getSessionId() : '')}`}
+              title="Open Dev Events"
+            >
+              events
+            </a>
+          )}
+        </div>
         {targets?.length ? (
           <div className="mt-1 text-[11px] text-muted-foreground">
             Targets: {targets.slice(0, 3).join(' · ')}
