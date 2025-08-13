@@ -636,15 +636,22 @@ export type Database = {
           address: string | null
           avatar_url: string | null
           birth_date: string | null
+          country_code: string | null
           created_at: string
+          currency_code: string | null
+          curriculum_code: string | null
           email: string | null
+          full_name: string | null
           grade: string | null
           id: string
+          locale: string | null
+          measurement_system: string | null
           name: string | null
           overall_mastery: number | null
           preferences: Json | null
           recent_performance: Json | null
           school: string | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -652,15 +659,22 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           birth_date?: string | null
+          country_code?: string | null
           created_at?: string
+          currency_code?: string | null
+          curriculum_code?: string | null
           email?: string | null
+          full_name?: string | null
           grade?: string | null
           id?: string
+          locale?: string | null
+          measurement_system?: string | null
           name?: string | null
           overall_mastery?: number | null
           preferences?: Json | null
           recent_performance?: Json | null
           school?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -668,15 +682,22 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           birth_date?: string | null
+          country_code?: string | null
           created_at?: string
+          currency_code?: string | null
+          curriculum_code?: string | null
           email?: string | null
+          full_name?: string | null
           grade?: string | null
           id?: string
+          locale?: string | null
+          measurement_system?: string | null
           name?: string | null
           overall_mastery?: number | null
           preferences?: Json | null
           recent_performance?: Json | null
           school?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
