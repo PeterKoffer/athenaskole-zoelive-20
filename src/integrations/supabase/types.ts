@@ -205,6 +205,39 @@ export type Database = {
           },
         ]
       }
+      class_overrides: {
+        Row: {
+          class_id: string
+          country_code: string | null
+          currency_code: string | null
+          curriculum_code: string | null
+          locale: string | null
+          measurement_system: string | null
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          class_id: string
+          country_code?: string | null
+          currency_code?: string | null
+          curriculum_code?: string | null
+          locale?: string | null
+          measurement_system?: string | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          class_id?: string
+          country_code?: string | null
+          currency_code?: string | null
+          curriculum_code?: string | null
+          locale?: string | null
+          measurement_system?: string | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       concept_mastery: {
         Row: {
           concept_name: string
