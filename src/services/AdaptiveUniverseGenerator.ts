@@ -1,32 +1,62 @@
 import { Universe } from './UniverseGenerator';
 import { topTags } from './interestProfile';
-import { UniverseBrief, buildUniverseBriefPrompt } from './universeBrief';
-import { supabase } from '@/integrations/supabase/client';
+import { createOrRefreshUniverse, simulateStep } from './universe/simulation';
+import { UniverseState, Horizon } from './universe/state';
+import { loadArc, saveArc } from './universe/persist';
+import { pickStandardsForToday, calculateEngagementSignals } from './universe/scheduler';
+import { resolveCurriculumTargets } from '@/utils/curriculumTargets';
+import { resolveCountryFlag } from '@/utils/country';
 
 export class AdaptiveUniverseGenerator {
   
   static async generatePersonalizedUniverse(
     subject: string = 'general',
-    gradeLevel: number = 6
+    gradeLevel: number = 6,
+    userId?: string,
+    horizon: Horizon = 'day'
   ): Promise<Universe> {
     
-    // Get user's top interests
-    const interests = topTags(3);
-    const gradeBand = `grade ${gradeLevel}`;
+    const gradeBand = gradeLevel <= 5 ? "3-5" : gradeLevel <= 8 ? "6-8" : "9-12";
     
     try {
-      // Generate universe brief using AI
-      const brief = await this.generateUniverseBrief(subject, gradeBand, interests);
+      // Load existing universe arc or create new one
+      let universeState: UniverseState;
       
-      // Convert brief to Universe format
+      if (userId) {
+        const existing = loadArc(userId);
+        if (existing && existing.subject === subject) {
+          // Advance the existing universe
+          const country = resolveCountryFlag();
+          const allStandards = resolveCurriculumTargets({ 
+            subject, 
+            gradeBand, 
+            country 
+          }).slice(0, 10);
+          
+          const todayStandards = pickStandardsForToday(allStandards, existing.metrics.mastery);
+          const signals = calculateEngagementSignals([]);
+          
+          universeState = await simulateStep(existing, horizon, todayStandards, signals);
+          saveArc(userId, universeState);
+        } else {
+          // Create new universe
+          universeState = await createOrRefreshUniverse(subject, gradeBand);
+          if (userId) saveArc(userId, universeState);
+        }
+      } else {
+        // Guest user - create temporary universe
+        universeState = await createOrRefreshUniverse(subject, gradeBand);
+      }
+      
+      // Convert universe state to Universe format for compatibility
       const universe: Universe = {
-        id: `adaptive-${Date.now()}`,
-        title: brief.title,
-        description: brief.synopsis,
+        id: universeState.id,
+        title: universeState.title,
+        description: universeState.synopsis,
         theme: subject,
-        characters: this.generateCharactersFromBrief(brief),
-        locations: this.generateLocationsFromBrief(brief),
-        activities: this.generateActivitiesFromBrief(brief, subject)
+        characters: this.generateCharactersFromState(universeState),
+        locations: this.generateLocationsFromState(universeState),
+        activities: this.generateActivitiesFromState(universeState, subject)
       };
       
       return universe;
@@ -34,100 +64,53 @@ export class AdaptiveUniverseGenerator {
     } catch (error) {
       console.error('Failed to generate personalized universe:', error);
       // Fallback to interest-based universe
+      const interests = topTags(3);
       return this.generateFallbackUniverse(subject, interests, gradeLevel);
     }
   }
   
-  private static async generateUniverseBrief(
-    subject: string,
-    gradeBand: string,
-    interests: string[]
-  ): Promise<UniverseBrief> {
-    
-    const prompt = buildUniverseBriefPrompt(subject, gradeBand, interests);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-        body: {
-          prompt: prompt,
-          maxTokens: 300,
-          temperature: 0.8
-        }
-      });
-      
-      if (error) throw error;
-      
-      // Parse the AI response
-      let briefData;
-      if (typeof data.content === 'string') {
-        // Try to extract JSON from the response
-        const jsonMatch = data.content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          briefData = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('No JSON found in response');
-        }
-      } else {
-        briefData = data.content;
-      }
-      
-      return {
-        title: briefData.title || 'Learning Adventure',
-        synopsis: briefData.synopsis || 'An engaging learning experience',
-        props: briefData.props || ['notebook', 'calculator', 'smartphone', 'backpack'],
-        imagePrompt: briefData.imagePrompt || 'Students engaged in learning activity',
-        tags: briefData.tags || interests,
-        subject,
-        gradeLevel: parseInt(gradeBand.split(' ')[1])
-      };
-      
-    } catch (error) {
-      console.error('AI brief generation failed:', error);
-      throw error;
-    }
-  }
   
-  private static generateCharactersFromBrief(brief: UniverseBrief): string[] {
+  private static generateCharactersFromState(state: UniverseState): string[] {
     const baseCharacters = ['You (the student)', 'Your mentor'];
     
-    // Add interest-specific characters
-    if (brief.tags.includes('sports')) {
+    // Add interest-specific characters based on tags
+    if (state.tags.includes('sports')) {
       baseCharacters.push('Team captain', 'Coach');
     }
-    if (brief.tags.includes('cooking')) {
+    if (state.tags.includes('cooking')) {
       baseCharacters.push('Head chef', 'Food critic');
     }
-    if (brief.tags.includes('technology')) {
+    if (state.tags.includes('technology')) {
       baseCharacters.push('Tech expert', 'Innovation lead');
     }
-    if (brief.tags.includes('music')) {
+    if (state.tags.includes('music')) {
       baseCharacters.push('Music director', 'Sound engineer');
     }
     
     return baseCharacters.slice(0, 4); // Keep it manageable
   }
   
-  private static generateLocationsFromBrief(brief: UniverseBrief): string[] {
+  private static generateLocationsFromState(state: UniverseState): string[] {
     const locations = ['Your classroom', 'School hallway'];
     
     // Add prop-based and interest-based locations
-    if (brief.props.some(p => p.includes('kitchen') || p.includes('food'))) {
+    if (state.props.some(p => p.includes('kitchen') || p.includes('food'))) {
       locations.push('School cafeteria', 'Local restaurant');
     }
-    if (brief.props.some(p => p.includes('computer') || p.includes('tech'))) {
+    if (state.props.some(p => p.includes('computer') || p.includes('tech'))) {
       locations.push('Computer lab', 'Tech startup office');
     }
-    if (brief.props.some(p => p.includes('gym') || p.includes('field'))) {
+    if (state.props.some(p => p.includes('gym') || p.includes('field'))) {
       locations.push('School gymnasium', 'Sports field');
     }
-    if (brief.props.some(p => p.includes('library') || p.includes('book'))) {
+    if (state.props.some(p => p.includes('library') || p.includes('book'))) {
       locations.push('School library', 'Study hall');
     }
     
     return locations.slice(0, 4);
   }
   
-  private static generateActivitiesFromBrief(brief: UniverseBrief, subject: string): string[] {
+  private static generateActivitiesFromState(state: UniverseState, subject: string): string[] {
     const activities = [];
     
     // Subject-specific activities
@@ -142,13 +125,13 @@ export class AdaptiveUniverseGenerator {
     }
     
     // Interest-based activities
-    if (brief.tags.includes('sports')) {
+    if (state.tags.includes('sports')) {
       activities.push('Plan team strategies', 'Track performance metrics');
     }
-    if (brief.tags.includes('cooking')) {
+    if (state.tags.includes('cooking')) {
       activities.push('Design healthy menus', 'Calculate nutrition values');
     }
-    if (brief.tags.includes('technology')) {
+    if (state.tags.includes('technology')) {
       activities.push('Build digital solutions', 'Test and iterate designs');
     }
     

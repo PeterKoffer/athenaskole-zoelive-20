@@ -12,6 +12,7 @@ import TextWithSpeaker from '@/components/education/components/shared/TextWithSp
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
 import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
+import { Horizon } from '@/services/universe/state';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -23,6 +24,7 @@ const DailyProgramPage = () => {
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [horizon, setHorizon] = useState<Horizon>('day');
   const universeRef = useRef<HTMLDivElement | null>(null);
 
 
@@ -47,7 +49,7 @@ const DailyProgramPage = () => {
       
       // Use adaptive generation based on user interests
       const grade = (user?.user_metadata as any)?.grade_level || 6;
-      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse('general', grade);
+      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse('general', grade, user?.id, horizon);
       
       if (!result) {
         // Fallback to a built-in sample if generation fails completely
@@ -140,9 +142,24 @@ const DailyProgramPage = () => {
             Back to Home
           </Button>
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Today's Program
-            </h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-4xl font-bold text-white">
+                Today's Program
+              </h1>
+              {(import.meta.env.DEV || (user?.user_metadata as any)?.role === 'teacher') && (
+                <select
+                  value={horizon} 
+                  onChange={e => setHorizon(e.target.value as Horizon)}
+                  className="text-[11px] border rounded px-2 py-1 bg-white/10 text-white border-white/30"
+                  title="Simulation horizon"
+                >
+                  <option value="day">Day</option>
+                  <option value="week">Week</option>
+                  <option value="month">Month</option>
+                  <option value="year">Year</option>
+                </select>
+              )}
+            </div>
             <TextWithSpeaker
               text="Welcome back! Here's your personalized AI-generated learning universe for today."
               context="daily-program-header"
