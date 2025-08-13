@@ -257,20 +257,31 @@ Always return valid JSON only with the exact format requested.`
           },
           {
             role: 'user',
-            content: `Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${requestData.subject || 'general subjects'}.
+            content: `Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${requestData.subject || 'science'}.
 
+Subject Focus: ${requestData.subject || 'science'} - MUST create content specifically for this subject area
 Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
 
-Create a universe that feels like an adventure but is grounded in real school/home/community life. Make it compelling with clear objectives and engaging activities.
+IMPORTANT: The universe MUST be designed specifically for ${requestData.subject || 'science'} learning. Incorporate ${requestData.subject || 'science'} concepts, vocabulary, and activities throughout.
+
+Subject-specific requirements:
+- Mathematics: Include problem-solving, calculations, measurements, data analysis
+- Science: Include experiments, observations, scientific method, discoveries
+- Language Arts: Include reading, writing, storytelling, communication skills  
+- History: Include historical events, timelines, research, cultural understanding
+- Arts: Include creativity, visual design, artistic expression, cultural appreciation
+- Geography: Include maps, locations, cultures, environmental studies
+
+Create a universe that feels like an adventure but is grounded in real school/home/community life. Make it compelling with clear ${requestData.subject || 'science'}-focused objectives and engaging activities.
 
 Return this exact JSON format:
 {
-  "title": "Engaging title (max 6 words)",
-  "description": "2-3 sentences describing the learning adventure with concrete stakes and objectives",
-  "theme": "${requestData.subject || 'education'}",
+  "title": "Engaging ${requestData.subject || 'science'}-focused title (max 6 words)",
+  "description": "2-3 sentences describing the ${requestData.subject || 'science'} learning adventure with concrete stakes and objectives",
+  "theme": "${requestData.subject || 'science'}",
   "characters": ["Character 1", "Character 2", "Character 3"],
-  "locations": ["Location 1", "Location 2", "Location 3"],
-  "activities": ["Activity 1", "Activity 2", "Activity 3"]
+  "locations": ["Location 1", "Location 2", "Location 3"],  
+  "activities": ["${requestData.subject || 'science'}-specific Activity 1", "${requestData.subject || 'science'}-specific Activity 2", "${requestData.subject || 'science'}-specific Activity 3"]
 }`
           }
         ],
