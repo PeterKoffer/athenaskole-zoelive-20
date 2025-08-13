@@ -47,8 +47,9 @@ export default function DevEventsPage() {
   const [filter, setFilter] = React.useState("");
   const [autoRefresh, setAutoRefresh] = React.useState(true);
   const [lastRefresh, setLastRefresh] = React.useState<Date | null>(null);
-  const [limit] = React.useState(200);
-  const [sinceMin] = React.useState(30);
+  const [limit, setLimit] = React.useState(200);
+  const [sinceMin, setSinceMin] = React.useState(30);
+  const [live, setLive] = React.useState(true);
   const fetching = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -91,6 +92,31 @@ export default function DevEventsPage() {
     refresh();
   }, [refresh]);
 
+  // Init from URL and localStorage
+  React.useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get("session");
+      if (s) setRaw(s);
+    } catch {}
+    try {
+      const saved = localStorage.getItem("devEventsControls");
+      if (saved) {
+        const obj = JSON.parse(saved);
+        if (typeof obj.limit === "number") setLimit(obj.limit);
+        if (typeof obj.sinceMin === "number") setSinceMin(obj.sinceMin);
+        if (typeof obj.raw === "string") setRaw(obj.raw);
+      }
+    } catch {}
+  }, []);
+
+  // Persist controls
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("devEventsControls", JSON.stringify({ limit, sinceMin, raw }));
+    } catch {}
+  }, [limit, sinceMin, raw]);
+
   React.useEffect(() => {
     if (!autoRefresh) return;
     const id = window.setInterval(() => refresh(), 10_000);
@@ -117,11 +143,17 @@ export default function DevEventsPage() {
     const channel = (supabase as any)
       .channel("events-inserts")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "events" }, (payload: any) => {
-        setRows((prev) => [payload.new as EventRow, ...prev].slice(0, limit));
+        if (!live) return;
+        setRows((prev) => {
+          const incoming = payload.new as EventRow;
+          if (prev.some((p) => p.id === incoming.id)) return prev; // dedupe
+          const next = [incoming, ...prev];
+          return next.slice(0, limit); // cap
+        });
       })
       .subscribe();
     return () => { (supabase as any).removeChannel(channel); };
-  }, [limit]);
+  }, [limit, live]);
 
   const filtered = React.useMemo(() => {
     const q = filter.trim();
@@ -174,6 +206,15 @@ export default function DevEventsPage() {
               onChange={(e) => setAutoRefresh(e.target.checked)}
             />
             Auto-refresh (10s)
+          </label>
+          <label className="text-sm flex items-center gap-2 select-none">
+            <input
+              type="checkbox"
+              className="accent-current"
+              checked={live}
+              onChange={(e) => setLive(e.target.checked)}
+            />
+            Live
           </label>
           <button
             className={`px-3 py-1.5 rounded border text-sm ${

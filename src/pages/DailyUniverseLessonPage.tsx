@@ -53,6 +53,15 @@ const DailyUniverseLessonPage: React.FC = () => {
           AI ✓ Planner→Activities — {targetDuration ?? 150} min · v{ver}
           {" · s:"}{(typeof window !== 'undefined' ? getSessionId().slice(0, 8) : 'nosess')}
         </span>
+        {import.meta.env.DEV && (
+          <a
+            className="ml-2 text-[11px] underline opacity-80 hover:opacity-100"
+            href={`/dev/events?session=${encodeURIComponent(typeof window !== 'undefined' ? getSessionId() : '')}`}
+            title="Open Dev Events"
+          >
+            events
+          </a>
+        )}
         {targets?.length ? (
           <div className="mt-1 text-[11px] text-muted-foreground">
             Targets (DK): {targets.slice(0, 3).join(' · ')}
