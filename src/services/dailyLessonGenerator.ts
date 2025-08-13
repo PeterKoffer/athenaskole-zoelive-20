@@ -67,7 +67,7 @@ export class DailyLessonGenerator {
     }
     // 0) Preferred: Planner → Activity pipeline (new)
     try {
-      const targets = resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel), country: 'DK' });
+      const targets = resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel) });
       console.debug("[NELIE] Planner ctx", {
         subject,
         gradeBand: String(gradeLevel),

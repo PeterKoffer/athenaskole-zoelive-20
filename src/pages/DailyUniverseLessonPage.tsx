@@ -43,7 +43,7 @@ const DailyUniverseLessonPage: React.FC = () => {
   const DevBadge: React.FC<{ subject: string; gradeLevel?: number }> = ({ subject, gradeLevel }) => {
     const { targetDuration } = useUnifiedLesson();
     const targets = React.useMemo(
-      () => resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel ?? 6), country: 'DK' }),
+      () => resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel ?? 6) }),
       [subject, gradeLevel]
     );
     const ver = (import.meta as any)?.env?.VITE_PROMPT_VERSION || 'v1';
@@ -64,7 +64,7 @@ const DailyUniverseLessonPage: React.FC = () => {
         )}
         {targets?.length ? (
           <div className="mt-1 text-[11px] text-muted-foreground">
-            Targets (DK): {targets.slice(0, 3).join(' · ')}
+            Targets: {targets.slice(0, 3).join(' · ')}
           </div>
         ) : null}
       </div>
