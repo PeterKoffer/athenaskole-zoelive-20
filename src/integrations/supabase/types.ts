@@ -1023,6 +1023,10 @@ export type Database = {
         Args: { uid: string; role: string }
         Returns: boolean
       }
+      purge_old_events: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       update_concept_mastery: {
         Args: {
           p_user_id: string
