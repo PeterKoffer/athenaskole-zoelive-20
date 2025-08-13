@@ -352,6 +352,33 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          payload: Json
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          payload?: Json
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          payload?: Json
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       knowledge_component_mastery: {
         Row: {
           attempts: number | null
@@ -992,6 +1019,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: { uid: string; role: string }
+        Returns: boolean
+      }
       update_concept_mastery: {
         Args: {
           p_user_id: string
