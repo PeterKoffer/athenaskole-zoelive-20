@@ -90,7 +90,7 @@ export default function DevEventsPage() {
       setLoading(false);
       fetching.current = false;
     }
-  }, [limit, sinceMin]);
+  }, [limit, sinceMin, sessionId]);
 
   React.useEffect(() => {
     document.title = "Dev · Events";
