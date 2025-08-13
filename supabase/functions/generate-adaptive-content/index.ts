@@ -56,6 +56,13 @@ serve(async (req) => {
     // Handle universe generation requests
     if (requestData.type === 'universe_generation') {
       console.log('🌌 Processing universe generation request');
+      console.log('📋 Universe request data:', {
+        subject: requestData.subject,
+        gradeLevel: requestData.gradeLevel,
+        hasStudentInterests: !!requestData.studentInterests,
+        studentInterests: requestData.studentInterests,
+        hasPrompt: !!requestData.prompt
+      });
       
       try {
         const universeContent = await generateUniverseContent(requestData, openaiKey, deepSeekKey);

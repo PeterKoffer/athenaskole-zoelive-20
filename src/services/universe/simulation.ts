@@ -11,6 +11,14 @@ async function callLLMJson<T = any>(
   subject: string = 'mathematics', 
   interests: string[] = []
 ): Promise<T> {
+  console.log('🔧 Calling edge function with:', {
+    type: 'universe_generation',
+    subject: subject,
+    gradeLevel: 6,
+    studentInterests: interests,
+    hasPrompt: !!prompt
+  });
+  
   const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
     body: {
       type: 'universe_generation',
@@ -61,6 +69,8 @@ export async function createOrRefreshUniverse(
   gradeBand: "3-5" | "6-8" | "9-12"
 ): Promise<UniverseState> {
   const tags = topTags(3);
+  
+  console.log('🌟 Creating universe with:', { subject, gradeBand, tags });
   
   try {
     const brief = await callLLMJson(
