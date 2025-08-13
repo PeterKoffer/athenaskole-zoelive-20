@@ -110,13 +110,13 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               position="corner"
               className="group"
             >
-              <p className="text-gray-300 text-lg leading-relaxed">
+              <p className="text-foreground text-lg leading-relaxed">
                 {activity.content.hook || activity.content.text || activity.content.description || activity.content.instructions || activity.content.message || activity.title || 'Content is preparing...'}
               </p>
             </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-primary/90"
             >
               Continue Learning
             </Button>
@@ -124,21 +124,35 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
         );
 
       case 'content-delivery':
+        // Don't show explanations that start with "Option A is correct" - these should only appear after questions
+        const contentText = activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || activity.title || '';
+        
+        // Skip content that looks like an answer explanation without a question
+        if (contentText.toLowerCase().includes('option') && contentText.toLowerCase().includes('correct') && !activity.content.question) {
+          console.log('🚫 Skipping answer explanation without question:', contentText.substring(0, 50));
+          setTimeout(() => handleContinue(), 100); // Auto-skip
+          return (
+            <div className="space-y-4">
+              <p className="text-muted-foreground text-center">Moving to next activity...</p>
+            </div>
+          );
+        }
+        
         return (
           <div className="space-y-4">
             <TextWithSpeaker
-              text={activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || activity.title || ''}
+              text={contentText}
               context={`activity-${activity.id}-content`}
               position="corner"
               className="group"
             >
-              <p className="text-gray-300 text-lg leading-relaxed">
-                {activity.content.segments?.[0]?.explanation || activity.content.explanation || activity.content.text || activity.content.description || activity.content.instructions || activity.title || 'Content is preparing...'}
+              <p className="text-foreground text-lg leading-relaxed">
+                {contentText}
               </p>
             </TextWithSpeaker>
             <Button 
               onClick={handleContinue}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-primary/90"
             >
               Continue Learning
             </Button>
@@ -157,7 +171,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               position="corner"
               className="group"
             >
-              <h3 className="text-xl font-semibold text-white mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 {activity.content.question || 'Answer the question'}
               </h3>
             </TextWithSpeaker>
@@ -167,14 +181,15 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
               const correctIdx = getCorrectAnswer();
 
               if (!options || options.length === 0) {
+                console.log('⚠️ No options found for interactive activity:', activity);
                 return (
-                  <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4">
-                    <p className="text-gray-300">
-                      Content is preparing. Press continue to move on.
+                  <div className="mt-4 p-4 bg-secondary/50 rounded-lg space-y-4">
+                    <p className="text-muted-foreground">
+                      No question options available. This might be an explanation that should appear after a question.
                     </p>
                     <Button 
                       onClick={handleContinue}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-primary hover:bg-primary/90"
                       disabled={isCompleted}
                     >
                       Continue
@@ -378,16 +393,16 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   };
 
   return (
-    <Card className="bg-gray-900 border-gray-700">
-      <CardHeader>
+    <Card className="bg-card border-border shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10">
         <div className="flex items-center gap-3">
-          <CardTitle className="text-white">{activity.title}</CardTitle>
+          <CardTitle className="text-foreground text-xl">{activity.title}</CardTitle>
           {import.meta.env.DEV && (activity as any)?.metadata?.slotId && (
             <DevRegenerateButton slotId={(activity as any).metadata.slotId} />
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {renderContent()}
       </CardContent>
     </Card>
