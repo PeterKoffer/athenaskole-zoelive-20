@@ -180,12 +180,22 @@ serve(async (req) => {
       });
     }
 
+    // Validate model output doesn't drift from subject
+    if (generatedContent.subject && generatedContent.subject.toLowerCase() !== (requestData.subject || 'mathematics').toLowerCase()) {
+      console.error('🚨 SUBJECT_DRIFT detected!', {
+        expected: requestData.subject || 'mathematics',
+        received: generatedContent.subject
+      });
+      throw new Error(`SUBJECT_DRIFT: expected ${requestData.subject || 'mathematics'}, got ${generatedContent.subject}`);
+    }
+
     console.log('✅ Content generated successfully:', {
       hasQuestion: !!generatedContent.question,
       optionsCount: generatedContent.options?.length || 0,
       hasExplanation: !!generatedContent.explanation,
       correctIndex: generatedContent.correct,
-      apiUsed
+      apiUsed,
+      subjectValidated: true
     });
 
     return new Response(JSON.stringify({
@@ -257,7 +267,9 @@ Always return valid JSON only with the exact format requested.`
           },
           {
             role: 'user',
-            content: `Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${requestData.subject || 'science'}.
+        content: `You are writing for SUBJECT = ${requestData.subject || 'science'}. Do not switch or broaden the subject. Reject and return an error if the subject is missing.
+
+Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${requestData.subject || 'science'}.
 
 Subject Focus: ${requestData.subject || 'science'} - MUST create content specifically for this subject area
 Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}

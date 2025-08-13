@@ -25,6 +25,7 @@ const DailyProgramPage = () => {
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [horizon, setHorizon] = useState<Horizon>('day');
+  const [currentSelectedSubject, setCurrentSelectedSubject] = useState<string>('');
   const universeRef = useRef<HTMLDivElement | null>(null);
 
 
@@ -87,6 +88,7 @@ const DailyProgramPage = () => {
         selectedSubject = availableSubjects[Math.floor(Math.random() * availableSubjects.length)];
       }
       
+      setCurrentSelectedSubject(selectedSubject); // Store for display
       console.log('🎯 Selected subject:', selectedSubject, 'from interests:', userInterests);
       
       // Use adaptive generation based on user interests
@@ -370,6 +372,15 @@ const DailyProgramPage = () => {
                   )}
                 </div>
                 <CardHeader>
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary-foreground border border-primary/30">
+                      {(currentSelectedSubject || universe.theme || 'General').charAt(0).toUpperCase() + (currentSelectedSubject || universe.theme || 'General').slice(1)}
+                    </span>
+                    <span className="text-sm text-white/60">•</span>
+                    <span className="text-sm text-white/80">Grade {(user?.user_metadata as any)?.grade_level || 6}</span>
+                    <span className="text-sm text-white/60">•</span>
+                    <span className="text-sm text-white/80">150 min</span>
+                  </div>
                   <CardTitle className="text-2xl">{universe.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
