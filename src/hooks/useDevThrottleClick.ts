@@ -1,13 +1,17 @@
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
-export function useDevThrottleClick(delay = 500) {
+export function useDevThrottleClick(ms = 600) {
   const last = useRef(0);
-  return useCallback(<T extends any[]>(fn: (...args: T) => void | Promise<void>) => {
-    return (...args: T) => {
-      const now = Date.now();
-      if (now - last.current < delay) return;
-      last.current = now;
-      void fn(...args);
-    };
-  }, [delay]);
+  // usage: const onClick = throttle(() => {...}, () => {...optional onThrottled...})
+  return (fn: () => void, onThrottled?: () => void) => () => {
+    const now = Date.now();
+    if (now - last.current < ms) {
+      // silent-ish dev note (no toast, no DB noise)
+      console.info("[DEV] regenerate throttled");
+      onThrottled?.();
+      return;
+    }
+    last.current = now;
+    fn();
+  };
 }

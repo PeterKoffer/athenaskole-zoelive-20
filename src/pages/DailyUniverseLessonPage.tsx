@@ -25,11 +25,19 @@ const DailyUniverseLessonPage: React.FC = () => {
   const state = location.state as LocationState | null;
   const universe = state?.universe;
   // gradeLevel handled by lesson manager
+  const sessionId = getSessionId();
+  const seqKey = `nelie_regen_seq:${sessionId}`;
+  const [regenSeq, setRegenSeq] = React.useState<number>(() => Number(typeof window !== 'undefined' ? window.localStorage.getItem(seqKey) ?? 0 : 0));
   const [devRemountKey, setDevRemountKey] = React.useState(0);
-  const onRegenerate = React.useCallback(async () => {
+  
+  const throttle = useDevThrottleClick(600);
+  const onRegenerate = React.useMemo(() => throttle(() => {
+    const next = (regenSeq ?? 0) + 1;
+    setRegenSeq(next);
+    if (typeof window !== 'undefined') window.localStorage.setItem(seqKey, String(next));
+    logEvent("dev_regenerate_clicked", { seq: next, throttleMs: 600, session_id: sessionId });
     setDevRemountKey(k => k + 1);
-    await logEvent("dev_regenerate_clicked", { reason: "manual" });
-  }, []);
+  }), [regenSeq, seqKey, sessionId, throttle]);
 
   if (!universe) {
     navigate('/daily-program');
@@ -49,7 +57,7 @@ const DailyUniverseLessonPage: React.FC = () => {
   };
 
   // Dev-only: badge with duration, prompt version and first DK targets
-  const DevBadge: React.FC<{ subject: string; gradeLevel?: number; onRegenerate?: () => void | Promise<void> }> = ({ subject, gradeLevel, onRegenerate }) => {
+  const DevBadge: React.FC<{ subject: string; gradeLevel?: number; onRegenerate?: () => void; busy?: boolean; regenSeq?: number }> = ({ subject, gradeLevel, onRegenerate, busy, regenSeq }) => {
     const { targetDuration } = useUnifiedLesson();
     const targets = React.useMemo(
       () => resolveCurriculumTargets({ subject, gradeBand: String(gradeLevel ?? 6) }),
@@ -58,8 +66,6 @@ const DailyUniverseLessonPage: React.FC = () => {
     const ver = (import.meta as any)?.env?.VITE_PROMPT_VERSION || 'v1';
     const requestedOverride = getDevCountryOverride();
     const resolvedCountry = resolveCountryFlag(requestedOverride) ?? 'EN';
-    const throttle = useDevThrottleClick(600);
-    const handleClick = React.useMemo(() => (onRegenerate ? throttle(onRegenerate) : undefined), [onRegenerate, throttle]);
     return (
       <div className="mb-2">
         <div className="flex items-center gap-2">
@@ -67,6 +73,7 @@ const DailyUniverseLessonPage: React.FC = () => {
             AI ✓ Planner→Activities — {targetDuration ?? 150} min · v{ver}
             {" · s:"}{(typeof window !== 'undefined' ? getSessionId().slice(0, 8) : 'nosess')}
             {" · "}{resolvedCountry}
+            {typeof regenSeq === 'number' ? <> · regen #{regenSeq}</> : null}
           </span>
           {/* DEV-only country toggle (per-session). EN = default (no override). */}
           <select
@@ -92,9 +99,10 @@ const DailyUniverseLessonPage: React.FC = () => {
             </a>
           )}
           <button
-            className="text-[11px] border rounded px-2 py-0.5 hover:bg-primary/5"
-            onClick={handleClick}
-            title="DEV: Remount lesson to force a fresh generation"
+            className="text-[11px] border rounded px-2 py-0.5 hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={onRegenerate}
+            disabled={!!busy}
+            title={busy ? "Generating…" : "DEV: Remount lesson to force a fresh generation"}
           >
             Regenerate
           </button>
@@ -118,7 +126,7 @@ const DailyUniverseLessonPage: React.FC = () => {
       <>
         {import.meta.env.DEV && (
           <div className="mb-2">
-            <DevBadge subject={resolvedSubject} gradeLevel={state?.gradeLevel} onRegenerate={onRegenerate} />
+            <DevBadge subject={resolvedSubject} gradeLevel={state?.gradeLevel} onRegenerate={onRegenerate} regenSeq={regenSeq} />
             <DevQAFromContext />
           </div>
         )}
