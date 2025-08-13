@@ -57,7 +57,11 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
   }, [activity]);
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult || isCompleted) return;
+    console.log('🎯 Answer selected:', { answerIndex, showResult, isCompleted });
+    if (showResult || isCompleted) {
+      console.log('🚫 Answer selection blocked:', { showResult, isCompleted });
+      return;
+    }
     
     setSelectedAnswer(answerIndex);
     setShowResult(true);
@@ -65,6 +69,8 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
     const correctIdx = getCorrectAnswer();
     const isCorrect = answerIndex === correctIdx;
     const points = isCorrect ? 10 : 0;
+    
+    console.log('✅ Answer processed:', { answerIndex, correctIdx, isCorrect, points });
     
     // Show result immediately, then auto-advance after delay
     setTimeout(() => {
@@ -77,7 +83,7 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
       if (onActivityComplete) {
         onActivityComplete(isCorrect);
       }
-    }, 2000);
+    }, 3000); // Increased delay to give user time to read feedback
   };
 
   const handleContinue = () => {
@@ -188,14 +194,16 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
                       <Button
                         key={index}
                         onClick={() => handleAnswerSelect(index)}
-                        disabled={showResult}
+                        disabled={showResult || isCompleted}
                         variant={selectedAnswer === index ? "default" : "outline"}
-                        className={`p-4 text-left justify-start h-auto ${
+                        className={`p-4 text-left justify-start h-auto transition-all hover:scale-[1.02] ${
                           showResult && index === correctIdx
-                            ? 'bg-green-600 border-green-500'
+                            ? 'bg-green-600 border-green-500 text-white'
                             : showResult && selectedAnswer === index && index !== correctIdx
-                            ? 'bg-red-600 border-red-500'
-                            : ''
+                            ? 'bg-red-600 border-red-500 text-white'
+                            : selectedAnswer === index
+                            ? 'bg-primary border-primary text-primary-foreground'
+                            : 'hover:bg-secondary hover:border-secondary-foreground/20'
                         }`}
                       >
                         <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
@@ -209,13 +217,25 @@ const EnhancedActivityRenderer: React.FC<EnhancedActivityRendererProps> = ({
             })()}
 
             {showResult && (
-              <div className="mt-4 p-4 bg-gray-800 rounded-lg space-y-4">
-                <p className="text-gray-300">
-                  {activity.content.explanation}
-                </p>
+              <div className="mt-4 p-4 bg-secondary/50 rounded-lg space-y-4 border border-secondary">
+                <div className="flex items-start gap-3">
+                  {selectedAnswer === getCorrectAnswer() ? (
+                    <div className="text-green-400 text-lg">✅</div>
+                  ) : (
+                    <div className="text-red-400 text-lg">❌</div>
+                  )}
+                  <div>
+                    <p className="font-medium text-foreground mb-2">
+                      {selectedAnswer === getCorrectAnswer() ? 'Correct!' : 'Not quite right.'}
+                    </p>
+                    <p className="text-muted-foreground">
+                      {activity.content.explanation || 'Good attempt! Let\'s move on to the next activity.'}
+                    </p>
+                  </div>
+                </div>
                 <Button 
                   onClick={handleContinue}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-primary hover:bg-primary/90"
                   disabled={isCompleted}
                 >
                   Continue to Next Activity

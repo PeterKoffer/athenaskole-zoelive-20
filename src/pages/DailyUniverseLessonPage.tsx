@@ -34,7 +34,21 @@ const DailyUniverseLessonPage: React.FC = () => {
   const onRegenerate = React.useMemo(() => throttle(() => {
     const next = (regenSeq ?? 0) + 1;
     setRegenSeq(next);
-    if (typeof window !== 'undefined') window.localStorage.setItem(seqKey, String(next));
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(seqKey, String(next));
+      // Clear lesson cache to force regeneration
+      const cacheKey = 'daily_lesson_cache';
+      const cache = window.localStorage.getItem(cacheKey);
+      if (cache) {
+        try {
+          // Clear all entries to force fresh generation
+          window.localStorage.setItem(cacheKey, JSON.stringify({}));
+          console.log('🗑️ Cleared lesson cache for regeneration');
+        } catch (e) {
+          console.warn('Error clearing lesson cache:', e);
+        }
+      }
+    }
     const requested = getDevCountryOverride() ?? "EN";
     const resolved = resolveCountryFlag(requested) ?? 'EN';
     const promptVersion = (import.meta as any)?.env?.VITE_PROMPT_VERSION ?? 'v1';
