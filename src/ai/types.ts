@@ -8,6 +8,13 @@ export type LessonRequest = {
   studentProfile?: {
     ability: string;
     learningStyle?: string;
+    // Educational localization fields
+    countryCode?: string;
+    locale?: string;
+    currencyCode?: string;
+    measurement?: string;
+    curriculumCode?: string;
+    timezone?: string;
   };
   teacherPreferences?: {
     subjectWeights?: Record<string, number>;

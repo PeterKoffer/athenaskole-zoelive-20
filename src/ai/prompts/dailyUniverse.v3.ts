@@ -1,3 +1,5 @@
+import { EduContext } from "@/services/edu/locale";
+
 export type TeachingPerspective =
   | "project_based" | "knowledge_first" | "skills_first"
   | "explicit_instruction" | "inquiry" | "inclusion_universal_design";
@@ -36,6 +38,9 @@ export type PromptCtx = {
   };
   seed?: string;
   lastSeeds?: string[];
+  
+  // Educational localization context
+  edu?: EduContext;
 };
 
 export function buildDailyUniversePromptV3(ctx: PromptCtx): { system: string; user: string } {
@@ -50,11 +55,28 @@ export function buildDailyUniversePromptV3(ctx: PromptCtx): { system: string; us
     calendarKeywords = [],
     calendarWindow,
     studentInterests = [],
-    curriculum = {}
+    curriculum = {},
+    edu
   } = ctx;
 
   const system = `
 You are an expert K-12 curriculum designer. Generate a daily learning universe that integrates all educational signals.
+
+${edu ? `
+COUNTRY & LOCALE:
+- Country: ${edu.countryCode}
+- Curriculum: ${edu.curriculumCode}
+- Language: ${edu.language}
+- Locale: ${edu.locale}
+- Units: ${edu.measurement} (always use ${edu.measurement} units)
+- Currency: ${edu.currencyCode} (use symbol ${edu.currencySymbol})
+
+REQUIREMENTS:
+- Use native conventions (spelling, examples, measurements, currency).
+- Align activities to ${edu.curriculumCode}.
+- Write in ${edu.language}. Avoid mixing languages unless explicitly told.
+- Prefer context relevant to ${edu.countryCode} (history/civics examples can be local). International content is welcome but keep native framing.
+` : ''}
 
 Return ONLY valid JSON matching this schema:
 {
@@ -107,6 +129,7 @@ CRITICAL RULES:
 [STUDENT INTERESTS]: ${studentInterests.join(', ')}
 [SUBJECT WEIGHTS]: ${JSON.stringify(subjectWeights)}
 [CURRICULUM]: ${curriculum.standards?.join('; ') || 'Standard curriculum'}
+${edu ? `[LOCALIZATION]: ${edu.countryCode} | ${edu.language} | ${edu.measurement} units | ${edu.currencySymbol}` : ''}
 
 Generate an engaging ${plannerMinutes}-minute learning experience that:
 1. Centers on ${subject} but connects to high-priority subjects from teacher weights
