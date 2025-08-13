@@ -9,26 +9,42 @@ import { logEvent } from "@/services/telemetry/events";
 async function callLLMJson<T = any>(prompt: string): Promise<T> {
   const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
     body: {
+      type: 'universe_generation',
       prompt: prompt,
+      gradeLevel: 6, // Default grade level
       maxTokens: 400,
       temperature: 0.7
     }
   });
   
-  if (error) throw error;
+  if (error) {
+    console.error('Edge function error:', error);
+    throw error;
+  }
   
-  // Parse the AI response
+  // Check if the response has the expected structure
+  if (data?.success === false) {
+    throw new Error(data.error || 'Universe generation failed');
+  }
+  
+  // Extract the generated content
   let result;
-  if (typeof data.content === 'string') {
-    // Try to extract JSON from the response
-    const jsonMatch = data.content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      result = JSON.parse(jsonMatch[0]);
+  if (data?.generatedContent) {
+    result = data.generatedContent;
+  } else if (data?.content) {
+    // Legacy format - try to parse
+    if (typeof data.content === 'string') {
+      const jsonMatch = data.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        result = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in LLM response');
+      }
     } else {
-      throw new Error('No JSON found in LLM response');
+      result = data.content;
     }
   } else {
-    result = data.content;
+    throw new Error('No content found in response');
   }
   
   return result as T;
