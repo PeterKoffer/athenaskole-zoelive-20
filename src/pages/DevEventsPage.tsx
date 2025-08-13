@@ -50,6 +50,8 @@ export default function DevEventsPage() {
   const [limit, setLimit] = React.useState(200);
   const [sinceMin, setSinceMin] = React.useState(30);
   const [live, setLive] = React.useState(true);
+  const [autoscroll, setAutoscroll] = React.useState(true);
+  const [sessionId, setSessionId] = React.useState<string | null>(null);
   const fetching = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -68,14 +70,17 @@ export default function DevEventsPage() {
     fetching.current = true;
     try {
       setLoading(true);
-      setError(null);
       const sinceISO = new Date(Date.now() - sinceMin * 60_000).toISOString();
-      const { data, error } = await (supabase as any)
+      let query = (supabase as any)
         .from("events")
         .select("id, created_at, name, session_id, payload")
         .gte("created_at", sinceISO)
         .order("created_at", { ascending: false })
         .limit(limit);
+      if (sessionId) {
+        query = query.eq("session_id", sessionId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       setRows((data || []) as EventRow[]);
       setLastRefresh(new Date());
@@ -97,7 +102,7 @@ export default function DevEventsPage() {
     try {
       const params = new URLSearchParams(window.location.search);
       const s = params.get("session");
-      if (s) setRaw(s);
+      if (s) { setRaw(s); setSessionId(s); }
     } catch {}
     try {
       const saved = localStorage.getItem("devEventsControls");
@@ -129,31 +134,48 @@ export default function DevEventsPage() {
     return () => window.clearTimeout(t);
   }, [raw]);
 
-  // Hotkey: focus filter with '/'
+  // Hotkeys: '/', 'p' (pause), 'r' (refresh)
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "/") { e.preventDefault(); inputRef.current?.focus(); }
+      const tag = (document.activeElement as HTMLElement | null)?.tagName;
+      const inEditable = tag === 'INPUT' || tag === 'TEXTAREA';
+      if (e.key === "/") { e.preventDefault(); inputRef.current?.focus(); return; }
+      if (inEditable) return;
+      if (e.key.toLowerCase() === 'p') setLive((v) => !v);
+      if (e.key.toLowerCase() === 'r') refresh();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [refresh]);
 
   // Realtime inserts
   React.useEffect(() => {
     const channel = (supabase as any)
       .channel("events-inserts")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "events" }, (payload: any) => {
-        if (!live) return;
-        setRows((prev) => {
-          const incoming = payload.new as EventRow;
-          if (prev.some((p) => p.id === incoming.id)) return prev; // dedupe
-          const next = [incoming, ...prev];
-          return next.slice(0, limit); // cap
-        });
-      })
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "events",
+          ...(sessionId ? { filter: `session_id=eq.${sessionId}` } : {}),
+        },
+        (payload: any) => {
+          if (!live) return;
+          setRows((prev) => {
+            const incoming = payload.new as EventRow;
+            if (prev.some((p) => p.id === incoming.id)) return prev; // dedupe
+            const next = [incoming, ...prev];
+            return next.slice(0, limit); // cap
+          });
+          if (autoscroll) {
+            try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {}
+          }
+        }
+      )
       .subscribe();
     return () => { (supabase as any).removeChannel(channel); };
-  }, [limit, live]);
+  }, [limit, live, sessionId, autoscroll]);
 
   const filtered = React.useMemo(() => {
     const q = filter.trim();
@@ -192,6 +214,17 @@ export default function DevEventsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const onExportNDJSON = () => {
+    const ndjson = filtered.map((r) => JSON.stringify(r)).join("\n");
+    const name = `events-${Date.now()}.ndjson`;
+    const blob = new Blob([ndjson], { type: "application/x-ndjson;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   return (
     <main className="p-6 max-w-6xl mx-auto">
       <header className="flex items-center gap-3 mb-4">
@@ -216,6 +249,15 @@ export default function DevEventsPage() {
             />
             Live
           </label>
+          <label className="text-sm flex items-center gap-2 select-none">
+            <input
+              type="checkbox"
+              className="accent-current"
+              checked={autoscroll}
+              onChange={(e) => setAutoscroll(e.target.checked)}
+            />
+            Autoscroll
+          </label>
           <button
             className={`px-3 py-1.5 rounded border text-sm ${
               loading ? "opacity-60 cursor-wait" : "hover:bg-muted"
@@ -228,10 +270,24 @@ export default function DevEventsPage() {
           </button>
           <button
             className="px-3 py-1.5 rounded border text-sm hover:bg-muted"
+            onClick={() => setRows([])}
+            title="Clear current buffer"
+          >
+            Clear
+          </button>
+          <button
+            className="px-3 py-1.5 rounded border text-sm hover:bg-muted"
             onClick={onExportCSV}
             title="Export current view to CSV"
           >
-            Export CSV
+            CSV
+          </button>
+          <button
+            className="px-3 py-1.5 rounded border text-sm hover:bg-muted"
+            onClick={onExportNDJSON}
+            title="Export current view to NDJSON"
+          >
+            NDJSON
           </button>
         </div>
       </header>
