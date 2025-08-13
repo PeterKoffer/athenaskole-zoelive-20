@@ -309,10 +309,37 @@ export async function generateContentWithTrainingGroundPrompt(requestData: any) 
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
-    console.log('📝 Raw Training Ground response:', generatedText.substring(0, 200) + '...');
+    console.log('📝 Raw Training Ground response:', generatedText.substring(0, 500) + '...');
 
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
-    const parsedContent = JSON.parse(cleanedResponse);
+    
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(cleanedResponse);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError.message);
+      console.error('🔍 Raw response causing error:', generatedText);
+      
+      // Try to fix common JSON issues
+      let fixedResponse = cleanedResponse;
+      
+      // Fix unterminated strings by finding the last complete object
+      const lastBraceIndex = cleanedResponse.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        fixedResponse = cleanedResponse.substring(0, lastBraceIndex + 1);
+        console.log('🔧 Attempting to fix truncated JSON...');
+        
+        try {
+          parsedContent = JSON.parse(fixedResponse);
+          console.log('✅ Fixed JSON successfully');
+        } catch (secondError) {
+          console.error('❌ Could not fix JSON:', secondError.message);
+          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${generatedText}`);
+        }
+      } else {
+        throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${generatedText}`);
+      }
+    }
 
     // Validate Interactive Adventure format
     if (!parsedContent.title || !parsedContent.scenario || !Array.isArray(parsedContent.stages) || parsedContent.stages.length === 0) {
@@ -399,11 +426,38 @@ export async function generateContentWithOpenAI(requestData: any) {
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
-    console.log('📝 Raw OpenAI response:', generatedText.substring(0, 200) + '...');
+    console.log('📝 Raw OpenAI response:', generatedText.substring(0, 500) + '...');
 
-    // Parse JSON response
+    // Parse JSON response with better error handling
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
-    const parsedContent = JSON.parse(cleanedResponse);
+    
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(cleanedResponse);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError.message);
+      console.error('🔍 Raw response causing error:', generatedText);
+      
+      // Try to fix common JSON issues
+      let fixedResponse = cleanedResponse;
+      
+      // Fix unterminated strings by finding the last complete object
+      const lastBraceIndex = cleanedResponse.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        fixedResponse = cleanedResponse.substring(0, lastBraceIndex + 1);
+        console.log('🔧 Attempting to fix truncated JSON...');
+        
+        try {
+          parsedContent = JSON.parse(fixedResponse);
+          console.log('✅ Fixed JSON successfully');
+        } catch (secondError) {
+          console.error('❌ Could not fix JSON:', secondError.message);
+          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${generatedText}`);
+        }
+      } else {
+        throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${generatedText}`);
+      }
+    }
 
     // Validate Interactive Adventure format (Daily Program)
     if (!parsedContent.title || !parsedContent.scenario || !Array.isArray(parsedContent.stages) || parsedContent.stages.length === 0) {
@@ -490,11 +544,38 @@ export async function generateContentWithDeepSeek(requestData: any) {
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
-    console.log('📝 Raw DeepSeek response:', generatedText.substring(0, 200) + '...');
+    console.log('📝 Raw DeepSeek response:', generatedText.substring(0, 500) + '...');
 
-    // Parse JSON response
+    // Parse JSON response with better error handling
     const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
-    const parsedContent = JSON.parse(cleanedResponse);
+    
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(cleanedResponse);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError.message);
+      console.error('🔍 Raw response causing error:', generatedText);
+      
+      // Try to fix common JSON issues
+      let fixedResponse = cleanedResponse;
+      
+      // Fix unterminated strings by finding the last complete object
+      const lastBraceIndex = cleanedResponse.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        fixedResponse = cleanedResponse.substring(0, lastBraceIndex + 1);
+        console.log('🔧 Attempting to fix truncated JSON...');
+        
+        try {
+          parsedContent = JSON.parse(fixedResponse);
+          console.log('✅ Fixed JSON successfully');
+        } catch (secondError) {
+          console.error('❌ Could not fix JSON:', secondError.message);
+          throw new Error(`Invalid JSON from DeepSeek: ${parseError.message}\n\nResponse: ${generatedText}`);
+        }
+      } else {
+        throw new Error(`Invalid JSON from DeepSeek: ${parseError.message}\n\nResponse: ${generatedText}`);
+      }
+    }
 
     // Validate Interactive Adventure format (Daily Program - DeepSeek)
     if (!parsedContent.title || !parsedContent.scenario || !Array.isArray(parsedContent.stages) || parsedContent.stages.length === 0) {

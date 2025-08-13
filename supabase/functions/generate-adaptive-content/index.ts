@@ -256,9 +256,33 @@ async function generateUniverseContent(requestData: any, openaiKey?: string, dee
     const data = await response.json();
     const content = data.choices[0].message.content;
     
-    // Clean and parse JSON
+    // Clean and parse JSON with error handling
     const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    return JSON.parse(cleanedContent);
+    
+    try {
+      return JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError.message);
+      console.error('🔍 Raw response causing error:', content);
+      
+      // Try to fix common JSON issues
+      const lastBraceIndex = cleanedContent.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        const fixedContent = cleanedContent.substring(0, lastBraceIndex + 1);
+        console.log('🔧 Attempting to fix truncated JSON...');
+        
+        try {
+          const result = JSON.parse(fixedContent);
+          console.log('✅ Fixed JSON successfully');
+          return result;
+        } catch (secondError) {
+          console.error('❌ Could not fix JSON:', secondError.message);
+          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
+        }
+      } else {
+        throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
+      }
+    }
   }
   
   if (deepSeekKey) {
@@ -292,9 +316,33 @@ async function generateUniverseContent(requestData: any, openaiKey?: string, dee
     const data = await response.json();
     const content = data.choices[0].message.content;
     
-    // Clean and parse JSON
+    // Clean and parse JSON with error handling
     const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    return JSON.parse(cleanedContent);
+    
+    try {
+      return JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError.message);
+      console.error('🔍 Raw response causing error:', content);
+      
+      // Try to fix common JSON issues
+      const lastBraceIndex = cleanedContent.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        const fixedContent = cleanedContent.substring(0, lastBraceIndex + 1);
+        console.log('🔧 Attempting to fix truncated JSON...');
+        
+        try {
+          const result = JSON.parse(fixedContent);
+          console.log('✅ Fixed JSON successfully');
+          return result;
+        } catch (secondError) {
+          console.error('❌ Could not fix JSON:', secondError.message);
+          throw new Error(`Invalid JSON from DeepSeek: ${parseError.message}\n\nResponse: ${content}`);
+        }
+      } else {
+        throw new Error(`Invalid JSON from DeepSeek: ${parseError.message}\n\nResponse: ${content}`);
+      }
+    }
   }
   
   throw new Error('No API keys available');
@@ -375,9 +423,33 @@ MANDATORY JSON FORMAT - RETURN EXACTLY THIS STRUCTURE:
     
     console.log('📨 Raw OpenAI Training Ground response:', content.substring(0, 200) + '...');
     
-    // Clean and parse JSON
+    // Clean and parse JSON with error handling
     const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    const parsed = JSON.parse(cleanedContent);
+    
+    let parsed;
+    try {
+      parsed = JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError.message);
+      console.error('🔍 Raw response causing error:', content);
+      
+      // Try to fix common JSON issues
+      const lastBraceIndex = cleanedContent.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        const fixedContent = cleanedContent.substring(0, lastBraceIndex + 1);
+        console.log('🔧 Attempting to fix truncated JSON...');
+        
+        try {
+          parsed = JSON.parse(fixedContent);
+          console.log('✅ Fixed JSON successfully');
+        } catch (secondError) {
+          console.error('❌ Could not fix JSON:', secondError.message);
+          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
+        }
+      } else {
+        throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
+      }
+    }
     
     console.log('✅ Parsed Training Ground activity:', {
       hasTitle: !!parsed.title,
