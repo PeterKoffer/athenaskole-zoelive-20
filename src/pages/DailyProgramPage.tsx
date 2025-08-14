@@ -3,19 +3,17 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target, Plus, AlertCircle } from 'lucide-react';
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
-import { UniverseImageGenerator, UniverseImageGeneratorService } from '@/services/UniverseImageGenerator';
+import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
 import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
-import { buildDailyLesson } from '@/services/lesson/buildDailyLesson';
-import { beatToActivities } from '@/services/content/beatToActivities';
-import { supabase } from '@/integrations/supabase/client';
+import { LessonSourceManager, LessonSource } from '@/services/lessonSourceManager';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -31,84 +29,44 @@ const DailyProgramPage = () => {
   const [currentSelectedSubject, setCurrentSelectedSubject] = useState<string>('');
   const universeRef = useRef<HTMLDivElement | null>(null);
   
-  // New lesson builder state
-  const [lesson, setLesson] = useState<any>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  // New lesson source state
+  const [lessonSource, setLessonSource] = useState<LessonSource | null>(null);
   const [loadingDailyLesson, setLoadingDailyLesson] = useState(false);
 
-  // Build daily lesson on component mount - check for planned lesson first
+  // Get lesson using priority system
   useEffect(() => {
     if (!user?.id) return;
     
     (async () => {
       setLoadingDailyLesson(true);
       try {
-        // First check if there's a planned lesson for today
         const today = new Date().toISOString().split('T')[0];
-        const { data: plannedLesson } = await supabase
-          .from('lesson_plans')
-          .select('*')
-          .eq('plan_date', today)
-          .eq('status', 'published')
-          .single();
-
-        if (plannedLesson) {
-          // Use the planned lesson
-          setLesson(plannedLesson.lesson_data as any);
-          if ((plannedLesson.lesson_data as any)?.hero?.imageUrl) {
-            setImageUrl((plannedLesson.lesson_data as any).hero.imageUrl);
-          }
-        } else {
-          // Generate a lesson if no plan exists
-          const grade = (user?.user_metadata as any)?.grade_level || 6;
-          const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
-          
-          const res = await buildDailyLesson({
-            userId: user.id,
-            gradeBand,
-            minutes: 150, // Default 2.5 hours
-            subject: currentSelectedSubject || undefined,
-            dateISO: new Date().toISOString().slice(0, 10),
-          });
-
-          // Force the hero we want (prevents "Learning Lab" template)
-          const hero = res?.hero ?? {
-            subject: res?.__fallback?.subject ?? "Cross-curricular",
-            gradeBand,
-            minutes: 150,
-            title: res?.title ?? "Today's Universe",
-            subtitle: res?.subtitle ?? res?.description ?? "",
-            packId: res?.__packId ?? null
-          };
-
-          // If the builder returned beats (as activities), expand them to renderable activities
-          if (Array.isArray(res.activities) && res.activities.length > 0 && res.activities[0].type) {
-            // These are beats, convert them to proper activities
-            res.activities = beatToActivities(res.activities as any, {
-              subject: hero.subject || "General",
-              gradeBand,
-              minutes: res.hero?.minutes || 150
-            });
-          }
-
-          setLesson({ ...res, hero });
-
-          // Generate/resolve image from pack.imagePrompt (or cached URL) with concrete fallback
-          const prompt = res?.meta?.imagePrompt ?? `${hero.title} — ${hero.subject} for ${gradeBand}`;
-          try {
-            const img = await UniverseImageGeneratorService.getOrCreate({ prompt, packId: res.__packId });
-            setImageUrl(img?.url ?? null);
-          } catch {
-            setImageUrl(null);
-          }
-        }
+        const userRole = (user?.user_metadata as any)?.role;
+        
+        const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole);
+        setLessonSource(source);
       } catch (error) {
-        console.error("Failed to build daily lesson:", error);
+        console.error("Failed to get daily lesson:", error);
       } finally {
         setLoadingDailyLesson(false);
       }
     })();
   }, [user?.id, currentSelectedSubject]);
+
+  const handleAddToCalendar = async () => {
+    if (!user?.id || !lessonSource || lessonSource.type !== 'ai-suggestion') return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const orgId = 'school-1'; // TODO: Get from user context
+    const success = await LessonSourceManager.saveLessonToPlan(user.id, today, lessonSource.lesson, orgId);
+    
+    if (success) {
+      // Refresh the lesson source to reflect the change
+      const userRole = (user?.user_metadata as any)?.role;
+      const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole);
+      setLessonSource(source);
+    }
+  };
 
 
   if (loading) {
@@ -257,6 +215,10 @@ const DailyProgramPage = () => {
     if (universe) {
       const grade = (user?.user_metadata as any)?.grade_level || 6;
       navigate('/daily-universe-lesson', { state: { universe, gradeLevel: grade } });
+    } else if (lessonSource) {
+      // Navigate to lesson with the current lesson source
+      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      navigate('/daily-universe-lesson', { state: { lesson: lessonSource.lesson, gradeLevel: grade } });
     }
   };
 
@@ -312,47 +274,79 @@ const DailyProgramPage = () => {
             </TextWithSpeaker>
         </div>
 
-        {/* New Daily Lesson Section */}
+        {/* Daily Lesson Section with Source Priority */}
         {loadingDailyLesson ? (
           <div className="p-6 text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
             <p>Loading your daily lesson...</p>
           </div>
-        ) : lesson ? (
+        ) : lessonSource ? (
           <div className="mb-8">
-            {/* Source/Pack dev chip */}
-            {import.meta.env.DEV && (
-              <div className="text-xs mb-2 opacity-70">
-                Mode: <span className="font-mono">{lesson.__source}</span>
-                {lesson.__packId && <> • pack <span className="font-mono">{lesson.__packId}</span></>}
+            {/* Source indicator and actions */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                {lessonSource.type === 'planned' && (
+                  <div className="flex items-center gap-2 text-green-400 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    Teacher-Planned Lesson
+                  </div>
+                )}
+                {lessonSource.type === 'ai-suggestion' && (
+                  <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    AI Suggestion — not yet in your official plan
+                  </div>
+                )}
+                {import.meta.env.DEV && (
+                  <div className="text-xs opacity-70 ml-4">
+                    Source: <span className="font-mono">{lessonSource.type}</span>
+                    {lessonSource.lesson.__packId && <> • pack <span className="font-mono">{lessonSource.lesson.__packId}</span></>}
+                  </div>
+                )}
               </div>
-            )}
+              
+              {lessonSource.type === 'ai-suggestion' && (user?.user_metadata as any)?.role === 'teacher' && (
+                <Button 
+                  onClick={handleAddToCalendar}
+                  size="sm" 
+                  variant="outline"
+                  className="text-yellow-400 border-yellow-400/30 hover:bg-yellow-400/10"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add to Calendar
+                </Button>
+              )}
+            </div>
 
             {/* Hero card */}
-            <div className="rounded-2xl overflow-hidden border border-neutral-800 bg-gradient-to-br from-indigo-700 to-blue-600">
+            <div className={`rounded-2xl overflow-hidden border border-neutral-800 ${
+              lessonSource.type === 'planned' 
+                ? 'bg-gradient-to-br from-green-700 to-emerald-600' 
+                : 'bg-gradient-to-br from-indigo-700 to-blue-600'
+            }`}>
               <div className="aspect-video bg-neutral-900/40 flex items-center justify-center">
-                {imageUrl ? (
-                  <img src={imageUrl} alt={lesson.hero.title} className="w-full h-full object-cover" />
+                {lessonSource.imageUrl ? (
+                  <img src={lessonSource.imageUrl} alt={lessonSource.lesson.hero?.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="text-neutral-400 text-sm">Generating image…</div>
+                  <div className="text-neutral-400 text-sm">No image available</div>
                 )}
               </div>
               <div className="p-4 md:p-6 text-white">
                 <div className="flex items-center gap-2 text-sm opacity-90">
-                  <span className="px-2 py-0.5 rounded-full bg-white/15">{lesson.hero.subject}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-white/15">{lessonSource.lesson.hero?.subject}</span>
                   <span>•</span>
-                  <span>Grade {lesson.hero.gradeBand}</span>
+                  <span>Grade {lessonSource.lesson.hero?.gradeBand}</span>
                   <span>•</span>
-                  <span>{lesson.hero.minutes} min</span>
+                  <span>{lessonSource.lesson.hero?.minutes} min</span>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-semibold mt-2">{lesson.hero.title}</h1>
-                <p className="mt-1 opacity-95">{lesson.hero.subtitle}</p>
+                <h1 className="text-2xl md:text-3xl font-semibold mt-2">{lessonSource.lesson.hero?.title}</h1>
+                <p className="mt-1 opacity-95">{lessonSource.lesson.hero?.subtitle}</p>
               </div>
             </div>
 
             {/* Activities preview */}
             <div className="mt-6 space-y-4">
-              {lesson.activities?.map((activity: any, index: number) => (
+              {lessonSource.lesson.activities?.map((activity: any, index: number) => (
                 <Card key={activity.id || index} className="bg-gray-800 border-gray-700">
                   <CardContent className="p-4">
                     <div className="text-white">
