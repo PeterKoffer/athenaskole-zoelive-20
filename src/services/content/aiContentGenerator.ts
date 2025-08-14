@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { GenerateContentRequest, GeneratedContent } from '../types/contentTypes';
+import { GenerateContentRequest } from '../types/contentTypes';
+import { GeneratedContent } from '../../types/contentTypes';
 import { generateTrainingGroundPrompt, TrainingGroundConfig } from './trainingGroundPromptGenerator';
 import { hasAllRequiredParams, LessonParams } from './strictParamsGate';
 
@@ -11,12 +12,14 @@ export class AIContentGenerator {
 
     // Strict params gate - check if we have required parameters
     const params = request as LessonParams;
-    const validation = hasAllRequiredParams(params);
+    const hasAllParams = hasAllRequiredParams(params);
     
-    if (!validation) {
+    if (!hasAllParams) {
       console.warn('⚠️ Missing required parameters, using catalog fallback');
       return this.getCuratedLessonFromCatalog(params.subject || 'science', params.gradeLevel || '7');
     }
+
+    console.log('✅ All required parameters present, proceeding with AI generation');
 
     try {
       // Build Training Ground prompt using the new unified system
@@ -82,7 +85,8 @@ export class AIContentGenerator {
         correct: content.correct,
         explanation: content.explanation || 'No explanation provided',
         learningObjectives: content.learningObjectives || [],
-        estimatedTime: content.estimatedTime || 30
+        estimatedTime: content.estimatedTime || 30,
+        contentSource: 'ai' as const
       };
 
       console.log('✅ Returning validated content from DeepSeek:', validatedContent);
@@ -106,18 +110,21 @@ export class AIContentGenerator {
 
   private async getCuratedLessonFromCatalog(subject: string, gradeLevel: string): Promise<GeneratedContent> {
     // Return a high-quality curated lesson instead of poor AI fallback
+    console.log(`📚 Using curated catalog content for ${subject}, grade ${gradeLevel}`);
+    
     return {
       question: `What makes ${subject} fascinating for Grade ${gradeLevel} students?`,
       options: [
         `Hands-on experiments and real-world applications`,
-        `Memorizing facts and formulas`,
-        `Reading textbooks only`,
-        `Watching videos passively`
+        `Interactive discovery and problem-solving`,
+        `Connecting concepts to daily life`,
+        `Building and creating with ${subject} principles`
       ],
       correct: 0,
-      explanation: `${subject} becomes engaging when students can interact with concepts through practical activities, experiments, and real-world connections that make learning meaningful.`,
+      explanation: `${subject} becomes engaging when students can interact with concepts through practical activities, experiments, and real-world connections that make learning meaningful and memorable.`,
       learningObjectives: [`Understand key ${subject} concepts`, 'Apply knowledge through practice'],
-      estimatedTime: 30
+      estimatedTime: 30,
+      contentSource: 'catalog' as const
     };
   }
 }

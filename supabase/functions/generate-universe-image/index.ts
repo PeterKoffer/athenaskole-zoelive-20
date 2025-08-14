@@ -88,7 +88,7 @@ async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
     .upload(`${universeId}.png`, pngBytes, {
       contentType: "image/png",
       upsert: true,
-      cacheControl: 'public, max-age=604800, immutable'
+      cacheControl: '604800' // 7 days CDN cache
     })
   if (error) throw error
   return storagePublicUrl(`universe-images/${universeId}.png`)
@@ -143,18 +143,17 @@ serve(async (req: Request) => {
     return new Response(null, { 
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+        'Access-Control-Allow-Headers': 'authorization, content-type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       }
     })
   }
 
-  const startTime = Date.now()
-  
-  const corsHeaders = {
+  const CORS = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*'
   }
+  const startTime = Date.now()
   
   // Parse body once to avoid stream consumption issues
   let body: { prompt?: string; imagePrompt?: string; universeId?: string; lang?: string; size?: string; subject?: string } = {}
@@ -180,7 +179,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: "universeId required" }), 
         { 
           status: 400,
-          headers
+          headers: CORS
         }
       )
     }
@@ -200,7 +199,7 @@ serve(async (req: Request) => {
           duration_ms: duration
         }), 
         {
-          headers: corsHeaders,
+          headers: CORS,
         }
       )
     }
@@ -226,7 +225,7 @@ serve(async (req: Request) => {
           duration_ms: duration
         }),
         { 
-          headers: corsHeaders
+          headers: CORS
         }
       )
     }
@@ -260,7 +259,7 @@ serve(async (req: Request) => {
         duration_ms: duration
       }), 
       {
-        headers: corsHeaders,
+        headers: CORS,
       }
     )
 
@@ -293,7 +292,7 @@ serve(async (req: Request) => {
         duration_ms: duration
       }), 
       {
-        headers: corsHeaders,
+        headers: CORS,
       }
     )
   }

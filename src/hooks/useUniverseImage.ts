@@ -56,6 +56,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
 
   useEffect(() => {
     // Critical guard: wait until we have a valid key
+    const key = universeId;
     if (!key) {
       console.log('🔄 useUniverseImage: waiting for universeId...', { universeId });
       return;
@@ -96,7 +97,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
         }
 
         if (data?.success && data?.imageUrl) {
-          // Cache-bust on first AI swap to ensure fresh image shows
+          // Cache-bust on first AI swap to ensure fresh image shows with force refresh
           const imageUrlWithVersion = data.from === 'ai' && !data.cached 
             ? `${data.imageUrl}?v=${Date.now()}`
             : data.imageUrl;
@@ -108,7 +109,8 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
             universeId: key, 
             from: data.from,
             isAI: data.isAI, 
-            cached: data.cached 
+            cached: data.cached,
+            url: imageUrlWithVersion
           });
         }
       } catch (error) {
