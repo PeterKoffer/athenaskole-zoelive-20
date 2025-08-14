@@ -18,6 +18,7 @@ import TeacherPlanning from "./pages/TeacherPlanning";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
+import CreateUniverse from "./pages/CreateUniverse";
 
 const DevEventsPage = React.lazy(() => import("./pages/DevEventsPage"));
 const GamesPage = React.lazy(() => import("./pages/GamesPage"));
@@ -244,6 +245,16 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DailyUniverseLessonPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Create Universe */}
+          <Route
+            path="/create-universe"
+            element={
+              <ProtectedRoute>
+                <CreateUniverse />
               </ProtectedRoute>
             }
           />
