@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UseUniverseImageOptions {
   universeId?: string;
@@ -71,28 +72,22 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
     setIsAI(false);
     setCached(false);
 
-    // 2) Generate or fetch AI image in background using absolute URL
+    // 2) Generate or fetch AI image in background using Supabase client
     const generateImage = async () => {
       try {
-        // Use absolute URL to avoid SSR/proxy/origin issues
-        const response = await fetch(`https://yphkfkpfdpdmllotpqua.supabase.co/functions/v1/generate-universe-image`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+        // Use Supabase client to properly handle auth
+        const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+          body: {
             prompt,
             imagePrompt: prompt, 
             universeId: key, 
             lang,
             subject
-          })
+          }
         });
-        
-        const data = await response.json();
 
-        if (!response.ok) {
-          console.error('❌ Universe image generation error:', response.status, data);
+        if (error) {
+          console.error('❌ Universe image generation error:', error);
           return;
         }
 
