@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUniverseImage } from '@/hooks/useUniverseImage';
 
 interface UniverseImageProps {
   universeId: string;
@@ -9,104 +10,87 @@ interface UniverseImageProps {
   version?: string; // For cache busting
 }
 
-export function UniverseImage({ universeId, title, subject, className = "", alt, version }: UniverseImageProps) {
+export function UniverseImage({ universeId, title, subject, className = "", alt }: UniverseImageProps) {
   const [imageError, setImageError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Use the hook that properly handles image generation
+  const { imageUrl, isLoading, isAI, cached } = useUniverseImage({
+    universeId,
+    subject,
+    lang: 'en'
+  });
 
-  // Smart fallback chain with responsive images: specific -> subject -> default
-  const getImageUrls = (fallbackLevel: number = 0) => {
+  // Smart fallback chain for when image fails to load
+  const getFallbackUrls = () => {
     const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
-    const cacheParam = version ? `?v=${version}` : '';
     
-    switch (fallbackLevel) {
-      case 0:
-        return {
-          src: `${baseUrl}/${universeId}.png${cacheParam}`,
-          srcSet: `${baseUrl}/${universeId}-512.png${cacheParam} 512w, ${baseUrl}/${universeId}-768.png${cacheParam} 768w, ${baseUrl}/${universeId}.png${cacheParam} 1024w`,
-          fallback: `${baseUrl}/${universeId}.png${cacheParam}`
-        };
-      case 1:
-        const subjectImage = subject ? `${subject}.png` : 'default.png';
-        return {
-          src: `${baseUrl}/${subjectImage}`,
-          srcSet: `${baseUrl}/${subjectImage}`,
-          fallback: `${baseUrl}/${subjectImage}`
-        };
-      case 2:
-        return {
-          src: `${baseUrl}/default.png`,
-          srcSet: `${baseUrl}/default.png`,
-          fallback: `${baseUrl}/default.png`
-        };
-      default:
-        return {
-          src: '/placeholder.svg?height=400&width=600&text=Loading...',
-          srcSet: '',
-          fallback: '/placeholder.svg?height=400&width=600&text=Loading...'
-        };
-    }
+    // Subject mapping for better fallbacks
+    const subjectMap: Record<string, string> = {
+      mathematics: "math.png",
+      science: "science.png", 
+      geography: "geography.png",
+      "computer-science": "computer-science.png",
+      music: "music.png",
+      "creative-arts": "arts.png",
+      "body-lab": "pe.png",
+      "life-essentials": "life.png",
+      "history-religion": "history.png",
+      languages: "languages.png",
+      "mental-wellness": "wellness.png",
+      default: "default.png",
+    };
+
+    const subjectImage = subject ? subjectMap[subject] || subjectMap.default : subjectMap.default;
+    
+    return [
+      `${baseUrl}/${universeId}.png`,
+      `${baseUrl}/${subjectImage}`,
+      `${baseUrl}/${subjectMap.default}`
+    ];
   };
 
-  const [currentUrls, setCurrentUrls] = useState(getImageUrls(0));
-  const [fallbackLevel, setFallbackLevel] = useState(0);
-
   const handleImageError = () => {
-    console.warn(`Image failed to load: ${currentUrls.src}`);
-    
-    if (fallbackLevel < 3) {
-      const nextLevel = fallbackLevel + 1;
-      const nextUrls = getImageUrls(nextLevel);
-      
-      console.log(`Falling back to level ${nextLevel}: ${nextUrls.src}`);
-      setFallbackLevel(nextLevel);
-      setCurrentUrls(nextUrls);
-    } else {
+    if (!imageError) {
       setImageError(true);
+      console.log('🔄 Image failed, trying fallback for:', universeId);
     }
   };
 
   const handleImageLoad = () => {
-    setIsLoading(false);
+    setImageError(false);
   };
 
-  if (imageError) {
+  // If loading, show skeleton
+  if (isLoading && !imageUrl) {
     return (
-      <div className={`bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white text-center p-4 ${className}`}>
-        <div>
-          <div className="text-lg font-semibold">{title}</div>
-          <div className="text-sm opacity-75">Learning Universe</div>
-        </div>
+      <div className={`${className} bg-neutral-800 animate-pulse flex items-center justify-center`}>
+        <div className="text-neutral-600 text-sm">Loading image...</div>
       </div>
     );
   }
 
+  // Use imageUrl from hook, with fallback chain on error
+  const currentImageUrl = imageError ? getFallbackUrls()[1] : imageUrl;
+  
   return (
     <div className={`relative ${className}`}>
       <img
-        src={currentUrls.src}
-        srcSet={currentUrls.srcSet}
-        sizes="(max-width: 640px) 512px, (max-width: 1024px) 768px, 1024px"
-        alt={alt || `Learning universe: ${title}`}
+        src={currentImageUrl}
+        alt={alt || title}
         className="w-full h-full object-cover"
         loading="lazy"
         decoding="async"
         onError={handleImageError}
         onLoad={handleImageLoad}
-        style={{ borderRadius: 'inherit' }}
+        style={{ width: '100%', height: '100%' }}
       />
       
-      {isLoading && (
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 animate-pulse flex items-center justify-center">
-          <div className="text-white text-center">
-            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            <div className="text-sm">Loading universe...</div>
-          </div>
-        </div>
-      )}
-      
-      {fallbackLevel > 0 && !isLoading && (
-        <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-          Fallback
+      {/* Debug indicators */}
+      {import.meta.env.DEV && (
+        <div className="absolute top-2 right-2 text-xs">
+          {isAI && <span className="bg-green-500 text-white px-1 rounded">AI</span>}
+          {cached && <span className="bg-blue-500 text-white px-1 rounded ml-1">Cached</span>}
+          {imageError && <span className="bg-orange-500 text-white px-1 rounded ml-1">Fallback</span>}
         </div>
       )}
     </div>
