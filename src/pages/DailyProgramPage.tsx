@@ -54,7 +54,7 @@ const DailyProgramPage = () => {
   }, [user?.id, currentSelectedSubject]);
 
   const handleAddToCalendar = async () => {
-    if (!user?.id || !lessonSource || lessonSource.type !== 'ai-suggestion') return;
+    if (!user?.id || !lessonSource || (lessonSource.type !== 'ai-suggestion' && lessonSource.type !== 'universe-fallback')) return;
     
     const today = new Date().toISOString().split('T')[0];
     const orgId = 'school-1'; // TODO: Get from user context
@@ -291,6 +291,12 @@ const DailyProgramPage = () => {
                     Teacher-Planned Lesson
                   </div>
                 )}
+                {lessonSource.type === 'universe-fallback' && (
+                  <div className="flex items-center gap-2 text-blue-400 text-sm">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                    From Universe Catalog — add to plan if you like it
+                  </div>
+                )}
                 {lessonSource.type === 'ai-suggestion' && (
                   <div className="flex items-center gap-2 text-yellow-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -305,7 +311,7 @@ const DailyProgramPage = () => {
                 )}
               </div>
               
-              {lessonSource.type === 'ai-suggestion' && (user?.user_metadata as any)?.role === 'teacher' && (
+              {(lessonSource.type === 'universe-fallback' || lessonSource.type === 'ai-suggestion') && (user?.user_metadata as any)?.role === 'teacher' && (
                 <Button 
                   onClick={handleAddToCalendar}
                   size="sm" 

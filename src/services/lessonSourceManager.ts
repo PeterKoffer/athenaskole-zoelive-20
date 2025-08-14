@@ -2,9 +2,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { buildDailyLesson } from '@/services/lesson/buildDailyLesson';
 import { UniverseImageGeneratorService } from '@/services/UniverseImageGenerator';
+import { UniversePacks, Prime100 } from '@/content/universe.catalog';
+import { UniversePack, CanonicalSubject } from '@/content/types';
 
 export interface LessonSource {
-  type: 'planned' | 'teacher-choice' | 'ai-suggestion';
+  type: 'planned' | 'teacher-choice' | 'universe-fallback' | 'ai-suggestion';
   lesson: any;
   imageUrl?: string;
   isFromTeacher?: boolean;
@@ -16,7 +18,8 @@ export class LessonSourceManager {
    * Get lesson for a specific date following priority order:
    * 1. Planned lessons from calendar (teacher-approved)
    * 2. Teacher-selected universe (teacher choice mode)
-   * 3. Auto-generated fallback (clearly labeled "AI Suggestion")
+   * 3. Universe DB fallback (from your 200 curated universes)
+   * 4. Generic AI suggestion (last resort only)
    */
   static async getLessonForDate(userId: string, date: string, userRole?: string): Promise<LessonSource> {
     
@@ -33,9 +36,20 @@ export class LessonSourceManager {
     }
 
     // Priority 2: Teacher choice mode (future implementation)
-    // For now, skip to AI suggestion
+    // For now, skip to universe fallback
 
-    // Priority 3: Auto-generated fallback
+    // Priority 3: Universe DB fallback - select from your 200 curated universes
+    const universeLesson = await this.generateUniverseLesson(userId, date);
+    if (universeLesson) {
+      return {
+        type: 'universe-fallback',
+        lesson: universeLesson.lesson,
+        imageUrl: universeLesson.imageUrl || undefined,
+        isFromTeacher: false
+      };
+    }
+
+    // Priority 4: Last resort - generic AI (should rarely happen)
     const aiLesson = await this.generateAILesson(userId, date);
     return {
       type: 'ai-suggestion',
@@ -69,7 +83,89 @@ export class LessonSourceManager {
   }
 
   /**
-   * Generate AI lesson with proper image handling
+   * Generate lesson from curated universe database (200 universes)
+   */
+  private static async generateUniverseLesson(_userId: string, _date: string) {
+    const grade = 6; // TODO: Get from user profile
+    const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
+    
+    // Get user preferences (mock for now - replace with actual user profile)
+    const userSubjectPreference = "Mathematics"; // TODO: Get from user profile
+    
+    // Select universe from our 200 curated universes
+    const selectedUniverse = this.selectUniverseFromCatalog(userSubjectPreference, gradeBand);
+    
+    if (!selectedUniverse) {
+      return null; // Will fall back to AI generation
+    }
+
+    // Create lesson from selected universe
+    const lesson = {
+      title: selectedUniverse.title,
+      description: `Explore the world of ${selectedUniverse.title}`,
+      subject: selectedUniverse.subjectHint,
+      universe: selectedUniverse,
+      hero: {
+        title: selectedUniverse.title,
+        subtitle: `A curated learning universe for ${gradeBand}`,
+        subject: selectedUniverse.subjectHint,
+        gradeBand,
+        minutes: 150,
+        packId: selectedUniverse.id
+      },
+      meta: {
+        imagePrompt: selectedUniverse.imagePrompt
+      },
+      __packId: selectedUniverse.id
+    };
+
+    // Handle image generation/retrieval
+    let imageUrl = null;
+    try {
+      const img = await UniverseImageGeneratorService.getOrCreate({ 
+        prompt: selectedUniverse.imagePrompt, 
+        packId: selectedUniverse.id 
+      });
+      imageUrl = img?.url;
+    } catch (error) {
+      console.warn('Image generation failed:', error);
+      // Fallback to subject-based stock image
+      imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
+    }
+
+    return { lesson, imageUrl };
+  }
+
+  /**
+   * Select a universe from the catalog based on subject and grade preferences
+   */
+  private static selectUniverseFromCatalog(preferredSubject: CanonicalSubject, _gradeBand: string): UniversePack | null {
+    // First try to match by subject
+    const subjectMatches = Prime100.filter(universe => 
+      universe.subjectHint === preferredSubject || 
+      universe.crossSubjects?.includes(preferredSubject)
+    );
+
+    if (subjectMatches.length > 0) {
+      // Random selection from subject matches
+      return subjectMatches[Math.floor(Math.random() * subjectMatches.length)];
+    }
+
+    // Fallback to any universe from Prime100
+    if (Prime100.length > 0) {
+      return Prime100[Math.floor(Math.random() * Prime100.length)];
+    }
+
+    // Last resort: any universe from full catalog
+    if (UniversePacks.length > 0) {
+      return UniversePacks[Math.floor(Math.random() * UniversePacks.length)];
+    }
+
+    return null;
+  }
+
+  /**
+   * Generate AI lesson with proper image handling (last resort)
    */
   private static async generateAILesson(userId: string, date: string) {
     const grade = 6; // TODO: Get from user profile
