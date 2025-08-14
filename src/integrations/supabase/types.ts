@@ -1233,6 +1233,60 @@ export type Database = {
         }
         Relationships: []
       }
+      universes: {
+        Row: {
+          created_at: string
+          description: string | null
+          goals: Json | null
+          grade_level: string
+          id: string
+          image_status: string
+          image_url: string | null
+          lang: string
+          metadata: Json
+          owner_id: string
+          slug: string
+          subject: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          goals?: Json | null
+          grade_level: string
+          id?: string
+          image_status?: string
+          image_url?: string | null
+          lang?: string
+          metadata?: Json
+          owner_id: string
+          slug: string
+          subject: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          goals?: Json | null
+          grade_level?: string
+          id?: string
+          image_status?: string
+          image_url?: string | null
+          lang?: string
+          metadata?: Json
+          owner_id?: string
+          slug?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       user_activity_sessions: {
         Row: {
           completion_status: string
