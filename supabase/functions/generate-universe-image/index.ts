@@ -45,6 +45,7 @@ serve(async (req: Request) => {
     }
 
     // Generate image with OpenAI
+    console.log('🎨 Calling OpenAI API with prompt:', prompt);
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
@@ -56,12 +57,14 @@ serve(async (req: Request) => {
         prompt: prompt,
         size: '1024x1024',
         quality: 'high',
-        n: 1
+        n: 1,
+        output_format: 'png'
       }),
     })
 
     if (!response.ok) {
-      console.error('OpenAI API error:', response.status, await response.text())
+      const errorText = await response.text();
+      console.error('OpenAI API error:', response.status, errorText);
       const fallbackUrl = `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(prompt.slice(0, 20))}`
       return new Response(
         JSON.stringify({ 
@@ -76,18 +79,37 @@ serve(async (req: Request) => {
     }
 
     const data = await response.json()
-    const imageUrl = data.data[0].url
+    console.log('OpenAI response received:', { hasData: !!data, hasImage: !!data.data?.[0] });
+    
+    // gpt-image-1 returns base64 directly in the response
+    if (data.data && data.data[0] && data.data[0].b64_json) {
+      const imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+      console.log('✅ Generated base64 image successfully');
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          imageUrl,
+          prompt 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    } else {
+      console.error('❌ Unexpected OpenAI response format:', data);
+      const fallbackUrl = `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(prompt.slice(0, 20))}`
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          imageUrl: fallbackUrl,
+          prompt 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        imageUrl,
-        prompt 
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    )
 
   } catch (error: any) {
     console.error('Universe image generation error:', error)
