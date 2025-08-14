@@ -31,6 +31,7 @@ async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
     .upload(`${universeId}.png`, pngBytes, {
       contentType: "image/png",
       upsert: true,
+      cacheControl: 'public, max-age=604800, immutable'
     })
   if (error) throw error
   return storagePublicUrl(`universe-images/${universeId}.png`)
@@ -171,7 +172,12 @@ async function generateOne(u: any, size = "1024x1024") {
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { 
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      }
+    })
   }
 
   try {

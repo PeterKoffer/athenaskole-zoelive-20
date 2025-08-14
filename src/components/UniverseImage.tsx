@@ -6,41 +6,60 @@ interface UniverseImageProps {
   subject?: string;
   className?: string;
   alt?: string;
+  version?: string; // For cache busting
 }
 
-export function UniverseImage({ universeId, title, subject, className = "", alt }: UniverseImageProps) {
+export function UniverseImage({ universeId, title, subject, className = "", alt, version }: UniverseImageProps) {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Smart fallback chain: specific -> subject -> default
-  const getImageUrl = (fallbackLevel: number = 0): string => {
+  // Smart fallback chain with responsive images: specific -> subject -> default
+  const getImageUrls = (fallbackLevel: number = 0) => {
     const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
+    const cacheParam = version ? `?v=${version}` : '';
     
     switch (fallbackLevel) {
       case 0:
-        return `${baseUrl}/${universeId}.png?v=${Date.now()}`; // Cache-busting on first load
+        return {
+          src: `${baseUrl}/${universeId}.png${cacheParam}`,
+          srcSet: `${baseUrl}/${universeId}-512.png${cacheParam} 512w, ${baseUrl}/${universeId}-768.png${cacheParam} 768w, ${baseUrl}/${universeId}.png${cacheParam} 1024w`,
+          fallback: `${baseUrl}/${universeId}.png${cacheParam}`
+        };
       case 1:
-        return subject ? `${baseUrl}/${subject}.png` : `${baseUrl}/default.png`;
+        const subjectImage = subject ? `${subject}.png` : 'default.png';
+        return {
+          src: `${baseUrl}/${subjectImage}`,
+          srcSet: `${baseUrl}/${subjectImage}`,
+          fallback: `${baseUrl}/${subjectImage}`
+        };
       case 2:
-        return `${baseUrl}/default.png`;
+        return {
+          src: `${baseUrl}/default.png`,
+          srcSet: `${baseUrl}/default.png`,
+          fallback: `${baseUrl}/default.png`
+        };
       default:
-        return '/placeholder.svg?height=400&width=600&text=Loading...';
+        return {
+          src: '/placeholder.svg?height=400&width=600&text=Loading...',
+          srcSet: '',
+          fallback: '/placeholder.svg?height=400&width=600&text=Loading...'
+        };
     }
   };
 
-  const [currentUrl, setCurrentUrl] = useState(getImageUrl(0));
+  const [currentUrls, setCurrentUrls] = useState(getImageUrls(0));
   const [fallbackLevel, setFallbackLevel] = useState(0);
 
   const handleImageError = () => {
-    console.warn(`Image failed to load: ${currentUrl}`);
+    console.warn(`Image failed to load: ${currentUrls.src}`);
     
     if (fallbackLevel < 3) {
       const nextLevel = fallbackLevel + 1;
-      const nextUrl = getImageUrl(nextLevel);
+      const nextUrls = getImageUrls(nextLevel);
       
-      console.log(`Falling back to level ${nextLevel}: ${nextUrl}`);
+      console.log(`Falling back to level ${nextLevel}: ${nextUrls.src}`);
       setFallbackLevel(nextLevel);
-      setCurrentUrl(nextUrl);
+      setCurrentUrls(nextUrls);
     } else {
       setImageError(true);
     }
@@ -64,9 +83,13 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
   return (
     <div className={`relative ${className}`}>
       <img
-        src={currentUrl}
+        src={currentUrls.src}
+        srcSet={currentUrls.srcSet}
+        sizes="(max-width: 640px) 512px, (max-width: 1024px) 768px, 1024px"
         alt={alt || `Learning universe: ${title}`}
         className="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
         onError={handleImageError}
         onLoad={handleImageLoad}
         style={{ borderRadius: 'inherit' }}
