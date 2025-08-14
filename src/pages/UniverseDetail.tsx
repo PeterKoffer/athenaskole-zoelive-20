@@ -43,10 +43,15 @@ export default function UniverseDetail() {
           .from('universes')
           .select('*')
           .eq('slug', slug)
-          .single();
+          .maybeSingle(); // respects RLS: owner or visibility='public'
 
         if (error) {
           setError(error.message);
+          return;
+        }
+
+        if (!data) {
+          setError('Universe not found or access denied');
           return;
         }
 
@@ -68,14 +73,16 @@ export default function UniverseDetail() {
     try {
       const newVisibility = isPublic ? 'public' : 'private';
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('universes')
         .update({ visibility: newVisibility })
-        .eq('id', universe.id);
+        .eq('id', universe.id)
+        .select('visibility')
+        .single(); // race-free update
 
       if (error) throw error;
 
-      setUniverse({ ...universe, visibility: newVisibility });
+      setUniverse({ ...universe, visibility: data.visibility });
       toast({
         title: "Visibility updated",
         description: `Universe is now ${newVisibility}`,
@@ -93,8 +100,9 @@ export default function UniverseDetail() {
 
   const getImageUrl = () => {
     if (universe?.image_url) {
-      return `${universe.image_url}?v=${Date.now()}`;
+      return `${universe.image_url}?v=${Date.now()}`; // cache-bust when swapping
     }
+    // Initial fallback URL
     return `${supabase.storage.from('universe-images').getPublicUrl(`${universe?.id}.png`).data.publicUrl}`;
   };
 
@@ -108,6 +116,8 @@ export default function UniverseDetail() {
         return <Badge variant="outline">AI Images Locked</Badge>;
       case 'ready':
         return null;
+      case 'failed':
+        return <Badge variant="destructive">Image: Failed</Badge>;
       default:
         return <Badge variant="outline">Image: Fallback</Badge>;
     }

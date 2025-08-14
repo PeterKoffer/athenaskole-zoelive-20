@@ -70,6 +70,8 @@ export default function MyUniverses() {
         return <Badge variant="outline" className="text-xs">Locked</Badge>;
       case 'ready':
         return null;
+      case 'failed':
+        return <Badge variant="destructive" className="text-xs">Failed</Badge>;
       default:
         return <Badge variant="outline" className="text-xs">Fallback</Badge>;
     }

@@ -28,8 +28,18 @@ export default function UniverseCreateForm() {
 
     // success
     setState({ loading: false, createdSlug: data.universe.slug });
+    
+    // Trigger image generation (non-blocking)
+    supabase.functions.invoke('generate-universe-image', {
+      body: {
+        universeId: data.universe.id,
+        imagePrompt: `${payload.subject} classroom, kid-friendly, bright`,
+        lang: payload.lang
+      }
+    }).catch(() => {}); // fire and forget
+    
     // navigate to the new universe if you like
-    // router.push(`/universes/${data.universe.slug}`);
+    // router.push(`/universes`);
   }
 
   if (!user) return <p>Please sign in to create universes.</p>;
