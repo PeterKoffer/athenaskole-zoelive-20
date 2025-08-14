@@ -207,40 +207,52 @@ export type Database = {
       }
       calendar_events: {
         Row: {
+          all_day: boolean
           audiences: string[]
           class_id: string | null
+          color: string | null
           created_at: string
           created_by: string
           details: string | null
           ends_at: string
           id: string
+          location: string | null
           org_id: string
+          rrule: string | null
           starts_at: string
           title: string
           updated_at: string
         }
         Insert: {
+          all_day?: boolean
           audiences?: string[]
           class_id?: string | null
+          color?: string | null
           created_at?: string
           created_by: string
           details?: string | null
           ends_at: string
           id?: string
+          location?: string | null
           org_id: string
+          rrule?: string | null
           starts_at: string
           title: string
           updated_at?: string
         }
         Update: {
+          all_day?: boolean
           audiences?: string[]
           class_id?: string | null
+          color?: string | null
           created_at?: string
           created_by?: string
           details?: string | null
           ends_at?: string
           id?: string
+          location?: string | null
           org_id?: string
+          rrule?: string | null
           starts_at?: string
           title?: string
           updated_at?: string
