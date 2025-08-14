@@ -70,12 +70,15 @@ serve(async (req) => {
   try {
     const ins = await supabase
       .from("universe_images")
-      .upsert({
-        universe_id: "diag-smoke",
-        lang: "en",
-        image_url: storageUrl || "diag://none",
-        source: storageOk ? "manual" : "fallback",
-      })
+      .upsert(
+        {
+          universe_id: "diag-smoke",
+          lang: "en",
+          image_url: storageUrl || "diag://none",
+          source: storageOk ? "manual" : "fallback",
+        },
+        { onConflict: "universe_id,lang" }
+      )
       .select()
       .single();
     if (ins.error) throw ins.error;
@@ -102,8 +105,7 @@ serve(async (req) => {
           model: "gpt-image-1",
           prompt: "A tiny test icon, flat minimal, gray square",
           size: "256x256",
-          n: 1,
-          response_format: "b64_json"
+          n: 1
         }),
       });
       
@@ -115,7 +117,7 @@ serve(async (req) => {
       }
       
       const data = await resp.json();
-      // vi uploader ikke output her for at spare – vi tjekker blot at b64 findes
+      // Check that the response contains image data (gpt-image-1 returns b64_json by default)
       if (!data?.data?.[0]?.b64_json) throw new Error("No b64_json in response");
       openaiOk = true;
     } catch (e: any) {
