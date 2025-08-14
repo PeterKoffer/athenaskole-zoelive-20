@@ -1164,6 +1164,36 @@ export type Database = {
         }
         Relationships: []
       }
+      universe_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_ai_generated: boolean
+          lang: string
+          universe_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_ai_generated?: boolean
+          lang?: string
+          universe_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_ai_generated?: boolean
+          lang?: string
+          universe_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_activity_sessions: {
         Row: {
           completion_status: string

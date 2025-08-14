@@ -16,12 +16,16 @@ export interface UniverseImageResponse {
 export class UniverseImageGeneratorService {
   private static cache = new Map<string, string>();
 
-  async generate(prompt: string): Promise<string | null> {
+  async generate(prompt: string, universeId?: string): Promise<string | null> {
     try {
       console.log('🎨 Generating universe image with prompt:', prompt);
 
       const { data, error } = await supabase.functions.invoke('generate-universe-image', {
-        body: { prompt }
+        body: { 
+          prompt,
+          universeId,
+          lang: 'en'
+        }
       });
 
       if (error) {
@@ -53,30 +57,43 @@ export class UniverseImageGeneratorService {
       return { url: cached, cached: true };
     }
 
-    // Create a more reliable fallback image URL
-    const fallback = args.packId 
-      ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
-      : '/placeholder.svg?height=400&width=600&text=Learning';
-    
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000); // Reduced timeout
-      
-      const instance = new UniverseImageGeneratorService();
-      const url = await instance.generate(args.prompt);
-      
-      clearTimeout(timeout);
-      
-      if (url) {
-        this.cache.set(cacheKey, url);
-        return { url, cached: false };
+      const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+        body: { 
+          prompt: args.prompt, 
+          universeId: args.packId,
+          lang: 'en'
+        }
+      });
+
+      if (error) {
+        console.error('❌ Universe image generation error:', error);
+        // Return fallback on error
+        const fallback = args.packId 
+          ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
+          : '/placeholder.svg?height=400&width=600&text=Learning';
+        return { url: fallback };
+      }
+
+      if (data?.success && data?.imageUrl) {
+        this.cache.set(cacheKey, data.imageUrl);
+        return { 
+          url: data.imageUrl, 
+          cached: data.cached || false 
+        };
       }
       
-      // Return fallback immediately if generation fails
+      // Return fallback if no valid image URL
+      const fallback = args.packId 
+        ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
+        : '/placeholder.svg?height=400&width=600&text=Learning';
       console.log(`🖼️ Using fallback image for ${args.packId || 'unknown'}`);
       return { url: fallback };
     } catch (error) {
       console.error("Failed to generate image:", error);
+      const fallback = args.packId 
+        ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
+        : '/placeholder.svg?height=400&width=600&text=Learning';
       return { url: fallback };
     }
   }

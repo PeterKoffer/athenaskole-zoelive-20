@@ -2,8 +2,10 @@
 import React from 'react';
 import { Universe } from '../services/UniverseGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { CurriculumStandard } from '../services/CurriculumMapper';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
+import { useUniverseImage } from '@/hooks/useUniverseImage';
 
 interface UniversePlayerProps {
     universe: Universe;
@@ -11,14 +13,35 @@ interface UniversePlayerProps {
 }
 
 const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
+    // Generate a prompt from universe data
+    const imagePrompt = `Create a vibrant, educational illustration for "${universe.title}". ${universe.description ? `Description: ${universe.description}.` : ''} Style: Colorful, engaging, child-friendly, modern digital art. Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery. Mood: Inspiring, fun, and educational. Perfect for students aged 8-16. No text or letters in the image.`;
+    
+    const { imageUrl, isLoading, isAI } = useUniverseImage({
+        universeId: universe.id,
+        prompt: imagePrompt,
+        lang: 'en'
+    });
+
     return (
         <div className="space-y-6">
             <Card className="overflow-hidden">
-                <img 
-                    src={universe.image ?? "/images/placeholder-16x9.png"} 
-                    alt="Universe"
-                    className="w-full aspect-video object-cover rounded-2xl bg-slate-100"
-                />
+                <div className="relative">
+                    <img 
+                        src={imageUrl || universe.image || "/images/placeholder-16x9.png"} 
+                        alt="Universe"
+                        className="w-full aspect-video object-cover rounded-2xl bg-slate-100"
+                    />
+                    {isLoading && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl">
+                            <span className="text-white text-sm">Loading universe image...</span>
+                        </div>
+                    )}
+                    {isAI && (
+                        <div className="absolute top-2 right-2">
+                            <Badge variant="secondary" className="text-xs">AI Generated</Badge>
+                        </div>
+                    )}
+                </div>
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
                         {universe.title}
