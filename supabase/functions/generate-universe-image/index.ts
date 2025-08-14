@@ -55,7 +55,7 @@ serve(async (req: Request) => {
         model: 'gpt-image-1',
         prompt: prompt,
         size: '1024x1024',
-        quality: 'standard',
+        quality: 'high',
         n: 1
       }),
     })
