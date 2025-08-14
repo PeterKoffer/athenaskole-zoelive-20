@@ -53,19 +53,26 @@ export class UniverseImageGeneratorService {
       return { url: cached, cached: true };
     }
 
+    const fallback = `/images/packs/${args.packId ?? "default"}.jpg`;
+    
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000); // 8s guard
+      
       const instance = new UniverseImageGeneratorService();
       const url = await instance.generate(args.prompt);
+      
+      clearTimeout(timeout);
       
       if (url) {
         this.cache.set(cacheKey, url);
         return { url, cached: false };
       }
       
-      return null;
+      return { url: fallback };
     } catch (error) {
       console.error("Failed to generate image:", error);
-      return null;
+      return { url: fallback };
     }
   }
 

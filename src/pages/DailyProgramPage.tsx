@@ -14,6 +14,7 @@ import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
 import { buildDailyLesson } from '@/services/lesson/buildDailyLesson';
+import { beatToActivities } from '@/services/content/beatToActivities';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -62,10 +63,19 @@ const DailyProgramPage = () => {
           packId: res?.__packId ?? null
         };
 
+        // If the builder returned beats, expand them to renderable activities
+        if (Array.isArray(res.beats) && (!res.activities || !res.activities.length)) {
+          res.activities = beatToActivities(res.beats, {
+            subject: hero.subject || "General",
+            gradeBand,
+            minutes: res.hero?.minutes || 150
+          });
+        }
+
         setLesson({ ...res, hero });
 
-        // Generate/resolve image from pack.imagePrompt (or cached URL)
-        const prompt = res?.meta?.imagePrompt ?? res?.hero?.title ?? res?.__packId ?? "classroom project";
+        // Generate/resolve image from pack.imagePrompt (or cached URL) with concrete fallback
+        const prompt = res?.meta?.imagePrompt ?? `${hero.title} — ${hero.subject} for ${gradeBand}`;
         try {
           const img = await UniverseImageGeneratorService.getOrCreate({ prompt, packId: res.__packId });
           setImageUrl(img?.url ?? null);
@@ -309,14 +319,26 @@ const DailyProgramPage = () => {
               </div>
             </div>
 
-            {/* Activities section would go here */}
+            {/* Activities preview */}
             <div className="mt-6 space-y-4">
               {lesson.activities?.map((activity: any, index: number) => (
-                <Card key={index} className="bg-gray-800 border-gray-700">
+                <Card key={activity.id || index} className="bg-gray-800 border-gray-700">
                   <CardContent className="p-4">
                     <div className="text-white">
-                      <h3 className="font-semibold mb-2">Activity {index + 1}</h3>
-                      <p className="text-gray-300">{JSON.stringify(activity, null, 2)}</p>
+                      <div className="text-xs opacity-70 mb-1">
+                        {activity.kind} • ~{activity.estimatedMinutes ?? activity.minutes ?? 10} min
+                        {activity.tags && <span className="ml-2">• {activity.tags.join(', ')}</span>}
+                      </div>
+                      <h3 className="font-semibold mb-2">{activity.title}</h3>
+                      {activity.stem && <p className="text-gray-300 mb-2">{activity.stem}</p>}
+                      {activity.instructions && <p className="text-gray-300 mb-2">{activity.instructions}</p>}
+                      {activity.body && <p className="text-gray-300 mb-2">{activity.body}</p>}
+                      {activity.prompt && <p className="text-gray-300 mb-2 italic">"{activity.prompt}"</p>}
+                      {activity.options && (
+                        <div className="text-gray-400 text-sm mt-2">
+                          Multiple choice: {activity.options.length} options
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
