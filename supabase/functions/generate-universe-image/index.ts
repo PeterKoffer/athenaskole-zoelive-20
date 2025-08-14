@@ -12,14 +12,46 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-// Function to get fallback image URL
-function getFallbackImageUrl(universeId?: string): string {
-  if (universeId) {
-    // Try to get specific universe image from storage
-    return `${supabaseUrl}/storage/v1/object/public/universe-images/${universeId}.png`
-  }
-  // Generic fallback
-  return `${supabaseUrl}/storage/v1/object/public/universe-images/default.png`
+// Util: base64 -> Uint8Array (Deno har atob)
+function b64ToUint8Array(b64: string) {
+  const bin = atob(b64)
+  const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+  return bytes
+}
+
+async function getCached(universeId: string, lang: string) {
+  const { data, error } = await supabase
+    .from("universe_images")
+    .select("image_url")
+    .eq("universe_id", universeId)
+    .eq("lang", lang)
+    .maybeSingle()
+  if (error) console.error("cache read error", error)
+  return data?.image_url ?? null
+}
+
+async function putCache(universeId: string, lang: string, imageUrl: string, source: "ai" | "fallback") {
+  const { error } = await supabase
+    .from("universe_images")
+    .upsert({ universe_id: universeId, lang, image_url: imageUrl, source })
+  if (error) console.error("cache write error", error)
+}
+
+function storagePublicUrl(path: string) {
+  const base = supabaseUrl.replace(/^https?:\/\//, "")
+  return `https://${base}/storage/v1/object/public/${path}`
+}
+
+async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
+  const { error } = await supabase.storage
+    .from("universe-images")
+    .upload(`${universeId}.png`, pngBytes, {
+      contentType: "image/png",
+      upsert: true,
+    })
+  if (error) throw error
+  return storagePublicUrl(`universe-images/${universeId}.png`)
 }
 
 serve(async (req: Request) => {
@@ -28,71 +60,54 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { prompt, universeId, lang = 'en' } = await req.json()
-    console.log('🎨 Image generation request:', { prompt: prompt?.slice(0, 50), universeId, lang })
+    const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024" } = await req.json()
+    console.log('🎨 Image generation request:', { universeId, lang, hasPrompt: !!(prompt || imagePrompt) })
 
-    if (!prompt) {
+    if (!universeId) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: "Missing prompt parameter" 
-        }), 
+        JSON.stringify({ error: "universeId required" }), 
         { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
 
-    // Check if cached image exists
-    if (universeId) {
-      const { data: cachedImage } = await supabase
-        .from('universe_images')
-        .select('image_url, is_ai_generated')
-        .eq('universe_id', universeId)
-        .eq('lang', lang)
-        .maybeSingle()
-      
-      if (cachedImage) {
-        console.log('✅ Returning cached image for universe:', universeId)
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            imageUrl: cachedImage.image_url,
-            prompt,
-            cached: true,
-            isAI: cachedImage.is_ai_generated
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
+    // 1) Check cache first
+    const cached = await getCached(universeId, lang)
+    if (cached) {
+      console.log('✅ Returning cached image for universe:', universeId)
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          imageUrl: cached, 
+          from: "cache",
+          cached: true,
+          isAI: true
+        }), 
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      )
     }
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
     
     if (!openAIApiKey) {
       console.error('OpenAI API key not found')
-      const fallbackUrl = getFallbackImageUrl(universeId)
+      // Fallback chain: exact match -> default
+      const fallbackExact = storagePublicUrl(`universe-images/${universeId}.png`)
+      const fallbackDefault = storagePublicUrl("universe-images/default.png")
+      const imageUrl = fallbackExact
       
-      // Store fallback in cache if universeId provided
-      if (universeId) {
-        await supabase.from('universe_images').upsert({
-          universe_id: universeId,
-          lang,
-          image_url: fallbackUrl,
-          is_ai_generated: false
-        }, {
-          onConflict: 'universe_id,lang'
-        })
-      }
+      // Cache fallback
+      await putCache(universeId, lang, imageUrl, "fallback")
       
       return new Response(
         JSON.stringify({ 
-          success: true, 
-          imageUrl: fallbackUrl,
-          prompt,
+          success: true,
+          imageUrl,
+          from: "fallback",
           cached: false,
           isAI: false
         }),
@@ -102,8 +117,10 @@ serve(async (req: Request) => {
       )
     }
 
-    // Generate image with OpenAI
-    console.log('🎨 Calling OpenAI API with prompt:', prompt)
+    // 2) Generate AI image
+    const finalPrompt = imagePrompt || prompt || `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`
+    console.log('🎨 Calling OpenAI API with prompt:', finalPrompt.slice(0, 100))
+    
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
@@ -112,9 +129,8 @@ serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: 'gpt-image-1',
-        prompt: prompt,
-        size: '1024x1024',
-        quality: 'high',
+        prompt: finalPrompt,
+        size: size,
         n: 1,
         output_format: 'png'
       }),
@@ -123,114 +139,66 @@ serve(async (req: Request) => {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('OpenAI API error:', response.status, errorText)
-      const fallbackUrl = getFallbackImageUrl(universeId)
-      
-      // Store fallback in cache if universeId provided
-      if (universeId) {
-        await supabase.from('universe_images').upsert({
-          universe_id: universeId,
-          lang,
-          image_url: fallbackUrl,
-          is_ai_generated: false
-        }, {
-          onConflict: 'universe_id,lang'
-        })
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          imageUrl: fallbackUrl,
-          prompt,
-          cached: false,
-          isAI: false
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+      throw new Error(`OpenAI API error: ${response.status} ${errorText}`)
     }
 
     const data = await response.json()
-    console.log('OpenAI response received:', { hasData: !!data, hasImage: !!data.data?.[0] })
+    const b64 = data.data?.[0]?.b64_json
     
-    // gpt-image-1 returns base64 directly in the response
-    if (data.data && data.data[0] && data.data[0].b64_json) {
-      const imageUrl = `data:image/png;base64,${data.data[0].b64_json}`
-      console.log('✅ Generated base64 image successfully')
-      
-      // Store AI-generated image in cache if universeId provided
-      if (universeId) {
-        await supabase.from('universe_images').upsert({
-          universe_id: universeId,
-          lang,
-          image_url: imageUrl,
-          is_ai_generated: true
-        }, {
-          onConflict: 'universe_id,lang'
-        })
-        console.log('💾 Cached AI image for universe:', universeId)
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          imageUrl,
-          prompt,
-          cached: false,
-          isAI: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    } else {
-      console.error('❌ Unexpected OpenAI response format:', data)
-      const fallbackUrl = getFallbackImageUrl(universeId)
-      
-      // Store fallback in cache if universeId provided
-      if (universeId) {
-        await supabase.from('universe_images').upsert({
-          universe_id: universeId,
-          lang,
-          image_url: fallbackUrl,
-          is_ai_generated: false
-        }, {
-          onConflict: 'universe_id,lang'
-        })
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          imageUrl: fallbackUrl,
-          prompt,
-          cached: false,
-          isAI: false
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+    if (!b64) {
+      throw new Error("No image data returned from OpenAI")
     }
 
-  } catch (error: any) {
-    console.error('Universe image generation error:', error)
+    // 3) Upload to Storage and cache
+    const png = b64ToUint8Array(b64)
+    const publicUrl = await uploadToStorage(universeId, png)
     
-    const fallbackUrl = getFallbackImageUrl()
-    
+    await putCache(universeId, lang, publicUrl, "ai")
+    console.log('✅ Generated and cached AI image:', universeId)
+
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        imageUrl: fallbackUrl,
-        prompt: '',
+        success: true,
+        imageUrl: publicUrl, 
+        from: "ai",
         cached: false,
-        isAI: false,
-        error: error?.message || 'Unknown error'
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        isAI: true
+      }), 
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    )
+
+  } catch (error: any) {
+    console.error('generate-universe-image error:', error)
+
+    // Fallback chain: exact match -> category -> default
+    const universeId = new URL(req.url).searchParams.get("universeId") || "unknown"
+    const lang = new URL(req.url).searchParams.get("lang") || "en"
+    const fallbackExact = storagePublicUrl(`universe-images/${universeId}.png`)
+    const fallbackDefault = storagePublicUrl("universe-images/default.png")
+    const imageUrl = fallbackExact
+
+    // Cache fallback (så UI altid får et billede)
+    try {
+      if (universeId !== "unknown") {
+        await putCache(universeId, lang, imageUrl, "fallback")
+      }
+    } catch (cacheError) {
+      console.error('Failed to cache fallback:', cacheError)
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        success: true,
+        imageUrl, 
+        from: "fallback", 
+        error: String(error),
+        cached: false,
+        isAI: false
+      }), 
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     )
   }

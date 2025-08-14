@@ -23,7 +23,8 @@ export class UniverseImageGeneratorService {
       const { data, error } = await supabase.functions.invoke('generate-universe-image', {
         body: { 
           prompt,
-          universeId,
+          imagePrompt: prompt,
+          universeId: universeId || `temp-${Date.now()}`,
           lang: 'en'
         }
       });
@@ -38,7 +39,12 @@ export class UniverseImageGeneratorService {
         return null;
       }
 
-      console.log('✅ Universe image generated successfully:', data.imageUrl);
+      console.log('✅ Universe image generated successfully:', { 
+        url: data.imageUrl?.slice(0, 100) + '...', 
+        from: data.from,
+        cached: data.cached,
+        isAI: data.isAI 
+      });
       return data.imageUrl;
 
     } catch (error) {
@@ -60,18 +66,19 @@ export class UniverseImageGeneratorService {
     try {
       const { data, error } = await supabase.functions.invoke('generate-universe-image', {
         body: { 
-          prompt: args.prompt, 
-          universeId: args.packId,
+          prompt: args.prompt,
+          imagePrompt: args.prompt, 
+          universeId: args.packId || `pack-${Date.now()}`,
           lang: 'en'
         }
       });
 
       if (error) {
         console.error('❌ Universe image generation error:', error);
-        // Return fallback on error
+        // Return storage fallback on error
         const fallback = args.packId 
-          ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
-          : '/placeholder.svg?height=400&width=600&text=Learning';
+          ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}.png`
+          : 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png';
         return { url: fallback };
       }
 
@@ -83,17 +90,17 @@ export class UniverseImageGeneratorService {
         };
       }
       
-      // Return fallback if no valid image URL
+      // Return storage fallback if no valid image URL
       const fallback = args.packId 
-        ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
-        : '/placeholder.svg?height=400&width=600&text=Learning';
-      console.log(`🖼️ Using fallback image for ${args.packId || 'unknown'}`);
+        ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}.png`
+        : 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png';
+      console.log(`🖼️ Using storage fallback for ${args.packId || 'unknown'}`);
       return { url: fallback };
     } catch (error) {
       console.error("Failed to generate image:", error);
       const fallback = args.packId 
-        ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
-        : '/placeholder.svg?height=400&width=600&text=Learning';
+        ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}.png`
+        : 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png';
       return { url: fallback };
     }
   }

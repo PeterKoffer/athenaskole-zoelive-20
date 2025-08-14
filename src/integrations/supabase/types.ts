@@ -1164,6 +1164,42 @@ export type Database = {
         }
         Relationships: []
       }
+      universe_image_jobs: {
+        Row: {
+          created_at: string
+          failed: number
+          finished_at: string | null
+          id: string
+          notes: string | null
+          skipped: number
+          started_at: string
+          success: number
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          skipped?: number
+          started_at?: string
+          success?: number
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          skipped?: number
+          started_at?: string
+          success?: number
+          total?: number
+        }
+        Relationships: []
+      }
       universe_images: {
         Row: {
           created_at: string
@@ -1171,6 +1207,7 @@ export type Database = {
           image_url: string
           is_ai_generated: boolean
           lang: string
+          source: string
           universe_id: string
           updated_at: string
         }
@@ -1180,6 +1217,7 @@ export type Database = {
           image_url: string
           is_ai_generated?: boolean
           lang?: string
+          source?: string
           universe_id: string
           updated_at?: string
         }
@@ -1189,6 +1227,7 @@ export type Database = {
           image_url?: string
           is_ai_generated?: boolean
           lang?: string
+          source?: string
           universe_id?: string
           updated_at?: string
         }

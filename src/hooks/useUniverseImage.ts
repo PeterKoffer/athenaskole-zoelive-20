@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { SUPABASE_URL } from '@/integrations/supabase/client';
 
 interface UseUniverseImageOptions {
   universeId?: string;
@@ -21,10 +20,10 @@ export function useUniverseImage({ universeId, prompt, lang = 'en' }: UseUnivers
   const [isAI, setIsAI] = useState(false);
   const [cached, setCached] = useState(false);
 
-  // Generate fallback URL
+  // Generate storage fallback URL
   const fallbackUrl = universeId 
-    ? `${SUPABASE_URL}/storage/v1/object/public/universe-images/${universeId}.png`
-    : `${SUPABASE_URL}/storage/v1/object/public/universe-images/default.png`;
+    ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${universeId}.png`
+    : `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png`;
 
   useEffect(() => {
     if (!prompt) return;
@@ -40,7 +39,8 @@ export function useUniverseImage({ universeId, prompt, lang = 'en' }: UseUnivers
       try {
         const { data, error } = await supabase.functions.invoke('generate-universe-image', {
           body: { 
-            prompt, 
+            prompt,
+            imagePrompt: prompt, 
             universeId, 
             lang 
           }
