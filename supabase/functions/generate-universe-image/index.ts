@@ -5,6 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS'
 }
 
 // Initialize Supabase client
@@ -12,12 +13,36 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+// Subject-to-fallback mapping for better categorized fallbacks
+const SUBJECT_MAP: Record<string, string> = {
+  mathematics: "math.png",
+  science: "science.png", 
+  geography: "geography.png",
+  "computer-science": "computer-science.png",
+  music: "music.png",
+  "creative-arts": "arts.png",
+  "body-lab": "pe.png",
+  "life-essentials": "life.png",
+  "history-religion": "history.png",
+  languages: "languages.png",
+  "mental-wellness": "wellness.png",
+  default: "default.png",
+}
+
 // Util: base64 -> Uint8Array (Deno har atob)
 function b64ToUint8Array(b64: string) {
   const bin = atob(b64)
   const bytes = new Uint8Array(bin.length)
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
   return bytes
+}
+
+// Robust timeout wrapper
+async function withTimeout<T>(promise: Promise<T>, ms = 20000): Promise<T> {
+  const timeout = new Promise<T>((_, reject) => 
+    setTimeout(() => reject(new Error("timeout")), ms)
+  )
+  return Promise.race([promise, timeout])
 }
 
 async function getCached(universeId: string, lang: string) {
@@ -43,6 +68,20 @@ function storagePublicUrl(path: string) {
   return `https://${base}/storage/v1/object/public/${path}`
 }
 
+// Enhanced fallback with subject mapping
+function getFallbackImageUrl(universeId: string, subject?: string): string {
+  const base = "universe-images"
+  
+  // Try: exact universe match -> subject category -> default
+  const candidates = [
+    `${base}/${universeId}.png`,
+    `${base}/${SUBJECT_MAP[subject || "default"]}`,
+    `${base}/${SUBJECT_MAP.default}`
+  ]
+  
+  return storagePublicUrl(candidates[0]) // For now return first, could enhance with actual file existence check
+}
+
 async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
   const { error } = await supabase.storage
     .from("universe-images")
@@ -54,14 +93,66 @@ async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
   return storagePublicUrl(`universe-images/${universeId}.png`)
 }
 
+// Enhanced OpenAI call with retries and timeout
+async function generateImageWithRetry(prompt: string, size = "1024x1024"): Promise<any> {
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
+  if (!openAIApiKey) {
+    throw new Error("OpenAI API key not available")
+  }
+
+  const attempt = async () => {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt: prompt,
+        size: size,
+        n: 1,
+        output_format: 'png'
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`)
+    }
+
+    return response.json()
+  }
+
+  // First attempt with timeout
+  try {
+    return await withTimeout(attempt(), 20000)
+  } catch (firstError) {
+    console.warn("First attempt failed, retrying in 600ms:", firstError)
+    
+    // Wait and retry once
+    await new Promise(resolve => setTimeout(resolve, 600))
+    return await withTimeout(attempt(), 20000)
+  }
+}
+
 serve(async (req: Request) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  const startTime = Date.now()
+  
   try {
-    const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024" } = await req.json()
-    console.log('🎨 Image generation request:', { universeId, lang, hasPrompt: !!(prompt || imagePrompt) })
+    const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject } = await req.json()
+    console.log('🎨 Image generation request:', { 
+      universeId, 
+      lang, 
+      subject,
+      hasPrompt: !!(prompt || imagePrompt),
+      timestamp: new Date().toISOString()
+    })
 
     if (!universeId) {
       return new Response(
@@ -76,14 +167,16 @@ serve(async (req: Request) => {
     // 1) Check cache first
     const cached = await getCached(universeId, lang)
     if (cached) {
-      console.log('✅ Returning cached image for universe:', universeId)
+      const duration = Date.now() - startTime
+      console.log('✅ Cache hit for universe:', universeId, `(${duration}ms)`)
       return new Response(
         JSON.stringify({ 
           success: true,
           imageUrl: cached, 
           from: "cache",
           cached: true,
-          isAI: true
+          isAI: true,
+          duration_ms: duration
         }), 
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -95,21 +188,21 @@ serve(async (req: Request) => {
     
     if (!openAIApiKey) {
       console.error('OpenAI API key not found')
-      // Fallback chain: exact match -> default
-      const fallbackExact = storagePublicUrl(`universe-images/${universeId}.png`)
-      const fallbackDefault = storagePublicUrl("universe-images/default.png")
-      const imageUrl = fallbackExact
+      const imageUrl = getFallbackImageUrl(universeId, subject)
       
       // Cache fallback
       await putCache(universeId, lang, imageUrl, "fallback")
+      const duration = Date.now() - startTime
       
       return new Response(
         JSON.stringify({ 
           success: true,
           imageUrl,
           from: "fallback",
+          error_code: "missing_api_key",
           cached: false,
-          isAI: false
+          isAI: false,
+          duration_ms: duration
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -117,32 +210,11 @@ serve(async (req: Request) => {
       )
     }
 
-    // 2) Generate AI image
+    // 2) Generate AI image with retries
     const finalPrompt = imagePrompt || prompt || `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`
-    console.log('🎨 Calling OpenAI API with prompt:', finalPrompt.slice(0, 100))
+    console.log('🎨 Calling OpenAI API with prompt:', finalPrompt.slice(0, 100) + '...')
     
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: finalPrompt,
-        size: size,
-        n: 1,
-        output_format: 'png'
-      }),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('OpenAI API error:', response.status, errorText)
-      throw new Error(`OpenAI API error: ${response.status} ${errorText}`)
-    }
-
-    const data = await response.json()
+    const data = await generateImageWithRetry(finalPrompt, size)
     const b64 = data.data?.[0]?.b64_json
     
     if (!b64) {
@@ -154,7 +226,8 @@ serve(async (req: Request) => {
     const publicUrl = await uploadToStorage(universeId, png)
     
     await putCache(universeId, lang, publicUrl, "ai")
-    console.log('✅ Generated and cached AI image:', universeId)
+    const duration = Date.now() - startTime
+    console.log('✅ Generated and cached AI image:', universeId, `(${duration}ms)`)
 
     return new Response(
       JSON.stringify({ 
@@ -162,7 +235,8 @@ serve(async (req: Request) => {
         imageUrl: publicUrl, 
         from: "ai",
         cached: false,
-        isAI: true
+        isAI: true,
+        duration_ms: duration
       }), 
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -170,16 +244,17 @@ serve(async (req: Request) => {
     )
 
   } catch (error: any) {
+    const duration = Date.now() - startTime
     console.error('generate-universe-image error:', error)
 
-    // Fallback chain: exact match -> category -> default
+    // Enhanced fallback with better error tracking
     const universeId = new URL(req.url).searchParams.get("universeId") || "unknown"
-    const lang = new URL(req.url).searchParams.get("lang") || "en"
-    const fallbackExact = storagePublicUrl(`universe-images/${universeId}.png`)
-    const fallbackDefault = storagePublicUrl("universe-images/default.png")
-    const imageUrl = fallbackExact
+    const lang = new URL(req.url).searchParams.get("lang") || "en" 
+    const subject = new URL(req.url).searchParams.get("subject")
+    
+    const imageUrl = getFallbackImageUrl(universeId, subject)
 
-    // Cache fallback (så UI altid får et billede)
+    // Cache fallback
     try {
       if (universeId !== "unknown") {
         await putCache(universeId, lang, imageUrl, "fallback")
@@ -194,8 +269,10 @@ serve(async (req: Request) => {
         imageUrl, 
         from: "fallback", 
         error: String(error),
+        error_code: error.message?.includes("timeout") ? "timeout" : "generation_failed",
         cached: false,
-        isAI: false
+        isAI: false,
+        duration_ms: duration
       }), 
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
