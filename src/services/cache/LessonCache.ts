@@ -23,3 +23,12 @@ export function clearLessonCache(): void {
     console.warn("Failed to clear lesson cache:", error);
   }
 }
+
+export function flushLessonCaches(prefix = "lesson:") {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i) ?? "";
+      if (k.startsWith(prefix)) localStorage.removeItem(k);
+    }
+  } catch {}
+}

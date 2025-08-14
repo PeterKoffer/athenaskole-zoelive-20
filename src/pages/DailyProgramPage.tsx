@@ -52,7 +52,17 @@ const DailyProgramPage = () => {
           dateISO: new Date().toISOString().slice(0, 10),
         });
 
-        setLesson(res);
+        // Force the hero we want (prevents "Learning Lab" template)
+        const hero = res?.hero ?? {
+          subject: res?.__fallback?.subject ?? "Cross-curricular",
+          gradeBand,
+          minutes: 150,
+          title: res?.title ?? "Today's Universe",
+          subtitle: res?.subtitle ?? res?.description ?? "",
+          packId: res?.__packId ?? null
+        };
+
+        setLesson({ ...res, hero });
 
         // Generate/resolve image from pack.imagePrompt (or cached URL)
         const prompt = res?.meta?.imagePrompt ?? res?.hero?.title ?? res?.__packId ?? "classroom project";
@@ -272,7 +282,7 @@ const DailyProgramPage = () => {
             {/* Source/Pack dev chip */}
             {import.meta.env.DEV && (
               <div className="text-xs mb-2 opacity-70">
-                Source: <span className="font-mono">{lesson.__source}</span>
+                Mode: <span className="font-mono">{lesson.__source}</span>
                 {lesson.__packId && <> • pack <span className="font-mono">{lesson.__packId}</span></>}
               </div>
             )}
