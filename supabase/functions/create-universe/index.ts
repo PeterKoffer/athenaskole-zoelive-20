@@ -8,8 +8,8 @@ declare global {
   };
 }
 
-// @ts-ignore - ESM import for Deno
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// @ts-ignore - JSR import for Deno
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
