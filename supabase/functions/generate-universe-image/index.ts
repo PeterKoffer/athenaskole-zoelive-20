@@ -140,15 +140,21 @@ async function generateImageWithRetry(prompt: string, size = "1024x1024"): Promi
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { 
+    return new Response(null, { 
       headers: {
-        ...corsHeaders,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       }
     })
   }
 
   const startTime = Date.now()
+  
+  const corsHeaders = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  }
   
   // Parse body once to avoid stream consumption issues
   let body: { prompt?: string; imagePrompt?: string; universeId?: string; lang?: string; size?: string; subject?: string } = {}
@@ -159,11 +165,6 @@ serve(async (req: Request) => {
   }
 
   const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject } = body
-  
-  const headers = {
-    ...corsHeaders,
-    'Content-Type': 'application/json'
-  }
 
   try {
     console.log('🎨 Image generation request:', { 
@@ -199,7 +200,7 @@ serve(async (req: Request) => {
           duration_ms: duration
         }), 
         {
-          headers,
+          headers: corsHeaders,
         }
       )
     }
@@ -225,7 +226,7 @@ serve(async (req: Request) => {
           duration_ms: duration
         }),
         { 
-          headers
+          headers: corsHeaders
         }
       )
     }
@@ -259,7 +260,7 @@ serve(async (req: Request) => {
         duration_ms: duration
       }), 
       {
-        headers,
+        headers: corsHeaders,
       }
     )
 
@@ -268,8 +269,8 @@ serve(async (req: Request) => {
     console.error('generate-universe-image error:', error)
 
     // Enhanced fallback using already-parsed universeId (not from URL)
-    const imageUrl = getFallbackImageUrl(universeId, subject)
-    console.log('🔄 Using fallback image:', imageUrl, 'for universe:', universeId)
+    const imageUrl = getFallbackImageUrl(universeId || 'default', subject)
+    console.log('🔄 Using fallback image:', imageUrl, 'for universe:', universeId || 'default')
 
     // Cache fallback
     try {
@@ -292,7 +293,7 @@ serve(async (req: Request) => {
         duration_ms: duration
       }), 
       {
-        headers,
+        headers: corsHeaders,
       }
     )
   }

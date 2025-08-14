@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface UseUniverseImageOptions {
   universeId?: string;
@@ -37,7 +36,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
   const [isAI, setIsAI] = useState(false);
   const [cached, setCached] = useState(false);
 
-  // Get the key to use (universe ID or slug)
+  // Get the key to use (universe ID or slug) - with guard
   const key = universeId;
   const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
 
@@ -56,9 +55,9 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
   };
 
   useEffect(() => {
-    // Guard: wait until we have a valid key
+    // Critical guard: wait until we have a valid key
     if (!key) {
-      console.log('🔄 useUniverseImage: waiting for universeId...');
+      console.log('🔄 useUniverseImage: waiting for universeId...', { universeId });
       return;
     }
 
@@ -71,24 +70,28 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
     setIsAI(false);
     setCached(false);
 
-    // 2) Generate or fetch AI image in background
+    // 2) Generate or fetch AI image in background using absolute URL
     const generateImage = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('generate-universe-image', {
-          body: { 
+        // Use absolute URL to avoid SSR/proxy/origin issues
+        const response = await fetch(`https://yphkfkpfdpdmllotpqua.supabase.co/functions/v1/generate-universe-image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
             prompt,
             imagePrompt: prompt, 
             universeId: key, 
             lang,
             subject
-          },
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          })
         });
+        
+        const data = await response.json();
 
-        if (error) {
-          console.error('❌ Universe image generation error:', error);
+        if (!response.ok) {
+          console.error('❌ Universe image generation error:', response.status, data);
           return;
         }
 
