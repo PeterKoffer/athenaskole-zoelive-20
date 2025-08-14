@@ -29,7 +29,7 @@ serve(async (req) => {
     });
 
     // Check for API key availability - prioritize OpenAI
-    const openaiKey = Deno.env.get('OpenaiAPI') || Deno.env.get('OPENAI_API_KEY');
+    const openaiKey = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('OpenaiAPI');
     const deepSeekKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('DeepSeek_API');
     
     console.log('🔑 API Key status:', {

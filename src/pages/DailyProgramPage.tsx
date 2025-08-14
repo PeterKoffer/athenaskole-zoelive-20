@@ -10,6 +10,7 @@ import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
+import { UniverseImage } from '@/components/UniverseImage';
 import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
@@ -330,11 +331,18 @@ const DailyProgramPage = () => {
                 ? 'bg-gradient-to-br from-green-700 to-emerald-600' 
                 : 'bg-gradient-to-br from-indigo-700 to-blue-600'
             }`}>
-              <div className="aspect-video bg-neutral-900/40 flex items-center justify-center">
-                {lessonSource.imageUrl ? (
+              <div className="aspect-video bg-neutral-900/40 flex items-center justify-center relative overflow-hidden">
+                {lessonSource.lesson.hero?.universeId ? (
+                  <UniverseImage 
+                    universeId={lessonSource.lesson.hero.universeId}
+                    title={lessonSource.lesson.hero.title || 'Learning Universe'}
+                    subject={lessonSource.lesson.hero.subject}
+                    className="w-full h-full object-cover"
+                  />
+                ) : lessonSource.imageUrl ? (
                   <img src={lessonSource.imageUrl} alt={lessonSource.lesson.hero?.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="text-neutral-400 text-sm">No image available</div>
+                  <div className="text-neutral-400 text-sm">Generating image...</div>
                 )}
               </div>
               <div className="p-4 md:p-6 text-white">

@@ -113,6 +113,7 @@ export class LessonSourceManager {
         gradeBand,
         minutes: 150,
         packId: selectedUniverse.id,
+        universeId: selectedUniverse.id, // Add universe ID for image component
         imageUrl: '' // Will be set below
       },
       meta: {
