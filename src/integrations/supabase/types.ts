@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -204,6 +204,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      calendar_events: {
+        Row: {
+          audiences: string[]
+          class_id: string | null
+          created_at: string
+          created_by: string
+          details: string | null
+          ends_at: string
+          id: string
+          org_id: string
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audiences?: string[]
+          class_id?: string | null
+          created_at?: string
+          created_by: string
+          details?: string | null
+          ends_at: string
+          id?: string
+          org_id: string
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audiences?: string[]
+          class_id?: string | null
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          ends_at?: string
+          id?: string
+          org_id?: string
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       class_overrides: {
         Row: {
@@ -1140,7 +1182,7 @@ export type Database = {
     }
     Functions: {
       has_role: {
-        Args: { uid: string; role: string }
+        Args: { role: string; uid: string }
         Returns: boolean
       }
       jwt_claim: {
@@ -1152,35 +1194,35 @@ export type Database = {
         Returns: undefined
       }
       submit_score: {
-        Args: { p_game_id: string; p_score: number; p_meta?: Json }
+        Args: { p_game_id: string; p_meta?: Json; p_score: number }
         Returns: undefined
       }
       update_concept_mastery: {
         Args: {
-          p_user_id: string
           p_concept_name: string
-          p_subject: string
           p_is_correct: boolean
+          p_subject: string
+          p_user_id: string
         }
         Returns: undefined
       }
       update_real_time_progress: {
         Args: {
-          p_user_id: string
-          p_subject: string
-          p_skill_area: string
-          p_time_spent: number
           p_progress_delta: number
+          p_skill_area: string
+          p_subject: string
+          p_time_spent: number
+          p_user_id: string
         }
         Returns: undefined
       }
       update_user_performance: {
         Args: {
-          p_user_id: string
-          p_subject: string
-          p_skill_area: string
-          p_is_correct: boolean
           p_completion_time: number
+          p_is_correct: boolean
+          p_skill_area: string
+          p_subject: string
+          p_user_id: string
         }
         Returns: undefined
       }
