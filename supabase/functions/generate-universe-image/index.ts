@@ -237,34 +237,58 @@ serve(async (req: Request) => {
     const finalPrompt = imagePrompt || prompt || `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`
     console.log('🎨 Calling OpenAI API with prompt:', finalPrompt.slice(0, 100) + '...')
     
-    const data = await generateImageWithRetry(finalPrompt, size)
-    const b64 = data.data?.[0]?.b64_json
-    
-    if (!b64) {
-      throw new Error("No image data returned from OpenAI")
-    }
-
-    // 3) Upload to Storage and cache
-    const png = b64ToUint8Array(b64)
-    const publicUrl = await uploadToStorage(universeId, png)
-    
-    await putCache(universeId, lang, publicUrl, "ai")
-    const duration = Date.now() - startTime
-    console.log('✅ Generated and cached AI image:', universeId, `(${duration}ms)`)
-
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        imageUrl: publicUrl, 
-        from: "ai",
-        cached: false,
-        isAI: true,
-        duration_ms: duration
-      }), 
-      {
-        headers: CORS,
+    try {
+      const data = await generateImageWithRetry(finalPrompt, size)
+      const b64 = data.data?.[0]?.b64_json
+      
+      if (!b64) {
+        throw new Error("No image data returned from OpenAI")
       }
-    )
+
+      // 3) Upload to Storage and cache
+      const png = b64ToUint8Array(b64)
+      const publicUrl = await uploadToStorage(universeId, png)
+      
+      await putCache(universeId, lang, publicUrl, "ai")
+      const duration = Date.now() - startTime
+      console.log('✅ Generated and cached AI image:', universeId, `(${duration}ms)`)
+
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          imageUrl: publicUrl, 
+          from: "ai",
+          cached: false,
+          isAI: true,
+          duration_ms: duration
+        }), 
+        {
+          headers: CORS,
+        }
+      )
+    } catch (aiError: any) {
+      const errorMsg = aiError?.response?.data?.error?.message ?? aiError?.message ?? "unknown"
+      
+      // Handle organization verification 403 error gracefully
+      if (errorMsg.includes("must be verified") || aiError?.status === 403) {
+        const imageUrl = getFallbackImageUrl(universeId, subject)
+        await putCache(universeId, lang, imageUrl, "fallback")
+        const duration = Date.now() - startTime
+        
+        return json({
+          success: true,
+          imageUrl,
+          from: "locked",
+          reason: "openai_org_unverified",
+          cached: false,
+          isAI: false,
+          duration_ms: duration
+        })
+      }
+      
+      // Re-throw for normal error handling
+      throw aiError
+    }
 
   } catch (error: any) {
     const duration = Date.now() - startTime
