@@ -5,6 +5,7 @@ interface UseUniverseImageOptions {
   universeId?: string;
   prompt?: string;
   lang?: string;
+  subject?: string;
 }
 
 interface UseUniverseImageResult {
@@ -14,35 +15,75 @@ interface UseUniverseImageResult {
   cached: boolean;
 }
 
-export function useUniverseImage({ universeId, prompt, lang = 'en' }: UseUniverseImageOptions): UseUniverseImageResult {
+// Subject mapping for better fallbacks
+const SUBJECT_MAP: Record<string, string> = {
+  mathematics: "math.png",
+  science: "science.png", 
+  geography: "geography.png",
+  "computer-science": "computer-science.png",
+  music: "music.png",
+  "creative-arts": "arts.png",
+  "body-lab": "pe.png",
+  "life-essentials": "life.png",
+  "history-religion": "history.png",
+  languages: "languages.png",
+  "mental-wellness": "wellness.png",
+  default: "default.png",
+};
+
+export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: UseUniverseImageOptions): UseUniverseImageResult {
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAI, setIsAI] = useState(false);
   const [cached, setCached] = useState(false);
 
-  // Generate storage fallback URL
-  const fallbackUrl = universeId 
-    ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${universeId}.png`
-    : `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png`;
+  // Get the key to use (universe ID or slug)
+  const key = universeId;
+  const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
+
+  // Smart fallback chain: specific -> subject -> default
+  const getFallbackUrl = (): string => {
+    if (!key) return `${baseUrl}/${SUBJECT_MAP.default}`;
+    
+    // Try: exact universe match -> subject category -> default
+    const candidates = [
+      `${baseUrl}/${key}.png`,
+      subject ? `${baseUrl}/${SUBJECT_MAP[subject]}` : null,
+      `${baseUrl}/${SUBJECT_MAP.default}`
+    ].filter(Boolean) as string[];
+    
+    return candidates[0];
+  };
 
   useEffect(() => {
-    if (!prompt) return;
+    // Guard: wait until we have a valid key
+    if (!key) {
+      console.log('🔄 useUniverseImage: waiting for universeId...');
+      return;
+    }
 
-    // Set fallback immediately
+    console.log('🖼️ useUniverseImage: starting for', { key, subject, hasPrompt: !!prompt });
+
+    // 1) Set placeholder immediately (key -> subject -> default)
+    const fallbackUrl = getFallbackUrl();
     setImageUrl(fallbackUrl);
     setIsLoading(true);
     setIsAI(false);
     setCached(false);
 
-    // Generate or fetch AI image in background
+    // 2) Generate or fetch AI image in background
     const generateImage = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('generate-universe-image', {
           body: { 
             prompt,
             imagePrompt: prompt, 
-            universeId, 
-            lang 
+            universeId: key, 
+            lang,
+            subject
+          },
+          headers: {
+            'Content-Type': 'application/json'
           }
         });
 
@@ -52,24 +93,31 @@ export function useUniverseImage({ universeId, prompt, lang = 'en' }: UseUnivers
         }
 
         if (data?.success && data?.imageUrl) {
-          setImageUrl(data.imageUrl);
+          // Cache-bust on first AI swap to ensure fresh image shows
+          const imageUrlWithVersion = data.from === 'ai' && !data.cached 
+            ? `${data.imageUrl}?v=${Date.now()}`
+            : data.imageUrl;
+            
+          setImageUrl(imageUrlWithVersion);
           setIsAI(data.isAI || false);
           setCached(data.cached || false);
           console.log('✅ Universe image updated:', { 
-            universeId, 
+            universeId: key, 
+            from: data.from,
             isAI: data.isAI, 
             cached: data.cached 
           });
         }
       } catch (error) {
         console.error('❌ Universe image generation failed:', error);
+        // Keep the placeholder fallback
       } finally {
         setIsLoading(false);
       }
     };
 
     generateImage();
-  }, [prompt, universeId, lang, fallbackUrl]);
+  }, [key, prompt, lang, subject]);
 
   return {
     imageUrl,

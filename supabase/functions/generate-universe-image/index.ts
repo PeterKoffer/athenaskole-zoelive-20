@@ -150,8 +150,22 @@ serve(async (req: Request) => {
 
   const startTime = Date.now()
   
+  // Parse body once to avoid stream consumption issues
+  let body: { prompt?: string; imagePrompt?: string; universeId?: string; lang?: string; size?: string; subject?: string } = {}
   try {
-    const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject } = await req.json()
+    body = await req.json()
+  } catch (parseError) {
+    console.warn('Failed to parse request body:', parseError)
+  }
+
+  const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject } = body
+  
+  const headers = {
+    ...corsHeaders,
+    'Content-Type': 'application/json'
+  }
+
+  try {
     console.log('🎨 Image generation request:', { 
       universeId, 
       lang, 
@@ -165,7 +179,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: "universeId required" }), 
         { 
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers
         }
       )
     }
@@ -185,7 +199,7 @@ serve(async (req: Request) => {
           duration_ms: duration
         }), 
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers,
         }
       )
     }
@@ -211,7 +225,7 @@ serve(async (req: Request) => {
           duration_ms: duration
         }),
         { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          headers
         }
       )
     }
@@ -245,7 +259,7 @@ serve(async (req: Request) => {
         duration_ms: duration
       }), 
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers,
       }
     )
 
@@ -253,16 +267,13 @@ serve(async (req: Request) => {
     const duration = Date.now() - startTime
     console.error('generate-universe-image error:', error)
 
-    // Enhanced fallback with better error tracking
-    const universeId = new URL(req.url).searchParams.get("universeId") || "unknown"
-    const lang = new URL(req.url).searchParams.get("lang") || "en" 
-    const subject = new URL(req.url).searchParams.get("subject")
-    
+    // Enhanced fallback using already-parsed universeId (not from URL)
     const imageUrl = getFallbackImageUrl(universeId, subject)
+    console.log('🔄 Using fallback image:', imageUrl, 'for universe:', universeId)
 
     // Cache fallback
     try {
-      if (universeId !== "unknown") {
+      if (universeId) {
         await putCache(universeId, lang, imageUrl, "fallback")
       }
     } catch (cacheError) {
@@ -281,7 +292,7 @@ serve(async (req: Request) => {
         duration_ms: duration
       }), 
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers,
       }
     )
   }
