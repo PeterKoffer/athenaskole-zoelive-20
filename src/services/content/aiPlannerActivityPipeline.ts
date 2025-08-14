@@ -213,9 +213,14 @@ export async function generateLessonPlan(context: LessonContext): Promise<Planne
   });
   if (error) throw new Error(`Planner generation failed: ${error.message}`);
   const raw = typeof data === 'string' ? JSON.parse(data) : data;
-  const parsed = PlannerSchema.safeParse(raw);
+  
+  // Handle the response format from the edge function
+  const responseData = raw.success ? raw.generatedContent : raw;
+  
+  const parsed = PlannerSchema.safeParse(responseData);
   if (!parsed.success) {
-    throw new Error(`Planner JSON invalid: ${parsed.error.message}`);
+    console.warn('Planner validation failed:', parsed.error.issues);
+    throw new Error(`Planner JSON invalid: ${JSON.stringify(parsed.error.issues)}`);
   }
   return parsed.data;
 }
@@ -232,9 +237,14 @@ export async function generateActivityForSlot(slot: PlannerActivitySlot, world: 
   });
   if (error) throw new Error(`Activity generation failed: ${error.message}`);
   const raw = typeof data === 'string' ? JSON.parse(data) : data;
-  const parsed = ActivitySchema.safeParse(raw);
+  
+  // Handle the response format from the edge function
+  const responseData = raw.success ? raw.generatedContent : raw;
+  
+  const parsed = ActivitySchema.safeParse(responseData);
   if (!parsed.success) {
-    throw new Error(`Activity JSON invalid: ${parsed.error.message}`);
+    console.warn('Activity validation failed:', parsed.error.issues);
+    throw new Error(`Activity JSON invalid: ${JSON.stringify(parsed.error.issues)}`);
   }
   return parsed.data;
 }

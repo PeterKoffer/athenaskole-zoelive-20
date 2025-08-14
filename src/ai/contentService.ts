@@ -4,7 +4,8 @@ import { LessonRequest, LessonResponse } from "./types";
 import { preferencesService } from "@/services/PreferencesService";
 
 function hashKey(obj: unknown): string {
-  return Buffer.from(JSON.stringify(obj)).toString("base64");
+  // Use browser-compatible base64 encoding
+  return btoa(JSON.stringify(obj));
 }
 
 export async function generateContent(req: LessonRequest): Promise<LessonResponse> {

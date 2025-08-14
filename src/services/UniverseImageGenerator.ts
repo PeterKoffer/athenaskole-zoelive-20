@@ -53,11 +53,14 @@ export class UniverseImageGeneratorService {
       return { url: cached, cached: true };
     }
 
-    const fallback = `/images/packs/${args.packId ?? "default"}.jpg`;
+    // Create a more reliable fallback image URL
+    const fallback = args.packId 
+      ? `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(args.packId)}`
+      : '/placeholder.svg?height=400&width=600&text=Learning';
     
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000); // 8s guard
+      const timeout = setTimeout(() => controller.abort(), 5000); // Reduced timeout
       
       const instance = new UniverseImageGeneratorService();
       const url = await instance.generate(args.prompt);
@@ -69,6 +72,8 @@ export class UniverseImageGeneratorService {
         return { url, cached: false };
       }
       
+      // Return fallback immediately if generation fails
+      console.log(`🖼️ Using fallback image for ${args.packId || 'unknown'}`);
       return { url: fallback };
     } catch (error) {
       console.error("Failed to generate image:", error);
