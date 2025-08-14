@@ -19,6 +19,8 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 import CreateUniverse from "./pages/CreateUniverse";
+import UniverseDetail from "./pages/UniverseDetail";
+import MyUniverses from "./pages/MyUniverses";
 
 const DevEventsPage = React.lazy(() => import("./pages/DevEventsPage"));
 const GamesPage = React.lazy(() => import("./pages/GamesPage"));
@@ -255,6 +257,26 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <CreateUniverse />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* My Universes */}
+          <Route
+            path="/universes"
+            element={
+              <ProtectedRoute>
+                <MyUniverses />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Universe Detail */}
+          <Route
+            path="/u/:slug"
+            element={
+              <ProtectedRoute>
+                <UniverseDetail />
               </ProtectedRoute>
             }
           />
