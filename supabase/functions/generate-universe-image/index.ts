@@ -2,11 +2,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-}
+// ── CORS (tillad Supabase-klientens preflight headers) ─────────────────────────
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "authorization, content-type, apikey, x-client-info, x-supabase-authorization",
+  "Content-Type": "application/json",
+} as const;
+
+// Lille helper til konsistente JSON-svar
+const json = (obj: unknown, status = 200) =>
+  new Response(JSON.stringify(obj), { status, headers: CORS });
 
 // Initialize Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -138,21 +145,9 @@ async function generateImageWithRetry(prompt: string, size = "1024x1024"): Promi
 }
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { 
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, content-type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      }
-    })
-  }
+  // Preflight
+  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
 
-  const CORS = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  }
   const startTime = Date.now()
   
   // Parse body once to avoid stream consumption issues
@@ -174,15 +169,7 @@ serve(async (req: Request) => {
       timestamp: new Date().toISOString()
     })
 
-    if (!universeId) {
-      return new Response(
-        JSON.stringify({ error: "universeId required" }), 
-        { 
-          status: 400,
-          headers: CORS
-        }
-      )
-    }
+    if (!universeId) return json({ error: "universeId required" }, 400);
 
     // Force cache clear if requested
     if (force) {
@@ -196,19 +183,14 @@ serve(async (req: Request) => {
     if (cached) {
       const duration = Date.now() - startTime
       console.log('✅ Cache hit for universe:', universeId, `(${duration}ms)`)
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          imageUrl: cached, 
-          from: "cache",
-          cached: true,
-          isAI: true,
-          duration_ms: duration
-        }), 
-        {
-          headers: CORS,
-        }
-      )
+      return json({ 
+        success: true,
+        imageUrl: cached, 
+        from: "cache",
+        cached: true,
+        isAI: true,
+        duration_ms: duration
+      })
     }
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
@@ -287,20 +269,16 @@ serve(async (req: Request) => {
       console.error('Failed to cache fallback:', cacheError)
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        imageUrl, 
-        from: "fallback", 
-        error: String(error),
-        error_code: error.message?.includes("timeout") ? "timeout" : "generation_failed",
-        cached: false,
-        isAI: false,
-        duration_ms: duration
-      }), 
-      {
-        headers: CORS,
-      }
-    )
+    // Giv dev-venlig årsag i response (hjælper i Network-tab)
+    const reason = (error as any)?.response?.data?.error?.message ?? (error as Error)?.message ?? "unknown";
+    return json({ 
+      success: true,
+      imageUrl, 
+      from: "fallback", 
+      reason,
+      cached: false,
+      isAI: false,
+      duration_ms: duration
+    })
   }
 })

@@ -2,12 +2,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
+// Ens CORS-opsætning med Supabase-klientens preflight headers
 const CORS = {
-  "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+  "Access-Control-Allow-Headers":
+    "authorization, content-type, apikey, x-client-info, x-supabase-authorization",
+  "Content-Type": "application/json",
+} as const;
+
+const json = (obj: unknown, status = 200) =>
+  new Response(JSON.stringify(obj), { status, headers: CORS });
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -121,20 +126,13 @@ serve(async (req) => {
   }
 
   const durationMs = Date.now() - started;
-  return new Response(
-    JSON.stringify(
-      {
-        env,
-        checks: {
-          storage: { ok: storageOk, url: storageUrl, reason: storageReason },
-          database: { ok: dbOk, reason: dbReason },
-          openai: { ok: openaiOk, took_ms: openaiTookMs, reason: openaiReason },
-        },
-        duration_ms: durationMs,
-      },
-      null,
-      2
-    ),
-    { headers: CORS }
-  );
+  return json({
+    env,
+    checks: {
+      storage:  { ok: storageOk, url: storageUrl, reason: storageReason },
+      database: { ok: dbOk,      reason: dbReason },
+      openai:   { ok: openaiOk,  took_ms: openaiTookMs, reason: openaiReason },
+    },
+    duration_ms: durationMs,
+  });
 });
