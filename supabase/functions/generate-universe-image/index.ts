@@ -156,14 +156,14 @@ serve(async (req: Request) => {
   const startTime = Date.now()
   
   // Parse body once to avoid stream consumption issues
-  let body: { prompt?: string; imagePrompt?: string; universeId?: string; lang?: string; size?: string; subject?: string } = {}
+  let body: { prompt?: string; imagePrompt?: string; universeId?: string; lang?: string; size?: string; subject?: string; force?: boolean } = {}
   try {
     body = await req.json()
   } catch (parseError) {
     console.warn('Failed to parse request body:', parseError)
   }
 
-  const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject } = body
+  const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject, force = false } = body
 
   try {
     console.log('🎨 Image generation request:', { 
@@ -184,8 +184,15 @@ serve(async (req: Request) => {
       )
     }
 
-    // 1) Check cache first
-    const cached = await getCached(universeId, lang)
+    // Force cache clear if requested
+    if (force) {
+      console.log('🗑️ Force clearing cache for universe:', universeId)
+      await supabase.from("universe_images").delete().eq("universe_id", universeId).eq("lang", lang).catch(() => {})
+      await supabase.storage.from("universe-images").remove([`${universeId}.png`]).catch(() => {})
+    }
+
+    // 1) Check cache first (skip if forced)
+    const cached = !force ? await getCached(universeId, lang) : null
     if (cached) {
       const duration = Date.now() - startTime
       console.log('✅ Cache hit for universe:', universeId, `(${duration}ms)`)
