@@ -7,97 +7,54 @@ const corsHeaders = {
 }
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { title, description, theme, prompt: directPrompt } = await req.json()
+    const { prompt } = await req.json()
 
-    // Use direct prompt if provided, otherwise build from title/description/theme
-    let prompt: string;
-    if (directPrompt) {
-      prompt = directPrompt;
-    } else {
-      if (!title && !description && !theme) {
-        return new Response(
-          JSON.stringify({ error: 'Either prompt or at least one of title, description, or theme is required' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-        )
-      }
-
-      // Create a descriptive prompt for the learning universe
-      prompt = `Create a vibrant, educational illustration for a learning universe called "${title}". 
-      ${description ? `Description: ${description}.` : ''}
-      ${theme ? `Theme: ${theme}.` : ''}
-      
-      Style: Colorful, engaging, child-friendly, modern digital art. 
-      Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery.
-      Mood: Inspiring, fun, and educational. Perfect for students aged 8-16.
-      No text or letters in the image.`;
+    if (!prompt) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Missing prompt parameter" 
+        }), 
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      )
     }
 
-    // @ts-ignore
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured')
-    }
-
-    console.log('🎨 Generating image with prompt:', prompt)
-
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: prompt,
-        n: 1,
-        size: '1024x1024',
-        quality: 'standard'
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.text()
-      console.error('OpenAI API error:', errorData)
-      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    
-    // gpt-image-1 returns base64 data directly
-    if (!data.data || !data.data[0] || !data.data[0].b64_json) {
-      console.error('Unexpected OpenAI response format:', data)
-      throw new Error('Invalid response format from OpenAI')
-    }
-
-    // Convert base64 to data URL
-    const base64Data = data.data[0].b64_json
-    const imageUrl = `data:image/png;base64,${base64Data}`
-    console.log('✅ Image generated successfully')
+    // For now, return a placeholder image URL
+    // TODO: Integrate with actual image generation service (OpenAI DALL-E, Replicate, etc.)
+    const imageUrl = `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(prompt.slice(0, 20))}`
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        imageUrl: imageUrl,
-        prompt: prompt
+        imageUrl,
+        prompt 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
 
   } catch (error: any) {
-    console.error('Error generating image:', error)
+    console.error('Universe image generation error:', error)
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: 'Failed to generate image', 
-        details: error.message 
+        error: 'Internal server error',
+        details: error?.message || 'Unknown error'
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
+      }
     )
   }
 })

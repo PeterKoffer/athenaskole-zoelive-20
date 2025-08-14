@@ -112,27 +112,33 @@ export class LessonSourceManager {
         subject: selectedUniverse.subjectHint,
         gradeBand,
         minutes: 150,
-        packId: selectedUniverse.id
+        packId: selectedUniverse.id,
+        imageUrl: '' // Will be set below
       },
       meta: {
         imagePrompt: selectedUniverse.imagePrompt
       },
-      __packId: selectedUniverse.id
+      __packId: selectedUniverse.id,
+      imageUrl: '' // Will be set below
     };
 
-    // Handle image generation/retrieval
+    // Handle image generation/retrieval with immediate fallback
     let imageUrl = null;
     try {
       const img = await UniverseImageGeneratorService.getOrCreate({ 
         prompt: selectedUniverse.imagePrompt, 
         packId: selectedUniverse.id 
       });
-      imageUrl = img?.url;
+      imageUrl = img?.url || `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(selectedUniverse.title)}`;
     } catch (error) {
-      console.warn('Image generation failed:', error);
-      // Fallback to subject-based stock image
-      imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
+      console.warn('Image generation failed, using fallback:', error);
+      // Always provide a fallback image
+      imageUrl = `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(selectedUniverse.title)}`;
     }
+
+    // Ensure image is set in the lesson data
+    lesson.hero.imageUrl = imageUrl;
+    lesson.imageUrl = imageUrl;
 
     return { lesson, imageUrl };
   }
