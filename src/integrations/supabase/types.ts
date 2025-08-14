@@ -655,6 +655,42 @@ export type Database = {
           },
         ]
       }
+      lesson_plans: {
+        Row: {
+          class_id: string | null
+          created_at: string | null
+          id: string
+          lesson_data: Json
+          org_id: string
+          plan_date: string
+          status: string
+          teacher_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_data: Json
+          org_id: string
+          plan_date: string
+          status?: string
+          teacher_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_data?: Json
+          org_id?: string
+          plan_date?: string
+          status?: string
+          teacher_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       music_projects: {
         Row: {
           collaboration_users: Json | null

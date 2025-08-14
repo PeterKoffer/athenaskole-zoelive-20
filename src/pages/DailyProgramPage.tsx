@@ -15,6 +15,7 @@ import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
 import { buildDailyLesson } from '@/services/lesson/buildDailyLesson';
 import { beatToActivities } from '@/services/content/beatToActivities';
+import { supabase } from '@/integrations/supabase/client';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -35,53 +36,71 @@ const DailyProgramPage = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loadingDailyLesson, setLoadingDailyLesson] = useState(false);
 
-  // Build daily lesson on component mount
+  // Build daily lesson on component mount - check for planned lesson first
   useEffect(() => {
     if (!user?.id) return;
     
     (async () => {
       setLoadingDailyLesson(true);
       try {
-        const grade = (user?.user_metadata as any)?.grade_level || 6;
-        const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
-        
-        const res = await buildDailyLesson({
-          userId: user.id,
-          gradeBand,
-          minutes: 150, // Default 2.5 hours
-          subject: currentSelectedSubject || undefined,
-          dateISO: new Date().toISOString().slice(0, 10),
-        });
+        // First check if there's a planned lesson for today
+        const today = new Date().toISOString().split('T')[0];
+        const { data: plannedLesson } = await supabase
+          .from('lesson_plans')
+          .select('*')
+          .eq('plan_date', today)
+          .eq('status', 'published')
+          .single();
 
-        // Force the hero we want (prevents "Learning Lab" template)
-        const hero = res?.hero ?? {
-          subject: res?.__fallback?.subject ?? "Cross-curricular",
-          gradeBand,
-          minutes: 150,
-          title: res?.title ?? "Today's Universe",
-          subtitle: res?.subtitle ?? res?.description ?? "",
-          packId: res?.__packId ?? null
-        };
-
-        // If the builder returned beats (as activities), expand them to renderable activities
-        if (Array.isArray(res.activities) && res.activities.length > 0 && res.activities[0].type) {
-          // These are beats, convert them to proper activities
-          res.activities = beatToActivities(res.activities as any, {
-            subject: hero.subject || "General",
+        if (plannedLesson) {
+          // Use the planned lesson
+          setLesson(plannedLesson.lesson_data as any);
+          if ((plannedLesson.lesson_data as any)?.hero?.imageUrl) {
+            setImageUrl((plannedLesson.lesson_data as any).hero.imageUrl);
+          }
+        } else {
+          // Generate a lesson if no plan exists
+          const grade = (user?.user_metadata as any)?.grade_level || 6;
+          const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
+          
+          const res = await buildDailyLesson({
+            userId: user.id,
             gradeBand,
-            minutes: res.hero?.minutes || 150
+            minutes: 150, // Default 2.5 hours
+            subject: currentSelectedSubject || undefined,
+            dateISO: new Date().toISOString().slice(0, 10),
           });
-        }
 
-        setLesson({ ...res, hero });
+          // Force the hero we want (prevents "Learning Lab" template)
+          const hero = res?.hero ?? {
+            subject: res?.__fallback?.subject ?? "Cross-curricular",
+            gradeBand,
+            minutes: 150,
+            title: res?.title ?? "Today's Universe",
+            subtitle: res?.subtitle ?? res?.description ?? "",
+            packId: res?.__packId ?? null
+          };
 
-        // Generate/resolve image from pack.imagePrompt (or cached URL) with concrete fallback
-        const prompt = res?.meta?.imagePrompt ?? `${hero.title} — ${hero.subject} for ${gradeBand}`;
-        try {
-          const img = await UniverseImageGeneratorService.getOrCreate({ prompt, packId: res.__packId });
-          setImageUrl(img?.url ?? null);
-        } catch {
-          setImageUrl(null);
+          // If the builder returned beats (as activities), expand them to renderable activities
+          if (Array.isArray(res.activities) && res.activities.length > 0 && res.activities[0].type) {
+            // These are beats, convert them to proper activities
+            res.activities = beatToActivities(res.activities as any, {
+              subject: hero.subject || "General",
+              gradeBand,
+              minutes: res.hero?.minutes || 150
+            });
+          }
+
+          setLesson({ ...res, hero });
+
+          // Generate/resolve image from pack.imagePrompt (or cached URL) with concrete fallback
+          const prompt = res?.meta?.imagePrompt ?? `${hero.title} — ${hero.subject} for ${gradeBand}`;
+          try {
+            const img = await UniverseImageGeneratorService.getOrCreate({ prompt, packId: res.__packId });
+            setImageUrl(img?.url ?? null);
+          } catch {
+            setImageUrl(null);
+          }
         }
       } catch (error) {
         console.error("Failed to build daily lesson:", error);
@@ -244,7 +263,7 @@ const DailyProgramPage = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8 flex items-center">
+        <div className="mb-8 flex items-center justify-between">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
@@ -253,25 +272,37 @@ const DailyProgramPage = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
-          <div>
-            <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-bold text-white">
-                Today's Program
-              </h1>
-              {(import.meta.env.DEV || (user?.user_metadata as any)?.role === 'teacher') && (
-                <select
-                  value={horizon} 
-                  onChange={e => setHorizon(e.target.value as Horizon)}
-                  className="text-[11px] border rounded px-2 py-1 bg-white/10 text-white border-white/30"
-                  title="Simulation horizon"
-                >
-                  <option value="day">Day</option>
-                  <option value="week">Week</option>
-                  <option value="month">Month</option>
-                  <option value="year">Year</option>
-                </select>
-              )}
-            </div>
+          
+          {(user?.user_metadata as any)?.role === 'teacher' && (
+            <Button
+              onClick={() => navigate('/teacher-planning')}
+              variant="outline"
+              className="text-white border-white/30 hover:bg-white/10"
+            >
+              Teacher Planning
+            </Button>
+          )}
+        </div>
+        
+        <div>
+          <div className="flex items-center justify-between">
+            <h1 className="text-4xl font-bold text-white">
+              Today's Program
+            </h1>
+            {(import.meta.env.DEV || (user?.user_metadata as any)?.role === 'teacher') && (
+              <select
+                value={horizon} 
+                onChange={e => setHorizon(e.target.value as Horizon)}
+                className="text-[11px] border rounded px-2 py-1 bg-white/10 text-white border-white/30"
+                title="Simulation horizon"
+              >
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+              </select>
+            )}
+          </div>
             <TextWithSpeaker
               text="Welcome back! Here's your personalized AI-generated learning universe for today."
               context="daily-program-header"
@@ -279,7 +310,6 @@ const DailyProgramPage = () => {
             >
               <p className="text-blue-200">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
             </TextWithSpeaker>
-          </div>
         </div>
 
         {/* New Daily Lesson Section */}

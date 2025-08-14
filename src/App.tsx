@@ -14,6 +14,7 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import CalendarPage from "./pages/CalendarPage";
+import TeacherPlanning from "./pages/TeacherPlanning";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
@@ -78,6 +79,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <CalendarPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher-planning"
+            element={
+              <ProtectedRoute requiredRole="teacher">
+                <TeacherPlanning />
               </ProtectedRoute>
             }
           />
