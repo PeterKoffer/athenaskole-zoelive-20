@@ -1,1 +1,4 @@
 project_id = "yphkfkpfdpdmllotpqua"
+
+[functions.diag-universe-image]
+verify_jwt = false
