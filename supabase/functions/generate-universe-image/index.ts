@@ -57,8 +57,7 @@ serve(async (req: Request) => {
         prompt: prompt,
         n: 1,
         size: '1024x1024',
-        quality: 'standard',
-        response_format: 'url'
+        quality: 'standard'
       }),
     })
 
@@ -70,13 +69,16 @@ serve(async (req: Request) => {
 
     const data = await response.json()
     
-    if (!data.data || !data.data[0] || !data.data[0].url) {
+    // gpt-image-1 returns base64 data directly
+    if (!data.data || !data.data[0] || !data.data[0].b64_json) {
       console.error('Unexpected OpenAI response format:', data)
       throw new Error('Invalid response format from OpenAI')
     }
 
-    const imageUrl = data.data[0].url
-    console.log('✅ Image generated successfully:', imageUrl)
+    // Convert base64 to data URL
+    const base64Data = data.data[0].b64_json
+    const imageUrl = `data:image/png;base64,${base64Data}`
+    console.log('✅ Image generated successfully')
 
     return new Response(
       JSON.stringify({ 

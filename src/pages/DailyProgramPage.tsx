@@ -63,9 +63,10 @@ const DailyProgramPage = () => {
           packId: res?.__packId ?? null
         };
 
-        // If the builder returned beats, expand them to renderable activities
-        if (Array.isArray(res.beats) && (!res.activities || !res.activities.length)) {
-          res.activities = beatToActivities(res.beats, {
+        // If the builder returned beats (as activities), expand them to renderable activities
+        if (Array.isArray(res.activities) && res.activities.length > 0 && res.activities[0].type) {
+          // These are beats, convert them to proper activities
+          res.activities = beatToActivities(res.activities as any, {
             subject: hero.subject || "General",
             gradeBand,
             minutes: res.hero?.minutes || 150
