@@ -92,7 +92,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
         }
 
         if (data?.success && data?.imageUrl) {
-          // Cache-bust on first AI swap to ensure fresh image shows with force refresh
+          // Cache-bust on first AI swap to ensure fresh image shows
           const imageUrlWithVersion = data.from === 'ai' && !data.cached 
             ? `${data.imageUrl}?v=${Date.now()}`
             : data.imageUrl;
