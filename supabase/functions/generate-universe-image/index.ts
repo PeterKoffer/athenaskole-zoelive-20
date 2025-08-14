@@ -174,8 +174,22 @@ serve(async (req: Request) => {
     // Force cache clear if requested
     if (force) {
       console.log('🗑️ Force clearing cache for universe:', universeId)
-      await supabase.from("universe_images").delete().eq("universe_id", universeId).eq("lang", lang).catch(() => {})
-      await supabase.storage.from("universe-images").remove([`${universeId}.png`]).catch(() => {})
+      try {
+        await supabase
+          .from("universe_images")
+          .delete()
+          .eq("universe_id", universeId)
+          .eq("lang", lang);
+      } catch (e) {
+        console.warn("cache delete failed", e);
+      }
+      try {
+        await supabase.storage
+          .from("universe-images")
+          .remove([`${universeId}.png`]);
+      } catch (e) {
+        console.warn("storage remove failed", e);
+      }
     }
 
     // 1) Check cache first (skip if forced)
