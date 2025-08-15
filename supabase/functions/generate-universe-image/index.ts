@@ -21,9 +21,11 @@ const supabase = createClient(
 );
 
 // ---------- Helpers ----------
-const publicUrlFor = (path: string) => {
-  const base = Deno.env.get("SUPABASE_URL")!.replace(/^https?:\/\//, "");
-  return `https://${base}/storage/v1/object/public/${path}`;
+const getStoragePublicUrl = (path: string) => {
+  const { data } = supabase.storage
+    .from("universe-images")
+    .getPublicUrl(path);
+  return data.publicUrl;
 };
 
 const b64ToBytes = (b64: string) =>
@@ -174,8 +176,7 @@ serve(async (req) => {
 
     if (!universeId) return json({ success: false, error: "universeId required" }, 400);
 
-    const storagePath = `universe-images/${universeId}.png`;
-    const placeholderUrl = publicUrlFor(storagePath);
+    const placeholderUrl = getStoragePublicUrl(`${universeId}.png`);
 
     // Optional: clear cache/object (safe try/catch)
     if (force) {
@@ -241,7 +242,7 @@ serve(async (req) => {
         cacheControl: "604800",
       });
 
-    const imageUrl = publicUrlFor(storagePath);
+    const imageUrl = getStoragePublicUrl(`${universeId}.png`);
 
     // Optional: update DB flags (best-effort)
     try {
