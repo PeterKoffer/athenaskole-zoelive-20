@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-// ── CORS (tillad Supabase-klientens preflight headers) ─────────────────────────
+// ---------- CORS ----------
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -11,311 +11,258 @@ const CORS = {
   "Content-Type": "application/json",
 } as const;
 
-// Lille helper til konsistente JSON-svar
 const json = (obj: unknown, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: CORS });
 
-// Initialize Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+// ---------- Supabase (Service Role for Storage writes) ----------
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+);
 
-// Subject-to-fallback mapping for better categorized fallbacks
-const SUBJECT_MAP: Record<string, string> = {
-  mathematics: "math.png",
-  science: "science.png", 
-  geography: "geography.png",
-  "computer-science": "computer-science.png",
-  music: "music.png",
-  "creative-arts": "arts.png",
-  "body-lab": "pe.png",
-  "life-essentials": "life.png",
-  "history-religion": "history.png",
-  languages: "languages.png",
-  "mental-wellness": "wellness.png",
-  default: "default.png",
+// ---------- Helpers ----------
+const publicUrlFor = (path: string) => {
+  const base = Deno.env.get("SUPABASE_URL")!.replace(/^https?:\/\//, "https://");
+  return `https://${base}/storage/v1/object/public/${path}`;
+};
+
+const b64ToBytes = (b64: string) =>
+  Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+
+async function fetchBytes(url: string): Promise<Uint8Array> {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`download failed: ${r.status}`);
+  const buf = new Uint8Array(await r.arrayBuffer());
+  return buf;
 }
 
-// Util: base64 -> Uint8Array (Deno har atob)
-function b64ToUint8Array(b64: string) {
-  const bin = atob(b64)
-  const bytes = new Uint8Array(bin.length)
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  return bytes
-}
-
-// Robust timeout wrapper
-async function withTimeout<T>(promise: Promise<T>, ms = 20000): Promise<T> {
-  const timeout = new Promise<T>((_, reject) => 
-    setTimeout(() => reject(new Error("timeout")), ms)
-  )
-  return Promise.race([promise, timeout])
-}
-
-async function getCached(universeId: string, lang: string) {
-  const { data, error } = await supabase
-    .from("universe_images")
-    .select("image_url")
-    .eq("universe_id", universeId)
-    .eq("lang", lang)
-    .maybeSingle()
-  if (error) console.error("cache read error", error)
-  return data?.image_url ?? null
-}
-
-async function putCache(universeId: string, lang: string, imageUrl: string, source: "ai" | "fallback") {
-  const { error } = await supabase
-    .from("universe_images")
-    .upsert({ universe_id: universeId, lang, image_url: imageUrl, source })
-  if (error) console.error("cache write error", error)
-}
-
-function storagePublicUrl(path: string) {
-  const base = supabaseUrl.replace(/^https?:\/\//, "")
-  return `https://${base}/storage/v1/object/public/${path}`
-}
-
-// Enhanced fallback with subject mapping
-function getFallbackImageUrl(universeId: string, subject?: string): string {
-  const base = "universe-images"
+// ---------- Providers ----------
+async function genWithOpenAI(prompt: string, w: number, h: number) {
+  const key = Deno.env.get("OPENAI_API_KEY");
+  if (!key) throw new Error("OPENAI_API_KEY missing");
   
-  // Try: exact universe match -> subject category -> default
-  const candidates = [
-    `${base}/${universeId}.png`,
-    `${base}/${SUBJECT_MAP[subject || "default"]}`,
-    `${base}/${SUBJECT_MAP.default}`
-  ]
-  
-  return storagePublicUrl(candidates[0]) // For now return first, could enhance with actual file existence check
-}
+  const size = `${w}x${h}`;
+  const resp = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-image-1',
+      prompt,
+      n: 1,
+      size,
+    }),
+  });
 
-async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
-  const { error } = await supabase.storage
-    .from("universe-images")
-    .upload(`${universeId}.png`, pngBytes, {
-      contentType: "image/png",
-      upsert: true,
-      cacheControl: '604800' // 7 days CDN cache
-    })
-  if (error) throw error
-  return storagePublicUrl(`universe-images/${universeId}.png`)
-}
-
-// Enhanced OpenAI gpt-image-1 call with retries and timeout
-async function generateImageWithRetry(prompt: string, size = "1024x1024"): Promise<any> {
-  const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
-  if (!openAIApiKey) {
-    throw new Error("OpenAI API key not available")
+  if (!resp.ok) {
+    const errorText = await resp.text();
+    throw new Error(`OpenAI API error: ${resp.status} - ${errorText}`);
   }
 
-  const attempt = async () => {
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
+  const data = await resp.json();
+  const b64 = data.data?.[0]?.b64_json;
+  if (!b64) throw new Error("OpenAI returned no image");
+  return b64ToBytes(b64);
+}
+
+async function genWithReplicate(prompt: string, w: number, h: number) {
+  const token = Deno.env.get("REPLICATE_API_TOKEN");
+  const version = Deno.env.get("REPLICATE_VERSION"); // REQUIRED: model version id
+  if (!token) throw new Error("REPLICATE_API_TOKEN missing");
+  if (!version) throw new Error("REPLICATE_VERSION missing");
+  // 1) Start prediction
+  const start = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      version,
+      input: { prompt, width: w, height: h },
+    }),
+  }).then((r) => r.json());
+
+  if (start.error) throw new Error(`Replicate start error: ${start.error?.message || start.error}`);
+
+  // 2) Poll
+  let pred = start;
+  const t0 = Date.now();
+  while (true) {
+    if (pred.status === "succeeded") break;
+    if (pred.status === "failed" || pred.status === "canceled") {
+      throw new Error(`Replicate ${pred.status}: ${pred.error || "unknown"}`);
+    }
+    if (Date.now() - t0 > 120000) throw new Error("Replicate timeout");
+    await new Promise((r) => setTimeout(r, 1200));
+    pred = await fetch(`https://api.replicate.com/v1/predictions/${start.id}`, {
+      headers: { Authorization: `Token ${token}` },
+    }).then((r) => r.json());
+  }
+
+  // 3) Download first output URL
+  const out = Array.isArray(pred.output) ? pred.output[0] : pred.output;
+  if (!out || typeof out !== "string") throw new Error("Replicate returned no output URL");
+  return await fetchBytes(out);
+}
+
+async function genWithFal(prompt: string, w: number, h: number) {
+  const key = Deno.env.get("FAL_KEY");
+  const modelPath = Deno.env.get("FAL_MODEL"); // e.g. "fal-ai/flux/schnell" from your fal.ai dashboard
+  if (!key) throw new Error("FAL_KEY missing");
+  if (!modelPath) throw new Error("FAL_MODEL missing");
+  // Typical fal run endpoint pattern:
+  const runUrl = `https://api.fal.ai/v1/run/${modelPath}`;
+  const r = await fetch(runUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Key ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      input: {
+        prompt,
+        size: { width: w, height: h },
       },
-      body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: prompt,
-        size: size,
-        n: 1
-      }),
-    })
+    }),
+  }).then((x) => x.json());
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`)
-    }
+  // fal responses usually include an image URL in output(s)
+  const out =
+    r?.image?.url ||
+    r?.images?.[0]?.url ||
+    r?.output?.[0]?.url ||
+    r?.output?.image?.url;
 
-    return response.json()
-  }
-
-  // First attempt with timeout
-  try {
-    return await withTimeout(attempt(), 20000)
-  } catch (firstError) {
-    console.warn("First attempt failed, retrying in 600ms:", firstError)
-    
-    // Wait and retry once
-    await new Promise(resolve => setTimeout(resolve, 600))
-    return await withTimeout(attempt(), 20000)
-  }
+  if (!out) throw new Error(`fal response missing image url: ${JSON.stringify(r)}`);
+  return await fetchBytes(out);
 }
 
-serve(async (req: Request) => {
-  // Preflight
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+// Placeholder until we have exact DeepSeek Janus endpoint
+async function genWithDeepSeek(_prompt: string, _w: number, _h: number) {
+  throw new Error("DeepSeek Janus provider requires endpoint details (base URL, headers, and response shape).");
+}
 
-  const startTime = Date.now()
-  
-  // Parse body once to avoid stream consumption issues
-  let body: { prompt?: string; imagePrompt?: string; universeId?: string; lang?: string; size?: string; subject?: string; force?: boolean } = {}
-  try {
-    body = await req.json()
-  } catch (parseError) {
-    console.warn('Failed to parse request body:', parseError)
-  }
+// ---------- Main ----------
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
 
-  const { prompt, imagePrompt, universeId, lang = "en", size = "1024x1024", subject, force = false } = body
+  const started = Date.now();
 
   try {
-    console.log('🎨 Image generation request:', { 
-      universeId, 
-      lang, 
-      subject,
-      hasPrompt: !!(prompt || imagePrompt),
-      timestamp: new Date().toISOString()
-    })
+    const {
+      universeId,
+      imagePrompt,
+      lang = "en",
+      width = Number(Deno.env.get("IMAGE_WIDTH") ?? 1024),
+      height = Number(Deno.env.get("IMAGE_HEIGHT") ?? 1024),
+      force = false,
+    } = (await req.json().catch(() => ({}))) as {
+      universeId?: string;
+      imagePrompt?: string;
+      lang?: string;
+      width?: number;
+      height?: number;
+      force?: boolean;
+    };
 
-    if (!universeId) return json({ error: "universeId required" }, 400);
+    if (!universeId) return json({ success: false, error: "universeId required" }, 400);
 
-    // Force cache clear if requested
+    const storagePath = `universe-images/${universeId}.png`;
+    const placeholderUrl = publicUrlFor(storagePath);
+
+    // Optional: clear cache/object (safe try/catch)
     if (force) {
-      console.log('🗑️ Force clearing cache for universe:', universeId)
       try {
-        await supabase
-          .from("universe_images")
-          .delete()
-          .eq("universe_id", universeId)
-          .eq("lang", lang);
-      } catch (e) {
-        console.warn("cache delete failed", e);
-      }
+        await supabase.from("universe_images").delete().eq("universe_id", universeId).eq("lang", lang);
+      } catch { /* noop */ }
       try {
-        await supabase.storage
-          .from("universe-images")
-          .remove([`${universeId}.png`]);
-      } catch (e) {
-        console.warn("storage remove failed", e);
-      }
+        await supabase.storage.from("universe-images").remove([`${universeId}.png`]);
+      } catch { /* noop */ }
     }
 
-    // 1) Check cache first (skip if forced)
-    const cached = !force ? await getCached(universeId, lang) : null
-    if (cached) {
-      const duration = Date.now() - startTime
-      console.log('✅ Cache hit for universe:', universeId, `(${duration}ms)`)
-      return json({ 
-        success: true,
-        imageUrl: cached, 
-        from: "cache",
-        cached: true,
-        isAI: true,
-        duration_ms: duration
-      })
-    }
+    const provider = (Deno.env.get("IMAGE_PROVIDER") ?? "openai").toLowerCase();
+    const prompt = imagePrompt?.trim() || "Kid-friendly classroom illustration, bright, high-contrast, simple shapes";
 
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
-    
-    if (!openAIApiKey) {
-      console.error('OpenAI API key not found')
-      const imageUrl = getFallbackImageUrl(universeId, subject)
-      
-      // Cache fallback
-      await putCache(universeId, lang, imageUrl, "fallback")
-      const duration = Date.now() - startTime
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          imageUrl,
-          from: "fallback",
-          error_code: "missing_api_key",
-          cached: false,
-          isAI: false,
-          duration_ms: duration
-        }),
-        { 
-          headers: CORS
-        }
-      )
-    }
+    let bytes: Uint8Array | null = null;
 
-    // 2) Generate AI image with retries
-    const finalPrompt = imagePrompt || prompt || `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`
-    console.log('🎨 Calling OpenAI gpt-image-1 with prompt:', finalPrompt.slice(0, 100) + '...')
-    
     try {
-      const data = await generateImageWithRetry(finalPrompt, size)
-      const b64 = data.data?.[0]?.b64_json
-      
-      if (!b64) {
-        throw new Error("No image data returned from OpenAI")
+      if (provider === "openai") {
+        bytes = await genWithOpenAI(prompt, width, height);
+      } else if (provider === "replicate") {
+        bytes = await genWithReplicate(prompt, width, height);
+      } else if (provider === "fal") {
+        bytes = await genWithFal(prompt, width, height);
+      } else if (provider === "deepseek") {
+        bytes = await genWithDeepSeek(prompt, width, height);
+      } else {
+        throw new Error(`Unknown IMAGE_PROVIDER: ${provider}`);
       }
-
-      // 3) Upload to Storage and cache
-      const png = b64ToUint8Array(b64)
-      const publicUrl = await uploadToStorage(universeId, png)
-      
-      await putCache(universeId, lang, publicUrl, "ai")
-      const duration = Date.now() - startTime
-      console.log('✅ Generated and cached AI image:', universeId, `(${duration}ms)`)
-
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          imageUrl: publicUrl, 
-          from: "ai",
-          cached: false,
-          isAI: true,
-          duration_ms: duration
-        }), 
-        {
-          headers: CORS,
-        }
-      )
-    } catch (aiError: any) {
-      const errorMsg = aiError?.response?.data?.error?.message ?? aiError?.message ?? "unknown"
-      
-      // Handle organization verification 403 error gracefully
-      if (errorMsg.includes("must be verified") || aiError?.status === 403) {
-        const imageUrl = getFallbackImageUrl(universeId, subject)
-        await putCache(universeId, lang, imageUrl, "fallback")
-        const duration = Date.now() - startTime
-        
+    } catch (e: any) {
+      const msg = e?.message || String(e);
+      // Special case: OpenAI org not verified (should be solved now, but keep it)
+      if (msg.toLowerCase().includes("must be verified")) {
         return json({
           success: true,
-          imageUrl,
+          imageUrl: placeholderUrl,
           from: "locked",
+          provider,
           reason: "openai_org_unverified",
           cached: false,
           isAI: false,
-          duration_ms: duration
-        })
+          duration_ms: Date.now() - started,
+        });
       }
-      
-      // Re-throw for normal error handling
-      throw aiError
+      // Provider misconfiguration or runtime error
+      return json({
+        success: true,
+        imageUrl: placeholderUrl,
+        from: "fallback",
+        provider,
+        reason: msg,
+        cached: false,
+        isAI: false,
+        duration_ms: Date.now() - started,
+      });
     }
 
-  } catch (error: any) {
-    const duration = Date.now() - startTime
-    console.error('generate-universe-image error:', error)
+    // Upload to Supabase Storage (upsert)
+    await supabase.storage
+      .from("universe-images")
+      .upload(`${universeId}.png`, bytes!, {
+        contentType: "image/png",
+        upsert: true,
+        cacheControl: "604800",
+      });
 
-    // Enhanced fallback using already-parsed universeId (not from URL)
-    const imageUrl = getFallbackImageUrl(universeId || 'default', subject)
-    console.log('🔄 Using fallback image:', imageUrl, 'for universe:', universeId || 'default')
+    const imageUrl = publicUrlFor(storagePath);
 
-    // Cache fallback
+    // Optional: update DB flags (best-effort)
     try {
-      if (universeId) {
-        await putCache(universeId, lang, imageUrl, "fallback")
-      }
-    } catch (cacheError) {
-      console.error('Failed to cache fallback:', cacheError)
+      await supabase
+        .from("universes")
+        .update({ image_url: imageUrl, image_status: "ready" })
+        .eq("id", universeId);
+    } catch {
+      /* noop */
     }
 
-    // Giv dev-venlig årsag i response (hjælper i Network-tab)
-    const reason = (error as any)?.response?.data?.error?.message ?? (error as Error)?.message ?? "unknown";
-    return json({ 
+    return json({
       success: true,
-      imageUrl, 
-      from: "fallback", 
-      reason,
+      imageUrl,
+      from: "ai",
+      provider,
       cached: false,
-      isAI: false,
-      duration_ms: duration
-    })
+      isAI: true,
+      duration_ms: Date.now() - started,
+    });
+  } catch (err: any) {
+    const reason =
+      err?.response?.data?.error?.message ||
+      err?.message ||
+      "unknown";
+    return json({ success: true, imageUrl: null, from: "fallback", reason }, 200);
   }
-})
+});
