@@ -194,6 +194,23 @@ serve(async (req) => {
 
     if (!universeId) return json({ success: false, error: "universeId required" }, 400);
 
+    // Feature flag: disable AI generation if needed
+    const ENABLE_AI_IMAGES = Deno.env.get("ENABLE_AI_IMAGES") !== "false";
+    if (!ENABLE_AI_IMAGES) {
+      const { data } = supabase.storage
+        .from("universe-images")
+        .getPublicUrl(`${universeId}.png`);
+      return json({
+        success: true,
+        imageUrl: data.publicUrl,
+        from: "disabled",
+        provider: "none",
+        cached: true,
+        isAI: false,
+        duration_ms: Date.now() - started,
+      });
+    }
+
     const placeholderUrl = getStoragePublicUrl(`${universeId}.png`);
     
     // Ensure valid size for OpenAI
