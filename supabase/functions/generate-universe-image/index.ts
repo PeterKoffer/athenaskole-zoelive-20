@@ -22,7 +22,7 @@ const supabase = createClient(
 
 // ---------- Helpers ----------
 const publicUrlFor = (path: string) => {
-  const base = Deno.env.get("SUPABASE_URL")!.replace(/^https?:\/\//, "https://");
+  const base = Deno.env.get("SUPABASE_URL")!.replace(/^https?:\/\//, "");
   return `https://${base}/storage/v1/object/public/${path}`;
 };
 
