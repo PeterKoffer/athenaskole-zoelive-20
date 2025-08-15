@@ -41,7 +41,11 @@ async function genWithOpenAI(prompt: string, w: number, h: number) {
   const key = Deno.env.get("OPENAI_API_KEY");
   if (!key) throw new Error("OPENAI_API_KEY missing");
   
-  const size = `${w}x${h}`;
+  // OpenAI gpt-image-1 only supports specific sizes
+  const allowed = new Set(["1024x1024", "1024x1536", "1536x1024"]);
+  let size = `${w}x${h}`;
+  if (!allowed.has(size)) size = "1024x1024";
+  
   const resp = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {

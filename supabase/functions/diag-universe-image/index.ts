@@ -104,7 +104,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: "gpt-image-1",
           prompt: "A tiny test icon, flat minimal, gray square",
-          size: "256x256",
+          size: "1024x1024",
           n: 1
         }),
       });
