@@ -101,32 +101,31 @@ async function uploadToStorage(universeId: string, pngBytes: Uint8Array) {
   return storagePublicUrl(`universe-images/${universeId}.png`)
 }
 
-// Enhanced DeepSeek Janus Pro call with retries and timeout
+// Enhanced OpenAI gpt-image-1 call with retries and timeout
 async function generateImageWithRetry(prompt: string, size = "1024x1024"): Promise<any> {
-  const deepseekApiKey = Deno.env.get('DEEPSEEK_API_KEY')
-  if (!deepseekApiKey) {
-    throw new Error("DeepSeek API key not available")
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
+  if (!openAIApiKey) {
+    throw new Error("OpenAI API key not available")
   }
 
   const attempt = async () => {
-    const response = await fetch('https://api.deepseek.com/v1/images/generations', {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${deepseekApiKey}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'janus-pro-1-vision',
+        model: 'gpt-image-1',
         prompt: prompt,
         size: size,
-        n: 1,
-        response_format: 'b64_json'
+        n: 1
       }),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`)
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`)
     }
 
     return response.json()
@@ -207,10 +206,10 @@ serve(async (req: Request) => {
       })
     }
 
-    const deepseekApiKey = Deno.env.get('DEEPSEEK_API_KEY')
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
     
-    if (!deepseekApiKey) {
-      console.error('DeepSeek API key not found')
+    if (!openAIApiKey) {
+      console.error('OpenAI API key not found')
       const imageUrl = getFallbackImageUrl(universeId, subject)
       
       // Cache fallback
@@ -235,7 +234,7 @@ serve(async (req: Request) => {
 
     // 2) Generate AI image with retries
     const finalPrompt = imagePrompt || prompt || `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`
-    console.log('🎨 Calling DeepSeek Janus Pro with prompt:', finalPrompt.slice(0, 100) + '...')
+    console.log('🎨 Calling OpenAI gpt-image-1 with prompt:', finalPrompt.slice(0, 100) + '...')
     
     try {
       const data = await generateImageWithRetry(finalPrompt, size)
