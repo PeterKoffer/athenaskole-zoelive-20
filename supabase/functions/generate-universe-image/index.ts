@@ -28,6 +28,24 @@ const getStoragePublicUrl = (path: string) => {
   return data.publicUrl;
 };
 
+function withTimeout<T>(p: Promise<T>, ms = 10000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort("timeout"), ms);
+  return Promise.race([
+    p, 
+    new Promise<never>((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))
+  ]).finally(() => clearTimeout(t));
+}
+
+// Hash function for prompt deduplication
+async function hashPrompt(universeId: string, lang: string, prompt: string, size: string): Promise<string> {
+  const text = `${universeId}|${lang}|${prompt}|${size}`;
+  const msgUint8 = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+}
+
 const b64ToBytes = (b64: string) =>
   Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 
@@ -177,6 +195,17 @@ serve(async (req) => {
     if (!universeId) return json({ success: false, error: "universeId required" }, 400);
 
     const placeholderUrl = getStoragePublicUrl(`${universeId}.png`);
+    
+    // Ensure valid size for OpenAI
+    const allowed = new Set(["1024x1024", "1024x1536", "1536x1024"]);
+    let size = `${width}x${height}`;
+    if (!allowed.has(size)) size = "1024x1024";
+
+    const provider = (Deno.env.get("IMAGE_PROVIDER") ?? "openai").toLowerCase();
+    const prompt = imagePrompt?.trim() || "Kid-friendly classroom illustration, bright, high-contrast, simple shapes";
+    
+    // Generate hash for prompt deduplication
+    const promptHash = await hashPrompt(universeId, lang, prompt, size);
 
     // Optional: clear cache/object (safe try/catch)
     if (force) {
@@ -188,23 +217,63 @@ serve(async (req) => {
       } catch { /* noop */ }
     }
 
-    const provider = (Deno.env.get("IMAGE_PROVIDER") ?? "openai").toLowerCase();
-    const prompt = imagePrompt?.trim() || "Kid-friendly classroom illustration, bright, high-contrast, simple shapes";
+    // Cache-first: Check if image already exists
+    if (!force) {
+      try {
+        const { data: headResponse } = await supabase.storage
+          .from("universe-images")
+          .list("", { search: `${universeId}.png` });
+        
+        if (headResponse && headResponse.length > 0) {
+          console.log(`✅ Cache hit for ${universeId}`);
+          return json({
+            success: true,
+            imageUrl: placeholderUrl,
+            from: "cache",
+            provider,
+            cached: true,
+            isAI: true,
+            duration_ms: Date.now() - started,
+          });
+        }
+      } catch {
+        // Continue to generation if cache check fails
+      }
+    }
 
     let bytes: Uint8Array | null = null;
 
     try {
+      console.log(`🎨 Generating image for ${universeId} with ${provider}`);
+      const t0 = Date.now();
+      
+      // Apply timeout to prevent hanging
       if (provider === "openai") {
-        bytes = await genWithOpenAI(prompt, width, height);
+        bytes = await withTimeout(genWithOpenAI(prompt, width, height), 10000);
       } else if (provider === "replicate") {
-        bytes = await genWithReplicate(prompt, width, height);
+        bytes = await withTimeout(genWithReplicate(prompt, width, height), 30000);
       } else if (provider === "fal") {
-        bytes = await genWithFal(prompt, width, height);
+        bytes = await withTimeout(genWithFal(prompt, width, height), 15000);
       } else if (provider === "deepseek") {
-        bytes = await genWithDeepSeek(prompt, width, height);
+        bytes = await withTimeout(genWithDeepSeek(prompt, width, height), 10000);
       } else {
         throw new Error(`Unknown IMAGE_PROVIDER: ${provider}`);
       }
+      
+      const t1 = Date.now();
+      console.log(`✅ Image generated in ${t1 - t0}ms`);
+      
+      // Upload timing
+      const uploadStart = Date.now();
+      await supabase.storage
+        .from("universe-images")
+        .upload(`${universeId}.png`, bytes!, {
+          contentType: "image/png",
+          upsert: true,
+          cacheControl: "604800",
+        });
+      const uploadEnd = Date.now();
+      console.log(`📤 Upload completed in ${uploadEnd - uploadStart}ms`);
     } catch (e: any) {
       const msg = e?.message || String(e);
       // Special case: OpenAI org not verified (should be solved now, but keep it)
@@ -232,15 +301,6 @@ serve(async (req) => {
         duration_ms: Date.now() - started,
       });
     }
-
-    // Upload to Supabase Storage (upsert)
-    await supabase.storage
-      .from("universe-images")
-      .upload(`${universeId}.png`, bytes!, {
-        contentType: "image/png",
-        upsert: true,
-        cacheControl: "604800",
-      });
 
     const imageUrl = getStoragePublicUrl(`${universeId}.png`);
 

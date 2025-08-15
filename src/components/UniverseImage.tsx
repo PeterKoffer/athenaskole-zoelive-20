@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useUniverseImage } from '@/hooks/useUniverseImage';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UniverseImageProps {
   universeId: string;
@@ -12,19 +12,16 @@ interface UniverseImageProps {
 
 export function UniverseImage({ universeId, title, subject, className = "", alt }: UniverseImageProps) {
   const [imageError, setImageError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState("");
+  const [fromCache, setFromCache] = useState(false);
+  const [isAIGenerated, setIsAIGenerated] = useState(false);
   
-  // Use the hook that properly handles image generation
-  const { imageUrl, isLoading, isAI, cached } = useUniverseImage({
-    universeId,
-    subject,
-    lang: 'en'
-  });
+  // Base storage URL - shows immediately for instant feel
+  const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
+  const placeholderUrl = `${baseStorageUrl}/${universeId}.png`;
 
   // Smart fallback chain for when image fails to load
   const getFallbackUrls = () => {
-    const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
-    
-    // Subject mapping for better fallbacks
     const subjectMap: Record<string, string> = {
       mathematics: "math.png",
       science: "science.png", 
@@ -43,15 +40,72 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
     const subjectImage = subject ? subjectMap[subject] || subjectMap.default : subjectMap.default;
     
     return [
-      `${baseUrl}/${universeId}.png`,
-      `${baseUrl}/${subjectImage}`,
-      `${baseUrl}/${subjectMap.default}`
+      placeholderUrl,
+      `${baseStorageUrl}/${subjectImage}`,
+      `${baseStorageUrl}/${subjectMap.default}`
     ];
   };
+
+  // Initialize with placeholder and handle generation
+  useEffect(() => {
+    // Set placeholder immediately
+    setCurrentSrc(placeholderUrl);
+    
+    if (!universeId) return;
+    
+    let cancelled = false;
+
+    // Hard client timeout - keep placeholder if function is slow  
+    const budget = setTimeout(() => {
+      if (!cancelled) {
+        console.log('⏰ Function timeout, keeping placeholder');
+      }
+    }, 2000);
+
+    // Fire-and-forget generation (no blocking)
+    supabase.functions.invoke('generate-universe-image', {
+      body: { 
+        universeId,
+        imagePrompt: `Kid-friendly ${subject || 'educational'} illustration, bright colors, simple shapes`,
+        lang: 'en'
+      }
+    }).then(({ data, error }) => {
+      if (cancelled || error) return;
+      
+      if (data?.imageUrl && data.imageUrl !== placeholderUrl) {
+        // Cache-bust when swapping from placeholder to AI image
+        const cacheBustUrl = data.from === 'ai' 
+          ? `${data.imageUrl}?v=${Date.now()}`
+          : data.imageUrl;
+        
+        setCurrentSrc(cacheBustUrl);
+        setFromCache(data.from === 'cache');
+        setIsAIGenerated(data.isAI || data.from === 'ai');
+        
+        console.log('✅ Image updated:', { 
+          universeId, 
+          from: data.from,
+          cached: data.cached,
+          url: cacheBustUrl
+        });
+      }
+    }).catch((error) => {
+      console.log('🔄 Generation failed, keeping placeholder:', error);
+    }).finally(() => {
+      clearTimeout(budget);
+    });
+
+    return () => { 
+      cancelled = true; 
+      clearTimeout(budget); 
+    };
+  }, [universeId, subject, placeholderUrl]);
 
   const handleImageError = () => {
     if (!imageError) {
       setImageError(true);
+      const fallbacks = getFallbackUrls();
+      setCurrentSrc(fallbacks[1]); // Use subject fallback
       console.log('🔄 Image failed, trying fallback for:', universeId);
     }
   };
@@ -59,25 +113,13 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
   const handleImageLoad = () => {
     setImageError(false);
   };
-
-  // If loading, show skeleton
-  if (isLoading && !imageUrl) {
-    return (
-      <div className={`${className} bg-neutral-800 animate-pulse flex items-center justify-center`}>
-        <div className="text-neutral-600 text-sm">Loading image...</div>
-      </div>
-    );
-  }
-
-  // Use imageUrl from hook, with fallback chain on error
-  const currentImageUrl = imageError ? getFallbackUrls()[1] : imageUrl;
   
   return (
     <div className={`relative ${className}`}>
       <img
-        src={currentImageUrl}
+        src={currentSrc}
         alt={alt || title}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover transition-opacity duration-300"
         loading="lazy"
         decoding="async"
         onError={handleImageError}
@@ -87,10 +129,10 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
       
       {/* Debug indicators */}
       {import.meta.env.DEV && (
-        <div className="absolute top-2 right-2 text-xs">
-          {isAI && <span className="bg-green-500 text-white px-1 rounded">AI</span>}
-          {cached && <span className="bg-blue-500 text-white px-1 rounded ml-1">Cached</span>}
-          {imageError && <span className="bg-orange-500 text-white px-1 rounded ml-1">Fallback</span>}
+        <div className="absolute top-2 right-2 text-xs flex gap-1">
+          {isAIGenerated && <span className="bg-green-500 text-white px-1 rounded">AI</span>}
+          {fromCache && <span className="bg-blue-500 text-white px-1 rounded">Cache</span>}
+          {imageError && <span className="bg-orange-500 text-white px-1 rounded">Fallback</span>}
         </div>
       )}
     </div>
