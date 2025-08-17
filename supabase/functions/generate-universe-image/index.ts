@@ -91,11 +91,20 @@ async function genWithOpenAI(prompt: string, w: number, h: number) {
   return b64ToBytes(b64);
 }
 
-async function genWithReplicate(prompt: string, w: number, h: number) {
+async function genWithReplicate(prompt: string, w: number, h: number, replicateInput: Record<string, unknown> = {}) {
   const token = Deno.env.get("REPLICATE_API_TOKEN");
-  const version = Deno.env.get("REPLICATE_VERSION"); // REQUIRED: model version id
+  const version = Deno.env.get("REPLICATE_VERSION");
   if (!token) throw new Error("REPLICATE_API_TOKEN missing");
   if (!version) throw new Error("REPLICATE_VERSION missing");
+
+  // Merge our defaults with whatever the ComfyUI workflow requires
+  const input = {
+    prompt,        // your prompt (workflow can ignore/override this)
+    width: w,
+    height: h,
+    ...replicateInput,  // ← critical: pass through model-specific fields
+  };
+
   // 1) Start prediction
   const start = await fetch("https://api.replicate.com/v1/predictions", {
     method: "POST",
@@ -103,11 +112,8 @@ async function genWithReplicate(prompt: string, w: number, h: number) {
       Authorization: `Token ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      version,
-      input: { prompt, width: w, height: h },
-    }),
-  }).then((r) => r.json());
+    body: JSON.stringify({ version, input }),
+  }).then(r => r.json());
 
   if (start.error) throw new Error(`Replicate start error: ${start.error?.message || start.error}`);
 
@@ -120,16 +126,27 @@ async function genWithReplicate(prompt: string, w: number, h: number) {
       throw new Error(`Replicate ${pred.status}: ${pred.error || "unknown"}`);
     }
     if (Date.now() - t0 > 120000) throw new Error("Replicate timeout");
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1200));
     pred = await fetch(`https://api.replicate.com/v1/predictions/${start.id}`, {
       headers: { Authorization: `Token ${token}` },
-    }).then((r) => r.json());
+    }).then(r => r.json());
   }
 
-  // 3) Download first output URL
-  const out = Array.isArray(pred.output) ? pred.output[0] : pred.output;
-  if (!out || typeof out !== "string") throw new Error("Replicate returned no output URL");
-  return await fetchBytes(out);
+  // 3) Extract a URL and download bytes (ComfyUI outputs can vary)
+  const out =
+    (Array.isArray(pred.output) && pred.output[0]) ||
+    pred.output?.image ||
+    pred.output?.images?.[0] ||
+    pred.output?.[0]?.url ||
+    pred.output?.url;
+
+  if (!out || typeof out !== "string") {
+    throw new Error(`Replicate output missing image URL: ${JSON.stringify(pred.output).slice(0,500)}`);
+  }
+
+  const r = await fetch(out);
+  if (!r.ok) throw new Error(`download failed: ${r.status}`);
+  return new Uint8Array(await r.arrayBuffer());
 }
 
 async function genWithFal(prompt: string, w: number, h: number) {
@@ -183,6 +200,7 @@ serve(async (req) => {
       width = Number(Deno.env.get("IMAGE_WIDTH") ?? 1024),
       height = Number(Deno.env.get("IMAGE_HEIGHT") ?? 1024),
       force = false,
+      replicateInput = {},
     } = (await req.json().catch(() => ({}))) as {
       universeId?: string;
       imagePrompt?: string;
@@ -190,6 +208,7 @@ serve(async (req) => {
       width?: number;
       height?: number;
       force?: boolean;
+      replicateInput?: Record<string, unknown>;
     };
 
     if (!universeId) return json({ success: false, error: "universeId required" }, 400);
@@ -268,7 +287,7 @@ serve(async (req) => {
       if (provider === "openai") {
         bytes = await withTimeout(genWithOpenAI(prompt, width, height), 10000);
       } else if (provider === "replicate") {
-        bytes = await withTimeout(genWithReplicate(prompt, width, height), 30000);
+        bytes = await withTimeout(genWithReplicate(prompt, width, height, replicateInput), 30000);
       } else if (provider === "fal") {
         bytes = await withTimeout(genWithFal(prompt, width, height), 15000);
       } else if (provider === "deepseek") {
