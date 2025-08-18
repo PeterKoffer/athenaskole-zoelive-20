@@ -91,19 +91,53 @@ async function genWithOpenAI(prompt: string, w: number, h: number) {
   return b64ToBytes(b64);
 }
 
-async function genWithReplicate(prompt: string, w: number, h: number, replicateInput: Record<string, unknown> = {}) {
+// ---- helpers ----
+function firstImageRef(val: any): { kind: "url" | "dataurl"; value: string } | null {
+  const seen = new Set<any>();
+  const stack = [val];
+  const isHttp = (s: string) => /^https?:\/\//i.test(s);
+  const isData = (s: string) => /^data:image\/[a-zA-Z+]+;base64,/i.test(s);
+
+  while (stack.length) {
+    const cur = stack.pop();
+    if (!cur || seen.has(cur)) continue;
+    seen.add(cur);
+
+    if (typeof cur === "string") {
+      if (isHttp(cur)) return { kind: "url", value: cur };
+      if (isData(cur)) return { kind: "dataurl", value: cur };
+    } else if (Array.isArray(cur)) {
+      for (const item of cur) stack.push(item);
+    } else if (typeof cur === "object") {
+      for (const v of Object.values(cur)) stack.push(v);
+    }
+  }
+  return null;
+}
+
+function dataUrlToBytes(dataUrl: string): Uint8Array {
+  const b64 = dataUrl.split(",", 2)[1] ?? "";
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+}
+
+async function genWithReplicate(
+  prompt: string,
+  w: number,
+  h: number,
+  replicateInput?: Record<string, unknown>
+) {
   const token = Deno.env.get("REPLICATE_API_TOKEN");
   const version = Deno.env.get("REPLICATE_VERSION");
   if (!token) throw new Error("REPLICATE_API_TOKEN missing");
   if (!version) throw new Error("REPLICATE_VERSION missing");
 
-  // Merge our defaults with whatever the ComfyUI workflow requires
-  const input = {
-    prompt,        // your prompt (workflow can ignore/override this)
-    width: w,
-    height: h,
-    ...replicateInput,  // ← critical: pass through model-specific fields
-  };
+  // Build input: for ComfyUI workflows, you can pass whatever the model expects.
+  // If you provided replicateInput in the request, we pass it straight through.
+  // Otherwise fall back to a simple shape some models accept (prompt/width/height).
+  const input =
+    replicateInput && Object.keys(replicateInput).length
+      ? replicateInput
+      : { prompt, width: w, height: h };
 
   // 1) Start prediction
   const start = await fetch("https://api.replicate.com/v1/predictions", {
@@ -115,9 +149,11 @@ async function genWithReplicate(prompt: string, w: number, h: number, replicateI
     body: JSON.stringify({ version, input }),
   }).then(r => r.json());
 
-  if (start.error) throw new Error(`Replicate start error: ${start.error?.message || start.error}`);
+  if (start.error) {
+    throw new Error(`Replicate start error: ${start.error?.message || start.error}`);
+  }
 
-  // 2) Poll
+  // 2) Poll for completion
   let pred = start;
   const t0 = Date.now();
   while (true) {
@@ -132,21 +168,22 @@ async function genWithReplicate(prompt: string, w: number, h: number, replicateI
     }).then(r => r.json());
   }
 
-  // 3) Extract a URL and download bytes (ComfyUI outputs can vary)
-  const out =
-    (Array.isArray(pred.output) && pred.output[0]) ||
-    pred.output?.image ||
-    pred.output?.images?.[0] ||
-    pred.output?.[0]?.url ||
-    pred.output?.url;
-
-  if (!out || typeof out !== "string") {
-    throw new Error(`Replicate output missing image URL: ${JSON.stringify(pred.output).slice(0,500)}`);
+  // 3) Extract first image reference (URL or data URL) from pred.output
+  const ref = firstImageRef(pred.output);
+  if (!ref) {
+    // Helpful for one-off debugging: enable only temporarily
+    // console.log("Replicate full output (sanitized):", JSON.stringify(pred.output).slice(0, 2000));
+    throw new Error(`Replicate output missing image URL or data URL`);
   }
 
-  const r = await fetch(out);
-  if (!r.ok) throw new Error(`download failed: ${r.status}`);
-  return new Uint8Array(await r.arrayBuffer());
+  if (ref.kind === "url") {
+    const r = await fetch(ref.value);
+    if (!r.ok) throw new Error(`download failed: ${r.status}`);
+    return new Uint8Array(await r.arrayBuffer());
+  } else {
+    // data:image/...;base64,...
+    return dataUrlToBytes(ref.value);
+  }
 }
 
 async function genWithFal(prompt: string, w: number, h: number) {
