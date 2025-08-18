@@ -57,8 +57,53 @@ const styleByBand: Record<GradeBand, { positive: string; negative: string; ar: '
 
 function normalizeSubject(subject: string): string {
   return subject.trim().toLowerCase()
-    .replace(/&/g,'and')
-    .replace(/\s+/g,'-');
+    .replace(/[._]/g, ' ')
+    .replace(/\s*&\s*/g, ' & ')
+    .replace(/\s+/g, ' ')
+}
+
+const subjectKeyAliases: Record<string, string> = {
+  'native language': 'native-language',
+  'native-language': 'native-language',
+
+  'mathematics': 'mathematics',
+
+  'language lab': 'language-lab',
+  'language-lab': 'language-lab',
+
+  'science': 'science',
+
+  'history & religion': 'history-religion',
+  'history and religion': 'history-religion',
+  'history-religion': 'history-religion',
+
+  'geography': 'geography',
+
+  'computer and technology': 'computer-and-technology',
+  'computer & technology': 'computer-and-technology',
+  'computer-and-technology': 'computer-and-technology',
+
+  'creative arts': 'creative-arts',
+  'creative-arts': 'creative-arts',
+
+  'music': 'music-discovery',
+  'music discovery': 'music-discovery',
+  'music-discovery': 'music-discovery',
+
+  'physical education': 'physical-education',
+  'pe': 'physical-education',
+  'physical-education': 'physical-education',
+
+  'mental wellness': 'mental-wellness',
+  'mental-wellness': 'mental-wellness',
+
+  'life essentials': 'life-essentials',
+  'life-essentials': 'life-essentials',
+};
+
+function resolveSubjectKey(subject: string): string {
+  const norm = normalizeSubject(subject);
+  return subjectKeyAliases[norm] ?? norm.replace(/\s+/g, '-');
 }
 
 export type ImagePromptSpec = {
@@ -77,7 +122,7 @@ export function buildImagePrompt(opts: {
   extraStyle?: string;     // optional per-universe seasoning
 }): ImagePromptSpec {
   const band = gradeToBand(opts.grade);
-  const sKey = normalizeSubject(opts.subject);
+  const sKey = resolveSubjectKey(opts.subject);
   const subjectCue = subjectTokens[sKey] ?? '';
   const style = styleByBand[band];
 
@@ -106,5 +151,5 @@ export function buildImagePrompt(opts: {
 // Stable key so you can dedupe/cache by band without touching content generation.
 export function imageCacheKey(universeSlug: string, subject: string, scene: string, grade?: number, styleVersion = 'v1') {
   const band = gradeToBand(grade);
-  return `${universeSlug}::${normalizeSubject(subject)}::${band}::${scene}::${styleVersion}`;
+  return `${universeSlug}::${resolveSubjectKey(subject)}::${band}::${scene}::${styleVersion}`;
 }
