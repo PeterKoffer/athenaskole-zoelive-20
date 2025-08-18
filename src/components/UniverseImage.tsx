@@ -31,6 +31,7 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
       "creative-arts": "arts.png",
       "body-lab": "pe.png",
       "life-essentials": "life.png",
+      "Life Skills": "life.png", // Add mapping for catalog subjects
       "history-religion": "history.png",
       languages: "languages.png",
       "mental-wellness": "wellness.png",

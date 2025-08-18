@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Image Generation</title>
+</head>
+<body>
+    <h1>Testing Replicate Image Generation</h1>
+    <button onclick="testImageGeneration()">Generate Test Image</button>
+    <div id="result"></div>
+    <div id="image-container"></div>
+
+    <script>
+        async function testImageGeneration() {
+            const resultDiv = document.getElementById('result');
+            const imageContainer = document.getElementById('image-container');
+            
+            resultDiv.innerHTML = 'Generating image...';
+            
+            try {
+                const response = await fetch('https://yphkfkpfdpdmllotpqua.supabase.co/functions/v1/generate-universe-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwaGtma3BmZHBkbWxsb3RwcXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MTcxNTksImV4cCI6MjA2Mzk5MzE1OX0.hqyZ2nk3dqMx8rX9tdM1H4XF9wZ9gvaRor-6i5AyCy8'
+                    },
+                    body: JSON.stringify({
+                        universeId: 'test-digital-detox',
+                        imagePrompt: 'bright kid-friendly digital wellness illustration, simple shapes, high-contrast',
+                        lang: 'en',
+                        force: true
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                if (data.imageUrl) {
+                    imageContainer.innerHTML = `<img src="${data.imageUrl}" style="max-width: 400px; margin-top: 20px;" alt="Generated image">`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
