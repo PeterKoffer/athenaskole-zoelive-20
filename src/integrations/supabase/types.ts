@@ -1286,6 +1286,7 @@ export type Database = {
       }
       universes: {
         Row: {
+          content_hash: string | null
           created_at: string
           description: string | null
           goals: Json | null
@@ -1303,6 +1304,7 @@ export type Database = {
           visibility: string
         }
         Insert: {
+          content_hash?: string | null
           created_at?: string
           description?: string | null
           goals?: Json | null
@@ -1320,6 +1322,7 @@ export type Database = {
           visibility?: string
         }
         Update: {
+          content_hash?: string | null
           created_at?: string
           description?: string | null
           goals?: Json | null
@@ -1477,6 +1480,14 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
+      }
+      upsert_universes: {
+        Args: { _data: Json; _owner_id?: string }
+        Returns: {
+          attempted: number
+          inserted: number
+          skipped_slugs: string[]
+        }[]
       }
     }
     Enums: {
