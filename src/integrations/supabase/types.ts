@@ -83,6 +83,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_images: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error: string | null
+          height: number
+          id: string
+          model_version: string
+          prompt: string
+          provider: string
+          replicate_prediction_id: string | null
+          seed: number | null
+          status: string
+          storage_path: string | null
+          universe_id: string
+          width: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error?: string | null
+          height: number
+          id?: string
+          model_version: string
+          prompt: string
+          provider?: string
+          replicate_prediction_id?: string | null
+          seed?: number | null
+          status: string
+          storage_path?: string | null
+          universe_id: string
+          width: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error?: string | null
+          height?: number
+          id?: string
+          model_version?: string
+          prompt?: string
+          provider?: string
+          replicate_prediction_id?: string | null
+          seed?: number | null
+          status?: string
+          storage_path?: string | null
+          universe_id?: string
+          width?: number
+        }
+        Relationships: []
+      }
       ai_interactions: {
         Row: {
           ai_service: string
