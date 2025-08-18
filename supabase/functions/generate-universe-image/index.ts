@@ -323,15 +323,19 @@ serve(async (req) => {
       console.log(`🎨 Generating image for ${universeId} with ${provider}`);
       const t0 = Date.now();
       
+      // Get configurable timeout (default 30s, can be extended via IMG_TIMEOUT_MS)
+      const timeoutMs = Number(Deno.env.get("IMG_TIMEOUT_MS") ?? 30000);
+      console.log(`⏱️ Using timeout: ${timeoutMs}ms for ${provider}`);
+      
       // Apply timeout to prevent hanging
       if (provider === "openai") {
-        bytes = await withTimeout(genWithOpenAI(prompt, width, height), 10000);
+        bytes = await withTimeout(genWithOpenAI(prompt, width, height), timeoutMs);
       } else if (provider === "replicate") {
-        bytes = await withTimeout(genWithReplicate(prompt, width, height, replicateInput), 30000);
+        bytes = await withTimeout(genWithReplicate(prompt, width, height, replicateInput), timeoutMs);
       } else if (provider === "fal") {
-        bytes = await withTimeout(genWithFal(prompt, width, height), 15000);
+        bytes = await withTimeout(genWithFal(prompt, width, height), timeoutMs);
       } else if (provider === "deepseek") {
-        bytes = await withTimeout(genWithDeepSeek(prompt, width, height), 10000);
+        bytes = await withTimeout(genWithDeepSeek(prompt, width, height), timeoutMs);
       } else {
         throw new Error(`Unknown IMAGE_PROVIDER: ${provider}`);
       }
