@@ -4,7 +4,7 @@ project_id = "yphkfkpfdpdmllotpqua"
 verify_jwt = false
 
 [functions.generate-universe-image]
-verify_jwt = false
+verify_jwt = true
 
 [functions.create-universe]
 verify_jwt = true
