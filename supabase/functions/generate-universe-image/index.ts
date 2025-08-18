@@ -237,7 +237,8 @@ serve(async (req) => {
     let size = `${width}x${height}`;
     if (!allowed.has(size)) size = "1024x1024";
 
-    const provider = (Deno.env.get("IMAGE_PROVIDER") ?? "openai").toLowerCase();
+    const provider = (Deno.env.get("IMAGE_PROVIDER") ?? "replicate").toLowerCase();
+    console.log(`🔍 IMAGE_PROVIDER env var: "${Deno.env.get("IMAGE_PROVIDER")}" -> using provider: "${provider}"`);
     const prompt = imagePrompt?.trim() || "Kid-friendly classroom illustration, bright, high-contrast, simple shapes";
     
     // Generate hash for prompt deduplication
