@@ -2,6 +2,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
+// Force function restart to pick up new secrets
+
 // ---------- CORS ----------
 const CORS = {
   "Access-Control-Allow-Origin": "*",
