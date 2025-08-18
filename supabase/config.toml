@@ -5,7 +5,9 @@ verify_jwt = false
 
 [functions.generate-universe-image]
 verify_jwt = true
-# Force redeploy to pick up IMAGE_PROVIDER secret - v2
 
 [functions.create-universe]
 verify_jwt = true
+
+[functions.image-service]
+verify_jwt = false
