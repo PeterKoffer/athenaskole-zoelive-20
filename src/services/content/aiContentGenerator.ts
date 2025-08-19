@@ -38,14 +38,28 @@ export class AIContentGenerator {
       console.log('🎯 Generated unified prompt with metadata:', promptResult.metadata);
 
       console.log('📞 Calling edge function: generate-adaptive-content (using unified prompt)');
-      
-      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-        body: {
-          ...request,
-          customPrompt: promptResult.prompt,
-          promptMetadata: promptResult.metadata
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      let data, error;
+      try {
+        ({ data, error } = await supabase.functions.invoke('generate-adaptive-content', {
+          body: {
+            ...request,
+            customPrompt: promptResult.prompt,
+            promptMetadata: promptResult.metadata
+          },
+          signal: controller.signal
+        }));
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          throw new Error('Edge function request timed out');
         }
-      });
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       console.log('📨 Function response:', { data, error });
 
