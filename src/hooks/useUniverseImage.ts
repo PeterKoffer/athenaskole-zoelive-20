@@ -41,15 +41,16 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
   const key = universeId;
   const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
 
-  // Smart fallback chain: specific -> subject -> default
+  // Smart fallback chain: specific -> subject -> local fallback -> default
   const getFallbackUrl = (): string => {
-    if (!key) return `${baseUrl}/${SUBJECT_MAP.default}`;
+    if (!key) return `/fallback-images/default.png`;
     
-    // Try: exact universe match -> subject category -> default
+    // Try: exact universe match -> subject category -> local fallback -> default
     const candidates = [
       `${baseUrl}/${key}.png`,
       subject ? `${baseUrl}/${SUBJECT_MAP[subject]}` : null,
-      `${baseUrl}/${SUBJECT_MAP.default}`
+      `/fallback-images/${key}.png`,
+      `/fallback-images/default.png`
     ].filter(Boolean) as string[];
     
     return candidates[0];
