@@ -34,7 +34,17 @@ async function resolveReplicateVersion(token: string) {
   return latest;
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+  
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   const {
