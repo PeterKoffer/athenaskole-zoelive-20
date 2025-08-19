@@ -1,25 +1,10 @@
 // @ts-nocheck
-// Deno Edge Function — image-ensure (fire-and-forget queue)
-// Handles CORS + supports either REPLICATE_MODEL *or* REPLICATE_VERSION
-
-// Minimal prompt + band helpers
-type GradeBand = 'K-2'|'3-5'|'6-8'|'9-10'|'11-12';
-function gradeToBand(g?: number): GradeBand {
-  if (g == null) return '6-8';
-  if (g <= 2) return 'K-2';
-  if (g <= 5) return '3-5';
-  if (g <= 8) return '6-8';
-  if (g <= 10) return '9-10';
-  return '11-12';
-}
-
-function corsHeaders(origin?: string) {
-  return {
-    "Access-Control-Allow-Origin": origin || "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, content-type",
-  };
-}
+// Deno Edge Function: queue image generation (per-grade), fire-and-forget
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "POST,OPTIONS",
+  "access-control-allow-headers": "authorization,content-type",
+};
 
 function env(name: string, required = true) {
   const v = Deno.env.get(name);
@@ -27,135 +12,88 @@ function env(name: string, required = true) {
   return v ?? "";
 }
 
-async function replicateCreatePredictionUsingModel(model: string, token: string, body: any) {
-  const url = `https://api.replicate.com/v1/models/${model}/predictions`;
-  const r = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Authorization": `Token ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) {
-    return { ok: false as const, text: await r.text() };
-  }
-  return { ok: true as const, json: await r.json() };
-}
+// Resolve a Replicate version: prefer REPLICATE_VERSION, else fetch latest from REPLICATE_MODEL
+async function resolveReplicateVersion(token: string) {
+  const explicit = Deno.env.get("REPLICATE_VERSION");
+  if (explicit) return explicit;
+  const model = Deno.env.get("REPLICATE_MODEL");
+  if (!model) throw new Error("Set REPLICATE_MODEL or REPLICATE_VERSION");
 
-async function replicateCreatePredictionUsingVersion(version: string, token: string, body: any) {
-  const url = `https://api.replicate.com/v1/predictions`;
-  const r = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Authorization": `Token ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ version, ...body }),
+  const r = await fetch(`https://api.replicate.com/v1/models/${model}`, {
+    headers: { Authorization: `Token ${token}` },
   });
-  if (!r.ok) {
-    return { ok: false as const, text: await r.text() };
-  }
-  return { ok: true as const, json: await r.json() };
+  if (!r.ok) throw new Error(`Failed to fetch model: ${await r.text()}`);
+  const j = await r.json();
+  const id = j?.latest_version?.id;
+  if (!id) throw new Error("Model has no latest_version.id");
+  return id;
 }
 
 Deno.serve(async (req) => {
-  const origin = req.headers.get("origin") || "*";
-
-  // CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: corsHeaders(origin) });
-  }
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders(origin) });
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: CORS });
 
   try {
-    const { universeId, universeTitle, subject, grade, scene = "cover: main activity" } = await req.json();
+    const { universeId, universeTitle, subject, scene = "cover: main activity", grade } = await req.json();
 
     if (!universeId || !universeTitle || !subject) {
-      return new Response(JSON.stringify({ error: "universeId, universeTitle, subject are required" }), {
-        status: 400, headers: { ...corsHeaders(origin), "Content-Type": "application/json" }
-      });
+      return new Response(JSON.stringify({ error: "universeId, universeTitle, subject are required" }), { status: 400, headers: { ...CORS, "content-type": "application/json" } });
     }
 
-    const step = Math.min(12, Math.max(1, Number.isFinite(grade) ? grade : 7));
-    const replicateToken = env("REPLICATE_API_TOKEN");
-    const functionsBase = env("FUNCTIONS_URL"); // e.g. https://<ref>.functions.supabase.co
-    const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
+    const step = Math.min(12, Math.max(1, Number.isFinite(Number(grade)) ? Number(grade) : 7));
 
-    // Build a safe prompt (fold negatives inline; FLUX ignores negative_prompt)
+    const functionsBase = env("FUNCTIONS_URL");
+    const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
+    const replicateTok  = env("REPLICATE_API_TOKEN");
+    const modelSlug     = Deno.env.get("REPLICATE_MODEL") || "";
+    const version       = await resolveReplicateVersion(replicateTok);
+
+    // Build a simple, safe prompt (no separate negative_prompt; fold negatives inline for max compatibility)
     const prompt = [
       `Illustrate: ${scene}`,
       `Universe: ${universeTitle}`,
       `Subject: ${subject}`,
       `Audience: Grade ${step}`,
-      `Style: age-appropriate, clear, no legible text, no watermarks`,
-      `Avoid: gore, scary imagery, clutter, watermark, signature, text overlay`
+      `Style: age-appropriate, clean composition, no legible text overlays`,
+      `Avoid: watermarks, signatures, misspelled labels, deformed anatomy`,
     ].join(" — ");
 
-    // Webhook with minimal context for the writer
-    const webhook = `${functionsBase}/image-webhook?token=${
-      encodeURIComponent(webhookToken)
-    }&universeId=${encodeURIComponent(universeId)}&grade=${step}&scene=${encodeURIComponent(scene)}`;
-
-    // Prepare input for models
-    const modelSlug = Deno.env.get("REPLICATE_MODEL") || ""; // e.g. black-forest-labs/flux-schnell
-    const versionId = Deno.env.get("REPLICATE_VERSION") || ""; // optional
-
-    // Basic defaults that work for FLUX + SDXL (each will ignore unknowns)
-    // FLUX cares about: prompt, aspect_ratio, output_format, output_quality, go_fast, num_outputs
-    // SDXL cares about: prompt, negative_prompt (we folded), width/height if you later add them
-    const fluxLike = modelSlug.toLowerCase().includes("flux");
-    const input: Record<string, unknown> = fluxLike
+    // FLUX models have different input knobs; default path just uses "prompt"
+    const isFlux = modelSlug.toLowerCase().includes("flux");
+    const input = isFlux
       ? {
           prompt,
           aspect_ratio: "1:1",
           output_format: "webp",
-          output_quality: 80,
-          num_outputs: 1,
           go_fast: true,
-        }
-      : {
-          prompt,
-          // negative_prompt intentionally folded into prompt
-          // SDXL often supports width/height; not required
           num_outputs: 1,
-        };
+        }
+      : { prompt };
 
-    // Create prediction using either model slug or version id
-    let result:
-      | { ok: true; json: any }
-      | { ok: false; text: string };
+    const webhook = `${functionsBase}/image-webhook?token=${encodeURIComponent(webhookToken)}&universeId=${encodeURIComponent(universeId)}&grade=${step}&scene=${encodeURIComponent(scene)}`;
 
-    if (modelSlug) {
-      result = await replicateCreatePredictionUsingModel(modelSlug, replicateToken, {
+    const resp = await fetch("https://api.replicate.com/v1/predictions", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${replicateTok}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        version,
         input,
         webhook,
         webhook_events_filter: ["completed"],
-      });
-    } else if (versionId) {
-      result = await replicateCreatePredictionUsingVersion(versionId, replicateToken, {
-        input,
-        webhook,
-        webhook_events_filter: ["completed"],
-      });
-    } else {
-      throw new Error("Set REPLICATE_MODEL or REPLICATE_VERSION in function secrets");
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      return new Response(JSON.stringify({ status: "error", error: err }), { status: 500, headers: { ...CORS, "content-type": "application/json" } });
     }
 
-    if (!result.ok) {
-      return new Response(JSON.stringify({ status: "error", error: result.text }), {
-        status: 500, headers: { ...corsHeaders(origin), "Content-Type": "application/json" }
-      });
-    }
-
-    return new Response(JSON.stringify({ status: "queued", id: result.json.id }), {
-      status: 202, headers: { ...corsHeaders(origin), "Content-Type": "application/json" }
-    });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ status: "error", error: String(e?.message ?? e) }), {
-      status: 500, headers: { ...corsHeaders(origin), "Content-Type": "application/json" }
-    });
+    const data = await resp.json();
+    return new Response(JSON.stringify({ status: "queued", id: data.id }), { status: 202, headers: { ...CORS, "content-type": "application/json" } });
+  } catch (e) {
+    return new Response(JSON.stringify({ status: "error", error: String(e?.message ?? e) }), { status: 500, headers: { ...CORS, "content-type": "application/json" } });
   }
 });

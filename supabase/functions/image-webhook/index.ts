@@ -1,19 +1,12 @@
 // @ts-nocheck
-// Deno Edge Function — image-webhook
-// Saves Replicate output into Supabase Storage at:
-//   universe-images/<universeId>/<band>/cover.webp
+// Deno Edge Function: receives Replicate webhook, writes to Storage (/universe-images/<universeId>/<grade>/cover.webp)
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.3";
-
-type GradeBand = 'K-2'|'3-5'|'6-8'|'9-10'|'11-12';
-function gradeToBand(g?: number): GradeBand {
-  if (g == null) return '6-8';
-  if (g <= 2) return 'K-2';
-  if (g <= 5) return '3-5';
-  if (g <= 8) return '6-8';
-  if (g <= 10) return '9-10';
-  return '11-12';
-}
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "POST,OPTIONS",
+  "access-control-allow-headers": "authorization,content-type",
+};
 
 function env(name: string, required = true) {
   const v = Deno.env.get(name);
@@ -22,59 +15,57 @@ function env(name: string, required = true) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" } });
-  }
-  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: CORS });
 
   try {
     const url = new URL(req.url);
     const token = url.searchParams.get("token");
-    if (token !== env("REPLICATE_WEBHOOK_TOKEN")) return new Response("Forbidden", { status: 403 });
+    if (token !== env("REPLICATE_WEBHOOK_TOKEN")) return new Response("Forbidden", { status: 403, headers: CORS });
 
-    const universeId = url.searchParams.get("universeId")!;
-    const scene = url.searchParams.get("scene") ?? "cover: main activity";
-    const gradeStr = url.searchParams.get("grade") ?? "";
-    const step = Math.min(12, Math.max(1, gradeStr ? Number(gradeStr) : 7));
+    const universeId = url.searchParams.get("universeId") || "";
+    const gradeStr   = url.searchParams.get("grade") || "";
+    const step       = Math.min(12, Math.max(1, Number(gradeStr) || 7));
 
-    const payload = await req.json();
+    const payload = await req.json(); // Replicate webhook payload
     if (payload?.status !== "succeeded") {
-      return new Response(JSON.stringify({ ok: true, ignored: true }), { status: 200 });
+      return new Response("ignored", { status: 200, headers: CORS });
     }
+    const first = Array.isArray(payload?.output) ? payload.output[0] : payload?.output;
+    if (!first) return new Response("no output", { status: 200, headers: CORS });
 
-    const output = Array.isArray(payload.output) ? payload.output[0] : payload.output;
-    if (!output || typeof output !== "string") {
-      return new Response(JSON.stringify({ ok: false, error: "No image URL in webhook payload" }), { status: 400 });
-    }
-
-    const img = await fetch(output);
-    if (!img.ok) return new Response("Failed to fetch output image", { status: 502 });
+    const img = await fetch(first);
+    if (!img.ok) return new Response("fetch image failed", { status: 502, headers: CORS });
     const bytes = new Uint8Array(await img.arrayBuffer());
 
-    const supabase = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"));
+    const supa = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"));
     const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") || "universe-images";
     const path = `${universeId}/${step}/cover.webp`;
 
-    // Upload (upsert)
-    const put = await supabase.storage.from(bucket).upload(path, bytes, {
+    const up = await supa.storage.from(bucket).upload(path, bytes, {
       contentType: "image/webp",
       upsert: true,
     });
-    if (put.error) {
-      return new Response(JSON.stringify({ ok: false, error: put.error.message }), { status: 500 });
+    if (up.error) {
+      return new Response(JSON.stringify(up.error), { status: 500, headers: { ...CORS, "content-type": "application/json" } });
     }
 
-    const publicUrl = supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+    const publicUrl = supa.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 
-    // Optional: if you have ai_images table, you can upsert here.
+    // Optional DB upsert if you have ai_images table (store step as string in grade_band)
+    await supa.from("ai_images").upsert({
+      universe_id: universeId,
+      variant: "cover",
+      grade_band: String(step),
+      status: "completed",
+      storage_path: path,
+      public_url: publicUrl,
+      updated_at: new Date().toISOString(),
+      completed_at: new Date().toISOString(),
+    }, { onConflict: "universe_id,variant,grade_band" });
 
-    return new Response(JSON.stringify({ ok: true, path, url: publicUrl, scene }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ ok: false, error: String(e?.message ?? e) }), {
-      status: 500, headers: { "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({ ok: true, url: publicUrl }), { status: 200, headers: { ...CORS, "content-type": "application/json" } });
+  } catch (e) {
+    return new Response(JSON.stringify({ status: "error", error: String(e?.message ?? e) }), { status: 500, headers: { ...CORS, "content-type": "application/json" } });
   }
 });
