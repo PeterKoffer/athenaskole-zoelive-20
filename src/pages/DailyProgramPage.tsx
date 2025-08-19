@@ -174,9 +174,12 @@ const DailyProgramPage = () => {
         await generateLessonFromUniverse(result as Universe);
       }
 
-      // After setting the universe scroll to the details section
+      // After setting the universe scroll to the details section (if supported)
       setTimeout(() => {
-        universeRef.current?.scrollIntoView({ behavior: 'smooth' });
+        const el = universeRef.current;
+        if (el && typeof el.scrollIntoView === 'function') {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate universe');
