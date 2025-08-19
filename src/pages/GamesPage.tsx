@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Play, Trophy, Clock, Target } from 'lucide-react';
 import { getAvailableGames } from '@/games/registry';
+import comingSoonGames from '@/data/comingSoonGames';
 
 const gameMetadata: Record<string, { 
   title: string; 
@@ -112,26 +113,7 @@ export default function GamesPage() {
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6">Coming Soon</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'Budget Cafe Challenge',
-                subject: 'Mathematics & Business',
-                description: 'Manage a virtual cafe, handle budgets, and learn business math concepts.',
-                estimatedTime: '5-10 minutes'
-              },
-              {
-                title: 'Science Lab Simulator',
-                subject: 'Science',
-                description: 'Conduct virtual experiments and learn scientific principles safely.',
-                estimatedTime: '10-15 minutes'
-              },
-              {
-                title: 'Word Builder Arena',
-                subject: 'Language Arts',
-                description: 'Build words and compete in spelling and vocabulary challenges.',
-                estimatedTime: '3-5 minutes'
-              }
-            ].map((game, index) => (
+            {comingSoonGames.map((game, index) => (
               <Card key={index} className="opacity-60">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -148,12 +130,10 @@ export default function GamesPage() {
                   <p className="text-sm text-gray-600 leading-relaxed">
                     {game.description}
                   </p>
-                  
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="w-3 h-3" />
                     {game.estimatedTime}
                   </div>
-
                   <Button disabled className="w-full">
                     Coming Soon
                   </Button>
