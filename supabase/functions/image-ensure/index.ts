@@ -77,8 +77,8 @@ Deno.serve(async (req) => {
       if (user?.id) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("grade, birth_date")
-          .eq("user_id", user.id)
+          .select("grade_level, age")
+          .eq("id", user.id)
           .single();
 
         if (profile) {
