@@ -73,51 +73,79 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
     setIsAI(false);
     setCached(false);
 
-    // 2) Generate or fetch AI image in background using Supabase client
-    const generateImage = async () => {
+    // 2) Fire-and-forget image generation request
+    const ensureImage = async () => {
       try {
-        // Use Supabase client to properly handle auth
-        const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+        // Use the new image-ensure endpoint
+        const { data, error } = await supabase.functions.invoke('image-ensure', {
           body: {
-            prompt,
-            imagePrompt: prompt, 
-            universeId: key, 
-            lang,
-            subject
+            universeId: key,
+            variant: 'cover',
+            grade: 7, // Default grade, could be passed as prop
+            prompt: prompt || `Educational image for ${key}`,
           }
         });
 
         if (error) {
-          console.error('❌ Universe image generation error:', error);
+          console.error('❌ Image ensure error:', error);
           return;
         }
 
-        if (data?.success && data?.imageUrl) {
-          // Cache-bust on first AI swap to ensure fresh image shows
-          const imageUrlWithVersion = data.from === 'ai' && !data.cached 
-            ? `${data.imageUrl}?v=${Date.now()}`
-            : data.imageUrl;
-            
+        console.log('🎨 Image ensure response:', data);
+
+        // If we already have a completed image, use it immediately
+        if (data?.status === 'exists' && data?.imageUrl) {
+          const imageUrlWithVersion = `${data.imageUrl}?v=${Date.now()}`;
           setImageUrl(imageUrlWithVersion);
-          setIsAI(data.isAI || false);
-          setCached(data.cached || false);
-          console.log('✅ Universe image updated:', { 
+          setIsAI(true);
+          setCached(data.cached || true);
+          console.log('✅ Existing image found:', { 
             universeId: key, 
-            from: data.from,
-            isAI: data.isAI, 
-            cached: data.cached,
-            url: imageUrlWithVersion
+            url: imageUrlWithVersion,
+            cached: data.cached
           });
+        } else if (data?.status === 'queued') {
+          console.log('⏳ Image generation queued, showing fallback');
+          // Keep showing fallback, poll for completion
+          startPolling(key);
         }
       } catch (error) {
-        console.error('❌ Universe image generation failed:', error);
+        console.error('❌ Image ensure failed:', error);
         // Keep the placeholder fallback
       } finally {
         setIsLoading(false);
       }
     };
 
-    generateImage();
+    // 3) Poll for completed images (simplified for existing schema)
+    const startPolling = (universeId: string) => {
+      const pollInterval = setInterval(async () => {
+        try {
+          // Check if image is now available in storage
+          const testUrl = `${baseUrl}/${universeId}.png`;
+          const response = await fetch(testUrl, { method: 'HEAD' });
+          
+          if (response.ok) {
+            clearInterval(pollInterval);
+            const imageUrlWithVersion = `${testUrl}?v=${Date.now()}`;
+            setImageUrl(imageUrlWithVersion);
+            setIsAI(true);
+            setCached(false);
+            console.log('✅ AI image ready:', { 
+              universeId: key, 
+              url: imageUrlWithVersion 
+            });
+          }
+        } catch (error) {
+          // Still polling, image not ready yet
+        }
+      }, 5000); // Poll every 5 seconds
+
+      // Stop polling after 2 minutes
+      setTimeout(() => clearInterval(pollInterval), 120000);
+    };
+
+    ensureImage();
   }, [key, prompt, lang, subject]);
 
   return {

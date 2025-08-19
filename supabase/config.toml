@@ -1,13 +1,23 @@
 project_id = "yphkfkpfdpdmllotpqua"
 
-[functions.diag-universe-image]
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[functions.image-ensure]
 verify_jwt = false
 
-[functions.generate-universe-image]
-verify_jwt = true
-
-[functions.create-universe]
-verify_jwt = true
-
-[functions.image-service]
+[functions.image-webhook]
 verify_jwt = false
+
+[edge_runtime]
+enabled = true
+inspector_port = 8083

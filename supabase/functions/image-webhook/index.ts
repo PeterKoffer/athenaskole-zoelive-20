@@ -1,177 +1,197 @@
-// @ts-nocheck
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-
-const STORAGE_BUCKET = "universe-images";
-
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const REPLICATE_WEBHOOK_TOKEN = Deno.env.get("REPLICATE_WEBHOOK_TOKEN") || "";
-
-const sbAdmin = createClient(SUPABASE_URL, SERVICE_ROLE);
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.3'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-function ok(body: unknown) {
-  return new Response(JSON.stringify(body), { 
-    status: 200, 
-    headers: { ...corsHeaders, "Content-Type": "application/json" } 
-  });
 }
 
-function bad(msg: string, code = 400) {
-  return new Response(JSON.stringify({ error: msg }), { 
-    status: code, 
-    headers: { ...corsHeaders, "Content-Type": "application/json" } 
-  });
+function ok(body: any) {
+  return new Response(JSON.stringify(body), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
 }
 
-// Find the first URL or data URL anywhere in a complex object
-function firstImageRef(val: unknown): { kind: "url" | "dataurl"; value: string } | null {
-  const seen = new Set<unknown>();
-  const stack = [val];
-  const isHttp = (s: string) => /^https?:\/\//i.test(s);
-  const isData = (s: string) => /^data:image\/[a-zA-Z+]+;base64,/i.test(s);
+function bad(message: string, status = 400) {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+}
 
-  while (stack.length) {
-    const cur = stack.pop();
-    if (cur == null || seen.has(cur)) continue;
-    seen.add(cur);
-
-    if (typeof cur === "string") {
-      if (isHttp(cur)) return { kind: "url", value: cur };
-      if (isData(cur)) return { kind: "dataurl", value: cur };
-    } else if (Array.isArray(cur)) {
-      for (const it of cur) stack.push(it);
-    } else if (typeof cur === "object") {
-      for (const v of Object.values(cur as Record<string, unknown>)) stack.push(v);
+// Helper to extract image URL from Replicate output
+function firstImageRef(val: any): string | null {
+  if (typeof val === 'string' && (val.startsWith('http') || val.startsWith('data:'))) {
+    return val
+  }
+  if (Array.isArray(val)) {
+    for (const item of val) {
+      const ref = firstImageRef(item)
+      if (ref) return ref
     }
   }
-  return null;
+  if (val && typeof val === 'object') {
+    for (const key of Object.keys(val)) {
+      const ref = firstImageRef(val[key])
+      if (ref) return ref
+    }
+  }
+  return null
 }
 
+// Convert data URL to bytes
 function dataUrlToBytes(dataUrl: string): Uint8Array {
-  const [, b64] = dataUrl.split(",", 2);
-  const bin = atob(b64 || "");
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-  return arr;
+  const [, data] = dataUrl.split(',')
+  const bytes = new Uint8Array(
+    atob(data)
+      .split('')
+      .map(char => char.charCodeAt(0))
+  )
+  return bytes
 }
 
-serve(async (req: Request) => {
-  // Handle CORS preflight requests
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
-
-  // Optional simple token guard
-  if (REPLICATE_WEBHOOK_TOKEN) {
-    const token = new URL(req.url).searchParams.get("token");
-    if (token !== REPLICATE_WEBHOOK_TOKEN) {
-      console.log(`❌ Webhook unauthorized: expected token but got ${token}`);
-      return bad("unauthorized", 401);
-    }
-  }
-
-  if (req.method !== "POST") return bad("POST required", 405);
-
-  let payload: any;
-  try {
-    payload = await req.json();
-  } catch {
-    return bad("Invalid JSON");
-  }
-
-  const predictionId = String(payload?.id ?? "");
-  if (!predictionId) return bad("Missing prediction id");
-
-  console.log(`🎣 Webhook received for prediction ${predictionId}, status: ${payload?.status}`);
 
   try {
-    const { data: row, error } = await sbAdmin
-      .from("ai_images")
-      .select("id, universe_id")
-      .eq("replicate_prediction_id", predictionId)
-      .single();
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const webhookToken = Deno.env.get('REPLICATE_WEBHOOK_TOKEN')!
 
-    if (error || !row) {
-      console.log(`❌ Unknown prediction id: ${predictionId}`);
-      return bad("Unknown prediction id", 404);
+    const url = new URL(req.url)
+    const token = url.searchParams.get('token')
+    const rowId = url.searchParams.get('rowId')
+
+    // Verify webhook token
+    if (token !== webhookToken) {
+      return bad('Invalid webhook token', 401)
     }
 
-    if (payload?.status !== "succeeded") {
-      console.log(`❌ Prediction failed: ${payload?.status}, error: ${payload?.error}`);
-      await sbAdmin.from("ai_images")
-        .update({ 
-          status: payload?.status ?? "failed", 
-          error: String(payload?.error ?? ""),
+    if (!rowId) {
+      return bad('Missing rowId parameter')
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const payload = await req.json()
+
+    console.log('🪝 Webhook received:', { rowId, status: payload.status })
+
+    // Get the AI image record
+    const { data: imageRecord } = await supabase
+      .from('ai_images')
+      .select('*')
+      .eq('id', rowId)
+      .single()
+
+    if (!imageRecord) {
+      return bad('Image record not found')
+    }
+
+    // Handle failed prediction
+    if (payload.status === 'failed') {
+      await supabase
+        .from('ai_images')
+        .update({
+          status: 'failed',
+          error_message: payload.error || 'Prediction failed',
           completed_at: new Date().toISOString()
         })
-        .eq("id", row.id);
-      return ok({ handled: true, status: payload?.status });
+        .eq('id', rowId)
+
+      return ok({ status: 'failed', rowId })
     }
 
-    const ref = firstImageRef(payload?.output);
-    if (!ref) {
-      console.log(`❌ No image found in output:`, JSON.stringify(payload?.output).slice(0, 500));
-      await sbAdmin.from("ai_images").update({ 
-        status: "failed", 
-        error: "No image in output",
-        completed_at: new Date().toISOString()
-      }).eq("id", row.id);
-      return bad("no image found in output", 422);
-    }
+    // Handle successful prediction
+    if (payload.status === 'succeeded' && payload.output) {
+      const imageRef = firstImageRef(payload.output)
+      
+      if (!imageRef) {
+        await supabase
+          .from('ai_images')
+          .update({
+            status: 'failed',
+            error_message: 'No image found in output',
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', rowId)
 
-    console.log(`📸 Found image reference: ${ref.kind} - ${ref.value.slice(0, 100)}...`);
+        return bad('No image found in prediction output')
+      }
 
-    let bytes: Uint8Array;
-    let contentType = "image/png";
+      let imageBytes: Uint8Array
+      let contentType = 'image/webp'
 
-    if (ref.kind === "url") {
-      console.log(`⬇️ Downloading image from URL...`);
-      const r = await fetch(ref.value);
-      if (!r.ok) throw new Error(`download failed: ${r.status}`);
-      const ct = r.headers.get("content-type") ?? "image/png";
-      contentType = ct.includes("jpeg") ? "image/jpeg" : (ct.includes("webp") ? "image/webp" : "image/png");
-      bytes = new Uint8Array(await r.arrayBuffer());
-    } else {
-      console.log(`🔄 Converting data URL to bytes...`);
-      bytes = dataUrlToBytes(ref.value);
-      if (/image\/jpeg/i.test(ref.value)) contentType = "image/jpeg";
-      if (/image\/webp/i.test(ref.value)) contentType = "image/webp";
-    }
+      if (imageRef.startsWith('data:')) {
+        // Handle data URL
+        imageBytes = dataUrlToBytes(imageRef)
+        contentType = imageRef.split(';')[0].split(':')[1] || 'image/webp'
+      } else {
+        // Download from URL
+        const response = await fetch(imageRef)
+        if (!response.ok) {
+          throw new Error(`Failed to download image: ${response.statusText}`)
+        }
+        imageBytes = new Uint8Array(await response.arrayBuffer())
+        contentType = response.headers.get('content-type') || 'image/webp'
+      }
 
-    const fileName = `${row.id}.png`;
-    const storagePath = `${row.universe_id}/${fileName}`;
+      // Create storage path: universe-images/{universeId}/{gradeBand}/{variant}.webp
+      const extension = contentType.includes('png') ? 'png' : 'webp'
+      const storagePath = `${imageRecord.universe_id}/${imageRecord.grade_band}/${imageRecord.variant}.${extension}`
 
-    console.log(`📤 Uploading to storage: ${storagePath} (${bytes.length} bytes)`);
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('universe-images')
+        .upload(storagePath, imageBytes, {
+          contentType,
+          upsert: true
+        })
 
-    const { error: upErr } = await sbAdmin.storage
-      .from(STORAGE_BUCKET)
-      .upload(storagePath, bytes, { contentType, upsert: true });
-    
-    if (upErr) {
-      console.error(`❌ Upload error:`, upErr);
-      throw upErr;
-    }
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError)
+        await supabase
+          .from('ai_images')
+          .update({
+            status: 'failed',
+            error_message: `Storage upload failed: ${uploadError.message}`,
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', rowId)
 
-    await sbAdmin
-      .from("ai_images")
-      .update({ 
-        status: "succeeded", 
-        storage_path: storagePath, 
-        completed_at: new Date().toISOString() 
+        return bad('Failed to upload to storage')
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('universe-images')
+        .getPublicUrl(storagePath)
+
+      // Update AI image record
+      await supabase
+        .from('ai_images')
+        .update({
+          status: 'completed',
+          storage_path: storagePath,
+          public_url: publicUrl,
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', rowId)
+
+      console.log(`✅ Image completed for ${imageRecord.universe_id}:${imageRecord.variant}:${imageRecord.grade_band}`)
+
+      return ok({ 
+        status: 'completed', 
+        rowId, 
+        imageUrl: publicUrl,
+        storagePath 
       })
-      .eq("id", row.id);
+    }
 
-    console.log(`✅ Webhook completed successfully for ${predictionId}`);
+    return ok({ status: 'processing', rowId })
 
-    return ok({ handled: true, storagePath });
-  } catch (e) {
-    console.error(`❌ Webhook error:`, e);
-    return bad(`webhook error: ${String(e)}`, 500);
+  } catch (error) {
+    console.error('Webhook error:', error)
+    return bad('Internal server error', 500)
   }
-});
+})
