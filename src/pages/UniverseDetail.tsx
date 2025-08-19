@@ -9,6 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Globe, Lock } from "lucide-react";
+import { resolveLearnerGrade } from '@/lib/grade';
+import { UserMetadata } from '@/types/auth';
 
 interface Universe {
   id: string;
@@ -175,7 +177,11 @@ export default function UniverseDetail() {
               <CardTitle className="text-3xl mb-2">{universe.title}</CardTitle>
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary">{universe.subject}</Badge>
-                <Badge variant="outline">Grade {universe.grade_level}</Badge>
+                <Badge variant="outline">Grade {(() => {
+                  const metadata = user?.user_metadata as UserMetadata | undefined;
+                  const learnerGrade = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
+                  return learnerGrade;
+                })()}</Badge>
                 <Badge variant="outline">{universe.lang}</Badge>
                 {getImageStatusBadge()}
               </div>

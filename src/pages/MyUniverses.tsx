@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Globe, Lock } from "lucide-react";
+import { resolveLearnerGrade, gradeToBand } from '@/lib/grade';
+import { UserMetadata } from '@/types/auth';
 
 interface Universe {
   id: string;
@@ -177,7 +179,12 @@ export default function MyUniverses() {
               <CardContent className="pt-0">
                 <div className="flex items-center gap-2 mb-3">
                   <Badge variant="secondary">{universe.subject}</Badge>
-                  <Badge variant="outline">{universe.grade_level}</Badge>
+                  <Badge variant="outline">{(() => {
+                    const metadata = user?.user_metadata as UserMetadata | undefined;
+                    const learnerGrade = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
+                    const band = gradeToBand(learnerGrade);
+                    return band;
+                  })()}</Badge>
                   {getImageStatusBadge(universe.image_status)}
                 </div>
                 
