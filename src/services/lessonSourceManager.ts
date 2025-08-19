@@ -5,6 +5,7 @@ import { UniversePacks, Prime100 } from '@/content/universe.catalog';
 import { UniversePack, CanonicalSubject } from '@/content/types';
 // import { PromptService } from '@/services/promptService'; // TODO: Enable when AI integration ready
 import { validateLessonStructure, StructuredLesson } from '@/services/lessonSchema';
+import { gradeToBand } from '@/lib/grade';
 
 export interface LessonSource {
   type: 'planned' | 'teacher-choice' | 'universe-fallback' | 'ai-suggestion';
@@ -86,9 +87,27 @@ export class LessonSourceManager {
   /**
    * Generate lesson from curated universe database (200 universes)
    */
-  private static async generateUniverseLesson(_userId: string, _date: string) {
-    const grade = 6; // TODO: Get from user profile
-    const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
+  private static async generateUniverseLesson(userId: string, _date: string) {
+    // Get user metadata to determine grade (fallback to default)
+    let grade = 6; // Default fallback
+    let gradeBand = gradeToBand(grade);
+    
+    try {
+      // Try to get user profile from Supabase
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (profile && !error) {
+        // Profile doesn't have grade_level directly, fall back to default
+        grade = 6;
+        gradeBand = gradeToBand(grade);
+      }
+    } catch (error) {
+      console.warn('Could not fetch user profile, using default grade:', error);
+    }
     
     // Get user preferences (mock for now - replace with actual user profile)
     const userSubjectPreference = "Mathematics"; // TODO: Get from user profile
@@ -175,15 +194,29 @@ export class LessonSourceManager {
   /**
    * Generate structured AI lesson using master prompt (last resort)
    */
-  private static async generateAILesson(_userId: string, date: string) {
+  private static async generateAILesson(userId: string, date: string) {
     try {
-      // Get the master prompt from database  
-      // const masterPrompt = await PromptService.getPrompt('daily_program');
+      // Get user metadata to determine grade (fallback to default)
+      let grade = 6; // Default fallback
+      let gradeBand = gradeToBand(grade);
       
-      // Prepare context with Prime 100 universe catalog
-      // const universeContext = Prime100.map(u => `${u.title} (${u.category})`).join(', ');
-      const grade = 6; // TODO: Get from user profile
-      const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
+      try {
+        // Try to get user profile from Supabase
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        
+        if (profile && !error) {
+          // Profile doesn't have grade_level directly, fall back to default
+          grade = 6;
+          gradeBand = gradeToBand(grade);
+        }
+      } catch (error) {
+        console.warn('Could not fetch user profile, using default grade:', error);
+      }
+      
       
       // For now, create a structured lesson using the universe catalog
       // TODO: Use master prompt with actual AI service call like OpenAI

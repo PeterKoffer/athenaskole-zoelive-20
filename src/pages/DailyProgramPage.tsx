@@ -7,7 +7,8 @@ import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target, Plus, AlertCirc
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
-import { learnerGrade } from '@/lib/gradeLabels';
+import { learnerGrade, learnerBadge } from '@/lib/gradeLabels';
+import { resolveLearnerGrade, gradeToBand } from '@/lib/grade';
 import { UserMetadata } from '@/types/auth';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
@@ -36,9 +37,21 @@ const DailyProgramPage = () => {
   const [lessonSource, setLessonSource] = useState<LessonSource | null>(null);
   const [loadingDailyLesson, setLoadingDailyLesson] = useState(false);
 
+  // Don't render or load until we can resolve a grade
+  const metadata = user?.user_metadata as UserMetadata | undefined;
+  const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
+  const learnerBandValue = gradeToBand(learnerGradeValue);
+  const gradeLabel = learnerBadge(
+    { grade_level: metadata?.grade_level, age: metadata?.age },
+    'band'
+  );
+
+  // Guard: avoid kicking the loader with undefined grade
+  const ready = Number.isFinite(learnerGradeValue);
+
   // Get lesson using priority system
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !ready) return;
     
     (async () => {
       setLoadingDailyLesson(true);
@@ -54,7 +67,7 @@ const DailyProgramPage = () => {
         setLoadingDailyLesson(false);
       }
     })();
-  }, [user?.id, currentSelectedSubject]);
+  }, [user?.id, currentSelectedSubject, ready, learnerGradeValue, learnerBandValue]);
 
   const handleAddToCalendar = async () => {
     if (!user?.id || !lessonSource || (lessonSource.type !== 'ai-suggestion' && lessonSource.type !== 'universe-fallback')) return;
@@ -355,7 +368,7 @@ const DailyProgramPage = () => {
                 <div className="flex items-center gap-2 text-sm opacity-90">
                   <span className="px-2 py-0.5 rounded-full bg-white/15">{lessonSource.lesson.hero?.subject}</span>
                   <span>•</span>
-                  <span>Grade {lessonSource.lesson.hero?.gradeBand}</span>
+                  <span>{gradeLabel}</span>
                   <span>•</span>
                   <span>{lessonSource.lesson.hero?.minutes} min</span>
                 </div>

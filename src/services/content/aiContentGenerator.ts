@@ -49,8 +49,7 @@ export class AIContentGenerator {
             ...request,
             customPrompt: promptResult.prompt,
             promptMetadata: promptResult.metadata
-          },
-          signal: controller.signal
+          }
         }));
       } catch (err: any) {
         if (err.name === 'AbortError') {
