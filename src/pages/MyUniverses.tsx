@@ -181,9 +181,7 @@ export default function MyUniverses() {
                   <Badge variant="secondary">{universe.subject}</Badge>
                   <Badge variant="outline">{(() => {
                     const metadata = user?.user_metadata as UserMetadata | undefined;
-                    const learnerGrade = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
-                    const band = gradeToBand(learnerGrade);
-                    return band;
+                    return gradeToBand(resolveLearnerGrade(metadata?.grade_level, metadata?.age));
                   })()}</Badge>
                   {getImageStatusBadge(universe.image_status)}
                 </div>

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { learnerGrade } from '@/lib/gradeLabels';
+import { UserMetadata } from '@/types/auth';
 
 interface UseUniverseImageOptions {
   universeId?: string;
@@ -32,6 +35,7 @@ const SUBJECT_MAP: Record<string, string> = {
 };
 
 export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: UseUniverseImageOptions): UseUniverseImageResult {
+  const { user } = useAuth();
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAI, setIsAI] = useState(false);
@@ -81,7 +85,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
           body: {
             universeId: key,
             variant: 'cover',
-            grade: 7, // Default grade, could be passed as prop
+            grade: learnerGrade({ grade_level: (user?.user_metadata as UserMetadata)?.grade_level, age: (user?.user_metadata as UserMetadata)?.age }),
             prompt: prompt || `Educational image for ${key}`,
           }
         });

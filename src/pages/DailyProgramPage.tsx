@@ -7,7 +7,8 @@ import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target, Plus, AlertCirc
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
-import { LessonActivity } from '@/components/education/components/types/LessonTypes';
+import { learnerGrade } from '@/lib/gradeLabels';
+import { UserMetadata } from '@/types/auth';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
 import { UniverseImage } from '@/components/UniverseImage';
@@ -15,6 +16,7 @@ import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
 import { LessonSourceManager, LessonSource } from '@/services/lessonSourceManager';
+import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 
 const DailyProgramPage = () => {
   const { user, loading } = useAuth();
@@ -197,7 +199,8 @@ const DailyProgramPage = () => {
     setLessonError(null);
 
     try {
-      const grade = 6;
+      const metadata = user?.user_metadata as UserMetadata | undefined;
+      const grade = learnerGrade({ grade_level: metadata?.grade_level, age: metadata?.age });
       const currentDate = new Date().toISOString().split('T')[0];
       const activities = await dailyLessonGenerator.generateDailyLesson({
         subject: u.theme || 'general',

@@ -177,10 +177,9 @@ export default function UniverseDetail() {
               <CardTitle className="text-3xl mb-2">{universe.title}</CardTitle>
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary">{universe.subject}</Badge>
-                <Badge variant="outline">Grade {(() => {
+                <Badge variant="outline">{(() => {
                   const metadata = user?.user_metadata as UserMetadata | undefined;
-                  const learnerGrade = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
-                  return learnerGrade;
+                  return `Grade ${resolveLearnerGrade(metadata?.grade_level, metadata?.age)}`;
                 })()}</Badge>
                 <Badge variant="outline">{universe.lang}</Badge>
                 {getImageStatusBadge()}

@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { gradeToBand } from '@/lib/grade';
+import { useAuth } from '@/hooks/useAuth';
+import { learnerBand } from '@/lib/gradeLabels';
+import { resolveLearnerGrade } from '@/lib/grade';
+import { UserMetadata } from '@/types/auth';
 
 interface UniverseImageProps {
   universeId: string;
@@ -12,7 +15,9 @@ interface UniverseImageProps {
 }
 
 export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
-  const band = gradeToBand(grade);
+  const { user } = useAuth();
+  const metadata = user?.user_metadata as UserMetadata | undefined;
+  const band = learnerBand({ grade_level: metadata?.grade_level, age: metadata?.age });
   const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
   const expectedPath = `${universeId}/${band}/cover.webp`;
   const publicUrl = `${baseStorageUrl}/${expectedPath}`;
@@ -62,14 +67,15 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
     // Start with fallback and queue generation
     setSrc(fallbackUrl);
     
-    // Fire-and-forget generation
+    // Fire-and-forget generation with learner's grade
+    const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
     supabase.functions.invoke('image-ensure', {
       body: { 
         universeId,
         universeTitle: title,
         subject: subject || 'educational',
         scene: 'cover: main activity',
-        grade: grade || 7
+        grade: learnerGradeValue
       }
     }).then(({ data, error }) => {
       if (cancelled || error) {
