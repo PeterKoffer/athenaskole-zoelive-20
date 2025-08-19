@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { gradeToBand } from '@/lib/gradeBand';
+import { gradeToBand } from '@/lib/grade';
 
 interface UniverseImageProps {
   universeId: string;
