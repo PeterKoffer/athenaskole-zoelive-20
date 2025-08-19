@@ -1,70 +1,56 @@
-// @ts-nocheck
-import "https://deno.land/x/xhr@0.1.0/mod.ts"
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// Deno runtime, no Node SDKs
+import { buildPrompt } from "../_shared/prompt.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+type Body = {
+  universeId: string;
+  universeSlug?: string;
+  universeTitle: string;
+  subject: string;
+  scene?: string;   // default "cover scene"
+  grade?: number;
+};
+
+function env(name: string, required = true) {
+  const v = Deno.env.get(name);
+  if (!v && required) throw new Error(`Missing env: ${name}`);
+  return v ?? "";
 }
 
-function ok(body: any) {
-  return new Response(JSON.stringify(body), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  })
-}
+Deno.serve(async (req) => {
+  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
-function bad(message: string, status = 400) {
-  return new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  })
-}
+  const {
+    universeId, universeTitle, subject, scene = "cover: main activity", grade
+  } = await req.json() as Body;
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+  const { prompt, negative, size } = buildPrompt({ universeTitle, subject, scene, grade });
+
+  const replicateToken = env("REPLICATE_API_TOKEN");
+  const modelVersion   = env("REPLICATE_VERSION");
+  const functionsBase  = env("FUNCTIONS_URL"); // e.g., https://<project>.functions.supabase.co
+  const webhookToken   = env("REPLICATE_WEBHOOK_TOKEN");
+  const webhookUrl     = `${functionsBase}/image-webhook?token=${encodeURIComponent(webhookToken)}&universeId=${encodeURIComponent(universeId)}&scene=${encodeURIComponent(scene)}&grade=${grade ?? ""}`;
+
+  // Create prediction via REST (works in Deno)
+  const r = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Token ${replicateToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      version: modelVersion,
+      input: { prompt, negative_prompt: negative, size },
+      webhook: webhookUrl,
+      webhook_events_filter: ["completed"],
+    }),
+  });
+
+  if (!r.ok) {
+    const err = await r.text();
+    return new Response(JSON.stringify({ status: "error", error: err }), { status: 500 });
   }
 
-  try {
-    const { universeId, variant = 'cover', grade = 7, prompt } = await req.json()
-
-    if (!universeId) {
-      return bad('universeId is required')
-    }
-
-    console.log(`🚀 Fire-and-forget image generation for ${universeId}`)
-
-    // Fire off the existing generate-universe-image function without waiting
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    
-    // Don't await this - fire and forget
-    fetch(`${supabaseUrl}/functions/v1/generate-universe-image`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')!}`,
-      },
-      body: JSON.stringify({
-        universeId,
-        imagePrompt: prompt || `Educational image for ${universeId}`,
-        lang: 'en',
-        width: grade <= 8 ? 1024 : 1280,
-        height: grade <= 8 ? 1024 : 720,
-      })
-    }).catch(error => {
-      console.error('Background image generation error:', error)
-    })
-
-    // Return immediately
-    return ok({
-      status: 'queued',
-      universeId,
-      variant,
-      message: 'Image generation started in background'
-    })
-
-  } catch (error) {
-    console.error('Error in image-ensure:', error)
-    return bad('Internal server error', 500)
-  }
-})
+  const data = await r.json();
+  return new Response(JSON.stringify({ status: "queued", id: data.id }), { status: 202 });
+});
