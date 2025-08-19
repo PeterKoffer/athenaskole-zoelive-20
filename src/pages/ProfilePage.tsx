@@ -1,7 +1,8 @@
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveEduContext } from "@/services/edu/locale";
+import AvatarUpload from "@/components/profile/AvatarUpload";
 
 interface ProfileData {
   full_name?: string | null;
@@ -11,6 +12,10 @@ interface ProfileData {
   measurement_system?: string | null;
   curriculum_code?: string | null;
   timezone?: string | null;
+  avatar_url?: string | null;
+  grade?: string | null;
+  birth_date?: string | null;
+  preferences?: { interests?: string[] } | null;
 }
 
 const COUNTRIES = [
@@ -31,6 +36,7 @@ const COUNTRIES = [
 export default function ProfilePage() {
   const [userId, setUserId] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     full_name: "",
     country_code: "US",
@@ -39,6 +45,10 @@ export default function ProfilePage() {
     measurement_system: "imperial",
     curriculum_code: "",
     timezone: "",
+    avatar_url: "",
+    grade: "",
+    age: "",
+    interests: [] as string[],
   });
 
   useEffect(() => {
@@ -56,6 +66,9 @@ export default function ProfilePage() {
         curriculumCode: profile.curriculum_code || undefined,
         timezone: profile.timezone || undefined,
       });
+      const age = profile.birth_date ?
+        new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : "";
+      const interests = profile.preferences?.interests || [];
       setForm({
         full_name: profile.full_name ?? "",
         country_code: ctx.countryCode,
@@ -64,6 +77,10 @@ export default function ProfilePage() {
         measurement_system: ctx.measurement,
         curriculum_code: ctx.curriculumCode,
         timezone: ctx.timezone ?? "",
+        avatar_url: profile.avatar_url ?? "",
+        grade: profile.grade ?? "",
+        age: age ? String(age) : "",
+        interests,
       });
       setLoading(false);
     })();
@@ -82,9 +99,45 @@ export default function ProfilePage() {
     }));
   }
 
+  const handleInterestKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && e.currentTarget.value) {
+      e.preventDefault();
+      setForm(f => ({ ...f, interests: [...f.interests, e.currentTarget.value] }));
+      e.currentTarget.value = '';
+    }
+  };
+
+  const removeInterest = (interest: string) => {
+    setForm(f => ({ ...f, interests: f.interests.filter(i => i !== interest) }));
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !userId) return;
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file);
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+      setForm(f => ({ ...f, avatar_url: data.publicUrl }));
+    } catch (err) {
+      console.error('Avatar upload error:', err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   async function save() {
     if (!userId) return;
     setLoading(true);
+    const birthDate = form.age
+      ? new Date(new Date().setFullYear(new Date().getFullYear() - parseInt(form.age)))
+          .toISOString().split('T')[0]
+      : null;
     const { error } = await supabase.from("profiles").update({
       full_name: form.full_name,
       country_code: form.country_code,
@@ -93,6 +146,10 @@ export default function ProfilePage() {
       measurement_system: form.measurement_system,
       curriculum_code: form.curriculum_code,
       timezone: form.timezone,
+      avatar_url: form.avatar_url || null,
+      grade: form.grade || null,
+      birth_date: birthDate,
+      preferences: { interests: form.interests },
     }).eq("user_id", userId);
     setLoading(false);
     if (error) alert(error.message); else alert("Saved!");
@@ -103,6 +160,12 @@ export default function ProfilePage() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Profile</h1>
+      <AvatarUpload
+        avatarUrl={form.avatar_url}
+        name={form.full_name}
+        uploading={uploading}
+        onUpload={handleAvatarUpload}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="text-sm">
@@ -153,11 +216,41 @@ export default function ProfilePage() {
                  onChange={e=>setForm({...form, curriculum_code: e.target.value})}/>
         </label>
 
+        <label className="text-sm">
+          Grade Level
+          <input className="mt-1 w-full border rounded px-2 py-1"
+                 value={form.grade}
+                 onChange={e=>setForm({...form, grade: e.target.value})}/>
+        </label>
+
+        <label className="text-sm">
+          Age
+          <input className="mt-1 w-full border rounded px-2 py-1" type="number"
+                 value={form.age}
+                 onChange={e=>setForm({...form, age: e.target.value})}/>
+        </label>
+
         <label className="text-sm md:col-span-2">
           Timezone
           <input className="mt-1 w-full border rounded px-2 py-1"
                  value={form.timezone}
                  onChange={e=>setForm({...form, timezone: e.target.value})}/>
+        </label>
+
+        <label className="text-sm md:col-span-2">
+          Interests
+          <input className="mt-1 w-full border rounded px-2 py-1" onKeyDown={handleInterestKeyDown}
+                 placeholder="Type an interest and press Enter"/>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {form.interests.map(interest => (
+              <span key={interest} className="bg-gray-200 text-gray-800 px-2 py-1 rounded flex items-center">
+                {interest}
+                <button type="button" className="ml-1" onClick={() => removeInterest(interest)}>
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
         </label>
       </div>
 
