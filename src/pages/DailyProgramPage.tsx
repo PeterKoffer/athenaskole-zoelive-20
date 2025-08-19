@@ -7,7 +7,8 @@ import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target, Plus, AlertCirc
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
-import { learnerGrade } from '@/lib/gradeLabels';
+import { resolveLearnerGrade, gradeToBand } from '@/lib/grade';
+import { learnerBadge } from '@/lib/gradeLabels';
 import { UserMetadata } from '@/types/auth';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
@@ -36,17 +37,28 @@ const DailyProgramPage = () => {
   const [lessonSource, setLessonSource] = useState<LessonSource | null>(null);
   const [loadingDailyLesson, setLoadingDailyLesson] = useState(false);
 
+  const metadata = user?.user_metadata as UserMetadata | undefined;
+  const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
+  const learnerBand = gradeToBand(learnerGradeValue);
+  const gradeLabel = learnerBadge({ grade_level: metadata?.grade_level, age: metadata?.age }, 'band');
+
   // Get lesson using priority system
   useEffect(() => {
     if (!user?.id) return;
-    
+
     (async () => {
       setLoadingDailyLesson(true);
       try {
         const today = new Date().toISOString().split('T')[0];
         const userRole = (user?.user_metadata as any)?.role;
-        
-        const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole);
+
+        const source = await LessonSourceManager.getLessonForDate(
+          user.id,
+          today,
+          userRole,
+          learnerGradeValue,
+          learnerBand
+        );
         setLessonSource(source);
       } catch (error) {
         console.error("Failed to get daily lesson:", error);
@@ -54,7 +66,7 @@ const DailyProgramPage = () => {
         setLoadingDailyLesson(false);
       }
     })();
-  }, [user?.id, currentSelectedSubject]);
+  }, [user?.id, currentSelectedSubject, learnerGradeValue, learnerBand]);
 
   const handleAddToCalendar = async () => {
     if (!user?.id || !lessonSource || (lessonSource.type !== 'ai-suggestion' && lessonSource.type !== 'universe-fallback')) return;
@@ -62,11 +74,17 @@ const DailyProgramPage = () => {
     const today = new Date().toISOString().split('T')[0];
     const orgId = 'school-1'; // TODO: Get from user context
     const success = await LessonSourceManager.saveLessonToPlan(user.id, today, lessonSource.lesson, orgId);
-    
+
     if (success) {
       // Refresh the lesson source to reflect the change
       const userRole = (user?.user_metadata as any)?.role;
-      const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole);
+      const source = await LessonSourceManager.getLessonForDate(
+        user.id,
+        today,
+        userRole,
+        learnerGradeValue,
+        learnerBand
+      );
       setLessonSource(source);
     }
   };
@@ -135,8 +153,11 @@ const DailyProgramPage = () => {
       console.log('🎯 Selected subject:', selectedSubject, 'from interests:', userInterests);
       
       // Use adaptive generation based on user interests
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
-      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse(selectedSubject, grade, user?.id);
+      let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse(
+        selectedSubject,
+        learnerGradeValue,
+        user?.id
+      );
       
       if (!result) {
         // Fallback to a built-in sample if generation fails completely
@@ -199,14 +220,12 @@ const DailyProgramPage = () => {
     setLessonError(null);
 
     try {
-      const metadata = user?.user_metadata as UserMetadata | undefined;
-      const grade = learnerGrade({ grade_level: metadata?.grade_level, age: metadata?.age });
       const currentDate = new Date().toISOString().split('T')[0];
       const activities = await dailyLessonGenerator.generateDailyLesson({
         subject: u.theme || 'general',
         skillArea: 'general',
         userId: user.id,
-        gradeLevel: grade,
+        gradeLevel: learnerGradeValue,
         currentDate
       });
 
@@ -220,12 +239,10 @@ const DailyProgramPage = () => {
 
   const handleStartLearning = () => {
     if (universe) {
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
-      navigate('/daily-universe-lesson', { state: { universe, gradeLevel: grade } });
+      navigate('/daily-universe-lesson', { state: { universe, gradeLevel: learnerGradeValue } });
     } else if (lessonSource) {
       // Navigate to lesson with the current lesson source
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
-      navigate('/daily-universe-lesson', { state: { lesson: lessonSource.lesson, gradeLevel: grade } });
+      navigate('/daily-universe-lesson', { state: { lesson: lessonSource.lesson, gradeLevel: learnerGradeValue } });
     }
   };
 
@@ -355,7 +372,7 @@ const DailyProgramPage = () => {
                 <div className="flex items-center gap-2 text-sm opacity-90">
                   <span className="px-2 py-0.5 rounded-full bg-white/15">{lessonSource.lesson.hero?.subject}</span>
                   <span>•</span>
-                  <span>Grade {lessonSource.lesson.hero?.gradeBand}</span>
+                  <span>{gradeLabel}</span>
                   <span>•</span>
                   <span>{lessonSource.lesson.hero?.minutes} min</span>
                 </div>
