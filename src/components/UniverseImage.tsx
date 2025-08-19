@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { learnerBand } from '@/lib/gradeLabels';
+import { learnerStep } from '@/lib/gradeLabels';
 import { resolveLearnerGrade } from '@/lib/grade';
 import { UserMetadata } from '@/types/auth';
 
@@ -17,9 +17,9 @@ interface UniverseImageProps {
 export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
   const { user } = useAuth();
   const metadata = user?.user_metadata as UserMetadata | undefined;
-  const band = learnerBand({ grade_level: metadata?.grade_level, age: metadata?.age });
+  const step = learnerStep({ grade_level: metadata?.grade_level, age: metadata?.age });
   const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
-  const expectedPath = `${universeId}/${band}/cover.webp`;
+  const expectedPath = `${universeId}/${step}/cover.webp`;
   const publicUrl = `${baseStorageUrl}/${expectedPath}`;
   
   const fallbackUrl = useMemo(() => {
@@ -111,7 +111,7 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
       {/* Debug indicators */}
       {import.meta.env.DEV && (
         <div className="absolute top-2 right-2 text-xs flex gap-1">
-          <span className="bg-blue-500 text-white px-1 rounded text-xs">{band}</span>
+          <span className="bg-blue-500 text-white px-1 rounded text-xs">G{step}</span>
         </div>
       )}
     </div>

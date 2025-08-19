@@ -34,9 +34,8 @@ Deno.serve(async (req) => {
 
     const universeId = url.searchParams.get("universeId")!;
     const scene = url.searchParams.get("scene") ?? "cover: main activity";
-    const gradeStr = url.searchParams.get("grade") ?? undefined;
-    const grade = gradeStr ? Number(gradeStr) : undefined;
-    const band = gradeToBand(grade);
+    const gradeStr = url.searchParams.get("grade") ?? "";
+    const step = Math.min(12, Math.max(1, gradeStr ? Number(gradeStr) : 7));
 
     const payload = await req.json();
     if (payload?.status !== "succeeded") {
@@ -54,7 +53,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"));
     const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") || "universe-images";
-    const path = `${universeId}/${band}/cover.webp`;
+    const path = `${universeId}/${step}/cover.webp`;
 
     // Upload (upsert)
     const put = await supabase.storage.from(bucket).upload(path, bytes, {

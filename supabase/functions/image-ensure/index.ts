@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const band = gradeToBand(grade);
+    const step = Math.min(12, Math.max(1, Number.isFinite(grade) ? grade : 7));
     const replicateToken = env("REPLICATE_API_TOKEN");
     const functionsBase = env("FUNCTIONS_URL"); // e.g. https://<ref>.functions.supabase.co
     const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       `Illustrate: ${scene}`,
       `Universe: ${universeTitle}`,
       `Subject: ${subject}`,
-      `Audience: grade band ${band}`,
+      `Audience: Grade ${step}`,
       `Style: age-appropriate, clear, no legible text, no watermarks`,
       `Avoid: gore, scary imagery, clutter, watermark, signature, text overlay`
     ].join(" — ");
@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
     // Webhook with minimal context for the writer
     const webhook = `${functionsBase}/image-webhook?token=${
       encodeURIComponent(webhookToken)
-    }&universeId=${encodeURIComponent(universeId)}&grade=${encodeURIComponent(grade ?? "")}&scene=${encodeURIComponent(scene)}`;
+    }&universeId=${encodeURIComponent(universeId)}&grade=${step}&scene=${encodeURIComponent(scene)}`;
 
     // Prepare input for models
     const modelSlug = Deno.env.get("REPLICATE_MODEL") || ""; // e.g. black-forest-labs/flux-schnell
