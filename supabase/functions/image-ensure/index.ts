@@ -54,11 +54,40 @@ Deno.serve(async (req) => {
   const { prompt, negative, size } = buildPrompt({ universeTitle, subject, scene, grade });
 
   const replicateToken = env("REPLICATE_API_TOKEN");
-  const modelVersion   = await resolveReplicateVersion(replicateToken);
+  const modelSlug = env("REPLICATE_MODEL", false);
+  const modelVersion = await resolveReplicateVersion(replicateToken);
   const functionsBase = env("FUNCTIONS_URL", false) || 
     env("SUPABASE_URL").replace(".supabase.co", ".functions.supabase.co");
-  const webhookToken   = env("REPLICATE_WEBHOOK_TOKEN");
-  const webhookUrl     = `${functionsBase}/image-webhook?token=${encodeURIComponent(webhookToken)}&universeId=${encodeURIComponent(universeId)}&scene=${encodeURIComponent(scene)}&grade=${grade ?? ""}`;
+  const webhookToken = env("REPLICATE_WEBHOOK_TOKEN");
+  const webhookUrl = `${functionsBase}/image-webhook?token=${encodeURIComponent(webhookToken)}&universeId=${encodeURIComponent(universeId)}&scene=${encodeURIComponent(scene)}&grade=${grade ?? ""}`;
+
+  // Build model-specific input based on model type
+  let input: Record<string, unknown>;
+
+  if (modelSlug?.includes("flux")) {
+    // FLUX models: no negative_prompt, use aspect_ratio and output_format
+    input = {
+      prompt: `${prompt} — Avoid: ${negative}`,
+      aspect_ratio: "1:1",
+      output_format: "webp",
+      output_quality: 80,
+      go_fast: true,
+      num_outputs: 1,
+    };
+  } else if (modelSlug?.includes("sdxl") || modelSlug?.includes("stability-ai/sdxl")) {
+    // SDXL models: use negative_prompt and width/height
+    const [w, h] = (size ?? "1024x1024").split("x").map((n) => Number(n));
+    input = {
+      prompt,
+      negative_prompt: negative,
+      width: w,
+      height: h,
+      output_format: "webp",
+    };
+  } else {
+    // Safe generic fallback: send only the prompt
+    input = { prompt };
+  }
 
   // Create prediction via REST (works in Deno)
   const r = await fetch("https://api.replicate.com/v1/predictions", {
@@ -69,7 +98,7 @@ Deno.serve(async (req) => {
     },
     body: JSON.stringify({
       version: modelVersion,
-      input: { prompt, negative_prompt: negative, size },
+      input,
       webhook: webhookUrl,
       webhook_events_filter: ["completed"],
     }),
