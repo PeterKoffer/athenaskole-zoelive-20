@@ -1,5 +1,7 @@
 // @ts-nocheck
 // Deno Edge Function: queue image generation (per-grade), fire-and-forget
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "POST,OPTIONS",
@@ -29,6 +31,27 @@ async function resolveReplicateVersion(token: string) {
   return id;
 }
 
+// Grade resolution helper (copied from src/lib/grade.ts)
+function parseGrade(input?: string | number | null): number | undefined {
+  if (input == null) return undefined;
+  if (typeof input === 'number' && Number.isFinite(input)) return input;
+  const m = String(input).match(/\d+/); // pulls 5 out of "5a", "5. klasse", etc.
+  if (!m) return undefined;
+  const n = parseInt(m[0], 10);
+  return n >= 0 && n <= 13 ? n : undefined;
+}
+
+function ageToUsGrade(age?: number): number | undefined {
+  if (!Number.isFinite(age as number)) return undefined;
+  // simple mapping: 6→K/1, 7→1/2 … 11→5, 12→6 …
+  return Math.max(0, Math.min(12, (age as number) - 6));
+}
+
+function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number) {
+  const g = parseGrade(gradeRaw);
+  return g ?? ageToUsGrade(age) ?? 6; // final fallback = 6
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: CORS });
@@ -40,7 +63,38 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "universeId, universeTitle, subject are required" }), { status: 400, headers: { ...CORS, "content-type": "application/json" } });
     }
 
-    const step = Math.min(12, Math.max(1, Number.isFinite(Number(grade)) ? Number(grade) : 7));
+    // Try to get grade from request, or fall back to user profile
+    const authHeader = req.headers.get("Authorization") || "";
+    let gradeNum = Number(grade) || undefined;
+
+    if (!gradeNum) {
+      const supabase = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"), {
+        global: { headers: { Authorization: authHeader } },
+      });
+
+      // get the user id from the JWT (if a user token was sent)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("grade, birth_date")
+          .eq("user_id", user.id)
+          .single();
+
+        if (profile) {
+          const age = profile.birth_date ? 
+            new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : 
+            undefined;
+          gradeNum = resolveLearnerGrade(profile?.grade, age);
+        }
+      }
+    }
+
+    if (!gradeNum) {
+      return new Response(JSON.stringify({ status: "error", error: "Missing grade and no user profile available" }), { status: 400, headers: { ...CORS, "content-type": "application/json" } });
+    }
+
+    const step = Math.min(12, Math.max(1, gradeNum));
 
     const functionsBase = env("FUNCTIONS_URL");
     const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
