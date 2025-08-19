@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { gradeToBand } from '@/lib/gradeBand';
 
 interface UniverseImageProps {
   universeId: string;
@@ -7,19 +8,16 @@ interface UniverseImageProps {
   subject?: string;
   className?: string;
   alt?: string;
-  version?: string; // For cache busting
+  grade?: number;
 }
 
-export function UniverseImage({ universeId, title, subject, className = "", alt }: UniverseImageProps) {
-  const [imageError, setImageError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState("");
-  
-  // Base storage URL - shows immediately for instant feel
+export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
+  const band = gradeToBand(grade);
   const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
-  const placeholderUrl = `${baseStorageUrl}/${universeId}.png`;
-
-  // Smart fallback chain for when image fails to load
-  const getFallbackUrls = () => {
+  const expectedPath = `${universeId}/${band}/cover.webp`;
+  const publicUrl = `${baseStorageUrl}/${expectedPath}`;
+  
+  const fallbackUrl = useMemo(() => {
     const subjectMap: Record<string, string> = {
       mathematics: "math.png",
       science: "science.png", 
@@ -29,46 +27,49 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
       "creative-arts": "arts.png",
       "body-lab": "pe.png",
       "life-essentials": "life.png",
-      "Life Skills": "life.png", // Add mapping for catalog subjects
+      "Life Skills": "life.png",
       "history-religion": "history.png",
       languages: "languages.png",
       "mental-wellness": "wellness.png",
       default: "default.png",
     };
-
+    
     const subjectImage = subject ? subjectMap[subject] || subjectMap.default : subjectMap.default;
-    
-    return [
-      placeholderUrl,
-      `${baseStorageUrl}/${subjectImage}`,
-      `${baseStorageUrl}/${subjectMap.default}`
-    ];
-  };
+    return `${baseStorageUrl}/${subjectImage}`;
+  }, [subject, baseStorageUrl]);
 
-  // Initialize with placeholder and handle generation
+  const [src, setSrc] = useState<string>(fallbackUrl);
+
   useEffect(() => {
-    // Set placeholder immediately
-    setCurrentSrc(placeholderUrl);
-    
-    if (!universeId) return;
-    
     let cancelled = false;
+    let attempt = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
-    // Hard client timeout - keep placeholder if function is slow  
-    const budget = setTimeout(() => {
-      if (!cancelled) {
-        console.log('⏰ Function timeout, keeping placeholder');
-      }
-    }, 2000);
+    const check = async () => {
+      attempt += 1;
+      try {
+        const res = await fetch(publicUrl, { method: 'HEAD', cache: 'no-store' });
+        if (res.ok && !cancelled) {
+          setSrc(`${publicUrl}?v=${Date.now()}`); // cache-buster
+          return;
+        }
+      } catch {}
+      // backoff up to 30s
+      const delay = Math.min(30000, Math.round(800 * Math.pow(1.7, attempt)));
+      timer = setTimeout(check, delay);
+    };
 
-    // Fire-and-forget generation (no blocking)
+    // Start with fallback and queue generation
+    setSrc(fallbackUrl);
+    
+    // Fire-and-forget generation
     supabase.functions.invoke('image-ensure', {
       body: { 
         universeId,
         universeTitle: title,
         subject: subject || 'educational',
         scene: 'cover: main activity',
-        grade: 7 // Default grade, could be made configurable
+        grade: grade || 7
       }
     }).then(({ data, error }) => {
       if (cancelled || error) {
@@ -78,46 +79,33 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
       console.log('✅ Image generation queued:', data);
     }).catch((error) => {
       console.log('🔄 Generation failed:', error);
-    }).finally(() => {
-      clearTimeout(budget);
     });
 
-    return () => { 
-      cancelled = true; 
-      clearTimeout(budget); 
+    // Start polling immediately
+    check();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
     };
-  }, [universeId, subject, placeholderUrl]);
+  }, [publicUrl, fallbackUrl, universeId, title, subject, grade]);
 
-  const handleImageError = () => {
-    if (!imageError) {
-      setImageError(true);
-      const fallbacks = getFallbackUrls();
-      setCurrentSrc(fallbacks[1]); // Use subject fallback
-      console.log('🔄 Image failed, trying fallback for:', universeId);
-    }
-  };
-
-  const handleImageLoad = () => {
-    setImageError(false);
-  };
-  
   return (
     <div className={`relative ${className}`}>
       <img
-        src={currentSrc}
+        src={src}
         alt={alt || title}
         className="w-full h-full object-cover transition-opacity duration-300"
         loading="lazy"
         decoding="async"
-        onError={handleImageError}
-        onLoad={handleImageLoad}
+        onError={() => setSrc(fallbackUrl)}
         style={{ width: '100%', height: '100%' }}
       />
       
       {/* Debug indicators */}
       {import.meta.env.DEV && (
         <div className="absolute top-2 right-2 text-xs flex gap-1">
-          {imageError && <span className="bg-orange-500 text-white px-1 rounded">Fallback</span>}
+          <span className="bg-blue-500 text-white px-1 rounded text-xs">{band}</span>
         </div>
       )}
     </div>

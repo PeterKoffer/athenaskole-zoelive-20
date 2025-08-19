@@ -57,7 +57,10 @@ export default function ProfilePage() {
       if (!user) { setLoading(false); return; }
       setUserId(user.id);
       const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
-      const profile: ProfileData = data ?? {};
+      const profile: ProfileData = data ? {
+        ...data,
+        preferences: data.preferences as { interests?: string[] } | null
+      } : {};
       const ctx = resolveEduContext({
         countryCode: profile.country_code || undefined,
         locale: profile.locale || undefined,
