@@ -13,8 +13,6 @@ interface UniverseImageProps {
 export function UniverseImage({ universeId, title, subject, className = "", alt }: UniverseImageProps) {
   const [imageError, setImageError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState("");
-  const [fromCache, setFromCache] = useState(false);
-  const [isAIGenerated, setIsAIGenerated] = useState(false);
   
   // Base storage URL - shows immediately for instant feel
   const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
@@ -64,34 +62,22 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
     }, 2000);
 
     // Fire-and-forget generation (no blocking)
-    supabase.functions.invoke('generate-universe-image', {
+    supabase.functions.invoke('image-ensure', {
       body: { 
         universeId,
-        imagePrompt: `Kid-friendly ${subject || 'educational'} illustration, bright colors, simple shapes`,
-        lang: 'en'
+        universeTitle: title,
+        subject: subject || 'educational',
+        scene: 'cover: main activity',
+        grade: 7 // Default grade, could be made configurable
       }
     }).then(({ data, error }) => {
-      if (cancelled || error) return;
-      
-      if (data?.imageUrl && data.imageUrl !== placeholderUrl) {
-        // Cache-bust when swapping from placeholder to AI image
-        const cacheBustUrl = data.from === 'ai' 
-          ? `${data.imageUrl}?v=${Date.now()}`
-          : data.imageUrl;
-        
-        setCurrentSrc(cacheBustUrl);
-        setFromCache(data.from === 'cache');
-        setIsAIGenerated(data.isAI || data.from === 'ai');
-        
-        console.log('✅ Image updated:', { 
-          universeId, 
-          from: data.from,
-          cached: data.cached,
-          url: cacheBustUrl
-        });
+      if (cancelled || error) {
+        console.log('🔄 Image generation queued or failed:', error);
+        return;
       }
+      console.log('✅ Image generation queued:', data);
     }).catch((error) => {
-      console.log('🔄 Generation failed, keeping placeholder:', error);
+      console.log('🔄 Generation failed:', error);
     }).finally(() => {
       clearTimeout(budget);
     });
@@ -131,8 +117,6 @@ export function UniverseImage({ universeId, title, subject, className = "", alt 
       {/* Debug indicators */}
       {import.meta.env.DEV && (
         <div className="absolute top-2 right-2 text-xs flex gap-1">
-          {isAIGenerated && <span className="bg-green-500 text-white px-1 rounded">AI</span>}
-          {fromCache && <span className="bg-blue-500 text-white px-1 rounded">Cache</span>}
           {imageError && <span className="bg-orange-500 text-white px-1 rounded">Fallback</span>}
         </div>
       )}
