@@ -27,7 +27,8 @@ Deno.serve(async (req) => {
 
   const replicateToken = env("REPLICATE_API_TOKEN");
   const modelVersion   = env("REPLICATE_VERSION");
-  const functionsBase  = env("FUNCTIONS_URL"); // e.g., https://<project>.functions.supabase.co
+  const functionsBase = env("FUNCTIONS_URL", false) || 
+    env("SUPABASE_URL").replace(".supabase.co", ".functions.supabase.co");
   const webhookToken   = env("REPLICATE_WEBHOOK_TOKEN");
   const webhookUrl     = `${functionsBase}/image-webhook?token=${encodeURIComponent(webhookToken)}&universeId=${encodeURIComponent(universeId)}&scene=${encodeURIComponent(scene)}&grade=${grade ?? ""}`;
 
