@@ -41,7 +41,8 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
 
   // Get the key to use (universe ID or slug) - with guard
   const key = universeId;
-  const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
+  const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
+
 
   // Smart fallback chain: specific -> subject -> local fallback -> default
   const getFallbackUrl = (): string => {
