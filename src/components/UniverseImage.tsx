@@ -17,7 +17,7 @@ interface UniverseImageProps {
 export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
   const { user } = useAuth();
   const metadata = user?.user_metadata as UserMetadata | undefined;
-  const step = learnerStep({ grade_level: metadata?.grade_level, age: metadata?.age });
+  const step = learnerStep({ grade: metadata?.grade_level, age: metadata?.age });
   const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
   const expectedPath = `${universeId}/${step}/cover.webp`;
   const publicUrl = `${baseStorageUrl}/${expectedPath}`;

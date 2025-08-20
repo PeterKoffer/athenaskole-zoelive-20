@@ -42,7 +42,7 @@ const DailyProgramPage = () => {
   const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
   const learnerBandValue = gradeToBand(learnerGradeValue);
   const gradeLabel = learnerBadge(
-    { grade_level: metadata?.grade_level, age: metadata?.age },
+    { grade: metadata?.grade_level, age: metadata?.age },
     'band'
   );
 
@@ -215,7 +215,7 @@ const DailyProgramPage = () => {
 
     try {
       const metadata = user?.user_metadata as UserMetadata | undefined;
-      const grade = learnerGrade({ grade_level: metadata?.grade_level, age: metadata?.age });
+      const grade = learnerGrade({ grade: metadata?.grade_level, age: metadata?.age });
       const currentDate = new Date().toISOString().split('T')[0];
       const activities = await dailyLessonGenerator.generateDailyLesson({
         subject: u.theme || 'general',

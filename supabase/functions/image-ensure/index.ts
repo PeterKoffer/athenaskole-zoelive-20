@@ -57,9 +57,12 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: CORS });
 
   try {
+    console.log('🎨 Image-ensure function called with request:', req.url);
     const { universeId, universeTitle, subject, scene = "cover: main activity", grade } = await req.json();
+    console.log('📝 Request body parsed:', { universeId, universeTitle, subject, scene, grade });
 
     if (!universeId || !universeTitle || !subject) {
+      console.error('❌ Missing required fields:', { universeId, universeTitle, subject });
       return new Response(JSON.stringify({ error: "universeId, universeTitle, subject are required" }), { status: 400, headers: { ...CORS, "content-type": "application/json" } });
     }
 
@@ -77,8 +80,8 @@ Deno.serve(async (req) => {
       if (user?.id) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("grade_level, age")
-          .eq("id", user.id)
+          .select("grade, birth_date")
+          .eq("user_id", user.id)
           .single();
 
         if (profile) {
@@ -95,12 +98,16 @@ Deno.serve(async (req) => {
     }
 
     const step = Math.min(12, Math.max(1, gradeNum));
+    console.log('✅ Final grade resolved:', step);
 
     const functionsBase = env("FUNCTIONS_URL");
     const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
     const replicateTok  = env("REPLICATE_API_TOKEN");
     const modelSlug     = Deno.env.get("REPLICATE_MODEL") || "";
+    console.log('🔧 Environment check:', { functionsBase, hasWebhookToken: !!webhookToken, hasReplicateToken: !!replicateTok, modelSlug });
+    
     const version       = await resolveReplicateVersion(replicateTok);
+    console.log('🎯 Replicate version resolved:', version);
 
     // Build a simple, safe prompt (no separate negative_prompt; fold negatives inline for max compatibility)
     const prompt = [

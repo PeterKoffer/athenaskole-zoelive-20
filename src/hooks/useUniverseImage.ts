@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { learnerGrade } from '@/lib/gradeLabels';
-import { UserMetadata } from '@/types/auth';
 
 interface UseUniverseImageOptions {
   universeId?: string;
@@ -35,7 +33,7 @@ const SUBJECT_MAP: Record<string, string> = {
 };
 
 export function useUniverseImage({ universeId, title, subject, scene = 'cover: main activity' }: UseUniverseImageOptions): UseUniverseImageResult {
-  const { user } = useAuth();
+  const { } = useAuth();
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAI, setIsAI] = useState(false);
@@ -79,10 +77,7 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
 
     const ensureImage = async () => {
       try {
-        const grade = learnerGrade({
-          grade_level: (user?.user_metadata as UserMetadata)?.grade_level,
-          age: (user?.user_metadata as UserMetadata)?.age
-        });
+        const grade = 6; // Use default grade for now, will be resolved by backend
         const { data, error } = await supabase.functions.invoke('image-ensure', {
           body: {
             universeId: key,
@@ -125,7 +120,7 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
     const startPolling = (universeId: string, grade?: number) => {
       const pollInterval = setInterval(async () => {
         try {
-          const testUrl = `${baseUrl}/${universeId}/${grade ?? learnerGrade({ grade_level: (user?.user_metadata as UserMetadata)?.grade_level, age: (user?.user_metadata as UserMetadata)?.age })}/cover.webp`;
+          const testUrl = `${baseUrl}/${universeId}/${grade ?? 6}/cover.webp`;
           const response = await fetch(testUrl, { method: 'HEAD' });
           
           if (response.ok) {
