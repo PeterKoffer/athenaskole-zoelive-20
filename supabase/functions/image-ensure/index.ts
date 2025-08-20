@@ -117,6 +117,7 @@ Deno.serve(async (req) => {
       `Audience: Grade ${step}`,
       `Style: age-appropriate, clean composition, no legible text overlays`,
       `Avoid: watermarks, signatures, misspelled labels, deformed anatomy`,
+      `Do NOT include any text, words, titles, logos, labels, or letters`,
     ].join(" — ");
 
     // FLUX models have different input knobs; default path just uses "prompt"

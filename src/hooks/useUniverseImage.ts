@@ -33,7 +33,7 @@ const SUBJECT_MAP: Record<string, string> = {
 };
 
 export function useUniverseImage({ universeId, title, subject, scene = 'cover: main activity' }: UseUniverseImageOptions): UseUniverseImageResult {
-  const { } = useAuth();
+  const { user } = useAuth();
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAI, setIsAI] = useState(false);
@@ -77,7 +77,14 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
 
     const ensureImage = async () => {
       try {
-        const grade = 6; // Use default grade for now, will be resolved by backend
+        // Import grade resolution helper
+        const { resolveLearnerGrade } = await import('@/lib/grade');
+        const metadata = user?.user_metadata;
+        const grade = resolveLearnerGrade(
+          metadata?.grade ?? metadata?.grade_level, 
+          metadata?.age
+        ) ?? 6;
+        
         const { data, error } = await supabase.functions.invoke('image-ensure', {
           body: {
             universeId: key,

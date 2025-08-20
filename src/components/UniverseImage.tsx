@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { learnerStep } from '@/lib/gradeLabels';
 import { resolveLearnerGrade } from '@/lib/grade';
 import { UserMetadata } from '@/types/auth';
 
@@ -17,9 +16,13 @@ interface UniverseImageProps {
 export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
   const { user } = useAuth();
   const metadata = user?.user_metadata as UserMetadata | undefined;
-  const step = learnerStep({ grade: metadata?.grade_level, age: metadata?.age });
+  // Properly resolve grade from user profile, parsing "5a" → 5
+  const resolvedGrade = resolveLearnerGrade(
+    metadata?.grade_level, 
+    metadata?.age
+  ) ?? 6;
   const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
-  const expectedPath = `${universeId}/${step}/cover.webp`;
+  const expectedPath = `${universeId}/${resolvedGrade}/cover.webp`;
   const publicUrl = `${baseStorageUrl}/${expectedPath}`;
   
   const fallbackUrl = useMemo(() => {
@@ -68,14 +71,13 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
     setSrc(fallbackUrl);
     
     // Fire-and-forget generation with learner's grade
-    const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
     supabase.functions.invoke('image-ensure', {
       body: { 
         universeId,
         universeTitle: title,
         subject: subject || 'educational',
         scene: 'cover: main activity',
-        grade: learnerGradeValue
+        grade: resolvedGrade
       }
     }).then(({ data, error }) => {
       if (cancelled || error) {
@@ -111,7 +113,7 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
       {/* Debug indicators */}
       {import.meta.env.DEV && (
         <div className="absolute top-2 right-2 text-xs flex gap-1">
-          <span className="bg-blue-500 text-white px-1 rounded text-xs">G{step}</span>
+          <span className="bg-blue-500 text-white px-1 rounded text-xs">G{resolvedGrade}</span>
         </div>
       )}
     </div>
