@@ -28,6 +28,7 @@ export class UniverseImageGeneratorService {
           subject,
           scene: 'cover: main activity',
           grade: gradeNum
+
         }
       });
 
@@ -71,12 +72,14 @@ export class UniverseImageGeneratorService {
 
     try {
       const { data, error } = await supabase.functions.invoke('image-ensure', {
+
         body: {
           universeId: args.packId,
           universeTitle: args.title,
           subject: args.subject,
           scene: 'cover: main activity',
           grade: args.grade ?? 6
+
         }
       });
 
@@ -127,12 +130,14 @@ export class UniverseImageGeneratorService {
       console.log('🎨 Generating universe image for:', request);
 
       const { data, error } = await supabase.functions.invoke('image-ensure', {
+
         body: {
           universeId: request.title,
           universeTitle: request.title,
           subject: request.theme || 'education',
           scene: 'cover: main activity'
         }
+
       });
 
       if (error) {

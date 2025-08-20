@@ -42,11 +42,13 @@ export function UniverseImageManager() {
         console.warn('Could not clear cache:', deleteError);
       }
 
+
       const { data: meta } = await supabase
         .from('universes')
         .select('title, subject')
         .eq('id', universeId.trim())
         .single();
+
 
       const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: {
