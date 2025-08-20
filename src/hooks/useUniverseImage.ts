@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 type UseUniverseImageOptions = {
-  universeId: string;         // required (we write/read by this)
+  universeId?: string;           // optional is OK
   title: string;
   subject: string;
-  scene?: string;             // defaults to "cover: main activity"
-  grade?: number;             // optional; we’ll derive from profile if omitted
+  scene?: string;
 };
 
 type UseUniverseImageResult = {
@@ -17,118 +16,136 @@ type UseUniverseImageResult = {
   cached: boolean;
 };
 
-// --- helpers ---
-function parseExactGrade(v?: string | number): number | undefined {
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (v == null) return undefined;
-  const m = String(v).match(/\d+/);
-  return m ? Number(m[0]) : undefined;
-}
+// Subject mapping for better fallbacks
+const SUBJECT_MAP: Record<string, string> = {
+  mathematics: 'math.png',
+  science: 'science.png',
+  geography: 'geography.png',
+  'computer-science': 'computer-science.png',
+  music: 'music.png',
+  'creative-arts': 'arts.png',
+  'body-lab': 'pe.png',
+  'life-essentials': 'life.png',
+  'history-religion': 'history.png',
+  languages: 'languages.png',
+  'mental-wellness': 'wellness.png',
+  default: 'default.png',
+};
 
 export function useUniverseImage(
-  { universeId, title, subject, scene = 'cover: main activity', grade }: UseUniverseImageOptions
+  { universeId, title, subject, scene = 'cover: main activity' }: UseUniverseImageOptions
 ): UseUniverseImageResult {
   const { user } = useAuth();
-  const [imageUrl, setImageUrl]   = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isAI, setIsAI]           = useState<boolean>(false);
-  const [cached, setCached]       = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAI, setIsAI] = useState(false);
+  const [cached, setCached] = useState(false);
 
-  // Public bucket base (do not rename to baseUrl elsewhere)
-  const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
+  // Storage base URL (PUBLIC bucket)
+  const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
 
-  // Use local/static placeholders while we wait (avoid 400s from missing bucket PNGs)
-  const placeholder = '/images/placeholder-16x9.png';
+  // Smart fallback chain: specific -> subject -> local fallback -> default
+  const getFallbackUrl = (): string => {
+    if (!universeId) return '/fallback-images/default.png';
 
-  // Try to fetch the exact path we write (per-grade, webp)
-  async function tryGetImage(universe: string, g: number) {
-    const finalUrl = `${base}/${universe}/${g}/cover.webp`;
-    try {
-      const r = await fetch(finalUrl, { method: 'HEAD' });
-      if (r.ok) {
-        setImageUrl(`${finalUrl}?v=${Date.now()}`);
-        setIsAI(true);
-        setCached(false);
-        setIsLoading(false);
-        console.log('✅ AI image ready:', { universe, finalUrl });
-        return true;
-      }
-    } catch {
-      // not ready yet
-    }
-    return false;
-  }
+    const candidates = [
+      `${baseUrl}/${universeId}.png`,                   // legacy single-file fallback
+      subject ? `${baseUrl}/${SUBJECT_MAP[subject]}` : null,
+      `/fallback-images/${universeId}.png`,
+      '/fallback-images/default.png',
+    ].filter(Boolean) as string[];
 
-  // Poll until available (every 5s, max 2 min)
-  function startPolling(universe: string, g: number) {
-    const timer = setInterval(async () => {
-      if (await tryGetImage(universe, g)) clearInterval(timer);
-    }, 5000);
-    setTimeout(() => clearInterval(timer), 120000);
-  }
+    return candidates[0];
+  };
 
   useEffect(() => {
-    if (!universeId) return;
+    // guard: we need an id to generate/poll
+    if (!universeId) {
+      // leave placeholder empty or set a generic fallback
+      return;
+    }
 
-    // show a placeholder immediately
-    setImageUrl(placeholder);
+    // 1) Set placeholder immediately
+    const fallbackUrl = getFallbackUrl();
+    setImageUrl(fallbackUrl);
     setIsLoading(true);
     setIsAI(false);
     setCached(false);
 
-    // Resolve grade: explicit → profile.grade_level / profile.grade (e.g. "5a") → fallback
-    const md = (user?.user_metadata as any) ?? {};
-    const profileGrade =
-      parseExactGrade(md.grade_level) ??
-      parseExactGrade(md.grade) ??
-      undefined;
+    const parseExactGrade = (g?: string | number) =>
+      Math.min(12, Math.max(1, Number(String(g ?? '').match(/\d+/)?.[0]) || 7));
 
-    const resolvedGrade =
-      parseExactGrade(grade) ??
-      profileGrade ??
-      6;
-
-    // Fire & forget: queue/ensure generation
-    (async () => {
+    const ensureImage = async () => {
       try {
+        const meta = user?.user_metadata as Record<string, unknown> | undefined;
+        const fromProfile =
+          (meta?.grade_level as string | undefined) ??
+          (meta?.grade as string | undefined);
+
+        // Try grade from profile like "5a" → 5, else derive from age, fallback 6
+        const grade =
+          parseExactGrade(fromProfile) ??
+          parseExactGrade(typeof meta?.age === 'number' ? (meta!.age as number) - 6 : undefined) ??
+          6;
+
+        // Ask edge function to ensure image exists (or queue it)
         const { data, error } = await supabase.functions.invoke('image-ensure', {
           body: {
             universeId,
             universeTitle: title,
             subject,
             scene,
-            grade: resolvedGrade,
+            grade,
           },
         });
 
         if (error) {
           console.error('❌ image-ensure error:', error);
-          setIsLoading(false);
           return;
         }
 
-        console.log('🎨 image-ensure response:', data);
-
-        // If the function reports an existing image immediately, use it
+        // If it already exists, use it immediately
         if (data?.status === 'exists' && typeof data?.imageUrl === 'string') {
-          setImageUrl(`${data.imageUrl}?v=${Date.now()}`);
+          const url = `${data.imageUrl}?v=${Date.now()}`;
+          setImageUrl(url);
           setIsAI(true);
           setCached(Boolean(data.cached));
-          setIsLoading(false);
           return;
         }
 
-        // Otherwise check once, then poll
-        if (!(await tryGetImage(universeId, resolvedGrade))) {
-          console.log('⏳ Image queued/not ready yet — polling…');
-          startPolling(universeId, resolvedGrade);
+        // Otherwise poll storage at the exact per-grade path
+        if (data?.status === 'queued' || data?.status === 'accepted' || !data?.status) {
+          startPolling(universeId, grade);
         }
       } catch (e) {
         console.error('❌ image-ensure failed:', e);
+      } finally {
         setIsLoading(false);
       }
-    })();
-  }, [universeId, title, subject, scene]);
+    };
+
+    const startPolling = (id: string, grade: number) => {
+      const interval = setInterval(async () => {
+        const testUrl = `${baseUrl}/${id}/${grade}/cover.webp?v=${Date.now()}`;
+        try {
+          const head = await fetch(testUrl, { method: 'HEAD' });
+          if (head.ok) {
+            clearInterval(interval);
+            setImageUrl(testUrl);
+            setIsAI(true);
+            setCached(false);
+          }
+        } catch {
+          // keep polling
+        }
+      }, 5000); // 5s
+
+      // stop after 2 minutes
+      setTimeout(() => clearInterval(interval), 120000);
+    };
+
+    ensureImage();
+  }, [universeId, title, subject, scene]); // re-run if any change
 
   return { imageUrl, isLoading, isAI, cached };
 }
