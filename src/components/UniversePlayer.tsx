@@ -13,13 +13,10 @@ interface UniversePlayerProps {
 }
 
 const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
-    // Generate a prompt from universe data
-    const imagePrompt = `Create a vibrant, educational illustration for "${universe.title}". ${universe.description ? `Description: ${universe.description}.` : ''} Style: Colorful, engaging, child-friendly, modern digital art. Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery. Mood: Inspiring, fun, and educational. Perfect for students aged 8-16. No text or letters in the image.`;
-    
     const { imageUrl, isLoading, isAI } = useUniverseImage({
         universeId: universe.id,
-        prompt: imagePrompt,
-        lang: 'en'
+        title: universe.title,
+        subject: universe.theme || 'education'
     });
 
     return (

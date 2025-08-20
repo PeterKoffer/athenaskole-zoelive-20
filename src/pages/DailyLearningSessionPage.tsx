@@ -15,7 +15,7 @@ const DailyLearningSessionPage = () => {
     const generatePlan = async () => {
       if (!user) return;
       try {
-        const grade = (user.user_metadata as any)?.grade_level || 6;
+        const grade = (user.user_metadata as any)?.grade_level ?? 6;
         const result = await dailyLearningPlanService.generateDailyPlan(user.id, grade);
         setPlan(result);
       } catch (err) {

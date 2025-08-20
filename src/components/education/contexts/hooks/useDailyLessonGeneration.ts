@@ -119,7 +119,7 @@ export const useDailyLessonGeneration = ({
         subject,
         skillArea,
         userId: user.id,
-        gradeLevel: gradeLevel || 6,
+        gradeLevel: gradeLevel ?? 6,
         currentDate
       });
 

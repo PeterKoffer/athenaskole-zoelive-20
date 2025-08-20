@@ -67,7 +67,7 @@ export function mapAppDataToPromptContext(
     subject: lessonContext?.subject || 'Mathematics',
 
     // 2. Student Grade Level - from student profile, fallback to 6
-    gradeLevel: studentProfile?.grade_level || 6,
+    gradeLevel: studentProfile?.grade_level ?? 6,
 
     // 3. Curriculum Alignment - from teacher settings or school config
     curriculumStandards: 

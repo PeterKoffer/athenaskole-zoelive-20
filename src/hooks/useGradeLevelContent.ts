@@ -93,6 +93,6 @@ export const useGradeLevelContent = (subject: string) => {
     loading,
     isContentAppropriate,
     getStandardForSkillArea,
-    getUserGradeLevel: () => gradeConfig?.userGrade || 6
+    getUserGradeLevel: () => gradeConfig?.userGrade ?? 6
   };
 };

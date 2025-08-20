@@ -84,7 +84,7 @@ export default function TeacherPlanning() {
     
     setLoading(true);
     try {
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      const grade = (user?.user_metadata as any)?.grade_level ?? 6;
       const gradeBand = grade <= 2 ? "K-2" : grade <= 5 ? "3-5" : grade <= 8 ? "6-8" : grade <= 10 ? "9-10" : "11-12";
       
       const lesson = await buildDailyLesson({

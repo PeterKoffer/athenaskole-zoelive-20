@@ -148,7 +148,7 @@ const DailyProgramPage = () => {
       console.log('🎯 Selected subject:', selectedSubject, 'from interests:', userInterests);
       
       // Use adaptive generation based on user interests
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      const grade = (user?.user_metadata as any)?.grade_level ?? 6;
       let result = await AdaptiveUniverseGenerator.generatePersonalizedUniverse(selectedSubject, grade, user?.id);
       
       if (!result) {
@@ -156,14 +156,16 @@ const DailyProgramPage = () => {
         result = UniverseGenerator.getUniverses()[0];
       }
 
-      // Generate AI image for the universe
       if (result) {
         setGeneratingImage(true);
         try {
-          const generatedImageUrl = await UniverseImageGenerator.generate(
-            `Create a vibrant, educational illustration for "${result.title || 'Learning Universe'}". ${result.description ? `Description: ${result.description}.` : ''} Theme: ${result.theme || 'education'}. Style: Colorful, engaging, child-friendly, modern digital art. Elements: Include educational symbols, books, science elements, and a sense of adventure and discovery. Mood: Inspiring, fun, and educational. Perfect for students aged 8-16. No text or letters in the image.`
-          );
-          
+          const generatedImageUrl = await UniverseImageGenerator.generate({
+            title: result.title || 'Learning Universe',
+            subject: result.theme || 'education',
+            universeId: result.id,
+            grade
+          });
+
           if (generatedImageUrl) {
             result.image = generatedImageUrl;
             console.log('✅ Universe image generated:', generatedImageUrl);
@@ -233,11 +235,11 @@ const DailyProgramPage = () => {
 
   const handleStartLearning = () => {
     if (universe) {
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      const grade = (user?.user_metadata as any)?.grade_level ?? 6;
       navigate('/daily-universe-lesson', { state: { universe, gradeLevel: grade } });
     } else if (lessonSource) {
       // Navigate to lesson with the current lesson source
-      const grade = (user?.user_metadata as any)?.grade_level || 6;
+      const grade = (user?.user_metadata as any)?.grade_level ?? 6;
       navigate('/daily-universe-lesson', { state: { lesson: lessonSource.lesson, gradeLevel: grade } });
     }
   };
@@ -561,7 +563,7 @@ const DailyProgramPage = () => {
                       {(currentSelectedSubject || universe.theme || 'General').charAt(0).toUpperCase() + (currentSelectedSubject || universe.theme || 'General').slice(1)}
                     </span>
                     <span className="text-sm text-white/60">•</span>
-                    <span className="text-sm text-white/80">Grade {(user?.user_metadata as any)?.grade_level || 6}</span>
+                    <span className="text-sm text-white/80">Grade {(user?.user_metadata as any)?.grade_level ?? 6}</span>
                     <span className="text-sm text-white/60">•</span>
                     <span className="text-sm text-white/80">150 min</span>
                   </div>

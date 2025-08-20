@@ -84,8 +84,8 @@ async function generateAIActivities(args: BuildFromPackArgs): Promise<LessonStru
         type: 'lesson-activity',
         subject: pack.subject,
         skillArea: 'general',
-        gradeLevel: pack.gradeLevel || 6,
-        difficultyLevel: pack.gradeLevel || 6,
+        gradeLevel: pack.gradeLevel ?? 6,
+        difficultyLevel: pack.gradeLevel ?? 6,
         prompt: `Create an engaging ${pack.subject} lesson based on: ${pack.description}. Title: ${pack.title}. Make it interactive and age-appropriate.`
       }
     });
@@ -131,8 +131,8 @@ async function generateHybridActivities(args: BuildFromPackArgs): Promise<Lesson
         type: 'lesson-activity',
         subject: pack.subject,
         skillArea: 'general', 
-        gradeLevel: pack.gradeLevel || 6,
-        difficultyLevel: pack.gradeLevel || 6,
+        gradeLevel: pack.gradeLevel ?? 6,
+        difficultyLevel: pack.gradeLevel ?? 6,
         prompt: `Create ${embellishmentCount} short, engaging activities to enhance a ${pack.subject} lesson about: ${pack.description}`
       }
     });
