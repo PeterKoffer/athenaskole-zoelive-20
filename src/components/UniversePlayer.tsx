@@ -14,8 +14,8 @@ interface UniversePlayerProps {
 
 const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
     const { imageUrl, isLoading, isAI } = useUniverseImage({
-        universeId: universe.id,
-        title: universe.title,
+        universeId: universe.id || '',
+        title: universe.title || '',
         subject: universe.theme || 'education'
     });
 
