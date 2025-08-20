@@ -1,161 +1,187 @@
 // @ts-nocheck
-// Deno Edge Function: queue image generation (per-grade), fire-and-forget
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
-const CORS = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "POST,OPTIONS",
-  "access-control-allow-headers": "authorization,content-type",
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 function env(name: string, required = true) {
-  const v = Deno.env.get(name);
-  if (!v && required) throw new Error(`Missing env: ${name}`);
-  return v ?? "";
+  const value = Deno.env.get(name);
+  if (required && !value) {
+    throw new Error(`Environment variable ${name} is required`);
+  }
+  return value;
 }
 
-// Resolve a Replicate version: prefer REPLICATE_VERSION, else fetch latest from REPLICATE_MODEL
 async function resolveReplicateVersion(token: string) {
-  const explicit = Deno.env.get("REPLICATE_VERSION");
-  if (explicit) return explicit;
-  const model = Deno.env.get("REPLICATE_MODEL");
-  if (!model) throw new Error("Set REPLICATE_MODEL or REPLICATE_VERSION");
+  try {
+    const explicitVersion = env('REPLICATE_VERSION', false);
+    if (explicitVersion) return explicitVersion;
 
-  const r = await fetch(`https://api.replicate.com/v1/models/${model}`, {
-    headers: { Authorization: `Token ${token}` },
-  });
-  if (!r.ok) throw new Error(`Failed to fetch model: ${await r.text()}`);
-  const j = await r.json();
-  const id = j?.latest_version?.id;
-  if (!id) throw new Error("Model has no latest_version.id");
-  return id;
+    const model = env('REPLICATE_MODEL', false) || 'black-forest-labs/flux-schnell';
+    const response = await fetch(`https://api.replicate.com/v1/models/${model}`, {
+      headers: { 'Authorization': `Token ${token}` }
+    });
+    
+    if (!response.ok) throw new Error(`Failed to fetch model: ${response.statusText}`);
+    
+    const data = await response.json();
+    return data.latest_version?.id || 'latest';
+  } catch (error) {
+    console.warn('Failed to resolve Replicate version:', error);
+    return 'latest';
+  }
 }
 
-// Grade resolution helper (copied from src/lib/grade.ts)
-function parseGrade(input?: string | number | null): number | undefined {
-  if (input == null) return undefined;
-  if (typeof input === 'number' && Number.isFinite(input)) return input;
-  const m = String(input).match(/\d+/); // pulls 5 out of "5a", "5. klasse", etc.
-  if (!m) return undefined;
-  const n = parseInt(m[0], 10);
-  return n >= 0 && n <= 13 ? n : undefined;
+function parseGrade(input?: string | number | null): number | null {
+  if (input == null) return null;
+  const match = String(input).match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
 }
 
-function ageToUsGrade(age?: number): number | undefined {
-  if (!Number.isFinite(age as number)) return undefined;
-  // simple mapping: 6→K/1, 7→1/2 … 11→5, 12→6 …
-  return Math.max(0, Math.min(12, (age as number) - 6));
+function ageToUsGrade(age?: number): number | null {
+  return age && age >= 5 && age <= 18 ? Math.max(1, Math.min(12, age - 5)) : null;
 }
 
-function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number) {
-  const g = parseGrade(gradeRaw);
-  return g ?? ageToUsGrade(age) ?? 6; // final fallback = 6
+function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): number {
+  return parseGrade(gradeRaw) || ageToUsGrade(age) || 6;
 }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: CORS });
+serve(async (req: Request) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
   try {
-    console.log('🎨 Image-ensure function called with request:', req.url);
-    const { universeId, universeTitle, subject, scene = "cover: main activity", grade } = await req.json();
-    console.log('📝 Request body parsed:', { universeId, universeTitle, subject, scene, grade });
+    const { universeId, universeTitle, subject, scene = 'cover: main activity', grade } = await req.json();
 
-    if (!universeId || !universeTitle || !subject) {
-      console.error('❌ Missing required fields:', { universeId, universeTitle, subject });
-      return new Response(JSON.stringify({ error: "universeId, universeTitle, subject are required" }), { status: 400, headers: { ...CORS, "content-type": "application/json" } });
+    if (!universeId || !universeTitle) {
+      return new Response(
+        JSON.stringify({ error: 'universeId and universeTitle are required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Try to get grade from request, or fall back to user profile
-    const authHeader = req.headers.get("Authorization") || "";
-    let gradeNum = Number(grade) || undefined;
+    // Initialize Supabase client
+    const supabase = createClient(
+      env('SUPABASE_URL'),
+      env('SUPABASE_SERVICE_ROLE_KEY')
+    );
 
-    if (!gradeNum) {
-      const supabase = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"), {
-        global: { headers: { Authorization: authHeader } },
-      });
-
-      // get the user id from the JWT (if a user token was sent)
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.id) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("grade, birth_date")
-          .eq("user_id", user.id)
-          .single();
-
-        if (profile) {
-          const age = profile.birth_date ? 
-            new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : 
-            undefined;
-          gradeNum = resolveLearnerGrade(profile?.grade, age);
+    let finalGrade = grade;
+    
+    // If no grade provided, try to get it from user profile
+    if (!finalGrade) {
+      try {
+        const authHeader = req.headers.get('Authorization');
+        if (authHeader) {
+          const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+          if (user?.user_metadata) {
+            finalGrade = resolveLearnerGrade(
+              user.user_metadata.grade_level || user.user_metadata.grade,
+              user.user_metadata.age
+            );
+          }
         }
+      } catch (error) {
+        console.warn('Could not get user profile for grade:', error);
       }
     }
 
-    if (!gradeNum) {
-      return new Response(JSON.stringify({ status: "error", error: "Missing grade and no user profile available" }), { status: 400, headers: { ...CORS, "content-type": "application/json" } });
+    finalGrade = finalGrade || 6;
+
+    // Check if image already exists
+    const imagePath = `${universeId}/${finalGrade}/cover.webp`;
+    const { data: existingFile } = await supabase.storage
+      .from('universe-images')
+      .list(`${universeId}/${finalGrade}`, { search: 'cover.webp' });
+
+    if (existingFile && existingFile.length > 0) {
+      const imageUrl = supabase.storage
+        .from('universe-images')
+        .getPublicUrl(imagePath).data.publicUrl;
+      
+      return new Response(
+        JSON.stringify({ 
+          status: 'exists', 
+          imageUrl,
+          cached: true 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const step = Math.min(12, Math.max(1, gradeNum));
-    console.log('✅ Final grade resolved:', step);
-
-    const functionsBase = env("FUNCTIONS_URL");
-    const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
-    const replicateTok  = env("REPLICATE_API_TOKEN");
-    const modelSlug     = Deno.env.get("REPLICATE_MODEL") || "";
-    console.log('🔧 Environment check:', { functionsBase, hasWebhookToken: !!webhookToken, hasReplicateToken: !!replicateTok, modelSlug });
+    // Generate image using Replicate
+    const REPLICATE_TOKEN = env('REPLICATE_API_TOKEN');
+    const replicateVersion = await resolveReplicateVersion(REPLICATE_TOKEN!);
     
-    const version       = await resolveReplicateVersion(replicateTok);
-    console.log('🎯 Replicate version resolved:', version);
+    const prompt = `Create an educational ${scene} image for "${universeTitle}" (${subject || 'educational'} subject) suitable for grade ${finalGrade} students (age ${finalGrade + 5}). 
+    
+Style: Vibrant, engaging, kid-friendly illustration with bright colors and clear visual elements that would appeal to ${finalGrade + 5}-year-old learners. Clean, modern educational design.
 
-    // Build a simple, safe prompt (no separate negative_prompt; fold negatives inline for max compatibility)
-    const prompt = [
-      `Illustrate: ${scene}`,
-      `Universe: ${universeTitle}`,
-      `Subject: ${subject}`,
-      `Audience: Grade ${step}`,
-      `Style: age-appropriate, clean composition, no legible text overlays`,
-      `Avoid: watermarks, signatures, misspelled labels, deformed anatomy`,
-      `Do NOT include any text, words, titles, logos, labels, or letters`,
-    ].join(" — ");
+Do NOT include any text, words, titles, logos, labels, or letters in the image.
 
-    // FLUX models have different input knobs; default path just uses "prompt"
-    const isFlux = modelSlug.toLowerCase().includes("flux");
-    const input = isFlux
-      ? {
-          prompt,
-          aspect_ratio: "1:1",
-          output_format: "webp",
-          go_fast: true,
-          num_outputs: 1,
-        }
-      : { prompt };
+The image should be inspiring and directly related to the subject matter, showing the main activity or concept in an age-appropriate way.`;
 
-    const webhook = `${functionsBase}/image-webhook?token=${encodeURIComponent(webhookToken)}&universeId=${encodeURIComponent(universeId)}&grade=${step}&scene=${encodeURIComponent(scene)}`;
+    const webhookUrl = `${env('SUPABASE_URL')}/functions/v1/image-webhook`;
+    
+    const inputs = {
+      prompt,
+      go_fast: true,
+      megapixels: "1",
+      num_outputs: 1,
+      aspect_ratio: "1:1",
+      output_format: "webp",
+      output_quality: 80,
+      num_inference_steps: 4
+    };
 
-    const resp = await fetch("https://api.replicate.com/v1/predictions", {
-      method: "POST",
+    console.log('🎨 Queuing image generation:', { universeId, grade: finalGrade, prompt: prompt.substring(0, 100) + '...' });
+
+    const response = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
       headers: {
-        Authorization: `Token ${replicateTok}`,
-        "Content-Type": "application/json",
+        'Authorization': `Token ${REPLICATE_TOKEN}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        version,
-        input,
-        webhook,
-        webhook_events_filter: ["completed"],
+        version: replicateVersion,
+        input: inputs,
+        webhook: webhookUrl,
+        webhook_events_filter: ['completed', 'failed']
       }),
     });
 
-    if (!resp.ok) {
-      const err = await resp.text();
-      return new Response(JSON.stringify({ status: "error", error: err }), { status: 500, headers: { ...CORS, "content-type": "application/json" } });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Replicate API error: ${response.status} ${error}`);
     }
 
-    const data = await resp.json();
-    return new Response(JSON.stringify({ status: "queued", id: data.id }), { status: 202, headers: { ...CORS, "content-type": "application/json" } });
-  } catch (e) {
-    return new Response(JSON.stringify({ status: "error", error: String(e?.message ?? e) }), { status: 500, headers: { ...CORS, "content-type": "application/json" } });
+    const prediction = await response.json();
+    console.log('✅ Image generation queued:', prediction.id);
+
+    return new Response(
+      JSON.stringify({ 
+        status: 'queued', 
+        predictionId: prediction.id 
+      }),
+      { 
+        status: 202,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+
+  } catch (error: any) {
+    console.error('❌ Image ensure error:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
   }
 });

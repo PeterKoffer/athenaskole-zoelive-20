@@ -1,538 +1,71 @@
 // @ts-nocheck
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { generateContentWithTrainingGroundPrompt, generateContentWithOpenAI, generateContentWithDeepSeek } from './contentGenerator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
-  console.log('🚀 Generate-adaptive-content function called at:', new Date().toISOString());
-  
+serve(async (req: Request) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const requestData = await req.json();
-    console.log('📋 Request data received:', {
-      type: requestData.type,
-      subject: requestData.subject,
-      skillArea: requestData.skillArea,
-      difficultyLevel: requestData.difficultyLevel,
-      hasPrompt: !!requestData.prompt,
-      userId: requestData.userId?.substring(0, 8) + '...',
-      hasGradeLevel: !!requestData.gradeLevel,
-      hasPreviousQuestions: Array.isArray(requestData.previousQuestions) && requestData.previousQuestions.length > 0
+    const { systemPrompt, userPrompt, model = "gpt-4o-mini", temperature = 0.4 } = await req.json();
+
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+
+    console.log('🤖 Generating content with OpenAI:', { model, temperature });
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature,
+        max_tokens: 4000,
+      }),
     });
 
-    // Check for API key availability - prioritize OpenAI
-    const openaiKey = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('OpenaiAPI');
-    const deepSeekKey = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('DeepSeek_API');
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('❌ OpenAI API error:', error);
+      throw new Error(`OpenAI API error: ${response.status} ${error}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('No content received from OpenAI');
+    }
+
+    console.log('✅ Content generated successfully');
     
-    console.log('🔑 API Key status:', {
-      hasOpenaiKey: !!openaiKey,
-      hasDeepSeekKey: !!deepSeekKey,
-      openaiKeyLength: openaiKey?.length || 0,
-      deepSeekKeyLength: deepSeekKey?.length || 0
-    });
-
-    if (!openaiKey && !deepSeekKey) {
-      console.error('❌ No API keys found in environment');
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'No API keys configured. Please add OpenaiAPI or DEEPSEEK_API_KEY to your Supabase Edge Function Secrets.',
-        debug: {
-          availableEnvVars: Object.keys(Deno.env.toObject()).filter(key => key.includes('API') || key.includes('KEY'))
-        }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      });
-    }
-
-    // Handle universe generation requests
-    if (requestData.type === 'universe_generation') {
-      console.log('🌌 Processing universe generation request');
-      console.log('📋 Universe request data:', {
-        subject: requestData.subject,
-        gradeLevel: requestData.gradeLevel,
-        hasStudentInterests: !!requestData.studentInterests,
-        studentInterests: requestData.studentInterests,
-        hasPrompt: !!requestData.prompt
-      });
-      
-      try {
-        const universeContent = await generateUniverseContent(requestData, openaiKey, deepSeekKey);
-        
-        return new Response(JSON.stringify({
-          success: true,
-          generatedContent: universeContent,
-          debug: {
-            timestamp: new Date().toISOString(),
-            type: 'universe_generation'
-          }
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      } catch (error) {
-        console.error('❌ Universe generation failed:', error);
-        
-        return new Response(JSON.stringify({
-          success: false,
-          error: `Universe generation failed: ${error.message}`,
-          debug: {
-            errorName: error.name,
-            timestamp: new Date().toISOString()
-          }
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500
-        });
-      }
-    }
-
-    // Handle Training Ground specific content generation
-    if (requestData.activityType === 'training-ground' || requestData.skillArea === 'training_ground') {
-      console.log('🏋️ Processing Training Ground activity request');
-      
-      try {
-        const trainingGroundActivity = await generateTrainingGroundActivity(requestData, openaiKey, deepSeekKey);
-        
-        return new Response(JSON.stringify({
-          success: true,
-          trainingGroundActivity: trainingGroundActivity,
-          debug: {
-            timestamp: new Date().toISOString(),
-            type: 'training_ground',
-            apiUsed: openaiKey ? 'openai' : 'deepseek'
-          }
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      } catch (error) {
-        console.error('❌ Training Ground generation failed:', error);
-        
-        return new Response(JSON.stringify({
-          success: false,
-          error: `Training Ground generation failed: ${error.message}`,
-          debug: {
-            errorName: error.name,
-            timestamp: new Date().toISOString()
-          }
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500
-        });
-      }
-    }
-
-    // Handle regular content generation (existing logic)
-    let generatedContent = null;
-    let apiUsed = 'none';
-
-    if (openaiKey) {
-      try {
-        console.log('🤖 Attempting OpenAI content generation for daily lessons...');
-        generatedContent = await generateContentWithOpenAI(requestData);
-        apiUsed = 'openai';
-      } catch (error) {
-        console.error('❌ OpenAI generation failed:', error);
-        
-        // Fallback to DeepSeek if available
-        if (deepSeekKey) {
-          console.log('🔄 Falling back to DeepSeek...');
-          try {
-            generatedContent = await generateContentWithDeepSeek(requestData);
-            apiUsed = 'deepseek-fallback';
-          } catch (deepSeekError) {
-            console.error('❌ DeepSeek fallback also failed:', deepSeekError);
-            throw error; // Throw original OpenAI error
-          }
-        } else {
-          throw error;
-        }
-      }
-    } else if (deepSeekKey) {
-      console.log('🤖 Attempting DeepSeek content generation...');
-      generatedContent = await generateContentWithDeepSeek(requestData);
-      apiUsed = 'deepseek';
-    }
-    
-    if (!generatedContent) {
-      console.error('❌ AI generation returned null/undefined');
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'AI content generation failed - no content returned',
-        debug: {
-          requestData: {
-            subject: requestData.subject,
-            skillArea: requestData.skillArea,
-            difficultyLevel: requestData.difficultyLevel
-          },
-          apiUsed
-        }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      });
-    }
-
-    // Validate model output doesn't drift from subject
-    if (generatedContent.subject && generatedContent.subject.toLowerCase() !== (requestData.subject || 'mathematics').toLowerCase()) {
-      console.error('🚨 SUBJECT_DRIFT detected!', {
-        expected: requestData.subject || 'mathematics',
-        received: generatedContent.subject
-      });
-      throw new Error(`SUBJECT_DRIFT: expected ${requestData.subject || 'mathematics'}, got ${generatedContent.subject}`);
-    }
-
-    console.log('✅ Content generated successfully:', {
-      hasQuestion: !!generatedContent.question,
-      optionsCount: generatedContent.options?.length || 0,
-      hasExplanation: !!generatedContent.explanation,
-      correctIndex: generatedContent.correct,
-      apiUsed,
-      subjectValidated: true
-    });
-
-    return new Response(JSON.stringify({
-      success: true,
-      generatedContent: generatedContent,
-      debug: {
-        timestamp: new Date().toISOString(),
-        apiUsed,
-        generationTime: 'success'
-      }
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-
-  } catch (error) {
-    console.error('💥 Unexpected error:', error);
-    
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message || 'Unknown error occurred',
-      debug: {
-        errorName: error.name,
-        errorStack: error.stack,
-        timestamp: new Date().toISOString()
-      }
-    }), {
+    return new Response(content, {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500
     });
+
+  } catch (error: any) {
+    console.error('❌ Content generation error:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
   }
 });
-
-async function generateUniverseContent(requestData: any, openaiKey?: string, deepSeekKey?: string) {
-  const prompt = `Create an engaging educational learning universe for grade ${requestData.gradeLevel || 4} students.
-  
-  Include:
-  - A creative title and theme
-  - Interesting characters students can relate to
-  - Educational locations or settings
-  - Interactive activities that teach the subject matter
-  - A compelling description that motivates learning
-  
-  Return valid JSON with: title, description, theme, characters, locations, activities
-  
-  Base prompt: ${requestData.prompt}`;
-
-  if (openaiKey) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a creative educational universe designer. Create immersive, engaging learning worlds that blend education with student interests.
-
-Generate learning universes that:
-- Are grounded in real-world scenarios (no fantasy unless specifically requested)
-- Connect subject matter to student interests
-- Create compelling narratives with stakes and objectives
-- Include relatable characters and settings
-- Provide hands-on activities and challenges
-
-Always return valid JSON only with the exact format requested.`
-          },
-          {
-            role: 'user',
-        content: `You are generating content for SUBJECT = ${resolvedSubject}. Do not broaden or switch subject. If asked, reject with an error.
-
-Create a vivid, engaging learning universe for ${requestData.gradeLevel || 6}th grade students studying ${resolvedSubject}.
-
-Subject Focus: ${resolvedSubject} - MUST create content specifically for this subject area
-Student interests: ${requestData.studentInterests?.join(', ') || 'exploring new topics'}
-
-IMPORTANT: The universe MUST be designed specifically for ${requestData.subject || 'science'} learning. Incorporate ${requestData.subject || 'science'} concepts, vocabulary, and activities throughout.
-
-Subject-specific requirements:
-- Mathematics: Include problem-solving, calculations, measurements, data analysis
-- Science: Include experiments, observations, scientific method, discoveries
-- Language Arts: Include reading, writing, storytelling, communication skills  
-- History: Include historical events, timelines, research, cultural understanding
-- Arts: Include creativity, visual design, artistic expression, cultural appreciation
-- Geography: Include maps, locations, cultures, environmental studies
-
-Create a universe that feels like an adventure but is grounded in real school/home/community life. Make it compelling with clear ${requestData.subject || 'science'}-focused objectives and engaging activities.
-
-Return this exact JSON format:
-{
-  "title": "Engaging ${resolvedSubject}-focused title (max 6 words)",
-  "description": "2-3 sentences describing the ${resolvedSubject} learning adventure with concrete stakes and objectives",
-  "theme": "${resolvedSubject}",
-  "subject": "${resolvedSubject}",
-  "characters": ["Character 1", "Character 2", "Character 3"],
-  "locations": ["Location 1", "Location 2", "Location 3"],  
-  "activities": ["${resolvedSubject}-specific Activity 1", "${resolvedSubject}-specific Activity 2", "${resolvedSubject}-specific Activity 3"]
-}`
-          }
-        ],
-        temperature: 0.9,
-        max_tokens: 1000
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    // Clean and parse JSON with error handling
-    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    
-    try {
-      return JSON.parse(cleanedContent);
-    } catch (parseError) {
-      console.error('❌ JSON Parse Error:', parseError.message);
-      console.error('🔍 Raw response causing error:', content);
-      
-      // Try to fix common JSON issues
-      const lastBraceIndex = cleanedContent.lastIndexOf('}');
-      if (lastBraceIndex > 0) {
-        const fixedContent = cleanedContent.substring(0, lastBraceIndex + 1);
-        console.log('🔧 Attempting to fix truncated JSON...');
-        
-        try {
-          const result = JSON.parse(fixedContent);
-          console.log('✅ Fixed JSON successfully');
-          return result;
-        } catch (secondError) {
-          console.error('❌ Could not fix JSON:', secondError.message);
-          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
-        }
-      } else {
-        throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
-      }
-    }
-  }
-  
-  if (deepSeekKey) {
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${deepSeekKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert educational content creator. Generate engaging learning universes for students. Always return valid JSON only.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 800
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`DeepSeek API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    // Clean and parse JSON with error handling
-    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    
-    try {
-      return JSON.parse(cleanedContent);
-    } catch (parseError) {
-      console.error('❌ JSON Parse Error:', parseError.message);
-      console.error('🔍 Raw response causing error:', content);
-      
-      // Try to fix common JSON issues
-      const lastBraceIndex = cleanedContent.lastIndexOf('}');
-      if (lastBraceIndex > 0) {
-        const fixedContent = cleanedContent.substring(0, lastBraceIndex + 1);
-        console.log('🔧 Attempting to fix truncated JSON...');
-        
-        try {
-          const result = JSON.parse(fixedContent);
-          console.log('✅ Fixed JSON successfully');
-          return result;
-        } catch (secondError) {
-          console.error('❌ Could not fix JSON:', secondError.message);
-          throw new Error(`Invalid JSON from DeepSeek: ${parseError.message}\n\nResponse: ${content}`);
-        }
-      } else {
-        throw new Error(`Invalid JSON from DeepSeek: ${parseError.message}\n\nResponse: ${content}`);
-      }
-    }
-  }
-  
-  throw new Error('No API keys available');
-}
-
-async function generateTrainingGroundActivity(requestData: any, openaiKey?: string, deepSeekKey?: string) {
-  console.log('🎯 Generating Training Ground activity with CREATIVE prompt');
-  
-  // FORCE CREATIVE CONTENT - NO QUIZ MODE ALLOWED
-  const basePrompt = requestData.customPrompt || buildDefaultTrainingGroundPrompt(requestData);
-  
-  // Add EXPLICIT restrictions to prevent quiz content
-  const restrictivePrompt = `${basePrompt}
-
-🚫 CRITICAL RESTRICTIONS - DO NOT VIOLATE:
-- DO NOT create multiple choice questions
-- DO NOT create quiz-style content  
-- DO NOT use phrases like "What is..." or "Which of the following..."
-- DO NOT include answer options A, B, C, D
-- DO NOT create word problems about buying things or counting objects
-- DO NOT make boring content like "Lily has 12 apples..."
-
-✅ REQUIRED CREATIVE ELEMENTS:
-- Use games, simulations, interactive challenges, or hands-on activities
-- Include visual or kinesthetic learning elements
-- Create scenarios that feel like adventures or explorations
-- Use creative activity types like: CookingGame, SpaceExploration, ArtChallenge, ScienceExperiment, MusicComposer, StoryBuilder, PuzzleSolver
-- Make it feel like play-based learning, not a test
-
-MANDATORY JSON FORMAT - RETURN EXACTLY THIS STRUCTURE:
-{
-  "title": "Creative activity title with action words",
-  "objective": "What the student will learn through this activity", 
-  "explanation": "Brief explanation of the concept in simple terms",
-  "activity": {
-    "type": "CreativeActivityType (not Quiz or Question)",
-    "instructions": "Step-by-step creative instructions for hands-on activity"
-  },
-  "optionalExtension": "Additional creative challenge for advanced learners",
-  "studentSkillTargeted": "Specific skill being developed through this activity",
-  "learningStyleAdaptation": "How this activity adapts to different learning styles"
-}`;
-
-  console.log('📝 RESTRICTIVE Training Ground prompt length:', restrictivePrompt.length);
-  console.log('📝 Training Ground prompt preview:', restrictivePrompt.substring(0, 300) + '...');
-
-  if (openaiKey) {
-    console.log('🤖 Using OpenAI for Training Ground activity');
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
-        body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a creative educational activity designer who NEVER creates quizzes or multiple choice questions. You design hands-on, interactive, and imaginative learning experiences that feel like games and adventures. You must follow the user\'s format requirements exactly and avoid any quiz-style content.'
-          },
-          {
-            role: 'user',
-            content: restrictivePrompt
-          }
-        ],
-        temperature: 0.9,
-        max_tokens: 1200
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    console.log('📨 Raw OpenAI Training Ground response:', content.substring(0, 200) + '...');
-    
-    // Clean and parse JSON with error handling
-    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    
-    let parsed;
-    try {
-      parsed = JSON.parse(cleanedContent);
-    } catch (parseError) {
-      console.error('❌ JSON Parse Error:', parseError.message);
-      console.error('🔍 Raw response causing error:', content);
-      
-      // Try to fix common JSON issues
-      const lastBraceIndex = cleanedContent.lastIndexOf('}');
-      if (lastBraceIndex > 0) {
-        const fixedContent = cleanedContent.substring(0, lastBraceIndex + 1);
-        console.log('🔧 Attempting to fix truncated JSON...');
-        
-        try {
-          parsed = JSON.parse(fixedContent);
-          console.log('✅ Fixed JSON successfully');
-        } catch (secondError) {
-          console.error('❌ Could not fix JSON:', secondError.message);
-          throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
-        }
-      } else {
-        throw new Error(`Invalid JSON from OpenAI: ${parseError.message}\n\nResponse: ${content}`);
-      }
-    }
-    
-    console.log('✅ Parsed Training Ground activity:', {
-      hasTitle: !!parsed.title,
-      hasActivity: !!parsed.activity,
-      activityType: parsed.activity?.type
-    });
-    
-    return parsed;
-  }
-  
-  throw new Error('No OpenAI API key available for Training Ground generation');
-}
-
-function buildDefaultTrainingGroundPrompt(requestData: any): string {
-  // This function is now deprecated - use the unified prompt system instead
-  // Kept for backward compatibility but will redirect to new system
-  
-  console.log('⚠️ Using deprecated prompt function - should migrate to unified system');
-  
-  return `You are a highly creative AI educator. Create an engaging, hands-on learning activity.
-
-FORBIDDEN:
-- No quizzes or multiple choice questions
-- No word problems like "Sarah has 8 apples..."
-
-REQUIRED:
-- Creative, themed activities (cooking, art, science experiments)
-- Return JSON with title, objective, explanation, activity, optionalExtension, studentSkillTargeted, learningStyleAdaptation
-
-Subject: ${requestData.subject || 'general learning'}
-Grade: ${requestData.gradeLevel || 5}`;
-}
