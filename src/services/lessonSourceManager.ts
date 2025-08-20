@@ -300,7 +300,7 @@ export class LessonSourceManager {
       try {
         const img = await UniverseImageGeneratorService.getOrCreate({
           packId: `ai-${date}`,
-          title: structuredLesson.title,
+          title: structuredLesson.hero.title,
           subject: structuredLesson.hero.subject
         });
         imageUrl = img?.url;

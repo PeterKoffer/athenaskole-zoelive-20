@@ -29,7 +29,7 @@ export function BulkImageGenerator() {
     try {
       console.log('🚀 Starting bulk universe image generation...');
       
-      const { data, error } = await supabase.functions.invoke('bulk-generate-universe-images', {
+      const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: {},
         headers: {
           'Content-Type': 'application/json'
