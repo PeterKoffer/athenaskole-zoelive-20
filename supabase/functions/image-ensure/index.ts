@@ -20,18 +20,11 @@ async function resolveReplicateVersion(token: string) {
     const explicitVersion = env('REPLICATE_VERSION', false);
     if (explicitVersion) return explicitVersion;
 
-    const model = env('REPLICATE_MODEL', false) || 'black-forest-labs/flux-schnell';
-    const response = await fetch(`https://api.replicate.com/v1/models/${model}`, {
-      headers: { 'Authorization': `Token ${token}` }
-    });
-    
-    if (!response.ok) throw new Error(`Failed to fetch model: ${response.statusText}`);
-    
-    const data = await response.json();
-    return data.latest_version?.id || 'latest';
+    // Use the stable black-forest-labs/flux-schnell model directly
+    return 'black-forest-labs/flux-schnell';
   } catch (error) {
     console.warn('Failed to resolve Replicate version:', error);
-    return 'latest';
+    return 'black-forest-labs/flux-schnell';
   }
 }
 
@@ -141,14 +134,13 @@ The image should be inspiring and directly related to the subject matter, showin
 
     console.log('🎨 Queuing image generation:', { universeId, grade: finalGrade, prompt: prompt.substring(0, 100) + '...' });
 
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
+    const response = await fetch(`https://api.replicate.com/v1/models/${replicateVersion}/predictions`, {
       method: 'POST',
       headers: {
         'Authorization': `Token ${REPLICATE_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        version: replicateVersion,
         input: inputs,
         webhook: webhookUrl,
         webhook_events_filter: ['completed']
