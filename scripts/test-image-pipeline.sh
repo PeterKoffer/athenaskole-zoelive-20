@@ -16,7 +16,7 @@ if [ -n "$SERVICE_ROLE_KEY" ]; then
     curl -s -X POST "${BASE_URL}/functions/v1/image-ensure" \
      -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
      -H "Content-Type: application/json" \
-     -d '{"universeId":"test-pipeline","imagePrompt":"Cinematic science lab, kid-friendly","lang":"en"}' | jq .
+     -d '{"universeId":"test-pipeline","universeTitle":"Test Pipeline","subject":"science","scene":"cover: main activity","grade":5}' | jq .
 else
     echo "⚠️ Test 2 skipped: SERVICE_ROLE_KEY not set"
 fi

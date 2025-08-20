@@ -36,10 +36,15 @@ export async function generateActivityImage(prompt?: string): Promise<string | n
       const res = await fetch(`${base}/image-ensure`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, size: '1024x576', promptVersion: PROMPT_VERSION })
+        body: JSON.stringify({
+          universeId: `activity-${key}`,
+          universeTitle: prompt,
+          subject: 'education',
+          scene: 'cover: main activity'
+        })
       });
       const data = await res.json().catch(() => ({}));
-      return typeof data?.url === 'string' ? (data.url as string) : null;
+      return typeof data?.imageUrl === 'string' ? (data.imageUrl as string) : null;
     } catch {
       return null;
     }

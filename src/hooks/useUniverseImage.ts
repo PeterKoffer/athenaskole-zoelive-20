@@ -6,9 +6,9 @@ import { UserMetadata } from '@/types/auth';
 
 interface UseUniverseImageOptions {
   universeId?: string;
-  prompt?: string;
-  lang?: string;
-  subject?: string;
+  title: string;
+  subject: string;
+  scene?: string;
 }
 
 interface UseUniverseImageResult {
@@ -34,7 +34,7 @@ const SUBJECT_MAP: Record<string, string> = {
   default: "default.png",
 };
 
-export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: UseUniverseImageOptions): UseUniverseImageResult {
+export function useUniverseImage({ universeId, title, subject, scene = 'cover: main activity' }: UseUniverseImageOptions): UseUniverseImageResult {
   const { user } = useAuth();
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
       return;
     }
 
-    console.log('🖼️ useUniverseImage: starting for', { key, subject, hasPrompt: !!prompt });
+    console.log('🖼️ useUniverseImage: starting for', { key, title, subject });
 
     // 1) Set placeholder immediately (key -> subject -> default)
     const fallbackUrl = getFallbackUrl();
@@ -77,16 +77,19 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
     setIsAI(false);
     setCached(false);
 
-    // 2) Fire-and-forget image generation request
     const ensureImage = async () => {
       try {
-        // Use the new image-ensure endpoint
+        const grade = learnerGrade({
+          grade_level: (user?.user_metadata as UserMetadata)?.grade_level,
+          age: (user?.user_metadata as UserMetadata)?.age
+        });
         const { data, error } = await supabase.functions.invoke('image-ensure', {
           body: {
             universeId: key,
-            variant: 'cover',
-            grade: learnerGrade({ grade_level: (user?.user_metadata as UserMetadata)?.grade_level, age: (user?.user_metadata as UserMetadata)?.age }),
-            prompt: prompt || `Educational image for ${key}`,
+            universeTitle: title,
+            subject,
+            scene,
+            grade
           }
         });
 
@@ -97,36 +100,32 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
 
         console.log('🎨 Image ensure response:', data);
 
-        // If we already have a completed image, use it immediately
         if (data?.status === 'exists' && data?.imageUrl) {
           const imageUrlWithVersion = `${data.imageUrl}?v=${Date.now()}`;
           setImageUrl(imageUrlWithVersion);
           setIsAI(true);
           setCached(data.cached || true);
-          console.log('✅ Existing image found:', { 
-            universeId: key, 
+          console.log('✅ Existing image found:', {
+            universeId: key,
             url: imageUrlWithVersion,
             cached: data.cached
           });
         } else if (data?.status === 'queued') {
           console.log('⏳ Image generation queued, showing fallback');
-          // Keep showing fallback, poll for completion
-          startPolling(key);
+          startPolling(key, grade);
         }
       } catch (error) {
         console.error('❌ Image ensure failed:', error);
-        // Keep the placeholder fallback
       } finally {
         setIsLoading(false);
       }
     };
 
     // 3) Poll for completed images (simplified for existing schema)
-    const startPolling = (universeId: string) => {
+    const startPolling = (universeId: string, grade?: number) => {
       const pollInterval = setInterval(async () => {
         try {
-          // Check if image is now available in storage
-          const testUrl = `${baseUrl}/${universeId}.png`;
+          const testUrl = `${baseUrl}/${universeId}/${grade ?? learnerGrade({ grade_level: (user?.user_metadata as UserMetadata)?.grade_level, age: (user?.user_metadata as UserMetadata)?.age })}/cover.webp`;
           const response = await fetch(testUrl, { method: 'HEAD' });
           
           if (response.ok) {
@@ -150,7 +149,7 @@ export function useUniverseImage({ universeId, prompt, lang = 'en', subject }: U
     };
 
     ensureImage();
-  }, [key, prompt, lang, subject]);
+  }, [key, title, subject, scene]);
 
   return {
     imageUrl,

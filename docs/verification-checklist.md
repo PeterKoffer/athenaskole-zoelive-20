@@ -32,9 +32,9 @@
 curl -X POST "https://PROJECT.supabase.co/functions/v1/image-ensure" \
   -H "Authorization: Bearer SERVICE_ROLE_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"universeId":"test-1","imagePrompt":"science lab","subject":"science"}'
+  -d '{"universeId":"test-1","universeTitle":"Test Universe","subject":"science","scene":"cover: main activity","grade":5}'
 ```
-**Expected:** `{"success":true,"imageUrl":"https://...","from":"ai","duration_ms":3000}`
+**Expected:** `{"status":"queued","id":"..."}` or `{"status":"exists","imageUrl":"https://..."}`
 
 ### Cache Hit Test
 Run same request twice - second should return `"from":"cache"` instantly

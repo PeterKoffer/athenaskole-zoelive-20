@@ -145,9 +145,10 @@ export class LessonSourceManager {
     // Handle image generation/retrieval with immediate fallback
     let imageUrl = null;
     try {
-      const img = await UniverseImageGeneratorService.getOrCreate({ 
-        prompt: selectedUniverse.imagePrompt, 
-        packId: selectedUniverse.id 
+      const img = await UniverseImageGeneratorService.getOrCreate({
+        packId: selectedUniverse.id,
+        title: selectedUniverse.title,
+        subject: selectedUniverse.subjectHint
       });
       imageUrl = img?.url || `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(selectedUniverse.title)}`;
     } catch (error) {
@@ -297,9 +298,10 @@ export class LessonSourceManager {
       // Handle image generation
       let imageUrl = null;
       try {
-        const img = await UniverseImageGeneratorService.getOrCreate({ 
-          prompt: structuredLesson.imagePrompt, 
-          packId: `ai-${date}` 
+        const img = await UniverseImageGeneratorService.getOrCreate({
+          packId: `ai-${date}`,
+          title: structuredLesson.title,
+          subject: structuredLesson.hero.subject
         });
         imageUrl = img?.url;
       } catch (error) {

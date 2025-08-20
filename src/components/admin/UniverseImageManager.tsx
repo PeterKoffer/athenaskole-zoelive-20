@@ -42,12 +42,21 @@ export function UniverseImageManager() {
         console.warn('Could not clear cache:', deleteError);
       }
 
+
+      const { data: meta } = await supabase
+        .from('universes')
+        .select('title, subject')
+        .eq('id', universeId.trim())
+        .single();
+
+
       const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: {
           universeId: universeId.trim(),
-          imagePrompt: `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`,
-          lang: 'en',
-          force: true
+          universeTitle: meta?.title || universeId.trim(),
+          subject: meta?.subject || 'education',
+          scene: 'cover: main activity',
+          grade: 6
         },
         headers: {
           'Content-Type': 'application/json'

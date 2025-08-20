@@ -18,14 +18,15 @@ curl -X POST "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Content-Type: application/json" \
   -d '{
     "universeId": "test-science-lab",
-    "imagePrompt": "Cinematic classroom adventure in a bright science lab, kid friendly, educational, vibrant colors",
-    "lang": "en",
-    "subject": "science"
+    "universeTitle": "Test Science Lab",
+    "subject": "science",
+    "scene": "cover: main activity",
+    "grade": 5
   }' \
   --silent --show-error | jq '.'
 
 echo ""
-echo "Expected: imageUrl with https://...supabase.co/storage/.../test-science-lab.png, from: 'ai' or 'cache'"
+echo "Expected: status 'queued' or 'exists' with imageUrl when ready"
 
 # Test B: Cache Hit (should be instant)
 echo ""
@@ -35,14 +36,16 @@ curl -X POST "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
-    "universeId": "test-science-lab", 
-    "imagePrompt": "Same prompt as before",
-    "lang": "en"
+    "universeId": "test-science-lab",
+    "universeTitle": "Test Science Lab",
+    "subject": "science",
+    "scene": "cover: main activity",
+    "grade": 5
   }' \
   --silent --show-error | jq '.'
 
 echo ""
-echo "Expected: Same imageUrl, from: 'cache', cached: true"
+echo "Expected: status 'exists' with cached true"
 
 # Test C: Fallback Path (simulate missing API key)
 echo ""
@@ -53,14 +56,15 @@ curl -X POST "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Content-Type: application/json" \
   -d '{
     "universeId": "test-fallback-universe",
-    "imagePrompt": "This should fallback",
-    "lang": "en",
-    "subject": "mathematics"
+    "universeTitle": "Test Fallback Universe",
+    "subject": "mathematics",
+    "scene": "cover: main activity",
+    "grade": 5
   }' \
   --silent --show-error | jq '.'
 
 echo ""
-echo "Expected: imageUrl pointing to fallback, from: 'fallback', error_code present"
+echo "Expected: status 'error' with fallback message"
 
 # Test D: Bulk Generation (small batch)
 echo ""
