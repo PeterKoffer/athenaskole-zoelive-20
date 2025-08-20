@@ -29,7 +29,7 @@
 
 ### Single Image Generation
 ```bash
-curl -X POST "https://PROJECT.supabase.co/functions/v1/generate-universe-image" \
+curl -X POST "https://PROJECT.supabase.co/functions/v1/image-ensure" \
   -H "Authorization: Bearer SERVICE_ROLE_KEY" \
   -H "Content-Type: application/json" \
   -d '{"universeId":"test-1","imagePrompt":"science lab","subject":"science"}'
@@ -54,7 +54,7 @@ curl -X POST "https://PROJECT.supabase.co/functions/v1/bulk-generate-universe-im
 
 ### OPTIONS Request
 ```bash
-curl -X OPTIONS "https://PROJECT.supabase.co/functions/v1/generate-universe-image" \
+curl -X OPTIONS "https://PROJECT.supabase.co/functions/v1/image-ensure" \
   -H "Origin: https://example.com" -I
 ```
 **Expected Headers:**

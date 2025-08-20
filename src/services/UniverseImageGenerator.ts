@@ -20,7 +20,7 @@ export class UniverseImageGeneratorService {
     try {
       console.log('🎨 Generating universe image with prompt:', prompt);
 
-      const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+      const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: { 
           prompt,
           imagePrompt: prompt,
@@ -64,7 +64,7 @@ export class UniverseImageGeneratorService {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+      const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: { 
           prompt: args.prompt,
           imagePrompt: args.prompt, 
@@ -110,7 +110,7 @@ export class UniverseImageGeneratorService {
     try {
       console.log('🎨 Generating universe image for:', request);
 
-      const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+      const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: request
       });
 
