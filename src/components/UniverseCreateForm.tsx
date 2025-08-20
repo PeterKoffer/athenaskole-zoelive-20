@@ -29,12 +29,17 @@ export default function UniverseCreateForm() {
     // success
     setState({ loading: false, createdSlug: data.universe.slug });
     
+    const gradeMatch = String(payload.gradeLevel).match(/\d+/);
+    const grade = gradeMatch ? parseInt(gradeMatch[0], 10) : undefined;
+
     // Trigger image generation (non-blocking)
-    supabase.functions.invoke('generate-universe-image', {
+    supabase.functions.invoke('image-ensure', {
       body: {
         universeId: data.universe.id,
-        imagePrompt: `${payload.subject} classroom, kid-friendly, bright`,
-        lang: payload.lang
+        universeTitle: payload.title,
+        subject: payload.subject,
+        grade,
+        scene: 'cover: main activity'
       }
     }).catch(() => {}); // fire and forget
     
