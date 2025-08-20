@@ -134,13 +134,14 @@ The image should be inspiring and directly related to the subject matter, showin
 
     console.log('🎨 Queuing image generation:', { universeId, grade: finalGrade, prompt: prompt.substring(0, 100) + '...' });
 
-    const response = await fetch(`https://api.replicate.com/v1/models/${replicateVersion}/predictions`, {
+    const response = await fetch('https://api.replicate.com/v1/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Token ${REPLICATE_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        version: replicateVersion,
         input: inputs,
         webhook: webhookUrl,
         webhook_events_filter: ['completed']
