@@ -13,7 +13,7 @@ echo "================================================"
 echo ""
 echo "Test A: Single Generate (Happy Path)"
 echo "------------------------------------"
-curl -X POST "${PROJECT_URL}/functions/v1/generate-universe-image" \
+curl -X POST "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -31,7 +31,7 @@ echo "Expected: imageUrl with https://...supabase.co/storage/.../test-science-la
 echo ""
 echo "Test B: Cache Hit Test (should be instant)"
 echo "-----------------------------------------"
-curl -X POST "${PROJECT_URL}/functions/v1/generate-universe-image" \
+curl -X POST "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -48,7 +48,7 @@ echo "Expected: Same imageUrl, from: 'cache', cached: true"
 echo ""
 echo "Test C: Fallback Path Test"
 echo "--------------------------"
-curl -X POST "${PROJECT_URL}/functions/v1/generate-universe-image" \
+curl -X POST "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -92,7 +92,7 @@ fi
 echo ""
 echo "Test F: CORS Headers Test"
 echo "------------------------"
-curl -X OPTIONS "${PROJECT_URL}/functions/v1/generate-universe-image" \
+curl -X OPTIONS "${PROJECT_URL}/functions/v1/image-ensure" \
   -H "Origin: https://example.com" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: Content-Type" \

@@ -13,7 +13,7 @@ curl -s -I "${BASE_URL}/storage/v1/object/public/universe-images/default.png" | 
 # Test 2: Test edge function (requires SERVICE_ROLE_KEY to be set)
 if [ -n "$SERVICE_ROLE_KEY" ]; then
     echo "🔧 Test 2: Edge function..."
-    curl -s -X POST "${BASE_URL}/functions/v1/generate-universe-image" \
+    curl -s -X POST "${BASE_URL}/functions/v1/image-ensure" \
      -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
      -H "Content-Type: application/json" \
      -d '{"universeId":"test-pipeline","imagePrompt":"Cinematic science lab, kid-friendly","lang":"en"}' | jq .

@@ -30,7 +30,7 @@ export default function UniverseCreateForm() {
     setState({ loading: false, createdSlug: data.universe.slug });
     
     // Trigger image generation (non-blocking)
-    supabase.functions.invoke('generate-universe-image', {
+    supabase.functions.invoke('image-ensure', {
       body: {
         universeId: data.universe.id,
         imagePrompt: `${payload.subject} classroom, kid-friendly, bright`,

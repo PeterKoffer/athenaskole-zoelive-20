@@ -42,7 +42,7 @@ export function UniverseImageManager() {
         console.warn('Could not clear cache:', deleteError);
       }
 
-      const { data, error } = await supabase.functions.invoke('generate-universe-image', {
+      const { data, error } = await supabase.functions.invoke('image-ensure', {
         body: {
           universeId: universeId.trim(),
           imagePrompt: `Cinematic key art for "${universeId}" classroom adventure, child-friendly, detailed, vibrant, no text`,
