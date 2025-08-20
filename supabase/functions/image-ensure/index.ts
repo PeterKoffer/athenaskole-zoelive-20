@@ -151,7 +151,7 @@ The image should be inspiring and directly related to the subject matter, showin
         version: replicateVersion,
         input: inputs,
         webhook: webhookUrl,
-        webhook_events_filter: ['completed', 'failed']
+        webhook_events_filter: ['completed']
       }),
     });
 
