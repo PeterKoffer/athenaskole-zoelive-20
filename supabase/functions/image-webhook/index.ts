@@ -2,10 +2,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+function corsHeaders(req: Request) {
+  const origin = req.headers.get("origin") ?? "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Vary": "Origin",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-client-info, x-client-version",
+  };
+}
 
 function env(name: string, required = true) {
   const value = Deno.env.get(name);
@@ -16,9 +21,15 @@ function env(name: string, required = true) {
 }
 
 serve(async (req: Request) => {
+  const headers = corsHeaders(req);
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { status: 200, headers });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response("Method Not Allowed", { status: 405, headers });
   }
 
   try {
@@ -31,7 +42,7 @@ serve(async (req: Request) => {
 
     if (webhook.status !== 'succeeded' || !webhook.output?.[0]) {
       console.log('⚠️ Webhook not successful or no output:', webhook.status);
-      return new Response('OK', { headers: corsHeaders });
+      return new Response('OK', { headers });
     }
 
     const imageUrl = webhook.output[0];
@@ -75,13 +86,13 @@ serve(async (req: Request) => {
 
     console.log('✅ Image uploaded successfully:', storagePath);
 
-    return new Response('OK', { headers: corsHeaders });
+    return new Response('OK', { headers });
 
   } catch (error) {
     console.error('❌ Webhook processing error:', error);
     return new Response('Error', { 
       status: 500, 
-      headers: corsHeaders 
+      headers 
     });
   }
 });

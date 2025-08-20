@@ -2,10 +2,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+function corsHeaders(req: Request) {
+  const origin = req.headers.get("origin") ?? "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Vary": "Origin",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-client-info, x-client-version",
+  };
+}
 
 function env(name: string, required = true) {
   const value = Deno.env.get(name);
@@ -43,9 +48,15 @@ function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): numbe
 }
 
 serve(async (req: Request) => {
+  const headers = corsHeaders(req);
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { status: 200, headers });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response("Method Not Allowed", { status: 405, headers });
   }
 
   try {
@@ -54,7 +65,7 @@ serve(async (req: Request) => {
     if (!universeId || !universeTitle) {
       return new Response(
         JSON.stringify({ error: 'universeId and universeTitle are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json", ...headers } }
       );
     }
 
@@ -103,7 +114,7 @@ serve(async (req: Request) => {
           imageUrl,
           cached: true 
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { "Content-Type": "application/json", ...headers } }
       );
     }
 
@@ -163,7 +174,7 @@ The image should be inspiring and directly related to the subject matter, showin
       }),
       { 
         status: 202,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { "Content-Type": "application/json", ...headers }
       }
     );
 
@@ -173,7 +184,7 @@ The image should be inspiring and directly related to the subject matter, showin
       JSON.stringify({ error: error.message }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { "Content-Type": "application/json", ...headers } 
       }
     );
   }

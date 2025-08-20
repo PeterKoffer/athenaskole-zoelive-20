@@ -12,12 +12,12 @@ interface UniversePlayerProps {
     standards?: CurriculumStandard[];
 }
 
-const { imageUrl, isLoading, isAI } = useUniverseImage({
-  universeId: universe.id ?? undefined,                  // use undefined, not ""
-  title: universe.title ?? 'Learning Universe',
-  subject: universe.theme ?? 'education',
-  // scene: 'cover: main activity', // optional
-});
+const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
+    const { imageUrl, isLoading, isAI } = useUniverseImage({
+        universeId: universe.id ?? undefined,
+        title: universe.title ?? 'Learning Universe',
+        subject: universe.theme ?? 'education',
+    });
 
 
     return (
