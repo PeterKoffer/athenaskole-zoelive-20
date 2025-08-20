@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { resolveLearnerGrade } from '@/lib/grade';
 import { UserMetadata } from '@/types/auth';
 
 interface UniverseImageProps {
@@ -16,14 +15,17 @@ interface UniverseImageProps {
 export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
   const { user } = useAuth();
   const metadata = user?.user_metadata as UserMetadata | undefined;
-  // Properly resolve grade from user profile, parsing "5a" → 5
-  const resolvedGrade = resolveLearnerGrade(
-    metadata?.grade_level, 
-    metadata?.age
-  ) ?? 6;
-  const baseStorageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images`;
-  const expectedPath = `${universeId}/${resolvedGrade}/cover.webp`;
-  const publicUrl = `${baseStorageUrl}/${expectedPath}`;
+  
+  // Parse exact grade from "5a" → 5
+  const parseExactGrade = (g?: string | number) =>
+    Math.min(12, Math.max(1, Number(String(g).match(/\d+/)?.[0]) || 7));
+  
+  const resolvedGrade = parseExactGrade(metadata?.grade_level) || parseExactGrade(metadata?.age ? metadata.age - 6 : undefined) || 6;
+  
+  // Use exact path format with cache-busting
+  const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
+  const path = `${universeId}/${resolvedGrade}/cover.webp`;
+  const publicUrl = `${base}/${path}?v=${Date.now()}`;
   
   const fallbackUrl = useMemo(() => {
     const subjectMap: Record<string, string> = {
@@ -43,8 +45,8 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
     };
     
     const subjectImage = subject ? subjectMap[subject] || subjectMap.default : subjectMap.default;
-    return `${baseStorageUrl}/${subjectImage}`;
-  }, [subject, baseStorageUrl]);
+    return `${base}/${subjectImage}`;
+  }, [subject, base]);
 
   const [src, setSrc] = useState<string>(fallbackUrl);
 

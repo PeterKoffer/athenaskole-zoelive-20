@@ -41,7 +41,7 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
 
   // Get the key to use (universe ID or slug) - with guard
   const key = universeId;
-  const baseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images';
+  const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
 
   // Smart fallback chain: specific -> subject -> local fallback -> default
   const getFallbackUrl = (): string => {
@@ -77,13 +77,12 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
 
     const ensureImage = async () => {
       try {
-        // Import grade resolution helper
-        const { resolveLearnerGrade } = await import('@/lib/grade');
+        // Parse exact grade from "5a" → 5
+        const parseExactGrade = (g?: string | number) =>
+          Math.min(12, Math.max(1, Number(String(g).match(/\d+/)?.[0]) || 7));
+        
         const metadata = user?.user_metadata;
-        const grade = resolveLearnerGrade(
-          metadata?.grade ?? metadata?.grade_level, 
-          metadata?.age
-        ) ?? 6;
+        const grade = parseExactGrade(metadata?.grade_level || metadata?.grade) || parseExactGrade(metadata?.age ? metadata.age - 6 : undefined) || 6;
         
         const { data, error } = await supabase.functions.invoke('image-ensure', {
           body: {
@@ -123,22 +122,21 @@ export function useUniverseImage({ universeId, title, subject, scene = 'cover: m
       }
     };
 
-    // 3) Poll for completed images (simplified for existing schema)
+    // 3) Poll for completed images using exact path format
     const startPolling = (universeId: string, grade?: number) => {
       const pollInterval = setInterval(async () => {
         try {
-          const testUrl = `${baseUrl}/${universeId}/${grade ?? 6}/cover.webp`;
+          const testUrl = `${baseUrl}/${universeId}/${grade ?? 6}/cover.webp?v=${Date.now()}`;
           const response = await fetch(testUrl, { method: 'HEAD' });
           
           if (response.ok) {
             clearInterval(pollInterval);
-            const imageUrlWithVersion = `${testUrl}?v=${Date.now()}`;
-            setImageUrl(imageUrlWithVersion);
+            setImageUrl(testUrl);
             setIsAI(true);
             setCached(false);
             console.log('✅ AI image ready:', { 
               universeId: key, 
-              url: imageUrlWithVersion 
+              url: testUrl 
             });
           }
         } catch (error) {
