@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
+import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Image, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface BulkJobResult {
@@ -17,11 +18,14 @@ interface BulkJobResult {
 }
 
 export function BulkImageGenerator() {
+  const { user, loading: authLoading } = useAuth();
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<BulkJobResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const runBulkGeneration = async () => {
+    if (authLoading || !user) return;
+    
     setIsRunning(true);
     setError(null);
     setResult(null);
@@ -29,18 +33,9 @@ export function BulkImageGenerator() {
     try {
       console.log('🚀 Starting bulk universe image generation...');
       
-      const { data, error } = await supabase.functions.invoke('image-ensure', {
-        body: {},
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const data = await invokeFn('image-ensure', {});
 
-      if (error) {
-        throw new Error(error.message || 'Failed to start bulk generation');
-      }
-
-      setResult(data);
+      setResult(data as BulkJobResult);
       console.log('✅ Bulk generation completed:', data);
       
     } catch (err: any) {

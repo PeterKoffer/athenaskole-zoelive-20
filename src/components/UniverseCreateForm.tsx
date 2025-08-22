@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFn } from '@/supabase/functionsClient';
 import { useAuth } from "@/hooks/useAuth";
 
 export default function UniverseCreateForm() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [state, setState] = useState<{ loading: boolean; error?: string; createdSlug?: string }>({ 
     loading: false 
   });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    
+    // Don't allow submission if auth is loading or user is not authenticated
+    if (authLoading || !user) return;
+    
     setState({ loading: true });
 
     const form = new FormData(e.currentTarget);
@@ -22,29 +26,33 @@ export default function UniverseCreateForm() {
       description: form.get("description") || "",
     };
 
-    const { data, error } = await supabase.functions.invoke("create-universe", { body: payload });
-    if (error) { setState({ loading: false, error: error.message }); return; }
-    if (!data?.success) { setState({ loading: false, error: "Unknown error" }); return; }
-
-    // success
-    setState({ loading: false, createdSlug: data.universe.slug });
-    
-    const gradeMatch = String(payload.gradeLevel).match(/\d+/);
-    const grade = gradeMatch ? parseInt(gradeMatch[0], 10) : undefined;
-
-    // Trigger image generation (non-blocking)
-    supabase.functions.invoke('image-ensure', {
-      body: {
-        universeId: data.universe.id,
-        universeTitle: payload.title,
-        subject: payload.subject,
-        grade,
-        scene: 'cover: main activity'
+    try {
+      const data = await invokeFn("create-universe", payload) as any;
+      
+      if (!data?.success) { 
+        setState({ loading: false, error: "Unknown error" }); 
+        return; 
       }
-    }).catch(() => {}); // fire and forget
-    
-    // navigate to the new universe if you like
-    // router.push(`/universes`);
+
+      // success
+      setState({ loading: false, createdSlug: data.universe?.slug });
+      
+      const gradeMatch = String(payload.gradeLevel).match(/\d+/);
+      const grade = gradeMatch ? parseInt(gradeMatch[0], 10) : undefined;
+
+      // Trigger image generation (non-blocking)
+      if (data.universe?.id) {
+        invokeFn('image-ensure', {
+          universeId: data.universe.id,
+          universeTitle: payload.title,
+          subject: payload.subject,
+          grade,
+          scene: 'cover: main activity'
+        }).catch(() => {}); // fire and forget
+      }
+    } catch (error) {
+      setState({ loading: false, error: (error as Error).message });
+    }
   }
 
   if (!user) return <p>Please sign in to create universes.</p>;

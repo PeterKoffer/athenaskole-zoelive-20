@@ -1,4 +1,4 @@
-import { safeCallFunction } from '@/utils/supabaseClient';
+import { safeInvokeFn } from '@/supabase/functionsClient';
 
 export interface UniverseImageRequest {
   title: string;
@@ -28,7 +28,7 @@ export class UniverseImageGeneratorService {
     const id = universeId || `temp-${Date.now()}`;
     const gradeNum = grade ?? 6;
     try {
-      const data = await safeCallFunction<ImageEnsureResponse>('image-ensure', {
+      const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
         universeId: id,
         universeTitle: title,
         subject,
@@ -80,7 +80,7 @@ export class UniverseImageGeneratorService {
     }
 
     try {
-      const data = await safeCallFunction<ImageEnsureResponse>('image-ensure', {
+      const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
         universeId: args.packId,  // UUID only
         universeTitle: args.title,
         subject: args.subject,
@@ -143,7 +143,7 @@ export class UniverseImageGeneratorService {
     try {
       console.log('🎨 Generating universe image for:', request);
 
-      const data = await safeCallFunction<ImageEnsureResponse>('image-ensure', {
+      const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
         universeId: request.title,
         universeTitle: request.title,
         subject: request.theme || 'education',

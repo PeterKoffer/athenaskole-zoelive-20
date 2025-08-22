@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export async function invokeFn<T>(name: string, body?: unknown): Promise<T> {
+export async function invokeFn<T>(name: string, body?: Record<string, unknown>): Promise<T> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('No session. Please sign in before calling functions.');
 
@@ -15,7 +15,7 @@ export async function invokeFn<T>(name: string, body?: unknown): Promise<T> {
 // Circuit breaker for hard failures
 const contentServiceDown = new Set<string>();
 
-export async function safeInvokeFn<T>(name: string, body?: unknown): Promise<T> {
+export async function safeInvokeFn<T>(name: string, body?: Record<string, unknown>): Promise<T> {
   const key = `${name}-${JSON.stringify(body)}`;
   
   if (contentServiceDown.has(key)) {

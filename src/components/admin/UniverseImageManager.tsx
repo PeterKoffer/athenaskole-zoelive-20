@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { invokeFn } from '@/supabase/functionsClient';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Loader2, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface RegenerateResult {
@@ -14,6 +16,7 @@ interface RegenerateResult {
 }
 
 export function UniverseImageManager() {
+  const { user, loading: authLoading } = useAuth();
   const [universeId, setUniverseId] = useState('');
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [result, setResult] = useState<RegenerateResult | null>(null);
@@ -24,6 +27,8 @@ export function UniverseImageManager() {
       setError('Please enter a universe ID');
       return;
     }
+
+    if (authLoading || !user) return;
 
     setIsRegenerating(true);
     setError(null);
@@ -42,32 +47,21 @@ export function UniverseImageManager() {
         console.warn('Could not clear cache:', deleteError);
       }
 
-
       const { data: meta } = await supabase
         .from('universes')
         .select('title, subject')
         .eq('id', universeId.trim())
         .single();
 
-
-      const { data, error } = await supabase.functions.invoke('image-ensure', {
-        body: {
-          universeId: universeId.trim(),
-          universeTitle: meta?.title || universeId.trim(),
-          subject: meta?.subject || 'education',
-          scene: 'cover: main activity',
-          grade: 6
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const data = await invokeFn('image-ensure', {
+        universeId: universeId.trim(),
+        universeTitle: meta?.title || universeId.trim(),
+        subject: meta?.subject || 'education',
+        scene: 'cover: main activity',
+        grade: 6
       });
 
-      if (error) {
-        throw new Error(error.message || 'Failed to regenerate image');
-      }
-
-      setResult(data);
+      setResult(data as RegenerateResult);
       console.log('✅ Image regenerated:', data);
       
     } catch (err: any) {
