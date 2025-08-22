@@ -24,16 +24,15 @@ export class UniverseImageGeneratorService {
   private static cache = new Map<string, string>();
 
   async generate(args: { title: string; subject: string; universeId?: string; grade?: number }): Promise<string | null> {
-    const { title, subject, universeId, grade } = args;
+    const { universeId, grade } = args;
     const id = universeId || `temp-${Date.now()}`;
     const gradeNum = grade ?? 6;
     try {
       const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
-        universeId: id,
-        universeTitle: title,
-        subject,
-        scene: 'cover: main activity',
-        grade: gradeNum
+        bucket: 'universe-images',
+        path: `${id}/${gradeNum}/cover.webp`,
+        generateIfMissing: true,
+        kind: 'cover'
       });
 
       if (data?.status === 'exists' && data?.imageUrl) {
@@ -81,11 +80,10 @@ export class UniverseImageGeneratorService {
 
     try {
       const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
-        universeId: args.packId,  // UUID only
-        universeTitle: args.title,
-        subject: args.subject,
-        scene: 'cover: main activity',
-        grade: args.grade ?? 6
+        bucket: 'universe-images',
+        path: `${args.packId}/${args.grade ?? 6}/cover.webp`,
+        generateIfMissing: true,
+        kind: 'cover'
       });
 
       if (data?.status === 'exists' && data?.imageUrl) {
@@ -144,10 +142,10 @@ export class UniverseImageGeneratorService {
       console.log('🎨 Generating universe image for:', request);
 
       const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
-        universeId: request.title,
-        universeTitle: request.title,
-        subject: request.theme || 'education',
-        scene: 'cover: main activity'
+        bucket: 'universe-images', 
+        path: `${request.title}/6/cover.webp`,
+        generateIfMissing: true,
+        kind: 'cover'
       });
 
       if (data?.status === 'exists' && data?.imageUrl) {

@@ -1,4 +1,5 @@
-import type { EducationalContext, GeneratedQuestion } from './types';
+import { GeneratedQuestion, EducationalContext } from './types';
+import { invokeFn } from '@/supabase/functionsClient';
 
 export class QuestionGenerator {
   
@@ -18,34 +19,21 @@ export class QuestionGenerator {
         try {
           console.log(`📡 Calling enhanced K-12 question API for ${educationalContext.subject} question ${i + 1}...`);
           
-          const response = await fetch('https://tgjudtnjhtumrfthegis.supabase.co/functions/v1/generate-question', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnanVkdG5qaHR1bXJmdGhlZ2lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NTk4NjEsImV4cCI6MjA2NDQzNTg2MX0.1OexubPIEWxM3sZ4ds3kSeWxNslKXbJo5GzCDOZRHcQ`
-            },
-            body: JSON.stringify({
-              subject: educationalContext.subject,
-              skillArea: educationalContext.skillArea,
-              difficultyLevel: educationalContext.difficultyLevel,
-              gradeLevel: educationalContext.gradeLevel,
-              userId,
-              questionIndex: i,
-              promptVariation: this.getPromptVariation(educationalContext.subject, i),
-              specificContext: `personalized K-12 learning for ${educationalContext.subject}`,
-              teacherRequirements: educationalContext.teacherRequirements,
-              schoolStandards: educationalContext.schoolStandards,
-              studentAdaptation: educationalContext.studentAdaptation
-            }),
+          const questionData: any = await invokeFn('generate-question', {
+            subject: educationalContext.subject,
+            skillArea: educationalContext.skillArea,
+            difficultyLevel: educationalContext.difficultyLevel,
+            gradeLevel: educationalContext.gradeLevel,
+            userId,
+            questionIndex: i,
+            promptVariation: this.getPromptVariation(educationalContext.subject, i),
+            specificContext: `personalized K-12 learning for ${educationalContext.subject}`,
+            teacherRequirements: educationalContext.teacherRequirements,
+            schoolStandards: educationalContext.schoolStandards,
+            studentAdaptation: educationalContext.studentAdaptation
           });
 
-          if (response.ok) {
-            const questionData = await response.json();
-            
-            if (questionData.error || !questionData.question) {
-              throw new Error(questionData.error || 'Invalid response structure');
-            }
-            
+          if (questionData && !questionData.error && questionData.question) {
             if (this.validateQuestion(questionData) && !this.isDuplicateQuestion(questionData.question)) {
               this.usedQuestions.add(questionData.question);
               questions.push({

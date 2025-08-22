@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 import { useAuth } from '@/hooks/useAuth';
 
 type UseUniverseImageOptions = {
@@ -68,10 +68,12 @@ export function useUniverseImage(
     const run = async () => {
       try {
         // queue (or short-circuit to "exists")
-        const { error } = await supabase.functions.invoke("image-ensure", {
-          body: { universeId, universeTitle: title, subject, scene, grade },
+        await invokeFn("image-ensure", {
+          bucket: 'universe-images',
+          path: `${universeId}/${grade}/cover.webp`,
+          generateIfMissing: true,
+          kind: 'cover'
         });
-        if (error) throw error;
 
         // poll exact path using GET instead of HEAD
         const baseUrl = `${BUCKET_BASE}/${encodeURIComponent(universeId!)}/${grade}/cover.webp`;

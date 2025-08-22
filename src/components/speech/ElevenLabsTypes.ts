@@ -1,6 +1,5 @@
 
 export interface ElevenLabsConfig {
-  apiKey: string;
   voiceId: string;
   model: string;
 }
