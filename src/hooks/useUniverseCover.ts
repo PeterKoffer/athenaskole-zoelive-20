@@ -1,0 +1,81 @@
+// src/hooks/useUniverseCover.ts
+import { useEffect, useMemo, useState } from "react";
+import { coverUrl } from "../utils/imageUrl";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
+const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY!;
+const FUNCTIONS_BASE = SUPABASE_URL.replace("supabase.co", "functions.supabase.co");
+
+function coverGeneratorURL(title: string, author = "NELIE") {
+  const u = new URL(`${FUNCTIONS_BASE}/cover-generator`);
+  u.searchParams.set("title", title);
+  u.searchParams.set("author", author);
+  u.searchParams.set("bg", "264653");
+  u.searchParams.set("color", "ffffff");
+  u.searchParams.set("v", String(Date.now())); // cache-bust
+  return u.toString();
+}
+
+export function useUniverseCover({
+  universeId, title, subject, grade,
+  pollMs = 1200, timeoutMs = 25000,
+}: {
+  universeId: string;
+  title: string;
+  subject: string;
+  grade: number | string;
+  pollMs?: number;
+  timeoutMs?: number;
+}) {
+  const [src, setSrc] = useState<string>("");
+  const [ready, setReady] = useState(false);
+
+  const primary = useMemo(
+    () => coverUrl(universeId, grade, String(Date.now())),
+    [universeId, grade]
+  );
+  const fallback = useMemo(() => coverGeneratorURL(title), [title]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function ensureAndPoll() {
+      // 1) cue generering (fire-and-forget)
+      try {
+        await fetch(`${FUNCTIONS_BASE}/image-ensure`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${ANON}`,
+            apikey: ANON,
+          },
+          body: JSON.stringify({
+            universeId,
+            universeTitle: title,
+            subject,
+            scene: "cover: main activity",
+            grade,
+          }),
+        });
+      } catch {}
+
+      // 2) poll HEAD på cover.webp
+      const t0 = Date.now();
+      while (!cancelled && Date.now() - t0 < timeoutMs) {
+        try {
+          const r = await fetch(primary, { method: "HEAD", cache: "no-store" });
+          if (r.ok) { setSrc(primary); setReady(true); return; }
+        } catch {}
+        await new Promise(r => setTimeout(r, pollMs));
+      }
+
+      // 3) fallback SVG
+      if (!cancelled) { setSrc(fallback); setReady(true); }
+    }
+
+    setReady(false); setSrc(""); ensureAndPoll();
+    return () => { cancelled = true; };
+  }, [primary, fallback, universeId, title, subject, grade, pollMs, timeoutMs]);
+
+  return { src, ready };
+}
