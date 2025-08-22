@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';
 import { publicOrSignedUrl } from '@/utils/storageUrls';
+import { coverKey } from '@/utils/coverKey';
 
 interface UniverseImageProps {
   universeId: string;              // MUST be the UUID
@@ -69,7 +70,7 @@ export function UniverseImage({
 
     const recheckForImage = async () => {
       try {
-        const path = `${universeId}/${resolvedGrade}/cover.webp`;
+        const path = coverKey(universeId, resolvedGrade);
         const url = await publicOrSignedUrl(path);
         
         if (!cancelled && url) {
@@ -139,6 +140,8 @@ export function UniverseImage({
         className="w-full h-full object-cover transition-opacity duration-300"
         loading="lazy"
         decoding="async"
+        crossOrigin="anonymous"
+        fetchPriority="auto"
         onError={() => setSrc(fallbackUrl)}
         style={{ width: '100%', height: '100%' }}
       />
