@@ -143,7 +143,6 @@ export function UniverseImage({
         loading="lazy"
         decoding="async"
         crossOrigin="anonymous"
-        fetchPriority="auto"
         onError={() => setSrc(fallbackUrl)}
         style={{ width: '100%', height: '100%' }}
       />

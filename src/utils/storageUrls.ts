@@ -25,7 +25,7 @@ function withParam(url: string, key: string, value: string | number): string {
 }
 
 export async function publicOrSignedUrl(path: string): Promise<string | null> {
-  const debug = import.meta.env.DEV && import.meta.env.VITE_IMG_DEBUG === 'true';
+  const debug = import.meta.env.DEV;
   
   // 1) Try public URL first
   const { data: pub } = supabase.storage.from('universe-images').getPublicUrl(path);
@@ -39,6 +39,8 @@ export async function publicOrSignedUrl(path: string): Promise<string | null> {
       headers: { Range: 'bytes=0-0' },
     });
 
+    if (debug) console.log('[storage probe]', path, 'status:', probe.status);
+
     // 200/206 → exists
     if (probe.ok || probe.status === 206) return cacheBustedUrl;
 
@@ -47,12 +49,18 @@ export async function publicOrSignedUrl(path: string): Promise<string | null> {
 
     // Check if this is a permission issue (private bucket)
     if (isPermissionish(probe, body, true)) {
+      if (debug) console.log('[storage probe] detected private bucket, trying signed URL for:', path);
+      
       const { data: signed, error } = await supabase
         .storage
         .from('universe-images')
         .createSignedUrl(path, 60 * 60);
 
-      if (error) throw error;
+      if (error) {
+        if (debug) console.log('[storage probe] signed URL error:', error);
+        throw error;
+      }
+      if (debug) console.log('[storage probe] got signed URL for:', path);
       return signed.signedUrl; // Use as-is, already has signature
     }
 
