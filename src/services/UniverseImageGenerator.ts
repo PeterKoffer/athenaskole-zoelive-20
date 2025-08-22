@@ -41,12 +41,14 @@ export class UniverseImageGeneratorService {
         return data.imageUrl as string;
       }
 
-      const storageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${id}/${gradeNum}/cover.webp`;
+      // Use GET instead of HEAD to avoid 400 errors, cache-bust each attempt
+      const baseUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${id}/${gradeNum}/cover.webp`;
       for (let attempt = 0; attempt < 20; attempt++) {
         try {
-          const res = await fetch(storageUrl, { method: 'HEAD' });
+          const url = `${baseUrl}?v=${Date.now()}`;
+          const res = await fetch(url, { method: 'GET', cache: 'no-store' });
           if (res.ok) {
-            return `${storageUrl}?v=${Date.now()}`;
+            return url;
           }
         } catch {}
         await new Promise((r) => setTimeout(r, 3000));
@@ -60,7 +62,7 @@ export class UniverseImageGeneratorService {
     }
   }
 
-  // New method for pack-based image generation with caching
+  // Method for UUID-based image generation with proper fallbacks
   static async getOrCreate(args: { packId: string; title: string; subject: string; grade?: number }): Promise<{ url: string; cached?: boolean } | null> {
     const cacheKey = `img:${args.packId}`;
     
@@ -70,26 +72,28 @@ export class UniverseImageGeneratorService {
       return { url: cached, cached: true };
     }
 
+    // Check if packId is a UUID - if not, use local fallback
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(args.packId);
+    
+    if (!isUUID) {
+      console.log(`🖼️ Using local fallback for non-UUID: ${args.packId}`);
+      return { url: this.getSubjectFallback(args.subject) };
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke('image-ensure', {
-
         body: {
-          universeId: args.packId,
+          universeId: args.packId,  // UUID only
           universeTitle: args.title,
           subject: args.subject,
           scene: 'cover: main activity',
           grade: args.grade ?? 6
-
         }
       });
 
       if (error) {
         console.error('❌ Universe image generation error:', error);
-        // Return storage fallback on error
-        const fallback = args.packId 
-          ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}.png`
-          : 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png';
-        return { url: fallback };
+        return { url: this.getSubjectFallback(args.subject) };
       }
 
       if (data?.status === 'exists' && data?.imageUrl) {
@@ -100,28 +104,46 @@ export class UniverseImageGeneratorService {
         };
       }
 
-      const storageUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}/${args.grade ?? 6}/cover.webp`;
+      // Poll with GET instead of HEAD, cache-bust each attempt
+      const baseUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}/${args.grade ?? 6}/cover.webp`;
       for (let attempt = 0; attempt < 20; attempt++) {
         try {
-          const res = await fetch(storageUrl, { method: 'HEAD' });
+          const url = `${baseUrl}?v=${Date.now()}`;
+          const res = await fetch(url, { method: 'GET', cache: 'no-store' });
           if (res.ok) {
-            this.cache.set(cacheKey, storageUrl);
-            return { url: `${storageUrl}?v=${Date.now()}` };
+            this.cache.set(cacheKey, url);
+            return { url };
           }
         } catch {}
         await new Promise((r) => setTimeout(r, 3000));
       }
 
-      const fallback = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}.png`;
-      console.log(`🖼️ Using storage fallback for ${args.packId}`);
-      return { url: fallback };
+      console.log(`🖼️ Using subject fallback for ${args.packId}`);
+      return { url: this.getSubjectFallback(args.subject) };
     } catch (error) {
       console.error("Failed to generate image:", error);
-      const fallback = args.packId 
-        ? `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}.png`
-        : 'https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/default.png';
-      return { url: fallback };
+      return { url: this.getSubjectFallback(args.subject) };
     }
+  }
+
+  // Helper to get local subject fallback images
+  private static getSubjectFallback(subject: string): string {
+    const subjectMap: Record<string, string> = {
+      'mathematics': '/fallback-images/math.png',
+      'science': '/fallback-images/science.png',
+      'geography': '/fallback-images/geography.png',
+      'technology': '/fallback-images/computer-science.png',
+      'music': '/fallback-images/music.png',
+      'creative arts': '/fallback-images/arts.png',
+      'physical education': '/fallback-images/pe.png',
+      'life skills': '/fallback-images/life.png',
+      'history': '/fallback-images/history.png',
+      'languages': '/fallback-images/languages.png',
+      'mental wellness': '/fallback-images/wellness.png',
+      'default': '/fallback-images/default.png'
+    };
+    const key = subject?.toLowerCase().replace(/[^a-z\s]/g, '');
+    return subjectMap[key] || subjectMap.default;
   }
 
   // Legacy method for backward compatibility

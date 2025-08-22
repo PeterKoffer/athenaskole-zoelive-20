@@ -145,16 +145,26 @@ export class LessonSourceManager {
     // Handle image generation/retrieval with immediate fallback
     let imageUrl = null;
     try {
-      const img = await UniverseImageGeneratorService.getOrCreate({
-        packId: selectedUniverse.id,
-        title: selectedUniverse.title,
-        subject: selectedUniverse.subjectHint
-      });
-      imageUrl = img?.url || `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(selectedUniverse.title)}`;
+      // Only call getOrCreate if we have a UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(selectedUniverse.id);
+      
+      if (isUUID) {
+        const img = await UniverseImageGeneratorService.getOrCreate({
+          packId: selectedUniverse.id, // This should be a UUID
+          title: selectedUniverse.title,
+          subject: selectedUniverse.subjectHint,
+          grade: grade
+        });
+        imageUrl = img?.url;
+      }
+      
+      // Fallback to local image if no UUID or generation failed
+      if (!imageUrl) {
+        imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
+      }
     } catch (error) {
       console.warn('Image generation failed, using fallback:', error);
-      // Always provide a fallback image
-      imageUrl = `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(selectedUniverse.title)}`;
+      imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
     }
 
     // Ensure image is set in the lesson data
@@ -299,11 +309,12 @@ export class LessonSourceManager {
       let imageUrl = null;
       try {
         const img = await UniverseImageGeneratorService.getOrCreate({
-          packId: `ai-${date}`,
+          packId: `ai-${date}`, // Not a UUID, will use fallback
           title: structuredLesson.hero.title,
-          subject: structuredLesson.hero.subject
+          subject: structuredLesson.hero.subject,
+          grade: grade
         });
-        imageUrl = img?.url;
+        imageUrl = img?.url || this.getSubjectFallbackImage(structuredLesson.hero.subject);
       } catch (error) {
         console.warn('Image generation failed:', error);
         imageUrl = this.getSubjectFallbackImage(structuredLesson.hero.subject);
@@ -337,13 +348,15 @@ export class LessonSourceManager {
    */
   private static getSubjectFallbackImage(subject: string): string {
     const subjectImages: Record<string, string> = {
-      'Mathematics': '/placeholder.svg?height=400&width=600&text=Mathematics',
-      'Science': '/placeholder.svg?height=400&width=600&text=Science',
-      'English': '/placeholder.svg?height=400&width=600&text=English',
-      'History': '/placeholder.svg?height=400&width=600&text=History',
-      'Art': '/placeholder.svg?height=400&width=600&text=Art',
-      'Physical Education': '/placeholder.svg?height=400&width=600&text=PE',
-      'default': '/placeholder.svg?height=400&width=600&text=Learning'
+      'Mathematics': '/fallback-images/math.png',
+      'Science': '/fallback-images/science.png',
+      'English': '/fallback-images/languages.png',
+      'History': '/fallback-images/history.png',
+      'Art': '/fallback-images/arts.png',
+      'Physical Education': '/fallback-images/pe.png',
+      'Technology': '/fallback-images/computer-science.png',
+      'Life Skills': '/fallback-images/life.png',
+      'default': '/fallback-images/default.png'
     };
     
     return subjectImages[subject] || subjectImages.default;
