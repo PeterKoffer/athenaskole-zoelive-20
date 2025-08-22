@@ -1,40 +1,41 @@
 import { supabase } from '@/integrations/supabase/client';
 
+async function isNotFound(res: Response): Promise<boolean> {
+  try {
+    const body = await res.clone().text();        // don't consume the original
+    return /not_found|Object not found/i.test(body);
+  } catch {
+    return false;
+  }
+}
+
 export async function publicOrSignedUrl(path: string): Promise<string | null> {
-  // 1) Try public URL first
+  // 1) Try public URL
   const { data: pub } = supabase.storage.from('universe-images').getPublicUrl(path);
   const u = new URL(pub.publicUrl);
-  u.searchParams.set('v', String(Date.now()));
-  
-  try {
-    const head = await fetch(u.toString(), { method: 'HEAD' });
+  u.searchParams.set('v', String(Date.now()));    // cache-bust
 
-    if (head.ok) return u.toString();
-    
-    if (head.status === 400) {
-      console.warn('Storage 400 body:', await (await fetch(u.toString())).text());
-    }
-    
-    if (head.status !== 404) {
-      // 2) Fallback to signed URL on 400/401/403/etc.
-      const { data, error } = await supabase
-        .storage
-        .from('universe-images')
-        .createSignedUrl(path, 60 * 60); // 1h
-      if (error) throw error;
-      return data.signedUrl;
-    }
-  } catch (error) {
-    console.warn('Public URL fetch failed, trying signed URL:', error);
-    // Fallback to signed URL on network errors
-    const { data, error: signedError } = await supabase
-      .storage
-      .from('universe-images')
-      .createSignedUrl(path, 60 * 60); // 1h
-    if (signedError) throw signedError;
-    return data.signedUrl;
+  // Use GET + Range (HEAD can 400 on missing)
+  const probe = await fetch(u.toString(), {
+    method: 'GET',
+    cache: 'no-store',
+    headers: { Range: 'bytes=0-0' },
+  });
+
+  // 200/206 → exists
+  if (probe.ok || probe.status === 206) return u.toString();
+
+  // Treat missing as missing (don't try to sign it)
+  if (probe.status === 404 || (probe.status === 400 && (await isNotFound(probe)))) {
+    return null; // object not there yet
   }
-  
-  // 404: not generated yet
-  return null;
+
+  // 401/403/other errors → try signed URL
+  const { data: signed, error } = await supabase
+    .storage
+    .from('universe-images')
+    .createSignedUrl(path, 60 * 60);
+
+  if (error) throw error;
+  return signed.signedUrl;
 }

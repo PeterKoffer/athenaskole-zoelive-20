@@ -77,20 +77,19 @@ export function UniverseImage({
           return;
         }
         
-        // Only retry on null (404 - file might not exist yet)
+        // File missing: show fallback + recheck later (only if not too many attempts)
         if (url === null && attempt < 10) {
           const delay = Math.min(30000, Math.round(800 * Math.pow(1.7, attempt)));
           timer = setTimeout(checkForImage, delay);
         }
       } catch (error) {
         console.warn('Image URL fetch failed:', error);
-        // Stop retrying on errors - permission/config issues don't resolve by waiting
+        // Stop retrying on actual errors (401/403/5xx) - these won't resolve by waiting
       }
     };
 
     // start from fallback
     setSrc(fallbackUrl);
-    console.log('🖼️ Using storage fallback for', title);
 
     // fire-and-forget generation request with debouncing
     const queueKey = `${universeId}-${resolvedGrade}`;
@@ -112,10 +111,7 @@ export function UniverseImage({
           },
         })
         .then(({ data, error }) => {
-          if (cancelled || error) {
-            console.log('🔄 Image generation queued or failed:', error);
-            return;
-          }
+          if (cancelled || error) return;
           console.log('✅ Image generation queued:', data);
         })
         .catch((err) => console.log('🔄 Generation failed:', err))
@@ -127,7 +123,7 @@ export function UniverseImage({
         });
     }
 
-    // start polling immediately
+    // start checking for the generated image
     checkForImage();
 
     return () => {
