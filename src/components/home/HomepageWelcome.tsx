@@ -38,7 +38,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
           .from('profiles')
           .select('name')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profile?.name) {
           const firstName = profile.name.split(' ')[0];

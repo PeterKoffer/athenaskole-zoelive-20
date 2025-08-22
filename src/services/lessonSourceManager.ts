@@ -1,3 +1,8 @@
+import { v5 as uuidv5 } from 'uuid';
+
+// Namespace for generating deterministic UUIDs from slugs
+const UNIVERSE_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
 // Service to manage lesson source priority and image handling
 import { supabase } from '@/integrations/supabase/client';
 import { UniverseImageGeneratorService } from '@/services/UniverseImageGenerator';
@@ -142,7 +147,7 @@ export class LessonSourceManager {
         gradeBand,
         minutes: 150,
         packId: selectedUniverse.id,
-        universeId: selectedUniverse.id, // Add universe ID for image component
+        universeId: uuidv5(selectedUniverse.id, UNIVERSE_NAMESPACE), // Convert slug to deterministic UUID for image component
         imageUrl: '' // Will be set below
       },
       meta: {
@@ -155,12 +160,13 @@ export class LessonSourceManager {
     // Handle image generation/retrieval with immediate fallback
     let imageUrl = null;
     try {
-      // Only call getOrCreate if we have a UUID
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(selectedUniverse.id);
+      // Generate deterministic UUID from slug
+      const universeUuid = uuidv5(selectedUniverse.id, UNIVERSE_NAMESPACE);
+      const isUUID = true; // We now have a valid UUID
       
       if (isUUID) {
         const img = await UniverseImageGeneratorService.getOrCreate({
-          packId: selectedUniverse.id, // This should be a UUID
+          packId: universeUuid, // Use the generated UUID
           title: selectedUniverse.title,
           subject: selectedUniverse.subjectHint,
           grade: resolvedGrade

@@ -24,7 +24,7 @@ const StudentDashboard = () => {
           .from('profiles')
           .select('name')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         const metadata = user?.user_metadata as UserMetadata | undefined;
         if (profile?.name) {

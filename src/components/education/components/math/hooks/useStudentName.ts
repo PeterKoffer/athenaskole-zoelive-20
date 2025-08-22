@@ -17,7 +17,7 @@ export const useStudentName = () => {
           .from('profiles')
           .select('name')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profile?.name) {
           setStudentName(profile.name.split(' ')[0]); // Use first name

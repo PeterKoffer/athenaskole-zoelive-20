@@ -16,6 +16,9 @@ export interface LessonHero {
   subject: string;
   gradeBand: string;
   minutes: number;
+  universeId?: string;
+  packId?: string;
+  imageUrl?: string;
 }
 
 export interface AgeVariants {
