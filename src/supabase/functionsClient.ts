@@ -1,8 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export async function invokeFn<T>(name: string, body?: Record<string, unknown>): Promise<T> {
+  // SSR guard
+  if (typeof window === 'undefined') {
+    throw new Error(`Cannot call ${name} during SSR`);
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('No session. Please sign in before calling functions.');
+  if (!session) throw new Error(`No session for ${name}. Please sign in before calling functions.`);
+  
+  // Debug logging for JWT presence
+  console.debug(`[invokeFn] ${name} jwt.len=${session.access_token.length}`);
 
   const { data, error } = await supabase.functions.invoke<T>(name, {
     body,
