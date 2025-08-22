@@ -12,42 +12,52 @@ interface UniverseImageProps {
   grade?: number;
 }
 
-export function UniverseImage({ universeId, title, subject, className = "", alt, grade }: UniverseImageProps) {
+export function UniverseImage({
+  universeId,
+  title,
+  subject,
+  className = '',
+  alt,
+  grade,
+}: UniverseImageProps) {
   const { user } = useAuth();
   const metadata = user?.user_metadata as UserMetadata | undefined;
-  
-  // Parse exact grade from "5a" → 5
+
+  // ---------- Helpers ----------
   const parseExactGrade = (g?: string | number) =>
     Math.min(12, Math.max(1, Number(String(g).match(/\d+/)?.[0]) || 7));
-  
-  const resolvedGrade = parseExactGrade(metadata?.grade_level) || parseExactGrade(metadata?.age ? metadata.age - 6 : undefined) || 6;
-  
-  // Use exact path format with cache-busting
-  const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
-  const path = `${universeId}/${resolvedGrade}/cover.webp`;
-  const publicUrl = `${base}/${path}?v=${Date.now()}`;
-  
-  const fallbackUrl = useMemo(() => {
-    const subjectMap: Record<string, string> = {
-      mathematics: "math.png",
-      science: "science.png", 
-      geography: "geography.png",
-      "computer-science": "computer-science.png",
-      music: "music.png",
-      "creative-arts": "arts.png",
-      "body-lab": "pe.png",
-      "life-essentials": "life.png",
-      "Life Skills": "life.png",
-      "history-religion": "history.png",
-      languages: "languages.png",
-      "mental-wellness": "wellness.png",
-      default: "default.png",
-    };
-    
-    const subjectImage = subject ? subjectMap[subject] || subjectMap.default : subjectMap.default;
-    return `${base}/${subjectImage}`;
-  }, [subject, base]);
 
+  const resolvedGrade =
+    parseExactGrade(metadata?.grade_level) ||
+    parseExactGrade(metadata?.age ? metadata.age - 6 : undefined) ||
+    6;
+
+  // Supabase Storage (public) – uden cache-buster i base-URL
+  const storageBase = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
+  const coverPath = `${universeId}/${resolvedGrade}/cover.webp`;
+  const coverUrlNoBust = `${storageBase}/${coverPath}`;
+  const withBust = (u: string) => `${u}?v=${Date.now()}`;
+
+  // Functions base (offentlig SVG-fallback)
+  const FUNCTIONS_BASE = import.meta.env.VITE_SUPABASE_URL!.replace(
+    'supabase.co',
+    'functions.supabase.co',
+  );
+
+  function coverGeneratorURL(t: string, author = 'NELIE') {
+    const u = new URL(`${FUNCTIONS_BASE}/cover-generator`);
+    u.searchParams.set('title', t || 'Untitled');
+    u.searchParams.set('author', author);
+    u.searchParams.set('bg', '264653');
+    u.searchParams.set('color', 'ffffff');
+    u.searchParams.set('v', String(Date.now())); // cache-bust
+    return u.toString();
+  }
+
+  // ---------- Fallback: offentlig SVG-generator ----------
+  const fallbackUrl = useMemo(() => coverGeneratorURL(title), [title]);
+
+  // Start med fallback, skift til cover.webp når det findes
   const [src, setSrc] = useState<string>(fallbackUrl);
 
   useEffect(() => {
@@ -58,47 +68,53 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
     const check = async () => {
       attempt += 1;
       try {
-        const res = await fetch(publicUrl, { method: 'HEAD', cache: 'no-store' });
+        // Poll kun HEAD på filen uden cache-buster
+        const res = await fetch(coverUrlNoBust, { method: 'HEAD', cache: 'no-store' });
         if (res.ok && !cancelled) {
-          setSrc(`${publicUrl}?v=${Date.now()}`); // cache-buster
+          setSrc(withBust(coverUrlNoBust)); // sæt rigtig webp med frisk cache-buster
           return;
         }
-      } catch {}
-      // backoff up to 30s
+      } catch {
+        // ignore
+      }
+      // backoff op til ~30s
       const delay = Math.min(30000, Math.round(800 * Math.pow(1.7, attempt)));
       timer = setTimeout(check, delay);
     };
 
-    // Start with fallback and queue generation
+    // 1) Vis straks fallback
     setSrc(fallbackUrl);
-    
-    // Fire-and-forget generation with learner's grade
-    supabase.functions.invoke('image-ensure', {
-      body: { 
-        universeId,
-        universeTitle: title,
-        subject: subject || 'educational',
-        scene: 'cover: main activity',
-        grade: resolvedGrade
-      }
-    }).then(({ data, error }) => {
-      if (cancelled || error) {
-        console.log('🔄 Image generation queued or failed:', error);
-        return;
-      }
-      console.log('✅ Image generation queued:', data);
-    }).catch((error) => {
-      console.log('🔄 Generation failed:', error);
-    });
 
-    // Start polling immediately
+    // 2) Kø image-ensure (fire-and-forget)
+    supabase.functions
+      .invoke('image-ensure', {
+        body: {
+          universeId,
+          universeTitle: title,
+          subject: subject || 'educational',
+          scene: 'cover: main activity',
+          grade: resolvedGrade,
+        },
+      })
+      .then(({ data, error }) => {
+        if (cancelled || error) {
+          console.log('🔄 Image generation queued or failed:', error);
+          return;
+        }
+        console.log('✅ Image generation queued:', data);
+      })
+      .catch((error) => {
+        console.log('🔄 Generation failed:', error);
+      });
+
+    // 3) Start polling
     check();
 
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [publicUrl, fallbackUrl, universeId, title, subject, grade]);
+  }, [coverUrlNoBust, fallbackUrl, universeId, title, subject, grade]);
 
   return (
     <div className={`relative ${className}`}>
@@ -108,11 +124,11 @@ export function UniverseImage({ universeId, title, subject, className = "", alt,
         className="w-full h-full object-cover transition-opacity duration-300"
         loading="lazy"
         decoding="async"
-        onError={() => setSrc(fallbackUrl)}
+        onError={() => setSrc(fallbackUrl)} // ekstra sikkerhedsnet
         style={{ width: '100%', height: '100%' }}
       />
-      
-      {/* Debug indicators */}
+
+      {/* Debug (kun i dev) */}
       {import.meta.env.DEV && (
         <div className="absolute top-2 right-2 text-xs flex gap-1">
           <span className="bg-blue-500 text-white px-1 rounded text-xs">G{resolvedGrade}</span>
