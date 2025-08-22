@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from "react";
 import { supabase } from '@/integrations/supabase/client';
+import { resolveImageUrl } from "@/utils/storageUrls";
+import { coverKey } from "@/utils/coverKey";
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';
-import { coverUrl } from '@/utils/storageUrls';
 
 interface UniverseImageProps {
   universeId: string;              // MUST be the UUID
@@ -11,12 +12,64 @@ interface UniverseImageProps {
   className?: string;
   alt?: string;
   grade?: number;                  // optional hard lock
+  canEnsure?: boolean;             // allow image generation for specific roles
 }
 
 function parseExactGrade(g?: string | number) {
   const n = Number(String(g ?? '').match(/\d+/)?.[0]);
   if (!Number.isFinite(n)) return undefined;
   return Math.min(12, Math.max(1, n));
+}
+
+// Get fallback image path based on subject
+function getLocalFallback(subject?: string): string {
+  const subjectMap: Record<string, string> = {
+    mathematics: '/images/fallbacks/math.png',
+    science: '/images/fallbacks/science.png',
+    geography: '/images/fallbacks/geography.png',
+    'computer-science': '/images/fallbacks/computer-science.png',
+    music: '/images/fallbacks/music.png',
+    'creative-arts': '/images/fallbacks/arts.png',
+    'body-lab': '/images/fallbacks/pe.png',
+    'life-essentials': '/images/fallbacks/life.png',
+    'history-religion': '/images/fallbacks/history.png',
+    languages: '/images/fallbacks/languages.png',
+    'mental-wellness': '/images/fallbacks/wellness.png',
+    default: '/images/fallbacks/default.png',
+  };
+  const key = subject?.toLowerCase() ?? 'default';
+  return subjectMap[key] ?? subjectMap.default;
+}
+
+async function ensureImage(universeId: string, title: string, subject?: string, grade?: number): Promise<boolean> {
+  try {
+    // Ensure we pass the user's JWT; without it you'll get 401/403.
+    const { data: s } = await supabase.auth.getSession();
+    const accessToken = s?.session?.access_token;
+
+    const { data, error } = await supabase.functions.invoke("image-ensure", {
+      body: { 
+        universeId,
+        universeTitle: title,
+        subject: subject || 'educational',
+        scene: 'cover: main activity',
+        grade: grade || 6
+      },
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    });
+
+    if (error) {
+      // 403/401 → don't retry again from the client
+      console.debug("[image-ensure] skipped/forbidden:", error);
+      return false;
+    }
+
+    // Check for successful response
+    return !!data;
+  } catch (e) {
+    console.debug("[image-ensure] error:", e);
+    return false;
+  }
 }
 
 export function UniverseImage({
@@ -26,6 +79,7 @@ export function UniverseImage({
   className = '',
   alt,
   grade,
+  canEnsure = false,
 }: UniverseImageProps) {
   const { user } = useAuth();
   const metadata = user?.user_metadata as UserMetadata | undefined;
@@ -37,117 +91,60 @@ export function UniverseImage({
     parseExactGrade((metadata?.age ?? 12) - 6) ??
     6;
 
-  // Local fallback helper
-  const getLocalFallback = useMemo(() => {
-    const subjectMap: Record<string, string> = {
-      mathematics: '/images/fallbacks/math.png',
-      science: '/images/fallbacks/science.png',
-      geography: '/images/fallbacks/geography.png',
-      'computer-science': '/images/fallbacks/computer-science.png',
-      music: '/images/fallbacks/music.png',
-      'creative-arts': '/images/fallbacks/arts.png',
-      'body-lab': '/images/fallbacks/pe.png',
-      'life-essentials': '/images/fallbacks/life.png',
-      'history-religion': '/images/fallbacks/history.png',
-      languages: '/images/fallbacks/languages.png',
-      'mental-wellness': '/images/fallbacks/wellness.png',
-      default: '/images/fallbacks/default.png',
-    };
-    const key = subject?.toLowerCase() ?? 'default';
-    return subjectMap[key] ?? subjectMap.default;
-  }, [subject]);
-
-  const fallbackUrl = getLocalFallback;
-
-  const [src, setSrc] = useState<string>(fallbackUrl);
-  const backoffMs = useRef(600); 
+  const [src, setSrc] = useState<string | null>(null);
   const triedEnsure = useRef(false);
-  const hardFail = useRef(false);
+  const unmounted = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
+    unmounted.current = false;
+    setSrc(null);
+    triedEnsure.current = false;
 
-    const resolveCover = async () => {
-      if (hardFail.current || cancelled) return;
-
-      try {
-        const url = await coverUrl(universeId, resolvedGrade);
-        
-        if (cancelled) return;
-
-        if (url) {
-          setSrc(url);
-          backoffMs.current = 600; // reset backoff
-          return;
-        }
-
-        // Missing: ask backend to generate/upload only once
-        if (!triedEnsure.current) {
-          triedEnsure.current = true;
-          try {
-            const { error } = await supabase.functions.invoke('image-ensure', {
-              body: {
-                universeId,
-                universeTitle: title,
-                subject: subject || 'educational',
-                scene: 'cover: main activity',
-                grade: resolvedGrade,
-              },
-            });
-            if (error) throw error;
-            if (import.meta.env.DEV) console.log('✅ Image generation queued');
-          } catch (err) {
-            hardFail.current = true;
-            setSrc(getLocalFallback);
-            if (import.meta.env.DEV) console.debug('[image-ensure] failed:', err);
-            return;
-          }
-        }
-
-        // Recheck later (cap at 8s). Only for "missing" case.
-        if (!cancelled) {
-          const delay = Math.min(backoffMs.current, 8000);
-          timer = setTimeout(resolveCover, delay);
-          backoffMs.current *= 2;
-        }
-      } catch (error) {
-        if (cancelled) return;
-        console.warn('Image resolution failed:', error);
-        hardFail.current = true;
-        setSrc(getLocalFallback);
+    (async () => {
+      const path = coverKey(universeId, resolvedGrade);
+      if (!path) {
+        setSrc(null);
+        return;
       }
-    };
 
-    // Start from fallback
-    setSrc(fallbackUrl);
-    backoffMs.current = 600;
-    
-    // Begin resolution
-    resolveCover();
+      // Try to resolve exactly once
+      const url = await resolveImageUrl(path);
+      if (unmounted.current) return;
+
+      if (url) {
+        setSrc(url);
+        return;
+      }
+
+      // If we got here, it's a hard miss (400/404). Optionally try server-side ensure ONCE.
+      if (canEnsure && !triedEnsure.current) {
+        triedEnsure.current = true;
+        const ok = await ensureImage(universeId, title, subject, resolvedGrade);
+        if (!unmounted.current && ok) {
+          // Re-resolve a single time after ensure
+          const ensuredUrl = await resolveImageUrl(path);
+          if (!unmounted.current) setSrc(ensuredUrl ?? null);
+        }
+      }
+    })();
 
     return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
+      unmounted.current = true;
     };
-  }, [universeId, resolvedGrade, fallbackUrl, title, subject, getLocalFallback]);
+  }, [universeId, resolvedGrade, canEnsure, title, subject]);
 
-  // Reset guards when universeId changes
-  useEffect(() => {
-    triedEnsure.current = false;
-    hardFail.current = false;
-  }, [universeId, resolvedGrade]);
+  const fallbackImage = getLocalFallback(subject);
 
   return (
     <div className={`relative ${className}`}>
       <img
-        src={src}
+        src={src ?? fallbackImage}
         alt={alt || title}
         className="w-full h-full object-cover transition-opacity duration-300"
         loading="lazy"
         decoding="async"
         crossOrigin="anonymous"
-        onError={() => setSrc(fallbackUrl)}
+        onError={() => setSrc(null)} // swap to fallback without loops
         style={{ width: '100%', height: '100%' }}
       />
       {import.meta.env.DEV && (

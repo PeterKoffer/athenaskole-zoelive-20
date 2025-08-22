@@ -54,6 +54,9 @@ serve(async (req: Request) => {
   }
 
   try {
+    // Get auth token from request
+    const authHeader = req.headers.get('Authorization');
+    
     const { universeId, universeTitle, subject, scene = 'cover: main activity', grade } = await req.json();
 
     if (!universeId || !universeTitle) {
@@ -68,21 +71,24 @@ serve(async (req: Request) => {
 
     let finalGrade = grade;
     
-    // If no grade provided, try to get it from user profile
-    if (!finalGrade) {
+    // Verify user authentication if auth token provided
+    if (authHeader) {
       try {
-        const authHeader = req.headers.get('Authorization');
-        if (authHeader) {
-          const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-          if (user?.user_metadata) {
-            finalGrade = resolveLearnerGrade(
-              user.user_metadata.grade_level || user.user_metadata.grade,
-              user.user_metadata.age
-            );
-          }
+        const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+        if (authError || !user) {
+          return json(req, { error: 'Unauthorized' }, { status: 401 });
+        }
+        
+        // If no grade provided, try to get it from user profile
+        if (!finalGrade && user.user_metadata) {
+          finalGrade = resolveLearnerGrade(
+            user.user_metadata.grade_level || user.user_metadata.grade,
+            user.user_metadata.age
+          );
         }
       } catch (error) {
-        console.warn('Could not get user profile for grade:', error);
+        console.warn('Could not verify user authentication:', error);
+        return json(req, { error: 'Authentication failed' }, { status: 401 });
       }
     }
 
