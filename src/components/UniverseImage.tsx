@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';
+import { publicOrSignedUrl } from '@/utils/storageUrls';
 
 interface UniverseImageProps {
   universeId: string;              // MUST be the UUID
@@ -36,10 +37,6 @@ export function UniverseImage({
     parseExactGrade((metadata?.age ?? 12) - 6) ??
     6;
 
-  // exact storage path (UUID → grade → cover.webp)
-  const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
-  const coverUrl = `${base}/${universeId}/${resolvedGrade}/cover.webp`;
-
   // subject fallback (pngs you already ship in the same bucket root)
   const fallbackUrl = useMemo(() => {
     const subjectMap: Record<string, string> = {
@@ -58,8 +55,9 @@ export function UniverseImage({
     };
     const key = subject?.toLowerCase() ?? 'default';
     const file = subjectMap[key] ?? subjectMap.default;
+    const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
     return `${base}/${file}`;
-  }, [subject, base]);
+  }, [subject]);
 
   const [src, setSrc] = useState<string>(fallbackUrl);
 
@@ -68,36 +66,25 @@ export function UniverseImage({
     let attempt = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const check = async () => {
+    const checkForImage = async () => {
       attempt += 1;
       try {
-        // use GET instead of HEAD — avoids 400-on-missing quirk
-        const url = `${coverUrl}?v=${Date.now()}`;
-        const res = await fetch(url, { method: 'GET', cache: 'no-store' });
-        if (!cancelled && res.ok) {
-          setSrc(url); // cache-busted direct cover
+        const path = `${universeId}/${resolvedGrade}/cover.webp`;
+        const url = await publicOrSignedUrl(path);
+        
+        if (!cancelled && url) {
+          setSrc(url);
           return;
         }
         
-        // Don't retry on 400/401/403 - these are permission/bucket issues, not transient
-        if (res.status === 400 || res.status === 401 || res.status === 403) {
-          console.log(`🚫 Storage returned ${res.status} for ${universeId}. Using fallback.`);
-          return; // Stop retrying, use fallback
+        // Only retry on null (404 - file might not exist yet)
+        if (url === null && attempt < 10) {
+          const delay = Math.min(30000, Math.round(800 * Math.pow(1.7, attempt)));
+          timer = setTimeout(checkForImage, delay);
         }
-        
-        // Only retry on 404 (file might not exist yet) or 5xx (server issues)
-        if (res.status !== 404 && res.status < 500) {
-          console.log(`🚫 Unexpected status ${res.status} for ${universeId}. Using fallback.`);
-          return; // Stop retrying on other 4xx errors
-        }
-      } catch {
-        // ignore network errors, keep retrying
-      }
-      
-      // Retry with backoff, but cap attempts to prevent infinite loops
-      if (attempt < 10) {
-        const delay = Math.min(30000, Math.round(800 * Math.pow(1.7, attempt)));
-        timer = setTimeout(check, delay);
+      } catch (error) {
+        console.warn('Image URL fetch failed:', error);
+        // Stop retrying on errors - permission/config issues don't resolve by waiting
       }
     };
 
@@ -141,13 +128,13 @@ export function UniverseImage({
     }
 
     // start polling immediately
-    check();
+    checkForImage();
 
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [coverUrl, fallbackUrl, universeId, title, subject, resolvedGrade]);
+  }, [universeId, resolvedGrade, fallbackUrl, title, subject]);
 
   return (
     <div className={`relative ${className}`}>
