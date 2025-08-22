@@ -2,9 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';
-import { publicOrSignedUrl } from '@/utils/storageUrls';
-import { coverKey } from '@/utils/coverKey';
-import DefaultImage from '@/assets/fallback-images/default.png';
+import { coverUrl } from '@/utils/storageUrls';
 
 interface UniverseImageProps {
   universeId: string;              // MUST be the UUID
@@ -42,18 +40,18 @@ export function UniverseImage({
   // subject fallback (local assets to avoid storage dependency)
   const fallbackUrl = useMemo(() => {
     const subjectMap: Record<string, string> = {
-      mathematics: '/fallback-images/math.png',
-      science: '/fallback-images/science.png',
-      geography: '/fallback-images/geography.png',
-      'computer-science': '/fallback-images/computer-science.png',
-      music: '/fallback-images/music.png',
-      'creative-arts': '/fallback-images/arts.png',
-      'body-lab': '/fallback-images/pe.png',
-      'life-essentials': '/fallback-images/life.png',
-      'history-religion': '/fallback-images/history.png',
-      languages: '/fallback-images/languages.png',
-      'mental-wellness': '/fallback-images/wellness.png',
-      default: DefaultImage,
+      mathematics: '/images/fallbacks/math.png',
+      science: '/images/fallbacks/science.png',
+      geography: '/images/fallbacks/geography.png',
+      'computer-science': '/images/fallbacks/computer-science.png',
+      music: '/images/fallbacks/music.png',
+      'creative-arts': '/images/fallbacks/arts.png',
+      'body-lab': '/images/fallbacks/pe.png',
+      'life-essentials': '/images/fallbacks/life.png',
+      'history-religion': '/images/fallbacks/history.png',
+      languages: '/images/fallbacks/languages.png',
+      'mental-wellness': '/images/fallbacks/wellness.png',
+      default: '/images/fallbacks/default.png',
     };
     const key = subject?.toLowerCase() ?? 'default';
     return subjectMap[key] ?? subjectMap.default;
@@ -69,8 +67,7 @@ export function UniverseImage({
 
     const recheckForImage = async () => {
       try {
-        const path = coverKey(universeId, resolvedGrade);
-        const url = await publicOrSignedUrl(path);
+        const url = await coverUrl(universeId, resolvedGrade);
         
         if (!cancelled && url) {
           setSrc(url);

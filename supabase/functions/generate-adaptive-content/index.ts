@@ -1,15 +1,11 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, okCors, json } from '../_shared/cors.ts';
 
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return okCors();
   }
 
   try {
@@ -54,18 +50,10 @@ serve(async (req: Request) => {
 
     console.log('✅ Content generated successfully');
     
-    return new Response(content, {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json({ content });
 
   } catch (error: any) {
     console.error('❌ Content generation error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    return json({ error: error.message }, { status: 500 });
   }
 });

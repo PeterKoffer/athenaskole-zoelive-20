@@ -1,10 +1,11 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders, okCors, json } from "../_shared/cors.ts";
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
+const BUCKET = 'universe-images';
 
 
 function env(name: string, required = true) {
@@ -18,7 +19,7 @@ function env(name: string, required = true) {
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response("ok", { headers: corsHeaders });
+    return okCors();
   }
 
   if (req.method !== 'POST') {
@@ -35,7 +36,7 @@ serve(async (req: Request) => {
 
     if (webhook.status !== 'succeeded' || !webhook.output?.[0]) {
       console.log('⚠️ Webhook not successful or no output:', webhook.status);
-      return new Response('OK', { headers: corsHeaders });
+      return json({ ok: true, message: 'Webhook ignored' });
     }
 
     const imageUrl = webhook.output[0];
@@ -68,10 +69,10 @@ serve(async (req: Request) => {
 
     // Upload to Supabase Storage with proper cache headers and content type
     const { error: uploadError } = await supabase.storage
-      .from('universe-images')
+      .from(BUCKET)
       .upload(storagePath, imageBuffer, {
         contentType: 'image/webp',
-        cacheControl: 'public, max-age=31536000, immutable',
+        cacheControl: '31536000, immutable',
         upsert: true
       });
 
@@ -81,19 +82,16 @@ serve(async (req: Request) => {
 
     // Get cache-busted URL after successful upload
     const { data } = supabase.storage
-      .from('universe-images')
+      .from(BUCKET)
       .getPublicUrl(storagePath);
     const finalUrl = `${data.publicUrl}?v=${Date.now()}`;
 
     console.log('✅ Image uploaded successfully:', finalUrl);
 
-    return new Response('OK', { headers: corsHeaders });
+    return json({ ok: true, url: finalUrl });
 
   } catch (error) {
     console.error('❌ Webhook processing error:', error);
-    return new Response('Error', { 
-      status: 500, 
-      headers: corsHeaders 
-    });
+    return json({ ok: false, error: String(error) }, { status: 500 });
   }
 });

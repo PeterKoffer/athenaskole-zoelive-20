@@ -1,21 +1,11 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders, okCors, json } from "../_shared/cors.ts";
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
-
-// JSON response helper
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 
-      "content-type": "application/json",
-      ...corsHeaders
-    },
-  });
-}
+const BUCKET = 'universe-images';
 
 
 function env(name: string, required = true) {
@@ -56,11 +46,11 @@ function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): numbe
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response("ok", { headers: corsHeaders });
+    return okCors();
   }
 
   if (req.method !== 'POST') {
-    return json({ error: "Method Not Allowed" }, 405);
+    return json({ error: "Method Not Allowed" }, { status: 405 });
   }
 
   try {
@@ -102,16 +92,16 @@ serve(async (req: Request) => {
     const imagePath = coverKey(universeId, finalGrade);
     const prefix = `${universeId}/${finalGrade}`;
     const { data: existingFile, error: listError } = await supabase.storage
-      .from('universe-images')
+      .from(BUCKET)
       .list(prefix, { search: 'cover.webp' });
 
     if (listError) {
-      return json({ error: listError.message }, 400);
+      return json({ error: listError.message }, { status: 400 });
     }
 
     if (existingFile && existingFile.length > 0) {
       const { data } = supabase.storage
-        .from('universe-images')
+        .from(BUCKET)
         .getPublicUrl(imagePath);
       
       // Return cache-busted URL
@@ -176,7 +166,7 @@ The image should be inspiring and directly related to the subject matter, showin
     return json({ 
       status: 'queued', 
       predictionId: prediction.id 
-    }, 202);
+    }, { status: 202 });
 
   } catch (error: any) {
     console.error('❌ Image ensure error:', error);
@@ -187,6 +177,6 @@ The image should be inspiring and directly related to the subject matter, showin
                  : /permission|policy|public bucket/i.test(message) ? 403
                  : 400;
     
-    return json({ error: message }, status);
+    return json({ error: message }, { status });
   }
 });
