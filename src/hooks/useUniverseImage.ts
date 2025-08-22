@@ -73,10 +73,11 @@ export function useUniverseImage(
         });
         if (error) throw error;
 
-        // poll exact path
-        const url = `${BUCKET_BASE}/${encodeURIComponent(universeId!)}/${grade}/cover.webp?v=${Date.now()}`;
-        const ok = await fetch(url, { method: "HEAD" }).then(r => r.ok).catch(() => false);
-        if (ok) {
+        // poll exact path using GET instead of HEAD
+        const baseUrl = `${BUCKET_BASE}/${encodeURIComponent(universeId!)}/${grade}/cover.webp`;
+        let url = `${baseUrl}?v=${Date.now()}`;
+        const res = await fetch(url, { method: "GET", cache: "no-store" }).catch(() => null);
+        if (res?.ok) {
           setImageUrl(url);
           setIsAI(true);
           return;
@@ -85,8 +86,9 @@ export function useUniverseImage(
         // keep polling up to 2 minutes
         const start = Date.now();
         const timer = setInterval(async () => {
-          const ok = await fetch(url, { method: "HEAD" }).then(r => r.ok).catch(() => false);
-          if (ok) {
+          url = `${baseUrl}?v=${Date.now()}`;
+          const res = await fetch(url, { method: "GET", cache: "no-store" }).catch(() => null);
+          if (res?.ok) {
             clearInterval(timer);
             setImageUrl(url);
             setIsAI(true);

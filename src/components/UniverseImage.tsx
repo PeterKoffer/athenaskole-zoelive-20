@@ -89,25 +89,40 @@ export function UniverseImage({
     setSrc(fallbackUrl);
     console.log('🖼️ Using storage fallback for', title);
 
-    // fire-and-forget generation request
-    supabase.functions
-      .invoke('image-ensure', {
-        body: {
-          universeId,
-          universeTitle: title,
-          subject: subject || 'educational',
-          scene: 'cover: main activity',
-          grade: resolvedGrade,
-        },
-      })
-      .then(({ data, error }) => {
-        if (cancelled || error) {
-          console.log('🔄 Image generation queued or failed:', error);
-          return;
-        }
-        console.log('✅ Image generation queued:', data);
-      })
-      .catch((err) => console.log('🔄 Generation failed:', err));
+    // fire-and-forget generation request with debouncing
+    const queueKey = `${universeId}-${resolvedGrade}`;
+    if (!(window as any).__imageGenerationQueue) {
+      (window as any).__imageGenerationQueue = new Set();
+    }
+    
+    if (!(window as any).__imageGenerationQueue.has(queueKey)) {
+      (window as any).__imageGenerationQueue.add(queueKey);
+      
+      supabase.functions
+        .invoke('image-ensure', {
+          body: {
+            universeId,
+            universeTitle: title,
+            subject: subject || 'educational',
+            scene: 'cover: main activity',
+            grade: resolvedGrade,
+          },
+        })
+        .then(({ data, error }) => {
+          if (cancelled || error) {
+            console.log('🔄 Image generation queued or failed:', error);
+            return;
+          }
+          console.log('✅ Image generation queued:', data);
+        })
+        .catch((err) => console.log('🔄 Generation failed:', err))
+        .finally(() => {
+          // Remove from queue after 15 seconds
+          setTimeout(() => {
+            (window as any).__imageGenerationQueue?.delete(queueKey);
+          }, 15000);
+        });
+    }
 
     // start polling immediately
     check();

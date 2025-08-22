@@ -64,12 +64,13 @@ export function useUniverseCover({
         });
       } catch {}
 
-      // 2) poll HEAD på cover.webp
+      // 2) poll GET on cover.webp (instead of HEAD to avoid 400s)
       const t0 = Date.now();
       while (!cancelled && Date.now() - t0 < timeoutMs) {
         try {
-          const r = await fetch(primary, { method: "HEAD", cache: "no-store" });
-          if (r.ok) { setSrc(primary); setReady(true); return; }
+          const url = `${primary}?v=${Date.now()}`;
+          const r = await fetch(url, { method: "GET", cache: "no-store" });
+          if (r.ok) { setSrc(url); setReady(true); return; }
         } catch {}
         await new Promise(r => setTimeout(r, pollMs));
       }

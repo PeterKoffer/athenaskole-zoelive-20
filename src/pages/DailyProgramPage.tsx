@@ -9,6 +9,7 @@ import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator'
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { learnerGrade } from '@/lib/gradeLabels';
 import { resolveLearnerGrade, gradeToBand } from '@/lib/grade';
+import { getLearnerGrade } from '@/utils/grade';
 import { UserMetadata } from '@/types/auth';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
 import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
@@ -42,7 +43,7 @@ const DailyProgramPage = () => {
   const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
   const learnerBandValue = gradeToBand(learnerGradeValue);
   // Use exact grade instead of band for UI display
-  const gradeLabel = `Grade ${learnerGradeValue || 6}`;
+  const lg = getLearnerGrade(metadata);
 
   // Guard: avoid kicking the loader with undefined grade
   const ready = Number.isFinite(learnerGradeValue);
@@ -368,7 +369,7 @@ const DailyProgramPage = () => {
                 <div className="flex items-center gap-2 text-sm opacity-90">
                   <span className="px-2 py-0.5 rounded-full bg-white/15">{lessonSource.lesson.hero?.subject}</span>
                   <span>•</span>
-                  <span>{gradeLabel}</span>
+                  <span>Grade {lg}</span>
                   <span>•</span>
                   <span>{lessonSource.lesson.hero?.minutes} min</span>
                 </div>
