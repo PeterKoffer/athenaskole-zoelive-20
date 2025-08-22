@@ -5,6 +5,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
 
+// JSON response helper
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
 function corsHeaders(req: Request) {
   const origin = req.headers.get("origin") ?? "*";
   return {
@@ -100,11 +108,16 @@ serve(async (req: Request) => {
 
     finalGrade = finalGrade || 6;
 
-    // Check if image already exists using coverKey helper
+    // Check if image already exists using admin client (no public probes)
     const imagePath = coverKey(universeId, finalGrade);
-    const { data: existingFile } = await supabase.storage
+    const prefix = `${universeId}/${finalGrade}`;
+    const { data: existingFile, error: listError } = await supabase.storage
       .from('universe-images')
-      .list(`${universeId}/${finalGrade}`, { search: 'cover.webp' });
+      .list(prefix, { search: 'cover.webp' });
+
+    if (listError) {
+      return json({ error: listError.message }, 400);
+    }
 
     if (existingFile && existingFile.length > 0) {
       const { data } = supabase.storage
@@ -114,14 +127,11 @@ serve(async (req: Request) => {
       // Return cache-busted URL
       const imageUrl = `${data.publicUrl}?v=${Date.now()}`;
       
-      return new Response(
-        JSON.stringify({ 
-          status: 'exists', 
-          imageUrl,
-          cached: true 
-        }),
-        { headers: { "Content-Type": "application/json", ...headers } }
-      );
+      return json({ 
+        status: 'exists', 
+        imageUrl,
+        cached: true 
+      });
     }
 
     // Generate image using Replicate
@@ -173,25 +183,20 @@ The image should be inspiring and directly related to the subject matter, showin
     const prediction = await response.json();
     console.log('✅ Image generation queued:', prediction.id);
 
-    return new Response(
-      JSON.stringify({ 
-        status: 'queued', 
-        predictionId: prediction.id 
-      }),
-      { 
-        status: 202,
-        headers: { "Content-Type": "application/json", ...headers }
-      }
-    );
+    return json({ 
+      status: 'queued', 
+      predictionId: prediction.id 
+    }, 202);
 
   } catch (error: any) {
     console.error('❌ Image ensure error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { "Content-Type": "application/json", ...headers } 
-      }
-    );
+    const message = error instanceof Error ? error.message : String(error);
+    
+    // Map expected errors to appropriate status codes
+    const status = /Not Found|No such file|invalid key/i.test(message) ? 404
+                 : /permission|policy|public bucket/i.test(message) ? 403
+                 : 400;
+    
+    return json({ error: message }, status);
   }
 });

@@ -9,36 +9,63 @@ async function isNotFound(res: Response): Promise<boolean> {
   }
 }
 
+function isPermissionish(res: Response, bodyText?: string, triedPublicRoute?: boolean): boolean {
+  if (res.status === 401 || res.status === 403) return true;
+  // Supabase returns 400 when hitting /object/public on a private bucket
+  if (triedPublicRoute && res.status === 400) return true;
+  if (/public buckets/i.test(bodyText ?? "")) return true;
+  return false;
+}
+
+// Safe cache-buster appender (handles signed vs public URLs)
+function withParam(url: string, key: string, value: string | number): string {
+  const u = new URL(url);
+  u.searchParams.set(key, String(value));
+  return u.toString();
+}
+
 export async function publicOrSignedUrl(path: string): Promise<string | null> {
   const debug = import.meta.env.DEV && import.meta.env.VITE_IMG_DEBUG === 'true';
   
-  // 1) Try public URL
+  // 1) Try public URL first
   const { data: pub } = supabase.storage.from('universe-images').getPublicUrl(path);
-  const u = new URL(pub.publicUrl);
-  u.searchParams.set('v', String(Date.now()));    // cache-bust for public URLs only
+  const cacheBustedUrl = withParam(pub.publicUrl, 'v', Date.now());
 
-  // Use GET + Range (HEAD can 400 on missing)
-  const probe = await fetch(u.toString(), {
-    method: 'GET',
-    cache: 'no-store',
-    headers: { Range: 'bytes=0-0' },
-  });
+  try {
+    // Use GET + Range (HEAD can 400 on missing)
+    const probe = await fetch(cacheBustedUrl, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: { Range: 'bytes=0-0' },
+    });
 
-  // 200/206 → exists
-  if (probe.ok || probe.status === 206) return u.toString();
+    // 200/206 → exists
+    if (probe.ok || probe.status === 206) return cacheBustedUrl;
 
-  // Treat missing as missing (don't try to sign it)
-  if (probe.status === 404 || (probe.status === 400 && (await isNotFound(probe)))) {
-    if (debug) console.info('Storage object not found:', path);
-    return null; // object not there yet
+    let body = "";
+    try { body = await probe.clone().text(); } catch {}
+
+    // Check if this is a permission issue (private bucket)
+    if (isPermissionish(probe, body, true)) {
+      const { data: signed, error } = await supabase
+        .storage
+        .from('universe-images')
+        .createSignedUrl(path, 60 * 60);
+
+      if (error) throw error;
+      return signed.signedUrl; // Use as-is, already has signature
+    }
+
+    // Treat missing as missing (don't try to sign it)
+    if (probe.status === 404 || (await isNotFound(probe))) {
+      if (debug) console.info('Storage object not found:', path);
+      return null; // object not there yet
+    }
+
+    if (debug) console.debug('[storage probe] unexpected:', probe.status, body);
+    return null;
+  } catch (e) {
+    if (debug) console.debug('[storage probe] error:', e);
+    return null;
   }
-
-  // 401/403/other errors → try signed URL (no cache-buster needed)
-  const { data: signed, error } = await supabase
-    .storage
-    .from('universe-images')
-    .createSignedUrl(path, 60 * 60);
-
-  if (error) throw error;
-  return signed.signedUrl; // Use as-is, already has signature
 }

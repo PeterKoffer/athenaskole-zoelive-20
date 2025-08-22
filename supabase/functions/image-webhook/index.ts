@@ -81,7 +81,7 @@ serve(async (req: Request) => {
       .from('universe-images')
       .upload(storagePath, imageBuffer, {
         contentType: 'image/webp',
-        cacheControl: '31536000, immutable',
+        cacheControl: 'public, max-age=31536000, immutable',
         upsert: true
       });
 

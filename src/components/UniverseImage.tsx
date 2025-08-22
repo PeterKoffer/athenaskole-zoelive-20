@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';
 import { publicOrSignedUrl } from '@/utils/storageUrls';
 import { coverKey } from '@/utils/coverKey';
+import DefaultImage from '@/assets/fallback-images/default.png';
 
 interface UniverseImageProps {
   universeId: string;              // MUST be the UUID
@@ -38,26 +39,24 @@ export function UniverseImage({
     parseExactGrade((metadata?.age ?? 12) - 6) ??
     6;
 
-  // subject fallback (pngs you already ship in the same bucket root)
+  // subject fallback (local assets to avoid storage dependency)
   const fallbackUrl = useMemo(() => {
     const subjectMap: Record<string, string> = {
-      mathematics: 'math.png',
-      science: 'science.png',
-      geography: 'geography.png',
-      'computer-science': 'computer-science.png',
-      music: 'music.png',
-      'creative-arts': 'arts.png',
-      'body-lab': 'pe.png',
-      'life-essentials': 'life.png',
-      'history-religion': 'history.png',
-      languages: 'languages.png',
-      'mental-wellness': 'wellness.png',
-      default: 'default.png',
+      mathematics: '/fallback-images/math.png',
+      science: '/fallback-images/science.png',
+      geography: '/fallback-images/geography.png',
+      'computer-science': '/fallback-images/computer-science.png',
+      music: '/fallback-images/music.png',
+      'creative-arts': '/fallback-images/arts.png',
+      'body-lab': '/fallback-images/pe.png',
+      'life-essentials': '/fallback-images/life.png',
+      'history-religion': '/fallback-images/history.png',
+      languages: '/fallback-images/languages.png',
+      'mental-wellness': '/fallback-images/wellness.png',
+      default: DefaultImage,
     };
     const key = subject?.toLowerCase() ?? 'default';
-    const file = subjectMap[key] ?? subjectMap.default;
-    const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
-    return `${base}/${file}`;
+    return subjectMap[key] ?? subjectMap.default;
   }, [subject]);
 
   const [src, setSrc] = useState<string>(fallbackUrl);
@@ -111,10 +110,13 @@ export function UniverseImage({
         })
         .then(({ data, error }) => {
           if (cancelled || error) return;
+          if (!data?.ok && import.meta.env.DEV) {
+            console.debug('[image-ensure]', data?.error || 'unknown error');
+          }
           if (import.meta.env.DEV) console.log('✅ Image generation queued:', data);
         })
         .catch((err) => {
-          if (import.meta.env.DEV) console.log('🔄 Generation failed:', err);
+          if (import.meta.env.DEV) console.debug('[image-ensure]', err);
         });
     }
 
