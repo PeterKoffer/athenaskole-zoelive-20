@@ -2,6 +2,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
+// Helper function to create consistent storage keys
+const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
+
 function corsHeaders(req: Request) {
   const origin = req.headers.get("origin") ?? "*";
   return {
@@ -97,16 +100,19 @@ serve(async (req: Request) => {
 
     finalGrade = finalGrade || 6;
 
-    // Check if image already exists
-    const imagePath = `${universeId}/${finalGrade}/cover.webp`;
+    // Check if image already exists using coverKey helper
+    const imagePath = coverKey(universeId, finalGrade);
     const { data: existingFile } = await supabase.storage
       .from('universe-images')
       .list(`${universeId}/${finalGrade}`, { search: 'cover.webp' });
 
     if (existingFile && existingFile.length > 0) {
-      const imageUrl = supabase.storage
+      const { data } = supabase.storage
         .from('universe-images')
-        .getPublicUrl(imagePath).data.publicUrl;
+        .getPublicUrl(imagePath);
+      
+      // Return cache-busted URL
+      const imageUrl = `${data.publicUrl}?v=${Date.now()}`;
       
       return new Response(
         JSON.stringify({ 

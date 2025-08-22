@@ -2,6 +2,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
+// Helper function to create consistent storage keys
+const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
+
 function corsHeaders(req: Request) {
   const origin = req.headers.get("origin") ?? "*";
   return {
@@ -68,15 +71,17 @@ serve(async (req: Request) => {
     const gradeMatch = webhook.input?.prompt?.match(/grade (\d+)/);
     const grade = gradeMatch ? parseInt(gradeMatch[1]) : 6;
     
-    const storagePath = `${universeId}/${grade}/cover.webp`;
+    // Use coverKey helper for consistent path
+    const storagePath = coverKey(universeId, grade);
     
     console.log('📁 Uploading to storage:', { storagePath, size: imageBuffer.byteLength });
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage with proper cache headers and content type
     const { error: uploadError } = await supabase.storage
       .from('universe-images')
       .upload(storagePath, imageBuffer, {
         contentType: 'image/webp',
+        cacheControl: '31536000, immutable',
         upsert: true
       });
 
@@ -84,7 +89,13 @@ serve(async (req: Request) => {
       throw new Error(`Upload failed: ${uploadError.message}`);
     }
 
-    console.log('✅ Image uploaded successfully:', storagePath);
+    // Get cache-busted URL after successful upload
+    const { data } = supabase.storage
+      .from('universe-images')
+      .getPublicUrl(storagePath);
+    const finalUrl = `${data.publicUrl}?v=${Date.now()}`;
+
+    console.log('✅ Image uploaded successfully:', finalUrl);
 
     return new Response('OK', { headers });
 
