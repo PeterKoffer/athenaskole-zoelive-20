@@ -31,7 +31,7 @@ export class LessonSourceManager {
   static async getLessonForDate(userId: string, date: string, userRole?: string, grade?: number): Promise<LessonSource> {
     
     // Priority 1: Check for planned lessons from calendar
-    const plannedLesson = await this.getPlannedLesson(date, userRole, grade);
+    const plannedLesson = await this.getPlannedLesson(date, userRole);
     if (plannedLesson) {
       const lessonData = plannedLesson.lesson_data as any;
       return {
@@ -69,7 +69,7 @@ export class LessonSourceManager {
   /**
    * Get planned lesson from calendar/lesson_plans table
    */
-  private static async getPlannedLesson(date: string, userRole?: string, grade?: number) {
+  private static async getPlannedLesson(date: string, userRole?: string) {
     try {
       let query = supabase
         .from('lesson_plans')
@@ -81,10 +81,8 @@ export class LessonSourceManager {
         query = query.eq('status', 'published');
       }
 
-      // Add grade filtering to prevent multiple results
-      if (grade) {
-        query = query.eq('grade_level', grade.toString());
-      }
+      // Note: lesson_plans table doesn't have grade_level column
+      // Grade filtering should be done on the lesson_data content if needed
 
       const { data } = await query.maybeSingle();
       return data;

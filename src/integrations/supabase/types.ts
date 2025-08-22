@@ -385,6 +385,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_images: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string
+          metadata: Json | null
+          prompt: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url: string
+          metadata?: Json | null
+          prompt: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          metadata?: Json | null
+          prompt?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       curriculum_standards: {
         Row: {
           code: string
@@ -739,6 +769,36 @@ export type Database = {
           status?: string
           teacher_id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      lesson_snapshots: {
+        Row: {
+          created_at: string
+          date: string
+          frozen_config: Json
+          id: string
+          is_locked: boolean
+          student_id: string
+          universe_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          frozen_config: Json
+          id?: string
+          is_locked?: boolean
+          student_id: string
+          universe_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          frozen_config?: Json
+          id?: string
+          is_locked?: boolean
+          student_id?: string
+          universe_id?: string | null
         }
         Relationships: []
       }
@@ -1433,9 +1493,53 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      keyword_event: {
+        Row: {
+          created_at: string | null
+          date_end: string | null
+          date_start: string | null
+          id: string | null
+          name: string | null
+          payload: Json | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date_end?: never
+          date_start?: never
+          id?: string | null
+          name?: string | null
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date_end?: never
+          date_start?: never
+          id?: string | null
+          name?: string | null
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_recent_cover_images: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string | null
+          id: string
+          image_url: string
+          metadata: Json | null
+          prompt: string
+          status: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: { role: string; uid: string }
         Returns: boolean
