@@ -58,7 +58,7 @@ const DailyProgramPage = () => {
         const today = new Date().toISOString().split('T')[0];
         const userRole = (user?.user_metadata as any)?.role;
         
-        const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole);
+        const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole, lg);
         setLessonSource(source);
       } catch (error) {
         console.error("Failed to get daily lesson:", error);
@@ -78,7 +78,7 @@ const DailyProgramPage = () => {
     if (success) {
       // Refresh the lesson source to reflect the change
       const userRole = (user?.user_metadata as any)?.role;
-      const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole);
+      const source = await LessonSourceManager.getLessonForDate(user.id, today, userRole, lg);
       setLessonSource(source);
     }
   };

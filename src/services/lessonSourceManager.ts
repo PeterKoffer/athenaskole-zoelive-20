@@ -23,10 +23,10 @@ export class LessonSourceManager {
    * 3. Universe DB fallback (from your 200 curated universes)
    * 4. Generic AI suggestion (last resort only)
    */
-  static async getLessonForDate(userId: string, date: string, userRole?: string): Promise<LessonSource> {
+  static async getLessonForDate(userId: string, date: string, userRole?: string, grade?: number): Promise<LessonSource> {
     
     // Priority 1: Check for planned lessons from calendar
-    const plannedLesson = await this.getPlannedLesson(date, userRole);
+    const plannedLesson = await this.getPlannedLesson(date, userRole, grade);
     if (plannedLesson) {
       const lessonData = plannedLesson.lesson_data as any;
       return {
@@ -41,7 +41,7 @@ export class LessonSourceManager {
     // For now, skip to universe fallback
 
     // Priority 3: Universe DB fallback - select from your 200 curated universes
-    const universeLesson = await this.generateUniverseLesson(userId, date);
+    const universeLesson = await this.generateUniverseLesson(userId, date, grade);
     if (universeLesson) {
       return {
         type: 'universe-fallback',
@@ -52,7 +52,7 @@ export class LessonSourceManager {
     }
 
     // Priority 4: Last resort - generic AI (should rarely happen)
-    const aiLesson = await this.generateAILesson(userId, date);
+    const aiLesson = await this.generateAILesson(userId, date, grade);
     return {
       type: 'ai-suggestion',
       lesson: aiLesson.lesson,
@@ -64,7 +64,7 @@ export class LessonSourceManager {
   /**
    * Get planned lesson from calendar/lesson_plans table
    */
-  private static async getPlannedLesson(date: string, userRole?: string) {
+  private static async getPlannedLesson(date: string, userRole?: string, grade?: number) {
     try {
       let query = supabase
         .from('lesson_plans')
@@ -76,7 +76,12 @@ export class LessonSourceManager {
         query = query.eq('status', 'published');
       }
 
-      const { data } = await query.single();
+      // Add grade filtering to prevent multiple results
+      if (grade) {
+        query = query.eq('grade_level', grade.toString());
+      }
+
+      const { data } = await query.maybeSingle();
       return data;
     } catch (error) {
       // No planned lesson found
@@ -87,23 +92,28 @@ export class LessonSourceManager {
   /**
    * Generate lesson from curated universe database (200 universes)
    */
-  private static async generateUniverseLesson(userId: string, _date: string) {
+  private static async generateUniverseLesson(userId: string, _date: string, grade?: number) {
     // Get user metadata to determine grade (fallback to default)
-    let grade = 6; // Default fallback
-    let gradeBand = gradeToBand(grade);
+    let resolvedGrade = grade || 6; // Use passed grade or default fallback
+    let gradeBand = gradeToBand(resolvedGrade);
     
     try {
       // Try to get user profile from Supabase
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
-        .single();
+        .eq('user_id', userId)
+        .maybeSingle();
       
       if (profile && !error) {
-        // Profile doesn't have grade_level directly, fall back to default
-        grade = 6;
-        gradeBand = gradeToBand(grade);
+        // If no grade was passed, try to get from profile
+        if (!grade && profile.grade) {
+          const gradeNum = parseInt(profile.grade);
+          if (!isNaN(gradeNum)) {
+            resolvedGrade = gradeNum;
+            gradeBand = gradeToBand(resolvedGrade);
+          }
+        }
       }
     } catch (error) {
       console.warn('Could not fetch user profile, using default grade:', error);
@@ -127,7 +137,7 @@ export class LessonSourceManager {
       universe: selectedUniverse,
       hero: {
         title: selectedUniverse.title,
-        subtitle: `A curated learning universe for ${gradeBand}`,
+        subtitle: `A curated learning universe for Grade ${resolvedGrade}`,
         subject: selectedUniverse.subjectHint,
         gradeBand,
         minutes: 150,
@@ -153,7 +163,7 @@ export class LessonSourceManager {
           packId: selectedUniverse.id, // This should be a UUID
           title: selectedUniverse.title,
           subject: selectedUniverse.subjectHint,
-          grade: grade
+          grade: resolvedGrade
         });
         imageUrl = img?.url;
       }
@@ -205,24 +215,29 @@ export class LessonSourceManager {
   /**
    * Generate structured AI lesson using master prompt (last resort)
    */
-  private static async generateAILesson(userId: string, date: string) {
+  private static async generateAILesson(userId: string, date: string, grade?: number) {
     try {
       // Get user metadata to determine grade (fallback to default)
-      let grade = 6; // Default fallback
-      let gradeBand = gradeToBand(grade);
+      let resolvedGrade = grade || 6; // Use passed grade or default fallback
+      let gradeBand = gradeToBand(resolvedGrade);
       
       try {
-        // Try to get user profile from Supabase
+        // Try to get user profile from Supabase  
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', userId)
-          .single();
+          .eq('user_id', userId)
+          .maybeSingle();
         
         if (profile && !error) {
-          // Profile doesn't have grade_level directly, fall back to default
-          grade = 6;
-          gradeBand = gradeToBand(grade);
+          // If no grade was passed, try to get from profile
+          if (!grade && profile.grade) {
+            const gradeNum = parseInt(profile.grade);
+            if (!isNaN(gradeNum)) {
+              resolvedGrade = gradeNum;
+              gradeBand = gradeToBand(resolvedGrade);
+            }
+          }
         }
       } catch (error) {
         console.warn('Could not fetch user profile, using default grade:', error);
@@ -312,7 +327,7 @@ export class LessonSourceManager {
           packId: `ai-${date}`, // Not a UUID, will use fallback
           title: structuredLesson.hero.title,
           subject: structuredLesson.hero.subject,
-          grade: grade
+          grade: resolvedGrade
         });
         imageUrl = img?.url || this.getSubjectFallbackImage(structuredLesson.hero.subject);
       } catch (error) {
