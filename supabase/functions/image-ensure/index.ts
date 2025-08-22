@@ -1,7 +1,14 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { withCors, okCors, json } from "../_shared/cors.ts";
+
+const URL = Deno.env.get('SUPABASE_URL')!;
+const SRK = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+const cors = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
@@ -46,37 +53,33 @@ function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): numbe
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return okCors(req);
+    return new Response('ok', { headers: cors });
   }
 
   if (req.method !== 'POST') {
-    return json(req, { error: "Method Not Allowed" }, { status: 405 });
+    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { status: 405, headers: cors });
   }
 
   try {
     // Require Authorization header
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return json(req, { error: 'Missing Authorization header' }, { status: 401 });
+    const auth = req.headers.get('authorization');
+    if (!auth) {
+      return new Response(JSON.stringify({ error: 'Missing Authorization' }), { status: 401, headers: cors });
     }
     
     const { universeId, universeTitle, subject, scene = 'cover: main activity', grade } = await req.json();
 
     if (!universeId || !universeTitle) {
-      return json(req, { error: 'universeId and universeTitle are required' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'universeId and universeTitle are required' }), { status: 400, headers: cors });
     }
 
-    // Initialize Supabase client with service role for storage operations but verify user auth
-    const supabase = createClient(
-      env('SUPABASE_URL'),
-      env('SUPABASE_SERVICE_ROLE_KEY'),
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
+    // Service role for Storage writes, but still verify the incoming user
+    const supabase = createClient(URL, SRK, { global: { headers: { Authorization: auth } } });
+    
     // Verify user authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      return json(req, { error: 'Invalid or expired JWT' }, { status: 401 });
+      return new Response(JSON.stringify({ error: 'Invalid/expired JWT' }), { status: 401, headers: cors });
     }
 
     let finalGrade = grade;
@@ -100,7 +103,7 @@ serve(async (req: Request) => {
 
     if (listError) {
       console.error('❌ Storage list error:', listError);
-      return json(req, { error: listError.message }, { status: 400 });
+      return new Response(JSON.stringify({ error: listError.message }), { status: 400, headers: cors });
     }
 
     if (existingFile && existingFile.length > 0) {
@@ -111,18 +114,18 @@ serve(async (req: Request) => {
       // Return cache-busted URL
       const imageUrl = `${data.publicUrl}?v=${Date.now()}`;
       
-      return json(req, { 
+      return new Response(JSON.stringify({ 
         status: 'exists', 
         imageUrl,
         cached: true 
-      });
+      }), { status: 200, headers: cors });
     }
 
     // Generate image using Replicate
     const REPLICATE_TOKEN = env('REPLICATE_API_TOKEN');
     if (!REPLICATE_TOKEN) {
       console.error('❌ REPLICATE_API_TOKEN not configured');
-      return json(req, { error: 'REPLICATE_API_TOKEN not set' }, { status: 500 });
+      return new Response(JSON.stringify({ error: 'REPLICATE_API_TOKEN not set' }), { status: 500, headers: cors });
     }
 
     const replicateVersion = await resolveReplicateVersion(REPLICATE_TOKEN);
@@ -167,16 +170,16 @@ The image should be inspiring and directly related to the subject matter, showin
     if (!response.ok) {
       const error = await response.text();
       console.error('❌ Replicate API error:', error);
-      return json(req, { error: `Replicate API error: ${response.status} ${error}` }, { status: 502 });
+      return new Response(JSON.stringify({ error: `Replicate API error: ${response.status} ${error}` }), { status: 502, headers: cors });
     }
 
     const prediction = await response.json();
     console.log('✅ Image generation queued:', prediction.id);
 
-    return json(req, { 
+    return new Response(JSON.stringify({ 
       status: 'queued', 
       predictionId: prediction.id 
-    }, { status: 202 });
+    }), { status: 202, headers: cors });
 
   } catch (error: any) {
     console.error('❌ Image ensure error:', error);
@@ -187,6 +190,6 @@ The image should be inspiring and directly related to the subject matter, showin
                  : /permission|policy|public bucket/i.test(message) ? 403
                  : 500;
     
-    return json(req, { error: message }, { status });
+    return new Response(JSON.stringify({ error: message }), { status, headers: cors });
   }
 });
