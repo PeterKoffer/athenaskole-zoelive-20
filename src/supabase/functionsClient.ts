@@ -2,16 +2,28 @@ import { supabase } from '@/integrations/supabase/client';
 
 export { supabase };
 
+export async function waitForAuth() {
+  // Garanterer at vi har en frisk token før vi kalder edge functions
+  let { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) return session;
+
+  return new Promise<any>((resolve) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      if (s?.access_token) {
+        sub.subscription.unsubscribe();
+        resolve(s);
+      }
+    });
+  });
+}
+
 export async function invokeFn<T>(name: string, body?: unknown): Promise<T> {
   // SSR guard
   if (typeof window === 'undefined') {
     throw new Error(`Cannot call ${name} during SSR`);
   }
 
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) throw new Error(`No session for ${name}. Please sign in before calling functions.`);
-  
-  // Debug logging for JWT presence
+  const session = await waitForAuth();
   console.debug(`[invokeFn] ${name} jwt.len=${session.access_token.length}`);
 
   const { data, error } = await supabase.functions.invoke<T>(name, {
@@ -19,7 +31,7 @@ export async function invokeFn<T>(name: string, body?: unknown): Promise<T> {
     headers: { Authorization: `Bearer ${session.access_token}` },
   });
   if (error) throw error;
-  return data!;
+  return data as T;
 }
 
 // Circuit breaker for hard failures

@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { safeInvokeFn } from '@/supabase/functionsClient';
 import { GenerateContentRequest } from '../types/contentTypes';
 import { GeneratedContent } from '../../types/contentTypes';
 import { generateTrainingGroundPrompt, TrainingGroundConfig } from './trainingGroundPromptGenerator';
@@ -42,16 +42,19 @@ export class AIContentGenerator {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      let data, error;
+      let data: any;
       try {
-        ({ data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            ...request,
-            customPrompt: promptResult.prompt,
-            promptMetadata: promptResult.metadata
-          }
-        }));
+        data = await safeInvokeFn<any>('generate-adaptive-content', {
+          ...request,
+          customPrompt: promptResult.prompt,
+          promptMetadata: promptResult.metadata
+        });
       } catch (err: any) {
+        const status = err?.status ?? 500;
+        if (status === 400) {
+          console.warn('Bad request payload – bruger fallback.');
+          return this.getCuratedLessonFromCatalog(request.subject || 'science', (request as any).gradeLevel?.toString() || '7');
+        }
         if (err.name === 'AbortError') {
           throw new Error('Edge function request timed out');
         }
@@ -60,12 +63,7 @@ export class AIContentGenerator {
         clearTimeout(timeoutId);
       }
 
-      console.log('📨 Function response:', { data, error });
-
-      if (error) {
-        console.error('❌ Function error:', error);
-        throw new Error(`Function error: ${error.message}`);
-      }
+      console.log('📨 Function response:', data);
 
       if (!data) {
         console.error('❌ No data returned');

@@ -1,11 +1,10 @@
 // @ts-nocheck
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const URL = Deno.env.get('SUPABASE_URL')!;
 const SRK = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-const cors = {
+const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
@@ -50,47 +49,46 @@ function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): numbe
   return parseGrade(gradeRaw) || ageToUsGrade(age) || 6;
 }
 
-serve(async (req: Request) => {
-  // Handle CORS preflight requests
+Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: cors });
+    return new Response('ok', { headers: CORS });
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { status: 405, headers: cors });
+    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { status: 405, headers: CORS });
+  }
+
+  const auth = req.headers.get('authorization') || '';
+  const jwt = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+
+  if (!jwt) {
+    return new Response(JSON.stringify({ error: 'Missing JWT' }), { status: 401, headers: CORS });
+  }
+
+  // Admin-klient til at verificere token og skrive til storage
+  const admin = createClient(URL, SRK);
+
+  // Verificér at JWT er gyldig og tilhører en bruger
+  const { data: userData, error: authErr } = await admin.auth.getUser(jwt);
+  if (authErr || !userData?.user) {
+    return new Response(JSON.stringify({ error: 'Invalid JWT' }), { status: 401, headers: CORS });
   }
 
   try {
-    // Require Authorization header
-    const auth = req.headers.get('authorization');
-    if (!auth) {
-      return new Response(JSON.stringify({ error: 'Missing Authorization' }), { status: 401, headers: cors });
-    }
+    const { bucket, path, generateIfMissing = true, contentType = 'image/webp' } = await req.json();
     
-    const { bucket, path, generateIfMissing, kind } = await req.json();
-
     if (!bucket || !path) {
-      return new Response(JSON.stringify({ error: 'bucket and path are required' }), { status: 400, headers: cors });
+      return new Response(JSON.stringify({ error: 'bucket and path required' }), { status: 400, headers: CORS });
     }
 
-    // Service role for Storage operations, verify user JWT
-    const supabase = createClient(URL, SRK, { global: { headers: { Authorization: auth } } });
-    
-    // Verify user authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid/expired JWT' }), { status: 401, headers: cors });
-    }
-
-    // Check if file exists
-    const dir = path.split('/').slice(0, -1).join('/') || '';
+    const folder = path.split('/').slice(0, -1).join('/');
     const filename = path.split('/').pop();
-    
-    const { data: files, error: listError } = await supabase.storage
-      .from(bucket)
-      .list(dir, { search: filename });
 
-    const exists = !listError && files?.some(f => f.name === filename);
+    const { data: listing, error: listErr } = await admin
+      .storage.from(bucket)
+      .list(folder || '', { search: filename });
+
+    const exists = !listErr && listing?.some(f => f.name === filename);
 
     if (exists) {
       console.log(`✅ File exists: ${path}`);
@@ -98,30 +96,20 @@ serve(async (req: Request) => {
         ok: true, 
         path, 
         exists: true 
-      }), { status: 200, headers: cors });
+      }), { status: 200, headers: CORS });
     }
 
     if (!exists && generateIfMissing) {
-      console.log(`🎨 Generating ${kind || 'image'}: ${path}`);
+      console.log(`🎨 Generating image: ${path}`);
       
-      // For demo - create a minimal placeholder image
-      // In production, this would call your image generation service
-      const placeholder = new Uint8Array([
-        0x52, 0x49, 0x46, 0x46, // "RIFF"
-        0x20, 0x00, 0x00, 0x00, // File size
-        0x57, 0x45, 0x42, 0x50, // "WEBP"
-        0x56, 0x50, 0x38, 0x20, // "VP8 "
-        0x14, 0x00, 0x00, 0x00, // Chunk size
-        0x30, 0x01, 0x00, 0x9D, 0x01, 0x2A, // VP8 header
-        0x01, 0x00, 0x01, 0x00, 0x02, 0x00, // VP8 data
-        0x34, 0x25, 0xA4, 0x00, 0x03, 0x70, 0x00, 0xFE
-      ]);
-
-      const { error: uploadError } = await supabase.storage
+      // TODO: erstat med rigtig billedgenerering – her lægger vi en minimal placeholder
+      const tinyWebp = new Uint8Array([0x52,0x49,0x46,0x46]); // "RIFF" – bare en markør
+      
+      const { error: uploadError } = await admin.storage
         .from(bucket)
-        .upload(path, placeholder, {
+        .upload(path, tinyWebp, {
           upsert: true,
-          contentType: 'image/webp',
+          contentType,
         });
 
       if (uploadError) {
@@ -129,22 +117,15 @@ serve(async (req: Request) => {
         throw uploadError;
       }
 
-      console.log(`✅ Generated ${kind || 'image'}: ${path}`);
+      console.log(`✅ Generated image: ${path}`);
     }
 
-    return new Response(JSON.stringify({ ok: true, path, exists }), { 
-      status: 200, headers: cors 
+    return new Response(JSON.stringify({ ok: true, path }), { 
+      status: 200, headers: CORS 
     });
 
-  } catch (error: any) {
-    console.error('❌ Image ensure error:', error);
-    const message = error instanceof Error ? error.message : String(error);
-    
-    // Map expected errors to appropriate status codes
-    const status = /Not Found|No such file|invalid key/i.test(message) ? 404
-                 : /permission|policy|public bucket/i.test(message) ? 403
-                 : 500;
-    
-    return new Response(JSON.stringify({ error: message }), { status, headers: cors });
+  } catch (e) {
+    console.error('image-ensure error', e);
+    return new Response(JSON.stringify({ error: String(e?.message ?? e) }), { status: 500, headers: CORS });
   }
 });

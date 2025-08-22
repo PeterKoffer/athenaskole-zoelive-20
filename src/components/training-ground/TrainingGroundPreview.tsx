@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ActivityRenderer } from './activities/ActivityRenderer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 
 
 export function TrainingGroundPreview() {
@@ -15,23 +15,17 @@ export function TrainingGroundPreview() {
     setError(null);
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-        body: {
-          activityType: 'training-ground',
-          subject: 'mathematics',
-          gradeLevel: 5,
-          performanceLevel: 'average',
-          learningStyle: 'kinesthetic',
-          interests: ['space', 'dinosaurs', 'building'],
-          schoolPhilosophy: 'Experiential & creative learning',
-          emphasis: 7,
-          calendarKeywords: ['winter', 'exploration']
-        }
+      const data = await invokeFn<any>('generate-adaptive-content', {
+        activityType: 'training-ground',
+        subject: 'mathematics',
+        gradeLevel: 5,
+        performanceLevel: 'average',
+        learningStyle: 'kinesthetic',
+        interests: ['space', 'dinosaurs', 'building'],
+        schoolPhilosophy: 'Experiential & creative learning',
+        emphasis: 7,
+        calendarKeywords: ['winter', 'exploration']
       });
-
-      if (error) {
-        throw error;
-      }
 
       if (data?.success && data?.trainingGroundActivity) {
         setActivity(data.trainingGroundActivity);

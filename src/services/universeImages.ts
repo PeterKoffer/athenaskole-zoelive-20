@@ -3,27 +3,24 @@ import { invokeFn, supabase } from '@/supabase/functionsClient';
 export async function getUniverseCoverSignedUrl(universeId: string, version: number = 6) {
   const path = `${universeId}/${version}/cover.webp`;
 
-  // 1) ensure (this writes the file if missing)
+  // 1) ensure
   await invokeFn('image-ensure', {
     bucket: 'universe-images',
     path,
     generateIfMissing: true,
-    kind: 'cover',
   });
 
-  // 2) check if file exists after ensure
-  const exists = await supabase.storage.from('universe-images')
-    .list(`${universeId}/${version}`, { limit: 1, search: 'cover.webp' });
-  
-  if (!exists.data?.length) {
-    throw new Error('cover.webp missing after ensure()');
-  }
+  // 2) sanity check (giver klar fejl hvis ensure ikke skrev filen)
+  const { data: list } = await supabase.storage.from('universe-images')
+    .list(`${universeId}/${version}`, { search: 'cover.webp', limit: 1 });
 
-  // 3) now create a signed URL (object exists now)
+  if (!list?.length) throw new Error('cover.webp missing after ensure()');
+
+  // 3) sign
   const { data, error } = await supabase
     .storage
     .from('universe-images')
-    .createSignedUrl(path, 60 * 60, { download: false });
+    .createSignedUrl(path, 60 * 60);
 
   if (error) throw error;
   return data.signedUrl;
