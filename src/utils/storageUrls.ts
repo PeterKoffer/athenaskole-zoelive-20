@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 async function isNotFound(res: Response): Promise<boolean> {
   try {
-    const body = await res.clone().text();        // don't consume the original
+    const body = await res.clone().text();
     return /not_found|Object not found/i.test(body);
   } catch {
     return false;
@@ -10,10 +10,12 @@ async function isNotFound(res: Response): Promise<boolean> {
 }
 
 export async function publicOrSignedUrl(path: string): Promise<string | null> {
+  const debug = import.meta.env.DEV && import.meta.env.VITE_IMG_DEBUG === 'true';
+  
   // 1) Try public URL
   const { data: pub } = supabase.storage.from('universe-images').getPublicUrl(path);
   const u = new URL(pub.publicUrl);
-  u.searchParams.set('v', String(Date.now()));    // cache-bust
+  u.searchParams.set('v', String(Date.now()));    // cache-bust for public URLs only
 
   // Use GET + Range (HEAD can 400 on missing)
   const probe = await fetch(u.toString(), {
@@ -27,15 +29,16 @@ export async function publicOrSignedUrl(path: string): Promise<string | null> {
 
   // Treat missing as missing (don't try to sign it)
   if (probe.status === 404 || (probe.status === 400 && (await isNotFound(probe)))) {
+    if (debug) console.info('Storage object not found:', path);
     return null; // object not there yet
   }
 
-  // 401/403/other errors → try signed URL
+  // 401/403/other errors → try signed URL (no cache-buster needed)
   const { data: signed, error } = await supabase
     .storage
     .from('universe-images')
     .createSignedUrl(path, 60 * 60);
 
   if (error) throw error;
-  return signed.signedUrl;
+  return signed.signedUrl; // Use as-is, already has signature
 }

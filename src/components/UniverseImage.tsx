@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth';
@@ -60,45 +60,43 @@ export function UniverseImage({
   }, [subject]);
 
   const [src, setSrc] = useState<string>(fallbackUrl);
+  const backoffMs = useRef(600); // start small
+  const generationQueued = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
-    let attempt = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const checkForImage = async () => {
-      attempt += 1;
+    const recheckForImage = async () => {
       try {
         const path = `${universeId}/${resolvedGrade}/cover.webp`;
         const url = await publicOrSignedUrl(path);
         
         if (!cancelled && url) {
           setSrc(url);
+          backoffMs.current = 600; // reset backoff
           return;
         }
         
-        // File missing: show fallback + recheck later (only if not too many attempts)
-        if (url === null && attempt < 10) {
-          const delay = Math.min(30000, Math.round(800 * Math.pow(1.7, attempt)));
-          timer = setTimeout(checkForImage, delay);
+        // File missing: gentle backoff recheck (never retry on auth errors)
+        if (url === null) {
+          const delay = Math.min(backoffMs.current, 8000);
+          timer = setTimeout(recheckForImage, delay);
+          backoffMs.current *= 2; // cap at ~8s
         }
       } catch (error) {
-        console.warn('Image URL fetch failed:', error);
         // Stop retrying on actual errors (401/403/5xx) - these won't resolve by waiting
+        console.warn('Image URL fetch failed:', error);
       }
     };
 
     // start from fallback
     setSrc(fallbackUrl);
+    backoffMs.current = 600; // reset
 
-    // fire-and-forget generation request with debouncing
-    const queueKey = `${universeId}-${resolvedGrade}`;
-    if (!(window as any).__imageGenerationQueue) {
-      (window as any).__imageGenerationQueue = new Set();
-    }
-    
-    if (!(window as any).__imageGenerationQueue.has(queueKey)) {
-      (window as any).__imageGenerationQueue.add(queueKey);
+    // fire-and-forget generation request (one-time guard)
+    if (!generationQueued.current) {
+      generationQueued.current = true;
       
       supabase.functions
         .invoke('image-ensure', {
@@ -112,25 +110,26 @@ export function UniverseImage({
         })
         .then(({ data, error }) => {
           if (cancelled || error) return;
-          console.log('✅ Image generation queued:', data);
+          if (import.meta.env.DEV) console.log('✅ Image generation queued:', data);
         })
-        .catch((err) => console.log('🔄 Generation failed:', err))
-        .finally(() => {
-          // Remove from queue after 15 seconds
-          setTimeout(() => {
-            (window as any).__imageGenerationQueue?.delete(queueKey);
-          }, 15000);
+        .catch((err) => {
+          if (import.meta.env.DEV) console.log('🔄 Generation failed:', err);
         });
     }
 
     // start checking for the generated image
-    checkForImage();
+    recheckForImage();
 
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
   }, [universeId, resolvedGrade, fallbackUrl, title, subject]);
+
+  // Reset generation guard when universeId changes
+  useEffect(() => {
+    generationQueued.current = false;
+  }, [universeId, resolvedGrade]);
 
   return (
     <div className={`relative ${className}`}>
