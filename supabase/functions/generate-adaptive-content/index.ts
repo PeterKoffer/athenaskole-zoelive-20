@@ -1,11 +1,11 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { corsHeaders, okCors, json } from '../_shared/cors.ts';
+import { withCors, okCors, json } from '../_shared/cors.ts';
 
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return okCors();
+    return okCors(req);
   }
 
   try {
@@ -50,10 +50,10 @@ serve(async (req: Request) => {
 
     console.log('✅ Content generated successfully');
     
-    return json({ content });
+    return json(req, { content });
 
   } catch (error: any) {
     console.error('❌ Content generation error:', error);
-    return json({ error: error.message }, { status: 500 });
+    return json(req, { error: error.message }, { status: 500 });
   }
 });

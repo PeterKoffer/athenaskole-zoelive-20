@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { corsHeaders, okCors, json } from "../_shared/cors.ts";
+import { withCors, okCors, json } from "../_shared/cors.ts";
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
@@ -19,11 +19,11 @@ function env(name: string, required = true) {
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return okCors();
+    return okCors(req);
   }
 
   if (req.method !== 'POST') {
-    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
+    return json(req, { error: "Method Not Allowed" }, { status: 405 });
   }
 
   try {
@@ -36,7 +36,7 @@ serve(async (req: Request) => {
 
     if (webhook.status !== 'succeeded' || !webhook.output?.[0]) {
       console.log('⚠️ Webhook not successful or no output:', webhook.status);
-      return json({ ok: true, message: 'Webhook ignored' });
+      return json(req, { ok: true, message: 'Webhook ignored' });
     }
 
     const imageUrl = webhook.output[0];
@@ -88,10 +88,10 @@ serve(async (req: Request) => {
 
     console.log('✅ Image uploaded successfully:', finalUrl);
 
-    return json({ ok: true, url: finalUrl });
+    return json(req, { ok: true, url: finalUrl });
 
   } catch (error) {
     console.error('❌ Webhook processing error:', error);
-    return json({ ok: false, error: String(error) }, { status: 500 });
+    return json(req, { ok: false, error: String(error) }, { status: 500 });
   }
 });

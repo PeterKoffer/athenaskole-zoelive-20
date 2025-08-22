@@ -28,14 +28,11 @@ function withParam(url: string, key: string, value: string | number): string {
  */
 export async function publicOrSignedUrl(path: string): Promise<string | null> {
   const debug = import.meta.env.DEV;
-  
-  // 1) Public URL (exists even for private buckets; request will 401/403)
   const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-  const publicUrl = pub.publicUrl;
-  const cacheBustedPublic = withParam(publicUrl, 'v', Date.now());
+  const cacheBustedUrl = withParam(pub.publicUrl, 'v', Date.now());
 
   try {
-    const probe = await fetch(cacheBustedPublic, {
+    const probe = await fetch(cacheBustedUrl, {
       method: 'GET',
       cache: 'no-store',
       headers: { Range: 'bytes=0-0' },
@@ -43,34 +40,31 @@ export async function publicOrSignedUrl(path: string): Promise<string | null> {
 
     if (debug) console.log('[storage probe]', path, 'status:', probe.status);
 
-    if (probe.ok || probe.status === 206) return cacheBustedPublic;
+    if (probe.ok || probe.status === 206) return cacheBustedUrl;
 
-    let body = "";
+    let body = '';
     try { body = await probe.clone().text(); } catch {}
 
     if (probe.status === 400 || probe.status === 404 || (await isNotFound(probe))) {
-      if (debug) console.info('[storage probe] not found:', path, body);
-      return null; // don't try to sign non-existent objects
+      if (debug) console.info('Storage object not found:', path);
+      return null; // don't try to sign missing files
     }
 
     if (probe.status === 401 || probe.status === 403) {
-      if (debug) console.log('[storage probe] auth issue -> signing:', path);
-
+      if (debug) console.log('[storage probe] auth issue → signed URL:', path);
       const { data: signed, error } =
-        await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
-
+        await supabase.storage.from(BUCKET).createSignedUrl(path, 3600);
       if (error) {
         if (debug) console.log('[storage probe] signed URL error:', error);
-        return null;
+        throw error;
       }
-      // IMPORTANT: do NOT cache-bust signed URLs (query tampering invalidates signatures)
-      return signed.signedUrl;
+      return signed.signedUrl; // already includes its own params/signature
     }
 
     if (debug) console.debug('[storage probe] unexpected:', probe.status, body);
     return null;
   } catch (e) {
-    if (debug) console.debug('[storage probe] fetch error:', e);
+    if (debug) console.debug('[storage probe] error:', e);
     return null;
   }
 }

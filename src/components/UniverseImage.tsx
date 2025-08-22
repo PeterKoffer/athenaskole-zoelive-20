@@ -60,12 +60,15 @@ export function UniverseImage({
   const [src, setSrc] = useState<string>(fallbackUrl);
   const backoffMs = useRef(600); // start small
   const generationQueued = useRef(false);
+  const hardFailRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     const recheckForImage = async () => {
+      if (hardFailRef.current) return;
+
       try {
         const url = await coverUrl(universeId, resolvedGrade);
         
@@ -84,6 +87,8 @@ export function UniverseImage({
       } catch (error) {
         // Stop retrying on actual errors (401/403/5xx) - these won't resolve by waiting
         console.warn('Image URL fetch failed:', error);
+        hardFailRef.current = true;
+        setSrc(fallbackUrl);
       }
     };
 
@@ -92,7 +97,7 @@ export function UniverseImage({
     backoffMs.current = 600; // reset
 
     // fire-and-forget generation request (one-time guard)
-    if (!generationQueued.current) {
+    if (!generationQueued.current && !hardFailRef.current) {
       generationQueued.current = true;
       
       supabase.functions
@@ -106,13 +111,23 @@ export function UniverseImage({
           },
         })
         .then(({ data, error }) => {
-          if (cancelled || error) return;
+          if (cancelled) return;
+          if (error) {
+            // Hard failure - stop retrying
+            hardFailRef.current = true;
+            setSrc(fallbackUrl);
+            return;
+          }
           if (!data?.ok && import.meta.env.DEV) {
             console.debug('[image-ensure]', data?.error || 'unknown error');
           }
           if (import.meta.env.DEV) console.log('✅ Image generation queued:', data);
         })
         .catch((err) => {
+          if (cancelled) return;
+          // Hard failure - stop retrying
+          hardFailRef.current = true;
+          setSrc(fallbackUrl);
           if (import.meta.env.DEV) console.debug('[image-ensure]', err);
         });
     }
@@ -129,6 +144,7 @@ export function UniverseImage({
   // Reset generation guard when universeId changes
   useEffect(() => {
     generationQueued.current = false;
+    hardFailRef.current = false;
   }, [universeId, resolvedGrade]);
 
   return (

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { corsHeaders, okCors, json } from "../_shared/cors.ts";
+import { withCors, okCors, json } from "../_shared/cors.ts";
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
@@ -46,18 +46,18 @@ function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): numbe
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return okCors();
+    return okCors(req);
   }
 
   if (req.method !== 'POST') {
-    return json({ error: "Method Not Allowed" }, { status: 405 });
+    return json(req, { error: "Method Not Allowed" }, { status: 405 });
   }
 
   try {
     const { universeId, universeTitle, subject, scene = 'cover: main activity', grade } = await req.json();
 
     if (!universeId || !universeTitle) {
-      return json({ error: 'universeId and universeTitle are required' }, 400);
+      return json(req, { error: 'universeId and universeTitle are required' }, { status: 400 });
     }
 
     // Initialize Supabase client
@@ -96,7 +96,7 @@ serve(async (req: Request) => {
       .list(prefix, { search: 'cover.webp' });
 
     if (listError) {
-      return json({ error: listError.message }, { status: 400 });
+      return json(req, { error: listError.message }, { status: 400 });
     }
 
     if (existingFile && existingFile.length > 0) {
@@ -107,7 +107,7 @@ serve(async (req: Request) => {
       // Return cache-busted URL
       const imageUrl = `${data.publicUrl}?v=${Date.now()}`;
       
-      return json({ 
+      return json(req, { 
         status: 'exists', 
         imageUrl,
         cached: true 
@@ -163,7 +163,7 @@ The image should be inspiring and directly related to the subject matter, showin
     const prediction = await response.json();
     console.log('✅ Image generation queued:', prediction.id);
 
-    return json({ 
+    return json(req, { 
       status: 'queued', 
       predictionId: prediction.id 
     }, { status: 202 });
@@ -177,6 +177,6 @@ The image should be inspiring and directly related to the subject matter, showin
                  : /permission|policy|public bucket/i.test(message) ? 403
                  : 400;
     
-    return json({ error: message }, { status });
+    return json(req, { error: message }, { status });
   }
 });
