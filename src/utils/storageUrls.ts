@@ -9,14 +9,6 @@ async function isNotFound(res: Response): Promise<boolean> {
   }
 }
 
-function isPermissionish(res: Response, bodyText?: string, triedPublicRoute?: boolean): boolean {
-  if (res.status === 401 || res.status === 403) return true;
-  // Supabase returns 400 when hitting /object/public on a private bucket
-  if (triedPublicRoute && res.status === 400) return true;
-  if (/public buckets/i.test(bodyText ?? "")) return true;
-  return false;
-}
-
 // Safe cache-buster appender (handles signed vs public URLs)
 function withParam(url: string, key: string, value: string | number): string {
   const u = new URL(url);
@@ -47,9 +39,15 @@ export async function publicOrSignedUrl(path: string): Promise<string | null> {
     let body = "";
     try { body = await probe.clone().text(); } catch {}
 
-    // Check if this is a permission issue (private bucket)
-    if (isPermissionish(probe, body, true)) {
-      if (debug) console.log('[storage probe] detected private bucket, trying signed URL for:', path);
+    // Treat 400 & 404 as missing (don't try to sign non-existent files)
+    if (probe.status === 400 || probe.status === 404 || (await isNotFound(probe))) {
+      if (debug) console.info('Storage object not found:', path);
+      return null; // object not there yet
+    }
+
+    // Only sign for auth issues (401/403)
+    if (probe.status === 401 || probe.status === 403) {
+      if (debug) console.log('[storage probe] detected auth issue, trying signed URL for:', path);
       
       const { data: signed, error } = await supabase
         .storage
@@ -62,12 +60,6 @@ export async function publicOrSignedUrl(path: string): Promise<string | null> {
       }
       if (debug) console.log('[storage probe] got signed URL for:', path);
       return signed.signedUrl; // Use as-is, already has signature
-    }
-
-    // Treat missing as missing (don't try to sign it)
-    if (probe.status === 404 || (await isNotFound(probe))) {
-      if (debug) console.info('Storage object not found:', path);
-      return null; // object not there yet
     }
 
     if (debug) console.debug('[storage probe] unexpected:', probe.status, body);

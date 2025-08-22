@@ -1,19 +1,11 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { corsHeaders } from "../_shared/cors.ts";
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
 
-function corsHeaders(req: Request) {
-  const origin = req.headers.get("origin") ?? "*";
-  return {
-    "Access-Control-Allow-Origin": origin,
-    "Vary": "Origin",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-client-info, x-client-version",
-  };
-}
 
 function env(name: string, required = true) {
   const value = Deno.env.get(name);
@@ -24,15 +16,13 @@ function env(name: string, required = true) {
 }
 
 serve(async (req: Request) => {
-  const headers = corsHeaders(req);
-
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response("ok", { status: 200, headers });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   if (req.method !== 'POST') {
-    return new Response("Method Not Allowed", { status: 405, headers });
+    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
   }
 
   try {
@@ -45,7 +35,7 @@ serve(async (req: Request) => {
 
     if (webhook.status !== 'succeeded' || !webhook.output?.[0]) {
       console.log('⚠️ Webhook not successful or no output:', webhook.status);
-      return new Response('OK', { headers });
+      return new Response('OK', { headers: corsHeaders });
     }
 
     const imageUrl = webhook.output[0];
@@ -97,13 +87,13 @@ serve(async (req: Request) => {
 
     console.log('✅ Image uploaded successfully:', finalUrl);
 
-    return new Response('OK', { headers });
+    return new Response('OK', { headers: corsHeaders });
 
   } catch (error) {
     console.error('❌ Webhook processing error:', error);
     return new Response('Error', { 
       status: 500, 
-      headers 
+      headers: corsHeaders 
     });
   }
 });

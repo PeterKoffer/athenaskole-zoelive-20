@@ -1,12 +1,13 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { corsHeaders } from "../_shared/cors.ts";
 
 // Helper function to create consistent storage keys
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
 
 // JSON response helper
-function json(data: unknown, status = 200, corsHeaders = {}) {
+function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: { 
@@ -16,15 +17,6 @@ function json(data: unknown, status = 200, corsHeaders = {}) {
   });
 }
 
-function corsHeaders(req: Request) {
-  const origin = req.headers.get("origin") ?? "*";
-  return {
-    "Access-Control-Allow-Origin": origin,
-    "Vary": "Origin",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-client-info, x-client-version",
-  };
-}
 
 function env(name: string, required = true) {
   const value = Deno.env.get(name);
@@ -62,22 +54,20 @@ function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): numbe
 }
 
 serve(async (req: Request) => {
-  const headers = corsHeaders(req);
-
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response("ok", { status: 200, headers });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   if (req.method !== 'POST') {
-    return json({ error: "Method Not Allowed" }, 405, headers);
+    return json({ error: "Method Not Allowed" }, 405);
   }
 
   try {
     const { universeId, universeTitle, subject, scene = 'cover: main activity', grade } = await req.json();
 
     if (!universeId || !universeTitle) {
-      return json({ error: 'universeId and universeTitle are required' }, 400, headers);
+      return json({ error: 'universeId and universeTitle are required' }, 400);
     }
 
     // Initialize Supabase client
@@ -116,7 +106,7 @@ serve(async (req: Request) => {
       .list(prefix, { search: 'cover.webp' });
 
     if (listError) {
-      return json({ error: listError.message }, 400, headers);
+      return json({ error: listError.message }, 400);
     }
 
     if (existingFile && existingFile.length > 0) {
@@ -131,7 +121,7 @@ serve(async (req: Request) => {
         status: 'exists', 
         imageUrl,
         cached: true 
-      }, 200, headers);
+      });
     }
 
     // Generate image using Replicate
@@ -186,7 +176,7 @@ The image should be inspiring and directly related to the subject matter, showin
     return json({ 
       status: 'queued', 
       predictionId: prediction.id 
-    }, 202, headers);
+    }, 202);
 
   } catch (error: any) {
     console.error('❌ Image ensure error:', error);
@@ -197,6 +187,6 @@ The image should be inspiring and directly related to the subject matter, showin
                  : /permission|policy|public bucket/i.test(message) ? 403
                  : 400;
     
-    return json({ error: message }, status, headers);
+    return json({ error: message }, status);
   }
 });
