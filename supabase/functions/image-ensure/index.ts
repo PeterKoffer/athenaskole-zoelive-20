@@ -99,6 +99,7 @@ serve(async (req: Request) => {
       .list(prefix, { search: 'cover.webp' });
 
     if (listError) {
+      console.error('❌ Storage list error:', listError);
       return json(req, { error: listError.message }, { status: 400 });
     }
 
@@ -119,7 +120,12 @@ serve(async (req: Request) => {
 
     // Generate image using Replicate
     const REPLICATE_TOKEN = env('REPLICATE_API_TOKEN');
-    const replicateVersion = await resolveReplicateVersion(REPLICATE_TOKEN!);
+    if (!REPLICATE_TOKEN) {
+      console.error('❌ REPLICATE_API_TOKEN not configured');
+      return json(req, { error: 'REPLICATE_API_TOKEN not set' }, { status: 500 });
+    }
+
+    const replicateVersion = await resolveReplicateVersion(REPLICATE_TOKEN);
     
     const prompt = `Create an educational ${scene} image for "${universeTitle}" (${subject || 'educational'} subject) suitable for grade ${finalGrade} students (age ${finalGrade + 5}). 
     
@@ -160,7 +166,8 @@ The image should be inspiring and directly related to the subject matter, showin
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Replicate API error: ${response.status} ${error}`);
+      console.error('❌ Replicate API error:', error);
+      return json(req, { error: `Replicate API error: ${response.status} ${error}` }, { status: 502 });
     }
 
     const prediction = await response.json();
@@ -178,7 +185,7 @@ The image should be inspiring and directly related to the subject matter, showin
     // Map expected errors to appropriate status codes
     const status = /Not Found|No such file|invalid key/i.test(message) ? 404
                  : /permission|policy|public bucket/i.test(message) ? 403
-                 : 400;
+                 : 500;
     
     return json(req, { error: message }, { status });
   }
