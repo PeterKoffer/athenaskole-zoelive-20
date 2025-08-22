@@ -54,8 +54,11 @@ serve(async (req: Request) => {
   }
 
   try {
-    // Get auth token from request
+    // Require Authorization header
     const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return json(req, { error: 'Missing Authorization header' }, { status: 401 });
+    }
     
     const { universeId, universeTitle, subject, scene = 'cover: main activity', grade } = await req.json();
 
@@ -63,33 +66,27 @@ serve(async (req: Request) => {
       return json(req, { error: 'universeId and universeTitle are required' }, { status: 400 });
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role for storage operations but verify user auth
     const supabase = createClient(
       env('SUPABASE_URL'),
-      env('SUPABASE_SERVICE_ROLE_KEY')
+      env('SUPABASE_SERVICE_ROLE_KEY'),
+      { global: { headers: { Authorization: authHeader } } }
     );
+
+    // Verify user authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return json(req, { error: 'Invalid or expired JWT' }, { status: 401 });
+    }
 
     let finalGrade = grade;
     
-    // Verify user authentication if auth token provided
-    if (authHeader) {
-      try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-        if (authError || !user) {
-          return json(req, { error: 'Unauthorized' }, { status: 401 });
-        }
-        
-        // If no grade provided, try to get it from user profile
-        if (!finalGrade && user.user_metadata) {
-          finalGrade = resolveLearnerGrade(
-            user.user_metadata.grade_level || user.user_metadata.grade,
-            user.user_metadata.age
-          );
-        }
-      } catch (error) {
-        console.warn('Could not verify user authentication:', error);
-        return json(req, { error: 'Authentication failed' }, { status: 401 });
-      }
+    // Try to get grade from user metadata if not provided
+    if (!finalGrade && user.user_metadata) {
+      finalGrade = resolveLearnerGrade(
+        user.user_metadata.grade_level || user.user_metadata.grade,
+        user.user_metadata.age
+      );
     }
 
     finalGrade = finalGrade || 6;

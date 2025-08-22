@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { safeCallFunction } from '@/utils/supabaseClient';
 
 export interface UniverseImageRequest {
   title: string;
@@ -13,6 +13,13 @@ export interface UniverseImageResponse {
   prompt?: string;
 }
 
+interface ImageEnsureResponse {
+  status?: string;
+  imageUrl?: string;
+  cached?: boolean;
+  predictionId?: string;
+}
+
 export class UniverseImageGeneratorService {
   private static cache = new Map<string, string>();
 
@@ -21,24 +28,16 @@ export class UniverseImageGeneratorService {
     const id = universeId || `temp-${Date.now()}`;
     const gradeNum = grade ?? 6;
     try {
-      const { data, error } = await supabase.functions.invoke('image-ensure', {
-        body: {
-          universeId: id,
-          universeTitle: title,
-          subject,
-          scene: 'cover: main activity',
-          grade: gradeNum
-
-        }
+      const data = await safeCallFunction<ImageEnsureResponse>('image-ensure', {
+        universeId: id,
+        universeTitle: title,
+        subject,
+        scene: 'cover: main activity',
+        grade: gradeNum
       });
 
-      if (error) {
-        console.error('❌ Universe image generation error:', error);
-        return null;
-      }
-
       if (data?.status === 'exists' && data?.imageUrl) {
-        return data.imageUrl as string;
+        return data.imageUrl;
       }
 
       // Use GET instead of HEAD to avoid 400 errors, cache-bust each attempt
@@ -81,20 +80,13 @@ export class UniverseImageGeneratorService {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('image-ensure', {
-        body: {
-          universeId: args.packId,  // UUID only
-          universeTitle: args.title,
-          subject: args.subject,
-          scene: 'cover: main activity',
-          grade: args.grade ?? 6
-        }
+      const data = await safeCallFunction<ImageEnsureResponse>('image-ensure', {
+        universeId: args.packId,  // UUID only
+        universeTitle: args.title,
+        subject: args.subject,
+        scene: 'cover: main activity',
+        grade: args.grade ?? 6
       });
-
-      if (error) {
-        console.error('❌ Universe image generation error:', error);
-        return { url: this.getSubjectFallback(args.subject) };
-      }
 
       if (data?.status === 'exists' && data?.imageUrl) {
         this.cache.set(cacheKey, data.imageUrl);
@@ -151,21 +143,12 @@ export class UniverseImageGeneratorService {
     try {
       console.log('🎨 Generating universe image for:', request);
 
-      const { data, error } = await supabase.functions.invoke('image-ensure', {
-
-        body: {
-          universeId: request.title,
-          universeTitle: request.title,
-          subject: request.theme || 'education',
-          scene: 'cover: main activity'
-        }
-
+      const data = await safeCallFunction<ImageEnsureResponse>('image-ensure', {
+        universeId: request.title,
+        universeTitle: request.title,
+        subject: request.theme || 'education',
+        scene: 'cover: main activity'
       });
-
-      if (error) {
-        console.error('❌ Universe image generation error:', error);
-        return null;
-      }
 
       if (data?.status === 'exists' && data?.imageUrl) {
         console.log('✅ Universe image generated successfully:', data.imageUrl);

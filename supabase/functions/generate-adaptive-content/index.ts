@@ -9,12 +9,14 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { systemPrompt, userPrompt, model = "gpt-4o-mini", temperature = 0.4 } = await req.json();
-
+    // Validate API key first
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY environment variable is required');
+      console.error('❌ OPENAI_API_KEY not configured');
+      return json(req, { error: 'OPENAI_API_KEY not set' }, { status: 500 });
     }
+
+    const { systemPrompt, userPrompt, model = "gpt-4o-mini", temperature = 0.4 } = await req.json();
 
     console.log('🤖 Generating content with OpenAI:', { model, temperature });
 
@@ -38,7 +40,7 @@ serve(async (req: Request) => {
     if (!response.ok) {
       const error = await response.text();
       console.error('❌ OpenAI API error:', error);
-      throw new Error(`OpenAI API error: ${response.status} ${error}`);
+      return json(req, { error: `OpenAI API error: ${response.status} ${error}` }, { status: 502 });
     }
 
     const data = await response.json();
@@ -54,6 +56,6 @@ serve(async (req: Request) => {
 
   } catch (error: any) {
     console.error('❌ Content generation error:', error);
-    return json(req, { error: error.message }, { status: 500 });
+    return json(req, { error: String(error?.message ?? error) }, { status: 500 });
   }
 });
