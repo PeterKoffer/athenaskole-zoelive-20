@@ -37,8 +37,8 @@ export function UniverseImage({
     parseExactGrade((metadata?.age ?? 12) - 6) ??
     6;
 
-  // subject fallback (local assets to avoid storage dependency)
-  const fallbackUrl = useMemo(() => {
+  // Local fallback helper
+  const getLocalFallback = useMemo(() => {
     const subjectMap: Record<string, string> = {
       mathematics: '/images/fallbacks/math.png',
       science: '/images/fallbacks/science.png',
@@ -57,94 +57,85 @@ export function UniverseImage({
     return subjectMap[key] ?? subjectMap.default;
   }, [subject]);
 
+  const fallbackUrl = getLocalFallback;
+
   const [src, setSrc] = useState<string>(fallbackUrl);
-  const backoffMs = useRef(600); // start small
-  const generationQueued = useRef(false);
-  const hardFailRef = useRef(false);
+  const backoffMs = useRef(600); 
+  const triedEnsure = useRef(false);
+  const hardFail = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const recheckForImage = async () => {
-      if (hardFailRef.current) return;
+    const resolveCover = async () => {
+      if (hardFail.current || cancelled) return;
 
       try {
         const url = await coverUrl(universeId, resolvedGrade);
         
-        if (!cancelled && url) {
+        if (cancelled) return;
+
+        if (url) {
           setSrc(url);
           backoffMs.current = 600; // reset backoff
           return;
         }
-        
-        // File missing: gentle backoff recheck (never retry on auth errors)
-        if (url === null) {
+
+        // Missing: ask backend to generate/upload only once
+        if (!triedEnsure.current) {
+          triedEnsure.current = true;
+          try {
+            const { error } = await supabase.functions.invoke('image-ensure', {
+              body: {
+                universeId,
+                universeTitle: title,
+                subject: subject || 'educational',
+                scene: 'cover: main activity',
+                grade: resolvedGrade,
+              },
+            });
+            if (error) throw error;
+            if (import.meta.env.DEV) console.log('✅ Image generation queued');
+          } catch (err) {
+            hardFail.current = true;
+            setSrc(getLocalFallback);
+            if (import.meta.env.DEV) console.debug('[image-ensure] failed:', err);
+            return;
+          }
+        }
+
+        // Recheck later (cap at 8s). Only for "missing" case.
+        if (!cancelled) {
           const delay = Math.min(backoffMs.current, 8000);
-          timer = setTimeout(recheckForImage, delay);
-          backoffMs.current *= 2; // cap at ~8s
+          timer = setTimeout(resolveCover, delay);
+          backoffMs.current *= 2;
         }
       } catch (error) {
-        // Stop retrying on actual errors (401/403/5xx) - these won't resolve by waiting
-        console.warn('Image URL fetch failed:', error);
-        hardFailRef.current = true;
-        setSrc(fallbackUrl);
+        if (cancelled) return;
+        console.warn('Image resolution failed:', error);
+        hardFail.current = true;
+        setSrc(getLocalFallback);
       }
     };
 
-    // start from fallback
+    // Start from fallback
     setSrc(fallbackUrl);
-    backoffMs.current = 600; // reset
-
-    // fire-and-forget generation request (one-time guard)
-    if (!generationQueued.current && !hardFailRef.current) {
-      generationQueued.current = true;
-      
-      supabase.functions
-        .invoke('image-ensure', {
-          body: {
-            universeId,
-            universeTitle: title,
-            subject: subject || 'educational',
-            scene: 'cover: main activity',
-            grade: resolvedGrade,
-          },
-        })
-        .then(({ data, error }) => {
-          if (cancelled) return;
-          if (error) {
-            // Hard failure - stop retrying
-            hardFailRef.current = true;
-            setSrc(fallbackUrl);
-            return;
-          }
-          if (!data?.ok && import.meta.env.DEV) {
-            console.debug('[image-ensure]', data?.error || 'unknown error');
-          }
-          if (import.meta.env.DEV) console.log('✅ Image generation queued:', data);
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          // Hard failure - stop retrying
-          hardFailRef.current = true;
-          setSrc(fallbackUrl);
-          if (import.meta.env.DEV) console.debug('[image-ensure]', err);
-        });
-    }
-
-    // start checking for the generated image
-    recheckForImage();
+    backoffMs.current = 600;
+    
+    // Begin resolution
+    resolveCover();
 
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [universeId, resolvedGrade, fallbackUrl, title, subject]);
+  }, [universeId, resolvedGrade, fallbackUrl, title, subject, getLocalFallback]);
 
-  // Reset generation guard when universeId changes
+  // Reset guards when universeId changes
   useEffect(() => {
-    generationQueued.current = false;
-    hardFailRef.current = false;
+    triedEnsure.current = false;
+    hardFail.current = false;
   }, [universeId, resolvedGrade]);
 
   return (
