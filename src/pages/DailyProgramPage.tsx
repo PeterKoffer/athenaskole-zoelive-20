@@ -7,7 +7,7 @@ import { ArrowLeft, BookOpen, Play, Loader2, Users, Map, Target, Plus, AlertCirc
 import { Universe, UniverseGenerator } from '@/services/UniverseGenerator';
 import { AdaptiveUniverseGenerator } from '@/services/AdaptiveUniverseGenerator';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
-import { learnerGrade, learnerBadge } from '@/lib/gradeLabels';
+import { learnerGrade } from '@/lib/gradeLabels';
 import { resolveLearnerGrade, gradeToBand } from '@/lib/grade';
 import { UserMetadata } from '@/types/auth';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
@@ -41,10 +41,8 @@ const DailyProgramPage = () => {
   const metadata = user?.user_metadata as UserMetadata | undefined;
   const learnerGradeValue = resolveLearnerGrade(metadata?.grade_level, metadata?.age);
   const learnerBandValue = gradeToBand(learnerGradeValue);
-  const gradeLabel = learnerBadge(
-    { grade: metadata?.grade_level, age: metadata?.age },
-    'band'
-  );
+  // Use exact grade instead of band for UI display
+  const gradeLabel = `Grade ${learnerGradeValue || 6}`;
 
   // Guard: avoid kicking the loader with undefined grade
   const ready = Number.isFinite(learnerGradeValue);

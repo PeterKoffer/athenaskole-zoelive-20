@@ -1,6 +1,11 @@
 // src/hooks/useUniverseCover.ts
 import { useEffect, useMemo, useState } from "react";
-import { coverUrl } from "../utils/imageUrl";
+
+// Create coverUrl function directly since utils/imageUrl doesn't exist
+function coverUrl(universeId: string, grade: number | string, cacheBust: string) {
+  const BUCKET_BASE = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/universe-images`;
+  return `${BUCKET_BASE}/${encodeURIComponent(universeId)}/${grade}/cover.webp?v=${cacheBust}`;
+}
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
 const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY!;
