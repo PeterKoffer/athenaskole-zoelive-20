@@ -87,9 +87,14 @@ async function ensureAiCover(admin: any, bucket: string, path: string, meta: { t
   const bytes = new Uint8Array(await img.arrayBuffer());
   const pngPath = path.replace(/\/cover\.webp$/, "/cover.png");
 
+  // Protect against null/tiny uploads
+  if (!bytes || bytes.byteLength < MIN_BYTES) {
+    throw new Error(`Generated image too small: ${bytes?.byteLength || 0} bytes`);
+  }
+
   const { error } = await admin.storage.from(bucket).upload(pngPath, bytes, {
     contentType: "image/png",
-    upsert: true,
+    upsert: true, // Critical: allow overwriting tiny/corrupt files
   });
   if (error) throw error;
 

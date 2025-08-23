@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { healAndGetSignedUrl, getSignedUniverseCover } from '@/services/storage/getSignedUrl';
 
 const BUCKET = 'universe-images';
-export const MIN_BYTES = 2000;
+export const MIN_BYTES = 1024;
 
 function makePlaceholderWebp({ w, h, label }: { w: number; h: number; label: string }): Promise<Blob> {
   const c = document.createElement('canvas');
@@ -21,7 +21,7 @@ export async function getUniverseImageSignedUrl(
   path: string,
   opts: { expires?: number; minBytes?: number; label?: string; title?: string; subject?: string } = {}
 ): Promise<string> {
-  const { expires = 300, minBytes = 2000, label = 'Cover', title = 'Learning Universe', subject = 'Education' } = opts;
+  const { expires = 300, minBytes = MIN_BYTES, label = 'Cover', title = 'Learning Universe', subject = 'Education' } = opts;
 
   // Extract pathBase from full path (remove /cover.webp or /cover.png)
   const pathBase = path.replace(/\/cover\.(webp|png)$/, '');
@@ -36,9 +36,13 @@ export async function getUniverseImageSignedUrl(
       if (len >= minBytes) {
         return existing;
       }
-      console.debug(`🔧 File too small (${len} bytes), triggering heal`);
+      if (import.meta.env.DEV || (typeof localStorage !== 'undefined' && localStorage.getItem("debugImages") === "1")) {
+        console.debug(`🔧 File too small (${len} bytes), triggering heal`);
+      }
     } catch (e) {
-      console.debug('🔧 HEAD check failed, triggering heal');
+      if (import.meta.env.DEV || (typeof localStorage !== 'undefined' && localStorage.getItem("debugImages") === "1")) {
+        console.debug('🔧 HEAD check failed, triggering heal');
+      }
     }
   }
   

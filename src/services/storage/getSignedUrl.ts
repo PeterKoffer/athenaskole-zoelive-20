@@ -1,8 +1,9 @@
 import { memoGet, memoSet } from '@/utils/cache';
 import { singleFlight } from '@/utils/singleflight';
 import { signForDownload } from './signForDownload';
-import { objectExists, pollUntilExists } from './objectExists';
+import { objectExists, objectExistsWithSize, pollUntilExists } from './objectExists';
 import { invokeFn } from '@/supabase/safeInvoke';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   incr, 
   debugLog, 
@@ -27,6 +28,9 @@ async function validateContentType(url: string, cid: string): Promise<boolean> {
     return false;
   }
 }
+
+const MIN_BYTES = 1024; // Files smaller than this are considered corrupt
+const LOG_HEAL = import.meta.env.DEV || (typeof localStorage !== 'undefined' && localStorage.getItem("debugImages") === "1");
 
 export async function getSignedUniverseCover(
   pathBase: string, 
@@ -54,8 +58,25 @@ export async function getSignedUniverseCover(
 
     const run = async () => {
       try {
-        const existsResult = await objectExists('universe-images', path);
-        if (!existsResult.ok) return null;
+        // Check if file exists and has proper size
+        const existsResult = await objectExistsWithSize('universe-images', path, MIN_BYTES);
+        if (!existsResult.ok) {
+          if (existsResult.size != null && existsResult.size < MIN_BYTES) {
+            // Tiny/corrupt file detected - purge it first
+            if (LOG_HEAL) {
+              console.debug("🔧 Tiny object detected, purging before heal", { 
+                path, 
+                size: existsResult.size 
+              });
+            }
+            
+            try {
+              await supabase.storage.from('universe-images').remove([path]);
+              incr('image.purge.tiny');
+            } catch (_) { /* ignore purge errors */ }
+          }
+          return null;
+        }
 
         const res = await signForDownload('universe-images', path, expires);
         if (!res.data?.signedUrl) return null;
@@ -129,10 +150,13 @@ export async function healAndGetSignedUrl(
       warnLog(correlationId, 'heal-invoke-failed', error);
     });
 
-    // Poll for file appearance (try both extensions)
+    // Poll for file appearance (try both extensions) with size check
     for (const ext of ['webp', 'png']) {
       const path = `${pathBase}/cover.${ext}`;
-      const appeared = await pollUntilExists('universe-images', path);
+      const appeared = await pollUntilExists('universe-images', path, { 
+        timeoutMs: 30000, 
+        minBytes: MIN_BYTES 
+      });
       if (appeared) {
         const res = await signForDownload('universe-images', path, expires);
         if (res.data?.signedUrl) {
