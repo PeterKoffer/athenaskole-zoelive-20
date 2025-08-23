@@ -29,9 +29,8 @@ export function useUniverseImage(path: string | null | undefined, opts: Options 
         
         // Use the new auto-healing signed URL function
         const signedUrl = await getUniverseImageSignedUrl(path, { 
-          autoHeal, 
-          label, 
-          ttlSec: expires 
+          expires, 
+          label 
         });
         
         if (cancelled) return;

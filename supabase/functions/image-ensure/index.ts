@@ -35,6 +35,68 @@ function env(name: string, required = true) {
   return value;
 }
 
+async function generateWithReplicate(prompt: string, w = 1024, h = 512) {
+  const token = Deno.env.get("REPLICATE_API_TOKEN");
+  if (!token) throw new Error("REPLICATE_API_TOKEN missing");
+
+  // Create prediction
+  const create = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "black-forest-labs/flux-schnell", // Fast model for covers
+      input: { prompt, width: w, height: h, num_inference_steps: 4 }
+    })
+  });
+  const pred = await create.json();
+  if (!create.ok) throw new Error(pred?.error ?? "replicate create failed");
+
+  // Poll until complete
+  for (let attempts = 0; attempts < 30; attempts++) {
+    const r = await fetch(pred.urls.get, { headers: { "Authorization": `Bearer ${token}` }});
+    const j = await r.json();
+    if (j.status === "succeeded") {
+      const out = Array.isArray(j.output) ? j.output[0] : j.output;
+      return out as string; // URL to image
+    }
+    if (j.status === "failed" || j.status === "canceled") {
+      throw new Error(j.error ?? j.status);
+    }
+    await new Promise(s => setTimeout(s, 2000));
+  }
+  throw new Error("Replicate generation timeout");
+}
+
+async function ensureAiCover(admin: any, bucket: string, path: string, meta: { title?: string; subject?: string }) {
+  // Extract universe info from path pattern
+  const pathMatch = path.match(/^([^\/]+)\/(\d+)\/cover\.(webp|png)$/);
+  if (!pathMatch) throw new Error("Invalid path format");
+  
+  const [, universeId, grade] = pathMatch;
+  const title = meta.title || "Learning Universe";
+  const subject = meta.subject || "General";
+  
+  // Create educational prompt
+  const prompt = `Wide 1024x512 cover image for an educational learning universe about "${title}"${subject !== "General" ? ` (${subject})` : ""}. Bright, friendly, modern, high quality educational illustration.`;
+  
+  console.log(`🎨 Generating AI cover for ${universeId}: ${prompt}`);
+  const imageUrl = await generateWithReplicate(prompt);
+
+  // Download and upload as PNG (more reliable)
+  const img = await fetch(imageUrl);
+  const bytes = new Uint8Array(await img.arrayBuffer());
+  const pngPath = path.replace(/\/cover\.webp$/, "/cover.png");
+
+  const { error } = await admin.storage.from(bucket).upload(pngPath, bytes, {
+    contentType: "image/png",
+    upsert: true,
+  });
+  if (error) throw error;
+
+  console.log(`✅ AI cover generated and uploaded: ${pngPath}`);
+  return { ok: true, path: pngPath, exists: true, generated: true };
+}
+
 async function resolveReplicateVersion(token: string) {
   try {
     const explicitVersion = env('REPLICATE_VERSION', false);
@@ -135,9 +197,23 @@ Deno.serve(async (req: Request) => {
       exists = false;
     }
 
-    // If missing and we may generate: (here we let the client handle upload/placeholder)
-    // We can add actual server-generation later if needed.
+    // If missing and we may generate: try AI generation first
     if (!exists && generateIfMissing) {
+      try {
+        // Try to generate AI cover if Replicate token is available
+        const replicateToken = Deno.env.get("REPLICATE_API_TOKEN");
+        if (replicateToken && path.includes("/cover.")) {
+          const result = await ensureAiCover(admin, bucket, path, { 
+            title: "Learning Universe", 
+            subject: "Education" 
+          });
+          return new Response(JSON.stringify(result), { headers: jsonHeaders });
+        }
+      } catch (aiError) {
+        console.warn(`AI generation failed for ${path}:`, aiError);
+        // Fall back to client placeholder generation
+      }
+      
       return new Response(JSON.stringify({
         ok: true,
         path,
