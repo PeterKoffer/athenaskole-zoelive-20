@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { invokeFn } from '@/supabase/safeInvoke';
+import { trySignDownload, pollHeadUntilExists } from '@/services/storage/signForDownload';
 
 const BUCKET = 'universe-images';
 export const MIN_BYTES = 2000;
@@ -24,45 +25,66 @@ async function dataUrlPlaceholder({ w, h, label }: { w: number; h: number; label
 
 export async function getUniverseImageSignedUrl(
   path: string,
-  { expires = 300, minBytes = 2000, label = 'Cover' }: { expires?: number; minBytes?: number; label?: string } = {}
+  opts: { expires?: number; minBytes?: number; label?: string } = {}
 ): Promise<string> {
-  // 1) sikre (server guard regenererer hvis mangler/for lille)
+  const { expires = 300, minBytes = 2000, label = 'Cover' } = opts;
+
+  // Try to get signed URL first with better error handling
+  const signResult = await trySignDownload(BUCKET, path, expires);
+  
+  if (!signResult.pending && signResult.data?.signedUrl) {
+    // File exists - do sanity check
+    try {
+      const head = await fetch(signResult.data.signedUrl, { method: 'HEAD' });
+      const len = +(head.headers.get('content-length') || 0);
+      if (len >= minBytes) {
+        return signResult.data.signedUrl;
+      }
+      console.debug(`🔧 File too small (${len} bytes), triggering heal`);
+    } catch (e) {
+      console.debug('🔧 HEAD check failed, triggering heal');
+    }
+  }
+  
+  // File doesn't exist, is corrupt, or sign failed - trigger auto-healing
+  console.debug('🔧 Auto-healing universe image:', path);
+  
   await invokeFn<{ ok: boolean; path: string; exists: boolean }>(
     'image-ensure',
-    { bucket: BUCKET, path, generateIfMissing: true }
-  ).catch(() => null); // vi fortsætter selv ved fejl
+    {
+      bucket: BUCKET,
+      path,
+      generateIfMissing: true,
+      ai: { title: 'Learning Universe', subject: 'Education' }
+    },
+    { logName: 'image-ensure-heal' }
+  ).catch(() => {
+    console.warn('Image ensure failed, uploading fallback placeholder');
+  });
 
-  const sign = () => supabase.storage.from(BUCKET).createSignedUrl(path, expires);
-
-  // 2) første sign-forsøg
-  let { data, error } = await sign();
-
-  // 3) hvis sign fejler → upload korrekt placeholder og prøv igen
-  if (!data?.signedUrl || error) {
+  // Try signing again after heal
+  const retryResult = await trySignDownload(BUCKET, path, expires);
+  if (retryResult.data?.signedUrl) {
+    return retryResult.data.signedUrl;
+  }
+  
+  // If all else fails, upload a placeholder directly
+  try {
     const blob = await makePlaceholderWebp({ w: 1024, h: 512, label });
     await supabase.storage
       .from(BUCKET)
-      .upload(path, blob, { upsert: true, contentType: 'image/webp' })
-      .catch(() => null);
-
-    ;({ data, error } = await sign());
-  }
-
-  if (!data?.signedUrl) {
-    throw new Error(error?.message || 'Could not create signed URL');
-  }
-
-  // 4) sanity: filen skal være "rigtig"
-  try {
-    const head = await fetch(data.signedUrl, { method: 'HEAD' });
-    const len = +(head.headers.get('content-length') || 0);
-    if (len < minBytes) throw new Error(`too small (${len})`);
+      .upload(path, blob, { upsert: true, contentType: 'image/webp' });
+    
+    const finalResult = await trySignDownload(BUCKET, path, expires);
+    if (finalResult.data?.signedUrl) {
+      return finalResult.data.signedUrl;
+    }
   } catch (e) {
-    // Falder tilbage til data-url placeholder hvis CDN fejler
-    return await dataUrlPlaceholder({ w: 1024, h: 512, label });
+    console.warn('Failed to upload placeholder:', e);
   }
-
-  return data.signedUrl;
+  
+  // Final fallback to inline SVG placeholder
+  return inlinePlaceholder(1024, 512, label);
 }
 
 // Legacy function for backwards compatibility

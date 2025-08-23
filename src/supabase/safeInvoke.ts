@@ -61,9 +61,17 @@ export function validatePlannerResponse(payload: any, context = 'unknown') {
 
 function normalizePlanner(x: any) {
   if (!x || typeof x !== 'object') return null;
-  // Ny struktur?
-  if (x.meta && x.world && Array.isArray(x.scenes)) return x;
-  // Legacy? pak ind i en "scene"
+
+  // Ny model
+  if (x.meta && x.world && Array.isArray(x.scenes)) {
+    return {
+      ...x,
+      timeBudget: x.timeBudget ?? { minutes: 20 },
+      scenes: x.scenes.length ? x.scenes : [{ id: 'auto-1', activities: [] }],
+    };
+  }
+
+  // Legacy model -> pak ind
   if (Array.isArray(x.activities)) {
     return {
       meta: { version: 'legacy-adapted' },
@@ -72,6 +80,7 @@ function normalizePlanner(x: any) {
       timeBudget: { minutes: 20 },
     };
   }
+
   return null;
 }
 
