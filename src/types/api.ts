@@ -4,7 +4,7 @@ export type ImageEnsureReq = {
   generateIfMissing?: boolean;
 };
 
-export type ImageEnsureOk = { ok: true; path: string; exists: boolean };
+export type ImageEnsureOk = { ok: true; path: string; exists: boolean; size?: number; created?: boolean };
 export type ImageEnsureErr = { ok: false; error?: string; status?: number };
 export type ImageEnsureRes = ImageEnsureOk | ImageEnsureErr;
 

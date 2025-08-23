@@ -13,6 +13,17 @@ const CORS = {
 const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
 const BUCKET = 'universe-images';
 
+// 1x1 PNG placeholder (much better than 4-byte RIFF)
+const PLACEHOLDER_PNG_BASE64 = 
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
+
+function b64ToBytes(b64: string) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
 
 function env(name: string, required = true) {
   const value = Deno.env.get(name);
@@ -84,47 +95,43 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { bucket, path, generateIfMissing = true, contentType = 'image/webp' } = await req.json();
+    const { bucket, path, generateIfMissing = true, minBytes = 128 } = await req.json();
     
     if (!bucket || !path) {
-      return new Response(JSON.stringify({ error: 'bucket and path required' }), { 
+      return new Response(JSON.stringify({ 
+        ok: false, 
+        error: 'bucket and path required' 
+      }), { 
         status: 400, 
         headers: { ...CORS, 'Content-Type': 'application/json' } 
       });
     }
 
-    const folder = path.split('/').slice(0, -1).join('/');
-    const filename = path.split('/').pop();
+    // Check if file exists and get its size
+    const { data: downloadData, error: downloadError } = await admin.storage
+      .from(bucket)
+      .download(path);
 
-    const { data: listing, error: listErr } = await admin
-      .storage.from(bucket)
-      .list(folder || '', { search: filename });
+    let exists = false;
+    let size = 0;
 
-    const exists = !listErr && listing?.some(f => f.name === filename);
-
-    if (exists) {
-      console.log(`✅ File exists: ${path}`);
-      return new Response(JSON.stringify({ 
-        ok: true, 
-        path, 
-        exists: true 
-      }), { 
-        status: 200, 
-        headers: { ...CORS, 'Content-Type': 'application/json' }
-      });
+    if (!downloadError && downloadData) {
+      exists = true;
+      size = (await downloadData.arrayBuffer()).byteLength;
+      console.log(`📏 File exists: ${path}, size: ${size} bytes`);
     }
 
-    if (!exists && generateIfMissing) {
-      console.log(`🎨 Generating image: ${path}`);
+    // If file doesn't exist or is too small (corrupt), create proper placeholder
+    if ((!exists || size < minBytes) && generateIfMissing) {
+      console.log(`🎨 ${exists ? 'Replacing corrupt' : 'Creating'} image: ${path}`);
       
-      // TODO: erstat med rigtig billedgenerering – her lægger vi en minimal placeholder
-      const tinyWebp = new Uint8Array([0x52,0x49,0x46,0x46]); // "RIFF" – bare en markør
+      const placeholderBytes = b64ToBytes(PLACEHOLDER_PNG_BASE64);
       
       const { error: uploadError } = await admin.storage
         .from(bucket)
-        .upload(path, tinyWebp, {
+        .upload(path, placeholderBytes, {
           upsert: true,
-          contentType,
+          contentType: 'image/png',
         });
 
       if (uploadError) {
@@ -132,13 +139,25 @@ Deno.serve(async (req: Request) => {
         throw uploadError;
       }
 
-      console.log(`✅ Generated image: ${path}`);
+      console.log(`✅ ${exists ? 'Replaced corrupt' : 'Generated'} image: ${path} (${placeholderBytes.length} bytes)`);
+      
+      return new Response(JSON.stringify({ 
+        ok: true, 
+        path, 
+        exists: true,
+        created: !exists,
+        size: placeholderBytes.length
+      }), { 
+        status: 200, 
+        headers: { ...CORS, 'Content-Type': 'application/json' }
+      });
     }
 
     return new Response(JSON.stringify({ 
       ok: true, 
       path, 
-      exists: false 
+      exists,
+      size 
     }), { 
       status: 200, 
       headers: { ...CORS, 'Content-Type': 'application/json' }
