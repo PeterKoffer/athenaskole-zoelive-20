@@ -4,7 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 const BUCKET = 'universe-images';
 const MIN_BYTES = 1024;
 
-function makePlaceholderBlob(label = 'Cover'): Promise<Blob> {
+function makePlaceholderBlob(
+  label = 'Cover',
+  mime: 'image/webp' | 'image/png' = 'image/webp'
+): Promise<Blob> {
   const w = 1024, h = 512;
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const g = c.getContext('2d')!;
@@ -14,7 +17,13 @@ function makePlaceholderBlob(label = 'Cover'): Promise<Blob> {
   g.fillStyle = 'rgba(255,255,255,.9)';
   g.font = 'bold 38px system-ui, sans-serif';
   g.fillText(label, 28, 64);
-  return new Promise(res => c.toBlob(b => res(b!), 'image/webp', 0.9)!);
+  return new Promise(res =>
+    c.toBlob(
+      b => res(b!),
+      mime,
+      mime === 'image/webp' ? 0.9 : undefined
+    )!
+  );
 }
 
 async function listAll(prefix = ''): Promise<string[]> {
@@ -40,7 +49,7 @@ export default function RepairCoversButton() {
     setLog([]);
     try {
       const all = await listAll('');
-      const covers = all.filter(p => /\/6\/cover\.webp$/i.test(p));
+        const covers = all.filter(p => /\/6\/cover\.(webp|png)$/i.test(p));
       append(`Found ${covers.length} covers`);
 
       let repaired = 0;
@@ -53,7 +62,7 @@ export default function RepairCoversButton() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
           },
-          body: JSON.stringify({ bucket: BUCKET, path, generateIfMissing: false }),
+          body: JSON.stringify({ bucket: BUCKET, objectKey: path }),
         });
 
         // HEAD check
@@ -65,9 +74,11 @@ export default function RepairCoversButton() {
         const type = head.headers.get('content-type') || '';
 
         if (!head.ok || !type.startsWith('image/') || len < MIN_BYTES) {
-          const blob = await makePlaceholderBlob('Cover');
+          const isPng = path.toLowerCase().endsWith('.png');
+          const mime = isPng ? 'image/png' as const : 'image/webp' as const;
+          const blob = await makePlaceholderBlob('Cover', mime);
           const { error } = await supabase.storage.from(BUCKET)
-            .upload(path, blob, { upsert: true, contentType: 'image/webp' });
+            .upload(path, blob, { upsert: true, contentType: mime });
           if (error) { append(`Upload failed ${path}: ${error.message}`); continue; }
           repaired++;
           append(`Repaired ${path}`);

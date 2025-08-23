@@ -1,128 +1,72 @@
-// @ts-nocheck
-// Deno Edge Function: queue image generation (fire-and-forget) using Replicate
-// Works with either REPLICATE_VERSION or REPLICATE_MODEL (auto-resolves latest)
-function corsHeaders(origin: string | null) {
-  return {
-    "Access-Control-Allow-Origin": origin || "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, content-type",
-  };
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// Minimal guard that ensures a storage object exists and is not obviously corrupt/small.
+// If it's missing or tiny, we either delete it (so the client can repair)
+// or write a tiny placeholder (real PNG for .png only).
+
+const MIN_BYTES = 1024;
+
+// --- Helpers ---------------------------------------------------------------
+const PNG_1x1_BASE64 =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO9zE9kAAAAASUVORK5CYII="; // transparent 1×1 PNG
+const png1x1 = Uint8Array.from(atob(PNG_1x1_BASE64), (c) => c.charCodeAt(0));
+
+function isPng(path: string) {
+  return path.toLowerCase().endsWith(".png");
+}
+function isWebp(path: string) {
+  return path.toLowerCase().endsWith(".webp");
 }
 
-function env(name: string, required = true) {
-  const v = Deno.env.get(name);
-  if (!v && required) throw new Error(`Missing env: ${name}`);
-  return v ?? "";
-}
-
-async function resolveReplicateVersion(token: string): Promise<string> {
-  const explicit = Deno.env.get("REPLICATE_VERSION");
-  if (explicit) return explicit;
-
-  const model = Deno.env.get("REPLICATE_MODEL");
-  if (!model) throw new Error("Set REPLICATE_VERSION or REPLICATE_MODEL");
-  const resp = await fetch(`https://api.replicate.com/v1/models/${model}`, {
-    headers: { "Authorization": `Token ${token}` },
-  });
-  if (!resp.ok) throw new Error(`Resolve model failed: ${await resp.text()}`);
-  const json = await resp.json();
-  const id = json?.latest_version?.id;
-  if (!id) throw new Error("No latest_version.id on model");
-  return id;
-}
-
-Deno.serve(async (req) => {
-  const origin = req.headers.get("origin");
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders(origin) });
-  }
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders(origin) });
-  }
-
+serve(async (req) => {
   try {
-    const {
-      universeId,
-      universeTitle,
-      subject,
-      scene = "cover: main activity",
-      grade,            // exact grade 1–12
-      // optional: extraStyle
-    } = await req.json();
-
-    if (!universeId || !universeTitle || !subject) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400, headers: { ...corsHeaders(origin), "content-type": "application/json" }
-      });
+    const { bucket, objectKey } = await req.json();
+    if (!bucket || !objectKey) {
+      return new Response(
+        JSON.stringify({ error: "bucket and objectKey are required" }),
+        { status: 400, headers: { "content-type": "application/json" } },
+      );
     }
 
-    // Simple prompt builder (per-grade, not banded)
-    const positive = [
-      `Illustrate: ${scene}`,
-      `Universe: ${universeTitle}`,
-      `Subject: ${subject}`,
-      grade ? `Audience: Grade ${grade}` : null,
-      `Style: clear composition, age-appropriate, no text overlays`,
-    ].filter(Boolean).join(" — ");
-    const negative = `blurry, watermark, signature, text overlay, misspelled labels, gore, scary imagery`;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const client = createClient(supabaseUrl, serviceKey);
 
-    const replicateToken = env("REPLICATE_API_TOKEN");
-    const version = await resolveReplicateVersion(replicateToken); // works with MODEL fallback
-    const modelSlug = Deno.env.get("REPLICATE_MODEL") || "";       // only used to tweak inputs
+    // Try to download to validate size & type (HEAD isn’t exposed here)
+    const dl = await client.storage.from(bucket).download(objectKey);
+    let ok = !!dl.data && dl.error === null;
+    let size = ok ? dl.data!.size : 0;
+    let repaired = false;
+    let uploadedFallback = false;
 
-    const functionsBase = env("FUNCTIONS_URL");
-    const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
-    const webhook = `${functionsBase}/image-webhook` +
-      `?token=${encodeURIComponent(webhookToken)}` +
-      `&universeId=${encodeURIComponent(universeId)}` +
-      `&grade=${encodeURIComponent(grade ?? "")}` +
-      `&variant=cover`;
+    if (!ok || size < MIN_BYTES) {
+      // Remove any junk to let the client (or us) repair cleanly.
+      await client.storage.from(bucket).remove([objectKey]);
 
-    // Replicate input shape differences (Flux vs SDXL-ish)
-    let input: Record<string, unknown>;
-    if (modelSlug.toLowerCase().includes("flux")) {
-      input = {
-        prompt: `${positive} — Negative: ${negative}`,
-        aspect_ratio: "1:1",
-        output_format: "webp",
-        num_outputs: 1,
-        go_fast: true,
-      };
-    } else {
-      input = {
-        prompt: positive,
-        negative_prompt: negative,
-        // most SDXL endpoints accept these defaults; keep it minimal
-      };
+      // Fallback behavior:
+      // - .png  -> upload real PNG bytes (1×1 transparent)
+      // - .webp -> no server upload; client-side tool will regenerate a proper WebP
+      if (isPng(objectKey)) {
+        await client.storage
+          .from(bucket)
+          .upload(objectKey, png1x1, { contentType: "image/png", upsert: true });
+        uploadedFallback = true;
+      } else if (isWebp(objectKey)) {
+        // leave it deleted; client will re-create as proper WebP
+      }
+
+      repaired = true;
     }
 
-    const r = await fetch("https://api.replicate.com/v1/predictions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Token ${replicateToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        version,
-        input,
-        webhook,
-        webhook_events_filter: ["completed"],
-      }),
-    });
-
-    const text = await r.text();
-    if (!r.ok) {
-      return new Response(JSON.stringify({ status: "error", error: text }), {
-        status: 500, headers: { ...corsHeaders(origin), "content-type": "application/json" }
-      });
-    }
-    const data = JSON.parse(text);
-    return new Response(JSON.stringify({ status: "queued", id: data.id }), {
-      status: 202, headers: { ...corsHeaders(origin), "content-type": "application/json" }
-    });
+    return new Response(
+      JSON.stringify({ ok: true, repaired, uploadedFallback }),
+      { headers: { "Content-Type": "application/json" } },
+    );
   } catch (e) {
-    return new Response(JSON.stringify({ status: "error", error: String(e?.message || e) }), {
-      status: 500, headers: { ...corsHeaders(origin), "content-type": "application/json" }
-    });
+    return new Response(
+      JSON.stringify({ error: String(e?.message || e) }),
+      { status: 500, headers: { "content-type": "application/json" } },
+    );
   }
 });

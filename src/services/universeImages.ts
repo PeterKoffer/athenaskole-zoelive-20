@@ -1,43 +1,55 @@
-import { healAndGetSignedUrl, getSignedUniverseCover } from '@/services/storage/getSignedUrl';
+import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 
+export const BUCKET = 'universe-images';
 export const MIN_BYTES = 1024;
+
+export const imageKey = (universeId: string, grade: number) =>
+  `${universeId}/${grade}/cover.webp`;
 
 export async function getUniverseImageSignedUrl(
   path: string,
-  opts: { expires?: number; minBytes?: number; label?: string; title?: string; subject?: string } = {}
+  opts: { prompt?: string } = {}
 ): Promise<string> {
-  const { expires = 300, minBytes = MIN_BYTES, label = 'Cover', title = 'Learning Universe', subject = 'Education' } = opts;
+  const parts = path.split('/');
+  if (parts.length < 3) throw new Error('invalid path');
+  const [universeId, grade] = parts;
 
-  // Extract pathBase from full path (remove /cover.webp or /cover.png)
-  const pathBase = path.replace(/\/cover\.(webp|png)$/, '');
-  
-  // Try to get existing signed URL with extension fallback
-  const existing = await getSignedUniverseCover(pathBase, { expires, label });
+  const from = supabase.storage.from(BUCKET);
+
+  // 1) Find existing file (check both webp and png)
+  const { data: list } = await from.list(`${universeId}/${grade}`);
+  const existing = list?.find(o => o.name === 'cover.webp')?.name
+                 || list?.find(o => o.name === 'cover.png')?.name;
   if (existing) {
-    // Do optional sanity check for size if we have a URL
-    try {
-      const head = await fetch(existing, { method: 'HEAD' });
-      const len = +(head.headers.get('content-length') || 0);
-      if (len >= minBytes) {
-        return existing;
-      }
-      if (import.meta.env.DEV || (typeof localStorage !== 'undefined' && localStorage.getItem("debugImages") === "1")) {
-        console.debug(`🔧 File too small (${len} bytes), triggering heal`);
-      }
-    } catch (e) {
-      if (import.meta.env.DEV || (typeof localStorage !== 'undefined' && localStorage.getItem("debugImages") === "1")) {
-        console.debug('🔧 HEAD check failed, triggering heal');
+    const actualPath = `${universeId}/${grade}/${existing}`;
+    return from.getPublicUrl(actualPath).data.publicUrl;
+  }
+
+  // 2) Invoke edge function to ensure image exists
+  const { prompt } = opts;
+  await invokeFn('image-ensure', { bucket: BUCKET, objectKey: path, prompt }).catch(() => {});
+
+  // 3) Deterministic wait for the file to appear (webp or png)
+  const deadline = Date.now() + 45000;
+  const candidates = [`${universeId}/${grade}/cover.webp`, `${universeId}/${grade}/cover.png`];
+  while (Date.now() < deadline) {
+    for (const p of candidates) {
+      const { data: signed } = await from.createSignedUrl(p, 60);
+      if (signed?.signedUrl) {
+        return from.getPublicUrl(p).data.publicUrl;
       }
     }
+    await new Promise(r => setTimeout(r, 1200));
   }
-  
-  // File doesn't exist or is corrupt - trigger auto-healing with all hardening
-  return healAndGetSignedUrl(pathBase, { expires, label, title, subject });
+
+  // 4) Graceful fallback so UI always shows something
+  return inlinePlaceholder(1024, 512, 'Cover');
 }
 
-// Legacy function for backwards compatibility
-export async function ensureAndSign(path: string, expires = 300): Promise<string> {
-  return getUniverseImageSignedUrl(path, { expires });
+// Legacy wrapper for backwards compatibility
+export async function ensureAndSign(path: string, _expires = 300): Promise<string> {
+  return getUniverseImageSignedUrl(path);
 }
 
 /** Lille, pæn inline-placeholder så vi altid viser noget */
@@ -53,5 +65,6 @@ export function inlinePlaceholder(width = 512, height = 256, label = 'Loading…
 }
 
 export async function getUniverseCoverSignedUrl(universeId: string, version = 6): Promise<string> {
-  return getUniverseImageSignedUrl(`${universeId}/${version}/cover.webp`, { label: 'Cover' });
+  return getUniverseImageSignedUrl(`${universeId}/${version}/cover.webp`);
 }
+
