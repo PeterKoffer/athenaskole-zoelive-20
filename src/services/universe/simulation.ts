@@ -1,7 +1,7 @@
 import { UNIVERSE_BRIEF_PROMPT, SIMULATE_STEP_PROMPT } from "./prompts";
 import { UniverseState, UniverseDiff, applyDiff, Horizon } from "./state";
 import { topTags } from "@/services/interestProfile";
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 import { logEvent } from "@/services/telemetry/events";
 import type { AdaptiveContentRes } from '@/types/api';
 

@@ -1,7 +1,7 @@
 // Training Ground AI Integration Hook
 import { useState, useEffect } from 'react';
 import { buildTrainingGroundPrompt } from './content/trainingGroundPromptBuilder';
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 import { useAuth } from '@/hooks/useAuth';
 
 interface TrainingGroundActivity {

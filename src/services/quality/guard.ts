@@ -1,5 +1,5 @@
 import { RUBRIC_PROMPT, RubricReport } from "./rubric";
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 import { logEvent } from "@/services/telemetry/events";
 import type { AdaptiveContentRes } from '@/types/api';
 

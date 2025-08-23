@@ -1,5 +1,5 @@
 
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 import { Universe } from './UniverseGenerator';
 import type { AdaptiveContentRes } from '@/types/api';
 

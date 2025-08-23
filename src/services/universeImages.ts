@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 
 const BUCKET = 'universe-images';
 export const MIN_BYTES = 2000;

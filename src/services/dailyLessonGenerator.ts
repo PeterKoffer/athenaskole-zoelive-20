@@ -406,8 +406,8 @@ export class DailyLessonGenerator {
       while (!uniqueContent && attempts < 3) {
         try {
           // Use standard lesson generation for daily lessons, not Training Ground
-          const { safeInvoke } = await import('@/supabase/safeInvoke');
-          const aiContent = await safeInvoke('generate-adaptive-content', {
+          const { invokeFn } = await import('@/supabase/safeInvoke');
+          const aiContent = await invokeFn('generate-adaptive-content', {
             type: 'lesson-activity',
             subject,
             skillArea: this.getVariedSkillAreaForIndex(skillArea, i),

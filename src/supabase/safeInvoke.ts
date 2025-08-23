@@ -58,3 +58,25 @@ export function validatePlannerResponse(payload: any, context = 'unknown') {
   }
   return true;
 }
+
+function normalizePlanner(x: any) {
+  if (!x || typeof x !== 'object') return null;
+  // Ny struktur?
+  if (x.meta && x.world && Array.isArray(x.scenes)) return x;
+  // Legacy? pak ind i en "scene"
+  if (Array.isArray(x.activities)) {
+    return {
+      meta: { version: 'legacy-adapted' },
+      world: { theme: 'default' },
+      scenes: [{ id: 'legacy-1', activities: x.activities }],
+      timeBudget: { minutes: 20 },
+    };
+  }
+  return null;
+}
+
+export { normalizePlanner };
+
+// --- COMPAT LAYER ---
+export const invokeFn = safeInvoke;   // gammel API, samme signatur
+export default safeInvoke;            // valgfrit: nem import som default

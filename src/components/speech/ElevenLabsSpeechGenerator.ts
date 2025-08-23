@@ -1,5 +1,5 @@
 
-import { invokeFn } from "@/supabase/functionsClient";
+import { invokeFn } from "@/supabase/safeInvoke";
 import { AudioResponse, ElevenLabsConfig } from "./ElevenLabsTypes";
 
 export class ElevenLabsSpeechGenerator {

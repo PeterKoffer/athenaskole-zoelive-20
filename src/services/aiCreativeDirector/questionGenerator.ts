@@ -1,5 +1,5 @@
 import { GeneratedQuestion, EducationalContext } from './types';
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 
 export class QuestionGenerator {
   

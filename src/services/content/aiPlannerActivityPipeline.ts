@@ -1,4 +1,4 @@
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn, normalizePlanner } from '@/supabase/safeInvoke';
 import { z } from "zod";
 
 // Zod schemas for validating AI outputs
@@ -215,7 +215,19 @@ export async function generateLessonPlan(context: LessonContext): Promise<Planne
   // Handle the response format from the edge function
   const responseData = raw.success ? raw.generatedContent : raw;
   
-  const parsed = PlannerSchema.safeParse(responseData);
+  // Try to normalize the planner response first
+  const normalized = normalizePlanner(responseData);
+  if (!normalized) {
+    console.groupCollapsed('⚠️ Planner validation failed – raw response');
+    console.log('context:', 'generateLessonPlan');
+    console.log('type:', typeof responseData);
+    try { console.log('keys:', Object.keys(responseData ?? {})); } catch {}
+    console.log(responseData);
+    console.groupEnd();
+    throw new Error('No valid planner content found in response');
+  }
+  
+  const parsed = PlannerSchema.safeParse(normalized);
   if (!parsed.success) {
     console.warn('Planner validation failed:', parsed.error.issues);
     throw new Error(`Planner JSON invalid: ${JSON.stringify(parsed.error.issues)}`);

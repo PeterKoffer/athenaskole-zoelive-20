@@ -1,5 +1,5 @@
 
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 import CurriculumIntegrationService from '../curriculum/CurriculumIntegrationService';
 import { ContentGenerationRequest, AtomSequence } from './ContentGenerationService';
 import type { AdaptiveContentRes } from '@/types/api';

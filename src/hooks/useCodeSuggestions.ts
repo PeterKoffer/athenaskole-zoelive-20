@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { invokeFn } from '@/supabase/functionsClient';
+import { invokeFn } from '@/supabase/safeInvoke';
 import type { AdaptiveContentRes } from '@/types/api';
 
 interface CodeSuggestionRequest {
