@@ -1,21 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
 import { healAndGetSignedUrl, getSignedUniverseCover } from '@/services/storage/getSignedUrl';
 
-const BUCKET = 'universe-images';
 export const MIN_BYTES = 1024;
-
-function makePlaceholderWebp({ w, h, label }: { w: number; h: number; label: string }): Promise<Blob> {
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  const ctx = c.getContext('2d')!;
-  const g = ctx.createLinearGradient(0, 0, w, h);
-  g.addColorStop(0, '#3b82f6'); g.addColorStop(1, '#9333ea');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.font = 'bold 110px system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
-  ctx.fillText(label, 64, 200);
-  return new Promise(res => c.toBlob(b => res(b!), 'image/webp', 0.92));
-}
 
 export async function getUniverseImageSignedUrl(
   path: string,

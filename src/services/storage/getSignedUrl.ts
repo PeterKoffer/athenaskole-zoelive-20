@@ -1,7 +1,7 @@
 import { memoGet, memoSet } from '@/utils/cache';
 import { singleFlight } from '@/utils/singleflight';
 import { signForDownload } from './signForDownload';
-import { objectExists, objectExistsWithSize, pollUntilExists } from './objectExists';
+import { objectExistsWithSize, pollUntilExists } from './objectExists';
 import { invokeFn } from '@/supabase/safeInvoke';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -36,7 +36,7 @@ export async function getSignedUniverseCover(
   pathBase: string, 
   opts: { expires?: number; label?: string } = {}
 ): Promise<string | null> {
-  const { expires = 300, label = 'Cover' } = opts;
+  const { expires = 300 } = opts;
   const correlationId = makeCorrelationId('universe-images', pathBase);
   
   incr('image.ensure.requested');
