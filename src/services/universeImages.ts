@@ -1,6 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { invokeFn } from '@/supabase/safeInvoke';
-import { trySignDownload, pollUntilExists } from '@/services/storage/signForDownload';
+import { healAndGetSignedUrl, getSignedUniverseCover } from '@/services/storage/getSignedUrl';
 
 const BUCKET = 'universe-images';
 export const MIN_BYTES = 2000;
@@ -18,27 +17,24 @@ function makePlaceholderWebp({ w, h, label }: { w: number; h: number; label: str
   return new Promise(res => c.toBlob(b => res(b!), 'image/webp', 0.92));
 }
 
-async function dataUrlPlaceholder({ w, h, label }: { w: number; h: number; label: string }) {
-  const blob = await makePlaceholderWebp({ w, h, label });
-  return URL.createObjectURL(blob);
-}
-
 export async function getUniverseImageSignedUrl(
   path: string,
-  opts: { expires?: number; minBytes?: number; label?: string } = {}
+  opts: { expires?: number; minBytes?: number; label?: string; title?: string; subject?: string } = {}
 ): Promise<string> {
-  const { expires = 300, minBytes = 2000, label = 'Cover' } = opts;
+  const { expires = 300, minBytes = 2000, label = 'Cover', title = 'Learning Universe', subject = 'Education' } = opts;
 
-  // Check if file exists first (no 400s in network panel)
-  let res = await trySignDownload(BUCKET, path, expires);
+  // Extract pathBase from full path (remove /cover.webp or /cover.png)
+  const pathBase = path.replace(/\/cover\.(webp|png)$/, '');
   
-  if (!res.pending && res.data?.signedUrl) {
-    // File exists - do sanity check via HEAD
+  // Try to get existing signed URL with extension fallback
+  const existing = await getSignedUniverseCover(pathBase, { expires, label });
+  if (existing) {
+    // Do optional sanity check for size if we have a URL
     try {
-      const head = await fetch(res.data.signedUrl, { method: 'HEAD' });
+      const head = await fetch(existing, { method: 'HEAD' });
       const len = +(head.headers.get('content-length') || 0);
       if (len >= minBytes) {
-        return res.data.signedUrl;
+        return existing;
       }
       console.debug(`🔧 File too small (${len} bytes), triggering heal`);
     } catch (e) {
@@ -46,52 +42,8 @@ export async function getUniverseImageSignedUrl(
     }
   }
   
-  // File doesn't exist or is corrupt - trigger auto-healing  
-  console.debug('🔧 Auto-healing universe image:', path);
-  
-  await invokeFn<{ ok: boolean; path: string; exists: boolean }>(
-    'image-ensure',
-    {
-      bucket: BUCKET,
-      path,
-      generateIfMissing: true,
-      ai: { title: 'Learning Universe', subject: 'Education' }
-    },
-    { logName: 'image-ensure-heal' }
-  ).catch(() => {
-    console.warn('Image ensure failed, will try placeholder upload');
-  });
-
-  // Poll using list API (no HEAD requests needed)
-  const appeared = await pollUntilExists(BUCKET, path);
-  if (!appeared) {
-    console.warn('⚠️ File did not appear after healing, using fallback');
-    return inlinePlaceholder(1024, 512, label);
-  }
-
-  // Try signing again after heal (file should exist now)
-  res = await trySignDownload(BUCKET, path, expires);
-  if (res.data?.signedUrl) {
-    return res.data.signedUrl;
-  }
-  
-  // If still no success, upload a placeholder directly
-  try {
-    const blob = await makePlaceholderWebp({ w: 1024, h: 512, label });
-    await supabase.storage
-      .from(BUCKET)
-      .upload(path, blob, { upsert: true, contentType: 'image/webp' });
-    
-    const finalRes = await trySignDownload(BUCKET, path, expires);
-    if (finalRes.data?.signedUrl) {
-      return finalRes.data.signedUrl;
-    }
-  } catch (e) {
-    console.warn('Failed to upload placeholder:', e);
-  }
-  
-  // Final fallback to inline SVG placeholder
-  return inlinePlaceholder(1024, 512, label);
+  // File doesn't exist or is corrupt - trigger auto-healing with all hardening
+  return healAndGetSignedUrl(pathBase, { expires, label, title, subject });
 }
 
 // Legacy function for backwards compatibility

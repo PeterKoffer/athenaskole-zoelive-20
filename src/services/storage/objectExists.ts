@@ -14,3 +14,19 @@ export async function objectExists(bucket: string, path: string) {
   if (error) throw error;
   return !!data?.some(f => f.name === filename);
 }
+
+export async function pollUntilExists(bucket: string, path: string, timeoutMs = 15000, intervalMs = 800) {
+  const start = Date.now();
+  console.debug(`🔄 Polling for ${bucket}/${path}...`);
+  
+  while (Date.now() - start < timeoutMs) {
+    if (await objectExists(bucket, path)) {
+      console.debug(`✅ File appeared: ${bucket}/${path}`);
+      return true;
+    }
+    await new Promise(r => setTimeout(r, intervalMs));
+  }
+  
+  console.warn(`⏰ Timeout waiting for file: ${bucket}/${path}`);
+  return false;
+}
