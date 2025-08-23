@@ -1,35 +1,21 @@
-// Observability counters
-type CounterName = 
-  | 'image.ensure.requested'
-  | 'image.ensure.healed' 
-  | 'image.ensure.skipped'
-  | 'storage.list.calls'
-  | 'signedurl.cache.hit'
-  | 'signedurl.cache.miss'
-  | 'fallback.used.webp'
-  | 'fallback.used.png'
-  | 'fallback.used.placeholder';
+// Observability counters (leaf module - no imports)
+type C = Record<string, number>;
+const counters: C = {};
 
-const counters = new Map<CounterName, number>();
-
-export function incrementCounter(name: CounterName, delta = 1) {
-  counters.set(name, (counters.get(name) || 0) + delta);
+export function incr(name: string, by = 1) {
+  counters[name] = (counters[name] || 0) + by;
 }
 
-export function getCounter(name: CounterName): number {
-  return counters.get(name) || 0;
-}
-
-export function getAllCounters(): Record<string, number> {
-  return Object.fromEntries(counters.entries());
+export function getAll(): Record<string, number> {
+  return { ...counters };
 }
 
 export function resetCounters() {
-  counters.clear();
+  Object.keys(counters).forEach(key => delete counters[key]);
 }
 
 // Structured logging with correlation IDs
-const DEBUG_ENABLED = localStorage?.getItem('debug:image') === 'true';
+const DEBUG_ENABLED = typeof localStorage !== 'undefined' && localStorage?.getItem('debug:image') === 'true';
 
 export function makeCorrelationId(bucket: string, path: string): string {
   return `img:${bucket}/${path}:${Date.now().toString(36)}`;

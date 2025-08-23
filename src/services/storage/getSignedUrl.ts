@@ -1,17 +1,14 @@
 import { memoGet, memoSet } from '@/utils/cache';
 import { singleFlight } from '@/utils/singleflight';
-import { trySignDownload } from './signForDownload';
+import { signForDownload } from './signForDownload';
 import { objectExists, pollUntilExists } from './objectExists';
 import { invokeFn } from '@/supabase/safeInvoke';
 import { 
-  incrementCounter, 
+  incr, 
   debugLog, 
   warnLog, 
   makeCorrelationId 
 } from '@/utils/observability';
-
-// Import auth initialization
-import '@/utils/cacheAuth';
 
 function hashPath(bucket: string, path: string): string {
   return btoa(`${bucket}:${path}`).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
@@ -38,7 +35,7 @@ export async function getSignedUniverseCover(
   const { expires = 300, label = 'Cover' } = opts;
   const correlationId = makeCorrelationId('universe-images', pathBase);
   
-  incrementCounter('image.ensure.requested');
+  incr('image.ensure.requested');
   
   // Try .webp then .png extensions
   for (const ext of ['webp', 'png']) {
@@ -48,19 +45,19 @@ export async function getSignedUniverseCover(
     // Check cache first
     const cached = memoGet<string>(cacheKey);
     if (cached) {
-      incrementCounter('signedurl.cache.hit');
+      incr('signedurl.cache.hit');
       debugLog(correlationId, 'cache-hit', `ext: ${ext}`);
       return cached;
     }
     
-    incrementCounter('signedurl.cache.miss');
+    incr('signedurl.cache.miss');
 
     const run = async () => {
       try {
-        const exists = await objectExists('universe-images', path, correlationId);
-        if (!exists) return null;
+        const existsResult = await objectExists('universe-images', path);
+        if (!existsResult.ok) return null;
 
-        const res = await trySignDownload('universe-images', path, expires);
+        const res = await signForDownload('universe-images', path, expires);
         if (!res.data?.signedUrl) return null;
 
         // Validate content type before caching
@@ -72,7 +69,7 @@ export async function getSignedUniverseCover(
 
         // Cache the signed URL (TTL < token expiry)
         memoSet(cacheKey, res.data.signedUrl, 2.5 * 60 * 1000);
-        incrementCounter(ext === 'webp' ? 'fallback.used.webp' : 'fallback.used.png');
+        incr(ext === 'webp' ? 'fallback.used.webp' : 'fallback.used.png');
         
         debugLog(correlationId, 'sign-cached', `ext: ${ext}, expires: ${expires}s`);
         return res.data.signedUrl;
@@ -108,7 +105,7 @@ export async function healAndGetSignedUrl(
   // Try to get existing signed URL first
   const existing = await getSignedUniverseCover(pathBase, { expires, label });
   if (existing) {
-    incrementCounter('image.ensure.skipped');
+    incr('image.ensure.skipped');
     return existing;
   }
   
@@ -118,7 +115,7 @@ export async function healAndGetSignedUrl(
   
   const healAndSign = async () => {
     debugLog(correlationId, 'heal-start', `jobId: ${jobId}`);
-    incrementCounter('image.ensure.healed');
+    incr('image.ensure.healed');
     
     // Trigger healing with job ID for idempotent processing
     await invokeFn('image-ensure', {
@@ -137,7 +134,7 @@ export async function healAndGetSignedUrl(
       const path = `${pathBase}/cover.${ext}`;
       const appeared = await pollUntilExists('universe-images', path);
       if (appeared) {
-        const res = await trySignDownload('universe-images', path, expires);
+        const res = await signForDownload('universe-images', path, expires);
         if (res.data?.signedUrl) {
           debugLog(correlationId, 'heal-success', `ext: ${ext}`);
           return res.data.signedUrl;
@@ -152,7 +149,7 @@ export async function healAndGetSignedUrl(
   const url = await singleFlight(healKey, healAndSign);
   
   if (!url) {
-    incrementCounter('fallback.used.placeholder');
+    incr('fallback.used.placeholder');
     debugLog(correlationId, 'fallback-placeholder', 'using SVG fallback');
   }
   
