@@ -1,16 +1,26 @@
 import { supabase } from '@/integrations/supabase/client';
 import { objectExists } from './objectExists';
+import { debugLog, warnLog, makeCorrelationId } from '@/utils/observability';
 
 export async function trySignDownload(bucket: string, path: string, expires = 300) {
+  const correlationId = makeCorrelationId(bucket, path);
+  
   // Avoid 400s by skipping sign until file is present
-  const exists = await objectExists(bucket, path);
+  const exists = await objectExists(bucket, path, correlationId);
   if (!exists) {
-    console.debug(`📦 Storage object not found: ${bucket}/${path}`);
+    debugLog(correlationId, 'sign-skip', `object not found: ${bucket}/${path}`);
     return { data: null, pending: true };
   }
 
+  debugLog(correlationId, 'sign-attempt', `bucket: ${bucket}, path: ${path}, expires: ${expires}s`);
+  
   const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, expires);
-  if (error) throw error;
+  if (error) {
+    warnLog(correlationId, 'sign-error', error);
+    throw error;
+  }
+  
+  debugLog(correlationId, 'sign-success', 'signed URL created');
   return { data, pending: false };
 }
 
