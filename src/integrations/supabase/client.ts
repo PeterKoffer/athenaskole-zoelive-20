@@ -20,3 +20,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     }
   }
 });
+
+// Midlertidig debug access
+;(window as any).dbg = { supabase };
