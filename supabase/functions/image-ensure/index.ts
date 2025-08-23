@@ -25,7 +25,7 @@ serve(async (req) => {
     if (!bucket || !objectKey) {
       return new Response(
         JSON.stringify({ error: "bucket and objectKey are required" }),
-        { status: 400 },
+        { status: 400, headers: { "content-type": "application/json" } },
       );
     }
 
@@ -61,14 +61,12 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ ok: true, repaired, uploadedFallback }),
-      {
-        headers: { "Content-Type": "application/json" },
-      },
+      { headers: { "Content-Type": "application/json" } },
     );
   } catch (e) {
     return new Response(
       JSON.stringify({ error: String(e?.message || e) }),
-      { status: 500 },
+      { status: 500, headers: { "content-type": "application/json" } },
     );
   }
 });
