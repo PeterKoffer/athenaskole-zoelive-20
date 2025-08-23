@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 
 export interface ContentGenerationRequest {
   kcId: string;
@@ -66,20 +67,18 @@ class ContentGenerationService {
       
       console.log('📚 Extracted KC info:', { subject, grade, topic });
 
-      const { data: edgeResponse, error } = await supabase.functions.invoke('generate-content-atoms', {
-        body: {
-          kcId: request.kcId,
-          userId: request.userId,
-          subject: subject,
-          gradeLevel: grade,
-          topic: topic,
-          contentTypes: request.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE', 'INTERACTIVE_EXERCISE'],
-          maxAtoms: request.maxAtoms || 3,
-          diversityPrompt: request.diversityPrompt || `Create engaging ${grade} ${subject} content about ${topic}`,
-          sessionId: request.sessionId,
-          forceUnique: request.forceUnique,
-          enhancedPrompt: true
-        }
+      const edgeResponse = await invokeFn('generate-content-atoms', {
+        kcId: request.kcId,
+        userId: request.userId,
+        subject: subject,
+        gradeLevel: grade,
+        topic: topic,
+        contentTypes: request.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE', 'INTERACTIVE_EXERCISE'],
+        maxAtoms: request.maxAtoms || 3,
+        diversityPrompt: request.diversityPrompt || `Create engaging ${grade} ${subject} content about ${topic}`,
+        sessionId: request.sessionId,
+        forceUnique: request.forceUnique,
+        enhancedPrompt: true
       });
 
       if (error) {

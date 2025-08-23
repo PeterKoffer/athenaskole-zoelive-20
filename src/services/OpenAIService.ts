@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 import { Universe } from './UniverseGenerator';
 
 export const openAIService = {
@@ -15,9 +15,7 @@ export const openAIService = {
 
       console.log('📞 Calling generate-adaptive-content edge function for universe generation');
       
-      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-        body: requestData
-      });
+      const data = await invokeFn('generate-adaptive-content', requestData);
 
       console.log('📨 Edge function response:', { data, error });
 

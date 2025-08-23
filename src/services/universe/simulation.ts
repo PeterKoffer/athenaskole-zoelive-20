@@ -1,8 +1,7 @@
 import { UNIVERSE_BRIEF_PROMPT, SIMULATE_STEP_PROMPT } from "./prompts";
 import { UniverseState, UniverseDiff, applyDiff, Horizon } from "./state";
 import { topTags } from "@/services/interestProfile";
-
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFn } from '@/supabase/functionsClient';
 import { logEvent } from "@/services/telemetry/events";
 
 // Helper to call LLM and parse JSON response
@@ -19,16 +18,14 @@ async function callLLMJson<T = any>(
     hasPrompt: !!prompt
   });
   
-  const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-    body: {
-      type: 'universe_generation',
-      prompt: prompt,
-      subject: subject,
-      gradeLevel: 6, // Default grade level
-      studentInterests: interests,
-      maxTokens: 400,
-      temperature: 0.7
-    }
+  const data = await invokeFn('generate-adaptive-content', {
+    type: 'universe_generation',
+    prompt: prompt,
+    subject: subject,
+    gradeLevel: 6, // Default grade level
+    studentInterests: interests,
+    maxTokens: 400,
+    temperature: 0.7
   });
   
   if (error) {

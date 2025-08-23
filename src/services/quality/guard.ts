@@ -1,15 +1,13 @@
 import { RUBRIC_PROMPT, RubricReport } from "./rubric";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFn } from '@/supabase/functionsClient';
 import { logEvent } from "@/services/telemetry/events";
 
 // Helper to call LLM and parse JSON response
 async function callLLMJson<T = any>(prompt: string): Promise<T> {
-  const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-    body: {
-      prompt: prompt,
-      maxTokens: 300,
-      temperature: 0.3 // Lower temperature for more consistent evaluation
-    }
+  const data = await invokeFn('generate-adaptive-content', {
+    prompt: prompt,
+    maxTokens: 300,
+    temperature: 0.3 // Lower temperature for more consistent evaluation
   });
   
   if (error) throw error;

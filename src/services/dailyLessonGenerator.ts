@@ -406,32 +406,25 @@ export class DailyLessonGenerator {
       while (!uniqueContent && attempts < 3) {
         try {
           // Use standard lesson generation for daily lessons, not Training Ground
-          const { data: aiContent, error } = await supabase.functions.invoke('generate-adaptive-content', {
-            body: {
-              type: 'lesson-activity',
-              subject,
-              skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
-              gradeLevel,
-              difficultyLevel: gradeLevel + this.getDifficultyVariation(i),
-              activityType: this.getActivityTypeForIndex(i),
-              learningStyle: learnerProfile?.learning_style_preference || 'balanced',
-              interests: learnerProfile?.interests || [],
-              performanceData: {
-                accuracy: studentProgress?.accuracy_rate || 0.75,
-                engagement: studentProgress?.engagement_level || 'moderate'
-              },
-              calendarKeywords: activeKeywords,
-              sessionId,
-              activityIndex: i,
-              varietyPrompt: this.getVarietyPrompt(i),
-              uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
-            }
+          const aiContent = await invokeFn('generate-adaptive-content', {
+            type: 'lesson-activity',
+            subject,
+            skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
+            gradeLevel,
+            difficultyLevel: gradeLevel + this.getDifficultyVariation(i),
+            activityType: this.getActivityTypeForIndex(i),
+            learningStyle: learnerProfile?.learning_style_preference || 'balanced',
+            interests: learnerProfile?.interests || [],
+            performanceData: {
+              accuracy: studentProgress?.accuracy_rate || 0.75,
+              engagement: studentProgress?.engagement_level || 'moderate'
+            },
+            calendarKeywords: activeKeywords,
+            sessionId,
+            activityIndex: i,
+            varietyPrompt: this.getVarietyPrompt(i),
+            uniquenessSeeds: this.getUniquenessSeeds(i, attempts)
           });
-
-          if (error) {
-            console.error('❌ Training Ground generation error:', error);
-            throw error;
-          }
 
           // Handle both envelope { generatedContent } and raw content objects from the edge function
           const payload: any = (aiContent && (aiContent as any).generatedContent)

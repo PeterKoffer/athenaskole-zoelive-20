@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 
 // AI content generation and pack building
 type BuildFromPackArgs = {
@@ -79,15 +79,13 @@ async function generateAIActivities(args: BuildFromPackArgs): Promise<LessonStru
   
   try {
     // Use the existing AI content generation
-    const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-      body: {
-        type: 'lesson-activity',
-        subject: pack.subject,
-        skillArea: 'general',
-        gradeLevel: pack.gradeLevel || 6,
-        difficultyLevel: pack.gradeLevel || 6,
-        prompt: `Create an engaging ${pack.subject} lesson based on: ${pack.description}. Title: ${pack.title}. Make it interactive and age-appropriate.`
-      }
+    const data = await invokeFn('generate-adaptive-content', {
+      type: 'lesson-activity',
+      subject: pack.subject,
+      skillArea: 'general',
+      gradeLevel: pack.gradeLevel || 6,
+      difficultyLevel: pack.gradeLevel || 6,
+      prompt: `Create an engaging ${pack.subject} lesson based on: ${pack.description}. Title: ${pack.title}. Make it interactive and age-appropriate.`
     });
 
     if (error) {
@@ -126,15 +124,13 @@ async function generateHybridActivities(args: BuildFromPackArgs): Promise<Lesson
   
   try {
     // Add AI embellishments
-    const { data } = await supabase.functions.invoke('generate-adaptive-content', {
-      body: {
-        type: 'lesson-activity',
-        subject: pack.subject,
-        skillArea: 'general', 
-        gradeLevel: pack.gradeLevel || 6,
-        difficultyLevel: pack.gradeLevel || 6,
-        prompt: `Create ${embellishmentCount} short, engaging activities to enhance a ${pack.subject} lesson about: ${pack.description}`
-      }
+    const data = await invokeFn('generate-adaptive-content', {
+      type: 'lesson-activity',
+      subject: pack.subject,
+      skillArea: 'general', 
+      gradeLevel: pack.gradeLevel || 6,
+      difficultyLevel: pack.gradeLevel || 6,
+      prompt: `Create ${embellishmentCount} short, engaging activities to enhance a ${pack.subject} lesson about: ${pack.description}`
     });
 
     if (data?.content) {

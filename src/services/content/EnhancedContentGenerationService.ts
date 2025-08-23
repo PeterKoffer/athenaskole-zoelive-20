@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 import CurriculumIntegrationService from '../curriculum/CurriculumIntegrationService';
 import { ContentGenerationRequest, AtomSequence } from './ContentGenerationService';
 
@@ -39,9 +39,7 @@ class EnhancedContentGenerationService {
       };
 
       // Call enhanced edge function with curriculum data
-      const { data: edgeResponse, error } = await supabase.functions.invoke('generate-content-atoms', {
-        body: enhancedRequest
-      });
+      const edgeResponse = await invokeFn('generate-content-atoms', enhancedRequest);
 
       if (error) {
         console.error('❌ Enhanced content generation error:', error);

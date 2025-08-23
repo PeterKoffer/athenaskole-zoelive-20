@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 import { useToast } from '@/hooks/use-toast';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Volume2 } from 'lucide-react';
@@ -46,13 +46,11 @@ const SimpleMathematicsLearningPage = () => {
       for (let i = 0; i < 2; i++) {
         console.log(`📚 NELIE: Generating initial question ${i + 1} of 2...`);
         
-        const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            subject: 'mathematics',
-            skillArea: 'general',
-            gradeLevel: 3,
-            userId: 'student'
-          }
+        const data = await invokeFn('generate-adaptive-content', {
+          subject: 'mathematics',
+          skillArea: 'general',
+          gradeLevel: 3,
+          userId: 'student'
         });
 
         if (error) {
@@ -115,13 +113,11 @@ const SimpleMathematicsLearningPage = () => {
       for (let i = 2; i < 5; i++) {
         console.log(`📚 NELIE: Generating background question ${i + 1} of 5...`);
         
-        const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            subject: 'mathematics',
-            skillArea: 'general',
-            gradeLevel: 3,
-            userId: 'student'
-          }
+        const data = await invokeFn('generate-adaptive-content', {
+          subject: 'mathematics',
+          skillArea: 'general',
+          gradeLevel: 3,
+          userId: 'student'
         });
 
         if (error) {

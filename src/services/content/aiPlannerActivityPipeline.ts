@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFn } from '@/supabase/functionsClient';
 import { z } from "zod";
 
 // Zod schemas for validating AI outputs
@@ -203,15 +203,13 @@ Output valid JSON only.\n\n${JSON.stringify({ slot, world, context })}`;
 
 export async function generateLessonPlan(context: LessonContext): Promise<Planner> {
   const { systemPrompt, userPrompt } = buildPlannerPrompts(context);
-  const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-    body: {
-      systemPrompt,
-      userPrompt,
-      model: 'gpt-4o',
-      temperature: 0.4,
-    },
+  const data = await invokeFn('generate-adaptive-content', {
+    systemPrompt,
+    userPrompt,
+    model: 'gpt-4o',
+    temperature: 0.4
   });
-  if (error) throw new Error(`Planner generation failed: ${error.message}`);
+  
   const raw = typeof data === 'string' ? JSON.parse(data) : data;
   
   // Handle the response format from the edge function
@@ -227,15 +225,13 @@ export async function generateLessonPlan(context: LessonContext): Promise<Planne
 
 export async function generateActivityForSlot(slot: PlannerActivitySlot, world: Planner["world"], context: LessonContext): Promise<GeneratedActivity> {
   const { systemPrompt, userPrompt } = buildActivityPrompts(slot, world, context);
-  const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-    body: {
-      systemPrompt,
-      userPrompt,
-      model: 'gpt-4o',
-      temperature: 0.5,
-    },
+  const data = await invokeFn('generate-adaptive-content', {
+    systemPrompt,
+    userPrompt,
+    model: 'gpt-4o',
+    temperature: 0.5
   });
-  if (error) throw new Error(`Activity generation failed: ${error.message}`);
+  
   const raw = typeof data === 'string' ? JSON.parse(data) : data;
   
   // Handle the response format from the edge function

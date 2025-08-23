@@ -1,27 +1,24 @@
-import { invokeFn, supabase } from '@/supabase/functionsClient';
+import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 
-export async function getUniverseCoverSignedUrl(universeId: string, version: number = 6) {
-  const path = `${universeId}/${version}/cover.webp`;
-
-  // 1) ensure
+export async function getUniverseImageSignedUrl(path: string) {
+  // A) Sørg for at filen findes (opretter placeholder hvis mangler)
   await invokeFn('image-ensure', {
     bucket: 'universe-images',
     path,
     generateIfMissing: true,
   });
 
-  // 2) sanity check (giver klar fejl hvis ensure ikke skrev filen)
-  const { data: list } = await supabase.storage.from('universe-images')
-    .list(`${universeId}/${version}`, { search: 'cover.webp', limit: 1 });
-
-  if (!list?.length) throw new Error('cover.webp missing after ensure()');
-
-  // 3) sign
+  // B) Signér
   const { data, error } = await supabase
-    .storage
-    .from('universe-images')
-    .createSignedUrl(path, 60 * 60);
+    .storage.from('universe-images')
+    .createSignedUrl(path, 300);
 
   if (error) throw error;
   return data.signedUrl;
+}
+
+export async function getUniverseCoverSignedUrl(universeId: string, version: number = 6) {
+  const path = `${universeId}/${version}/cover.webp`;
+  return getUniverseImageSignedUrl(path);
 }
