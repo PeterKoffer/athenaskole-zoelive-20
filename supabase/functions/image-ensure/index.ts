@@ -1,248 +1,128 @@
 // @ts-nocheck
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-
-const URL = Deno.env.get('SUPABASE_URL')!;
-const SRK = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-// Helper function to create consistent storage keys
-const coverKey = (universeId: string, grade: number) => `${universeId}/${grade}/cover.webp`;
-const BUCKET = 'universe-images';
-
-// 1x1 PNG placeholder (much better than 4-byte RIFF)
-const PLACEHOLDER_PNG_BASE64 = 
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
-
-const MIN_BYTES = 1024;
-
-function b64ToBytes(b64: string) {
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes;
+// Deno Edge Function: queue image generation (fire-and-forget) using Replicate
+// Works with either REPLICATE_VERSION or REPLICATE_MODEL (auto-resolves latest)
+function corsHeaders(origin: string | null) {
+  return {
+    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, content-type",
+  };
 }
-
 
 function env(name: string, required = true) {
-  const value = Deno.env.get(name);
-  if (required && !value) {
-    throw new Error(`Environment variable ${name} is required`);
-  }
-  return value;
+  const v = Deno.env.get(name);
+  if (!v && required) throw new Error(`Missing env: ${name}`);
+  return v ?? "";
 }
 
-async function generateWithReplicate(prompt: string, w = 1024, h = 512) {
-  const token = Deno.env.get("REPLICATE_API_TOKEN");
-  if (!token) throw new Error("REPLICATE_API_TOKEN missing");
+async function resolveReplicateVersion(token: string): Promise<string> {
+  const explicit = Deno.env.get("REPLICATE_VERSION");
+  if (explicit) return explicit;
 
-  // Create prediction
-  const create = await fetch("https://api.replicate.com/v1/predictions", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "black-forest-labs/flux-schnell", // Fast model for covers
-      input: { prompt, width: w, height: h, num_inference_steps: 4 }
-    })
+  const model = Deno.env.get("REPLICATE_MODEL");
+  if (!model) throw new Error("Set REPLICATE_VERSION or REPLICATE_MODEL");
+  const resp = await fetch(`https://api.replicate.com/v1/models/${model}`, {
+    headers: { "Authorization": `Token ${token}` },
   });
-  const pred = await create.json();
-  if (!create.ok) throw new Error(pred?.error ?? "replicate create failed");
-
-  // Poll until complete
-  for (let attempts = 0; attempts < 30; attempts++) {
-    const r = await fetch(pred.urls.get, { headers: { "Authorization": `Bearer ${token}` }});
-    const j = await r.json();
-    if (j.status === "succeeded") {
-      const out = Array.isArray(j.output) ? j.output[0] : j.output;
-      return out as string; // URL to image
-    }
-    if (j.status === "failed" || j.status === "canceled") {
-      throw new Error(j.error ?? j.status);
-    }
-    await new Promise(s => setTimeout(s, 2000));
-  }
-  throw new Error("Replicate generation timeout");
+  if (!resp.ok) throw new Error(`Resolve model failed: ${await resp.text()}`);
+  const json = await resp.json();
+  const id = json?.latest_version?.id;
+  if (!id) throw new Error("No latest_version.id on model");
+  return id;
 }
 
-async function ensureAiCover(admin: any, bucket: string, path: string, meta: { title?: string; subject?: string }) {
-  // Extract universe info from path pattern
-  const pathMatch = path.match(/^([^\/]+)\/(\d+)\/cover\.(webp|png)$/);
-  if (!pathMatch) throw new Error("Invalid path format");
-  
-  const [, universeId, grade] = pathMatch;
-  const title = meta.title || "Learning Universe";
-  const subject = meta.subject || "General";
-  
-  // Create educational prompt
-  const prompt = `Wide 1024x512 cover image for an educational learning universe about "${title}"${subject !== "General" ? ` (${subject})` : ""}. Bright, friendly, modern, high quality educational illustration.`;
-  
-  console.log(`🎨 Generating AI cover for ${universeId}: ${prompt}`);
-  const imageUrl = await generateWithReplicate(prompt);
-
-  // Download and upload as PNG (more reliable)
-  const img = await fetch(imageUrl);
-  const bytes = new Uint8Array(await img.arrayBuffer());
-  const pngPath = path.replace(/\/cover\.webp$/, "/cover.png");
-
-  // Protect against null/tiny uploads
-  if (!bytes || bytes.byteLength < MIN_BYTES) {
-    throw new Error(`Generated image too small: ${bytes?.byteLength || 0} bytes`);
+Deno.serve(async (req) => {
+  const origin = req.headers.get("origin");
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders(origin) });
   }
-
-  const { error } = await admin.storage.from(bucket).upload(pngPath, bytes, {
-    contentType: "image/png",
-    upsert: true, // Critical: allow overwriting tiny/corrupt files
-  });
-  if (error) throw error;
-
-  console.log(`✅ AI cover generated and uploaded: ${pngPath}`);
-  return { ok: true, path: pngPath, exists: true, generated: true };
-}
-
-async function resolveReplicateVersion(token: string) {
-  try {
-    const explicitVersion = env('REPLICATE_VERSION', false);
-    if (explicitVersion) return explicitVersion;
-
-    // Use the stable black-forest-labs/flux-schnell model directly
-    return 'black-forest-labs/flux-schnell';
-  } catch (error) {
-    console.warn('Failed to resolve Replicate version:', error);
-    return 'black-forest-labs/flux-schnell';
-  }
-}
-
-function parseGrade(input?: string | number | null): number | null {
-  if (input == null) return null;
-  const match = String(input).match(/\d+/);
-  return match ? parseInt(match[0], 10) : null;
-}
-
-function ageToUsGrade(age?: number): number | null {
-  return age && age >= 5 && age <= 18 ? Math.max(1, Math.min(12, age - 5)) : null;
-}
-
-function resolveLearnerGrade(gradeRaw?: string|number|null, age?: number): number {
-  return parseGrade(gradeRaw) || ageToUsGrade(age) || 6;
-}
-
-Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: CORS });
-  }
-
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { 
-      status: 405, 
-      headers: { ...CORS, 'Content-Type': 'application/json' } 
-    });
-  }
-
-  const auth = req.headers.get('authorization') || '';
-  const jwt = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-
-  if (!jwt) {
-    return new Response(JSON.stringify({ error: 'Missing JWT' }), { 
-      status: 401, 
-      headers: { ...CORS, 'Content-Type': 'application/json' } 
-    });
-  }
-
-  // Admin-klient til at verificere token og skrive til storage
-  const admin = createClient(URL, SRK);
-
-  // Verificér at JWT er gyldig og tilhører en bruger
-  const { data: userData, error: authErr } = await admin.auth.getUser(jwt);
-  if (authErr || !userData?.user) {
-    return new Response(JSON.stringify({ error: 'Invalid JWT' }), { 
-      status: 401, 
-      headers: { ...CORS, 'Content-Type': 'application/json' } 
-    });
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders(origin) });
   }
 
   try {
-    const { bucket, path, generateIfMissing = true } = await req.json();
-    const jsonHeaders = { ...CORS, 'content-type': 'application/json; charset=utf-8' };
-    
-    if (!bucket || !path) {
-      return new Response(JSON.stringify({ 
-        ok: false, 
-        error: 'bucket and path required' 
-      }), { 
-        status: 400, 
-        headers: jsonHeaders 
+    const {
+      universeId,
+      universeTitle,
+      subject,
+      scene = "cover: main activity",
+      grade,            // exact grade 1–12
+      // optional: extraStyle
+    } = await req.json();
+
+    if (!universeId || !universeTitle || !subject) {
+      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        status: 400, headers: { ...corsHeaders(origin), "content-type": "application/json" }
       });
     }
 
-    // HEAD the current file via a short signed URL
-    let exists = false;
-    let tooSmall = false;
-    let contentLength = 0;
-    let contentType = '';
+    // Simple prompt builder (per-grade, not banded)
+    const positive = [
+      `Illustrate: ${scene}`,
+      `Universe: ${universeTitle}`,
+      `Subject: ${subject}`,
+      grade ? `Audience: Grade ${grade}` : null,
+      `Style: clear composition, age-appropriate, no text overlays`,
+    ].filter(Boolean).join(" — ");
+    const negative = `blurry, watermark, signature, text overlay, misspelled labels, gore, scary imagery`;
 
-    const { data: signed } = await admin.storage.from(bucket).createSignedUrl(path, 60);
-    if (signed?.signedUrl) {
-      const head = await fetch(signed.signedUrl, { method: 'HEAD' });
-      if (head.ok) {
-        exists = true;
-        contentLength = parseInt(head.headers.get('content-length') || '0', 10);
-        contentType = head.headers.get('content-type') || '';
-        tooSmall = !contentType.startsWith('image/') || contentLength < MIN_BYTES;
-        console.log(`📏 File exists: ${path}, size: ${contentLength} bytes, type: ${contentType}`);
-      }
+    const replicateToken = env("REPLICATE_API_TOKEN");
+    const version = await resolveReplicateVersion(replicateToken); // works with MODEL fallback
+    const modelSlug = Deno.env.get("REPLICATE_MODEL") || "";       // only used to tweak inputs
+
+    const functionsBase = env("FUNCTIONS_URL");
+    const webhookToken  = env("REPLICATE_WEBHOOK_TOKEN");
+    const webhook = `${functionsBase}/image-webhook` +
+      `?token=${encodeURIComponent(webhookToken)}` +
+      `&universeId=${encodeURIComponent(universeId)}` +
+      `&grade=${encodeURIComponent(grade ?? "")}` +
+      `&variant=cover`;
+
+    // Replicate input shape differences (Flux vs SDXL-ish)
+    let input: Record<string, unknown>;
+    if (modelSlug.toLowerCase().includes("flux")) {
+      input = {
+        prompt: `${positive} — Negative: ${negative}`,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        num_outputs: 1,
+        go_fast: true,
+      };
+    } else {
+      input = {
+        prompt: positive,
+        negative_prompt: negative,
+        // most SDXL endpoints accept these defaults; keep it minimal
+      };
     }
 
-    // If too small/corrupt: delete the file, so we can treat as "missing"
-    if (exists && tooSmall) {
-      console.log(`🗑️ Deleting corrupt file: ${path} (${contentLength} bytes)`);
-      await admin.storage.from(bucket).remove([path]).catch(() => {});
-      exists = false;
+    const r = await fetch("https://api.replicate.com/v1/predictions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Token ${replicateToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        version,
+        input,
+        webhook,
+        webhook_events_filter: ["completed"],
+      }),
+    });
+
+    const text = await r.text();
+    if (!r.ok) {
+      return new Response(JSON.stringify({ status: "error", error: text }), {
+        status: 500, headers: { ...corsHeaders(origin), "content-type": "application/json" }
+      });
     }
-
-    // If missing and we may generate: try AI generation first
-    if (!exists && generateIfMissing) {
-      try {
-        // Try to generate AI cover if Replicate token is available
-        const replicateToken = Deno.env.get("REPLICATE_API_TOKEN");
-        if (replicateToken && path.includes("/cover.")) {
-          const result = await ensureAiCover(admin, bucket, path, { 
-            title: "Learning Universe", 
-            subject: "Education" 
-          });
-          return new Response(JSON.stringify(result), { headers: jsonHeaders });
-        }
-      } catch (aiError) {
-        console.warn(`AI generation failed for ${path}:`, aiError);
-        // Fall back to client placeholder generation
-      }
-      
-      return new Response(JSON.stringify({
-        ok: true,
-        path,
-        exists: false,
-        needsUpload: true, // signal to client
-      }), { headers: jsonHeaders });
-    }
-
-    return new Response(JSON.stringify({
-      ok: true,
-      path,
-      exists: exists,
-      size: contentLength,
-      type: contentType,
-    }), { headers: jsonHeaders });
-
+    const data = JSON.parse(text);
+    return new Response(JSON.stringify({ status: "queued", id: data.id }), {
+      status: 202, headers: { ...corsHeaders(origin), "content-type": "application/json" }
+    });
   } catch (e) {
-    console.error('image-ensure error', e);
-    return new Response(JSON.stringify({ 
-      ok: false, 
-      error: String(e?.message ?? e) 
-    }), { 
-      status: 500, 
-      headers: { ...CORS, 'Content-Type': 'application/json' } 
+    return new Response(JSON.stringify({ status: "error", error: String(e?.message || e) }), {
+      status: 500, headers: { ...corsHeaders(origin), "content-type": "application/json" }
     });
   }
 });
