@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { TeachingPerspectiveSettings, TeachingPerspectiveType } from "@/types/school";
+import { TeachingPerspectiveSettings } from "@/types/school";
 import { toast } from "@/hooks/use-toast";
 
 const DEFAULT_SETTINGS: TeachingPerspectiveSettings = {

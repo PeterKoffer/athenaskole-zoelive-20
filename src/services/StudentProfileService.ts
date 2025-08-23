@@ -12,20 +12,53 @@ class StudentProfileService {
       console.error('Error getting profile:', error);
       return null;
     }
-    return data;
+    if (!data) return null;
+
+    const lsRaw = (data as any).learning_style;
+    const allowed = ['mixed','visual','auditory','kinesthetic'] as const;
+    const learningStyle = (allowed as readonly string[]).includes(lsRaw) ? (lsRaw as typeof allowed[number]) : 'mixed';
+
+    const profile: StudentProfile = {
+      id: data.id,
+      name: (data as any).name,
+      gradeLevel: (data as any).grade_level,
+      learningStyle,
+      interests: (data as any).interests ?? [],
+      progress: ((data as any).progress as any) ?? {},
+      avatarUrl: (data as any).avatar_url || undefined,
+    };
+    return profile;
   }
 
   public async createProfile(profile: StudentProfile): Promise<void> {
-    const { error } = await supabase.from('student_profiles').insert([profile]);
+    const dbRow = {
+      id: profile.id,
+      name: profile.name,
+      grade_level: profile.gradeLevel,
+      learning_style: profile.learningStyle,
+      interests: profile.interests,
+      progress: profile.progress,
+      avatar_url: profile.avatarUrl ?? null,
+    };
+    const { error } = await supabase.from('student_profiles').insert([dbRow]);
     if (error) {
       console.error('Error creating profile:', error);
     }
   }
 
   public async updateProfile(profile: StudentProfile): Promise<void> {
+    const dbRow = {
+      id: profile.id,
+      name: profile.name,
+      grade_level: profile.gradeLevel,
+      learning_style: profile.learningStyle,
+      interests: profile.interests,
+      progress: profile.progress,
+      avatar_url: profile.avatarUrl ?? null,
+    };
     const { error } = await supabase
       .from('student_profiles')
-      .update(profile)
+      .update(dbRow)
       .eq('id', profile.id);
     if (error) {
       console.error('Error updating profile:', error);

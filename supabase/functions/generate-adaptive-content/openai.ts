@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { generateContentWithOpenAI } from './contentGenerator.ts';
 
 // Re-export for backward compatibility

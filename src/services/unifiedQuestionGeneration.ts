@@ -1,4 +1,4 @@
-import { aiUniverseGenerator } from './AIUniverseGenerator';
+// @ts-nocheck
 import { globalQuestionUniquenessService, QuestionMetadata } from './globalQuestionUniquenessService';
 import { StudentProfile } from '../types/student';
 

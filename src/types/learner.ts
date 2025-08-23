@@ -1,12 +1,12 @@
 
 // Learner Types
 
-import { KcMastery } from './learnerProfile';
+import { KnowledgeComponentMastery } from './learnerProfile';
 
 export interface Learner {
   id: string;
   profile: {
-    kc_masteries: KcMastery[];
+    kc_masteries: KnowledgeComponentMastery[];
     overall_mastery: number;
   };
 }

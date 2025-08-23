@@ -13,7 +13,7 @@ interface UseScenarioCompletionProps {
 
 export const useScenarioCompletion = ({
   session,
-  score,
+  score: _score,
   updateSession,
   logSessionEnd,
   onComplete,

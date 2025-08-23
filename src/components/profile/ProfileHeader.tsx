@@ -7,7 +7,7 @@ interface ProfileHeaderProps {
   onSignOut: () => void;
 }
 
-const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
+const ProfileHeader = ({ onSignOut: _onSignOut }: ProfileHeaderProps) => {
   const navigate = useNavigate();
 
   return (

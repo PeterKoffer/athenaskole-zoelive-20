@@ -1,5 +1,5 @@
 import curriculumIndex from '../data/unified-curriculum-index.json';
-import type { CurriculumNode, CurriculumNodeType } from '../types/curriculum';
+import type { CurriculumNode } from '../types/curriculum';
 import { universeGenerationService } from './UniverseGenerationService';
 
 class ContentGenerationService {
@@ -14,7 +14,7 @@ class ContentGenerationService {
         parentId: rawNode.parentId || null,
         name: rawNode.name || 'Unnamed Node',
         ...rawNode,
-        nodeType: rawNode.nodeType as CurriculumNodeType
+        nodeType: String(rawNode.nodeType)
       } as CurriculumNode;
       return acc;
     }, {} as { [key: string]: CurriculumNode });

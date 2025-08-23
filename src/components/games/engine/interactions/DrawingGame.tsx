@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Palette, Eraser, RotateCcw } from 'lucide-react';
+import { Palette, RotateCcw } from 'lucide-react';
 import { CurriculumGame } from '../../types/GameTypes';
 
 interface DrawingGameProps {
@@ -13,6 +13,7 @@ interface DrawingGameProps {
 }
 
 const DrawingGame = ({ level, onLevelComplete, gameData }: DrawingGameProps) => {
+  void gameData;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState('#3B82F6');

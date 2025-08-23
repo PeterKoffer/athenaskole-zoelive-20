@@ -1,8 +1,7 @@
 
-import { CurriculumNode } from '@/types/curriculum';
 import { NELIESubject } from '@/types/curriculum/NELIESubjects';
 
-export const dkCurriculumNodes: CurriculumNode[] = [
+export const dkCurriculumNodes: any[] = [
   // Denmark Root
   {
     id: 'dk',

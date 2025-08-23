@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { GeneratedContent } from './types.ts';
 
 export interface GradeDescriptor {

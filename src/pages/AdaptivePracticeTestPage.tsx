@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -12,7 +12,6 @@ import Grade3FractionTestTrigger from '@/components/adaptive-learning/components
 import FocusedGrade3MultiplicationTest from '@/components/adaptive-learning/components/FocusedGrade3MultiplicationTest';
 
 const AdaptivePracticeTestPage = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [showModule, setShowModule] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);

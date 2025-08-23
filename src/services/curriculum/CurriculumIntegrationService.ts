@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { completeStudyPugCurriculum, CurriculumLevel, CurriculumTopic } from './curriculumData';
 

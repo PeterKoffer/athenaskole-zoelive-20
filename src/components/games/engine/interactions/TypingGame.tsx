@@ -33,6 +33,7 @@ const generateChallenges = (level: number): TypingChallenge[] => {
 };
 
 const TypingGame = ({ level, onLevelComplete, gameData }: TypingGameProps) => {
+  void gameData;
   const [challenges] = useState(() => generateChallenges(level));
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [userInput, setUserInput] = useState('');

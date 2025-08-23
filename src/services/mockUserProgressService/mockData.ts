@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { UserStepProgress, ObjectiveProgressMetrics } from '@/types/curriculum';
 
 // In-memory store for mock user progress

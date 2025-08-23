@@ -1,5 +1,5 @@
 
-import { StudentProfile } from "@/types/studentProfile";
+import { LearnerProfile } from "@/types/learnerProfile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
 interface ProfileFormProps {
-  profileData: StudentProfile;
+  profileData: LearnerProfile;
   loading: boolean;
-  onDataChange: (data: Partial<StudentProfile>) => void;
+  onDataChange: (data: Partial<LearnerProfile>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -41,18 +41,18 @@ const ProfileForm = ({ profileData, loading, onDataChange, onSubmit }: ProfileFo
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="gradeLevel" className="text-gray-300">Grade Level</label>
+            <label htmlFor="grade_level" className="text-gray-300">Grade Level</label>
             <Input
-              id="gradeLevel"
+              id="grade_level"
               type="number"
-              value={profileData?.gradeLevel || ''}
-              onChange={(e) => onDataChange({ gradeLevel: parseInt(e.target.value) })}
+              value={profileData?.grade_level || ''}
+              onChange={(e) => onDataChange({ grade_level: parseInt(e.target.value) })}
               className="bg-gray-700 text-white border-gray-600"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="learningStyle" className="text-gray-300">Learning Style</label>
-            <Select onValueChange={(value) => onDataChange({ learningStyle: value as any })} value={profileData.learningStyle}>
+            <label htmlFor="learning_style_preference" className="text-gray-300">Learning Style</label>
+            <Select onValueChange={(value) => onDataChange({ learning_style_preference: value as any })} value={profileData.learning_style_preference as any}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Learning Style" />
               </SelectTrigger>

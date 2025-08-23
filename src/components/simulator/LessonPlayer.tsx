@@ -15,7 +15,7 @@ interface LessonPlayerProps {
 const LessonPlayer: React.FC<LessonPlayerProps> = ({ lesson: initialLesson, onComplete }) => {
   const [lesson, setLesson] = useState(initialLesson);
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
-  const [progress, setProgress] = useState({});
+  const [progress, setProgress] = useState<Record<number, any>>({});
   const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const LessonPlayer: React.FC<LessonPlayerProps> = ({ lesson: initialLesson, onCo
     }
   };
 
-  const handleDifficultyChange = async (difficulty: number) => {
+  const handleDifficultyChange = async (_difficulty: number) => {
     const newLesson = await generateEnhancedLesson(lesson.subject, lesson.skillArea, lesson.gradeLevel, lesson.learningStyle);
     setLesson(newLesson);
   };

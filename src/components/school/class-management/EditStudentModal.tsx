@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { Student, Class } from "@/types/school";
 

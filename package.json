@@ -22,7 +22,6 @@
   "dependencies": {
     "@11labs/react": "^0.1.4",
     "@hookform/resolvers": "^3.9.0",
-    "@huggingface/transformers": "^3.5.2",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -58,6 +57,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "compromise": "^14.14.4",
+    "cross-env": "^10.0.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "framer-motion": "^12.19.1",

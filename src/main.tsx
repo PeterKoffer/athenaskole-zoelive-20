@@ -9,6 +9,12 @@ import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "./index.css";
 
+// Bootstrap auth cache wiring
+import { wireAuthCache } from "@/utils/cacheAuth";
+import { setNamespace, memoClear } from "@/utils/cache";
+
+wireAuthCache(setNamespace, memoClear);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

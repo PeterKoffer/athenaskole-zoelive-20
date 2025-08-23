@@ -7,7 +7,7 @@ interface ClassAssignmentsTabProps {
   currentClass: Class;
 }
 
-const ClassAssignmentsTab = ({ currentClass }: ClassAssignmentsTabProps) => {
+const ClassAssignmentsTab = ({ currentClass: _currentClass }: ClassAssignmentsTabProps) => {
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader>

@@ -9,6 +9,7 @@ interface LessonProgressDisplayProps {
   score: number;
   correctStreak: number;
   onBackToProgram: () => void;
+  hideActivityCount?: boolean;
 }
 
 const LessonProgressDisplay = ({
@@ -18,7 +19,8 @@ const LessonProgressDisplay = ({
   targetLessonLength,
   score,
   correctStreak,
-  onBackToProgram
+  onBackToProgram,
+  hideActivityCount
 }: LessonProgressDisplayProps) => {
   return (
     <LessonProgressHeader
@@ -31,6 +33,7 @@ const LessonProgressDisplay = ({
       engagementLevel={85}
       questionsGenerated={totalActivities}
       onBackToProgram={onBackToProgram}
+      hideActivityCount={hideActivityCount}
     />
   );
 };

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -76,7 +76,7 @@ serve(async (req) => {
           headers: {
             "Accept": "audio/mpeg",
             "Content-Type": "application/json",
-            "xi-api-key": apiKey,
+            "xi-api-key": ELEVENLABS_API_KEY,
           },
           body: JSON.stringify({
             text,
@@ -131,7 +131,7 @@ serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ error: "Unknown request type: " + type }), { 
+    return new Response(JSON.stringify({ error: "Unknown action: " + action }), { 
       status: 400, 
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });

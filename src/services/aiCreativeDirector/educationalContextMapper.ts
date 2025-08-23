@@ -104,7 +104,7 @@ export class EducationalContextMapper {
     return parts.slice(3).join(' ').replace(/_/g, ' ') || 'general concepts';
   }
 
-  private static generateSubjectContext(subject: string, skillArea: string, gradeLevel: number, userId: string): EducationalContext {
+  private static generateSubjectContext(subject: string, skillArea: string, gradeLevel: number, _userId: string): EducationalContext {
     const subjectContexts = {
       english: {
         teacherRequirements: {

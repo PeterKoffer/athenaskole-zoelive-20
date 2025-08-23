@@ -16,7 +16,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     return sessionStorage.getItem('nelieHomepageWelcomed') === 'true';
   });
   
-  const [hasManuallyTriggered, setHasManuallyTriggered] = useState(false);
+  const [hasManuallyTriggered] = useState(false);
   const [actualUserName, setActualUserName] = useState(userName);
   
   const {
@@ -25,7 +25,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     hasUserInteracted,
     isReady,
     speak,
-    stop,
     toggleEnabled,
   } = useUnifiedSpeech();
 
@@ -39,7 +38,7 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
           .from('profiles')
           .select('name')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profile?.name) {
           const firstName = profile.name.split(' ')[0];
@@ -109,10 +108,6 @@ const HomepageWelcome = ({ userName }: HomepageWelcomeProps) => {
     }
   }, [isReady, hasWelcomedThisSession, hasManuallyTriggered, isEnabled, hasUserInteracted, userName, speak, welcomeMessage]);
 
-  const handleStopSpeech = () => {
-    console.log('🔊 Stopping Nelie speech');
-    stop();
-  };
 
   return (
     <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-none mb-6">

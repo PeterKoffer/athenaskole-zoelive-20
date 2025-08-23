@@ -24,6 +24,7 @@ export interface Curriculum {
 }
 
 import { LearningAtomPerformance } from "./learning";
+import { NELIESubject } from "./curriculum/NELIESubjects";
 
 export interface ObjectiveProgressMetrics {
   isCompleted: boolean;
@@ -51,3 +52,25 @@ export interface UserStepProgress {
   // Value: Metrics related to the student's interaction with that objective over time
   curriculumProgress: Record<string, ObjectiveProgressMetrics>;
 }
+
+// Flexible curriculum node type used by curriculum data files
+export interface CurriculumNode {
+  id: string;
+  parentId?: string | null;
+  nodeType: string; // e.g., 'subject', 'subject_area', 'course', 'grade_level', 'domain', 'learning_objective'
+  name: string;
+  description?: string;
+  countryCode?: string;
+  languageCode?: string;
+  subject?: NELIESubject;
+  subjectName?: string;
+  educationalLevel?: string; // e.g., 'K', '1', 'K-12'
+  estimatedDuration?: number;
+  difficultyLevel?: number;
+  sourceIdentifier?: string; // e.g., NGSS code
+  tags?: string[];
+  children?: CurriculumNode[];
+}
+
+// Alias used by some modules
+export type UnifiedCurriculumNode = CurriculumNode;

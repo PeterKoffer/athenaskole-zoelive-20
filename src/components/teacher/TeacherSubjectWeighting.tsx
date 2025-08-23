@@ -32,7 +32,7 @@ const TeacherSubjectWeighting = () => {
         const preferences = await preferencesService.getTeacherPreferences(user.id);
         
         if (preferences?.subject_weights) {
-          setWeights(preferences.subject_weights);
+          setWeights(preferences.subject_weights as Record<string, number>);
         } else {
           // Initialize with default weights of 5 for all subjects
           const defaultWeights = SUBJECTS.reduce((acc, subject) => {

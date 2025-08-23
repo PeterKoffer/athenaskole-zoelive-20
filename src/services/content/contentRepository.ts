@@ -82,7 +82,7 @@ export class ContentRepository {
     }
   }
 
-  async getAtomsByKcId(kcId: string): Promise<ContentAtom[]> {
+  async getAtomsByKcId(_kcId: string): Promise<ContentAtom[]> {
     console.log('⚠️ ContentRepository.getAtomsByKcId called - now using AI generation instead');
     
     // This method is now legacy - AI generation handles content creation

@@ -4,7 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { safeInvokeFn } from '@/supabase/functionsClient';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MathQuestion {
   id: string;
@@ -28,42 +29,38 @@ const AIGeneratedMathQuestion = ({
   onQuestionComplete
 }: AIGeneratedMathQuestionProps) => {
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState<MathQuestion | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isGenerating, setIsGenerating] = useState(true);
 
   const generateQuestion = useCallback(async () => {
+    if (authLoading || !user) return;
+    
     setIsGenerating(true);
     console.log(`🤖 Generating AI math question for grade ${studentGrade} question ${questionNumber}`);
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate-question', {
-        body: {
-          subject: 'mathematics',
-          skillArea: questionNumber <= 2 ? 'basic_arithmetic' : 'word_problems',
-          difficultyLevel: studentGrade,
-          gradeLevel: studentGrade,
-          userId: 'student',
-          questionIndex: questionNumber - 1,
-          promptVariation: questionNumber <= 2 ? 'basic' : 'story',
-          topicFocus: questionNumber % 2 === 0 ? 'addition' : 'subtraction',
-          questionType: questionNumber <= 2 ? 'multiple_choice' : 'word_problem'
-        }
+      const data = await safeInvokeFn('generate-question', {
+        subject: 'mathematics',
+        skillArea: questionNumber <= 2 ? 'basic_arithmetic' : 'word_problems',
+        difficultyLevel: studentGrade,
+        gradeLevel: studentGrade,
+        userId: 'student',
+        questionIndex: questionNumber - 1,
+        promptVariation: questionNumber <= 2 ? 'basic' : 'story',
+        topicFocus: questionNumber % 2 === 0 ? 'addition' : 'subtraction',
+        questionType: questionNumber <= 2 ? 'multiple_choice' : 'word_problem'
       });
 
-      if (error) {
-        console.error('❌ AI question generation error:', error);
-        throw error;
-      }
-
-      if (data?.question) {
+      if ((data as any)?.question) {
         const newQuestion: MathQuestion = {
           id: `ai-question-${questionNumber}-${Date.now()}`,
-          question: data.question,
-          options: data.options || ['A', 'B', 'C', 'D'],
-          correct: data.correct || 0,
-          explanation: data.explanation || 'Great job!'
+          question: (data as any).question,
+          options: (data as any).options || ['A', 'B', 'C', 'D'],
+          correct: (data as any).correct || 0,
+          explanation: (data as any).explanation || 'Great job!'
         };
 
         console.log('✅ Generated diverse question:', newQuestion.question.substring(0, 50) + '...');
@@ -113,7 +110,7 @@ const AIGeneratedMathQuestion = ({
     } finally {
       setIsGenerating(false);
     }
-  }, [questionNumber, studentGrade, toast]);
+  }, [questionNumber, studentGrade, toast, authLoading, user]);
 
   useEffect(() => {
     generateQuestion();

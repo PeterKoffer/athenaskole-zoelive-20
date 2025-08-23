@@ -2,8 +2,8 @@
 import { toast } from "@/components/ui/use-toast";
 
 export const showSpeechToast = (
-  title: string,
-  description?: string,
+  _title: string,
+  _description?: string,
   variant: "success" | "destructive" | "default" = "default"
 ) => {
   // Only show error toasts to avoid confusing students with technical details

@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/safeInvoke';
+import type { AdaptiveContentRes } from '@/types/api';
 
 interface CodeSuggestionRequest {
   prompt: string;
@@ -28,14 +29,7 @@ export const useCodeSuggestions = () => {
     try {
       console.log('🔄 Requesting code suggestion:', request);
 
-      const { data, error: supabaseError } = await supabase.functions.invoke('generate-code-suggestions', {
-        body: request
-      });
-
-      if (supabaseError) {
-        console.error('❌ Supabase function error:', supabaseError);
-        throw new Error(supabaseError.message);
-      }
+      const data = await invokeFn<AdaptiveContentRes>('generate-code-suggestions', request);
 
       const response = data as CodeSuggestionResponse;
 

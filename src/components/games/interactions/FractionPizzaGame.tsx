@@ -21,6 +21,7 @@ const FractionPizzaGame = ({
   instruction, 
   onComplete 
 }: FractionPizzaGameProps) => {
+  void gameState;
   const [selectedSlices, setSelectedSlices] = useState<number>(0);
   const [gameCompleted, setGameCompleted] = useState(false);
   const totalSlices = targetFraction.denominator;

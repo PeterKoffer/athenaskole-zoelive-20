@@ -32,7 +32,7 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario, onStart }) => {
             <div className="mb-4">
               <h4 className="text-white font-medium mb-2">Learning Outcomes:</h4>
               <ul className="list-disc list-inside space-y-1 text-gray-300">
-                {scenario.educational.learningOutcomes.map((outcome, index) => (
+                {(scenario.educational.learningOutcomes ?? []).map((outcome, index) => (
                   <li key={index}>{outcome}</li>
                 ))}
               </ul>

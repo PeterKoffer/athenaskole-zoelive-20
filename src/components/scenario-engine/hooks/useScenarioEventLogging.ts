@@ -15,7 +15,7 @@ export const useScenarioEventLogging = ({
   scenario,
   session,
   currentNode,
-  score
+  score: _score
 }: UseScenarioEventLoggingProps) => {
   
   // Log scenario start when component mounts
@@ -34,7 +34,7 @@ export const useScenarioEventLogging = ({
       console.log('📊 Logging CONTENT_VIEW event for node:', currentNode.id);
       stealthAssessmentService.logContentView({
         contentAtomId: currentNode.id,
-        knowledgeComponentIds: [currentNode.educational.skillArea],
+        knowledgeComponentIds: [currentNode.educational?.skillArea],
         contentType: currentNode.type.toUpperCase(),
         timeViewedMs: undefined
       }, 'ScenarioPlayer');
@@ -45,22 +45,22 @@ export const useScenarioEventLogging = ({
     console.log('📊 Logging QUESTION_ATTEMPT event');
     stealthAssessmentService.logQuestionAttempt({
       questionId: currentNode.id,
-      knowledgeComponentIds: [currentNode.educational.skillArea],
+      knowledgeComponentIds: [currentNode.educational?.skillArea],
       answerGiven: selectedAnswer,
-      isCorrect: selectedAnswer === currentNode.config.customProperties?.correctAnswer,
+      isCorrect: selectedAnswer === currentNode.config?.customProperties?.correctAnswer,
       attemptsMade: 1,
       timeTakenMs: undefined
     }, 'ScenarioPlayer');
   };
 
-  const logNavigation = (fromNodeId: string, toNodeId: string | null) => {
+  const logNavigation = (_fromNodeId: string, _toNodeId: string | null) => {
     console.log('📊 Logging NAVIGATION event for branching decision');
     stealthAssessmentService.logEvent({
       type: InteractionEventType.NAVIGATION
     }, 'ScenarioPlayer');
   };
 
-  const logSessionEnd = (reason: 'COMPLETION' | 'USER_INITIATED', session: ScenarioSession) => {
+  const logSessionEnd = (_reason: 'COMPLETION' | 'USER_INITIATED', _session: ScenarioSession) => {
     console.log('📊 Logging SESSION_END event');
     stealthAssessmentService.logEvent({
       type: InteractionEventType.SESSION_END

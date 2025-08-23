@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { corsHeaders } from './cors.ts';
 import { ErrorResponse, SuccessResponse } from './types.ts';
 

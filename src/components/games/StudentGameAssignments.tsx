@@ -14,9 +14,9 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
-import { gameAssignmentService, type GameAssignment } from '@/services/gameAssignmentService';
+import { gameAssignmentService } from '@/services/gameAssignmentService';
+import type { GameAssignment } from '@/types/database';
 import { curriculumGames, type CurriculumGame } from '@/components/games/CurriculumGameConfig';
-import { useGameTracking } from '@/hooks/useGameTracking';
 
 interface StudentGameAssignmentsProps {
   onGameSelect?: (gameId: string, assignmentId?: string) => void;

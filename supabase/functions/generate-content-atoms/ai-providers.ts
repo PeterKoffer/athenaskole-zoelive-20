@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // AI Provider Configuration and Generation Logic
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");

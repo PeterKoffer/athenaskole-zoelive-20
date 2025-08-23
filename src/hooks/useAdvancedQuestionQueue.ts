@@ -109,7 +109,7 @@ export const useAdvancedQuestionQueue = ({
     question: UniqueQuestion,
     userAnswer: number,
     isCorrect: boolean,
-    responseTime: number
+    _responseTime: number
   ) => {
     try {
       console.log('📝 Saving question response:', { question: question.id, userAnswer, isCorrect });

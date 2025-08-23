@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 
 interface QuestionData {

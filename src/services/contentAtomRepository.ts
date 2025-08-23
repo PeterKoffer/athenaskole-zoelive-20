@@ -3,7 +3,7 @@
 // This service would need proper database tables to function
 
 export const contentAtomRepository = {
-  async getAtomsByKcId(kcId: string) {
+  async getAtomsByKcId(_kcId: string) {
     console.log('📚 ContentAtomRepository: getAtomsByKcId called (stub implementation)');
     // Return empty array for now since content_atoms table doesn't exist
     return [];

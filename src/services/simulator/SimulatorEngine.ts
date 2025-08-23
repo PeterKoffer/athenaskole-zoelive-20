@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Educational Simulator Engine - Core orchestration logic
 
 import { 

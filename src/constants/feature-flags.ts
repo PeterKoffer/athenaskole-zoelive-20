@@ -1,0 +1,1 @@
+export const GRADE_LABEL_MODE: 'single' | 'range' = 'single';

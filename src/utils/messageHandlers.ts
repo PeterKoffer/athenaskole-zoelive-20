@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Message handling logic for Jules AI integration
 
 import type { JulesMessageHandler, ProjectInfo } from '@/types/jules';

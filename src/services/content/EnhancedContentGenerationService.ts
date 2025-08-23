@@ -1,7 +1,8 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/safeInvoke';
 import CurriculumIntegrationService from '../curriculum/CurriculumIntegrationService';
 import { ContentGenerationRequest, AtomSequence } from './ContentGenerationService';
+import type { AdaptiveContentRes } from '@/types/api';
 
 interface EnhancedContentRequest extends ContentGenerationRequest {
   useRealWorldScenarios?: boolean;
@@ -39,14 +40,7 @@ class EnhancedContentGenerationService {
       };
 
       // Call enhanced edge function with curriculum data
-      const { data: edgeResponse, error } = await supabase.functions.invoke('generate-content-atoms', {
-        body: enhancedRequest
-      });
-
-      if (error) {
-        console.error('❌ Enhanced content generation error:', error);
-        return null;
-      }
+      const edgeResponse = await invokeFn<AdaptiveContentRes>('generate-content-atoms', enhancedRequest);
 
       if (edgeResponse?.atoms && edgeResponse.atoms.length > 0) {
         console.log('✅ Generated enhanced curriculum-aligned content:', edgeResponse.atoms.length, 'atoms');

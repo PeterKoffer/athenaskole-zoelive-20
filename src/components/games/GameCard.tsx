@@ -32,7 +32,7 @@ const GameCard = ({ game, onGameSelect }: GameCardProps) => {
   };
 
   const getSubjectColor = (subject: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       "Mathematics": "bg-blue-900 text-blue-400 border-blue-400",
       "English": "bg-red-900 text-red-400 border-red-400",
       "Programming": "bg-purple-900 text-purple-400 border-purple-400",
@@ -40,7 +40,7 @@ const GameCard = ({ game, onGameSelect }: GameCardProps) => {
       "Science & Technology": "bg-green-900 text-green-400 border-green-400",
       "Music": "bg-pink-900 text-pink-400 border-pink-400"
     };
-    return colors[subject] || "bg-gray-900 text-gray-400 border-gray-400";
+    return colors[subject] ?? "bg-gray-900 text-gray-400 border-gray-400";
   };
 
   return (

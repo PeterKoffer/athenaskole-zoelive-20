@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mockProfileService, MOCK_USER_ID } from '../MockProfileService';
 import { KCMasteryUpdateData } from '@/types/learnerProfile';

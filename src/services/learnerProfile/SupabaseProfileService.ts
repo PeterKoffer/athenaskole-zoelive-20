@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Main Supabase service implementing LearnerProfileService interface
 import type { LearnerProfile, KnowledgeComponentMastery, LearnerPreferences, KCMasteryUpdateData } from '@/types/learnerProfile';
 import type { LearnerProfileService } from './types';

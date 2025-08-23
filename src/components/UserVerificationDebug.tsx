@@ -34,7 +34,7 @@ const UserVerificationDebug: React.FC = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (rawProfileError && rawProfileError.code !== 'PGRST116') {
         console.error('❌ Raw profile error:', rawProfileError);

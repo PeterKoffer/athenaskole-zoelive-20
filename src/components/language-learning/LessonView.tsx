@@ -80,7 +80,7 @@ const LessonView = ({
   };
 
   if (isLoadingLesson) {
-    return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><LoadingSpinner size="lg" /></div>;
+    return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><LoadingSpinner /></div>;
   }
 
   if (!currentLesson) {

@@ -6,7 +6,7 @@ import SubjectCardTooltip from './SubjectCardTooltip';
 
 const SubjectCardIcon: React.FC<SubjectCardIconProps> = ({ 
   subject, 
-  isHovered, 
+  isHovered: _isHovered, 
   onMouseEnter, 
   onMouseLeave 
 }) => {

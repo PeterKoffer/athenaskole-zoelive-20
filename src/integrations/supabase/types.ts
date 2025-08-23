@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -80,6 +80,57 @@ export type Database = {
           json?: Json
           key?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_images: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error: string | null
+          height: number
+          id: string
+          model_version: string
+          prompt: string
+          provider: string
+          replicate_prediction_id: string | null
+          seed: number | null
+          status: string
+          storage_path: string | null
+          universe_id: string
+          width: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error?: string | null
+          height: number
+          id?: string
+          model_version: string
+          prompt: string
+          provider?: string
+          replicate_prediction_id?: string | null
+          seed?: number | null
+          status: string
+          storage_path?: string | null
+          universe_id: string
+          width: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error?: string | null
+          height?: number
+          id?: string
+          model_version?: string
+          prompt?: string
+          provider?: string
+          replicate_prediction_id?: string | null
+          seed?: number | null
+          status?: string
+          storage_path?: string | null
+          universe_id?: string
+          width?: number
         }
         Relationships: []
       }
@@ -205,6 +256,93 @@ export type Database = {
           },
         ]
       }
+      calendar_events: {
+        Row: {
+          all_day: boolean
+          audiences: string[]
+          class_id: string | null
+          color: string | null
+          created_at: string
+          created_by: string
+          details: string | null
+          ends_at: string
+          id: string
+          location: string | null
+          org_id: string
+          rrule: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          all_day?: boolean
+          audiences?: string[]
+          class_id?: string | null
+          color?: string | null
+          created_at?: string
+          created_by: string
+          details?: string | null
+          ends_at: string
+          id?: string
+          location?: string | null
+          org_id: string
+          rrule?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          all_day?: boolean
+          audiences?: string[]
+          class_id?: string | null
+          color?: string | null
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          ends_at?: string
+          id?: string
+          location?: string | null
+          org_id?: string
+          rrule?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      class_overrides: {
+        Row: {
+          class_id: string
+          country_code: string | null
+          currency_code: string | null
+          curriculum_code: string | null
+          locale: string | null
+          measurement_system: string | null
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          class_id: string
+          country_code?: string | null
+          currency_code?: string | null
+          curriculum_code?: string | null
+          locale?: string | null
+          measurement_system?: string | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          class_id?: string
+          country_code?: string | null
+          currency_code?: string | null
+          curriculum_code?: string | null
+          locale?: string | null
+          measurement_system?: string | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       concept_mastery: {
         Row: {
           concept_name: string
@@ -243,6 +381,36 @@ export type Database = {
           subject?: string
           total_attempts?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cover_images: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string
+          metadata: Json | null
+          prompt: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url: string
+          metadata?: Json | null
+          prompt: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          metadata?: Json | null
+          prompt?: string
+          status?: string
           user_id?: string
         }
         Relationships: []
@@ -349,6 +517,33 @@ export type Database = {
           performance_accuracy?: number | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          payload: Json
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          payload?: Json
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          payload?: Json
+          session_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -541,6 +736,72 @@ export type Database = {
           },
         ]
       }
+      lesson_plans: {
+        Row: {
+          class_id: string | null
+          created_at: string | null
+          id: string
+          lesson_data: Json
+          org_id: string
+          plan_date: string
+          status: string
+          teacher_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_data: Json
+          org_id: string
+          plan_date: string
+          status?: string
+          teacher_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_data?: Json
+          org_id?: string
+          plan_date?: string
+          status?: string
+          teacher_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      lesson_snapshots: {
+        Row: {
+          created_at: string
+          date: string
+          frozen_config: Json
+          id: string
+          is_locked: boolean
+          student_id: string
+          universe_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          frozen_config: Json
+          id?: string
+          is_locked?: boolean
+          student_id: string
+          universe_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          frozen_config?: Json
+          id?: string
+          is_locked?: boolean
+          student_id?: string
+          universe_id?: string | null
+        }
+        Relationships: []
+      }
       music_projects: {
         Row: {
           collaboration_users: Json | null
@@ -609,15 +870,22 @@ export type Database = {
           address: string | null
           avatar_url: string | null
           birth_date: string | null
+          country_code: string | null
           created_at: string
+          currency_code: string | null
+          curriculum_code: string | null
           email: string | null
+          full_name: string | null
           grade: string | null
           id: string
+          locale: string | null
+          measurement_system: string | null
           name: string | null
           overall_mastery: number | null
           preferences: Json | null
           recent_performance: Json | null
           school: string | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -625,15 +893,22 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           birth_date?: string | null
+          country_code?: string | null
           created_at?: string
+          currency_code?: string | null
+          curriculum_code?: string | null
           email?: string | null
+          full_name?: string | null
           grade?: string | null
           id?: string
+          locale?: string | null
+          measurement_system?: string | null
           name?: string | null
           overall_mastery?: number | null
           preferences?: Json | null
           recent_performance?: Json | null
           school?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -641,17 +916,54 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           birth_date?: string | null
+          country_code?: string | null
           created_at?: string
+          currency_code?: string | null
+          curriculum_code?: string | null
           email?: string | null
+          full_name?: string | null
           grade?: string | null
           id?: string
+          locale?: string | null
+          measurement_system?: string | null
           name?: string | null
           overall_mastery?: number | null
           preferences?: Json | null
           recent_performance?: Json | null
           school?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      prompts: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          prompt_text: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          prompt_text: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          prompt_text?: string
+          updated_at?: string
+          version?: number
         }
         Relationships: []
       }
@@ -745,6 +1057,42 @@ export type Database = {
           pedagogy?: string | null
           school_name?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      scores: {
+        Row: {
+          country: string | null
+          created_at: string
+          game_id: string
+          meta: Json
+          period: string
+          school_id: string | null
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          game_id: string
+          meta?: Json
+          period?: string
+          school_id?: string | null
+          score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          game_id?: string
+          meta?: Json
+          period?: string
+          school_id?: string | null
+          score?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -897,6 +1245,192 @@ export type Database = {
         }
         Relationships: []
       }
+      universe_arcs: {
+        Row: {
+          class_id: string
+          created_at: string
+          date: string
+          pack_id: string
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          date: string
+          pack_id: string
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          date?: string
+          pack_id?: string
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      universe_content: {
+        Row: {
+          activities: Json
+          created_at: string
+          id: string
+          objectives: string[]
+          summary: string
+          universe_id: string
+          updated_at: string
+        }
+        Insert: {
+          activities?: Json
+          created_at?: string
+          id?: string
+          objectives?: string[]
+          summary: string
+          universe_id: string
+          updated_at?: string
+        }
+        Update: {
+          activities?: Json
+          created_at?: string
+          id?: string
+          objectives?: string[]
+          summary?: string
+          universe_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      universe_image_jobs: {
+        Row: {
+          created_at: string
+          failed: number
+          finished_at: string | null
+          id: string
+          notes: string | null
+          skipped: number
+          started_at: string
+          success: number
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          skipped?: number
+          started_at?: string
+          success?: number
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          skipped?: number
+          started_at?: string
+          success?: number
+          total?: number
+        }
+        Relationships: []
+      }
+      universe_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_ai_generated: boolean
+          lang: string
+          source: string
+          universe_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_ai_generated?: boolean
+          lang?: string
+          source?: string
+          universe_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_ai_generated?: boolean
+          lang?: string
+          source?: string
+          universe_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      universes: {
+        Row: {
+          content_hash: string | null
+          created_at: string
+          description: string | null
+          goals: Json | null
+          grade_level: string
+          id: string
+          image_status: string
+          image_url: string | null
+          lang: string
+          metadata: Json
+          owner_id: string
+          slug: string
+          subject: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          content_hash?: string | null
+          created_at?: string
+          description?: string | null
+          goals?: Json | null
+          grade_level: string
+          id?: string
+          image_status?: string
+          image_url?: string | null
+          lang?: string
+          metadata?: Json
+          owner_id: string
+          slug: string
+          subject: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          content_hash?: string | null
+          created_at?: string
+          description?: string | null
+          goals?: Json | null
+          grade_level?: string
+          id?: string
+          image_status?: string
+          image_url?: string | null
+          lang?: string
+          metadata?: Json
+          owner_id?: string
+          slug?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       user_activity_sessions: {
         Row: {
           completion_status: string
@@ -989,37 +1523,105 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      keyword_event: {
+        Row: {
+          created_at: string | null
+          date_end: string | null
+          date_start: string | null
+          id: string | null
+          name: string | null
+          payload: Json | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date_end?: never
+          date_start?: never
+          id?: string | null
+          name?: string | null
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date_end?: never
+          date_start?: never
+          id?: string | null
+          name?: string | null
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_recent_cover_images: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string | null
+          id: string
+          image_url: string
+          metadata: Json | null
+          prompt: string
+          status: string
+          user_id: string
+        }[]
+      }
+      has_role: {
+        Args: { role: string; uid: string }
+        Returns: boolean
+      }
+      jwt_claim: {
+        Args: { "": string }
+        Returns: string
+      }
+      purge_old_events: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      submit_score: {
+        Args: { p_game_id: string; p_meta?: Json; p_score: number }
+        Returns: undefined
+      }
       update_concept_mastery: {
         Args: {
-          p_user_id: string
           p_concept_name: string
-          p_subject: string
           p_is_correct: boolean
+          p_subject: string
+          p_user_id: string
         }
         Returns: undefined
       }
       update_real_time_progress: {
         Args: {
-          p_user_id: string
-          p_subject: string
-          p_skill_area: string
-          p_time_spent: number
           p_progress_delta: number
+          p_skill_area: string
+          p_subject: string
+          p_time_spent: number
+          p_user_id: string
         }
         Returns: undefined
       }
       update_user_performance: {
         Args: {
-          p_user_id: string
-          p_subject: string
-          p_skill_area: string
-          p_is_correct: boolean
           p_completion_time: number
+          p_is_correct: boolean
+          p_skill_area: string
+          p_subject: string
+          p_user_id: string
         }
         Returns: undefined
+      }
+      upsert_universes: {
+        Args: { _data: Json; _owner_id?: string }
+        Returns: {
+          attempted: number
+          inserted: number
+          skipped_slugs: string[]
+        }[]
       }
     }
     Enums: {

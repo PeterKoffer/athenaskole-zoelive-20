@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,12 +8,14 @@ import { Loader2, Play, BookOpen, Brain } from 'lucide-react';
 import { dailyLessonGenerator } from '@/services/dailyLessonGenerator';
 import { useAuth } from '@/hooks/useAuth';
 
+interface GeneratedLesson { subject: string; grade: string; activities: any[]; totalActivities: number; estimatedDuration: number }
+
 const K5LessonTester = () => {
   const { user } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedGrade, setSelectedGrade] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedLesson, setGeneratedLesson] = useState(null);
+  const [generatedLesson, setGeneratedLesson] = useState<GeneratedLesson | null>(null);
   const [error, setError] = useState('');
 
   const subjects = [
@@ -74,7 +76,7 @@ const K5LessonTester = () => {
 
     } catch (err) {
       console.error('❌ Lesson generation failed:', err);
-      setError(`Failed to generate lesson: ${err.message}`);
+      setError(`Failed to generate lesson: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsGenerating(false);
     }
@@ -205,7 +207,7 @@ const K5LessonTester = () => {
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-gray-300">Generated Activities:</h4>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {generatedLesson.activities.map((activity, index) => (
+                    {generatedLesson.activities.map((activity: any, index: number) => (
                       <div key={activity.id} className="bg-gray-900/30 rounded p-3 text-sm">
                         <div className="flex items-center justify-between">
                           <span className="text-white font-medium">

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 import { useToast } from '@/hooks/use-toast';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Volume2 } from 'lucide-react';
+import type { AdaptiveContentRes } from '@/types/api';
 
 interface Question {
   question: string;
@@ -15,7 +16,7 @@ interface Question {
 const SimpleMathematicsLearningPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { speakText, isNelieReady } = useUnifiedSpeech();
+  const { speakText, isReady } = useUnifiedSpeech();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -29,7 +30,7 @@ const SimpleMathematicsLearningPage = () => {
 
   // Text-to-speech helper
   const handleSpeak = (text: string) => {
-    if (isNelieReady) {
+    if (isReady) {
       speakText(text);
     }
   };
@@ -46,19 +47,12 @@ const SimpleMathematicsLearningPage = () => {
       for (let i = 0; i < 2; i++) {
         console.log(`📚 NELIE: Generating initial question ${i + 1} of 2...`);
         
-        const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            subject: 'mathematics',
-            skillArea: 'general',
-            gradeLevel: 3,
-            userId: 'student'
-          }
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
+          subject: 'mathematics',
+          skillArea: 'general',
+          gradeLevel: 3,
+          userId: 'student'
         });
-
-        if (error) {
-          console.error(`❌ NELIE: Question ${i + 1} generation error:`, error);
-          throw error;
-        }
 
         if (data?.question) {
           const aiQuestion: Question = {
@@ -115,19 +109,12 @@ const SimpleMathematicsLearningPage = () => {
       for (let i = 2; i < 5; i++) {
         console.log(`📚 NELIE: Generating background question ${i + 1} of 5...`);
         
-        const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            subject: 'mathematics',
-            skillArea: 'general',
-            gradeLevel: 3,
-            userId: 'student'
-          }
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
+          subject: 'mathematics',
+          skillArea: 'general',
+          gradeLevel: 3,
+          userId: 'student'
         });
-
-        if (error) {
-          console.error(`❌ NELIE: Background question ${i + 1} generation error:`, error);
-          continue; // Continue with other questions even if one fails
-        }
 
         if (data?.question) {
           const aiQuestion: Question = {

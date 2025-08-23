@@ -21,6 +21,7 @@ interface SimulationState {
 }
 
 const SimulationGame = ({ level, onLevelComplete, gameData }: SimulationGameProps) => {
+  void gameData;
   const [state, setState] = useState<SimulationState>({
     money: 100,
     customers: 0,

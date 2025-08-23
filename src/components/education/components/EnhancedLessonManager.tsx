@@ -14,11 +14,13 @@ interface EnhancedLessonManagerProps {
   subject: string;
   skillArea: string;
   onBackToProgram: () => void;
+  hideActivityCount?: boolean;
 }
 
 const EnhancedLessonManager = ({ 
   subject, 
-  onBackToProgram 
+  onBackToProgram, 
+  hideActivityCount
 }: EnhancedLessonManagerProps) => {
   const {
     currentActivityIndex,
@@ -30,7 +32,8 @@ const EnhancedLessonManager = ({
     phase,
     handleActivityComplete,
     isLoadingActivities,
-    regenerateLesson
+    regenerateLesson,
+    targetDuration
   } = useUnifiedLesson();
 
   const {
@@ -74,8 +77,10 @@ const EnhancedLessonManager = ({
     );
   }
 
-  // Target lesson length
-  const targetLessonLength = DEFAULT_LESSON_SECONDS;
+  // Target lesson length (seconds); prefer context's targetDuration (minutes)
+  const targetLessonLength = (typeof targetDuration === 'number' && targetDuration > 0)
+    ? targetDuration * 60
+    : DEFAULT_LESSON_SECONDS;
 
   const handleManualRead = async () => {
     if (currentActivity) {
@@ -118,6 +123,7 @@ const EnhancedLessonManager = ({
         score={score}
         correctStreak={correctStreak}
         onBackToProgram={onBackToProgram}
+        hideActivityCount={hideActivityCount}
       />
 
       <LessonActivityManager

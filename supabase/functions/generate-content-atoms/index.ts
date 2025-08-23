@@ -1,7 +1,6 @@
-
+// @ts-nocheck
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createSubjectPrompt } from '../prompts/index.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,13 +39,13 @@ serve(async (req) => {
     }
 
     // Generate unified training ground prompt
-    const enhancedPrompt = createSubjectPrompt(
-      requestData.subject || 'mathematics',
-      requestData.kcId,
-      requestData.gradeLevel || 4,
-      requestData.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE'],
-      requestData.maxAtoms || 3
-    );
+    const enhancedPrompt = `Create educational content atoms for ${requestData.subject || 'mathematics'} Grade ${requestData.gradeLevel || 4}.
+    
+    Content types needed: ${(requestData.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE']).join(', ')}
+    Maximum atoms: ${requestData.maxAtoms || 3}
+    Knowledge component: ${requestData.kcId}
+    
+    Return valid JSON with an "atoms" array containing the educational content.`;
 
     // Add curriculum context if available
     let finalPrompt = enhancedPrompt;

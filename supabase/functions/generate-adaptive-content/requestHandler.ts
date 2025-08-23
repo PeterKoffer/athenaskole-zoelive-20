@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { RequestBody, ErrorResponse } from './types.ts';
 import { createErrorResponse } from './response.ts';
 

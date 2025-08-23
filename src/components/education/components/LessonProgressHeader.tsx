@@ -13,6 +13,7 @@ interface LessonProgressHeaderProps {
   engagementLevel?: number;
   questionsGenerated?: number;
   onBackToProgram?: () => void;
+  hideActivityCount?: boolean;
 }
 
 const LessonProgressHeader = ({
@@ -20,7 +21,8 @@ const LessonProgressHeader = ({
   score,
   currentActivityIndex,
   totalActivities,
-  targetLessonLength = DEFAULT_LESSON_SECONDS
+  targetLessonLength = DEFAULT_LESSON_SECONDS,
+  hideActivityCount
 }: LessonProgressHeaderProps) => {
   // Convert timeElapsed (seconds) to minutes for display
   const timeElapsedMinutes = Math.floor(timeElapsed / 60);
@@ -28,7 +30,9 @@ const LessonProgressHeader = ({
   
   // Convert target length (seconds) to minutes for display
   const targetMinutes = Math.floor(targetLessonLength / 60);
-  
+  const activityProgress = totalActivities > 0 ? ((currentActivityIndex + 1) / totalActivities) * 100 : 0;
+  const timeProgress = Math.min((timeElapsed / targetLessonLength) * 100, 100);
+  const widthPercent = hideActivityCount ? timeProgress : activityProgress;
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardContent className="p-4">
@@ -43,15 +47,17 @@ const LessonProgressHeader = ({
             <Star className="w-5 h-5 text-yellow-400" />
             <span className="text-sm">Score: {score}</span>
           </div>
-          <div className="text-sm">
-            Activity {currentActivityIndex + 1} of {totalActivities}
-          </div>
+          {!hideActivityCount && (
+            <div className="text-sm">
+              Activity {currentActivityIndex + 1} of {totalActivities}
+            </div>
+          )}
         </div>
         
         <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
           <div 
             className="bg-lime-400 h-2 rounded-full transition-all duration-500" 
-            style={{ width: `${(currentActivityIndex + 1) / totalActivities * 100}%` }} 
+            style={{ width: `${widthPercent}%` }} 
           />
         </div>
       </CardContent>

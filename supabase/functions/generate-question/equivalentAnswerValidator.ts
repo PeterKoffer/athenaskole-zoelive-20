@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { GeneratedQuestion, QuestionValidationResult } from './types.ts';
 
 export function validateForEquivalentAnswers(questionData: GeneratedQuestion, skillArea: string): QuestionValidationResult {

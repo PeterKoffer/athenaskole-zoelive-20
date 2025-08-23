@@ -1,5 +1,5 @@
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,11 +24,12 @@ interface DragDropGameProps {
 }
 
 const DragDropGame = ({ gameState, gameActions, items, instruction, onComplete }: DragDropGameProps) => {
+  void gameState;
   const [draggedItem, setDraggedItem] = useState<DragDropItem | null>(null);
   const [droppedItems, setDroppedItems] = useState<Record<string, DragDropItem>>({});
   const [feedback, setFeedback] = useState<{ correct: string[], incorrect: string[] }>({ correct: [], incorrect: [] });
   const [gameCompleted, setGameCompleted] = useState(false);
-  const dragRef = useRef<HTMLDivElement>(null);
+  
 
   const draggableItems = items.filter(item => item.type === 'draggable');
   const dropZones = items.filter(item => item.type === 'dropzone');

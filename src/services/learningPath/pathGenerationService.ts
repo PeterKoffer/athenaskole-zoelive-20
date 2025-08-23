@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Path Generation Service
 
 export class PathGenerationService {

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,7 +38,7 @@ const generateSequence = (level: number): SequenceItem[] => {
   return sequence.sort(() => Math.random() - 0.5);
 };
 
-const ClickSequenceGame = ({ level, onLevelComplete, gameData }: ClickSequenceGameProps) => {
+const ClickSequenceGame = ({ level, onLevelComplete, gameData: _gameData }: ClickSequenceGameProps) => {
   const [sequence, setSequence] = useState(() => generateSequence(level));
   const [currentStep, setCurrentStep] = useState(1);
   const [score, setScore] = useState(0);

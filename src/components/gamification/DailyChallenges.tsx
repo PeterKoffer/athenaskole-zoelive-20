@@ -24,7 +24,7 @@ interface DailyChallengesProps {
 
 const DailyChallenges = ({ onChallengeComplete }: DailyChallengesProps) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [streakDays, setStreakDays] = useState(5);
+  const [streakDays] = useState(5);
   const [totalCoins, setTotalCoins] = useState(150);
 
   useEffect(() => {

@@ -24,7 +24,10 @@ export const UnifiedLessonProvider = ({
     extendLessonDynamically,
     isExtending,
     targetDuration,
-    usedQuestionIds
+    usedQuestionIds,
+    replaceActivityBySlotId,
+    regenerateActivityBySlotId,
+    isSlotBusy
   } = useDailyLessonGeneration({
     subject,
     skillArea,
@@ -133,6 +136,11 @@ export const UnifiedLessonProvider = ({
     // Loading states
     isLoadingActivities: isLoadingActivities || isExtending,
     regenerateLesson,
+
+    // Dev helpers
+    replaceActivityBySlotId,
+    regenerateActivityBySlotId,
+    isSlotBusy,
     
     // Dynamic extension properties
     targetDuration,

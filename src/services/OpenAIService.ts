@@ -1,9 +1,10 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/safeInvoke';
 import { Universe } from './UniverseGenerator';
+import type { AdaptiveContentRes } from '@/types/api';
 
 export const openAIService = {
-  async generateUniverse(prompt: string, signal?: AbortSignal): Promise<Universe> {
+  async generateUniverse(prompt: string, _signal?: AbortSignal): Promise<Universe> {
     console.log('🤖 OpenAI Service: Generating universe via Supabase Edge Function');
     console.log('📋 Prompt:', typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : prompt);
     
@@ -15,30 +16,21 @@ export const openAIService = {
 
       console.log('📞 Calling generate-adaptive-content edge function for universe generation');
       
-      const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-        body: requestData
-      });
+      const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', requestData);
 
-      console.log('📨 Edge function response:', { data, error });
-
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw new Error(`Edge function error: ${error.message}`);
-      }
-
-      if (!data || !data.success) {
+      if (data?.success === false) {
         console.error('❌ Edge function returned error:', data?.error);
         // Instead of throwing, return a fallback universe
         return this.createFallbackUniverse(prompt);
       }
 
       // If we have generated content, try to parse it as a universe
-      if (data.generatedContent) {
+      if (data?.generatedContent) {
         console.log('✅ Successfully received generated content');
         
         // Convert the complex objects to simple strings for compatibility
         const characters = Array.isArray(data.generatedContent.characters) 
-          ? data.generatedContent.characters.map(char => 
+          ? data.generatedContent.characters.map((char: any) => 
               typeof char === 'string' ? char : `${char.name || 'Character'} - ${char.description || char.role || 'A helpful character'}`
             )
           : [
@@ -48,7 +40,7 @@ export const openAIService = {
             ];
 
         const locations = Array.isArray(data.generatedContent.locations) 
-          ? data.generatedContent.locations.map(loc => 
+          ? data.generatedContent.locations.map((loc: any) => 
               typeof loc === 'string' ? loc : `${loc.name || 'Location'} - ${loc.description || 'An interesting place to explore'}`
             )
           : [
@@ -58,7 +50,7 @@ export const openAIService = {
             ];
 
         const activities = Array.isArray(data.generatedContent.activities) 
-          ? data.generatedContent.activities.map(act => 
+          ? data.generatedContent.activities.map((act: any) => 
               typeof act === 'string' ? act : `${act.name || 'Activity'} - ${act.description || 'An engaging learning experience'}`
             )
           : [

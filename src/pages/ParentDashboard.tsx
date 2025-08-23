@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Users, ArrowLeft, BarChart3, Calendar, Settings } from 'lucide-react';
+import { ArrowLeft, BarChart3, Calendar, Settings } from 'lucide-react';
 
 const ParentDashboard = () => {
   const { user, loading } = useAuth();

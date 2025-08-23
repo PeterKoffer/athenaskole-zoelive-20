@@ -2,11 +2,27 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { StableQuizOptions } from '../education/components/activities/stable-quiz/StableQuizOptions';
-import { StableQuizSubmitButton } from '../education/components/activities/stable-quiz/StableQuizSubmitButton';
-import QuestionAnswerOptions from '../education/components/question/QuestionAnswerOptions';
-import SimplifiedQuestionDisplay from '../adaptive-learning/components/SimplifiedQuestionDisplay';
-import QuestionOptions from '../adaptive-learning/components/QuestionOptions';
+type OptionsProps = { options: string[]; selectedAnswer: number | null; onAnswerSelect: (i:number)=>void; showResult?: boolean; correctAnswer?: number; activityId?: string };
+const StableQuizOptions = ({ options, selectedAnswer, onAnswerSelect, showResult, correctAnswer }: OptionsProps) => (
+  <div className="space-y-2">
+    {options.map((opt, idx) => (
+      <Button key={idx} variant={selectedAnswer===idx ? "default":"outline"} onClick={()=>onAnswerSelect(idx)}>
+        {opt} {showResult && correctAnswer===idx ? "✓": ""}
+      </Button>
+    ))}
+  </div>
+);
+const StableQuizSubmitButton = ({ onSubmit, disabled }: { onSubmit: () => void; disabled?: boolean }) => (
+  <Button onClick={onSubmit} disabled={disabled}>Submit</Button>
+);
+const QuestionAnswerOptions = StableQuizOptions as any;
+const SimplifiedQuestionDisplay = ({ currentQuestion, selectedAnswer, onAnswerSelect, showResult }: any) => (
+  <div>
+    <div className="text-white">{currentQuestion.question}</div>
+    <StableQuizOptions options={currentQuestion.options} selectedAnswer={selectedAnswer} onAnswerSelect={onAnswerSelect} showResult={showResult} correctAnswer={currentQuestion.correct} />
+  </div>
+);
+const QuestionOptions = StableQuizOptions as any;
 
 const ButtonTestingComponent = () => {
   const [selectedAnswer1, setSelectedAnswer1] = useState<number | null>(null);

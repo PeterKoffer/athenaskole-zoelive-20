@@ -1,7 +1,7 @@
 import { EnhancedSubjectLessonFactory } from './EnhancedSubjectLessonFactory';
 import { preferencesService } from './PreferencesService';
-import { conceptMasteryService } from './conceptMasteryService';
-import { aiLearningPathService } from './aiLearningPathService';
+
+
 import { validateEnhancedLesson } from '../components/education/components/utils/EnhancedLessonGenerator';
 
 interface NELIESession {
@@ -31,49 +31,49 @@ const NELIESessionGenerator = {
         const lessons: any[] = [];
 
         // Get preferences and weights
-        const [schoolPreferences, teacherPreferences, conceptMastery, learningPath] = await Promise.all([
+        const [schoolPreferences, teacherPreferences] = await Promise.all([
             preferencesService.getSchoolPreferences(config.schoolId),
-            config.teacherId ? preferencesService.getTeacherPreferences(config.teacherId) : Promise.resolve(null),
-            conceptMasteryService.getConceptMastery(config.userId),
-            aiLearningPathService.getAdaptiveRecommendations(config.userId, 'general')
+            config.teacherId ? preferencesService.getTeacherPreferences(config.teacherId) : Promise.resolve(null)
         ]);
 
-        const subjectWeights = {
-            ...schoolPreferences?.subject_weights,
-            ...teacherPreferences?.subject_weights,
-            ...teacherPreferences?.weekly_emphasis
-        };
+        const subjectWeights: Record<string, number> = {};
+        Object.assign(
+            subjectWeights,
+            (schoolPreferences && typeof schoolPreferences.subject_weights === 'object') ? schoolPreferences.subject_weights : {},
+            (teacherPreferences && typeof teacherPreferences.subject_weights === 'object') ? teacherPreferences.subject_weights : {},
+            (teacherPreferences && typeof teacherPreferences.weekly_emphasis === 'object') ? teacherPreferences.weekly_emphasis : {}
+        );
 
         for (const subject of config.subjects) {
             let lesson;
-            const subjectDifficulty = conceptMastery.find(c => c.subject === subject)?.masteryLevel || config.difficulty;
+            const subjectDifficulty = config.difficulty;
             const weightedDifficulty = (subjectDifficulty || 1) * (subjectWeights[subject] || 1);
-
+            const learningStyle = (['mixed','visual','auditory','kinesthetic'] as const).includes(config.preferredLearningStyle as any) ? (config.preferredLearningStyle as any) : 'mixed';
             switch (subject) {
                 case 'mathematics':
-                    lesson = await EnhancedSubjectLessonFactory.generateMathLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+                    lesson = await EnhancedSubjectLessonFactory.generateMathLesson(config.gradeLevel, learningStyle, weightedDifficulty);
                     break;
                 case 'english':
-                    lesson = await EnhancedSubjectLessonFactory.generateEnglishLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+                    lesson = await EnhancedSubjectLessonFactory.generateEnglishLesson(config.gradeLevel, learningStyle, weightedDifficulty);
                     break;
                 case 'science':
-                    lesson = await EnhancedSubjectLessonFactory.generateScienceLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+                    lesson = await EnhancedSubjectLessonFactory.generateScienceLesson(config.gradeLevel, learningStyle, weightedDifficulty);
                     break;
                 case 'music':
-                    lesson = await EnhancedSubjectLessonFactory.generateMusicLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+                    lesson = await EnhancedSubjectLessonFactory.generateMusicLesson(config.gradeLevel, learningStyle, weightedDifficulty);
                     break;
                 case 'computerScience':
-                    lesson = await EnhancedSubjectLessonFactory.generateComputerScienceLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+                    lesson = await EnhancedSubjectLessonFactory.generateComputerScienceLesson(config.gradeLevel, learningStyle, weightedDifficulty);
                     break;
                 case 'creativeArts':
-                    lesson = await EnhancedSubjectLessonFactory.generateCreativeArtsLesson(config.gradeLevel, config.preferredLearningStyle, weightedDifficulty);
+                    lesson = await EnhancedSubjectLessonFactory.generateCreativeArtsLesson(config.gradeLevel, learningStyle, weightedDifficulty);
                     break;
                 default:
                     throw new Error(`Unknown subject: ${subject}`);
             }
             const validation = validateEnhancedLesson(lesson);
             qualityScores[subject] = validation.qualityScore;
-            totalDuration += lesson.estimatedTotalDuration;
+            totalDuration += (lesson?.estimatedTotalDuration || 0);
             lessons.push(lesson);
         }
 
@@ -88,7 +88,7 @@ const NELIESessionGenerator = {
     },
 
     NELIEHelpers: {
-        generateMathLesson: (gradeLevel: number, learningStyle: string) => {
+        generateMathLesson: (gradeLevel: number, learningStyle: 'mixed' | 'visual' | 'auditory' | 'kinesthetic') => {
             return EnhancedSubjectLessonFactory.generateMathLesson(gradeLevel, learningStyle);
         }
     }

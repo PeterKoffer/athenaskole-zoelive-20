@@ -77,7 +77,7 @@ class SpeechStateManager {
   }
 
   updateState(updates: Partial<SpeechState>) {
-    const prevState = { ...this.state };
+    
     this.state = { ...this.state, ...updates };
     
     console.log('🔄 [SpeechStateManager] State updated', this.state);

@@ -10,7 +10,8 @@ echo "🔧 Running setup..."
 apt-get update
 
 # Install base system packages required for building node modules
-apt-get install -y git curl build-essential
+# Includes Python for projects that rely on node-gyp during npm install
+apt-get install -y git curl build-essential python3 python3-pip
 
 # Install additional libraries commonly required by Playwright and other tools
 apt-get install -y libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libdrm2 libxcomposite1 libgbm1 ca-certificates

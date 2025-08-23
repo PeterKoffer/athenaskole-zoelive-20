@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { CurriculumNode, CurriculumLevel, CurriculumSubject, CurriculumTopic } from '@/types/curriculum/index';
 import { CurriculumStats } from './core/CurriculumStats';

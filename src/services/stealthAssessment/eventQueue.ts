@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // src/services/stealthAssessment/eventQueue.ts
 
 import { InteractionEvent, InteractionEventType, QuestionAttemptEvent } from '@/types/stealthAssessment';

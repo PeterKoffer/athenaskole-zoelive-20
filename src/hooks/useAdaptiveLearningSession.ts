@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { LearningAtom, LearningAtomPerformance } from '@/types/learning';
 import InSessionAdaptiveManager from '@/services/InSessionAdaptiveManager';
-import AdaptiveDifficultyEngine, { DifficultyLevel } from '@/services/AdaptiveDifficultyEngine';
+import AdaptiveDifficultyEngine from '@/services/AdaptiveDifficultyEngine';
 import UniverseSessionManager from '@/services/UniverseSessionManager';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -39,8 +39,8 @@ export const useAdaptiveLearningSession = (initialAtom: LearningAtom | null) => 
           // Get historically-informed initial difficulty
           const suggestedDifficulty = await AdaptiveDifficultyEngine.suggestInitialDifficulty(
             user.id,
-            initialAtom.curriculumObjectiveId,
-            initialAtom.subject
+            initialAtom.curriculumObjectiveId || 'unknown-objective',
+            initialAtom.subject || 'General'
           );
 
           console.log(`[useAdaptiveLearningSession] Historical difficulty suggestion: ${suggestedDifficulty} for objective: ${initialAtom.curriculumObjectiveId}`);

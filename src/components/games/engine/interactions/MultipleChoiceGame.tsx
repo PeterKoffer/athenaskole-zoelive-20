@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -264,6 +264,7 @@ const generateQuestions = (gameData: CurriculumGame, level: number): Question[] 
 };
 
 const generateXRQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  void gameData; void level;
   if (gameData.id.includes('ancient-rome')) {
     return [
       {
@@ -314,6 +315,7 @@ const generateXRQuestions = (gameData: CurriculumGame, level: number, basePoints
 };
 
 const generateCodingQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  void gameData; void level;
   return [
     {
       question: "🧩 In block-based programming, what does a 'loop' block do?",
@@ -340,6 +342,7 @@ const generateCodingQuestions = (gameData: CurriculumGame, level: number, basePo
 };
 
 const generateMusicQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  void gameData; void level;
   return [
     {
       question: "🎼 In music composition, what creates the 'melody'?",
@@ -366,6 +369,7 @@ const generateMusicQuestions = (gameData: CurriculumGame, level: number, basePoi
 };
 
 const generateDetectiveQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  void level;
   if (gameData.subject.toLowerCase().includes('math')) {
     return [
       {
@@ -404,6 +408,7 @@ const generateDetectiveQuestions = (gameData: CurriculumGame, level: number, bas
 };
 
 const generateMultiSubjectQuestions = (gameData: CurriculumGame, level: number, basePoints: number): Question[] => {
+  void gameData; void level;
   const subjects = ['Math', 'Science', 'History', 'English'];
   const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
   

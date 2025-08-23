@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
@@ -18,9 +18,9 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   User, 
   LogOut, 
-  Settings, 
   UserCog,
-  ChevronDown
+  ChevronDown,
+  Bug
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -126,6 +126,12 @@ const UserMenu = () => {
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
+        {import.meta.env.DEV && (
+          <DropdownMenuItem onClick={() => navigate('/dev/events')}>
+            <Bug className="mr-2 h-4 w-4" />
+            <span>Dev · Events</span>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

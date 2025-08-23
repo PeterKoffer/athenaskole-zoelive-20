@@ -10,7 +10,7 @@ export const useProfileData = (): UseProfileDataReturn => {
     profileData,
     setProfileData: setProfileDataState,
     loading: fetchLoading,
-    error: fetchError,
+    error: _fetchError,
     refetch,
   } = useProfileFetch();
 

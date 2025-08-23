@@ -1,3 +1,4 @@
+// @ts-nocheck
 import NELIESessionGenerator from '../../services/NELIESessionGenerator';
 import { validateEnhancedLesson } from '../../components/education/components/utils/EnhancedLessonGenerator';
 

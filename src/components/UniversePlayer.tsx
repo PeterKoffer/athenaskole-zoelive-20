@@ -2,7 +2,10 @@
 import React from 'react';
 import { Universe } from '../services/UniverseGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { CurriculumStandard } from '../services/CurriculumMapper';
+import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
+import { useUniverseImage } from '@/hooks/useUniverseImage';
 
 interface UniversePlayerProps {
     universe: Universe;
@@ -10,12 +13,31 @@ interface UniversePlayerProps {
 }
 
 const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
+    const path = universe.id ? `${universe.id}/6/cover.webp` : undefined;
+    const { url: imageUrl, loading: isLoading } = useUniverseImage(path);
+    const isAI = !!imageUrl && imageUrl.includes('universe-images');
+
+
     return (
         <div className="space-y-6">
             <Card className="overflow-hidden">
-                {universe.image && (
-                    <img src={universe.image} alt="Universe" className="w-full h-48 object-cover" />
-                )}
+                <div className="relative">
+                    <img 
+                        src={imageUrl || universe.image || "/images/placeholder-16x9.png"} 
+                        alt="Universe"
+                        className="w-full aspect-video object-cover rounded-2xl bg-slate-100"
+                    />
+                    {isLoading && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl">
+                            <span className="text-white text-sm">Loading universe image...</span>
+                        </div>
+                    )}
+                    {isAI && (
+                        <div className="absolute top-2 right-2">
+                            <Badge variant="secondary" className="text-xs">AI Generated</Badge>
+                        </div>
+                    )}
+                </div>
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
                         {universe.title}
@@ -39,7 +61,9 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.characters || []).map((character, index) => (
                                 <li key={index} className="text-sm">
-                                    {character}
+                                    <TextWithSpeaker text={character} context={`universe-character-${index}`} position="corner" className="group">
+                                        <span>{character}</span>
+                                    </TextWithSpeaker>
                                 </li>
                             ))}
                         </ul>
@@ -56,7 +80,9 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.locations || []).map((location, index) => (
                                 <li key={index} className="text-sm">
-                                    {location}
+                                    <TextWithSpeaker text={location} context={`universe-location-${index}`} position="corner" className="group">
+                                        <span>{location}</span>
+                                    </TextWithSpeaker>
                                 </li>
                             ))}
                         </ul>
@@ -73,7 +99,9 @@ const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [
                         <ul className="list-disc list-inside space-y-1">
                             {(universe.activities || []).map((activity, index) => (
                                 <li key={index} className="text-sm">
-                                    {activity}
+                                    <TextWithSpeaker text={activity} context={`universe-activity-${index}`} position="corner" className="group">
+                                        <span>{activity}</span>
+                                    </TextWithSpeaker>
                                 </li>
                             ))}
                         </ul>

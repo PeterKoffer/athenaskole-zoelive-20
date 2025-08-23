@@ -17,7 +17,7 @@ import {
   School, 
   Calendar, 
   Shield,
-  ChevronDown
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
@@ -77,13 +77,22 @@ const UnifiedNavigationDropdown = ({
       icon: School,
       show: true
     }] : []),
-    ...(userRole === 'teacher' ? [{
-      title: "Teacher Dashboard",
-      href: "/teacher-dashboard",
-      description: "Manage your classes and student progress", 
-      icon: GraduationCap,
-      show: true
-    }] : []),
+    ...(userRole === 'teacher' ? [
+      {
+        title: "Teacher Dashboard",
+        href: "/teacher-dashboard",
+        description: "Manage your classes and student progress", 
+        icon: GraduationCap,
+        show: true
+      },
+      {
+        title: "Universe Admin",
+        href: "/admin/universe",
+        description: "Configure universe scheduling and timezone settings",
+        icon: Settings,
+        show: true
+      }
+    ] : []),
     ...(userRole === 'parent' ? [{
       title: "Parent Dashboard", 
       href: "/parent-dashboard",
@@ -91,13 +100,22 @@ const UnifiedNavigationDropdown = ({
       icon: Users,
       show: true
     }] : []),
-    ...(userRole === 'admin' ? [{
-      title: "Admin Dashboard",
-      href: "/admin-dashboard", 
-      description: "Full system management and administration",
-      icon: Shield,
-      show: true
-    }] : [])
+    ...(userRole === 'admin' ? [
+      {
+        title: "Admin Dashboard",
+        href: "/admin-dashboard", 
+        description: "Full system management and administration",
+        icon: Shield,
+        show: true
+      },
+      {
+        title: "Universe Admin",
+        href: "/admin/universe",
+        description: "Configure universe scheduling and timezone settings",
+        icon: Settings,
+        show: true
+      }
+    ] : [])
   ];
 
   const learningItems = [
@@ -184,7 +202,7 @@ const ListItem = forwardRef<
     className?: string;
     href?: string;
   }
->(({ className, title, children, icon: Icon, onClick, href, ...props }, ref) => {
+>(({ className, title, children, icon: Icon, onClick }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>

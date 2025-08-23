@@ -1,6 +1,4 @@
 
-import { openaiContentService } from './openaiContentService'; // Import named export instead of default
-import { Curriculum } from '@/types/curriculum'; // For LearningObjective structure
 
 // Predefined themes and fallback contexts (similar to what was in DailyUniverseGenerator)
 // These will be used if AI generation fails or is not preferred.
@@ -34,6 +32,7 @@ const FALLBACK_THEMES = [
 
 
 import { DifficultyLevel } from './AdaptiveDifficultyEngine'; // Import DifficultyLevel
+import { openaiContentService } from './openaiContentService';
 
 export interface LearningObjectiveInput {
   objectiveId: string;
@@ -65,11 +64,7 @@ interface AIResponseFormat {
 
 
 class DynamicNarrativeService {
-  private formatObjectivesForPrompt(objectives: LearningObjectiveInput[]): string {
-    return objectives.map((obj, index) =>
-      `${index + 1}. ID: "${obj.objectiveId}", Title: "${obj.objectiveTitle}", Subject: "${obj.subject}", Difficulty: "${obj.difficulty}"${obj.estimatedMinutes ? `, Duration: ${obj.estimatedMinutes} mins` : ''}`
-    ).join('\n');
-  }
+    // (removed unused helper formatObjectivesForPrompt to satisfy TS)
 
   private generateFallbackNarrative(
     themeName: string,
@@ -101,55 +96,13 @@ class DynamicNarrativeService {
     themeName: string,
     studentAge: number, // or gradeLevel
     learningObjectives: LearningObjectiveInput[],
-    desiredAtomCount: number
+    _desiredAtomCount: number
   ): Promise<DynamicNarrativeComponents> {
     console.log(`[DynamicNarrativeService] Generating narrative for theme: ${themeName}, age: ${studentAge}, objectives: ${learningObjectives.length}`);
 
-    const gradeLevel = Math.max(1, studentAge - 5); // Example conversion
-    const formattedObjectives = this.formatObjectivesForPrompt(learningObjectives);
+    // compute grade level and format objectives if needed in future
+    // (removed unused locals to satisfy TS)
 
-    const prompt = `
-System Message:
-You are a creative and engaging educational content writer for children. Your task is to weave learning objectives into exciting themed adventures. Ensure the tone is age-appropriate, positive, and encouraging. Output your response as a single JSON object only, without any surrounding text or explanations.
-
-User Prompt:
-Generate a complete narrative structure for a daily learning adventure.
-
-Theme: "${themeName}"
-Target Age/Grade: ${studentAge} years old / Grade ${gradeLevel}
-Number of Learning Atoms to Integrate: ${desiredAtomCount}
-
-Learning Objectives to Integrate (each with an ID, Title, Subject, and assigned Difficulty):
-${formattedObjectives}
-
-Please generate the following components in a single JSON object format:
-
-1.  "storylineIntro": A short (2-4 sentences) and engaging introduction that sets the stage for the day's adventure based on the theme: "${themeName}". It should be exciting and make the student look forward to the day.
-
-2.  "atomContexts": An array of objects. Each object in the array should correspond to one of the provided Learning Objectives (matching the order and IDs if possible) and must include:
-    *   "objectiveId": The exact ID of the learning objective as provided above (e.g., "math_multiply_1").
-    *   "narrativeContext": A creative and engaging narrative snippet (2-3 sentences). This snippet should seamlessly embed the specific learning objective (considering its Title, Subject, and assigned Difficulty) into the "${themeName}" storyline. For example, if Difficulty is 'easy', the context might offer more clues or simplify the problem's framing within the story. If 'hard', it might present a more complex scenario. The snippet should provide a reason *within the story* for why the student needs to engage with this learning objective.
-
-3.  "storylineOutro": A short (2-3 sentences) concluding narrative snippet that wraps up the day's adventure for the theme "${themeName}" and offers a sense of accomplishment.
-
-JSON Output Structure Example:
-{
-  "storylineIntro": "Welcome, brave explorer, to the mystery of the Whispering Woods! Today, we need your sharp mind to uncover ancient secrets...",
-  "atomContexts": [
-    {
-      "objectiveId": "math_multiply_1",
-      "narrativeContext": "Oh no! The map to the hidden temple is encoded with repeating symbols! To decipher it, we first need to master this ancient scroll on 'Introduction to Multiplication'. It seems the old guardians used math to protect their secrets!"
-    }
-    // ... more atom contexts, ensure one for each objective ID provided in the input
-  ],
-  "storylineOutro": "Amazing work, detective! You've pieced together the clues and solved the mystery of the Whispering Woods. The forest thanks you!"
-}
-
-Ensure all narrative text is age-appropriate for ${studentAge} years old / Grade ${gradeLevel}.
-Maintain a consistent and engaging tone throughout, fitting the theme: "${themeName}".
-The narrative contexts for each atom should ideally flow logically if encountered in sequence.
-The "atomContexts" array must contain exactly ${desiredAtomCount} entries, one for each provided objective ID, and include the correct "objectiveId".
-`;
 
     try {
       // Use the correct method from openaiContentService

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeFn } from '@/supabase/functionsClient';
 import { useToast } from '@/hooks/use-toast';
+import type { AdaptiveContentRes } from '@/types/api';
 
 console.log('🔥 DEBUGGING: MathematicsLearningPage loaded');
 
@@ -34,19 +35,12 @@ const MathematicsLearningPage = () => {
       for (let i = 0; i < 2; i++) {
         console.log(`🤖 Generating initial question ${i + 1} of 2...`);
         
-        const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            subject: 'mathematics',
-            skillArea: 'general',
-            gradeLevel: 3,
-            userId: 'student'
-          }
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
+          subject: 'mathematics',
+          skillArea: 'general',
+          gradeLevel: 3,
+          userId: 'student'
         });
-
-        if (error) {
-          console.error(`❌ AI question ${i + 1} generation error:`, error);
-          throw error;
-        }
 
         if (data?.question) {
           const aiQuestion = {
@@ -97,25 +91,18 @@ const MathematicsLearningPage = () => {
     console.log('🤖 Generating additional questions in background...');
     
     try {
-      const additionalQuestions = [];
+      const additionalQuestions: any[] = [];
       
       // Generate 3 more questions to reach 5 total
       for (let i = 2; i < 5; i++) {
         console.log(`🤖 Generating background question ${i + 1} of 5...`);
         
-        const { data, error } = await supabase.functions.invoke('generate-adaptive-content', {
-          body: {
-            subject: 'mathematics',
-            skillArea: 'general',
-            gradeLevel: 3,
-            userId: 'student'
-          }
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
+          subject: 'mathematics',
+          skillArea: 'general',
+          gradeLevel: 3,
+          userId: 'student'
         });
-
-        if (error) {
-          console.error(`❌ Background question ${i + 1} generation error:`, error);
-          continue; // Continue with other questions even if one fails
-        }
 
         if (data?.question) {
           const aiQuestion = {
@@ -289,7 +276,7 @@ const MathematicsLearningPage = () => {
                 </h3>
                 
                 <div className="grid gap-3">
-                  {questions[currentQuestion].options.map((option, index) => (
+                  {questions[currentQuestion].options.map((option: string, index: number) => (
                     <button
                       key={index}
                       onClick={() => handleAnswerSelect(index)}

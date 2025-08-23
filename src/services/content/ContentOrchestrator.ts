@@ -35,7 +35,7 @@ export class ContentOrchestrator {
     };
   }
 
-  async getAtomSequenceForKc(kcId: string, userId: string) {
+  async getAtomSequenceForKc(_kcId: string, _userId: string) {
     console.log('🔬 Content Orchestrator: getAtomSequenceForKc (stub implementation)');
     
     return {

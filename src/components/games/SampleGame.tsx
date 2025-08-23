@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
-import { curriculumGames, getGameById } from './CurriculumGameConfig';
+import { getGameById } from './CurriculumGameConfig';
 import GameEngine from './engine/GameEngine';
 import { useToast } from '@/hooks/use-toast';
 import { loadAllGamesData } from './data/GameData';

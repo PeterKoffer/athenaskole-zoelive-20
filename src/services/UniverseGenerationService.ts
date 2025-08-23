@@ -34,7 +34,7 @@ class UniverseGenerationService {
     ];
 
     private getCurriculumObjectives(gradeLevel: number, subjects: NELIESubject[]): CurriculumNode[] {
-        const gradeMap = {
+        const gradeMap: Record<number, string> = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
             7: "7", 8: "8", 9: "9", 10: "10", 11: "11", 12: "12"
         };
@@ -45,7 +45,7 @@ class UniverseGenerationService {
             return [];
         }
 
-        return relevantStep.curriculums
+        return (relevantStep.curriculums
             .filter(curriculum => subjects.includes(curriculum.subject as NELIESubject))
             .map(curriculum => ({
                 id: curriculum.id,
@@ -53,7 +53,7 @@ class UniverseGenerationService {
                 description: curriculum.description,
                 subjectName: curriculum.subject,
                 educationalLevel: `Grade ${gradeLevel}`
-            }));
+            })) ) as unknown as CurriculumNode[];
     }
 
     public async generate(studentProfile: any): Promise<DailyUniverse> {

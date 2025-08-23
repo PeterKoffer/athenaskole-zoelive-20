@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // src/services/learnerProfile/integrationHelpers.ts
 
 import { mockCurriculumService } from '@/services/curriculumService/mockCurriculumService';

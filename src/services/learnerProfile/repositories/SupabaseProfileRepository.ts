@@ -64,7 +64,7 @@ export class SupabaseProfileRepository {
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (profileError) {
       console.error('❌ Error fetching profile:', profileError);
@@ -84,7 +84,7 @@ export class SupabaseProfileRepository {
           .from('profiles')
           .select('recent_performance')
           .eq('user_id', userId)
-          .single();
+          .maybeSingle();
 
         const recentPerformance = (profile?.recent_performance as any[]) || [];
         const updatedPerformance = [...recentPerformance, interactionData.performance].slice(-10); // Keep last 10

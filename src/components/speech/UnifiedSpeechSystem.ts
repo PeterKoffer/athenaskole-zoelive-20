@@ -1,3 +1,4 @@
+import { elevenLabsService } from '@/components/speech/ElevenLabsService';
 
 interface SpeechState {
   isSpeaking: boolean;
@@ -55,25 +56,48 @@ class UnifiedSpeechSystem {
     return this.speakAsNelie(text, priority, context);
   }
 
-  async speakAsNelie(text: string, priority: boolean = false, context?: string) {
+  async speakAsNelie(text: string, priority: boolean = false, _context?: string) {
     if (!this.state.isEnabled || !text.trim()) return;
 
-    // Simple deduplication
     const textKey = text.toLowerCase().trim();
     if (this.spokenContent.has(textKey) && !priority) {
       console.log('🔇 Skipping duplicate speech:', textKey.substring(0, 50));
       return;
     }
 
-    try {
-      this.stop();
-      this.state.isSpeaking = true;
-      this.notifySubscribers();
+    this.stop();
+    this.state.isSpeaking = true;
+    this.state.isCheckingElevenLabs = true;
+    this.state.lastError = null;
+    this.notifySubscribers();
 
+    // Try ElevenLabs first via edge proxy
+    try {
+      const result = await elevenLabsService.generateSpeech(text);
+      this.state.isCheckingElevenLabs = false;
+
+      if (result.audioContent) {
+        await elevenLabsService.playAudio(result.audioContent);
+        console.log('🔊 NELIE (ElevenLabs) speaking:', text.substring(0, 50) + '...');
+        this.state.isSpeaking = false;
+        this.spokenContent.add(textKey);
+        this.notifySubscribers();
+        return;
+      }
+
+      // fallthrough to browser TTS if no audio
+      console.warn('⚠️ ElevenLabs returned no audio, falling back to Web Speech:', result.error);
+    } catch (e) {
+      this.state.isCheckingElevenLabs = false;
+      console.warn('⚠️ ElevenLabs failed, falling back to Web Speech:', e);
+    }
+
+    // Fallback: Browser Web Speech API
+    try {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      utterance.volume = 0.8;
+      utterance.rate = 0.95;
+      utterance.pitch = 1.05;
+      utterance.volume = 0.9;
 
       utterance.onend = () => {
         this.state.isSpeaking = false;
@@ -85,15 +109,14 @@ class UnifiedSpeechSystem {
       utterance.onerror = (error) => {
         console.error('Speech error:', error);
         this.state.isSpeaking = false;
-        this.state.lastError = error.error;
+        this.state.lastError = (error as any).error ?? 'Unknown speech error';
         this.currentUtterance = null;
         this.notifySubscribers();
       };
 
       this.currentUtterance = utterance;
       speechSynthesis.speak(utterance);
-
-      console.log('🔊 Nelie speaking:', text.substring(0, 50) + '...');
+      console.log('🔊 NELIE (Web Speech) speaking:', text.substring(0, 50) + '...');
     } catch (error) {
       console.error('Speech synthesis error:', error);
       this.state.isSpeaking = false;
@@ -102,8 +125,8 @@ class UnifiedSpeechSystem {
     }
   }
 
-  async repeatLastSpeech(text: string, context?: string) {
-    return this.speakAsNelie(text, true, context);
+  async repeatLastSpeech(text: string, _context?: string) {
+    return this.speakAsNelie(text, true, _context);
   }
 
   stop() {

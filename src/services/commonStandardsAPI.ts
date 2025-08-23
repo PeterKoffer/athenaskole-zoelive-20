@@ -1,6 +1,6 @@
 
 import { CommonStandard } from '@/types/gradeStandards';
-import { getAllStandards, getStandardsByGrade, getFilteredStandards } from '@/data/curriculumStandards';
+import { getFilteredStandards } from '@/data/curriculumStandards';
 
 export class CommonStandardsAPI {
   static async getStandardsByGradeAndSubject(grade: number, subject: string): Promise<CommonStandard[]> {

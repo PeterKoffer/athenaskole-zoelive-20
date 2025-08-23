@@ -22,7 +22,7 @@ export const useAnswerHandler = ({
   playAudio
 }: UseAnswerHandlerProps) => {
   
-  const handleAnswerSelect = useCallback((answer: string | number) => {
+  const handleAnswerSelect = useCallback(( _answer: string | number) => {
     // This will be handled by the parent component
   }, []);
 

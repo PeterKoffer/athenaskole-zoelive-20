@@ -1,5 +1,5 @@
 
-import { EDGE_BASE, FENA_VOICE_ID, ELEVENLABS_API_KEY } from "./ElevenLabsConfig";
+import { EDGE_BASE, FENA_VOICE_ID } from "./ElevenLabsConfig";
 import { VoicesResponse } from "./ElevenLabsTypes";
 
 export class ElevenLabsVoiceManager {

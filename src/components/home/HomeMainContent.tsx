@@ -1,6 +1,6 @@
 
 import HeroSection from "@/components/home/HeroSection";
-import SubjectsSection from "@/components/home/SubjectsSection";
+// import SubjectsSection from "@/components/home/SubjectsSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import CTASection from "@/components/home/CTASection";
 import NELIE from "@/components/NELIE";
@@ -10,11 +10,11 @@ interface HomeMainContentProps {
   onGetStarted: () => void;
 }
 
-const HomeMainContent = ({ user, onGetStarted }: HomeMainContentProps) => {
+const HomeMainContent = ({ user: _user, onGetStarted }: HomeMainContentProps) => {
   return (
     <>
       <HeroSection onGetStarted={onGetStarted} />
-      <SubjectsSection />
+      {/* SubjectsSection removed per request - available in Training Ground */}
       <FeaturesSection />
       <div className="pb-20">
         <CTASection onGetStarted={onGetStarted} />

@@ -29,11 +29,12 @@ export interface ScenarioDefinition {
       requiredNodes?: string[];
     };
   };
+  metadata?: Record<string, any>;
 }
 
 export interface ScenarioNode {
   id: string;
-  type: 'explanation' | 'question' | 'interactive' | 'narrative';
+  type: 'explanation' | 'question' | 'interactive' | 'narrative' | 'summary';
   title?: string;
   content: string;
   educational?: {
@@ -47,11 +48,19 @@ export interface ScenarioNode {
     next?: string;
     correct?: string;
     incorrect?: string;
-    [key: string]: string | undefined;
+    branches?: { condition: string; targetNodeId: string; reason?: string }[];
+    fallback?: string;
+    [key: string]: any;
   };
   config?: {
     required?: boolean;
     allowHints?: boolean;
+    maxAttempts?: number;
+    customProperties?: {
+      options?: string[];
+      correctAnswer?: string;
+      questionType?: string;
+    };
   };
   question?: {
     id: string;

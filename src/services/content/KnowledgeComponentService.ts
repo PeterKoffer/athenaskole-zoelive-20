@@ -1,5 +1,4 @@
 
-import { supabase } from '@/integrations/supabase/client';
 
 export interface KnowledgeComponent {
   id: string;
@@ -61,9 +60,10 @@ class KnowledgeComponentService {
       filteredComponents = filteredComponents.filter(kc => kc.grade_level === filters.gradeLevel);
     }
     
-    if (filters?.difficulty) {
-      filteredComponents = filteredComponents.filter(kc => 
-        Math.abs(kc.difficulty_estimate - filters.difficulty) <= 0.2
+    const diff = filters?.difficulty;
+    if (typeof diff === 'number') {
+      filteredComponents = filteredComponents.filter(kc =>
+        Math.abs(kc.difficulty_estimate - diff) <= 0.2
       );
     }
 

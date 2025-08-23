@@ -11,6 +11,7 @@ import UniverseSessionManager from '@/services/UniverseSessionManager';
 import { DailyUniverse } from '@/types/learning';
 // Removed adaptive learning components
 import { ArrowLeft, RefreshCw, Brain, Sparkles } from 'lucide-react';
+import { resolveLearnerGrade } from '@/lib/grade';
 
 const EnhancedDailyProgram: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const EnhancedDailyProgram: React.FC = () => {
     try {
       const universe = await universeGenerationService.generate({
         userId: user.id,
-        gradeLevel: metadata?.grade_level || 4,
+        gradeLevel: resolveLearnerGrade(metadata?.grade_level, metadata?.age),
         preferredLearningStyle: 'mixed',
         interests: [],
       });
@@ -49,7 +50,7 @@ const EnhancedDailyProgram: React.FC = () => {
           learningAtoms: universe.objectives.map((obj) => ({
             id: obj.id,
             curriculumObjectiveTitle: obj.name,
-            subject: obj.subjectName,
+            subject: obj.subjectName || 'General',
             difficulty: 'medium',
             type: 'video',
             content: obj.description,

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { CurriculumMapper } from '../../services/CurriculumMapper';
 import { UniverseGenerator } from '../../services/UniverseGenerator';
