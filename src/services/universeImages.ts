@@ -2,27 +2,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { invokeFn } from '@/supabase/functionsClient';
 import type { ImageEnsureReq, ImageEnsureRes } from '@/types/api';
 
+const normalizePath = (path: string) => path.replace(/^\/+/, '').replace(/\/{2,}/g, '/');
+
 export async function getUniverseImageSignedUrl(path: string, ttlSec = 300): Promise<string> {
   const ensureReq: ImageEnsureReq = { bucket: 'universe-images', path, generateIfMissing: true };
   const ensured = await invokeFn<ImageEnsureRes>('image-ensure', ensureReq);
   
-  // Handle both parsed object and string responses
-  let parsedEnsured: ImageEnsureRes;
-  if (typeof ensured === 'string') {
-    try {
-      parsedEnsured = JSON.parse(ensured);
-    } catch {
-      throw new Error('Invalid JSON response from image-ensure');
-    }
-  } else {
-    parsedEnsured = ensured;
-  }
-  
-  if (!parsedEnsured.ok) throw new Error('image-ensure failed');
+  if (!ensured.ok) throw new Error(ensured.error ?? 'image-ensure failed');
 
+  const normalizedPath = normalizePath(path);
   const { data, error } = await supabase.storage
     .from('universe-images')
-    .createSignedUrl(path, ttlSec);
+    .createSignedUrl(normalizedPath, ttlSec);
 
   if (error || !data?.signedUrl) throw error ?? new Error('No signedUrl');
   return data.signedUrl as string;

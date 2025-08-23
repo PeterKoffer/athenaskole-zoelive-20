@@ -55,14 +55,20 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { status: 405, headers: CORS });
+    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { 
+      status: 405, 
+      headers: { ...CORS, 'Content-Type': 'application/json' } 
+    });
   }
 
   const auth = req.headers.get('authorization') || '';
   const jwt = auth.startsWith('Bearer ') ? auth.slice(7) : '';
 
   if (!jwt) {
-    return new Response(JSON.stringify({ error: 'Missing JWT' }), { status: 401, headers: CORS });
+    return new Response(JSON.stringify({ error: 'Missing JWT' }), { 
+      status: 401, 
+      headers: { ...CORS, 'Content-Type': 'application/json' } 
+    });
   }
 
   // Admin-klient til at verificere token og skrive til storage
@@ -71,14 +77,20 @@ Deno.serve(async (req: Request) => {
   // Verificér at JWT er gyldig og tilhører en bruger
   const { data: userData, error: authErr } = await admin.auth.getUser(jwt);
   if (authErr || !userData?.user) {
-    return new Response(JSON.stringify({ error: 'Invalid JWT' }), { status: 401, headers: CORS });
+    return new Response(JSON.stringify({ error: 'Invalid JWT' }), { 
+      status: 401, 
+      headers: { ...CORS, 'Content-Type': 'application/json' } 
+    });
   }
 
   try {
     const { bucket, path, generateIfMissing = true, contentType = 'image/webp' } = await req.json();
     
     if (!bucket || !path) {
-      return new Response(JSON.stringify({ error: 'bucket and path required' }), { status: 400, headers: CORS });
+      return new Response(JSON.stringify({ error: 'bucket and path required' }), { 
+        status: 400, 
+        headers: { ...CORS, 'Content-Type': 'application/json' } 
+      });
     }
 
     const folder = path.split('/').slice(0, -1).join('/');
@@ -96,7 +108,10 @@ Deno.serve(async (req: Request) => {
         ok: true, 
         path, 
         exists: true 
-      }), { status: 200, headers: CORS });
+      }), { 
+        status: 200, 
+        headers: { ...CORS, 'Content-Type': 'application/json' }
+      });
     }
 
     if (!exists && generateIfMissing) {
@@ -120,12 +135,23 @@ Deno.serve(async (req: Request) => {
       console.log(`✅ Generated image: ${path}`);
     }
 
-    return new Response(JSON.stringify({ ok: true, path }), { 
-      status: 200, headers: CORS 
+    return new Response(JSON.stringify({ 
+      ok: true, 
+      path, 
+      exists: false 
+    }), { 
+      status: 200, 
+      headers: { ...CORS, 'Content-Type': 'application/json' }
     });
 
   } catch (e) {
     console.error('image-ensure error', e);
-    return new Response(JSON.stringify({ error: String(e?.message ?? e) }), { status: 500, headers: CORS });
+    return new Response(JSON.stringify({ 
+      ok: false, 
+      error: String(e?.message ?? e) 
+    }), { 
+      status: 500, 
+      headers: { ...CORS, 'Content-Type': 'application/json' } 
+    });
   }
 });
