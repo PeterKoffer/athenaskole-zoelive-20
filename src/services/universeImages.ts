@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { invokeFn } from '@/supabase/safeInvoke';
-import { trySignDownload, pollHeadUntilExists } from '@/services/storage/signForDownload';
+import { trySignDownload, pollUntilExists } from '@/services/storage/signForDownload';
 
 const BUCKET = 'universe-images';
 export const MIN_BYTES = 2000;
@@ -29,16 +29,16 @@ export async function getUniverseImageSignedUrl(
 ): Promise<string> {
   const { expires = 300, minBytes = 2000, label = 'Cover' } = opts;
 
-  // Try to get signed URL first with better error handling
-  const signResult = await trySignDownload(BUCKET, path, expires);
+  // Check if file exists first (no 400s in network panel)
+  let res = await trySignDownload(BUCKET, path, expires);
   
-  if (!signResult.pending && signResult.data?.signedUrl) {
-    // File exists - do sanity check
+  if (!res.pending && res.data?.signedUrl) {
+    // File exists - do sanity check via HEAD
     try {
-      const head = await fetch(signResult.data.signedUrl, { method: 'HEAD' });
+      const head = await fetch(res.data.signedUrl, { method: 'HEAD' });
       const len = +(head.headers.get('content-length') || 0);
       if (len >= minBytes) {
-        return signResult.data.signedUrl;
+        return res.data.signedUrl;
       }
       console.debug(`🔧 File too small (${len} bytes), triggering heal`);
     } catch (e) {
@@ -46,7 +46,7 @@ export async function getUniverseImageSignedUrl(
     }
   }
   
-  // File doesn't exist, is corrupt, or sign failed - trigger auto-healing
+  // File doesn't exist or is corrupt - trigger auto-healing  
   console.debug('🔧 Auto-healing universe image:', path);
   
   await invokeFn<{ ok: boolean; path: string; exists: boolean }>(
@@ -59,25 +59,32 @@ export async function getUniverseImageSignedUrl(
     },
     { logName: 'image-ensure-heal' }
   ).catch(() => {
-    console.warn('Image ensure failed, uploading fallback placeholder');
+    console.warn('Image ensure failed, will try placeholder upload');
   });
 
-  // Try signing again after heal
-  const retryResult = await trySignDownload(BUCKET, path, expires);
-  if (retryResult.data?.signedUrl) {
-    return retryResult.data.signedUrl;
+  // Poll using list API (no HEAD requests needed)
+  const appeared = await pollUntilExists(BUCKET, path);
+  if (!appeared) {
+    console.warn('⚠️ File did not appear after healing, using fallback');
+    return inlinePlaceholder(1024, 512, label);
+  }
+
+  // Try signing again after heal (file should exist now)
+  res = await trySignDownload(BUCKET, path, expires);
+  if (res.data?.signedUrl) {
+    return res.data.signedUrl;
   }
   
-  // If all else fails, upload a placeholder directly
+  // If still no success, upload a placeholder directly
   try {
     const blob = await makePlaceholderWebp({ w: 1024, h: 512, label });
     await supabase.storage
       .from(BUCKET)
       .upload(path, blob, { upsert: true, contentType: 'image/webp' });
     
-    const finalResult = await trySignDownload(BUCKET, path, expires);
-    if (finalResult.data?.signedUrl) {
-      return finalResult.data.signedUrl;
+    const finalRes = await trySignDownload(BUCKET, path, expires);
+    if (finalRes.data?.signedUrl) {
+      return finalRes.data.signedUrl;
     }
   } catch (e) {
     console.warn('Failed to upload placeholder:', e);

@@ -1,28 +1,36 @@
 import { supabase } from '@/integrations/supabase/client';
+import { objectExists } from './objectExists';
 
 export async function trySignDownload(bucket: string, path: string, expires = 300) {
-  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, expires);
-
-  // Supabase sender 400 når objektet ikke findes – det er "ok" i vores heal-flow
-  if (error) {
-    const msg = (error as any)?.message || '';
-    const status = (error as any)?.status || (error as any)?.statusCode;
-
-    const isNotReady =
-      status === 400 ||
-      /not found|does not exist|No such file/i.test(msg);
-
-    if (isNotReady) {
-      console.debug(`📦 Storage object pending: ${bucket}/${path}`);
-      return { data: null, pending: true }; // lad ensure→HEAD→fallback tage over
-    }
-    // andre fejl er rigtige fejl
-    throw error;
+  // Avoid 400s by skipping sign until file is present
+  const exists = await objectExists(bucket, path);
+  if (!exists) {
+    console.debug(`📦 Storage object not found: ${bucket}/${path}`);
+    return { data: null, pending: true };
   }
 
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, expires);
+  if (error) throw error;
   return { data, pending: false };
 }
 
+export async function pollUntilExists(bucket: string, path: string, timeoutMs = 15000, intervalMs = 800) {
+  const start = Date.now();
+  console.debug(`🔄 Polling for ${bucket}/${path}...`);
+  
+  while (Date.now() - start < timeoutMs) {
+    if (await objectExists(bucket, path)) {
+      console.debug(`✅ File appeared: ${bucket}/${path}`);
+      return true;
+    }
+    await new Promise(r => setTimeout(r, intervalMs));
+  }
+  
+  console.warn(`⏰ Timeout waiting for file: ${bucket}/${path}`);
+  return false;
+}
+
+// Legacy function for HEAD polling (kept for compatibility)
 export async function pollHeadUntilExists(url: string, maxAttempts = 10, delayMs = 500) {
   for (let i = 0; i < maxAttempts; i++) {
     try {
