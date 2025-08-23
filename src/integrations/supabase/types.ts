@@ -1275,6 +1275,36 @@ export type Database = {
         }
         Relationships: []
       }
+      universe_content: {
+        Row: {
+          activities: Json
+          created_at: string
+          id: string
+          objectives: string[]
+          summary: string
+          universe_id: string
+          updated_at: string
+        }
+        Insert: {
+          activities?: Json
+          created_at?: string
+          id?: string
+          objectives?: string[]
+          summary: string
+          universe_id: string
+          updated_at?: string
+        }
+        Update: {
+          activities?: Json
+          created_at?: string
+          id?: string
+          objectives?: string[]
+          summary?: string
+          universe_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       universe_image_jobs: {
         Row: {
           created_at: string

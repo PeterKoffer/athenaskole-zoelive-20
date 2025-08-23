@@ -20,32 +20,25 @@ export interface ContentResponse {
   }>;
 }
 
-export interface UniverseContent {
-  id?: string;
-  universe_id: string;
-  summary: string;
-  objectives: string[];
-  activities: any[];
-  created_at?: string;
-  updated_at?: string;
-}
-
 export async function ensureUniverseContent(req: ContentRequest): Promise<ContentResponse> {
   console.log('🧠 Generating universe content for:', req.title);
   
-  // Check if content already exists
+  // Check if content already exists in adaptive_content table
   const { data: existing } = await supabase
-    .from('universe_content')
+    .from('adaptive_content')
     .select('*')
-    .eq('universe_id', req.universeId)
+    .eq('subject', req.subject || 'general')
+    .eq('difficulty_level', Math.max(1, Math.min(5, req.grade - 2)))
+    .eq('content_type', 'universe_content')
     .maybeSingle();
 
-  if (existing) {
+  if (existing?.content) {
     console.log('✅ Using existing universe content');
+    const content = existing.content as any;
     return {
-      summary: existing.summary,
-      objectives: existing.objectives,
-      activities: existing.activities
+      summary: content.summary || `Explore the fascinating world of ${req.title}!`,
+      objectives: content.objectives || [`Learn about ${req.title}`],
+      activities: content.activities || []
     };
   }
 
@@ -67,12 +60,15 @@ Focus on interactive, age-appropriate content that encourages exploration and di
       temperature: 0.7
     });
 
-    // Save to database
-    const { error } = await supabase.from('universe_content').upsert({
-      universe_id: req.universeId,
-      summary: data.summary,
-      objectives: data.objectives,
-      activities: data.activities,
+    // Save to adaptive_content table
+    const { error } = await supabase.from('adaptive_content').upsert({
+      subject: req.subject || 'general',
+      skill_area: 'universe_exploration',
+      difficulty_level: Math.max(1, Math.min(5, req.grade - 2)),
+      content_type: 'universe_content',
+      title: req.title,
+      content: data,
+      learning_objectives: data.objectives
     });
 
     if (error) {
