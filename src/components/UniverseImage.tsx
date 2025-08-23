@@ -2,7 +2,10 @@ import React from 'react';
 import { useUniverseImage } from '@/hooks/useUniverseImage';
 
 interface UniverseImageProps {
-  path: string;
+  path?: string;
+  universeId?: string;
+  title?: string;
+  subject?: string;
   alt?: string;
   className?: string;
   label?: string;
@@ -10,11 +13,15 @@ interface UniverseImageProps {
 
 export const UniverseImage: React.FC<UniverseImageProps> = ({ 
   path, 
+  universeId,
   alt = 'Cover', 
   className = '',
   label = 'Cover'
 }) => {
-  const { url, loading, fallback, meta } = useUniverseImage(path, { label });
+  // If universeId is provided, construct the path
+  const imagePath = path || (universeId ? `${universeId}/6/cover.webp` : undefined);
+  
+  const { url, fallback, meta } = useUniverseImage(imagePath, { label });
 
   return (
     <div className={`relative overflow-hidden rounded-xl ${className}`}>
@@ -22,7 +29,7 @@ export const UniverseImage: React.FC<UniverseImageProps> = ({
         src={url}
         alt={alt}
         className="w-full h-full object-cover"
-        onError={(e) => { /* Hvis Browser-image loader fejler, så hold fast i inline placeholder */ }}
+        onError={() => { /* Browser image loader fallback handled by hook */ }}
       />
       {/* valgfri badge ved fallback */}
       {fallback && (

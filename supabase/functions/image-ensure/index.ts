@@ -17,6 +17,8 @@ const BUCKET = 'universe-images';
 const PLACEHOLDER_PNG_BASE64 = 
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
 
+const MIN_BYTES = 1024;
+
 function b64ToBytes(b64: string) {
   const bin = atob(b64);
   const bytes = new Uint8Array(bin.length);
@@ -95,7 +97,8 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { bucket, path, generateIfMissing = true, minBytes = 128 } = await req.json();
+    const { bucket, path, generateIfMissing = true } = await req.json();
+    const jsonHeaders = { ...CORS, 'content-type': 'application/json; charset=utf-8' };
     
     if (!bucket || !path) {
       return new Response(JSON.stringify({ 
@@ -103,65 +106,53 @@ Deno.serve(async (req: Request) => {
         error: 'bucket and path required' 
       }), { 
         status: 400, 
-        headers: { ...CORS, 'Content-Type': 'application/json' } 
+        headers: jsonHeaders 
       });
     }
 
-    // Check if file exists and get its size
-    const { data: downloadData, error: downloadError } = await admin.storage
-      .from(bucket)
-      .download(path);
-
+    // HEAD the current file via a short signed URL
     let exists = false;
-    let size = 0;
+    let tooSmall = false;
+    let contentLength = 0;
+    let contentType = '';
 
-    if (!downloadError && downloadData) {
-      exists = true;
-      size = (await downloadData.arrayBuffer()).byteLength;
-      console.log(`📏 File exists: ${path}, size: ${size} bytes`);
-    }
-
-    // If file doesn't exist or is too small (corrupt), create proper placeholder
-    if ((!exists || size < minBytes) && generateIfMissing) {
-      console.log(`🎨 ${exists ? 'Replacing corrupt' : 'Creating'} image: ${path}`);
-      
-      const placeholderBytes = b64ToBytes(PLACEHOLDER_PNG_BASE64);
-      
-      const { error: uploadError } = await admin.storage
-        .from(bucket)
-        .upload(path, placeholderBytes, {
-          upsert: true,
-          contentType: 'image/png',
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw uploadError;
+    const { data: signed } = await admin.storage.from(bucket).createSignedUrl(path, 60);
+    if (signed?.signedUrl) {
+      const head = await fetch(signed.signedUrl, { method: 'HEAD' });
+      if (head.ok) {
+        exists = true;
+        contentLength = parseInt(head.headers.get('content-length') || '0', 10);
+        contentType = head.headers.get('content-type') || '';
+        tooSmall = !contentType.startsWith('image/') || contentLength < MIN_BYTES;
+        console.log(`📏 File exists: ${path}, size: ${contentLength} bytes, type: ${contentType}`);
       }
-
-      console.log(`✅ ${exists ? 'Replaced corrupt' : 'Generated'} image: ${path} (${placeholderBytes.length} bytes)`);
-      
-      return new Response(JSON.stringify({ 
-        ok: true, 
-        path, 
-        exists: true,
-        created: !exists,
-        size: placeholderBytes.length
-      }), { 
-        status: 200, 
-        headers: { ...CORS, 'Content-Type': 'application/json' }
-      });
     }
 
-    return new Response(JSON.stringify({ 
-      ok: true, 
-      path, 
-      exists,
-      size 
-    }), { 
-      status: 200, 
-      headers: { ...CORS, 'Content-Type': 'application/json' }
-    });
+    // If too small/corrupt: delete the file, so we can treat as "missing"
+    if (exists && tooSmall) {
+      console.log(`🗑️ Deleting corrupt file: ${path} (${contentLength} bytes)`);
+      await admin.storage.from(bucket).remove([path]).catch(() => {});
+      exists = false;
+    }
+
+    // If missing and we may generate: (here we let the client handle upload/placeholder)
+    // We can add actual server-generation later if needed.
+    if (!exists && generateIfMissing) {
+      return new Response(JSON.stringify({
+        ok: true,
+        path,
+        exists: false,
+        needsUpload: true, // signal to client
+      }), { headers: jsonHeaders });
+    }
+
+    return new Response(JSON.stringify({
+      ok: true,
+      path,
+      exists: exists,
+      size: contentLength,
+      type: contentType,
+    }), { headers: jsonHeaders });
 
   } catch (e) {
     console.error('image-ensure error', e);
