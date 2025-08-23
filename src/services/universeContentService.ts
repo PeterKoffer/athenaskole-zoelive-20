@@ -67,7 +67,7 @@ Focus on interactive, age-appropriate content that encourages exploration and di
       difficulty_level: Math.max(1, Math.min(5, req.grade - 2)),
       content_type: 'universe_content',
       title: req.title,
-      content: data,
+      content: data as any,
       learning_objectives: data.objectives
     });
 
