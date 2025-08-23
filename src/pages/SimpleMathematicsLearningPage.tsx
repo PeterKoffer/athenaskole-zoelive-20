@@ -4,6 +4,7 @@ import { invokeFn } from '@/supabase/functionsClient';
 import { useToast } from '@/hooks/use-toast';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { Volume2 } from 'lucide-react';
+import type { AdaptiveContentRes } from '@/types/api';
 
 interface Question {
   question: string;
@@ -46,17 +47,12 @@ const SimpleMathematicsLearningPage = () => {
       for (let i = 0; i < 2; i++) {
         console.log(`📚 NELIE: Generating initial question ${i + 1} of 2...`);
         
-        const data = await invokeFn('generate-adaptive-content', {
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
           subject: 'mathematics',
           skillArea: 'general',
           gradeLevel: 3,
           userId: 'student'
         });
-
-        if (error) {
-          console.error(`❌ NELIE: Question ${i + 1} generation error:`, error);
-          throw error;
-        }
 
         if (data?.question) {
           const aiQuestion: Question = {
@@ -113,17 +109,12 @@ const SimpleMathematicsLearningPage = () => {
       for (let i = 2; i < 5; i++) {
         console.log(`📚 NELIE: Generating background question ${i + 1} of 5...`);
         
-        const data = await invokeFn('generate-adaptive-content', {
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
           subject: 'mathematics',
           skillArea: 'general',
           gradeLevel: 3,
           userId: 'student'
         });
-
-        if (error) {
-          console.error(`❌ NELIE: Background question ${i + 1} generation error:`, error);
-          continue; // Continue with other questions even if one fails
-        }
 
         if (data?.question) {
           const aiQuestion: Question = {

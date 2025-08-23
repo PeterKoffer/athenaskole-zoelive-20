@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { invokeFn } from '@/supabase/functionsClient';
+import type { AdaptiveContentRes } from '@/types/api';
 
 export interface ContentGenerationRequest {
   kcId: string;
@@ -67,7 +68,7 @@ class ContentGenerationService {
       
       console.log('📚 Extracted KC info:', { subject, grade, topic });
 
-      const edgeResponse = await invokeFn('generate-content-atoms', {
+      const edgeResponse = await invokeFn<AdaptiveContentRes>('generate-content-atoms', {
         kcId: request.kcId,
         userId: request.userId,
         subject: subject,
@@ -80,11 +81,6 @@ class ContentGenerationService {
         forceUnique: request.forceUnique,
         enhancedPrompt: true
       });
-
-      if (error) {
-        console.error('❌ Edge Function error:', error);
-        return [];
-      }
 
       if (edgeResponse?.atoms && edgeResponse.atoms.length > 0) {
         console.log('✅ AI generated content successfully:', edgeResponse.atoms.length, 'atoms');

@@ -1,4 +1,5 @@
 import { invokeFn } from '@/supabase/functionsClient';
+import type { AdaptiveContentRes } from '@/types/api';
 
 // AI content generation and pack building
 type BuildFromPackArgs = {
@@ -79,7 +80,7 @@ async function generateAIActivities(args: BuildFromPackArgs): Promise<LessonStru
   
   try {
     // Use the existing AI content generation
-    const data = await invokeFn('generate-adaptive-content', {
+    const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
       type: 'lesson-activity',
       subject: pack.subject,
       skillArea: 'general',
@@ -87,11 +88,6 @@ async function generateAIActivities(args: BuildFromPackArgs): Promise<LessonStru
       difficultyLevel: pack.gradeLevel || 6,
       prompt: `Create an engaging ${pack.subject} lesson based on: ${pack.description}. Title: ${pack.title}. Make it interactive and age-appropriate.`
     });
-
-    if (error) {
-      console.error("AI generation failed, falling back to offline:", error);
-      return generateOfflineActivities(args);
-    }
 
     // Transform AI response into structured activities
     if (data?.content) {
@@ -124,7 +120,7 @@ async function generateHybridActivities(args: BuildFromPackArgs): Promise<Lesson
   
   try {
     // Add AI embellishments
-    const data = await invokeFn('generate-adaptive-content', {
+    const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
       type: 'lesson-activity',
       subject: pack.subject,
       skillArea: 'general', 

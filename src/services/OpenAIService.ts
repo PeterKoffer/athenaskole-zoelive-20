@@ -1,6 +1,7 @@
 
 import { invokeFn } from '@/supabase/functionsClient';
 import { Universe } from './UniverseGenerator';
+import type { AdaptiveContentRes } from '@/types/api';
 
 export const openAIService = {
   async generateUniverse(prompt: string, _signal?: AbortSignal): Promise<Universe> {
@@ -15,23 +16,16 @@ export const openAIService = {
 
       console.log('📞 Calling generate-adaptive-content edge function for universe generation');
       
-      const data = await invokeFn('generate-adaptive-content', requestData);
+      const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', requestData);
 
-      console.log('📨 Edge function response:', { data, error });
-
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw new Error(`Edge function error: ${error.message}`);
-      }
-
-      if (!data || !data.success) {
+      if (data?.success === false) {
         console.error('❌ Edge function returned error:', data?.error);
         // Instead of throwing, return a fallback universe
         return this.createFallbackUniverse(prompt);
       }
 
       // If we have generated content, try to parse it as a universe
-      if (data.generatedContent) {
+      if (data?.generatedContent) {
         console.log('✅ Successfully received generated content');
         
         // Convert the complex objects to simple strings for compatibility

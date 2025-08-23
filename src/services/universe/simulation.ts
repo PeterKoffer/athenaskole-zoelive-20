@@ -3,6 +3,7 @@ import { UniverseState, UniverseDiff, applyDiff, Horizon } from "./state";
 import { topTags } from "@/services/interestProfile";
 import { invokeFn } from '@/supabase/functionsClient';
 import { logEvent } from "@/services/telemetry/events";
+import type { AdaptiveContentRes } from '@/types/api';
 
 // Helper to call LLM and parse JSON response
 async function callLLMJson<T = any>(
@@ -18,7 +19,7 @@ async function callLLMJson<T = any>(
     hasPrompt: !!prompt
   });
   
-  const data = await invokeFn('generate-adaptive-content', {
+  const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
     type: 'universe_generation',
     prompt: prompt,
     subject: subject,
@@ -27,11 +28,6 @@ async function callLLMJson<T = any>(
     maxTokens: 400,
     temperature: 0.7
   });
-  
-  if (error) {
-    console.error('Edge function error:', error);
-    throw error;
-  }
   
   // Check if the response has the expected structure
   if (data?.success === false) {

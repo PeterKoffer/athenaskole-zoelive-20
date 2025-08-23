@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { invokeFn } from '@/supabase/functionsClient';
 import { useToast } from '@/hooks/use-toast';
+import type { AdaptiveContentRes } from '@/types/api';
 
 console.log('🔥 DEBUGGING: MathematicsLearningPage loaded');
 
@@ -34,7 +35,7 @@ const MathematicsLearningPage = () => {
       for (let i = 0; i < 2; i++) {
         console.log(`🤖 Generating initial question ${i + 1} of 2...`);
         
-        const data = await invokeFn('generate-adaptive-content', {
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
           subject: 'mathematics',
           skillArea: 'general',
           gradeLevel: 3,
@@ -96,7 +97,7 @@ const MathematicsLearningPage = () => {
       for (let i = 2; i < 5; i++) {
         console.log(`🤖 Generating background question ${i + 1} of 5...`);
         
-        const data = await invokeFn('generate-adaptive-content', {
+        const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
           subject: 'mathematics',
           skillArea: 'general',
           gradeLevel: 3,

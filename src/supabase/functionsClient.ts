@@ -17,7 +17,13 @@ export async function waitForAuth() {
   });
 }
 
-export async function invokeFn<T>(name: string, body?: unknown): Promise<T> {
+export type InvokeOptions = { headers?: Record<string, string> };
+
+export async function invokeFn<T = unknown>(
+  name: string,
+  body?: unknown,
+  opts?: InvokeOptions
+): Promise<T> {
   // SSR guard
   if (typeof window === 'undefined') {
     throw new Error(`Cannot call ${name} during SSR`);
@@ -28,7 +34,7 @@ export async function invokeFn<T>(name: string, body?: unknown): Promise<T> {
 
   const { data, error } = await supabase.functions.invoke<T>(name, {
     body: body as Record<string, unknown>,
-    headers: { Authorization: `Bearer ${session.access_token}` },
+    headers: { Authorization: `Bearer ${session.access_token}`, ...(opts?.headers ?? {}) },
   });
   if (error) throw error;
   return data as T;

@@ -1,16 +1,15 @@
 import { RUBRIC_PROMPT, RubricReport } from "./rubric";
 import { invokeFn } from '@/supabase/functionsClient';
 import { logEvent } from "@/services/telemetry/events";
+import type { AdaptiveContentRes } from '@/types/api';
 
 // Helper to call LLM and parse JSON response
 async function callLLMJson<T = any>(prompt: string): Promise<T> {
-  const data = await invokeFn('generate-adaptive-content', {
+  const data = await invokeFn<AdaptiveContentRes>('generate-adaptive-content', {
     prompt: prompt,
     maxTokens: 300,
     temperature: 0.3 // Lower temperature for more consistent evaluation
   });
-  
-  if (error) throw error;
   
   // Parse the AI response
   let result;

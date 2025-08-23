@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { invokeFn } from '@/supabase/functionsClient';
+import type { AdaptiveContentRes } from '@/types/api';
 
 interface CodeSuggestionRequest {
   prompt: string;
@@ -28,7 +29,7 @@ export const useCodeSuggestions = () => {
     try {
       console.log('🔄 Requesting code suggestion:', request);
 
-      const data = await invokeFn('generate-code-suggestions', request);
+      const data = await invokeFn<AdaptiveContentRes>('generate-code-suggestions', request);
 
       const response = data as CodeSuggestionResponse;
 
