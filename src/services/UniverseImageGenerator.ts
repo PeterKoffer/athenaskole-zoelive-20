@@ -1,4 +1,4 @@
-import { safeInvokeFn } from '@/supabase/functionsClient';
+import { getUniverseImageSignedUrl } from '@/services/universeImages';
 
 export interface UniverseImageRequest {
   title: string;
@@ -13,12 +13,6 @@ export interface UniverseImageResponse {
   prompt?: string;
 }
 
-interface ImageEnsureResponse {
-  status?: string;
-  imageUrl?: string;
-  cached?: boolean;
-  predictionId?: string;
-}
 
 export class UniverseImageGeneratorService {
   private static cache = new Map<string, string>();
@@ -27,33 +21,11 @@ export class UniverseImageGeneratorService {
     const { universeId, grade } = args;
     const id = universeId || `temp-${Date.now()}`;
     const gradeNum = grade ?? 6;
+    
     try {
-      const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
-        bucket: 'universe-images',
-        path: `${id}/${gradeNum}/cover.webp`,
-        generateIfMissing: true,
-        kind: 'cover'
-      });
-
-      if (data?.status === 'exists' && data?.imageUrl) {
-        return data.imageUrl;
-      }
-
-      // Use GET instead of HEAD to avoid 400 errors, cache-bust each attempt
-      const baseUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${id}/${gradeNum}/cover.webp`;
-      for (let attempt = 0; attempt < 20; attempt++) {
-        try {
-          const url = `${baseUrl}?v=${Date.now()}`;
-          const res = await fetch(url, { method: 'GET', cache: 'no-store' });
-          if (res.ok) {
-            return url;
-          }
-        } catch {}
-        await new Promise((r) => setTimeout(r, 3000));
-      }
-
-      return null;
-
+      const path = `${id}/${gradeNum}/cover.webp`;
+      const url = await getUniverseImageSignedUrl(path);
+      return url;
     } catch (error) {
       console.error('❌ Universe image generation failed:', error);
       return null;
@@ -79,37 +51,10 @@ export class UniverseImageGeneratorService {
     }
 
     try {
-      const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
-        bucket: 'universe-images',
-        path: `${args.packId}/${args.grade ?? 6}/cover.webp`,
-        generateIfMissing: true,
-        kind: 'cover'
-      });
-
-      if (data?.status === 'exists' && data?.imageUrl) {
-        this.cache.set(cacheKey, data.imageUrl);
-        return {
-          url: data.imageUrl,
-          cached: data.cached || false
-        };
-      }
-
-      // Poll with GET instead of HEAD, cache-bust each attempt
-      const baseUrl = `https://yphkfkpfdpdmllotpqua.supabase.co/storage/v1/object/public/universe-images/${args.packId}/${args.grade ?? 6}/cover.webp`;
-      for (let attempt = 0; attempt < 20; attempt++) {
-        try {
-          const url = `${baseUrl}?v=${Date.now()}`;
-          const res = await fetch(url, { method: 'GET', cache: 'no-store' });
-          if (res.ok) {
-            this.cache.set(cacheKey, url);
-            return { url };
-          }
-        } catch {}
-        await new Promise((r) => setTimeout(r, 3000));
-      }
-
-      console.log(`🖼️ Using subject fallback for ${args.packId}`);
-      return { url: this.getSubjectFallback(args.subject) };
+      const path = `${args.packId}/${args.grade ?? 6}/cover.webp`;
+      const url = await getUniverseImageSignedUrl(path);
+      this.cache.set(cacheKey, url);
+      return { url };
     } catch (error) {
       console.error("Failed to generate image:", error);
       return { url: this.getSubjectFallback(args.subject) };
@@ -140,21 +85,10 @@ export class UniverseImageGeneratorService {
   static async generateImage(request: UniverseImageRequest): Promise<string | null> {
     try {
       console.log('🎨 Generating universe image for:', request);
-
-      const data = await safeInvokeFn<ImageEnsureResponse>('image-ensure', {
-        bucket: 'universe-images', 
-        path: `${request.title}/6/cover.webp`,
-        generateIfMissing: true,
-        kind: 'cover'
-      });
-
-      if (data?.status === 'exists' && data?.imageUrl) {
-        console.log('✅ Universe image generated successfully:', data.imageUrl);
-        return data.imageUrl;
-      }
-
-      return null;
-
+      
+      const path = `${request.title}/6/cover.webp`;
+      const url = await getUniverseImageSignedUrl(path);
+      return url;
     } catch (error) {
       console.error('❌ Universe image generation failed:', error);
       return null;

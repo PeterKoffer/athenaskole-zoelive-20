@@ -13,11 +13,9 @@ interface UniversePlayerProps {
 }
 
 const UniversePlayer: React.FC<UniversePlayerProps> = ({ universe, standards = [] }) => {
-    const { imageUrl, isLoading, isAI } = useUniverseImage({
-        universeId: universe.id ?? undefined,
-        title: universe.title ?? 'Learning Universe',
-        subject: universe.theme ?? 'education',
-    });
+    const path = universe.id ? `${universe.id}/6/cover.webp` : undefined;
+    const { url: imageUrl, loading: isLoading } = useUniverseImage(path);
+    const isAI = !!imageUrl && imageUrl.includes('universe-images');
 
 
     return (

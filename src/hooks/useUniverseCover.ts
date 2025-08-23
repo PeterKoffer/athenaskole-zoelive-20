@@ -1,5 +1,6 @@
 // src/hooks/useUniverseCover.ts
 import { useEffect, useMemo, useState } from "react";
+import { getUniverseImageSignedUrl } from '@/services/universeImages';
 
 // Create coverUrl function directly since utils/imageUrl doesn't exist
 function coverUrl(universeId: string, grade: number | string, cacheBust: string) {
@@ -8,7 +9,6 @@ function coverUrl(universeId: string, grade: number | string, cacheBust: string)
 }
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
-const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 const FUNCTIONS_BASE = SUPABASE_URL.replace("supabase.co", "functions.supabase.co");
 
 function coverGeneratorURL(title: string, author = "NELIE") {
@@ -45,23 +45,13 @@ export function useUniverseCover({
     let cancelled = false;
 
     async function ensureAndPoll() {
-      // 1) cue generering (fire-and-forget)
+      // 1) Generate signed URL (ensures + signs)  
       try {
-        await fetch(`${FUNCTIONS_BASE}/image-ensure`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${ANON}`,
-            apikey: ANON,
-          },
-          body: JSON.stringify({
-            universeId,
-            universeTitle: title,
-            subject,
-            scene: "cover: main activity",
-            grade,
-          }),
-        });
+        const path = `${universeId}/${grade}/cover.webp`;
+        const url = await getUniverseImageSignedUrl(path);
+        setSrc(url);
+        setReady(true);
+        return;
       } catch {}
 
       // 2) poll GET on cover.webp (instead of HEAD to avoid 400s)

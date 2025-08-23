@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { invokeFn } from '@/supabase/functionsClient';
+import { getUniverseImageSignedUrl } from '@/services/universeImages';
 import { useAuth } from "@/hooks/useAuth";
 
 export default function UniverseCreateForm() {
@@ -42,13 +43,8 @@ export default function UniverseCreateForm() {
 
       // Trigger image generation (non-blocking)
       if (data.universe?.id) {
-        invokeFn('image-ensure', {
-          universeId: data.universe.id,
-          universeTitle: payload.title,
-          subject: payload.subject,
-          grade,
-          scene: 'cover: main activity'
-        }).catch(() => {}); // fire and forget
+        const path = `${data.universe.id}/${grade || 6}/cover.webp`;
+        getUniverseImageSignedUrl(path).catch(console.warn);
       }
     } catch (error) {
       setState({ loading: false, error: (error as Error).message });

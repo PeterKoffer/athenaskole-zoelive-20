@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { invokeFn } from '@/supabase/functionsClient';
+import { getUniverseImageSignedUrl } from '@/services/universeImages';
 import { useAuth } from '@/hooks/useAuth';
 import { resolveImageUrl } from "@/utils/storageUrls";
 import { coverKey } from "@/utils/coverKey";
@@ -43,20 +43,13 @@ function getLocalFallback(subject?: string): string {
 
 const ensureImage = async (
   universeId: string,
-  title: string,
-  subject?: string,
   grade?: number
 ): Promise<{ imageUrl?: string; status?: string }> => {
   try {
-    const data = await invokeFn("image-ensure", {
-      universeId,
-      universeTitle: title,
-      subject: subject || 'education',
-      scene: 'cover: main activity',
-      grade: grade || 6
-    });
-
-    return data || {};
+    const path = `${universeId}/${grade || 6}/cover.webp`;
+    const imageUrl = await getUniverseImageSignedUrl(path);
+    
+    return { imageUrl };
   } catch (error) {
     console.error('Error ensuring image:', error);
     throw error;
@@ -114,7 +107,7 @@ export const UniverseImage: React.FC<UniverseImageProps> = ({
       if (canEnsure && !authLoading && user) {
         try {
           console.log('🎨 Attempting to ensure image for:', universeId, title);
-          const result = await ensureImage(universeId, title, subject, resolvedGrade);
+          const result = await ensureImage(universeId, resolvedGrade);
           
           if (result.imageUrl) {
             setImageSrc(result.imageUrl);

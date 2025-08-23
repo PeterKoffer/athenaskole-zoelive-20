@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { invokeFn } from '@/supabase/functionsClient';
+import { getUniverseImageSignedUrl } from '@/services/universeImages';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
@@ -47,19 +47,20 @@ export function UniverseImageManager() {
         console.warn('Could not clear cache:', deleteError);
       }
 
-      const { data: meta } = await supabase
+      // Get universe metadata for potential future use
+      await supabase
         .from('universes')
         .select('title, subject')
         .eq('id', universeId.trim())
         .single();
 
-      const data = await invokeFn('image-ensure', {
-        universeId: universeId.trim(),
-        universeTitle: meta?.title || universeId.trim(),
-        subject: meta?.subject || 'education',
-        scene: 'cover: main activity',
-        grade: 6
-      });
+      const path = `${universeId.trim()}/6/cover.webp`;
+      const imageUrl = await getUniverseImageSignedUrl(path);
+      const data = {
+        imageUrl,
+        from: 'ai' as const,
+        duration_ms: 0
+      };
 
       setResult(data as RegenerateResult);
       console.log('✅ Image regenerated:', data);
