@@ -7,8 +7,9 @@ export default function Page() {
   useEffect(() => {
     ensureDailyProgramCover({
       universeId: "7150d0ee-59cc-40d9-a1f3-b31951bb5b24",
-      gradeRaw: "5a",
-      prompt: "Classroom-friendly landscape cover for Today’s Program",
+      title: "Today’s Program",
+      subject: "general",
+      grade: "5a",
     }).then(setUrl);
   }, []);
   return (
