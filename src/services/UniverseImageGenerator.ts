@@ -11,8 +11,6 @@ export async function ensureDailyProgramCover(opts: {
   const prompt = `Classroom-friendly ${subject} cover for ${title}`;
 
   const { data, error } = await supabase.functions.invoke("image-service", {
-    method: "POST",
-    path: "/generate",
     body: { universeId, gradeRaw, prompt },
   });
 
