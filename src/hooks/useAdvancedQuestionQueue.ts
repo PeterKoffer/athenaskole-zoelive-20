@@ -42,15 +42,10 @@ export const useAdvancedQuestionQueue = ({
       
       for (let i = 0; i < needed; i++) {
         try {
-          const question = await questionGeneration.generateQuestion({
-            subject,
-            skillArea,
-            difficultyLevel,
-            gradeLevel: 6,
-            queuePosition: questionQueue.length + i,
-            totalInQueue: questionQueue.length + needed
-          });
-          newQuestions.push(question);
+          const question = await questionGeneration.generateQuestion();
+          if (question) {
+            newQuestions.push(question as any);
+          }
           console.log(`✅ Pre-generated question ${i + 1}/${needed} for queue`);
         } catch (error) {
           console.error(`❌ Failed to generate question ${i + 1}:`, error);

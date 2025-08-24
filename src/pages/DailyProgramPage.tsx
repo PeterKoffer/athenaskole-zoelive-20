@@ -165,7 +165,7 @@ const DailyProgramPage = () => {
         setGeneratingImage(true);
         try {
           const generatedImageUrl = await ensureDailyProgramCover({
-            universeId: result.id,
+            universeId: result.id || 'unknown',
             title: result.title || 'Learning Universe',
             subject: result.theme || 'education',
             grade,

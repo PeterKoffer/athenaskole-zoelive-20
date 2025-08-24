@@ -13,7 +13,6 @@ type UniverseImageProps = {
  * Any "how to use" examples must live inside comments, not as live JSX.
  */
 const UniverseImage: React.FC<UniverseImageProps> = ({
-  universeId,
   title,
   subject,
   className,

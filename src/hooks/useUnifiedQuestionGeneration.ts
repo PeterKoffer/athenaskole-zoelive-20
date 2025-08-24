@@ -2,19 +2,19 @@
 // Unified Question Generation Hook
 
 import { useState, useCallback } from 'react';
-import { unifiedQuestionGenerationService } from '@/services/unifiedQuestionGeneration';
-import { QuestionMetadata } from '@/services/globalQuestionUniquenessService';
+import { UnifiedQuestionGenerationService } from '@/services/unifiedQuestionGeneration';
+
 
 export const useUnifiedQuestionGeneration = (userId: string) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateQuestion = useCallback(async (metadata: QuestionMetadata) => {
+  const generateQuestion = useCallback(async () => {
     setIsGenerating(true);
     setError(null);
     
     try {
-      const question = await unifiedQuestionGenerationService.generateQuestion(userId, metadata);
+      const question = await UnifiedQuestionGenerationService.generateQuestion();
       return question;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
