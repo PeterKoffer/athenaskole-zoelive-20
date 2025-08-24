@@ -78,7 +78,7 @@ Additional guides and references can be found in the `docs` folder. A new prompt
 
 - [Training Ground Prompt Template](docs/TRAINING_GROUND_PROMPT_TEMPLATE.md)
 - [Curriculum Coverage](docs/CURRICULUM_COVERAGE.md)
-
+- 
 ## Images (auto-heal) & security
 
 Universe covers are **auto-healed** by a Supabase Edge Function (`image-ensure`) that:
