@@ -7,17 +7,20 @@
 //   { status: 'generated'|'exists', url, key }  |  { error, stack }
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Replicate from "https://esm.sh/replicate@0.31.0";
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
 };
-function json(body, init = {}) {
+
+function json(body: any, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
     ...init,
     headers: {
       "content-type": "application/json",
       ...cors,
-      ...init.headers || {}
+      ...(init.headers || {})
     }
   });
 }
@@ -59,7 +62,7 @@ Deno.serve(async (req)=>{
       const existing = await supabase.storage.from("universe-images").list(`${universeId}/${grade}`, {
         search: "cover.webp"
       });
-      if (!existing.error && existing.data?.some((f)=>f.name === "cover.webp")) {
+      if (!existing.error && existing.data?.some((f: any) => f.name === "cover.webp")) {
         const url = supabase.storage.from("universe-images").getPublicUrl(key).data.publicUrl;
         return json({
           status: "exists",
@@ -73,52 +76,26 @@ Deno.serve(async (req)=>{
       if (provider === "replicate") {
         const token = Deno.env.get("REPLICATE_API_TOKEN");
         if (!token) throw new Error("Missing REPLICATE_API_TOKEN");
-        // Create prediction using version ID
-        const version = Deno.env.get("REPLICATE_VERSION");
-        if (!version) throw new Error("Missing REPLICATE_VERSION");
         
-        const start = await fetch("https://api.replicate.com/v1/predictions", {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            version,
-            input: {
-              prompt,
-              width: 1024,
-              height: 576,
-              output_format: "webp"
-            }
-          })
+        const replicate = new Replicate({
+          auth: token,
         });
-        if (!start.ok) throw new Error(`Replicate create failed: ${await start.text()}`);
-        const created = await start.json();
-        // Poll for completion
-        const pollUrl = created?.urls?.get;
-        const headers = {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json"
-        };
-        let outputUrl = null;
-        for(let i = 0; i < 40; i++){
-          const r = await fetch(pollUrl, {
-            headers
-          });
-          const j = await r.json();
-          if (j.status === "succeeded") {
-            const out = j.output;
-            outputUrl = Array.isArray(out) ? out[0] : out;
-            break;
+
+        // Use flux-dev directly by slug - SDK resolves latest version
+        const output = await replicate.run("black-forest-labs/flux-dev", {
+          input: {
+            prompt,
+            width: 1024,
+            height: 576,
+            output_format: "webp"
           }
-          if (j.status === "failed" || j.status === "canceled") {
-            throw new Error(`Replicate ${j.status}: ${j.error || "unknown error"}`);
-          }
-          await new Promise((res)=>setTimeout(res, 1000));
-        }
-        if (!outputUrl) throw new Error("No output URL from provider.");
-        const img = await fetch(outputUrl);
+        });
+
+        // Many image models return an array of URLs; grab the first
+        const outputUrl = Array.isArray(output) ? output[0] : output;
+        if (!outputUrl) throw new Error("No output URL from Replicate.");
+        
+        const img = await fetch(String(outputUrl));
         if (!img.ok) throw new Error(`Image fetch failed: ${img.status}`);
         imageArrayBuffer = await img.arrayBuffer();
       } else if (provider === "openai") {
@@ -157,7 +134,7 @@ Deno.serve(async (req)=>{
         url: publicUrl,
         key
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       return json({
         error: String(e?.message || e),
