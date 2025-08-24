@@ -34,4 +34,21 @@ if npx --yes playwright --version >/dev/null 2>&1; then
   npx --yes playwright install --with-deps
 fi
 
+# --- Image Ensure function secrets ---
+if command -v supabase >/dev/null 2>&1; then
+  if [ -z "$IMAGE_ENSURE_TOKEN" ]; then
+    echo "Generating IMAGE_ENSURE_TOKEN..."
+    IMAGE_ENSURE_TOKEN="$(openssl rand -hex 32)"
+  fi
+  echo "Setting Supabase function secrets…"
+  supabase secrets set \
+    SUPABASE_URL="$SUPABASE_URL" \
+    SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY" \
+    IMAGE_ENSURE_TOKEN="$IMAGE_ENSURE_TOKEN" \
+    PLACEHOLDER_MIN_BYTES="${PLACEHOLDER_MIN_BYTES:-1024}"
+  echo "IMAGE_ENSURE_TOKEN set. Keep this secret; use it only from server-to-server calls."
+else
+  echo "Supabase CLI not found; skipping secret setup."
+fi
+
 echo "✅ Setup complete."
