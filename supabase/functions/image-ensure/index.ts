@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
 
     const { bytes, contentType } = await generateImage(prompt);
     const finalBytes = bytes.byteLength < PLACEHOLDER_MIN_BYTES ? fallbackPng : bytes;
+    // Upload the validated bytes (placeholder or generated image)
     const { error } = await sb.storage.from(bucket).upload(objectKey, finalBytes, {
       contentType,
       upsert: true,
