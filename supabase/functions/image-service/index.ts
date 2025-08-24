@@ -73,7 +73,10 @@ Deno.serve(async (req)=>{
       if (provider === "replicate") {
         const token = Deno.env.get("REPLICATE_API_TOKEN");
         if (!token) throw new Error("Missing REPLICATE_API_TOKEN");
-        // Create prediction (use model:, not version hash)
+        // Create prediction using version ID
+        const version = Deno.env.get("REPLICATE_VERSION");
+        if (!version) throw new Error("Missing REPLICATE_VERSION");
+        
         const start = await fetch("https://api.replicate.com/v1/predictions", {
           method: "POST",
           headers: {
@@ -81,7 +84,7 @@ Deno.serve(async (req)=>{
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "black-forest-labs/flux-1.1-pro",
+            version,
             input: {
               prompt,
               width: 1024,
