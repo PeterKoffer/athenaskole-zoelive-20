@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { ensureDailyProgramCover } from "@/services/UniverseImageGenerator";
 
 export default function Page() {
@@ -15,7 +14,7 @@ export default function Page() {
   return (
     <div style={{ padding: 24 }}>
       <h1>Cover Test</h1>
-      {url ? <Image src={url} alt="cover" width={1024} height={576} /> : <div>Loading…</div>}
+      {url ? <img src={url} alt="cover" width={1024} height={576} /> : <div>Loading…</div>}
     </div>
   );
 }
