@@ -5,7 +5,7 @@ const UNIVERSE_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
 // Service to manage lesson source priority and image handling
 import { supabase } from '@/integrations/supabase/client';
-import { UniverseImageGeneratorService } from '@/services/UniverseImageGenerator';
+import { ensureDailyProgramCover } from '@/services/UniverseImageGenerator';
 import { UniversePacks, Prime100 } from '@/content/universe.catalog';
 import { UniversePack, CanonicalSubject } from '@/content/types';
 // import { PromptService } from '@/services/promptService'; // TODO: Enable when AI integration ready
@@ -163,13 +163,12 @@ export class LessonSourceManager {
       const isUUID = true; // We now have a valid UUID
       
       if (isUUID) {
-        const img = await UniverseImageGeneratorService.getOrCreate({
-          packId: universeUuid, // Use the generated UUID
+        imageUrl = await ensureDailyProgramCover({
+          universeId: universeUuid, // Use the generated UUID
           title: selectedUniverse.title,
           subject: selectedUniverse.subjectHint,
           grade: resolvedGrade
         });
-        imageUrl = img?.url;
       }
       
       // Fallback to local image if no UUID or generation failed
@@ -327,13 +326,13 @@ export class LessonSourceManager {
       // Handle image generation
       let imageUrl = null;
       try {
-        const img = await UniverseImageGeneratorService.getOrCreate({
-          packId: `ai-${date}`, // Not a UUID, will use fallback
+        imageUrl = await ensureDailyProgramCover({
+          universeId: `ai-${date}`, // Not a UUID, will use fallback
           title: structuredLesson.hero.title,
           subject: structuredLesson.hero.subject,
           grade: resolvedGrade
         });
-        imageUrl = img?.url || this.getSubjectFallbackImage(structuredLesson.hero.subject);
+        imageUrl = imageUrl || this.getSubjectFallbackImage(structuredLesson.hero.subject);
       } catch (error) {
         console.warn('Image generation failed:', error);
         imageUrl = this.getSubjectFallbackImage(structuredLesson.hero.subject);
