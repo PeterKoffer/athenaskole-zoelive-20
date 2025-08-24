@@ -1,33 +1,36 @@
-// src/components/UniverseImage.tsx
-import { useUniverseCover } from "../hooks/useUniverseCover";
+import { useState, useEffect } from 'react';
+import { healAndGetSignedUrl } from '../services/storage/getSignedUrl';
 
-type Props = {
+interface UseUniverseCoverProps {
   universeId: string;
   title: string;
   subject: string;
   grade: number | string;
-  className?: string;
-};
-
-export default function UniverseImage({ universeId, title, subject, grade, className }: Props) {
-  const { src, ready } = useUniverseCover({ universeId, title, subject, grade });
-
-  return (
-    <div
-      className={`relative w-full overflow-hidden rounded-2xl ${className ?? ""}`}
-      style={{ aspectRatio: "16 / 9", background: "rgba(255,255,255,0.06)" }}
-    >
-      {!ready && <div className="absolute inset-0 animate-pulse" />}
-      {ready && (
-        <img
-          src={src}
-          alt={`${title} cover`}
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="eager"
-          draggable={false}
-        />
-      )}
-    </div>
-  );
 }
 
+export function useUniverseCover({ universeId, title, subject, grade }: UseUniverseCoverProps) {
+  const [src, setSrc] = useState<string>('');
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        const pathBase = `${universeId}/cover`;
+        const url = await healAndGetSignedUrl(pathBase, {
+          title,
+          subject,
+          label: `${title} - ${subject} Grade ${grade}`
+        });
+        setSrc(url);
+        setReady(true);
+      } catch (error) {
+        console.error('Failed to load universe cover:', error);
+        setReady(true);
+      }
+    };
+
+    loadImage();
+  }, [universeId, title, subject, grade]);
+
+  return { src, ready };
+}
