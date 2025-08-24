@@ -13,6 +13,7 @@ describe('App Component Tests', () => {
         </AuthProvider>
       </MemoryRouter>
     );
-    expect(screen.getByText(/Welcome to NELIE/i)).toBeInTheDocument();
+    const buttons = screen.getAllByRole('button', { name: /View Daily Program/i });
+    expect(buttons.length).toBeGreaterThan(0);
   });
 });

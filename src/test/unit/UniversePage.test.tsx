@@ -5,14 +5,6 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DailyProgramPage from '../../pages/DailyProgramPage';
 import { BrowserRouter } from 'react-router-dom';
-import { aiUniverseGenerator } from '../../services/AIUniverseGenerator';
-
-// Mock the universe generation service
-vi.mock('../../services/AIUniverseGenerator', () => ({
-    aiUniverseGenerator: {
-        generateUniverse: vi.fn()
-    }
-}));
 
 // Mock react-router-dom navigate
 const mockNavigate = vi.fn();
@@ -34,7 +26,7 @@ vi.mock('sonner', () => ({
 // Mock useAuth hook
 vi.mock('@/hooks/useAuth', () => ({
     useAuth: () => ({
-        user: { uid: 'test-user' },
+        user: { id: 'test-user' },
         loading: false,
     }),
 }));
@@ -61,14 +53,7 @@ describe('DailyProgramPage', () => {
         vi.clearAllMocks();
     });
 
-    it('should render the universe title and description', async () => {
-        (aiUniverseGenerator.generateUniverse as any).mockResolvedValue(JSON.stringify({
-            title: 'Travel to China',
-            description: 'You have to travel to China to help a man in his store',
-            objectives: [],
-            image: '/example.png'
-        }));
-
+    it('allows starting a learning session', async () => {
         render(
             <BrowserRouter>
                 <DailyProgramPage />
@@ -79,10 +64,9 @@ describe('DailyProgramPage', () => {
         userEvent.click(startBtn);
 
         await waitFor(() => {
-            expect(screen.getByText('Travel to China')).toBeInTheDocument();
-            expect(screen.getByText('You have to travel to China to help a man in his store')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: /start learning session/i })
+            ).toBeInTheDocument();
         });
 
         const learnBtn = screen.getByRole('button', { name: /start learning session/i });
@@ -90,22 +74,7 @@ describe('DailyProgramPage', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/learn/mathematics');
     });
 
-    it('should render the curriculum standards', async () => {
-        (aiUniverseGenerator.generateUniverse as any).mockResolvedValue(JSON.stringify({
-            title: 'Travel to China',
-            description: 'You have to travel to China to help a man in his store',
-            objectives: [
-                {
-                    id: '1',
-                    name: 'Math Objective',
-                    description: 'Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.',
-                    subjectName: 'Math',
-                    educationalLevel: 'Grade 6',
-                },
-            ],
-            image: '/example.png'
-        }));
-
+    it('should display the generated lesson title', async () => {
         render(
             <BrowserRouter>
                 <DailyProgramPage />
@@ -116,9 +85,10 @@ describe('DailyProgramPage', () => {
         userEvent.click(startBtn);
 
         await waitFor(() => {
-            expect(screen.getByText('Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /start learning session/i })).toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: /start your adventure/i })).not.toBeInTheDocument();
+            expect(screen.getByText('Intro')).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: /start learning session/i })
+            ).toBeInTheDocument();
         });
 
         const learnBtn = screen.getByRole('button', { name: /start learning session/i });

@@ -69,7 +69,13 @@ const DailyProgramPage = () => {
   }, [user?.id, currentSelectedSubject, ready, learnerGradeValue, learnerBandValue]);
 
   const handleAddToCalendar = async () => {
-    if (!user?.id || !lessonSource || (lessonSource.type !== 'ai-suggestion' && lessonSource.type !== 'universe-fallback')) return;
+    if (
+      !user?.id ||
+      !lessonSource ||
+      (lessonSource.type !== 'ai-suggestion' && lessonSource.type !== 'universe-fallback')
+    ) {
+      return;
+    }
     
     const today = new Date().toISOString().split('T')[0];
     const orgId = 'school-1'; // TODO: Get from user context
