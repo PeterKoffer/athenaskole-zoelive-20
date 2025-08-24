@@ -15,10 +15,12 @@ vi.mock('@/hooks/useAuth', () => ({
   }),
 }));
 
+
 // Mock cover generation so vi ikke rammer Supabase edge functions i test
 vi.mock('@/services/UniverseImageGenerator', () => ({
   ensureDailyProgramCover: vi.fn().mockResolvedValue('data:image/svg+xml;base64,AAA='),
 }));
+
 
 // Mock lesson source manager til at levere en AI-forslag med én aktivitet
 vi.mock('@/services/lessonSourceManager', () => ({
