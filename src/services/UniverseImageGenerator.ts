@@ -2,10 +2,13 @@ import { supabase } from "../lib/supabaseClient";
 
 export async function ensureDailyProgramCover(opts: {
   universeId: string;
-  gradeRaw: string | number;
-  prompt: string;
+  title: string;
+  subject: string;
+  grade: string | number;
 }) {
-  const { universeId, gradeRaw, prompt } = opts;
+  const { universeId, title, subject, grade } = opts;
+  const gradeRaw = grade;
+  const prompt = `Classroom-friendly ${subject} cover for ${title}`;
 
   const { data, error } = await supabase.functions.invoke("image-service", {
     method: "POST",

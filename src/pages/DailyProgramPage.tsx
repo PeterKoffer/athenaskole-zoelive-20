@@ -12,8 +12,8 @@ import { resolveLearnerGrade, gradeToBand } from '@/lib/grade';
 import { getLearnerGrade } from '@/utils/grade';
 import { UserMetadata } from '@/types/auth';
 import TextWithSpeaker from '@/components/education/components/shared/TextWithSpeaker';
-import { UniverseImageGenerator } from '@/services/UniverseImageGenerator';
-import { UniverseImage } from '@/components/UniverseImage';
+import { ensureDailyProgramCover } from '@/services/UniverseImageGenerator';
+import UniverseImage from '@/components/UniverseImage';
 import { emitInterest } from '@/services/interestSignals';
 import { topTags } from '@/services/interestProfile';
 import { Horizon } from '@/services/universe/state';
@@ -164,19 +164,19 @@ const DailyProgramPage = () => {
       if (result) {
         setGeneratingImage(true);
         try {
-          const generatedImageUrl = await UniverseImageGenerator.generate({
+          const generatedImageUrl = await ensureDailyProgramCover({
+            universeId: result.id,
             title: result.title || 'Learning Universe',
             subject: result.theme || 'education',
-            universeId: result.id,
-            grade
+            grade,
           });
 
           if (generatedImageUrl) {
             result.image = generatedImageUrl;
-            console.log('✅ Universe image generated:', generatedImageUrl);
+            console.log('✅ Universe cover ensured:', generatedImageUrl);
           }
         } catch (imgError) {
-          console.warn('⚠️ Image generation failed, using placeholder:', imgError);
+          console.warn('⚠️ Cover generation failed, using placeholder:', imgError);
         } finally {
           setGeneratingImage(false);
         }
