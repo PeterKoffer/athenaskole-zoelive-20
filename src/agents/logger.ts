@@ -7,7 +7,14 @@ export async function logEvent(args: {
   message: string;
   meta?: unknown;
 }) {
-  if (process.env.NODE_ENV !== "production") {
+  // In Edge Functions (Deno), process.env is not defined.
+  // Gate by Deno.env if available.
+  const env =
+    typeof Deno !== "undefined" && "env" in Deno
+      ? Deno.env.get("NODE_ENV")
+      : undefined;
+
+  if (env !== "production") {
     // eslint-disable-next-line no-console
     console.log("[AGENT]", JSON.stringify(args));
   }
