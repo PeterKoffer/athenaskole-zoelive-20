@@ -1,4 +1,41 @@
-import { supabase } from "../lib/supabaseClient";
+export async function generateCover(
+  universeId: string,
+  {
+    title,
+    prompt,
+    width = 1024,
+    height = 576,
+  }: { title?: string; prompt?: string; width?: number; height?: number } = {}
+): Promise<string> {
+  const supaUrl = "https://yphkfkpfdpdmllotpqua.supabase.co";
+  const anon = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwaGtma3BmZHBkbWxsb3RwcXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MTcxNTksImV4cCI6MjA2Mzk5MzE1OX0.hqyZ2nk3dqMx8rX9tdM1H4XF9wZ9gvaRor-6i5AyCy8";
+
+  const body = {
+    universeId,
+    prompt:
+      prompt ??
+      `${title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
+    width,
+    height,
+  };
+
+  const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${anon}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const json = await res.json().catch(() => ({} as any));
+  if (!res.ok) {
+    throw new Error(`edge returned ${res.status}: ${json?.error ?? "unknown error"}`);
+  }
+  const url = typeof json?.url === "string" ? json.url : null;
+  if (!url) throw new Error("edge returned no url");
+  return url;
+}
 
 export async function ensureDailyProgramCover(opts: {
   universeId: string;
@@ -7,18 +44,15 @@ export async function ensureDailyProgramCover(opts: {
   grade: string | number;
 }) {
   const { universeId, title, subject, grade } = opts;
-  const gradeRaw = grade;
   const prompt = `Classroom-friendly ${subject} cover for ${title}`;
 
-  const { data, error } = await supabase.functions.invoke("image-service/generate", {
-    body: { universeId, gradeRaw, prompt },
-  });
-
-  if (error || !data?.url) {
-    console.warn("Cover generation failed:", error?.message);
-    return svgFallback(universeId, gradeRaw);
+  try {
+    const url = await generateCover(universeId, { title, prompt });
+    return `${url}?v=${Date.now()}`; // cache-bust
+  } catch (error) {
+    console.warn("Cover generation failed:", error);
+    return svgFallback(universeId, grade);
   }
-  return `${data.url}?v=${Date.now()}`; // cache-bust
 }
 
 function svgFallback(universeId: string, gradeRaw: string | number) {
