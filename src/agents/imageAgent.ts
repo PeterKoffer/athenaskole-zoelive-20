@@ -1,5 +1,5 @@
-import { logEvent } from "./logger";
-import { placeholderImagePath } from "./fallbacks";
+import { logEvent } from "./logger.ts";
+import { placeholderImagePath } from "./fallbacks.ts";
 
 export async function ensureCoverImage(
   sessionId: string,

@@ -1,5 +1,5 @@
 import type { AgentInputs } from "./types";
-import { logEvent } from "./logger";
+import { logEvent } from "./logger.ts";
 
 export interface ScenarioState {
   step: number;
