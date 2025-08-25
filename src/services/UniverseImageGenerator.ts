@@ -1,38 +1,57 @@
 // src/services/UniverseImageGenerator.ts
-// Minimal, stabil klient til edge image-service.
-// Ingen supabase.functions.invoke — vi rammer /generate direkte.
+import supabase from "../lib/supabaseClient";
 
-type GenerateOpts = {
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function fallbackSvg(title: string, w = 1024, h = 576) {
+  const safe = escapeHtml(title || "Today’s Program");
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#0b1220"/>
+          <stop offset="100%" stop-color="#1f2a44"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <text x="50%" y="50%" fill="#cbd5e1" font-size="36" text-anchor="middle" font-family="system-ui, sans-serif">
+        ${safe}
+      </text>
+    </svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+type GenerateInput = {
+  universeId: string;
   title?: string;
-  prompt?: string;
+  subject?: string;
+  grade?: number;
   width?: number;
   height?: number;
+  prompt?: string;
 };
 
-export async function generateCover(
-  universeId: string,
-  { title, prompt, width = 1024, height = 576 }: GenerateOpts = {}
-): Promise<string> {
+// Low-level direkte kald til edge-funktionen (/generate)
+async function generateCoverDirect(input: GenerateInput): Promise<string> {
   const supaUrl = import.meta.env.VITE_SUPABASE_URL;
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
   if (!supaUrl || !anon) {
-    throw new Error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY");
-  }
-  if (!universeId || !universeId.trim()) {
-    throw new Error("universeId is required");
+    console.warn("[cover] Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY");
+    return fallbackSvg(input.title ?? "Today’s Program", input.width ?? 1024, input.height ?? 576);
   }
 
+  const url = `${supaUrl}/functions/v1/image-service/generate`;
   const body = {
-    universeId,
+    universeId: input.universeId,
     prompt:
-      prompt ??
-      `${title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
-    width,
-    height,
+      input.prompt ??
+      `${input.title ?? "Today’s Program"} — classroom-friendly, minimal, bright, 16:9`,
+    width: input.width ?? 1024,
+    height: input.height ?? 576,
   };
 
-  const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -41,65 +60,39 @@ export async function generateCover(
     body: JSON.stringify(body),
   });
 
-  // Robust JSON-parsing
-  let json: any = null;
-  try {
-    json = await res.json();
-  } catch {
-    json = {};
-  }
-
   if (!res.ok) {
-    const msg = json?.error || `HTTP ${res.status}`;
-    throw new Error(`edge returned non-OK: ${msg}`);
+    const txt = await res.text().catch(() => "");
+    console.warn("[cover] edge returned non-2xx:", res.status, txt);
+    return fallbackSvg(input.title ?? "Today’s Program", body.width, body.height);
   }
 
-  const url = typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
-  if (!url) throw new Error("edge returned no url");
-  return url;
+  const json = (await res.json().catch(() => ({}))) as any;
+  const candidate = typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
+  return candidate ?? fallbackSvg(input.title ?? "Today’s Program", body.width, body.height);
 }
 
-// Bruges af sider/loader til at sikre et cover — falder pænt tilbage til SVG.
+// Højniveau API der bruges af resten af appen
 export async function ensureDailyProgramCover(opts: {
   universeId: string;
   title?: string;
   subject?: string;
-  grade?: number | string;
+  grade?: number;
+  width?: number;
+  height?: number;
+  prompt?: string;
 }): Promise<string> {
-  const { universeId, title, subject } = opts;
+  // Kør altid direkte mod /generate (ikke supabase.functions.invoke)
+  const url = await generateCoverDirect({
+    universeId: opts.universeId,
+    title: opts.title,
+    subject: opts.subject,
+    grade: opts.grade,
+    width: opts.width ?? 1024,
+    height: opts.height ?? 576,
+    prompt: opts.prompt,
+  });
 
-  const niceTitle = title ?? "Today's Program";
-  const prompt = `Classroom-friendly ${subject ? subject + " " : ""}cover for ${niceTitle}, minimal, bright, 16:9`;
-
-  try {
-    const url = await generateCover(universeId, { title: niceTitle, prompt, width: 1024, height: 576 });
-    // ⚠️ IKKE tilføje egen cache-bust på signerede links
-    return url;
-  } catch (error) {
-    console.warn("[cover] generation failed, using SVG fallback:", error);
-    return makeFallbackSvg(niceTitle, 1024, 576);
-  }
-}
-
-// En simpel, neutral fallback som data-URL (virker uden netværk/CORS)
-function makeFallbackSvg(text: string, w = 1024, h = 576): string {
-  const safe = (text || "Today's Program")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;");
-
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-      <defs>
-        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stop-color="#111827"/>
-          <stop offset="1" stop-color="#1f2937"/>
-        </linearGradient>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#g)"/>
-      <text x="50%" y="50%" fill="#d1d5db" font-size="36" text-anchor="middle"
-            font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial" dy="12">
-        ${safe}
-      </text>
-    </svg>`;
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
+  // lille cache-bust så <img> henter igen, hvis samme URL genbruges
+  const bust = `ts=${Date.now()}`;
+  return url.includes("?") ? `${url}&${bust}` : `${url}?${bust}`;
 }
