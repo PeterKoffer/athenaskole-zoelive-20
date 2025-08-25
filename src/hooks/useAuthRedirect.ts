@@ -1,46 +1,33 @@
-
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './useAuth';
-import { useRoleAccess } from './useRoleAccess';
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./useAuth";
+import { useRoleAccess } from "./useRoleAccess";
 
 export const useAuthRedirect = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { user, loading } = useAuth();
   const { userRole } = useRoleAccess();
 
   useEffect(() => {
-    // Don't redirect while still loading
-    if (loading) return;
+    if (loading || !user) return;
 
-    // Don't redirect from auth page - allow users to change roles
-    const currentPath = window.location.pathname;
-    if (currentPath === '/auth') {
-      console.log('[useAuthRedirect] Not redirecting from auth page - allowing role selection');
-      return;
-    }
+    // Mål pr. rolle (kan justeres senere)
+    const targets: Record<string, string> = {
+      admin: "/school-dashboard",
+      school_leader: "/school-dashboard",
+      school_staff: "/school-dashboard",
+      teacher: "/teacher-dashboard",
+      parent: "/parent-dashboard",
+      student: "/daily-program",
+      unknown: "/daily-program",
+    };
 
-    // Only redirect if user is authenticated and on a page that should redirect
-    if (user && userRole && currentPath !== '/auth') {
-      console.log('[useAuthRedirect] User authenticated, checking if redirect needed', { userRole, currentPath });
-      
-      // Define target paths for each role
-      const targetPaths: Record<string, string> = {
-        'admin': '/school-dashboard',
-        'school_leader': '/school-dashboard',
-        'school_staff': '/school-dashboard',
-        'teacher': '/teacher-dashboard',
-        'parent': '/parent-dashboard',
-        'student': '/daily-program'
-      };
-      
-      const targetPath = targetPaths[userRole] || '/profile';
-      
-      // Only redirect if current path doesn't match the expected role path
-      if (currentPath !== targetPath && currentPath === '/') {
-        console.log('[useAuthRedirect] Redirecting to', targetPath, 'for role', userRole);
-        navigate(targetPath, { replace: true });
-      }
+    const target = targets[userRole ?? "unknown"] ?? "/daily-program";
+
+    // Kun auto-redirect fra forsiden, auth, eller legacy /profile
+    if (pathname === "/" || pathname === "/auth" || pathname === "/profile") {
+      navigate(target, { replace: true });
     }
-  }, [user, userRole, loading, navigate]);
+  }, [loading, user, userRole, navigate, pathname]);
 };
