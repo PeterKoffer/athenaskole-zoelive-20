@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-// Lille helper til stabilt fallback-id
-const slug = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 function useEdgeCover(
   universeId: string,
@@ -16,7 +16,6 @@ function useEdgeCover(
     let cancelled = false;
     (async () => {
       if (!supaUrl || !anon || !universeId) return;
-
       try {
         const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
           method: "POST",
@@ -30,76 +29,47 @@ function useEdgeCover(
             height: opts.height ?? 576,
           }),
         });
-
-        const json = await res.json().catch(() => ({} as any));
+        const json = await res.json().catch(() => ({}));
         const candidate =
-          typeof json?.url === "string" && json.url.length > 8 ? json.url : undefined;
-
-        if (!cancelled && candidate) setUrl(candidate);
-      } catch {
-        /* silent fallback */
-      }
+          typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
+        if (!cancelled) setUrl(candidate);
+      } catch {/* ignore */}
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [supaUrl, anon, universeId, opts.title, opts.prompt, opts.width, opts.height]);
 
   return url;
 }
 
-type UniverseImageProps = {
-  universeId?: string;
-  title?: string;
-  subject?: string;
-  className?: string;
-};
+type Props = { universeId?: string; title?: string; subject?: string; className?: string };
 
-const UniverseImage: React.FC<UniverseImageProps> = ({
-  universeId,
-  title,
-  subject,
-  className,
-}) => {
+export default function UniverseImage({ universeId, title, subject, className }: Props) {
   const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
-
-  // Fald tilbage til et stabilt id når universeId mangler (typisk i lokale fallbacks)
   const effectiveId =
     (universeId && universeId.trim()) ||
-    (title ? `fallback-${slug(title)}` : "fallback-general");
+    (title ? `fallback-${slugify(title)}` : "fallback-general");
 
-  const edgeUrl = useEdgeCover(effectiveId, { title, width: 1024, height: 576 });
+  const src = useEdgeCover(effectiveId, { title, width: 1024, height: 576 });
 
-  const src = edgeUrl ?? undefined;
-
-  return (
-    <div className={className}>
-      {src ? (
-        <img
-          src={src}
-          alt={alt}
-          style={{ width: "100%", aspectRatio: "16 / 9", borderRadius: 12, objectFit: "cover" }}
-        />
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            aspectRatio: "16 / 9",
-            background: "#1f2937",
-            borderRadius: 12,
-            display: "grid",
-            placeItems: "center",
-            color: "white",
-            fontWeight: 600,
-          }}
-          aria-label={alt}
-        >
-          {title || "Universe Cover"}
-        </div>
-      )}
+  return src ? (
+    <img
+      src={src}
+      alt={alt}
+      crossOrigin="anonymous"
+      referrerPolicy="no-referrer"
+      style={{ width: "100%", aspectRatio: "16 / 9", borderRadius: 12, objectFit: "cover" }}
+      className={className}
+    />
+  ) : (
+    <div
+      className={className}
+      style={{
+        width: "100%", aspectRatio: "16 / 9", background: "#1f2937",
+        borderRadius: 12, display: "grid", placeItems: "center", color: "white", fontWeight: 600,
+      }}
+      aria-label={alt}
+    >
+      {title || "Universe Cover"}
     </div>
   );
-};
-
-export default UniverseImage;
-
+}
