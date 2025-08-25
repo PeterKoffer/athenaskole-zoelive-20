@@ -43,7 +43,7 @@ function useEdgeCover(
 
 type Props = { universeId?: string; title?: string; subject?: string; className?: string };
 
-export default function UniverseImage({ universeId, title, subject, className }: Props) {
+export default function UniverseImage({ universeId, title, subject }: Props) {
   const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
 
   // ✅ brug et stabilt fallback-id når universeId mangler
@@ -58,17 +58,22 @@ export default function UniverseImage({ universeId, title, subject, className }:
     <img
       src={src}
       alt={alt}
-      crossOrigin="anonymous"
+      loading="lazy"
+      decoding="async"
       referrerPolicy="no-referrer"
       style={{ width: "100%", aspectRatio: "16 / 9", borderRadius: 12, objectFit: "cover" }}
-      className={className}
     />
   ) : (
     <div
-      className={className}
       style={{
-        width: "100%", aspectRatio: "16 / 9", background: "#1f2937",
-        borderRadius: 12, display: "grid", placeItems: "center", color: "white", fontWeight: 600,
+        width: "100%",
+        aspectRatio: "16 / 9",
+        background: "#1f2937",
+        borderRadius: 12,
+        display: "grid",
+        placeItems: "center",
+        color: "white",
+        fontWeight: 600,
       }}
       aria-label={alt}
     >
