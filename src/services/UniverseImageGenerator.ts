@@ -32,13 +32,16 @@ type GenerateInput = {
   prompt?: string;
 };
 
-// Low-level direkte kald til edge-funktionen (/generate)
+// Direkte fetch til edge-funktionen (ALTID /generate)
 async function generateCoverDirect(input: GenerateInput): Promise<string> {
   const supaUrl = import.meta.env.VITE_SUPABASE_URL;
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const W = input.width ?? 1024;
+  const H = input.height ?? 576;
+
   if (!supaUrl || !anon) {
     console.warn("[cover] Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY");
-    return fallbackSvg(input.title ?? "Today’s Program", input.width ?? 1024, input.height ?? 576);
+    return fallbackSvg(input.title ?? "Today’s Program", W, H);
   }
 
   const url = `${supaUrl}/functions/v1/image-service/generate`;
@@ -47,31 +50,28 @@ async function generateCoverDirect(input: GenerateInput): Promise<string> {
     prompt:
       input.prompt ??
       `${input.title ?? "Today’s Program"} — classroom-friendly, minimal, bright, 16:9`,
-    width: input.width ?? 1024,
-    height: input.height ?? 576,
+    width: W,
+    height: H,
   };
 
   const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${anon}`,
-    },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${anon}` },
     body: JSON.stringify(body),
   });
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    console.warn("[cover] edge returned non-2xx:", res.status, txt);
-    return fallbackSvg(input.title ?? "Today’s Program", body.width, body.height);
+    console.warn("[cover] edge non-2xx:", res.status, txt);
+    return fallbackSvg(input.title ?? "Today’s Program", W, H);
   }
 
   const json = (await res.json().catch(() => ({}))) as any;
   const candidate = typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
-  return candidate ?? fallbackSvg(input.title ?? "Today’s Program", body.width, body.height);
+  return candidate ?? fallbackSvg(input.title ?? "Today’s Program", W, H);
 }
 
-// Højniveau API der bruges af resten af appen
+// Offentligt API
 export async function ensureDailyProgramCover(opts: {
   universeId: string;
   title?: string;
@@ -81,7 +81,6 @@ export async function ensureDailyProgramCover(opts: {
   height?: number;
   prompt?: string;
 }): Promise<string> {
-  // Kør altid direkte mod /generate (ikke supabase.functions.invoke)
   const url = await generateCoverDirect({
     universeId: opts.universeId,
     title: opts.title,
@@ -92,7 +91,7 @@ export async function ensureDailyProgramCover(opts: {
     prompt: opts.prompt,
   });
 
-  // lille cache-bust så <img> henter igen, hvis samme URL genbruges
+  // let-bust for at tvinge <img> til at hente igen
   const bust = `ts=${Date.now()}`;
   return url.includes("?") ? `${url}&${bust}` : `${url}?${bust}`;
 }
