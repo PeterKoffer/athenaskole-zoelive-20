@@ -1,97 +1,100 @@
 // src/services/UniverseImageGenerator.ts
-import supabase from "../lib/supabaseClient";
+// Single place to generate a cover image for a universe/lesson.
+// Uses our Supabase Edge Function: /functions/v1/image-service/generate
 
-function escapeHtml(s: string) {
+type EnsureCoverOpts = {
+  universeId: string;
+  title: string;
+  subject?: string;
+  grade?: number;
+  width?: number;
+  height?: number;
+};
+
+function escapeSvgText(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-function fallbackSvg(title: string, w = 1024, h = 576) {
-  const safe = escapeHtml(title || "Today’s Program");
+
+function makeFallbackSvg(text: string, w = 1024, h = 576) {
+  const safe = escapeSvgText(text || "Today's Program");
   const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-      <defs>
-        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="#0b1220"/>
-          <stop offset="100%" stop-color="#1f2a44"/>
-        </linearGradient>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#g)"/>
-      <text x="50%" y="50%" fill="#cbd5e1" font-size="36" text-anchor="middle" font-family="system-ui, sans-serif">
-        ${safe}
-      </text>
-    </svg>`;
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+    `  <defs>` +
+    `    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">` +
+    `      <stop offset="0%" stop-color="#111827"/><stop offset="100%" stop-color="#1f2937"/>` +
+    `    </linearGradient>` +
+    `  </defs>` +
+    `  <rect width="100%" height="100%" fill="url(#g)"/>` +
+    `  <text x="50%" y="50%" fill="#e5e7eb" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto"` +
+    `        font-size="28" text-anchor="middle" dominant-baseline="middle">${safe}</text>` +
+    `</svg>`;
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
 
-type GenerateInput = {
-  universeId: string;
-  title?: string;
-  subject?: string;
-  grade?: number;
-  width?: number;
-  height?: number;
-  prompt?: string;
-};
-
-// Direkte fetch til edge-funktionen (ALTID /generate)
-async function generateCoverDirect(input: GenerateInput): Promise<string> {
+async function callEdgeGenerate(
+  universeId: string,
+  prompt: string,
+  w = 1024,
+  h = 576
+): Promise<string | null> {
   const supaUrl = import.meta.env.VITE_SUPABASE_URL;
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const W = input.width ?? 1024;
-  const H = input.height ?? 576;
 
-  if (!supaUrl || !anon) {
-    console.warn("[cover] Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY");
-    return fallbackSvg(input.title ?? "Today’s Program", W, H);
+  if (!supaUrl || !anon) return null;
+
+  try {
+    const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${anon}`,
+      },
+      body: JSON.stringify({
+        universeId,
+        prompt,
+        width: w,
+        height: h,
+      }),
+    });
+
+    // Edge function always returns JSON (even for fallback)
+    const json = (await res.json().catch(() => ({}))) as {
+      url?: string;
+      error?: string;
+      source?: string;
+      status?: string;
+    };
+
+    // If BFL succeeded, url is a https link. If BFL failed, we still get a data: URL fallback.
+    if (typeof json?.url === "string" && json.url.length > 8) {
+      return json.url;
+    }
+
+    // Explicit fallback if we got here without a url
+    return null;
+  } catch {
+    return null;
   }
-
-  const url = `${supaUrl}/functions/v1/image-service/generate`;
-  const body = {
-    universeId: input.universeId,
-    prompt:
-      input.prompt ??
-      `${input.title ?? "Today’s Program"} — classroom-friendly, minimal, bright, 16:9`,
-    width: W,
-    height: H,
-  };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${anon}` },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    console.warn("[cover] edge non-2xx:", res.status, txt);
-    return fallbackSvg(input.title ?? "Today’s Program", W, H);
-  }
-
-  const json = (await res.json().catch(() => ({}))) as any;
-  const candidate = typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
-  return candidate ?? fallbackSvg(input.title ?? "Today’s Program", W, H);
 }
 
-// Offentligt API
-export async function ensureDailyProgramCover(opts: {
-  universeId: string;
-  title?: string;
-  subject?: string;
-  grade?: number;
-  width?: number;
-  height?: number;
-  prompt?: string;
-}): Promise<string> {
-  const url = await generateCoverDirect({
-    universeId: opts.universeId,
-    title: opts.title,
-    subject: opts.subject,
-    grade: opts.grade,
-    width: opts.width ?? 1024,
-    height: opts.height ?? 576,
-    prompt: opts.prompt,
-  });
+/**
+ * Main entry used by the app to ensure there is a cover image URL.
+ * Always resolves to a usable URL (remote image or SVG data URL).
+ */
+export async function ensureDailyProgramCover(opts: EnsureCoverOpts): Promise<string> {
+  const w = opts.width ?? 1024;
+  const h = opts.height ?? 576;
+  const title = opts.title?.trim() || "Today’s Program";
 
-  // let-bust for at tvinge <img> til at hente igen
-  const bust = `ts=${Date.now()}`;
-  return url.includes("?") ? `${url}&${bust}` : `${url}?${bust}`;
+  const prompt =
+    `Classroom-friendly cover for "${title}"` +
+    (opts.subject ? `, ${opts.subject}` : "") +
+    ", minimal, bright, 16:9";
+
+  // Try edge function (BFL or its internal fallback)
+  const edgeUrl = await callEdgeGenerate(opts.universeId || `fallback-${title}`, prompt, w, h);
+  if (edgeUrl) return `${edgeUrl}${edgeUrl.startsWith("data:") ? "" : `?x=${Date.now()}`}`;
+
+  // Last-resort local fallback
+  return makeFallbackSvg(title, w, h);
 }
