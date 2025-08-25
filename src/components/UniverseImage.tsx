@@ -3,20 +3,6 @@ import { useEffect, useState } from "react";
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
-function makeFallbackSvg(text: string, w = 1024, h = 576) {
-  const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-      <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0%" stop-color="#0b1220"/><stop offset="100%" stop-color="#1c2a44"/>
-      </linearGradient></defs>
-      <rect width="100%" height="100%" fill="url(#g)"/>
-      <text x="50%" y="50%" fill="#7dd3fc" font-size="36" text-anchor="middle"
-            font-family="ui-sans-serif,system-ui,Segoe UI,Roboto"
-            dominant-baseline="middle">${safe}</text>
-    </svg>`;
-  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
-}
 
 function useEdgeCover(
   universeId: string,
@@ -28,35 +14,46 @@ function useEdgeCover(
 
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
-      if (!supaUrl || !anon || !universeId) return;
-      const body = {
-        universeId,
-        prompt:
-          opts.prompt ??
-          `${opts.title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
-        width: opts.width ?? 1024,
-        height: opts.height ?? 576,
-      };
-      console.debug("[UniverseImage] calling edge with:", { supaUrl, body });
+      if (!supaUrl || !anon || !universeId) {
+        console.debug("[UniverseImage] missing env or universeId", { supaUrl: !!supaUrl, anon: !!anon, universeId });
+        return;
+      }
 
       try {
-        const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
+        const endpoint = `${supaUrl}/functions/v1/image-service/generate`;
+        const body = {
+          universeId,
+          prompt:
+            opts.prompt ??
+            `${opts.title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
+          width: opts.width ?? 1024,
+          height: opts.height ?? 576,
+        };
+        console.debug("[UniverseImage] POST", endpoint, body);
+
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${anon}` },
           body: JSON.stringify(body),
         });
-        const json = await res.json().catch(() => ({}));
-        console.debug("[UniverseImage] edge response:", json);
 
-        const candidate =
-          typeof json?.url === "string" && json.url.startsWith("data:") ? json.url : null;
+        if (!res.ok) {
+          console.warn("[UniverseImage] edge returned non-2xx", res.status, await res.text());
+          return;
+        }
+
+        const json = await res.json().catch(() => ({}));
+        const candidate = typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
+        console.debug("[UniverseImage] edge response url:", candidate);
+
         if (!cancelled) setUrl(candidate);
       } catch (e) {
-        console.warn("[UniverseImage] edge error:", e);
-        if (!cancelled) setUrl(null);
+        console.error("[UniverseImage] fetch error", e);
       }
     })();
+
     return () => { cancelled = true; };
   }, [supaUrl, anon, universeId, opts.title, opts.prompt, opts.width, opts.height]);
 
@@ -68,13 +65,12 @@ type Props = { universeId?: string; title?: string; subject?: string; className?
 export default function UniverseImage({ universeId, title, subject, className }: Props) {
   const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
   const effectiveId =
-    (universeId && universeId.trim()) || (title ? `fallback-${slugify(title)}` : "fallback-general");
+    (universeId && universeId.trim()) ||
+    (title ? `fallback-${slugify(title)}` : "fallback-general");
 
-  const src =
-    useEdgeCover(effectiveId, { title, width: 1024, height: 576 }) ||
-    makeFallbackSvg(title || "Universe Cover");
+  const src = useEdgeCover(effectiveId, { title, width: 1024, height: 576 });
 
-  return (
+  return src ? (
     <img
       src={src}
       alt={alt}
@@ -83,5 +79,16 @@ export default function UniverseImage({ universeId, title, subject, className }:
       style={{ width: "100%", aspectRatio: "16 / 9", borderRadius: 12, objectFit: "cover" }}
       className={className}
     />
+  ) : (
+    <div
+      className={className}
+      style={{
+        width: "100%", aspectRatio: "16 / 9", background: "#1f2937",
+        borderRadius: 12, display: "grid", placeItems: "center", color: "white", fontWeight: 600,
+      }}
+      aria-label={alt}
+    >
+      {title || "Universe Cover"}
+    </div>
   );
 }
