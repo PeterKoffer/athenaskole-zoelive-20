@@ -65,9 +65,7 @@ function useEdgeCover(
         const candidate =
           typeof json?.url === "string" && json.url.length > 8 ? (json.url as string) : null;
 
-        if (!cancelled) {
-          setUrl(candidate);
-        }
+        if (!cancelled) setUrl(candidate);
       } catch (e) {
         console.debug("[UniverseImage] fetch failed:", e);
         if (!cancelled) setUrl(null);
@@ -100,14 +98,12 @@ export default function UniverseImage({ universeId, title, subject, className }:
   const src = useEdgeCover(effectiveId, { title, width: 1024, height: 576 });
   const fallback = makeFallbackSvg(alt, 1024, 576);
 
-  // If we have a URL, render <img>. Otherwise render a styled placeholder.
   return src ? (
     <img
       key={src}
       src={src}
       alt={alt}
-      // IMPORTANT: do NOT set crossOrigin. BFL delivery doesn’t send CORS
-      // headers, and setting crossOrigin would cause the image to fail.
+      // do NOT set crossOrigin — BFL delivery lacks CORS headers
       referrerPolicy="no-referrer"
       loading="lazy"
       decoding="async"
