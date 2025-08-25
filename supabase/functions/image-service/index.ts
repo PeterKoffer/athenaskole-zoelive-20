@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
     return ok({
       url: makeFallbackSvg(title, width, height),
       source: "fallback",
-      error: String(e?.message || e),
+      error: String((e as Error)?.message || e),
     });
   }
 });

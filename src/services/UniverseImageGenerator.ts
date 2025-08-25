@@ -10,7 +10,7 @@ export async function ensureDailyProgramCover(opts: {
   const gradeRaw = grade;
   const prompt = `Classroom-friendly ${subject} cover for ${title}`;
 
-  const { data, error } = await supabase.functions.invoke("image-service", {
+  const { data, error } = await supabase.functions.invoke("image-service/generate", {
     body: { universeId, gradeRaw, prompt },
   });
 
