@@ -4,15 +4,20 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function fallbackSvgDataUrl(text: string, w = 1024, h = 576) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-      <rect width="100%" height="100%" fill="#0b1220"/>
-      <text x="50%" y="50%" fill="#7dd3fc" font-size="36" text-anchor="middle"
-            font-family="sans-serif" dominant-baseline="middle">
-        ${text.replace(/&/g, "&amp;").replace(/</g, "&lt;")}
-      </text>
-    </svg>`;
+function makeFallbackSvg(text: string, w = 1024, h = 576) {
+  const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+    <defs>
+      <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#0b1220"/>
+        <stop offset="1" stop-color="#1f2937"/>
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#g)"/>
+    <text x="50%" y="50%" fill="#7dd3fc" font-size="36" text-anchor="middle"
+          font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+          dominant-baseline="middle">${safe}</text>
+  </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
@@ -28,7 +33,21 @@ function useEdgeCover(
     let cancelled = false;
 
     (async () => {
-      if (!supaUrl || !anon || !universeId) return;
+      if (!supaUrl || !anon || !universeId) {
+        console.debug("[UniverseImage] missing env or id", { supaUrl: !!supaUrl, anon: !!anon, universeId });
+        return;
+      }
+
+      const body = {
+        universeId,
+        prompt:
+          opts.prompt ??
+          `${opts.title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
+        width: opts.width ?? 1024,
+        height: opts.height ?? 576,
+      };
+
+      console.debug("[UniverseImage] calling edge with:", { supaUrl, body });
 
       try {
         const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
@@ -37,23 +56,21 @@ function useEdgeCover(
             "Content-Type": "application/json",
             Authorization: `Bearer ${anon}`,
           },
-          body: JSON.stringify({
-            universeId,
-            prompt:
-              opts.prompt ??
-              `${opts.title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
-            width: opts.width ?? 1024,
-            height: opts.height ?? 576,
-          }),
+          body: JSON.stringify(body),
         });
 
         const json = await res.json().catch(() => ({} as any));
+        console.debug("[UniverseImage] edge response:", json);
+
         const candidate =
           typeof json?.url === "string" && json.url.length > 8 ? (json.url as string) : null;
 
-        if (!cancelled) setUrl(candidate);
-      } catch {
-        // silent fallback
+        if (!cancelled) {
+          setUrl(candidate);
+        }
+      } catch (e) {
+        console.debug("[UniverseImage] fetch failed:", e);
+        if (!cancelled) setUrl(null);
       }
     })();
 
@@ -75,25 +92,27 @@ type Props = {
 export default function UniverseImage({ universeId, title, subject, className }: Props) {
   const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
 
-  // Always have a stable id (lets us cache per-title too)
+  // Stable id so we can generate per-title when no id is present
   const effectiveId =
     (universeId && universeId.trim()) ||
     (title ? `fallback-${slugify(title)}` : "fallback-general");
 
   const src = useEdgeCover(effectiveId, { title, width: 1024, height: 576 });
-  const fallback = fallbackSvgDataUrl(alt, 1024, 576);
+  const fallback = makeFallbackSvg(alt, 1024, 576);
 
+  // If we have a URL, render <img>. Otherwise render a styled placeholder.
   return src ? (
     <img
-      key={src}                   // ensure React swaps image when URL changes
+      key={src}
       src={src}
       alt={alt}
-      // IMPORTANT: no `crossOrigin` — BFL delivery URLs do not send CORS headers
+      // IMPORTANT: do NOT set crossOrigin. BFL delivery doesn’t send CORS
+      // headers, and setting crossOrigin would cause the image to fail.
       referrerPolicy="no-referrer"
       loading="lazy"
       decoding="async"
       onError={(e) => {
-        // graceful fallback if the signed URL expires or is blocked
+        console.debug("[UniverseImage] image onError -> fallback");
         (e.currentTarget as HTMLImageElement).src = fallback;
       }}
       style={{
