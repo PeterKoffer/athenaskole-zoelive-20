@@ -74,7 +74,7 @@ const HeroSection = ({ onGetStarted: _onGetStarted }: HeroSectionProps) => {
                 <LogIn className="mr-2 h-4 w-4" />
                 Login
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/profile')} className="hover:bg-gray-700">
+              <DropdownMenuItem onClick={() => navigate('/daily-program')} className="hover:bg-gray-700">
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>

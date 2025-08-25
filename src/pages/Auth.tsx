@@ -39,7 +39,7 @@ const Auth = () => {
         'student': '/daily-program'
       };
       
-      const targetPath = targetPaths[userRole] || '/profile';
+      const targetPath = targetPaths[userRole] || '/daily-program';
       console.log('[Auth] Redirecting authenticated user to:', targetPath);
       navigate(targetPath, { replace: true });
       return;
@@ -66,7 +66,7 @@ const Auth = () => {
           'student': '/daily-program'
         };
         
-        const targetPath = targetPaths[role] || '/profile';
+        const targetPath = targetPaths[role] || '/daily-program';
         navigate(targetPath, { replace: true });
       } catch (error) {
         console.error('[Auth] Failed to update user role:', error);
@@ -89,7 +89,7 @@ const Auth = () => {
     return (
       <RoleSelector
         onRoleSelect={handleRoleSelect}
-        onBack={() => navigate('/profile')}
+        onBack={() => navigate('/daily-program')}
         currentUserRole={userRole}
       />
     );

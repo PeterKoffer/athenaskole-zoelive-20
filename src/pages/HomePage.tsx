@@ -29,7 +29,7 @@ const HomePage = () => {
             icon={<Users className="w-5 h-5 mr-2 text-green-400" />}
             title="Profile"
             description="Manage your profile and learning preferences"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate("/daily-program")}
           />
           <DashboardCard
             icon={<Calendar className="w-5 h-5 mr-2 text-purple-400" />}

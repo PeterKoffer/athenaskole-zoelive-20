@@ -62,7 +62,7 @@ const SchoolDashboard = () => {
               <DropdownMenuItem onClick={() => setShowTeachingSettings(true)}>
                 Teaching Settings
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <DropdownMenuItem onClick={() => navigate('/daily-program')}>
                 Profile
               </DropdownMenuItem>
             </DropdownMenuContent>
