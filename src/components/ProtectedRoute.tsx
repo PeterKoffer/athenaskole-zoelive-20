@@ -60,7 +60,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       'student': '/daily-program'
     };
     
-    const targetPath = targetPaths[userRole] || '/profile';
+    const targetPath = targetPaths[userRole] || '/daily-program';
     console.log('[ProtectedRoute] Redirecting to:', targetPath);
     return <Navigate to={targetPath} replace />;
   }

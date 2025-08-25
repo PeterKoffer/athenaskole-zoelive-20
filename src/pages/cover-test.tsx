@@ -8,7 +8,7 @@ export default function Page() {
       universeId: "7150d0ee-59cc-40d9-a1f3-b31951bb5b24",
       title: "Today’s Program",
       subject: "general",
-      grade: "5a",
+      grade: 5,
     }).then(setUrl);
   }, []);
   return (

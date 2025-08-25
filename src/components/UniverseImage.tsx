@@ -5,24 +5,6 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function escapeSvgText(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-function makeFallbackSvg(text: string, w = 1024, h = 576) {
-  const safe = escapeSvgText(text || "Today’s Program");
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
-    `  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1">` +
-    `    <stop offset="0%" stop-color="#111827"/><stop offset="100%" stop-color="#1f2937"/>` +
-    `  </linearGradient></defs>` +
-    `  <rect width="100%" height="100%" fill="url(#g)"/>` +
-    `  <text x="50%" y="50%" fill="#e5e7eb" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto"` +
-    `        font-size="28" text-anchor="middle" dominant-baseline="middle">${safe}</text>` +
-    `</svg>`;
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
-}
-
 /** Minimal hook that hits our edge function and returns a usable URL (or null). */
 function useEdgeCover(
   universeId: string,
@@ -99,7 +81,6 @@ export default function UniverseImage({ universeId, title, subject, className }:
       <img
         src={src.startsWith("data:") ? src : `${src}?ts=${Date.now()}`} // cache-bust
         alt={alt}
-        crossOrigin="anonymous"
         referrerPolicy="no-referrer"
         style={{ width: "100%", aspectRatio: "16 / 9", borderRadius: 12, objectFit: "cover" }}
         className={className}
