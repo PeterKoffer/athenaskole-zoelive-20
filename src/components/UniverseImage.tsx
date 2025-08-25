@@ -45,10 +45,13 @@ type Props = { universeId?: string; title?: string; subject?: string; className?
 
 export default function UniverseImage({ universeId, title, subject, className }: Props) {
   const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
+
+  // ✅ brug et stabilt fallback-id når universeId mangler
   const effectiveId =
     (universeId && universeId.trim()) ||
     (title ? `fallback-${slugify(title)}` : "fallback-general");
 
+  // ✅ kald hook'en med effectiveId (ikke "")
   const src = useEdgeCover(effectiveId, { title, width: 1024, height: 576 });
 
   return src ? (
