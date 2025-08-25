@@ -1,21 +1,41 @@
 import React, { useEffect, useState } from "react";
 
-// --- Quick wire to BFL edge function (minimal, safe) ---
-// Called when the component mounts and no image URL is known.
+// --- Quick wire to BFL edge function (robust) ---
 function useEdgeCover(
-  universeId: string,
-  opts: { title?: string; prompt?: string; width?: number; height?: number } = {},
+  universeId: string | undefined,
+  opts: { title?: string; subject?: string; prompt?: string; width?: number; height?: number } = {},
 ) {
   const [url, setUrl] = useState<string | null>(null);
   const supaUrl = import.meta.env.VITE_SUPABASE_URL;
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (!supaUrl || !anon || !universeId) return;
+    if (!supaUrl || !anon) return;
 
+    // Use a stable fallback id if universeId is missing
+    const idFallback =
+      universeId && universeId.trim().length > 0
+        ? universeId
+        : `demo-${(opts.title || "program").toLowerCase().replace(/\s+/g, "-")}`;
+
+    const controller = new AbortController();
+    const width = opts.width ?? 1024;
+    const height = opts.height ?? 576;
+    const prompt =
+      opts.prompt ??
+      `${opts.title ?? "Today's Program"}${
+        opts.subject ? ` (${opts.subject})` : ""
+      } — classroom-friendly, minimal, bright, 16:9`;
+
+    (async () => {
       try {
+        console.debug("[UniverseImage] calling edge fn", {
+          supaUrl,
+          id: idFallback,
+          width,
+          height,
+        });
+
         const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
           method: "POST",
           headers: {
@@ -23,30 +43,30 @@ function useEdgeCover(
             Authorization: `Bearer ${anon}`,
           },
           body: JSON.stringify({
-            universeId,
-            prompt:
-              opts.prompt ?? `${opts.title ?? "Today's Program"} — classroom-friendly, minimal, bright, 16:9`,
-            width: opts.width ?? 1024,
-            height: opts.height ?? 576,
+            universeId: idFallback,
+            prompt,
+            width,
+            height,
           }),
+          signal: controller.signal,
         });
 
         const json = await res.json().catch(() => ({}));
-        const candidate: string | undefined =
-          json?.url && typeof json.url === "string" && json.url.length > 8
-            ? json.url
-            : undefined;
+        console.debug("[UniverseImage] edge response", res.status, json);
 
-        if (!cancelled && candidate) setUrl(candidate);
-      } catch {
-        /* silent fallback */
+        const candidate =
+          json && typeof json.url === "string" && json.url.length > 8 ? json.url : undefined;
+
+        if (candidate) setUrl(candidate);
+      } catch (err) {
+        if ((err as any)?.name !== "AbortError") {
+          console.debug("[UniverseImage] edge call failed", err);
+        }
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [supaUrl, anon, universeId, opts.title, opts.prompt, opts.width, opts.height]);
+    return () => controller.abort();
+  }, [supaUrl, anon, universeId, opts.title, opts.subject, opts.prompt, opts.width, opts.height]);
 
   return url;
 }
@@ -59,32 +79,20 @@ type UniverseImageProps = {
   className?: string;
 };
 
-/**
- * NOTE:
- * Keep this component free of side effects so test imports don't crash.
- * Any "how to use" examples must live inside comments, not as live JSX.
- */
 const UniverseImage: React.FC<UniverseImageProps> = ({
   universeId,
   title,
   subject,
   className,
 }) => {
-  const alt =
-    title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
-
-  const edgeUrl = useEdgeCover(universeId ?? "", { title, width: 1024, height: 576 });
-
-  // Placeholder variables for future image sources or SVG data URIs.
-  const existingResolvedUrlFromStateOrProps = undefined;
-  const fallbackSvgDataUrl = undefined;
-  const src = existingResolvedUrlFromStateOrProps || edgeUrl || fallbackSvgDataUrl;
+  const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
+  const edgeUrl = useEdgeCover(universeId, { title, subject, width: 1024, height: 576 });
 
   return (
     <div className={className}>
-      {src ? (
+      {edgeUrl ? (
         <img
-          src={src}
+          src={edgeUrl}
           alt={alt}
           loading="lazy"
           style={{
@@ -117,13 +125,3 @@ const UniverseImage: React.FC<UniverseImageProps> = ({
 };
 
 export default UniverseImage;
-
-/*
-Usage (EXAMPLE ONLY; keep examples inside comments):
-
-<UniverseImage
-  universeId="uuid-here"
-  title="Genetic Engineering Lab"
-  subject="Science"
-/>
-*/
