@@ -1,14 +1,27 @@
+// src/services/UniverseImageGenerator.ts
+// Minimal, stabil klient til edge image-service.
+// Ingen supabase.functions.invoke — vi rammer /generate direkte.
+
+type GenerateOpts = {
+  title?: string;
+  prompt?: string;
+  width?: number;
+  height?: number;
+};
+
 export async function generateCover(
   universeId: string,
-  {
-    title,
-    prompt,
-    width = 1024,
-    height = 576,
-  }: { title?: string; prompt?: string; width?: number; height?: number } = {}
+  { title, prompt, width = 1024, height = 576 }: GenerateOpts = {}
 ): Promise<string> {
-  const supaUrl = "https://yphkfkpfdpdmllotpqua.supabase.co";
-  const anon = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwaGtma3BmZHBkbWxsb3RwcXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MTcxNTksImV4cCI6MjA2Mzk5MzE1OX0.hqyZ2nk3dqMx8rX9tdM1H4XF9wZ9gvaRor-6i5AyCy8";
+  const supaUrl = import.meta.env.VITE_SUPABASE_URL;
+  const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supaUrl || !anon) {
+    throw new Error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY");
+  }
+  if (!universeId || !universeId.trim()) {
+    throw new Error("universeId is required");
+  }
 
   const body = {
     universeId,
@@ -28,42 +41,65 @@ export async function generateCover(
     body: JSON.stringify(body),
   });
 
-  const json = await res.json().catch(() => ({} as any));
-  if (!res.ok) {
-    throw new Error(`edge returned ${res.status}: ${json?.error ?? "unknown error"}`);
+  // Robust JSON-parsing
+  let json: any = null;
+  try {
+    json = await res.json();
+  } catch {
+    json = {};
   }
-  const url = typeof json?.url === "string" ? json.url : null;
+
+  if (!res.ok) {
+    const msg = json?.error || `HTTP ${res.status}`;
+    throw new Error(`edge returned non-OK: ${msg}`);
+  }
+
+  const url = typeof json?.url === "string" && json.url.length > 8 ? json.url : null;
   if (!url) throw new Error("edge returned no url");
   return url;
 }
 
+// Bruges af sider/loader til at sikre et cover — falder pænt tilbage til SVG.
 export async function ensureDailyProgramCover(opts: {
   universeId: string;
-  title: string;
-  subject: string;
-  grade: string | number;
-}) {
-  const { universeId, title, subject, grade } = opts;
-  const prompt = `Classroom-friendly ${subject} cover for ${title}`;
+  title?: string;
+  subject?: string;
+  grade?: number | string;
+}): Promise<string> {
+  const { universeId, title, subject } = opts;
+
+  const niceTitle = title ?? "Today's Program";
+  const prompt = `Classroom-friendly ${subject ? subject + " " : ""}cover for ${niceTitle}, minimal, bright, 16:9`;
 
   try {
-    const url = await generateCover(universeId, { title, prompt });
-    return `${url}?v=${Date.now()}`; // cache-bust
+    const url = await generateCover(universeId, { title: niceTitle, prompt, width: 1024, height: 576 });
+    // ⚠️ IKKE tilføje egen cache-bust på signerede links
+    return url;
   } catch (error) {
-    console.warn("Cover generation failed:", error);
-    return svgFallback(universeId, grade);
+    console.warn("[cover] generation failed, using SVG fallback:", error);
+    return makeFallbackSvg(niceTitle, 1024, 576);
   }
 }
 
-function svgFallback(universeId: string, gradeRaw: string | number) {
-  const g = String(gradeRaw).match(/\d+/)?.[0] ?? "0";
-  const txt = `U:${universeId.slice(0,4)} G:${g}`;
-  const svg = encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='576'>
-      <rect width='100%' height='100%' fill='rgb(220,200,180)'/>
-      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'
-        font-family='Inter,Arial' font-size='48' fill='black'>${txt}</text>
-    </svg>`
-  );
-  return `data:image/svg+xml;charset=utf-8,${svg}`;
+// En simpel, neutral fallback som data-URL (virker uden netværk/CORS)
+function makeFallbackSvg(text: string, w = 1024, h = 576): string {
+  const safe = (text || "Today's Program")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;");
+
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="#111827"/>
+          <stop offset="1" stop-color="#1f2937"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <text x="50%" y="50%" fill="#d1d5db" font-size="36" text-anchor="middle"
+            font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial" dy="12">
+        ${safe}
+      </text>
+    </svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
