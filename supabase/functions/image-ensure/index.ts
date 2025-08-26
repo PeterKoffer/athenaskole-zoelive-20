@@ -1,17 +1,10 @@
+// supabase/functions/image-ensure/index.ts
+// Orchestrator for cover images: calls image-service, validates bytes, uploads to Storage.
+// Virker både lokalt (CLI) og i cloud (Supabase deploy).
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-type Body = {
-  sessionId?: string;
-  universeId: string;
-  gradeInt: number;
-  prompt?: string;
-  minBytes?: number;
-  title?: string;
-  width?: number;
-  height?: number;
-};
-
-type GenResp = { url?: string; source?: string; [k: string]: unknown };
+/** ---------- Utils ---------- */
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -19,15 +12,19 @@ const CORS = {
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
 };
 
-function json(body: unknown, status = 200) {
+function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json", ...CORS },
+    headers: { "content-type": "application/json", ...CORS, ...extra },
   });
 }
 
 function getEnv(name: string): string | undefined {
-  try { return (Deno as any)?.env?.get?.(name); } catch { return undefined; }
+  try {
+    // @ts-ignore Deno types i Edge runtime
+    if (typeof Deno !== "undefined" && Deno?.env?.get) return Deno.env.get(name) || undefined;
+  } catch {}
+  return undefined;
 }
 
 function placeholderPath(universeId: string, gradeInt: number) {
@@ -44,13 +41,55 @@ function fromDataUrl(dataUrl: string): { mime: string; bytes: Uint8Array } {
   return { mime, bytes: u8 };
 }
 
+/** ---------- Env handling (lokal + cloud) ---------- */
+/* I lokal CLI accepteres ikke SUPABASE_* via --env-file.
+   Derfor understøtter vi SB_URL + SB_SERVICE_ROLE_KEY som aliaser i dev.
+   I cloud bruger vi de “rigtige” SUPABASE_* secrets. */
+
+const SUPA_URL =
+  getEnv("SUPABASE_URL") ?? getEnv("SB_URL") ?? "http://127.0.0.1:54321";
+const SERVICE_KEY =
+  getEnv("SUPABASE_SERVICE_ROLE_KEY") ?? getEnv("SB_SERVICE_ROLE_KEY") ?? "";
+const IMAGE_SVC_URL =
+  getEnv("IMAGE_SERVICE_URL") ?? "http://127.0.0.1:54321/functions/v1/image-service";
+const BUCKET = getEnv("IMAGE_BUCKET") || "universe-images";
+const MIN_BYTES_DEFAULT = parseInt(getEnv("PLACEHOLDER_MIN_BYTES") ?? "4096", 10) || 4096;
+const LOG_LEVEL = (getEnv("LOG_LEVEL") ?? "info").toLowerCase();
+
+/** ---------- Types ---------- */
+
+type Body = {
+  sessionId?: string;
+  universeId?: string;
+  gradeInt?: number;
+  prompt?: string;
+  minBytes?: number;
+  title?: string;
+  width?: number;
+  height?: number;
+};
+
+type GenResp =
+  | { url: string; source: "bfl" | "fallback"; error?: string }
+  | { url?: string; [k: string]: unknown };
+
+/** ---------- Handler ---------- */
+
 Deno.serve(async (req) => {
   try {
     if (req.method === "OPTIONS") return json({});
     if (req.method !== "POST") return json({ ok: false, error: "method not allowed" }, 405);
 
-    const { sessionId, universeId, gradeInt, prompt, minBytes, title, width, height } =
-      (await req.json()) as Body;
+    const {
+      sessionId,
+      universeId,
+      gradeInt,
+      prompt,
+      minBytes,
+      title,
+      width,
+      height,
+    } = (await req.json()) as Body;
 
     if (!universeId || typeof gradeInt !== "number") {
       return json({ ok: false, error: "missing or invalid universeId/gradeInt" }, 400);
@@ -60,24 +99,19 @@ Deno.serve(async (req) => {
       sessionId ??
       ((crypto as any)?.randomUUID?.() ?? `sess_${Math.random().toString(36).slice(2)}`);
 
-    const SUPABASE_URL = getEnv("SUPABASE_URL");
-    const SERVICE_KEY = getEnv("SUPABASE_SERVICE_ROLE_KEY");
-    if (!SUPABASE_URL || !SERVICE_KEY) return json({ ok: false, error: "missing Supabase env" }, 500);
-
-    const IMAGE_SERVICE_URL = getEnv("IMAGE_SERVICE_URL"); // https://<project>.functions.supabase.co/image-service
-    const BUCKET = getEnv("IMAGE_BUCKET") || "universe-images";
-     const MIN_BYTES = Math.max(
-+   Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
-+   parseInt(getEnv("PLACEHOLDER_MIN_BYTES") || "1024", 10)
-+ );
+    // Beregn minimum bytes for at acceptere billedet
+    const MIN_BYTES = Math.max(
+      Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
+      MIN_BYTES_DEFAULT
+    );
 
     const objectKey = `${universeId}/${gradeInt}/cover.webp`;
     let source: "image-service" | "placeholder" = "placeholder";
     let bytesLen = 0;
 
-    if (IMAGE_SERVICE_URL) {
+    if (IMAGE_SVC_URL) {
       try {
-        const r = await fetch(`${IMAGE_SERVICE_URL.replace(/\/+$/, "")}/generate`, {
+        const r = await fetch(`${IMAGE_SVC_URL.replace(/\/+$/, "")}/generate`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
@@ -88,22 +122,43 @@ Deno.serve(async (req) => {
             height: height || 576,
           }),
         });
+
         if (!r.ok) throw new Error(`image-service bad status: ${r.status}`);
 
         const j = (await r.json()) as GenResp;
-        const dataUrl = j?.url;
+        const dataUrl = (j as any)?.url;
+
         if (typeof dataUrl === "string" && dataUrl.startsWith("data:")) {
           const { mime, bytes } = fromDataUrl(dataUrl);
+
+          if (LOG_LEVEL === "debug") {
+            console.log(
+              "[image-ensure] generated",
+              JSON.stringify({ mime, size: bytes.byteLength, source: (j as any)?.source || "unknown" })
+            );
+          }
+
+          // Accepter kun rigtige billeder over mindste størrelse
           if (bytes.byteLength >= MIN_BYTES && /^image\//i.test(mime)) {
-            const sb = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
+            const sb = createClient(SUPA_URL, SERVICE_KEY, { auth: { persistSession: false } });
+
             const up = await sb.storage.from(BUCKET).upload(objectKey, bytes, {
+              // Vi holder sti/extension som .webp for at matche UI, selv hvis kilde er jpeg
               contentType: "image/webp",
               upsert: true,
             });
             if (up.error) throw new Error(`upload error: ${up.error.message}`);
+
             source = "image-service";
             bytesLen = bytes.byteLength;
+          } else if (LOG_LEVEL === "debug") {
+            console.log(
+              "[image-ensure] rejected image",
+              JSON.stringify({ reason: "too-small-or-not-image", size: bytes.byteLength, MIN_BYTES, mime })
+            );
           }
+        } else if (LOG_LEVEL === "debug") {
+          console.log("[image-ensure] no data URL from image-service", j);
         }
       } catch (e) {
         console.warn("[image-ensure] image-service failed:", String(e));
