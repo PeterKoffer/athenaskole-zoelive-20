@@ -1,4 +1,4 @@
-import type { AgentInputs } from "./types";
+import type { AgentInputs } from "./types.ts";
 import { logEvent } from "./logger.ts";
 import { boringButCorrectLesson } from "./fallbacks.ts";
 import { validateJson } from "./qaAgent.ts";
