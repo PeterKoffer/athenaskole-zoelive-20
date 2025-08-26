@@ -1,4 +1,4 @@
-export * from "./types";
+export * from "./types.ts";
 export * from "./logger.ts";
 export * from "./fallbacks.ts";
 export * from "./qaAgent.ts";
