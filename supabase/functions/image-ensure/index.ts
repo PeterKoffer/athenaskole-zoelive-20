@@ -27,12 +27,7 @@ function json(body: unknown, status = 200) {
 }
 
 function getEnv(name: string): string | undefined {
-  try {
-    // @ts-ignore
-    return Deno?.env?.get?.(name);
-  } catch {
-    return undefined;
-  }
+  try { return (Deno as any)?.env?.get?.(name); } catch { return undefined; }
 }
 
 function placeholderPath(universeId: string, gradeInt: number) {
@@ -43,8 +38,7 @@ function fromDataUrl(dataUrl: string): { mime: string; bytes: Uint8Array } {
   const m = dataUrl.match(/^data:([^;]+);base64,(.*)$/i);
   if (!m) throw new Error("Invalid data URL");
   const mime = m[1];
-  const b64 = m[2];
-  const bin = atob(b64);
+  const bin = atob(m[2]);
   const u8 = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
   return { mime, bytes: u8 };
@@ -64,10 +58,7 @@ Deno.serve(async (req) => {
 
     const id =
       sessionId ??
-      // @ts-ignore
-      (typeof crypto !== "undefined" && (crypto as any).randomUUID?.()
-        ? (crypto as any).randomUUID()
-        : `sess_${Math.random().toString(36).slice(2)}`);
+      ((crypto as any)?.randomUUID?.() ?? `sess_${Math.random().toString(36).slice(2)}`);
 
     const SUPABASE_URL = getEnv("SUPABASE_URL");
     const SERVICE_KEY = getEnv("SUPABASE_SERVICE_ROLE_KEY");
@@ -98,7 +89,6 @@ Deno.serve(async (req) => {
             height: height || 576,
           }),
         });
-
         if (!r.ok) throw new Error(`image-service bad status: ${r.status}`);
 
         const j = (await r.json()) as GenResp;
@@ -117,7 +107,6 @@ Deno.serve(async (req) => {
           }
         }
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn("[image-ensure] image-service failed:", String(e));
       }
     }
