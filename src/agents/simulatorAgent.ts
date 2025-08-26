@@ -1,4 +1,4 @@
-import type { AgentInputs } from "./types.dk";
+import type { AgentInputs } from "./types.ts";
 import { logEvent } from "./logger.ts";
 
 export interface ScenarioState {
