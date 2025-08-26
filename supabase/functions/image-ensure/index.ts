@@ -1,15 +1,10 @@
 // supabase/functions/image-ensure/index.ts
-// Deno Edge Function: ensure a universe cover exists in Storage.
-// - Calls image-service/generate to create an image
-// - Uploads to Storage at `${BUCKET}/${universeId}/${gradeInt}/cover.webp`
-// - Falls back to a placeholder path if generation/upload fails
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 type Body = {
   sessionId?: string;
-  universeId?: string;
-  gradeInt?: number;
+  universeId: string;
+  gradeInt: number;
   prompt?: string;
   minBytes?: number;
   title?: string;
@@ -17,27 +12,19 @@ type Body = {
   height?: number;
 };
 
-type GenResp =
-  | { url: string; source?: string; error?: string } // data URL fallback
-  | { path?: string; bucket?: string; objectKey?: string; error?: string }; // if service stores for us
-
-const LOG_LEVEL = (Deno.env.get("LOG_LEVEL") || "info").toLowerCase();
-
-function log(...args: unknown[]) {
-  if (LOG_LEVEL === "debug") console.log("[image-ensure]", ...args);
+function getEnv(k: string) {
+  return Deno.env.get(k) ?? "";
 }
 
-function getEnv(name: string): string | undefined {
-  return (
-    Deno.env.get(name) ||
-    Deno.env.get(`SB_${name}`) // not used, but keeps the intent clear
-  );
-}
-
-function json(obj: unknown, status = 200): Response {
-  return new Response(JSON.stringify(obj), {
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8" },
+    headers: {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "content-type, authorization",
+      "access-control-allow-methods": "POST, OPTIONS",
+    },
   });
 }
 
@@ -52,13 +39,15 @@ function fromDataUrl(dataUrl: string): { mime: string; bytes: Uint8Array } {
 }
 
 function placeholderPath(universeId: string, gradeInt: number) {
-  return `/placeholders/${universeId}/${gradeInt}/cover.svg`;
+  return `/placeholders/${universeId}/${gradeInt}.svg`;
 }
 
 Deno.serve(async (req) => {
   try {
     if (req.method === "OPTIONS") return json({});
-    if (req.method !== "POST") return json({ ok: false, error: "method not allowed" }, 405);
+    if (req.method !== "POST") {
+      return json({ ok: false, error: "method not allowed" }, 405);
+    }
 
     const { sessionId, universeId, gradeInt, prompt, minBytes, title, width, height } =
       (await req.json()) as Body;
@@ -71,27 +60,26 @@ Deno.serve(async (req) => {
       sessionId ??
       ((crypto as any)?.randomUUID?.() ?? `sess_${Math.random().toString(36).slice(2)}`);
 
-    const SUPABASE_URL =
-      getEnv("SUPABASE_URL") ?? getEnv("SB_URL") ?? "http://127.0.0.1:54321";
+    // env
+    const SUPABASE_URL = getEnv("SB_URL") || getEnv("SUPABASE_URL") || "http://127.0.0.1:54321";
     const SERVICE_KEY =
-      getEnv("SUPABASE_SERVICE_ROLE_KEY") ?? getEnv("SB_SERVICE_ROLE_KEY") ?? "";
+      getEnv("SB_SERVICE_ROLE_KEY") || getEnv("SUPABASE_SERVICE_ROLE_KEY") || "";
     const IMAGE_SERVICE_URL =
-      getEnv("IMAGE_SERVICE_URL") ??
-      "http://127.0.0.1:54321/functions/v1/image-service";
+      getEnv("IMAGE_SERVICE_URL") || "http://127.0.0.1:54321/functions/v1/image-service";
     const BUCKET = getEnv("IMAGE_BUCKET") || "universe-images";
-
-    const MIN_BYTES =
-      Math.max(
-        Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
-        parseInt(getEnv("PLACEHOLDER_MIN_BYTES") || "4096", 10),
-      ) || 4096;
+    const MIN_BYTES_DEFAULT = parseInt(getEnv("PLACEHOLDER_MIN_BYTES") || "4096", 10) || 4096;
+    const MIN_BYTES = Math.max(
+      Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
+      MIN_BYTES_DEFAULT
+    );
 
     const objectKey = `${universeId}/${gradeInt}/cover.webp`;
+
     let source: "image-service" | "placeholder" = "placeholder";
     let bytesLen = 0;
+    let path = placeholderPath(universeId, gradeInt);
 
-    // First try to have image-service generate (and possibly store) the image.
-    // Newer image-service expects bucket/objectKey.
+    // Call generator WITH bucket+objectKey so it can store for us.
     try {
       const r = await fetch(`${IMAGE_SERVICE_URL.replace(/\/+$/, "")}/generate`, {
         method: "POST",
@@ -103,46 +91,37 @@ Deno.serve(async (req) => {
           width: width || 1024,
           height: height || 576,
           bucket: BUCKET,
-          objectKey, // tell image-service where to write
+          objectKey,
         }),
       });
+      if (!r.ok) throw new Error(`image-service status ${r.status}`);
 
-      if (!r.ok) throw new Error(`image-service bad status: ${r.status}`);
-      const j = (await r.json()) as GenResp;
+      const j = (await r.json()) as any;
 
-      // Case A: service already stored it (preferred)
-      if (!j.error && (j as any).bucket && (j as any).objectKey) {
+      if (typeof j?.path === "string") {
+        // generator uploaded to storage
+        path = j.path.startsWith("/") ? j.path : `/${j.path}`;
         source = "image-service";
-        bytesLen = MIN_BYTES; // we don’t know the exact size; report at least MIN_BYTES
-      }
-
-      // Case B: service returned a data URL – we upload it ourselves.
-      else if (!j.error && (j as any).url?.startsWith?.("data:")) {
-        const { mime, bytes } = fromDataUrl((j as any).url);
+        bytesLen = Number(j?.bytes) || MIN_BYTES;
+      } else if (typeof j?.url === "string" && j.url.startsWith("data:")) {
+        // generator returned data URL -> upload here
+        const { mime, bytes } = fromDataUrl(j.url);
         if (bytes.byteLength >= MIN_BYTES && /^image\//i.test(mime)) {
           const sb = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
           const up = await sb.storage.from(BUCKET).upload(objectKey, bytes, {
-            contentType: "image/webp",
+            contentType: mime,
             upsert: true,
           });
           if (up.error) throw new Error(`upload error: ${up.error.message}`);
+          path = `/${BUCKET}/${objectKey}`;
           source = "image-service";
           bytesLen = bytes.byteLength;
-        } else {
-          log("image-service returned too-small or invalid data URL, falling back.");
         }
       }
-
-      // Case C: service errored — carry on to placeholder.
-      else if (j.error) {
-        log("image-service error:", j.error);
-      }
     } catch (e) {
-      log("image-service request failed:", String(e));
+      console.warn("[image-ensure] generator failed:", String(e));
     }
 
-    const path =
-      source === "image-service" ? `/${BUCKET}/${objectKey}` : placeholderPath(universeId, gradeInt);
     if (!bytesLen) bytesLen = MIN_BYTES;
 
     return json({ ok: true, data: { path, bytes: bytesLen, source }, sessionId: id });
