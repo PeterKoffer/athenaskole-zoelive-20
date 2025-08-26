@@ -66,11 +66,10 @@ Deno.serve(async (req) => {
 
     const IMAGE_SERVICE_URL = getEnv("IMAGE_SERVICE_URL"); // https://<project>.functions.supabase.co/image-service
     const BUCKET = getEnv("IMAGE_BUCKET") || "universe-images";
-    const MIN_BYTES = Math.max(
-      Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
-      parseInt(getEnv("PLACEHOLDER_MIN_BYTES") || "4096", 10),
-      1024
-    );
+     const MIN_BYTES = Math.max(
++   Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
++   parseInt(getEnv("PLACEHOLDER_MIN_BYTES") || "1024", 10)
++ );
 
     const objectKey = `${universeId}/${gradeInt}/cover.webp`;
     let source: "image-service" | "placeholder" = "placeholder";
