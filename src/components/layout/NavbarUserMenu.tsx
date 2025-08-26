@@ -84,7 +84,7 @@ const NavbarUserMenu = ({ user, onGetStarted }: NavbarUserMenuProps) => {
         </div>
         <DropdownMenuSeparator className="bg-gray-700" />
         <DropdownMenuItem 
-          onClick={() => navigate('/profile')}
+          onClick={() => navigate('/daily-program')}
           className="text-white hover:bg-gray-700 focus:bg-gray-700"
         >
           <User className="mr-2 h-4 w-4" />

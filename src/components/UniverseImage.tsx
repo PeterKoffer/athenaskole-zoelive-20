@@ -1,127 +1,107 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { ensureCover, publicCoverUrl } from "@/services/UniverseImageGenerator";
 
-// --- Quick wire to BFL edge function (robust) ---
-function useEdgeCover(
-  universeId: string | undefined,
-  opts: { title?: string; subject?: string; prompt?: string; width?: number; height?: number } = {},
-) {
-  const [url, setUrl] = useState<string | null>(null);
-  const supaUrl = import.meta.env.VITE_SUPABASE_URL;
-  const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+type Props = {
+  universeId: string;
+  gradeInt: number;
+  title?: string;
+  className?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  minBytes?: number;
+};
+
+export default function UniverseImage({
+  universeId,
+  gradeInt,
+  title = "Today's Program",
+  className,
+  alt = "Universe cover",
+  width = 1024,
+  height = 576,
+  minBytes = 4096,
+}: Props) {
+  const [src, setSrc] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const initialUrl = useMemo(() => publicCoverUrl(universeId, gradeInt), [universeId, gradeInt]);
 
   useEffect(() => {
-    if (!supaUrl || !anon) return;
-
-    // Use a stable fallback id if universeId is missing
-    const idFallback =
-      universeId && universeId.trim().length > 0
-        ? universeId
-        : `demo-${(opts.title || "program").toLowerCase().replace(/\s+/g, "-")}`;
-
-    const controller = new AbortController();
-    const width = opts.width ?? 1024;
-    const height = opts.height ?? 576;
-    const prompt =
-      opts.prompt ??
-      `${opts.title ?? "Today's Program"}${
-        opts.subject ? ` (${opts.subject})` : ""
-      } — classroom-friendly, minimal, bright, 16:9`;
+    let cancelled = false;
 
     (async () => {
       try {
-        console.debug("[UniverseImage] calling edge fn", {
-          supaUrl,
-          id: idFallback,
+        // 1) Forsøg at sikre billedet via edge function (den uploader hvis nødvendigt)
+        const res = await ensureCover({
+          universeId,
+          gradeInt,
+          title,
+          minBytes,
           width,
           height,
         });
 
-        const res = await fetch(`${supaUrl}/functions/v1/image-service/generate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${anon}`,
-          },
-          body: JSON.stringify({
-            universeId: idFallback,
-            prompt,
-            width,
-            height,
-          }),
-          signal: controller.signal,
-        });
-
-        const json = await res.json().catch(() => ({}));
-        console.debug("[UniverseImage] edge response", res.status, json);
-
-        const candidate =
-          json && typeof json.url === "string" && json.url.length > 8 ? json.url : undefined;
-
-        if (candidate) setUrl(candidate);
-      } catch (err) {
-        if ((err as any)?.name !== "AbortError") {
-          console.debug("[UniverseImage] edge call failed", err);
+        // 2) Byg public URL og cache-bust
+        const finalUrl = publicCoverUrl(universeId, gradeInt) + `?v=${Date.now()}`;
+        if (!cancelled) setSrc(finalUrl);
+      } catch (e: any) {
+        // 3) Fallback: prøv i det mindste at vise hvad der allerede ligger
+        if (!cancelled) {
+          setSrc(initialUrl + `?v=${Date.now()}`);
+          setError(String(e?.message || e));
         }
       }
     })();
 
-    return () => controller.abort();
-  }, [supaUrl, anon, universeId, opts.title, opts.subject, opts.prompt, opts.width, opts.height]);
+    return () => {
+      cancelled = true;
+    };
+  }, [universeId, gradeInt, title, minBytes, width, height, initialUrl]);
 
-  return url;
-}
-// --- END quick wire ---
-
-type UniverseImageProps = {
-  universeId?: string;
-  title?: string;
-  subject?: string;
-  className?: string;
-};
-
-const UniverseImage: React.FC<UniverseImageProps> = ({
-  universeId,
-  title,
-  subject,
-  className,
-}) => {
-  const alt = title ? `${title}${subject ? ` (${subject})` : ""}` : "Universe cover";
-  const edgeUrl = useEdgeCover(universeId, { title, subject, width: 1024, height: 576 });
+  if (!src) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: "100%",
+          aspectRatio: `${width}/${height}`,
+          display: "grid",
+          placeItems: "center",
+          background: "linear-gradient(135deg,#111827,#1f2937)",
+          color: "#e5e7eb",
+          borderRadius: 12,
+        }}
+      >
+        Genererer cover …
+      </div>
+    );
+  }
 
   return (
-    <div className={className}>
-      {edgeUrl ? (
-        <img
-          src={edgeUrl}
-          alt={alt}
-          loading="lazy"
-          style={{
-            width: "100%",
-            aspectRatio: "16 / 9",
-            borderRadius: 12,
-            objectFit: "cover",
-            display: "block",
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            aspectRatio: "16 / 9",
-            background: "#1f2937",
-            borderRadius: 12,
-            display: "grid",
-            placeItems: "center",
-            color: "white",
-            fontWeight: 600,
-          }}
-          aria-label={alt}
-        >
-          {title || "Universe Cover"}
-        </div>
-      )}
-    </div>
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      onError={() => {
+        // Hvis Storage-billedet mangler/fejler, hold brugbar fallback-tekst
+        setSrc(
+          `data:image/svg+xml;base64,${btoa(
+            unescape(
+              encodeURIComponent(
+                `<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'>
+                  <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+                  <stop offset='0%' stop-color='#111827'/><stop offset='100%' stop-color='#1f2937'/></linearGradient></defs>
+                  <rect width='100%' height='100%' fill='url(#g)'/>
+                  <text x='50%' y='50%' fill='#e5e7eb' font-family='system-ui,Segoe UI,Roboto'
+                        font-size='28' text-anchor='middle' dominant-baseline='middle'>${title}</text>
+                </svg>`
+              )
+            )
+          )}`
+        );
+      }}
+    />
   );
-};
-
-export default UniverseImage;
+}

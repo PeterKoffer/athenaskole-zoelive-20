@@ -37,7 +37,7 @@ const RoleSwitcher = () => {
           'student': '/daily-program'
         };
         
-        const targetPath = targetPaths[selectedRole] || '/profile';
+        const targetPath = targetPaths[selectedRole] || '/daily-program';
         window.location.href = targetPath; // Force full page navigation
       }, 1500);
     } catch (error) {

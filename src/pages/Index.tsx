@@ -43,7 +43,7 @@ const Index = () => {
 
   const handleGetStarted = () => {
     if (user && userRole) {
-      const targetPath = targetPaths[userRole] || '/profile';
+      const targetPath = targetPaths[userRole] || '/daily-program';
       navigate(targetPath);
     } else if (user) {
       navigate('/daily-program');

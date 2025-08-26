@@ -1,35 +1,49 @@
-import { supabase } from "../lib/supabaseClient";
+// src/services/UniverseImageGenerator.ts
+import { createClient } from "@supabase/supabase-js";
 
-export async function ensureDailyProgramCover(opts: {
-  universeId: string;
-  title: string;
-  subject: string;
-  grade: string | number;
-}) {
-  const { universeId, title, subject, grade } = opts;
-  const gradeRaw = grade;
-  const prompt = `Classroom-friendly ${subject} cover for ${title}`;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  const { data, error } = await supabase.functions.invoke("image-service", {
-    body: { universeId, gradeRaw, prompt },
-  });
-
-  if (error || !data?.url) {
-    console.warn("Cover generation failed:", error?.message);
-    return svgFallback(universeId, gradeRaw);
-  }
-  return `${data.url}?v=${Date.now()}`; // cache-bust
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  // eslint-disable-next-line no-console
+  console.warn("[UniverseImageGenerator] Missing NEXT_PUBLIC_SUPABASE_URL/ANON_KEY");
 }
 
-function svgFallback(universeId: string, gradeRaw: string | number) {
-  const g = String(gradeRaw).match(/\d+/)?.[0] ?? "0";
-  const txt = `U:${universeId.slice(0,4)} G:${g}`;
-  const svg = encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='576'>
-      <rect width='100%' height='100%' fill='rgb(220,200,180)'/>
-      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'
-        font-family='Inter,Arial' font-size='48' fill='black'>${txt}</text>
-    </svg>`
-  );
-  return `data:image/svg+xml;charset=utf-8,${svg}`;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+export function coverPath(universeId: string, gradeInt: number) {
+  // path inde i bucket
+  return `/universe-images/${universeId}/${gradeInt}/cover.webp`;
+}
+
+export function publicCoverUrl(universeId: string, gradeInt: number) {
+  // public URL til object i public bucket
+  return `${SUPABASE_URL}/storage/v1/object/public${coverPath(universeId, gradeInt)}`;
+}
+
+export async function ensureCover(args: {
+  universeId: string;
+  gradeInt: number;
+  prompt?: string;
+  title?: string;
+  width?: number;
+  height?: number;
+  minBytes?: number;
+}) {
+  const { data, error } = await sb.functions.invoke("image-ensure", {
+    body: {
+      universeId: args.universeId,
+      gradeInt: args.gradeInt,
+      prompt: args.prompt,
+      title: args.title ?? "Today's Program",
+      width: args.width ?? 1024,
+      height: args.height ?? 576,
+      minBytes: args.minBytes ?? 4096,
+    },
+  });
+
+  if (error) throw error;
+  if (!data?.ok) throw new Error(data?.error || "image-ensure failed");
+
+  return data.data as { path: string; bytes: number; source: string };
 }
