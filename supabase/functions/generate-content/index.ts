@@ -1,5 +1,5 @@
-import { generateLesson } from "../../../src/agents/contentAgent";
-import type { AgentInputs } from "../../../src/agents/types";
+import { generateLesson } from "../../../src/agents/contentAgent.ts";
+import type { AgentInputs } from "../../../src/agents/types.ts";
 
 Deno.serve(async (req) => {
   try {
