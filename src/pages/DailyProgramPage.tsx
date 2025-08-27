@@ -299,6 +299,27 @@ const DailyProgramPage = () => {
             >
               <p className="text-blue-200">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
             </TextWithSpeaker>
+          <div className="rounded-2xl overflow-hidden border border-white/10 mb-6 bg-black/20">
+           <div className="aspect-video">
+            <UniverseImage
+              universeId={
+                lessonSource?.lesson?.hero?.universeId ??
+                (universe as any)?.id ??
+                "7150d0ee-59cc-40d9-a1f3-b31951bb5b24"
+              }
+              title={
+                lessonSource?.lesson?.hero?.title ??
+                universe?.title ??
+                "Today's Program"
+              }
+              subject={
+                lessonSource?.lesson?.hero?.subject ??
+                currentSelectedSubject ||
+                "education"
+              }
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
 
         {/* Daily Lesson Section with Source Priority */}
