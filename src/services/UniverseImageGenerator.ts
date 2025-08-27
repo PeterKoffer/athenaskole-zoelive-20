@@ -1,82 +1,59 @@
 // src/services/UniverseImageGenerator.ts
+export type EnsureResult = {
+  path: string;
+  bytes: number;
+  source: "storage" | "placeholder";
+  url: string; // full public URL when in storage
+};
 
-type EnsureArgs = {
+const BASE =
+  (import.meta.env.VITE_SUPABASE_URL as string) || "http://127.0.0.1:54321";
+const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+
+export function publicCoverUrl(path: string) {
+  // path looks like: /universe-images/<uuid>/<grade>/cover.webp
+  const base = BASE.replace(/\/$/, "");
+  return `${base}/storage/v1/object/public${path}`;
+}
+
+export async function ensureCover(opts: {
   universeId: string;
   gradeInt: number;
   title?: string;
+  bucket?: string;
+  objectKey?: string;
   minBytes?: number;
-};
-
-type EnsureResp =
-  | { url: string; source: "storage" }
-  | { url: string; source: "placeholder" };
-
-/**
- * Calls the Edge Function `image-ensure`.
- * - If the image exists in Storage, returns its public URL.
- * - If not, returns a simple SVG data URL as a placeholder.
- *
- * NOTE: Generating + uploading a real image when missing requires a server-side
- * action using the service role key. This client function does NOT upload.
- */
-export async function ensureDailyProgramCover({
-  universeId,
-  gradeInt,
-  title = "Today's Program",
-  minBytes = 4096,
-}: EnsureArgs): Promise<EnsureResp> {
-  const SUPABASE_URL =
-    import.meta.env.VITE_SUPABASE_URL ?? "http://127.0.0.1:54321";
-
-  const body = {
+}): Promise<EnsureResult> {
+  const {
     universeId,
     gradeInt,
     title,
-    bucket: "universe-images",
-    objectKey: `${universeId}/${gradeInt}/cover.webp`,
-    minBytes,
-  };
+    bucket = "universe-images",
+    objectKey = `${universeId}/${gradeInt}/cover.webp`,
+    minBytes = Number(import.meta.env.VITE_PLACEHOLDER_MIN_BYTES ?? 4096),
+  } = opts;
 
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/image-ensure`, {
+  const res = await fetch(`${BASE}/functions/v1/image-ensure`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // When running `supabase functions serve --no-verify-jwt` the auth header is optional,
-      // but sending anon is fine if you have it in env:
-      ...(import.meta.env.VITE_SUPABASE_ANON_KEY
-        ? { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` }
-        : {}),
+      ...(ANON ? { Authorization: `Bearer ${ANON}` } : {}),
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ universeId, gradeInt, title, bucket, objectKey, minBytes }),
   });
+  if (!res.ok) throw new Error(`image-ensure failed: ${res.status}`);
 
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok || json?.ok !== true) {
-    throw new Error(json?.message ?? "image-ensure failed");
-  }
+  const json = await res.json();
+  const data = json.data ?? json; // supports either shape
 
-  const path: string = json.data.path;
-  const source: "storage" | "placeholder" = json.data.source;
-
-  if (source === "storage" && path.startsWith("/universe-images/")) {
-    return {
-      source: "storage",
-      url: `${SUPABASE_URL}/storage/v1/object/public${path}`,
-    };
-  }
-
-  // Fallback placeholder (simple SVG data URL) when the storage image doesn't exist yet.
-  const svg = encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="576">
-       <rect width="100%" height="100%" fill="#e8edf7"/>
-       <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle"
-             font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial"
-             font-size="56" fill="#222"> ${title} </text>
-       <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle"
-             font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial"
-             font-size="28" fill="#555"> Grade ${gradeInt} </text>
-     </svg>`
-  );
-
-  return { source: "placeholder", url: `data:image/svg+xml;utf8,${svg}` };
+  const result: EnsureResult = {
+    path: data.path,
+    bytes: Number(data.bytes ?? 0),
+    source: (data.source ?? "storage") as "storage" | "placeholder",
+    url: publicCoverUrl(data.path),
+  };
+  return result;
 }
+
+// Back-compat alias for older imports
+export const ensureDailyProgramCover = ensureCover;
