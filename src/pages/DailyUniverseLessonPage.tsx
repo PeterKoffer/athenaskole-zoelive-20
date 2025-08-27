@@ -12,6 +12,7 @@ import { useDevThrottleClick } from '@/hooks/useDevThrottleClick';
 
 interface LocationState {
   universe?: Universe;
+  lesson?: { activities?: any[] };
   gradeLevel?: number;
 }
 
@@ -73,6 +74,7 @@ const DailyUniverseLessonPage: React.FC = () => {
       subject={resolvedSubject}
       skillArea={'general'}
       gradeLevel={state?.gradeLevel}
+      allActivities={[]}
       onLessonComplete={() => navigate('/daily-program')}
     >
       <>

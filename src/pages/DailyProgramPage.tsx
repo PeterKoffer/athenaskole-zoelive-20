@@ -167,8 +167,7 @@ const DailyProgramPage = () => {
           const generatedImageUrl = await ensureDailyProgramCover({
             universeId: result.id || 'unknown',
             title: result.title || 'Learning Universe',
-            subject: result.theme || 'education',
-            grade,
+          gradeInt: grade,
           });
 
           if (generatedImageUrl) {
@@ -292,33 +291,32 @@ const DailyProgramPage = () => {
               </select>
             )}
           </div>
-            <TextWithSpeaker
-              text="Welcome back! Here's your personalized AI-generated learning universe for today."
-              context="daily-program-header"
-              position="corner"
-            >
-              <p className="text-blue-200">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
-            </TextWithSpeaker>
+          
+          <TextWithSpeaker
+            text="Welcome back! Here's your personalized AI-generated learning universe for today."
+            context="daily-program-header"
+            position="corner"
+          >
+            <p className="text-blue-200">Welcome back! Here's your personalized AI-generated learning universe for today.</p>
+          </TextWithSpeaker>
+          
           <div className="rounded-2xl overflow-hidden border border-white/10 mb-6 bg-black/20">
-           <div className="aspect-video">
-            <UniverseImage
-              universeId={
-                lessonSource?.lesson?.hero?.universeId ??
-                (universe as any)?.id ??
-                "7150d0ee-59cc-40d9-a1f3-b31951bb5b24"
-              }
-              title={
-                lessonSource?.lesson?.hero?.title ??
-                universe?.title ??
-                "Today's Program"
-              }
-              subject={
-                lessonSource?.lesson?.hero?.subject ??
-                currentSelectedSubject ||
-                "education"
-              }
-              className="w-full h-full object-cover"
-            />
+            <div className="aspect-video">
+              <UniverseImage
+                universeId={
+                  lessonSource?.lesson?.hero?.universeId ??
+                  (universe as any)?.id ??
+                  "7150d0ee-59cc-40d9-a1f3-b31951bb5b24"
+                }
+                title={
+                  lessonSource?.lesson?.hero?.title ??
+                  universe?.title ??
+                  "Today's Program"
+                }
+                gradeInt={lg}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
 
@@ -381,10 +379,10 @@ const DailyProgramPage = () => {
               <div className="aspect-video bg-neutral-900/40 flex items-center justify-center relative overflow-hidden">
                 {lessonSource.lesson.hero?.universeId ? (
                   <UniverseImage 
-                    universeId={lessonSource.lesson.hero.universeId}
-                    title={lessonSource.lesson.hero.title || 'Learning Universe'}
-                    subject={lessonSource.lesson.hero.subject}
-                    className="w-full h-full object-cover"
+                universeId={lessonSource.lesson.hero.universeId}
+                title={lessonSource.lesson.hero.title || 'Learning Universe'}
+                gradeInt={lg}
+                className="w-full h-full object-cover"
                   />
                 ) : lessonSource.imageUrl ? (
                   <img src={lessonSource.imageUrl} alt={lessonSource.lesson.hero?.title} className="w-full h-full object-cover" />
