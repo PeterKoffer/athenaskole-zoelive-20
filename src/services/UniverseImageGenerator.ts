@@ -60,7 +60,7 @@ export async function ensureDailyProgramCover(opts: {
     }).then(r => r.json());
 
     const path = ensure2?.data?.path ?? ensure1?.data?.path;
-    return publicCoverUrl(path);
+    return publicCoverUrl(path!);
   }
 
   return publicCoverUrl(ensure1.data!.path);

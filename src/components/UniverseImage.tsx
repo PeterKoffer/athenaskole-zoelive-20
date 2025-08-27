@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { ensureCover, publicCoverUrl } from "@/services/UniverseImageGenerator";
+import { useEffect, useMemo, useState } from "react";
+import { ensureDailyProgramCover, publicCoverUrl } from "@/services/UniverseImageGenerator";
 
 type Props = {
   universeId: string;
@@ -23,9 +23,8 @@ export default function UniverseImage({
   minBytes = 4096,
 }: Props) {
   const [src, setSrc] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const initialUrl = useMemo(() => publicCoverUrl(universeId, gradeInt), [universeId, gradeInt]);
+  const initialUrl = useMemo(() => publicCoverUrl(`/${universeId}/${gradeInt}/cover.webp`), [universeId, gradeInt]);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,23 +32,19 @@ export default function UniverseImage({
     (async () => {
       try {
         // 1) Forsøg at sikre billedet via edge function (den uploader hvis nødvendigt)
-        const res = await ensureCover({
+        const coverUrl = await ensureDailyProgramCover({
           universeId,
           gradeInt,
           title,
-          minBytes,
           width,
           height,
         });
 
-        // 2) Byg public URL og cache-bust
-        const finalUrl = publicCoverUrl(universeId, gradeInt) + `?v=${Date.now()}`;
-        if (!cancelled) setSrc(finalUrl);
+        if (!cancelled) setSrc(coverUrl + `?v=${Date.now()}`);
       } catch (e: any) {
         // 3) Fallback: prøv i det mindste at vise hvad der allerede ligger
         if (!cancelled) {
           setSrc(initialUrl + `?v=${Date.now()}`);
-          setError(String(e?.message || e));
         }
       }
     })();

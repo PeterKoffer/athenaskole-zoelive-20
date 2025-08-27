@@ -166,8 +166,7 @@ export class LessonSourceManager {
         imageUrl = await ensureDailyProgramCover({
           universeId: universeUuid, // Use the generated UUID
           title: selectedUniverse.title,
-          subject: selectedUniverse.subjectHint,
-          grade: resolvedGrade
+          gradeInt: resolvedGrade
         });
       }
       
@@ -329,8 +328,7 @@ export class LessonSourceManager {
         imageUrl = await ensureDailyProgramCover({
           universeId: `ai-${date}`, // Not a UUID, will use fallback
           title: structuredLesson.hero.title,
-          subject: structuredLesson.hero.subject,
-          grade: resolvedGrade
+          gradeInt: resolvedGrade
         });
         imageUrl = imageUrl || this.getSubjectFallbackImage(structuredLesson.hero.subject);
       } catch (error) {
