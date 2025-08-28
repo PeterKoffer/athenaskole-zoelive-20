@@ -1,15 +1,10 @@
-// src/pages/DailyProgramPage.tsx
 import { useMemo } from "react";
 import UniverseImage from "@/components/UniverseImage";
 
 /**
- * NOTE:
- * - Erstat de tre "use..."-funktioner nedenfor med dine rigtige datakilder
- *   (Redux/Zustand/React-Query/Context). De er kun stubs, så siden
- *   kompilerer uden afhængigheder.
+ * STUBS: Skift til dine rigtige datakilder (Redux/Zustand/React-Query/Context).
+ * De gør, at siden kan køre med placeholders, indtil du binder rigtige data på.
  */
-
-// ====== STUBS: Skift til dine egne hooks/selectors ======
 type UniverseLike = { id?: string; universeId?: string; title?: string; subject?: string };
 
 function useTodaysUniverse(): UniverseLike | null {
@@ -17,19 +12,16 @@ function useTodaysUniverse(): UniverseLike | null {
   // @ts-ignore
   return window.__TODAYS_UNIVERSE__ || null;
 }
-
 function useSuggestions(): UniverseLike[] {
   // TODO: bind til rigtig kilde (fx selectCatalogSuggestions())
   // @ts-ignore
   return window.__SUGGESTIONS__ || [];
 }
-
 function useStudentGradeInt(): number {
   // TODO: bind til rigtig kilde (fx selectStudent().gradeInt)
   // @ts-ignore
   return window.__STUDENT_GRADE_INT__ ?? 6;
 }
-// =========================================================
 
 function getId(u?: UniverseLike | null): string | null {
   if (!u) return null;
@@ -43,7 +35,7 @@ export default function DailyProgramPage() {
 
   const todaysId = getId(todaysUniverse);
 
-  // Deduplikér: fjern dubletter og ekskludér dagens universe i kataloget
+  // Deduplikér kataloget: fjern dubletter og ekskludér dagens universe
   const uniqueSuggestions = useMemo(() => {
     const seen = new Set<string>();
     return (suggestions ?? []).filter((u) => {
@@ -61,9 +53,7 @@ export default function DailyProgramPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
       <header className="mb-6">
-        <a href="/" className="text-sm text-gray-400 hover:text-gray-200">
-          ← Back to Home
-        </a>
+        <a href="/" className="text-sm text-gray-400 hover:text-gray-200">← Back to Home</a>
         <h1 className="mt-2 text-2xl font-semibold text-white">Today&apos;s Program</h1>
         <p className="mt-1 text-sm text-gray-400">
           Welcome back! Here&apos;s your personalized AI-generated learning universe for today.
@@ -83,10 +73,7 @@ export default function DailyProgramPage() {
             minBytes={2048}
           />
         </div>
-        <div className="sr-only">
-          {/* Skærmlæser-tekst */}
-          {todaysUniverse?.title}
-        </div>
+        <div className="sr-only">{todaysUniverse?.title}</div>
       </section>
 
       {/* --- Katalog-forslag (deduplikeret) --- */}
@@ -95,7 +82,6 @@ export default function DailyProgramPage() {
           <p className="mb-2 text-xs text-blue-300">
             From Universe Catalog — add to plan if you like it
           </p>
-
           <div className="rounded-xl overflow-hidden bg-gradient-to-b from-slate-800 to-slate-900 border border-white/10">
             <UniverseImage
               universeId={getId(catalogPick) ?? "unknown-catalog"}
@@ -121,7 +107,7 @@ export default function DailyProgramPage() {
         </section>
       ) : null}
 
-      {/* --- Feature-sektion (behold eller erstat med din egen) --- */}
+      {/* --- Feature-sektion --- */}
       <section className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-xl p-4 bg-gradient-to-br from-rose-500/20 to-orange-500/20 border border-white/10">
           <h4 className="font-semibold text-white">Personalized Content</h4>
@@ -151,3 +137,4 @@ export default function DailyProgramPage() {
     </main>
   );
 }
+
