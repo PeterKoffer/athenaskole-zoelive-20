@@ -1,24 +1,31 @@
 // src/lib/supabaseClient.ts
 import { createClient } from "@supabase/supabase-js";
 
-// Make it work in both Vite (browser) and Node (tsx) by falling back to process.env
-const VITE =
-  typeof import.meta !== "undefined" && (import.meta as any)?.env
-    ? (import.meta as any).env
-    : ({} as Record<string, string | undefined>);
+function sanitizeUrl(u?: string) {
+  return (u ?? "").trim().replace(/\/+$/, "");
+}
 
-const SUPABASE_URL =
-  VITE.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY =
-  VITE.VITE_SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY;
+const envUrl  = sanitizeUrl(import.meta.env?.VITE_SUPABASE_URL as string);
+const envAnon = (import.meta.env?.VITE_SUPABASE_ANON_KEY as string)?.trim();
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn(
-    "[supabaseClient] Missing env. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (or export them in your shell)."
+// (VALGFRIT) – udfyld KUN hvis du vil have hardcoded fallback i fx Lovable preview
+const FALLBACK_URL  = ""; // fx "https://yphkfkpfdpdmllotpqua.supabase.co"
+const FALLBACK_ANON = ""; // fx "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." (anon key)
+
+const url  = envUrl  || FALLBACK_URL;
+const anon = envAnon || FALLBACK_ANON;
+
+if (!url || !anon) {
+  // Gør fejlen tydelig i dev – så slipper du for “Invalid API key” senere
+  // (Vi logger kun længden af nøglen for ikke at eksponere den)
+  console.error("[Supabase] Missing config",
+    { urlPresent: !!url, anonLen: anon ? anon.length : 0 }
+  );
+  throw new Error(
+    "Supabase config mangler. Sæt VITE_SUPABASE_URL og VITE_SUPABASE_ANON_KEY i .env.local og genstart dev-serveren."
   );
 }
 
-export const supabase = createClient(
-  String(SUPABASE_URL ?? ""),
-  String(SUPABASE_ANON_KEY ?? "")
-);
+export const supabase = createClient(url, anon, {
+  auth: { persistSession: true, autoRefreshToken: true },
+});
