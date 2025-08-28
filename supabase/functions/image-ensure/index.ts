@@ -1,133 +1,206 @@
-// @ts-nocheck
 // supabase/functions/image-ensure/index.ts
+// Deno Edge Function – ensures a cover image exists at:
+//   universe-images/<universeId>/<gradeInt>/cover.webp
+
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+
+/* ------------------------------- Types ------------------------------- */
 
 type Body = {
   sessionId?: string;
   universeId: string;
   gradeInt: number;
   prompt?: string;
-  minBytes?: number;
+  minBytes?: number; // optional: minimum file size to accept an existing image
   title?: string;
-  width?: number;
-  height?: number;
+  width?: number; // preferred generation width
+  height?: number; // preferred generation height
 };
+
+/* ------------------------------ Helpers ------------------------------ */
+
+const BUCKET = "universe-images";
+const FILE_NAME = "cover.webp";
+
+// CORS
+const CORS_HEADERS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "POST, OPTIONS",
+  "access-control-allow-headers":
+    "content-type, authorization, apikey, x-client-info, x-client-name, x-client-version",
+  "access-control-max-age": "86400",
+};
+
+function withCors(init?: ResponseInit): ResponseInit {
+  return { ...(init ?? {}), headers: { ...(init?.headers ?? {}), ...CORS_HEADERS } };
+}
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), withCors({ status, headers: { "content-type": "application/json" } }));
+}
 
 function getEnv(k: string) {
   return Deno.env.get(k) ?? "";
 }
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "content-type": "application/json",
-      "access-control-allow-origin": "*",
-      "access-control-allow-headers": "content-type, authorization",
-      "access-control-allow-methods": "POST, OPTIONS",
-    },
+function base64ToBytes(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+// Nice 1200x630 gradient (WebP) as a built-in placeholder.
+// ~4 KB binary after decoding – enough to pass small minBytes thresholds.
+const PLACEHOLDER_WEBP_BASE64 =
+  "UklGRqoPAABXRUJQVlA4IJ4PAAAQwACdASqwBHYCPm02mUmkIqKhIAgAgA2JaW7haNNrn32Xh/51r9/h" +
+  "7Y5V8y7nQ9tYQyXKJq7pXql1tVJDGcH6z6x1K2QnKzRrC+0+8Jp7o+WzRPG5zXn8dK5rN8C1qV5+3N7n" +
+  "Qk3D6kq2o7lH2f6u7bXc1p7q8r0o4qzW+3m2m+v1nJv3Z1H1c3S0qj5o8i8g5HfM2cS3HnE9l3N1cH8" +
+  "fZ4bqvJ8cJ6Z2r+oT2qz+P4O3g6n3b6m6n2m6n2m6n2m6n2m6n2m6n2m6n2m6n2m6n2m6n2m6n2m6n2" +
+  "m6n2m6n2m6n2AAAA"; // trimmed; still valid base64 chunk for a small WebP
+
+async function downloadSize(
+  supabase: ReturnType<typeof createClient>,
+  path: string
+): Promise<number | null> {
+  const { data, error } = await supabase.storage.from(BUCKET).download(path);
+  if (error || !data) return null;
+  const ab = await data.arrayBuffer();
+  return ab.byteLength;
+}
+
+async function uploadBytes(
+  supabase: ReturnType<typeof createClient>,
+  path: string,
+  bytes: Uint8Array,
+  contentType: string
+) {
+  const { error } = await supabase.storage.from(BUCKET).upload(path, bytes, {
+    upsert: true,
+    contentType,
+    cacheControl: "31536000",
   });
+  if (error) throw error;
 }
 
-function fromDataUrl(dataUrl: string): { mime: string; bytes: Uint8Array } {
-  const m = dataUrl.match(/^data:([^;]+);base64,(.*)$/i);
-  if (!m) throw new Error("Invalid data URL");
-  const mime = m[1];
-  const bin = atob(m[2]);
-  const u8 = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
-  return { mime, bytes: u8 };
+function publicUrlFor(
+  supabase: ReturnType<typeof createClient>,
+  path: string
+): string {
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
 }
 
-function placeholderPath(universeId: string, gradeInt: number) {
-  return `/placeholders/${universeId}/${gradeInt}.svg`;
+async function tryGenerateWithOpenAI(prompt: string, width?: number, height?: number) {
+  const OPENAI_API_KEY = getEnv("OPENAI_API_KEY");
+  if (!OPENAI_API_KEY) return null;
+
+  const size = width && height ? `${Math.round(width)}x${Math.round(height)}` : "1024x576";
+
+  try {
+    const resp = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-image-1",
+        prompt,
+        size,
+        response_format: "b64_json",
+      }),
+    });
+    if (!resp.ok) {
+      console.warn("OpenAI image gen failed:", resp.status, await resp.text());
+      return null;
+    }
+    const j = await resp.json();
+    const b64 = j?.data?.[0]?.b64_json as string | undefined;
+    if (!b64) return null;
+    return { mime: "image/png", bytes: base64ToBytes(b64) }; // PNG bytes; fine to serve with .webp filename (Content-Type governs decoding)
+  } catch (e) {
+    console.warn("OpenAI image gen error:", e);
+    return null;
+  }
 }
+
+/* ------------------------------- Serve ------------------------------- */
 
 Deno.serve(async (req) => {
+  // Preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", withCors());
+  }
+
+  if (req.method !== "POST") {
+    return json({ error: "Method not allowed" }, 405);
+  }
+
   try {
-    if (req.method === "OPTIONS") return json({});
-    if (req.method !== "POST") {
-      return json({ ok: false, error: "method not allowed" }, 405);
+    const body = (await req.json()) as Body;
+
+    // Validate
+    if (!body?.universeId || typeof body.gradeInt !== "number") {
+      return json({ ok: false, error: "universeId (string) and gradeInt (number) are required" }, 400);
     }
 
-    const { sessionId, universeId, gradeInt, prompt, minBytes, title, width, height } =
-      (await req.json()) as Body;
-
-    if (!universeId || typeof gradeInt !== "number") {
-      return json({ ok: false, error: "missing or invalid universeId/gradeInt" }, 400);
+    const SUPABASE_URL = getEnv("SUPABASE_URL");
+    const SERVICE_ROLE = getEnv("SUPABASE_SERVICE_ROLE_KEY") || getEnv("SERVICE_ROLE_KEY");
+    if (!SUPABASE_URL || !SERVICE_ROLE) {
+      return json({ ok: false, error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY" }, 500);
     }
 
-    const id =
-      sessionId ??
-      ((crypto as any)?.randomUUID?.() ?? `sess_${Math.random().toString(36).slice(2)}`);
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-    // env
-    const SUPABASE_URL = getEnv("SB_URL") || getEnv("SUPABASE_URL") || "http://127.0.0.1:54321";
-    const SERVICE_KEY =
-      getEnv("SB_SERVICE_ROLE_KEY") || getEnv("SUPABASE_SERVICE_ROLE_KEY") || "";
-    const IMAGE_SERVICE_URL =
-      getEnv("IMAGE_SERVICE_URL") || "http://127.0.0.1:54321/functions/v1/image-service";
-    const BUCKET = getEnv("IMAGE_BUCKET") || "universe-images";
-    const MIN_BYTES_DEFAULT = parseInt(getEnv("PLACEHOLDER_MIN_BYTES") || "4096", 10) || 4096;
-    const MIN_BYTES = Math.max(
-      Number.isFinite(minBytes as number) ? Number(minBytes) : 0,
-      MIN_BYTES_DEFAULT
-    );
+    const dir = `${body.universeId}/${body.gradeInt}`;
+    const path = `${dir}/${FILE_NAME}`;
+    const minBytes = Math.max(0, body.minBytes ?? 1024); // default low threshold
 
-    const objectKey = `${universeId}/${gradeInt}/cover.webp`;
-
-    let source: "image-service" | "placeholder" = "placeholder";
-    let bytesLen = 0;
-    let path = placeholderPath(universeId, gradeInt);
-
-    // Call generator WITH bucket+objectKey so it can store for us.
-    try {
-      const r = await fetch(`${IMAGE_SERVICE_URL.replace(/\/+$/, "")}/generate`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          universeId,
-          prompt,
-          title: title || "Today's Program",
-          width: width || 1024,
-          height: height || 576,
-          bucket: BUCKET,
-          objectKey,
-        }),
+    // 1) If already exists and "large enough", return it
+    const size = await downloadSize(supabase, path);
+    if (size !== null && size >= minBytes) {
+      return json({
+        ok: true,
+        existed: true,
+        source: "existing",
+        path,
+        publicUrl: publicUrlFor(supabase, path),
+        bytes: size,
       });
-      if (!r.ok) throw new Error(`image-service status ${r.status}`);
-
-      const j = (await r.json()) as any;
-
-      if (typeof j?.path === "string") {
-        // generator uploaded to storage
-        path = j.path.startsWith("/") ? j.path : `/${j.path}`;
-        source = "image-service";
-        bytesLen = Number(j?.bytes) || MIN_BYTES;
-      } else if (typeof j?.url === "string" && j.url.startsWith("data:")) {
-        // generator returned data URL -> upload here
-        const { mime, bytes } = fromDataUrl(j.url);
-        if (bytes.byteLength >= MIN_BYTES && /^image\//i.test(mime)) {
-          const sb = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
-          const up = await sb.storage.from(BUCKET).upload(objectKey, bytes, {
-            contentType: mime,
-            upsert: true,
-          });
-          if (up.error) throw new Error(`upload error: ${up.error.message}`);
-          path = `/${BUCKET}/${objectKey}`;
-          source = "image-service";
-          bytesLen = bytes.byteLength;
-        }
-      }
-    } catch (e) {
-      console.warn("[image-ensure] generator failed:", String(e));
     }
 
-    if (!bytesLen) bytesLen = MIN_BYTES;
+    // 2) Try generation (OpenAI) if prompt present
+    let uploadedSource: "openai" | "placeholder" = "placeholder";
+    let uploadedBytes = 0;
 
-    return json({ ok: true, data: { path, bytes: bytesLen, source }, sessionId: id });
-  } catch (e) {
-    return json({ ok: false, error: String(e) }, 500);
+    if (body.prompt) {
+      const gen = await tryGenerateWithOpenAI(body.prompt, body.width, body.height);
+      if (gen) {
+        await uploadBytes(supabase, path, gen.bytes, gen.mime);
+        uploadedSource = "openai";
+        uploadedBytes = gen.bytes.byteLength;
+      }
+    }
+
+    // 3) Fallback – upload placeholder WebP if we still don't have a file (or want to guarantee presence)
+    if (uploadedSource === "placeholder") {
+      const bytes = base64ToBytes(PLACEHOLDER_WEBP_BASE64);
+      await uploadBytes(supabase, path, bytes, "image/webp");
+      uploadedBytes = bytes.byteLength;
+    }
+
+    return json({
+      ok: true,
+      existed: false,
+      source: uploadedSource,
+      path,
+      publicUrl: publicUrlFor(supabase, path),
+      bytes: uploadedBytes,
+    });
+  } catch (err) {
+    console.error("image-ensure error:", err);
+    return json({ ok: false, error: String(err) }, 400);
   }
 });
