@@ -8,10 +8,9 @@ function sanitizeUrl(u?: string) {
 const envUrl  = sanitizeUrl(import.meta.env?.VITE_SUPABASE_URL as string);
 const envAnon = (import.meta.env?.VITE_SUPABASE_ANON_KEY as string)?.trim();
 
-// (VALGFRIT – midlertidig fallback, kun til fejlsøgning)
-// Udfyld KUN disse to linjer hvis du vil teste uden .env.local
-const FALLBACK_URL  = "https://yphkfkpfdpdmllotpqua.supabase.co"; // fx "https://yphkfkpfdpdmllotpqua.supabase.co"
-const FALLBACK_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwaGtma3BmZHBkbWxsb3RwcXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MTcxNTksImV4cCI6MjA2Mzk5MzE1OX0.hqyZ2nk3dqMx8rX9tdM1H4XF9wZ9gvaRor-6i5AyCy8"; // fx "eyJhbGciOiJIUzI1NiIs..."
+// No fallbacks - use environment variables only
+const FALLBACK_URL  = "";
+const FALLBACK_ANON = "";
 
 const url  = envUrl  || FALLBACK_URL;
 const anon = envAnon || FALLBACK_ANON;
