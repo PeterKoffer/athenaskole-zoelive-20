@@ -1,138 +1,86 @@
+// src/hooks/useAuth.tsx
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import type { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabaseClient';
-
-interface AuthContextType {
+type AuthContextValue = {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, metadata?: { name?: string; age?: string }) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUserRole: (newRole: string) => Promise<any>;
-}
+  quickSignIn?: (role: "admin" | "teacher" | "student") => Promise<void>;
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue>({
+  user: null,
+  session: null,
+  loading: true,
+  // noops – bliver overskrevet i provider
+  signIn: async () => {},
+  signOut: async () => {},
+});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  console.log('AuthProvider render - User:', user?.email, 'Loading:', loading);
-
+  // Init session + subscribe to changes
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        console.log('Getting initial session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-        } else {
-          console.log('Initial session:', session?.user?.email || 'No user');
-          setUser(session?.user ?? null);
-        }
-      } catch (error) {
-        console.error('Error getting initial session:', error);
-      } finally {
-        setLoading(false);
-      }
+    let unsub: (() => void) | undefined;
+
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session ?? null);
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+
+      const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+        setSession(newSession ?? null);
+        setUser(newSession?.user ?? null);
+      });
+      unsub = () => sub.subscription.unsubscribe();
+    })();
+
+    return () => {
+      if (unsub) unsub();
     };
-
-    getInitialSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email || 'No user');
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    console.log('Attempting to sign in:', email);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) {
-      console.error('Sign in error:', error);
-      throw error;
-    }
-    
-    console.log('Sign in successful:', data.user?.email);
-  };
+  const signIn = useCallback(async (email: string, password: string) => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) throw error; // fang i UI og vis besked "Forkert email/kodeord"
+  }, []);
 
-  const signUp = async (email: string, password: string, metadata?: { name?: string; age?: string }) => {
-    console.log('Attempting to sign up:', email);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata || {},
-        emailRedirectTo: `${window.location.origin}/`
-      }
-    });
-    
-    if (error) {
-      console.error('Sign up error:', error);
-      throw error;
-    }
-    
-    console.log('Sign up successful:', data.user?.email);
-  };
-
-  const signOut = async () => {
-    console.log('Signing out user:', user?.email);
+  const signOut = useCallback(async () => {
+    setLoading(true);
     const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Sign out error:', error);
-      throw error;
-    }
-    setUser(null);
-    console.log('Sign out successful');
-  };
+    setLoading(false);
+    if (error) throw error;
+  }, []);
 
-  const updateUserRole = async (newRole: string) => {
-    if (!user) {
-      throw new Error('No user logged in');
-    }
-    
-    console.log('Updating user role from', user.user_metadata?.role, 'to', newRole);
-    
-    const { data, error } = await supabase.auth.updateUser({
-      data: {
-        ...user.user_metadata,
-        role: newRole
-      }
-    });
-    
-    if (error) {
-      console.error('Update user role error:', error);
-      throw error;
-    }
-    
-    console.log('User role updated successfully:', data.user?.user_metadata?.role);
-    return data;
-  };
+  // Valgfri quick logins – ret emails/passwords til jeres testbrugere
+  const quickSignIn = useCallback(async (role: "admin" | "teacher" | "student") => {
+    const DEMO = {
+      admin:   { email: "admin@example.com",   password: "Pass1234!" },
+      teacher: { email: "teacher@example.com", password: "Pass1234!" },
+      student: { email: "student@example.com", password: "Pass1234!" },
+    } as const;
+    const creds = DEMO[role];
+    const { error } = await supabase.auth.signInWithPassword(creds);
+    if (error) throw error;
+  }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateUserRole }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const value = useMemo<AuthContextValue>(() => ({
+    user, session, loading, signIn, signOut, quickSignIn,
+  }), [user, session, loading, signIn, signOut, quickSignIn]);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
