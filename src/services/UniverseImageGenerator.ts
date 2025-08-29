@@ -35,3 +35,4 @@ export async function ensureDailyProgramCover(args: EnsureArgs): Promise<string>
   const title = (args.title?.trim() || "cover").replace(/\.(png|jpe?g|webp)$/i, "");
   return publicCoverUrl(`/${args.universeId}/${args.gradeInt}/${title}.webp`);
 }
+
