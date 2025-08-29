@@ -1,4 +1,3 @@
-// src/lib/supabaseClient.ts
 import { createClient } from "@supabase/supabase-js";
 
 function sanitize(u?: string) { return (u ?? "").trim().replace(/\/+$/, ""); }
@@ -28,10 +27,10 @@ export const supabase = createClient(url, anon, {
       Authorization: `Bearer ${anon}`,
     },
     fetch: async (input, init) => {
-      const urlStr = typeof input === "string" ? input : input.toString();
-      if (import.meta.env.DEV && urlStr.includes("/auth/v1/")) {
+      const s = typeof input === "string" ? input : input.toString();
+      if (import.meta.env.DEV && s.includes("/auth/v1/")) {
         const h = new Headers(init?.headers);
-        console.info("[Supabase fetch]", urlStr.split("/auth/v1/")[1], {
+        console.info("[Supabase fetch]", s.split("/auth/v1/")[1], {
           apikeyLen: (h.get("apikey") || "").length,
           hasAuth: !!h.get("authorization"),
         });
@@ -40,3 +39,4 @@ export const supabase = createClient(url, anon, {
     },
   },
 });
+
