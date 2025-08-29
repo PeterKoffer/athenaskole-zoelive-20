@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabaseClient';
-const SUPABASE_URL = "https://yphkfkpfdpdmllotpqua.supabase.co";
 import { CalendarEvent, KeywordEvent, CalendarLayer, KeywordScopeType } from '@/types/calendar';
 
 export interface CreateCalendarEvent {
@@ -21,7 +20,7 @@ export interface CreateKeywordEvent {
   created_by?: number;
 }
 
-const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+const FUNCTIONS_URL = "https://yphkfkpfdpdmllotpqua.supabase.co/functions/v1";
 
 class CalendarService {
   private async authHeader(): Promise<HeadersInit> {

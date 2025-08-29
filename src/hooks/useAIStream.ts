@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-const SUPABASE_URL = "https://yphkfkpfdpdmllotpqua.supabase.co";
 
 type StreamStatus = "idle" | "loading" | "error" | "done" | "timeout";
 
@@ -36,7 +35,7 @@ export function useAIStream(request: Record<string, any>) {
     setParsedData(null);
 
     const controller = new AbortController();
-    const url = `${SUPABASE_URL}/functions/v1/ai-stream`;
+    const url = `https://yphkfkpfdpdmllotpqua.supabase.co/functions/v1/ai-stream`;
     
     // Timeout efter 12 sekunder
     const timeoutId = setTimeout(() => {

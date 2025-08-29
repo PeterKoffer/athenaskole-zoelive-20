@@ -1,5 +1,5 @@
 // src/utils/imageUrl.ts
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
+const SUPABASE_URL = "https://yphkfkpfdpdmllotpqua.supabase.co";
 const PUBLIC_BASE = `${SUPABASE_URL}/storage/v1/object/public`;
 
 export function coverUrl(universeId: string, grade: number | string, bust?: string) {

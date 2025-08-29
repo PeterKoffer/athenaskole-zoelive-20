@@ -8,7 +8,9 @@ type AuthContextValue = {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUserRole: (role: string) => Promise<void>;
   quickSignIn?: (role: "admin" | "teacher" | "student") => Promise<void>;
 };
 
@@ -18,7 +20,9 @@ const AuthContext = createContext<AuthContextValue>({
   loading: true,
   // noops – bliver overskrevet i provider
   signIn: async () => {},
+  signUp: async () => {},
   signOut: async () => {},
+  updateUserRole: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -55,12 +59,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error; // fang i UI og vis besked "Forkert email/kodeord"
   }, []);
 
+  const signUp = useCallback(async (email: string, password: string, metadata?: any) => {
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata
+      }
+    });
+    setLoading(false);
+    if (error) throw error;
+  }, []);
+
   const signOut = useCallback(async () => {
     setLoading(true);
     const { error } = await supabase.auth.signOut();
     setLoading(false);
     if (error) throw error;
   }, []);
+
+  const updateUserRole = useCallback(async (role: string) => {
+    if (!user) throw new Error('No user logged in');
+    
+    const { error } = await supabase.auth.updateUser({
+      data: { role }
+    });
+    
+    if (error) throw error;
+  }, [user]);
 
   // Valgfri quick logins – ret emails/passwords til jeres testbrugere
   const quickSignIn = useCallback(async (role: "admin" | "teacher" | "student") => {
@@ -75,8 +102,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(() => ({
-    user, session, loading, signIn, signOut, quickSignIn,
-  }), [user, session, loading, signIn, signOut, quickSignIn]);
+    user, session, loading, signIn, signUp, signOut, updateUserRole, quickSignIn,
+  }), [user, session, loading, signIn, signUp, signOut, updateUserRole, quickSignIn]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

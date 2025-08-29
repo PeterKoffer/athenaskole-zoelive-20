@@ -56,13 +56,8 @@ export default function RepairCoversButton() {
 
       for (const path of covers) {
         // ensure (deletes corrupt if server-guard is activated)
-        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/image-ensure`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          },
-          body: JSON.stringify({ bucket: BUCKET, objectKey: path }),
+        await supabase.functions.invoke('image-ensure', {
+          body: { bucket: BUCKET, objectKey: path }
         });
 
         // HEAD check
