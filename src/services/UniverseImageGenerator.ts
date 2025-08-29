@@ -20,8 +20,8 @@ export type EnsureArgs = {
 };
 
 /**
- * Kalder kun den hostede edge function "image-ensure".
- * Returnerer en stabil public URL til cover-billedet.
+ * KUN edge functionen "image-ensure".
+ * Returnerer en stabil public URL til cover-billedet i Storage.
  */
 export async function ensureDailyProgramCover(args: EnsureArgs): Promise<string> {
   const { data, error } = await supabase.functions.invoke("image-ensure", {
@@ -35,4 +35,3 @@ export async function ensureDailyProgramCover(args: EnsureArgs): Promise<string>
   const title = (args.title?.trim() || "cover").replace(/\.(png|jpe?g|webp)$/i, "");
   return publicCoverUrl(`/${args.universeId}/${args.gradeInt}/${title}.webp`);
 }
-
