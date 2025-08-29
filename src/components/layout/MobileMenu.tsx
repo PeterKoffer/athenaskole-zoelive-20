@@ -11,7 +11,7 @@ import {
   Calendar
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/hooks/use-toast";
 import UserRoleDisplay from "@/components/layout/UserRoleDisplay";
 

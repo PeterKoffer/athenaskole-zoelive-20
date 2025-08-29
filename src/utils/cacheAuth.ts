@@ -1,5 +1,5 @@
 // Auth cache wiring (no cache import to avoid cycles)
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 
 export function wireAuthCache(onScope: (ns: string) => void, onClear: () => void) {
   // Set initial namespace

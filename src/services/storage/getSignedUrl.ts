@@ -3,7 +3,7 @@ import { singleFlight } from '@/utils/singleflight';
 import { signForDownload } from './signForDownload';
 import { objectExistsWithSize, pollUntilExists } from './objectExists';
 import { invokeFn } from '@/supabase/safeInvoke';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { 
   incr, 
   debugLog, 

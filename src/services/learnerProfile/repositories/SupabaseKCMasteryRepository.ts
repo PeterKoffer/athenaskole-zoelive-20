@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Repository for Knowledge Component mastery operations
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export class SupabaseKCMasteryRepository {
   static async getKnowledgeComponentMastery(userId: string): Promise<KnowledgeComponentMastery[]> {

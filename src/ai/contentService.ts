@@ -1,5 +1,5 @@
 import { safeInvokeFn } from '@/supabase/functionsClient';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { buildPrompt, PROMPT_VERSION } from "./promptBuilder";
 import { LessonRequest, LessonResponse } from "./types";
 import { preferencesService } from "@/services/PreferencesService";

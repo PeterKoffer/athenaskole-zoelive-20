@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { LearnerProfile, LearnerPreferences } from '@/types/learnerProfile';
 import { Json } from '@/integrations/supabase/types';
 

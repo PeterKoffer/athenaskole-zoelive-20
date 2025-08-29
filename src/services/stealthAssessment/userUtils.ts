@@ -1,7 +1,7 @@
 
 // src/services/stealthAssessment/userUtils.ts
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { STEALTH_ASSESSMENT_CONFIG } from './config';
 
 export const getCurrentUserId = async (): Promise<string | null> => {

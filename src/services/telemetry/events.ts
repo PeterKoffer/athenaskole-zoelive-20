@@ -1,5 +1,5 @@
 // src/services/telemetry/events.ts
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { getSessionId } from '@/utils/session';
 
 export type TelemetryPayload = Record<string, any>;

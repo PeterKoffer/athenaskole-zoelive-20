@@ -5,7 +5,7 @@ import { BookOpen, Trophy, Clock, Star } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserMetadata } from "@/types/auth"; // Import UserMetadata
 import { useNavigate } from "react-router-dom";
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import PracticeSkillsModal from "@/components/student/PracticeSkillsModal";
 
 const StudentDashboard = () => {

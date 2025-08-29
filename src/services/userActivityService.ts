@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export interface UserActivitySession {
   id?: string;

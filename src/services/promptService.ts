@@ -1,5 +1,5 @@
 // Single source of truth for all AI prompts
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export interface PromptRecord {
   id: string;

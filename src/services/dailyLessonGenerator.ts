@@ -8,7 +8,7 @@ import { CacheService } from './dailyLessonGenerator/cacheService';
 import { calendarService } from './CalendarService';
 import { aiContentGenerator } from './content/aiContentGenerator'; // Fixed import path
 import learnerProfileService from './learnerProfile/LearnerProfileService';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { generateContent } from '@/ai/contentService';
 import { buildLessonContext as buildUnifiedLessonContext } from './content/unifiedLessonContext';
 import { generateLessonPlan, generateActivityForSlot } from './content/aiPlannerActivityPipeline';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SUPABASE_URL } from "@/integrations/supabase/client";
+const SUPABASE_URL = "https://yphkfkpfdpdmllotpqua.supabase.co";
 
 type StreamStatus = "idle" | "loading" | "error" | "done" | "timeout";
 

@@ -4,7 +4,7 @@ import { v5 as uuidv5 } from 'uuid';
 const UNIVERSE_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
 // Service to manage lesson source priority and image handling
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { ensureDailyProgramCover } from '@/services/UniverseImageGenerator';
 import { UniversePacks, Prime100 } from '@/content/universe.catalog';
 import { UniversePack, CanonicalSubject } from '@/content/types';

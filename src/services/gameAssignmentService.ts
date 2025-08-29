@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { type GameAssignment, type GameSession } from '@/types/database';
 
 export const gameAssignmentService = {

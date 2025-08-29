@@ -1,7 +1,7 @@
 
 // Learning Path Service Implementation
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { LearningPathway, LearningPathStep, LearningPathService } from './types';
 
 class LearningPathServiceImpl implements LearningPathService {

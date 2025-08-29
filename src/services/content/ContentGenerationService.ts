@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { invokeFn } from '@/supabase/safeInvoke';
 import type { AdaptiveContentRes } from '@/types/api';
 

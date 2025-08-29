@@ -1,5 +1,5 @@
 // src/services/edu/loadOverrides.ts
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import type { PartialEdu } from "./effectiveContext";
 import type { MeasurementSystem } from "./locale";
 

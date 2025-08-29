@@ -1,5 +1,5 @@
 // src/supabase/safeInvoke.ts
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import * as fc from '@/supabase/functionsClient'; // kan indeholde invokeFn
 // ^ vi bruger namespace import for at kunne teste fc.invokeFn findes
 

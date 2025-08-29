@@ -1,5 +1,5 @@
 // src/services/universe/arcs.ts
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export interface UniverseArcData {
   user_id: string;

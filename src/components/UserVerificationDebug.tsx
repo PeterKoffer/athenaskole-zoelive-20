@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { User, Database, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { SupabaseProfileService } from '@/services/learnerProfile/SupabaseProfileService';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 const UserVerificationDebug: React.FC = () => {
   const { user } = useAuth();

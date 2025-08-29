@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth'; // Import UserMetadata
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent } from '@/components/ui/card';
 import WelcomeContent from './WelcomeContent';
 

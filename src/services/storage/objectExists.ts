@@ -1,5 +1,5 @@
 // Storage objectExists (leaf module)
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 function normalizePath(path: string): string {
   return path.replace(/^\/+/, '');

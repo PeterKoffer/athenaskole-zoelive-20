@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export interface UserProgress {
   id: string;

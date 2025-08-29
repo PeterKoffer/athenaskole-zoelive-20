@@ -1,5 +1,5 @@
 // src/services/settings.ts
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 
 type Scope = "system" | "school" | "class" | "teacher" | "student";
 

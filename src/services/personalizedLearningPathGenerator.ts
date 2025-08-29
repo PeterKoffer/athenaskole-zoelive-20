@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { getStandardsByGrade, findStandardByCode } from '@/data/curriculumStandards';
 import { userLearningProfileService } from './userLearningProfileService';
 import { conceptMasteryService } from './conceptMasteryService';

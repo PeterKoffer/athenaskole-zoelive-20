@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 // Toggle if this bucket is actually public. If it's private, NEVER hit /object/public.
 const UNIVERSE_BUCKET = "universe-images";

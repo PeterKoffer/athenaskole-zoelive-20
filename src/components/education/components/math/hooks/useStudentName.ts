@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserMetadata } from '@/types/auth'; // Import UserMetadata
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export const useStudentName = () => {
   const { user } = useAuth();

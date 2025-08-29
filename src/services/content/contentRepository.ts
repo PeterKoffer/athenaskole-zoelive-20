@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { GeneratedContent, AdaptiveContentRecord } from '../types/contentTypes';
 import type { ContentAtom } from '@/types/content';
 

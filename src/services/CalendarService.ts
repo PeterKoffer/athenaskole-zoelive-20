@@ -1,4 +1,5 @@
-import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
+const SUPABASE_URL = "https://yphkfkpfdpdmllotpqua.supabase.co";
 import { CalendarEvent, KeywordEvent, CalendarLayer, KeywordScopeType } from '@/types/calendar';
 
 export interface CreateCalendarEvent {

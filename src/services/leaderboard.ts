@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { LeaderboardEntry } from "../games/types";
 
 export type { LeaderboardEntry };

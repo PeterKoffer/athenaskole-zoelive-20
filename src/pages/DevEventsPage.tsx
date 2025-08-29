@@ -1,5 +1,5 @@
 import React from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 
 // Dev-only page listing recent telemetry events with counters, filter, auto-refresh, and CSV export
 // Route at "/dev/events" (page self-guards in production)

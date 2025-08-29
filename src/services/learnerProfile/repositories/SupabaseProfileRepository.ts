@@ -1,5 +1,5 @@
 // Repository for basic profile operations
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import type { LearnerPreferences, LearnerProfile } from '@/types/learnerProfile';
 
 export class SupabaseProfileRepository {

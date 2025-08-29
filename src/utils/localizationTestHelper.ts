@@ -1,6 +1,6 @@
 
 // Utility to help with manual testing of the localization flow
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export const MOCK_TEST_USER_ID = '12345678-1234-5678-9012-123456789012';
 

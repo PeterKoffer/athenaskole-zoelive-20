@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { resolveEduContext } from "@/services/edu/locale";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 
