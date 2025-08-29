@@ -10,24 +10,23 @@ const anon = (import.meta.env.VITE_SUPABASE_ANON_KEY as string)?.trim();
 
 if (!url || !anon) {
   console.error("[Supabase] Missing config", { urlPresent: !!url, anonLen: anon ? anon.length : 0 });
-  throw new Error("Supabase ENV mangler. Tilføj VITE_SUPABASE_URL og VITE_SUPABASE_ANON_KEY i .env.local og genstart dev.");
+  throw new Error("Supabase ENV mangler. Sæt VITE_SUPABASE_URL og VITE_SUPABASE_ANON_KEY i .env.local og genstart.");
 }
 
-// Sikker debug i dev: tjek at issHost matcher projektets host
+// Sikker debug i dev
 if (import.meta.env.DEV) {
   try {
     const host = new URL(url).host;
-    const parts = anon.split(".");
-    const payloadJson = parts[1] ? atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")) : "{}";
+    const payloadJson = atob(anon.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"));
     const payload = JSON.parse(payloadJson);
     const issHost = payload?.iss ? new URL(payload.iss).host : "n/a";
     console.info("[Supabase]", { urlHost: host, anonLen: anon.length, role: payload?.role, issHost });
-  } catch {}
+  } catch { /* no-op */ }
 }
 
 export const supabase = createClient(url, anon, {
   auth: { persistSession: true, autoRefreshToken: true },
-  // 👇 Gør det umuligt at “miste” nøglerne i request headers
+  // Tving nøgler på alle requests, så signup/signin altid har korrekte headers
   global: {
     headers: {
       apikey: anon,
