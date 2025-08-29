@@ -1,66 +1,34 @@
 // src/services/UniverseImageGenerator.ts
-type EnsureResp = { ok: boolean; data?: { path: string; source: string; bytes: number } };
+import { supabase } from "@/lib/supabaseClient";
 
-const SB_URL = "https://yphkfkpfdpdmllotpqua.supabase.co";
-const FUNCTIONS_BASE = "http://127.0.0.1:54321";
-
-const ENSURE_URL = `${FUNCTIONS_BASE}/functions/v1/image-ensure`;
-const GENERATE_URL = `${FUNCTIONS_BASE}/functions/v1/image-service/generate`;
+const BUCKET = "universe-images";
 
 export function publicCoverUrl(path: string) {
-  return `${SB_URL}/storage/v1/object/public${path}`;
+  const clean = path.replace(/^\//, "");
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(clean);
+  return data.publicUrl;
 }
 
-export async function ensureDailyProgramCover(opts: {
+type EnsureArgs = {
   universeId: string;
   gradeInt: number;
-  title: string;
+  title?: string;
   width?: number;
   height?: number;
-  bucket?: string;
-}) {
-  const bucket = opts.bucket ?? "universe-images";
-  const objectKey = `${opts.universeId}/${opts.gradeInt}/cover.webp`;
-  const minBytes = Number(import.meta.env.VITE_PLACEHOLDER_MIN_BYTES ?? 4096);
+  minBytes?: number;
+  prompt?: string;
+};
 
-  const ensureBody = {
-    universeId: opts.universeId,
-    gradeInt: opts.gradeInt,
-    title: opts.title,
-    bucket,
-    objectKey,
-    minBytes,
-  };
+export async function ensureDailyProgramCover(args: EnsureArgs): Promise<string> {
+  // Kalder KUN den hostede edge function
+  const { data, error } = await supabase.functions.invoke("image-ensure", {
+    body: args,
+  });
+  if (error) throw error;
 
-  const ensure1: EnsureResp = await fetch(ENSURE_URL, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(ensureBody),
-  }).then(r => r.json());
+  const url = (data as any)?.publicUrl as string | undefined;
+  if (url) return url;
 
-  if (ensure1?.data?.source !== "storage") {
-    await fetch(GENERATE_URL, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        universeId: opts.universeId,
-        title: opts.title,
-        width: opts.width ?? 1024,
-        height: opts.height ?? 576,
-        bucket,
-        objectKey,
-      }),
-    });
-
-    const ensure2: EnsureResp = await fetch(ENSURE_URL, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(ensureBody),
-    }).then(r => r.json());
-
-    const path = ensure2?.data?.path ?? ensure1?.data?.path;
-    return publicCoverUrl(path!);
-  }
-
-  return publicCoverUrl(ensure1.data!.path);
+  const title = (args.title?.trim() || "cover").replace(/\.(png|jpe?g|webp)$/i, "");
+  return publicCoverUrl(`/${args.universeId}/${args.gradeInt}/${title}.webp`);
 }
