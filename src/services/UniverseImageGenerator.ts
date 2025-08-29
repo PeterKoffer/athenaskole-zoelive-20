@@ -9,7 +9,7 @@ export function publicCoverUrl(path: string) {
   return data.publicUrl;
 }
 
-type EnsureArgs = {
+export type EnsureArgs = {
   universeId: string;
   gradeInt: number;
   title?: string;
@@ -19,8 +19,11 @@ type EnsureArgs = {
   prompt?: string;
 };
 
+/**
+ * Kalder kun den hostede edge function "image-ensure".
+ * Returnerer en stabil public URL til cover-billedet.
+ */
 export async function ensureDailyProgramCover(args: EnsureArgs): Promise<string> {
-  // Kalder KUN den hostede edge function
   const { data, error } = await supabase.functions.invoke("image-ensure", {
     body: args,
   });
