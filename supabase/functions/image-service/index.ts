@@ -1,13 +1,16 @@
 // deno-lint-ignore-file no-explicit-any
 // Edge function: POST /functions/v1/image-service/generate
 // Genererer et billede via Black Forest Labs og uploader til Storage.
-// Returnerer stabil public URL, så klienten altid kan vise samme sti.
+// Returnerer stabil public URL (samme bucket/path hver gang).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?dts";
 
+/* ---------------------------------- CORS ---------------------------------- */
+
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
 };
 
@@ -21,7 +24,12 @@ function json(data: any, init: ResponseInit = {}) {
     },
   });
 }
-function bad(msg: string, code = 400) { return json({ error: msg }, { status: code }); }
+
+function bad(msg: string, code = 400) {
+  return json({ ok: false, error: msg }, { status: code });
+}
+
+/* ------------------------------ util helpers ------------------------------ */
 
 function slug(s: string) {
   return (s ?? "")
@@ -30,19 +38,20 @@ function slug(s: string) {
     .replace(/^-+|-+$/g, "") || "cover";
 }
 
-// ---- BFL helpers ------------------------------------------------------------
+const clamp = (n: number, min: number, max: number) =>
+  Math.max(min, Math.min(n, max));
+const snap32 = (n: number) => Math.round(n / 32) * 32;
 
-const IMAGE_MODEL = Deno.env.get("IMAGE_MODEL") || "flux-dev";
-const BFL_OUTPUT = (Deno.env.get("BFL_OUTPUT") || "webp").toLowerCase(); // 'webp' eller 'jpeg'
+/* ------------------------------ BFL (flux-dev) ---------------------------- */
+
+const BFL_OUTPUT = (Deno.env.get("BFL_OUTPUT") || "webp").toLowerCase(); // "webp" | "jpeg"
+const BFL_ENDPOINT = "https://api.bfl.ai/v1/flux-dev"; // flux-dev
 
 async function bflStart(prompt: string, width: number, height: number) {
   const apiKey = Deno.env.get("BFL_API_KEY");
   if (!apiKey) throw new Error("Missing BFL_API_KEY");
 
-  // flux-dev endpoint
-  const endpoint = "https://api.bfl.ai/v1/flux-dev";
-
-  const r = await fetch(endpoint, {
+  const r = await fetch(BFL_ENDPOINT, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -55,7 +64,7 @@ async function bflStart(prompt: string, width: number, height: number) {
       steps: 28,
       guidance: 3,
       prompt_upsampling: false,
-      output_format: BFL_OUTPUT, // 'webp' (foretrukket) eller 'jpeg'
+      output_format: BFL_OUTPUT, // "webp" (foretrukket) eller "jpeg"
     }),
   });
 
@@ -75,7 +84,7 @@ async function bflPoll(pollingUrl: string, timeoutMs = 60_000) {
 
     const j = await r.json().catch(() => ({}));
 
-    // Find en URL til billedet i svaret
+    // Find en (første) URL i svaret
     let candidate: string | undefined;
     const scan = (v: any) => {
       if (!v) return;
@@ -87,10 +96,14 @@ async function bflPoll(pollingUrl: string, timeoutMs = 60_000) {
     scan(j);
 
     const status = String(j?.status ?? j?.state ?? "").toLowerCase();
-    if (candidate && (status === "ready" || status === "succeeded" || status === "success")) {
+    if (
+      candidate &&
+      (status === "ready" || status === "succeeded" || status === "success")
+    ) {
       return candidate;
     }
-    if (candidate && !status) return candidate; // prøv hvis vi allerede har en URL
+    // Ingen tydelig status, men vi har allerede en URL? Prøv den.
+    if (candidate && !status) return candidate;
 
     await new Promise((s) => setTimeout(s, 1500));
   }
@@ -104,35 +117,40 @@ async function fetchBytes(url: string): Promise<Uint8Array> {
   return new Uint8Array(await r.arrayBuffer());
 }
 
-// ---- Storage upload ---------------------------------------------------------
+/* ------------------------------ Storage upload ---------------------------- */
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const BUCKET = Deno.env.get("UNIVERSE_IMAGES_BUCKET") || "universe-images";
+const supaSrv = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+function publicUrlFor(path: string) {
+  const { data } = supaSrv.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
 
 async function uploadToStorage(bytes: Uint8Array, path: string, mime: string) {
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const BUCKET = Deno.env.get("UNIVERSE_IMAGES_BUCKET") || "universe-images";
-
-  const supa = createClient(SUPABASE_URL, SERVICE_ROLE);
-
-  // Brug Blob for korrekt content-type
   const blob = new Blob([bytes], { type: mime });
 
-  const { error } = await supa.storage.from(BUCKET).upload(path, blob, {
+  const { error } = await supaSrv.storage.from(BUCKET).upload(path, blob, {
     upsert: true,
     cacheControl: "31536000",
   });
   if (error) throw error;
 
-  const { data } = supa.storage.from(BUCKET).getPublicUrl(path);
-  return data.publicUrl;
+  return publicUrlFor(path);
 }
 
-// ---- HTTP handler -----------------------------------------------------------
+/* --------------------------------- Server --------------------------------- */
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return json({}, { status: 204 });
 
   const u = new URL(req.url);
-  if (!(u.pathname.endsWith("/generate"))) {
+  if (u.pathname.endsWith("/health")) {
+    return json({ ok: true, time: new Date().toISOString() });
+  }
+  if (!u.pathname.endsWith("/generate")) {
     return bad("Not Found", 404);
   }
 
@@ -143,18 +161,27 @@ Deno.serve(async (req) => {
     return bad("Invalid JSON body");
   }
 
-  const universeId: string | undefined = body.universeId ?? body.universeID ?? body.id;
-  const gradeInt: number | undefined = body.gradeInt ?? body.grade ?? body.grade_id;
+  const universeId: string | undefined =
+    body.universeId ?? body.universeID ?? body.id;
+  const gradeInt: number | undefined =
+    body.gradeInt ?? body.grade ?? body.grade_id;
   const title: string = body.title ?? "Daily Program";
-  const prompt: string = body.prompt ?? `${title} — classroom-friendly, minimal, bright, 16:9, clean graphic cover`;
-  const width: number = Math.max(256, Math.min(body.width ?? 1200, 2048));
-  const height: number = Math.max(256, Math.min(body.height ?? 630, 2048));
 
   if (!universeId || typeof gradeInt !== "number") {
     return bad("Missing universeId or gradeInt");
   }
 
-  // Ensartet filnavn – hold det i .webp som standard
+  // Prompt + dimensioner (snap til multipla af 32 + clamp til fornuftigt spænd)
+  const prompt: string =
+    body.prompt ??
+    `${title} — classroom-friendly, minimal, bright, 16:9, clean graphic cover`;
+
+  const wIn = Number(body.width ?? 1216);
+  const hIn = Number(body.height ?? 640);
+  const width = clamp(snap32(wIn), 256, 1440);
+  const height = clamp(snap32(hIn), 256, 1440);
+
+  // Samme filnavn hver gang (stabil URL). Default til webp.
   const ext = BFL_OUTPUT === "jpeg" ? "jpg" : "webp";
   const name = `${slug(title)}.${ext}`;
   const path = `${universeId}/${gradeInt}/${name}`;
@@ -163,19 +190,42 @@ Deno.serve(async (req) => {
   try {
     // 1) Start + poll BFL
     const start = await bflStart(prompt, width, height);
-    const pollingUrl = start?.polling_url as string | undefined;
+    const pollingUrl = (start?.polling_url as string | undefined) ?? "";
     if (!pollingUrl) {
-      // Kan ske ved fejl eller rate limit – returnér intet, så `image-ensure` beholder placeholder
-      return json({ fallback: true, note: "No polling_url from BFL", path });
+      // Ingen job oprettet – returnér stabil public URL (peger på placeholder indtil upload)
+      return json({
+        ok: false,
+        note: "No polling_url from BFL",
+        path,
+        publicUrl: publicUrlFor(path),
+        width,
+        height,
+      });
     }
+
     const finalUrl = await bflPoll(pollingUrl);
 
-    // 2) Hent bytes og upload til Storage
+    // 2) Hent bytes og upload til Storage (samme path → samme public URL)
     const bytes = await fetchBytes(finalUrl);
     const publicUrl = await uploadToStorage(bytes, path, mime);
 
-    return json({ ok: true, publicUrl, path });
+    return json({
+      ok: true,
+      source: "bfl",
+      path,
+      publicUrl,
+      width,
+      height,
+    });
   } catch (e) {
-    return json({ ok: false, error: String(e?.message || e), path }, { status: 500 });
+    // Bevar stabil URL (peger på eksisterende placeholder hvis generering fejler).
+    return json({
+      ok: false,
+      error: String(e?.message || e),
+      path,
+      publicUrl: publicUrlFor(path),
+      width,
+      height,
+    });
   }
 });
