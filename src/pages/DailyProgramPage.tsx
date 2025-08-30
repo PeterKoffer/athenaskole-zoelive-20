@@ -105,8 +105,8 @@ export default function DailyProgramPage() {
     universeId: todaysId,
     gradeInt,
     title: todaysTitle,
-    width: 1200,
-    height: 630,
+    width: 1216,
+    height: 640,
     minBytes: 2048,
   });
 
