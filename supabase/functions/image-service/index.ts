@@ -1,35 +1,23 @@
 // deno-lint-ignore-file no-explicit-any
 // Edge function: POST /functions/v1/image-service/generate
-// Genererer et billede via Black Forest Labs og uploader til Storage.
-// Returnerer stabil public URL (samme bucket/path hver gang).
+// Generates an image via Black Forest Labs, uploads to Storage,
+// and returns a stable public URL.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?dts";
 
-/* ---------------------------------- CORS ---------------------------------- */
-
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
 };
 
 function json(data: any, init: ResponseInit = {}) {
   return new Response(JSON.stringify(data), {
     ...init,
-    headers: {
-      "content-type": "application/json",
-      ...CORS,
-      ...(init.headers ?? {}),
-    },
+    headers: { "content-type": "application/json", ...CORS, ...(init.headers ?? {}) },
   });
 }
-
-function bad(msg: string, code = 400) {
-  return json({ ok: false, error: msg }, { status: code });
-}
-
-/* ------------------------------ util helpers ------------------------------ */
+function bad(msg: string, code = 400) { return json({ error: msg }, { status: code }); }
 
 function slug(s: string) {
   return (s ?? "")
@@ -37,34 +25,25 @@ function slug(s: string) {
     .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
     .replace(/^-+|-+$/g, "") || "cover";
 }
+const align32 = (n: number) => Math.max(256, Math.min(2048, Math.round(n / 32) * 32));
 
-const clamp = (n: number, min: number, max: number) =>
-  Math.max(min, Math.min(n, max));
-const snap32 = (n: number) => Math.round(n / 32) * 32;
+// -------- BFL helpers --------------------------------------------------------
 
-/* ------------------------------ BFL (flux-dev) ---------------------------- */
-
-const BFL_OUTPUT = (Deno.env.get("BFL_OUTPUT") || "webp").toLowerCase(); // "webp" | "jpeg"
-const BFL_ENDPOINT = "https://api.bfl.ai/v1/flux-dev"; // flux-dev
+const IMAGE_MODEL = Deno.env.get("IMAGE_MODEL") || "flux-dev";
+const BFL_OUTPUT = (Deno.env.get("BFL_OUTPUT") || "webp").toLowerCase(); // 'webp' or 'jpeg'
 
 async function bflStart(prompt: string, width: number, height: number) {
   const apiKey = Deno.env.get("BFL_API_KEY");
   if (!apiKey) throw new Error("Missing BFL_API_KEY");
 
-  const r = await fetch(BFL_ENDPOINT, {
+  const endpoint = `https://api.bfl.ai/v1/${IMAGE_MODEL}`;
+  const r = await fetch(endpoint, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-key": apiKey,
-    },
+    headers: { "content-type": "application/json", "x-key": apiKey },
     body: JSON.stringify({
-      prompt,
-      width,
-      height,
-      steps: 28,
-      guidance: 3,
-      prompt_upsampling: false,
-      output_format: BFL_OUTPUT, // "webp" (foretrukket) eller "jpeg"
+      prompt, width, height,
+      steps: 28, guidance: 3, prompt_upsampling: false,
+      output_format: BFL_OUTPUT, // 'webp' or 'jpeg'
     }),
   });
 
@@ -77,38 +56,39 @@ async function bflStart(prompt: string, width: number, height: number) {
 
 async function bflPoll(pollingUrl: string, timeoutMs = 60_000) {
   const t0 = Date.now();
-
   while (Date.now() - t0 < timeoutMs) {
     const r = await fetch(pollingUrl);
     if (!r.ok) throw new Error(`BFL poll failed: ${r.status}`);
-
     const j = await r.json().catch(() => ({}));
 
-    // Find en (første) URL i svaret
+    // Find a URL string in the response (http(s) or data:)
     let candidate: string | undefined;
     const scan = (v: any) => {
       if (!v) return;
-      if (typeof v === "string" && /^https?:\/\//i.test(v)) {
-        if (!candidate) candidate = v;
+      if (typeof v === "string" && /^(https?:\/\/|data:image\/)/i.test(v)) {
+        candidate ??= v;
       } else if (Array.isArray(v)) v.forEach(scan);
       else if (typeof v === "object") Object.values(v).forEach(scan);
     };
     scan(j);
 
     const status = String(j?.status ?? j?.state ?? "").toLowerCase();
-    if (
-      candidate &&
-      (status === "ready" || status === "succeeded" || status === "success")
-    ) {
-      return candidate;
-    }
-    // Ingen tydelig status, men vi har allerede en URL? Prøv den.
-    if (candidate && !status) return candidate;
+    if (candidate && (status === "ready" || status === "succeeded" || status === "success")) return candidate;
+    if (candidate && !status) return candidate; // some responses omit status
 
     await new Promise((s) => setTimeout(s, 1500));
   }
-
   throw new Error("BFL poll timeout");
+}
+
+function dataUrlToBytes(dataUrl: string) {
+  const m = dataUrl.match(/^data:(.*?);base64,(.*)$/i);
+  if (!m) throw new Error("Invalid data URL from BFL");
+  const mime = m[1] || "application/octet-stream";
+  const bin = atob(m[2]);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return { mime, bytes };
 }
 
 async function fetchBytes(url: string): Promise<Uint8Array> {
@@ -117,115 +97,90 @@ async function fetchBytes(url: string): Promise<Uint8Array> {
   return new Uint8Array(await r.arrayBuffer());
 }
 
-/* ------------------------------ Storage upload ---------------------------- */
-
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const BUCKET = Deno.env.get("UNIVERSE_IMAGES_BUCKET") || "universe-images";
-const supaSrv = createClient(SUPABASE_URL, SERVICE_ROLE);
-
-function publicUrlFor(path: string) {
-  const { data } = supaSrv.storage.from(BUCKET).getPublicUrl(path);
-  return data.publicUrl;
-}
+// -------- Storage upload -----------------------------------------------------
 
 async function uploadToStorage(bytes: Uint8Array, path: string, mime: string) {
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const BUCKET = Deno.env.get("UNIVERSE_IMAGES_BUCKET") || "universe-images";
+
+  const supa = createClient(SUPABASE_URL, SERVICE_ROLE);
   const blob = new Blob([bytes], { type: mime });
 
-  const { error } = await supaSrv.storage.from(BUCKET).upload(path, blob, {
+  const { error } = await supa.storage.from(BUCKET).upload(path, blob, {
     upsert: true,
     cacheControl: "31536000",
   });
   if (error) throw error;
 
-  return publicUrlFor(path);
+  const { data } = supa.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
 }
 
-/* --------------------------------- Server --------------------------------- */
+// -------- HTTP handler -------------------------------------------------------
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return json({}, { status: 204 });
 
   const u = new URL(req.url);
-  if (u.pathname.endsWith("/health")) {
-    return json({ ok: true, time: new Date().toISOString() });
-  }
-  if (!u.pathname.endsWith("/generate")) {
-    return bad("Not Found", 404);
-  }
+  if (!u.pathname.endsWith("/generate")) return bad("Not Found", 404);
 
   let body: any;
-  try {
-    body = await req.json();
-  } catch {
-    return bad("Invalid JSON body");
-  }
+  try { body = await req.json(); } catch { return bad("Invalid JSON body"); }
 
-  const universeId: string | undefined =
-    body.universeId ?? body.universeID ?? body.id;
-  const gradeInt: number | undefined =
-    body.gradeInt ?? body.grade ?? body.grade_id;
+  const universeId: string | undefined = body.universeId ?? body.universeID ?? body.id;
+  const gradeInt: number | undefined = body.gradeInt ?? body.grade ?? body.grade_id;
   const title: string = body.title ?? "Daily Program";
+  const prompt: string = body.prompt ?? `${title} — classroom-friendly, minimal, bright, 16:9, clean graphic cover`;
 
-  if (!universeId || typeof gradeInt !== "number") {
-    return bad("Missing universeId or gradeInt");
-  }
+  const width: number = align32(body.width ?? 1200);
+  const height: number = align32(body.height ?? 630);
+  if (!universeId || typeof gradeInt !== "number") return bad("Missing universeId or gradeInt");
 
-  // Prompt + dimensioner (snap til multipla af 32 + clamp til fornuftigt spænd)
-  const prompt: string =
-    body.prompt ??
-    `${title} — classroom-friendly, minimal, bright, 16:9, clean graphic cover`;
-
-  const wIn = Number(body.width ?? 1216);
-  const hIn = Number(body.height ?? 640);
-  const width = clamp(snap32(wIn), 256, 1440);
-  const height = clamp(snap32(hIn), 256, 1440);
-
-  // Samme filnavn hver gang (stabil URL). Default til webp.
-  const ext = BFL_OUTPUT === "jpeg" ? "jpg" : "webp";
+  // File naming (defaults to .webp unless BFL_OUTPUT === 'jpeg')
+  let ext = BFL_OUTPUT === "jpeg" ? "jpg" : "webp";
+  let mime = ext === "jpg" ? "image/jpeg" : "image/webp";
   const name = `${slug(title)}.${ext}`;
   const path = `${universeId}/${gradeInt}/${name}`;
-  const mime = ext === "jpg" ? "image/jpeg" : "image/webp";
 
   try {
     // 1) Start + poll BFL
     const start = await bflStart(prompt, width, height);
-    const pollingUrl = (start?.polling_url as string | undefined) ?? "";
-    if (!pollingUrl) {
-      // Ingen job oprettet – returnér stabil public URL (peger på placeholder indtil upload)
-      return json({
-        ok: false,
-        note: "No polling_url from BFL",
-        path,
-        publicUrl: publicUrlFor(path),
-        width,
-        height,
-      });
+    const pollingUrl = start?.polling_url as string | undefined;
+
+    // Some BFL plans return the image immediately instead of a polling URL.
+    let finalRef: string | undefined = pollingUrl;
+    if (!finalRef) {
+      // try to find an immediate url or data url on the start response
+      const scan = (v: any): string | undefined => {
+        if (!v) return;
+        if (typeof v === "string" && /^(https?:\/\/|data:image\/)/i.test(v)) return v;
+        if (Array.isArray(v)) for (const x of v) { const r = scan(x); if (r) return r; }
+        if (typeof v === "object") for (const x of Object.values(v)) { const r = scan(x); if (r) return r; }
+      };
+      finalRef = scan(start);
+    }
+    if (!finalRef) return json({ fallback: true, note: "No polling_url or image ref from BFL", path });
+
+    let bytes: Uint8Array;
+    if (/^data:image\//i.test(finalRef)) {
+      const dec = dataUrlToBytes(finalRef);
+      bytes = dec.bytes;
+      // honor the MIME we actually got
+      if (dec.mime === "image/jpeg") { ext = "jpg"; mime = "image/jpeg"; }
+      if (dec.mime === "image/webp") { ext = "webp"; mime = "image/webp"; }
+    } else {
+      bytes = await fetchBytes(finalRef);
     }
 
-    const finalUrl = await bflPoll(pollingUrl);
+    // If extension changed due to MIME, adjust path & name
+    const finalName = `${slug(title)}.${ext}`;
+    const finalPath = `${universeId}/${gradeInt}/${finalName}`;
 
-    // 2) Hent bytes og upload til Storage (samme path → samme public URL)
-    const bytes = await fetchBytes(finalUrl);
-    const publicUrl = await uploadToStorage(bytes, path, mime);
-
-    return json({
-      ok: true,
-      source: "bfl",
-      path,
-      publicUrl,
-      width,
-      height,
-    });
+    // 2) Upload to Storage
+    const publicUrl = await uploadToStorage(bytes, finalPath, mime);
+    return json({ ok: true, publicUrl, path: finalPath });
   } catch (e) {
-    // Bevar stabil URL (peger på eksisterende placeholder hvis generering fejler).
-    return json({
-      ok: false,
-      error: String(e?.message || e),
-      path,
-      publicUrl: publicUrlFor(path),
-      width,
-      height,
-    });
+    return json({ ok: false, error: String(e?.message || e), path }, { status: 500 });
   }
 });
