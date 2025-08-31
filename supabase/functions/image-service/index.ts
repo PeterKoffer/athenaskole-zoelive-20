@@ -26,6 +26,7 @@ function slug(s: string) {
     .replace(/^-+|-+$/g, "") || "cover";
 }
 const align32 = (n: number) => Math.max(256, Math.min(2048, Math.round(n / 32) * 32));
+const cleanPath = (s: string) => (s ?? "").replace(/[^\w\-./]/g, "");
 
 // -------- BFL helpers --------------------------------------------------------
 
@@ -91,10 +92,12 @@ function dataUrlToBytes(dataUrl: string) {
   return { mime, bytes };
 }
 
-async function fetchBytes(url: string): Promise<Uint8Array> {
+async function fetchBytes(url: string): Promise<{ bytes: Uint8Array; mime?: string }> {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`Fetch image failed: ${r.status}`);
-  return new Uint8Array(await r.arrayBuffer());
+  const mime = r.headers.get("content-type") || undefined;
+  const bytes = new Uint8Array(await r.arrayBuffer());
+  return { bytes, mime };
 }
 
 // -------- Storage upload -----------------------------------------------------
@@ -128,7 +131,8 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch { return bad("Invalid JSON body"); }
 
-  const universeId: string | undefined = body.universeId ?? body.universeID ?? body.id;
+  const universeIdRaw: string | undefined = body.universeId ?? body.universeID ?? body.id;
+  const universeId = cleanPath(universeIdRaw || "");
   const gradeInt: number | undefined = body.gradeInt ?? body.grade ?? body.grade_id;
   const title: string = body.title ?? "Daily Program";
   const prompt: string = body.prompt ?? `${title} — classroom-friendly, minimal, bright, 16:9, clean graphic cover`;
@@ -144,14 +148,15 @@ Deno.serve(async (req) => {
   const path = `${universeId}/${gradeInt}/${name}`;
 
   try {
-    // 1) Start + poll BFL
+    // 1) Start BFL job
     const start = await bflStart(prompt, width, height);
-    const pollingUrl = start?.polling_url as string | undefined;
+    const pollingUrl = (start?.polling_url as string | undefined) || undefined;
 
-    // Some BFL plans return the image immediately instead of a polling URL.
-    let finalRef: string | undefined = pollingUrl;
-    if (!finalRef) {
-      // try to find an immediate url or data url on the start response
+    // 2) Resolve final image ref (poll if needed; else scan immediate payload)
+    let finalRef: string | undefined;
+    if (pollingUrl) {
+      finalRef = await bflPoll(pollingUrl);
+    } else {
       const scan = (v: any): string | undefined => {
         if (!v) return;
         if (typeof v === "string" && /^(https?:\/\/|data:image\/)/i.test(v)) return v;
@@ -162,24 +167,28 @@ Deno.serve(async (req) => {
     }
     if (!finalRef) return json({ fallback: true, note: "No polling_url or image ref from BFL", path });
 
+    // 3) Obtain bytes and honor actual MIME
     let bytes: Uint8Array;
     if (/^data:image\//i.test(finalRef)) {
       const dec = dataUrlToBytes(finalRef);
       bytes = dec.bytes;
-      // honor the MIME we actually got
       if (dec.mime === "image/jpeg") { ext = "jpg"; mime = "image/jpeg"; }
-      if (dec.mime === "image/webp") { ext = "webp"; mime = "image/webp"; }
+      if (dec.mime === "image/webp")  { ext = "webp"; mime = "image/webp"; }
     } else {
-      bytes = await fetchBytes(finalRef);
+      const fetched = await fetchBytes(finalRef);
+      bytes = fetched.bytes;
+      const ct = (fetched.mime || "").toLowerCase();
+      if (ct.includes("jpeg")) { ext = "jpg"; mime = "image/jpeg"; }
+      if (ct.includes("webp")) { ext = "webp"; mime = "image/webp"; }
     }
 
     // If extension changed due to MIME, adjust path & name
     const finalName = `${slug(title)}.${ext}`;
     const finalPath = `${universeId}/${gradeInt}/${finalName}`;
 
-    // 2) Upload to Storage
+    // 4) Upload to Storage (public bucket) and return the URL
     const publicUrl = await uploadToStorage(bytes, finalPath, mime);
-    return json({ ok: true, publicUrl, path: finalPath });
+    return json({ ok: true, publicUrl, path: finalPath, width, height, model: IMAGE_MODEL });
   } catch (e) {
     return json({ ok: false, error: String(e?.message || e), path }, { status: 500 });
   }
