@@ -1,3 +1,4 @@
+cat > supabase/functions/image-service/index.ts <<'TS'
 // supabase/functions/image-service/index.ts
 import { bad, ok, handleOptions } from "../_shared/http.ts";
 import { bflGenerateImage } from "../_shared/imageProviders.ts";
@@ -8,37 +9,30 @@ function slug(s: string) {
 }
 
 Deno.serve(async (req) => {
-  // CORS / preflight
   const pre = handleOptions(req);
   if (pre) return pre;
-
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
   let body: any;
-  try {
-    body = await req.json();
-  } catch {
-    return bad("Invalid JSON body");
-  }
+  try { body = await req.json(); } catch { return bad("Invalid JSON body"); }
 
   const prompt = String(body.prompt ?? body.title ?? "Untitled");
   const width = Number(body.width ?? 1024);
   const height = Number(body.height ?? 576);
   const universeId = String(body.universeId ?? "fallback");
 
-  // --- BFL config from env ---
+  // ---- ENV ----
   const bflKey = Deno.env.get("BFL_API_KEY");
   if (!bflKey) return bad("Missing BFL_API_KEY", 500);
 
-  // --- Supabase (for upload) ---
   const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
   const serviceRole = Deno.env.get("SERVICE_ROLE_KEY");
   if (!serviceRole) return bad("Missing SERVICE_ROLE_KEY", 500);
 
-  // NOTE: during local `serve` SUPABASE_URL env is ignored; use localhost as a fallback.
+  // Local dev fallback for URL
   const SUPABASE_URL =
     Deno.env.get("SUPABASE_URL") ??
-    Deno.env.get("URL") ?? // some setups expose URL
+    Deno.env.get("URL") ??
     "http://127.0.0.1:54321";
 
   const supabase = createClient(SUPABASE_URL, serviceRole, {
@@ -46,10 +40,10 @@ Deno.serve(async (req) => {
   });
 
   try {
-    // 1) Generate image via BFL
+    // 1) Generate with BFL
     const { url: bflUrl } = await bflGenerateImage({ prompt, width, height, apiKey: bflKey });
 
-    // 2) Download the image
+    // 2) Download image bytes
     const res = await fetch(bflUrl);
     if (!res.ok) return bad(`Failed to download BFL image (${res.status})`, 502);
     const contentType = res.headers.get("content-type") ?? "image/jpeg";
@@ -68,14 +62,13 @@ Deno.serve(async (req) => {
 
     return ok({
       impl: "bfl-upload-v1",
-      width,
-      height,
-      bflUrl,            // original BFL URL (useful for debugging)
-      bucket,
-      path,
+      width, height,
+      bflUrl,           // original (debug)
+      bucket, path,
       publicUrl: pub.data.publicUrl,
     });
   } catch (e) {
     return bad(e instanceof Error ? e.message : String(e), 502);
   }
 });
+TS
