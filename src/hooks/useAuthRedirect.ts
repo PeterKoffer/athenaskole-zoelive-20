@@ -25,8 +25,8 @@ export const useAuthRedirect = () => {
 
     const target = targets[userRole ?? "unknown"] ?? "/daily-program";
 
-    // Kun auto-redirect fra forsiden, auth, eller legacy /profile
-    if (pathname === "/" || pathname === "/auth" || pathname === "/profile") {
+    // Kun auto-redirect fra auth eller legacy /profile (ikke forsiden)
+    if (pathname === "/auth" || pathname === "/profile") {
       navigate(target, { replace: true });
     }
   }, [loading, user, userRole, navigate, pathname]);
