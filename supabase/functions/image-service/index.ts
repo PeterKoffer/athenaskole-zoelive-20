@@ -1,67 +1,63 @@
-// deno run --allow-net --allow-env
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+// Use ONE of the following imports. Prefer jsr; if it fails in your CI, switch to esm.sh.
+// import { createClient } from "jsr:@supabase/supabase-js@2.45.4";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?target=deno";
 
-type Payload = {
-  universeId: string;
-  gradeInt: number;
-  title: string;
-  width: number;
-  height: number;
-};
+/**
+ * This function returns a data: URL (SVG) so the client always has a cover image.
+ * It does NOT require Supabase secrets to work, but we initialize the client if available.
+ */
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const supabase = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
+  : null;
 
-// TODO: Plug din nuværende generator ind her og returnér { url: string }
-async function generateRawImage(_p: Payload): Promise<{ url: string }> {
-  // Du har allerede en generator der giver en data: URL — kald den her.
-  // Midlertidigt stub for at illustrere strukturen:
-  return { url: "data:image/jpeg;base64,/9j/4AAQSkZJRgABA..." };
-}
+serve(async (req) => {
+  try {
+    if (req.method === "OPTIONS") return cors(204);
+    if (req.method !== "POST") return cors(405, "Method Not Allowed");
+
+    const body = (await req.json().catch(() => ({}))) ?? {};
+    const title = (body.title ?? "Today’s Program") as string;
+    const width = Number(body.width ?? 1216);
+    const height = Number(body.height ?? 640);
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fb923c"/>
+          <stop offset="1" stop-color="#f97316"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+            font-size="${Math.round(Math.min(width, height) / 9)}"
+            font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+            fill="#111827" font-weight="800">${title}</text>
+    </svg>`;
+
+    const url = `data:image/svg+xml;base64,${btoa(svg)}`;
+    return json({ url });
+  } catch (err) {
+    return json({ error: String(err?.message ?? err) }, 500);
+  }
+});
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-      "Access-Control-Allow-Methods": "POST,OPTIONS",
-    },
+    headers: corsHeaders("application/json"),
   });
 }
-
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return json({});
-  try {
-    const payload = (await req.json()) as Payload;
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")! // service role for upload
-    );
-
-    // 1) Generér billedet (kan returnere data: eller http:)
-    const { url: rawUrl } = await generateRawImage(payload);
-
-    // 2) Hvis http(s), returnér direkte. Ellers upload til Storage.
-    let publicUrl = rawUrl;
-    if (rawUrl.startsWith("data:")) {
-      const [meta, b64] = rawUrl.split(",");
-      const mime = /data:(.*);base64/.exec(meta)?.[1] ?? "image/jpeg";
-      const ext = mime.split("/")[1] || "jpg";
-      const path = `covers/${crypto.randomUUID()}.${ext}`;
-
-      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-      const { error: upErr } = await supabase.storage.from("images").upload(path, bytes, {
-        contentType: mime,
-        upsert: false,
-      });
-      if (upErr) return json({ error: upErr.message }, 500);
-
-      const { data } = supabase.storage.from("images").getPublicUrl(path);
-      publicUrl = data.publicUrl;
-    }
-
-    return json({ url: publicUrl }, 200);
-  } catch (e) {
-    return json({ error: (e as Error).message ?? "unknown error" }, 500);
-  }
-});
+function cors(status = 204, text = "ok") {
+  return new Response(text, { status, headers: corsHeaders() });
+}
+function corsHeaders(contentType?: string) {
+  return {
+    ...(contentType ? { "Content-Type": contentType } : {}),
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST,OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
