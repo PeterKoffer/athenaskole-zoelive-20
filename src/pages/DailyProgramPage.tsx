@@ -1,11 +1,11 @@
 // src/pages/DailyProgramPage.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { generateCover } from "@/lib/functions";
 
-/** ---- STUB DATASOURCES (replace with real data binding when ready) ---- */
 type UniverseLike = { id?: string; universeId?: string; title?: string; subject?: string };
 
+// ---- STUB DATASOURCES (replace once your real data is wired) ----
 function useTodaysUniverse(): UniverseLike | null {
   // @ts-ignore
   return window.__TODAYS_UNIVERSE__ || null;
@@ -24,7 +24,7 @@ function getId(u?: UniverseLike | null): string | null {
   return (u.id || u.universeId || null) as string | null;
 }
 
-/** Try new route first; if it fails (404/old project), fall back to legacy `image-ensure`. */
+// ---- Call new function first, then legacy fallback ----
 async function getCoverUrlWithFallback(args: {
   universeId: string;
   gradeInt: number;
@@ -43,7 +43,7 @@ async function getCoverUrlWithFallback(args: {
     });
     if (!url) throw new Error("No url from image-service/generate");
     return url;
-  } catch {
+  } catch (e) {
     const { data, error } = await supabase.functions.invoke("image-ensure", { body: args });
     if (error) throw new Error(error.message ?? String(error));
     const publicUrl = (data as any)?.publicUrl as string | undefined;
@@ -52,7 +52,6 @@ async function getCoverUrlWithFallback(args: {
   }
 }
 
-/** Hook that resolves a stable cover image URL from Edge Functions and probes load result. */
 function useCoverUrl(args: {
   universeId: string;
   gradeInt: number;
@@ -74,10 +73,8 @@ function useCoverUrl(args: {
       .then((u) => {
         if (!alive) return;
         setUrl(u);
-        // dev visibility
         try {
-          const sample = u.slice(0, 80) + (u.length > 80 ? "…" : "");
-          console.log("[DailyProgram] cover url:", sample);
+          console.log("[DailyProgram] cover url:", u.slice(0, 120) + (u.length > 120 ? "…" : ""));
         } catch {}
       })
       .catch((e) => {
@@ -102,11 +99,9 @@ export default function DailyProgramPage() {
   const suggestions = useSuggestions();
   const gradeInt = useStudentGradeInt();
 
-  // Stable IDs/titles even if stubs are missing
   const todaysId = getId(todaysUniverse) ?? "universe-fallback";
   const todaysTitle = (todaysUniverse?.title ?? "Today’s Program").trim();
 
-  // De-duplicate suggestions and exclude today's universe
   const uniqueSuggestions = useMemo(() => {
     const seen = new Set<string>();
     return (suggestions ?? []).filter((u) => {
@@ -119,7 +114,6 @@ export default function DailyProgramPage() {
 
   const catalogPick = uniqueSuggestions[0] ?? null;
 
-  // Resolve cover image URL (new function first, legacy fallback)
   const { url, loading, err } = useCoverUrl({
     universeId: todaysId,
     gradeInt,
@@ -129,9 +123,31 @@ export default function DailyProgramPage() {
     minBytes: 2048,
   });
 
-  // --- tiny helpers for debug badge
   const scheme = url?.split(":")[0] ?? "";
   const urlLen = url?.length ?? 0;
+
+  // ---- Debug probe: fetch -> blob -> object URL (helps bypass data: CSP) ----
+  const [probeBusy, setProbeBusy] = useState(false);
+  const [probeUrl, setProbeUrl] = useState<string | null>(null);
+  const [probeErr, setProbeErr] = useState<string | null>(null);
+
+  const runProbe = useCallback(async () => {
+    if (!url) return;
+    setProbeBusy(true);
+    setProbeErr(null);
+    setProbeUrl(null);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`fetch ${res.status}: ${res.statusText}`);
+      const blob = await res.blob();
+      const obj = URL.createObjectURL(blob);
+      setProbeUrl(obj);
+    } catch (e: any) {
+      setProbeErr(e?.message ?? String(e));
+    } finally {
+      setProbeBusy(false);
+    }
+  }, [url]);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
@@ -143,7 +159,7 @@ export default function DailyProgramPage() {
         </p>
       </header>
 
-      {/* --- Today - large cover image --- */}
+      {/* ---- Hero with reserved space ---- */}
       <section aria-labelledby="today-cover" className="mb-6">
         <h2 id="today-cover" className="sr-only">Today’s cover</h2>
 
@@ -151,12 +167,8 @@ export default function DailyProgramPage() {
           {/* Reserve space so layout never collapses */}
           <div className="w-full aspect-[1216/640]" />
 
-          {/* Loading skeleton overlays the reserved space */}
-          {loading && (
-            <div className="absolute inset-0 animate-pulse bg-slate-700/40" />
-          )}
+          {loading && <div className="absolute inset-0 animate-pulse bg-slate-700/40" />}
 
-          {/* Error (dev-friendly) */}
           {!loading && err && (
             <div className="absolute inset-0 p-4 text-sm text-red-300 bg-slate-900/60">
               <div className="font-semibold">Image error</div>
@@ -167,7 +179,6 @@ export default function DailyProgramPage() {
             </div>
           )}
 
-          {/* Actual image */}
           {!loading && url && (
             <>
               <img
@@ -176,12 +187,8 @@ export default function DailyProgramPage() {
                 className="absolute inset-0 h-full w-full object-cover"
                 loading="eager"
                 decoding="async"
-                onError={() => {
-                  // Surface CSP / network block as a visible message
-                  console.warn("[DailyProgram] <img> failed to load cover image.");
-                }}
+                onError={() => console.warn("[DailyProgram] <img> failed to load cover image.")}
               />
-              {/* Debug badge so we always know what we got back */}
               <div className="absolute right-2 bottom-2 rounded-md bg-black/60 px-2 py-1 text-[10px] text-white/80">
                 {scheme || "no-scheme"} • {urlLen} chars
               </div>
@@ -190,7 +197,41 @@ export default function DailyProgramPage() {
         </div>
       </section>
 
-      {/* --- Catalog suggestion (compact, no image) --- */}
+      {/* ---- DEBUG PANEL (temporary; keep until we see the image) ---- */}
+      <section className="mb-6 rounded-lg border border-yellow-400/30 bg-yellow-500/10 p-3 text-xs text-yellow-200">
+        <div className="font-semibold mb-1">Debug</div>
+        <div className="grid gap-1">
+          <div>loading: <code>{String(loading)}</code></div>
+          <div>error: <code>{err ?? "none"}</code></div>
+          <div>url (scheme/len): <code>{scheme || "n/a"}</code> / <code>{urlLen}</code></div>
+          <div className="truncate">url preview: <code>{url ? url.slice(0, 160) + (url.length > 160 ? "…" : "") : "n/a"}</code></div>
+          <div className="flex gap-2 mt-1">
+            <button
+              className="rounded bg-white/10 px-2 py-1 hover:bg-white/20 disabled:opacity-50"
+              disabled={!url}
+              onClick={() => url && window.open(url, "_blank")}
+            >
+              Open URL in new tab
+            </button>
+            <button
+              className="rounded bg-white/10 px-2 py-1 hover:bg-white/20 disabled:opacity-50"
+              disabled={!url || probeBusy}
+              onClick={runProbe}
+            >
+              {probeBusy ? "Probing…" : "Probe via fetch→blob"}
+            </button>
+          </div>
+          {probeErr && <div className="text-red-300 mt-1">probe error: {probeErr}</div>}
+          {probeUrl && (
+            <div className="mt-2">
+              <div className="mb-1 opacity-80">blob preview (object URL):</div>
+              <img src={probeUrl} alt="probe" className="max-h-48 w-auto rounded border border-white/10" />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ---- Compact suggestion card ---- */}
       {catalogPick ? (
         <section className="mt-4" aria-labelledby="catalog-pick">
           <p className="mb-2 text-xs text-blue-300">
@@ -225,26 +266,6 @@ export default function DailyProgramPage() {
           </div>
         </section>
       ) : null}
-
-      {/* --- Feature section --- */}
-      <section className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl p-4 bg-gradient-to-br from-rose-500/20 to-orange-500/20 border border-white/10">
-          <h4 className="font-semibold text-white">Personalized Content</h4>
-          <p className="text-sm text-gray-300">AI-crafted lessons that adapt to your progress and interests</p>
-        </div>
-        <div className="rounded-xl p-4 bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-white/10">
-          <h4 className="font-semibold text-white">Interactive Universe</h4>
-          <p className="text-sm text-gray-300">Explore characters, locations, and activities in your learning world</p>
-        </div>
-        <div className="rounded-xl p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-white/10">
-          <h4 className="font-semibold text-white">Dynamic Learning</h4>
-          <p className="text-sm text-gray-300">Content that evolves based on your performance and engagement</p>
-        </div>
-        <div className="rounded-xl p-4 bg-gradient-to-br from-fuchsia-500/20 to-pink-500/20 border border-white/10">
-          <h4 className="font-semibold text-white">Gamified Experience</h4>
-          <p className="text-sm text-gray-300">Learn through engaging activities and achievement systems</p>
-        </div>
-      </section>
     </main>
   );
 }
