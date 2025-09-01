@@ -1,10 +1,9 @@
 // src/pages/DailyProgramPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { generateCover } from "@/lib/functions";
 
-/**
- * STUBS: Skift til dine rigtige datakilder, når du binder rigtigt data på.
- */
+/** ---- STUB DATASOURCES (replace with real data binding when ready) ---- */
 type UniverseLike = { id?: string; universeId?: string; title?: string; subject?: string };
 
 function useTodaysUniverse(): UniverseLike | null {
@@ -25,7 +24,36 @@ function getId(u?: UniverseLike | null): string | null {
   return (u.id || u.universeId || null) as string | null;
 }
 
-/** Henter en stabil public URL fra edge-funktionen "image-ensure". */
+/** Try new route first; if it fails (404/old project), fall back to legacy `image-ensure`. */
+async function getCoverUrlFallback(args: {
+  universeId: string;
+  gradeInt: number;
+  title: string;
+  width?: number;
+  height?: number;
+  minBytes?: number;
+}): Promise<string> {
+  try {
+    const url = await generateCover({
+      universeId: args.universeId,
+      gradeInt: args.gradeInt,
+      title: args.title,
+      width: args.width ?? 1216,
+      height: args.height ?? 640,
+    });
+    if (!url) throw new Error("No url from image-service/generate");
+    return url;
+  } catch (e: any) {
+    // Fallback to legacy Edge Function name
+    const { data, error } = await supabase.functions.invoke("image-ensure", { body: args });
+    if (error) throw new Error(error.message ?? String(error));
+    const publicUrl = (data as any)?.publicUrl as string | undefined;
+    if (!publicUrl) throw new Error("No publicUrl returned from image-ensure");
+    return publicUrl;
+  }
+}
+
+/** Hook that resolves a stable cover image URL from Edge Functions. */
 function useCoverUrl(args: {
   universeId: string;
   gradeInt: number;
@@ -43,30 +71,22 @@ function useCoverUrl(args: {
     setLoading(true);
     setErr(null);
 
-    supabase
-      .functions
-      .invoke("image-ensure", { body: args })
-      .then(({ data, error }) => {
+    getCoverUrlFallback(args)
+      .then((u) => {
         if (!alive) return;
-        if (error) {
-          setErr(error.message ?? String(error));
-          setUrl(null);
-          return;
-        }
-        const publicUrl = (data as any)?.publicUrl as string | undefined;
-        if (!publicUrl) {
-          setErr("No publicUrl returned from image-ensure");
-          setUrl(null);
-          return;
-        }
-        setUrl(publicUrl);
+        setUrl(u);
+        // Dev visibility
+        // eslint-disable-next-line no-console
+        console.log("[DailyProgram] cover url:", u.slice(0, 80) + (u.length > 80 ? "…" : ""));
       })
       .catch((e) => {
         if (!alive) return;
         setErr(e?.message ?? String(e));
         setUrl(null);
       })
-      .finally(() => alive && setLoading(false));
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
 
     return () => {
       alive = false;
@@ -81,18 +101,16 @@ export default function DailyProgramPage() {
   const suggestions = useSuggestions();
   const gradeInt = useStudentGradeInt();
 
-  // Sørg for en stabil ID, også hvis stub mangler:
+  // Stable IDs/titles even if stubs are missing
   const todaysId = getId(todaysUniverse) ?? "universe-fallback";
-  const todaysTitle = (todaysUniverse?.title ?? "Todays Program").trim();
+  const todaysTitle = (todaysUniverse?.title ?? "Today’s Program").trim();
 
-  // Deduplikér kataloget og ekskludér dagens universe
+  // De-duplicate suggestions and exclude today's universe
   const uniqueSuggestions = useMemo(() => {
     const seen = new Set<string>();
     return (suggestions ?? []).filter((u) => {
       const id = getId(u);
-      if (!id) return false;
-      if (id === todaysId) return false;
-      if (seen.has(id)) return false;
+      if (!id || id === todaysId || seen.has(id)) return false;
       seen.add(id);
       return true;
     });
@@ -100,7 +118,7 @@ export default function DailyProgramPage() {
 
   const catalogPick = uniqueSuggestions[0] ?? null;
 
-  // Hent cover-URL direkte fra edge-funktionen
+  // Resolve cover image URL (new function first, legacy fallback)
   const { url, loading, err } = useCoverUrl({
     universeId: todaysId,
     gradeInt,
@@ -120,17 +138,15 @@ export default function DailyProgramPage() {
         </p>
       </header>
 
-      {/* --- Dagens universe: ét stort billede --- */}
+      {/* --- Today - large cover image --- */}
       <section aria-labelledby="today-cover" className="mb-6">
         <h2 id="today-cover" className="sr-only">Today’s cover</h2>
 
         <div className="rounded-xl overflow-hidden bg-slate-800/40 border border-white/10">
-          {/* Skeleton mens vi loader */}
-          {loading && (
-            <div className="w-full aspect-[1200/630] animate-pulse bg-slate-700/40" />
-          )}
+          {/* Skeleton while loading */}
+          {loading && <div className="w-full aspect-[1216/640] animate-pulse bg-slate-700/40" />}
 
-          {/* Fejl/debug (kun i dev) */}
+          {/* Error (dev-friendly) */}
           {!loading && err && (
             <div className="p-4 text-sm text-red-300">
               <div className="font-semibold">Image error</div>
@@ -141,7 +157,7 @@ export default function DailyProgramPage() {
             </div>
           )}
 
-          {/* Selve billedet */}
+          {/* Image */}
           {!loading && url && (
             <img
               src={url}
@@ -154,7 +170,7 @@ export default function DailyProgramPage() {
         </div>
       </section>
 
-      {/* --- Katalog-forslag UDEN billede (kompakt card) --- */}
+      {/* --- Catalog suggestion (compact, no image) --- */}
       {catalogPick ? (
         <section className="mt-4" aria-labelledby="catalog-pick">
           <p className="mb-2 text-xs text-blue-300">
@@ -190,7 +206,7 @@ export default function DailyProgramPage() {
         </section>
       ) : null}
 
-      {/* --- Feature-sektion --- */}
+      {/* --- Feature section --- */}
       <section className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-xl p-4 bg-gradient-to-br from-rose-500/20 to-orange-500/20 border border-white/10">
           <h4 className="font-semibold text-white">Personalized Content</h4>
