@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { generateCover } from "@/lib/functions";
 
-/** ----- STUB DATASOURCES (skift til rigtige datakilder når du binder data) ----- */
+/** ---- STUB DATASOURCES (replace with real data binding when ready) ---- */
 type UniverseLike = { id?: string; universeId?: string; title?: string; subject?: string };
 
 function useTodaysUniverse(): UniverseLike | null {
@@ -24,8 +24,8 @@ function getId(u?: UniverseLike | null): string | null {
   return (u.id || u.universeId || null) as string | null;
 }
 
-/** Prøv ny route først; hvis den fejler (fx i ældre projekt), fald tilbage til legacy `image-ensure`. */
-async function getCoverUrlFallback(args: {
+/** Try new route first; if it fails (404/old project), fall back to legacy `image-ensure`. */
+async function getCoverUrlWithFallback(args: {
   universeId: string;
   gradeInt: number;
   title: string;
@@ -43,17 +43,16 @@ async function getCoverUrlFallback(args: {
     });
     if (!url) throw new Error("No url from image-service/generate");
     return url;
-  } catch (_e) {
-    // Fallback til legacy Edge Function
+  } catch {
     const { data, error } = await supabase.functions.invoke("image-ensure", { body: args });
     if (error) throw new Error(error.message ?? String(error));
     const publicUrl = (data as any)?.publicUrl as string | undefined;
-    if (!publicUrl) throw new Error("No publicUrl returned from image-ensure");
+    if (!publicUrl) throw new Error("No publicUrl from image-ensure");
     return publicUrl;
   }
 }
 
-/** Hook der henter en stabil cover-URL fra Edge Functions. */
+/** Hook that resolves a stable cover image URL from Edge Functions and probes load result. */
 function useCoverUrl(args: {
   universeId: string;
   gradeInt: number;
@@ -71,15 +70,14 @@ function useCoverUrl(args: {
     setLoading(true);
     setErr(null);
 
-    getCoverUrlFallback(args)
+    getCoverUrlWithFallback(args)
       .then((u) => {
         if (!alive) return;
         setUrl(u);
-        // Dev-log for at kunne se at URL'en kommer retur
+        // dev visibility
         try {
-          const short = u.length > 80 ? `${u.slice(0, 80)}…` : u;
-          // eslint-disable-next-line no-console
-          console.log("[DailyProgram] cover url:", short);
+          const sample = u.slice(0, 80) + (u.length > 80 ? "…" : "");
+          console.log("[DailyProgram] cover url:", sample);
         } catch {}
       })
       .catch((e) => {
@@ -87,31 +85,28 @@ function useCoverUrl(args: {
         setErr(e?.message ?? String(e));
         setUrl(null);
       })
-      .finally(() => alive && setLoading(false));
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
 
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [args.universeId, args.gradeInt, args.title, args.width, args.height, args.minBytes]);
 
   return { url, loading, err };
 }
 
 export default function DailyProgramPage() {
-  // Hjælp til at bekræfte at det ER denne fil der renderer
-  // eslint-disable-next-line no-console
-  console.log("[DailyProgramPage] from", import.meta.url);
-
   const todaysUniverse = useTodaysUniverse();
   const suggestions = useSuggestions();
   const gradeInt = useStudentGradeInt();
 
-  // Stabil ID/title selv hvis stub mangler
+  // Stable IDs/titles even if stubs are missing
   const todaysId = getId(todaysUniverse) ?? "universe-fallback";
   const todaysTitle = (todaysUniverse?.title ?? "Today’s Program").trim();
 
-  // Dedupliker forslag og ekskludér dagens universe
+  // De-duplicate suggestions and exclude today's universe
   const uniqueSuggestions = useMemo(() => {
     const seen = new Set<string>();
     return (suggestions ?? []).filter((u) => {
@@ -124,7 +119,7 @@ export default function DailyProgramPage() {
 
   const catalogPick = uniqueSuggestions[0] ?? null;
 
-  // Hent cover-URL (ny funktion først, legacy fallback)
+  // Resolve cover image URL (new function first, legacy fallback)
   const { url, loading, err } = useCoverUrl({
     universeId: todaysId,
     gradeInt,
@@ -133,6 +128,10 @@ export default function DailyProgramPage() {
     height: 640,
     minBytes: 2048,
   });
+
+  // --- tiny helpers for debug badge
+  const scheme = url?.split(":")[0] ?? "";
+  const urlLen = url?.length ?? 0;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
@@ -144,20 +143,22 @@ export default function DailyProgramPage() {
         </p>
       </header>
 
-      {/* --- Today - large cover image (robust layout) --- */}
+      {/* --- Today - large cover image --- */}
       <section aria-labelledby="today-cover" className="mb-6">
         <h2 id="today-cover" className="sr-only">Today’s cover</h2>
 
         <div className="relative w-full overflow-hidden rounded-xl bg-slate-800/40 border border-white/10">
-          {/* Spacer reserverer højde (1216x640) så layout ikke kollapser */}
-          <div className="w-full" style={{ aspectRatio: "1216 / 640" }} />
+          {/* Reserve space so layout never collapses */}
+          <div className="w-full aspect-[1216/640]" />
 
-          {/* Loading-skelet ovenpå spacer */}
-          {loading && <div className="absolute inset-0 animate-pulse bg-slate-700/40" />}
+          {/* Loading skeleton overlays the reserved space */}
+          {loading && (
+            <div className="absolute inset-0 animate-pulse bg-slate-700/40" />
+          )}
 
-          {/* Fejl-overlay */}
+          {/* Error (dev-friendly) */}
           {!loading && err && (
-            <div className="absolute inset-0 p-4 text-sm text-red-300 bg-slate-900/40 backdrop-blur">
+            <div className="absolute inset-0 p-4 text-sm text-red-300 bg-slate-900/60">
               <div className="font-semibold">Image error</div>
               <div className="opacity-80">{err}</div>
               <div className="mt-2 text-xs text-white/60">
@@ -166,7 +167,7 @@ export default function DailyProgramPage() {
             </div>
           )}
 
-          {/* Selve billedet – dækker hele fladen */}
+          {/* Actual image */}
           {!loading && url && (
             <>
               <img
@@ -175,22 +176,21 @@ export default function DailyProgramPage() {
                 className="absolute inset-0 h-full w-full object-cover"
                 loading="eager"
                 decoding="async"
+                onError={() => {
+                  // Surface CSP / network block as a visible message
+                  console.warn("[DailyProgram] <img> failed to load cover image.");
+                }}
               />
-              {/* Dev-hjælp: åbn billedet i ny fane */}
-              <a
-                href={url}
-                target="_blank"
-                rel="noreferrer"
-                className="absolute bottom-2 right-2 text-[10px] px-2 py-1 rounded bg-black/50 text-white"
-              >
-                open image
-              </a>
+              {/* Debug badge so we always know what we got back */}
+              <div className="absolute right-2 bottom-2 rounded-md bg-black/60 px-2 py-1 text-[10px] text-white/80">
+                {scheme || "no-scheme"} • {urlLen} chars
+              </div>
             </>
           )}
         </div>
       </section>
 
-      {/* --- Catalog suggestion (kompakt, uden billede) --- */}
+      {/* --- Catalog suggestion (compact, no image) --- */}
       {catalogPick ? (
         <section className="mt-4" aria-labelledby="catalog-pick">
           <p className="mb-2 text-xs text-blue-300">
@@ -226,7 +226,7 @@ export default function DailyProgramPage() {
         </section>
       ) : null}
 
-      {/* --- Feature sektion --- */}
+      {/* --- Feature section --- */}
       <section className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-xl p-4 bg-gradient-to-br from-rose-500/20 to-orange-500/20 border border-white/10">
           <h4 className="font-semibold text-white">Personalized Content</h4>
