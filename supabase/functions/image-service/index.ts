@@ -27,12 +27,12 @@ Deno.serve(async (req) => {
   console.info("[image-service] submitting to:", submitUrl, "prompt:", prompt, "w/h:", width, height);
 
   try {
-    // 1) Submit job til BFL
+    // 1) Submit til BFL
     const submitRes = await fetch(submitUrl, {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-key": apiKey,            // VIGTIGT: BFL bruger x-key
+        "x-key": apiKey,            // BFL bruger x-key (ikke Authorization)
         "accept": "application/json",
       },
       body: JSON.stringify({ prompt, width, height }),
@@ -72,29 +72,30 @@ Deno.serve(async (req) => {
           return bad(`[endpoint=${submitUrl}] BFL poll: invalid result.sample URL`, 502);
         }
 
-        // 3) Forsøg at gemme i Supabase Storage (valgfrit, men anbefalet)
+        // 3) Upload til Supabase Storage (hvis env er sat)
         const bucket = env("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
         const projectUrl = env("SUPABASE_URL") ?? env("PROJECT_URL");
         const serviceRole = env("SUPABASE_SERVICE_ROLE_KEY") ?? env("SERVICE_ROLE_KEY");
 
-        let storagePublicUrl: string | undefined;
+        let storagePublicUrl: string | null = null;
         if (projectUrl && serviceRole && bucket) {
           try {
             // Hent bytes fra BFL
-            const imgRes = await fetch(bflUrl, { method: "GET" });
+            const imgRes = await fetch(bflUrl);
             if (!imgRes.ok) throw new Error(`download ${imgRes.status}`);
             const contentType = imgRes.headers.get("content-type") ?? "image/jpeg";
             const bytes = new Uint8Array(await imgRes.arrayBuffer());
 
-            // Generér stinavn
-            const date = new Date();
-            const y = date.getUTCFullYear();
-            const m = String(date.getUTCMonth() + 1).padStart(2, "0");
-            const d = String(date.getUTCDate()).padStart(2, "0");
-            const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
-            const objectPath = `bfl/${y}/${m}/${d}/${crypto.randomUUID()}.${ext}`;
+            // Navngivning
+            const d = new Date();
+            const y = d.getUTCFullYear();
+            const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+            const day = String(d.getUTCDate()).padStart(2, "0");
+            const ext = contentType.includes("png") ? "png"
+              : contentType.includes("webp") ? "webp" : "jpg";
+            const objectPath = `bfl/${y}/${m}/${day}/${crypto.randomUUID()}.${ext}`;
 
-            // Upload til Storage (raw bytes)
+            // Upload
             const uploadUrl = `${projectUrl.replace(/\/+$/, "")}/storage/v1/object/${encodeURIComponent(bucket)}/${objectPath}`;
             const upRes = await fetch(uploadUrl, {
               method: "POST",
@@ -111,13 +112,11 @@ Deno.serve(async (req) => {
               throw new Error(`storage upload ${upRes.status}: ${txt}`);
             }
 
-            // Byg public URL (kræver at bucket er public)
             const candidate = `${projectUrl.replace(/\/+$/, "")}/storage/v1/object/public/${encodeURIComponent(bucket)}/${objectPath}`;
-            // Valgfri verifikation:
             try {
               const head = await fetch(candidate, { method: "HEAD" });
               if (head.ok) storagePublicUrl = candidate;
-            } catch { /* ignorer HEAD fejl */ }
+            } catch { /* ignore */ }
           } catch (e) {
             console.warn("[image-service] storage upload failed:", e);
           }
@@ -126,8 +125,8 @@ Deno.serve(async (req) => {
         return ok({
           impl: "bfl-inline-v1",
           endpoint: submitUrl,
-          url: bflUrl,               // BFL’s midlertidige URL (fallback)
-          storageUrl: storagePublicUrl ?? null, // Din permanente URL (hvis upload lykkedes)
+          url: bflUrl,                 // midlertidig BFL-URL (fallback)
+          storageUrl: storagePublicUrl, // stabil URL hvis upload lykkes
           width, height,
         });
       }
@@ -135,7 +134,7 @@ Deno.serve(async (req) => {
       if (status === "Error" || status === "Failed") {
         return bad(`[endpoint=${submitUrl}] BFL job failed: ${JSON.stringify(pollJson)}`, 502);
       }
-      // ellers: Queued/Processing → fortsæt polling
+      // Queued/Processing → fortsæt
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
