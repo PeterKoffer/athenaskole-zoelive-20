@@ -1,31 +1,39 @@
-// supabase/functions/image-service/index.ts
 import { ok, bad, handleOptions } from "../_shared/http.ts";
+import { bflGenerateImage } from "../_shared/imageProviders.ts";
 
 Deno.serve(async (req) => {
-  // CORS preflight
-  const opt = handleOptions(req);
-  if (opt) return opt;
+  const opt = handleOptions(req); if (opt) return opt;
 
-  // Tillad KUN POST (GET skal give 405 – ikke 404)
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
-  // Provider-guards (tydelige fejl fremfor tavs 404)
+  // Guards
   const provider = (Deno.env.get("IMAGE_PROVIDER") || "bfl").toLowerCase();
   if (!["bfl", "replicate"].includes(provider)) return bad("Invalid IMAGE_PROVIDER");
-  if (provider === "bfl" && !Deno.env.get("BFL_API_KEY")) return bad("Missing BFL_API_KEY", 500);
 
-  // Parse body
+  const bflKey = Deno.env.get("BFL_API_KEY");
+  if (provider === "bfl" && !bflKey) return bad("Missing BFL_API_KEY", 500);
+
+  // Parse
   let body: any;
-  try {
-    body = await req.json();
-  } catch {
-    return bad("Invalid JSON body");
-  }
+  try { body = await req.json(); } catch { return bad("Invalid JSON body"); }
 
-  // TODO: kald BFL her. Midlertidigt returnerer vi bekræftelse.
-  return ok({
-    provider,
-    received: body,
-    status: "hello-from-image-service",
-  });
+  const prompt = String(body.title ?? body.prompt ?? "Untitled");
+  const width = Number(body.width ?? 1024);
+  const height = Number(body.height ?? 576);
+
+  try {
+    if (provider === "bfl") {
+      const { url } = await bflGenerateImage({
+        prompt, width, height, apiKey: bflKey!,
+      });
+
+      // Returnér bare URL (nemmeste vej til at få image i UI nu)
+      return ok({ provider, url });
+    }
+
+    // Replicate er slået fra i denne iteration
+    return bad("Replicate provider not enabled in this build", 501);
+  } catch (e) {
+    return bad(e instanceof Error ? e.message : String(e), 500);
+  }
 });
