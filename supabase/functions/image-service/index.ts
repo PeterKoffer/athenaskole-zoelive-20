@@ -2,14 +2,14 @@
 // Simple placeholder generator -> returns { url: "data:image/svg+xml;base64,..." }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return corsOkService();
-  if (req.method !== "POST") return corsErrService(405, "Method Not Allowed");
+  if (req.method === "OPTIONS") return corsOk();
+  if (req.method !== "POST") return corsErr(405, "Method Not Allowed");
 
   try {
     const body = await req.json().catch(() => ({} as any));
     const width  = Number(body?.width)  || 1216;
     const height = Number(body?.height) || 640;
-    const title  = (body?.title ?? "Today's Program").toString();
+    const title  = (body?.title ?? "Today’s Program").toString();
 
     const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
@@ -22,26 +22,26 @@ Deno.serve(async (req) => {
   <text x="50%" y="50%" text-anchor="middle"
         font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
         font-size="${Math.max(24, Math.floor(width/16))}" font-weight="700"
-        fill="#1f2937">${escapeXmlService(title)}</text>
+        fill="#1f2937">${escapeXml(title)}</text>
 </svg>`;
 
     const url = "data:image/svg+xml;base64," + btoa(svg);
-    return jsonService({ url });
+    return json({ url });
   } catch (e) {
-    return jsonService({ error: (e as Error).message ?? String(e) }, 500);
+    return json({ error: (e as Error).message ?? String(e) }, 500);
   }
 });
 
-function escapeXmlService(s: string) {
+function escapeXml(s: string) {
   return s.replace(/[<>&'"]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]!));
 }
 
-function corsOkService() { return new Response("", { status: 204, headers: corsHeadersService() }); }
-function corsErrService(status: number, msg: string) { return new Response(msg, { status, headers: corsHeadersService("text/plain") }); }
-function jsonService(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: corsHeadersService("application/json") });
+function corsOk() { return new Response("", { status: 204, headers: corsHeaders() }); }
+function corsErr(status: number, msg: string) { return new Response(msg, { status, headers: corsHeaders("text/plain") }); }
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: corsHeaders("application/json") });
 }
-function corsHeadersService(contentType?: string) {
+function corsHeaders(contentType?: string) {
   const h: Record<string,string> = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
