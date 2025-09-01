@@ -1,3 +1,5 @@
+mkdir -p supabase/functions/_shared
+cat > supabase/functions/_shared/imageProviders.ts <<'TS'
 // supabase/functions/_shared/imageProviders.ts
 
 export async function bflGenerateImageInline(args: {
@@ -22,9 +24,9 @@ export async function bflGenerateImageInline(args: {
       height: args.height ?? 576,
     };
     if (args.negativePrompt) body.negative_prompt = args.negativePrompt;
-    if (args.seed !== undefined) body.seed = args.seed;
-    if (args.cfgScale !== undefined) body.cfg_scale = args.cfgScale;
-    if (args.steps !== undefined) body.steps = args.steps;
+    if (typeof args.seed === "number") body.seed = args.seed;
+    if (typeof args.cfgScale === "number") body.cfg_scale = args.cfgScale;
+    if (typeof args.steps === "number") body.steps = args.steps;
 
     const res = await fetch(args.endpoint, {
       method: "POST",
@@ -42,7 +44,6 @@ export async function bflGenerateImageInline(args: {
     }
     const json = await res.json();
 
-    // Find en brugbar URL uanset respons-format
     const candidates: unknown[] = [
       json?.url,
       json?.image?.url,
@@ -61,3 +62,4 @@ export async function bflGenerateImageInline(args: {
     clearTimeout(timeout);
   }
 }
+TS
