@@ -1,10 +1,11 @@
-// src/lib/image.ts
-// Minimal, robust helper til Edge Functions
-// (virker i Vite/React-klienten)
+// src/lib/functions.ts
+// Small, robust helpers to call Supabase Edge Functions from the client (Vite/React).
 
 /// <reference types="vite/client" />
 
 type Json = Record<string, unknown> | unknown[] | string | number | boolean | null;
+
+// --- Utils -------------------------------------------------------------------
 
 function sanitize(u?: string) {
   return (u ?? "").trim().replace(/\/+$/, "");
@@ -19,7 +20,16 @@ if (!BASE || !ANON) {
   );
 }
 
-async function postFunction<T extends Json>(path: string, body: Json): Promise<T> {
+if (import.meta.env.DEV) {
+  try {
+    const host = new URL(BASE).host;
+    console.info("[Supabase Edge]", { host, anonLen: ANON.length });
+  } catch {
+    /* noop */
+  }
+}
+
+async function postFunction<T = any>(path: string, body?: Json): Promise<T> {
   const url = `${BASE}/functions/v1${path.startsWith("/") ? path : "/" + path}`;
 
   const res = await fetch(url, {
@@ -33,11 +43,10 @@ async function postFunction<T extends Json>(path: string, body: Json): Promise<T
   });
 
   if (!res.ok) {
-    // Prøv at udtrække en mere brugbar fejltekst
+    // Try to surface a useful error message from the function
     let detail = "";
     try {
-      const txt = await res.text();
-      detail = txt || res.statusText;
+      detail = (await res.text()) || res.statusText;
     } catch {
       detail = res.statusText;
     }
@@ -47,9 +56,9 @@ async function postFunction<T extends Json>(path: string, body: Json): Promise<T
   return (await res.json()) as T;
 }
 
-// ---------- Public API ----------
+// --- Public API ---------------------------------------------------------------
 
-export type GenerateCoverParams = Partial<{
+export type ImageParams = Partial<{
   universeId: string;
   gradeInt: number;
   title: string;
@@ -57,35 +66,39 @@ export type GenerateCoverParams = Partial<{
   height: number;
 }>;
 
-export interface GenerateCoverResponse {
-  url: string; // data: URL eller https-URL
+const DEFAULTS: Required<ImageParams> = {
+  universeId: "universe-fallback",
+  gradeInt: 5,
+  title: "Mathematics Quest 001",
+  width: 1024,
+  height: 1024,
+} as const;
+
+/**
+ * Calls the **new** routed service: /functions/v1/image-service/generate
+ * Usually returns `{ url: string }` (can be data: or https).
+ */
+export async function generateCover(params?: ImageParams): Promise<string> {
+  const payload = { ...DEFAULTS, ...(params || {}) };
+  const data = await postFunction<{ url?: string }>(
+    "/image-service/generate",
+    payload
+  );
+  if (!data?.url) throw new Error("Edge returned no url");
+  return data.url;
 }
 
-// Kaldet vi har brug for lige nu
-export async function generateCover(params?: GenerateCoverParams): Promise<string> {
-  const payload: Required<GenerateCoverParams> = {
-    universeId: "universe-fallback",
-    gradeInt: 5,
-    title: "Mathematics Quest 001",
-    width: 1024,
-    height: 1024,
-    ...(params || {}),
-  };
-
-  const data = await postFunction<GenerateCoverResponse>("/image-service/generate", payload);
-
-  if (!data?.url) {
-    throw new Error("Edge returned no url");
-  }
-  return data.url; // typisk data:... eller en https-URL
-}
-
-// Valgfrit: lille sundhedstjek du kan kalde fra Console/knap
-export async function pingImageService(): Promise<boolean> {
-  try {
-    await postFunction("/image-service/ping", {});
-    return true;
-  } catch {
-    return false;
-  }
+/**
+ * Calls the **existing** function name route: /functions/v1/image-ensure
+ * Typically returns `{ publicUrl: string }` but we also accept `{ url }`.
+ */
+export async function ensureCover(params?: ImageParams): Promise<string> {
+  const payload = { ...DEFAULTS, ...(params || {}) };
+  const data = await postFunction<{ publicUrl?: string; url?: string }>(
+    "/image-ensure",
+    payload
+  );
+  const u = data?.publicUrl || data?.url;
+  if (!u) throw new Error("Edge returned no public URL");
+  return u;
 }
