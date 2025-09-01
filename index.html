@@ -1,11 +1,19 @@
-
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NELIE - AI Learning Companion</title>
+    <meta http-equiv="Content-Security-Policy"
+          content="
+            default-src 'self';
+            img-src 'self' data: https: blob:;
+            connect-src 'self' https://*.supabase.co https://*.supabase.in;
+            script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules';
+            style-src 'self' 'unsafe-inline';
+            frame-src https://*.supabase.co;
+          ">
+    <title>NELIE – AI Learning Companion</title>
   </head>
   <body>
     <div id="root"></div>
