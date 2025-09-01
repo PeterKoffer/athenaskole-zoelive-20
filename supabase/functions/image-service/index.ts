@@ -1,3 +1,4 @@
+cat > supabase/functions/image-service/index.ts <<'TS'
 // supabase/functions/image-service/index.ts
 // Edge Function: generate via BFL and upload to Storage
 
@@ -26,11 +27,9 @@ Deno.serve(async (req) => {
   const opt = handleOptions(req); if (opt) return opt;
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
-  // Parse body
   let body: any;
   try { body = await req.json(); } catch { return bad("Invalid JSON body"); }
 
-  // Inputs
   const provider = (Deno.env.get("IMAGE_PROVIDER") || "bfl").toLowerCase();
   if (provider !== "bfl") return bad("Replicate provider not configured yet", 501);
 
@@ -48,37 +47,36 @@ Deno.serve(async (req) => {
   const endpoint = `${apiBase}/v1/${model}`;
   console.info("[image-service] submitting to:", endpoint, "prompt:", prompt, "w/h:", width, height);
 
-  // Generate image via BFL
+  // 1) Generate via BFL
   const { url } = await bflGenerateImageInline({ apiKey, endpoint, prompt, width, height });
 
-  // Storage config
+  // 2) Upload til Storage hvis SERVICE_ROLE_KEY findes
   const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
   const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "http://127.0.0.1:54321";
   const serviceRole = Deno.env.get("SERVICE_ROLE_KEY");
 
-  // Hvis ikke SERVICE_ROLE_KEY er sat, falder vi pænt tilbage til inline-respons
   if (!serviceRole) {
+    // Faldbag hvis secret mangler
     return ok({ impl: "bfl-inline-v1", endpoint, url, width, height });
   }
 
-  // Upload til Storage med service role
   const supabase = createClient(supabaseUrl, serviceRole, { auth: { persistSession: false } });
 
-  // Hent billedbytes fra BFL delivery URL
+  // Hent bytes fra delivery-URL
   const imgRes = await fetch(url);
   if (!imgRes.ok) return bad(`Failed to fetch image: ${imgRes.status}`, 502);
   const contentType = imgRes.headers.get("content-type") ?? "image/jpeg";
   const bytes = new Uint8Array(await imgRes.arrayBuffer());
+  const blob = new Blob([bytes], { type: contentType });
 
-  // Gem i bucket
   const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${contentType.includes("png") ? "png" : "jpg"}`;
   const path = `${universeId}/${filename}`;
 
-  const up = await supabase.storage.from(bucket).upload(path, bytes, {
+  const up = await supabase.storage.from(bucket).upload(path, blob, {
     contentType,
     upsert: true,
   });
-  // @ts-ignore supabase-js on deno returns { data, error }
+  // @ts-ignore deno types
   if (up.error) return bad(`Upload error: ${up.error.message}`, 502);
 
   const pub = supabase.storage.from(bucket).getPublicUrl(path);
@@ -95,3 +93,4 @@ Deno.serve(async (req) => {
     height,
   });
 });
+TS
