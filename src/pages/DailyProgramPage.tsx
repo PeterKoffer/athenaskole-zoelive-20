@@ -44,7 +44,7 @@ async function getCoverUrlFallback(args: {
     if (!url) throw new Error("No url from image-service/generate");
     return url;
   } catch (e: any) {
-    // Fallback to legacy Edge Function name
+    // Fallback til legacy Edge Function-navn
     const { data, error } = await supabase.functions.invoke("image-ensure", { body: args });
     if (error) throw new Error(error.message ?? String(error));
     const publicUrl = (data as any)?.publicUrl as string | undefined;
@@ -53,7 +53,7 @@ async function getCoverUrlFallback(args: {
   }
 }
 
-/** Hook that resolves a stable cover image URL from Edge Functions. */
+/** Hook der henter en stabil cover-URL fra Edge Functions. */
 function useCoverUrl(args: {
   universeId: string;
   gradeInt: number;
@@ -75,9 +75,10 @@ function useCoverUrl(args: {
       .then((u) => {
         if (!alive) return;
         setUrl(u);
-        // Dev visibility
-        // eslint-disable-next-line no-console
-        console.log("[DailyProgram] cover url:", u.slice(0, 80) + (u.length > 80 ? "…" : ""));
+        if (import.meta.env.DEV) {
+          // Synligt i konsollen at vi FIK en URL
+          console.log("[DailyProgram] cover url:", (u || "").slice(0, 80) + (u && u.length > 80 ? "…" : ""));
+        }
       })
       .catch((e) => {
         if (!alive) return;
@@ -101,11 +102,11 @@ export default function DailyProgramPage() {
   const suggestions = useSuggestions();
   const gradeInt = useStudentGradeInt();
 
-  // Stable IDs/titles even if stubs are missing
+  // Stabil ID/title selv hvis stubs mangler
   const todaysId = getId(todaysUniverse) ?? "universe-fallback";
   const todaysTitle = (todaysUniverse?.title ?? "Today’s Program").trim();
 
-  // De-duplicate suggestions and exclude today's universe
+  // Dedupliker forslag og ekskludér dagens universe
   const uniqueSuggestions = useMemo(() => {
     const seen = new Set<string>();
     return (suggestions ?? []).filter((u) => {
@@ -118,7 +119,7 @@ export default function DailyProgramPage() {
 
   const catalogPick = uniqueSuggestions[0] ?? null;
 
-  // Resolve cover image URL (new function first, legacy fallback)
+  // Hent cover-URL (ny funktion først, legacy fallback)
   const { url, loading, err } = useCoverUrl({
     universeId: todaysId,
     gradeInt,
@@ -138,17 +139,20 @@ export default function DailyProgramPage() {
         </p>
       </header>
 
-      {/* --- Today - large cover image --- */}
+      {/* --- Today - LARGE cover med reserveret højde --- */}
       <section aria-labelledby="today-cover" className="mb-6">
         <h2 id="today-cover" className="sr-only">Today’s cover</h2>
 
-        <div className="rounded-xl overflow-hidden bg-slate-800/40 border border-white/10">
-          {/* Skeleton while loading */}
-          {loading && <div className="w-full aspect-[1216/640] animate-pulse bg-slate-700/40" />}
+        <div className="relative w-full overflow-hidden rounded-xl bg-slate-800/40 border border-white/10">
+          {/* Reserve plads så layout ikke kollapser */}
+          <div className="w-full aspect-[1216/640]" />
 
-          {/* Error (dev-friendly) */}
+          {/* Loading skeleton fylder reserveret område */}
+          {loading && <div className="absolute inset-0 animate-pulse bg-slate-700/40" />}
+
+          {/* Fejl/debug */}
           {!loading && err && (
-            <div className="p-4 text-sm text-red-300">
+            <div className="absolute inset-0 p-4 text-sm text-red-300 bg-slate-900/40">
               <div className="font-semibold">Image error</div>
               <div className="opacity-80">{err}</div>
               <div className="mt-2 text-xs text-white/60">
@@ -157,20 +161,28 @@ export default function DailyProgramPage() {
             </div>
           )}
 
-          {/* Image */}
+          {/* Selve billedet fylder hele rammen */}
           {!loading && url && (
             <img
               src={url}
               alt={todaysTitle}
-              className="w-full h-auto block"
+              className="absolute inset-0 h-full w-full object-cover"
               loading="eager"
               decoding="async"
             />
           )}
         </div>
+
+        {/* Dev: lyn-link til at åbne billedet */}
+        {!loading && url && import.meta.env.DEV && (
+          <div className="mt-2 text-xs text-white/60">
+            [dev] Cover URL:&nbsp;
+            <a href={url} target="_blank" rel="noreferrer" className="underline">open</a>
+          </div>
+        )}
       </section>
 
-      {/* --- Catalog suggestion (compact, no image) --- */}
+      {/* --- Catalog suggestion (kompakt, uden billede) --- */}
       {catalogPick ? (
         <section className="mt-4" aria-labelledby="catalog-pick">
           <p className="mb-2 text-xs text-blue-300">
