@@ -1,53 +1,52 @@
-/**
- * This function returns a data: URL (SVG) so the client always has a cover image.
- */
-Deno.serve(async (req: Request) => {
+// supabase/functions/image-service/index.ts
+// Simple placeholder generator -> returns { url: "data:image/svg+xml;base64,..." }
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return corsOkService();
+  if (req.method !== "POST") return corsErrService(405, "Method Not Allowed");
+
   try {
-    if (req.method === "OPTIONS") return corsResp(204);
-    if (req.method !== "POST") return corsResp(405, "Method Not Allowed");
+    const body = await req.json().catch(() => ({} as any));
+    const width  = Number(body?.width)  || 1216;
+    const height = Number(body?.height) || 640;
+    const title  = (body?.title ?? "Today's Program").toString();
 
-    const body = (await req.json().catch(() => ({}))) ?? {};
-    const title = (body.title ?? "Today's Program") as string;
-    const width = Number(body.width ?? 1216);
-    const height = Number(body.height ?? 640);
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD08A"/><stop offset="100%" stop-color="#FF8BA7"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <text x="50%" y="50%" text-anchor="middle"
+        font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="${Math.max(24, Math.floor(width/16))}" font-weight="700"
+        fill="#1f2937">${escapeXmlService(title)}</text>
+</svg>`;
 
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#fb923c"/>
-          <stop offset="1" stop-color="#f97316"/>
-        </linearGradient>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#g)"/>
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-            font-size="${Math.round(Math.min(width, height) / 9)}"
-            font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-            fill="#111827" font-weight="800">${title}</text>
-    </svg>`;
-
-    const url = `data:image/svg+xml;base64,${btoa(svg)}`;
-    return jsonResp({ url });
-  } catch (err) {
-    return jsonResp({ error: String((err as Error)?.message ?? err) }, 500);
+    const url = "data:image/svg+xml;base64," + btoa(svg);
+    return jsonService({ url });
+  } catch (e) {
+    return jsonService({ error: (e as Error).message ?? String(e) }, 500);
   }
 });
 
-function jsonResp(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: corsHead("application/json"),
-  });
+function escapeXmlService(s: string) {
+  return s.replace(/[<>&'"]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]!));
 }
 
-function corsResp(status = 204, text = "ok") {
-  return new Response(text, { status, headers: corsHead() });
+function corsOkService() { return new Response("", { status: 204, headers: corsHeadersService() }); }
+function corsErrService(status: number, msg: string) { return new Response(msg, { status, headers: corsHeadersService("text/plain") }); }
+function jsonService(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: corsHeadersService("application/json") });
 }
-
-function corsHead(contentType?: string) {
-  return {
-    ...(contentType ? { "Content-Type": contentType } : {}),
+function corsHeadersService(contentType?: string) {
+  const h: Record<string,string> = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST,OPTIONS",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   };
+  if (contentType) h["Content-Type"] = contentType;
+  return h;
 }
