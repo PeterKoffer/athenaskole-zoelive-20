@@ -1,5 +1,5 @@
 // deno run --allow-net --allow-env
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.1";
 
 type Payload = {
   universeId: string;
@@ -10,7 +10,7 @@ type Payload = {
 };
 
 // TODO: Plug din nuværende generator ind her og returnér { url: string }
-async function generateRawImage(p: Payload): Promise<{ url: string }> {
+async function generateRawImage(_p: Payload): Promise<{ url: string }> {
   // Du har allerede en generator der giver en data: URL — kald den her.
   // Midlertidigt stub for at illustrere strukturen:
   return { url: "data:image/jpeg;base64,/9j/4AAQSkZJRgABA..." };
