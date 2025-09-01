@@ -1,25 +1,13 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-// Use ONE of the following imports. Prefer jsr; if it fails in your CI, switch to esm.sh.
-// import { createClient } from "jsr:@supabase/supabase-js@2.45.4";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?target=deno";
-
 /**
  * This function returns a data: URL (SVG) so the client always has a cover image.
- * It does NOT require Supabase secrets to work, but we initialize the client if available.
  */
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const supabase = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
-  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
-  : null;
-
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
   try {
-    if (req.method === "OPTIONS") return cors(204);
-    if (req.method !== "POST") return cors(405, "Method Not Allowed");
+    if (req.method === "OPTIONS") return corsResp(204);
+    if (req.method !== "POST") return corsResp(405, "Method Not Allowed");
 
     const body = (await req.json().catch(() => ({}))) ?? {};
-    const title = (body.title ?? "Today’s Program") as string;
+    const title = (body.title ?? "Today's Program") as string;
     const width = Number(body.width ?? 1216);
     const height = Number(body.height ?? 640);
 
@@ -38,22 +26,24 @@ serve(async (req) => {
     </svg>`;
 
     const url = `data:image/svg+xml;base64,${btoa(svg)}`;
-    return json({ url });
+    return jsonResp({ url });
   } catch (err) {
-    return json({ error: String(err?.message ?? err) }, 500);
+    return jsonResp({ error: String((err as Error)?.message ?? err) }, 500);
   }
 });
 
-function json(body: unknown, status = 200) {
+function jsonResp(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: corsHeaders("application/json"),
+    headers: corsHead("application/json"),
   });
 }
-function cors(status = 204, text = "ok") {
-  return new Response(text, { status, headers: corsHeaders() });
+
+function corsResp(status = 204, text = "ok") {
+  return new Response(text, { status, headers: corsHead() });
 }
-function corsHeaders(contentType?: string) {
+
+function corsHead(contentType?: string) {
   return {
     ...(contentType ? { "Content-Type": contentType } : {}),
     "Access-Control-Allow-Origin": "*",
