@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { generateCover } from "@/lib/functions";
 
-/** ---- STUB DATASOURCES (replace with real data binding when ready) ---- */
+/** ----- STUB DATASOURCES (skift til rigtige datakilder når du binder data) ----- */
 type UniverseLike = { id?: string; universeId?: string; title?: string; subject?: string };
 
 function useTodaysUniverse(): UniverseLike | null {
@@ -24,7 +24,7 @@ function getId(u?: UniverseLike | null): string | null {
   return (u.id || u.universeId || null) as string | null;
 }
 
-/** Try new route first; if it fails (404/old project), fall back to legacy `image-ensure`. */
+/** Prøv ny route først; hvis den fejler (fx i ældre projekt), fald tilbage til legacy `image-ensure`. */
 async function getCoverUrlFallback(args: {
   universeId: string;
   gradeInt: number;
@@ -43,8 +43,8 @@ async function getCoverUrlFallback(args: {
     });
     if (!url) throw new Error("No url from image-service/generate");
     return url;
-  } catch (e: any) {
-    // Fallback til legacy Edge Function-navn
+  } catch (_e) {
+    // Fallback til legacy Edge Function
     const { data, error } = await supabase.functions.invoke("image-ensure", { body: args });
     if (error) throw new Error(error.message ?? String(error));
     const publicUrl = (data as any)?.publicUrl as string | undefined;
@@ -75,34 +75,39 @@ function useCoverUrl(args: {
       .then((u) => {
         if (!alive) return;
         setUrl(u);
-        if (import.meta.env.DEV) {
-          // Synligt i konsollen at vi FIK en URL
-          console.log("[DailyProgram] cover url:", (u || "").slice(0, 80) + (u && u.length > 80 ? "…" : ""));
-        }
+        // Dev-log for at kunne se at URL'en kommer retur
+        try {
+          const short = u.length > 80 ? `${u.slice(0, 80)}…` : u;
+          // eslint-disable-next-line no-console
+          console.log("[DailyProgram] cover url:", short);
+        } catch {}
       })
       .catch((e) => {
         if (!alive) return;
         setErr(e?.message ?? String(e));
         setUrl(null);
       })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
+      .finally(() => alive && setLoading(false));
 
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [args.universeId, args.gradeInt, args.title, args.width, args.height, args.minBytes]);
 
   return { url, loading, err };
 }
 
 export default function DailyProgramPage() {
+  // Hjælp til at bekræfte at det ER denne fil der renderer
+  // eslint-disable-next-line no-console
+  console.log("[DailyProgramPage] from", import.meta.url);
+
   const todaysUniverse = useTodaysUniverse();
   const suggestions = useSuggestions();
   const gradeInt = useStudentGradeInt();
 
-  // Stabil ID/title selv hvis stubs mangler
+  // Stabil ID/title selv hvis stub mangler
   const todaysId = getId(todaysUniverse) ?? "universe-fallback";
   const todaysTitle = (todaysUniverse?.title ?? "Today’s Program").trim();
 
@@ -139,20 +144,20 @@ export default function DailyProgramPage() {
         </p>
       </header>
 
-      {/* --- Today - LARGE cover med reserveret højde --- */}
+      {/* --- Today - large cover image (robust layout) --- */}
       <section aria-labelledby="today-cover" className="mb-6">
         <h2 id="today-cover" className="sr-only">Today’s cover</h2>
 
         <div className="relative w-full overflow-hidden rounded-xl bg-slate-800/40 border border-white/10">
-          {/* Reserve plads så layout ikke kollapser */}
-          <div className="w-full aspect-[1216/640]" />
+          {/* Spacer reserverer højde (1216x640) så layout ikke kollapser */}
+          <div className="w-full" style={{ aspectRatio: "1216 / 640" }} />
 
-          {/* Loading skeleton fylder reserveret område */}
+          {/* Loading-skelet ovenpå spacer */}
           {loading && <div className="absolute inset-0 animate-pulse bg-slate-700/40" />}
 
-          {/* Fejl/debug */}
+          {/* Fejl-overlay */}
           {!loading && err && (
-            <div className="absolute inset-0 p-4 text-sm text-red-300 bg-slate-900/40">
+            <div className="absolute inset-0 p-4 text-sm text-red-300 bg-slate-900/40 backdrop-blur">
               <div className="font-semibold">Image error</div>
               <div className="opacity-80">{err}</div>
               <div className="mt-2 text-xs text-white/60">
@@ -161,25 +166,28 @@ export default function DailyProgramPage() {
             </div>
           )}
 
-          {/* Selve billedet fylder hele rammen */}
+          {/* Selve billedet – dækker hele fladen */}
           {!loading && url && (
-            <img
-              src={url}
-              alt={todaysTitle}
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="eager"
-              decoding="async"
-            />
+            <>
+              <img
+                src={url}
+                alt={todaysTitle}
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="eager"
+                decoding="async"
+              />
+              {/* Dev-hjælp: åbn billedet i ny fane */}
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="absolute bottom-2 right-2 text-[10px] px-2 py-1 rounded bg-black/50 text-white"
+              >
+                open image
+              </a>
+            </>
           )}
         </div>
-
-        {/* Dev: lyn-link til at åbne billedet */}
-        {!loading && url && import.meta.env.DEV && (
-          <div className="mt-2 text-xs text-white/60">
-            [dev] Cover URL:&nbsp;
-            <a href={url} target="_blank" rel="noreferrer" className="underline">open</a>
-          </div>
-        )}
       </section>
 
       {/* --- Catalog suggestion (kompakt, uden billede) --- */}
@@ -218,7 +226,7 @@ export default function DailyProgramPage() {
         </section>
       ) : null}
 
-      {/* --- Feature section --- */}
+      {/* --- Feature sektion --- */}
       <section className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-xl p-4 bg-gradient-to-br from-rose-500/20 to-orange-500/20 border border-white/10">
           <h4 className="font-semibold text-white">Personalized Content</h4>
