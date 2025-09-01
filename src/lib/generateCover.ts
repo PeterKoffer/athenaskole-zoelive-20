@@ -28,7 +28,7 @@ export async function generateCover(overrides?: Partial<Payload>): Promise<strin
     ...overrides,
   };
 
-  const res = await fetch(`${PROJECT_URL}/functions/v1/image-service/generate`, {
+  const res = await fetch(`${PROJECT_URL}/functions/v1/image-service`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -120,7 +120,7 @@ export async function generateCover(overrides?: Partial<GenerateCoverPayload>): 
     ...(overrides ?? {}),
   };
 
-  const data = await invokeEdge<{ url?: string; error?: string }>("image-service/generate", payload);
+  const data = await invokeEdge<{ url?: string; error?: string }>("image-service", payload);
   if (!data?.url) throw new Error(data?.error || "Function returned no 'url'");
   return data.url;
 }

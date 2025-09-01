@@ -37,7 +37,7 @@ async function getCoverUrl(args: {
 }): Promise<string> {
   // 1) New route
   try {
-    const data = await postEdge<{ url: string }>("/image-service/generate", args);
+    const data = await postEdge<{ url: string }>("/image-service", args);
     if (!data?.url) throw new Error("No url from /image-service/generate");
     return data.url;
   } catch (e) {

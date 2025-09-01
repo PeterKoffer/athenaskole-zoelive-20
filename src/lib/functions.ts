@@ -81,7 +81,7 @@ const DEFAULTS: Required<ImageParams> = {
 export async function generateCover(params?: ImageParams): Promise<string> {
   const payload = { ...DEFAULTS, ...(params || {}) };
   const data = await postFunction<{ url?: string }>(
-    "/image-service/generate",
+    "/image-service",
     payload
   );
   if (!data?.url) throw new Error("Edge returned no url");

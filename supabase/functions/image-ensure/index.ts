@@ -1,29 +1,16 @@
 // supabase/functions/image-ensure/index.ts
-// Generates a simple SVG cover, uploads to Storage bucket "public", returns { publicUrl }
-
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-if (!SUPABASE_URL || !SERVICE_ROLE) {
-  console.error("[image-ensure] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-}
-
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
+// Returns a data URL fallback (no Storage dependency)
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return corsOk();
-  if (req.method !== "POST") return corsErr(405, "Method Not Allowed");
+  if (req.method === "OPTIONS") return corsResponse();
+  if (req.method !== "POST") return corsError(405, "Method Not Allowed");
 
   try {
     const body = await req.json().catch(() => ({} as any));
 
-    const universeId = (body?.universeId ?? "universe-fallback").toString();
     const width  = Number(body?.width)  || 1216;
     const height = Number(body?.height) || 640;
-    const title  = (body?.title ?? "Today’s Program").toString();
-
-    const key = `covers/${universeId}/${width}x${height}.svg`;
+    const title  = (body?.title ?? "Today's Program").toString();
 
     const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
@@ -36,36 +23,26 @@ Deno.serve(async (req) => {
   <text x="50%" y="50%" text-anchor="middle"
         font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
         font-size="${Math.max(24, Math.floor(width/16))}" font-weight="700"
-        fill="#0f172a">${escapeXml(title)}</text>
+        fill="#0f172a">${escapeXmlContent(title)}</text>
 </svg>`;
 
-    // Ensure bucket exists (idempotent)
-    await supabase.storage.createBucket("public", { public: true }).catch(() => {});
-
-    const { error: upErr } = await supabase.storage
-      .from("public")
-      .upload(key, new Blob([svg], { type: "image/svg+xml" }), { upsert: true, contentType: "image/svg+xml" });
-    if (upErr) return json({ error: upErr.message }, 500);
-
-    const { data: pub } = supabase.storage.from("public").getPublicUrl(key);
-    if (!pub?.publicUrl) return json({ error: "No publicUrl from storage" }, 500);
-
-    return json({ publicUrl: pub.publicUrl });
+    const publicUrl = "data:image/svg+xml;base64," + btoa(svg);
+    return jsonResponse({ publicUrl });
   } catch (e) {
-    return json({ error: (e as Error).message ?? String(e) }, 500);
+    return jsonResponse({ error: (e as Error).message ?? String(e) }, 500);
   }
 });
 
-function escapeXml(s: string) {
+function escapeXmlContent(s: string) {
   return s.replace(/[<>&'"]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]!));
 }
 
-function corsOk() { return new Response("", { status: 204, headers: corsHeaders() }); }
-function corsErr(status: number, msg: string) { return new Response(msg, { status, headers: corsHeaders("text/plain") }); }
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: corsHeaders("application/json") });
+function corsResponse() { return new Response("", { status: 204, headers: corsHeadersEnsure() }); }
+function corsError(status: number, msg: string) { return new Response(msg, { status, headers: corsHeadersEnsure("text/plain") }); }
+function jsonResponse(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: corsHeadersEnsure("application/json") });
 }
-function corsHeaders(contentType?: string) {
+function corsHeadersEnsure(contentType?: string) {
   const h: Record<string,string> = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
