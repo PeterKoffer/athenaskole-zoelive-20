@@ -23,8 +23,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create dummy .env for verify step
+        run: sed 's/=.*/=dummy/g' .env.example > .env
+
+      - name: Verify environment configuration
+        run: node ./tools/verify-env.mjs
+
+      - name: Typecheck (best effort)
+        run: npm run -s typecheck || true
+
       - name: Run ESLint
         run: npm run lint
+
+      - name: Smoke test edge functions
+        env:
+          VITE_IMAGE_EDGE_URL: ${{ secrets.VITE_IMAGE_EDGE_URL }}
+          VITE_CONTENT_EDGE_URL: ${{ secrets.VITE_CONTENT_EDGE_URL }}
+        run: node ./tools/smoke.mjs
 
       - name: Build application
         run: npm run build
