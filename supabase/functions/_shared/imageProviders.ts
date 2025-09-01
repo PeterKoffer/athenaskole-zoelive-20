@@ -1,104 +1,63 @@
 // supabase/functions/_shared/imageProviders.ts
-// BFL: submit -> poll -> returnér endelig billed-URL (result.sample)
 
-type BflSubmitResponse = {
-  id?: string;
-  polling_url?: string;
-};
-
-type BflPollResponse = {
-  status?: "Queued" | "Processing" | "Ready" | "Error" | "Failed";
-  result?: { sample?: string };
-  error?: unknown;
-};
-
-export async function bflGenerateImage(args: {
+export async function bflGenerateImageInline(args: {
+  apiKey: string;
+  endpoint: string; // fx https://api.bfl.ai/v1/flux-pro-1.1
   prompt: string;
   width?: number;
   height?: number;
-  apiKey: string;
+  negativePrompt?: string;
   seed?: number;
-  promptUpsampling?: boolean;
-  outputFormat?: "jpeg" | "png";
-  safetyTolerance?: number; // 0..6
+  cfgScale?: number;
+  steps?: number;
 }): Promise<{ url: string; raw: unknown }> {
-  const base = (Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai").replace(/\/+$/, "");
-  const model = (Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1").replace(/^\/+|\/+$/g, "");
-  const submitUrl = `${base}/v1/${model}`;
+  const timeoutMs = Number(Deno.env.get("BFL_TIMEOUT_MS") ?? 60_000);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-  const body: Record<string, unknown> = {
-    prompt: args.prompt,
-    width: args.width ?? 1024,
-    height: args.height ?? 1024,
-  };
-  if (args.seed !== undefined) body.seed = args.seed;
-  if (args.promptUpsampling !== undefined) body.prompt_upsampling = args.promptUpsampling;
-  if (args.outputFormat) body.output_format = args.outputFormat;
-  if (args.safetyTolerance !== undefined) body.safety_tolerance = args.safetyTolerance;
+  try {
+    const body: Record<string, unknown> = {
+      prompt: args.prompt,
+      width: args.width ?? 1024,
+      height: args.height ?? 576,
+    };
+    if (args.negativePrompt) body.negative_prompt = args.negativePrompt;
+    if (args.seed !== undefined) body.seed = args.seed;
+    if (args.cfgScale !== undefined) body.cfg_scale = args.cfgScale;
+    if (args.steps !== undefined) body.steps = args.steps;
 
-  // 1) Submit job
-  const submitRes = await fetch(submitUrl, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-key": args.apiKey,          // VIGTIGT: BFL bruger x-key, ikke Authorization
-      "accept": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!submitRes.ok) {
-    const txt = await safeText(submitRes);
-    throw new Error(`BFL submit ${submitRes.status}: ${txt}`);
-  }
-  const submitJson = (await safeJson<BflSubmitResponse>(submitRes)) ?? {};
-  const pollingUrl = submitJson.polling_url;
-  if (!pollingUrl) throw new Error("BFL submit: mangler polling_url i svaret");
-
-  // 2) Poll indtil Ready
-  const pollMs = toNumber(Deno.env.get("BFL_POLL_MS"), 800);
-  const timeoutMs = toNumber(Deno.env.get("BFL_TIMEOUT_MS"), 60000);
-  const abort = AbortSignal.timeout(timeoutMs);
-
-  while (true) {
-    await delay(pollMs, abort);
-
-    const pollRes = await fetch(pollingUrl, {
-      method: "GET",
-      headers: { "accept": "application/json", "x-key": args.apiKey },
-      signal: abort,
+    const res = await fetch(args.endpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${args.apiKey}`,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
     });
-    if (!pollRes.ok) {
-      const txt = await safeText(pollRes);
-      throw new Error(`BFL poll ${pollRes.status}: ${txt}`);
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      throw new Error(`BFL ${res.status}: ${txt || res.statusText}`);
+    }
+    const json = await res.json();
+
+    // Find en brugbar URL uanset respons-format
+    const candidates: unknown[] = [
+      json?.url,
+      json?.image?.url,
+      ...(Array.isArray(json?.data) ? json.data.map((x: any) => x?.url) : []),
+      ...(Array.isArray(json?.output) ? json.output : []),
+      ...(Array.isArray(json?.images) ? json.images.map((x: any) => x?.url ?? x) : []),
+    ].filter(Boolean);
+
+    const url = String(candidates[0] ?? "");
+    if (!url || !/^https?:\/\//i.test(url)) {
+      throw new Error("BFL response: missing image URL");
     }
 
-    const pollJson = (await safeJson<BflPollResponse>(pollRes)) ?? {};
-    const status = pollJson.status;
-
-    if (status === "Ready") {
-      const url = pollJson.result?.sample;
-      if (!url || !/^https?:\/\//i.test(url)) {
-        throw new Error("BFL poll: mangler gyldig result.sample URL");
-      }
-      return { url, raw: pollJson };
-    }
-    if (status === "Error" || status === "Failed") {
-      throw new Error(`BFL job fejlede: ${JSON.stringify(pollJson)}`);
-    }
-    // ellers: Queued/Processing → fortsæt
+    return { url, raw: json };
+  } finally {
+    clearTimeout(timeout);
   }
-}
-
-// Hjælpere
-function toNumber(v: string | undefined | null, def: number) {
-  const n = v ? Number(v) : NaN;
-  return Number.isFinite(n) ? n : def;
-}
-async function safeText(r: Response) { try { return await r.text(); } catch { return ""; } }
-async function safeJson<T = unknown>(r: Response): Promise<T | null> { try { return (await r.json()) as T; } catch { return null; } }
-function delay(ms: number, signal?: AbortSignal) {
-  return new Promise<void>((resolve, reject) => {
-    const id = setTimeout(() => resolve(), ms);
-    signal?.addEventListener("abort", () => { clearTimeout(id); reject(new DOMException("Aborted", "AbortError")); });
-  });
 }
