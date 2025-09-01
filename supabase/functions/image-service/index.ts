@@ -1,120 +1,81 @@
 // supabase/functions/image-service/index.ts
-import { bflGenerateImageInline } from "../_shared/imageProviders.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno";
+import { bad, ok, handleOptions } from "../_shared/http.ts";
+import { bflGenerateImage } from "../_shared/imageProviders.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
-const CORS = {
-  "content-type": "application/json",
-  "access-control-allow-origin": "*",
-  "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
-  "access-control-allow-methods": "GET,POST,OPTIONS",
-} as const;
-const ok = (data: unknown, status = 200) => new Response(JSON.stringify({ ok: true, data }), { status, headers: CORS });
-const bad = (msg: string, status = 400) => new Response(JSON.stringify({ error: msg }), { status, headers: CORS });
-const opt = (req: Request) => (req.method === "OPTIONS" ? new Response("{}", { headers: CORS }) : null);
-
-// Deadlines (hold hele requesten under ~55s, så du ikke ryger i early termination)
-const BFL_TIMEOUT_MS = Number(Deno.env.get("BFL_TIMEOUT_MS") ?? 25_000);    // generering
-const FETCH_IMG_TIMEOUT_MS = Number(Deno.env.get("FETCH_IMG_TIMEOUT_MS") ?? 12_000); // hente billedbytes
-const UPLOAD_TIMEOUT_MS = Number(Deno.env.get("UPLOAD_TIMEOUT_MS") ?? 15_000);      // upload til storage
+function slug(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 64);
+}
 
 Deno.serve(async (req) => {
-  const o = opt(req); if (o) return o;
+  // CORS / preflight
+  const pre = handleOptions(req);
+  if (pre) return pre;
+
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
   let body: any;
-  try { body = await req.json(); } catch { return bad("Invalid JSON body"); }
-
-  const provider = (Deno.env.get("IMAGE_PROVIDER") || "bfl").toLowerCase();
-  if (provider !== "bfl") return bad("Replicate provider not configured yet", 501);
+  try {
+    body = await req.json();
+  } catch {
+    return bad("Invalid JSON body");
+  }
 
   const prompt = String(body.prompt ?? body.title ?? "Untitled");
   const width = Number(body.width ?? 1024);
   const height = Number(body.height ?? 576);
-  const universeId = String(body.universeId ?? "default");
+  const universeId = String(body.universeId ?? "fallback");
 
-  const apiBase = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
-  const model = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
-  const apiKey = Deno.env.get("BFL_API_KEY");
-  if (!apiKey) return bad("Missing BFL_API_KEY", 500);
+  // --- BFL config from env ---
+  const bflKey = Deno.env.get("BFL_API_KEY");
+  if (!bflKey) return bad("Missing BFL_API_KEY", 500);
 
-  const endpoint = `${apiBase}/v1/${model}`;
-  console.info("[image-service] submit:", { endpoint, prompt, width, height });
-
-  // 1) Generer billede via BFL (stram timeout)
-  const bflCtl = new AbortController();
-  const bflTimer = setTimeout(() => bflCtl.abort("bfl-timeout"), BFL_TIMEOUT_MS);
-  let sourceUrl: string;
-  try {
-    const { url } = await bflGenerateImageInline({
-      apiKey, endpoint, prompt, width, height,
-      // den interne helper har egen timeout, men vi sætter også en overordnet:
-      // (AbortController her bruges kun hvis helperen skulle hænge i fetch)
-    } as any);
-    sourceUrl = url;
-  } catch (e) {
-    clearTimeout(bflTimer);
-    const msg = e instanceof Error ? e.message : String(e);
-    console.warn("[image-service] BFL error -> fallback:", msg);
-    return bad(`BFL error: ${msg}`, 502);
-  } finally {
-    clearTimeout(bflTimer);
-  }
-
-  // 2) Upload til Storage hvis SERVICE_ROLE_KEY findes — ellers returnér inline
+  // --- Supabase (for upload) ---
   const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "http://127.0.0.1:54321";
   const serviceRole = Deno.env.get("SERVICE_ROLE_KEY");
-  if (!serviceRole) {
-    return ok({ impl: "bfl-inline-v1", endpoint, url: sourceUrl, width, height });
-  }
+  if (!serviceRole) return bad("Missing SERVICE_ROLE_KEY", 500);
 
-  const supabase = createClient(supabaseUrl, serviceRole, { auth: { persistSession: false } });
+  // NOTE: during local `serve` SUPABASE_URL env is ignored; use localhost as a fallback.
+  const SUPABASE_URL =
+    Deno.env.get("SUPABASE_URL") ??
+    Deno.env.get("URL") ?? // some setups expose URL
+    "http://127.0.0.1:54321";
 
-  // Hent bytes med timeout (CDN kan være langsom)
-  console.time("[image-service] fetch-image");
-  let bytes: Uint8Array, contentType = "image/jpeg";
-  try {
-    const res = await fetch(sourceUrl, { signal: AbortSignal.timeout(FETCH_IMG_TIMEOUT_MS) });
-    if (!res.ok) return ok({ impl: "bfl-inline-v1", endpoint, url: sourceUrl, note: `image fetch ${res.status}` });
-    contentType = res.headers.get("content-type") ?? "image/jpeg";
-    bytes = new Uint8Array(await res.arrayBuffer());
-  } catch (e) {
-    console.warn("[image-service] fetch-image timeout/fail -> returning inline", e?.toString?.());
-    return ok({ impl: "bfl-inline-v1", endpoint, url: sourceUrl, width, height, note: "fetch-timeout" });
-  } finally {
-    console.timeEnd("[image-service] fetch-image");
-  }
-
-  // Upload med hård deadline — ellers returnér inline i stedet for at hænge
-  console.time("[image-service] upload");
-  const blob = new Blob([bytes], { type: contentType });
-  const filename = `${Date.now()}-${crypto.randomUUID().slice(0,8)}.${contentType.includes("png") ? "png" : "jpg"}`;
-  const path = `${universeId}/${filename}`;
+  const supabase = createClient(SUPABASE_URL, serviceRole, {
+    global: { headers: { "x-client-info": "edge:image-service" } },
+  });
 
   try {
-    const result = await Promise.race([
-      supabase.storage.from(bucket).upload(path, blob, { contentType, upsert: true }),
-      new Promise((_r, reject) => setTimeout(() => reject(new Error("upload-timeout")), UPLOAD_TIMEOUT_MS)),
-    ]) as any;
+    // 1) Generate image via BFL
+    const { url: bflUrl } = await bflGenerateImage({ prompt, width, height, apiKey: bflKey });
 
-    if (result?.error) {
-      console.warn("[image-service] upload error -> inline", result.error);
-      return ok({ impl: "bfl-inline-v1", endpoint, url: sourceUrl, width, height, note: `upload-error: ${result.error.message}` });
-    }
+    // 2) Download the image
+    const res = await fetch(bflUrl);
+    if (!res.ok) return bad(`Failed to download BFL image (${res.status})`, 502);
+    const contentType = res.headers.get("content-type") ?? "image/jpeg";
+    const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
+    const bytes = new Uint8Array(await res.arrayBuffer());
+
+    // 3) Upload to Storage
+    const path = `${universeId}/${Date.now()}-${slug(prompt)}.${ext}`;
+    const up = await supabase.storage.from(bucket).upload(path, bytes, {
+      contentType,
+      upsert: true,
+    });
+    if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
 
     const pub = supabase.storage.from(bucket).getPublicUrl(path);
-    console.timeEnd("[image-service] upload");
 
     return ok({
       impl: "bfl-upload-v1",
-      provider, endpoint,
-      sourceUrl,
-      bucket, path,
+      width,
+      height,
+      bflUrl,            // original BFL URL (useful for debugging)
+      bucket,
+      path,
       publicUrl: pub.data.publicUrl,
-      width, height,
     });
   } catch (e) {
-    console.warn("[image-service] upload timeout/fail -> inline", e?.toString?.());
-    return ok({ impl: "bfl-inline-v1", endpoint, url: sourceUrl, width, height, note: "upload-timeout" });
+    return bad(e instanceof Error ? e.message : String(e), 502);
   }
 });
