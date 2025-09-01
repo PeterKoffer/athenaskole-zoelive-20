@@ -3,7 +3,7 @@
 // Provider order: Black Forest Labs (BFL) → OpenAI → 1x1 placeholder
 // Idempotent, CORS-safe. Returns { ok, source, path, publicUrl, bytes }.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.1";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 /* ------------------------------- Types ------------------------------- */
 
