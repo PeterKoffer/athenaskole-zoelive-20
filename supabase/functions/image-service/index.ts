@@ -1,4 +1,3 @@
-cat > supabase/functions/image-service/index.ts <<'EOF'
 import { ok, bad, handleOptions } from "../_shared/http.ts";
 
 type SubmitResp = { polling_url?: string };
@@ -157,4 +156,3 @@ function env(name: string, required = false): string | undefined {
   if (required && (!v || v.trim() === "")) throw new Error(`Missing env: ${name}`);
   return v ?? undefined;
 }
-EOF

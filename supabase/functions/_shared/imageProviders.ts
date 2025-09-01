@@ -1,4 +1,3 @@
-cat > supabase/functions/_shared/imageProviders.ts <<'EOF'
 // supabase/functions/_shared/imageProviders.ts
 // BFL: submit -> poll -> returnér endelig billed-URL (result.sample)
 
@@ -103,4 +102,3 @@ function delay(ms: number, signal?: AbortSignal) {
     signal?.addEventListener("abort", () => { clearTimeout(id); reject(new DOMException("Aborted", "AbortError")); });
   });
 }
-EOF
