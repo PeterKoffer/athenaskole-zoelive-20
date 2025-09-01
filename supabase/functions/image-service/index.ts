@@ -1,6 +1,6 @@
 cat > supabase/functions/image-service/index.ts <<'TS'
 // supabase/functions/image-service/index.ts
-// Edge Function: generate via BFL and upload to Storage
+// Generate via BFL and upload to Supabase Storage (public URL out)
 
 import { bflGenerateImageInline } from "../_shared/imageProviders.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno";
@@ -47,22 +47,20 @@ Deno.serve(async (req) => {
   const endpoint = `${apiBase}/v1/${model}`;
   console.info("[image-service] submitting to:", endpoint, "prompt:", prompt, "w/h:", width, height);
 
-  // 1) Generate via BFL
+  // 1) Generate (delivery URL)
   const { url } = await bflGenerateImageInline({ apiKey, endpoint, prompt, width, height });
 
-  // 2) Upload til Storage hvis SERVICE_ROLE_KEY findes
+  // 2) Upload til Storage (kræver SERVICE_ROLE_KEY i env)
   const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
   const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "http://127.0.0.1:54321";
   const serviceRole = Deno.env.get("SERVICE_ROLE_KEY");
 
   if (!serviceRole) {
-    // Faldbag hvis secret mangler
     return ok({ impl: "bfl-inline-v1", endpoint, url, width, height });
   }
 
   const supabase = createClient(supabaseUrl, serviceRole, { auth: { persistSession: false } });
 
-  // Hent bytes fra delivery-URL
   const imgRes = await fetch(url);
   if (!imgRes.ok) return bad(`Failed to fetch image: ${imgRes.status}`, 502);
   const contentType = imgRes.headers.get("content-type") ?? "image/jpeg";
@@ -76,7 +74,7 @@ Deno.serve(async (req) => {
     contentType,
     upsert: true,
   });
-  // @ts-ignore deno types
+  // @ts-ignore (deno type nuance)
   if (up.error) return bad(`Upload error: ${up.error.message}`, 502);
 
   const pub = supabase.storage.from(bucket).getPublicUrl(path);
