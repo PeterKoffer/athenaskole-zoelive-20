@@ -1,0 +1,37 @@
+import { useState } from "react";
+import { generateCover } from "@/lib/functions";
+
+export default function GenerateCoverDebug() {
+  const [busy, setBusy] = useState(false);
+  const [url, setUrl]   = useState<string>();
+  const [err, setErr]   = useState<string>();
+
+  const run = async () => {
+    try {
+      setBusy(true); setErr(undefined); setUrl(undefined);
+      const u = await generateCover(); // brug defaults
+      console.log("[cover url]", u?.slice(0, 64), "..."); // synligt i DevTools
+      setUrl(u);
+    } catch (e: any) {
+      console.error(e);
+      setErr(e?.message ?? String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div style={{ display: "grid", gap: 12, padding: 12, border: "1px dashed #ccc" }}>
+      <button onClick={run} disabled={busy} style={{ width: 220, height: 40 }}>
+        {busy ? "Genererer…" : "Generate cover"}
+      </button>
+      {err && <div style={{ color: "crimson" }}>Fejl: {err}</div>}
+      {url && (
+        <>
+          <div style={{ fontFamily: "monospace", fontSize: 12, wordBreak: "break-all" }}>{url.slice(0, 200)}…</div>
+          <img src={url} alt="cover" style={{ maxWidth: 512, borderRadius: 8, display: "block" }} />
+        </>
+      )}
+    </div>
+  );
+}
