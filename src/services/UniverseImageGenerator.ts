@@ -20,16 +20,21 @@ export type EnsureArgs = {
 };
 
 /**
- * KUN edge functionen "image-ensure".
- * Returnerer en stabil public URL til cover-billedet i Storage.
+ * Uses the image-service edge function to generate and store images.
+ * Returns a stable public URL to the cover image in Storage.
  */
 export async function ensureDailyProgramCover(args: EnsureArgs): Promise<string> {
-  const { data, error } = await supabase.functions.invoke("image-ensure", {
-    body: args,
+  const { data, error } = await supabase.functions.invoke("image-service", {
+    body: {
+      prompt: args.title || args.prompt || "Daily program cover",
+      universeId: args.universeId,
+      width: args.width || 1024,
+      height: args.height || 576,
+    },
   });
   if (error) throw error;
 
-  const url = (data as any)?.publicUrl as string | undefined;
+  const url = (data as any)?.data?.publicUrl || (data as any)?.data?.bflUrl as string | undefined;
   if (url) return url;
 
   const title = (args.title?.trim() || "cover").replace(/\.(png|jpe?g|webp)$/i, "");

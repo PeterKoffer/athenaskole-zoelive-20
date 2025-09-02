@@ -28,7 +28,13 @@ export async function getUniverseImageSignedUrl(
 
   // 2) Invoke edge function to ensure image exists
   const { prompt } = opts;
-  await invokeFn('image-ensure', { bucket: BUCKET, objectKey: path, prompt }).catch(() => {});
+  await invokeFn('image-service', { 
+    prompt: prompt || 'Universe cover',
+    universeId: universeId,
+    gradeInt: Number(grade),
+    width: 1024,
+    height: 576
+  }).catch(() => {});
 
   // 3) Deterministic wait for the file to appear (webp or png)
   const deadline = Date.now() + 45000;

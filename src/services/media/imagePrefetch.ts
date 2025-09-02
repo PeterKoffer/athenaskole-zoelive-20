@@ -33,18 +33,22 @@ export async function generateActivityImage(prompt?: string): Promise<string | n
     try {
       const base = (import.meta as any)?.env?.VITE_IMAGE_EDGE_URL;
       if (!base) return null;
-      const res = await fetch(`${base}/image-ensure`, {
+      const res = await fetch(`${base}/image-service`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'apikey': (import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY || '',
+          'authorization': `Bearer ${(import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY || ''}`
+        },
         body: JSON.stringify({
+          prompt: prompt,
           universeId: `activity-${key}`,
-          universeTitle: prompt,
-          subject: 'education',
-          scene: 'cover: main activity'
+          width: 1024,
+          height: 576
         })
       });
       const data = await res.json().catch(() => ({}));
-      return typeof data?.imageUrl === 'string' ? (data.imageUrl as string) : null;
+      return data?.data?.publicUrl || data?.data?.bflUrl || null;
     } catch {
       return null;
     }
