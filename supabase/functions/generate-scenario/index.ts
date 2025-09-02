@@ -1,5 +1,5 @@
-import { advanceScenario, type ScenarioState } from "../../../src/agents/simulatorAgent.ts";
-import type { AgentInputs } from "../../../src/agents/types.ts";
+import { advanceScenario, type ScenarioState } from "../_shared/agents/simulatorAgent.ts";
+import type { AgentInputs } from "../_shared/agents/types.ts";
 
 Deno.serve(async (req) => {
   try {
