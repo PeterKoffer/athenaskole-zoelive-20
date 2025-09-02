@@ -26,10 +26,8 @@ if ! command -v node >/dev/null 2>&1; then
   apt-get install -y nodejs
 fi
 
-# Install project dependencies if missing
-if [ ! -d node_modules ]; then
-  npm install
-fi
+# Install project dependencies
+npm install
 
 # Install Playwright browsers if Playwright is available
 if npx --yes playwright --version >/dev/null 2>&1; then
