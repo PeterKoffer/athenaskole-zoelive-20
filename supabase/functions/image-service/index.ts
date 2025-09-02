@@ -77,6 +77,7 @@ Deno.serve(async (req) => {
 
     const { url: bflUrl } = await bflGenerateImage({
       prompt, width, height, apiKey: bflKey,
+      endpoint,
       negativePrompt: body.negativePrompt,
       seed: body.seed,
       cfgScale: body.cfgScale,
