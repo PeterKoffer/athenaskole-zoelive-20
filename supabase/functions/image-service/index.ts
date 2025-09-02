@@ -1,3 +1,4 @@
+// @ts-nocheck
 // supabase/functions/image-service/index.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { bflGenerateImage } from "../_shared/imageProviders.ts";
