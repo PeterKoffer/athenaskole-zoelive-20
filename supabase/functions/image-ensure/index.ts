@@ -1,141 +1,119 @@
+// @ts-nocheck
 // supabase/functions/image-ensure/index.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { bflGenerateImage } from "../_shared/imageProviders.ts";
 
 /* ---------- helpers ---------- */
-function ok(data: unknown, status = 200) {
-  return new Response(JSON.stringify({ ok: true, data }), {
-    status,
-    headers: {
-      "content-type": "application/json",
-      "access-control-allow-origin": "*",
-      "access-control-allow-headers":
-        "authorization, x-client-info, apikey, content-type",
-      "access-control-allow-methods": "GET,POST,OPTIONS",
-    },
+
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
+  "access-control-allow-methods": "GET,POST,OPTIONS",
+} as const;
+
+function json(body: unknown, init: ResponseInit = {}) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: { "content-type": "application/json", ...CORS, ...(init.headers ?? {}) },
   });
 }
-function bad(message: string, status = 400) {
-  return new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: {
-      "content-type": "application/json",
-      "access-control-allow-origin": "*",
-      "access-control-allow-headers":
-        "authorization, x-client-info, apikey, content-type",
-      "access-control-allow-methods": "GET,POST,OPTIONS",
-    },
-  });
-}
-function handleOptions(req: Request) {
-  if (req.method === "OPTIONS") return ok({});
-  return null;
-}
+
+const ok  = (data: unknown, status = 200) => json({ ok: true, data }, { status });
+const bad = (msg: string, status = 400) => json({ error: msg }, { status });
+
+const handleOptions = (req: Request) =>
+  req.method === "OPTIONS" ? new Response("ok", { headers: CORS, status: 204 }) : null;
+
 const slug = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
 
-// normalize titles like "Today's Program" → "Todays Program"
-function ascii(s: string) {
-  return s
-    .replace(/['']/g, "'")
-    .replace(/[""]/g, '"')
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\x00-\x7F]/g, "");
-}
+/** Make sure weird quotes/long dashes don't upset any encoders. */
+const toAscii = (s: string) =>
+  s.normalize("NFKD")
+    .replace(/[''‚‛']/g, "'")
+    .replace(/[""„‟"]/g, '"')
+    .replace(/[–—−]/g, "-")
+    .replace(/[^\x00-\x7F]/g, " ");
 
 /* ---------- handler ---------- */
+
 Deno.serve(async (req) => {
   const pre = handleOptions(req);
   if (pre) return pre;
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
-  // env
-  const supabaseUrl =
-    Deno.env.get("SUPABASE_URL") /* cloud */ ?? "http://127.0.0.1:54321"; /* local */
+  // Body
+  let body: any;
+  try { body = await req.json(); } catch { return bad("Invalid JSON"); }
+
+  // Env
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "http://127.0.0.1:54321";
   const srv =
     Deno.env.get("SERVICE_ROLE_KEY") ??
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
-
-  const bflKey = Deno.env.get("BFL_API_KEY");
-  const bflBase = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
-  const bflModel = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
-
-  // quick visibility while debugging (remove later if noisy)
-  console.log("[image-ensure] hasSRV:", Boolean(srv),
-              "hasBFL:", Boolean(bflKey),
-              "base:", bflBase, "model:", bflModel);
-
   if (!srv) return bad("Missing SERVICE_ROLE_KEY", 500);
+
+  const bucket   = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
+  const bflKey   = Deno.env.get("BFL_API_KEY");
+  const bflBase  = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
+  const bflModel = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
   if (!bflKey) return bad("Missing BFL_API_KEY", 500);
 
   const supabase = createClient(supabaseUrl, srv, { auth: { persistSession: false } });
 
-  // body
-  let body: any;
-  try {
-    body = await req.json();
-  } catch {
-    return bad("Invalid JSON body");
-  }
-
+  // Inputs
+  const width      = Math.max(16, Math.min(4096, Number(body.width  ?? 1216)));
+  const height     = Math.max(16, Math.min(4096, Number(body.height ??  640)));
+  const gradeInt   = Number.isFinite(body.gradeInt) ? Number(body.gradeInt) : undefined;
   const universeId = String(body.universeId ?? "default");
-  const title = ascii(String(body.title ?? body.prompt ?? "Today's Program"));
-  const width = Number(body.width ?? 1216);
-  const height = Number(body.height ?? 640);
-  const gradeInt = Number(body.gradeInt ?? 8);
+  const titleIn    = String(body.title ?? "Today's Program");
 
-  // Build a decent default prompt if caller didn't provide one
-  const prompt =
-    String(body.prompt) ||
-    `${title}, engaging classroom cover image for grade ${gradeInt}, vibrant, friendly, clean composition`;
+  // Safe prompt (ASCII-only is safest for external APIs that choke on Latin-1)
+  const prompt = toAscii(
+    body.title
+      ? titleIn
+      : `Engaging classroom cover image${gradeInt ? ` for grade ${gradeInt}` : ""}, vibrant, friendly, clean composition`
+  );
 
-  try {
-    // 1) Generate via BFL (returns delivery URL)
-    console.log("[image-ensure] generating via BFL…");
-    const { url: bflUrl } = await bflGenerateImage({
-      prompt,
-      width,
-      height,
-      apiKey: bflKey,
-      negativePrompt: body.negativePrompt,
-      seed: body.seed,
-      cfgScale: body.cfgScale,
-      steps: body.steps,
-    });
+  // 1) Generate via BFL
+  const { url: bflUrl } = await bflGenerateImage({
+    prompt, width, height, apiKey: bflKey,
+    negativePrompt: body.negativePrompt,
+    seed: body.seed,
+    cfgScale: body.cfgScale,
+    steps: body.steps,
+  });
 
-    // 2) Download bytes from the delivery URL
-    const imgRes = await fetch(bflUrl);
-    if (!imgRes.ok) return bad(`Fetch generated image failed: ${imgRes.status}`, 502);
-    const bytes = new Uint8Array(await imgRes.arrayBuffer());
-    const contentType = imgRes.headers.get("content-type") ?? "image/jpeg";
-    const ext =
-      contentType.includes("png") ? "png" :
-      contentType.includes("webp") ? "webp" :
-      contentType.includes("gif") ? "gif" : "jpg";
+  // 2) Download bytes
+  const resp = await fetch(bflUrl);
+  if (!resp.ok) return bad(`BFL delivered ${resp.status}`, 502);
+  const bytes = new Uint8Array(await resp.arrayBuffer());
+  const contentType = resp.headers.get("content-type") ?? "image/jpeg";
 
-    // 3) Upload to Storage
-    const path = `${universeId}/${Date.now()}-${slug(title)}.${ext}`;
-    const up = await supabase.storage.from(bucket).upload(path, bytes, {
-      contentType,
-      upsert: true,
-    });
-    if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
+  // 3) Choose extension
+  const ext =
+    contentType.includes("png")  ? "png"  :
+    contentType.includes("webp") ? "webp" :
+    contentType.includes("gif")  ? "gif"  : "jpg";
 
-    const pub = supabase.storage.from(bucket).getPublicUrl(path);
+  // 4) Upload to Storage
+  const path = `${universeId}/${Date.now()}-${slug(titleIn)}.${ext}`;
+  const up = await supabase.storage.from(bucket).upload(path, bytes, {
+    contentType,
+    upsert: true,
+  });
+  if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
 
-    return ok({
-      impl: "ensure-bfl-upload-v1",
-      bucket,
-      path,
-      publicUrl: pub.data.publicUrl,
-      width,
-      height,
-      // keep the original BFL URL around for debugging if you want
-      bflUrl,
-    });
-  } catch (e) {
-    return bad(e instanceof Error ? e.message : String(e), 502);
-  }
+  // 5) Public URL
+  const pub = supabase.storage.from(bucket).getPublicUrl(path);
+
+  return ok({
+    impl: "image-ensure@upload-v1",
+    base: bflBase,
+    model: bflModel,
+    bflUrl,                 // for debugging
+    bucket, path,
+    width, height,
+    publicUrl: pub.data.publicUrl,
+  });
 });
