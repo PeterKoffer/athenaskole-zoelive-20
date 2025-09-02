@@ -37,11 +37,19 @@ Deno.serve(async (req) => {
   if (pre) return pre;
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
-  // ── Env
-  const supabaseUrl =
-    Deno.env.get("SUPABASE_URL") /* set in cloud */ ?? "http://127.0.0.1:54321" /* local */;
-  const serviceRole = Deno.env.get("SERVICE_ROLE_KEY");
-  const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
+ // — Env
+const supabaseUrl =
+  Deno.env.get("SUPABASE_URL") /* cloud */ ?? "http://127.0.0.1:54321"; /* local */
+
+const srv =
+  Deno.env.get("SERVICE_ROLE_KEY") ??
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"); // fallback supported
+
+const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
+
+console.log("[image-service] hasSRV:", Boolean(srv));
+if (!srv) return bad("Missing SERVICE_ROLE_KEY", 500);
+
 
   const bflKey = Deno.env.get("BFL_API_KEY");
   const bflBase = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
