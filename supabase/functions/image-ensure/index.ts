@@ -1,7 +1,6 @@
 // supabase/functions/image-ensure/index.ts
-// Complete, drop-in file
-
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// @ts-nocheck
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.55.0";
 
 // --- helpers ---------------------------------------------------------------
 
