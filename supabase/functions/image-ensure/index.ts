@@ -1,6 +1,4 @@
 // supabase/functions/image-ensure/index.ts
-// Proxy to image-service (UTF-8 safe, no direct BFL calls)
-
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
@@ -17,7 +15,7 @@ const ok  = (data: unknown, status = 200) => json({ ok: true, data }, { status }
 const bad = (msg: string, status = 400) => json({ error: msg }, { status });
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS, status: 204 });
+  if (req.method === "OPTIONS") return new Response(null, { headers: CORS, status: 204 });
   if (req.method !== "GET" && req.method !== "POST") return bad("Method not allowed", 405);
 
   const supabaseUrl =
@@ -27,16 +25,13 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!srv) return bad("Missing SERVICE_ROLE_KEY", 500);
 
-  // Accept GET (query) or POST (json)
-  const url = new URL(req.url);
-  const q = Object.fromEntries(url.searchParams.entries());
-
+  // read inputs from query or json
+  const q = Object.fromEntries(new URL(req.url).searchParams.entries());
   let body: any = {};
   if (req.method === "POST") {
-    try { body = await req.json(); } catch { /* ignore */ }
+    try { body = await req.json(); } catch {}
   }
 
-  // Normalize payload for image-service
   const payload = {
     prompt: String(body.prompt ?? body.title ?? q.prompt ?? q.title ?? "Untitled"),
     universeId: String(body.universeId ?? q.universeId ?? "default"),
@@ -48,12 +43,11 @@ Deno.serve(async (req) => {
     steps: body.steps ?? (q.steps ? Number(q.steps) : undefined),
   };
 
-  // Call the already-working image-service with SERVICE ROLE auth
+  // forward to the working image-service with SRV auth
   const r = await fetch(`${supabaseUrl}/functions/v1/image-service`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      // apikey + authorization may both be SRV; the gateway accepts it
       "apikey": srv,
       "authorization": `Bearer ${srv}`,
     },
@@ -61,11 +55,10 @@ Deno.serve(async (req) => {
   });
 
   let out: any = null;
-  try { out = await r.json(); } catch { /* ignore */ }
+  try { out = await r.json(); } catch {}
 
   if (!r.ok || !out?.ok) {
-    const msg = out?.error ?? `image-service ${r.status}`;
-    return bad(msg, 502);
+    return bad(out?.error ?? `image-service ${r.status}`, 502);
   }
   return ok(out.data);
 });
