@@ -1,10 +1,12 @@
-mkdir -p supabase/functions/_shared
-cat > supabase/functions/_shared/imageProviders.ts <<'TS'
 // supabase/functions/_shared/imageProviders.ts
 
-export async function bflGenerateImageInline(args: {
+export interface BflGenerateArgs {
   apiKey: string;
-  endpoint: string; // fx https://api.bfl.ai/v1/flux-pro-1.1
+  /**
+   * Optional full endpoint, e.g. https://api.bfl.ai/v1/flux-pro-1.1
+   * If omitted, defaults to `${BFL_API_BASE}/v1/${BFL_MODEL}`.
+   */
+  endpoint?: string;
   prompt: string;
   width?: number;
   height?: number;
@@ -12,7 +14,12 @@ export async function bflGenerateImageInline(args: {
   seed?: number;
   cfgScale?: number;
   steps?: number;
-}): Promise<{ url: string; raw: unknown }> {
+}
+
+export async function bflGenerateImageInline(
+  args: Required<Pick<BflGenerateArgs, "apiKey" | "endpoint" | "prompt">> &
+    Omit<BflGenerateArgs, "apiKey" | "endpoint" | "prompt">
+): Promise<{ url: string; raw: unknown }> {
   const timeoutMs = Number(Deno.env.get("BFL_TIMEOUT_MS") ?? 60_000);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -62,4 +69,14 @@ export async function bflGenerateImageInline(args: {
     clearTimeout(timeout);
   }
 }
-TS
+
+export async function bflGenerateImage(
+  args: BflGenerateArgs
+): Promise<{ url: string; raw: unknown }> {
+  const base = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
+  const model = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
+  const endpoint = args.endpoint ?? `${base}/v1/${model}`;
+
+  return bflGenerateImageInline({ ...args, endpoint });
+}
+
