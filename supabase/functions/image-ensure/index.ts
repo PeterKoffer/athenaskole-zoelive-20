@@ -1,53 +1,120 @@
+// @ts-nocheck
 // supabase/functions/image-ensure/index.ts
-// Returns a data URL fallback (no Storage dependency)
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { bflGenerateImage } from "../_shared/imageProviders.ts";
 
+/* ---- tiny helpers ---- */
+function ok(data: unknown, status = 200) {
+  return new Response(JSON.stringify({ ok: true, data }), {
+    status,
+    headers: {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
+      "access-control-allow-methods": "GET,POST,OPTIONS",
+    },
+  });
+}
+function bad(message: string, status = 400) {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
+      "access-control-allow-methods": "GET,POST,OPTIONS",
+    },
+  });
+}
+function handleOptions(req: Request) {
+  if (req.method === "OPTIONS") return ok({});
+  return null;
+}
+const slug = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+
+/* ---- edge handler ---- */
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return corsResponse();
-  if (req.method !== "POST") return corsError(405, "Method Not Allowed");
+  const pre = handleOptions(req);
+  if (pre) return pre;
+  if (req.method !== "GET" && req.method !== "POST") return bad("Method not allowed", 405);
+
+  // Env
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "http://127.0.0.1:54321";
+  const srv =
+    Deno.env.get("SERVICE_ROLE_KEY") ??
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
+
+  const bflKey = Deno.env.get("BFL_API_KEY");
+  const bflBase = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
+  const bflModel = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
+
+  if (!srv) return bad("Missing SERVICE_ROLE_KEY", 500);
+  if (!bflKey) return bad("Missing BFL_API_KEY", 500);
+
+  const supabase = createClient(supabaseUrl, srv, { auth: { persistSession: false } });
+
+  // Accept both GET (query) and POST (json)
+  const url = new URL(req.url);
+  let q = Object.fromEntries(url.searchParams.entries());
+
+  let body: any = {};
+  if (req.method === "POST") {
+    try { body = await req.json(); } catch { /* ignore */ }
+  }
+
+  const prompt = String(
+    body.prompt ?? body.title ?? q.prompt ?? q.title ?? "Untitled"
+  );
+  const width = Number(body.width ?? q.width ?? 1024);
+  const height = Number(body.height ?? q.height ?? 576);
+  const universeId = String(body.universeId ?? q.universeId ?? "default");
 
   try {
-    const body = await req.json().catch(() => ({} as any));
+    // 1) Generate via BFL (UTF-8 safe; no btoa anywhere)
+    const endpoint = `${bflBase}/v1/${bflModel}`;
+    console.log("[image-ensure] submitting to:", endpoint, "prompt:", prompt, "w/h:", width, height);
 
-    const width  = Number(body?.width)  || 1216;
-    const height = Number(body?.height) || 640;
-    const title  = (body?.title ?? "Today's Program").toString();
+    const { url: bflUrl } = await bflGenerateImage({
+      prompt, width, height, apiKey: bflKey,
+      negativePrompt: body.negativePrompt,
+      seed: body.seed,
+      cfgScale: body.cfgScale,
+      steps: body.steps,
+    });
 
-    const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#C1D3FE"/><stop offset="100%" stop-color="#ABC4FF"/>
-    </linearGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#g)"/>
-  <text x="50%" y="50%" text-anchor="middle"
-        font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-        font-size="${Math.max(24, Math.floor(width/16))}" font-weight="700"
-        fill="#0f172a">${escapeXmlContent(title)}</text>
-</svg>`;
+    // 2) Download image bytes
+    const imgRes = await fetch(bflUrl);
+    if (!imgRes.ok) return bad(`Failed to fetch generated image: ${imgRes.status}`, 502);
+    const bytes = new Uint8Array(await imgRes.arrayBuffer());
+    const contentType = imgRes.headers.get("content-type") ?? "image/jpeg";
 
-    const publicUrl = "data:image/svg+xml;base64," + btoa(svg);
-    return jsonResponse({ publicUrl });
+    // 3) Pick extension
+    const ext =
+      contentType.includes("png") ? "png" :
+      contentType.includes("webp") ? "webp" :
+      contentType.includes("gif") ? "gif" : "jpg";
+
+    // 4) Upload to Storage
+    const path = `${universeId}/${Date.now()}-${slug(prompt)}.${ext}`;
+    const up = await supabase.storage.from(bucket).upload(path, bytes, {
+      contentType,
+      upsert: true,
+    });
+    if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
+
+    // 5) Public URL
+    const pub = supabase.storage.from(bucket).getPublicUrl(path);
+
+    return ok({
+      impl: "bfl-upload-v1",
+      width, height,
+      bflUrl,
+      bucket, path,
+      publicUrl: pub.data.publicUrl,
+    });
   } catch (e) {
-    return jsonResponse({ error: (e as Error).message ?? String(e) }, 500);
+    return bad(e instanceof Error ? e.message : String(e), 502);
   }
 });
-
-function escapeXmlContent(s: string) {
-  return s.replace(/[<>&'"]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]!));
-}
-
-function corsResponse() { return new Response("", { status: 204, headers: corsHeadersEnsure() }); }
-function corsError(status: number, msg: string) { return new Response(msg, { status, headers: corsHeadersEnsure("text/plain") }); }
-function jsonResponse(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: corsHeadersEnsure("application/json") });
-}
-function corsHeadersEnsure(contentType?: string) {
-  const h: Record<string,string> = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  };
-  if (contentType) h["Content-Type"] = contentType;
-  return h;
-}
