@@ -201,11 +201,15 @@ export default function DailyProgramPage() {
           <div>loading: <code>{String(loading)}</code></div>
           <div>err: <code>{err ?? "none"}</code></div>
           <div>url scheme(len): <code>{urlScheme} ({urlLen})</code></div>
+          <div className="mt-2">
+            <button className="underline text-yellow-300 hover:text-yellow-100" onClick={testBfl}>
+              Test BFL API
+            </button>
+          </div>
           {url && (
             <div className="mt-2 flex gap-2 flex-wrap">
               <a className="underline" href={url} target="_blank" rel="noreferrer">Open URL in new tab</a>
               <button className="underline" onClick={probeBlob}>Probe via fetch→blob</button>
-              <button className="underline" onClick={testBfl}>Test BFL API</button>
               <div className="opacity-70">url preview: <code>{url.slice(0, 120)}{url.length>120?"…":""}</code></div>
             </div>
           )}
