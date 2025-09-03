@@ -133,6 +133,17 @@ export default function DailyProgramPage() {
     }
   }, [url]);
 
+  const testBfl = useCallback(async () => {
+    try {
+      const data = await postEdge<any>("/test-bfl", {});
+      console.log("[DailyProgram] BFL test result:", data);
+      alert(JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.error("[DailyProgram] BFL test error", e);
+      alert("BFL test failed: " + (e as Error).message);
+    }
+  }, []);
+
   const urlScheme = url?.slice(0, 5) ?? "none";
   const urlLen = url?.length ?? 0;
 
@@ -191,9 +202,10 @@ export default function DailyProgramPage() {
           <div>err: <code>{err ?? "none"}</code></div>
           <div>url scheme(len): <code>{urlScheme} ({urlLen})</code></div>
           {url && (
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex gap-2 flex-wrap">
               <a className="underline" href={url} target="_blank" rel="noreferrer">Open URL in new tab</a>
               <button className="underline" onClick={probeBlob}>Probe via fetch→blob</button>
+              <button className="underline" onClick={testBfl}>Test BFL API</button>
               <div className="opacity-70">url preview: <code>{url.slice(0, 120)}{url.length>120?"…":""}</code></div>
             </div>
           )}
