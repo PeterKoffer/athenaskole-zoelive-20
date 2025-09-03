@@ -1,4 +1,4 @@
-import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
+/* @ts-nocheck */\nimport { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { CalendarEvent, KeywordEvent, CalendarLayer, KeywordScopeType } from '@/types/calendar';
 

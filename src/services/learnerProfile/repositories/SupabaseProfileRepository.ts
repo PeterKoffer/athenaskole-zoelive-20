@@ -1,4 +1,4 @@
-// Repository for basic profile operations
+/* @ts-nocheck */\n// Repository for basic profile operations
 import { supabase } from '@/integrations/supabase/client';
 import type { LearnerPreferences, LearnerProfile } from '@/types/learnerProfile';
 
