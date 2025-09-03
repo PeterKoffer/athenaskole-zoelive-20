@@ -31,7 +31,7 @@ const toAscii = (s: string) =>
     .replace(/[^\x00-\x7F]/g, " ");
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS, status: 204 });
+  if (req.method === "OPTIONS") return new Response(null, { headers: CORS, status: 204 });
   if (req.method !== "GET" && req.method !== "POST") return bad("Method not allowed", 405);
 
   // ---- env
