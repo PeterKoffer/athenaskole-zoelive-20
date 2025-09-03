@@ -14,6 +14,14 @@ Deno.serve(async (req) => {
 
   const bflKey = Deno.env.get("BFL_API_KEY");
   
+  // Debug: List all environment variables that start with BFL
+  console.log("Available BFL env vars:");
+  for (const [key, value] of Object.entries(Deno.env.toObject())) {
+    if (key.startsWith("BFL")) {
+      console.log(`- ${key}: ${value ? value.substring(0, 8) + "..." : "undefined"}`);
+    }
+  }
+  
   if (!bflKey) {
     return new Response(JSON.stringify({ error: "No BFL_API_KEY found" }), {
       status: 500,
