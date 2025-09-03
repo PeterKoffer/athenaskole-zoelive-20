@@ -46,6 +46,13 @@ Deno.serve(async (req) => {
   const bflModel = Deno.env.get("BFL_MODEL")     ?? "flux-pro-1.1";
   const bflEndpoint = `${bflBase}/v1/${bflModel}`;
 
+  console.log("[image-ensure] BFL config:", { 
+    hasKey: Boolean(bflKey), 
+    keyLength: bflKey?.length || 0,
+    keyPrefix: bflKey?.substring(0, 8) + "...",
+    endpoint: bflEndpoint 
+  });
+  
   if (!srv)    return bad("Missing SERVICE_ROLE_KEY", 500);
   if (!bflKey) return bad("Missing BFL_API_KEY", 500);
 
