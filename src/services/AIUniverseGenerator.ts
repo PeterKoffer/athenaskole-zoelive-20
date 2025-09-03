@@ -1,4 +1,5 @@
-/* @ts-nocheck */\n
+/* @ts-nocheck */
+
 import { Universe } from './UniverseGenerator';
 import { openAIService } from './OpenAIService';
 

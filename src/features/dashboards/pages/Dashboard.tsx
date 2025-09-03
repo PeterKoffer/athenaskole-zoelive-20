@@ -65,7 +65,8 @@ const LoadingSpinner = () => (
 );
 
 // A reusable component for the welcome header.
-const WelcomeHeader = ({ user }) => (
+type WelcomeHeaderProps = { user: any };
+const WelcomeHeader = ({ user }: WelcomeHeaderProps) => (
   <div className="mb-8">
     <h1 className="text-4xl font-bold text-white mb-2">
       Welcome back{user?.email ? `, ${user.email.split("@")[0]}` : "!"}
@@ -77,7 +78,8 @@ const WelcomeHeader = ({ user }) => (
 );
 
 // A reusable component for the dashboard cards.
-const DashboardCard = ({ icon, title, description, onClick }) => (
+type DashboardCardProps = { icon: any; title: string; description: string; onClick: () => void };
+const DashboardCard = ({ icon, title, description, onClick }: DashboardCardProps) => (
   <Card
     className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors cursor-pointer"
     onClick={onClick}

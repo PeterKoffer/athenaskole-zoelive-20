@@ -1,4 +1,5 @@
-/* @ts-nocheck */\n
+/* @ts-nocheck */
+
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
 import { DailyLessonConfig } from './dailyLessonGenerator/types';
 import { StudentProgressService } from './dailyLessonGenerator/studentProgressService';

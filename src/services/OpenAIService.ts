@@ -1,4 +1,5 @@
-/* @ts-nocheck */\n
+/* @ts-nocheck */
+
 import { supabase } from '@/integrations/supabase/client';
 import { Universe } from './UniverseGenerator';
 

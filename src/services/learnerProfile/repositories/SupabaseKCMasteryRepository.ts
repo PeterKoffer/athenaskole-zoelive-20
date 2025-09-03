@@ -1,4 +1,5 @@
-/* @ts-nocheck */\n// Repository for Knowledge Component mastery operations
+/* @ts-nocheck */
+// Repository for Knowledge Component mastery operations
 import { supabase } from '@/integrations/supabase/client';
 import type { KnowledgeComponentMastery, KCMasteryUpdateData } from '@/types/learnerProfile';
 

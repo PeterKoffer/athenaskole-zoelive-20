@@ -1,4 +1,5 @@
-/* @ts-nocheck */\n// Data transformation utilities for profile data
+/* @ts-nocheck */
+// Data transformation utilities for profile data
 import type { LearnerProfile, LearnerPreferences } from '@/types/learnerProfile';
 import { SupabaseKCMasteryRepository } from '../repositories/SupabaseKCMasteryRepository';
 

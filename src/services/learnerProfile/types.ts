@@ -1,4 +1,5 @@
-/* @ts-nocheck */\n
+/* @ts-nocheck */
+
 // src/services/learnerProfile/types.ts
 
 import { LearnerProfile, KnowledgeComponentMastery } from '@/types/learnerProfile';
