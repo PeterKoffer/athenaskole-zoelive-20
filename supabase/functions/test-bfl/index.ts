@@ -29,10 +29,10 @@ Deno.serve(async (req) => {
     });
   }
 
-  console.log("Testing BFL API key:");
+  console.log("Testing BFL API key (v2):");
   console.log("- Key exists:", Boolean(bflKey));
-  console.log("- Key length:", bflKey.length);
-  console.log("- Key prefix:", bflKey.substring(0, 8) + "...");
+  console.log("- Key length:", bflKey?.length || 0);
+  console.log("- Key prefix:", bflKey ? bflKey.substring(0, 8) + "..." : "NO KEY");
 
   // Test different endpoints
   const endpoints = [
