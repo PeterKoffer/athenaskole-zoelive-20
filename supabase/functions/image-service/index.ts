@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
   const bflModel = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
 
   console.log("[image-service] hasSRV:", Boolean(srv));
+  console.log("[image-service] bflKey exists:", Boolean(bflKey), "length:", bflKey?.length || 0);
   if (!srv) return bad("Missing SERVICE_ROLE_KEY", 500);
   if (!bflKey) return bad("Missing BFL_API_KEY", 500);
 
@@ -76,14 +77,22 @@ Deno.serve(async (req) => {
     const endpoint = `${bflBase}/v1/${bflModel}`;
     console.log("[image-service] submitting to:", endpoint, "prompt:", prompt, "w/h:", width, height);
 
-    const { url: bflUrl } = await bflGenerateImage({
-      prompt, width, height, apiKey: bflKey,
-      endpoint,
-      negativePrompt: body.negativePrompt,
-      seed: body.seed,
-      cfgScale: body.cfgScale,
-      steps: body.steps,
-    });
+    let bflUrl: string;
+    try {
+      const result = await bflGenerateImage({
+        prompt, width, height, apiKey: bflKey,
+        endpoint,
+        negativePrompt: body.negativePrompt,
+        seed: body.seed,
+        cfgScale: body.cfgScale,
+        steps: body.steps,
+      });
+      bflUrl = result.url;
+      console.log("[image-service] BFL response URL:", bflUrl);
+    } catch (bflError) {
+      console.error("[image-service] BFL API error:", bflError);
+      return bad(`BFL API error: ${bflError instanceof Error ? bflError.message : String(bflError)}`, 502);
+    }
 
     // 2) Download bytes
     const imgRes = await fetch(bflUrl);
