@@ -33,3 +33,9 @@ test-results/
 playwright-report/
 .nyc_output/
 junit.xml
+
+# Local secrets
+.env.local
+.env*
+supabase/.edge-secrets*
+supabase/.temp/
