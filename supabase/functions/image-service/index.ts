@@ -27,7 +27,7 @@ function bad(message: string, status = 400) {
   });
 }
 function handleOptions(req: Request) {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: headers(), status: 204 });
+  if (req.method === "OPTIONS") return new Response(null, { headers: headers(), status: 204 });
   return null;
 }
 const slug = (s: string) =>
