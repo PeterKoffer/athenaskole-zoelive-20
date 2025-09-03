@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@features/*": ["src/features/*"],
+      "@ui/*": ["src/shared/ui/*"],
+      "@lib/*": ["src/shared/lib/*"],
+      "@config/*": ["src/shared/config/*"],
+      "@stores/*": ["src/shared/stores/*"],
+      "@types/*": ["src/core/domain/types/*"]
+    }
+  }
+}
