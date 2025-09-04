@@ -1,5 +1,7 @@
+cd /Volumes/5TB/APP/github/Zoelive-local
+
 cat > supabase/functions/ai-image/index.ts <<'TS'
-// CORS shared headers
+// CORS
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -13,8 +15,8 @@ const json = (body: unknown, status = 200) =>
   });
 
 function mapAspectToOpenAISize(_ar?: string): "256x256" | "512x512" | "1024x1024" {
-  // Cheaper default? switch to "512x512"
-  return "1024x1024";
+  // Cheaper default; change to "1024x1024" if you want larger images.
+  return "512x512";
 }
 
 async function genWithOpenAI(prompt: string, aspect?: string): Promise<string> {
@@ -25,13 +27,9 @@ async function genWithOpenAI(prompt: string, aspect?: string): Promise<string> {
   const size = mapAspectToOpenAISize(aspect);
   const res = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model, prompt, size, response_format: "b64_json" }),
   });
-
   if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
   const data = await res.json();
   const b64: string | undefined = data?.data?.[0]?.b64_json;
@@ -47,19 +45,14 @@ async function genWithBFL(prompt: string, aspect?: string): Promise<string> {
     ? endpointRaw
     : `${base}${endpointRaw.startsWith("/") ? "" : "/"}${endpointRaw}`;
   const model = Deno.env.get("BFL_MODEL") || "flux-pro-1.1";
-
   if (!key) throw new Error("BFL_API_KEY not set");
 
   const payload = { model, prompt, aspect_ratio: aspect || "1:1" };
   const res = await fetch(endpoint, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-
   if (!res.ok) throw new Error(`BFL ${res.status}: ${await res.text()}`);
 
   const data = await res.json();
@@ -68,7 +61,6 @@ async function genWithBFL(prompt: string, aspect?: string): Promise<string> {
     data?.image_base64 ??
     data?.output?.[0]?.b64_json ??
     data?.output?.[0]?.base64;
-
   if (!b64) throw new Error("BFL returned no image");
   return b64;
 }
