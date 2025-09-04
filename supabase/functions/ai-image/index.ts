@@ -1,5 +1,3 @@
-// supabase/functions/ai-image/index.ts
-
 // CORS shared headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,8 +12,8 @@ const json = (body: unknown, status = 200) =>
     headers: { "Content-Type": "application/json", ...corsHeaders },
   });
 
-function mapAspectToOpenAISize(ar?: string): "256x256" | "512x512" | "1024x1024" {
-  // OpenAI only supports square sizes; map everything to 1024x1024
+function mapAspectToOpenAISize(_ar?: string): "256x256" | "512x512" | "1024x1024" {
+  // Change to "512x512" if you want cheaper images by default.
   return "1024x1024";
 }
 
@@ -39,10 +37,7 @@ async function genWithOpenAI(prompt: string, aspect?: string): Promise<string> {
     }),
   });
 
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`OpenAI ${res.status}: ${t}`);
-  }
+  if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
 
   const data = await res.json();
   const b64: string | undefined = data?.data?.[0]?.b64_json;
@@ -71,13 +66,10 @@ async function genWithBFL(prompt: string, aspect?: string): Promise<string> {
     body: JSON.stringify(payload),
   });
 
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`BFL ${res.status}: ${t}`);
-  }
+  if (!res.ok) throw new Error(`BFL ${res.status}: ${await res.text()}`);
 
   const data = await res.json();
-  // Try a few common shapes used by different vendors
+  // Many vendors use different shapes—try several:
   const b64 =
     data?.data?.[0]?.b64_json ??
     data?.image_base64 ??
