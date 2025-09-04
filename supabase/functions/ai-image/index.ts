@@ -1,77 +1,144 @@
-// Deno / Supabase Edge Function: ai-image
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// supabase/functions/ai-image/index.ts
 
-const BFL_API_KEY = Deno.env.get('BFL_API_KEY')!;
-const BFL_API_URL = Deno.env.get('BFL_API_URL') ?? 'https://api.bfl.ai/v1/generate'; // adjust to actual
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const MONTHLY_IMAGE_BUDGET = Number(Deno.env.get('AI_IMAGE_BUDGET_USD_MONTHLY') ?? '15');
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-function estimateImageCostUSD(size: string, steps: number): number {
-  // ballpark: larger size/steps → more cost
-  const base = size === '1024' ? 0.04 : size === '768' ? 0.03 : 0.02;
-  return base * (steps / 30);
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
+const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+const BFL_API_KEY = Deno.env.get("BFL_API_KEY")!;
+const BFL_API_URL = Deno.env.get("BFL_API_URL") ?? "https://api.bfl.ai";
+
+const IMAGE_BUDGET = Number(Deno.env.get("AI_IMAGE_BUDGET_USD_MONTHLY") ?? "15");
+// Simple fast pris pr. billede – sæt korrekt pris i secrets hvis du vil
+const IMAGE_PRICE_USD = Number(Deno.env.get("AI_IMAGE_PRICE_USD") ?? "0.010");
+
+function monthStartISO(d = new Date()) {
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString();
 }
 
-Deno.serve(async (req) => {
-  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
+async function getImageSpent(orgId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from("ai_metrics")
+    .select("cost_usd")
+    .eq("org_id", orgId)
+    .gte("created_at", monthStartISO())
+    .eq("provider", "bfl");
+  if (error) return 0;
+  return (data ?? []).reduce((s, r: any) => s + Number(r.cost_usd || 0), 0);
+}
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { global: { fetch } });
-
-  const orgId = req.headers.get('x-org-id') ?? 'public';
-  const size = req.headers.get('x-size') ?? '768';
-  const steps = Number(req.headers.get('x-steps') ?? '30');
-  const cacheKey = req.headers.get('x-cache-key') ?? '';
-
-  // Monthly image budget check
-  const firstOfMonth = new Date(); firstOfMonth.setDate(1); firstOfMonth.setHours(0,0,0,0);
-  const { data: sumRows } = await supabase
-    .from('ai_metrics')
-    .select('cost_usd')
-    .gte('created_at', firstOfMonth.toISOString());
-  const spent = (sumRows ?? []).reduce((s, r: any) => s + (r.cost_usd || 0), 0);
-  if (spent >= MONTHLY_IMAGE_BUDGET) {
-    return new Response(JSON.stringify({ error: 'Monthly image budget reached.' }), { status: 402, headers: { 'content-type': 'application/json' }});
-  }
-
-  // Cache?
-  if (cacheKey) {
-    const { data: cached } = await supabase.from('ai_cache').select('value').eq('key', cacheKey).maybeSingle();
-    if (cached?.value) {
-      return new Response(JSON.stringify(cached.value), { headers: { 'content-type': 'application/json', 'x-cache': 'HIT' }});
-    }
-  }
-
-  let body: { prompt: string };
-  try { body = await req.json(); } catch { return new Response('Bad JSON', { status: 400 }); }
-
-  // Call BFL (adjust to real API)
-  const bflRes = await fetch(BFL_API_URL, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'authorization': `Bearer ${BFL_API_KEY}` },
-    body: JSON.stringify({ prompt: body.prompt, size, steps }),
-  });
-
-  if (!bflRes.ok) {
-    const text = await bflRes.text();
-    return new Response(JSON.stringify({ error: 'BFL error', detail: text }), { status: 502, headers: { 'content-type': 'application/json' }});
-  }
-
-  const out = await bflRes.json(); // expected: { url: "..."} or { b64: "..." }
-
-  const cost = estimateImageCostUSD(size, steps);
-  await supabase.from('ai_metrics').insert({
+async function logCost(orgId: string, model: string, cost: number, key?: string) {
+  const { error } = await supabase.from("ai_metrics").insert({
     org_id: orgId,
-    provider: 'bfl',
-    model: `size:${size}/steps:${steps}`,
-    tokens: null,
+    provider: "bfl",
+    model,
+    tokens: 0,
     cost_usd: cost,
-    key: cacheKey || null,
+    key: key ?? null,
   });
+  if (error) console.error("log cost error", error);
+}
 
-  if (cacheKey) {
-    await supabase.from('ai_cache').upsert({ key: cacheKey, value: out });
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
-  return new Response(JSON.stringify(out), { headers: { 'content-type': 'application/json' }});
+  try {
+    if (req.method !== "POST") {
+      return new Response("Use POST", { status: 405, headers: corsHeaders });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const {
+      prompt,
+      orgId = "default-org",
+      size = "768x768", // "512x512" | "768x768" | "1024x1024" (afhængigt af din plan)
+      model = "flux-schnell", // Tilpas til BFL-modelnavn du bruger
+      steps = 20,
+      guidance = 3.5,
+      seed,
+    } = body ?? {};
+
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: "Missing 'prompt'" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Budget
+    const spent = await getImageSpent(orgId);
+    if (spent >= IMAGE_BUDGET) {
+      return new Response(
+        JSON.stringify({ error: "Image budget exceeded", spent, budget: IMAGE_BUDGET }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+
+    // Kald BFL – justér endpoint/payload/response efter din konto/dokumentation
+    const resp = await fetch(`${BFL_API_URL}/v1/images/generate`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${BFL_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+        model,
+        size,
+        steps,
+        guidance,
+        seed,
+        // evt. andre BFL-felter…
+      }),
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      return new Response(JSON.stringify({ error: "BFL error", details: text }), {
+        status: 502,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Forsøg at læse flere mulige formater (tilpas hvis din respons er anderledes)
+    const data = await resp.json().catch(() => ({}));
+    // eksempler:
+    // - { image_base64: "..." }
+    // - { images: [{ b64_json: "..." }] }
+    let b64 =
+      data?.image_base64 ??
+      data?.images?.[0]?.b64_json ??
+      null;
+
+    if (!b64) {
+      return new Response(JSON.stringify({ error: "Unknown BFL response shape", data }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Log fast pris
+    await logCost(orgId, model, IMAGE_PRICE_USD);
+
+    return new Response(JSON.stringify({ model, size, image_base64: b64 }), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  } catch (err) {
+    console.error(err);
+    return new Response(JSON.stringify({ error: "Internal error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 });
