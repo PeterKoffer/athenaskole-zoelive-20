@@ -1,6 +1,3 @@
-cd /Volumes/5TB/APP/github/Zoelive-local
-
-cat > supabase/functions/ai-image/index.ts <<'TS'
 // CORS
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,8 +12,7 @@ const json = (body: unknown, status = 200) =>
   });
 
 function mapAspectToOpenAISize(_ar?: string): "256x256" | "512x512" | "1024x1024" {
-  // Cheaper default; change to "1024x1024" if you want larger images.
-  return "512x512";
+  return "512x512"; // cheaper default
 }
 
 async function genWithOpenAI(prompt: string, aspect?: string): Promise<string> {
