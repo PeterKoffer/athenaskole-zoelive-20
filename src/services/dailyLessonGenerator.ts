@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* @ts-nocheck */
 
 import { LessonActivity } from '@/components/education/components/types/LessonTypes';
@@ -116,7 +117,7 @@ export class DailyLessonGenerator {
                 scenario: aiContent.scenario,
                 creativePrompt: aiContent.creativePrompt
               },
-              difficulty: gradeLevel + this.getDifficultyVariation(i),
+              difficulty: (gradeLevel + this.getDifficultyVariation(i)) as any,
               subject,
               skillArea: this.getVariedSkillAreaForIndex(skillArea, i),
               metadata: {

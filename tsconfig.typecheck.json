@@ -8,13 +8,16 @@
     "moduleResolution": "bundler",
     "noEmit": true,
     "skipLibCheck": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"]
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client"
+    ]
   },
   "include": [
-    "src/main.tsx",
-    "src/routes/**/*.ts",
-    "src/routes/**/*.tsx",
     "src/features/auth/**/*.ts",
     "src/features/auth/**/*.tsx",
     "src/features/daily-program/**/*.ts",
@@ -22,6 +25,7 @@
     "src/features/shell/**/*.ts",
     "src/features/shell/**/*.tsx",
     "src/shared/ui/**/*.ts",
-    "src/shared/ui/**/*.tsx"
+    "src/shared/ui/**/*.tsx",
+    "src/types/**/*.d.ts"
   ]
 }

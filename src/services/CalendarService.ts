@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* @ts-nocheck */
 import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
@@ -33,7 +34,7 @@ class CalendarService {
 
   async listEvents(start: string, end: string) {
     const headers = await this.authHeader();
-    const res = await fetch(`${FUNCTIONS_URL}/calendar-events?start=${start}&end=${end}`, { headers });
+    const res = await fetch(`${FUNCTIONS_URL}/calendar-events?start=${start}&end=${end}`, { headers: (headers as HeadersInit) });
     if (!res.ok) {
       console.error('Error fetching calendar events');
       return [];
@@ -45,7 +46,7 @@ class CalendarService {
     const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
     const res = await fetch(`${FUNCTIONS_URL}/calendar-events`, {
       method: 'POST',
-      headers,
+      headers: (headers as HeadersInit),
       body: JSON.stringify(event)
     });
     if (!res.ok) {
@@ -59,7 +60,7 @@ class CalendarService {
     const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
     const res = await fetch(`${FUNCTIONS_URL}/keyword-events`, {
       method: 'POST',
-      headers,
+      headers: (headers as HeadersInit),
       body: JSON.stringify(event)
     });
     if (!res.ok) {
@@ -73,7 +74,7 @@ class CalendarService {
     const headers = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
     const res = await fetch(`${FUNCTIONS_URL}/keyword-events/${id}`, {
       method: 'PUT',
-      headers,
+      headers: (headers as HeadersInit),
       body: JSON.stringify(updates)
     });
     if (!res.ok) {

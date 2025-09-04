@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* @ts-nocheck */
 
 import { Universe } from './UniverseGenerator';
@@ -14,8 +15,8 @@ class AIUniverseGenerator {
             const universe = await openAIService.generateUniverse(prompt, signal);
             console.log('✅ AIUniverseGenerator: Successfully generated universe');
             return universe;
-        } catch (error) {
-            if (error.name === 'AbortError') {
+        } catch (error: any) {
+            if ((error as any).name === 'AbortError') {
                 console.log('🛑 AIUniverseGenerator: Generation aborted');
                 return null;
             }
