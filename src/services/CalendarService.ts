@@ -23,7 +23,7 @@ export interface CreateKeywordEvent {
 const FUNCTIONS_URL = "https://yphkfkpfdpdmllotpqua.supabase.co/functions/v1";
 
 class CalendarService {
-  private async authHeader(): Promise<HeadersInit> {
+  private async authHeader(): Promise<Record<string, string>> {
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
     const headers: Record<string, string> = {};
@@ -42,7 +42,7 @@ class CalendarService {
   }
 
   async createEvent(event: CreateCalendarEvent) {
-    const headers: HeadersInit = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(await this.authHeader()) };
     const res = await fetch(`${FUNCTIONS_URL}/calendar-events`, {
       method: 'POST',
       headers,
@@ -56,7 +56,7 @@ class CalendarService {
   }
 
   async createKeywordEvent(event: CreateKeywordEvent) {
-    const headers: HeadersInit = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(await this.authHeader()) };
     const res = await fetch(`${FUNCTIONS_URL}/keyword-events`, {
       method: 'POST',
       headers,
@@ -70,7 +70,7 @@ class CalendarService {
   }
 
   async updateKeywordEvent(id: number, updates: Partial<CreateKeywordEvent>) {
-    const headers: HeadersInit = { ...(await this.authHeader()), 'Content-Type': 'application/json' };
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(await this.authHeader()) };
     const res = await fetch(`${FUNCTIONS_URL}/keyword-events/${id}`, {
       method: 'PUT',
       headers,
