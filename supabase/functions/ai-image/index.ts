@@ -1,8 +1,8 @@
+cat > supabase/functions/ai-image/index.ts <<'TS'
 // CORS shared headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -13,7 +13,7 @@ const json = (body: unknown, status = 200) =>
   });
 
 function mapAspectToOpenAISize(_ar?: string): "256x256" | "512x512" | "1024x1024" {
-  // Change to "512x512" if you want cheaper images by default.
+  // Cheaper default? switch to "512x512"
   return "1024x1024";
 }
 
@@ -29,16 +29,10 @@ async function genWithOpenAI(prompt: string, aspect?: string): Promise<string> {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model,
-      prompt,
-      size,
-      response_format: "b64_json",
-    }),
+    body: JSON.stringify({ model, prompt, size, response_format: "b64_json" }),
   });
 
   if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
-
   const data = await res.json();
   const b64: string | undefined = data?.data?.[0]?.b64_json;
   if (!b64) throw new Error("OpenAI returned no image");
@@ -69,7 +63,6 @@ async function genWithBFL(prompt: string, aspect?: string): Promise<string> {
   if (!res.ok) throw new Error(`BFL ${res.status}: ${await res.text()}`);
 
   const data = await res.json();
-  // Many vendors use different shapes—try several:
   const b64 =
     data?.data?.[0]?.b64_json ??
     data?.image_base64 ??
@@ -137,3 +130,4 @@ Deno.serve(async (req) => {
     return json({ error: "server_error", details: String((err as any)?.message || err) }, 500);
   }
 });
+TS
