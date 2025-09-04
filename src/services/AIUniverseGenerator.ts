@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* @ts-nocheck */
 
 import { Universe } from './UniverseGenerator';
