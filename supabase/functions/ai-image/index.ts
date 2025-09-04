@@ -1,177 +1,144 @@
+// supabase/functions/ai-image/index.ts
+// Deno / Supabase Edge Function – BFL first, OpenAI fallback.
+
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import OpenAI from "npm:openai@4";
+
+type ReqBody = {
+  prompt: string;
+  orgId?: string;
+  provider?: "bfl" | "openai";
+  fallback?: "openai";
+  aspect_ratio?: "1:1" | "16:9" | "9:16" | "4:3" | "3:4";
+  // (optional) pass-thru for future providers
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-
-// Providers & pricing
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") ?? "";
-const BFL_API_KEY = Deno.env.get("BFL_API_KEY") ?? "";
-const BFL_API_URL = (Deno.env.get("BFL_API_URL") ?? "https://api.bfl.ai").replace(/\/+$/,"");
-const BFL_IMAGE_ENDPOINT = (Deno.env.get("BFL_IMAGE_ENDPOINT") ?? "").replace(/\/+$/,"");
-
-// Budgets
-const IMAGE_BUDGET = Number(Deno.env.get("AI_IMAGE_BUDGET_USD_MONTHLY") ?? "15");
-const IMAGE_PRICE_USD = Number(Deno.env.get("AI_IMAGE_PRICE_USD") ?? "0.010"); // flat, adjust as needed
-
-function monthStartISO(d=new Date()) {
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString();
+function toBase64(u8: Uint8Array) {
+  // Safe base64 from bytes
+  let bin = "";
+  for (let i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
+  return btoa(bin);
 }
 
-async function getImageSpent(orgId: string) {
-  const { data, error } = await supabase
-    .from("ai_metrics")
-    .select("cost_usd")
-    .eq("org_id", orgId)
-    .gte("created_at", monthStartISO());
-  if (error) { console.error("getImageSpent error", error); return 0; }
-  return (data ?? []).reduce((s: number, r: any) => s + Number(r.cost_usd || 0), 0);
-}
+// ---------- BFL ----------
+async function generateWithBFL(prompt: string, aspect_ratio?: ReqBody["aspect_ratio"]) {
+  const base = Deno.env.get("BFL_API_URL") || "https://api.bfl.ai";
+  const model = Deno.env.get("BFL_MODEL") || "flux-pro-1.1";
+  const apiKey = Deno.env.get("BFL_API_KEY");
+  if (!apiKey) throw new Error("Missing BFL_API_KEY");
 
-async function logCost(orgId: string, provider: string, model: string, cost: number) {
-  const { error } = await supabase.from("ai_metrics").insert({
-    org_id: orgId, provider, model, tokens: 0, cost_usd: cost
+  // 1) submit job
+  const submit = await fetch(`${base}/v1/${model}`, {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "x-key": apiKey, // BFL uses x-key, not Authorization
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt,
+      ...(aspect_ratio ? { aspect_ratio } : {}),
+    }),
   });
-  if (error) console.error("logCost error", error);
-}
 
-function pickBase64FromAny(data: any): string | null {
-  if (typeof data?.image_base64 === "string") return data.image_base64;
-  if (Array.isArray(data?.data) && data.data[0]?.b64_json) return data.data[0].b64_json; // OpenAI
-  if (Array.isArray(data?.images) && data.images[0]?.b64_json) return data.images[0].b64_json;
-  if (Array.isArray(data?.artifacts) && data.artifacts[0]?.base64) return data.artifacts[0].base64;
-  return null;
-}
-
-// ---------- Providers ----------
-
-async function genWithOpenAI(prompt: string, size: string) {
-  if (!OPENAI_API_KEY) throw new Error("Missing OPENAI_API_KEY");
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-  const res = await openai.images.generate({
-    model: "gpt-image-1",
-    prompt,
-    size, // 512x512 | 768x768 | 1024x1024
-  });
-  const b64 = pickBase64FromAny(res);
-  if (!b64) throw new Error("OpenAI image: unexpected response shape");
-  return { provider: "openai", model: "gpt-image-1", image_base64: b64 };
-}
-
-async function genWithBFL(prompt: string, size: string, model: string, steps: number, guidance: number, seed?: number) {
-  if (!BFL_API_KEY) throw new Error("Missing BFL_API_KEY");
-
-  // Try an explicit endpoint if provided, otherwise try a few common ones.
-  const endpoints = [
-    BFL_IMAGE_ENDPOINT && `${BFL_API_URL}${BFL_IMAGE_ENDPOINT}`,
-    `${BFL_API_URL}/v1/images/generations`,
-    `${BFL_API_URL}/v1/images/generate`,
-    `${BFL_API_URL}/images/generations`,
-  ].filter(Boolean) as string[];
-
-  const body = { prompt, model, size, steps, guidance, seed };
-
-  const errors: string[] = [];
-  for (const url of endpoints) {
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${BFL_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    const txt = await resp.text();
-    let json: any = null;
-    try { json = JSON.parse(txt); } catch { /* keep txt for diagnostics */ }
-    if (resp.ok) {
-      const b64 = pickBase64FromAny(json);
-      if (!b64) throw new Error(`BFL OK but unexpected shape from ${url}: ${txt.slice(0,300)}...`);
-      return { provider: "bfl", model, image_base64: b64 };
-    } else {
-      errors.push(`${url} -> ${resp.status} ${txt}`);
-    }
+  if (!submit.ok) {
+    const details = await submit.text();
+    throw new Error(`BFL submit failed: ${submit.status} ${details}`);
   }
-  throw new Error(`All BFL endpoints failed:\n${errors.join("\n")}`);
+  const submitted = await submit.json() as { id: string; polling_url: string };
+
+  // 2) poll using polling_url
+  const start = Date.now();
+  while (true) {
+    await new Promise(r => setTimeout(r, 500));
+    const poll = await fetch(submitted.polling_url, {
+      headers: { "accept": "application/json", "x-key": apiKey },
+    });
+    if (!poll.ok) {
+      const details = await poll.text();
+      throw new Error(`BFL poll failed: ${poll.status} ${details}`);
+    }
+    const data = await poll.json() as any;
+    if (data.status === "Ready") {
+      const sampleUrl: string | undefined = data?.result?.sample;
+      if (!sampleUrl) throw new Error("BFL: Ready but no result.sample URL");
+      // 3) download binary (delivery URLs expire in ~10 minutes)
+      const imgRes = await fetch(sampleUrl);
+      if (!imgRes.ok) throw new Error(`BFL image download failed: ${imgRes.status}`);
+      const buf = new Uint8Array(await imgRes.arrayBuffer());
+      return {
+        provider: "bfl",
+        model,
+        delivery_url: sampleUrl,
+        image_base64: toBase64(buf),
+      };
+    }
+    if (data.status === "Error" || data.status === "Failed") {
+      throw new Error(`BFL generation error: ${JSON.stringify(data)}`);
+    }
+    // safety: stop after ~60s
+    if (Date.now() - start > 60_000) throw new Error("BFL timeout");
+  }
 }
 
-// ---------- HTTP handler ----------
+// ---------- OpenAI fallback ----------
+async function generateWithOpenAI(prompt: string) {
+  const url = Deno.env.get("OPENAI_BASE_URL")?.replace(/\/+$/, "") || "https://api.openai.com";
+  const key = Deno.env.get("OPENAI_API_KEY");
+  const model = Deno.env.get("OPENAI_IMAGE_MODEL") || "gpt-image-1";
+  if (!key) throw new Error("Missing OPENAI_API_KEY");
+
+  const res = await fetch(`${url}/v1/images/generations`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+    body: JSON.stringify({ model, prompt, size: "1024x1024" }),
+  });
+  if (!res.ok) {
+    const details = await res.text();
+    throw new Error(`OpenAI image error: ${res.status} ${details}`);
+  }
+  const json = await res.json();
+  const b64 = json?.data?.[0]?.b64_json;
+  if (!b64) throw new Error("OpenAI: no image returned");
+  return { provider: "openai", model, image_base64: b64 };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return new Response("Use POST", { status: 405, headers: corsHeaders });
 
   try {
-    const body = await req.json().catch(() => ({}));
-    const {
-      prompt,
-      orgId = "default-org",
-      size = "768x768",
-      model = "flux-schnell",
-      steps = 20,
-      guidance = 3.5,
-      seed,
-      provider = (Deno.env.get("AI_IMAGE_PROVIDER") ?? "bfl"),
-      fallback = "none", // "openai" or "none"
-    } = body ?? {};
-
-    if (!prompt) {
-      return new Response(JSON.stringify({ error: "missing_prompt" }), {
-        status: 400, headers: { "Content-Type": "application/json", ...corsHeaders }
+    const body = (await req.json()) as ReqBody;
+    if (!body?.prompt) {
+      return new Response(JSON.stringify({ error: "Missing 'prompt'" }), {
+        status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    // Budget check
-    const spent = await getImageSpent(orgId);
-    if (spent >= IMAGE_BUDGET) {
-      return new Response(JSON.stringify({ error: "budget_exceeded", spent, budget: IMAGE_BUDGET }), {
-        status: 429, headers: { "Content-Type": "application/json", ...corsHeaders }
-      });
-    }
-
-    let out;
+    const useProvider = body.provider || "bfl";
     try {
-      if (provider === "openai" || !BFL_API_KEY) {
-        out = await genWithOpenAI(prompt, size);
-      } else {
-        out = await genWithBFL(prompt, size, model, steps, guidance, seed);
-      }
-    } catch (primaryErr) {
-      console.error("primary provider failed:", primaryErr);
-      if (fallback === "openai") {
-        try {
-          out = await genWithOpenAI(prompt, size);
-        } catch (fallbackErr) {
-          console.error("fallback provider failed:", fallbackErr);
-          return new Response(JSON.stringify({ error: "generation_failed", details: String(fallbackErr) }), {
-            status: 502, headers: { "Content-Type": "application/json", ...corsHeaders }
-          });
-        }
-      } else {
-        return new Response(JSON.stringify({ error: "generation_failed", details: String(primaryErr) }), {
-          status: 502, headers: { "Content-Type": "application/json", ...corsHeaders }
+      const result = useProvider === "openai"
+        ? await generateWithOpenAI(body.prompt)
+        : await generateWithBFL(body.prompt, body.aspect_ratio);
+      return new Response(JSON.stringify(result), {
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    } catch (e) {
+      if (body.fallback === "openai") {
+        const fb = await generateWithOpenAI(body.prompt);
+        return new Response(JSON.stringify({ ...fb, note: "BFL failed, used OpenAI fallback" }), {
+          headers: { "Content-Type": "application/json", ...corsHeaders },
         });
       }
+      throw e;
     }
-
-    // Log flat cost
-    await logCost(orgId, out.provider, out.model, IMAGE_PRICE_USD);
-
-    return new Response(JSON.stringify({
-      provider: out.provider, model: out.model, size, image_base64: out.image_base64
-    }), { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } });
-
   } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: "internal_error", details: String(err) }), {
-      status: 500, headers: { "Content-Type": "application/json", ...corsHeaders }
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500, headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
 });
