@@ -1,0 +1,10 @@
+{
+  "id": "studypug:us:math:g3:fractions",
+  "subjectId": "mathematics",
+  "grade": 3,
+  "outcomes": [
+    { "id": "M3.FR.1", "code": "SPUG-MATH-3-FR-1", "title": "Understand fractions as numbers" },
+    { "id": "M3.FR.2", "title": "Compare fractions with same denominator" }
+  ],
+  "links": ["https://www.studypug.com/"]
+}
