@@ -1,102 +1,212 @@
-// Deno / Supabase Edge Function: ai-text
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// supabase/functions/ai-text/index.ts
+// Deno Edge Function (TypeScript)
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')!;
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const MONTHLY_BUDGET_USD = Number(Deno.env.get('AI_BUDGET_USD_MONTHLY') ?? '25');
-const PER_MINUTE_LIMIT = Number(Deno.env.get('AI_RATE_LIMIT_PER_MINUTE') ?? '60');
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import OpenAI from "npm:openai@4";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-type ChatRequest = { messages: Array<{ role: 'system'|'user'|'assistant'; content: string }> };
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
-function estimateCostUSD(model: string, tokens: number): number {
-  // very rough, adjust to your contract/prices
-  // mini input+output ballpark
-  const per1k = 0.002; 
-  return (tokens / 1000) * per1k;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
+const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY")! });
+
+// “Dreje-knapper”
+const AI_BUDGET_USD_MONTHLY =
+  Number(Deno.env.get("AI_BUDGET_USD_MONTHLY") ?? "25");
+const AI_MAX_TOKENS = Number(Deno.env.get("AI_MAX_TOKENS") ?? "1500");
+const AI_CHEAP_MODE = Deno.env.get("AI_CHEAP_MODE") === "1";
+
+// Pris pr. 1K tokens (kan justeres i secrets for at undgå forældede satser)
+const PRICE_IN_PER_1K = Number(Deno.env.get("AI_TEXT_PRICE_IN_PER_1K") ?? "0.15") / 1000;   // $0.15 per 1K
+const PRICE_OUT_PER_1K = Number(Deno.env.get("AI_TEXT_PRICE_OUT_PER_1K") ?? "0.60") / 1000; // $0.60 per 1K
+
+function monthStartISO(d = new Date()) {
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString();
 }
 
-Deno.serve(async (req) => {
-  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
+async function getSpentUSD(orgId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from("ai_metrics")
+    .select("cost_usd")
+    .eq("org_id", orgId)
+    .gte("created_at", monthStartISO());
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { global: { fetch } });
+  if (error) {
+    console.error("sum spent error", error);
+    return 0;
+  }
+  return (data ?? []).reduce((s, r: any) => s + Number(r.cost_usd || 0), 0);
+}
 
-  const orgId = req.headers.get('x-org-id') ?? 'public';
-  const model = req.headers.get('x-model') ?? 'gpt-4o-mini';
-  const maxTokens = Number(req.headers.get('x-max-tokens') ?? '1200');
-  const cheap = req.headers.get('x-cheap-mode') === '1';
-  const cacheKey = req.headers.get('x-cache-key') ?? '';
+async function getCache(key: string, ttlSec: number) {
+  const { data, error } = await supabase
+    .from("ai_cache")
+    .select("value, created_at")
+    .eq("key", key)
+    .maybeSingle();
+  if (error || !data) return null;
 
-  // Basic rate-limit (per minute)
-  const nowIso = new Date().toISOString();
-  const oneMinAgo = new Date(Date.now() - 60_000).toISOString();
-  const { data: recent, error: rlErr } = await supabase
-    .from('ai_metrics')
-    .select('id', { count: 'exact', head: true })
-    .eq('org_id', orgId)
-    .gte('created_at', oneMinAgo);
-  if (!rlErr && (recent?.length ?? 0) >= PER_MINUTE_LIMIT) {
-    return new Response(JSON.stringify({ error: 'Rate limit. Try later.' }), { status: 429, headers: { 'content-type': 'application/json' }});
+  const ageSec =
+    (Date.now() - new Date(data.created_at).getTime()) / 1000;
+  if (ageSec <= ttlSec) return data.value;
+  return null;
+}
+
+async function setCache(key: string, value: unknown) {
+  const { error } = await supabase
+    .from("ai_cache")
+    .upsert({ key, value, created_at: new Date().toISOString() });
+  if (error) console.error("cache upsert error", error);
+}
+
+async function logCost(opts: {
+  orgId: string;
+  provider: string;
+  model: string;
+  tokens: number;
+  cost: number;
+  key?: string;
+}) {
+  const { error } = await supabase.from("ai_metrics").insert({
+    org_id: opts.orgId,
+    provider: opts.provider,
+    model: opts.model,
+    tokens: opts.tokens,
+    cost_usd: opts.cost,
+    key: opts.key ?? null,
+  });
+  if (error) console.error("log cost error", error);
+}
+
+async function sha1(s: string) {
+  const buf = new TextEncoder().encode(s);
+  const hash = await crypto.subtle.digest("SHA-1", buf);
+  return Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
-  // Monthly budget check
-  const firstOfMonth = new Date(); firstOfMonth.setDate(1); firstOfMonth.setHours(0,0,0,0);
-  const { data: sumRows } = await supabase
-    .rpc('sum_ai_cost_usd', { p_org: orgId, p_since: firstOfMonth.toISOString() })
-    .catch(() => ({ data: [{ sum: 0 }] as any }));
-  const spent = Number((sumRows?.[0]?.sum ?? 0));
-  if (spent >= MONTHLY_BUDGET_USD) {
-    return new Response(JSON.stringify({ error: 'Monthly AI budget reached.' }), { status: 402, headers: { 'content-type': 'application/json' }});
-  }
-
-  // Cache hit?
-  if (cacheKey) {
-    const { data: cached } = await supabase.from('ai_cache').select('value').eq('key', cacheKey).maybeSingle();
-    if (cached?.value) {
-      return new Response(JSON.stringify(cached.value), { headers: { 'content-type': 'application/json', 'x-cache': 'HIT' }});
+  try {
+    if (req.method !== "POST") {
+      return new Response("Use POST", {
+        status: 405,
+        headers: corsHeaders,
+      });
     }
-  }
 
-  let body: ChatRequest;
-  try { body = await req.json(); } catch { return new Response('Bad JSON', { status: 400 }); }
+    const body = await req.json().catch(() => ({}));
+    const {
+      prompt,
+      orgId = "default-org",
+      cacheKey,
+      ttlSec = 60 * 60 * 24, // 24h cache
+      mode, // 'cheap' | 'normal'
+      model: modelOverride,
+      systemPrompt,
+      maxTokens,
+    } = body ?? {};
 
-  // OpenAI call
-  const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'authorization': `Bearer ${OPENAI_API_KEY}` },
-    body: JSON.stringify({
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: "Missing 'prompt'" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Budget check
+    const spent = await getSpentUSD(orgId);
+    if (spent >= AI_BUDGET_USD_MONTHLY) {
+      return new Response(
+        JSON.stringify({
+          error: "AI monthly budget exceeded",
+          spent,
+          budget: AI_BUDGET_USD_MONTHLY,
+        }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+
+    // Cache hit?
+    const keyRaw = cacheKey ?? `${orgId}:${prompt}`;
+    const key = await sha1(keyRaw);
+    const cached = await getCache(key, ttlSec);
+    if (cached) {
+      return new Response(
+        JSON.stringify({ cached: true, data: cached }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+
+    const cheap = (mode === "cheap") || AI_CHEAP_MODE;
+    const model = modelOverride ?? (cheap ? "gpt-4o-mini" : "gpt-4o");
+    const max_out_tokens = Math.min(Number(maxTokens ?? AI_MAX_TOKENS), AI_MAX_TOKENS);
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          systemPrompt ??
+          (cheap
+            ? "You are a concise educational content generator. Keep outputs compact and structured."
+            : "You are an engaging educational content generator. Be structured, clear, and adaptive."),
+      },
+      { role: "user", content: String(prompt) },
+    ] as const;
+
+    const res = await openai.chat.completions.create({
       model,
-      max_tokens: maxTokens,
-      temperature: cheap ? 0.3 : 0.7,
-      messages: body.messages,
-    }),
-  });
+      messages,
+      max_tokens: max_out_tokens,
+      temperature: cheap ? 0.2 : 0.7,
+    });
 
-  if (!oaiRes.ok) {
-    const text = await oaiRes.text();
-    return new Response(JSON.stringify({ error: 'OpenAI error', detail: text }), { status: 502, headers: { 'content-type': 'application/json' }});
+    const text = res.choices?.[0]?.message?.content ?? "";
+    const usage = res.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+
+    // Estimeret pris
+    const cost =
+      (usage.prompt_tokens * PRICE_IN_PER_1K) +
+      (usage.completion_tokens * PRICE_OUT_PER_1K);
+
+    await logCost({
+      orgId,
+      provider: "openai",
+      model,
+      tokens: usage.total_tokens ?? 0,
+      cost,
+      key,
+    });
+
+    const payload = {
+      model,
+      usage,
+      cost_est_usd: Number(cost.toFixed(6)),
+      output: text,
+    };
+
+    await setCache(key, payload);
+
+    return new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: "Internal error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
-
-  const out = await oaiRes.json();
-  const tokens = out?.usage?.total_tokens ?? 0;
-  const cost = estimateCostUSD(model, tokens);
-
-  // Log + cache
-  await supabase.from('ai_metrics').insert({
-    org_id: orgId,
-    provider: 'openai',
-    model,
-    tokens,
-    cost_usd: cost,
-    key: cacheKey || null,
-  });
-
-  if (cacheKey) {
-    await supabase.from('ai_cache').upsert({ key: cacheKey, value: out });
-  }
-
-  return new Response(JSON.stringify({
-    content: out.choices?.[0]?.message?.content ?? '',
-    usage: out.usage,
-  }), { headers: { 'content-type': 'application/json' }});
 });
