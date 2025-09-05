@@ -1,51 +1,65 @@
-import React from "react";
 import { Link } from "react-router-dom";
+
+// NOTE: we only *attempt* to read auth inside the component.
+// If the hook throws because a provider isn't present, we catch and show a no-auth view.
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Landing() {
-  // ✅ useAuth is called inside the component (under the provider)
-  const { user, isLoading, signIn, signOut } = useAuth();
+  // default: assume signed out
+  let authed = false;
+  let displayName: string | undefined;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
-    );
+  try {
+    const { user } = useAuth();
+    authed = !!user;
+    displayName = user?.name || user?.email || undefined;
+  } catch (_err) {
+    // If useAuth throws (no provider), we just treat as signed-out.
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-6 p-6">
-      <h1 className="text-3xl font-bold">Welcome to Athena Skole</h1>
+    <div className="min-h-screen flex items-center justify-center p-8 bg-background text-foreground">
+      <div className="max-w-2xl w-full space-y-6">
+        {/* NELIE visual (from /public) */}
+        <div className="flex justify-center">
+          <img
+            src="/nelie.png"
+            alt="NELIE — the floating tutor"
+            className="h-32 w-32 object-contain"
+          />
+        </div>
 
-      {user ? (
-        <>
-          <p className="text-lg">Signed in as <span className="font-medium">{user.email ?? user.id}</span></p>
-          <div className="flex gap-3">
-            <Link to="/daily-program" className="underline">Go to Daily Program</Link>
-            <Link to="/training-ground" className="underline">Training Ground</Link>
-            <button
-              className="border px-3 py-2 rounded"
-              onClick={() => signOut()}
+        <h1 className="text-3xl font-bold text-center">
+          {authed ? `Welcome${displayName ? `, ${displayName}` : ""}!` : "Welcome to NELIE"}
+        </h1>
+
+        {authed ? (
+          <div className="flex gap-3 justify-center">
+            <Link
+              to="/daily-program"
+              className="px-4 py-2 rounded-xl border hover:bg-accent"
             >
-              Sign out
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="text-lg">You’re not signed in.</p>
-          <div className="flex gap-3">
-            <Link to="/auth" className="underline">Open Sign-in</Link>
-            <button
-              className="border px-3 py-2 rounded"
-              onClick={() => signIn?.()}
+              Go to Daily Program
+            </Link>
+            <Link
+              to="/training-ground"
+              className="px-4 py-2 rounded-xl border hover:bg-accent"
             >
-              Quick Sign-in
-            </button>
+              Training Ground
+            </Link>
           </div>
-        </>
-      )}
-    </main>
+        ) : (
+          <div className="text-center space-y-3">
+            <p>Sign in to start your personalized journey with NELIE.</p>
+            <Link
+              to="/auth"
+              className="inline-block px-4 py-2 rounded-xl border hover:bg-accent"
+            >
+              Sign in / Create account
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
