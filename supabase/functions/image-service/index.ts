@@ -1,7 +1,7 @@
 // @ts-nocheck
 // supabase/functions/image-service/index.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { bflGenerateImage } from "../_shared/imageProviders.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 /* ---------- helpers ---------- */
 
@@ -52,14 +52,12 @@ Deno.serve(async (req) => {
 
   const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
 
-  const bflKey = Deno.env.get("BFL_API_KEY");
-  const bflBase = Deno.env.get("BFL_API_BASE") ?? "https://api.bfl.ai";
-  const bflModel = Deno.env.get("BFL_MODEL") ?? "flux-pro-1.1";
+  const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 
   console.log("[image-service] hasSRV:", Boolean(srv));
-  console.log("[image-service] bflKey exists:", Boolean(bflKey), "length:", bflKey?.length || 0);
+  console.log("[image-service] openaiKey exists:", Boolean(openaiApiKey), "length:", openaiApiKey?.length || 0);
   if (!srv) return bad("Missing SERVICE_ROLE_KEY", 500);
-  if (!bflKey) return bad("Missing BFL_API_KEY", 500);
+  if (!openaiApiKey) return bad("Missing OPENAI_API_KEY", 500);
 
   const supabase = createClient(supabaseUrl, srv, { auth: { persistSession: false } });
 
@@ -73,40 +71,47 @@ Deno.serve(async (req) => {
   const universeId = String(body.universeId ?? "default");
 
   try {
-    // 1) Generate via BFL
-    const endpoint = `${bflBase}/v1/${bflModel}`;
-    console.log("[image-service] submitting to:", endpoint, "prompt:", prompt, "w/h:", width, height);
+    // 1) Generate via OpenAI
+    console.log("[image-service] submitting to OpenAI, prompt:", prompt, "w/h:", width, height);
 
-    let bflUrl: string;
+    let imageBytes: Uint8Array;
     try {
-      const result = await bflGenerateImage({
-        prompt, width, height, apiKey: bflKey,
-        endpoint,
-        negativePrompt: body.negativePrompt,
-        seed: body.seed,
-        cfgScale: body.cfgScale,
-        steps: body.steps,
+      const result = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-image-1',
+          prompt,
+          size: `${width}x${height}`,
+          output_format: 'webp',
+          quality: 'high',
+          n: 1,
+        }),
       });
-      bflUrl = result.url;
-      console.log("[image-service] BFL response URL:", bflUrl);
-    } catch (bflError) {
-      console.error("[image-service] BFL API error:", bflError);
-      return bad(`BFL API error: ${bflError instanceof Error ? bflError.message : String(bflError)}`, 502);
+
+      if (!result.ok) {
+        const errorText = await result.text();
+        throw new Error(`OpenAI API error: ${result.status} ${errorText}`);
+      }
+
+      const data = await result.json();
+      const imageB64 = data.data[0].b64_json;
+      imageBytes = Uint8Array.from(atob(imageB64), c => c.charCodeAt(0));
+      console.log("[image-service] OpenAI generation successful, bytes:", imageBytes.length);
+    } catch (openaiError) {
+      console.error("[image-service] OpenAI API error:", openaiError);
+      return bad(`OpenAI API error: ${openaiError instanceof Error ? openaiError.message : String(openaiError)}`, 502);
     }
 
-    // 2) Download bytes
-    const imgRes = await fetch(bflUrl);
-    if (!imgRes.ok) return bad(`Failed to fetch generated image: ${imgRes.status}`, 502);
-
-    const arrayBuf = await imgRes.arrayBuffer();
-    const contentType = imgRes.headers.get("content-type") ?? "image/jpeg";
-    const blob = new Blob([arrayBuf], { type: contentType });
+    // 2) Create blob from bytes
+    const contentType = "image/webp";
+    const blob = new Blob([imageBytes], { type: contentType });
 
     // 3) Extension
-    const ext =
-      contentType.includes("png") ? "png" :
-      contentType.includes("webp") ? "webp" :
-      contentType.includes("gif") ? "gif" : "jpg";
+    const ext = "webp";
 
     // 4) Upload timestamped AND canonical "cover"
     const tsPath = `${universeId}/${Date.now()}-${slug(prompt)}.${ext}`;
@@ -126,9 +131,8 @@ Deno.serve(async (req) => {
     const pub = supabase.storage.from(bucket).getPublicUrl(coverPath);
 
     return ok({
-      impl: "bfl-upload-v1",
+      impl: "openai-upload-v1",
       width, height,
-      bflUrl,                   // original delivery URL (debug)
       bucket,
       path: tsPath,             // timestamped record
       coverPath,                // canonical path the UI can always load
