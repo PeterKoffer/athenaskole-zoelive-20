@@ -1,138 +1,104 @@
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+type AuthUser = {
+  id: string;
+  email?: string;
+  role?: string; // "student" | "teacher" | "school_leader" | ...
+} | null;
 
-interface AuthContextType {
-  user: User | null;
+type AuthContextValue = {
+  user: AuthUser;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, metadata?: { name?: string; age?: string }) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUserRole: (newRole: string) => Promise<any>;
-}
+  // Optional helpers
+  setDevUser: (u: AuthUser) => void; // DEV: let os "logge ind" uden backend
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<AuthUser>(null);
   const [loading, setLoading] = useState(true);
 
-  console.log('AuthProvider render - User:', user?.email, 'Loading:', loading);
-
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
+    let unsub: (() => void) | undefined;
+    let supabase: any | null = null;
+
+    (async () => {
       try {
-        console.log('Getting initial session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
+        // Prøv at indlæse Supabase klient, hvis den findes i koden
+        const mod = await import("@/lib/supabaseClient").catch(() => null);
+        supabase = mod?.supabase ?? mod?.default ?? null;
+
+        if (supabase?.auth) {
+          // Hent eksisterende session
+          const { data } = await supabase.auth.getSession();
+          const sUser = data?.session?.user
+            ? { id: data.session.user.id, email: data.session.user.email }
+            : null;
+          setUser(sUser);
+
+          // Lyt efter login/logout
+          const { data: sub } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+            const next = session?.user ? { id: session.user.id, email: session.user.email } : null;
+            setUser(next);
+            if (next) localStorage.setItem("auth:user", JSON.stringify(next));
+            else localStorage.removeItem("auth:user");
+          });
+          unsub = () => sub?.subscription?.unsubscribe?.();
         } else {
-          console.log('Initial session:', session?.user?.email || 'No user');
-          setUser(session?.user ?? null);
+          // Fallback: læs evt. dev-bruger fra localStorage
+          const raw = localStorage.getItem("auth:user");
+          setUser(raw ? JSON.parse(raw) : null);
         }
-      } catch (error) {
-        console.error('Error getting initial session:', error);
+      } catch {
+        // Fallback hvis import fejler
+        const raw = localStorage.getItem("auth:user");
+        setUser(raw ? JSON.parse(raw) : null);
       } finally {
         setLoading(false);
       }
-    };
+    })();
 
-    getInitialSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email || 'No user');
-        setUser(session?.user ?? null);
-        setLoading(false);
+    return () => {
+      try {
+        unsub?.();
+      } catch {
+        /* noop */
       }
-    );
-
-    return () => subscription.unsubscribe();
+    };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    console.log('Attempting to sign in:', email);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) {
-      console.error('Sign in error:', error);
-      throw error;
-    }
-    
-    console.log('Sign in successful:', data.user?.email);
-  };
+  const value = useMemo<AuthContextValue>(() => {
+    return {
+      user,
+      loading,
+      signOut: async () => {
+        try {
+          const mod = await import("@/lib/supabaseClient").catch(() => null);
+          const supabase = mod?.supabase ?? mod?.default ?? null;
+          if (supabase?.auth?.signOut) await supabase.auth.signOut();
+        } catch {
+          // ignore
+        }
+        localStorage.removeItem("auth:user");
+        setUser(null);
+      },
+      setDevUser: (u) => {
+        if (u) localStorage.setItem("auth:user", JSON.stringify(u));
+        else localStorage.removeItem("auth:user");
+        setUser(u);
+      },
+    };
+  }, [user, loading]);
 
-  const signUp = async (email: string, password: string, metadata?: { name?: string; age?: string }) => {
-    console.log('Attempting to sign up:', email);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata || {},
-        emailRedirectTo: `${window.location.origin}/`
-      }
-    });
-    
-    if (error) {
-      console.error('Sign up error:', error);
-      throw error;
-    }
-    
-    console.log('Sign up successful:', data.user?.email);
-  };
-
-  const signOut = async () => {
-    console.log('Signing out user:', user?.email);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Sign out error:', error);
-      throw error;
-    }
-    setUser(null);
-    console.log('Sign out successful');
-  };
-
-  const updateUserRole = async (newRole: string) => {
-    if (!user) {
-      throw new Error('No user logged in');
-    }
-    
-    console.log('Updating user role from', user.user_metadata?.role, 'to', newRole);
-    
-    const { data, error } = await supabase.auth.updateUser({
-      data: {
-        ...user.user_metadata,
-        role: newRole
-      }
-    });
-    
-    if (error) {
-      console.error('Update user role error:', error);
-      throw error;
-    }
-    
-    console.log('User role updated successfully:', data.user?.user_metadata?.role);
-    return data;
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateUserRole }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context;
+  return ctx;
 };
