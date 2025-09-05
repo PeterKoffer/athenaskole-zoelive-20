@@ -1,4 +1,5 @@
-// supabase/functions/ai-image/index.ts
+# from repo root
+cat > supabase/functions/ai-image/index.ts <<'TS'
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 const VERSION = "ai-image@v0.4-openai-only";
@@ -36,7 +37,7 @@ serve(async (req) => {
       );
     }
 
-    // OpenAI only (clear error if someone asks for other providers)
+    // OpenAI only for now
     if (provider !== "openai") {
       return json(
         { error: "unsupported_provider", details: `Provider '${provider}' not supported yet.`, version: VERSION },
@@ -53,7 +54,7 @@ serve(async (req) => {
       );
     }
 
-    // No response_format — API rejects it now.
+    // NOTE: no response_format here (OpenAI rejects it)
     const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
@@ -65,7 +66,6 @@ serve(async (req) => {
         prompt,
         size,
         n: 1,
-        // quality/style/background can be added if you want, but not response_format
       }),
     });
 
@@ -84,8 +84,6 @@ serve(async (req) => {
     }
 
     const data = await r.json();
-    // For gpt-image-1 the default is b64_json in most tenants; but if OpenAI ever
-    // returns a URL instead, we pass that back so the client can download it.
     const b64: string | undefined = data?.data?.[0]?.b64_json;
     const url: string | undefined = data?.data?.[0]?.url;
 
@@ -113,3 +111,4 @@ serve(async (req) => {
     );
   }
 });
+TS
