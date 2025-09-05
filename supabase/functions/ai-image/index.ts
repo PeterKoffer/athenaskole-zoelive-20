@@ -1,4 +1,3 @@
-# from repo root
 cat > supabase/functions/ai-image/index.ts <<'TS'
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
@@ -37,7 +36,6 @@ serve(async (req) => {
       );
     }
 
-    // OpenAI only for now
     if (provider !== "openai") {
       return json(
         { error: "unsupported_provider", details: `Provider '${provider}' not supported yet.`, version: VERSION },
@@ -54,7 +52,7 @@ serve(async (req) => {
       );
     }
 
-    // NOTE: no response_format here (OpenAI rejects it)
+    // NOTE: no response_format here
     const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
