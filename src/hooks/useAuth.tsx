@@ -1,20 +1,16 @@
 // src/hooks/useAuth.tsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import supabase from "@/lib/supabaseClient";
 
-type AuthUser =
-  | {
-      id: string;
-      email?: string;
-      role?: string; // "student" | "teacher" | "school_leader" | ...
-    }
-  | null;
+type AuthUser = {
+  id: string;
+  email?: string;
+  role?: string; // "student" | "teacher" | "school_leader" | ...
+} | null;
 
 type AuthContextValue = {
   user: AuthUser;
   loading: boolean;
   signOut: () => Promise<void>;
-  // DEV helper: allows setting a fake user when no backend
   setDevUser: (u: AuthUser) => void;
 };
 
@@ -29,26 +25,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     (async () => {
       try {
+        // Prøv alias først, fald tilbage til relativ sti hvis alias ikke virker
+        let mod: any = null;
+        try {
+          mod = await import("@/lib/supabaseClient");
+        } catch {
+          mod = await import("../lib/supabaseClient").catch(() => null);
+        }
+        const supabase = mod?.supabase ?? mod?.default ?? null;
+
         if (supabase?.auth) {
-          // existing session
           const { data } = await supabase.auth.getSession();
           const sUser = data?.session?.user
-            ? { id: data.session.user.id, email: data.session.user.email ?? undefined }
+            ? { id: data.session.user.id, email: data.session.user.email }
             : null;
           setUser(sUser);
 
-          // listen for auth changes
-          const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-            const next = session?.user
-              ? { id: session.user.id, email: session.user.email ?? undefined }
-              : null;
+          const { data: sub } = supabase.auth.onAuthStateChange((_evt: any, session: any) => {
+            const next = session?.user ? { id: session.user.id, email: session.user.email } : null;
             setUser(next);
             if (next) localStorage.setItem("auth:user", JSON.stringify(next));
             else localStorage.removeItem("auth:user");
           });
           unsub = () => sub?.subscription?.unsubscribe?.();
         } else {
-          // fallback: use localStorage (dev only)
           const raw = localStorage.getItem("auth:user");
           setUser(raw ? JSON.parse(raw) : null);
         }
@@ -61,35 +61,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })();
 
     return () => {
-      try {
-        unsub?.();
-      } catch {
-        /* noop */
-      }
+      try { unsub?.(); } catch {}
     };
   }, []);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      loading,
-      signOut: async () => {
+  const value = useMemo<AuthContextValue>(() => ({
+    user,
+    loading,
+    signOut: async () => {
+      try {
+        let mod: any = null;
         try {
-          if (supabase?.auth?.signOut) await supabase.auth.signOut();
+          mod = await import("@/lib/supabaseClient");
         } catch {
-          /* ignore */
+          mod = await import("../lib/supabaseClient").catch(() => null);
         }
-        localStorage.removeItem("auth:user");
-        setUser(null);
-      },
-      setDevUser: (u) => {
-        if (u) localStorage.setItem("auth:user", JSON.stringify(u));
-        else localStorage.removeItem("auth:user");
-        setUser(u);
-      },
-    }),
-    [user, loading]
-  );
+        const supabase = mod?.supabase ?? mod?.default ?? null;
+        if (supabase?.auth?.signOut) await supabase.auth.signOut();
+      } catch {}
+      localStorage.removeItem("auth:user");
+      setUser(null);
+    },
+    setDevUser: (u) => {
+      if (u) localStorage.setItem("auth:user", JSON.stringify(u));
+      else localStorage.removeItem("auth:user");
+      setUser(u);
+    },
+  }), [user, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
