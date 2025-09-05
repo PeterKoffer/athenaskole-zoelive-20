@@ -9,7 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import TrainingGround from "./pages/TrainingGround";
-import DailyProgramPage from "./pages/DailyProgramPage";
+import DailyProgramPage from "./pages/DailyProgram";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import ProfilePage from "./pages/ProfilePage";
