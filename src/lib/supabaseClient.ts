@@ -1,28 +1,24 @@
 // src/lib/supabaseClient.ts
-// Minimal og sikker initialisering. Virker også hvis env mangler.
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-let client: SupabaseClient | null = null;
+const url = import.meta.env.VITE_SUPABASE_URL;
+const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export function getSupabase(): SupabaseClient | null {
-  if (client) return client;
+// Hvis envs mangler, eksporterer vi en noop-klient så appen ikke crasher under build.
+let supabase: SupabaseClient | null = null;
 
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!url || !anon) {
-    console.warn(
-      "[supabaseClient] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY mangler - kører i dev/offline-mode."
-    );
-    return null;
-  }
-
-  // Late import så pakken ikke kræves hvis man kører uden Supabase
-  const { createClient } = (await import('@supabase/supabase-js')) as typeof import('@supabase/supabase-js');
-  client = createClient(url, anon);
-  return client;
+if (url && anon) {
+  supabase = createClient(url, anon);
+} else {
+  // Minimal no-op facsimile, så imports ikke fejler i Vite
+  supabase = {
+    auth: {
+      async getSession() { return { data: { session: null } } as any },
+      onAuthStateChange() { return { data: { subscription: { unsubscribe(){} } } } as any },
+      async signOut() { /* noop */ },
+    },
+  } as any;
 }
 
-// Kompat navn hvis noget kode tidligere importerede { supabase }
-export const supabase = await (async () => getSupabase())();
+export { supabase };
 export default supabase;
