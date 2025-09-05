@@ -1,11 +1,5 @@
-// src/hooks/useAuth.tsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-
-type AuthUser = {
-  id: string;
-  email?: string;
-  role?: string; // "student" | "teacher" | "school_leader" | ...
-} | null;
+type AuthUser = { id: string; email?: string; role?: string } | null;
 
 type AuthContextValue = {
   user: AuthUser;
@@ -25,14 +19,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     (async () => {
       try {
-        // Prøv alias først, fald tilbage til relativ sti hvis alias ikke virker
-        let mod: any = null;
-        try {
-          mod = await import("@/lib/supabaseClient");
-        } catch {
-          mod = await import("../lib/supabaseClient").catch(() => null);
-        }
-        const supabase = mod?.supabase ?? mod?.default ?? null;
+        const mod = await import("@/lib/supabaseClient");
+        const supabase = (mod as any)?.supabase ?? (mod as any)?.default ?? null;
 
         if (supabase?.auth) {
           const { data } = await supabase.auth.getSession();
@@ -60,9 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     })();
 
-    return () => {
-      try { unsub?.(); } catch {}
-    };
+    return () => { try { unsub?.(); } catch {} };
   }, []);
 
   const value = useMemo<AuthContextValue>(() => ({
@@ -70,13 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signOut: async () => {
       try {
-        let mod: any = null;
-        try {
-          mod = await import("@/lib/supabaseClient");
-        } catch {
-          mod = await import("../lib/supabaseClient").catch(() => null);
-        }
-        const supabase = mod?.supabase ?? mod?.default ?? null;
+        const mod = await import("@/lib/supabaseClient");
+        const supabase = (mod as any)?.supabase ?? (mod as any)?.default ?? null;
         if (supabase?.auth?.signOut) await supabase.auth.signOut();
       } catch {}
       localStorage.removeItem("auth:user");
