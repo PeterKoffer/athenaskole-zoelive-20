@@ -1,66 +1,51 @@
-
-import React, { useEffect } from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import { useRoleAccess } from "@/hooks/useRoleAccess";
-import HomeMainContent from "@/components/home/HomeMainContent";
-import RoleSwitcher from "@/components/RoleSwitcher";
 
-const Index = () => {
-  const { user } = useAuth();
-  const { userRole } = useRoleAccess();
-  const navigate = useNavigate();
+export default function Landing() {
+  // ✅ useAuth is called inside the component (under the provider)
+  const { user, isLoading, signIn, signOut } = useAuth();
 
-  const targetPaths: Record<string, string> = {
-    'admin': '/school-dashboard',
-    'school_leader': '/school-dashboard',
-    'school_staff': '/school-dashboard',
-    'teacher': '/teacher-dashboard',
-    'parent': '/parent-dashboard',
-    'student': '/daily-program'
-  };
-
-  // Remove automatic redirect - let users navigate manually
-  // useEffect(() => {
-  //   if (user && userRole) {
-  //     const targetPaths: Record<string, string> = {
-  //       'admin': '/school-dashboard',
-  //       'school_leader': '/school-dashboard',
-  //       'school_staff': '/school-dashboard',
-  //       'teacher': '/teacher-dashboard',
-  //       'parent': '/parent-dashboard',
-  //       'student': '/daily-program'
-  //     };
-
-  //     const targetPath = targetPaths[userRole] || '/profile';
-  //     navigate(targetPath, { replace: true });
-  //   }
-  // }, [user, userRole, navigate, targetPaths]);
-
-  const handleGetStarted = () => {
-    if (user && userRole) {
-      const targetPath = targetPaths[userRole] || '/profile';
-      navigate(targetPath);
-    } else if (user) {
-      navigate('/daily-program');
-    } else {
-      navigate('/auth');
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <p className="text-muted-foreground">Loading…</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <HomeMainContent 
-        user={user} 
-        onGetStarted={handleGetStarted} 
-      />
-      {user && (
-        <div className="fixed bottom-4 right-4 z-50">
-          <RoleSwitcher />
-        </div>
-      )}
-    </div>
-  );
-};
+    <main className="min-h-screen flex flex-col items-center justify-center gap-6 p-6">
+      <h1 className="text-3xl font-bold">Welcome to Athena Skole</h1>
 
-export default Index;
+      {user ? (
+        <>
+          <p className="text-lg">Signed in as <span className="font-medium">{user.email ?? user.id}</span></p>
+          <div className="flex gap-3">
+            <Link to="/daily-program" className="underline">Go to Daily Program</Link>
+            <Link to="/training-ground" className="underline">Training Ground</Link>
+            <button
+              className="border px-3 py-2 rounded"
+              onClick={() => signOut()}
+            >
+              Sign out
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-lg">You’re not signed in.</p>
+          <div className="flex gap-3">
+            <Link to="/auth" className="underline">Open Sign-in</Link>
+            <button
+              className="border px-3 py-2 rounded"
+              onClick={() => signIn?.()}
+            >
+              Quick Sign-in
+            </button>
+          </div>
+        </>
+      )}
+    </main>
+  );
+}
