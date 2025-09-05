@@ -1,18 +1,11 @@
 // src/lib/supabaseClient.ts
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-/**
- * Reads Vite env vars. If they’re missing, we export `null`
- * so the app can gracefully fall back in dev.
- */
+// These are optional. If they aren't set, we export `null` so imports still resolve.
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-let supabase: SupabaseClient | null = null;
+export const supabase: SupabaseClient | null =
+  url && anon ? createClient(url, anon) : null;
 
-if (url && anon) {
-  supabase = createClient(url, anon);
-}
-
-export { supabase };
 export default supabase;
