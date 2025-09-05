@@ -1,10 +1,10 @@
-// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
+
+// Pages
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import TrainingGround from "./pages/TrainingGround";
@@ -33,169 +33,116 @@ import LifeEssentialsLearning from "./components/subjects/life-essentials/LifeEs
 import GlobalGeographyLearning from "./components/subjects/global-geography/GlobalGeographyLearning";
 import WorldHistoryReligionsLearning from "./components/subjects/world-history-religions/WorldHistoryReligionsLearning";
 
-// NELIE floating launcher (ny)
+// Global NELIE launcher (flydende knap/panel)
 import NELIELauncher from "@/components/NELIELauncher";
 
 const App = () => (
-  <AuthProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/site-map" element={<SiteMapPage />} />
+  <TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/site-map" element={<SiteMapPage />} />
 
-          <Route
-            path="/auth"
-            element={
-              <ProtectedRoute requireAuth={false}>
-                <Auth />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/auth"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <Auth />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/training-ground"
-            element={
-              <ProtectedRoute>
-                <TrainingGround />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/training-ground"
+          element={
+            <ProtectedRoute>
+              <TrainingGround />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/daily-program"
-            element={
-              <ProtectedRoute>
-                <DailyProgramPage />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/daily-program"
+          element={
+            <ProtectedRoute>
+              <DailyProgramPage />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/calendar"
-            element={
-              <ProtectedRoute>
-                <CalendarPage />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/calendar"
+          element={
+            <ProtectedRoute>
+              <CalendarPage />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/school-dashboard"
-            element={
-              <ProtectedRoute requiredRole="school_leader">
-                <SchoolDashboard />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/school-dashboard"
+          element={
+            <ProtectedRoute requiredRole="school_leader">
+              <SchoolDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/teacher-dashboard"
-            element={
-              <ProtectedRoute requiredRole="teacher">
-                <TeacherDashboard />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/teacher-dashboard"
+          element={
+            <ProtectedRoute requiredRole="teacher">
+              <TeacherDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Learning routes */}
-          <Route
-            path="/learn/:subject"
-            element={
-              <ProtectedRoute>
-                <SubjectLearningPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/english"
-            element={
-              <ProtectedRoute>
-                <EnglishLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/science"
-            element={
-              <ProtectedRoute>
-                <ScienceLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/computer-science"
-            element={
-              <ProtectedRoute>
-                <ComputerScienceLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/creative-arts"
-            element={
-              <ProtectedRoute>
-                <CreativeArtsLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/music"
-            element={
-              <ProtectedRoute>
-                <MusicLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/mental-wellness"
-            element={
-              <ProtectedRoute>
-                <MentalWellnessLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/language-lab"
-            element={
-              <ProtectedRoute>
-                <LanguageLabLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/history-religion"
-            element={
-              <ProtectedRoute>
-                <HistoryReligionLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/geography"
-            element={
-              <ProtectedRoute>
-                <GeographyLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learn/body-lab"
-            element={
-              <ProtectedRoute>
-                <BodyLabLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route
+        {/* Learning routes */}
+        <Route
+          path="/learn/:subject"
+          element={
+            <ProtectedRoute>
+              <SubjectLearningPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/learn/english" element={<ProtectedRoute><EnglishLearning /></ProtectedRoute>} />
+        <Route path="/learn/science" element={<ProtectedRoute><ScienceLearning /></ProtectedRoute>} />
+        <Route path="/learn/computer-science" element={<ProtectedRoute><ComputerScienceLearning /></ProtectedRoute>} />
+        <Route path="/learn/creative-arts" element={<ProtectedRoute><CreativeArtsLearning /></ProtectedRoute>} />
+        <Route path="/learn/music" element={<ProtectedRoute><MusicLearning /></ProtectedRoute>} />
+        <Route path="/learn/mental-wellness" element={<ProtectedRoute><MentalWellnessLearning /></ProtectedRoute>} />
+        <Route path="/learn/language-lab" element={<ProtectedRoute><LanguageLabLearning /></ProtectedRoute>} />
+        <Route path="/learn/history-religion" element={<ProtectedRoute><HistoryReligionLearning /></ProtectedRoute>} />
+        <Route path="/learn/geography" element={<ProtectedRoute><GeographyLearning /></ProtectedRoute>} />
+        <Route path="/learn/body-lab" element={<ProtectedRoute><BodyLabLearning /></ProtectedRoute>} />
+        <Route path="/learn/life-essentials" element={<ProtectedRoute><LifeEssentialsLearning /></ProtectedRoute>} />
+        <Route path="/learn/global-geography" element={<ProtectedRoute><GlobalGeographyLearning /></ProtectedRoute>} />
+        <Route path="/learn/world-history-religions" element={<ProtectedRoute><WorldHistoryReligionsLearning /></ProtectedRoute>} />
+
+        {/* Daily sessions */}
+        <Route path="/daily-session" element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>} />
+        <Route path="/daily-universe-lesson" element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>} />
+
+        {/* Generic subject */}
+        <Route path="/subject/:subject" element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>} />
+      </Routes>
+
+      {/* NELIE flyder globalt på alle sider */}
+      <NELIELauncher />
+    </BrowserRouter>
+  </TooltipProvider>
+);
+
+export default App;
