@@ -1,20 +1,14 @@
 // src/lib/supabaseClient.ts
-import { createClient, Session } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL!;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY!;
+const url = import.meta.env.VITE_SUPABASE_URL;
+const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
 if (!url || !anon) {
-  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
+  // Undgå hårde crashes i dev: log tydeligt
+  console.warn("[supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY");
 }
 
-export const supabase = createClient(url, anon);
+export const supabase = createClient(url ?? "", anon ?? "");
+export default supabase;
 
-// Hjælpere (brug "await" inde i funktioner – aldrig på modul-top)
-export async function getSession(): Promise<Session | null> {
-  const { data } = await supabase.auth.getSession();
-  return data.session ?? null;
-}
-
-export function onAuthChanged(cb: (session: Session | null) => void) {
-  return supabase.auth.onAuthStateChange((_event, session) => cb(session));
-}
