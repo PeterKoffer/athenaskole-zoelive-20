@@ -1,3 +1,4 @@
+// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,7 +18,7 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
-// Import all learning components from new organized structure
+// Subjects
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
 import ScienceLearning from "./components/subjects/science/ScienceLearning";
 import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
@@ -32,6 +33,9 @@ import LifeEssentialsLearning from "./components/subjects/life-essentials/LifeEs
 import GlobalGeographyLearning from "./components/subjects/global-geography/GlobalGeographyLearning";
 import WorldHistoryReligionsLearning from "./components/subjects/world-history-religions/WorldHistoryReligionsLearning";
 
+// NELIE floating launcher (ny)
+import NELIELauncher from "@/components/NELIELauncher";
+
 const App = () => (
   <AuthProvider>
     <TooltipProvider>
@@ -41,22 +45,25 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/site-map" element={<SiteMapPage />} />
-          <Route 
-            path="/auth" 
+
+          <Route
+            path="/auth"
             element={
               <ProtectedRoute requireAuth={false}>
                 <Auth />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/training-ground" 
+
+          <Route
+            path="/training-ground"
             element={
               <ProtectedRoute>
                 <TrainingGround />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/daily-program"
             element={
@@ -65,6 +72,7 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/calendar"
             element={
@@ -73,6 +81,7 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/school-dashboard"
             element={
@@ -81,6 +90,7 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/teacher-dashboard"
             element={
@@ -89,161 +99,103 @@ const App = () => (
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/profile" 
+
+          <Route
+            path="/profile"
             element={
               <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
             }
           />
-          
-          {/* Learning Routes - All subjects organized by folder structure */}
-          <Route 
-            path="/learn/:subject" 
+
+          {/* Learning routes */}
+          <Route
+            path="/learn/:subject"
             element={
               <ProtectedRoute>
                 <SubjectLearningPage />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/english" 
+          <Route
+            path="/learn/english"
             element={
               <ProtectedRoute>
                 <EnglishLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/science" 
+          <Route
+            path="/learn/science"
             element={
               <ProtectedRoute>
                 <ScienceLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/computer-science" 
+          <Route
+            path="/learn/computer-science"
             element={
               <ProtectedRoute>
                 <ComputerScienceLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/creative-arts" 
+          <Route
+            path="/learn/creative-arts"
             element={
               <ProtectedRoute>
                 <CreativeArtsLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/music" 
+          <Route
+            path="/learn/music"
             element={
               <ProtectedRoute>
                 <MusicLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/mental-wellness" 
+          <Route
+            path="/learn/mental-wellness"
             element={
               <ProtectedRoute>
                 <MentalWellnessLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/language-lab" 
+          <Route
+            path="/learn/language-lab"
             element={
               <ProtectedRoute>
                 <LanguageLabLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/history-religion" 
+          <Route
+            path="/learn/history-religion"
             element={
               <ProtectedRoute>
                 <HistoryReligionLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/geography" 
+          <Route
+            path="/learn/geography"
             element={
               <ProtectedRoute>
                 <GeographyLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/body-lab" 
+          <Route
+            path="/learn/body-lab"
             element={
               <ProtectedRoute>
                 <BodyLabLearning />
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/learn/life-essentials" 
-            element={
-              <ProtectedRoute>
-                <LifeEssentialsLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="/learn/global-geography" 
-            element={
-              <ProtectedRoute>
-                <GlobalGeographyLearning />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="/learn/world-history-religions" 
-            element={
-              <ProtectedRoute>
-                <WorldHistoryReligionsLearning />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Daily learning session route */}
           <Route
-            path="/daily-session"
-            element={
-              <ProtectedRoute>
-                <DailyLearningSessionPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/daily-universe-lesson"
-            element={
-              <ProtectedRoute>
-                <DailyUniverseLessonPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Generic subject learning route for any other subjects */}
-          <Route 
-            path="/subject/:subject" 
-            element={
-              <ProtectedRoute>
-                <SubjectLearningPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </AuthProvider>
-);
-
-export default App;
