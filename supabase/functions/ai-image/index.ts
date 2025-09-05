@@ -1,8 +1,7 @@
 // supabase/functions/ai-image/index.ts
-// Minimal, reliable OpenAI-only generator with clear version + errors.
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-const VERSION = "ai-image@v0.3-openai-only";
+const VERSION = "ai-image@v0.4-openai-only";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -23,6 +22,7 @@ serve(async (req) => {
 
   try {
     const env = (k: string) => Deno.env.get(k)?.trim();
+
     const {
       prompt,
       size = "512x512",
@@ -36,10 +36,10 @@ serve(async (req) => {
       );
     }
 
-    // OpenAI only for now: fail fast on anything else so we can detect the new code.
+    // OpenAI only (clear error if someone asks for other providers)
     if (provider !== "openai") {
       return json(
-        { error: "unsupported_provider", provider, version: VERSION },
+        { error: "unsupported_provider", details: `Provider '${provider}' not supported yet.`, version: VERSION },
         400
       );
     }
@@ -53,6 +53,7 @@ serve(async (req) => {
       );
     }
 
+    // No response_format — API rejects it now.
     const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
@@ -63,7 +64,8 @@ serve(async (req) => {
         model: OPENAI_IMAGE_MODEL,
         prompt,
         size,
-        response_format: "b64_json",
+        n: 1,
+        // quality/style/background can be added if you want, but not response_format
       }),
     });
 
@@ -82,15 +84,28 @@ serve(async (req) => {
     }
 
     const data = await r.json();
-    const b64 = data?.data?.[0]?.b64_json;
-    if (!b64) {
+    // For gpt-image-1 the default is b64_json in most tenants; but if OpenAI ever
+    // returns a URL instead, we pass that back so the client can download it.
+    const b64: string | undefined = data?.data?.[0]?.b64_json;
+    const url: string | undefined = data?.data?.[0]?.url;
+
+    if (b64) {
       return json(
-        { error: "generation_failed", provider: "openai", version: VERSION },
-        502
+        { image_base64: b64, provider: "openai", model: OPENAI_IMAGE_MODEL, version: VERSION },
+        200
+      );
+    }
+    if (url) {
+      return json(
+        { image_url: url, provider: "openai", model: OPENAI_IMAGE_MODEL, version: VERSION },
+        200
       );
     }
 
-    return json({ image_base64: b64, provider: "openai", model: OPENAI_IMAGE_MODEL, version: VERSION }, 200);
+    return json(
+      { error: "generation_failed", provider: "openai", version: VERSION },
+      502
+    );
   } catch (err) {
     return json(
       { error: "server_error", details: String((err as any)?.message || err), version: VERSION },
