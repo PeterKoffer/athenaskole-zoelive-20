@@ -17,7 +17,8 @@ import SiteMapPage from "./pages/SiteMapPage";
 import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
-import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
+import DailyUniverseLessonPage from "@features/daily-program/pages/UniverseLesson";
+
 
 // Subjects
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
