@@ -1,11 +1,12 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Pages
-import Index from "./pages/Index";
+import Landing from "@/features/shell/pages/Landing";
 import Auth from "./pages/Auth";
 import TrainingGround from "./pages/TrainingGround";
 import DailyProgramPage from "./pages/DailyProgramPage";
@@ -18,7 +19,7 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
-// Subjects
+// Subjects (keep or trim as you like)
 import EnglishLearning from "./components/subjects/english/EnglishLearning";
 import ScienceLearning from "./components/subjects/science/ScienceLearning";
 import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
@@ -33,18 +34,16 @@ import LifeEssentialsLearning from "./components/subjects/life-essentials/LifeEs
 import GlobalGeographyLearning from "./components/subjects/global-geography/GlobalGeographyLearning";
 import WorldHistoryReligionsLearning from "./components/subjects/world-history-religions/WorldHistoryReligionsLearning";
 
-// Global NELIE launcher (flydende knap/panel)
-import NELIELauncher from "@/components/NELIELauncher";
-
-const App = () => (
-  <TooltipProvider>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
+export default function App() {
+  return (
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
       <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/site-map" element={<SiteMapPage />} />
+        {/* Public landing */}
+        <Route path="/" element={<Landing />} />
 
+        {/* Auth page can be public (ProtectedRoute requireAuth={false}) */}
         <Route
           path="/auth"
           element={
@@ -54,6 +53,7 @@ const App = () => (
           }
         />
 
+        {/* Authenticated app */}
         <Route
           path="/training-ground"
           element={
@@ -62,7 +62,6 @@ const App = () => (
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/daily-program"
           element={
@@ -71,7 +70,6 @@ const App = () => (
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/calendar"
           element={
@@ -80,7 +78,6 @@ const App = () => (
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/school-dashboard"
           element={
@@ -89,7 +86,6 @@ const App = () => (
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/teacher-dashboard"
           element={
@@ -98,7 +94,6 @@ const App = () => (
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/profile"
           element={
@@ -131,18 +126,13 @@ const App = () => (
         <Route path="/learn/global-geography" element={<ProtectedRoute><GlobalGeographyLearning /></ProtectedRoute>} />
         <Route path="/learn/world-history-religions" element={<ProtectedRoute><WorldHistoryReligionsLearning /></ProtectedRoute>} />
 
-        {/* Daily sessions */}
+        {/* Sessions */}
         <Route path="/daily-session" element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>} />
         <Route path="/daily-universe-lesson" element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>} />
 
-        {/* Generic subject */}
-        <Route path="/subject/:subject" element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>} />
+        {/* Sitemap (optionally public) */}
+        <Route path="/site-map" element={<SiteMapPage />} />
       </Routes>
-
-      {/* NELIE flyder globalt på alle sider */}
-      <NELIELauncher />
-    </BrowserRouter>
-  </TooltipProvider>
-);
-
-export default App;
+    </TooltipProvider>
+  );
+}
