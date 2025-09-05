@@ -1,19 +1,10 @@
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-cat > supabase/functions/ai-image/index.ts <<'TS'
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+// ai-image @ v0.4 minimal-openai
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-
-const VERSION = "ai-image@v0.4-openai-only";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, content-type",
 };
 
 function json(body: unknown, status = 200) {
@@ -24,95 +15,64 @@ function json(body: unknown, status = 200) {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return json({ ok: true }, 200);
 
   try {
-    const env = (k: string) => Deno.env.get(k)?.trim();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      // allow empty/malformed to produce a nice error below
+      body = {};
+    }
 
-    const {
-      prompt,
-      size = "512x512",
-      provider = env("DEFAULT_IMAGE_PROVIDER") || "openai",
-    } = await req.json().catch(() => ({}));
+    const prompt: string | undefined = body?.prompt;
+    const size: string = body?.size || "512x512";
 
     if (!prompt || typeof prompt !== "string") {
-      return json(
-        { error: "bad_request", details: "`prompt` is required", version: VERSION },
-        400
-      );
+      return json({ error: "bad_request", details: "Field 'prompt' (string) is required." }, 400);
     }
 
-    if (provider !== "openai") {
-      return json(
-        { error: "unsupported_provider", details: `Provider '${provider}' not supported yet.`, version: VERSION },
-        400
-      );
-    }
+    const apiKey = Deno.env.get("OPENAI_API_KEY");
+    const model = Deno.env.get("OPENAI_IMAGE_MODEL") ?? "gpt-image-1";
+    if (!apiKey) return json({ error: "config_error", details: "OPENAI_API_KEY not set" }, 500);
 
-    const OPENAI_API_KEY = env("OPENAI_API_KEY");
-    const OPENAI_IMAGE_MODEL = env("OPENAI_IMAGE_MODEL") || "gpt-image-1";
-    if (!OPENAI_API_KEY) {
-      return json(
-        { error: "config_error", details: "OPENAI_API_KEY missing", version: VERSION },
-        500
-      );
-    }
-
-    // NOTE: no response_format here
-    const r = await fetch("https://api.openai.com/v1/images/generations", {
+    const res = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: OPENAI_IMAGE_MODEL,
-        prompt,
-        size,
-        n: 1,
-      }),
+      body: JSON.stringify({ model, prompt, size }),
     });
 
-    if (!r.ok) {
-      const txt = await r.text().catch(() => "");
+    const text = await res.text();
+
+    if (!res.ok) {
+      // Bubble up OpenAI’s error payload so we can see exactly why
+      let details: unknown = text;
+      try { details = JSON.parse(text); } catch { /* keep text */ }
       return json(
-        {
-          error: "upstream_error",
-          provider: "openai",
-          status: r.status,
-          details: txt || "No error body",
-          version: VERSION,
-        },
-        502
+        { error: "upstream_error", provider: "openai", status: res.status, details },
+        res.status,
       );
     }
 
-    const data = await r.json();
-    const b64: string | undefined = data?.data?.[0]?.b64_json;
-    const url: string | undefined = data?.data?.[0]?.url;
-
-    if (b64) {
-      return json(
-        { image_base64: b64, provider: "openai", model: OPENAI_IMAGE_MODEL, version: VERSION },
-        200
-      );
-    }
-    if (url) {
-      return json(
-        { image_url: url, provider: "openai", model: OPENAI_IMAGE_MODEL, version: VERSION },
-        200
-      );
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return json({ error: "parse_error", details: String(e), raw: text }, 502);
     }
 
-    return json(
-      { error: "generation_failed", provider: "openai", version: VERSION },
-      502
-    );
+    const b64 = data?.data?.[0]?.b64_json;
+    const url = data?.data?.[0]?.url;
+
+    if (b64) return json({ image_base64: b64 }, 200);
+    if (url) return json({ image_url: url }, 200);
+
+    return json({ error: "no_image_in_response", provider: "openai", raw: data }, 502);
   } catch (err) {
-    return json(
-      { error: "server_error", details: String((err as any)?.message || err), version: VERSION },
-      500
-    );
+    return json({ error: "server_error", details: String(err) }, 500);
   }
 });
-TS
