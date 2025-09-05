@@ -1,2 +1,2 @@
-// src/pages/Auth.tsx
-export { default } from "@/features/auth/pages/Auth";
+// src/pages/Index.tsx
+export { default } from "@/features/shell/pages/Landing";
