@@ -1,138 +1,54 @@
+// src/App.tsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Routes, Route } from "react-router-dom";
 
+import { AuthProvider } from "@/hooks/useAuth";
+// If you already have this component, keep it. If not, we’ll add it later.
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-// Pages
+// PAGES that actually exist in your repo right now:
 import Landing from "@/features/shell/pages/Landing";
-import Auth from "./pages/Auth";
-import TrainingGround from "./pages/TrainingGround";
-import DailyProgramPage from "./pages/DailyProgramPage";
-import SchoolDashboard from "./pages/SchoolDashboard";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import ProfilePage from "./pages/ProfilePage";
-import SiteMapPage from "./pages/SiteMapPage";
-import CalendarPage from "./pages/CalendarPage";
-import SubjectLearningPage from "./pages/SubjectLearningPage";
-import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
-import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
+import Auth from "@/features/auth/pages/Auth";
 
-// Subjects (keep or trim as you like)
-import EnglishLearning from "./components/subjects/english/EnglishLearning";
-import ScienceLearning from "./components/subjects/science/ScienceLearning";
-import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
-import CreativeArtsLearning from "./components/subjects/creative-arts/CreativeArtsLearning";
-import MusicLearning from "./components/subjects/music/MusicLearning";
-import MentalWellnessLearning from "./components/subjects/mental-wellness/MentalWellnessLearning";
-import LanguageLabLearning from "./components/subjects/language-lab/LanguageLabLearning";
-import HistoryReligionLearning from "./components/subjects/history-religion/HistoryReligionLearning";
-import GeographyLearning from "./components/subjects/geography/GeographyLearning";
-import BodyLabLearning from "./components/subjects/body-lab/BodyLabLearning";
-import LifeEssentialsLearning from "./components/subjects/life-essentials/LifeEssentialsLearning";
-import GlobalGeographyLearning from "./components/subjects/global-geography/GlobalGeographyLearning";
-import WorldHistoryReligionsLearning from "./components/subjects/world-history-religions/WorldHistoryReligionsLearning";
+// ⚠️ NOTE:
+// I’m keeping the routing minimal to avoid “file not found” errors.
+// We can add TrainingGround, Dashboards, etc. once those files are in place.
 
-export default function App() {
+const App = () => {
   return (
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <Routes>
-        {/* Public landing */}
-        <Route path="/" element={<Landing />} />
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Home / Landing */}
+            <Route path="/" element={<Landing />} />
 
-        {/* Auth page can be public (ProtectedRoute requireAuth={false}) */}
-        <Route
-          path="/auth"
-          element={
-            <ProtectedRoute requireAuth={false}>
-              <Auth />
-            </ProtectedRoute>
-          }
-        />
+            {/* Auth (no guard so you can reach it even when logged out) */}
+            <Route path="/auth" element={<Auth />} />
 
-        {/* Authenticated app */}
-        <Route
-          path="/training-ground"
-          element={
-            <ProtectedRoute>
-              <TrainingGround />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/daily-program"
-          element={
-            <ProtectedRoute>
-              <DailyProgramPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/calendar"
-          element={
-            <ProtectedRoute>
-              <CalendarPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/school-dashboard"
-          element={
-            <ProtectedRoute requiredRole="school_leader">
-              <SchoolDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher-dashboard"
-          element={
-            <ProtectedRoute requiredRole="teacher">
-              <TeacherDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
+            {/* Example of a guarded route (uncomment when the page exists) */}
+            {/*
+            <Route
+              path="/training-ground"
+              element={
+                <ProtectedRoute>
+                  <TrainingGround />
+                </ProtectedRoute>
+              }
+            />
+            */}
 
-        {/* Learning routes */}
-        <Route
-          path="/learn/:subject"
-          element={
-            <ProtectedRoute>
-              <SubjectLearningPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/learn/english" element={<ProtectedRoute><EnglishLearning /></ProtectedRoute>} />
-        <Route path="/learn/science" element={<ProtectedRoute><ScienceLearning /></ProtectedRoute>} />
-        <Route path="/learn/computer-science" element={<ProtectedRoute><ComputerScienceLearning /></ProtectedRoute>} />
-        <Route path="/learn/creative-arts" element={<ProtectedRoute><CreativeArtsLearning /></ProtectedRoute>} />
-        <Route path="/learn/music" element={<ProtectedRoute><MusicLearning /></ProtectedRoute>} />
-        <Route path="/learn/mental-wellness" element={<ProtectedRoute><MentalWellnessLearning /></ProtectedRoute>} />
-        <Route path="/learn/language-lab" element={<ProtectedRoute><LanguageLabLearning /></ProtectedRoute>} />
-        <Route path="/learn/history-religion" element={<ProtectedRoute><HistoryReligionLearning /></ProtectedRoute>} />
-        <Route path="/learn/geography" element={<ProtectedRoute><GeographyLearning /></ProtectedRoute>} />
-        <Route path="/learn/body-lab" element={<ProtectedRoute><BodyLabLearning /></ProtectedRoute>} />
-        <Route path="/learn/life-essentials" element={<ProtectedRoute><LifeEssentialsLearning /></ProtectedRoute>} />
-        <Route path="/learn/global-geography" element={<ProtectedRoute><GlobalGeographyLearning /></ProtectedRoute>} />
-        <Route path="/learn/world-history-religions" element={<ProtectedRoute><WorldHistoryReligionsLearning /></ProtectedRoute>} />
-
-        {/* Sessions */}
-        <Route path="/daily-session" element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>} />
-        <Route path="/daily-universe-lesson" element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>} />
-
-        {/* Sitemap (optionally public) */}
-        <Route path="/site-map" element={<SiteMapPage />} />
-      </Routes>
-    </TooltipProvider>
+            {/* Fallback: unknown routes go home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   );
-}
+};
+
+export default App;
