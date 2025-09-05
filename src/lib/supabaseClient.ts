@@ -1,11 +1,28 @@
 // src/lib/supabaseClient.ts
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+// Minimal og sikker initialisering. Virker også hvis env mangler.
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-// These are optional. If they aren't set, we export `null` so imports still resolve.
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+let client: SupabaseClient | null = null;
 
-export const supabase: SupabaseClient | null =
-  url && anon ? createClient(url, anon) : null;
+export function getSupabase(): SupabaseClient | null {
+  if (client) return client;
 
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!url || !anon) {
+    console.warn(
+      "[supabaseClient] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY mangler - kører i dev/offline-mode."
+    );
+    return null;
+  }
+
+  // Late import så pakken ikke kræves hvis man kører uden Supabase
+  const { createClient } = (await import('@supabase/supabase-js')) as typeof import('@supabase/supabase-js');
+  client = createClient(url, anon);
+  return client;
+}
+
+// Kompat navn hvis noget kode tidligere importerede { supabase }
+export const supabase = await (async () => getSupabase())();
 export default supabase;
