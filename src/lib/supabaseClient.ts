@@ -1,24 +1,20 @@
 // src/lib/supabaseClient.ts
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient, Session } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Hvis envs mangler, eksporterer vi en noop-klient så appen ikke crasher under build.
-let supabase: SupabaseClient | null = null;
-
-if (url && anon) {
-  supabase = createClient(url, anon);
-} else {
-  // Minimal no-op facsimile, så imports ikke fejler i Vite
-  supabase = {
-    auth: {
-      async getSession() { return { data: { session: null } } as any },
-      onAuthStateChange() { return { data: { subscription: { unsubscribe(){} } } } as any },
-      async signOut() { /* noop */ },
-    },
-  } as any;
+const url = import.meta.env.VITE_SUPABASE_URL!;
+const anon = import.meta.env.VITE_SUPABASE_ANON_KEY!;
+if (!url || !anon) {
+  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
 }
 
-export { supabase };
-export default supabase;
+export const supabase = createClient(url, anon);
+
+// Hjælpere (brug "await" inde i funktioner – aldrig på modul-top)
+export async function getSession(): Promise<Session | null> {
+  const { data } = await supabase.auth.getSession();
+  return data.session ?? null;
+}
+
+export function onAuthChanged(cb: (session: Session | null) => void) {
+  return supabase.auth.onAuthStateChange((_event, session) => cb(session));
+}
