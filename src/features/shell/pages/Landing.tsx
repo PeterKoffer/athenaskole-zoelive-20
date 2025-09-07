@@ -1,4 +1,3 @@
-// src/features/shell/pages/Landing.tsx
 import { Link } from "react-router-dom";
 // Vi læser auth *inde* i komponenten. Hvis hooket kaster (mangler provider),
 // fanger vi det og viser "signed-out" visning i stedet.
