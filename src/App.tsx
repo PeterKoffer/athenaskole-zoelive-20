@@ -1,4 +1,3 @@
-cat > src/App.tsx <<'TSX'
 // src/App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -77,4 +76,3 @@ function App() {
 }
 
 export default App;
-TSX
