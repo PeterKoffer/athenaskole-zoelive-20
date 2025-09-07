@@ -1,12 +1,11 @@
 // src/features/shell/pages/Landing.tsx
 import { Link } from "react-router-dom";
-
-// NOTE: we only *attempt* to read auth inside the component.
-// If the hook throws because a provider isn't present, we catch and show a no-auth view.
+// Vi læser auth *inde* i komponenten. Hvis hooket kaster (mangler provider),
+// fanger vi det og viser "signed-out" visning i stedet.
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Landing() {
-  // default: assume signed out
+  // default: antag signed-out
   let authed = false;
   let displayName: string | undefined;
 
@@ -14,22 +13,22 @@ export default function Landing() {
     const { user } = useAuth();
     authed = !!user;
 
-    // Supabase User doesn't have `name`; use user_metadata or fallback to email prefix
-    const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
-    const fullName =
-      (typeof meta["full_name"] === "string" && (meta["full_name"] as string)) ||
-      (typeof meta["name"] === "string" && (meta["name"] as string)) ||
+    // Supabase: brug user.user_metadata til visningsnavn
+    const meta = (user as any)?.user_metadata ?? {};
+    displayName =
+      meta.full_name ??
+      meta.name ??
+      meta.display_name ??
+      user?.email ??
       undefined;
-
-    displayName = fullName ?? (user?.email ? user.email.split("@")[0] : undefined);
   } catch {
-    // If useAuth throws (no provider), we just treat as signed-out.
+    // Hvis useAuth kaster (ingen provider), så fortsæt som signed-out.
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-8 bg-background text-foreground">
       <div className="max-w-2xl w-full space-y-6">
-        {/* NELIE visual (from /public) */}
+        {/* NELIE visual (fra /public) */}
         <div className="flex justify-center">
           <img
             src="/nelie.png"
@@ -39,7 +38,9 @@ export default function Landing() {
         </div>
 
         <h1 className="text-3xl font-bold text-center">
-          {authed ? `Welcome${displayName ? `, ${displayName}` : ""}!` : "Welcome to NELIE"}
+          {authed
+            ? `Welcome${displayName ? `, ${displayName}` : ""}!`
+            : "Welcome to NELIE"}
         </h1>
 
         {authed ? (
