@@ -4,7 +4,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@features/*": ["src/features/*"],
-      "@ui/*": ["src/shared/ui/*"]
+      "@ui/*": ["src/shared/ui/*"],
+      "@components/*": ["src/components/*"]
     }
   }
 }
