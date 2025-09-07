@@ -1,3 +1,4 @@
+cat > src/App.tsx <<'TSX'
 // src/App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -14,7 +15,6 @@ import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 
-// Flyttet til feature-structure:
 import DailyProgramPage from "@features/daily-program/pages/DailyProgramPage";
 import DailyUniverseLessonPage from "@features/daily-program/pages/UniverseLesson";
 
@@ -27,7 +27,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/sitemap" element={<SiteMapPage />} />
 
-        {/* protected (kræver login) */}
+        {/* protected */}
         <Route
           path="/training-ground"
           element={<ProtectedRoute><TrainingGround /></ProtectedRoute>}
@@ -77,3 +77,4 @@ function App() {
 }
 
 export default App;
+TSX
