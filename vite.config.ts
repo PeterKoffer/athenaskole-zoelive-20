@@ -1,29 +1,14 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import { componentTagger } from "lovable-tagger";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "node:path";
 
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-    strictPort: true,
-  },
-  esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' },
-  },
-  plugins: [
-    react(),
-    mode === 'development' && componentTagger(),
-  ].filter(Boolean),
-  
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  
-  define: {
-    global: 'globalThis',
-  },
-}));
+      "@": path.resolve(__dirname, "src"),
+      "@features": path.resolve(__dirname, "src/features"),
+      "@ui": path.resolve(__dirname, "src/shared/ui")
+    }
+  }
+});
