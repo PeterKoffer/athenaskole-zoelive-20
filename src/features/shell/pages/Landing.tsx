@@ -1,3 +1,4 @@
+// src/features/shell/pages/Landing.tsx
 import { Link } from "react-router-dom";
 
 // NOTE: we only *attempt* to read auth inside the component.
@@ -12,8 +13,16 @@ export default function Landing() {
   try {
     const { user } = useAuth();
     authed = !!user;
-    displayName = user?.name || user?.email || undefined;
-  } catch (_err) {
+
+    // Supabase User doesn't have `name`; use user_metadata or fallback to email prefix
+    const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+    const fullName =
+      (typeof meta["full_name"] === "string" && (meta["full_name"] as string)) ||
+      (typeof meta["name"] === "string" && (meta["name"] as string)) ||
+      undefined;
+
+    displayName = fullName ?? (user?.email ? user.email.split("@")[0] : undefined);
+  } catch {
     // If useAuth throws (no provider), we just treat as signed-out.
   }
 
