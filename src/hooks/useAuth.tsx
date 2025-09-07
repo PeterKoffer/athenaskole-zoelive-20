@@ -89,11 +89,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateUserRole: async (next) => {
         setUserRole(next);
         if (user) {
-          // skriv til user metadata; Supabase v2 bruger "data" til user_metadata
           await supabase.auth.updateUser({
             data: { ...(user.user_metadata ?? {}), role: next ?? undefined },
           });
-          // hent frisk user
           const { data } = await supabase.auth.getUser();
           const refreshed = data?.user ?? null;
           setUser(refreshed);
