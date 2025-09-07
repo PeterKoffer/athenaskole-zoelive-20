@@ -1,21 +1,79 @@
+// src/App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { navItems } from "./nav-items";
-import NotFound from "./pages/NotFound";
-import AuthPage from "./pages/AuthPage";
-import { AuthProvider } from "./hooks/useAuth";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function App() {
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import TrainingGround from "./pages/TrainingGround";
+import SchoolDashboard from "./pages/SchoolDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import ParentDashboard from "./pages/ParentDashboard";
+import ProfilePage from "./pages/ProfilePage";
+import SiteMapPage from "./pages/SiteMapPage";
+import CalendarPage from "./pages/CalendarPage";
+import SubjectLearningPage from "./pages/SubjectLearningPage";
+import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
+
+// Flyttet til feature-structure:
+import DailyProgramPage from "@features/daily-program/pages/DailyProgramPage";
+import DailyUniverseLessonPage from "@features/daily-program/pages/UniverseLesson";
+
+function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {navItems.map(({ to, page: Page }) => (
-            <Route key={to} path={to} element={<Page />} />
-          ))}
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        {/* public */}
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/sitemap" element={<SiteMapPage />} />
+
+        {/* protected (kræver login) */}
+        <Route
+          path="/training-ground"
+          element={<ProtectedRoute><TrainingGround /></ProtectedRoute>}
+        />
+        <Route
+          path="/daily-program"
+          element={<ProtectedRoute><DailyProgramPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/daily-universe-lesson"
+          element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/school-dashboard"
+          element={<ProtectedRoute><SchoolDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="/teacher-dashboard"
+          element={<ProtectedRoute><TeacherDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="/parent-dashboard"
+          element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="/profile"
+          element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
+        />
+        <Route
+          path="/calendar"
+          element={<ProtectedRoute><CalendarPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/subject/:subject"
+          element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/daily-session"
+          element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>}
+        />
+
+        {/* fallback */}
+        <Route path="*" element={<Index />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
