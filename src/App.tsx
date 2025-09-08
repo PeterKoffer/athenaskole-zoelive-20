@@ -2,7 +2,7 @@
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
-import DailyProgram from "@/features/daily-program/pages/DailyProgram";
+import DailyProgramPage from "@/features/daily-program/pages/DailyProgramPage";
 import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
 import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
@@ -43,7 +43,6 @@ function Shell({ children }: { children: React.ReactNode }) {
       </header>
 
       <main>{children}</main>
-
       <RefactoredFloatingAITutor />
     </div>
   );
@@ -86,7 +85,7 @@ export default function App() {
               <Route path="/" element={<Navigate to="/daily-program" replace />} />
 
               {/* Daily Program */}
-              <Route path="/daily-program" element={<DailyProgram />} />
+              <Route path="/daily-program" element={<DailyProgramPage />} />
 
               {/* Scenario runner */}
               <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
