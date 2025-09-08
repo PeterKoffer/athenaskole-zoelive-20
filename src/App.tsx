@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
 import DailyUniverseLessonPage from "@/features/daily-program/pages/UniverseLesson";
 import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
+import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
 import NELIE from "@/components/NELIE";
 
@@ -90,8 +91,9 @@ export default function App() {
               {/* Scenario runner (ny rute) */}
               <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
 
-              {/* Bagudkompatibel alias (gamle knapper/links) */}
-              <Route path="/educational-simulator" element={<ScenarioRunner />} />
+              {/* Bagudkompatibilitet: /educational-simulator (med og uden query/wildcard) */}
+              <Route path="/educational-simulator" element={<EducationalSimulatorRedirect />} />
+              <Route path="/educational-simulator/*" element={<EducationalSimulatorRedirect />} />
 
               {/* Sundhedscheck */}
               <Route
