@@ -63,4 +63,53 @@ class ErrorBoundary extends React.Component<
     return { error };
   }
   render() {
-    if (this.state.erro
+    if (this.state.error) {
+      return (
+        <div className="mx-auto max-w-screen-md p-6">
+          <h1 className="mb-2 text-2xl font-semibold">Noget gik galt</h1>
+          <pre className="whitespace-pre-wrap rounded bg-red-50 p-3 text-sm text-red-700">
+            {String(this.state.error.message || this.state.error)}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ErrorBoundary>
+        <Suspense fallback={<Loader />}>
+          <Shell>
+            <Routes>
+              {/* Start altid på dagens program */}
+              <Route path="/" element={<Navigate to="/daily-program" replace />} />
+
+              {/* Daily Universe Lesson */}
+              <Route path="/daily-program" element={<DailyUniverseLessonPage />} />
+
+              {/* Scenario runner (generering + visning) */}
+              <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
+
+              {/* Sundhedscheck / ping */}
+              <Route
+                path="/health"
+                element={
+                  <div className="mx-auto max-w-screen-md p-6">
+                    <h1 className="mb-2 text-xl font-semibold">OK</h1>
+                    <p className="opacity-70">App svarer og routes er aktive.</p>
+                  </div>
+                }
+              />
+
+              {/* Fallback */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Shell>
+        </Suspense>
+      </ErrorBoundary>
+    </BrowserRouter>
+  );
+}
