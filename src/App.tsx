@@ -8,7 +8,6 @@ import EducationalSimulatorRedirect from "@/features/daily-program/pages/Educati
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
 import NELIE from "@/components/NELIE";
 
-// --- Lightweight UI bits ---
 function Loader() {
   return (
     <div className="flex min-h-[40vh] items-center justify-center">
@@ -29,7 +28,6 @@ function NotFound() {
   );
 }
 
-/** Minimal app-shell */
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
@@ -41,24 +39,15 @@ function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-
       <main>{children}</main>
       <RefactoredFloatingAITutor />
     </div>
   );
 }
 
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { error?: Error }
-> {
-  constructor(props: any) {
-    super(props);
-    this.state = { error: undefined };
-  }
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error?: Error }> {
+  constructor(props: any) { super(props); this.state = { error: undefined }; }
+  static getDerivedStateFromError(error: Error) { return { error }; }
   render() {
     if (this.state.error) {
       return (
@@ -81,31 +70,12 @@ export default function App() {
         <Suspense fallback={<Loader />}>
           <Shell>
             <Routes>
-              {/* Start på dagens program */}
               <Route path="/" element={<Navigate to="/daily-program" replace />} />
-
-              {/* Daily Program */}
               <Route path="/daily-program" element={<DailyProgramPage />} />
-
-              {/* Scenario runner */}
               <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
-
-              {/* Bagudkompatibilitet: fang ALLE varianter af /educational-simulator */}
               <Route path="/educational-simulator" element={<EducationalSimulatorRedirect />} />
               <Route path="/educational-simulator/*" element={<EducationalSimulatorRedirect />} />
-
-              {/* Sundhedscheck */}
-              <Route
-                path="/health"
-                element={
-                  <div className="mx-auto max-w-screen-md p-6">
-                    <h1 className="mb-2 text-xl font-semibold">OK</h1>
-                    <p className="opacity-70">App svarer og routes er aktive.</p>
-                  </div>
-                }
-              />
-
-              {/* Fallback */}
+              <Route path="/health" element={<div className="p-6">OK</div>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Shell>
