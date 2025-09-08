@@ -6,19 +6,18 @@ import { supabase } from "@/lib/supabaseClient";
 type Scenario = {
   id: string;
   title: string;
-  subject: string;   // fx "Mathematics", "Science"
-  gradeRange?: string; // optional, fx "3-5"
+  subject: string;      // fx "Mathematics", "Science"
+  gradeRange?: string;
   description?: string;
 };
 
 type Context = {
-  grade: number;                 // K-12 integer
-  curriculum: string;            // fx "DK/Fælles Mål 2024"
+  grade: number;
+  curriculum: string;
   ability: "support" | "core" | "advanced";
   learningStyle: "visual" | "auditory" | "kinesthetic" | "mixed";
-  interests?: string[];          // fx ["football","space"]
-  // plads til dine 11 parametre — tilføj bare felter her, de bliver sendt videre
-  [k: string]: unknown;
+  interests?: string[];
+  [k: string]: unknown; // alle dine øvrige 11 parametre kan med
 };
 
 type LocationState = { scenario: Scenario; context: Context };
@@ -36,7 +35,6 @@ export default function ScenarioRunner() {
     let mounted = true;
 
     async function run() {
-      // Kræv state fra navigation (for at undgå at holde global context i URL’en)
       if (!state?.scenario || !state?.context) {
         setError("Manglende scenarie- eller kontekstdata. Gå tilbage og start igen.");
         setLoading(false);
@@ -51,8 +49,7 @@ export default function ScenarioRunner() {
           ability: state.context.ability,
           learningStyle: state.context.learningStyle,
           interests: state.context.interests ?? [],
-          // Send ALT hvad du har i context videre (11+ parametre)
-          ...state.context,
+          ...state.context, // alle ekstra parametre sendes videre
         };
 
         const { data, error } = await supabase.functions.invoke("generate-content", {
@@ -88,13 +85,13 @@ export default function ScenarioRunner() {
   if (error) {
     return (
       <div className="mx-auto max-w-screen-md p-6">
-        <h1 className="mb-2 text-xl font-semibold">Noget gik galt</h1>
+        <h1 className="mb-2 text-2xl font-semibold">Noget gik galt</h1>
         <p className="mb-4 text-red-700">{error}</p>
         <button
           className="rounded-lg bg-blue-600 px-4 py-2 text-white"
           onClick={() => navigate(-1)}
         >
-          Tilbage
+          ⟵ Tilbage
         </button>
       </div>
     );
@@ -112,8 +109,7 @@ export default function ScenarioRunner() {
         </button>
       </div>
 
-      {/* Midlertidig rendering: vis JSON og evt. første aktiviteter.
-         ️Hook dette op til dine komponenter, når dit schema er fast. */}
+      {/* Midlertidig rendering: vis hele outputtet som JSON */}
       <pre className="overflow-auto rounded-lg bg-neutral-900 p-4 text-xs text-neutral-100">
         {JSON.stringify(result, null, 2)}
       </pre>
