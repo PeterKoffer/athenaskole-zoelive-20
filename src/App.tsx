@@ -28,11 +28,10 @@ function NotFound() {
   );
 }
 
-/** Minimal app-shell så du kan placere globale overlays og providers ét sted */
+/** Minimal app-shell */
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
-      {/* Øverste “branding”/status (kan fjernes hvis du har egen navbar) */}
       <header className="border-b bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
           <div className="flex items-center gap-2">
@@ -44,13 +43,11 @@ function Shell({ children }: { children: React.ReactNode }) {
 
       <main>{children}</main>
 
-      {/* Global AI-tutor flyder ovenpå alle sider */}
       <RefactoredFloatingAITutor />
     </div>
   );
 }
 
-// Valgfri: simpel ErrorBoundary så en enkelt sidefejl ikke vælter hele app’en.
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { error?: Error }
@@ -84,16 +81,19 @@ export default function App() {
         <Suspense fallback={<Loader />}>
           <Shell>
             <Routes>
-              {/* Start altid på dagens program */}
+              {/* Start på dagens program */}
               <Route path="/" element={<Navigate to="/daily-program" replace />} />
 
               {/* Daily Universe Lesson */}
               <Route path="/daily-program" element={<DailyUniverseLessonPage />} />
 
-              {/* Scenario runner (generering + visning) */}
+              {/* Scenario runner (ny rute) */}
               <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
 
-              {/* Sundhedscheck / ping */}
+              {/* Bagudkompatibel alias (gamle knapper/links) */}
+              <Route path="/educational-simulator" element={<ScenarioRunner />} />
+
+              {/* Sundhedscheck */}
               <Route
                 path="/health"
                 element={
