@@ -43,7 +43,7 @@ export default function DailyUniverseLessonPage() {
   const navigate = useNavigate();
 
   // TODO: Hent fra din rigtige profil/dashboard state
-  const [context, setContext] = useState<Context>({
+  const [context] = useState<Context>({
     grade: 5,
     curriculum: "DK/Fælles Mål 2024",
     ability: "core",
@@ -60,7 +60,7 @@ export default function DailyUniverseLessonPage() {
     setUniverseLoading(true);
     try {
       const payload = {
-        subject: "Universe", // eller anvend en korrekt "universe" nøgle i din backend
+        subject: "Universe", // skift til korrekt "universe" nøgle hvis din backend forventer andet
         grade: context.grade,
         curriculum: context.curriculum,
         ability: context.ability,
@@ -82,7 +82,10 @@ export default function DailyUniverseLessonPage() {
   }
 
   function onStartScenario(s: Scenario) {
+    // ✅ Brug den nye rute + state
     navigate(`/scenario/${s.id}`, { state: { scenario: s, context } });
+    // Hvis du VIL støtte fuld URL uden state:
+    // navigate(`/educational-simulator?subject=${encodeURIComponent(s.subject)}&id=${encodeURIComponent(s.id)}&title=${encodeURIComponent(s.title)}&grade=${context.grade}&curriculum=${encodeURIComponent(context.curriculum)}&ability=${context.ability}&learningStyle=${context.learningStyle}&interests=${encodeURIComponent((context.interests ?? []).join(","))}`);
   }
 
   return (
