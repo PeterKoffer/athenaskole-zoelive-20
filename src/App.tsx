@@ -1,3 +1,6 @@
+cp src/App.tsx src/App.tsx.bak
+
+cat > src/App.tsx <<'TSX'
 // src/App.tsx
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
@@ -41,7 +44,6 @@ function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-
       <main>{children}</main>
       <RefactoredFloatingAITutor />
     </div>
@@ -70,7 +72,7 @@ class ErrorBoundary extends React.Component<
         </div>
       );
     }
-      return this.props.children;
+    return this.props.children;
   }
 }
 
@@ -114,3 +116,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+TSX
