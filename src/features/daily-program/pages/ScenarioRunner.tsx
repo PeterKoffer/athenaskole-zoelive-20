@@ -1,7 +1,10 @@
 // src/features/daily-program/pages/ScenarioRunner.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
+
+type Ability = "support" | "core" | "advanced";
+type LearningStyle = "visual" | "auditory" | "kinesthetic" | "mixed";
 
 type Scenario = {
   id: string;
@@ -14,18 +17,60 @@ type Scenario = {
 type Context = {
   grade: number;
   curriculum: string;
-  ability: "support" | "core" | "advanced";
-  learningStyle: "visual" | "auditory" | "kinesthetic" | "mixed";
+  ability: Ability;
+  learningStyle: LearningStyle;
   interests?: string[];
-  [k: string]: unknown; // alle dine øvrige 11 parametre kan med
+  [k: string]: unknown; // øvrige parametre ok
 };
 
 type LocationState = { scenario: Scenario; context: Context };
 
+function parseIntSafe(v: string | null, def: number) {
+  const n = v ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : def;
+}
+
 export default function ScenarioRunner() {
   const { scenarioId } = useParams<{ scenarioId: string }>();
   const navigate = useNavigate();
-  const { state } = useLocation() as { state?: LocationState };
+  const location = useLocation();
+  const state = (location.state as LocationState | undefined) ?? undefined;
+
+  const search = useMemo(() => new URLSearchParams(location.search), [location.search]);
+
+  // --- Robuste faldbacks, så selv /educational-simulator uden state virker ---
+  const computedScenario: Scenario = useMemo(() => {
+    if (state?.scenario) return state.scenario;
+
+    const id = scenarioId ?? search.get("id") ?? "fraction-adventure";
+    const subject = search.get("subject") ?? (id.includes("ecosystem") ? "Science" : "Mathematics");
+    const title =
+      search.get("title") ??
+      (id === "ecosystem-explorer" ? "Ecosystem Explorer" : "Fraction Adventure");
+
+    return {
+      id,
+      subject,
+      title,
+      description: search.get("description") ?? undefined,
+      gradeRange: search.get("gradeRange") ?? undefined,
+    };
+  }, [state?.scenario, scenarioId, search]);
+
+  const computedContext: Context = useMemo(() => {
+    if (state?.context) return state.context;
+
+    const grade = parseIntSafe(search.get("grade"), 5);
+    const curriculum = search.get("curriculum") ?? "DK/Fælles Mål 2024";
+    const ability = (search.get("ability") as Ability) ?? "core";
+    const learningStyle = (search.get("learningStyle") as LearningStyle) ?? "mixed";
+    const interests = (search.get("interests") ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    return { grade, curriculum, ability, learningStyle, interests };
+  }, [state?.context, search]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,21 +80,16 @@ export default function ScenarioRunner() {
     let mounted = true;
 
     async function run() {
-      if (!state?.scenario || !state?.context) {
-        setError("Manglende scenarie- eller kontekstdata. Gå tilbage og start igen.");
-        setLoading(false);
-        return;
-      }
-
       try {
         const payload = {
-          subject: state.scenario.subject,
-          grade: state.context.grade,
-          curriculum: state.context.curriculum,
-          ability: state.context.ability,
-          learningStyle: state.context.learningStyle,
-          interests: state.context.interests ?? [],
-          ...state.context, // alle ekstra parametre sendes videre
+          subject: computedScenario.subject,
+          grade: computedContext.grade,
+          curriculum: computedContext.curriculum,
+          ability: computedContext.ability,
+          learningStyle: computedContext.learningStyle,
+          interests: computedContext.interests ?? [],
+          // alt andet fra context sendes videre
+          ...computedContext,
         };
 
         const { data, error } = await supabase.functions.invoke("generate-content", {
@@ -71,7 +111,7 @@ export default function ScenarioRunner() {
     return () => {
       mounted = false;
     };
-  }, [scenarioId, state]);
+  }, [computedScenario.subject, computedContext]);
 
   if (loading) {
     return (
@@ -100,7 +140,12 @@ export default function ScenarioRunner() {
   return (
     <div className="mx-auto max-w-screen-xl p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Scenarie</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">{computedScenario.title}</h1>
+          <p className="text-sm opacity-70">
+            Subject: {computedScenario.subject} • Grade {computedContext.grade}
+          </p>
+        </div>
         <button
           className="rounded-lg bg-neutral-200 px-3 py-1.5 text-sm"
           onClick={() => navigate(-1)}
