@@ -63,7 +63,7 @@ const DailyProgram = () => {
 
   const handleStartScenario = (scenarioId: string) => {
     console.log("Starting scenario:", scenarioId);
-    navigate('/educational-simulator', { state: { scenarioId } });
+   navigate(`/scenario/${scenarioId}`);
   };
 
   // Show loading state while authentication is being checked
