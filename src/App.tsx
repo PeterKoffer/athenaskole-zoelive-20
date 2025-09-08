@@ -1,8 +1,9 @@
 // src/App.tsx
 import React, { Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
 import DailyUniverseLessonPage from "@/features/daily-program/pages/UniverseLesson";
+import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
 import NELIE from "@/components/NELIE";
 
@@ -20,9 +21,9 @@ function NotFound() {
     <div className="mx-auto max-w-screen-md p-6">
       <h1 className="mb-2 text-2xl font-semibold">404 – Siden findes ikke</h1>
       <p className="opacity-80">Stien blev ikke fundet. Går til dagens program.</p>
-      <a className="text-blue-600 underline" href="/daily-program">
+      <Link className="text-blue-600 underline" to="/daily-program">
         Gå til Daily Program
-      </a>
+      </Link>
     </div>
   );
 }
@@ -62,51 +63,4 @@ class ErrorBoundary extends React.Component<
     return { error };
   }
   render() {
-    if (this.state.error) {
-      return (
-        <div className="mx-auto max-w-screen-md p-6">
-          <h1 className="mb-2 text-2xl font-semibold">Noget gik galt</h1>
-          <pre className="whitespace-pre-wrap rounded bg-red-50 p-3 text-sm text-red-700">
-            {String(this.state.error.message || this.state.error)}
-          </pre>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <Suspense fallback={<Loader />}>
-          <Shell>
-            <Routes>
-              {/* Start altid på dagens program */}
-              <Route path="/" element={<Navigate to="/daily-program" replace />} />
-
-              {/* Daily Universe Lesson (kendt sti i din branch) */}
-              <Route path="/daily-program" element={<DailyUniverseLessonPage />} />
-
-              {/* Sundhedscheck / ping (nyttig i drift) */}
-              <Route
-                path="/health"
-                element={
-                  <div className="mx-auto max-w-screen-md p-6">
-                    <h1 className="mb-2 text-xl font-semibold">OK</h1>
-                    <p className="opacity-70">App svarer og routes er aktive.</p>
-                  </div>
-                }
-              />
-
-              {/* Fallback */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Shell>
-        </Suspense>
-      </ErrorBoundary>
-    </BrowserRouter>
-  );
-}
-
+    if (this.state.erro
