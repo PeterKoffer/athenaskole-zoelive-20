@@ -1,146 +1,112 @@
 // src/App.tsx
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import React, { Suspense } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import TrainingGround from "./pages/TrainingGround";
-import DailyProgramPage from "./pages/DailyProgram";
-import SchoolDashboard from "./pages/SchoolDashboard";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import ProfilePage from "./pages/ProfilePage";
-import SiteMapPage from "./pages/SiteMapPage";
-import CalendarPage from "./pages/CalendarPage";
-import SubjectLearningPage from "./pages/SubjectLearningPage";
-import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 import DailyUniverseLessonPage from "@/features/daily-program/pages/UniverseLesson";
+import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
+import NELIE from "@/components/NELIE";
 
+// --- Lightweight UI bits ---
+function Loader() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <div className="animate-pulse text-sm opacity-70">Loading…</div>
+    </div>
+  );
+}
 
-// Subjects
-import EnglishLearning from "./components/subjects/english/EnglishLearning";
-import ScienceLearning from "./components/subjects/science/ScienceLearning";
-import ComputerScienceLearning from "./components/subjects/computer-science/ComputerScienceLearning";
-import CreativeArtsLearning from "./components/subjects/creative-arts/CreativeArtsLearning";
-import MusicLearning from "./components/subjects/music/MusicLearning";
-import MentalWellnessLearning from "./components/subjects/mental-wellness/MentalWellnessLearning";
-import LanguageLabLearning from "./components/subjects/language-lab/LanguageLabLearning";
-import HistoryReligionLearning from "./components/subjects/history-religion/HistoryReligionLearning";
-import GeographyLearning from "./components/subjects/geography/GeographyLearning";
-import BodyLabLearning from "./components/subjects/body-lab/BodyLabLearning";
-import LifeEssentialsLearning from "./components/subjects/life-essentials/LifeEssentialsLearning";
-import GlobalGeographyLearning from "./components/subjects/global-geography/GlobalGeographyLearning";
-import WorldHistoryReligionsLearning from "./components/subjects/world-history-religions/WorldHistoryReligionsLearning";
+function NotFound() {
+  return (
+    <div className="mx-auto max-w-screen-md p-6">
+      <h1 className="mb-2 text-2xl font-semibold">404 – Siden findes ikke</h1>
+      <p className="opacity-80">Stien blev ikke fundet. Går til dagens program.</p>
+      <a className="text-blue-600 underline" href="/daily-program">
+        Gå til Daily Program
+      </a>
+    </div>
+  );
+}
 
-const App = () => (
-  <AuthProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/site-map" element={<SiteMapPage />} />
+/** Minimal app-shell så du kan placere globale overlays og providers ét sted */
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-neutral-50 text-neutral-900">
+      {/* Øverste “branding”/status (kan fjernes hvis du har egen navbar) */}
+      <header className="border-b bg-white/70 backdrop-blur">
+        <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
+          <div className="flex items-center gap-2">
+            <NELIE />
+            <span className="text-sm opacity-70">New-core-map</span>
+          </div>
+        </div>
+      </header>
 
-          <Route
-            path="/auth"
-            element={
-              <ProtectedRoute requireAuth={false}>
-                <Auth />
-              </ProtectedRoute>
-            }
-          />
+      <main>{children}</main>
 
-          <Route
-            path="/training-ground"
-            element={
-              <ProtectedRoute>
-                <TrainingGround />
-              </ProtectedRoute>
-            }
-          />
+      {/* Global AI-tutor flyder ovenpå alle sider */}
+      <RefactoredFloatingAITutor />
+    </div>
+  );
+}
 
-          <Route
-            path="/daily-program"
-            element={
-              <ProtectedRoute>
-                <DailyProgramPage />
-              </ProtectedRoute>
-            }
-          />
+// Valgfri: simpel ErrorBoundary så en enkelt sidefejl ikke vælter hele app’en.
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error?: Error }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { error: undefined };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="mx-auto max-w-screen-md p-6">
+          <h1 className="mb-2 text-2xl font-semibold">Noget gik galt</h1>
+          <pre className="whitespace-pre-wrap rounded bg-red-50 p-3 text-sm text-red-700">
+            {String(this.state.error.message || this.state.error)}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
-          <Route
-            path="/calendar"
-            element={
-              <ProtectedRoute>
-                <CalendarPage />
-              </ProtectedRoute>
-            }
-          />
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ErrorBoundary>
+        <Suspense fallback={<Loader />}>
+          <Shell>
+            <Routes>
+              {/* Start altid på dagens program */}
+              <Route path="/" element={<Navigate to="/daily-program" replace />} />
 
-          <Route
-            path="/school-dashboard"
-            element={
-              <ProtectedRoute requiredRole="school_leader">
-                <SchoolDashboard />
-              </ProtectedRoute>
-            }
-          />
+              {/* Daily Universe Lesson (kendt sti i din branch) */}
+              <Route path="/daily-program" element={<DailyUniverseLessonPage />} />
 
-          <Route
-            path="/teacher-dashboard"
-            element={
-              <ProtectedRoute requiredRole="teacher">
-                <TeacherDashboard />
-              </ProtectedRoute>
-            }
-          />
+              {/* Sundhedscheck / ping (nyttig i drift) */}
+              <Route
+                path="/health"
+                element={
+                  <div className="mx-auto max-w-screen-md p-6">
+                    <h1 className="mb-2 text-xl font-semibold">OK</h1>
+                    <p className="opacity-70">App svarer og routes er aktive.</p>
+                  </div>
+                }
+              />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+              {/* Fallback */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Shell>
+        </Suspense>
+      </ErrorBoundary>
+    </BrowserRouter>
+  );
+}
 
-          {/* Learning routes */}
-          <Route
-            path="/learn/:subject"
-            element={
-              <ProtectedRoute>
-                <SubjectLearningPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/learn/english" element={<ProtectedRoute><EnglishLearning /></ProtectedRoute>} />
-          <Route path="/learn/science" element={<ProtectedRoute><ScienceLearning /></ProtectedRoute>} />
-          <Route path="/learn/computer-science" element={<ProtectedRoute><ComputerScienceLearning /></ProtectedRoute>} />
-          <Route path="/learn/creative-arts" element={<ProtectedRoute><CreativeArtsLearning /></ProtectedRoute>} />
-          <Route path="/learn/music" element={<ProtectedRoute><MusicLearning /></ProtectedRoute>} />
-          <Route path="/learn/mental-wellness" element={<ProtectedRoute><MentalWellnessLearning /></ProtectedRoute>} />
-          <Route path="/learn/language-lab" element={<ProtectedRoute><LanguageLabLearning /></ProtectedRoute>} />
-          <Route path="/learn/history-religion" element={<ProtectedRoute><HistoryReligionLearning /></ProtectedRoute>} />
-          <Route path="/learn/geography" element={<ProtectedRoute><GeographyLearning /></ProtectedRoute>} />
-          <Route path="/learn/body-lab" element={<ProtectedRoute><BodyLabLearning /></ProtectedRoute>} />
-          <Route path="/learn/life-essentials" element={<ProtectedRoute><LifeEssentialsLearning /></ProtectedRoute>} />
-          <Route path="/learn/global-geography" element={<ProtectedRoute><GlobalGeographyLearning /></ProtectedRoute>} />
-          <Route path="/learn/world-history-religions" element={<ProtectedRoute><WorldHistoryReligionsLearning /></ProtectedRoute>} />
-
-          {/* Daily session routes */}
-          <Route path="/daily-session" element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>} />
-          <Route path="/daily-universe-lesson" element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>} />
-
-          {/* Generic subject route */}
-          <Route path="/subject/:subject" element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </AuthProvider>
-);
-
-export default App;
