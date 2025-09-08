@@ -2,7 +2,7 @@
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
-import DailyUniverseLessonPage from "@/features/daily-program/pages/UniverseLesson";
+import DailyProgram from "@/features/daily-program/pages/DailyProgram";
 import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
 import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
@@ -85,13 +85,13 @@ export default function App() {
               {/* Start på dagens program */}
               <Route path="/" element={<Navigate to="/daily-program" replace />} />
 
-              {/* Daily Universe Lesson */}
-              <Route path="/daily-program" element={<DailyUniverseLessonPage />} />
+              {/* Daily Program */}
+              <Route path="/daily-program" element={<DailyProgram />} />
 
-              {/* Scenario runner (ny rute) */}
+              {/* Scenario runner */}
               <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
 
-              {/* Bagudkompatibilitet: /educational-simulator (med og uden query/wildcard) */}
+              {/* Bagudkompatibilitet: fang ALLE varianter af /educational-simulator */}
               <Route path="/educational-simulator" element={<EducationalSimulatorRedirect />} />
               <Route path="/educational-simulator/*" element={<EducationalSimulatorRedirect />} />
 
