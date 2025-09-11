@@ -1,0 +1,16 @@
+README.md
+docs/README_FIRST.md
+docs/ASSISTANT_BRIEF.md
+docs/ARCHITECTURE.md
+docs/WORKFLOW.md
+docs/NELIE.md
+docs/SIMULATOR_VISION.md
+docs/CURRICULUM_COVERAGE.md
+docs/PARAMETER_DATA_SOURCES.md
+docs/TRAINING_GROUND_PROMPT_TEMPLATE.md
+docs/verification-checklist.md
+supabase/functions/generate-content/index.ts
+supabase/functions/generate-adaptive-content/index.ts
+src/features/daily-program/pages/UniverseLesson.tsx
+src/features/daily-program/pages/ScenarioRunner.tsx
+src/App.tsx
