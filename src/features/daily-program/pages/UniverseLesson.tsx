@@ -59,22 +59,34 @@ export default function DailyUniverseLessonPage() {
     setUniverseError(null);
     setUniverseLoading(true);
     try {
-      const payload = {
-        subject: "Universe", // skift til korrekt "universe" nøgle hvis din backend forventer andet
-        grade: context.grade,
-        curriculum: context.curriculum,
-        ability: context.ability,
-        learningStyle: context.learningStyle,
-        interests: context.interests ?? [],
+      // ✅ Dedupe + normalisér: undgå duplikerede keys ved at spreade kun én gang
+      const sanitizedContext: Context = {
         ...context,
+        interests: context.interests ?? [],
+      };
+
+      const payload = {
+        subject: "Universe", // skift til korrekt nøgle hvis backend forventer andet
+        ...sanitizedContext,
       };
 
       const { data, error } = await supabase.functions.invoke("generate-content", {
         body: payload,
       });
-      if (error) throw error;
+      if (error) {
+        // @ts-ignore supabase error kan have status/context
+        console.error("[generate-content] non-2xx", {
+          message: error.message,
+          // @ts-ignore
+          status: error.status,
+          // @ts-ignore
+          context: error.context,
+        });
+        throw error;
+      }
       setUniverse(data);
     } catch (e: any) {
+      console.error("[UniverseLesson] invoke failed", e);
       setUniverseError(e?.message ?? String(e));
     } finally {
       setUniverseLoading(false);
@@ -82,9 +94,9 @@ export default function DailyUniverseLessonPage() {
   }
 
   function onStartScenario(s: Scenario) {
-    // ✅ Brug den nye rute + state
+    // ✅ Ny rute + state
     navigate(`/scenario/${s.id}`, { state: { scenario: s, context } });
-    // Hvis du VIL støtte fuld URL uden state:
+    // Hvis du vil støtte fuld URL uden state, behold evt. denne som reference (kommenteret):
     // navigate(`/educational-simulator?subject=${encodeURIComponent(s.subject)}&id=${encodeURIComponent(s.id)}&title=${encodeURIComponent(s.title)}&grade=${context.grade}&curriculum=${encodeURIComponent(context.curriculum)}&ability=${context.ability}&learningStyle=${context.learningStyle}&interests=${encodeURIComponent((context.interests ?? []).join(","))}`);
   }
 
