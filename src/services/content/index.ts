@@ -1,18 +1,13 @@
-// src/services/content/index.ts
+export type Ability = "support" | "core" | "advanced";
+export type LearningStyle = "visual" | "auditory" | "kinesthetic" | "mixed";
 export type Context = {
-  grade: number;
-  curriculum: string;
-  ability: "support" | "core" | "advanced";
-  learningStyle: "visual" | "auditory" | "kinesthetic" | "mixed";
-  interests?: string[];
-  [k: string]: unknown;
+  grade: number; curriculum: string; ability: Ability;
+  learningStyle: LearningStyle; interests?: string[]; [k: string]: unknown;
 };
-
 export type GenerateArgs = { subject: string; context: Context };
 export type GenerateResult = unknown;
 
-// Default: Edge (Supabase Functions)
-export { generate as generate } from "@content/edge";
-
-// Explicit opt-in til OpenAI – kun til lokale tests/fallbacks
-export { generate as generateWithOpenAI } from "@content/openai";
+// Default: Edge (Supabase)
+export { generate } from "./EdgeContentService";
+// Valgfri: eksplicit OpenAI (til lokale tests)
+export { generate as generateWithOpenAI } from "@/services/openai/OpenAIContentService";
