@@ -1,3 +1,4 @@
+src/features/daily-program/pages/UniverseLesson.tsx <<'TSX'
 // src/features/daily-program/pages/UniverseLesson.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -96,8 +97,6 @@ export default function DailyUniverseLessonPage() {
   function onStartScenario(s: Scenario) {
     // ✅ Ny rute + state
     navigate(`/scenario/${s.id}`, { state: { scenario: s, context } });
-    // Hvis du vil støtte fuld URL uden state, behold evt. denne som reference (kommenteret):
-    // navigate(`/educational-simulator?subject=${encodeURIComponent(s.subject)}&id=${encodeURIComponent(s.id)}&title=${encodeURIComponent(s.title)}&grade=${context.grade}&curriculum=${encodeURIComponent(context.curriculum)}&ability=${context.ability}&learningStyle=${context.learningStyle}&interests=${encodeURIComponent((context.interests ?? []).join(","))}`);
   }
 
   return (
@@ -163,3 +162,4 @@ export default function DailyUniverseLessonPage() {
     </div>
   );
 }
+TSX
