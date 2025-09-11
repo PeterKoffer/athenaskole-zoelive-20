@@ -9,7 +9,7 @@ type LearningStyle = "visual" | "auditory" | "kinesthetic" | "mixed";
 type Scenario = {
   id: string;
   title: string;
-  subject: string;      // fx "Mathematics", "Science"
+  subject: string; // fx "Mathematics", "Science"
   gradeRange?: string;
   description?: string;
 };
@@ -81,26 +81,41 @@ export default function ScenarioRunner() {
 
     async function run() {
       try {
+        // Dedupe + normalisér context, så TS ikke klager over duplikerede keys
+        const sanitizedContext: Context = {
+          ...computedContext,
+          interests: computedContext.interests ?? [],
+        };
+
         const payload = {
           subject: computedScenario.subject,
-          grade: computedContext.grade,
-          curriculum: computedContext.curriculum,
-          ability: computedContext.ability,
-          learningStyle: computedContext.learningStyle,
-          interests: computedContext.interests ?? [],
-          // alt andet fra context sendes videre
-          ...computedContext,
+          ...sanitizedContext,
+          // Hvis din Edge Function har gavn af scenarie-metadata, kan du sende dem med:
+          // scenarioId: computedScenario.id,
+          // scenarioTitle: computedScenario.title,
         };
 
         const { data, error } = await supabase.functions.invoke("generate-content", {
           body: payload,
         });
 
-        if (error) throw error;
+        if (error) {
+          // @ts-ignore supabase error kan have status/context
+          console.error("[EdgeFunction] non-2xx", {
+            message: error.message,
+            // @ts-ignore
+            status: error.status,
+            // @ts-ignore
+            context: error.context,
+          });
+          throw error;
+        }
+
         if (!mounted) return;
         setResult(data);
       } catch (e: any) {
         if (!mounted) return;
+        console.error("[ScenarioRunner] invoke failed", e);
         setError(e?.message ?? String(e));
       } finally {
         if (mounted) setLoading(false);
