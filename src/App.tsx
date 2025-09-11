@@ -1,6 +1,3 @@
-cp src/App.tsx src/App.tsx.bak
-
-cat > src/App.tsx <<'TSX'
 // src/App.tsx
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
