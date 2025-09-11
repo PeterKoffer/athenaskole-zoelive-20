@@ -2,10 +2,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@features/*": ["src/features/*"],
-      "@ui/*": ["src/shared/ui/*"],
-      "@components/*": ["src/components/*"]
+      "@content": ["src/services/content/index.ts"],
+      "@content/edge": ["src/services/content/EdgeContentService.ts"],
+      "@content/openai": ["src/services/openai/OpenAIContentService.ts"]
     }
   }
 }
