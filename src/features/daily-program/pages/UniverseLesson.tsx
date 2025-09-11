@@ -1,4 +1,3 @@
-src/features/daily-program/pages/UniverseLesson.tsx <<'TSX'
 // src/features/daily-program/pages/UniverseLesson.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,11 +11,14 @@ type Scenario = {
   description?: string;
 };
 
+type Ability = "support" | "core" | "advanced";
+type LearningStyle = "visual" | "auditory" | "kinesthetic" | "mixed";
+
 type Context = {
   grade: number;
   curriculum: string;
-  ability: "support" | "core" | "advanced";
-  learningStyle: "visual" | "auditory" | "kinesthetic" | "mixed";
+  ability: Ability;
+  learningStyle: LearningStyle;
   interests?: string[];
   [k: string]: unknown;
 };
@@ -43,7 +45,7 @@ const scenarios: Scenario[] = [
 export default function DailyUniverseLessonPage() {
   const navigate = useNavigate();
 
-  // TODO: Hent fra din rigtige profil/dashboard state
+  // TODO: Replace with real profile/dashboard state
   const [context] = useState<Context>({
     grade: 5,
     curriculum: "DK/Fælles Mål 2024",
@@ -54,48 +56,37 @@ export default function DailyUniverseLessonPage() {
 
   const [universeLoading, setUniverseLoading] = useState(false);
   const [universeError, setUniverseError] = useState<string | null>(null);
-  const [universe, setUniverse] = useState<any>(null);
+  const [universe, setUniverse] = useState<unknown>(null);
 
   async function onGenerateNewUniverse() {
     setUniverseError(null);
     setUniverseLoading(true);
     try {
-      // ✅ Dedupe + normalisér: undgå duplikerede keys ved at spreade kun én gang
+      // dedupe/sanitize so we don't duplicate keys later
       const sanitizedContext: Context = {
         ...context,
         interests: context.interests ?? [],
       };
 
       const payload = {
-        subject: "Universe", // skift til korrekt nøgle hvis backend forventer andet
+        subject: "Universe",
         ...sanitizedContext,
       };
 
       const { data, error } = await supabase.functions.invoke("generate-content", {
         body: payload,
       });
-      if (error) {
-        // @ts-ignore supabase error kan have status/context
-        console.error("[generate-content] non-2xx", {
-          message: error.message,
-          // @ts-ignore
-          status: error.status,
-          // @ts-ignore
-          context: error.context,
-        });
-        throw error;
-      }
+      if (error) throw error;
       setUniverse(data);
-    } catch (e: any) {
-      console.error("[UniverseLesson] invoke failed", e);
-      setUniverseError(e?.message ?? String(e));
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setUniverseError(msg);
     } finally {
       setUniverseLoading(false);
     }
   }
 
   function onStartScenario(s: Scenario) {
-    // ✅ Ny rute + state
     navigate(`/scenario/${s.id}`, { state: { scenario: s, context } });
   }
 
@@ -162,4 +153,3 @@ export default function DailyUniverseLessonPage() {
     </div>
   );
 }
-TSX
