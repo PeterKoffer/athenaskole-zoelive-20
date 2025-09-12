@@ -1,40 +1,33 @@
-import curriculumIndex from '../data/unified-curriculum-index.json';
-import type { CurriculumNode, CurriculumNodeType } from '../types/curriculum';
-import { universeGenerationService } from './UniverseGenerationService';
+// src/services/ContentGenerationService.ts
+import { buildContentRequest, normalizeGrade } from "../content";
+import { generateLesson } from "./contentClient";
 
-class ContentGenerationService {
-  private curriculum: { [key: string]: CurriculumNode } = {};
+export type ContentGenerationRequest = ReturnType<typeof buildContentRequest>;
+export type Atom = { type: string; text?: string; data?: any; steps?: any[] };
+export type AtomSequence = Atom[];
 
-  constructor() {
-    // Convert the imported JSON data to proper CurriculumNode objects
-    this.curriculum = Object.keys(curriculumIndex).reduce((acc, key) => {
-      const rawNode = curriculumIndex[key as keyof typeof curriculumIndex] as any;
-      acc[key] = {
-        id: key,
-        parentId: rawNode.parentId || null,
-        name: rawNode.name || 'Unnamed Node',
-        ...rawNode,
-        nodeType: rawNode.nodeType as CurriculumNodeType
-      } as CurriculumNode;
-      return acc;
-    }, {} as { [key: string]: CurriculumNode });
+export class ContentGenerationService {
+  async generate(params: {
+    subject: string;
+    grade: number | string;
+    curriculum?: string | null;
+    ability?: "remedial" | "standard" | "advanced" | string;
+    learningStyle?: string;
+    interests?: string[] | string | null;
+    schoolPhilosophy?: string | null;
+    teacherWeights?: Record<string, number> | null;
+    lessonDurationMins?: number | null;
+    calendarKeywords?: string[] | null;
+    calendarDurationDays?: number | null;
+  }) {
+    const body = buildContentRequest(params);
+    return await generateLesson(body);
   }
 
-  public getCurriculumNodeById(id: string): CurriculumNode | undefined {
-    return this.curriculum[id];
-  }
-
-  public findNodesBySubject(subject: string): CurriculumNode[] {
-    return Object.values(this.curriculum).filter(node => node.subjectName === subject);
-  }
-
-  public findNodesByGrade(grade: string): CurriculumNode[] {
-    return Object.values(this.curriculum).filter(node => node.educationalLevel === grade);
-  }
-
-  public generateDailyUniverse(studentProfile: any): any {
-    return universeGenerationService.generate(studentProfile);
-  }
+  // Bagudkompatible helpers
+  static normalizeGrade = normalizeGrade;
+  static buildRequest = buildContentRequest;
 }
 
 export const contentGenerationService = new ContentGenerationService();
+export default contentGenerationService;
