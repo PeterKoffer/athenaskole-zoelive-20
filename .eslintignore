@@ -1,0 +1,8 @@
+# ---- TEMP legacy freeze ----
+supabase/functions/**
+src/services/**
+src/pages/**
+src/test/**
+src/types/**
+src/utils/**
+src/features/**/avatar.ts

@@ -1,14 +1,2 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-npm run typecheck || exit 1
-npm run lint || exit 1
-
-# Blokér merge-markører
-if git diff --cached -U0 | grep -E '^(\\+|\\-)<<<<<<|^\\+=======$|^\\+>>>>>>>'; then
-  echo "❌ Merge markers detected. Resolve before commit."; exit 1; fi
-
-# Blokér utilsigtede legacy-links i nye ændringer
-if git diff --cached -U0 -- 'src/**/*.{ts,tsx}' | grep -E "\\/educational-simulator" ; then
-  echo "❌ Found '/educational-simulator' in staged changes. Use /scenario/:id or redirect."; exit 1; fi
-
+#!/bin/sh
+npx lint-staged

@@ -39,3 +39,11 @@ junit.xml
 .env*
 supabase/.edge-secrets*
 supabase/.temp/
+
+# local backups
+*.bak
+*.bad
+
+# local backups
+*.bak
+*.bad

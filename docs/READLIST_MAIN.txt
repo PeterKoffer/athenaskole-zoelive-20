@@ -1,0 +1,7 @@
+docs/CURRICULUM_COVERAGE.md
+docs/PARAMETER_DATA_SOURCES.md
+docs/TRAINING_GROUND_PROMPT_TEMPLATE.md
+docs/verification-checklist.md
+docs/universe-image-observability.sql
+src/App.tsx
+src/nav-items.tsx
