@@ -2,7 +2,7 @@
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
-import ScenarioPlayerPage from "./pages/ScenarioPlayerPage";
+import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
 import DailyProgramPage from "@/features/daily-program/pages/DailyProgramPage";
 import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
@@ -87,7 +87,7 @@ export default function App() {
               <Route path="/daily-program" element={<DailyProgramPage />} />
 
               {/* Scenario runner */}
-              <Route path="/scenario/:scenarioId" element={<ScenarioPlayerPage />} />
+             <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
 
               {/* Bagudkompatibilitet: fang ALLE varianter af /educational-simulator */}
               <Route path="/educational-simulator" element={<EducationalSimulatorRedirect />} />
