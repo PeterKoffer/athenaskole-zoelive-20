@@ -52,7 +52,6 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
-    "@radix-ui/react-tooltip": "^1.1.4",
     "@supabase/supabase-js": "^2.50.3",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-query-devtools": "^5.81.5",
@@ -121,7 +120,9 @@
     "vite": "^5.4.1",
     "vitest": "^3.2.4"
   },
- "lint-staged": {
-  "*.{ts,tsx,js,jsx}": "prettier --write",
-  "*.{json,md,mdx,css,scss,html,yml,yaml}": "prettier --write"
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "prettier --write",
+    "*.{json,md,mdx,css,scss,html,yml,yaml}": "prettier --write"
+  }
 }
+
