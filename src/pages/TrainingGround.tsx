@@ -7,7 +7,6 @@ import { UserMetadata } from "@/types/auth";
 import { ArrowLeft, Target, Dumbbell } from "lucide-react";
 import TodaysProgramGrid from "@/components/daily-program/TodaysProgramGrid";
 import { dailyActivities } from "@/components/daily-program/dailyActivitiesData";
-import NELIE from "@/components/NELIE";
 import LessonStream from "@/components/LessonStream";
 
 const TrainingGround = () => {
@@ -126,7 +125,7 @@ const TrainingGround = () => {
           <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
 
           {/* Floating NELIE Tutor */}
-          <NELIE />
+          
         </div>
       </div>
     );
@@ -154,7 +153,7 @@ const TrainingGround = () => {
         <TodaysProgramGrid activities={dailyActivities} onStartActivity={handleStartActivity} />
         
         {/* Floating NELIE Tutor */}
-        <NELIE />
+        
         
         <div className="mt-8 text-center">
           <Button variant="outline" onClick={() => navigate('/')} className="border-gray-600 text-slate-950 bg-sky-50">
