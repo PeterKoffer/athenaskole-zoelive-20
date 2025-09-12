@@ -1,13 +1,50 @@
-export type Ability = "support" | "core" | "advanced";
-export type LearningStyle = "visual" | "auditory" | "kinesthetic" | "mixed";
-export type Context = {
-  grade: number; curriculum: string; ability: Ability;
-  learningStyle: LearningStyle; interests?: string[]; [k: string]: unknown;
+export type LessonParams = {
+  subject: string;
+  grade: number | string;
+  curriculum?: string | null;
+  ability?: "remedial" | "standard" | "advanced" | string;
+  learningStyle?: string;
+  interests?: string[] | string | null;
+  schoolPhilosophy?: string | null;
+  teacherWeights?: Record<string, number> | null;
+  lessonDurationMins?: number | null;
+  calendarKeywords?: string[] | null;
+  calendarDurationDays?: number | null;
 };
-export type GenerateArgs = { subject: string; context: Context };
-export type GenerateResult = unknown;
 
-// Default: Edge (Supabase)
-export { generate } from "./EdgeContentService";
-// Valgfri: eksplicit OpenAI (til lokale tests)
-export { generate as generateWithOpenAI } from "@/services/openai/OpenAIContentService";
+export function normalizeGrade(input: number | string): number {
+  if (typeof input === "number" && Number.isFinite(input)) return input;
+  const m = String(input ?? "").match(/\d+/);
+  return m ? Math.max(0, parseInt(m[0], 10)) : 0;
+}
+
+export function buildContentRequest(params: LessonParams) {
+  const grade = normalizeGrade(params.grade);
+  const ability = params.ability ?? "standard";
+  const learningStyle = params.learningStyle ?? "mixed";
+  const interestsArr = Array.isArray(params.interests)
+    ? params.interests
+    : params.interests
+    ? [params.interests]
+    : [];
+
+  return {
+    subject: params.subject,
+    grade,
+    curriculum: params.curriculum ?? null,
+    ability,
+    learningStyle,
+    interests: interestsArr,
+    context: {
+      schoolPhilosophy: params.schoolPhilosophy ?? null,
+      teacherWeights: params.teacherWeights ?? null,
+      lessonDurationMins: params.lessonDurationMins ?? 45,
+      calendar: {
+        keywords: params.calendarKeywords ?? [],
+        durationDays: params.calendarDurationDays ?? 1,
+      },
+    },
+  };
+}
+
+export default { buildContentRequest, normalizeGrade };
