@@ -75,7 +75,6 @@ export default function NELIELauncher() {
           <div style={sheetStyle} onClick={(e) => e.stopPropagation()}>
             <button style={closeStyle} onClick={() => setOpen(false)} aria-label="Close">✕</button>
             {/* Her bruger vi den nyeste tutor-variant */}
-            <RefactoredFloatingAITutor />
           </div>
         </div>
       )}

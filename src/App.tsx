@@ -5,8 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
 import DailyProgramPage from "@/features/daily-program/pages/DailyProgramPage";
 import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
-import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
-import NELIE from "@/components/NELIE";
+import SingleNELIE from "@/components/SingleNELIE";
 
 // --- Lightweight UI bits ---
 function Loader() {
@@ -36,13 +35,12 @@ function Shell({ children }: { children: React.ReactNode }) {
       <header className="border-b bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
           <div className="flex items-center gap-2">
-            <NELIE />
+            <SingleNELIE />
             <span className="text-sm opacity-70">New-core-map</span>
           </div>
         </div>
       </header>
       <main>{children}</main>
-      <RefactoredFloatingAITutor />
     </div>
   );
 }

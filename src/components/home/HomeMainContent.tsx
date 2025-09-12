@@ -3,7 +3,6 @@ import HeroSection from "@/components/home/HeroSection";
 import SubjectsSection from "@/components/home/SubjectsSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import CTASection from "@/components/home/CTASection";
-import NELIE from "@/components/NELIE";
 
 interface HomeMainContentProps {
   user?: any;
@@ -20,7 +19,6 @@ const HomeMainContent = ({ user, onGetStarted }: HomeMainContentProps) => {
         <CTASection onGetStarted={onGetStarted} />
       </div>
       {/* NELIE Floating AI Tutor */}
-      <NELIE />
     </>
   );
 };
