@@ -87,7 +87,7 @@ export default function App() {
               <Route path="/daily-program" element={<DailyProgramPage />} />
 
               {/* Scenario runner */}
-              <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
+              <Route path="/scenario/:scenarioId" element={<ScenarioPlayerPage />} />
 
               {/* Bagudkompatibilitet: fang ALLE varianter af /educational-simulator */}
               <Route path="/educational-simulator" element={<EducationalSimulatorRedirect />} />
