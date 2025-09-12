@@ -1,13 +1,16 @@
 // src/services/contentClient.ts
-import { getSupabase } from "./supabaseClient";
+import { createClient } from "@supabase/supabase-js";
 
-export async function generateLesson(body: unknown): Promise<any> {
-  const supabase = getSupabase();
-  const { data, error } = await supabase.functions.invoke("generate-content", { body });
-  if (error) throw error;
-  return (data as any)?.data ?? data;
+const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const anon = import.meta.env.VITE_SUPABASE_ANON as string | undefined;
+
+if (!url || !anon) {
+  // Undgå crash ved import; log i stedet.
+  // eslint-disable-next-line no-console
+  console.warn(
+    "[contentClient] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON. Edge function calls will fail until set."
+  );
 }
-
 
 // Opret kun klient hvis nøgler findes (import-safe)
 export const supabase = url && anon ? createClient(url, anon) : undefined;
