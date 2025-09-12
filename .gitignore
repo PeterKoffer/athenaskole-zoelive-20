@@ -33,3 +33,6 @@ test-results/
 playwright-report/
 .nyc_output/
 junit.xml
+
+# Supabase secrets
+supabase/.edge-secrets
