@@ -125,4 +125,3 @@
     "*.{json,md,mdx,css,scss,html,yml,yaml}": "prettier --write"
   }
 }
-
