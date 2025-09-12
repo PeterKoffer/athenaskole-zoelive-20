@@ -1,0 +1,69 @@
++// src/pages/ScenarioRunner.tsx
++ Tip: Prøv query params, fx: <code>?subject=Science&grade=5&interests=basketball,space</code>
++ </div>
++ </header>
++
++ {loading && (
++ <div className="rounded-xl border p-6 animate-pulse">
++ <div className="h-4 w-1/3 rounded bg-gray-300" />
++ <div className="mt-4 h-3 w-2/3 rounded bg-gray-200" />
++ <div className="mt-2 h-3 w-1/2 rounded bg-gray-200" />
++ </div>
++ )}
++
++ {error && (
++ <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-800">
++ <div className="font-medium">Fejl ved indholds-generering</div>
++ <div className="text-sm mt-1">{error}</div>
++ <div className="text-xs mt-2 text-red-700/80">
++ Tjek venligst at <code>.env.local</code> indeholder <code>VITE_SUPABASE_URL</code> og <code>VITE_SUPABASE_ANON</code>.
++ </div>
++ </div>
++ )}
++
++ {!loading && !error && content && (
++ <section className="space-y-6">
++ {firstActivity && (
++ <div className="rounded-xl border p-6">
++ <h2 className="text-lg font-semibold">Aktivitet</h2>
++ <p className="mt-2 whitespace-pre-wrap">
++ {firstActivity.description || firstActivity.text || JSON.stringify(firstActivity)}
++ </p>
++ {Array.isArray(firstActivity.steps) && (
++ <ol className="mt-4 list-decimal pl-6 space-y-1">
++ {firstActivity.steps.map((s: any, i: number) => (
++ <li key={i} className="whitespace-pre-wrap">
++ {typeof s === "string" ? s : s?.text ?? JSON.stringify(s)}
++ </li>
++ ))}
++ </ol>
++ )}
++ </div>
++ )}
++
++ {reflection && (
++ <div className="rounded-xl border p-6">
++ <h2 className="text-lg font-semibold">Refleksion</h2>
++ <p className="mt-2 whitespace-pre-wrap">{reflection}</p>
++ </div>
++ )}
++
++ {/* Raw JSON for debugging while vi stabiliserer schema */}
++ <details className="rounded-xl border p-4">
++ <summary className="cursor-pointer text-sm font-medium">Rå data (debug)</summary>
++ <pre className="mt-3 overflow-auto text-xs leading-relaxed">
++ {JSON.stringify(content, null, 2)}
++ </pre>
++ </details>
++ </section>
++ )}
++
++ {!loading && !error && !content && (
++ <div className="text-sm text-muted-foreground">
++ Intet indhold endnu.
++ </div>
++ )}
++ </div>
++ );
++}
++
