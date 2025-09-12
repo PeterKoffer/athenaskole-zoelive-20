@@ -1,0 +1,75 @@
++// src/content/index.ts
++
++export type LessonParams = {
++ subject: string;
++ grade: number | string;
++ curriculum?: string | null;
++ ability?: "remedial" | "standard" | "advanced" | string;
++ learningStyle?: string;
++ interests?: string[] | string | null;
++ // School & teacher context
++ schoolPhilosophy?: string | null;
++ teacherWeights?: Record<string, number> | null;
++ lessonDurationMins?: number | null;
++ // Calendar context
++ calendarKeywords?: string[] | null;
++ calendarDurationDays?: number | null;
++};
++
++export const SUBJECTS = [
++ "Native language",
++ "Mathematics",
++ "Language lab",
++ "Science",
++ "History & Religion",
++ "Geography",
++ "Computer and technology",
++ "Creative arts",
++ "Music discovery",
++ "Physical education",
++ "Mental Wellness",
++ "Life Essentials",
++] as const;
++
++export function normalizeGrade(input: number | string): number {
++ if (typeof input === "number" && Number.isFinite(input)) return input;
++ const str = String(input ?? "");
++ const m = str.match(/\d+/);
++ return m ? Math.max(0, parseInt(m[0], 10)) : 0;
++}
++
++export function buildContentRequest(params: LessonParams) {
++ const grade = normalizeGrade(params.grade);
++ const ability = params.ability ?? "standard";
++ const learningStyle = params.learningStyle ?? "mixed";
++ const interestsArr = Array.isArray(params.interests)
++ ? params.interests
++ : params.interests
++ ? [params.interests]
++ : [];
++
++ const lessonDurationMins = params.lessonDurationMins ?? 45;
++ const calendar = {
++ keywords: params.calendarKeywords ?? [],
++ durationDays: params.calendarDurationDays ?? 1,
++ };
++
++ // This shape matches our Edge Function `generate-content` minimal contract
++ // (subject, grade, curriculum, ability, learningStyle, interests)
++ // and carries richer context under `context` for forward-compat.
++ return {
++ subject: params.subject,
++ grade,
++ curriculum: params.curriculum ?? null,
++ ability,
++ learningStyle,
++ interests: interestsArr,
++ context: {
++ schoolPhilosophy: params.schoolPhilosophy ?? null,
++ teacherWeights: params.teacherWeights ?? null,
++ lessonDurationMins,
++ calendar,
++ },
++ };
++}
++
