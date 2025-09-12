@@ -1,6 +1,6 @@
 // vite.config.ts
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import path from "node:path";
 
 export default defineConfig({
@@ -8,8 +8,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      "@components": path.resolve(__dirname, "src/components"),
       "@features": path.resolve(__dirname, "src/features"),
-      "@ui": path.resolve(__dirname, "src/shared/ui"),
+      "@services": path.resolve(__dirname, "src/services"),
     },
+  },
+  server: {
+    port: 5173,
   },
 });
