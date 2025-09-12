@@ -1,20 +1,6 @@
 // src/services/supabaseClient.ts
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+// Shim der bevarer gamle imports og peger på den kanoniske klient i lib/
+import supabaseDefault, { getSupabase, supabase } from "@/lib/supabaseClient";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anon = import.meta.env.VITE_SUPABASE_ANON as string | undefined;
-
-// Lazy singleton – undgå crash ved import-tid hvis env mangler
-let _client: SupabaseClient | null = null;
-
-export function getSupabase(): SupabaseClient {
-  if (_client) return _client;
-  if (!url || !anon) {
-    throw new Error(
-      "[supabaseClient] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON. " +
-      "Create .env.local in project root and restart the dev server."
-    );
-  }
-  _client = createClient(url, anon);
-  return _client;
-}
+export { getSupabase, supabase };
+export default supabaseDefault;
