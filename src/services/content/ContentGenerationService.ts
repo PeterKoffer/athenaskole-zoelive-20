@@ -12,7 +12,7 @@ class ContentGenerationService {
     return await generateLesson(body);
   }
 
-  // Instance helpers (nogle steder kan have brugt dem)
+  // Instance helpers (bevarer tidligere API)
   normalizeGrade = normalizeGrade;
   buildRequest = buildContentRequest;
 }
