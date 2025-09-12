@@ -139,23 +139,21 @@
 }
 /* ---- NELIE avatar: 2x size, no ring, no white bg ---- */
 .nelie-avatar,
-.nelie-avatar * ,
 img[alt="NELIE"] {
-  width: 96px !important;   /* ~dobbelt af 48px */
+  width: 96px !important;   /* dobbelt */
   height: 96px !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
   outline: 0 !important;
-  /* neutraliser Tailwind ring */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
   object-fit: contain !important;
 }
 
-/* Hvis der ligger en wrapper med ring/bg rundt om billedet */
-.nelie-avatar:where(div,button,span),
-.nelie-avatar:where(div,button,span) * {
+/* Fjern ring/bg på almindelige wrappere der indeholder avataren (kræver :has – virker i Chrome/Safari/Edge) */
+:where(div,button,span,figure):has(> img.nelie-avatar),
+:where(div,button,span,figure):has(> img[alt="NELIE"]) {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
