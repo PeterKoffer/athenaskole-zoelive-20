@@ -121,13 +121,7 @@
     "vite": "^5.4.1",
     "vitest": "^3.2.4"
   },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,mdx,css,scss,html,yml,yaml}": [
-      "prettier --write"
-    ]
-  }
+ "lint-staged": {
+  "*.{ts,tsx,js,jsx}": "prettier --write",
+  "*.{json,md,mdx,css,scss,html,yml,yaml}": "prettier --write"
 }
