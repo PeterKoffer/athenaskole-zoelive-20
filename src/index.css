@@ -137,20 +137,28 @@
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
-/* === NELIE avatar: bigger, no ring, no white bg === */
-/* Brug enten .nelie-avatar (foretrækkes) eller alt="NELIE" som fallback */
+/* ---- NELIE avatar: 2x size, no ring, no white bg ---- */
 .nelie-avatar,
+.nelie-avatar * ,
 img[alt="NELIE"] {
-  width: 96px !important;   /* ~dobbelt størrelse */
+  width: 96px !important;   /* ~dobbelt af 48px */
   height: 96px !important;
   background: transparent !important;
-
-  /* neutraliser Tailwind ring/border/boksskygge */
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  /* neutraliser Tailwind ring */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
-  box-shadow: none !important;
-  border: 0 !important;
+  object-fit: contain !important;
+}
 
-  display: block;
-  object-fit: contain;
+/* Hvis der ligger en wrapper med ring/bg rundt om billedet */
+.nelie-avatar:where(div,button,span),
+.nelie-avatar:where(div,button,span) * {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
 }
