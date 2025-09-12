@@ -2,8 +2,8 @@
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 
+import ScenarioPlayerPage from "./pages/ScenarioPlayerPage";
 import DailyProgramPage from "@/features/daily-program/pages/DailyProgramPage";
-import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
 import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
 import RefactoredFloatingAITutor from "@/components/RefactoredFloatingAITutor";
 import NELIE from "@/components/NELIE";
