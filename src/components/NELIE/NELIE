@@ -3,6 +3,6 @@ import React from "react";
 import FloatingNELIE from "./floating/RefactoredFloatingAITutor";
 
 export default function NELIE() {
-  // Centralt sted at konfigurere figuren senere (props, tema, størrelse, events).
+  // Ét centralt sted at konfigurere figuren (props, tema, størrelse, events)
   return <FloatingNELIE />;
 }
