@@ -37,13 +37,16 @@ export default function RefactoredFloatingAITutor() {
         ref={ref}
         onMouseDown={onMouseDown}
         onClick={() => setOpen(!open)}
-        className="fixed z-50 w-20 h-20 rounded-full shadow-lg cursor-move border border-gray-200"
+        className="fixed z-50 w-24 h-24 shadow-lg cursor-move"
         style={{
           left: pos.x,
           top: pos.y,
-          backgroundImage: "url('/nelie.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundImage:
+            "url('/lovable-uploads/50b77ea0-3474-47cb-8e98-16b77f963d10.png')",
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: 'transparent',
         }}
       />
       {open && (
