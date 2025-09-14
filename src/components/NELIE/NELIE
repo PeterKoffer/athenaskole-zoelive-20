@@ -1,7 +1,17 @@
-// src/components/NELIE/NELIE.tsx
-import React from "react";
-import FloatingNELIE from "./floating/RefactoredFloatingAITutor";
-
-export default function NELIE() {
-  return <FloatingNELIE />;
-}
+<div
+  ref={ref}
+  onMouseDown={onMouseDown}
+  onTouchStart={onTouchStart}
+  onClick={onClick}
+  role="button"
+  aria-label="NELIE"
+  className="fixed z-[9999] w-32 h-32 cursor-move select-none" // <- w-32 h-32 (128px)
+  style={{ left: pos.x, top: pos.y, background: "transparent" }}
+>
+  <img
+    src="/nelie.png"
+    alt="NELIE"
+    className="nelie-avatar w-full h-full pointer-events-none"
+    draggable={false}
+  />
+</div>
