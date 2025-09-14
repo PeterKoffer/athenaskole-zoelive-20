@@ -1,6 +1,7 @@
 // src/components/SingleNELIE.tsx
 import { useEffect, useRef, useState } from "react";
-import NELIE from "@/components/NELIE"; // <- virker nu pga. index.ts
+// use the direct file path to avoid any barrel/cache ambiguity
+import NELIE from "@/components/NELIE/NELIE";
 
 let mounted = false;
 
