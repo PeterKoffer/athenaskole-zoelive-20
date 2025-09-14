@@ -1,113 +1,113 @@
-// src/App.tsx
-import React, { Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+// src/components/NELIE/NELIE.tsx
+import React, { useState, useRef, useEffect } from "react";
+import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 
-import ScenarioRunner from "@/features/daily-program/pages/ScenarioRunner";
-import DailyProgramPage from "@/features/daily-program/pages/DailyProgramPage";
-import EducationalSimulatorRedirect from "@/features/daily-program/pages/EducationalSimulatorRedirect";
-import SingleNELIE from "@/components/SingleNELIE";
+type Pos = { x: number; y: number };
 
-// --- Lightweight UI bits ---
-function Loader() {
+export default function NELIE() {
+  const [open, setOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [pos, setPos] = useState<Pos>({ x: 24, y: 24 });
+  const [rel, setRel] = useState<Pos>({ x: 0, y: 0 });
+  const startPosRef = useRef<Pos | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const { speakAsNelie } = useUnifiedSpeech();
+
+  useEffect(() => {
+    const onMove = (x: number, y: number) =>
+      setPos({ x: x - rel.x, y: y - rel.y });
+
+    const mm = (e: MouseEvent) => dragging && onMove(e.pageX, e.pageY);
+    const mu = () => setDragging(false);
+
+    const tm = (e: TouchEvent) => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      if (t) onMove(t.pageX, t.pageY);
+    };
+    const tu = () => setDragging(false);
+
+    document.addEventListener("mousemove", mm);
+    document.addEventListener("mouseup", mu);
+    document.addEventListener("touchmove", tm, { passive: false });
+    document.addEventListener("touchend", tu);
+
+    return () => {
+      document.removeEventListener("mousemove", mm);
+      document.removeEventListener("mouseup", mu);
+      document.removeEventListener("touchmove", tm);
+      document.removeEventListener("touchend", tu);
+    };
+  }, [dragging, rel]);
+
+  const beginDrag = (pageX: number, pageY: number) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    setDragging(true);
+    setRel({ x: pageX - r.left, y: pageY - r.top });
+    startPosRef.current = { x: pageX, y: pageY };
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    beginDrag(e.pageX, e.pageY);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    if (!t) return;
+    beginDrag(t.pageX, t.pageY);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const onClick = () => {
+    const s = startPosRef.current;
+    if (!s) return setOpen((v) => !v);
+    const moved = Math.abs(pos.x - (s.x - rel.x)) + Math.abs(pos.y - (s.y - rel.y)) > 6;
+    if (!moved) setOpen((v) => !v);
+    startPosRef.current = null;
+  };
+
   return (
-    <div className="flex min-h-[40vh] items-center justify-center">
-      <div className="animate-pulse text-sm opacity-70">Loading…</div>
-    </div>
-  );
-}
+    <>
+      <div
+        ref={ref}
+        onMouseDown={onMouseDown}
+        onTouchStart={onTouchStart}
+        onClick={onClick}
+        role="button"
+        aria-label="NELIE"
+        className="fixed z-[9999] w-24 h-24 cursor-move select-none"
+        style={{ left: pos.x, top: pos.y, background: "transparent" }}
+      >
+        <img
+          src="/nelie.png"
+          alt="NELIE"
+          className="nelie-avatar w-full h-full pointer-events-none"
+          draggable={false}
+        />
+      </div>
 
-function NotFound() {
-  return (
-    <div className="mx-auto max-w-screen-md p-6">
-      <h1 className="mb-2 text-2xl font-semibold">404 – Siden findes ikke</h1>
-      <p className="opacity-80">Stien blev ikke fundet. Går til dagens program.</p>
-      <Link className="text-blue-600 underline" to="/daily-program">
-        Gå til Daily Program
-      </Link>
-    </div>
-  );
-}
-
-/** Minimal app-shell */
-function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900">
-      <header className="border-b bg-white/70 backdrop-blur">
-        <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
-          <div className="flex items-center gap-2">
-            <SingleNELIE />
-            <span className="text-sm opacity-70">New-core-map</span>
-          </div>
+      {open && (
+        <div
+          className="fixed z-[10000] w-80 rounded-lg shadow-xl p-3 bg-white dark:bg-neutral-900 border border-black/5"
+          style={{ left: pos.x - 280, top: pos.y - 20 }}
+        >
+          <div className="font-bold text-blue-600 dark:text-blue-400 mb-2">NELIE</div>
+          <textarea
+            className="w-full border rounded p-2 text-sm bg-white/70 dark:bg-neutral-800"
+            rows={4}
+            placeholder="Skriv til NELIE..."
+          />
+          <button
+            className="mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1 text-sm"
+            onClick={() => speakAsNelie("Hej, jeg er NELIE. Hvad vil du lære i dag?")}
+          >
+            🔊 Tal
+          </button>
         </div>
-      </header>
-      <main>{children}</main>
-    </div>
-  );
-}
-
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { error?: Error }
-> {
-  constructor(props: any) {
-    super(props);
-    this.state = { error: undefined };
-  }
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-  render() {
-    if (this.state.error) {
-      return (
-        <div className="mx-auto max-w-screen-md p-6">
-          <h1 className="mb-2 text-2xl font-semibold">Noget gik galt</h1>
-          <pre className="whitespace-pre-wrap rounded bg-red-50 p-3 text-sm text-red-700">
-            {String(this.state.error.message || this.state.error)}
-          </pre>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <Suspense fallback={<Loader />}>
-          <Shell>
-            <Routes>
-              {/* Start på dagens program */}
-              <Route path="/" element={<Navigate to="/daily-program" replace />} />
-
-              {/* Daily Program */}
-              <Route path="/daily-program" element={<DailyProgramPage />} />
-
-              {/* Scenario runner */}
-             <Route path="/scenario/:scenarioId" element={<ScenarioRunner />} />
-
-              {/* Bagudkompatibilitet: fang ALLE varianter af /educational-simulator */}
-              <Route path="/educational-simulator" element={<EducationalSimulatorRedirect />} />
-              <Route path="/educational-simulator/*" element={<EducationalSimulatorRedirect />} />
-
-              {/* Sundhedscheck */}
-              <Route
-                path="/health"
-                element={
-                  <div className="mx-auto max-w-screen-md p-6">
-                    <h1 className="mb-2 text-xl font-semibold">OK</h1>
-                    <p className="opacity-70">App svarer og routes er aktive.</p>
-                  </div>
-                }
-              />
-
-              {/* Fallback */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Shell>
-        </Suspense>
-      </ErrorBoundary>
-    </BrowserRouter>
+      )}
+    </>
   );
 }
