@@ -137,30 +137,30 @@
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
-/* ---- NELIE avatar: 2x size, no ring, no white bg ---- */
+/* ---- NELIE avatar: større, ingen ring, ingen hvid baggrund ---- */
 .nelie-avatar,
 .nelie-avatar *,
 img[alt="NELIE"] {
-  width: 96px !important;   /* ~double of 48px */
-  height: 96px !important;
+  width: 128px !important;   /* 2x */
+  height: 128px !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
   outline: 0 !important;
-
-  /* neutralize Tailwind ring */
+  /* neutraliser Tailwind ring */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
-
   object-fit: contain !important;
 }
 
-/* Remove ring/bg on common wrappers that contain the avatar (needs :has; works in Chrome/Safari/Edge) */
-:where(div,button,span,figure):has(> img.nelie-avatar),
-:where(div,button,span,figure):has(> img[alt="NELIE"]) {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  --tw-ring-offset-shadow: 0 0 #0000 !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
+/* Fjern ring/bg på wrappers der direkte indeholder avataren (kræver :has) */
+@supports selector(:has(*)) {
+  :where(div,button,span,figure):has(> img.nelie-avatar),
+  :where(div,button,span,figure):has(> img[alt="NELIE"]) {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
 }
