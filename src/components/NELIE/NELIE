@@ -1,3 +1,10 @@
+import React from "react";
+import FloatingNELIE from "./floating/RefactoredFloatingAITutor";
+
+export default function NELIE() {
+  // Centralized place to configure props/theme later
+  return <FloatingNELIE />;
+}
 <div
   ref={ref}
   onMouseDown={onMouseDown}
