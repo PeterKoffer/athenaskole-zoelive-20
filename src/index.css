@@ -98,14 +98,14 @@
 /* 2× avatar, no ring, no white bg */
 img.nelie-avatar,
 img[alt="NELIE"] {
-  width: 128px !important;   /* choose ONE size; we use 128px */
+  width: 128px !important;   /* change to 96px if you prefer smaller */
   height: 128px !important;
   object-fit: contain !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
   outline: 0 !important;
-  /* neutralise Tailwind ring */
+  /* neutralize Tailwind ring */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
 }
@@ -121,5 +121,3 @@ img[alt="NELIE"] {
     --tw-ring-shadow: 0 0 #0000 !important;
   }
 }
-
-
