@@ -1,22 +1,76 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 
 type ChatMsg = { role: "user" | "assistant" | "system"; content: string };
 
 export default function RefactoredFloatingAITutor() {
-  // UI state
+  // UI
   const [open, setOpen] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [pos, setPos] = useState({ x: 24, y: 24 });
   const [rel, setRel] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
 
-  // Chat state
+  // Chat
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
 
-  const { speakAsNelie } = useUnifiedSpeech();
+  // Optional external speech hook (if wired)
+  let hookSpeak: ((t: string) => void) | undefined;
+  try {
+    hookSpeak = useUnifiedSpeech()?.speakAsNelie;
+  } catch {
+    /* ignore if hook requires providers we don't have yet */
+  }
+
+  // ---------- Robust native TTS fallback ----------
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+    // Trigger voice load
+    const load = () => setVoices(synth.getVoices());
+    load();
+    synth.addEventListener("voiceschanged", load);
+    return () => synth.removeEventListener("voiceschanged", load);
+  }, []);
+
+  function speakNative(text: string) {
+    if (!text) return;
+    const synth = window.speechSynthesis;
+    // Safari/Chrome occasionally start paused until a user gesture; resume just in case
+    try {
+      // @ts-ignore - exists in browsers
+      if (synth?.paused) synth.resume();
+    } catch {}
+    synth.cancel(); // stop any previous utterance
+
+    const u = new SpeechSynthesisUtterance(text);
+    // Prefer Danish if present, then English as fallback
+    const v =
+      voices.find((v) => v.lang?.toLowerCase().startsWith("da")) ||
+      voices.find((v) => v.lang?.toLowerCase().startsWith("en")) ||
+      undefined;
+    if (v) u.voice = v;
+    u.lang = v?.lang || "da-DK";
+    u.rate = 1.0;
+    u.pitch = 1.0;
+    u.volume = 1.0;
+    window.speechSynthesis.speak(u);
+  }
+
+  function speakNelie(text: string) {
+    if (hookSpeak) {
+      try {
+        hookSpeak(text);
+        return;
+      } catch {
+        // fall through to native if hook fails
+      }
+    }
+    speakNative(text);
+  }
+  // ------------------------------------------------
 
   // Drag handlers
   useEffect(() => {
@@ -41,33 +95,26 @@ export default function RefactoredFloatingAITutor() {
     e.preventDefault();
   };
 
-  // ---- tiny local "brain" so you get an answer immediately (no server needed) ----
+  // Tiny local reply so UI feels alive
   function localNelieReply(prompt: string): string {
     const p = prompt.trim().toLowerCase();
     if (!p) return "Skriv bare din første besked 😊";
-    if (/(hej|hello|hi|halløj)/.test(p)) {
-      return "Hej! Jeg er NELIE 🤖✨ Hvad vil du gerne lære i dag?";
-    }
-    if (/mat(ematik|h)/.test(p)) return "Matematik er fedt! Skal vi øve procent, brøker eller ligninger?";
-    if (/dansk|skriv|essay|stil/.test(p)) return "Lad os skrive! Hvilket emne? Jeg kan hjælpe med idéer og struktur.";
-    if (/engelsk|english/.test(p)) return "Vil du øve ordforråd, læsning eller en lille samtale på engelsk?";
-    if (/hjælp|help/.test(p)) return "Jeg kan bygge en mini-plan, forklare trin-for-trin, eller lave små øvelser. Hvad foretrækker du?";
+    if (/(hej|hello|hi|halløj)/.test(p)) return "Hej! Jeg er NELIE 🤖✨ Hvad vil du gerne lære i dag?";
+    if (/mat(ematik|h)/.test(p)) return "Skal vi øve procent, brøker eller ligninger?";
+    if (/dansk|skriv|essay|stil/.test(p)) return "Hvilket emne vil du skrive om? Jeg kan hjælpe med idéer og struktur.";
+    if (/engelsk|english/.test(p)) return "Vil du øve ordforråd, læsning eller en lille samtale?";
+    if (/hjælp|help/.test(p)) return "Jeg kan lave en mini-plan, forklare trin-for-trin eller give øvelser. Hvad foretrækker du?";
     return `Spændende! Du skrev: “${prompt}”. Fortæl lidt mere, så guider jeg dig videre.`;
   }
 
   async function sendMessage(text?: string) {
     const content = (text ?? input).trim();
     if (!content || busy) return;
-
-    // show user's message
     setMessages((m) => [...m, { role: "user", content }]);
     setInput("");
     setBusy(true);
-
-    // simulate thinking + reply
-    await new Promise((r) => setTimeout(r, 250));
+    await new Promise((r) => setTimeout(r, 200));
     const reply = localNelieReply(content);
-
     setMessages((m) => [...m, { role: "assistant", content: reply }]);
     setBusy(false);
   }
@@ -80,6 +127,8 @@ export default function RefactoredFloatingAITutor() {
   }
 
   const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+  const toSpeak =
+    lastAssistant?.content || input.trim() || "Hej, jeg er NELIE. Hvad vil du lære i dag?";
 
   return (
     <>
@@ -117,7 +166,7 @@ export default function RefactoredFloatingAITutor() {
               </div>
             ) : (
               messages.map((m, i) => (
-                <div key={i} className={m.role === "user" ? "mb-2 text-sm" : "mb-2 text-sm"}>
+                <div key={i} className="mb-2 text-sm">
                   <span
                     className={
                       m.role === "user"
@@ -153,12 +202,18 @@ export default function RefactoredFloatingAITutor() {
 
             <button
               className="text-sm rounded px-3 py-1 border"
-              onClick={() => {
-                const toSpeak = lastAssistant?.content ?? "Hej, jeg er NELIE. Hvad vil du lære i dag?";
-                speakAsNelie(toSpeak);
-              }}
+              onClick={() => speakNelie(toSpeak)}
+              title="Tal det seneste svar (eller input/greeting)"
             >
               🔊 Tal
+            </button>
+
+            <button
+              className="text-sm rounded px-3 py-1 border"
+              onClick={() => speakNelie("Test lyd. Hej fra NELIE!")}
+              title="Afspil en kort testsætning"
+            >
+              ▶︎ Test lyd
             </button>
           </div>
         </div>
