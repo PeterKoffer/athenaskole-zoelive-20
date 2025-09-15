@@ -1,41 +1,32 @@
-# Context Snapshot – main
+# Context Snapshot – New-core-map
 
 ## File tree (src/)
 ```
  - src/App.css
  - src/App.tsx
- - src/App.tsx.bak
- - src/agents/contentAgent.ts
- - src/agents/fallbacks.ts
- - src/agents/imageAgent.ts
- - src/agents/index.ts
- - src/agents/logger.ts
- - src/agents/qaAgent.ts
- - src/agents/simulatorAgent.ts
- - src/agents/types.ts
  - src/ai/contentService.ts
  - src/ai/promptBuilder.ts
- - src/ai/prompts/dailyUniverse.v3.ts
  - src/ai/types.ts
- - src/assets/fallback-images/default.png
- - src/assets/fallback-images/math.png
- - src/assets/fallback-images/science.png
  - src/build-notes.ts
  - src/build-suppressions.ts
  - src/components/AITutor.tsx
  - src/components/AuthHandler.tsx
  - src/components/AuthModal.tsx
- - src/components/CoverGeneratorDemo.tsx
  - src/components/EnhancedAITutor.tsx
  - src/components/EnhancedNELIELessonManager.tsx
  - src/components/ErrorBoundary.tsx
  - src/components/GameHub.tsx
- - src/components/GenerateCoverButton.tsx
- - src/components/GenerateCoverDebug
  - src/components/JulesIntegration.tsx
  - src/components/LanguageSwitcher.tsx
  - src/components/LessonStream.tsx
  - src/components/NELIE.tsx
+ - src/components/NELIE/NELIE
+ - src/components/NELIE/NELIE.tsx
+ - src/components/NELIE/RefactoredFloatingAITutor.tsx
+ - src/components/NELIE/floating/RefactoredFloatingAITutor.tsx
+ - src/components/NELIE/index.ts
+ - src/components/NELIE/legacy/NELIE.main.tsx
+ - src/components/NELIELauncher.tsx
  - src/components/OpenAIApiTest.tsx
  - src/components/ProfileDebugButton.tsx
  - src/components/ProfileServiceTest.tsx
@@ -43,29 +34,13 @@
  - src/components/ProtectedRoute.tsx
  - src/components/RefactoredFloatingAITutor.tsx
  - src/components/RoleSwitcher.tsx
+ - src/components/SingleNELIE.tsx
  - src/components/SiteMap.tsx
  - src/components/SubscriptionPlans.tsx
  - src/components/ThemeProvider.tsx
- - src/components/UniverseCover.tsx
- - src/components/UniverseCreateForm.tsx
- - src/components/UniverseImage.tsx
- - src/components/UniverseImageDiagnostic.tsx
  - src/components/UniversePlayer.tsx
  - src/components/UserVerificationDebug.tsx
  - src/components/activities/EducationalGameEngine.tsx
- - src/components/adaptive-learning/AILearningDashboard.tsx
- - src/components/adaptive-learning/AILearningModule.tsx
- - src/components/adaptive-learning/AdaptiveLearningAtomRenderer.tsx
- - src/components/adaptive-learning/AdaptivePracticeModule.tsx
- - src/components/adaptive-learning/LearningModeSelector.tsx
- - src/components/adaptive-learning/components/FocusedGrade3MultiplicationTest.tsx
- - src/components/adaptive-learning/components/FocusedGrade3Test.tsx
- - src/components/adaptive-learning/components/Grade3FractionTestTrigger.tsx
- - src/components/adaptive-learning/components/QuestionCard.tsx
- - src/components/admin/BulkImageGenerator.tsx
- - src/components/admin/RepairCoversButton.tsx
- - src/components/admin/UniverseImageManager.tsx
- - src/components/ai-tutor/SubjectSelector.tsx
  - src/components/analytics/UserAnalyticsDashboard.tsx
  - src/components/auth/AuthForm.tsx
  - src/components/auth/AuthFormFields.tsx
@@ -93,9 +68,6 @@
  - src/components/communication/MessageGroupsList.tsx
  - src/components/communication/PredefinedGroupsList.tsx
  - src/components/communication/UserSelector.tsx
- - src/components/curriculum/CurriculumDashboard.tsx
- - src/components/curriculum/LessonForm.tsx
- - src/components/curriculum/LessonList.tsx
  - src/components/daily-program/AIEnhancedActivityCard.tsx
  - src/components/daily-program/ActivityCard.tsx
  - src/components/daily-program/EnhancedDailyProgram.tsx
@@ -104,10 +76,6 @@
  - src/components/daily-program/WelcomeCard.tsx
  - src/components/daily-program/dailyActivitiesData.ts
  - src/components/demo/GameAssignmentDemo.tsx
- - src/components/dev/DevLessonQA.tsx
- - src/components/dev/DevRegenerateButton.tsx
- - src/components/dev/UniverseImageDebug.tsx
- - src/components/education/EnhancedActivityRenderer.tsx
  - src/components/education/EnhancedBodyLabLearning.tsx
  - src/components/education/EnhancedGlobalGeographyLearning.tsx
  - src/components/education/EnhancedLifeEssentialsLearning.tsx
@@ -145,7 +113,6 @@
  - src/components/education/components/LessonStateManager.tsx
  - src/components/education/components/NelieAvatarSection.tsx
  - src/components/education/components/NelieIntroduction.tsx
- - src/components/education/components/OptimizedQuestionActivity.tsx
  - src/components/education/components/ProgressIndicator.tsx
  - src/components/education/components/QuestionDisplay.tsx
  - src/components/education/components/QuestionResult.tsx
@@ -153,9 +120,6 @@
  - src/components/education/components/TrainingGroundActivityRenderer.tsx
  - src/components/education/components/UnifiedClassIntroductionProgress.tsx
  - src/components/education/components/UnifiedLessonControls.tsx
- - src/components/education/components/WorldClassTeachingTemplate.tsx
- - src/components/education/components/hooks/useEnhancedTeachingEngine.ts
- - src/components/education/components/hooks/useOptimizedLessonManager.ts
  - src/components/education/components/interfaces/LessonControlsTypes.ts
  - src/components/education/components/lessonManager/LessonControls.tsx
  - src/components/education/components/lessonManager/LessonLoadingState.tsx
@@ -217,7 +181,6 @@
  - src/components/education/components/utils/EnhancedSubjectLessonFactory.ts
  - src/components/education/components/utils/EnhancedWorldHistoryReligionsLessonFactory.ts
  - src/components/education/components/utils/LessonValidator.ts
- - src/components/education/components/utils/NELIESessionGenerator.ts
  - src/components/education/components/utils/StandardLessonTemplate.ts
  - src/components/education/components/utils/enhancedSubjectIntroductions.ts
  - src/components/education/components/utils/subjectIntroductions.ts
@@ -547,15 +510,14 @@
  - src/components/ui/toggle.tsx
  - src/components/ui/tooltip.tsx
  - src/components/ui/use-toast.ts
- - src/constants/feature-flags.ts
+ - src/config/aiConfig.ts
+ - src/config/appContext.ts
  - src/constants/lesson.ts
  - src/constants/school.ts
- - src/content/types.ts
- - src/content/universe.catalog.ts
+ - src/content/index.ts
  - src/contexts/RoleContext.tsx
  - src/data/CurriculumStepGradeMap.ts
  - src/data/ai-curriculum.json
- - src/data/comingSoonGames.ts
  - src/data/curriculum.json
  - src/data/curriculum/dk/dkComputerScienceData.ts
  - src/data/curriculum/dk/dkCreativeArtsData.ts
@@ -594,10 +556,24 @@
  - src/data/unified-curriculum-index.json
  - src/data/unified-curriculum-index.json.bak
  - src/data/unified-curriculum-index.ts
- - src/games/components/MicroGameHost.tsx
- - src/games/fast-facts.tsx
- - src/games/registry.ts
- - src/games/types.ts
+ - src/domain/curriculum/index.ts
+ - src/domain/roles.ts
+ - src/domain/spec/adaption.ts
+ - src/domain/spec/resolveParams.ts
+ - src/domain/subjects.ts
+ - src/features/auth/pages/Auth.tsx
+ - src/features/auth/pages/Preferences.tsx
+ - src/features/auth/pages/Profile.tsx
+ - src/features/daily-program/pages/DailyProgramPage.tsx
+ - src/features/daily-program/pages/EducationalSimulatorRedirect.tsx
+ - src/features/daily-program/pages/ScenarioRunner.tsx
+ - src/features/daily-program/pages/TodaysProgram.tsx
+ - src/features/daily-program/pages/UniverseLesson.tsx
+ - src/features/dashboards/pages/Dashboard.tsx
+ - src/features/nelie/avatar.ts
+ - src/features/shell/pages/Landing.tsx
+ - src/features/simulator/dsl/schema.ts
+ - src/features/simulator/engine/engine.ts
  - src/global-suppressions.d.ts
  - src/hooks/use-mobile.tsx
  - src/hooks/use-toast.ts
@@ -616,8 +592,6 @@
  - src/hooks/useCommunication.ts
  - src/hooks/useConsolidatedSpeech.ts
  - src/hooks/useDashboardState.ts
- - src/hooks/useDevThrottleClick.ts
- - src/hooks/useEduLocalization.ts
  - src/hooks/useGameTracking.ts
  - src/hooks/useGradeLevelContent.ts
  - src/hooks/useHomeNavbarLogic.ts
@@ -632,34 +606,25 @@
  - src/hooks/useSessionActions.ts
  - src/hooks/useSessionLifecycle.ts
  - src/hooks/useSessionMetrics.ts
- - src/hooks/useSetting.ts
  - src/hooks/useSimpleMobileSpeech.ts
  - src/hooks/useSimpleRoleAccess.ts
  - src/hooks/useSimplifiedSpeech.ts
  - src/hooks/useSoundEffects.ts
  - src/hooks/useUnifiedQuestionGeneration.ts
  - src/hooks/useUnifiedSpeech.ts
- - src/hooks/useUniverseCover.ts
- - src/hooks/useUniverseImage.ts
  - src/i18n.ts
  - src/index.css
  - src/integrations/supabase/client.ts
  - src/integrations/supabase/types.ts
+ - src/lib/ai.ts
  - src/lib/build-suppress.ts
- - src/lib/env.ts
- - src/lib/functions.ts
- - src/lib/generateCover.ts
- - src/lib/grade.ts
- - src/lib/gradeBand.ts
- - src/lib/gradeLabels.ts
- - src/lib/imageProfiles.test.ts
- - src/lib/imageProfiles.ts
  - src/lib/supabaseClient.ts
  - src/lib/utils.ts
  - src/locales/da/translation.json
  - src/locales/en/translation.json
  - src/locales/es/translation.json
  - src/main.tsx
+ - src/main.tsx.bak.1756895609
  - src/nav-items.tsx
  - src/pages/AIInsightsPage.tsx
  - src/pages/AILearning.tsx
@@ -679,25 +644,18 @@
  - src/pages/AttendanceAnalyticsPage.tsx
  - src/pages/Auth.tsx
  - src/pages/AuthPage.tsx
- - src/pages/Calendar.tsx
  - src/pages/CalendarPage.tsx
  - src/pages/CommunicationCenter.tsx
  - src/pages/CommunicationPage.tsx
  - src/pages/ConsolidatedSimulatorPage.tsx
- - src/pages/CreateUniverse.tsx
  - src/pages/CurriculumEditorPage.tsx
  - src/pages/CurriculumSystem.tsx
  - src/pages/DailyLearningSessionPage.tsx
- - src/pages/DailyProgramPage.tsx
- - src/pages/DailyUniverseLessonPage.tsx
- - src/pages/Dashboard.tsx
- - src/pages/DevEventsPage.tsx
- - src/pages/DevSettingsInspector.tsx
+ - src/pages/DailyProgram.tsx
+ - src/pages/DevAiLab.tsx
  - src/pages/EducationPage.tsx
  - src/pages/GameHub.tsx
  - src/pages/GameHubPage.tsx
- - src/pages/GamePage.tsx
- - src/pages/GamesPage.tsx
  - src/pages/HomePage.tsx
  - src/pages/Index.tsx
  - src/pages/LandingPage.tsx
@@ -706,12 +664,10 @@
  - src/pages/MathPage.tsx
  - src/pages/MathematicsLearningPage.tsx
  - src/pages/MusicLesson.tsx
- - src/pages/MyUniverses.tsx
+ - src/pages/NelieChat.tsx
  - src/pages/NotFound.tsx
  - src/pages/ParentDashboard.tsx
  - src/pages/ParentPage.tsx
- - src/pages/PreferencesPage.tsx
- - src/pages/Profile.tsx
  - src/pages/ProfilePage.tsx
  - src/pages/ProgressDashboard.tsx
  - src/pages/ProgressPage.tsx
@@ -738,22 +694,15 @@
  - src/pages/TeacherCommunicationsPage.tsx
  - src/pages/TeacherDashboard.tsx
  - src/pages/TeacherPage.tsx
- - src/pages/TeacherPlanning.tsx
  - src/pages/TestPage.tsx
  - src/pages/TestingPage.tsx
- - src/pages/TodaysProgram.tsx
  - src/pages/TrainingGround.tsx
- - src/pages/UniverseDetail.tsx
  - src/pages/UniversePage.tsx
- - src/pages/admin/UniverseAdminPage.tsx
- - src/pages/cover-test.tsx
- - src/pages/dev/RouteInventory.tsx
- - src/pages/dev/UniverseQAPage.tsx
+ - src/routes/AppRouter.tsx
  - src/scripts/exportInteractionEvents.ts
  - src/scripts/populateKnowledgeComponents.ts
  - src/services/AIUniverseGenerator.ts
  - src/services/AdaptiveDifficultyEngine.ts
- - src/services/AdaptiveUniverseGenerator.ts
  - src/services/CalendarService.ts
  - src/services/ContentGenerationService.ts
  - src/services/CurriculumMapper.ts
@@ -761,7 +710,6 @@
  - src/services/EnhancedLessonGenerator.ts
  - src/services/EnhancedSubjectLessonFactory.ts
  - src/services/InSessionAdaptiveManager.ts
- - src/services/NELIEEngine.ts
  - src/services/NELIESessionGenerator.ts
  - src/services/NlpService.ts
  - src/services/OpenAIService.ts
@@ -772,9 +720,9 @@
  - src/services/StudentProfileService.ts
  - src/services/UniverseGenerationService.ts
  - src/services/UniverseGenerator.ts
- - src/services/UniverseImageGenerator.ts
  - src/services/UniverseSessionManager.ts
- - src/services/ai/validators/lessonQuality.ts
+ - src/services/ai/CostGovernor.ts
+ - src/services/ai/index.ts
  - src/services/aiContentRecommendationService.ts
  - src/services/aiCreativeDirector/atomSequenceBuilder.ts
  - src/services/aiCreativeDirector/educationalContextMapper.ts
@@ -784,26 +732,20 @@
  - src/services/aiInsightsScanner.ts
  - src/services/aiInteractionService.ts
  - src/services/aiLearningPathService.ts
- - src/services/cache/LessonCache.ts
- - src/services/calendar.ts
  - src/services/commonStandardsAPI.ts
  - src/services/conceptMasteryService.ts
  - src/services/content/ContentGenerationService.ts
  - src/services/content/ContentOrchestrator.ts
+ - src/services/content/EdgeContentService.ts
  - src/services/content/EnhancedContentGenerationService.ts
  - src/services/content/KnowledgeComponentService.ts
  - src/services/content/aiContentGenerator.ts
- - src/services/content/aiGlue.ts
- - src/services/content/aiPlannerActivityPipeline.ts
- - src/services/content/beatToActivities.ts
  - src/services/content/contentRepository.ts
- - src/services/content/fallbackContentService.ts
- - src/services/content/offlineScheduler.ts
- - src/services/content/strictParamsGate.ts
+ - src/services/content/index.ts
  - src/services/content/trainingGroundPromptBuilder.ts
  - src/services/content/trainingGroundPromptGenerator.ts
- - src/services/content/unifiedLessonContext.ts
  - src/services/contentAtomRepository.ts
+ - src/services/contentClient.ts
  - src/services/contentDeduplicationService.ts
  - src/services/curriculum/CurriculumIntegrationService.ts
  - src/services/curriculum/CurriculumService.test.ts
@@ -836,19 +778,11 @@
  - src/services/dailyLessonGenerator/types.ts
  - src/services/dailyLessonOrchestrator.ts
  - src/services/dynamicLessonExtender.ts
- - src/services/edu/effectiveContext.ts
- - src/services/edu/format.ts
- - src/services/edu/loadOverrides.ts
- - src/services/edu/locale.ts
- - src/services/edu/textTokens.ts
  - src/services/enhancedFallbackGenerators.ts
  - src/services/gameAssignmentService.ts
  - src/services/globalQuestionUniquenessService.ts
  - src/services/gradeAlignedQuestionGeneration.ts
- - src/services/interestProfile.ts
- - src/services/interestSignals.ts
  - src/services/knowledgeComponentService.ts
- - src/services/leaderboard.ts
  - src/services/learnerProfile/LearnerProfileService.ts
  - src/services/learnerProfile/MockLearnerProfileService.ts
  - src/services/learnerProfile/MockProfileService.ts
@@ -876,30 +810,24 @@
  - src/services/learningPath/progressTrackingService.ts
  - src/services/learningPath/stepManagementService.ts
  - src/services/learningPath/types.ts
- - src/services/lesson/buildDailyLesson.ts
- - src/services/lessonBuilder.ts
  - src/services/lessonProgressService.ts
- - src/services/lessonSchema.ts
- - src/services/lessonSourceManager.ts
- - src/services/media/imagePrefetch.ts
  - src/services/mockUserProgressService.ts
  - src/services/mockUserProgressService/helpers.ts
  - src/services/mockUserProgressService/mockData.ts
  - src/services/mockUserProgressService/types.ts
+ - src/services/nelie/NELIEEngine.main.ts
+ - src/services/nelie/NELIESessionGenerator.main.ts
+ - src/services/nelie/generator.ts
  - src/services/openaiContentService.ts
  - src/services/personalizedLearningPathGenerator.ts
  - src/services/progressPersistence.ts
  - src/services/prompt-system/dataMapping.ts
  - src/services/prompt-system/index.ts
- - src/services/promptService.ts
  - src/services/psychometrics/bktCalculator.ts
- - src/services/quality/guard.ts
- - src/services/quality/rubric.ts
  - src/services/questionTemplateSystem.ts
  - src/services/realTimeProgressService.ts
  - src/services/scalableQuestionGeneration.ts
  - src/services/sessionService.ts
- - src/services/settings.ts
  - src/services/simulator/SimulatorEngine.ts
  - src/services/stable-question-system/questionGenerator.ts
  - src/services/stable-question-system/stableQuestionTemplateSystem.ts
@@ -916,36 +844,18 @@
  - src/services/stealthAssessment/types.ts
  - src/services/stealthAssessment/userUtils.ts
  - src/services/stealthAssessmentService.ts
- - src/services/storage/getSignedUrl.ts
- - src/services/storage/objectExists.ts
- - src/services/storage/signForDownload.ts
- - src/services/subjectChoice.ts
  - src/services/subjectQuestionService.ts
+ - src/services/supabaseClient.ts
  - src/services/teachingPerspectiveService.ts
- - src/services/telemetry/events.ts
  - src/services/types/contentTypes.ts
  - src/services/unifiedQuestionGeneration.ts
  - src/services/universe-generator.ts
- - src/services/universe/aiGlue.ts
- - src/services/universe/arcs.ts
- - src/services/universe/lessonBuilder.ts
- - src/services/universe/offlineScheduler.ts
- - src/services/universe/persist.ts
- - src/services/universe/prompts.ts
- - src/services/universe/scheduler.ts
- - src/services/universe/simulation.ts
- - src/services/universe/state.ts
- - src/services/universeBrief.ts
- - src/services/universeContentService.ts
- - src/services/universeImages.ts
  - src/services/useTrainingGroundContent.ts
- - src/services/user/locale.ts
  - src/services/userActivityService.ts
  - src/services/userLearningProfileService.ts
  - src/services/userProgressService.ts
- - src/shared/contracts.ts
- - src/supabase/functionsClient.ts
- - src/supabase/safeInvoke.ts
+ - src/shared/ui/NotFound.tsx
+ - src/shared/ui/ProtectedRoute.tsx
  - src/temp-build-fix.ts
  - src/test/gameSystemVerification.ts
  - src/test/integration/AIUniverseGenerator.test.ts
@@ -964,21 +874,19 @@
  - src/test/unit/unifiedQuestionGeneration.test.ts
  - src/test/unit/universeGenerator.test.ts
  - src/types/admin.ts
- - src/types/api.ts
  - src/types/auth.ts
  - src/types/calendar.ts
  - src/types/communication.ts
  - src/types/content.ts
- - src/types/contentTypes.ts
  - src/types/curriculum.ts
  - src/types/curriculum/CurriculumFilters.ts
  - src/types/curriculum/CurriculumValidation.ts
- - src/types/curriculum/NELIESubjects.ts
  - src/types/curriculum/SubjectConstants.ts
  - src/types/curriculum/SubjectMetadata.ts
  - src/types/curriculum/UnifiedCurriculumNode.ts
  - src/types/curriculum/index.ts
  - src/types/database.ts
+ - src/types/env.d.ts
  - src/types/global.d.ts
  - src/types/gradeStandards.ts
  - src/types/interaction.ts
@@ -988,6 +896,8 @@
  - src/types/learnerProfile.ts
  - src/types/learning.ts
  - src/types/lessonCoverage.ts
+ - src/types/nelie/NELIESubjects.main.ts
+ - src/types/phase1-stubs.d.ts
  - src/types/scenario.ts
  - src/types/school.ts
  - src/types/simulator/SimulatorTypes.ts
@@ -1003,34 +913,12 @@
  - src/utils/CacheBuster.ts
  - src/utils/CrossOriginHandler.ts
  - src/utils/RealtimeAudio.ts
- - src/utils/__tests__/curriculumTargets.defaults.test.ts
- - src/utils/__tests__/curriculumTargets.flags.test.ts
- - src/utils/__tests__/curriculumTargets.test.ts
  - src/utils/adaptiveLearningUtils.ts
- - src/utils/bucketDetection.ts
- - src/utils/cache.ts
- - src/utils/cacheAuth.ts
- - src/utils/contentSource.ts
- - src/utils/country.ts
- - src/utils/coverKey.ts
- - src/utils/curriculumTargets.dk.ts
- - src/utils/curriculumTargets.ts
- - src/utils/devConsoleFilter.ts
- - src/utils/devCountry.ts
- - src/utils/featureFlags.ts
- - src/utils/grade.ts
- - src/utils/imageUrl.ts
+ - src/utils/backgroundRemoval.ts
  - src/utils/julesMessenger.ts
  - src/utils/localizationTestHelper.ts
  - src/utils/messageHandlers.ts
- - src/utils/observability.ts
  - src/utils/originChecker.ts
- - src/utils/session.ts
- - src/utils/singleflight.ts
- - src/utils/storageUrls.ts
- - src/utils/subjectMap.ts
- - src/utils/subjects.ts
- - src/utils/url.ts
  - src/vite-env.d.ts
 ```
 
@@ -1040,6 +928,7 @@
  --- FILE: src/components/layout/NavbarUserMenu.tsx
  --- FILE: src/components/scenario-engine/ScenarioPlayer.tsx
  --- FILE: src/components/scenario-engine/hooks/useScenarioEventLogging.ts
+ --- FILE: src/features/daily-program/pages/ScenarioRunner.tsx
  --- FILE: src/hooks/useAuth.tsx
  --- FILE: src/integrations/supabase/client.ts
  --- FILE: src/lib/supabaseClient.ts
@@ -1049,6 +938,7 @@
  --- FILE: src/services/ContentGenerationService.ts
  --- FILE: src/services/content/ContentGenerationService.ts
  --- FILE: src/services/content/EnhancedContentGenerationService.ts
+ --- FILE: src/test/integration/supabase.test.ts
  --- FILE: src/types/auth.ts
  --- FILE: src/types/user.ts
 ```
@@ -1057,365 +947,482 @@
 
 ### src/App.tsx
 ```tsx
-// src/App.tsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoute from "@/components/ProtectedRoute";
+// src/components/NELIE/NELIE.tsx
+import React, { useState, useRef, useEffect } from "react";
+import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
 
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import TrainingGround from "./pages/TrainingGround";
-import SchoolDashboard from "./pages/SchoolDashboard";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import ParentDashboard from "./pages/ParentDashboard";
-import ProfilePage from "./pages/ProfilePage";
-import SiteMapPage from "./pages/SiteMapPage";
-import CalendarPage from "./pages/CalendarPage";
-import SubjectLearningPage from "./pages/SubjectLearningPage";
-import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
+type Pos = { x: number; y: number };
 
-import DailyProgramPage from "@features/daily-program/pages/DailyProgramPage";
-import DailyUniverseLessonPage from "@features/daily-program/pages/UniverseLesson";
+export default function NELIE() {
+  const [open, setOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [pos, setPos] = useState<Pos>({ x: 24, y: 24 });
+  const [rel, setRel] = useState<Pos>({ x: 0, y: 0 });
+  const startPosRef = useRef<Pos | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const { speakAsNelie } = useUnifiedSpeech();
 
-function App() {
+  useEffect(() => {
+    const onMove = (x: number, y: number) =>
+      setPos({ x: x - rel.x, y: y - rel.y });
+
+    const mm = (e: MouseEvent) => dragging && onMove(e.pageX, e.pageY);
+    const mu = () => setDragging(false);
+
+    const tm = (e: TouchEvent) => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      if (t) onMove(t.pageX, t.pageY);
+    };
+    const tu = () => setDragging(false);
+
+    document.addEventListener("mousemove", mm);
+    document.addEventListener("mouseup", mu);
+    document.addEventListener("touchmove", tm, { passive: false });
+    document.addEventListener("touchend", tu);
+
+    return () => {
+      document.removeEventListener("mousemove", mm);
+      document.removeEventListener("mouseup", mu);
+      document.removeEventListener("touchmove", tm);
+      document.removeEventListener("touchend", tu);
+    };
+  }, [dragging, rel]);
+
+  const beginDrag = (pageX: number, pageY: number) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    setDragging(true);
+    setRel({ x: pageX - r.left, y: pageY - r.top });
+    startPosRef.current = { x: pageX, y: pageY };
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    beginDrag(e.pageX, e.pageY);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    if (!t) return;
+    beginDrag(t.pageX, t.pageY);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const onClick = () => {
+    const s = startPosRef.current;
+    if (!s) return setOpen((v) => !v);
+    const moved = Math.abs(pos.x - (s.x - rel.x)) + Math.abs(pos.y - (s.y - rel.y)) > 6;
+    if (!moved) setOpen((v) => !v);
+    startPosRef.current = null;
+  };
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* public */}
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/sitemap" element={<SiteMapPage />} />
+    <>
+      <div
+        ref={ref}
+        onMouseDown={onMouseDown}
+        onTouchStart={onTouchStart}
+        onClick={onClick}
+        role="button"
+        aria-label="NELIE"
+        className="fixed z-[9999] w-24 h-24 cursor-move select-none"
+        style={{ left: pos.x, top: pos.y, background: "transparent" }}
+      >
+        <img
+          src="/nelie.png"
+          alt="NELIE"
+          className="nelie-avatar w-full h-full pointer-events-none"
+          draggable={false}
+        />
+      </div>
 
-        {/* protected */}
-        <Route
-          path="/training-ground"
-          element={<ProtectedRoute><TrainingGround /></ProtectedRoute>}
-        />
-        <Route
-          path="/daily-program"
-          element={<ProtectedRoute><DailyProgramPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/daily-universe-lesson"
-          element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/school-dashboard"
-          element={<ProtectedRoute><SchoolDashboard /></ProtectedRoute>}
-        />
-        <Route
-          path="/teacher-dashboard"
-          element={<ProtectedRoute><TeacherDashboard /></ProtectedRoute>}
-        />
-        <Route
-          path="/parent-dashboard"
-          element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>}
-        />
-        <Route
-          path="/profile"
-          element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
-        />
-        <Route
-          path="/calendar"
-          element={<ProtectedRoute><CalendarPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/subject/:subject"
-          element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/daily-session"
-          element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>}
-        />
-
-        {/* fallback */}
-        <Route path="*" element={<Index />} />
-      </Routes>
-    </BrowserRouter>
+      {open && (
+        <div
+          className="fixed z-[10000] w-80 rounded-lg shadow-xl p-3 bg-white dark:bg-neutral-900 border border-black/5"
+          style={{ left: pos.x - 280, top: pos.y - 20 }}
+        >
+          <div className="font-bold text-blue-600 dark:text-blue-400 mb-2">NELIE</div>
+          <textarea
+            className="w-full border rounded p-2 text-sm bg-white/70 dark:bg-neutral-800"
+            rows={4}
+            placeholder="Skriv til NELIE..."
+          />
+          <button
+            className="mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1 text-sm"
+            onClick={() => speakAsNelie("Hej, jeg er NELIE. Hvad vil du lære i dag?")}
+          >
+            🔊 Tal
+          </button>
+        </div>
+      )}
+    </>
   );
 }
+```
 
-export default App;
+### src/features/daily-program/pages/ScenarioRunner.tsx
+```tsx
+// src/features/daily-program/pages/ScenarioRunner.tsx
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { buildContentRequest, normalizeGrade } from "@/content";
+import { generateLesson } from "@/services/contentClient";
+
+type Json = Record<string, any>;
+
+function useQuery() {
+  const { search } = useLocation();
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
+const SUBJECT_ALIASES: Record<string, string> = {
+  science: "Science",
+  math: "Mathematics",
+  maths: "Mathematics",
+  language: "Language lab",
+  history: "History & Religion",
+  geography: "Geography",
+  tech: "Computer and technology",
+};
+
+export default function ScenarioRunner() {
+  const { scenarioId = "demo" } = useParams();
+  const qs = useQuery();
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [content, setContent] = useState<Json | null>(null);
+
+  const subject = useMemo(() => {
+    const fromQs = qs.get("subject");
+    if (fromQs) return SUBJECT_ALIASES[fromQs.toLowerCase()] ?? fromQs;
+    return SUBJECT_ALIASES[scenarioId.toLowerCase()] ?? "Science";
+  }, [qs, scenarioId]);
+
+  const grade = useMemo(() => normalizeGrade(qs.get("grade") ?? 5), [qs]);
+  const learningStyle = useMemo(() => qs.get("learningStyle") ?? "mixed", [qs]);
+  const ability = useMemo(() => qs.get("ability") ?? "standard", [qs]);
+  const interests = useMemo(() => {
+    const raw = qs.get("interests");
+    if (!raw) return [] as string[];
+    return raw.split(",").map((s) => s.trim()).filter(Boolean);
+  }, [qs]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function run() {
+      setLoading(true);
+      setError(null);
+      setContent(null);
+      try {
+        const request = buildContentRequest({
+          subject,
+          grade,
+          curriculum: qs.get("curriculum"),
+          ability,
+          learningStyle,
+          interests,
+          schoolPhilosophy: qs.get("schoolPhilosophy"),
+          lessonDurationMins: Number(qs.get("duration")) || 45,
+          calendarKeywords: (qs.get("calendar") ?? "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          calendarDurationDays: Number(qs.get("calendarDays")) || 1,
+        });
+        const result = await generateLesson(request);
+        if (!cancelled) setContent(result);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    run();
+    return () => { cancelled = true; };
+  }, [subject, grade, learningStyle, ability, interests, qs]);
+
+  const title =
+    (content as any)?.title ??
+    (content as any)?.lesson?.title ??
+    `${subject} Scenario (Grade ${grade})`;
+
+  const firstActivity: Json | undefined =
+    (content as any)?.lesson?.activities?.[0] ??
+    (content as any)?.activities?.[0] ??
+    (content as any)?.game?.steps?.[0];
+
+  const reflection: string | undefined =
+    (content as any)?.lesson?.reflection ??
+    (content as any)?.reflection;
+
+  return (
+    <div className="mx-auto max-w-4xl p-6 space-y-6">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <p className="text-sm text-muted-foreground">
+          Scenario ID: <span className="font-mono">{scenarioId}</span> • Subject: {subject} • Grade: {grade} • Style: {learningStyle} • Ability: {ability}
+        </p>
+        <div className="text-xs text-muted-foreground">
+          Tip: <code>?subject=Science&grade=5&interests=basketball,space</code>
+        </div>
+      </header>
+
+      {loading && (
+        <div className="rounded-xl border p-6 animate-pulse">
+          <div className="h-4 w-1/3 rounded bg-gray-300" />
+          <div className="mt-4 h-3 w-2/3 rounded bg-gray-200" />
+          <div className="mt-2 h-3 w-1/2 rounded bg-gray-200" />
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-800">
+          <div className="font-medium">Fejl ved indholds-generering</div>
+          <div className="text-sm mt-1">{error}</div>
+          <div className="text-xs mt-2 text-red-700/80">
+            Tjek at <code>.env.local</code> har <code>VITE_SUPABASE_URL</code> og <code>VITE_SUPABASE_ANON</code>.
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && content && (
+        <section className="space-y-6">
+          {firstActivity && (
+            <div className="rounded-xl border p-6">
+              <h2 className="text-lg font-semibold">Aktivitet</h2>
+              <p className="mt-2 whitespace-pre-wrap">
+                {firstActivity.description || firstActivity.text || JSON.stringify(firstActivity)}
+              </p>
+              {Array.isArray(firstActivity.steps) && (
+                <ol className="mt-4 list-decimal pl-6 space-y-1">
+                  {firstActivity.steps.map((s: any, i: number) => (
+                    <li key={i} className="whitespace-pre-wrap">
+                      {typeof s === "string" ? s : s?.text ?? JSON.stringify(s)}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )}
+
+          {reflection && (
+            <div className="rounded-xl border p-6">
+              <h2 className="text-lg font-semibold">Refleksion</h2>
+              <p className="mt-2 whitespace-pre-wrap">{reflection}</p>
+            </div>
+          )}
+
+          <details className="rounded-xl border p-4">
+            <summary className="cursor-pointer text-sm font-medium">Rå data (debug)</summary>
+            <pre className="mt-3 overflow-auto text-xs leading-relaxed">
+              {JSON.stringify(content, null, 2)}
+            </pre>
+          </details>
+        </section>
+      )}
+
+      {!loading && !error && !content && (
+        <div className="text-sm text-muted-foreground">Intet indhold endnu.</div>
+      )}
+    </div>
+  );
+}
+```
+
+### src/services/supabaseClient.ts
+```ts
+// src/services/supabaseClient.ts
+import supabaseDefault, { getSupabase, supabase } from "@/lib/supabaseClient";
+export { getSupabase, supabase };
+export default supabaseDefault;
+```
+
+### src/services/contentClient.ts
+```ts
+// src/services/contentClient.ts
+import { getSupabase } from "@/lib/supabaseClient";
+
+/** Kald Supabase Edge Function `generate-content` */
+export async function generateLesson(body: unknown): Promise<any> {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.functions.invoke("generate-content", { body });
+  if (error) throw error;
+  return (data as any)?.data ?? data;
+}
+```
+
+### src/content/index.ts
+```ts
+// src/content/index.ts
+export type LessonParams = {
+  subject: string;
+  grade: number | string;
+  curriculum?: string | null;
+  ability?: "remedial" | "standard" | "advanced" | string;
+  learningStyle?: string;
+  interests?: string[] | string | null;
+  schoolPhilosophy?: string | null;
+  teacherWeights?: Record<string, number> | null;
+  lessonDurationMins?: number | null;
+  calendarKeywords?: string[] | null;
+  calendarDurationDays?: number | null;
+};
+
+export function normalizeGrade(input: number | string): number {
+  if (typeof input === "number" && Number.isFinite(input)) return input;
+  const m = String(input ?? "").match(/\d+/);
+  return m ? Math.max(0, parseInt(m[0], 10)) : 0;
+}
+
+export function buildContentRequest(params: LessonParams) {
+  const grade = normalizeGrade(params.grade);
+  const ability = params.ability ?? "standard";
+  const learningStyle = params.learningStyle ?? "mixed";
+  const interestsArr = Array.isArray(params.interests)
+    ? params.interests
+    : params.interests
+    ? [params.interests]
+    : [];
+
+  return {
+    subject: params.subject,
+    grade,
+    curriculum: params.curriculum ?? null,
+    ability,
+    learningStyle,
+    interests: interestsArr,
+    context: {
+      schoolPhilosophy: params.schoolPhilosophy ?? null,
+      teacherWeights: params.teacherWeights ?? null,
+      lessonDurationMins: params.lessonDurationMins ?? 45,
+      calendar: {
+        keywords: params.calendarKeywords ?? [],
+        durationDays: params.calendarDurationDays ?? 1,
+      },
+    },
+  };
+}
+
+export default { buildContentRequest, normalizeGrade };
 ```
 
 ### src/services/ContentGenerationService.ts
 ```ts
-import curriculumIndex from '../data/unified-curriculum-index.json';
-import type { CurriculumNode } from '../types/curriculum';
-import { universeGenerationService } from './UniverseGenerationService';
+// src/services/ContentGenerationService.ts
+import { buildContentRequest, normalizeGrade } from "../content";
+import { generateLesson } from "./contentClient";
 
-class ContentGenerationService {
-  private curriculum: { [key: string]: CurriculumNode } = {};
+export type ContentGenerationRequest = ReturnType<typeof buildContentRequest>;
+export type Atom = { type: string; text?: string; data?: any; steps?: any[] };
+export type AtomSequence = Atom[];
 
-  constructor() {
-    // Convert the imported JSON data to proper CurriculumNode objects
-    this.curriculum = Object.keys(curriculumIndex).reduce((acc, key) => {
-      const rawNode = curriculumIndex[key as keyof typeof curriculumIndex] as any;
-      acc[key] = {
-        id: key,
-        parentId: rawNode.parentId || null,
-        name: rawNode.name || 'Unnamed Node',
-        ...rawNode,
-        nodeType: String(rawNode.nodeType)
-      } as CurriculumNode;
-      return acc;
-    }, {} as { [key: string]: CurriculumNode });
+export class ContentGenerationService {
+  async generate(params: {
+    subject: string;
+    grade: number | string;
+    curriculum?: string | null;
+    ability?: "remedial" | "standard" | "advanced" | string;
+    learningStyle?: string;
+    interests?: string[] | string | null;
+    schoolPhilosophy?: string | null;
+    teacherWeights?: Record<string, number> | null;
+    lessonDurationMins?: number | null;
+    calendarKeywords?: string[] | null;
+    calendarDurationDays?: number | null;
+  }) {
+    const body = buildContentRequest(params);
+    return await generateLesson(body);
   }
 
-  public getCurriculumNodeById(id: string): CurriculumNode | undefined {
-    return this.curriculum[id];
-  }
-
-  public findNodesBySubject(subject: string): CurriculumNode[] {
-    return Object.values(this.curriculum).filter(node => node.subjectName === subject);
-  }
-
-  public findNodesByGrade(grade: string): CurriculumNode[] {
-    return Object.values(this.curriculum).filter(node => node.educationalLevel === grade);
-  }
-
-  public generateDailyUniverse(studentProfile: any): any {
-    return universeGenerationService.generate(studentProfile);
-  }
+  // Bagudkompatible helpers
+  static normalizeGrade = normalizeGrade;
+  static buildRequest = buildContentRequest;
 }
 
 export const contentGenerationService = new ContentGenerationService();
+export default contentGenerationService;
 ```
 
 ### src/services/content/ContentGenerationService.ts
 ```ts
-import { supabase } from '@/lib/supabaseClient';
-import { invokeFn } from '@/supabase/safeInvoke';
-import type { AdaptiveContentRes } from '@/types/api';
+// src/services/content/ContentGenerationService.ts
+import { buildContentRequest, normalizeGrade } from "../../content";
+import { generateLesson } from "../contentClient";
 
-export interface ContentGenerationRequest {
-  kcId: string;
-  userId: string;
-  difficultyLevel?: number;
-  contentTypes?: string[];
-  maxAtoms?: number;
-  diversityPrompt?: string;
-  sessionId?: string;
-  forceUnique?: boolean;
-}
-
-export interface AtomSequence {
-  sequence_id: string;
-  atoms: any[];
-  kc_id: string;
-  user_id: string;
-  created_at: string;
-}
+export type ContentGenerationRequest = ReturnType<typeof buildContentRequest>;
+export type Atom = { type: string; text?: string; data?: any; steps?: any[] };
+export type AtomSequence = Atom[];
 
 class ContentGenerationService {
-  async generateFromDatabase(kcId: string): Promise<any[]> {
-    console.log('🔍 Checking database for pre-built atoms...');
-    
-    // Use adaptive_content table instead of content_atoms
-    const { data: existingAtoms, error } = await supabase
-      .from('adaptive_content')
-      .select('*')
-      .eq('subject', 'math') // Simplified filtering since we don't have kc_ids
-      .limit(5);
-
-    if (error) {
-      console.error('❌ Database query error:', error);
-      return [];
-    }
-
-    if (existingAtoms && existingAtoms.length > 0) {
-      console.log('✅ Found pre-built atoms in database:', existingAtoms.length);
-      return existingAtoms.map(atom => ({
-        atom_id: atom.id,
-        atom_type: atom.content_type,
-        content: atom.content,
-        kc_ids: [kcId], // Use the provided kcId
-        metadata: {
-          difficulty: atom.difficulty_level,
-          source: 'database',
-          loadedAt: Date.now()
-        }
-      }));
-    }
-
-    console.log('⚠️ No pre-built atoms found in database');
-    return [];
+  async generate(params: Parameters<typeof buildContentRequest>[0]) {
+    const body = buildContentRequest(params);
+    return await generateLesson(body);
   }
 
-  async generateFromAI(request: ContentGenerationRequest): Promise<any[]> {
-    console.log('🤖 Attempting ENHANCED AI content generation...');
-    
-    try {
-      // Extract more specific information from KC ID
-      const kcParts = request.kcId.split('_');
-      const subject = kcParts[1] || 'math';
-      const grade = kcParts[2] || 'g4';
-      const topic = kcParts.slice(3).join(' ').replace(/_/g, ' ') || 'general topic';
-      
-      console.log('📚 Extracted KC info:', { subject, grade, topic });
-
-      const edgeResponse = await invokeFn<AdaptiveContentRes>('generate-content-atoms', {
-        kcId: request.kcId,
-        userId: request.userId,
-        subject: subject,
-        gradeLevel: grade,
-        topic: topic,
-        contentTypes: request.contentTypes || ['TEXT_EXPLANATION', 'QUESTION_MULTIPLE_CHOICE', 'INTERACTIVE_EXERCISE'],
-        maxAtoms: request.maxAtoms || 3,
-        diversityPrompt: request.diversityPrompt || `Create engaging ${grade} ${subject} content about ${topic}`,
-        sessionId: request.sessionId,
-        forceUnique: request.forceUnique,
-        enhancedPrompt: true
-      });
-
-      if (edgeResponse?.atoms && edgeResponse.atoms.length > 0) {
-        console.log('✅ AI generated content successfully:', edgeResponse.atoms.length, 'atoms');
-        
-        // Normalize the data structure to match renderer expectations
-        return edgeResponse.atoms.map((atom: any) => ({
-          ...atom,
-          content: {
-            ...atom.content,
-            // Ensure both correctAnswer and correct are set for compatibility
-            correctAnswer: atom.content.correctAnswer ?? atom.content.correct ?? 0,
-            correct: atom.content.correct ?? atom.content.correctAnswer ?? 0
-          }
-        }));
-      }
-
-      console.log('⚠️ Edge Function returned no atoms');
-      return [];
-    } catch (error) {
-      console.error('❌ AI generation failed:', error);
-      return [];
-    }
-  }
-
-  generateFallbackContent(kc: any): any[] {
-    console.log('🔄 Generating PROPER MATH fallback content for:', kc.name);
-    
-    const timestamp = Date.now();
-    const randomSeed = Math.floor(Math.random() * 10000);
-    
-    // Generate actual math questions based on the KC
-    const mathQuestions = this.generateMathQuestions(kc, randomSeed);
-    
-    return [
-      {
-        atom_id: `atom_${timestamp}_1_${randomSeed}`,
-        atom_type: 'TEXT_EXPLANATION',
-        content: {
-          title: `Understanding ${kc.name}`,
-          explanation: this.getMathExplanationForKc(kc, randomSeed),
-          examples: this.getMathExamplesForKc(kc, randomSeed)
-        },
-        kc_ids: [kc.id],
-        metadata: {
-          difficulty: kc.difficulty_estimate || 0.5,
-          estimatedTimeMs: 30000,
-          source: 'enhanced_fallback',
-          generated_at: timestamp,
-          randomSeed
-        }
-      },
-      {
-        atom_id: `atom_${timestamp}_2_${randomSeed}`,
-        atom_type: 'QUESTION_MULTIPLE_CHOICE',
-        content: mathQuestions,
-        kc_ids: [kc.id],
-        metadata: {
-          difficulty: kc.difficulty_estimate || 0.5,
-          estimatedTimeMs: 45000,
-          source: 'enhanced_fallback',
-          generated_at: timestamp,
-          randomSeed
-        }
-      }
-    ];
-  }
-
-  private generateMathQuestions(kc: any, seed: number) {
-    const kcId = kc.id.toLowerCase();
-    
-    if (kcId.includes('multiply_decimals')) {
-      const factor1 = (1.2 + (seed % 5) * 0.3).toFixed(1);
-      const factor2 = (2.1 + (seed % 4) * 0.2).toFixed(1);
-      const product = (parseFloat(factor1) * parseFloat(factor2)).toFixed(2);
-      
-      return {
-        question: `What is ${factor1} × ${factor2}?`,
-        options: [
-          product,
-          (parseFloat(product) + 0.5).toFixed(2),
-          (parseFloat(product) - 0.3).toFixed(2),
-          (parseFloat(factor1) + parseFloat(factor2)).toFixed(2)
-        ],
-        correctAnswer: 0,
-        correct: 0,
-        explanation: `To multiply decimals, multiply the numbers normally: ${factor1} × ${factor2} = ${product}`
-      };
-    }
-    
-    // Default math question
-    const num1 = 12 + (seed % 20);
-    const num2 = 5 + (seed % 15);
-    const sum = num1 + num2;
-    
-    return {
-      question: `What is ${num1} + ${num2}?`,
-      options: [
-        sum.toString(),
-        (sum + 1).toString(),
-        (sum - 2).toString(),
-        (num1 - num2).toString()
-      ],
-      correctAnswer: 0,
-      correct: 0,
-      explanation: `${num1} + ${num2} = ${sum}`
-    };
-  }
-
-  private getMathExplanationForKc(_kc: any, _seed: number) {
-    return `This mathematical concept helps us solve real-world problems and builds important thinking skills.`;
-  }
-
-  private getMathExamplesForKc(kc: any, _seed: number) {
-    return [`Practice helps you master ${kc.name}`];
-  }
+  // Instance helpers (bevarer tidligere API)
+  normalizeGrade = normalizeGrade;
+  buildRequest = buildContentRequest;
 }
 
 export default new ContentGenerationService();
+export { ContentGenerationService };
 ```
 
 ### vite.config.ts
 ```ts
+// vite.config.ts
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react-swc";
+import path from "node:path";
 
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+      "@components": path.resolve(__dirname, "src/components"),
+      "@features": path.resolve(__dirname, "src/features"),
+      "@services": path.resolve(__dirname, "src/services"),
+    },
+  },
+  server: {
+    port: 5173,
+  },
 });
+```
+
+### tsconfig.base.json
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@core/*": ["src/core/*"],
+      "@features/*": ["src/features/*"],
+      "@ui/*": ["src/shared/ui/*"],
+      "@lib/*": ["src/shared/lib/*"],
+      "@config/*": ["src/shared/config/*"],
+      "@stores/*": ["src/shared/stores/*"],
+      "@types/*": ["src/core/domain/types/*"]
+    }
+  }
+}
 ```
 
 ### tsconfig.json
 ```json
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "jsx": "react-jsx",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@features/*": ["src/features/*"],
-      "@ui/*": ["src/shared/ui/*"]
-    },
-    "types": ["vite/client"]
-  },
-  "include": ["src"]
+      "@content": ["src/services/content/index.ts"],
+      "@content/edge": ["src/services/content/EdgeContentService.ts"],
+      "@content/openai": ["src/services/openai/OpenAIContentService.ts"]
+    }
+  }
 }
 ```
