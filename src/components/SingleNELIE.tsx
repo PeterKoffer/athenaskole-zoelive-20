@@ -1,13 +1,26 @@
 // src/components/SingleNELIE.tsx
+import { useEffect, useRef } from "react";
 import NELIE from "@/components/NELIE";
 
-import { createPortal } from "react-dom";
-
+/**
+ * Ensures we only mount one global NELIE.
+ * Uses a body data-flag so HMR doesn’t duplicate.
+ */
 export default function SingleNELIE() {
-  const node = (
-    <div className="fixed top-6 left-6 z-[99999] pointer-events-none select-none" aria-hidden>
-      <img src="/nelie.png" alt="NELIE" width={96} height={96} className="nelie-avatar block" draggable={false} />
-    </div>
-  );
-  return createPortal(node, document.body);
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
+    if (!document.body.dataset.nelieMounted) {
+      document.body.dataset.nelieMounted = "true";
+    }
+  }, []);
+
+  // If something else already mounted it, render nothing.
+  if (document.body.dataset.nelieMounted === "true" && mountedRef.current) {
+    return <NELIE />;
+  }
+  return null;
 }
