@@ -1,17 +1,17 @@
 # Repo Context Snapshot
-_Generated: 2025-09-15 09:16:46_  |  _Branch: `main`_
+
+_Generated: 2025-09-15 09:27:21_ | _Branch: `New-core-map`_
 
 ---
-
 
 ## Git status
 
 ```bash
 New-core-map
 
+bf37f347 Update NELIE avatar size and improve comments
+7f79fb60 docs: add __CONTEXT_SNAPSHOT.md (main snapshot)
 1146cb86 docs: add __CONTEXT_SNAPSHOT.md (New-core-map)
-825dffc1 Merge branch 'New-core-map' of github.com:PeterKoffer/athenaskole-zoelive-20 into New-core-map
-58a4c116 docs: add __CONTEXT_SNAPSHOT.md (New-core-map)
 ```
 
 ## Vite + TS/aliases (vite.config.ts, tsconfig.json)
@@ -119,7 +119,8 @@ export default function NELIE() {
   const onClick = () => {
     const s = startPosRef.current;
     if (!s) return setOpen((v) => !v);
-    const moved = Math.abs(pos.x - (s.x - rel.x)) + Math.abs(pos.y - (s.y - rel.y)) > 6;
+    const moved =
+      Math.abs(pos.x - (s.x - rel.x)) + Math.abs(pos.y - (s.y - rel.y)) > 6;
     if (!moved) setOpen((v) => !v);
     startPosRef.current = null;
   };
@@ -149,7 +150,9 @@ export default function NELIE() {
           className="fixed z-[10000] w-80 rounded-lg shadow-xl p-3 bg-white dark:bg-neutral-900 border border-black/5"
           style={{ left: pos.x - 280, top: pos.y - 20 }}
         >
-          <div className="font-bold text-blue-600 dark:text-blue-400 mb-2">NELIE</div>
+          <div className="font-bold text-blue-600 dark:text-blue-400 mb-2">
+            NELIE
+          </div>
           <textarea
             className="w-full border rounded p-2 text-sm bg-white/70 dark:bg-neutral-800"
             rows={4}
@@ -157,7 +160,9 @@ export default function NELIE() {
           />
           <button
             className="mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1 text-sm"
-            onClick={() => speakAsNelie("Hej, jeg er NELIE. Hvad vil du lære i dag?")}
+            onClick={() =>
+              speakAsNelie("Hej, jeg er NELIE. Hvad vil du lære i dag?")
+            }
           >
             🔊 Tal
           </button>
@@ -187,7 +192,6 @@ src/lib/supabaseClient.ts:18:  _client = createClient(url, anon);
     17    }
     18    _client = createClient(url, anon);
 
-
 **supabase/functions/ai-stream/index.ts** (around "createClient"):
 
      1  // @ts-nocheck
@@ -197,7 +201,6 @@ src/lib/supabaseClient.ts:18:  _client = createClient(url, anon);
     18    console.error('Supabase credentials not found');
     19  }
     21  const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
-
 
 ## NELIE – komponenter og mounts
 
@@ -220,7 +223,6 @@ src/components/NELIE/floating/RefactoredFloatingAITutor.tsx
 src/components/NELIE/index.ts
 src/components/NELIE/legacy/NELIE.main.tsx
 src/components/NELIELauncher.tsx
-src/components/RefactoredFloatingAITutor.tsx
 src/components/SingleNELIE.tsx
 src/components/daily-program/NeliesTips.tsx
 src/components/education/components/EnhancedNELIELessonManager.tsx
@@ -272,7 +274,6 @@ src/components/SingleNELIE.tsx:8:export default function SingleNELIE() {
     28    }, []);
     30    return canRender ? <NELIE /> : null;
 
-
 **src/components/NELIE/NELIE.tsx** (around "FloatingNELIE"):
 
      1  // src/components/NELIE.tsx
@@ -285,7 +286,6 @@ src/components/SingleNELIE.tsx:8:export default function SingleNELIE() {
      6  export default function NELIE() {
      7    return <FloatingNELIE />;
 
-
 **src/components/NELIE/floating/RefactoredFloatingAITutor.tsx** (around "export default function"):
 
      3  import { generateLesson } from "@/services/contentClient";
@@ -297,8 +297,7 @@ src/components/SingleNELIE.tsx:8:export default function SingleNELIE() {
     10   */
     11  export default function RefactoredFloatingAITutor() {
 
-
-## NELIE – services (parkeret fra main som *.main.ts)
+## NELIE – services (parkeret fra main som \*.main.ts)
 
 ```bash
 src/services/NELIESessionGenerator.ts
@@ -311,7 +310,6 @@ src/types/nelie/NELIESubjects.main.ts
 ## CSS / index.css (NELIE styles nederst)
 
 ```css
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -415,67 +413,73 @@ src/types/nelie/NELIESubjects.main.ts
   .perspective-1000 {
     perspective: 1000px;
   }
-  
+
   .preserve-3d {
     transform-style: preserve-3d;
   }
-  
+
   .transform-gpu {
     transform: translate3d(0, 0, 0);
   }
-  
+
   .rotate-y-12 {
     transform: rotateY(12deg);
   }
-  
+
   .rotate-x-6 {
     transform: rotateX(6deg);
   }
-  
+
   .backface-hidden {
     backface-visibility: hidden;
   }
-  
+
   .translate-z-\[-10px\] {
     transform: translateZ(-10px);
   }
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
-/* ---- NELIE avatar: 2x size, no ring, no white bg ---- */
+/* ---- NELIE avatar: større, ingen ring, ingen hvid baggrund ---- */
 .nelie-avatar,
 .nelie-avatar *,
 img[alt="NELIE"] {
-  width: 96px !important;   /* ~double of 48px */
-  height: 96px !important;
+  width: 128px !important; /* 2x */
+  height: 128px !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
   outline: 0 !important;
-
-  /* neutralize Tailwind ring */
+  /* neutraliser Tailwind ring */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
-
   object-fit: contain !important;
 }
 
-/* Remove ring/bg on common wrappers that contain the avatar (needs :has; works in Chrome/Safari/Edge) */
-:where(div,button,span,figure):has(> img.nelie-avatar),
-:where(div,button,span,figure):has(> img[alt="NELIE"]) {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  --tw-ring-offset-shadow: 0 0 #0000 !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
+/* Fjern ring/bg på wrappers der direkte indeholder avataren (kræver :has) */
+@supports selector(:has(*)) {
+  :where(div, button, span, figure):has(> img.nelie-avatar),
+  :where(div, button, span, figure):has(> img[alt="NELIE"]) {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
 }
 ```
 
@@ -735,11 +739,11 @@ const DailyProgramPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-lg text-muted-foreground mb-6">
-                Today's learning adventure is uniquely crafted just for you! Dive into an immersive, 
-                AI-generated educational universe filled with interactive content, engaging storylines, 
+                Today's learning adventure is uniquely crafted just for you! Dive into an immersive,
+                AI-generated educational universe filled with interactive content, engaging storylines,
                 and personalized challenges that adapt to your learning style.
               </p>
-              
+
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div className="bg-card p-4 rounded-lg border">
                   <h4 className="font-semibold text-foreground mb-2">🎯 Personalized Content</h4>
@@ -795,8 +799,8 @@ const DailyProgramPage = () => {
               <p className="text-muted-foreground mb-4">
                 Looking for specific subject practice? Visit the Training Ground for focused learning activities.
               </p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => navigate('/training-ground')}
                 className="border-border text-foreground hover:bg-accent"
               >
