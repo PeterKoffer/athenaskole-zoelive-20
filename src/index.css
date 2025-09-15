@@ -164,3 +164,25 @@ img[alt="NELIE"] {
     --tw-ring-shadow: 0 0 #0000 !important;
   }
 }
+/* Keep NELIE above everything and clickable */
+.floating-tutor-container { position: fixed !important; z-index: 2147483647 !important; pointer-events: auto !important; }
+.floating-tutor-container * { pointer-events: auto !important; }
+
+/* 2x avatar, no ring/bg */
+img.nelie-avatar,
+img[alt="NELIE"] {
+  width: 96px !important;
+  height: 96px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Remove bg/ring on wrappers if any */
+:where(div,button,span,figure):has(> img.nelie-avatar),
+:where(div,button,span,figure):has(> img[alt="NELIE"]) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
