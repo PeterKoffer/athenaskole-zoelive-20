@@ -2,20 +2,29 @@ import React, { useEffect, useRef, useState } from "react";
 
 /** ---- Voice/bootstrap utilities ---- */
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function ensureVoicesLoaded(maxWaitMs = 3000) {
   const synth = window.speechSynthesis;
-  // If already present, done.
   if (synth.getVoices().length) return true;
 
   let resolved = false;
   await new Promise<void>((resolve) => {
-    const t = setTimeout(() => { if (!resolved) resolve(); }, maxWaitMs);
-    const on = () => { if (!resolved) { resolved = true; clearTimeout(t); resolve(); } };
+    const t = setTimeout(() => {
+      if (!resolved) resolve();
+    }, maxWaitMs);
+    const on = () => {
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(t);
+        resolve();
+      }
+    };
     synth.addEventListener("voiceschanged", on, { once: true });
     // poke Chrome
-    try { synth.getVoices(); } catch {}
+    try {
+      synth.getVoices();
+    } catch {}
   });
 
   return true;
@@ -25,9 +34,9 @@ async function primeAudioOnce() {
   // WebAudio “poke” helps autoplay unlock on some systems
   try {
     // @ts-ignore
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx = new Ctx();
     await ctx.resume();
-    // Tiny silent buffer (best-effort)
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     gain.gain.value = 0;
@@ -35,27 +44,40 @@ async function primeAudioOnce() {
     osc.start();
     osc.stop(ctx.currentTime + 0.02);
   } catch {}
-  try { window.speechSynthesis?.resume(); } catch {}
+  try {
+    window.speechSynthesis?.resume();
+  } catch {}
 }
 
-/** Single speak — no global cancel, no overlapping side-effects */
+/** Single speak — guarded cancel to coexist with global cancel patch */
 async function speakNativeOnce(text: string) {
   if (!text) return;
 
   await ensureVoicesLoaded(3000);
-  await sleep(120); // give the engine a heartbeat after voices load
+  try {
+    window.speechSynthesis.resume();
+  } catch {}
 
   const synth = window.speechSynthesis;
-  // If currently speaking, stop that one only.
-  if (synth.speaking) synth.cancel();
+
+  // If currently speaking or queued, stop it (allow just OUR cancel)
+  if (synth.speaking || synth.pending) {
+    (window as any).__NELIE_ALLOW_CANCEL__ = true;
+    try {
+      synth.cancel();
+    } finally {
+      (window as any).__NELIE_ALLOW_CANCEL__ = false;
+    }
+    await sleep(50);
+  }
 
   const u = new SpeechSynthesisUtterance(text);
 
   const voices = synth.getVoices();
   // Prefer Danish, then English, then first available
   const pick =
-    voices.find(v => v.lang?.toLowerCase().startsWith("da")) ||
-    voices.find(v => v.lang?.toLowerCase().startsWith("en")) ||
+    voices.find((v) => /da/i.test(v.lang) || /dansk/i.test(v.name)) ||
+    voices.find((v) => /en/i.test(v.lang)) ||
     voices[0];
 
   if (pick) u.voice = pick;
@@ -68,7 +90,7 @@ async function speakNativeOnce(text: string) {
   u.onerror = (e) => console.warn("TTS error", e);
   u.onend = () => console.log("✅ done");
 
-  // Delay a touch to avoid “canceled” on some macOS/Chrome combos
+  // Tiny delay avoids spurious "canceled" on some macOS/Chrome combos
   await sleep(60);
   synth.speak(u);
 }
@@ -112,7 +134,10 @@ export default function RefactoredFloatingAITutor() {
       primedRef.current = true;
       await primeAudioOnce();
       await ensureVoicesLoaded(3000);
-      console.log("✅ audio & voices primed:", window.speechSynthesis.getVoices().length);
+      console.log(
+        "✅ audio & voices primed:",
+        window.speechSynthesis.getVoices().length
+      );
     };
     document.addEventListener("pointerdown", onFirst, { once: true });
     return () => document.removeEventListener("pointerdown", onFirst);
@@ -164,7 +189,9 @@ export default function RefactoredFloatingAITutor() {
             </button>
             <button
               className="border rounded px-3 py-1 text-sm"
-              onClick={() => speakNativeOnce("Hej, jeg er NELIE. Hvad vil du lære i dag?")}
+              onClick={() =>
+                speakNativeOnce("Hej, jeg er NELIE. Hvad vil du lære i dag?")
+              }
             >
               ▶︎ Test lyd
             </button>
