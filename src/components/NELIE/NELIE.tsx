@@ -1,4 +1,8 @@
-// src/components/NELIE/NELIE.tsx
+// src/components/NELIE.tsx
 import React from "react";
-import FloatingNELIE from "./floating/RefactoredFloatingAITutor";
-export default function NELIE(){ return <FloatingNELIE />; }
+import FloatingNELIE from "@/components/NELIE/floating/RefactoredFloatingAITutor";
+
+/** Central place to configure theme/size later if needed */
+export default function NELIE() {
+  return <FloatingNELIE />;
+}
