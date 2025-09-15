@@ -159,4 +159,10 @@ img[alt="NELIE"] {
   box-shadow: none !important;
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
+  /* ---- NELIE avatar: 2x size, no ring ---- */
+.nelie-avatar, .nelie-avatar *, img[alt="NELIE"]{
+  width:96px!important;height:96px!important;background:transparent!important;
+  border:0!important;box-shadow:none!important;outline:0!important;
+  --tw-ring-offset-shadow:0 0 #0000!important;--tw-ring-shadow:0 0 #0000!important;
+  object-fit:contain!important;
 }
