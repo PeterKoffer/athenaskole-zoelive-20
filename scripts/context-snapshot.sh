@@ -1,76 +1,102 @@
 #!/usr/bin/env bash
-# Creates docs/__CONTEXT_SNAPSHOT.md with tree, greps and key files.
 set -euo pipefail
 
-BRANCH=${1:-$(git rev-parse --abbrev-ref HEAD)}
+BRANCH_ARG="${1:-}"
 OUT="docs/__CONTEXT_SNAPSHOT.md"
-TMP="$(mktemp -d)"
 
-echo "➜ Snapshotting branch: $BRANCH"
-git fetch --all --quiet
+# Find aktiv branch hvis ikke angivet
+current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'UNKNOWN')"
+branch="${BRANCH_ARG:-$current_branch}"
 
-# List files
-if git rev-parse --verify "origin/$BRANCH" >/dev/null 2>&1; then
-  git ls-tree -r --name-only "origin/$BRANCH" | sort > "$TMP/all.txt"
-else
-  git ls-tree -r --name-only "$BRANCH" | sort > "$TMP/all.txt"
-fi
-grep -E '^src/' "$TMP/all.txt" > "$TMP/src.txt" || true
+mkdir -p docs
 
-# Focused grep
-FOCUS_PAT='createClient\(|@supabase/supabase-js|ScenarioRunner|ScenarioPlayer|ContentGenerationService|EnhancedContentGenerationService'
-> "$TMP/grep.txt"
-while read -r p; do
-  case "$p" in
-    *.ts|*.tsx|*.js|*.jsx|*.json|*.md)
-      if git cat-file -e "$BRANCH:$p" 2>/dev/null; then
-        git show "$BRANCH:$p" | grep -nE "$FOCUS_PAT" && echo "--- FILE: $p" >> "$TMP/grep.txt"
-      fi
-      ;;
-  esac
-done < "$TMP/src.txt" || true
+ts() { date +"%Y-%m-%d %H:%M:%S"; }
+hr() { printf '\n---\n\n'; }
 
-# Key files to embed fully
-KEYS=(
-  "src/App.tsx"
-  "src/features/daily-program/pages/ScenarioRunner.tsx"
-  "src/services/supabaseClient.ts"
-  "src/services/contentClient.ts"
-  "src/content/index.ts"
-  "src/services/ContentGenerationService.ts"
-  "src/services/content/ContentGenerationService.ts"
-  "vite.config.ts"
-  "tsconfig.base.json"
-  "tsconfig.json"
-)
+section() {
+  echo -e "\n## $1\n"
+}
 
-# Write markdown
+snippet() {
+  # snippet <file> <pattern> [context]
+  local file="$1"; shift
+  local pat="$1"; shift
+  local ctx="${1:-2}"
+  if [[ -f "$file" ]]; then
+    echo -e "\n**$file** (around \"$pat\"):\n"
+    # macOS-compatible grep/awk:
+    awk -v pat="$pat" -v ctx="$ctx" '
+      { lines[NR]=$0 }
+      $0~pat { for(i=NR-ctx;i<=NR+ctx;i++){ if(i>0&&lines[i]!=""){ printf("%6d  %s\n", i, lines[i]) } } print "" }
+    ' "$file" || true
+  fi
+}
+
+echo "# Repo Context Snapshot" > "$OUT"
+echo "_Generated: $(ts)_  |  _Branch: \`$branch\`_" >> "$OUT"
+hr >> "$OUT"
+
 {
-  echo "# Context Snapshot – $BRANCH"
+  section "Git status"
+  echo '```bash'
+  git branch --show-current || true
   echo
-  echo "## File tree (src/)"
+  git --no-pager log -n 3 --oneline || true
   echo '```'
-  sed 's/^/ - /' "$TMP/src.txt"
-  echo '```'
+
+  section "Vite + TS/aliases (vite.config.ts, tsconfig.json)"
+  echo '```ts'
+  sed -n '1,220p' vite.config.ts 2>/dev/null || true
   echo
-  echo "## Grep focus (createClient, supabase-js, Scenario*, ContentGenerationService)"
+  echo "--- tsconfig.json ---"
+  sed -n '1,220p' tsconfig.json 2>/dev/null || true
   echo '```'
-  sed 's/^/ /' "$TMP/grep.txt"
+
+  section "Routes (src/App.tsx)"
+  echo '```tsx'
+  sed -n '1,220p' src/App.tsx 2>/dev/null || true
   echo '```'
+
+  section "Supabase client og env"
+  echo '```bash'
+  git grep -nF 'createClient(' -- src || true
   echo
-  echo "## Key files"
-  for f in "${KEYS[@]}"; do
-    if git cat-file -e "$BRANCH:$f" 2>/dev/null; then
-      echo
-      echo "### $f"
-      case "$f" in
-        *.tsx) lang="tsx" ;; *.ts) lang="ts" ;; *.json) lang="json" ;; *.md) lang="md" ;; *) lang="txt" ;;
-      esac
-      echo '```'"$lang"
-      git show "$BRANCH:$f"
-      echo '```'
-    fi
-  done
-} > "$OUT"
+  ls -la .env* 2>/dev/null || true
+  echo '```'
+  snippet "src/lib/supabaseClient.ts" "createClient" 4
+  snippet "supabase/functions/ai-stream/index.ts" "createClient" 4
+
+  section "NELIE – komponenter og mounts"
+  echo '```bash'
+  # list alle relevante filer
+  git ls-files | grep -i -E 'NELIE|RefactoredFloatingAITutor|floating' || true
+  echo
+  echo "— Mounts —"
+  git grep -nF '<NELIE' -- src || true
+  git grep -nF 'SingleNELIE' -- src || true
+  echo '```'
+  snippet "src/components/SingleNELIE.tsx" "NELIE" 5
+  snippet "src/components/NELIE/NELIE.tsx" "FloatingNELIE" 5
+  snippet "src/components/NELIE/floating/RefactoredFloatingAITutor.tsx" "export default function" 8
+
+  section "NELIE – services (parkeret fra main som *.main.ts)"
+  echo '```bash'
+  git ls-files | grep -i -E 'services/nelie|NELIEEngine\.main|NELIESessionGenerator\.main|NELIESubjects\.main' || true
+  echo '```'
+
+  section "CSS / index.css (NELIE styles nederst)"
+  echo '```css'
+  sed -n '1,260p' src/index.css 2>/dev/null || true
+  echo '```'
+
+  section "Andre nøglefiler (auth, daily program, training)"
+  echo '```tsx'
+  echo "--- src/hooks/useAuth.tsx ---"
+  sed -n '1,180p' src/hooks/useAuth.tsx 2>/dev/null || true
+  echo
+  echo "--- src/features/daily-program/pages/DailyProgramPage.tsx ---"
+  sed -n '1,220p' src/features/daily-program/pages/DailyProgramPage.tsx 2>/dev/null || true
+  echo '```'
+} >> "$OUT"
 
 echo "✅ Wrote $OUT"
