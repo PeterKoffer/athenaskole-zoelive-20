@@ -1,107 +1,127 @@
 import { useEffect, useRef, useState } from "react";
 
-type UseUnifiedSpeech = {
-  speakAsNelie: (text: string, opts?: { lang?: string }) => Promise<void>;
-  stop: () => void;
-  isSpeaking: boolean;
-};
+/* ---------- tiny utils ---------- */
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-async function ensureVoicesLoaded(timeoutMs = 1500) {
+/* ---------- robust voice boot ---------- */
+async function ensureVoicesLoaded(maxWaitMs = 2000) {
   const synth = window.speechSynthesis;
-  // poke Chrome/Safari so it actually populates voices
+  // prod the engine
+  try { synth.resume(); } catch {}
   synth.getVoices();
-  if (synth.getVoices().length) return;
 
+  if (synth.getVoices().length) return true;
+
+  // wait for voiceschanged OR poll for up to maxWaitMs
+  let resolved = false;
   await new Promise<void>((resolve) => {
-    const t = setTimeout(resolve, timeoutMs);
+    const t = setTimeout(() => {
+      if (!resolved) resolve();
+    }, maxWaitMs);
+
     const on = () => {
+      if (resolved) return;
+      resolved = true;
       clearTimeout(t);
       resolve();
     };
+
     synth.addEventListener("voiceschanged", on, { once: true });
+  });
+
+  // last nudge
+  synth.getVoices();
+  return true;
+}
+
+async function stopCurrent(maxWaitMs = 300) {
+  const synth = window.speechSynthesis;
+  if (synth.speaking || synth.pending) synth.cancel();
+  const start = performance.now();
+  while ((synth.speaking || synth.pending) && performance.now() - start < maxWaitMs) {
+    await sleep(25);
+  }
+}
+
+async function speakNative(text: string, preferredLang?: string) {
+  if (!text?.trim()) return;
+  const synth = window.speechSynthesis;
+
+  await ensureVoicesLoaded();
+  // DO NOT call cancel repeatedly; one clean stop before speaking
+  await stopCurrent();
+
+  const u = new SpeechSynthesisUtterance(text);
+
+  const voices = synth.getVoices();
+  const langLower = (preferredLang || "").toLowerCase();
+
+  const voice =
+    (langLower && voices.find((v) => v.lang?.toLowerCase().startsWith(langLower))) ||
+    voices.find((v) => v.lang?.toLowerCase().startsWith("da")) ||
+    voices.find((v) => v.lang?.toLowerCase().startsWith("en")) ||
+    voices[0];
+
+  if (voice) u.voice = voice;
+  u.lang = voice?.lang || preferredLang || "da-DK";
+  u.rate = 1;
+  u.pitch = 1;
+
+  synth.resume(); // in case the engine is suspended
+
+  return new Promise<void>((resolve) => {
+    u.onend = () => resolve();
+    u.onerror = () => resolve(); // swallow ‘canceled’ etc.
+    synth.speak(u);
   });
 }
 
-export function useUnifiedSpeech(): UseUnifiedSpeech {
-  const [isSpeaking, setSpeaking] = useState(false);
-  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  // Unlock/resume audio on first user gesture (browser policy)
+/* ---------- prime on first gesture (autoplay policy) ---------- */
+function usePrimeSpeech() {
   useEffect(() => {
     const unlock = () => {
       try {
-        // resume speech engine
-        window.speechSynthesis.resume();
-        // also unlock audio context if any libs create one later
-        const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
-        if (AC) {
-          const ctx = new AC();
-          ctx.resume?.();
-          ctx.close?.();
-        }
+        window.speechSynthesis?.resume?.();
+        window.speechSynthesis?.getVoices?.();
       } catch {}
     };
     document.addEventListener("pointerdown", unlock, { once: true, capture: true });
     return () => document.removeEventListener("pointerdown", unlock, { capture: true } as any);
   }, []);
+}
 
-  async function speakAsNelie(text: string, opts?: { lang?: string }) {
-    if (!text?.trim()) return;
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+/* ---------- exported hook (single, safe API) ---------- */
+export function useUnifiedSpeech() {
+  usePrimeSpeech();
 
-    const synth = window.speechSynthesis;
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const currentRef = useRef<Promise<void> | null>(null);
 
-    // If something is mid-flight, cancel and wait a tick so we don't
-    // immediately self-cancel.
-    if (synth.speaking || synth.pending) {
-      synth.cancel();
-      await wait(60);
-    }
-
-    await ensureVoicesLoaded();
-
-    const want = (opts?.lang || "da-DK").toLowerCase();
-    const voices = synth.getVoices();
-
-    const voice =
-      voices.find((v) => v.lang?.toLowerCase() === want) ||
-      voices.find((v) => v.lang?.toLowerCase().startsWith(want.split("-")[0])) ||
-      voices.find((v) => v.lang?.toLowerCase().startsWith("en")) ||
-      voices[0];
-
-    const u = new SpeechSynthesisUtterance(text);
-    if (voice) u.voice = voice;
-    u.lang = voice?.lang || "en-US"; // hard fallback that always exists
-    u.rate = 1;
-    u.pitch = 1;
-
-    u.onstart = () => setSpeaking(true);
-    u.onend = () => {
-      setSpeaking(false);
-      utterRef.current = null;
-    };
-    u.onerror = () => {
-      // swallow the noisy "canceled" error Chrome fires after cancel()
-      setSpeaking(false);
-      utterRef.current = null;
-    };
-
-    utterRef.current = u;
-    synth.resume();
-    synth.speak(u);
-  }
-
-  function stop() {
+  const speakAsNelie = async (text: string, opts?: { lang?: string }) => {
+    setIsSpeaking(true);
     try {
-      window.speechSynthesis.cancel();
-    } catch {}
-    setSpeaking(false);
-    utterRef.current = null;
-  }
+      // serialize calls so nothing cancels mid-utterance
+      currentRef.current = (currentRef.current || Promise.resolve()).then(() =>
+        speakNative(text, opts?.lang)
+      );
+      await currentRef.current;
+    } finally {
+      setIsSpeaking(false);
+      currentRef.current = null;
+    }
+  };
 
-  return { speakAsNelie, stop, isSpeaking };
+  const stop = async () => {
+    try {
+      await stopCurrent();
+    } finally {
+      setIsSpeaking(false);
+      currentRef.current = null;
+    }
+  };
+
+  return { speakAsNelie, isSpeaking, stop };
 }
 
 export default useUnifiedSpeech;
+
