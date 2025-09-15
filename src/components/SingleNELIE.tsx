@@ -1,26 +1,31 @@
-// src/components/SingleNELIE.tsx
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import NELIE from "@/components/NELIE";
 
 /**
- * Ensures we only mount one global NELIE.
- * Uses a body data-flag so HMR doesn’t duplicate.
+ * Mount exactly one global NELIE instance.
+ * Uses a body data-flag to prevent duplicate mounts across routes/HMR.
  */
 export default function SingleNELIE() {
-  const mountedRef = useRef(false);
+  const [canRender, setCanRender] = useState(false);
 
   useEffect(() => {
-    if (mountedRef.current) return;
-    mountedRef.current = true;
-
-    if (!document.body.dataset.nelieMounted) {
-      document.body.dataset.nelieMounted = "true";
+    // If someone already mounted NELIE, don't render this instance
+    if (document.body.dataset.nelieMounted === "true") {
+      setCanRender(false);
+      return;
     }
+    // Claim the singleton and render
+    document.body.dataset.nelieMounted = "true";
+    setCanRender(true);
+
+    // Optional cleanup if this component ever unmounts
+    return () => {
+      // Only clear if it's still ours (simple heuristic)
+      if (document.body.dataset.nelieMounted === "true") {
+        delete document.body.dataset.nelieMounted;
+      }
+    };
   }, []);
 
-  // If something else already mounted it, render nothing.
-  if (document.body.dataset.nelieMounted === "true" && mountedRef.current) {
-    return <NELIE />;
-  }
-  return null;
+  return canRender ? <NELIE /> : null;
 }
