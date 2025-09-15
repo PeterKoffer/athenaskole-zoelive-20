@@ -1,4 +1,6 @@
-import React from "react";
+// src/components/SingleNELIE.tsx
+import NELIE from "@/components/NELIE";
+
 import { createPortal } from "react-dom";
 
 export default function SingleNELIE() {
