@@ -1,5 +1,5 @@
 # Repo Context Snapshot
-_Generated: 2025-09-15 09:15:35_  |  _Branch: `New-core-map`_
+_Generated: 2025-09-15 09:16:46_  |  _Branch: `main`_
 
 ---
 
@@ -9,9 +9,9 @@ _Generated: 2025-09-15 09:15:35_  |  _Branch: `New-core-map`_
 ```bash
 New-core-map
 
+1146cb86 docs: add __CONTEXT_SNAPSHOT.md (New-core-map)
 825dffc1 Merge branch 'New-core-map' of github.com:PeterKoffer/athenaskole-zoelive-20 into New-core-map
 58a4c116 docs: add __CONTEXT_SNAPSHOT.md (New-core-map)
-a427d63a Refactor context snapshot script for clarity and structure
 ```
 
 ## Vite + TS/aliases (vite.config.ts, tsconfig.json)
