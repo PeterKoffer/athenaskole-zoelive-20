@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
+import { askNelie } from "@/services/nelie/chat";
 
 type Point = { x: number; y: number };
 
 const LS_KEY = "nelie-pos";
-const AVATAR_SIZE = 96; // ~2x
-const Z = 2147483647;   // stay on top
+const AVATAR_SIZE = 128; // matcher CSS
+const Z = 2147483647;
 
 export default function RefactoredFloatingAITutor() {
   const { speakAsNelie } = useUnifiedSpeech?.() ?? { speakAsNelie: undefined };
@@ -16,7 +17,12 @@ export default function RefactoredFloatingAITutor() {
   const rel = useRef<Point>({ x: 0, y: 0 });
   const boxRef = useRef<HTMLDivElement>(null);
 
-  // Initial position: bottom-right, or last saved
+  const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [messages, setMessages] = useState<{ role: "user" | "nelie"; text: string }[]>([]);
+  const [err, setErr] = useState<string | null>(null);
+
+  // Start nede i højre hjørne (eller brug sidste position)
   useEffect(() => {
     const saved = localStorage.getItem(LS_KEY);
     if (saved) {
@@ -31,12 +37,11 @@ export default function RefactoredFloatingAITutor() {
     setPos({ x, y });
   }, []);
 
-  // Persist position
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(pos));
   }, [pos]);
 
-  // Drag handlers
+  // Drag
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragging) return;
@@ -59,8 +64,32 @@ export default function RefactoredFloatingAITutor() {
     e.preventDefault();
   };
 
+  const send = async () => {
+    const q = input.trim();
+    if (!q || busy) return;
+    setInput("");
+    setErr(null);
+    setMessages((m) => [...m, { role: "user", text: q }]);
+    setBusy(true);
+    try {
+      const a = await askNelie(q);
+      setMessages((m) => [...m, { role: "nelie", text: a }]);
+      speakAsNelie?.(a);
+    } catch (e: any) {
+      const msg =
+        e?.message?.includes("Missing VITE_SUPABASE_")
+          ? "Supabase keys mangler i .env.local (VITE_SUPABASE_URL og VITE_SUPABASE_ANON)."
+          : e?.message || "Noget gik galt.";
+      setErr(msg);
+      setMessages((m) => [...m, { role: "nelie", text: msg }]);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <>
+      {/* Avatar */}
       <div
         ref={boxRef}
         className="floating-tutor-container"
@@ -85,37 +114,67 @@ export default function RefactoredFloatingAITutor() {
         />
       </div>
 
+      {/* Chat */}
       {open && (
         <div
-          className="fixed w-80 rounded-lg shadow-xl p-3 bg-white text-black"
+          className="fixed w-96 max-w-[92vw] rounded-lg shadow-xl p-3 bg-white text-black"
           style={{
-            left: Math.max(8, pos.x - 320),
+            left: Math.max(8, pos.x - 340),
             top: Math.max(8, pos.y - 20),
             zIndex: Z,
           }}
           role="dialog"
           aria-label="NELIE chat"
         >
-          <div className="font-bold text-blue-600 mb-2">NELIE</div>
-          <textarea
-            className="w-full border rounded p-2 text-sm"
-            rows={4}
-            placeholder="Skriv til NELIE..."
-          />
-          <div className="mt-2 flex gap-2">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="font-semibold text-blue-600">NELIE</div>
             <button
-              className="bg-blue-600 text-white rounded px-3 py-1 text-sm"
-              onClick={() =>
-                speakAsNelie?.("Hej, jeg er NELIE. Hvad vil du lære i dag?")
-              }
-            >
-              🔊 Tal
-            </button>
-            <button
-              className="border rounded px-3 py-1 text-sm"
+              className="rounded px-2 py-1 text-xs text-slate-600 hover:bg-slate-100"
               onClick={() => setOpen(false)}
             >
               Luk
+            </button>
+          </div>
+
+          <div className="mb-2 max-h-64 overflow-auto rounded border bg-slate-50 p-2 text-sm">
+            {messages.length === 0 ? (
+              <div className="opacity-60">
+                Hej! Jeg er NELIE. Skriv et spørgsmål, så hjælper jeg ✨
+              </div>
+            ) : (
+              messages.map((m, i) => (
+                <div key={i} className={m.role === "user" ? "mb-2 text-right" : "mb-2 text-left"}>
+                  <span
+                    className={
+                      "inline-block rounded px-2 py-1 " +
+                      (m.role === "user"
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-slate-800 border")
+                    }
+                  >
+                    {m.text}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+
+          {err && <div className="mb-2 text-xs text-red-600">{err}</div>}
+
+          <div className="flex gap-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && send()}
+              placeholder="Skriv til NELIE…"
+              className="flex-1 rounded border px-2 py-1 text-sm outline-none focus:ring"
+            />
+            <button
+              onClick={send}
+              disabled={busy}
+              className="rounded bg-blue-600 px-3 py-1 text-sm text-white disabled:opacity-50"
+            >
+              {busy ? "…" : "Send"}
             </button>
           </div>
         </div>
