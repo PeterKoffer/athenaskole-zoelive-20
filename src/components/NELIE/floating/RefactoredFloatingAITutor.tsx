@@ -1,48 +1,70 @@
-// src/components/NELIE/floating/RefactoredFloatingAITutor.tsx
 import React, { useEffect, useRef, useState } from "react";
 
-/** ---------- Voice cache & priming (module-level) ---------- */
+/** ---------- Voice / priming utilities ---------- */
 let VOICES: SpeechSynthesisVoice[] = [];
 let voicesReady = false;
 let primed = false;
 
-function loadVoicesOnce() {
+function refreshVoices() {
   try {
     const synth = window.speechSynthesis;
-    const fill = () => {
-      VOICES = synth.getVoices() || [];
-      voicesReady = VOICES.length > 0;
-    };
-    fill();
-    synth.addEventListener?.("voiceschanged", () => {
-      fill();
-    });
-    // poke Chrome to populate
+    VOICES = synth.getVoices() || [];
+    voicesReady = VOICES.length > 0;
+  } catch {}
+}
+
+function setupVoiceEventsOnce() {
+  try {
+    const synth = window.speechSynthesis;
+    refreshVoices();
+    synth.addEventListener?.("voiceschanged", refreshVoices, { once: false });
+    // poke Chrome
     synth.getVoices();
   } catch {}
 }
 
+/** Hard-unlock: speak a single space at volume 0, then cancel. */
 function primeAudioOnce() {
   if (primed) return;
   primed = true;
-  try {
-    // resume the speech engine as soon as we get *any* gesture
-    const resume = () => {
-      try {
-        // @ts-ignore
-        window.speechSynthesis?.resume?.();
-      } catch {}
-      document.removeEventListener("click", resume);
-      document.removeEventListener("keydown", resume);
-    };
-    document.addEventListener("click", resume);
-    document.addEventListener("keydown", resume);
-  } catch {}
+  const unlock = () => {
+    try {
+      const synth = window.speechSynthesis;
+      // Some engines need an utterance to “open” the pipeline
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0; // inaudible
+      u.onend = () => synth.cancel();
+      synth.speak(u);
+      // Also resume if the engine is paused
+      // @ts-ignore
+      synth.resume?.();
+    } catch {}
+    document.removeEventListener("click", unlock);
+    document.removeEventListener("keydown", unlock);
+  };
+  document.addEventListener("click", unlock);
+  document.addEventListener("keydown", unlock);
 }
 
-/** Pick a stable voice (prefer Danish → English → first) */
-function pickVoice() {
-  if (!VOICES.length) VOICES = window.speechSynthesis.getVoices() || [];
+/** Pick specific voice: prefer Danish -> English -> first */
+function pickVoice(langHint?: "da" | "en") {
+  if (!VOICES.length) refreshVoices();
+  if (langHint === "da") {
+    return (
+      VOICES.find((v) => /da/i.test(v.lang) || /dansk/i.test(v.name)) ||
+      VOICES.find((v) => /en/i.test(v.lang)) ||
+      VOICES[0] ||
+      null
+    );
+  }
+  if (langHint === "en") {
+    return (
+      VOICES.find((v) => /en/i.test(v.lang)) ||
+      VOICES.find((v) => /da/i.test(v.lang)) ||
+      VOICES[0] ||
+      null
+    );
+  }
   return (
     VOICES.find((v) => /da/i.test(v.lang) || /dansk/i.test(v.name)) ||
     VOICES.find((v) => /en/i.test(v.lang)) ||
@@ -51,44 +73,52 @@ function pickVoice() {
   );
 }
 
-/** Speak immediately (no awaits) to keep user-gesture context */
-function speakNow(text: string) {
+/** Speak with 0–2 retries if voices aren’t ready yet. NO awaits to keep gesture context. */
+function speakNow(text: string, langPref: "da" | "en" = "da") {
   const t = (text || "").trim();
   if (!t) return;
 
-  const synth = window.speechSynthesis;
-  try {
-    // Cancel quickly then speak in the *same tick*
-    synth.cancel();
+  const trySpeak = (attempt: number) => {
+    const synth = window.speechSynthesis;
+    try {
+      // Cancel then schedule speak in next tick to avoid cancel-race
+      synth.cancel();
+      setTimeout(() => {
+        const u = new SpeechSynthesisUtterance(t);
+        const v = pickVoice(langPref);
+        if (v) {
+          u.voice = v;
+          u.lang = v.lang || (langPref === "da" ? "da-DK" : "en-US");
+        } else {
+          u.lang = langPref === "da" ? "da-DK" : "en-US";
+        }
+        u.rate = 1;
+        u.pitch = 1;
+        u.volume = 1;
 
-    const u = new SpeechSynthesisUtterance(t);
-    const v = pickVoice();
+        u.onstart = () => console.debug("[NELIE:TTS] start", u.lang, u.voice?.name);
+        u.onerror = (e) => {
+          console.warn("[NELIE:TTS] error", e);
+          // If it failed because voices weren’t ready, retry a couple times
+          if (attempt < 2) setTimeout(() => trySpeak(attempt + 1), 250);
+        };
+        u.onend = () => console.debug("[NELIE:TTS] end");
 
-    if (v) {
-      u.voice = v;
-      u.lang = v.lang || (/da/i.test(v.name) ? "da-DK" : "en-US");
-    } else {
-      u.lang = "en-US"; // safe default if voices array is empty
+        synth.speak(u);
+      }, 0);
+    } catch (e) {
+      console.warn("[NELIE:TTS] speak error", e);
+      if (attempt < 2) setTimeout(() => trySpeak(attempt + 1), 250);
     }
-    u.rate = 1;
-    u.pitch = 1;
-    u.volume = 1;
+  };
 
-    u.onstart = () => console.debug("[NELIE:TTS] start", u.lang, u.voice?.name);
-    u.onerror = (e) => console.warn("[NELIE:TTS] error", e);
-    u.onend = () => console.debug("[NELIE:TTS] end");
-
-    synth.speak(u);
-  } catch (e) {
-    console.warn("[NELIE:TTS] speakNow error", e);
-  }
+  trySpeak(0);
 }
 
 /** ---------- Component ---------- */
 export default function RefactoredFloatingAITutor() {
-  // make sure we prime once per page
   useEffect(() => {
-    loadVoicesOnce();
+    setupVoiceEventsOnce();
     primeAudioOnce();
   }, []);
 
@@ -97,6 +127,8 @@ export default function RefactoredFloatingAITutor() {
   const [pos, setPos] = useState({ x: 24, y: 24 });
   const [rel, setRel] = useState({ x: 0, y: 0 });
   const [input, setInput] = useState("");
+  const [voiceInfo, setVoiceInfo] = useState<string>("");
+
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -120,9 +152,14 @@ export default function RefactoredFloatingAITutor() {
     e.preventDefault();
   };
 
+  const speak = (text: string, lang: "da" | "en" = "da") => {
+    const v = pickVoice(lang);
+    setVoiceInfo(v ? `${v.lang} — ${v.name}` : "no voice");
+    speakNow(text, lang);
+  };
+
   const send = () => {
-    // IMPORTANT: call speakNow synchronously from the click
-    speakNow(input);
+    speak(input || "Hej, jeg er NELIE. Hvad vil du lære i dag?", "da");
   };
 
   return (
@@ -133,6 +170,7 @@ export default function RefactoredFloatingAITutor() {
         onClick={() => setOpen(!open)}
         className="floating-tutor-container w-24 h-24 cursor-move"
         style={{ left: pos.x, top: pos.y }}
+        title="NELIE"
       >
         <img
           src="/nelie.png"
@@ -165,14 +203,22 @@ export default function RefactoredFloatingAITutor() {
             </button>
             <button
               className="border rounded px-3 py-1 text-sm"
-              onClick={() => speakNow("Hej, jeg er NELIE. Hvad vil du lære i dag?")}
+              onClick={() => speak("Dette er en test fra NELIE.", "da")}
+              title="Test dansk stemme"
             >
-              ▶︎ Test lyd
+              ▶︎ Test (DA)
+            </button>
+            <button
+              className="border rounded px-3 py-1 text-sm"
+              onClick={() => speak("This is a test from NELIE.", "en")}
+              title="Test English voice"
+            >
+              ▶︎ Test (EN)
             </button>
           </div>
-          {!voicesReady && (
-            <div className="mt-2 text-xs text-slate-500">Indlæser stemmer…</div>
-          )}
+          <div className="mt-2 text-[11px] text-slate-500">
+            Voices: {voicesReady ? VOICES.length : "loading…"}{voiceInfo ? ` • Using: ${voiceInfo}` : ""}
+          </div>
         </div>
       )}
     </>
