@@ -1,120 +1,172 @@
-// src/components/NELIE/floating/RefactoredFloatingAITutor.tsx
 import React, { useEffect, useRef, useState } from "react";
+import { useUnifiedSpeech } from "@/hooks/useUnifiedSpeech";
+import { generateLesson } from "@/services/contentClient";
 
-function speak(text: string) {
-  try {
-    const synth = window.speechSynthesis;
-    if (!synth) return;
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "da-DK"; // tweak if you prefer en-US
-    synth.cancel();
-    synth.speak(u);
-  } catch {
-    /* no-op */
-  }
-}
-
+/**
+ * Small floating avatar you can drag. Click to open a chat card.
+ * - Uses Supabase Edge Function via generateLesson()
+ * - Speaks responses via useUnifiedSpeech()
+ * - Safe if env isn't configured (shows hint)
+ */
 export default function RefactoredFloatingAITutor() {
   const [open, setOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [pos, setPos] = useState<{ x: number; y: number }>({ x: 24, y: 24 });
+  const [pos, setPos] = useState<{ x: number; y: number }>({ x: 20, y: 20 });
   const [rel, setRel] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const ref = useRef<HTMLDivElement>(null);
 
-  const rootRef = useRef<HTMLDivElement>(null);
-  const avatarRef = useRef<HTMLButtonElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [messages, setMessages] = useState<{ role: "user" | "nelie"; text: string }[]>([]);
 
-  // Drag handlers
+  const { speakAsNelie } = useUnifiedSpeech();
+
+  // ---- drag logic
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!dragging) return;
-      setPos({ x: e.pageX - rel.x, y: e.pageY - rel.y });
+    const mm = (e: MouseEvent) => {
+      if (dragging) setPos({ x: e.pageX - rel.x, y: e.pageY - rel.y });
     };
-    const onUp = () => setDragging(false);
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onUp);
+    const mu = () => setDragging(false);
+    document.addEventListener("mousemove", mm);
+    document.addEventListener("mouseup", mu);
     return () => {
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseup", onUp);
+      document.removeEventListener("mousemove", mm);
+      document.removeEventListener("mouseup", mu);
     };
   }, [dragging, rel]);
 
-  const startDrag = (e: React.MouseEvent) => {
-    if (!rootRef.current) return;
-    const r = rootRef.current.getBoundingClientRect();
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
     setDragging(true);
     setRel({ x: e.pageX - r.left, y: e.pageY - r.top });
     e.preventDefault();
-    e.stopPropagation();
   };
 
-  const onAvatarClick = () => setOpen((v) => !v);
+  // ---- send message via edge function
+  const send = async () => {
+    const q = input.trim();
+    if (!q || busy) return;
+    setInput("");
+    setMessages((m) => [...m, { role: "user", text: q }]);
 
-  const onSpeak = () => {
-    const text =
-      textareaRef.current?.value?.trim() ||
-      "Hej, jeg er NELIE. Hvad vil du lære i dag?";
-    speak(text);
+    setBusy(true);
+    try {
+      // Basic body the edge function can handle. Adapt as needed.
+      const body = {
+        subject: "general",
+        context: {
+          question: q,
+          source: "NELIE-floating",
+        },
+      };
+      const out = await generateLesson(body);
+      const text =
+        (typeof out === "string" && out) ||
+        out?.answer ||
+        out?.text ||
+        JSON.stringify(out);
+
+      setMessages((m) => [...m, { role: "nelie", text }]);
+      // speak (softly)
+      speakAsNelie(String(text));
+    } catch (err: any) {
+      const msg =
+        err?.message?.includes("Supabase client not initialized")
+          ? "Supabase keys mangler. Tilføj VITE_SUPABASE_URL og VITE_SUPABASE_ANON i .env.local"
+          : (err?.message || "Noget gik galt.");
+      setMessages((m) => [...m, { role: "nelie", text: msg }]);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <div
-      ref={rootRef}
-      className="floating-tutor-container"
-      style={{
-        position: "fixed",
-        left: pos.x,
-        top: pos.y,
-      }}
-    >
-      {/* Avatar button (draggable) */}
-      <button
-        ref={avatarRef}
-        onMouseDown={startDrag}
-        onClick={onAvatarClick}
-        className="block w-24 h-24 p-0 m-0 border-0 bg-transparent cursor-move"
+    <>
+      {/* Floating avatar */}
+      <div
+        ref={ref}
+        onMouseDown={onMouseDown}
+        onClick={() => setOpen((v) => !v)}
+        className="floating-tutor-container nelie-avatar"
+        style={{
+          position: "fixed",
+          left: pos.x,
+          top: pos.y,
+          width: 96,
+          height: 96,
+          backgroundImage: "url('/nelie.png')",
+          backgroundSize: "contain",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundColor: "transparent",
+          cursor: "grab",
+        }}
         aria-label="Open NELIE"
-      >
-        <img
-          src="/nelie.png"
-          alt="NELIE"
-          className="nelie-avatar w-full h-full pointer-events-none select-none"
-          draggable={false}
-        />
-      </button>
+      />
 
-      {/* Tiny chat card */}
+      {/* Chat card */}
       {open && (
         <div
-          className="mt-2 w-80 rounded-xl border bg-white/95 shadow-xl backdrop-blur px-3 py-3 text-sm"
-          style={{ cursor: "default" }}
-          onMouseDown={(e) => e.stopPropagation()}
+          className="fixed z-[9999999] w-96 max-w-[92vw] rounded-xl border bg-white p-3 shadow-xl"
+          style={{ left: pos.x + 110, top: pos.y }}
+          role="dialog"
+          aria-label="NELIE chat"
         >
-          <div className="font-semibold text-blue-600 mb-2">NELIE</div>
-
-          <textarea
-            ref={textareaRef}
-            rows={4}
-            placeholder="Skriv til NELIE…"
-            className="w-full resize-none rounded border p-2 outline-none"
-          />
-
-          <div className="mt-2 flex gap-2">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="font-semibold text-blue-600">NELIE</div>
             <button
-              onClick={onSpeak}
-              className="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
-            >
-              🔊 Tal
-            </button>
-            <button
+              className="rounded px-2 py-1 text-xs text-slate-600 hover:bg-slate-100"
               onClick={() => setOpen(false)}
-              className="rounded border px-3 py-1 hover:bg-neutral-50"
             >
               Luk
             </button>
           </div>
+
+          <div className="mb-2 max-h-64 overflow-auto rounded border bg-slate-50 p-2 text-sm">
+            {messages.length === 0 ? (
+              <div className="opacity-60">
+                Hej! Jeg er NELIE. Skriv et spørgsmål, så hjælper jeg ✨
+              </div>
+            ) : (
+              messages.map((m, i) => (
+                <div
+                  key={i}
+                  className={m.role === "user" ? "mb-2 text-right" : "mb-2 text-left"}
+                >
+                  <span
+                    className={
+                      "inline-block rounded px-2 py-1 " +
+                      (m.role === "user"
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-slate-800 border")
+                    }
+                  >
+                    {m.text}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && send()}
+              placeholder="Skriv til NELIE…"
+              className="flex-1 rounded border px-2 py-1 text-sm outline-none focus:ring"
+            />
+            <button
+              onClick={send}
+              disabled={busy}
+              className="rounded bg-blue-600 px-3 py-1 text-sm text-white disabled:opacity-50"
+            >
+              {busy ? "…" : "Send"}
+            </button>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
