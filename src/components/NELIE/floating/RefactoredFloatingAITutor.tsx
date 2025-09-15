@@ -1,39 +1,48 @@
 import React, { useEffect, useRef, useState } from "react";
 
-/** ---- Native TTS helpers (robust) ---- */
-async function ensureVoicesLoaded(timeout = 1500) {
+/* ===========================
+   Robust native TTS helpers
+   =========================== */
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function ensureVoicesLoaded(timeoutMs = 1500) {
   const synth = window.speechSynthesis;
+  // poke Chrome/Safari so it actually populates voices
+  synth.getVoices();
   if (synth.getVoices().length) return true;
+
   await new Promise<void>((resolve) => {
-    const t = setTimeout(resolve, timeout);
+    const t = setTimeout(resolve, timeoutMs);
     const on = () => {
       clearTimeout(t);
       resolve();
     };
     synth.addEventListener("voiceschanged", on, { once: true });
-    // poke Chrome to populate
-    synth.getVoices();
   });
+
   return true;
 }
 
-async function stopCurrent(maxWait = 300) {
+async function stopCurrent(maxWaitMs = 300) {
   const synth = window.speechSynthesis;
   if (synth.speaking || synth.pending) synth.cancel();
   const start = performance.now();
-  while ((synth.speaking || synth.pending) && performance.now() - start < maxWait) {
-    await new Promise((r) => setTimeout(r, 25));
+  while ((synth.speaking || synth.pending) && performance.now() - start < maxWaitMs) {
+    await sleep(25);
   }
 }
 
 async function speakNative(text: string) {
-  if (!text) return;
+  if (!text?.trim()) return;
+
   await ensureVoicesLoaded();
   await stopCurrent();
 
   const synth = window.speechSynthesis;
   const u = new SpeechSynthesisUtterance(text);
 
+  // pick a sensible voice: da-* → en-* → first
   const voices = synth.getVoices();
   const voice =
     voices.find((v) => v.lang?.toLowerCase().startsWith("da")) ||
@@ -49,24 +58,29 @@ async function speakNative(text: string) {
   u.onerror = (e) => console.warn("[NELIE:TTS] error", e);
   u.onend = () => console.debug("[NELIE:TTS] end");
 
+  synth.resume(); // in case engine was suspended
   synth.speak(u);
 }
 
-/** Prime speech on first user gesture (Chrome/Safari policy) */
+/** Prime speech on first user gesture (browser autoplay policy) */
 function usePrimeSpeech() {
   useEffect(() => {
-    const resume = () => {
+    const unlock = () => {
       try {
-        // @ts-ignore
         window.speechSynthesis?.resume?.();
+        // also gently prod voices list
+        window.speechSynthesis?.getVoices?.();
       } catch {}
     };
-    document.addEventListener("click", resume, { once: true });
-    return () => document.removeEventListener("click", resume);
+    document.addEventListener("pointerdown", unlock, { once: true, capture: true });
+    return () => document.removeEventListener("pointerdown", unlock, { capture: true } as any);
   }, []);
 }
 
-/** ---- Component ---- */
+/* ===========================
+   Component
+   =========================== */
+
 export default function RefactoredFloatingAITutor() {
   usePrimeSpeech();
 
@@ -77,9 +91,11 @@ export default function RefactoredFloatingAITutor() {
   const [input, setInput] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
+  // drag handlers
   useEffect(() => {
-    const mm = (e: MouseEvent) =>
-      dragging && setPos({ x: e.pageX - rel.x, y: e.pageY - rel.y });
+    const mm = (e: MouseEvent) => {
+      if (dragging) setPos({ x: e.pageX - rel.x, y: e.pageY - rel.y });
+    };
     const mu = () => setDragging(false);
     document.addEventListener("mousemove", mm);
     document.addEventListener("mouseup", mu);
@@ -108,6 +124,13 @@ export default function RefactoredFloatingAITutor() {
     speakNelie(t);
   };
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  };
+
   return (
     <>
       <div
@@ -115,10 +138,7 @@ export default function RefactoredFloatingAITutor() {
         onMouseDown={onMouseDown}
         onClick={() => setOpen(!open)}
         className="floating-tutor-container w-24 h-24 cursor-move"
-        style={{
-          left: pos.x,
-          top: pos.y,
-        }}
+        style={{ left: pos.x, top: pos.y }}
       >
         <img
           src="/nelie.png"
@@ -140,6 +160,7 @@ export default function RefactoredFloatingAITutor() {
             placeholder="Skriv til NELIE..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={onKeyDown}
           />
           <div className="mt-2 flex items-center gap-2">
             <button
