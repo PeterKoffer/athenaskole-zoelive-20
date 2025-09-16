@@ -22,13 +22,13 @@ const Dashboard = () => {
             icon={<BookOpen className="w-5 h-5 mr-2 text-blue-400" />}
             title="Daily Program"
             description="Explore your personalized learning content for today"
-            onClick={() => navigate("/daily-program")}
+            onClick={() => navigate("/")}
           />
           <DashboardCard
             icon={<Users className="w-5 h-5 mr-2 text-green-400" />}
             title="Profile"
             description="Manage your profile and learning preferences"
-            onClick={() => navigate("/daily-program")}
+            onClick={() => navigate("/")}
           />
           <DashboardCard
             icon={<Calendar className="w-5 h-5 mr-2 text-purple-400" />}

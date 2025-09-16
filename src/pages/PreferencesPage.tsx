@@ -53,7 +53,7 @@ const PreferencesPage = () => {
                 Your preference settings will be available here soon.
               </p>
               <Button 
-                onClick={() => navigate('/daily-program')}
+                onClick={() => navigate('/')}
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 Go to Profile

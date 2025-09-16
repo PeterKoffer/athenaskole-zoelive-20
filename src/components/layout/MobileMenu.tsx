@@ -147,7 +147,7 @@ const MobileMenu = ({
               variant="ghost"
               className="w-full justify-start text-white hover:text-lime-400 hover:bg-gray-700"
               onClick={() => {
-                navigate('/daily-program');
+                navigate('/');
                 onClose();
               }}
             >

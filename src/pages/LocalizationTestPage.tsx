@@ -77,7 +77,7 @@ const LocalizationTestPage: React.FC = () => {
                 Test Math Learning Content
               </Button>
               <Button 
-                onClick={() => navigate('/daily-program')} 
+                onClick={() => navigate('/')} 
                 className="w-full bg-purple-600 hover:bg-purple-700"
               >
                 Test Daily Program

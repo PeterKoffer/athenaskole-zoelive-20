@@ -84,14 +84,14 @@ const NavbarUserMenu = ({ user, onGetStarted }: NavbarUserMenuProps) => {
         </div>
         <DropdownMenuSeparator className="bg-gray-700" />
         <DropdownMenuItem 
-          onClick={() => navigate('/daily-program')}
+          onClick={() => navigate('/')}
           className="text-white hover:bg-gray-700 focus:bg-gray-700"
         >
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => navigate('/daily-program')}
+          onClick={() => navigate('/')}
           className="text-white hover:bg-gray-700 focus:bg-gray-700"
         >
           <BookOpen className="mr-2 h-4 w-4" />

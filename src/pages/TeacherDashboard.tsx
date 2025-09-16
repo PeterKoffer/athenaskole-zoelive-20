@@ -60,7 +60,7 @@ const TeacherDashboard = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate('/daily-program')}>
+              <DropdownMenuItem onClick={() => navigate('/')}>
                 <Calendar className="w-4 h-4 mr-2" />
                 Create Lesson Plan
               </DropdownMenuItem>
@@ -176,7 +176,7 @@ const TeacherDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => navigate('/daily-program')}
+                  onClick={() => navigate('/')}
                 >
                   <Calendar className="w-4 h-4 mr-2" />
                   Create Lesson Plan

@@ -19,7 +19,7 @@ const EnhancedMathematicsLearning = () => {
   const handleBackToProgram = () => {
     console.log('🔇 Stopping Nelie speech before navigating back to program');
     forceStopAll();
-    navigate('/daily-program');
+    navigate('/');
   };
 
   return (

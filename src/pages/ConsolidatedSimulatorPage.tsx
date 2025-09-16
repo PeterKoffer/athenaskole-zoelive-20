@@ -54,7 +54,7 @@ const ConsolidatedSimulatorPage = () => {
         <div className="mb-8 flex items-center">
           <Button
             variant="ghost"
-            onClick={() => navigate('/daily-program')}
+            onClick={() => navigate('/')}
             className="text-muted-foreground hover:text-foreground mr-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
