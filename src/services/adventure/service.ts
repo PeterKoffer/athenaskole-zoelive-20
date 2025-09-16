@@ -48,6 +48,51 @@ export interface AdventureSelectionCriteria {
 export class AdventureService {
   
   /**
+   * Generate magical, age-appropriate backstory to hook students into the adventure
+   */
+  private static generateMagicalBackstory(pack: UniversePack, gradeLevel: string): string {
+    const gradeInt = gradeLevel === "K-2" ? 1 : 
+                     gradeLevel === "3-5" ? 4 : 
+                     gradeLevel === "6-8" ? 6 : 
+                     gradeLevel === "9-10" ? 9 : 11;
+
+    const isYoung = gradeInt <= 5; // K-5 gets more magical language
+    const isMiddle = gradeInt >= 6 && gradeInt <= 8; // 6-8 gets adventure language  
+    const isOlder = gradeInt >= 9; // 9+ gets challenge/discovery language
+
+    const adventureTitle = pack.title;
+    const subject = pack.subjectHint;
+    const category = pack.category.toLowerCase();
+
+    // Create backstory templates based on age and adventure type
+    if (isYoung) {
+      const youngStories = [
+        `🌟 En dag når du går forbi en gammel, glemte ${adventureTitle.toLowerCase()}, begynder den pludselig at skinne magisk! Du opdager, at den gemmer på fantastiske hemmeligheder, der kan hjælpe dig med at lære om ${subject}. Hvad mon der sker, hvis du tager mod udfordringen?`,
+        `✨ I din baghave finder du en mystisk bog om ${adventureTitle}. Når du åbner den, springer ordene ud af siderne og inviterer dig med på det mest spændende eventyr! Er du klar til at springe ind i ${subject}-verdenen?`,
+        `🎪 Den gamle cirkusvogn på hjørnet har altid været tom - indtil i dag! Pludselig summer den af aktivitet med ${adventureTitle}, og du får chancen for at blive dagens helt ved at mestre ${subject} på en helt ny måde!`
+      ];
+      return youngStories[Math.floor(Math.random() * youngStories.length)];
+    }
+
+    if (isMiddle) {
+      const middleStories = [
+        `🚀 Du støder på en gådefuld ${adventureTitle.toLowerCase()}, som ser helt almindelig ud - men hold da op! Den gemmer på utrolige muligheder for at udforske ${subject} på en måde, du aldrig har prøvet før. Tør du tage udfordringen op?`,
+        `🕵️ En mærkelig opdagelse venter dig: ${adventureTitle} har brug for din hjælp! Med dine ${subject}-færdigheder som våben, kan du løse mysteriet og redde dagen. Hvad venter der på den anden side af eventyret?`,
+        `⚡ Forestil dig at ${adventureTitle.toLowerCase()} pludselig bliver dit ansvar. Du har chancen for at vise, hvad du kan med ${subject}, men der er både udfordringer og fantastiske overraskelser forude. Er du klar til at bevise dit værd?`
+      ];
+      return middleStories[Math.floor(Math.random() * middleStories.length)];
+    }
+
+    // Older students (9+)
+    const olderStories = [
+      `🎯 En uventet mulighed dukker op: du får chancen for at tage kontrol over ${adventureTitle} og bevise dine ${subject}-færdigheder i praksis. Det handler ikke bare om teori - det er din chance for at skabe noget betydningsfuldt og vise verden, hvad du kan!`,
+      `🌍 ${adventureTitle} står over for en kritisk udfordring, og der er brug for nogen med dine ${subject}-talenter til at finde løsningen. Dette er mere end bare en opgave - det er din mulighed for at gøre en reel forskel og lære utroligt meget undervejs.`,
+      `💡 Du opdager en fascinerende situation omkring ${adventureTitle}, der kræver kreativ problemløsning og solid ${subject}-viden. Dette projekt kan åbne døre til ny erkendelse og give dig færdigheder, du kan bruge resten af livet!`
+    ];
+    return olderStories[Math.floor(Math.random() * olderStories.length)];
+  }
+
+  /**
    * Convert UniversePack to AdventureUniverse format
    */
   private static universePackToAdventure(pack: UniversePack, gradeLevel: string = "6-8"): AdventureUniverse {
@@ -57,12 +102,15 @@ export class AdventureService {
                      gradeLevel === "6-8" ? 6 : 
                      gradeLevel === "9-10" ? 9 : 11;
     
+    // Generate magical backstory to hook the student
+    const magicalBackstory = this.generateMagicalBackstory(pack, gradeLevel);
+    
     return {
       id: pack.id,
       title: pack.title,
       subject: pack.subjectHint,
       grade_level: gradeLevel,
-      description: `Embark on an exciting ${pack.category.toLowerCase()} adventure! ${pack.title} combines hands-on learning with real-world problem solving.`,
+      description: magicalBackstory,
       goals: pack.beats[gradeLevel as keyof typeof pack.beats] || pack.beats["6-8"],
       metadata: {
         category: pack.category,
@@ -144,12 +192,12 @@ export class AdventureService {
       const content: AdventureContent = {
         id: `content-${selectedPack.id}`,
         universe_id: selectedPack.id,
-        summary: `Today you'll dive into ${selectedPack.title}! This ${selectedPack.category.toLowerCase()} adventure will challenge you to think creatively and solve real-world problems.`,
+        summary: `Nu hvor du er trådt ind i eventyret, er det tid til at dykke dybt ned i ${selectedPack.title}! Denne ${selectedPack.category.toLowerCase()} oplevelse vil udfordre dig til at tænke kreativt, løse problemer fra den virkelige verden, og opdage nye måder at anvende din viden på.`,
         objectives: [
-          `Understand the key concepts behind ${selectedPack.title}`,
-          `Apply problem-solving skills in a ${selectedPack.category.toLowerCase()} context`,
-          `Create something tangible related to ${selectedPack.title}`,
-          `Reflect on the learning experience and present your findings`
+          `Forstå nøglekoncepterne bag ${selectedPack.title}`,
+          `Anvend problemløsningsevner i en ${selectedPack.category.toLowerCase()} sammenhæng`,
+          `Skab noget konkret relateret til ${selectedPack.title}`,
+          `Reflektér over læringsoplevelsen og præsentér dine fund`
         ],
         activities: this.generateActivitiesFromBeats(selectedPack, criteria.gradeLevel || "6-8")
       };
