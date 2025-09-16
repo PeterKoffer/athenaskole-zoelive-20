@@ -78,80 +78,108 @@ function createStoryDrivenPrompt(context: PromptContext, adventureTitle: string)
 
   return `Create an immersive story-driven educational adventure for "${adventureTitle}" (${subject}, Grade ${gradeLevel}).
 
-🎯 MISSION: Transform learning into an epic quest! Students become heroes solving real-world challenges using ${subject} skills.
+🎯 MISSION: Create a captivating learning quest with rich stories, interactive challenges, and real educational content!
 
-📖 STORY STRUCTURE:
-- Hook: Dramatic opening scenario (mystery, crisis, magical discovery)
-- Character: Student becomes a detective, scientist, explorer, or inventor
-- Stakes: What happens if they don't succeed? Make it exciting!
-- Journey: Each stage reveals new clues and challenges
-- Victory: Satisfying conclusion where knowledge saves the day
+📖 ADVENTURE STRUCTURE:
+Create exactly 3 stages with engaging stories and educational activities:
 
-🎮 INTERACTIVE ELEMENTS (${lessonDuration} minutes total):
-Create exactly 4-6 stages with varied activities:
-1. Detective Work: Questions that reveal clues
-2. Puzzle Solving: Logic challenges using ${subject} concepts  
-3. Experiments: Hands-on discovery activities
-4. Creative Missions: Build, design, or create something
-5. Team Challenges: Collaboration and discussion
-6. Final Quest: Apply everything learned
+**Stage 1: Introduction & Setup (15-20 minutes)**
+- Hook students with an exciting scenario
+- Set up the adventure context
+- Include one interactive multiple-choice question to assess prior knowledge
 
-🎨 ENGAGEMENT BOOSTERS:
-- Character names from student interests: ${interestText}
+**Stage 2: Main Challenge (80-100 minutes)**  
+- Core learning activities with story integration
+- Interactive question about ${subject} concepts
+- Creative or problem-solving component
+
+**Stage 3: Resolution & Reflection (30 minutes)**
+- Wrap up the adventure story
+- Apply what was learned
+- Reflection activity
+
+🎮 REQUIREMENTS:
+- Each stage MUST have engaging storyText (2-3 sentences)
+- Each stage MUST have detailed educational activities
+- Include specific ${subject} questions with 4 options each
+- Make it age-appropriate for Grade ${gradeLevel}
+- Connect to student interests: ${interestText}
 - Context: ${keywordText}
-- Rewards: Points, badges, unlocking next levels
-- Choices: "What do you investigate first?"
-- Surprises: Plot twists and discoveries
 
-Return a detailed lesson plan in this exact JSON format:
+Return ONLY valid JSON in this exact format:
 
 {
   "title": "${adventureTitle}",
-  "subject": "${subject}",
+  "subject": "${subject}", 
   "gradeLevel": ${gradeLevel},
-  "scenario": "Exciting story opening that sets the adventure in motion",
-  "learningObjectives": ["Specific ${subject} skill 1", "Specific ${subject} skill 2", "Problem-solving and critical thinking"],
+  "scenario": "Exciting 2-3 sentence opening that hooks students and sets up the adventure",
+  "learningObjectives": [
+    "Specific ${subject} skill students will master",
+    "Problem-solving and critical thinking skill",
+    "Creative application of concepts"
+  ],
   "stages": [
     {
-      "id": "stage1",
-      "title": "Stage Title (e.g., 'The Mystery Begins')",
-      "description": "What happens in this stage",
-      "duration": 25,
-      "storyText": "Short, exciting narrative that hooks students",
+      "id": "introduction",
+      "title": "Adventure Begins",
+      "description": "Get familiar with the scenario and your mission",
+      "duration": 15,
+      "storyText": "Exciting story opening that sets the scene and introduces the challenge...",
       "activities": [
         {
           "type": "multipleChoice",
-          "title": "Activity Title",
-          "instructions": "Clear, engaging instructions",
+          "title": "Initial Challenge",
+          "instructions": "Answer this question to begin your adventure",
           "content": {
-            "question": "Story-integrated question using ${subject}",
-            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "question": "Specific ${subject} question related to the story",
+            "options": ["Option A with real content", "Option B with real content", "Option C with real content", "Option D with real content"],
             "correctAnswer": 0,
-            "explanation": "Why this answer helps solve the mystery/challenge",
+            "explanation": "Detailed explanation of why this answer is correct and how it relates to the adventure",
             "points": 10
           }
         }
-      ],
-      "materials": ["List of materials needed"],
-      "assessmentCriteria": ["What students should demonstrate"]
-    }
-  ],
-  "bonusMissions": [
+      ]
+    },
     {
-      "title": "Extra Challenge Title",
-      "description": "Optional advanced activity",
-      "type": "creativeTask",
-      "instructions": "Create something amazing!",
-      "duration": 15
+      "id": "main-challenge", 
+      "title": "The Core Quest",
+      "description": "Tackle the main learning objectives",
+      "duration": 90,
+      "storyText": "Story continuation that introduces the main challenge and raises the stakes...",
+      "activities": [
+        {
+          "type": "multipleChoice",
+          "title": "Key Challenge",
+          "instructions": "Solve this challenge to progress in your adventure",
+          "content": {
+            "question": "Advanced ${subject} question that builds on the story",
+            "options": ["Detailed option A", "Detailed option B", "Detailed option C", "Detailed option D"],
+            "correctAnswer": 1,
+            "explanation": "Comprehensive explanation connecting the answer to both ${subject} concepts and the adventure narrative",
+            "points": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "resolution",
+      "title": "Victory & Reflection", 
+      "description": "Complete the adventure and reflect on learning",
+      "duration": 30,
+      "storyText": "Satisfying conclusion where students apply their knowledge to resolve the adventure...",
+      "activities": [
+        {
+          "type": "creativeTask",
+          "title": "Adventure Conclusion",
+          "instructions": "Create or design something to complete your adventure using what you've learned"
+        }
+      ]
     }
   ],
-  "estimatedTime": ${lessonDuration},
-  "gameElements": {
-    "points": "How students earn points",
-    "achievements": ["Badge 1", "Badge 2"],
-    "progression": "How they unlock new stages"
-  }
-}`;
+  "estimatedTime": ${lessonDuration}
+}
+
+CRITICAL: Return ONLY the JSON object above. No additional text, markdown, or explanations. The JSON must be complete and valid.`;
 }
 
 // Convert grade level string to number
@@ -186,34 +214,36 @@ function buildPromptContext(request: AdventureLessonRequest): PromptContext {
   };
 }
 
-// Call OpenAI API
 async function callOpenAI(prompt: string): Promise<string> {
   const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
   
   if (!openaiApiKey) {
+    console.error('🔑 OPENAI_API_KEY not found in environment');
     throw new Error('OPENAI_API_KEY not configured');
   }
 
   console.log('🤖 Calling OpenAI for adventure lesson generation...');
   console.log('🔑 API Key configured:', openaiApiKey ? `Yes (${openaiApiKey.substring(0, 8)}...)` : 'No');
   console.log('✏️ Generated prompt length:', prompt.length);
+  console.log('📝 Prompt preview:', prompt.substring(0, 300) + '...');
   
   const requestBody = {
     model: 'gpt-5-mini-2025-08-07',
     messages: [
       {
         role: 'system',
-        content: 'You are an educational content creator. Generate lesson plans in JSON format. Be concise.'
+        content: 'You are an expert educational content creator specializing in interactive, story-driven lessons. Always return valid JSON responses with detailed, engaging educational content.'
       },
       {
         role: 'user',
         content: prompt
       }
     ],
-    max_completion_tokens: 2000,
+    max_completion_tokens: 3000,
   };
 
   console.log('📤 Request model:', requestBody.model);
+  console.log('📤 Request body preview:', JSON.stringify(requestBody).substring(0, 200) + '...');
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -225,21 +255,29 @@ async function callOpenAI(prompt: string): Promise<string> {
   });
 
   console.log('📥 Response status:', response.status);
+  console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('OpenAI API error:', response.status, errorText);
+    console.error('❌ OpenAI API error:', response.status, errorText);
     throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
-  console.log('🤖 OpenAI response received');
+  console.log('🤖 OpenAI response received:', {
+    id: data.id,
+    model: data.model,
+    choices: data.choices?.length,
+    usage: data.usage,
+    finishReason: data.choices?.[0]?.finish_reason
+  });
   
   if (!data.choices?.[0]?.message?.content) {
-    console.error('Invalid OpenAI response - missing content:', JSON.stringify(data));
+    console.error('❌ Invalid OpenAI response - missing content:', JSON.stringify(data, null, 2));
     
     // Check if it was truncated due to length
     if (data.choices?.[0]?.finish_reason === 'length') {
+      console.error('❌ Response was truncated due to length limit');
       throw new Error('Response truncated due to length limit. Please try again with a shorter prompt.');
     }
     
@@ -247,6 +285,9 @@ async function callOpenAI(prompt: string): Promise<string> {
   }
   
   const content = data.choices[0].message.content.trim();
+  console.log('📄 Response content length:', content.length);
+  console.log('📄 Response content preview:', content.substring(0, 500) + '...');
+  
   if (!content) {
     throw new Error('OpenAI returned empty content');
   }
@@ -257,23 +298,63 @@ async function callOpenAI(prompt: string): Promise<string> {
 
 // Parse and validate JSON response
 function parseAndValidateLesson(jsonContent: string): any {
+  console.log('🔍 Parsing JSON response...');
+  console.log('📄 Raw content length:', jsonContent.length);
+  console.log('📄 Content preview:', jsonContent.substring(0, 200) + '...');
+  
+  // Try to extract JSON from the response (in case there's extra text)
+  let jsonString = jsonContent.trim();
+  
+  // Look for JSON object boundaries
+  const jsonStart = jsonString.indexOf('{');
+  const jsonEnd = jsonString.lastIndexOf('}') + 1;
+  
+  if (jsonStart >= 0 && jsonEnd > jsonStart) {
+    jsonString = jsonString.substring(jsonStart, jsonEnd);
+    console.log('📄 Extracted JSON substring:', jsonString.substring(0, 200) + '...');
+  }
+  
   try {
-    const parsed = JSON.parse(jsonContent);
+    const parsed = JSON.parse(jsonString);
+    console.log('✅ Successfully parsed JSON');
+    console.log('📚 Parsed lesson preview:', {
+      title: parsed.title,
+      subject: parsed.subject,
+      gradeLevel: parsed.gradeLevel,
+      stagesCount: parsed.stages?.length,
+      scenario: parsed.scenario?.substring(0, 100) + '...'
+    });
     
-    // Basic validation
-    if (!parsed.title || !parsed.scenario || !parsed.stages) {
-      throw new Error('Missing required fields in generated lesson');
+    // Enhanced validation
+    if (!parsed.title || !parsed.subject || !parsed.scenario) {
+      console.error('❌ Missing required top-level fields:', {
+        hasTitle: !!parsed.title,
+        hasSubject: !!parsed.subject,
+        hasScenario: !!parsed.scenario
+      });
+      throw new Error('Missing required fields: title, subject, or scenario');
     }
     
     if (!Array.isArray(parsed.stages) || parsed.stages.length === 0) {
-      throw new Error('Lesson must have at least one stage');
+      console.error('❌ Invalid stages array:', parsed.stages);
+      throw new Error('Lesson must have at least one stage with valid structure');
     }
     
+    // Validate each stage has required fields
+    parsed.stages.forEach((stage, index) => {
+      if (!stage.title || !stage.duration || !Array.isArray(stage.activities)) {
+        console.error(`❌ Stage ${index} missing required fields:`, stage);
+        throw new Error(`Stage ${index + 1} is missing required fields (title, duration, or activities)`);
+      }
+    });
+    
+    console.log('✅ Lesson validation passed');
     return parsed;
   } catch (error) {
-    console.error('Failed to parse OpenAI response as JSON:', error);
-    console.error('Raw content:', jsonContent.substring(0, 500) + '...');
-    throw new Error('Failed to parse lesson content from AI response');
+    console.error('❌ Failed to parse OpenAI response as JSON:', error);
+    console.error('📄 Full response content:', jsonContent);
+    console.error('🔍 Attempted JSON string:', jsonString);
+    throw new Error(`Failed to parse lesson content: ${error.message}. Raw response: ${jsonContent.substring(0, 500)}...`);
   }
 }
 
