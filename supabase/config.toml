@@ -1,3 +1,7 @@
 project_id = "yphkfkpfdpdmllotpqua"
+
 [functions.cover-generator]
+verify_jwt = false
+
+[functions.generate-adventure-lesson]
 verify_jwt = false

@@ -9,6 +9,7 @@ import type { AdventureUniverse } from "@/services/adventure/service";
 import adventureIllustration from "@/assets/adventure-illustration.jpg";
 import digitalDetoxCover from "@/assets/digital-detox-cover.webp";
 import UniverseImage from "@/components/UniverseImage";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function TodaysAdventure() {
   const { user } = useAuth();
@@ -49,19 +50,75 @@ export default function TodaysAdventure() {
   const handleStartAdventure = async (universe: AdventureUniverse, isRecap: boolean) => {
     if (!user?.id) return;
     
-    console.log('🚀 Starting adventure:', universe.title, isRecap ? '(Recap)' : '(New)');
+    console.log('🚀 Starting adventure lesson generation:', universe.title, isRecap ? '(Recap)' : '(New)');
     
-    // TODO: Navigate to adventure experience
-    // navigate(`/adventure/${universe.id}`, { 
-    //   state: { 
-    //     universe, 
-    //     isRecap,
-    //     startTime: new Date().toISOString()
-    //   } 
-    // });
-    
-    // For now, just mark as started (you might want to do this when actually completed)
-    // await AdventureService.completeAdventure(user.id, universe.id, isRecap);
+    try {
+      setLoading(true);
+      
+      // Call our new edge function to generate the lesson
+      const { data: lessonData, error } = await supabase.functions.invoke('generate-adventure-lesson', {
+        body: {
+          adventure: {
+            id: universe.id,
+            title: universe.title,
+            subject: universe.subject,
+            category: universe.category || 'General',
+            gradeLevel: universe.grade_level,
+            description: universe.description,
+            tags: universe.metadata?.tags || [],
+            crossSubjects: universe.metadata?.crossSubjects || []
+          },
+          studentProfile: {
+            abilities: 'mixed ability with both support and challenges',
+            learningStyle: 'multimodal approach',
+            interests: ['technology', 'games', 'creativity']
+          },
+          schoolSettings: {
+            curriculum: 'broadly accepted topics and skills for that grade',
+            teachingPerspective: 'balanced, evidence-based style',
+            lessonDuration: 35
+          },
+          teacherPreferences: {
+            subjectWeights: {
+              [universe.subject]: 'medium'
+            }
+          },
+          calendarContext: {
+            keywords: ['interactive learning', 'problem solving'],
+            duration: 'single session'
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('❌ Adventure lesson generation failed:', error);
+        throw new Error(error.message || 'Failed to generate lesson');
+      }
+      
+      if (lessonData?.success) {
+        console.log('✅ Adventure lesson generated successfully!');
+        console.log('📚 Lesson preview:', lessonData.lesson.title);
+        console.log('🎯 Number of stages:', lessonData.lesson.stages?.length);
+        
+        // TODO: Navigate to adventure lesson display
+        // For now, just log the success
+        alert(`Adventure lesson "${lessonData.lesson.title}" generated successfully! 
+        
+Stages: ${lessonData.lesson.stages?.length}
+Estimated time: ${lessonData.lesson.estimatedTime} minutes`);
+        
+        // Mark as started (optional)
+        await AdventureService.completeAdventure(user.id, universe.id, isRecap);
+      } else {
+        throw new Error('Lesson generation failed');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error starting adventure:', error);
+      setError(error instanceof Error ? error.message : 'Failed to start adventure');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Auto-load today's adventure when component mounts
