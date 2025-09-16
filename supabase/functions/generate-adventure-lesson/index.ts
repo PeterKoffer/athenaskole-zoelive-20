@@ -190,14 +190,14 @@ async function callOpenAI(prompt: string): Promise<string> {
     messages: [
       {
         role: 'system',
-        content: 'You are an expert educational content generator. Create a complete lesson plan and return only valid JSON as requested. Be concise but comprehensive.'
+        content: 'You are an educational content creator. Generate lesson plans in JSON format. Be concise.'
       },
       {
         role: 'user',
         content: prompt
       }
     ],
-    max_completion_tokens: 4000,
+    max_completion_tokens: 2000,
   };
 
   console.log('📤 Request model:', requestBody.model);
@@ -301,10 +301,12 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let requestData: AdventureLessonRequest | null = null;
+
   try {
     console.log('🚀 Starting generate-adventure-lesson function');
     
-    const requestData: AdventureLessonRequest = await req.json();
+    requestData = await req.json();
     console.log('📨 Received request for adventure:', requestData?.adventure?.title);
     
     if (!requestData?.adventure) {
@@ -343,7 +345,7 @@ serve(async (req) => {
           id: "intro",
           title: "Introduction",
           description: "Get familiar with the adventure setting",
-          duration: 5,
+          duration: 15,
           activities: [
             {
               type: "exploration",
@@ -357,7 +359,7 @@ serve(async (req) => {
           id: "main",
           title: "Main Challenge", 
           description: "Tackle the primary learning objectives",
-          duration: 20,
+          duration: 90,
           activities: [
             {
               type: "problem_solving",
@@ -371,7 +373,7 @@ serve(async (req) => {
           id: "conclusion",
           title: "Wrap Up",
           description: "Reflect on what you've learned",
-          duration: 10,
+          duration: 30,
           activities: [
             {
               type: "reflection",
@@ -382,7 +384,7 @@ serve(async (req) => {
           ]
         }
       ],
-      estimatedTime: 35,
+      estimatedTime: 135,
       materials: ["Computer or tablet", "Notebook for reflection"],
       assessmentCriteria: ["Understanding of key concepts", "Problem-solving approach", "Engagement with activities"]
     };
