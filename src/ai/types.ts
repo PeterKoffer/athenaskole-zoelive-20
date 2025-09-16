@@ -8,6 +8,7 @@ export type LessonRequest = {
   studentProfile?: {
     ability: string;
     learningStyle?: string;
+    interests?: string[]; // Added for student interests parameter
     // Educational localization fields
     countryCode?: string;
     locale?: string;
@@ -21,6 +22,14 @@ export type LessonRequest = {
     lessonDurations?: Record<string, number>; // hours per class
     teachingPerspective?: TeachingPerspective;
   };
+  // Calendar context for lessons
+  calendarContext?: {
+    keywords?: string[];
+    duration?: string; // e.g., "daily", "weekly", "unit"
+    timeframe?: string;
+  };
+  // Optional class context
+  classId?: string;
 };
 
 export type Activity = {

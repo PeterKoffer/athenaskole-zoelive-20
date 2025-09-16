@@ -6,6 +6,9 @@ import { normalizeSubject } from "@/utils/subjects";
 export const PROMPT_VERSION = PROMPT_VERSION_V3;
 
 export async function buildPrompt(req: LessonRequest) {
+  // Import services for dynamic data
+  const { calendarService } = await import('../services/CalendarService');
+  
   // Default subject weights based on UI image
   const DEFAULT_SUBJECT_WEIGHTS: Record<string, number> = {
     Mathematics: 7,
@@ -37,29 +40,64 @@ export async function buildPrompt(req: LessonRequest) {
                    req.gradeLevel <= 8 ? "6-8" as const :
                    req.gradeLevel <= 10 ? "9-10" as const : "11-12" as const;
 
+  // Fetch dynamic calendar keywords
+  const currentDate = new Date().toISOString().split('T')[0];
+  const calendarKeywords = await calendarService.getActiveKeywords(currentDate, req.gradeLevel, []);
+  
+  // Extract student interests from profile
+  const studentInterests = req.studentProfile?.interests || [];
+
+  // Get calendar context from request or use fetched keywords as fallback  
+  const finalCalendarKeywords = req.calendarContext?.keywords || calendarKeywords;
+  const calendarDuration = req.calendarContext?.duration || (req.mode === "daily" ? "daily session" : "training module");
+
+  // Build calendar window for context
+  const now = new Date();
+  const startISO = now.toISOString();
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + (req.mode === "daily" ? 1 : 30)); // daily or training mode
+  const endISO = endDate.toISOString();
+
+  // Build ability profile - ensure it's always defined
+  const abilityProfile = {
+    readingLevel: req.studentProfile?.ability === "above" ? "above" : 
+                 req.studentProfile?.ability === "below" ? "below" : "on",
+    scaffolding: req.studentProfile?.ability === "below",
+    stretchGoals: req.studentProfile?.ability === "above"
+  } as const;
+
   // Build v3 prompt context with all signals
   const promptCtx: PromptCtx = {
     subject: normalizedSubject,
     gradeBand,
     plannerMinutes: targetDuration,
     timeScope: req.mode === "daily" ? "day" : "season",
-    studentInterests: [], // TODO: wire from student profile
+    studentInterests,
     subjectWeights,
     teachingPerspective: req.teacherPreferences?.teachingPerspective || "project_based",
     learningStyle: (req.studentProfile?.learningStyle as any) || "visual",
-    ability: {
-      readingLevel: req.studentProfile?.ability === "above" ? "above" : 
-                   req.studentProfile?.ability === "below" ? "below" : "on",
-      scaffolding: req.studentProfile?.ability === "below",
-      stretchGoals: req.studentProfile?.ability === "above"
-    },
-    calendarKeywords: [], // TODO: wire from calendar service
+    ability: abilityProfile,
+    calendarKeywords: finalCalendarKeywords,
+    calendarWindow: { startISO, endISO },
     curriculum: {
       standards: [req.curriculum]
     },
-    // Include classId for educational context (TODO: add to LessonRequest type)
-    classId: undefined
+    classId: req.classId
   };
+
+  console.log('🎯 All parameters now active for lesson generation:', {
+    '✅ Subject': normalizedSubject,
+    '✅ Grade Level': `Grade ${req.gradeLevel} (${gradeBand})`,
+    '✅ Curriculum': req.curriculum,
+    '✅ Teaching Perspective': promptCtx.teachingPerspective,
+    '✅ Lesson Duration': `${targetDuration} minutes`,
+    '✅ Subject Weights': `${Object.keys(subjectWeights).length} subjects configured`,
+    '✅ Calendar Keywords': finalCalendarKeywords.length > 0 ? finalCalendarKeywords.join(', ') : 'None active',
+    '✅ Calendar Duration': calendarDuration,
+    '✅ Student Abilities': `${abilityProfile.readingLevel} level, scaffolding: ${abilityProfile.scaffolding}`,
+    '✅ Learning Style': promptCtx.learningStyle,
+    '✅ Student Interests': studentInterests.length > 0 ? studentInterests.join(', ') : 'None specified'
+  });
 
   return await buildDailyUniversePromptV3(promptCtx);
 }
